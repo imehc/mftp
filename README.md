@@ -1,4 +1,4 @@
-# mftp — Termius Lite
+# mftp
 
 一个轻量的桌面 SSH/SFTP 客户端，基于 **Tauri v2 + React 19 + Vite + Tailwind v4 + shadcn**。
 后端用 Rust `ssh2`（libssh2）实现 shell 与 SFTP 通道，前端用 xterm.js 呈现交互式终端。
@@ -26,13 +26,6 @@ pnpm tauri build   # 打包
 2. 密钥认证：先点 **钥匙** 图标进入密钥管理，导入私钥（可标记口令保护）。
 3. 双击主机或点闪电图标连接 → 打开终端标签。
 4. 标签上的文件夹图标可切换到该连接的 **SFTP** 文件管理视图。
-
-## 数据位置
-
-macOS：`~/Library/Application Support/com.imehc.mftp/`
-（`hosts.json`、`keys.json`、私钥目录 `keys/` 权限 0600）
-
-> 说明：这是 lite 版，主机密码与私钥以本地文件形式保存，未做加密的密钥库。请勿在不可信设备上使用。
 
 ## 技术栈
 
