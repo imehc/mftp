@@ -44,10 +44,30 @@ export const sftpRename = (sessionId: string, from: string, to: string) =>
   invoke<void>("sftp_rename", { sessionId, from, to });
 export const sftpDelete = (sessionId: string, path: string, isDir: boolean) =>
   invoke<void>("sftp_delete", { sessionId, path, isDir });
-export const sftpDownload = (sessionId: string, remote: string, local: string) =>
-  invoke<void>("sftp_download", { sessionId, remote, local });
-export const sftpUpload = (sessionId: string, local: string, remote: string) =>
-  invoke<void>("sftp_upload", { sessionId, local, remote });
+export const sftpDownload = (
+  sessionId: string,
+  remote: string,
+  local: string,
+  transferId?: string,
+) =>
+  invoke<void>("sftp_download", {
+    sessionId,
+    remote,
+    local,
+    transferId: transferId ?? null,
+  });
+export const sftpUpload = (
+  sessionId: string,
+  local: string,
+  remote: string,
+  transferId?: string,
+) =>
+  invoke<void>("sftp_upload", {
+    sessionId,
+    local,
+    remote,
+    transferId: transferId ?? null,
+  });
 export const sftpExists = (sessionId: string, path: string) =>
   invoke<boolean>("sftp_exists", { sessionId, path });
 export const sftpUploadDir = (
@@ -55,18 +75,29 @@ export const sftpUploadDir = (
   localDir: string,
   remoteParent: string,
   remoteName: string,
+  transferId?: string,
 ) =>
   invoke<void>("sftp_upload_dir", {
     sessionId,
     localDir,
     remoteParent,
     remoteName,
+    transferId: transferId ?? null,
   });
 export const sftpDownloadDir = (
   sessionId: string,
   remoteDir: string,
   localArchive: string,
-) => invoke<void>("sftp_download_dir", { sessionId, remoteDir, localArchive });
+  transferId?: string,
+) =>
+  invoke<void>("sftp_download_dir", {
+    sessionId,
+    remoteDir,
+    localArchive,
+    transferId: transferId ?? null,
+  });
+export const sftpCancelTransfer = (transferId: string) =>
+  invoke<void>("sftp_cancel_transfer", { transferId });
 export const sftpExtract = (
   sessionId: string,
   remoteArchive: string,

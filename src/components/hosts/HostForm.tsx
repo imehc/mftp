@@ -107,131 +107,135 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{host ? "编辑主机" : "新建主机"}</DialogTitle>
         </DialogHeader>
 
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="host-label">名称</FieldLabel>
-            <Input
-              id="host-label"
-              value={form.label}
-              onChange={(e) => set("label", e.target.value)}
-              placeholder="My Server"
-            />
-          </Field>
-
-          <div className="grid grid-cols-[1fr_100px] gap-3">
+        <div className="min-h-0 overflow-y-auto pr-1">
+          <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="host-addr">地址</FieldLabel>
+              <FieldLabel htmlFor="host-label">名称</FieldLabel>
               <Input
-                id="host-addr"
-                value={form.host}
-                onChange={(e) => set("host", e.target.value)}
-                placeholder="example.com"
+                id="host-label"
+                value={form.label}
+                onChange={(e) => set("label", e.target.value)}
+                placeholder="My Server"
               />
             </Field>
+
+            <div className="grid grid-cols-[1fr_100px] gap-3">
+              <Field>
+                <FieldLabel htmlFor="host-addr">地址</FieldLabel>
+                <Input
+                  id="host-addr"
+                  value={form.host}
+                  onChange={(e) => set("host", e.target.value)}
+                  placeholder="example.com"
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="host-port">端口</FieldLabel>
+                <Input
+                  id="host-port"
+                  type="number"
+                  value={form.port}
+                  onChange={(e) => set("port", Number(e.target.value) || 22)}
+                />
+              </Field>
+            </div>
+
             <Field>
-              <FieldLabel htmlFor="host-port">端口</FieldLabel>
+              <FieldLabel htmlFor="host-user">用户名</FieldLabel>
               <Input
-                id="host-port"
-                type="number"
-                value={form.port}
-                onChange={(e) => set("port", Number(e.target.value) || 22)}
+                id="host-user"
+                value={form.username}
+                onChange={(e) => set("username", e.target.value)}
+                placeholder="root"
               />
             </Field>
-          </div>
 
-          <Field>
-            <FieldLabel htmlFor="host-user">用户名</FieldLabel>
-            <Input
-              id="host-user"
-              value={form.username}
-              onChange={(e) => set("username", e.target.value)}
-              placeholder="root"
-            />
-          </Field>
-
-          <Field>
-            <FieldLabel>认证方式</FieldLabel>
-            <ToggleGroup
-              type="single"
-              value={form.authType}
-              onValueChange={(v) => v && set("authType", v as HostInput["authType"])}
-              variant="outline"
-              className="w-full"
-            >
-              <ToggleGroupItem value="password" className="flex-1">
-                密码
-              </ToggleGroupItem>
-              <ToggleGroupItem value="key" className="flex-1">
-                密钥
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </Field>
-
-          {form.authType === "password" ? (
             <Field>
-              <FieldLabel htmlFor="host-pw">密码</FieldLabel>
-              <Input
-                id="host-pw"
-                type="password"
-                value={form.password ?? ""}
-                onChange={(e) => set("password", e.target.value)}
-                placeholder="••••••••"
-              />
-            </Field>
-          ) : (
-            <Field>
-              <FieldLabel>密钥</FieldLabel>
-              <Select
-                value={form.keyId ?? ""}
-                onValueChange={(v) => set("keyId", v || null)}
-                disabled={missingKeys}
+              <FieldLabel>认证方式</FieldLabel>
+              <ToggleGroup
+                type="single"
+                value={form.authType}
+                onValueChange={(v) =>
+                  v && set("authType", v as HostInput["authType"])
+                }
+                variant="outline"
+                className="w-full"
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="选择密钥…" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {keys.map((k) => (
-                      <SelectItem key={k.id} value={k.id}>
-                        {k.label}
-                        {k.hasPassphrase ? " (需口令)" : ""}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {missingKeys ? (
-                <FieldDescription>
-                  暂无密钥，请先在密钥管理中导入。
-                </FieldDescription>
-              ) : null}
+                <ToggleGroupItem value="password" className="flex-1">
+                  密码
+                </ToggleGroupItem>
+                <ToggleGroupItem value="key" className="flex-1">
+                  密钥
+                </ToggleGroupItem>
+              </ToggleGroup>
             </Field>
-          )}
 
-          <Field>
-            <FieldLabel htmlFor="host-defpath">默认目录</FieldLabel>
-            <Input
-              id="host-defpath"
-              value={form.defaultPath ?? ""}
-              onChange={(e) => set("defaultPath", e.target.value)}
-              placeholder="/var/www（留空则用主目录）"
-            />
-            <FieldDescription>
-              打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。
-            </FieldDescription>
-          </Field>
+            {form.authType === "password" ? (
+              <Field>
+                <FieldLabel htmlFor="host-pw">密码</FieldLabel>
+                <Input
+                  id="host-pw"
+                  type="password"
+                  value={form.password ?? ""}
+                  onChange={(e) => set("password", e.target.value)}
+                  placeholder="••••••••"
+                />
+              </Field>
+            ) : (
+              <Field>
+                <FieldLabel>密钥</FieldLabel>
+                <Select
+                  value={form.keyId ?? ""}
+                  onValueChange={(v) => set("keyId", v || null)}
+                  disabled={missingKeys}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="选择密钥…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {keys.map((k) => (
+                        <SelectItem key={k.id} value={k.id}>
+                          {k.label}
+                          {k.hasPassphrase ? " (需口令)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                {missingKeys ? (
+                  <FieldDescription>
+                    暂无密钥，请先在密钥管理中导入。
+                  </FieldDescription>
+                ) : null}
+              </Field>
+            )}
 
-          {error ? (
-            <FieldDescription className="text-destructive">
-              {error}
-            </FieldDescription>
-          ) : null}
-        </FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="host-defpath">默认目录</FieldLabel>
+              <Input
+                id="host-defpath"
+                value={form.defaultPath ?? ""}
+                onChange={(e) => set("defaultPath", e.target.value)}
+                placeholder="/var/www（留空则用主目录）"
+              />
+              <FieldDescription>
+                打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。
+              </FieldDescription>
+            </Field>
+
+            {error ? (
+              <FieldDescription className="text-destructive">
+                {error}
+              </FieldDescription>
+            ) : null}
+          </FieldGroup>
+        </div>
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>

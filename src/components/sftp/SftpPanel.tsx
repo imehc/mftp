@@ -10,6 +10,7 @@ import {
   FolderPlus,
   FolderUp,
   Home,
+  LoaderCircle,
   Pencil,
   RefreshCw,
   Trash2,
@@ -19,6 +20,7 @@ import { toast } from "sonner";
 import type { Session, SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { useHostsStore } from "~/store/hosts";
+import { useTransfersStore } from "~/store/transfers";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -64,6 +66,23 @@ function formatSize(bytes: number): string {
   return `${v.toFixed(1)} ${units[i]}`;
 }
 
+function nextTransferId(): string {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+}
+
+function formatMtime(seconds: number): string {
+  if (!seconds) return "—";
+  return new Date(seconds * 1000).toLocaleString();
+}
+
+function entryType(entry: SftpEntry): string {
+  if (entry.isDir) return "文件夹";
+  if (entry.isSymlink) return "链接";
+  const dot = entry.name.lastIndexOf(".");
+  if (dot <= 0 || dot === entry.name.length - 1) return "文件";
+  return entry.name.slice(dot + 1).toLowerCase();
+}
+
 function joinPath(dir: string, name: string): string {
   return dir.endsWith("/") ? `${dir}${name}` : `${dir}/${name}`;
 }
@@ -100,19 +119,34 @@ type ConflictState =
     }
   | null;
 
+type LoadingAction = "home" | "parent" | "refresh" | "list" | `enter:${string}`;
+
+function loadingLabel(action: LoadingAction | null): string {
+  if (!action) return "加载中…";
+  if (action === "home") return "正在打开主目录…";
+  if (action === "parent") return "正在打开上级目录…";
+  if (action === "refresh") return "正在刷新…";
+  if (action.startsWith("enter:")) return "正在打开文件夹…";
+  return "加载中…";
+}
+
 export default function SftpPanel({ session }: Props) {
   const sessionId = session.id;
   const [cwd, setCwd] = useState<string | null>(null);
   const [entries, setEntries] = useState<SftpEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<LoadingAction | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<PromptState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const [conflict, setConflict] = useState<ConflictState>(null);
+  const startTransfer = useTransfersStore((s) => s.start);
+  const finishTransfer = useTransfersStore((s) => s.finish);
 
   const load = useCallback(
-    async (path: string) => {
+    async (path: string, action: LoadingAction = "list") => {
       setLoading(true);
+      setLoadingAction(action);
       try {
         const list = await ipc.sftpList(sessionId, path);
         setEntries(list);
@@ -121,6 +155,7 @@ export default function SftpPanel({ session }: Props) {
         toast.error(String(e));
       } finally {
         setLoading(false);
+        setLoadingAction(null);
       }
     },
     [sessionId],
@@ -131,6 +166,7 @@ export default function SftpPanel({ session }: Props) {
     let cancelled = false;
     (async () => {
       setLoading(true);
+      setLoadingAction("list");
       try {
         const host = useHostsStore
           .getState()
@@ -141,6 +177,7 @@ export default function SftpPanel({ session }: Props) {
         if (!cancelled) {
           toast.error(String(e));
           setLoading(false);
+          setLoadingAction(null);
         }
       }
     })();
@@ -150,11 +187,15 @@ export default function SftpPanel({ session }: Props) {
   }, [sessionId, session.hostId, load]);
 
   async function goHome() {
+    setLoading(true);
+    setLoadingAction("home");
     try {
       const home = await ipc.sftpHome(sessionId);
-      await load(home);
+      await load(home, "home");
     } catch (e) {
       toast.error(String(e));
+      setLoading(false);
+      setLoadingAction(null);
     }
   }
 
@@ -169,16 +210,23 @@ export default function SftpPanel({ session }: Props) {
     });
     if (typeof selected !== "string") return;
     const name = baseName(selected);
+    const transferId = nextTransferId();
     const tid = toast.loading(`上传 ${name}…`);
-    setBusy(`上传 ${name}…`);
+    startTransfer(transferId, `上传 ${name}`);
     try {
-      await ipc.sftpUpload(sessionId, selected, joinPath(cwd, name));
+      await ipc.sftpUpload(sessionId, selected, joinPath(cwd, name), transferId);
+      finishTransfer(transferId, "success");
       toast.success(`已上传 ${name}`, { id: tid });
       await load(cwd);
     } catch (e) {
-      toast.error(String(e), { id: tid });
-    } finally {
-      setBusy(null);
+      const message = String(e);
+      if (message === "传输已取消") {
+        finishTransfer(transferId, "cancelled");
+        toast.info(`已取消上传 ${name}`, { id: tid });
+      } else {
+        finishTransfer(transferId, "error", message);
+        toast.error(message, { id: tid });
+      }
     }
   }
 
@@ -186,15 +234,22 @@ export default function SftpPanel({ session }: Props) {
     if (entry.isDir) return onDownloadDir(entry);
     const dest = await saveDialog({ defaultPath: entry.name, title: "保存到" });
     if (typeof dest !== "string") return;
+    const transferId = nextTransferId();
     const tid = toast.loading(`下载 ${entry.name}…`);
-    setBusy(`下载 ${entry.name}…`);
+    startTransfer(transferId, `下载 ${entry.name}`);
     try {
-      await ipc.sftpDownload(sessionId, entry.path, dest);
+      await ipc.sftpDownload(sessionId, entry.path, dest, transferId);
+      finishTransfer(transferId, "success");
       toast.success(`已下载 ${entry.name}`, { id: tid });
     } catch (e) {
-      toast.error(String(e), { id: tid });
-    } finally {
-      setBusy(null);
+      const message = String(e);
+      if (message === "传输已取消") {
+        finishTransfer(transferId, "cancelled");
+        toast.info(`已取消下载 ${entry.name}`, { id: tid });
+      } else {
+        finishTransfer(transferId, "error", message);
+        toast.error(message, { id: tid });
+      }
     }
   }
 
@@ -206,15 +261,18 @@ export default function SftpPanel({ session }: Props) {
       title: "下载文件夹",
     });
     if (typeof dest !== "string") return;
-    const tid = toast.loading(`正在下载 ${entry.name}…`);
-    setBusy(`下载 ${entry.name}…`);
+    const transferId = nextTransferId();
+    startTransfer(transferId, `下载 ${entry.name}`);
     try {
-      await ipc.sftpDownloadDir(sessionId, entry.path, dest);
-      toast.success(`已下载 ${baseName(dest)}`, { id: tid });
+      await ipc.sftpDownloadDir(sessionId, entry.path, dest, transferId);
+      finishTransfer(transferId, "success");
     } catch (e) {
-      toast.error(String(e), { id: tid });
-    } finally {
-      setBusy(null);
+      const message = String(e);
+      if (message === "传输已取消") {
+        finishTransfer(transferId, "cancelled");
+      } else {
+        finishTransfer(transferId, "error", message);
+      }
     }
   }
 
@@ -266,16 +324,23 @@ export default function SftpPanel({ session }: Props) {
 
   async function runUploadDir(localDir: string, remoteName: string) {
     if (!cwd) return;
+    const transferId = nextTransferId();
     const tid = toast.loading(`正在压缩并上传 ${remoteName}…`);
-    setBusy(`压缩上传 ${remoteName}…`);
+    startTransfer(transferId, `上传 ${remoteName}`);
     try {
-      await ipc.sftpUploadDir(sessionId, localDir, cwd, remoteName);
+      await ipc.sftpUploadDir(sessionId, localDir, cwd, remoteName, transferId);
+      finishTransfer(transferId, "success");
       toast.success(`已上传文件夹 ${remoteName}`, { id: tid });
       await load(cwd);
     } catch (e) {
-      toast.error(String(e), { id: tid });
-    } finally {
-      setBusy(null);
+      const message = String(e);
+      if (message === "传输已取消") {
+        finishTransfer(transferId, "cancelled");
+        toast.info(`已取消上传 ${remoteName}`, { id: tid });
+      } else {
+        finishTransfer(transferId, "error", message);
+        toast.error(message, { id: tid });
+      }
     }
   }
 
@@ -375,25 +440,44 @@ export default function SftpPanel({ session }: Props) {
     <div className="flex h-full flex-col bg-background">
       {/* Toolbar */}
       <div className="flex items-center gap-1 border-b border-border px-2 py-1.5">
-        <Button variant="ghost" size="icon-sm" title="主目录" onClick={goHome}>
-          <Home />
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          title="主目录"
+          onClick={goHome}
+          disabled={loading}
+        >
+          {loadingAction === "home" ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <Home />
+          )}
         </Button>
         <Button
           variant="ghost"
           size="icon-sm"
           title="上级目录"
-          onClick={() => cwd && load(parentPath(cwd))}
-          disabled={!cwd || cwd === "/"}
+          onClick={() => cwd && load(parentPath(cwd), "parent")}
+          disabled={loading || !cwd || cwd === "/"}
         >
-          <ArrowUp />
+          {loadingAction === "parent" ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <ArrowUp />
+          )}
         </Button>
         <Button
           variant="ghost"
           size="icon-sm"
           title="刷新"
-          onClick={() => cwd && load(cwd)}
+          onClick={() => cwd && load(cwd, "refresh")}
+          disabled={loading || !cwd}
         >
-          <RefreshCw className={cn(loading && "animate-spin")} />
+          {loadingAction === "refresh" ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <RefreshCw />
+          )}
         </Button>
         <div className="mx-1 flex-1 truncate rounded-md bg-muted px-2 py-1 font-mono text-xs">
           {cwd ?? "…"}
@@ -424,16 +508,21 @@ export default function SftpPanel({ session }: Props) {
       </div>
 
       {busy ? (
-        <div className="flex items-center gap-2 border-b border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 border-b border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground">
           <RefreshCw className="size-3 animate-spin" />
-          {busy}
+          <span className="min-w-0 truncate text-foreground">{busy}</span>
         </div>
       ) : null}
 
       {/* Listing — a plain div list (not <table>) so content-visibility can
           skip painting off-screen rows, keeping scrolling smooth. */}
-      <div className="flex-1 overflow-y-auto">
-        {!loading && entries.length === 0 ? (
+      <div className="relative flex-1 overflow-y-auto">
+        {loading && entries.length === 0 ? (
+          <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+            <LoaderCircle className="size-4 animate-spin" />
+            加载中…
+          </div>
+        ) : !loading && entries.length === 0 ? (
           <Empty className="h-full">
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -443,17 +532,27 @@ export default function SftpPanel({ session }: Props) {
             </EmptyHeader>
           </Empty>
         ) : (
-          <div>
+          <div
+            key={cwd ?? "sftp-root"}
+            className={cn(
+              "sftp-list-content transition-opacity duration-150 ease-out",
+              loading && !busy && "opacity-60",
+            )}
+          >
             <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
               <span className="flex-1">名称</span>
-              <span className="w-20 text-right">大小</span>
+              <span className="w-36 text-left">修改日期</span>
+              <span className="w-16 text-left">类型</span>
+              <span className="w-20 text-left">大小</span>
               <span className="w-32 text-right">操作</span>
             </div>
             {entries.map((entry) => (
               <SftpRow
                 key={entry.path}
                 entry={entry}
-                onEnter={load}
+                loading={loadingAction === `enter:${entry.path}`}
+                disabled={loading}
+                onEnter={(path) => load(path, `enter:${path}`)}
                 onDownload={onDownload}
                 onExtract={onExtract}
                 onRename={(e) => setPrompt({ kind: "rename", entry: e })}
@@ -462,6 +561,14 @@ export default function SftpPanel({ session }: Props) {
             ))}
           </div>
         )}
+        {loading && entries.length > 0 && !busy ? (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70 backdrop-blur-[1px] duration-150 animate-in fade-in-0">
+            <div className="flex items-center gap-2 rounded-md border border-border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-sm duration-150 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-1">
+              <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+              {loadingLabel(loadingAction)}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <PromptDialog
@@ -521,6 +628,8 @@ export default function SftpPanel({ session }: Props) {
 
 interface RowProps {
   entry: SftpEntry;
+  loading: boolean;
+  disabled: boolean;
   onEnter: (path: string) => void;
   onDownload: (entry: SftpEntry) => void;
   onExtract: (entry: SftpEntry) => void;
@@ -535,6 +644,8 @@ interface RowProps {
  */
 const SftpRow = memo(function SftpRow({
   entry,
+  loading,
+  disabled,
   onEnter,
   onDownload,
   onExtract,
@@ -547,9 +658,11 @@ const SftpRow = memo(function SftpRow({
       <button
         className="flex min-w-0 flex-1 items-center gap-2 text-left"
         onDoubleClick={() => entry.isDir && onEnter(entry.path)}
-        disabled={!entry.isDir}
+        disabled={!entry.isDir || disabled}
       >
-        {entry.isDir ? (
+        {loading ? (
+          <LoaderCircle className="size-4 shrink-0 animate-spin text-muted-foreground" />
+        ) : entry.isDir ? (
           <Folder className="size-4 shrink-0 text-primary" />
         ) : canExtract ? (
           <FileArchive className="size-4 shrink-0 text-muted-foreground" />
@@ -560,7 +673,13 @@ const SftpRow = memo(function SftpRow({
           {entry.name}
         </span>
       </button>
-      <span className="w-20 text-right text-xs text-muted-foreground">
+      <span className="w-36 truncate text-left text-xs text-muted-foreground">
+        {formatMtime(entry.mtime)}
+      </span>
+      <span className="w-16 truncate text-left text-xs text-muted-foreground">
+        {entryType(entry)}
+      </span>
+      <span className="w-20 text-left text-xs text-muted-foreground">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
       <div className="flex w-32 justify-end gap-0.5 opacity-0 group-hover:opacity-100">

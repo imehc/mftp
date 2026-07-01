@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from '@tailwindcss/vite'
-import { resolve } from 'path';
+import tailwindcss from "@tailwindcss/vite";
+import { resolve } from "path";
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -30,9 +30,32 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
-  resolve:{
-    alias:{
-      '~': resolve(__dirname, 'src'),
-    }
-  }
+  build: {
+    rolldownOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("/@xterm/")) return "vendor-xterm";
+          if (id.includes("/@tauri-apps/")) return "vendor-tauri";
+          if (id.includes("/react/") || id.includes("/react-dom/")) {
+            return "vendor-react";
+          }
+          if (
+            id.includes("/lucide-react/") ||
+            id.includes("/radix-ui/") ||
+            id.includes("/sonner/") ||
+            id.includes("/next-themes/")
+          ) {
+            return "vendor-ui";
+          }
+          return "vendor";
+        },
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      "~": resolve(__dirname, "src"),
+    },
+  },
 }));

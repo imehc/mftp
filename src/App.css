@@ -128,3 +128,26 @@
     @apply font-sans;
     }
 }
+
+@layer components {
+  .sftp-list-content {
+    animation: sftp-list-in 140ms ease-out;
+  }
+}
+
+@keyframes sftp-list-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sftp-list-content {
+    animation: none;
+  }
+}
