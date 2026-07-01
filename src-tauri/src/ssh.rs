@@ -42,12 +42,20 @@ struct ShellHandle {
     tx: Sender<ShellJob>,
 }
 
+/// A cached SFTP connection: the initialized subsystem plus the session that
+/// backs it (kept alive alongside so the channel stays open).
+struct SftpConn {
+    sftp: ssh2::Sftp,
+    _session: Session,
+}
+
 #[derive(Default)]
 pub struct Manager {
     auth: Mutex<HashMap<String, AuthMaterial>>,
     shells: Mutex<HashMap<String, ShellHandle>>,
-    /// Lazily-created SFTP sessions (one blocking session per connection).
-    sftp: Mutex<HashMap<String, Arc<Mutex<Session>>>>,
+    /// Lazily-created SFTP connections (one per session). Cached so that the
+    /// SFTP subsystem is initialized only once, not on every operation.
+    sftp: Mutex<HashMap<String, Arc<Mutex<SftpConn>>>>,
 }
 
 /// Open + authenticate a blocking ssh2 session.
@@ -144,14 +152,19 @@ impl Manager {
 
     // ---- SFTP ----
 
-    /// Get (or lazily create) the SFTP session for this connection.
-    fn sftp_session(&self, session_id: &str) -> AppResult<Arc<Mutex<Session>>> {
+    /// Get (or lazily create) the SFTP connection for this session. The SFTP
+    /// subsystem is initialized once here and reused for every subsequent call.
+    fn sftp_conn(&self, session_id: &str) -> AppResult<Arc<Mutex<SftpConn>>> {
         if let Some(s) = self.sftp.lock().get(session_id) {
             return Ok(s.clone());
         }
         let mat = self.material(session_id)?;
         let sess = connect(&mat)?;
-        let arc = Arc::new(Mutex::new(sess));
+        let sftp = sess.sftp()?;
+        let arc = Arc::new(Mutex::new(SftpConn {
+            sftp,
+            _session: sess,
+        }));
         self.sftp
             .lock()
             .insert(session_id.to_string(), arc.clone());
@@ -159,21 +172,45 @@ impl Manager {
     }
 
     pub fn sftp_home(&self, session_id: &str) -> AppResult<String> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
         // realpath(".") resolves the login directory.
-        let home = sftp.realpath(Path::new("."))?;
+        let home = conn.sftp.realpath(Path::new("."))?;
         Ok(home.to_string_lossy().to_string())
     }
 
+    /// Resolve the directory to open first: the host's configured default if it
+    /// exists, otherwise the login/home directory, otherwise "/".
+    pub fn sftp_start_dir(&self, session_id: &str, preferred: Option<&str>) -> AppResult<String> {
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        if let Some(p) = preferred {
+            let p = p.trim();
+            if !p.is_empty() {
+                // stat() succeeds only if the path exists and is reachable.
+                if let Ok(stat) = conn.sftp.stat(Path::new(p)) {
+                    if stat.is_dir() {
+                        if let Ok(real) = conn.sftp.realpath(Path::new(p)) {
+                            return Ok(real.to_string_lossy().to_string());
+                        }
+                        return Ok(p.to_string());
+                    }
+                }
+            }
+        }
+        // Fall back to the home directory, then root.
+        match conn.sftp.realpath(Path::new(".")) {
+            Ok(home) => Ok(home.to_string_lossy().to_string()),
+            Err(_) => Ok("/".to_string()),
+        }
+    }
+
     pub fn sftp_list(&self, session_id: &str, path: &str) -> AppResult<Vec<SftpEntry>> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
         let base = Path::new(path);
         let mut entries = Vec::new();
-        for (p, stat) in sftp.readdir(base)? {
+        for (p, stat) in conn.sftp.readdir(base)? {
             let name = p
                 .file_name()
                 .map(|n| n.to_string_lossy().to_string())
@@ -200,39 +237,36 @@ impl Manager {
     }
 
     pub fn sftp_mkdir(&self, session_id: &str, path: &str) -> AppResult<()> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
-        sftp.mkdir(Path::new(path), 0o755)?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        conn.sftp.mkdir(Path::new(path), 0o755)?;
         Ok(())
     }
 
     pub fn sftp_rename(&self, session_id: &str, from: &str, to: &str) -> AppResult<()> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
-        sftp.rename(Path::new(from), Path::new(to), None)?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        conn.sftp.rename(Path::new(from), Path::new(to), None)?;
         Ok(())
     }
 
     pub fn sftp_delete(&self, session_id: &str, path: &str, is_dir: bool) -> AppResult<()> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
         if is_dir {
-            sftp.rmdir(Path::new(path))?;
+            // Recursively remove directory contents, then the directory itself.
+            remove_dir_recursive(&conn.sftp, Path::new(path))?;
         } else {
-            sftp.unlink(Path::new(path))?;
+            conn.sftp.unlink(Path::new(path))?;
         }
         Ok(())
     }
 
     /// Download a remote file to a local path.
     pub fn sftp_download(&self, session_id: &str, remote: &str, local: &str) -> AppResult<()> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
-        let mut remote_file = sftp.open(Path::new(remote))?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        let mut remote_file = conn.sftp.open(Path::new(remote))?;
         let mut local_file = std::fs::File::create(local)?;
         let mut buf = [0u8; 32 * 1024];
         loop {
@@ -247,11 +281,10 @@ impl Manager {
 
     /// Upload a local file to a remote path.
     pub fn sftp_upload(&self, session_id: &str, local: &str, remote: &str) -> AppResult<()> {
-        let sess = self.sftp_session(session_id)?;
-        let sess = sess.lock();
-        let sftp = sess.sftp()?;
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
         let mut local_file = std::fs::File::open(local)?;
-        let mut remote_file = sftp.create(Path::new(remote))?;
+        let mut remote_file = conn.sftp.create(Path::new(remote))?;
         let mut buf = [0u8; 32 * 1024];
         loop {
             let n = local_file.read(&mut buf)?;
@@ -262,6 +295,23 @@ impl Manager {
         }
         Ok(())
     }
+}
+
+/// Recursively delete a remote directory and all of its contents.
+fn remove_dir_recursive(sftp: &ssh2::Sftp, dir: &Path) -> AppResult<()> {
+    for (path, stat) in sftp.readdir(dir)? {
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if name == "." || name == ".." {
+            continue;
+        }
+        if stat.is_dir() {
+            remove_dir_recursive(sftp, &path)?;
+        } else {
+            sftp.unlink(&path)?;
+        }
+    }
+    sftp.rmdir(dir)?;
+    Ok(())
 }
 
 /// Runs on a dedicated thread; owns the session + shell channel exclusively.

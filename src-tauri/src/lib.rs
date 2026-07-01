@@ -43,6 +43,7 @@ pub fn run() {
             commands::ssh_resize,
             commands::ssh_disconnect,
             commands::sftp_home,
+            commands::sftp_start_dir,
             commands::sftp_list,
             commands::sftp_mkdir,
             commands::sftp_rename,

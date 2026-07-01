@@ -81,6 +81,7 @@ impl Storage {
             auth_type: input.auth_type,
             password: input.password,
             key_id: input.key_id,
+            default_path: input.default_path,
             created_at: ts,
             updated_at: ts,
         };
@@ -102,6 +103,7 @@ impl Storage {
         h.auth_type = input.auth_type;
         h.password = input.password;
         h.key_id = input.key_id;
+        h.default_path = input.default_path;
         h.updated_at = now_ms();
         let updated = h.clone();
         Self::write_json(&self.hosts_file(), &hosts)?;

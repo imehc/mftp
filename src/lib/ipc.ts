@@ -34,6 +34,8 @@ export const sshDisconnect = (sessionId: string) =>
 // ---- SFTP ----
 export const sftpHome = (sessionId: string) =>
   invoke<string>("sftp_home", { sessionId });
+export const sftpStartDir = (sessionId: string, preferred?: string | null) =>
+  invoke<string>("sftp_start_dir", { sessionId, preferred: preferred ?? null });
 export const sftpList = (sessionId: string, path: string) =>
   invoke<SftpEntry[]>("sftp_list", { sessionId, path });
 export const sftpMkdir = (sessionId: string, path: string) =>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import {
   ArrowUp,
@@ -16,15 +16,8 @@ import {
 import { toast } from "sonner";
 import type { Session, SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
+import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 import {
   Empty,
   EmptyHeader,
@@ -100,14 +93,17 @@ export default function SftpPanel({ session }: Props) {
     [sessionId],
   );
 
-  // On first open, resolve the home directory and list it.
+  // On first open, resolve the start directory (host default → home → "/").
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
       try {
-        const home = await ipc.sftpHome(sessionId);
-        if (!cancelled) await load(home);
+        const host = useHostsStore
+          .getState()
+          .hosts.find((h) => h.id === session.hostId);
+        const start = await ipc.sftpStartDir(sessionId, host?.defaultPath);
+        if (!cancelled) await load(start);
       } catch (e) {
         if (!cancelled) {
           toast.error(String(e));
@@ -118,7 +114,7 @@ export default function SftpPanel({ session }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, load]);
+  }, [sessionId, session.hostId, load]);
 
   async function goHome() {
     try {
@@ -248,7 +244,8 @@ export default function SftpPanel({ session }: Props) {
         </div>
       ) : null}
 
-      {/* Listing */}
+      {/* Listing — a plain div list (not <table>) so content-visibility can
+          skip painting off-screen rows, keeping scrolling smooth. */}
       <div className="flex-1 overflow-y-auto">
         {!loading && entries.length === 0 ? (
           <Empty className="h-full">
@@ -260,70 +257,23 @@ export default function SftpPanel({ session }: Props) {
             </EmptyHeader>
           </Empty>
         ) : (
-          <Table>
-            <TableHeader className="sticky top-0 bg-background">
-              <TableRow>
-                <TableHead>名称</TableHead>
-                <TableHead className="w-24 text-right">大小</TableHead>
-                <TableHead className="w-32 text-right">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.map((entry) => (
-                <TableRow key={entry.path} className="group">
-                  <TableCell>
-                    <button
-                      className="flex items-center gap-2 text-left"
-                      onDoubleClick={() => entry.isDir && load(entry.path)}
-                      disabled={!entry.isDir}
-                    >
-                      {entry.isDir ? (
-                        <Folder className="size-4 shrink-0 text-primary" />
-                      ) : (
-                        <FileIcon className="size-4 shrink-0 text-muted-foreground" />
-                      )}
-                      <span className={cn(entry.isDir && "cursor-pointer")}>
-                        {entry.name}
-                      </span>
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-right text-xs text-muted-foreground">
-                    {entry.isDir ? "—" : formatSize(entry.size)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                      {!entry.isDir ? (
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          title="下载"
-                          onClick={() => onDownload(entry)}
-                        >
-                          <Download />
-                        </Button>
-                      ) : null}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title="重命名"
-                        onClick={() => setPrompt({ kind: "rename", entry })}
-                      >
-                        <Pencil />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title="删除"
-                        onClick={() => setDeleteTarget(entry)}
-                      >
-                        <Trash2 className="text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div>
+            <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
+              <span className="flex-1">名称</span>
+              <span className="w-20 text-right">大小</span>
+              <span className="w-24 text-right">操作</span>
+            </div>
+            {entries.map((entry) => (
+              <SftpRow
+                key={entry.path}
+                entry={entry}
+                onEnter={load}
+                onDownload={onDownload}
+                onRename={(e) => setPrompt({ kind: "rename", entry: e })}
+                onDelete={setDeleteTarget}
+              />
+            ))}
+          </div>
         )}
       </div>
 
@@ -357,7 +307,7 @@ export default function SftpPanel({ session }: Props) {
             </AlertDialogTitle>
             <AlertDialogDescription>
               确定删除 “{deleteTarget?.name}”？
-              {deleteTarget?.isDir ? "文件夹须为空。" : ""}
+              {deleteTarget?.isDir ? "该文件夹及其全部内容将被永久删除。" : ""}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -369,3 +319,76 @@ export default function SftpPanel({ session }: Props) {
     </div>
   );
 }
+
+interface RowProps {
+  entry: SftpEntry;
+  onEnter: (path: string) => void;
+  onDownload: (entry: SftpEntry) => void;
+  onRename: (entry: SftpEntry) => void;
+  onDelete: (entry: SftpEntry) => void;
+}
+
+/**
+ * A single directory row. Memoized and wrapped with `content-visibility: auto`
+ * (via the `cv-auto` utility) so the browser skips layout/paint for rows that
+ * are scrolled off-screen — this is what keeps large listings smooth.
+ */
+const SftpRow = memo(function SftpRow({
+  entry,
+  onEnter,
+  onDownload,
+  onRename,
+  onDelete,
+}: RowProps) {
+  return (
+    <div
+      className="group flex items-center gap-2 border-b border-border/40 px-3 py-1.5 text-sm [content-visibility:auto] [contain-intrinsic-size:auto_36px] hover:bg-muted/50"
+    >
+      <button
+        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+        onDoubleClick={() => entry.isDir && onEnter(entry.path)}
+        disabled={!entry.isDir}
+      >
+        {entry.isDir ? (
+          <Folder className="size-4 shrink-0 text-primary" />
+        ) : (
+          <FileIcon className="size-4 shrink-0 text-muted-foreground" />
+        )}
+        <span className={cn("truncate", entry.isDir && "cursor-pointer")}>
+          {entry.name}
+        </span>
+      </button>
+      <span className="w-20 text-right text-xs text-muted-foreground">
+        {entry.isDir ? "—" : formatSize(entry.size)}
+      </span>
+      <div className="flex w-24 justify-end gap-0.5 opacity-0 group-hover:opacity-100">
+        {!entry.isDir ? (
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            title="下载"
+            onClick={() => onDownload(entry)}
+          >
+            <Download />
+          </Button>
+        ) : null}
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          title="重命名"
+          onClick={() => onRename(entry)}
+        >
+          <Pencil />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          title="删除"
+          onClick={() => onDelete(entry)}
+        >
+          <Trash2 className="text-destructive" />
+        </Button>
+      </div>
+    </div>
+  );
+});

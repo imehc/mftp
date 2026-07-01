@@ -20,6 +20,9 @@ pub struct Host {
     pub password: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub key_id: Option<String>,
+    /// Directory to open first in SFTP; falls back to home then "/" if missing.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_path: Option<String>,
     pub created_at: i64,
     pub updated_at: i64,
 }
@@ -37,6 +40,8 @@ pub struct HostInput {
     pub password: Option<String>,
     #[serde(default)]
     pub key_id: Option<String>,
+    #[serde(default)]
+    pub default_path: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

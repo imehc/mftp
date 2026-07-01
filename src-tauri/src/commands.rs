@@ -143,6 +143,19 @@ pub fn sftp_home(state: State<AppState>, session_id: String) -> AppResult<String
     state.manager.sftp_home(&session_id)
 }
 
+/// Resolve the first directory to open: the host's `preferred` default if it
+/// exists, otherwise the home directory, otherwise "/".
+#[tauri::command]
+pub fn sftp_start_dir(
+    state: State<AppState>,
+    session_id: String,
+    preferred: Option<String>,
+) -> AppResult<String> {
+    state
+        .manager
+        .sftp_start_dir(&session_id, preferred.as_deref())
+}
+
 #[tauri::command]
 pub fn sftp_list(
     state: State<AppState>,

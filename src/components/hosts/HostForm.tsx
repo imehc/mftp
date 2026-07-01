@@ -41,6 +41,7 @@ const empty: HostInput = {
   authType: "password",
   password: "",
   keyId: null,
+  defaultPath: "",
 };
 
 export default function HostForm({ open, onOpenChange, host }: Props) {
@@ -63,6 +64,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
         authType: host.authType,
         password: host.password ?? "",
         keyId: host.keyId ?? null,
+        defaultPath: host.defaultPath ?? "",
       });
     } else {
       setForm(empty);
@@ -89,6 +91,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
         ...form,
         password: form.authType === "password" ? form.password : null,
         keyId: form.authType === "key" ? form.keyId : null,
+        defaultPath: form.defaultPath?.trim() ? form.defaultPath.trim() : null,
       };
       if (host) await updateHost(host.id, payload);
       else await createHost(payload);
@@ -209,6 +212,19 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
               ) : null}
             </Field>
           )}
+
+          <Field>
+            <FieldLabel htmlFor="host-defpath">默认目录</FieldLabel>
+            <Input
+              id="host-defpath"
+              value={form.defaultPath ?? ""}
+              onChange={(e) => set("defaultPath", e.target.value)}
+              placeholder="/var/www（留空则用主目录）"
+            />
+            <FieldDescription>
+              打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。
+            </FieldDescription>
+          </Field>
 
           {error ? (
             <FieldDescription className="text-destructive">

@@ -9,6 +9,7 @@ export interface Host {
   authType: AuthType;
   password?: string;
   keyId?: string;
+  defaultPath?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -21,6 +22,7 @@ export interface HostInput {
   authType: AuthType;
   password?: string | null;
   keyId?: string | null;
+  defaultPath?: string | null;
 }
 
 export interface SshKey {
