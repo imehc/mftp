@@ -5,6 +5,16 @@ use crate::AppState;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use tauri::{AppHandle, State};
 
+async fn run_blocking<T, F>(f: F) -> AppResult<T>
+where
+    T: Send + 'static,
+    F: FnOnce() -> AppResult<T> + Send + 'static,
+{
+    tauri::async_runtime::spawn_blocking(f)
+        .await
+        .map_err(|e| AppError(format!("background task failed: {e}")))?
+}
+
 // ---------- Hosts ----------
 
 #[tauri::command]
@@ -59,7 +69,11 @@ pub fn key_delete(state: State<AppState>, id: String) -> AppResult<()> {
 // ---------- SSH ----------
 
 /// Build auth material for a host, resolving key file path + optional passphrase.
-fn build_auth(state: &AppState, host: &Host, passphrase: Option<String>) -> AppResult<AuthMaterial> {
+fn build_auth(
+    state: &AppState,
+    host: &Host,
+    passphrase: Option<String>,
+) -> AppResult<AuthMaterial> {
     let method = match host.auth_type {
         AuthType::Password => {
             let pw = host
@@ -101,14 +115,15 @@ pub fn ssh_connect(
 }
 
 #[tauri::command]
-pub fn ssh_open_shell(
+pub async fn ssh_open_shell(
     app: AppHandle,
-    state: State<AppState>,
+    state: State<'_, AppState>,
     session_id: String,
     cols: u32,
     rows: u32,
 ) -> AppResult<()> {
-    state.manager.open_shell(app, &session_id, cols, rows)
+    let manager = state.manager.clone();
+    run_blocking(move || manager.open_shell(app, &session_id, cols, rows)).await
 }
 
 #[tauri::command]
@@ -131,131 +146,199 @@ pub fn ssh_resize(
 }
 
 #[tauri::command]
-pub fn ssh_disconnect(state: State<AppState>, session_id: String) -> AppResult<()> {
-    state.manager.disconnect(&session_id);
-    Ok(())
+pub async fn ssh_disconnect(state: State<'_, AppState>, session_id: String) -> AppResult<()> {
+    let manager = state.manager.clone();
+    run_blocking(move || {
+        manager.disconnect(&session_id);
+        Ok(())
+    })
+    .await
 }
 
 // ---------- SFTP ----------
 
 #[tauri::command]
-pub fn sftp_home(state: State<AppState>, session_id: String) -> AppResult<String> {
-    state.manager.sftp_home(&session_id)
+pub async fn sftp_home(state: State<'_, AppState>, session_id: String) -> AppResult<String> {
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_home(&session_id)).await
 }
 
 /// Resolve the first directory to open: the host's `preferred` default if it
 /// exists, otherwise the home directory, otherwise "/".
 #[tauri::command]
-pub fn sftp_start_dir(
-    state: State<AppState>,
+pub async fn sftp_start_dir(
+    state: State<'_, AppState>,
     session_id: String,
     preferred: Option<String>,
 ) -> AppResult<String> {
-    state
-        .manager
-        .sftp_start_dir(&session_id, preferred.as_deref())
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_start_dir(&session_id, preferred.as_deref())).await
 }
 
 #[tauri::command]
-pub fn sftp_list(
-    state: State<AppState>,
+pub async fn sftp_list(
+    state: State<'_, AppState>,
     session_id: String,
     path: String,
 ) -> AppResult<Vec<SftpEntry>> {
-    state.manager.sftp_list(&session_id, &path)
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_list(&session_id, &path)).await
 }
 
 #[tauri::command]
-pub fn sftp_mkdir(state: State<AppState>, session_id: String, path: String) -> AppResult<()> {
-    state.manager.sftp_mkdir(&session_id, &path)
+pub async fn sftp_mkdir(
+    state: State<'_, AppState>,
+    session_id: String,
+    path: String,
+) -> AppResult<()> {
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_mkdir(&session_id, &path)).await
 }
 
 #[tauri::command]
-pub fn sftp_rename(
-    state: State<AppState>,
+pub async fn sftp_rename(
+    state: State<'_, AppState>,
     session_id: String,
     from: String,
     to: String,
 ) -> AppResult<()> {
-    state.manager.sftp_rename(&session_id, &from, &to)
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_rename(&session_id, &from, &to)).await
 }
 
 #[tauri::command]
-pub fn sftp_delete(
-    state: State<AppState>,
+pub async fn sftp_delete(
+    state: State<'_, AppState>,
     session_id: String,
     path: String,
     is_dir: bool,
 ) -> AppResult<()> {
-    state.manager.sftp_delete(&session_id, &path, is_dir)
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_delete(&session_id, &path, is_dir)).await
 }
 
 #[tauri::command]
-pub fn sftp_download(
-    state: State<AppState>,
+pub async fn sftp_download(
+    app: AppHandle,
+    state: State<'_, AppState>,
     session_id: String,
     remote: String,
     local: String,
+    transfer_id: Option<String>,
 ) -> AppResult<()> {
-    state.manager.sftp_download(&session_id, &remote, &local)
+    let manager = state.manager.clone();
+    run_blocking(move || {
+        manager.sftp_download(
+            &session_id,
+            &remote,
+            &local,
+            Some(&app),
+            transfer_id.as_deref(),
+        )
+    })
+    .await
 }
 
 #[tauri::command]
-pub fn sftp_upload(
-    state: State<AppState>,
+pub async fn sftp_upload(
+    app: AppHandle,
+    state: State<'_, AppState>,
     session_id: String,
     local: String,
     remote: String,
+    transfer_id: Option<String>,
 ) -> AppResult<()> {
-    state.manager.sftp_upload(&session_id, &local, &remote)
+    let manager = state.manager.clone();
+    run_blocking(move || {
+        manager.sftp_upload(
+            &session_id,
+            &local,
+            &remote,
+            Some(&app),
+            transfer_id.as_deref(),
+        )
+    })
+    .await
 }
 
 #[tauri::command]
-pub fn sftp_exists(
-    state: State<AppState>,
+pub async fn sftp_exists(
+    state: State<'_, AppState>,
     session_id: String,
     path: String,
 ) -> AppResult<bool> {
-    state.manager.sftp_exists(&session_id, &path)
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_exists(&session_id, &path)).await
 }
 
 #[tauri::command]
-pub fn sftp_upload_dir(
-    state: State<AppState>,
+pub async fn sftp_upload_dir(
+    app: AppHandle,
+    state: State<'_, AppState>,
     session_id: String,
     local_dir: String,
     remote_parent: String,
     remote_name: String,
+    transfer_id: Option<String>,
 ) -> AppResult<()> {
-    state
-        .manager
-        .sftp_upload_dir(&session_id, &local_dir, &remote_parent, &remote_name)
+    let manager = state.manager.clone();
+    run_blocking(move || {
+        manager.sftp_upload_dir(
+            &session_id,
+            &local_dir,
+            &remote_parent,
+            &remote_name,
+            Some(&app),
+            transfer_id.as_deref(),
+        )
+    })
+    .await
 }
 
 #[tauri::command]
-pub fn sftp_download_dir(
-    state: State<AppState>,
+pub async fn sftp_download_dir(
+    app: AppHandle,
+    state: State<'_, AppState>,
     session_id: String,
     remote_dir: String,
     local_archive: String,
+    transfer_id: Option<String>,
 ) -> AppResult<()> {
-    state
-        .manager
-        .sftp_download_dir(&session_id, &remote_dir, &local_archive)
+    let manager = state.manager.clone();
+    run_blocking(move || {
+        manager.sftp_download_dir(
+            &session_id,
+            &remote_dir,
+            &local_archive,
+            Some(&app),
+            transfer_id.as_deref(),
+        )
+    })
+    .await
 }
 
 #[tauri::command]
-pub fn sftp_extract(
-    state: State<AppState>,
+pub fn sftp_cancel_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
+    state.manager.cancel_transfer(&transfer_id);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn sftp_extract(
+    state: State<'_, AppState>,
     session_id: String,
     remote_archive: String,
     remote_parent: String,
     out_name: Option<String>,
 ) -> AppResult<()> {
-    state.manager.sftp_extract(
-        &session_id,
-        &remote_archive,
-        &remote_parent,
-        out_name.as_deref(),
-    )
+    let manager = state.manager.clone();
+    run_blocking(move || {
+        manager.sftp_extract(
+            &session_id,
+            &remote_archive,
+            &remote_parent,
+            out_name.as_deref(),
+        )
+    })
+    .await
 }

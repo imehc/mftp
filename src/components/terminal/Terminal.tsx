@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { listen } from "@tauri-apps/api/event";
 import "@xterm/xterm/css/xterm.css";
 import { toast } from "sonner";
-import { TriangleAlert } from "lucide-react";
+import { LoaderCircle, TriangleAlert } from "lucide-react";
 import type { Session } from "~/types";
 import { useSessionsStore } from "~/store/sessions";
 import * as ipc from "~/lib/ipc";
@@ -37,10 +37,19 @@ function base64ToBytes(b64: string): Uint8Array {
 export default function Terminal({ session }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const patch = useSessionsStore((s) => s.patch);
+  const [shellOpening, setShellOpening] = useState(false);
+  const hasBackendSession = !session.id.startsWith("tab-");
 
   useEffect(() => {
-    // Only wire up a real shell once the backend session is connected.
-    if (session.status !== "connected") return;
+    // Wire up a real shell once the backend session id exists. The session
+    // remains "connecting" until this succeeds, so sidebars/tabs do not turn
+    // green before the terminal is actually open.
+    if (
+      session.status !== "connected" &&
+      !(session.status === "connecting" && !session.id.startsWith("tab-"))
+    ) {
+      return;
+    }
     const el = containerRef.current;
     if (!el) return;
 
@@ -59,12 +68,8 @@ export default function Terminal({ session }: Props) {
 
     const sessionId = session.id;
     let disposed = false;
-
-    // Open the remote shell sized to the current terminal.
-    void ipc.sshOpenShell(sessionId, term.cols, term.rows).catch((e) => {
-      patch(sessionId, { status: "error", error: String(e) });
-      toast.error(`打开终端失败: ${e}`);
-    });
+    let shellOpenConfirmed = false;
+    setShellOpening(true);
 
     // Backend -> terminal: decode base64 payloads and write.
     const unlistenData = listen<string>(`ssh://data/${sessionId}`, (e) => {
@@ -73,9 +78,33 @@ export default function Terminal({ session }: Props) {
     const unlistenClosed = listen<string>(`ssh://closed/${sessionId}`, () => {
       if (!disposed) {
         term.write("\r\n\x1b[31m[连接已关闭]\x1b[0m\r\n");
-        patch(sessionId, { status: "closed" });
+        patch(
+          sessionId,
+          shellOpenConfirmed
+            ? { status: "closed" }
+            : {
+                status: "error",
+                error: "远端连接在终端打开前已关闭",
+              },
+        );
       }
     });
+
+    // Open the remote shell sized to the current terminal.
+    void ipc
+      .sshOpenShell(sessionId, term.cols, term.rows)
+      .then(() => {
+        shellOpenConfirmed = true;
+        if (!disposed) {
+          setShellOpening(false);
+          patch(sessionId, { status: "connected" });
+        }
+      })
+      .catch((e) => {
+        if (!disposed) setShellOpening(false);
+        patch(sessionId, { status: "error", error: String(e) });
+        toast.error(`打开终端失败: ${e}`);
+      });
 
     // Terminal -> backend: forward keystrokes as base64.
     const onData = term.onData((data) => {
@@ -98,20 +127,23 @@ export default function Terminal({ session }: Props) {
 
     return () => {
       disposed = true;
+      setShellOpening(false);
       ro.disconnect();
       onData.dispose();
       void unlistenData.then((f) => f());
       void unlistenClosed.then((f) => f());
       term.dispose();
     };
-    // Re-run only when the connected session identity changes.
+    // Re-run only when the backend session identity changes. Changing status
+    // from connecting -> connected must not reopen the shell.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.id, session.status]);
+  }, [session.id]);
 
-  if (session.status === "connecting") {
+  if (session.status === "connecting" && !hasBackendSession) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        正在连接 {session.title}…
+      <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+        <LoaderCircle className="size-4 animate-spin" />
+        <span>正在连接 {session.title}…</span>
       </div>
     );
   }
@@ -131,5 +163,17 @@ export default function Terminal({ session }: Props) {
     );
   }
 
-  return <div ref={containerRef} className="h-full w-full bg-[#0a0a0a] p-1" />;
+  return (
+    <div className="relative h-full w-full bg-[#0a0a0a]">
+      <div ref={containerRef} className="h-full w-full p-1" />
+      {session.status === "connecting" || shellOpening ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-sm">
+            <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+            正在打开终端…
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }

@@ -43,6 +43,13 @@ export interface SftpEntry {
   mode: number;
 }
 
+export interface TransferProgress {
+  id: string;
+  phase: string;
+  transferred: number;
+  total?: number | null;
+}
+
 /** An open terminal/sftp session tab. */
 export interface Session {
   id: string; // backend session id

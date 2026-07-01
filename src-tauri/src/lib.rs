@@ -5,13 +5,14 @@ mod ssh;
 mod storage;
 
 use ssh::Manager;
+use std::sync::Arc;
 use storage::Storage;
 use tauri::Manager as _;
 
 /// Shared application state available to all commands.
 pub struct AppState {
     pub storage: Storage,
-    pub manager: Manager,
+    pub manager: Arc<Manager>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -26,7 +27,7 @@ pub fn run() {
             let storage = Storage::new(data_dir).map_err(|e| e.to_string())?;
             app.manage(AppState {
                 storage,
-                manager: Manager::default(),
+                manager: Arc::new(Manager::default()),
             });
             Ok(())
         })
@@ -55,6 +56,7 @@ pub fn run() {
             commands::sftp_exists,
             commands::sftp_upload_dir,
             commands::sftp_download_dir,
+            commands::sftp_cancel_transfer,
             commands::sftp_extract,
         ])
         .run(tauri::generate_context!())

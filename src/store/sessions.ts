@@ -21,6 +21,16 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
   activeId: null,
 
   async openSession(host, passphrase) {
+    const existing = get().sessions.find(
+      (s) =>
+        s.hostId === host.id &&
+        (s.status === "connecting" || s.status === "connected"),
+    );
+    if (existing) {
+      set({ activeId: existing.id });
+      return existing.id;
+    }
+
     const tabId = nextTabId();
     // Optimistically add a connecting tab.
     const draft: Session = {
@@ -34,7 +44,26 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
 
     try {
       const sessionId = await ipc.sshConnect(host.id, passphrase);
-      get().patch(tabId, { id: sessionId, status: "connected" });
+      const current = get().sessions.find((s) => s.id === tabId);
+      if (!current) {
+        await ipc.sshDisconnect(sessionId).catch(() => undefined);
+        return sessionId;
+      }
+      const duplicate = get().sessions.find(
+        (s) =>
+          s.id !== tabId &&
+          s.hostId === host.id &&
+          (s.status === "connecting" || s.status === "connected"),
+      );
+      if (duplicate) {
+        await ipc.sshDisconnect(sessionId).catch(() => undefined);
+        set({
+          sessions: get().sessions.filter((s) => s.id !== tabId),
+          activeId: duplicate.id,
+        });
+        return duplicate.id;
+      }
+      get().patch(tabId, { id: sessionId, status: "connecting" });
       // Re-point activeId if it was the draft.
       if (get().activeId === tabId) set({ activeId: sessionId });
       return sessionId;

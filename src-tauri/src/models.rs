@@ -66,3 +66,13 @@ pub struct SftpEntry {
     pub mtime: u64,
     pub mode: u32,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TransferProgress {
+    pub id: String,
+    pub phase: String,
+    pub transferred: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total: Option<u64>,
+}
