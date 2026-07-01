@@ -209,3 +209,53 @@ pub fn sftp_upload(
 ) -> AppResult<()> {
     state.manager.sftp_upload(&session_id, &local, &remote)
 }
+
+#[tauri::command]
+pub fn sftp_exists(
+    state: State<AppState>,
+    session_id: String,
+    path: String,
+) -> AppResult<bool> {
+    state.manager.sftp_exists(&session_id, &path)
+}
+
+#[tauri::command]
+pub fn sftp_upload_dir(
+    state: State<AppState>,
+    session_id: String,
+    local_dir: String,
+    remote_parent: String,
+    remote_name: String,
+) -> AppResult<()> {
+    state
+        .manager
+        .sftp_upload_dir(&session_id, &local_dir, &remote_parent, &remote_name)
+}
+
+#[tauri::command]
+pub fn sftp_download_dir(
+    state: State<AppState>,
+    session_id: String,
+    remote_dir: String,
+    local_archive: String,
+) -> AppResult<()> {
+    state
+        .manager
+        .sftp_download_dir(&session_id, &remote_dir, &local_archive)
+}
+
+#[tauri::command]
+pub fn sftp_extract(
+    state: State<AppState>,
+    session_id: String,
+    remote_archive: String,
+    remote_parent: String,
+    out_name: Option<String>,
+) -> AppResult<()> {
+    state.manager.sftp_extract(
+        &session_id,
+        &remote_archive,
+        &remote_parent,
+        out_name.as_deref(),
+    )
+}

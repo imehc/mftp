@@ -43,10 +43,11 @@ struct ShellHandle {
 }
 
 /// A cached SFTP connection: the initialized subsystem plus the session that
-/// backs it (kept alive alongside so the channel stays open).
+/// backs it (reused both for SFTP ops and for `exec` channels running remote
+/// commands like `tar` / `unzip`).
 struct SftpConn {
     sftp: ssh2::Sftp,
-    _session: Session,
+    session: Session,
 }
 
 #[derive(Default)]
@@ -163,7 +164,7 @@ impl Manager {
         let sftp = sess.sftp()?;
         let arc = Arc::new(Mutex::new(SftpConn {
             sftp,
-            _session: sess,
+            session: sess,
         }));
         self.sftp
             .lock()
@@ -295,6 +296,170 @@ impl Manager {
         }
         Ok(())
     }
+
+    // ---- Remote command execution + archive helpers ----
+
+    /// Run a remote command over an `exec` channel; return (exit_code, stdout, stderr).
+    fn exec(&self, session_id: &str, cmd: &str) -> AppResult<(i32, String, String)> {
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        // Ensure blocking mode with no stray timeout from the shell poller.
+        conn.session.set_blocking(true);
+        conn.session.set_timeout(0);
+        let mut channel = conn.session.channel_session()?;
+        channel.exec(cmd)?;
+        let mut stdout = String::new();
+        channel.read_to_string(&mut stdout)?;
+        let mut stderr = String::new();
+        channel.stderr().read_to_string(&mut stderr)?;
+        channel.wait_close()?;
+        let code = channel.exit_status()?;
+        Ok((code, stdout, stderr))
+    }
+
+    /// Run a command and turn a non-zero exit into an error carrying stderr.
+    fn exec_checked(&self, session_id: &str, cmd: &str) -> AppResult<String> {
+        let (code, stdout, stderr) = self.exec(session_id, cmd)?;
+        if code != 0 {
+            let msg = if stderr.trim().is_empty() {
+                stdout.trim().to_string()
+            } else {
+                stderr.trim().to_string()
+            };
+            return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
+        }
+        Ok(stdout)
+    }
+
+    /// Whether a remote path exists.
+    pub fn sftp_exists(&self, session_id: &str, path: &str) -> AppResult<bool> {
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        Ok(conn.sftp.stat(Path::new(path)).is_ok())
+    }
+
+    /// Upload a local directory: pack it locally into a tar.gz whose top-level
+    /// entry is `remote_name`, stream the archive up, then extract remotely.
+    pub fn sftp_upload_dir(
+        &self,
+        session_id: &str,
+        local_dir: &str,
+        remote_parent: &str,
+        remote_name: &str,
+    ) -> AppResult<()> {
+        // 1. Build a local tar.gz with `remote_name` as the top directory.
+        let local_archive = std::env::temp_dir().join(format!("mftp-up-{}.tar.gz", uuid_v4()));
+        pack_tar_gz(local_dir, remote_name, &local_archive)?;
+
+        // 2. Upload it to a hidden temp file in the remote parent.
+        let remote_archive = join_remote(remote_parent, &format!(".mftp-up-{}.tar.gz", uuid_v4()));
+        let upload_res = self.sftp_upload(session_id, &local_archive.to_string_lossy(), &remote_archive);
+        // Local temp no longer needed once uploaded (or on failure).
+        let _ = std::fs::remove_file(&local_archive);
+        upload_res?;
+
+        // 3. Extract remotely, then remove the remote temp archive regardless.
+        let cmd = format!(
+            "tar -xzf {} -C {}",
+            shell_quote(&remote_archive),
+            shell_quote(remote_parent)
+        );
+        let extract_res = self.exec_checked(session_id, &cmd).map(|_| ());
+        let _ = self.exec(session_id, &format!("rm -f {}", shell_quote(&remote_archive)));
+        extract_res
+    }
+
+    /// Pack a remote directory into a tar.gz on the remote, then download it.
+    pub fn sftp_download_dir(
+        &self,
+        session_id: &str,
+        remote_dir: &str,
+        local_archive: &str,
+    ) -> AppResult<()> {
+        let parent = remote_parent_of(remote_dir);
+        let name = remote_basename(remote_dir);
+        let remote_archive = format!("/tmp/mftp-dl-{}.tar.gz", uuid_v4());
+
+        // 1. Pack remotely (top-level entry = the directory name).
+        let cmd = format!(
+            "tar -czf {} -C {} {}",
+            shell_quote(&remote_archive),
+            shell_quote(&parent),
+            shell_quote(&name)
+        );
+        self.exec_checked(session_id, &cmd)?;
+
+        // 2. Download, then remove the remote temp archive regardless.
+        let dl = self.sftp_download(session_id, &remote_archive, local_archive);
+        let _ = self.exec(session_id, &format!("rm -f {}", shell_quote(&remote_archive)));
+        dl
+    }
+
+    /// Extract a remote archive into `remote_parent`.
+    ///
+    /// When `out_name` is `Some`, the archive is extracted into a temporary
+    /// staging dir first, then placed as a single directory named `out_name`
+    /// (a lone top-level dir is unwrapped/renamed; multiple entries are wrapped).
+    /// This makes the result name predictable and lets the caller rename it.
+    /// When `None`, the archive is extracted directly with its natural names.
+    pub fn sftp_extract(
+        &self,
+        session_id: &str,
+        remote_archive: &str,
+        remote_parent: &str,
+        out_name: Option<&str>,
+    ) -> AppResult<()> {
+        let out_name = match out_name {
+            None => {
+                let cmd = extract_cmd(remote_archive, remote_parent)?;
+                return self.exec_checked(session_id, &cmd).map(|_| ());
+            }
+            Some(n) => n,
+        };
+
+        let staging = join_remote(remote_parent, &format!(".mftp-x-{}", uuid_v4()));
+        self.exec_checked(session_id, &format!("mkdir -p {}", shell_quote(&staging)))?;
+
+        // Extract into the staging dir; clean up staging on any failure.
+        let cmd = match extract_cmd(remote_archive, &staging) {
+            Ok(c) => c,
+            Err(e) => {
+                let _ = self.exec(session_id, &format!("rm -rf {}", shell_quote(&staging)));
+                return Err(e);
+            }
+        };
+        if let Err(e) = self.exec_checked(session_id, &cmd) {
+            let _ = self.exec(session_id, &format!("rm -rf {}", shell_quote(&staging)));
+            return Err(e);
+        }
+
+        // Inspect the staging dir's top-level entries.
+        let (_, listing, _) =
+            self.exec(session_id, &format!("ls -1A {}", shell_quote(&staging)))?;
+        let entries: Vec<&str> = listing.lines().filter(|l| !l.is_empty()).collect();
+        let target = join_remote(remote_parent, out_name);
+
+        let result = if entries.len() == 1 {
+            // Single top entry: move it to the target name (unwrap/rename).
+            let only = join_remote(&staging, entries[0]);
+            self.exec_checked(
+                session_id,
+                &format!("mv {} {}", shell_quote(&only), shell_quote(&target)),
+            )
+            .map(|_| ())
+        } else {
+            // Multiple/zero entries: wrap the staging dir itself as the target.
+            self.exec_checked(
+                session_id,
+                &format!("mv {} {}", shell_quote(&staging), shell_quote(&target)),
+            )
+            .map(|_| ())
+        };
+
+        // Remove staging if it still exists (it's gone when wrapped by mv).
+        let _ = self.exec(session_id, &format!("rm -rf {}", shell_quote(&staging)));
+        result
+    }
 }
 
 /// Recursively delete a remote directory and all of its contents.
@@ -313,6 +478,82 @@ fn remove_dir_recursive(sftp: &ssh2::Sftp, dir: &Path) -> AppResult<()> {
     sftp.rmdir(dir)?;
     Ok(())
 }
+
+/// Generate a fresh UUID v4 string (short helper for temp file names).
+fn uuid_v4() -> String {
+    uuid::Uuid::new_v4().to_string()
+}
+
+/// Quote an argument for a POSIX shell by wrapping in single quotes.
+fn shell_quote(s: &str) -> String {
+    // Close the quote, insert an escaped single quote, reopen: ' -> '\''
+    format!("'{}'", s.replace('\'', "'\\''"))
+}
+
+/// Join a remote parent dir and a name with a single "/".
+fn join_remote(parent: &str, name: &str) -> String {
+    if parent.ends_with('/') {
+        format!("{parent}{name}")
+    } else {
+        format!("{parent}/{name}")
+    }
+}
+
+/// The parent directory of a remote path (POSIX, "/" separators).
+fn remote_parent_of(path: &str) -> String {
+    let trimmed = path.trim_end_matches('/');
+    match trimmed.rfind('/') {
+        Some(0) | None => "/".to_string(),
+        Some(idx) => trimmed[..idx].to_string(),
+    }
+}
+
+/// The final component of a remote path.
+fn remote_basename(path: &str) -> String {
+    let trimmed = path.trim_end_matches('/');
+    match trimmed.rfind('/') {
+        Some(idx) => trimmed[idx + 1..].to_string(),
+        None => trimmed.to_string(),
+    }
+}
+
+/// Build the shell command to extract `archive` into `dest_dir`, choosing the
+/// tool by file extension.
+fn extract_cmd(archive: &str, dest_dir: &str) -> AppResult<String> {
+    let lower = archive.to_lowercase();
+    let a = shell_quote(archive);
+    let d = shell_quote(dest_dir);
+    if lower.ends_with(".zip") {
+        Ok(format!("unzip -o {a} -d {d}"))
+    } else if lower.ends_with(".tar.gz") || lower.ends_with(".tgz") {
+        Ok(format!("tar -xzf {a} -C {d}"))
+    } else if lower.ends_with(".tar.bz2") || lower.ends_with(".tbz2") {
+        Ok(format!("tar -xjf {a} -C {d}"))
+    } else if lower.ends_with(".tar") {
+        Ok(format!("tar -xf {a} -C {d}"))
+    } else {
+        Err(AppError("不支持的压缩包格式".into()))
+    }
+}
+
+/// Pack `local_dir` into `dest` (tar.gz) with `top_name` as the archive's
+/// top-level directory. `append_dir_all` includes empty directories.
+fn pack_tar_gz(local_dir: &str, top_name: &str, dest: &Path) -> AppResult<()> {
+    use flate2::write::GzEncoder;
+    use flate2::Compression;
+    let file = std::fs::File::create(dest)?;
+    let enc = GzEncoder::new(file, Compression::default());
+    let mut builder = tar::Builder::new(enc);
+    builder
+        .append_dir_all(top_name, local_dir)
+        .map_err(|e| AppError(format!("打包失败: {e}")))?;
+    let enc = builder
+        .into_inner()
+        .map_err(|e| AppError(format!("打包失败: {e}")))?;
+    enc.finish().map_err(|e| AppError(format!("打包失败: {e}")))?;
+    Ok(())
+}
+
 
 /// Runs on a dedicated thread; owns the session + shell channel exclusively.
 /// Blocking reads with a short timeout let us interleave write/resize jobs.

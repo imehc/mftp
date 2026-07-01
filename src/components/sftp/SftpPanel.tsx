@@ -4,9 +4,11 @@ import {
   ArrowUp,
   Download,
   File as FileIcon,
+  FileArchive,
   Folder,
   FolderOpen,
   FolderPlus,
+  FolderUp,
   Home,
   Pencil,
   RefreshCw,
@@ -18,6 +20,12 @@ import type { Session, SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import {
   Empty,
   EmptyHeader,
@@ -35,6 +43,9 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import PromptDialog from "~/components/ui/prompt-dialog";
+import ConflictDialog, {
+  type ConflictMode,
+} from "~/components/sftp/ConflictDialog";
 import { cn } from "~/lib/utils";
 
 interface Props {
@@ -62,10 +73,31 @@ function parentPath(p: string): string {
   const idx = trimmed.lastIndexOf("/");
   return idx <= 0 ? "/" : trimmed.slice(0, idx);
 }
+function baseName(p: string): string {
+  return p.split(/[\\/]/).filter(Boolean).pop() ?? p;
+}
+
+const ARCHIVE_RE = /\.(zip|tar|tar\.gz|tgz|tar\.bz2|tbz2)$/i;
+function isArchive(name: string): boolean {
+  return ARCHIVE_RE.test(name);
+}
+/** The directory name an archive is expected to produce once extracted. */
+function archiveStem(name: string): string {
+  return name.replace(ARCHIVE_RE, "");
+}
 
 type PromptState =
   | { kind: "mkdir" }
   | { kind: "rename"; entry: SftpEntry }
+  | null;
+
+/** A pending action blocked on resolving a remote name conflict. */
+type ConflictState =
+  | {
+      name: string; // the conflicting existing name
+      incomingLabel: string;
+      run: (mode: ConflictMode, newName: string) => Promise<void>;
+    }
   | null;
 
 export default function SftpPanel({ session }: Props) {
@@ -76,6 +108,7 @@ export default function SftpPanel({ session }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<PromptState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
+  const [conflict, setConflict] = useState<ConflictState>(null);
 
   const load = useCallback(
     async (path: string) => {
@@ -125,6 +158,8 @@ export default function SftpPanel({ session }: Props) {
     }
   }
 
+  // ---- File upload / download ----
+
   async function onUpload() {
     if (!cwd) return;
     const selected = await openDialog({
@@ -133,32 +168,170 @@ export default function SftpPanel({ session }: Props) {
       title: "选择上传文件",
     });
     if (typeof selected !== "string") return;
-    const name = selected.split(/[\\/]/).pop() ?? "upload";
+    const name = baseName(selected);
+    const tid = toast.loading(`上传 ${name}…`);
     setBusy(`上传 ${name}…`);
     try {
       await ipc.sftpUpload(sessionId, selected, joinPath(cwd, name));
-      toast.success(`已上传 ${name}`);
+      toast.success(`已上传 ${name}`, { id: tid });
       await load(cwd);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(String(e), { id: tid });
     } finally {
       setBusy(null);
     }
   }
 
   async function onDownload(entry: SftpEntry) {
+    if (entry.isDir) return onDownloadDir(entry);
     const dest = await saveDialog({ defaultPath: entry.name, title: "保存到" });
     if (typeof dest !== "string") return;
+    const tid = toast.loading(`下载 ${entry.name}…`);
     setBusy(`下载 ${entry.name}…`);
     try {
       await ipc.sftpDownload(sessionId, entry.path, dest);
-      toast.success(`已下载 ${entry.name}`);
+      toast.success(`已下载 ${entry.name}`, { id: tid });
     } catch (e) {
-      toast.error(String(e));
+      toast.error(String(e), { id: tid });
     } finally {
       setBusy(null);
     }
   }
+
+  // ---- Folder download (packed as .tar.gz for transfer) ----
+
+  async function onDownloadDir(entry: SftpEntry) {
+    const dest = await saveDialog({
+      defaultPath: `${entry.name}.tar.gz`,
+      title: "下载文件夹",
+    });
+    if (typeof dest !== "string") return;
+    const tid = toast.loading(`正在下载 ${entry.name}…`);
+    setBusy(`下载 ${entry.name}…`);
+    try {
+      await ipc.sftpDownloadDir(sessionId, entry.path, dest);
+      toast.success(`已下载 ${baseName(dest)}`, { id: tid });
+    } catch (e) {
+      toast.error(String(e), { id: tid });
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // ---- Folder upload (local pack → upload → remote extract) ----
+
+  async function onUploadDir() {
+    if (!cwd) return;
+    const selected = await openDialog({
+      multiple: false,
+      directory: true,
+      title: "选择上传文件夹",
+    });
+    if (typeof selected !== "string") return;
+    const name = baseName(selected);
+    await uploadDirWithName(selected, name);
+  }
+
+  async function uploadDirWithName(localDir: string, remoteName: string) {
+    if (!cwd) return;
+    // Pre-check remote conflict; if present, ask how to resolve first.
+    try {
+      const exists = await ipc.sftpExists(sessionId, joinPath(cwd, remoteName));
+      if (exists) {
+        setConflict({
+          name: remoteName,
+          incomingLabel: "上传的文件夹",
+          run: async (mode, newName) => {
+            if (mode === "incoming") {
+              await uploadDirWithName(localDir, newName);
+            } else {
+              // Rename the existing remote folder out of the way, then upload.
+              await ipc.sftpRename(
+                sessionId,
+                joinPath(cwd, remoteName),
+                joinPath(cwd, newName),
+              );
+              await runUploadDir(localDir, remoteName);
+            }
+          },
+        });
+        return;
+      }
+    } catch (e) {
+      toast.error(String(e));
+      return;
+    }
+    await runUploadDir(localDir, remoteName);
+  }
+
+  async function runUploadDir(localDir: string, remoteName: string) {
+    if (!cwd) return;
+    const tid = toast.loading(`正在压缩并上传 ${remoteName}…`);
+    setBusy(`压缩上传 ${remoteName}…`);
+    try {
+      await ipc.sftpUploadDir(sessionId, localDir, cwd, remoteName);
+      toast.success(`已上传文件夹 ${remoteName}`, { id: tid });
+      await load(cwd);
+    } catch (e) {
+      toast.error(String(e), { id: tid });
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // ---- Remote extract ----
+
+  async function onExtract(entry: SftpEntry) {
+    if (!cwd) return;
+    await extractWithName(entry, archiveStem(entry.name));
+  }
+
+  async function extractWithName(entry: SftpEntry, outName: string) {
+    if (!cwd) return;
+    try {
+      const exists = await ipc.sftpExists(sessionId, joinPath(cwd, outName));
+      if (exists) {
+        setConflict({
+          name: outName,
+          incomingLabel: "解压出的文件夹",
+          run: async (mode, newName) => {
+            if (mode === "incoming") {
+              await extractWithName(entry, newName);
+            } else {
+              await ipc.sftpRename(
+                sessionId,
+                joinPath(cwd, outName),
+                joinPath(cwd, newName),
+              );
+              await runExtract(entry, outName);
+            }
+          },
+        });
+        return;
+      }
+    } catch (e) {
+      toast.error(String(e));
+      return;
+    }
+    await runExtract(entry, outName);
+  }
+
+  async function runExtract(entry: SftpEntry, outName: string) {
+    if (!cwd) return;
+    const tid = toast.loading(`正在解压 ${entry.name}…`);
+    setBusy(`解压 ${entry.name}…`);
+    try {
+      await ipc.sftpExtract(sessionId, entry.path, cwd, outName);
+      toast.success(`已解压到 ${outName}`, { id: tid });
+      await load(cwd);
+    } catch (e) {
+      toast.error(String(e), { id: tid });
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // ---- Directory ops ----
 
   async function doMkdir(name: string) {
     if (!cwd) return;
@@ -229,17 +402,30 @@ export default function SftpPanel({ session }: Props) {
           variant="outline"
           size="sm"
           onClick={() => setPrompt({ kind: "mkdir" })}
-          disabled={!cwd}
+          disabled={!cwd || !!busy}
         >
           <FolderPlus data-icon="inline-start" /> 新建
         </Button>
-        <Button variant="outline" size="sm" onClick={onUpload} disabled={!cwd}>
-          <Upload data-icon="inline-start" /> 上传
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" disabled={!cwd || !!busy}>
+              <Upload data-icon="inline-start" /> 上传
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={onUpload}>
+              <FileIcon data-icon="inline-start" /> 上传文件
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={onUploadDir}>
+              <FolderUp data-icon="inline-start" /> 上传文件夹
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {busy ? (
-        <div className="border-b border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 border-b border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground">
+          <RefreshCw className="size-3 animate-spin" />
           {busy}
         </div>
       ) : null}
@@ -261,7 +447,7 @@ export default function SftpPanel({ session }: Props) {
             <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
               <span className="flex-1">名称</span>
               <span className="w-20 text-right">大小</span>
-              <span className="w-24 text-right">操作</span>
+              <span className="w-32 text-right">操作</span>
             </div>
             {entries.map((entry) => (
               <SftpRow
@@ -269,6 +455,7 @@ export default function SftpPanel({ session }: Props) {
                 entry={entry}
                 onEnter={load}
                 onDownload={onDownload}
+                onExtract={onExtract}
                 onRename={(e) => setPrompt({ kind: "rename", entry: e })}
                 onDelete={setDeleteTarget}
               />
@@ -294,6 +481,18 @@ export default function SftpPanel({ session }: Props) {
         onConfirm={(name) =>
           prompt?.kind === "rename" && doRename(prompt.entry, name)
         }
+      />
+
+      <ConflictDialog
+        open={!!conflict}
+        name={conflict?.name ?? ""}
+        incomingLabel={conflict?.incomingLabel ?? "文件夹"}
+        onOpenChange={(o) => !o && setConflict(null)}
+        onResolve={(mode, newName) => {
+          const c = conflict;
+          setConflict(null);
+          if (c) void c.run(mode, newName).catch((e) => toast.error(String(e)));
+        }}
       />
 
       <AlertDialog
@@ -324,26 +523,27 @@ interface RowProps {
   entry: SftpEntry;
   onEnter: (path: string) => void;
   onDownload: (entry: SftpEntry) => void;
+  onExtract: (entry: SftpEntry) => void;
   onRename: (entry: SftpEntry) => void;
   onDelete: (entry: SftpEntry) => void;
 }
 
 /**
  * A single directory row. Memoized and wrapped with `content-visibility: auto`
- * (via the `cv-auto` utility) so the browser skips layout/paint for rows that
- * are scrolled off-screen — this is what keeps large listings smooth.
+ * so the browser skips layout/paint for rows scrolled off-screen — this is
+ * what keeps large listings smooth.
  */
 const SftpRow = memo(function SftpRow({
   entry,
   onEnter,
   onDownload,
+  onExtract,
   onRename,
   onDelete,
 }: RowProps) {
+  const canExtract = !entry.isDir && isArchive(entry.name);
   return (
-    <div
-      className="group flex items-center gap-2 border-b border-border/40 px-3 py-1.5 text-sm [content-visibility:auto] [contain-intrinsic-size:auto_36px] hover:bg-muted/50"
-    >
+    <div className="group flex items-center gap-2 border-b border-border/40 px-3 py-1.5 text-sm [content-visibility:auto] [contain-intrinsic-size:auto_36px] hover:bg-muted/50">
       <button
         className="flex min-w-0 flex-1 items-center gap-2 text-left"
         onDoubleClick={() => entry.isDir && onEnter(entry.path)}
@@ -351,6 +551,8 @@ const SftpRow = memo(function SftpRow({
       >
         {entry.isDir ? (
           <Folder className="size-4 shrink-0 text-primary" />
+        ) : canExtract ? (
+          <FileArchive className="size-4 shrink-0 text-muted-foreground" />
         ) : (
           <FileIcon className="size-4 shrink-0 text-muted-foreground" />
         )}
@@ -361,17 +563,25 @@ const SftpRow = memo(function SftpRow({
       <span className="w-20 text-right text-xs text-muted-foreground">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
-      <div className="flex w-24 justify-end gap-0.5 opacity-0 group-hover:opacity-100">
-        {!entry.isDir ? (
+      <div className="flex w-32 justify-end gap-0.5 opacity-0 group-hover:opacity-100">
+        {canExtract ? (
           <Button
             variant="ghost"
             size="icon-xs"
-            title="下载"
-            onClick={() => onDownload(entry)}
+            title="解压"
+            onClick={() => onExtract(entry)}
           >
-            <Download />
+            <FolderOpen />
           </Button>
         ) : null}
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          title="下载"
+          onClick={() => onDownload(entry)}
+        >
+          <Download />
+        </Button>
         <Button
           variant="ghost"
           size="icon-xs"

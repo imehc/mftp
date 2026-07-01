@@ -28,4 +28,6 @@ uuid = { version = "1", features = ["v4"] }
 base64 = "0.22"
 dirs = "5"
 parking_lot = "0.12"
+tar = "0.4"
+flate2 = "1"
 

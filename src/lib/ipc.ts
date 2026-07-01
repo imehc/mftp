@@ -48,3 +48,34 @@ export const sftpDownload = (sessionId: string, remote: string, local: string) =
   invoke<void>("sftp_download", { sessionId, remote, local });
 export const sftpUpload = (sessionId: string, local: string, remote: string) =>
   invoke<void>("sftp_upload", { sessionId, local, remote });
+export const sftpExists = (sessionId: string, path: string) =>
+  invoke<boolean>("sftp_exists", { sessionId, path });
+export const sftpUploadDir = (
+  sessionId: string,
+  localDir: string,
+  remoteParent: string,
+  remoteName: string,
+) =>
+  invoke<void>("sftp_upload_dir", {
+    sessionId,
+    localDir,
+    remoteParent,
+    remoteName,
+  });
+export const sftpDownloadDir = (
+  sessionId: string,
+  remoteDir: string,
+  localArchive: string,
+) => invoke<void>("sftp_download_dir", { sessionId, remoteDir, localArchive });
+export const sftpExtract = (
+  sessionId: string,
+  remoteArchive: string,
+  remoteParent: string,
+  outName?: string | null,
+) =>
+  invoke<void>("sftp_extract", {
+    sessionId,
+    remoteArchive,
+    remoteParent,
+    outName: outName ?? null,
+  });
