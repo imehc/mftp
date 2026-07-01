@@ -1,0 +1,48 @@
+import { invoke } from "@tauri-apps/api/core";
+import type { Host, HostInput, SftpEntry, SshKey } from "~/types";
+
+// ---- Hosts ----
+export const hostsList = () => invoke<Host[]>("hosts_list");
+export const hostGet = (id: string) => invoke<Host>("host_get", { id });
+export const hostCreate = (input: HostInput) =>
+  invoke<Host>("host_create", { input });
+export const hostUpdate = (id: string, input: HostInput) =>
+  invoke<Host>("host_update", { id, input });
+export const hostDelete = (id: string) => invoke<void>("host_delete", { id });
+
+// ---- Keys ----
+export const keysList = () => invoke<SshKey[]>("keys_list");
+export const keyImport = (
+  label: string,
+  sourcePath: string,
+  hasPassphrase: boolean,
+) => invoke<SshKey>("key_import", { label, sourcePath, hasPassphrase });
+export const keyDelete = (id: string) => invoke<void>("key_delete", { id });
+
+// ---- SSH ----
+export const sshConnect = (hostId: string, passphrase?: string) =>
+  invoke<string>("ssh_connect", { hostId, passphrase: passphrase ?? null });
+export const sshOpenShell = (sessionId: string, cols: number, rows: number) =>
+  invoke<void>("ssh_open_shell", { sessionId, cols, rows });
+export const sshWrite = (sessionId: string, data: string) =>
+  invoke<void>("ssh_write", { sessionId, data });
+export const sshResize = (sessionId: string, cols: number, rows: number) =>
+  invoke<void>("ssh_resize", { sessionId, cols, rows });
+export const sshDisconnect = (sessionId: string) =>
+  invoke<void>("ssh_disconnect", { sessionId });
+
+// ---- SFTP ----
+export const sftpHome = (sessionId: string) =>
+  invoke<string>("sftp_home", { sessionId });
+export const sftpList = (sessionId: string, path: string) =>
+  invoke<SftpEntry[]>("sftp_list", { sessionId, path });
+export const sftpMkdir = (sessionId: string, path: string) =>
+  invoke<void>("sftp_mkdir", { sessionId, path });
+export const sftpRename = (sessionId: string, from: string, to: string) =>
+  invoke<void>("sftp_rename", { sessionId, from, to });
+export const sftpDelete = (sessionId: string, path: string, isDir: boolean) =>
+  invoke<void>("sftp_delete", { sessionId, path, isDir });
+export const sftpDownload = (sessionId: string, remote: string, local: string) =>
+  invoke<void>("sftp_download", { sessionId, remote, local });
+export const sftpUpload = (sessionId: string, local: string, remote: string) =>
+  invoke<void>("sftp_upload", { sessionId, local, remote });

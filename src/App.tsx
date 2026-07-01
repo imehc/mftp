@@ -1,37 +1,66 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useEffect } from "react";
+import { useHostsStore } from "~/store/hosts";
+import { useSessionsStore } from "~/store/sessions";
+import Sidebar from "~/components/layout/Sidebar";
+import TabBar from "~/components/terminal/TabBar";
+import Terminal from "~/components/terminal/Terminal";
+import SftpPanel from "~/components/sftp/SftpPanel";
+import { TerminalSquare } from "lucide-react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "~/components/ui/empty";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+export default function App() {
+  const loadAll = useHostsStore((s) => s.loadAll);
+  const sessions = useSessionsStore((s) => s.sessions);
+  const activeId = useSessionsStore((s) => s.activeId);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   return (
-    <main className="container">
-      
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit" className="text-red-500">Greet</button>
-      </form>
-      <p >{greetMsg}</p>
-    </main>
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+      <Sidebar />
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <TabBar />
+        <div className="relative flex-1 overflow-hidden">
+          {sessions.length === 0 ? (
+            <Empty className="h-full">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <TerminalSquare />
+                </EmptyMedia>
+                <EmptyTitle>还没有打开的连接</EmptyTitle>
+                <EmptyDescription>
+                  在左侧选择主机并点击连接，或新建主机
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : null}
+          {/* Keep every session mounted so terminals preserve their state. */}
+          {sessions.map((session) => (
+            <div
+              key={session.id}
+              className="absolute inset-0"
+              style={{ display: session.id === activeId ? "block" : "none" }}
+            >
+              {/* Terminal stays mounted to keep the shell alive across view switches. */}
+              <div
+                className="h-full"
+                style={{ display: session.view === "terminal" ? "block" : "none" }}
+              >
+                <Terminal session={session} />
+              </div>
+              {session.view === "sftp" && <SftpPanel session={session} />}
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
   );
 }
-
-export default App;
