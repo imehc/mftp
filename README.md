@@ -31,3 +31,10 @@ pnpm tauri build   # 打包
 
 - 前端：React 19、TypeScript、Tailwind v4、shadcn/ui、zustand、@xterm/xterm
 - 后端：Tauri v2、Rust、ssh2（vendored-openssl）、tauri-plugin-dialog
+
+## 注意事项
+
+- macOS未签名包可能提示“mftp 已损坏，无法打开”，可执行：
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/mftp.app
+> ```

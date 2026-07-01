@@ -13,17 +13,74 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test:
-    name: Test and build
+  release-info:
+    name: Release info
     runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.release-info.outputs.version }}
+      should_release: ${{ steps.release-info.outputs.should_release }}
       release_body: ${{ steps.release-info.outputs.release_body }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate release notes
+        id: release-info
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            {
+              echo "version=${VERSION}"
+              echo "should_release=false"
+              echo "release_body<<EOF"
+              echo "Version v${VERSION} already exists. Release build skipped."
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PREVIOUS_TAG="$(git tag --list 'v[0-9]*' --sort=-v:refname | head -n 1 || true)"
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            RANGE="${PREVIOUS_TAG}..HEAD"
+            HEADER="Changes since ${PREVIOUS_TAG}"
+          else
+            RANGE="HEAD"
+            HEADER="Initial release"
+          fi
+
+          NOTES="$(git log "$RANGE" --pretty=format:'- %s (%h)' --no-merges)"
+          if [ -z "$NOTES" ]; then
+            NOTES="- No code changes since ${PREVIOUS_TAG}."
+          fi
+
+          {
+            echo "version=${VERSION}"
+            echo "should_release=true"
+            echo "release_body<<EOF"
+            echo "${HEADER}"
+            echo
+            echo "${NOTES}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test and build
+    needs: release-info
+    if: needs.release-info.outputs.should_release == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Install Linux dependencies
         run: |
@@ -66,35 +123,6 @@ jobs:
       - name: Check version consistency
         run: pnpm run version:check
 
-      - name: Generate release notes
-        id: release-info
-        shell: bash
-        run: |
-          VERSION="$(node -p "require('./package.json').version")"
-          PREVIOUS_TAG="$(git tag --list 'v[0-9]*' --sort=-v:refname | grep -v "^v${VERSION}$" | head -n 1 || true)"
-
-          if [ -n "$PREVIOUS_TAG" ]; then
-            RANGE="${PREVIOUS_TAG}..HEAD"
-            HEADER="Changes since ${PREVIOUS_TAG}"
-          else
-            RANGE="HEAD"
-            HEADER="Initial release"
-          fi
-
-          NOTES="$(git log "$RANGE" --pretty=format:'- %s (%h)' --no-merges)"
-          if [ -z "$NOTES" ]; then
-            NOTES="- No code changes since ${PREVIOUS_TAG}."
-          fi
-
-          {
-            echo "version=${VERSION}"
-            echo "release_body<<EOF"
-            echo "${HEADER}"
-            echo
-            echo "${NOTES}"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
       - name: Build frontend
         run: pnpm run build
 
@@ -103,7 +131,8 @@ jobs:
 
   build:
     name: Build ${{ matrix.platform }}
-    needs: test
+    needs: [release-info, test]
+    if: needs.release-info.outputs.should_release == 'true'
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
@@ -180,7 +209,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: mftp v__VERSION__
-          releaseBody: ${{ needs.test.outputs.release_body }}
+          releaseBody: ${{ needs.release-info.outputs.release_body }}
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
@@ -189,20 +218,13 @@ jobs:
 
   publish:
     name: Publish release
-    needs: build
+    needs: [release-info, build]
+    if: needs.release-info.outputs.should_release == 'true'
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: Publish draft release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.release-info.outputs.version }}
         run: |
-          VERSION="$(node -p "require('./package.json').version")"
           gh release edit "v${VERSION}" --draft=false
