@@ -2,7 +2,7 @@ use crate::error::{AppError, AppResult};
 use crate::models::SftpEntry;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use parking_lot::Mutex;
-use ssh2::Session;
+use ssh2::{ErrorCode, Session};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::net::TcpStream;
@@ -11,6 +11,16 @@ use std::sync::mpsc::{Receiver, Sender};
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter};
+
+const SFTP_KEEPALIVE_INTERVAL_SECS: u32 = 15;
+const SFTP_KEEPALIVE_TIMEOUT_MS: u32 = 10_000;
+
+const LIBSSH2_ERROR_SOCKET_SEND: i32 = -7;
+const LIBSSH2_ERROR_TIMEOUT: i32 = -9;
+const LIBSSH2_ERROR_SOCKET_DISCONNECT: i32 = -13;
+const LIBSSH2_ERROR_SOCKET_TIMEOUT: i32 = -30;
+const LIBSSH2_ERROR_SOCKET_RECV: i32 = -43;
+const LIBSSH2_ERROR_BAD_SOCKET: i32 = -45;
 
 /// How the backend should authenticate a session. Captured at connect time so
 /// the shell and SFTP channels (separate TCP sessions) can each (re)connect.
@@ -77,7 +87,31 @@ fn connect(mat: &AuthMaterial) -> AppResult<Session> {
     if !sess.authenticated() {
         return Err(AppError("authentication failed".into()));
     }
+    sess.set_keepalive(true, SFTP_KEEPALIVE_INTERVAL_SECS);
     Ok(sess)
+}
+
+fn stale_session_error(err: &ssh2::Error) -> bool {
+    matches!(
+        err.code(),
+        ErrorCode::Session(
+            LIBSSH2_ERROR_SOCKET_SEND
+                | LIBSSH2_ERROR_TIMEOUT
+                | LIBSSH2_ERROR_SOCKET_DISCONNECT
+                | LIBSSH2_ERROR_SOCKET_TIMEOUT
+                | LIBSSH2_ERROR_SOCKET_RECV
+                | LIBSSH2_ERROR_BAD_SOCKET
+        )
+    )
+}
+
+fn check_sftp_conn(conn: &Arc<Mutex<SftpConn>>) -> Result<(), ssh2::Error> {
+    let conn = conn.lock();
+    conn.session.set_blocking(true);
+    conn.session.set_timeout(SFTP_KEEPALIVE_TIMEOUT_MS);
+    let result = conn.session.keepalive_send();
+    conn.session.set_timeout(0);
+    result.map(|_| ())
 }
 
 impl Manager {
@@ -156,8 +190,21 @@ impl Manager {
     /// Get (or lazily create) the SFTP connection for this session. The SFTP
     /// subsystem is initialized once here and reused for every subsequent call.
     fn sftp_conn(&self, session_id: &str) -> AppResult<Arc<Mutex<SftpConn>>> {
-        if let Some(s) = self.sftp.lock().get(session_id) {
-            return Ok(s.clone());
+        let cached = { self.sftp.lock().get(session_id).cloned() };
+        if let Some(conn) = cached {
+            match check_sftp_conn(&conn) {
+                Ok(()) => return Ok(conn),
+                Err(e) if stale_session_error(&e) => {
+                    let mut sftp = self.sftp.lock();
+                    if sftp
+                        .get(session_id)
+                        .is_some_and(|current| Arc::ptr_eq(current, &conn))
+                    {
+                        sftp.remove(session_id);
+                    }
+                }
+                Err(e) => return Err(e.into()),
+            }
         }
         let mat = self.material(session_id)?;
         let sess = connect(&mat)?;
@@ -166,9 +213,7 @@ impl Manager {
             sftp,
             session: sess,
         }));
-        self.sftp
-            .lock()
-            .insert(session_id.to_string(), arc.clone());
+        self.sftp.lock().insert(session_id.to_string(), arc.clone());
         Ok(arc)
     }
 
@@ -353,7 +398,11 @@ impl Manager {
 
         // 2. Upload it to a hidden temp file in the remote parent.
         let remote_archive = join_remote(remote_parent, &format!(".mftp-up-{}.tar.gz", uuid_v4()));
-        let upload_res = self.sftp_upload(session_id, &local_archive.to_string_lossy(), &remote_archive);
+        let upload_res = self.sftp_upload(
+            session_id,
+            &local_archive.to_string_lossy(),
+            &remote_archive,
+        );
         // Local temp no longer needed once uploaded (or on failure).
         let _ = std::fs::remove_file(&local_archive);
         upload_res?;
@@ -365,7 +414,10 @@ impl Manager {
             shell_quote(remote_parent)
         );
         let extract_res = self.exec_checked(session_id, &cmd).map(|_| ());
-        let _ = self.exec(session_id, &format!("rm -f {}", shell_quote(&remote_archive)));
+        let _ = self.exec(
+            session_id,
+            &format!("rm -f {}", shell_quote(&remote_archive)),
+        );
         extract_res
     }
 
@@ -391,7 +443,10 @@ impl Manager {
 
         // 2. Download, then remove the remote temp archive regardless.
         let dl = self.sftp_download(session_id, &remote_archive, local_archive);
-        let _ = self.exec(session_id, &format!("rm -f {}", shell_quote(&remote_archive)));
+        let _ = self.exec(
+            session_id,
+            &format!("rm -f {}", shell_quote(&remote_archive)),
+        );
         dl
     }
 
@@ -550,10 +605,10 @@ fn pack_tar_gz(local_dir: &str, top_name: &str, dest: &Path) -> AppResult<()> {
     let enc = builder
         .into_inner()
         .map_err(|e| AppError(format!("打包失败: {e}")))?;
-    enc.finish().map_err(|e| AppError(format!("打包失败: {e}")))?;
+    enc.finish()
+        .map_err(|e| AppError(format!("打包失败: {e}")))?;
     Ok(())
 }
-
 
 /// Runs on a dedicated thread; owns the session + shell channel exclusively.
 /// Blocking reads with a short timeout let us interleave write/resize jobs.
@@ -612,9 +667,7 @@ fn shell_worker(
             }
             Err(e) => {
                 let kind = e.kind();
-                if kind == std::io::ErrorKind::WouldBlock
-                    || kind == std::io::ErrorKind::TimedOut
-                {
+                if kind == std::io::ErrorKind::WouldBlock || kind == std::io::ErrorKind::TimedOut {
                     // No data within the poll window; keep going.
                 } else {
                     break;
