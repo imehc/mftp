@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState, memo } from "react";
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import {
   ArrowUp,
+  ChevronDown,
+  ChevronUp,
   Download,
   File as FileIcon,
   FileArchive,
@@ -46,7 +48,7 @@ import {
 } from "~/components/ui/alert-dialog";
 import PromptDialog from "~/components/ui/prompt-dialog";
 import ConflictDialog, {
-  type ConflictMode,
+  type ConflictResolution,
 } from "~/components/sftp/ConflictDialog";
 import { cn } from "~/lib/utils";
 
@@ -97,6 +99,7 @@ function baseName(p: string): string {
 }
 
 const ARCHIVE_RE = /\.(zip|tar|tar\.gz|tgz|tar\.bz2|tbz2)$/i;
+const DOWNLOAD_ARCHIVE_RE = /\.(tar\.gz|tgz)$/i;
 function isArchive(name: string): boolean {
   return ARCHIVE_RE.test(name);
 }
@@ -104,10 +107,19 @@ function isArchive(name: string): boolean {
 function archiveStem(name: string): string {
   return name.replace(ARCHIVE_RE, "");
 }
+function validPlainName(name: string): boolean {
+  return name.trim() !== "" && !/[\\/]/.test(name.trim());
+}
+function normalizeDownloadArchiveName(name: string): string {
+  const trimmed = name.trim();
+  return DOWNLOAD_ARCHIVE_RE.test(trimmed) ? trimmed : `${trimmed}.tar.gz`;
+}
 
 type PromptState =
   | { kind: "mkdir" }
   | { kind: "rename"; entry: SftpEntry }
+  | { kind: "uploadDir"; localDir: string; initialName: string }
+  | { kind: "downloadDir"; entry: SftpEntry; initialName: string }
   | null;
 
 /** A pending action blocked on resolving a remote name conflict. */
@@ -115,11 +127,25 @@ type ConflictState =
   | {
       name: string; // the conflicting existing name
       incomingLabel: string;
-      run: (mode: ConflictMode, newName: string) => Promise<void>;
+      initialIncomingName?: string;
+      initialExistingName?: string;
+      run: (resolution: ConflictResolution) => Promise<void>;
     }
   | null;
 
 type LoadingAction = "home" | "parent" | "refresh" | "list" | `enter:${string}`;
+type SortKey = "name" | "mtime" | "type" | "size";
+type SortDirection = "asc" | "desc";
+
+interface SortState {
+  key: SortKey;
+  direction: SortDirection;
+}
+
+const nameCollator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: "base",
+});
 
 function loadingLabel(action: LoadingAction | null): string {
   if (!action) return "加载中…";
@@ -130,6 +156,39 @@ function loadingLabel(action: LoadingAction | null): string {
   return "加载中…";
 }
 
+function defaultSortDirection(key: SortKey): SortDirection {
+  return key === "mtime" || key === "size" ? "desc" : "asc";
+}
+
+function entrySortType(entry: SftpEntry): string {
+  if (entry.isDir) return "0:folder";
+  if (entry.isSymlink) return "1:symlink";
+  const type = entryType(entry);
+  return type === "文件" ? "2:file" : `3:${type}`;
+}
+
+function compareEntries(a: SftpEntry, b: SftpEntry, sort: SortState): number {
+  // Keep directories grouped first for navigation, then sort inside each group.
+  if (a.isDir !== b.isDir) return a.isDir ? -1 : 1;
+
+  let result = 0;
+  if (sort.key === "name") {
+    result = nameCollator.compare(a.name, b.name);
+  } else if (sort.key === "mtime") {
+    result = a.mtime - b.mtime;
+  } else if (sort.key === "size") {
+    result = a.size - b.size;
+  } else {
+    result = nameCollator.compare(entrySortType(a), entrySortType(b));
+  }
+
+  if (result === 0) {
+    result = nameCollator.compare(a.name, b.name);
+  }
+
+  return sort.direction === "asc" ? result : -result;
+}
+
 export default function SftpPanel({ session }: Props) {
   const sessionId = session.id;
   const [cwd, setCwd] = useState<string | null>(null);
@@ -137,11 +196,28 @@ export default function SftpPanel({ session }: Props) {
   const [loading, setLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState<LoadingAction | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortState>({ key: "name", direction: "asc" });
   const [prompt, setPrompt] = useState<PromptState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const [conflict, setConflict] = useState<ConflictState>(null);
   const startTransfer = useTransfersStore((s) => s.start);
   const finishTransfer = useTransfersStore((s) => s.finish);
+
+  const sortedEntries = useMemo(
+    () => [...entries].sort((a, b) => compareEntries(a, b, sort)),
+    [entries, sort],
+  );
+
+  const toggleSort = useCallback((key: SortKey) => {
+    setSort((current) =>
+      current.key === key
+        ? {
+            key,
+            direction: current.direction === "asc" ? "desc" : "asc",
+          }
+        : { key, direction: defaultSortDirection(key) },
+    );
+  }, []);
 
   const load = useCallback(
     async (path: string, action: LoadingAction = "list") => {
@@ -256,8 +332,22 @@ export default function SftpPanel({ session }: Props) {
   // ---- Folder download (packed as .tar.gz for transfer) ----
 
   async function onDownloadDir(entry: SftpEntry) {
+    setPrompt({
+      kind: "downloadDir",
+      entry,
+      initialName: `${entry.name}.tar.gz`,
+    });
+  }
+
+  async function downloadDirWithName(entry: SftpEntry, archiveName: string) {
+    if (!validPlainName(archiveName)) {
+      toast.error("名称不能为空，且不能包含斜杠");
+      return;
+    }
+    setPrompt(null);
+    const normalizedName = normalizeDownloadArchiveName(archiveName);
     const dest = await saveDialog({
-      defaultPath: `${entry.name}.tar.gz`,
+      defaultPath: normalizedName,
       title: "下载文件夹",
     });
     if (typeof dest !== "string") return;
@@ -287,7 +377,76 @@ export default function SftpPanel({ session }: Props) {
     });
     if (typeof selected !== "string") return;
     const name = baseName(selected);
-    await uploadDirWithName(selected, name);
+    await prepareUploadDir(selected, name);
+  }
+
+  async function prepareUploadDir(localDir: string, defaultName: string) {
+    if (!cwd) return;
+    try {
+      const exists = await ipc.sftpExists(sessionId, joinPath(cwd, defaultName));
+      if (exists) {
+        showUploadConflict(localDir, defaultName);
+        return;
+      }
+      setPrompt({
+        kind: "uploadDir",
+        localDir,
+        initialName: defaultName,
+      });
+    } catch (e) {
+      toast.error(String(e));
+    }
+  }
+
+  async function uploadDirWithPromptName(localDir: string, remoteName: string) {
+    if (!validPlainName(remoteName)) {
+      toast.error("名称不能为空，且不能包含斜杠");
+      return;
+    }
+    setPrompt(null);
+    await uploadDirWithName(localDir, remoteName.trim());
+  }
+
+  function showUploadConflict(
+    localDir: string,
+    remoteName: string,
+    initialIncomingName?: string,
+    initialExistingName?: string,
+  ) {
+    setConflict({
+      name: remoteName,
+      incomingLabel: "上传的文件夹",
+      initialIncomingName,
+      initialExistingName,
+      run: async (resolution) => {
+        await resolveUploadConflict(localDir, remoteName, resolution);
+      },
+    });
+  }
+
+  async function resolveUploadConflict(
+    localDir: string,
+    remoteName: string,
+    { incomingName, existingName }: ConflictResolution,
+  ) {
+    if (!cwd) return;
+    if (existingName !== remoteName) {
+      const targetExists = await ipc.sftpExists(
+        sessionId,
+        joinPath(cwd, existingName),
+      );
+      if (targetExists) {
+        toast.error(`远端已存在 “${existingName}”，请重新命名`);
+        showUploadConflict(localDir, remoteName, incomingName, existingName);
+        return;
+      }
+      await ipc.sftpRename(
+        sessionId,
+        joinPath(cwd, remoteName),
+        joinPath(cwd, existingName),
+      );
+    }
+    await uploadDirWithName(localDir, incomingName);
   }
 
   async function uploadDirWithName(localDir: string, remoteName: string) {
@@ -296,23 +455,7 @@ export default function SftpPanel({ session }: Props) {
     try {
       const exists = await ipc.sftpExists(sessionId, joinPath(cwd, remoteName));
       if (exists) {
-        setConflict({
-          name: remoteName,
-          incomingLabel: "上传的文件夹",
-          run: async (mode, newName) => {
-            if (mode === "incoming") {
-              await uploadDirWithName(localDir, newName);
-            } else {
-              // Rename the existing remote folder out of the way, then upload.
-              await ipc.sftpRename(
-                sessionId,
-                joinPath(cwd, remoteName),
-                joinPath(cwd, newName),
-              );
-              await runUploadDir(localDir, remoteName);
-            }
-          },
-        });
+        showUploadConflict(localDir, remoteName);
         return;
       }
     } catch (e) {
@@ -356,22 +499,7 @@ export default function SftpPanel({ session }: Props) {
     try {
       const exists = await ipc.sftpExists(sessionId, joinPath(cwd, outName));
       if (exists) {
-        setConflict({
-          name: outName,
-          incomingLabel: "解压出的文件夹",
-          run: async (mode, newName) => {
-            if (mode === "incoming") {
-              await extractWithName(entry, newName);
-            } else {
-              await ipc.sftpRename(
-                sessionId,
-                joinPath(cwd, outName),
-                joinPath(cwd, newName),
-              );
-              await runExtract(entry, outName);
-            }
-          },
-        });
+        showExtractConflict(entry, outName);
         return;
       }
     } catch (e) {
@@ -379,6 +507,48 @@ export default function SftpPanel({ session }: Props) {
       return;
     }
     await runExtract(entry, outName);
+  }
+
+  function showExtractConflict(
+    entry: SftpEntry,
+    outName: string,
+    initialIncomingName?: string,
+    initialExistingName?: string,
+  ) {
+    setConflict({
+      name: outName,
+      incomingLabel: "解压出的文件夹",
+      initialIncomingName,
+      initialExistingName,
+      run: async (resolution) => {
+        await resolveExtractConflict(entry, outName, resolution);
+      },
+    });
+  }
+
+  async function resolveExtractConflict(
+    entry: SftpEntry,
+    outName: string,
+    { incomingName, existingName }: ConflictResolution,
+  ) {
+    if (!cwd) return;
+    if (existingName !== outName) {
+      const targetExists = await ipc.sftpExists(
+        sessionId,
+        joinPath(cwd, existingName),
+      );
+      if (targetExists) {
+        toast.error(`远端已存在 “${existingName}”，请重新命名`);
+        showExtractConflict(entry, outName, incomingName, existingName);
+        return;
+      }
+      await ipc.sftpRename(
+        sessionId,
+        joinPath(cwd, outName),
+        joinPath(cwd, existingName),
+      );
+    }
+    await extractWithName(entry, incomingName);
   }
 
   async function runExtract(entry: SftpEntry, outName: string) {
@@ -427,12 +597,23 @@ export default function SftpPanel({ session }: Props) {
     const entry = deleteTarget;
     if (!entry || !cwd) return;
     setDeleteTarget(null);
+    const transferId = entry.isDir ? nextTransferId() : undefined;
+    const tid = toast.loading(`正在删除 ${entry.name}…`);
+    setBusy(`删除 ${entry.name}…`);
+    if (transferId) {
+      startTransfer(transferId, `删除 ${entry.name}`, { cancellable: false });
+    }
     try {
-      await ipc.sftpDelete(sessionId, entry.path, entry.isDir);
-      toast.success(`已删除 ${entry.name}`);
+      await ipc.sftpDelete(sessionId, entry.path, entry.isDir, transferId);
+      if (transferId) finishTransfer(transferId, "success");
+      toast.success(`已删除 ${entry.name}`, { id: tid });
       await load(cwd);
     } catch (e) {
-      toast.error(String(e));
+      const message = String(e);
+      if (transferId) finishTransfer(transferId, "error", message);
+      toast.error(message, { id: tid });
+    } finally {
+      setBusy(null);
     }
   }
 
@@ -540,13 +721,37 @@ export default function SftpPanel({ session }: Props) {
             )}
           >
             <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
-              <span className="flex-1">名称</span>
-              <span className="w-36 text-left">修改日期</span>
-              <span className="w-16 text-left">类型</span>
-              <span className="w-20 text-left">大小</span>
+              <SortHeader
+                label="名称"
+                sortKey="name"
+                sort={sort}
+                className="flex-1"
+                onSort={toggleSort}
+              />
+              <SortHeader
+                label="修改日期"
+                sortKey="mtime"
+                sort={sort}
+                className="w-36"
+                onSort={toggleSort}
+              />
+              <SortHeader
+                label="类型"
+                sortKey="type"
+                sort={sort}
+                className="w-16"
+                onSort={toggleSort}
+              />
+              <SortHeader
+                label="大小"
+                sortKey="size"
+                sort={sort}
+                className="w-20"
+                onSort={toggleSort}
+              />
               <span className="w-32 text-right">操作</span>
             </div>
-            {entries.map((entry) => (
+            {sortedEntries.map((entry) => (
               <SftpRow
                 key={entry.path}
                 entry={entry}
@@ -589,16 +794,42 @@ export default function SftpPanel({ session }: Props) {
           prompt?.kind === "rename" && doRename(prompt.entry, name)
         }
       />
+      <PromptDialog
+        open={prompt?.kind === "uploadDir"}
+        title="上传文件夹"
+        initialValue={prompt?.kind === "uploadDir" ? prompt.initialName : ""}
+        placeholder="远端文件夹名称"
+        confirmText="继续"
+        onOpenChange={(o) => !o && setPrompt(null)}
+        onConfirm={(name) =>
+          prompt?.kind === "uploadDir" &&
+          void uploadDirWithPromptName(prompt.localDir, name)
+        }
+      />
+      <PromptDialog
+        open={prompt?.kind === "downloadDir"}
+        title="下载文件夹"
+        initialValue={prompt?.kind === "downloadDir" ? prompt.initialName : ""}
+        placeholder="压缩包名称"
+        confirmText="继续"
+        onOpenChange={(o) => !o && setPrompt(null)}
+        onConfirm={(name) =>
+          prompt?.kind === "downloadDir" &&
+          void downloadDirWithName(prompt.entry, name)
+        }
+      />
 
       <ConflictDialog
         open={!!conflict}
         name={conflict?.name ?? ""}
         incomingLabel={conflict?.incomingLabel ?? "文件夹"}
+        initialIncomingName={conflict?.initialIncomingName}
+        initialExistingName={conflict?.initialExistingName}
         onOpenChange={(o) => !o && setConflict(null)}
-        onResolve={(mode, newName) => {
+        onResolve={(resolution) => {
           const c = conflict;
           setConflict(null);
-          if (c) void c.run(mode, newName).catch((e) => toast.error(String(e)));
+          if (c) void c.run(resolution).catch((e) => toast.error(String(e)));
         }}
       />
 
@@ -623,6 +854,41 @@ export default function SftpPanel({ session }: Props) {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+function SortHeader({
+  label,
+  sortKey,
+  sort,
+  className,
+  onSort,
+}: {
+  label: string;
+  sortKey: SortKey;
+  sort: SortState;
+  className?: string;
+  onSort: (key: SortKey) => void;
+}) {
+  const active = sort.key === sortKey;
+  const Icon = sort.direction === "asc" ? ChevronUp : ChevronDown;
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        "flex min-w-0 items-center gap-1 text-left hover:text-foreground",
+        active && "text-foreground",
+        className,
+      )}
+      aria-sort={
+        active ? (sort.direction === "asc" ? "ascending" : "descending") : "none"
+      }
+      onClick={() => onSort(sortKey)}
+    >
+      <span className="truncate">{label}</span>
+      {active ? <Icon className="size-3 shrink-0" /> : null}
+    </button>
   );
 }
 

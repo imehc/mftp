@@ -177,7 +177,7 @@ const TransferItem = memo(function TransferItem({
         <span className="min-w-0 truncate font-medium text-foreground">
           {transfer.label}
         </span>
-        {transfer.status === "running" ? (
+        {transfer.status === "running" && transfer.cancellable !== false ? (
           <Button
             variant="ghost"
             size="icon-xs"

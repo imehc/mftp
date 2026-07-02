@@ -2,11 +2,12 @@ use crate::error::{AppError, AppResult};
 use crate::models::{SftpEntry, TransferProgress};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use parking_lot::Mutex;
-use ssh2::{ErrorCode, FileStat, Session};
+use ssh2::{ErrorCode, FileStat, OpenFlags, OpenType, Session};
 use std::collections::HashMap;
-use std::fs::OpenOptions;
+use std::env;
+use std::fs::{self, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
-use std::net::TcpStream;
+use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::mpsc::{Receiver, Sender};
@@ -16,6 +17,8 @@ use tauri::{AppHandle, Emitter};
 
 const SFTP_KEEPALIVE_INTERVAL_SECS: u32 = 15;
 const SFTP_TRANSFER_RETRIES: usize = 3;
+const SFTP_TRANSFER_BUFFER_SIZE: usize = 256 * 1024;
+const SFTP_TRANSFER_KEEPALIVE_SECS: u64 = 5;
 const LIBSSH2_ERROR_SOCKET_SEND: i32 = -7;
 const LIBSSH2_ERROR_TIMEOUT: i32 = -9;
 const LIBSSH2_ERROR_SOCKET_DISCONNECT: i32 = -13;
@@ -48,7 +51,7 @@ fn emit_transfer_progress(
 /// the shell and SFTP channels (separate TCP sessions) can each (re)connect.
 #[derive(Clone)]
 pub enum AuthMethod {
-    Password(String),
+    Password(Option<String>),
     Key {
         path: PathBuf,
         passphrase: Option<String>,
@@ -61,6 +64,7 @@ pub struct AuthMaterial {
     pub port: u16,
     pub username: String,
     pub method: AuthMethod,
+    pub identity_files: Vec<PathBuf>,
 }
 
 /// Jobs sent to a shell worker thread.
@@ -139,15 +143,15 @@ pub struct Manager {
 
 /// Open + authenticate a blocking ssh2 session.
 fn connect(mat: &AuthMaterial) -> AppResult<Session> {
-    let tcp = TcpStream::connect((mat.host.as_str(), mat.port))
-        .map_err(|e| AppError(format!("connect {}:{} failed: {e}", mat.host, mat.port)))?;
+    let tcp = connect_tcp(&mat.host, mat.port)?;
     let mut sess = Session::new()?;
     sess.set_tcp_stream(tcp);
     sess.handshake()?;
     match &mat.method {
-        AuthMethod::Password(pw) => {
+        AuthMethod::Password(Some(pw)) => {
             sess.userauth_password(&mat.username, pw)?;
         }
+        AuthMethod::Password(None) => authenticate_with_local_defaults(&sess, mat)?,
         AuthMethod::Key { path, passphrase } => {
             sess.userauth_pubkey_file(&mat.username, None, path, passphrase.as_deref())?;
         }
@@ -157,6 +161,280 @@ fn connect(mat: &AuthMaterial) -> AppResult<Session> {
     }
     sess.set_keepalive(true, SFTP_KEEPALIVE_INTERVAL_SECS);
     Ok(sess)
+}
+
+fn authenticate_with_local_defaults(sess: &Session, mat: &AuthMaterial) -> AppResult<()> {
+    let mut errors = Vec::new();
+
+    match sess.userauth_agent(&mat.username) {
+        Ok(()) if sess.authenticated() => return Ok(()),
+        Ok(()) => {}
+        Err(e) => errors.push(format!("agent: {e}")),
+    }
+
+    for path in local_identity_candidates(&mat.identity_files) {
+        if !path.exists() {
+            continue;
+        }
+        match sess.userauth_pubkey_file(&mat.username, None, &path, None) {
+            Ok(()) if sess.authenticated() => return Ok(()),
+            Ok(()) => {}
+            Err(e) => errors.push(format!("{}: {e}", path.display())),
+        }
+    }
+
+    let detail = if errors.is_empty() {
+        "未找到可用的 ssh-agent 或默认私钥".to_string()
+    } else {
+        errors.join("; ")
+    };
+    Err(AppError(format!(
+        "authentication failed for {}@{}:{} ({detail})",
+        mat.username, mat.host, mat.port
+    )))
+}
+
+fn connect_tcp(host: &str, port: u16) -> AppResult<TcpStream> {
+    let host = host.trim();
+    let mut addrs: Vec<SocketAddr> = (host, port)
+        .to_socket_addrs()
+        .map_err(|e| AppError(format!("resolve {host}:{port} failed: {e}")))?
+        .collect();
+
+    if addrs.is_empty() {
+        return Err(AppError(format!("resolve {host}:{port} failed: no addresses")));
+    }
+
+    if host.eq_ignore_ascii_case("localhost") {
+        addrs.sort_by_key(|addr| if addr.is_ipv4() { 0 } else { 1 });
+    }
+
+    let mut errors = Vec::new();
+    for addr in addrs {
+        match TcpStream::connect(addr) {
+            Ok(tcp) => {
+                let _ = tcp.set_nodelay(true);
+                return Ok(tcp);
+            }
+            Err(e) => errors.push(format!("{addr}: {e}")),
+        }
+    }
+
+    let hint = if host.eq_ignore_ascii_case("localhost") {
+        "；如果命令行依赖 ProxyCommand/ProxyJump，当前内置连接暂不支持该跳板配置"
+    } else {
+        ""
+    };
+    Err(AppError(format!(
+        "connect {host}:{port} failed: {}{hint}",
+        errors.join("; ")
+    )))
+}
+
+#[derive(Default)]
+struct SshHostConfig {
+    hostname: Option<String>,
+    port: Option<u16>,
+    user: Option<String>,
+    identity_files: Vec<PathBuf>,
+}
+
+pub fn resolve_auth_material(mut mat: AuthMaterial) -> AppResult<AuthMaterial> {
+    let original_host = mat.host.clone();
+    if let Some(config) = read_ssh_config_for_host(&original_host) {
+        if mat.username.trim().is_empty() {
+            if let Some(user) = config.user {
+                mat.username = expand_ssh_tokens(&user, &original_host, "");
+            }
+        }
+        if let Some(hostname) = config.hostname {
+            mat.host = expand_ssh_tokens(&hostname, &original_host, &mat.username);
+        }
+        if let Some(port) = config.port {
+            mat.port = port;
+        }
+        mat.identity_files = config.identity_files;
+    }
+
+    if mat.username.trim().is_empty() {
+        mat.username = local_username()?;
+    }
+
+    Ok(mat)
+}
+
+fn read_ssh_config_for_host(host: &str) -> Option<SshHostConfig> {
+    let path = dirs::home_dir()?.join(".ssh/config");
+    let raw = fs::read_to_string(path).ok()?;
+    let mut config = SshHostConfig::default();
+    let mut active = true;
+
+    for raw_line in raw.lines() {
+        let Some((key, value)) = parse_ssh_config_line(raw_line) else {
+            continue;
+        };
+        let key = key.to_ascii_lowercase();
+        if key == "host" {
+            active = host_patterns_match(&value, host);
+            continue;
+        }
+        if !active {
+            continue;
+        }
+
+        match key.as_str() {
+            "hostname" if config.hostname.is_none() => {
+                config.hostname = Some(value);
+            }
+            "port" if config.port.is_none() => {
+                config.port = value.parse::<u16>().ok();
+            }
+            "user" if config.user.is_none() => {
+                config.user = Some(value);
+            }
+            "identityfile" => {
+                let user = config.user.as_deref().unwrap_or("");
+                config
+                    .identity_files
+                    .push(expand_identity_path(&value, host, user));
+            }
+            _ => {}
+        }
+    }
+
+    Some(config)
+}
+
+fn parse_ssh_config_line(line: &str) -> Option<(String, String)> {
+    let line = strip_ssh_comment(line).trim();
+    if line.is_empty() {
+        return None;
+    }
+
+    let first_ws = line.find(char::is_whitespace);
+    let first_eq = line.find('=');
+    let (key, value) = match (first_eq, first_ws) {
+        (Some(eq), Some(ws)) if eq < ws => (&line[..eq], &line[eq + 1..]),
+        (Some(eq), None) => (&line[..eq], &line[eq + 1..]),
+        (_, Some(ws)) => (&line[..ws], &line[ws + 1..]),
+        _ => return None,
+    };
+
+    Some((key.trim().to_string(), unquote_ssh_value(value.trim())))
+}
+
+fn strip_ssh_comment(line: &str) -> &str {
+    let mut single = false;
+    let mut double = false;
+    for (idx, ch) in line.char_indices() {
+        match ch {
+            '\'' if !double => single = !single,
+            '"' if !single => double = !double,
+            '#' if !single && !double => return &line[..idx],
+            _ => {}
+        }
+    }
+    line
+}
+
+fn unquote_ssh_value(value: &str) -> String {
+    if value.len() >= 2 {
+        let bytes = value.as_bytes();
+        if (bytes[0] == b'"' && bytes[value.len() - 1] == b'"')
+            || (bytes[0] == b'\'' && bytes[value.len() - 1] == b'\'')
+        {
+            return value[1..value.len() - 1].to_string();
+        }
+    }
+    value.to_string()
+}
+
+fn host_patterns_match(patterns: &str, host: &str) -> bool {
+    let mut matched = false;
+    for pattern in patterns.split_whitespace() {
+        if let Some(negated) = pattern.strip_prefix('!') {
+            if wildcard_match(negated, host) {
+                return false;
+            }
+        } else if wildcard_match(pattern, host) {
+            matched = true;
+        }
+    }
+    matched
+}
+
+fn wildcard_match(pattern: &str, text: &str) -> bool {
+    let pattern = pattern.to_ascii_lowercase();
+    let text = text.to_ascii_lowercase();
+    wildcard_match_bytes(pattern.as_bytes(), text.as_bytes())
+}
+
+fn wildcard_match_bytes(pattern: &[u8], text: &[u8]) -> bool {
+    if pattern.is_empty() {
+        return text.is_empty();
+    }
+
+    match pattern[0] {
+        b'*' => {
+            wildcard_match_bytes(&pattern[1..], text)
+                || (!text.is_empty() && wildcard_match_bytes(pattern, &text[1..]))
+        }
+        b'?' => !text.is_empty() && wildcard_match_bytes(&pattern[1..], &text[1..]),
+        ch => !text.is_empty() && ch == text[0] && wildcard_match_bytes(&pattern[1..], &text[1..]),
+    }
+}
+
+fn expand_identity_path(value: &str, host: &str, user: &str) -> PathBuf {
+    let expanded = expand_ssh_tokens(value, host, user);
+    if let Some(home) = dirs::home_dir() {
+        if expanded == "~" {
+            return home;
+        }
+        if let Some(rest) = expanded.strip_prefix("~/") {
+            return home.join(rest);
+        }
+    }
+    PathBuf::from(expanded)
+}
+
+fn expand_ssh_tokens(value: &str, host: &str, user: &str) -> String {
+    let local_user = local_username().unwrap_or_else(|_| String::new());
+    let home = dirs::home_dir()
+        .map(|path| path.to_string_lossy().to_string())
+        .unwrap_or_default();
+    value
+        .replace("%h", host)
+        .replace("%n", host)
+        .replace("%r", user)
+        .replace("%u", &local_user)
+        .replace("%d", &home)
+}
+
+fn local_username() -> AppResult<String> {
+    env::var("USER")
+        .or_else(|_| env::var("USERNAME"))
+        .map_err(|_| AppError("无法获取本机用户名，请在主机配置中填写用户名".into()))
+}
+
+fn local_identity_candidates(configured: &[PathBuf]) -> Vec<PathBuf> {
+    let mut paths = configured.to_vec();
+    if let Some(home) = dirs::home_dir() {
+        let ssh_dir = home.join(".ssh");
+        for name in [
+            "id_ed25519",
+            "id_ecdsa",
+            "id_ecdsa_sk",
+            "id_ed25519_sk",
+            "id_rsa",
+            "id_dsa",
+        ] {
+            let path = ssh_dir.join(name);
+            if !paths.iter().any(|item| item == &path) {
+                paths.push(path);
+            }
+        }
+    }
+    paths
 }
 
 fn stale_session_error(err: &ssh2::Error) -> bool {
@@ -411,15 +689,28 @@ impl Manager {
         Ok(())
     }
 
-    pub fn sftp_delete(&self, session_id: &str, path: &str, is_dir: bool) -> AppResult<()> {
+    pub fn sftp_delete(
+        &self,
+        session_id: &str,
+        path: &str,
+        is_dir: bool,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+    ) -> AppResult<()> {
+        if is_protected_remote_path(path) {
+            return Err(AppError("拒绝删除根目录或空路径".into()));
+        }
+
+        if is_dir {
+            emit_transfer_progress(app, transfer_id, "远端删除中", 0, None);
+            self.exec_checked(session_id, &format!("rm -rf -- {}", shell_quote(path)))?;
+            emit_transfer_progress(app, transfer_id, "完成", 1, Some(1));
+            return Ok(());
+        }
+
         let conn = self.sftp_conn(session_id)?;
         let conn = conn.lock();
-        if is_dir {
-            // Recursively remove directory contents, then the directory itself.
-            remove_dir_recursive(&conn.sftp, Path::new(path))?;
-        } else {
-            conn.sftp.unlink(Path::new(path))?;
-        }
+        conn.sftp.unlink(Path::new(path))?;
         Ok(())
     }
 
@@ -442,7 +733,7 @@ impl Manager {
             .write(true)
             .truncate(true)
             .open(local)?;
-        let mut buf = [0u8; 32 * 1024];
+        let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
         let mut transferred = 0u64;
         let mut last_emit = Instant::now();
         let mut attempts = 0usize;
@@ -459,6 +750,7 @@ impl Manager {
             let transfer_result: AppResult<()> = {
                 let conn_guard = conn.lock();
                 let mut remote_file = conn_guard.sftp.open(Path::new(remote))?;
+                let mut last_keepalive = Instant::now();
                 if transferred > 0 {
                     remote_file.seek(SeekFrom::Start(transferred))?;
                     local_file.seek(SeekFrom::Start(transferred))?;
@@ -476,6 +768,12 @@ impl Manager {
                     if last_emit.elapsed() >= Duration::from_millis(120) {
                         emit_transfer_progress(app, transfer_id, "下载中", transferred, total);
                         last_emit = Instant::now();
+                    }
+                    if last_keepalive.elapsed()
+                        >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
+                    {
+                        let _ = conn_guard.session.keepalive_send();
+                        last_keepalive = Instant::now();
                     }
                 }
             };
@@ -515,42 +813,85 @@ impl Manager {
         transfer_id: Option<&str>,
     ) -> AppResult<()> {
         let transfer = self.transfer_guard(transfer_id);
-        let conn = self.sftp_conn(session_id)?;
-        let conn = conn.lock();
         let total = std::fs::metadata(local).ok().map(|meta| meta.len());
         let mut local_file = std::fs::File::open(local)?;
-        let mut remote_file = conn.sftp.create(Path::new(remote))?;
-        let mut buf = [0u8; 32 * 1024];
+        let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
         let mut transferred = 0u64;
         let mut last_emit = Instant::now();
+        let mut attempts = 0usize;
+
         emit_transfer_progress(app, transfer_id, "上传中", 0, total);
-        let result: AppResult<()> = loop {
+        loop {
             if let Some(transfer) = &transfer {
-                transfer.check()?;
+                if let Err(e) = transfer.check() {
+                    let _ = self.remove_remote_path_if_file(session_id, remote);
+                    return Err(e);
+                }
             }
-            let n = local_file.read(&mut buf)?;
-            if n == 0 {
-                break Ok(());
+            let conn = self.sftp_conn(session_id)?;
+            let transfer_result: AppResult<()> = {
+                let conn_guard = conn.lock();
+                let mut remote_file = if transferred == 0 {
+                    conn_guard.sftp.create(Path::new(remote))?
+                } else {
+                    conn_guard.sftp.open_mode(
+                        Path::new(remote),
+                        OpenFlags::WRITE,
+                        0o644,
+                        OpenType::File,
+                    )?
+                };
+                let mut last_keepalive = Instant::now();
+                if transferred > 0 {
+                    remote_file.seek(SeekFrom::Start(transferred))?;
+                    local_file.seek(SeekFrom::Start(transferred))?;
+                }
+
+                loop {
+                    if let Some(transfer) = &transfer {
+                        transfer.check()?;
+                    }
+                    let n = local_file.read(&mut buf)?;
+                    if n == 0 {
+                        break Ok(());
+                    }
+                    if let Some(transfer) = &transfer {
+                        transfer.check()?;
+                    }
+                    remote_file.write_all(&buf[..n])?;
+                    transferred += n as u64;
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(app, transfer_id, "上传中", transferred, total);
+                        last_emit = Instant::now();
+                    }
+                    if last_keepalive.elapsed()
+                        >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
+                    {
+                        let _ = conn_guard.session.keepalive_send();
+                        last_keepalive = Instant::now();
+                    }
+                }
+            };
+
+            match transfer_result {
+                Ok(()) => break,
+                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    emit_transfer_progress(app, transfer_id, "重连后继续上传", transferred, total);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => {
+                    if transfer_cancelled_error(&e) {
+                        let _ = self.remove_remote_path_if_file(session_id, remote);
+                    }
+                    return Err(e);
+                }
             }
-            if let Some(transfer) = &transfer {
-                transfer.check()?;
-            }
-            remote_file.write_all(&buf[..n])?;
-            transferred += n as u64;
-            if last_emit.elapsed() >= Duration::from_millis(120) {
-                emit_transfer_progress(app, transfer_id, "上传中", transferred, total);
-                last_emit = Instant::now();
-            }
-        };
-        if let Err(e) = result {
-            if transfer_cancelled_error(&e) {
-                let _ = conn.sftp.unlink(Path::new(remote));
-            }
-            return Err(e);
         }
         if let Some(transfer) = &transfer {
             if let Err(e) = transfer.check() {
-                let _ = conn.sftp.unlink(Path::new(remote));
+                let _ = self.remove_remote_path_if_file(session_id, remote);
                 return Err(e);
             }
         }
@@ -599,6 +940,116 @@ impl Manager {
         Ok(conn.sftp.stat(Path::new(path)).is_ok())
     }
 
+    fn remove_remote_path_if_file(&self, session_id: &str, path: &str) -> AppResult<()> {
+        let conn = self.sftp_conn(session_id)?;
+        let conn = conn.lock();
+        match conn.sftp.unlink(Path::new(path)) {
+            Ok(()) => Ok(()),
+            Err(e) if stale_session_error(&e) => Err(e.into()),
+            Err(_) => Ok(()),
+        }
+    }
+
+    fn upload_file_with_exec(
+        &self,
+        session_id: &str,
+        local: &str,
+        remote: &str,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+        phase: &str,
+    ) -> AppResult<()> {
+        let transfer = self.transfer_guard(transfer_id);
+        let total = std::fs::metadata(local).ok().map(|meta| meta.len());
+        let mat = self.material(session_id)?;
+        let mut attempts = 0usize;
+
+        loop {
+            if let Some(transfer) = &transfer {
+                transfer.check()?;
+            }
+
+            let sess = match connect(&mat) {
+                Ok(sess) => sess,
+                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
+                    attempts += 1;
+                    emit_transfer_progress(app, transfer_id, "重连后重新上传压缩包", 0, total);
+                    std::thread::sleep(Duration::from_millis(250));
+                    continue;
+                }
+                Err(e) => return Err(e),
+            };
+
+            let result: AppResult<()> = {
+                sess.set_blocking(true);
+                sess.set_timeout(0);
+                let mut channel = sess.channel_session()?;
+                channel.exec(&format!("cat > {}", shell_quote(remote)))?;
+
+                let mut local_file = std::fs::File::open(local)?;
+                let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
+                let mut transferred = 0u64;
+                let mut last_emit = Instant::now();
+                let mut last_keepalive = Instant::now();
+
+                emit_transfer_progress(app, transfer_id, phase, 0, total);
+                loop {
+                    if let Some(transfer) = &transfer {
+                        transfer.check()?;
+                    }
+                    let n = local_file.read(&mut buf)?;
+                    if n == 0 {
+                        break;
+                    }
+                    channel.write_all(&buf[..n])?;
+                    transferred += n as u64;
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(app, transfer_id, phase, transferred, total);
+                        last_emit = Instant::now();
+                    }
+                    if last_keepalive.elapsed()
+                        >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
+                    {
+                        let _ = sess.keepalive_send();
+                        last_keepalive = Instant::now();
+                    }
+                }
+
+                channel.flush()?;
+                channel.send_eof()?;
+                let mut stderr = String::new();
+                channel.stderr().read_to_string(&mut stderr)?;
+                channel.wait_close()?;
+                let code = channel.exit_status()?;
+                if code != 0 {
+                    let msg = if stderr.trim().is_empty() {
+                        "cat failed".to_string()
+                    } else {
+                        stderr.trim().to_string()
+                    };
+                    return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
+                }
+
+                if let Some(transfer) = &transfer {
+                    transfer.check()?;
+                }
+                emit_transfer_progress(app, transfer_id, phase, transferred, total);
+                Ok(())
+            };
+
+            match result {
+                Ok(()) => return Ok(()),
+                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
+                    attempts += 1;
+                    emit_transfer_progress(app, transfer_id, "重连后重新上传压缩包", 0, total);
+                    let _ = self.exec(session_id, &format!("rm -f -- {}", shell_quote(remote)));
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => return Err(e),
+            }
+        }
+    }
+
     /// Upload a local directory: pack it locally into a tar.gz whose top-level
     /// entry is `remote_name`, stream the archive up, then extract remotely.
     pub fn sftp_upload_dir(
@@ -627,16 +1078,23 @@ impl Manager {
 
         // 2. Upload it to a hidden temp file in the remote parent.
         let remote_archive = join_remote(remote_parent, &format!(".mftp-up-{}.tar.gz", uuid_v4()));
-        let upload_res = self.sftp_upload(
+        let upload_res = self.upload_file_with_exec(
             session_id,
             &local_archive.to_string_lossy(),
             &remote_archive,
             app,
             transfer_id,
+            "上传压缩包中",
         );
         // Local temp no longer needed once uploaded (or on failure).
         let _ = std::fs::remove_file(&local_archive);
-        upload_res?;
+        if let Err(e) = upload_res {
+            let _ = self.exec(
+                session_id,
+                &format!("rm -f -- {}", shell_quote(&remote_archive)),
+            );
+            return Err(e);
+        }
         if let Some(transfer) = &transfer {
             if let Err(e) = transfer.check() {
                 let _ = self.exec(
@@ -712,7 +1170,7 @@ impl Manager {
                     .write(true)
                     .truncate(true)
                     .open(local_archive)?;
-                let mut buf = [0u8; 32 * 1024];
+                let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
                 let mut transferred = 0u64;
                 let mut last_emit = Instant::now();
 
@@ -882,26 +1340,14 @@ impl Manager {
     }
 }
 
-/// Recursively delete a remote directory and all of its contents.
-fn remove_dir_recursive(sftp: &ssh2::Sftp, dir: &Path) -> AppResult<()> {
-    for (path, stat) in sftp.readdir(dir)? {
-        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
-        if name == "." || name == ".." {
-            continue;
-        }
-        if stat.is_dir() {
-            remove_dir_recursive(sftp, &path)?;
-        } else {
-            sftp.unlink(&path)?;
-        }
-    }
-    sftp.rmdir(dir)?;
-    Ok(())
-}
-
 /// Generate a fresh UUID v4 string (short helper for temp file names).
 fn uuid_v4() -> String {
     uuid::Uuid::new_v4().to_string()
+}
+
+fn is_protected_remote_path(path: &str) -> bool {
+    let trimmed = path.trim();
+    trimmed.is_empty() || trimmed == "/" || trimmed == "." || trimmed == ".."
 }
 
 /// Quote an argument for a POSIX shell by wrapping in single quotes.
@@ -987,7 +1433,7 @@ fn pack_tar_gz(local_dir: &str, top_name: &str, dest: &Path) -> AppResult<()> {
     use flate2::write::GzEncoder;
     use flate2::Compression;
     let file = std::fs::File::create(dest)?;
-    let enc = GzEncoder::new(file, Compression::default());
+    let enc = GzEncoder::new(file, Compression::fast());
     let mut builder = tar::Builder::new(enc);
     builder
         .append_dir_all(top_name, local_dir)

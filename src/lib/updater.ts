@@ -3,22 +3,71 @@ import { check, type DownloadEvent, type Update } from "@tauri-apps/plugin-updat
 import { toast } from "sonner";
 
 let checkedOnLaunch = false;
+const UPDATE_CHECK_TIMEOUT_MS = 15_000;
 
 export async function checkForUpdateOnLaunch() {
-  if (checkedOnLaunch || !import.meta.env.PROD || !("__TAURI_INTERNALS__" in window)) {
+  if (checkedOnLaunch || !import.meta.env.PROD || !isTauriRuntime()) {
     return;
   }
 
   checkedOnLaunch = true;
 
   try {
-    const update = await check();
+    const update = await checkWithTimeout();
     if (!update) return;
 
     showUpdatePrompt(update);
   } catch (error) {
     console.warn("update check failed", error);
   }
+}
+
+export async function checkForUpdateManually() {
+  if (!isTauriRuntime()) {
+    toast.error("只能在桌面应用中检查更新");
+    return;
+  }
+
+  const toastId = toast.loading("正在检查更新…");
+  try {
+    const update = await checkWithTimeout();
+    if (!update) {
+      toast.success("当前已是最新版本", { id: toastId });
+      return;
+    }
+
+    toast.dismiss(toastId);
+    showUpdatePrompt(update);
+  } catch (error) {
+    console.warn("manual update check failed", error);
+    toast.error(updateErrorTitle(error), {
+      id: toastId,
+      closeButton: true,
+    });
+  }
+}
+
+function isTauriRuntime() {
+  return "__TAURI_INTERNALS__" in window;
+}
+
+function checkWithTimeout() {
+  return withTimeout(
+    check({ timeout: UPDATE_CHECK_TIMEOUT_MS }),
+    UPDATE_CHECK_TIMEOUT_MS,
+    "检查更新超时，请确认 GitHub Release 更新源是否可访问",
+  );
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string) {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), ms);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+  });
 }
 
 function showUpdatePrompt(update: Update) {
@@ -148,4 +197,26 @@ function formatReleaseNotes(body?: string) {
   const lines = notes.split("\n").filter(Boolean);
   const visible = lines.slice(0, 8).join("\n");
   return lines.length > 8 ? `${visible}\n...` : visible;
+}
+
+function formatError(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+function updateErrorTitle(error: unknown) {
+  const message = formatError(error);
+  if (message.includes("None of the fallback platforms")) {
+    return "检查更新失败：当前平台没有可用更新包";
+  }
+
+  if (
+    message.includes("error sending request") ||
+    message.includes("timed out") ||
+    message.includes("超时")
+  ) {
+    return "检查更新失败：无法连接更新源";
+  }
+
+  return `检查更新失败：${message}`;
 }

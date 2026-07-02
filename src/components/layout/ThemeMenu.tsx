@@ -1,16 +1,21 @@
-import { Monitor, Moon, Palette, Settings, Sun } from "lucide-react";
+import { useState } from "react";
+import { Monitor, Moon, Palette, RefreshCw, Settings, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { checkForUpdateManually } from "~/lib/updater";
 import { cn } from "~/lib/utils";
 
 const themes = [
@@ -21,6 +26,13 @@ const themes = [
 
 export default function ThemeMenu() {
   const { theme = "system", setTheme } = useTheme();
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+
+  function onCheckUpdate() {
+    if (checkingUpdate) return;
+    setCheckingUpdate(true);
+    void checkForUpdateManually().finally(() => setCheckingUpdate(false));
+  }
 
   return (
     <DropdownMenu>
@@ -38,6 +50,13 @@ export default function ThemeMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" align="start">
+        <DropdownMenuGroup>
+          <DropdownMenuItem disabled={checkingUpdate} onSelect={onCheckUpdate}>
+            <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
+            检查更新
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Palette />

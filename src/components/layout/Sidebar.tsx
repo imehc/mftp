@@ -137,6 +137,11 @@ export default function Sidebar() {
     }
   }
 
+  function hostAddress(host: Host) {
+    const target = `${host.host}:${host.port}`;
+    return host.username ? `${host.username}@${target}` : target;
+  }
+
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-sidebar">
       <div className="flex items-center justify-between px-3 py-2.5">
@@ -230,11 +235,11 @@ export default function Sidebar() {
                       <p className="truncate text-xs text-muted-foreground">
                         {isConnected
                           ? isDisconnecting
-                            ? `断开中 · ${host.username}@${host.host}:${host.port}`
-                            : `已连接 · ${host.username}@${host.host}:${host.port}`
+                            ? `断开中 · ${hostAddress(host)}`
+                            : `已连接 · ${hostAddress(host)}`
                           : isConnecting
-                            ? `连接中 · ${host.username}@${host.host}:${host.port}`
-                            : `${host.username}@${host.host}:${host.port}`}
+                            ? `连接中 · ${hostAddress(host)}`
+                            : hostAddress(host)}
                       </p>
                     </button>
                     <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 gap-0.5 rounded-md bg-sidebar-accent/95 group-hover:pointer-events-auto group-hover:flex">

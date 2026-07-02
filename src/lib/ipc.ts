@@ -42,8 +42,18 @@ export const sftpMkdir = (sessionId: string, path: string) =>
   invoke<void>("sftp_mkdir", { sessionId, path });
 export const sftpRename = (sessionId: string, from: string, to: string) =>
   invoke<void>("sftp_rename", { sessionId, from, to });
-export const sftpDelete = (sessionId: string, path: string, isDir: boolean) =>
-  invoke<void>("sftp_delete", { sessionId, path, isDir });
+export const sftpDelete = (
+  sessionId: string,
+  path: string,
+  isDir: boolean,
+  transferId?: string,
+) =>
+  invoke<void>("sftp_delete", {
+    sessionId,
+    path,
+    isDir,
+    transferId: transferId ?? null,
+  });
 export const sftpDownload = (
   sessionId: string,
   remote: string,
