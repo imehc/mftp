@@ -139,7 +139,7 @@ jobs:
       matrix:
         include:
           - platform: macos-latest
-            args: --bundles dmg
+            args: --bundles app,dmg
           - platform: windows-latest
             args: --bundles nsis,msi
           - platform: ubuntu-22.04
@@ -224,6 +224,76 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate updater manifest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.release-info.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p /tmp/mftp-release
+          gh release download "v${VERSION}" \
+            --pattern latest.json \
+            --dir /tmp/mftp-release \
+            --clobber
+
+          node <<'NODE'
+          const fs = require("fs");
+
+          const manifest = JSON.parse(
+            fs.readFileSync("/tmp/mftp-release/latest.json", "utf8"),
+          );
+          const platforms = manifest.platforms ?? {};
+          const platformKeys = Object.keys(platforms);
+          const required = [
+            {
+              name: "macOS Apple Silicon",
+              keys: ["darwin-aarch64-app", "darwin-aarch64"],
+            },
+            {
+              name: "Windows x64",
+              keys: ["windows-x86_64-nsis", "windows-x86_64-msi", "windows-x86_64"],
+            },
+            {
+              name: "Linux x64",
+              keys: ["linux-x86_64-appimage", "linux-x86_64-deb", "linux-x86_64"],
+            },
+          ];
+
+          const missing = required.filter((item) =>
+            item.keys.every((key) => !platforms[key]),
+          );
+          if (missing.length > 0) {
+            console.error(
+              `latest.json is missing updater platforms: ${missing
+                .map((item) => item.name)
+                .join(", ")}`,
+            );
+            console.error(`Found platforms: ${platformKeys.sort().join(", ")}`);
+            process.exit(1);
+          }
+
+          const incomplete = platformKeys.filter((key) => {
+            const platform = platforms[key];
+            return !platform?.url || !platform?.signature;
+          });
+          if (incomplete.length > 0) {
+            console.error(
+              `latest.json has platforms without url/signature: ${incomplete.join(
+                ", ",
+              )}`,
+            );
+            process.exit(1);
+          }
+
+          console.log(`Validated updater platforms: ${platformKeys.sort().join(", ")}`);
+          NODE
 
       - name: Publish draft release
         env:

@@ -76,8 +76,8 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
     setForm((f) => ({ ...f, [key]: value }));
 
   async function save() {
-    if (!form.label.trim() || !form.host.trim() || !form.username.trim()) {
-      setError("名称、地址、用户名为必填项");
+    if (!form.label.trim() || !form.host.trim()) {
+      setError("名称、地址为必填项");
       return;
     }
     if (form.authType === "key" && !form.keyId) {
@@ -89,6 +89,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
     try {
       const payload: HostInput = {
         ...form,
+        label: form.label.trim(),
+        host: form.host.trim(),
+        username: form.username.trim(),
         password: form.authType === "password" ? form.password : null,
         keyId: form.authType === "key" ? form.keyId : null,
         defaultPath: form.defaultPath?.trim() ? form.defaultPath.trim() : null,
@@ -151,8 +154,11 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                 id="host-user"
                 value={form.username}
                 onChange={(e) => set("username", e.target.value)}
-                placeholder="root"
+                placeholder="留空则使用 SSH 配置或本机用户"
               />
+              <FieldDescription>
+                留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。
+              </FieldDescription>
             </Field>
 
             <Field>

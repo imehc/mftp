@@ -12,11 +12,16 @@ export interface TransferState {
   status: "running" | "success" | "error" | "cancelled";
   error?: string;
   cancelling?: boolean;
+  cancellable?: boolean;
 }
 
 interface TransfersState {
   transfers: TransferState[];
-  start: (id: string, label: string) => void;
+  start: (
+    id: string,
+    label: string,
+    options?: { cancellable?: boolean },
+  ) => void;
   updateProgress: (progress: TransferProgress) => void;
   finish: (
     id: string,
@@ -31,7 +36,7 @@ interface TransfersState {
 export const useTransfersStore = create<TransfersState>((set) => ({
   transfers: [],
 
-  start(id, label) {
+  start(id, label, options) {
     set((state) => ({
       transfers: [
         {
@@ -43,6 +48,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
           speed: null,
           updatedAt: performance.now(),
           status: "running",
+          cancellable: options?.cancellable ?? true,
         },
         ...state.transfers.filter((item) => item.id !== id),
       ],

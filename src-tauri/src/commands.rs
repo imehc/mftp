@@ -1,6 +1,6 @@
 use crate::error::{AppError, AppResult};
 use crate::models::{AuthType, Host, HostInput, SftpEntry, SshKey};
-use crate::ssh::{AuthMaterial, AuthMethod};
+use crate::ssh::{resolve_auth_material, AuthMaterial, AuthMethod};
 use crate::AppState;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use tauri::{AppHandle, State};
@@ -76,10 +76,7 @@ fn build_auth(
 ) -> AppResult<AuthMaterial> {
     let method = match host.auth_type {
         AuthType::Password => {
-            let pw = host
-                .password
-                .clone()
-                .ok_or_else(|| AppError("host has no password".into()))?;
+            let pw = host.password.clone().filter(|value| !value.is_empty());
             AuthMethod::Password(pw)
         }
         AuthType::Key => {
@@ -91,11 +88,12 @@ fn build_auth(
             AuthMethod::Key { path, passphrase }
         }
     };
-    Ok(AuthMaterial {
+    resolve_auth_material(AuthMaterial {
         host: host.host.clone(),
         port: host.port,
         username: host.username.clone(),
         method,
+        identity_files: Vec::new(),
     })
 }
 
@@ -208,13 +206,24 @@ pub async fn sftp_rename(
 
 #[tauri::command]
 pub async fn sftp_delete(
+    app: AppHandle,
     state: State<'_, AppState>,
     session_id: String,
     path: String,
     is_dir: bool,
+    transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || manager.sftp_delete(&session_id, &path, is_dir)).await
+    run_blocking(move || {
+        manager.sftp_delete(
+            &session_id,
+            &path,
+            is_dir,
+            Some(&app),
+            transfer_id.as_deref(),
+        )
+    })
+    .await
 }
 
 #[tauri::command]

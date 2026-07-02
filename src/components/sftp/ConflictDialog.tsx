@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Field, FieldLabel, FieldDescription } from "~/components/ui/field";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +16,10 @@ import {
   DialogDescription,
 } from "~/components/ui/dialog";
 
-export type ConflictMode = "incoming" | "existing";
+export interface ConflictResolution {
+  incomingName: string;
+  existingName: string;
+}
 
 interface Props {
   open: boolean;
@@ -20,36 +27,42 @@ interface Props {
   name: string;
   /** Wording for the incoming item, e.g. "上传的文件夹" / "解压出的文件夹". */
   incomingLabel: string;
+  initialIncomingName?: string;
+  initialExistingName?: string;
   onOpenChange: (open: boolean) => void;
-  onResolve: (mode: ConflictMode, newName: string) => void;
+  onResolve: (resolution: ConflictResolution) => void;
 }
 
 /**
- * Resolve a remote name conflict: either rename the incoming folder, or rename
- * the existing remote folder. The new name must differ from the conflicting
- * name, otherwise the conflict persists and confirm stays disabled.
+ * Resolve a remote name conflict by optionally renaming both the incoming item
+ * and the existing remote folder before continuing.
  */
 export default function ConflictDialog({
   open,
   name,
   incomingLabel,
+  initialIncomingName,
+  initialExistingName,
   onOpenChange,
   onResolve,
 }: Props) {
-  const [mode, setMode] = useState<ConflictMode>("incoming");
-  const [value, setValue] = useState(name);
+  const [incomingValue, setIncomingValue] = useState(name);
+  const [existingValue, setExistingValue] = useState(name);
 
   useEffect(() => {
     if (open) {
-      setMode("incoming");
-      setValue(name);
+      setIncomingValue(initialIncomingName ?? name);
+      setExistingValue(initialExistingName ?? name);
     }
-  }, [open, name]);
+  }, [open, name, initialIncomingName, initialExistingName]);
 
-  const trimmed = value.trim();
-  // Still conflicting if empty or unchanged; also block path separators.
-  const invalid =
-    trimmed === "" || trimmed === name || /[\\/]/.test(trimmed);
+  const incomingName = incomingValue.trim();
+  const existingName = existingValue.trim();
+  const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
+  const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
+  const unchanged = incomingName === name && existingName === name;
+  const duplicated = incomingName !== "" && incomingName === existingName;
+  const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -57,67 +70,64 @@ export default function ConflictDialog({
         <DialogHeader>
           <DialogTitle>目标已存在同名文件夹</DialogTitle>
           <DialogDescription>
-            远端已存在 “{name}”。请选择如何处理后继续。
+            远端已存在 “{name}”。修改要创建的名称，或先重命名远端已有文件夹。
           </DialogDescription>
         </DialogHeader>
 
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (!invalid) onResolve(mode, trimmed);
+            if (!invalid) onResolve({ incomingName, existingName });
           }}
-          className="flex flex-col gap-3"
         >
-          <Field>
-            <FieldLabel>处理方式</FieldLabel>
-            <ToggleGroup
-              type="single"
-              value={mode}
-              onValueChange={(v) => v && setMode(v as ConflictMode)}
-              variant="outline"
-              className="w-full"
-            >
-              <ToggleGroupItem value="incoming" className="flex-1">
-                重命名{incomingLabel}
-              </ToggleGroupItem>
-              <ToggleGroupItem value="existing" className="flex-1">
-                重命名远端已有
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </Field>
+          <FieldGroup>
+            <Field data-invalid={incomingInvalid || duplicated}>
+              <FieldLabel htmlFor="conflict-incoming-name">
+                {incomingLabel}名称
+              </FieldLabel>
+              <Input
+                id="conflict-incoming-name"
+                autoFocus
+                value={incomingValue}
+                onChange={(e) => setIncomingValue(e.target.value)}
+                aria-invalid={incomingInvalid || duplicated}
+              />
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="conflict-name">
-              {mode === "incoming" ? `${incomingLabel}新名称` : "远端已有新名称"}
-            </FieldLabel>
-            <Input
-              id="conflict-name"
-              autoFocus
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              aria-invalid={invalid}
-            />
-            <FieldDescription className={invalid ? "text-destructive" : ""}>
-              {trimmed === name
-                ? "名称与现有相同，仍会冲突。"
-                : /[\\/]/.test(trimmed)
-                  ? "名称不能包含斜杠。"
-                  : "改名后不再冲突即可继续。"}
-            </FieldDescription>
-          </Field>
+            <Field data-invalid={existingInvalid || duplicated}>
+              <FieldLabel htmlFor="conflict-existing-name">
+                远端已有名称
+              </FieldLabel>
+              <Input
+                id="conflict-existing-name"
+                value={existingValue}
+                onChange={(e) => setExistingValue(e.target.value)}
+                aria-invalid={existingInvalid || duplicated}
+              />
+              <FieldDescription className={invalid ? "text-destructive" : ""}>
+                {unchanged
+                  ? "至少修改其中一个名称。"
+                  : duplicated
+                    ? "两个名称不能相同。"
+                    : incomingInvalid || existingInvalid
+                      ? "名称不能为空，且不能包含斜杠。"
+                      : "确认后会按上面的名称继续。"}
+              </FieldDescription>
+            </Field>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-            >
-              取消
-            </Button>
-            <Button type="submit" disabled={invalid}>
-              确认
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+              >
+                取消
+              </Button>
+              <Button type="submit" disabled={invalid}>
+                确认
+              </Button>
+            </DialogFooter>
+          </FieldGroup>
         </form>
       </DialogContent>
     </Dialog>
