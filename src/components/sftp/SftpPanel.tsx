@@ -12,6 +12,7 @@ import {
   FolderPlus,
   FolderUp,
   Home,
+  Info,
   LoaderCircle,
   Pencil,
   RefreshCw,
@@ -19,7 +20,7 @@ import {
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { Session, SftpEntry } from "~/types";
+import type { Session, SftpEntry, SftpFileInfo } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { useHostsStore } from "~/store/hosts";
 import { useSettingsStore } from "~/store/settings";
@@ -47,6 +48,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import PromptDialog from "~/components/ui/prompt-dialog";
 import ConflictDialog, {
   type ConflictResolution,
@@ -76,6 +84,27 @@ function nextTransferId(): string {
 function formatMtime(seconds: number): string {
   if (!seconds) return "—";
   return new Date(seconds * 1000).toLocaleString();
+}
+
+function formatInfoTime(seconds: number | null | undefined): string {
+  if (!seconds) return "不可用";
+  return new Date(seconds * 1000).toLocaleString();
+}
+
+function formatInfoSize(entry: Pick<SftpEntry, "isDir" | "size">): string {
+  return entry.isDir ? "不可用" : formatSize(entry.size);
+}
+
+function formatMode(mode: number): string {
+  if (!mode) return "—";
+  return `0${(mode & 0o777).toString(8)}`;
+}
+
+function formatOwner(info: Pick<SftpFileInfo, "uid" | "gid">): string {
+  if (info.uid == null && info.gid == null) return "—";
+  if (info.uid == null) return `gid ${info.gid}`;
+  if (info.gid == null) return `uid ${info.uid}`;
+  return `${info.uid}:${info.gid}`;
 }
 
 function entryType(entry: SftpEntry): string {
@@ -123,6 +152,12 @@ type PromptState =
   | { kind: "uploadDir"; localDir: string; initialName: string }
   | { kind: "downloadDir"; entry: SftpEntry; initialName: string }
   | null;
+
+type InfoState = {
+  entry: SftpEntry;
+  details: SftpFileInfo | null;
+  loading: boolean;
+} | null;
 
 /** A pending action blocked on resolving a remote name conflict. */
 type ConflictState =
@@ -201,6 +236,7 @@ export default function SftpPanel({ session }: Props) {
   const [sort, setSort] = useState<SortState>({ key: "name", direction: "asc" });
   const [prompt, setPrompt] = useState<PromptState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
+  const [info, setInfo] = useState<InfoState>(null);
   const [conflict, setConflict] = useState<ConflictState>(null);
   const startTransfer = useTransfersStore((s) => s.start);
   const finishTransfer = useTransfersStore((s) => s.finish);
@@ -277,6 +313,23 @@ export default function SftpPanel({ session }: Props) {
       toast.error(String(e));
       setLoading(false);
       setLoadingAction(null);
+    }
+  }
+
+  async function showInfo(entry: SftpEntry) {
+    setInfo({ entry, details: null, loading: true });
+    try {
+      const details = await ipc.sftpInfo(sessionId, entry.path);
+      setInfo((current) => {
+        if (!current || current.entry.path !== entry.path) return current;
+        return { entry, details, loading: false };
+      });
+    } catch (e) {
+      toast.error(String(e));
+      setInfo((current) => {
+        if (!current || current.entry.path !== entry.path) return current;
+        return { ...current, loading: false };
+      });
     }
   }
 
@@ -775,7 +828,7 @@ export default function SftpPanel({ session }: Props) {
                 className="w-20"
                 onSort={toggleSort}
               />
-              <span className="w-32 text-right">操作</span>
+              <span className="w-40 text-right">操作</span>
             </div>
             {sortedEntries.map((entry) => (
               <SftpRow
@@ -784,6 +837,7 @@ export default function SftpPanel({ session }: Props) {
                 loading={loadingAction === `enter:${entry.path}`}
                 disabled={loading}
                 onEnter={(path) => load(path, `enter:${path}`)}
+                onInfo={showInfo}
                 onDownload={onDownload}
                 onExtract={onExtract}
                 onRename={(e) => setPrompt({ kind: "rename", entry: e })}
@@ -859,6 +913,24 @@ export default function SftpPanel({ session }: Props) {
         }}
       />
 
+      <Dialog open={!!info} onOpenChange={(o) => !o && setInfo(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>简介</DialogTitle>
+            <DialogDescription className="truncate">
+              {info?.details?.name ?? info?.entry.name ?? ""}
+            </DialogDescription>
+          </DialogHeader>
+          {info ? (
+            <FileInfoDetails
+              entry={info.entry}
+              details={info.details}
+              loading={info.loading}
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
@@ -918,11 +990,71 @@ function SortHeader({
   );
 }
 
+function FileInfoDetails({
+  entry,
+  details,
+  loading,
+}: {
+  entry: SftpEntry;
+  details: SftpFileInfo | null;
+  loading: boolean;
+}) {
+  const source = details ?? entry;
+
+  return (
+    <div className="flex flex-col gap-3">
+      {loading ? (
+        <div className="flex items-center gap-2 rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">
+          <LoaderCircle className="size-3 animate-spin" />
+          正在读取最新信息…
+        </div>
+      ) : null}
+      <dl className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
+        <InfoItem label="名称" value={source.name} />
+        <InfoItem label="种类" value={entryType(source)} />
+        <InfoItem label="大小" value={formatInfoSize(source)} />
+        <InfoItem label="位置" value={parentPath(source.path)} mono />
+        <InfoItem label="完整路径" value={source.path} mono />
+        <InfoItem label="创建时间" value={formatInfoTime(details?.createdAt)} />
+        <InfoItem label="修改时间" value={formatInfoTime(source.mtime)} />
+        <InfoItem label="访问时间" value={formatInfoTime(details?.atime)} />
+        <InfoItem label="权限" value={formatMode(source.mode)} />
+        {details ? <InfoItem label="所有者" value={formatOwner(details)} /> : null}
+      </dl>
+    </div>
+  );
+}
+
+function InfoItem({
+  label,
+  value,
+  mono = false,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <>
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd
+        className={cn(
+          "min-w-0 break-words text-foreground",
+          mono && "break-all font-mono text-xs",
+        )}
+      >
+        {value}
+      </dd>
+    </>
+  );
+}
+
 interface RowProps {
   entry: SftpEntry;
   loading: boolean;
   disabled: boolean;
   onEnter: (path: string) => void;
+  onInfo: (entry: SftpEntry) => void;
   onDownload: (entry: SftpEntry) => void;
   onExtract: (entry: SftpEntry) => void;
   onRename: (entry: SftpEntry) => void;
@@ -939,6 +1071,7 @@ const SftpRow = memo(function SftpRow({
   loading,
   disabled,
   onEnter,
+  onInfo,
   onDownload,
   onExtract,
   onRename,
@@ -974,7 +1107,7 @@ const SftpRow = memo(function SftpRow({
       <span className="w-20 text-left text-xs text-muted-foreground">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
-      <div className="flex w-32 justify-end gap-0.5 opacity-0 group-hover:opacity-100">
+      <div className="flex w-40 justify-end gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
         {canExtract ? (
           <Button
             variant="ghost"
@@ -985,6 +1118,14 @@ const SftpRow = memo(function SftpRow({
             <FolderOpen />
           </Button>
         ) : null}
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          title="简介"
+          onClick={() => onInfo(entry)}
+        >
+          <Info />
+        </Button>
         <Button
           variant="ghost"
           size="icon-xs"

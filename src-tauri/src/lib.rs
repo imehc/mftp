@@ -48,6 +48,7 @@ pub fn run() {
             commands::sftp_home,
             commands::sftp_start_dir,
             commands::sftp_list,
+            commands::sftp_info,
             commands::sftp_mkdir,
             commands::sftp_rename,
             commands::sftp_delete,

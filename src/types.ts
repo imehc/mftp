@@ -43,6 +43,13 @@ export interface SftpEntry {
   mode: number;
 }
 
+export interface SftpFileInfo extends SftpEntry {
+  atime: number;
+  createdAt?: number | null;
+  uid?: number | null;
+  gid?: number | null;
+}
+
 export interface TransferProgress {
   id: string;
   phase: string;

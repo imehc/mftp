@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { DirectoryTransferMode } from "~/store/settings";
-import type { Host, HostInput, SftpEntry, SshKey } from "~/types";
+import type { Host, HostInput, SftpEntry, SftpFileInfo, SshKey } from "~/types";
 
 // ---- Hosts ----
 export const hostsList = () => invoke<Host[]>("hosts_list");
@@ -39,6 +39,8 @@ export const sftpStartDir = (sessionId: string, preferred?: string | null) =>
   invoke<string>("sftp_start_dir", { sessionId, preferred: preferred ?? null });
 export const sftpList = (sessionId: string, path: string) =>
   invoke<SftpEntry[]>("sftp_list", { sessionId, path });
+export const sftpInfo = (sessionId: string, path: string) =>
+  invoke<SftpFileInfo>("sftp_info", { sessionId, path });
 export const sftpMkdir = (sessionId: string, path: string) =>
   invoke<void>("sftp_mkdir", { sessionId, path });
 export const sftpRename = (sessionId: string, from: string, to: string) =>

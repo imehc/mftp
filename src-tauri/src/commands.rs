@@ -1,5 +1,5 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{AuthType, Host, HostInput, SftpEntry, SshKey};
+use crate::models::{AuthType, Host, HostInput, SftpEntry, SftpFileInfo, SshKey};
 use crate::ssh::{resolve_auth_material, AuthMaterial, AuthMethod, DirectoryTransferMode};
 use crate::AppState;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
@@ -181,6 +181,16 @@ pub async fn sftp_list(
 ) -> AppResult<Vec<SftpEntry>> {
     let manager = state.manager.clone();
     run_blocking(move || manager.sftp_list(&session_id, &path)).await
+}
+
+#[tauri::command]
+pub async fn sftp_info(
+    state: State<'_, AppState>,
+    session_id: String,
+    path: String,
+) -> AppResult<SftpFileInfo> {
+    let manager = state.manager.clone();
+    run_blocking(move || manager.sftp_info(&session_id, &path)).await
 }
 
 #[tauri::command]

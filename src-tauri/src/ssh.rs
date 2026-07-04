@@ -1,5 +1,5 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{SftpEntry, TransferProgress};
+use crate::models::{SftpEntry, SftpFileInfo, TransferProgress};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use parking_lot::Mutex;
 use ssh2::{ErrorCode, FileStat, OpenFlags, OpenType, RenameFlags, Session};
@@ -518,6 +518,38 @@ fn sftp_entries(read_dir: Vec<(PathBuf, FileStat)>) -> Vec<SftpEntry> {
     entries
 }
 
+fn sftp_file_info(path: &str, stat: FileStat, created_at: Option<u64>) -> SftpFileInfo {
+    let name = {
+        let basename = remote_basename(path);
+        if basename.is_empty() {
+            path.to_string()
+        } else {
+            basename
+        }
+    };
+
+    SftpFileInfo {
+        name,
+        path: path.to_string(),
+        is_dir: stat.is_dir(),
+        is_symlink: stat.file_type().is_symlink(),
+        size: stat.size.unwrap_or(0),
+        atime: stat.atime.unwrap_or(0),
+        mtime: stat.mtime.unwrap_or(0),
+        created_at,
+        mode: stat.perm.unwrap_or(0),
+        uid: stat.uid,
+        gid: stat.gid,
+    }
+}
+
+fn parse_remote_birth_time(stdout: &str) -> Option<u64> {
+    stdout.lines().find_map(|line| {
+        let value = line.trim().parse::<i64>().ok()?;
+        (value > 0).then_some(value as u64)
+    })
+}
+
 enum UploadEntryKind {
     Directory,
     File { size: u64 },
@@ -1002,6 +1034,12 @@ impl Manager {
         Ok(sftp_entries(read_dir))
     }
 
+    pub fn sftp_info(&self, session_id: &str, path: &str) -> AppResult<SftpFileInfo> {
+        let stat = self.sftp_lstat_retry(session_id, path)?;
+        let created_at = self.sftp_birth_time(session_id, path);
+        Ok(sftp_file_info(path, stat, created_at))
+    }
+
     pub fn sftp_mkdir(&self, session_id: &str, path: &str) -> AppResult<()> {
         let conn = self.sftp_conn(session_id)?;
         let conn = conn.lock();
@@ -1203,6 +1241,15 @@ impl Manager {
             return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
         }
         Ok(stdout)
+    }
+
+    fn sftp_birth_time(&self, session_id: &str, path: &str) -> Option<u64> {
+        let path = shell_quote(path);
+        let cmd = format!("(stat -c %W -- {path} 2>/dev/null || stat -f %B {path} 2>/dev/null)");
+        let Ok((0, stdout, _)) = self.exec(session_id, &cmd) else {
+            return None;
+        };
+        parse_remote_birth_time(&stdout)
     }
 
     /// Whether a remote path exists.
