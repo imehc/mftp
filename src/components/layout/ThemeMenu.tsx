@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Monitor, Moon, Palette, RefreshCw, Settings, Sun } from "lucide-react";
+import {
+  Archive,
+  FolderTree,
+  Monitor,
+  Moon,
+  Palette,
+  RefreshCw,
+  Settings,
+  Sun,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "~/components/ui/button";
 import {
@@ -16,6 +25,11 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { checkForUpdateManually } from "~/lib/updater";
+import {
+  type DirectoryTransferMode,
+  useSettingsStore,
+} from "~/store/settings";
+import { useTransfersStore } from "~/store/transfers";
 import { cn } from "~/lib/utils";
 
 const themes = [
@@ -24,8 +38,22 @@ const themes = [
   { value: "dark", label: "深色", icon: Moon },
 ] as const;
 
+const directoryTransferModes = [
+  { value: "archive", label: "压缩包", icon: Archive },
+  { value: "direct", label: "直接传输", icon: FolderTree },
+] as const;
+
 export default function ThemeMenu() {
   const { theme = "system", setTheme } = useTheme();
+  const directoryTransferMode = useSettingsStore(
+    (s) => s.directoryTransferMode,
+  );
+  const setDirectoryTransferMode = useSettingsStore(
+    (s) => s.setDirectoryTransferMode,
+  );
+  const hasRunningTransfer = useTransfersStore((s) =>
+    s.transfers.some((item) => item.status === "running"),
+  );
   const [checkingUpdate, setCheckingUpdate] = useState(false);
 
   function onCheckUpdate() {
@@ -56,6 +84,36 @@ export default function ThemeMenu() {
             检查更新
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger disabled={hasRunningTransfer}>
+            <Archive />
+            文件夹传输
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuRadioGroup
+              value={directoryTransferMode}
+              onValueChange={(value) => {
+                if (hasRunningTransfer) return;
+                setDirectoryTransferMode(value as DirectoryTransferMode);
+              }}
+            >
+              {directoryTransferModes.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <DropdownMenuRadioItem
+                    key={item.value}
+                    value={item.value}
+                    disabled={hasRunningTransfer}
+                  >
+                    <Icon />
+                    {item.label}
+                  </DropdownMenuRadioItem>
+                );
+              })}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

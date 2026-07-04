@@ -27,6 +27,22 @@ const LIBSSH2_ERROR_SOCKET_TIMEOUT: i32 = -30;
 const LIBSSH2_ERROR_SOCKET_RECV: i32 = -43;
 const LIBSSH2_ERROR_BAD_SOCKET: i32 = -45;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DirectoryTransferMode {
+    Archive,
+    Direct,
+}
+
+impl DirectoryTransferMode {
+    pub fn parse(value: Option<&str>) -> Self {
+        match value {
+            Some("direct") => Self::Direct,
+            Some("archive") | None => Self::Archive,
+            Some(_) => Self::Archive,
+        }
+    }
+}
+
 fn emit_transfer_progress(
     app: Option<&AppHandle>,
     transfer_id: Option<&str>,
@@ -536,6 +552,36 @@ struct DownloadPlan {
     total_file_bytes: u64,
 }
 
+struct ProgressReader<'a, R: Read> {
+    inner: R,
+    app: Option<&'a AppHandle>,
+    transfer_id: Option<&'a str>,
+    phase: &'a str,
+    transferred: &'a mut u64,
+    total: Option<u64>,
+    last_emit: Instant,
+}
+
+impl<R: Read> Read for ProgressReader<'_, R> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let n = self.inner.read(buf)?;
+        if n > 0 {
+            *self.transferred += n as u64;
+            if self.last_emit.elapsed() >= Duration::from_millis(120) {
+                emit_transfer_progress(
+                    self.app,
+                    self.transfer_id,
+                    self.phase,
+                    *self.transferred,
+                    self.total,
+                );
+                self.last_emit = Instant::now();
+            }
+        }
+        Ok(n)
+    }
+}
+
 fn build_upload_plan(local_dir: &str, remote_root: &str) -> AppResult<UploadPlan> {
     let root = Path::new(local_dir);
     if !root.is_dir() {
@@ -587,6 +633,191 @@ fn remote_path_for_relative(remote_root: &str, relative: &Path) -> String {
         remote = join_remote(&remote, &part.to_string_lossy());
     }
     remote
+}
+
+fn should_skip_archive_path(path: &Path) -> bool {
+    path.components().any(|component| {
+        let name = component.as_os_str().to_string_lossy();
+        name == "__MACOSX"
+            || name == ".DS_Store"
+            || name.starts_with("._")
+            || name.eq_ignore_ascii_case("thumbs.db")
+            || name.eq_ignore_ascii_case("desktop.ini")
+    })
+}
+
+fn archive_total_file_bytes(local_dir: &str) -> AppResult<u64> {
+    let root = Path::new(local_dir);
+    let mut total = 0u64;
+    let mut iter = WalkDir::new(root).follow_links(false).into_iter();
+    while let Some(entry) = iter.next() {
+        let entry = entry.map_err(|e| AppError(format!("扫描失败: {e}")))?;
+        let relative = entry.path().strip_prefix(root).unwrap_or(Path::new(""));
+        if !relative.as_os_str().is_empty() && should_skip_archive_path(relative) {
+            if entry.file_type().is_dir() {
+                iter.skip_current_dir();
+            }
+            continue;
+        }
+        if entry.file_type().is_file() {
+            total = total.saturating_add(std::fs::symlink_metadata(entry.path())?.len());
+        }
+    }
+    Ok(total)
+}
+
+fn pack_clean_tar_gz(
+    local_dir: &str,
+    top_name: &str,
+    dest: &Path,
+    app: Option<&AppHandle>,
+    transfer_id: Option<&str>,
+    transfer: Option<&TransferGuard>,
+) -> AppResult<()> {
+    use flate2::write::GzEncoder;
+    use flate2::Compression;
+    use tar::Header;
+
+    let root = Path::new(local_dir);
+    if !root.is_dir() {
+        return Err(AppError("本地路径不是文件夹".into()));
+    }
+
+    let total = archive_total_file_bytes(local_dir)?;
+    let total_for_progress = if total == 0 { Some(1) } else { Some(total) };
+    let mut transferred = 0u64;
+    emit_transfer_progress(app, transfer_id, "压缩中", 0, total_for_progress);
+
+    let file = std::fs::File::create(dest)?;
+    let enc = GzEncoder::new(file, Compression::fast());
+    let mut builder = tar::Builder::new(enc);
+    builder.follow_symlinks(false);
+
+    let mut iter = WalkDir::new(root).follow_links(false).into_iter();
+    while let Some(entry) = iter.next() {
+        if let Some(transfer) = transfer {
+            transfer.check()?;
+        }
+        let entry = entry.map_err(|e| AppError(format!("打包失败: {e}")))?;
+        let local = entry.path();
+        let relative = local.strip_prefix(root).unwrap_or(Path::new(""));
+        if !relative.as_os_str().is_empty() && should_skip_archive_path(relative) {
+            if entry.file_type().is_dir() {
+                iter.skip_current_dir();
+            }
+            continue;
+        }
+
+        let archive_path = if relative.as_os_str().is_empty() {
+            PathBuf::from(top_name)
+        } else {
+            Path::new(top_name).join(relative)
+        };
+
+        if entry.file_type().is_file() {
+            let mut file = std::fs::File::open(local)?;
+            let meta = file.metadata()?;
+            let mut header = Header::new_gnu();
+            header.set_metadata(&meta);
+            header.set_size(meta.len());
+            let reader = ProgressReader {
+                inner: &mut file,
+                app,
+                transfer_id,
+                phase: "压缩中",
+                transferred: &mut transferred,
+                total: total_for_progress,
+                last_emit: Instant::now(),
+            };
+            builder
+                .append_data(&mut header, &archive_path, reader)
+                .map_err(|e| AppError(format!("打包失败: {e}")))?;
+        } else {
+            builder
+                .append_path_with_name(local, &archive_path)
+                .map_err(|e| AppError(format!("打包失败: {e}")))?;
+        }
+    }
+
+    let enc = builder
+        .into_inner()
+        .map_err(|e| AppError(format!("打包失败: {e}")))?;
+    enc.finish()
+        .map_err(|e| AppError(format!("打包失败: {e}")))?;
+    emit_transfer_progress(
+        app,
+        transfer_id,
+        "压缩中",
+        total_for_progress.unwrap_or(1),
+        total_for_progress,
+    );
+    Ok(())
+}
+
+fn archive_entry_target(base: &Path, path: &Path) -> AppResult<Option<PathBuf>> {
+    use std::path::Component;
+
+    if should_skip_archive_path(path) {
+        return Ok(None);
+    }
+
+    let mut components = Vec::new();
+    for component in path.components() {
+        match component {
+            Component::Normal(value) => components.push(value.to_os_string()),
+            Component::CurDir => {}
+            _ => {
+                return Err(AppError(format!(
+                    "压缩包包含不安全路径: {}",
+                    path.display()
+                )))
+            }
+        }
+    }
+
+    if components.is_empty() {
+        return Ok(Some(base.to_path_buf()));
+    }
+
+    let tail = if components.len() > 1 {
+        &components[1..]
+    } else {
+        &components[0..0]
+    };
+    let mut target = base.to_path_buf();
+    for component in tail {
+        target.push(component);
+    }
+    Ok(Some(target))
+}
+
+fn extract_clean_tar_gz(archive: &Path, local_dir: &Path) -> AppResult<()> {
+    use flate2::read::GzDecoder;
+
+    std::fs::create_dir_all(local_dir)?;
+    let file = std::fs::File::open(archive)?;
+    let decoder = GzDecoder::new(file);
+    let mut archive = tar::Archive::new(decoder);
+    for entry in archive
+        .entries()
+        .map_err(|e| AppError(format!("解压失败: {e}")))?
+    {
+        let mut entry = entry.map_err(|e| AppError(format!("解压失败: {e}")))?;
+        let path = entry
+            .path()
+            .map_err(|e| AppError(format!("解压失败: {e}")))?
+            .into_owned();
+        let Some(target) = archive_entry_target(local_dir, &path)? else {
+            continue;
+        };
+        if let Some(parent) = target.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        entry
+            .unpack(&target)
+            .map_err(|e| AppError(format!("解压失败: {e}")))?;
+    }
+    Ok(())
 }
 
 impl Manager {
@@ -1353,8 +1584,109 @@ impl Manager {
         Ok(())
     }
 
-    /// Upload a local directory recursively over SFTP.
     pub fn sftp_upload_dir(
+        &self,
+        session_id: &str,
+        local_dir: &str,
+        remote_parent: &str,
+        remote_name: &str,
+        transfer_mode: DirectoryTransferMode,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+    ) -> AppResult<()> {
+        match transfer_mode {
+            DirectoryTransferMode::Archive => self.sftp_upload_dir_archive(
+                session_id,
+                local_dir,
+                remote_parent,
+                remote_name,
+                app,
+                transfer_id,
+            ),
+            DirectoryTransferMode::Direct => self.sftp_upload_dir_direct(
+                session_id,
+                local_dir,
+                remote_parent,
+                remote_name,
+                app,
+                transfer_id,
+            ),
+        }
+    }
+
+    fn sftp_upload_dir_archive(
+        &self,
+        session_id: &str,
+        local_dir: &str,
+        remote_parent: &str,
+        remote_name: &str,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+    ) -> AppResult<()> {
+        let transfer = self.transfer_guard(transfer_id);
+        emit_transfer_progress(app, transfer_id, "压缩中", 0, None);
+        if let Some(transfer) = &transfer {
+            transfer.check()?;
+        }
+
+        let local_archive = std::env::temp_dir().join(format!("mftp-up-{}.tar.gz", uuid_v4()));
+        if let Err(e) = pack_clean_tar_gz(
+            local_dir,
+            remote_name,
+            &local_archive,
+            app,
+            transfer_id,
+            transfer.as_ref(),
+        ) {
+            let _ = std::fs::remove_file(&local_archive);
+            return Err(e);
+        }
+        if let Some(transfer) = &transfer {
+            if let Err(e) = transfer.check() {
+                let _ = std::fs::remove_file(&local_archive);
+                return Err(e);
+            }
+        }
+
+        let archive_size = std::fs::metadata(&local_archive)?.len();
+        let remote_archive = join_remote(remote_parent, &format!(".mftp-up-{}.tar.gz", uuid_v4()));
+        let upload_res = self.upload_local_file_to_remote(
+            session_id,
+            &local_archive,
+            &remote_archive,
+            app,
+            transfer_id,
+            "上传压缩包中",
+            0,
+            archive_size,
+            transfer.as_ref(),
+        );
+        let _ = std::fs::remove_file(&local_archive);
+        if let Err(e) = upload_res {
+            let _ = self.remove_remote_path_if_file(session_id, &remote_archive);
+            return Err(e);
+        }
+
+        if let Some(transfer) = &transfer {
+            if let Err(e) = transfer.check() {
+                let _ = self.remove_remote_path_if_file(session_id, &remote_archive);
+                return Err(e);
+            }
+        }
+
+        emit_transfer_progress(app, transfer_id, "远端解压中", 0, None);
+        let cmd = format!(
+            "tar -xzf {} -C {}",
+            shell_quote(&remote_archive),
+            shell_quote(remote_parent)
+        );
+        let extract_res = self.exec_checked(session_id, &cmd).map(|_| ());
+        let _ = self.remove_remote_path_if_file(session_id, &remote_archive);
+        extract_res
+    }
+
+    /// Upload a local directory recursively over SFTP.
+    fn sftp_upload_dir_direct(
         &self,
         session_id: &str,
         local_dir: &str,
@@ -1562,8 +1894,191 @@ impl Manager {
         Ok(())
     }
 
-    /// Download a remote directory recursively over SFTP.
     pub fn sftp_download_dir(
+        &self,
+        session_id: &str,
+        remote_dir: &str,
+        local_dir: &str,
+        transfer_mode: DirectoryTransferMode,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+    ) -> AppResult<()> {
+        match transfer_mode {
+            DirectoryTransferMode::Archive => {
+                self.sftp_download_dir_archive(session_id, remote_dir, local_dir, app, transfer_id)
+            }
+            DirectoryTransferMode::Direct => {
+                self.sftp_download_dir_direct(session_id, remote_dir, local_dir, app, transfer_id)
+            }
+        }
+    }
+
+    fn stream_remote_dir_tar_gz(
+        &self,
+        session_id: &str,
+        remote_dir: &str,
+        local_archive: &Path,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+        transfer: Option<&TransferGuard>,
+    ) -> AppResult<()> {
+        let mat = self.material(session_id)?;
+        let parent = remote_parent_of(remote_dir);
+        let name = remote_basename(remote_dir);
+        let remote_stderr = format!("/tmp/.mftp-dl-{}.stderr", uuid_v4());
+        let cmd = format!(
+            "tar --exclude={} --exclude={} --exclude={} --exclude={} --exclude={} -czf - -C {} {} 2> {}",
+            shell_quote("__MACOSX"),
+            shell_quote(".DS_Store"),
+            shell_quote("._*"),
+            shell_quote("Thumbs.db"),
+            shell_quote("desktop.ini"),
+            shell_quote(&parent),
+            shell_quote(&name),
+            shell_quote(&remote_stderr)
+        );
+        let mut attempts = 0usize;
+
+        loop {
+            if let Some(transfer) = transfer {
+                transfer.check()?;
+            }
+            let sess = match connect(&mat) {
+                Ok(sess) => sess,
+                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
+                    attempts += 1;
+                    emit_transfer_progress(app, transfer_id, "重连后重新下载压缩包", 0, None);
+                    std::thread::sleep(Duration::from_millis(250));
+                    continue;
+                }
+                Err(e) => return Err(e),
+            };
+
+            let result: AppResult<()> = {
+                sess.set_blocking(true);
+                sess.set_timeout(0);
+                let mut channel = sess.channel_session()?;
+                channel.exec(&cmd)?;
+
+                let mut local_file = OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .truncate(true)
+                    .open(local_archive)?;
+                let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
+                let mut transferred = 0u64;
+                let mut last_emit = Instant::now();
+
+                emit_transfer_progress(app, transfer_id, "下载压缩包中", 0, None);
+                loop {
+                    if let Some(transfer) = transfer {
+                        transfer.check()?;
+                    }
+                    let n = channel.read(&mut buf)?;
+                    if n == 0 {
+                        break;
+                    }
+                    local_file.write_all(&buf[..n])?;
+                    transferred += n as u64;
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(app, transfer_id, "下载压缩包中", transferred, None);
+                        last_emit = Instant::now();
+                    }
+                }
+                local_file.flush()?;
+
+                if let Some(transfer) = transfer {
+                    transfer.check()?;
+                }
+
+                channel.wait_close()?;
+                let code = channel.exit_status()?;
+                if code != 0 {
+                    let stderr = self
+                        .exec(
+                            session_id,
+                            &format!(
+                                "cat {}; rm -f {}",
+                                shell_quote(&remote_stderr),
+                                shell_quote(&remote_stderr)
+                            ),
+                        )
+                        .map(|(_, stdout, _)| stdout)
+                        .unwrap_or_else(|_| String::new());
+                    let msg = if stderr.trim().is_empty() {
+                        "tar failed".to_string()
+                    } else {
+                        stderr.trim().to_string()
+                    };
+                    return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
+                }
+
+                let _ = self.exec(
+                    session_id,
+                    &format!("rm -f {}", shell_quote(&remote_stderr)),
+                );
+                emit_transfer_progress(app, transfer_id, "下载压缩包中", transferred, None);
+                Ok(())
+            };
+
+            match result {
+                Ok(()) => return Ok(()),
+                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
+                    attempts += 1;
+                    let _ = std::fs::remove_file(local_archive);
+                    let _ = self.exec(
+                        session_id,
+                        &format!("rm -f {}", shell_quote(&remote_stderr)),
+                    );
+                    emit_transfer_progress(app, transfer_id, "重连后重新下载压缩包", 0, None);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => {
+                    let _ = self.exec(
+                        session_id,
+                        &format!("rm -f {}", shell_quote(&remote_stderr)),
+                    );
+                    if transfer_cancelled_error(&e) {
+                        let _ = std::fs::remove_file(local_archive);
+                    }
+                    return Err(e);
+                }
+            }
+        }
+    }
+
+    fn sftp_download_dir_archive(
+        &self,
+        session_id: &str,
+        remote_dir: &str,
+        local_dir: &str,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+    ) -> AppResult<()> {
+        let transfer = self.transfer_guard(transfer_id);
+        let local_archive = std::env::temp_dir().join(format!("mftp-dl-{}.tar.gz", uuid_v4()));
+        let result = self
+            .stream_remote_dir_tar_gz(
+                session_id,
+                remote_dir,
+                &local_archive,
+                app,
+                transfer_id,
+                transfer.as_ref(),
+            )
+            .and_then(|_| {
+                if let Some(transfer) = &transfer {
+                    transfer.check()?;
+                }
+                emit_transfer_progress(app, transfer_id, "本地解压中", 0, None);
+                extract_clean_tar_gz(&local_archive, Path::new(local_dir))
+            });
+        let _ = std::fs::remove_file(&local_archive);
+        result
+    }
+
+    /// Download a remote directory recursively over SFTP.
+    fn sftp_download_dir_direct(
         &self,
         session_id: &str,
         remote_dir: &str,

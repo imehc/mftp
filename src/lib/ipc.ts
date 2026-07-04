@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { DirectoryTransferMode } from "~/store/settings";
 import type { Host, HostInput, SftpEntry, SshKey } from "~/types";
 
 // ---- Hosts ----
@@ -85,6 +86,7 @@ export const sftpUploadDir = (
   localDir: string,
   remoteParent: string,
   remoteName: string,
+  transferMode: DirectoryTransferMode,
   transferId?: string,
 ) =>
   invoke<void>("sftp_upload_dir", {
@@ -92,18 +94,21 @@ export const sftpUploadDir = (
     localDir,
     remoteParent,
     remoteName,
+    transferMode,
     transferId: transferId ?? null,
   });
 export const sftpDownloadDir = (
   sessionId: string,
   remoteDir: string,
   localDir: string,
+  transferMode: DirectoryTransferMode,
   transferId?: string,
 ) =>
   invoke<void>("sftp_download_dir", {
     sessionId,
     remoteDir,
     localDir,
+    transferMode,
     transferId: transferId ?? null,
   });
 export const sftpCancelTransfer = (transferId: string) =>

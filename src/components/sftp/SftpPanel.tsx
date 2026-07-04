@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import type { Session, SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { useHostsStore } from "~/store/hosts";
+import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
 import { Button } from "~/components/ui/button";
 import {
@@ -203,6 +204,9 @@ export default function SftpPanel({ session }: Props) {
   const [conflict, setConflict] = useState<ConflictState>(null);
   const startTransfer = useTransfersStore((s) => s.start);
   const finishTransfer = useTransfersStore((s) => s.finish);
+  const directoryTransferMode = useSettingsStore(
+    (s) => s.directoryTransferMode,
+  );
 
   const sortedEntries = useMemo(
     () => [...entries].sort((a, b) => compareEntries(a, b, sort)),
@@ -354,11 +358,18 @@ export default function SftpPanel({ session }: Props) {
     });
     if (typeof parent !== "string") return;
     const dest = joinLocalPath(parent, trimmedName);
+    const transferMode = directoryTransferMode;
     const transferId = nextTransferId();
     const tid = toast.loading(`下载文件夹 ${entry.name}…`);
     startTransfer(transferId, `下载 ${entry.name}`);
     try {
-      await ipc.sftpDownloadDir(sessionId, entry.path, dest, transferId);
+      await ipc.sftpDownloadDir(
+        sessionId,
+        entry.path,
+        dest,
+        transferMode,
+        transferId,
+      );
       finishTransfer(transferId, "success");
       toast.success(`已下载文件夹 ${entry.name}`, { id: tid });
     } catch (e) {
@@ -476,9 +487,17 @@ export default function SftpPanel({ session }: Props) {
     if (!cwd) return;
     const transferId = nextTransferId();
     const tid = toast.loading(`正在上传文件夹 ${remoteName}…`);
+    const transferMode = directoryTransferMode;
     startTransfer(transferId, `上传 ${remoteName}`);
     try {
-      await ipc.sftpUploadDir(sessionId, localDir, cwd, remoteName, transferId);
+      await ipc.sftpUploadDir(
+        sessionId,
+        localDir,
+        cwd,
+        remoteName,
+        transferMode,
+        transferId,
+      );
       finishTransfer(transferId, "success");
       toast.success(`已上传文件夹 ${remoteName}`, { id: tid });
       await load(cwd);

@@ -1,6 +1,6 @@
 use crate::error::{AppError, AppResult};
 use crate::models::{AuthType, Host, HostInput, SftpEntry, SshKey};
-use crate::ssh::{resolve_auth_material, AuthMaterial, AuthMethod};
+use crate::ssh::{resolve_auth_material, AuthMaterial, AuthMethod, DirectoryTransferMode};
 use crate::AppState;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use tauri::{AppHandle, State};
@@ -288,6 +288,7 @@ pub async fn sftp_upload_dir(
     local_dir: String,
     remote_parent: String,
     remote_name: String,
+    transfer_mode: Option<String>,
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
@@ -297,6 +298,7 @@ pub async fn sftp_upload_dir(
             &local_dir,
             &remote_parent,
             &remote_name,
+            DirectoryTransferMode::parse(transfer_mode.as_deref()),
             Some(&app),
             transfer_id.as_deref(),
         )
@@ -311,6 +313,7 @@ pub async fn sftp_download_dir(
     session_id: String,
     remote_dir: String,
     local_dir: String,
+    transfer_mode: Option<String>,
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
@@ -319,6 +322,7 @@ pub async fn sftp_download_dir(
             &session_id,
             &remote_dir,
             &local_dir,
+            DirectoryTransferMode::parse(transfer_mode.as_deref()),
             Some(&app),
             transfer_id.as_deref(),
         )
