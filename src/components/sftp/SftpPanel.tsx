@@ -99,7 +99,6 @@ function baseName(p: string): string {
 }
 
 const ARCHIVE_RE = /\.(zip|tar|tar\.gz|tgz|tar\.bz2|tbz2)$/i;
-const DOWNLOAD_ARCHIVE_RE = /\.(tar\.gz|tgz)$/i;
 function isArchive(name: string): boolean {
   return ARCHIVE_RE.test(name);
 }
@@ -110,9 +109,11 @@ function archiveStem(name: string): string {
 function validPlainName(name: string): boolean {
   return name.trim() !== "" && !/[\\/]/.test(name.trim());
 }
-function normalizeDownloadArchiveName(name: string): string {
-  const trimmed = name.trim();
-  return DOWNLOAD_ARCHIVE_RE.test(trimmed) ? trimmed : `${trimmed}.tar.gz`;
+function joinLocalPath(parent: string, name: string): string {
+  const separator = parent.includes("\\") && !parent.includes("/") ? "\\" : "/";
+  return parent.endsWith("/") || parent.endsWith("\\")
+    ? `${parent}${name}`
+    : `${parent}${separator}${name}`;
 }
 
 type PromptState =
@@ -329,44 +330,50 @@ export default function SftpPanel({ session }: Props) {
     }
   }
 
-  // ---- Folder download (packed as .tar.gz for transfer) ----
+  // ---- Folder download ----
 
   async function onDownloadDir(entry: SftpEntry) {
     setPrompt({
       kind: "downloadDir",
       entry,
-      initialName: `${entry.name}.tar.gz`,
+      initialName: entry.name,
     });
   }
 
-  async function downloadDirWithName(entry: SftpEntry, archiveName: string) {
-    if (!validPlainName(archiveName)) {
+  async function downloadDirWithName(entry: SftpEntry, folderName: string) {
+    const trimmedName = folderName.trim();
+    if (!validPlainName(trimmedName)) {
       toast.error("名称不能为空，且不能包含斜杠");
       return;
     }
     setPrompt(null);
-    const normalizedName = normalizeDownloadArchiveName(archiveName);
-    const dest = await saveDialog({
-      defaultPath: normalizedName,
-      title: "下载文件夹",
+    const parent = await openDialog({
+      multiple: false,
+      directory: true,
+      title: "选择保存位置",
     });
-    if (typeof dest !== "string") return;
+    if (typeof parent !== "string") return;
+    const dest = joinLocalPath(parent, trimmedName);
     const transferId = nextTransferId();
+    const tid = toast.loading(`下载文件夹 ${entry.name}…`);
     startTransfer(transferId, `下载 ${entry.name}`);
     try {
       await ipc.sftpDownloadDir(sessionId, entry.path, dest, transferId);
       finishTransfer(transferId, "success");
+      toast.success(`已下载文件夹 ${entry.name}`, { id: tid });
     } catch (e) {
       const message = String(e);
       if (message === "传输已取消") {
         finishTransfer(transferId, "cancelled");
+        toast.info(`已取消下载 ${entry.name}`, { id: tid });
       } else {
         finishTransfer(transferId, "error", message);
+        toast.error(message, { id: tid });
       }
     }
   }
 
-  // ---- Folder upload (local pack → upload → remote extract) ----
+  // ---- Folder upload ----
 
   async function onUploadDir() {
     if (!cwd) return;
@@ -468,7 +475,7 @@ export default function SftpPanel({ session }: Props) {
   async function runUploadDir(localDir: string, remoteName: string) {
     if (!cwd) return;
     const transferId = nextTransferId();
-    const tid = toast.loading(`正在压缩并上传 ${remoteName}…`);
+    const tid = toast.loading(`正在上传文件夹 ${remoteName}…`);
     startTransfer(transferId, `上传 ${remoteName}`);
     try {
       await ipc.sftpUploadDir(sessionId, localDir, cwd, remoteName, transferId);
@@ -810,7 +817,7 @@ export default function SftpPanel({ session }: Props) {
         open={prompt?.kind === "downloadDir"}
         title="下载文件夹"
         initialValue={prompt?.kind === "downloadDir" ? prompt.initialName : ""}
-        placeholder="压缩包名称"
+        placeholder="本地文件夹名称"
         confirmText="继续"
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>

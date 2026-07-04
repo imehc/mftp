@@ -310,7 +310,7 @@ pub async fn sftp_download_dir(
     state: State<'_, AppState>,
     session_id: String,
     remote_dir: String,
-    local_archive: String,
+    local_dir: String,
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
@@ -318,7 +318,7 @@ pub async fn sftp_download_dir(
         manager.sftp_download_dir(
             &session_id,
             &remote_dir,
-            &local_archive,
+            &local_dir,
             Some(&app),
             transfer_id.as_deref(),
         )

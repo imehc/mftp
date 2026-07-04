@@ -2,7 +2,7 @@ use crate::error::{AppError, AppResult};
 use crate::models::{SftpEntry, TransferProgress};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use parking_lot::Mutex;
-use ssh2::{ErrorCode, FileStat, OpenFlags, OpenType, Session};
+use ssh2::{ErrorCode, FileStat, OpenFlags, OpenType, RenameFlags, Session};
 use std::collections::HashMap;
 use std::env;
 use std::fs::{self, OpenOptions};
@@ -14,6 +14,7 @@ use std::sync::mpsc::{Receiver, Sender};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter};
+use walkdir::WalkDir;
 
 const SFTP_KEEPALIVE_INTERVAL_SECS: u32 = 15;
 const SFTP_TRANSFER_RETRIES: usize = 3;
@@ -202,7 +203,9 @@ fn connect_tcp(host: &str, port: u16) -> AppResult<TcpStream> {
         .collect();
 
     if addrs.is_empty() {
-        return Err(AppError(format!("resolve {host}:{port} failed: no addresses")));
+        return Err(AppError(format!(
+            "resolve {host}:{port} failed: no addresses"
+        )));
     }
 
     if host.eq_ignore_ascii_case("localhost") {
@@ -459,6 +462,12 @@ fn stale_app_error(err: &AppError) -> bool {
         || msg.contains("socket disconnect")
         || msg.contains("connection reset")
         || msg.contains("broken pipe")
+        || msg.contains("session(-7)")
+        || msg.contains("session(-9)")
+        || msg.contains("session(-13)")
+        || msg.contains("session(-30)")
+        || msg.contains("session(-43)")
+        || msg.contains("session(-45)")
 }
 
 fn transfer_cancelled_error(err: &AppError) -> bool {
@@ -491,6 +500,93 @@ fn sftp_entries(read_dir: Vec<(PathBuf, FileStat)>) -> Vec<SftpEntry> {
         _ => a.name.to_lowercase().cmp(&b.name.to_lowercase()),
     });
     entries
+}
+
+enum UploadEntryKind {
+    Directory,
+    File { size: u64 },
+    Symlink { target: String },
+}
+
+struct UploadEntry {
+    local: PathBuf,
+    remote: String,
+    kind: UploadEntryKind,
+}
+
+struct UploadPlan {
+    entries: Vec<UploadEntry>,
+    total_file_bytes: u64,
+}
+
+enum DownloadEntryKind {
+    Directory,
+    File { size: u64 },
+    Symlink { target: String },
+}
+
+struct DownloadEntry {
+    remote: String,
+    local: PathBuf,
+    kind: DownloadEntryKind,
+}
+
+struct DownloadPlan {
+    entries: Vec<DownloadEntry>,
+    total_file_bytes: u64,
+}
+
+fn build_upload_plan(local_dir: &str, remote_root: &str) -> AppResult<UploadPlan> {
+    let root = Path::new(local_dir);
+    if !root.is_dir() {
+        return Err(AppError("本地路径不是文件夹".into()));
+    }
+
+    let mut entries = Vec::new();
+    let mut total_file_bytes = 0u64;
+    for entry in WalkDir::new(root).follow_links(false).into_iter() {
+        let entry = entry.map_err(|e| AppError(format!("扫描失败: {e}")))?;
+        let local = entry.path().to_path_buf();
+        let relative = local.strip_prefix(root).unwrap_or(Path::new(""));
+        let remote = remote_path_for_relative(remote_root, relative);
+        let file_type = entry.file_type();
+
+        let kind = if file_type.is_dir() {
+            UploadEntryKind::Directory
+        } else if file_type.is_file() {
+            let size = std::fs::symlink_metadata(&local)?.len();
+            total_file_bytes = total_file_bytes.saturating_add(size);
+            UploadEntryKind::File { size }
+        } else if file_type.is_symlink() {
+            let target = std::fs::read_link(&local)?.to_string_lossy().to_string();
+            UploadEntryKind::Symlink { target }
+        } else {
+            return Err(AppError(format!("不支持上传特殊文件: {}", local.display())));
+        };
+
+        entries.push(UploadEntry {
+            local,
+            remote,
+            kind,
+        });
+    }
+
+    Ok(UploadPlan {
+        entries,
+        total_file_bytes,
+    })
+}
+
+fn remote_path_for_relative(remote_root: &str, relative: &Path) -> String {
+    if relative.as_os_str().is_empty() {
+        return remote_root.to_string();
+    }
+
+    let mut remote = remote_root.to_string();
+    for part in relative {
+        remote = join_remote(&remote, &part.to_string_lossy());
+    }
+    remote
 }
 
 impl Manager {
@@ -769,8 +865,7 @@ impl Manager {
                         emit_transfer_progress(app, transfer_id, "下载中", transferred, total);
                         last_emit = Instant::now();
                     }
-                    if last_keepalive.elapsed()
-                        >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
+                    if last_keepalive.elapsed() >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
                     {
                         let _ = conn_guard.session.keepalive_send();
                         last_keepalive = Instant::now();
@@ -813,89 +908,35 @@ impl Manager {
         transfer_id: Option<&str>,
     ) -> AppResult<()> {
         let transfer = self.transfer_guard(transfer_id);
-        let total = std::fs::metadata(local).ok().map(|meta| meta.len());
-        let mut local_file = std::fs::File::open(local)?;
-        let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
-        let mut transferred = 0u64;
-        let mut last_emit = Instant::now();
-        let mut attempts = 0usize;
-
-        emit_transfer_progress(app, transfer_id, "上传中", 0, total);
-        loop {
-            if let Some(transfer) = &transfer {
-                if let Err(e) = transfer.check() {
-                    let _ = self.remove_remote_path_if_file(session_id, remote);
-                    return Err(e);
-                }
-            }
-            let conn = self.sftp_conn(session_id)?;
-            let transfer_result: AppResult<()> = {
-                let conn_guard = conn.lock();
-                let mut remote_file = if transferred == 0 {
-                    conn_guard.sftp.create(Path::new(remote))?
-                } else {
-                    conn_guard.sftp.open_mode(
-                        Path::new(remote),
-                        OpenFlags::WRITE,
-                        0o644,
-                        OpenType::File,
-                    )?
-                };
-                let mut last_keepalive = Instant::now();
-                if transferred > 0 {
-                    remote_file.seek(SeekFrom::Start(transferred))?;
-                    local_file.seek(SeekFrom::Start(transferred))?;
-                }
-
-                loop {
-                    if let Some(transfer) = &transfer {
-                        transfer.check()?;
-                    }
-                    let n = local_file.read(&mut buf)?;
-                    if n == 0 {
-                        break Ok(());
-                    }
-                    if let Some(transfer) = &transfer {
-                        transfer.check()?;
-                    }
-                    remote_file.write_all(&buf[..n])?;
-                    transferred += n as u64;
-                    if last_emit.elapsed() >= Duration::from_millis(120) {
-                        emit_transfer_progress(app, transfer_id, "上传中", transferred, total);
-                        last_emit = Instant::now();
-                    }
-                    if last_keepalive.elapsed()
-                        >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
-                    {
-                        let _ = conn_guard.session.keepalive_send();
-                        last_keepalive = Instant::now();
-                    }
-                }
-            };
-
-            match transfer_result {
-                Ok(()) => break,
-                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
-                    attempts += 1;
-                    self.remove_sftp_conn_if_current(session_id, &conn);
-                    emit_transfer_progress(app, transfer_id, "重连后继续上传", transferred, total);
-                    std::thread::sleep(Duration::from_millis(250));
-                }
-                Err(e) => {
-                    if transfer_cancelled_error(&e) {
-                        let _ = self.remove_remote_path_if_file(session_id, remote);
-                    }
-                    return Err(e);
-                }
-            }
+        let total = std::fs::metadata(local)?.len();
+        let temp_remote = remote_temp_sibling(remote);
+        emit_transfer_progress(app, transfer_id, "上传中", 0, Some(total));
+        let upload_res = self.upload_local_file_to_remote(
+            session_id,
+            Path::new(local),
+            &temp_remote,
+            app,
+            transfer_id,
+            "上传中",
+            0,
+            total,
+            transfer.as_ref(),
+        );
+        if let Err(e) = upload_res {
+            let _ = self.remove_remote_path_if_file(session_id, &temp_remote);
+            return Err(e);
         }
         if let Some(transfer) = &transfer {
             if let Err(e) = transfer.check() {
-                let _ = self.remove_remote_path_if_file(session_id, remote);
+                let _ = self.remove_remote_path_if_file(session_id, &temp_remote);
                 return Err(e);
             }
         }
-        emit_transfer_progress(app, transfer_id, "完成", transferred, total);
+        if let Err(e) = self.sftp_rename_overwrite(session_id, &temp_remote, remote) {
+            let _ = self.remove_remote_path_if_file(session_id, &temp_remote);
+            return Err(e);
+        }
+        emit_transfer_progress(app, transfer_id, "完成", total, Some(total));
         Ok(())
     }
 
@@ -950,18 +991,263 @@ impl Manager {
         }
     }
 
-    fn upload_file_with_exec(
+    fn sftp_remote_file_size(&self, session_id: &str, path: &str) -> AppResult<Option<u64>> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result = {
+                let conn_guard = conn.lock();
+                conn_guard.sftp.stat(Path::new(path))
+            };
+            match result {
+                Ok(stat) => return Ok(stat.size),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) if stale_session_error(&e) => return Err(e.into()),
+                Err(_) => return Ok(None),
+            }
+        }
+    }
+
+    fn sftp_mkdir_existing_ok(&self, session_id: &str, path: &str) -> AppResult<()> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result: Result<(), ssh2::Error> = {
+                let conn_guard = conn.lock();
+                if conn_guard
+                    .sftp
+                    .stat(Path::new(path))
+                    .is_ok_and(|stat| stat.is_dir())
+                {
+                    return Ok(());
+                }
+                conn_guard.sftp.mkdir(Path::new(path), 0o755)
+            };
+            match result {
+                Ok(()) => return Ok(()),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) if stale_session_error(&e) => return Err(e.into()),
+                Err(e) => {
+                    let conn = self.sftp_conn(session_id)?;
+                    let conn_guard = conn.lock();
+                    if conn_guard
+                        .sftp
+                        .stat(Path::new(path))
+                        .is_ok_and(|stat| stat.is_dir())
+                    {
+                        return Ok(());
+                    }
+                    return Err(e.into());
+                }
+            }
+        }
+    }
+
+    fn sftp_rename_overwrite(&self, session_id: &str, from: &str, to: &str) -> AppResult<()> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result = {
+                let conn_guard = conn.lock();
+                conn_guard.sftp.rename(
+                    Path::new(from),
+                    Path::new(to),
+                    Some(RenameFlags::ATOMIC | RenameFlags::OVERWRITE | RenameFlags::NATIVE),
+                )
+            };
+            match result {
+                Ok(()) => return Ok(()),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => return Err(e.into()),
+            }
+        }
+    }
+
+    fn sftp_symlink_overwrite(&self, session_id: &str, target: &str, link: &str) -> AppResult<()> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result = {
+                let conn_guard = conn.lock();
+                let _ = conn_guard.sftp.unlink(Path::new(link));
+                conn_guard.sftp.symlink(Path::new(target), Path::new(link))
+            };
+            match result {
+                Ok(()) => return Ok(()),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => return Err(e.into()),
+            }
+        }
+    }
+
+    fn sftp_lstat_retry(&self, session_id: &str, path: &str) -> AppResult<FileStat> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result = {
+                let conn_guard = conn.lock();
+                conn_guard.sftp.lstat(Path::new(path))
+            };
+            match result {
+                Ok(stat) => return Ok(stat),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => return Err(e.into()),
+            }
+        }
+    }
+
+    fn sftp_readdir_retry(
         &self,
         session_id: &str,
-        local: &str,
+        path: &str,
+    ) -> AppResult<Vec<(PathBuf, FileStat)>> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result = {
+                let conn_guard = conn.lock();
+                conn_guard.sftp.readdir(Path::new(path))
+            };
+            match result {
+                Ok(entries) => return Ok(entries),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => return Err(e.into()),
+            }
+        }
+    }
+
+    fn sftp_readlink_retry(&self, session_id: &str, path: &str) -> AppResult<String> {
+        let mut attempts = 0usize;
+        loop {
+            let conn = self.sftp_conn(session_id)?;
+            let result = {
+                let conn_guard = conn.lock();
+                conn_guard.sftp.readlink(Path::new(path))
+            };
+            match result {
+                Ok(target) => return Ok(target.to_string_lossy().to_string()),
+                Err(e) if stale_session_error(&e) && attempts < SFTP_TRANSFER_RETRIES => {
+                    attempts += 1;
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+                Err(e) => return Err(e.into()),
+            }
+        }
+    }
+
+    fn build_download_plan(
+        &self,
+        session_id: &str,
+        remote_dir: &str,
+        local_dir: &str,
+    ) -> AppResult<DownloadPlan> {
+        let mut plan = DownloadPlan {
+            entries: Vec::new(),
+            total_file_bytes: 0,
+        };
+        self.collect_download_entry(
+            session_id,
+            remote_dir,
+            Path::new(local_dir).to_path_buf(),
+            &mut plan,
+        )?;
+        Ok(plan)
+    }
+
+    fn collect_download_entry(
+        &self,
+        session_id: &str,
+        remote: &str,
+        local: PathBuf,
+        plan: &mut DownloadPlan,
+    ) -> AppResult<()> {
+        let stat = self.sftp_lstat_retry(session_id, remote)?;
+        if stat.is_dir() {
+            plan.entries.push(DownloadEntry {
+                remote: remote.to_string(),
+                local: local.clone(),
+                kind: DownloadEntryKind::Directory,
+            });
+            for (path, _) in self.sftp_readdir_retry(session_id, remote)? {
+                let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                    continue;
+                };
+                if name.is_empty() || name == "." || name == ".." {
+                    continue;
+                }
+                self.collect_download_entry(
+                    session_id,
+                    &join_remote(remote, name),
+                    local.join(name),
+                    plan,
+                )?;
+            }
+        } else if stat.file_type().is_symlink() {
+            let target = self.sftp_readlink_retry(session_id, remote)?;
+            plan.entries.push(DownloadEntry {
+                remote: remote.to_string(),
+                local,
+                kind: DownloadEntryKind::Symlink { target },
+            });
+        } else if stat.is_file() {
+            let size = stat.size.unwrap_or(0);
+            plan.total_file_bytes = plan.total_file_bytes.saturating_add(size);
+            plan.entries.push(DownloadEntry {
+                remote: remote.to_string(),
+                local,
+                kind: DownloadEntryKind::File { size },
+            });
+        } else {
+            return Err(AppError(format!("不支持下载特殊文件: {remote}")));
+        }
+        Ok(())
+    }
+
+    fn upload_local_file_to_remote(
+        &self,
+        session_id: &str,
+        local: &Path,
         remote: &str,
         app: Option<&AppHandle>,
         transfer_id: Option<&str>,
         phase: &str,
+        completed_before: u64,
+        total: u64,
+        transfer: Option<&TransferGuard>,
     ) -> AppResult<()> {
-        let transfer = self.transfer_guard(transfer_id);
-        let total = std::fs::metadata(local).ok().map(|meta| meta.len());
-        let mat = self.material(session_id)?;
+        let file_size = std::fs::metadata(local)?.len();
+        let total = Some(total);
+        let mut file_transferred = self
+            .sftp_remote_file_size(session_id, remote)
+            .unwrap_or(None)
+            .unwrap_or(0)
+            .min(file_size);
+        let mut last_emit = Instant::now();
         let mut attempts = 0usize;
 
         loop {
@@ -969,30 +1255,44 @@ impl Manager {
                 transfer.check()?;
             }
 
-            let sess = match connect(&mat) {
-                Ok(sess) => sess,
-                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
-                    attempts += 1;
-                    emit_transfer_progress(app, transfer_id, "重连后重新上传压缩包", 0, total);
-                    std::thread::sleep(Duration::from_millis(250));
-                    continue;
-                }
-                Err(e) => return Err(e),
-            };
-
+            let conn = self.sftp_conn(session_id)?;
             let result: AppResult<()> = {
-                sess.set_blocking(true);
-                sess.set_timeout(0);
-                let mut channel = sess.channel_session()?;
-                channel.exec(&format!("cat > {}", shell_quote(remote)))?;
-
+                let conn_guard = conn.lock();
+                if file_transferred > 0 {
+                    file_transferred = conn_guard
+                        .sftp
+                        .stat(Path::new(remote))
+                        .ok()
+                        .and_then(|stat| stat.size)
+                        .unwrap_or(0)
+                        .min(file_size);
+                }
+                let mut remote_file = if file_transferred == 0 {
+                    conn_guard.sftp.create(Path::new(remote))?
+                } else {
+                    conn_guard.sftp.open_mode(
+                        Path::new(remote),
+                        OpenFlags::WRITE,
+                        0o644,
+                        OpenType::File,
+                    )?
+                };
                 let mut local_file = std::fs::File::open(local)?;
                 let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
-                let mut transferred = 0u64;
-                let mut last_emit = Instant::now();
                 let mut last_keepalive = Instant::now();
 
-                emit_transfer_progress(app, transfer_id, phase, 0, total);
+                if file_transferred > 0 {
+                    remote_file.seek(SeekFrom::Start(file_transferred))?;
+                    local_file.seek(SeekFrom::Start(file_transferred))?;
+                }
+
+                emit_transfer_progress(
+                    app,
+                    transfer_id,
+                    phase,
+                    completed_before + file_transferred,
+                    total,
+                );
                 loop {
                     if let Some(transfer) = &transfer {
                         transfer.check()?;
@@ -1001,57 +1301,59 @@ impl Manager {
                     if n == 0 {
                         break;
                     }
-                    channel.write_all(&buf[..n])?;
-                    transferred += n as u64;
+                    remote_file.write_all(&buf[..n])?;
+                    file_transferred += n as u64;
                     if last_emit.elapsed() >= Duration::from_millis(120) {
-                        emit_transfer_progress(app, transfer_id, phase, transferred, total);
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            phase,
+                            completed_before + file_transferred,
+                            total,
+                        );
                         last_emit = Instant::now();
                     }
-                    if last_keepalive.elapsed()
-                        >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
+                    if last_keepalive.elapsed() >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
                     {
-                        let _ = sess.keepalive_send();
+                        let _ = conn_guard.session.keepalive_send();
                         last_keepalive = Instant::now();
                     }
                 }
-
-                channel.flush()?;
-                channel.send_eof()?;
-                let mut stderr = String::new();
-                channel.stderr().read_to_string(&mut stderr)?;
-                channel.wait_close()?;
-                let code = channel.exit_status()?;
-                if code != 0 {
-                    let msg = if stderr.trim().is_empty() {
-                        "cat failed".to_string()
-                    } else {
-                        stderr.trim().to_string()
-                    };
-                    return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
-                }
-
-                if let Some(transfer) = &transfer {
-                    transfer.check()?;
-                }
-                emit_transfer_progress(app, transfer_id, phase, transferred, total);
+                remote_file.flush()?;
                 Ok(())
             };
 
             match result {
-                Ok(()) => return Ok(()),
+                Ok(()) => break,
                 Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
                     attempts += 1;
-                    emit_transfer_progress(app, transfer_id, "重连后重新上传压缩包", 0, total);
-                    let _ = self.exec(session_id, &format!("rm -f -- {}", shell_quote(remote)));
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "重连后继续上传",
+                        completed_before + file_transferred,
+                        total,
+                    );
                     std::thread::sleep(Duration::from_millis(250));
                 }
                 Err(e) => return Err(e),
             }
         }
+
+        let actual_size = self
+            .sftp_remote_file_size(session_id, remote)?
+            .ok_or_else(|| AppError(format!("上传校验失败：远端临时文件不存在: {}", remote)))?;
+        if actual_size != file_size {
+            return Err(AppError(format!(
+                "上传校验失败：远端文件大小为 {actual_size} 字节，本地文件大小为 {file_size} 字节"
+            )));
+        }
+        emit_transfer_progress(app, transfer_id, phase, completed_before + file_size, total);
+        Ok(())
     }
 
-    /// Upload a local directory: pack it locally into a tar.gz whose top-level
-    /// entry is `remote_name`, stream the archive up, then extract remotely.
+    /// Upload a local directory recursively over SFTP.
     pub fn sftp_upload_dir(
         &self,
         session_id: &str,
@@ -1062,215 +1364,302 @@ impl Manager {
         transfer_id: Option<&str>,
     ) -> AppResult<()> {
         let transfer = self.transfer_guard(transfer_id);
-        // 1. Build a local tar.gz with `remote_name` as the top directory.
-        let local_archive = std::env::temp_dir().join(format!("mftp-up-{}.tar.gz", uuid_v4()));
-        emit_transfer_progress(app, transfer_id, "压缩中", 0, None);
+        emit_transfer_progress(app, transfer_id, "扫描中", 0, None);
         if let Some(transfer) = &transfer {
             transfer.check()?;
         }
-        pack_tar_gz(local_dir, remote_name, &local_archive)?;
+        let remote_root = join_remote(remote_parent, remote_name);
+        let plan = build_upload_plan(local_dir, &remote_root)?;
         if let Some(transfer) = &transfer {
-            if let Err(e) = transfer.check() {
-                let _ = std::fs::remove_file(&local_archive);
-                return Err(e);
+            transfer.check()?;
+        }
+
+        let total = plan.total_file_bytes;
+        let total_for_progress = if total == 0 { Some(1) } else { Some(total) };
+        let mut uploaded = 0u64;
+        emit_transfer_progress(app, transfer_id, "创建目录中", 0, total_for_progress);
+
+        for entry in plan.entries {
+            if let Some(transfer) = &transfer {
+                transfer.check()?;
+            }
+
+            match entry.kind {
+                UploadEntryKind::Directory => {
+                    self.sftp_mkdir_existing_ok(session_id, &entry.remote)?;
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "上传文件夹中",
+                        uploaded,
+                        total_for_progress,
+                    );
+                }
+                UploadEntryKind::File { size } => {
+                    self.sftp_mkdir_existing_ok(session_id, &remote_parent_of(&entry.remote))?;
+                    let temp_remote = remote_temp_sibling(&entry.remote);
+                    let upload_res = self.upload_local_file_to_remote(
+                        session_id,
+                        &entry.local,
+                        &temp_remote,
+                        app,
+                        transfer_id,
+                        "上传文件夹中",
+                        uploaded,
+                        total,
+                        transfer.as_ref(),
+                    );
+                    if let Err(e) = upload_res {
+                        let _ = self.remove_remote_path_if_file(session_id, &temp_remote);
+                        return Err(e);
+                    }
+                    if let Err(e) =
+                        self.sftp_rename_overwrite(session_id, &temp_remote, &entry.remote)
+                    {
+                        let _ = self.remove_remote_path_if_file(session_id, &temp_remote);
+                        return Err(e);
+                    }
+                    uploaded = uploaded.saturating_add(size);
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "上传文件夹中",
+                        uploaded,
+                        total_for_progress,
+                    );
+                }
+                UploadEntryKind::Symlink { target } => {
+                    self.sftp_symlink_overwrite(session_id, &target, &entry.remote)?;
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "上传文件夹中",
+                        uploaded,
+                        total_for_progress,
+                    );
+                }
             }
         }
 
-        // 2. Upload it to a hidden temp file in the remote parent.
-        let remote_archive = join_remote(remote_parent, &format!(".mftp-up-{}.tar.gz", uuid_v4()));
-        let upload_res = self.upload_file_with_exec(
-            session_id,
-            &local_archive.to_string_lossy(),
-            &remote_archive,
+        emit_transfer_progress(
             app,
             transfer_id,
-            "上传压缩包中",
+            "完成",
+            total_for_progress.unwrap_or(1),
+            total_for_progress,
         );
-        // Local temp no longer needed once uploaded (or on failure).
-        let _ = std::fs::remove_file(&local_archive);
-        if let Err(e) = upload_res {
-            let _ = self.exec(
-                session_id,
-                &format!("rm -f -- {}", shell_quote(&remote_archive)),
-            );
-            return Err(e);
-        }
-        if let Some(transfer) = &transfer {
-            if let Err(e) = transfer.check() {
-                let _ = self.exec(
-                    session_id,
-                    &format!("rm -f {}", shell_quote(&remote_archive)),
-                );
-                return Err(e);
-            }
-        }
-
-        // 3. Extract remotely, then remove the remote temp archive regardless.
-        emit_transfer_progress(app, transfer_id, "远端解压中", 0, None);
-        let cmd = format!(
-            "tar -xzf {} -C {}",
-            shell_quote(&remote_archive),
-            shell_quote(remote_parent)
-        );
-        let extract_res = self.exec_checked(session_id, &cmd).map(|_| ());
-        let _ = self.exec(
-            session_id,
-            &format!("rm -f {}", shell_quote(&remote_archive)),
-        );
-        extract_res
+        Ok(())
     }
 
-    /// Stream a remote directory as tar.gz directly to a local archive.
-    pub fn sftp_download_dir(
+    fn download_remote_file_to_local(
         &self,
         session_id: &str,
-        remote_dir: &str,
-        local_archive: &str,
+        remote: &str,
+        local: &Path,
+        expected_size: u64,
         app: Option<&AppHandle>,
         transfer_id: Option<&str>,
+        phase: &str,
+        completed_before: u64,
+        total: u64,
+        transfer: Option<&TransferGuard>,
     ) -> AppResult<()> {
-        let transfer = self.transfer_guard(transfer_id);
-        let mat = self.material(session_id)?;
-        let parent = remote_parent_of(remote_dir);
-        let name = remote_basename(remote_dir);
-        let remote_stderr = format!("/tmp/.mftp-dl-{}.stderr", uuid_v4());
-        let cmd = format!(
-            "tar -czf - -C {} {} 2> {}",
-            shell_quote(&parent),
-            shell_quote(&name),
-            shell_quote(&remote_stderr)
-        );
+        let total = Some(total);
+        let mut file_transferred = std::fs::metadata(local)
+            .ok()
+            .map(|meta| meta.len())
+            .unwrap_or(0)
+            .min(expected_size);
+        let mut last_emit = Instant::now();
         let mut attempts = 0usize;
 
         loop {
             if let Some(transfer) = &transfer {
-                if let Err(e) = transfer.check() {
-                    let _ = std::fs::remove_file(local_archive);
-                    return Err(e);
-                }
+                transfer.check()?;
             }
-            let sess = match connect(&mat) {
-                Ok(sess) => sess,
-                Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
-                    attempts += 1;
-                    emit_transfer_progress(app, transfer_id, "重连后重新下载文件夹", 0, None);
-                    std::thread::sleep(Duration::from_millis(250));
-                    continue;
-                }
-                Err(e) => return Err(e),
-            };
+
+            let conn = self.sftp_conn(session_id)?;
             let result: AppResult<()> = {
-                sess.set_blocking(true);
-                sess.set_timeout(0);
-                let mut channel = sess.channel_session()?;
-                channel.exec(&cmd)?;
-
-                let mut local_file = OpenOptions::new()
-                    .create(true)
-                    .write(true)
-                    .truncate(true)
-                    .open(local_archive)?;
+                let conn_guard = conn.lock();
+                let mut remote_file = conn_guard.sftp.open(Path::new(remote))?;
+                let mut local_file = OpenOptions::new().create(true).write(true).open(local)?;
                 let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
-                let mut transferred = 0u64;
-                let mut last_emit = Instant::now();
+                let mut last_keepalive = Instant::now();
 
-                emit_transfer_progress(app, transfer_id, "远端打包并下载中", 0, None);
+                if file_transferred > 0 {
+                    remote_file.seek(SeekFrom::Start(file_transferred))?;
+                    local_file.seek(SeekFrom::Start(file_transferred))?;
+                }
+
+                emit_transfer_progress(
+                    app,
+                    transfer_id,
+                    phase,
+                    completed_before + file_transferred,
+                    total,
+                );
                 loop {
                     if let Some(transfer) = &transfer {
                         transfer.check()?;
                     }
-                    let n = channel.read(&mut buf)?;
+                    let n = remote_file.read(&mut buf)?;
                     if n == 0 {
                         break;
                     }
                     local_file.write_all(&buf[..n])?;
-                    transferred += n as u64;
+                    file_transferred += n as u64;
                     if last_emit.elapsed() >= Duration::from_millis(120) {
                         emit_transfer_progress(
                             app,
                             transfer_id,
-                            "远端打包并下载中",
-                            transferred,
-                            None,
+                            phase,
+                            completed_before + file_transferred,
+                            total,
                         );
                         last_emit = Instant::now();
                     }
+                    if last_keepalive.elapsed() >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
+                    {
+                        let _ = conn_guard.session.keepalive_send();
+                        last_keepalive = Instant::now();
+                    }
                 }
                 local_file.flush()?;
-                if let Some(transfer) = &transfer {
-                    transfer.check()?;
-                }
-
-                if let Err(e) = channel.wait_close() {
-                    if stale_session_error(&e) {
-                        if let Some(transfer) = &transfer {
-                            if let Err(e) = transfer.check() {
-                                let _ = remove_remote_file(&sess, &remote_stderr);
-                                let _ = std::fs::remove_file(local_archive);
-                                return Err(e);
-                            }
-                        }
-                        let _ = remove_remote_file(&sess, &remote_stderr);
-                        emit_transfer_progress(app, transfer_id, "完成", transferred, None);
-                        return Ok(());
-                    }
-                    return Err(e.into());
-                }
-                let code = match channel.exit_status() {
-                    Ok(code) => code,
-                    Err(e) if stale_session_error(&e) => {
-                        if let Some(transfer) = &transfer {
-                            if let Err(e) = transfer.check() {
-                                let _ = remove_remote_file(&sess, &remote_stderr);
-                                let _ = std::fs::remove_file(local_archive);
-                                return Err(e);
-                            }
-                        }
-                        let _ = remove_remote_file(&sess, &remote_stderr);
-                        emit_transfer_progress(app, transfer_id, "完成", transferred, None);
-                        return Ok(());
-                    }
-                    Err(e) => return Err(e.into()),
-                };
-                if code != 0 {
-                    let stderr = read_remote_text_and_remove(&sess, &remote_stderr)
-                        .unwrap_or_else(|_| String::new());
-                    let msg = if stderr.trim().is_empty() {
-                        "tar failed".to_string()
-                    } else {
-                        stderr.trim().to_string()
-                    };
-                    return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
-                }
-
-                let _ = remove_remote_file(&sess, &remote_stderr);
-                if let Some(transfer) = &transfer {
-                    if let Err(e) = transfer.check() {
-                        let _ = std::fs::remove_file(local_archive);
-                        return Err(e);
-                    }
-                }
-                emit_transfer_progress(app, transfer_id, "完成", transferred, None);
                 Ok(())
             };
 
             match result {
-                Ok(()) => return Ok(()),
+                Ok(()) => break,
                 Err(e) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&e) => {
                     attempts += 1;
-                    let _ = remove_remote_file(&sess, &remote_stderr);
-                    emit_transfer_progress(app, transfer_id, "重连后重新下载文件夹", 0, None);
+                    self.remove_sftp_conn_if_current(session_id, &conn);
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "重连后继续下载",
+                        completed_before + file_transferred,
+                        total,
+                    );
                     std::thread::sleep(Duration::from_millis(250));
                 }
-                Err(e) => {
-                    let _ = remove_remote_file(&sess, &remote_stderr);
-                    if transfer_cancelled_error(&e) {
-                        let _ = std::fs::remove_file(local_archive);
+                Err(e) => return Err(e),
+            }
+        }
+
+        let actual_size = std::fs::metadata(local)?.len();
+        if actual_size != expected_size {
+            return Err(AppError(format!(
+                "下载校验失败：本地文件大小为 {actual_size} 字节，远端文件大小为 {expected_size} 字节"
+            )));
+        }
+        emit_transfer_progress(
+            app,
+            transfer_id,
+            phase,
+            completed_before + expected_size,
+            total,
+        );
+        Ok(())
+    }
+
+    /// Download a remote directory recursively over SFTP.
+    pub fn sftp_download_dir(
+        &self,
+        session_id: &str,
+        remote_dir: &str,
+        local_dir: &str,
+        app: Option<&AppHandle>,
+        transfer_id: Option<&str>,
+    ) -> AppResult<()> {
+        let transfer = self.transfer_guard(transfer_id);
+        emit_transfer_progress(app, transfer_id, "扫描中", 0, None);
+        if let Some(transfer) = &transfer {
+            transfer.check()?;
+        }
+        let plan = self.build_download_plan(session_id, remote_dir, local_dir)?;
+        if let Some(transfer) = &transfer {
+            transfer.check()?;
+        }
+
+        let total = plan.total_file_bytes;
+        let total_for_progress = if total == 0 { Some(1) } else { Some(total) };
+        let mut downloaded = 0u64;
+        emit_transfer_progress(app, transfer_id, "创建目录中", 0, total_for_progress);
+
+        for entry in plan.entries {
+            if let Some(transfer) = &transfer {
+                transfer.check()?;
+            }
+
+            match entry.kind {
+                DownloadEntryKind::Directory => {
+                    std::fs::create_dir_all(&entry.local)?;
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "下载文件夹中",
+                        downloaded,
+                        total_for_progress,
+                    );
+                }
+                DownloadEntryKind::File { size } => {
+                    if let Some(parent) = entry.local.parent() {
+                        std::fs::create_dir_all(parent)?;
                     }
-                    return Err(e);
+                    let temp_local = local_temp_sibling(&entry.local);
+                    let download_res = self.download_remote_file_to_local(
+                        session_id,
+                        &entry.remote,
+                        &temp_local,
+                        size,
+                        app,
+                        transfer_id,
+                        "下载文件夹中",
+                        downloaded,
+                        total,
+                        transfer.as_ref(),
+                    );
+                    if let Err(e) = download_res {
+                        let _ = std::fs::remove_file(&temp_local);
+                        return Err(e);
+                    }
+                    if let Err(e) = rename_local_file_overwrite(&temp_local, &entry.local) {
+                        let _ = std::fs::remove_file(&temp_local);
+                        return Err(e);
+                    }
+                    downloaded = downloaded.saturating_add(size);
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "下载文件夹中",
+                        downloaded,
+                        total_for_progress,
+                    );
+                }
+                DownloadEntryKind::Symlink { target } => {
+                    if let Some(parent) = entry.local.parent() {
+                        std::fs::create_dir_all(parent)?;
+                    }
+                    create_local_symlink_overwrite(&target, &entry.local)?;
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        "下载文件夹中",
+                        downloaded,
+                        total_for_progress,
+                    );
                 }
             }
         }
+
+        emit_transfer_progress(
+            app,
+            transfer_id,
+            "完成",
+            total_for_progress.unwrap_or(1),
+            total_for_progress,
+        );
+        Ok(())
     }
 
     /// Extract a remote archive into `remote_parent`.
@@ -1383,29 +1772,65 @@ fn remote_basename(path: &str) -> String {
     }
 }
 
-fn exec_on_session(sess: &Session, cmd: &str) -> AppResult<(i32, String, String)> {
-    sess.set_blocking(true);
-    sess.set_timeout(0);
-    let mut channel = sess.channel_session()?;
-    channel.exec(cmd)?;
-    let mut stdout = String::new();
-    channel.read_to_string(&mut stdout)?;
-    let mut stderr = String::new();
-    channel.stderr().read_to_string(&mut stderr)?;
-    channel.wait_close()?;
-    let code = channel.exit_status()?;
-    Ok((code, stdout, stderr))
+fn remote_temp_sibling(path: &str) -> String {
+    let parent = remote_parent_of(path);
+    let name = remote_basename(path);
+    join_remote(&parent, &format!(".{name}.mftp-part-{}", uuid_v4()))
 }
 
-fn read_remote_text_and_remove(sess: &Session, path: &str) -> AppResult<String> {
-    let cmd = format!("cat {}; rm -f {}", shell_quote(path), shell_quote(path));
-    let (_, stdout, _) = exec_on_session(sess, &cmd)?;
-    Ok(stdout)
+fn local_temp_sibling(path: &Path) -> PathBuf {
+    let name = path
+        .file_name()
+        .map(|name| name.to_string_lossy())
+        .unwrap_or_else(|| "download".into());
+    path.with_file_name(format!(".{name}.mftp-part-{}", uuid_v4()))
 }
 
-fn remove_remote_file(sess: &Session, path: &str) -> AppResult<()> {
-    let cmd = format!("rm -f {}", shell_quote(path));
-    exec_on_session(sess, &cmd).map(|_| ())
+fn rename_local_file_overwrite(from: &Path, to: &Path) -> AppResult<()> {
+    if to.is_dir() {
+        return Err(AppError(format!(
+            "本地目标已是文件夹，无法覆盖为文件: {}",
+            to.display()
+        )));
+    }
+    if to.exists() {
+        std::fs::remove_file(to)?;
+    }
+    std::fs::rename(from, to)?;
+    Ok(())
+}
+
+fn create_local_symlink_overwrite(target: &str, link: &Path) -> AppResult<()> {
+    if link.is_dir() {
+        return Err(AppError(format!(
+            "本地目标已是文件夹，无法覆盖为符号链接: {}",
+            link.display()
+        )));
+    }
+    if link.exists() {
+        std::fs::remove_file(link)?;
+    }
+    create_local_symlink(target, link)
+}
+
+#[cfg(unix)]
+fn create_local_symlink(target: &str, link: &Path) -> AppResult<()> {
+    std::os::unix::fs::symlink(target, link)?;
+    Ok(())
+}
+
+#[cfg(windows)]
+fn create_local_symlink(target: &str, link: &Path) -> AppResult<()> {
+    std::os::windows::fs::symlink_file(target, link)?;
+    Ok(())
+}
+
+#[cfg(not(any(unix, windows)))]
+fn create_local_symlink(_target: &str, link: &Path) -> AppResult<()> {
+    Err(AppError(format!(
+        "当前平台不支持创建本地符号链接: {}",
+        link.display()
+    )))
 }
 
 /// Build the shell command to extract `archive` into `dest_dir`, choosing the
@@ -1425,25 +1850,6 @@ fn extract_cmd(archive: &str, dest_dir: &str) -> AppResult<String> {
     } else {
         Err(AppError("不支持的压缩包格式".into()))
     }
-}
-
-/// Pack `local_dir` into `dest` (tar.gz) with `top_name` as the archive's
-/// top-level directory. `append_dir_all` includes empty directories.
-fn pack_tar_gz(local_dir: &str, top_name: &str, dest: &Path) -> AppResult<()> {
-    use flate2::write::GzEncoder;
-    use flate2::Compression;
-    let file = std::fs::File::create(dest)?;
-    let enc = GzEncoder::new(file, Compression::fast());
-    let mut builder = tar::Builder::new(enc);
-    builder
-        .append_dir_all(top_name, local_dir)
-        .map_err(|e| AppError(format!("打包失败: {e}")))?;
-    let enc = builder
-        .into_inner()
-        .map_err(|e| AppError(format!("打包失败: {e}")))?;
-    enc.finish()
-        .map_err(|e| AppError(format!("打包失败: {e}")))?;
-    Ok(())
 }
 
 /// Runs on a dedicated thread; owns the session + shell channel exclusively.

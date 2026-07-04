@@ -97,13 +97,13 @@ export const sftpUploadDir = (
 export const sftpDownloadDir = (
   sessionId: string,
   remoteDir: string,
-  localArchive: string,
+  localDir: string,
   transferId?: string,
 ) =>
   invoke<void>("sftp_download_dir", {
     sessionId,
     remoteDir,
-    localArchive,
+    localDir,
     transferId: transferId ?? null,
   });
 export const sftpCancelTransfer = (transferId: string) =>
