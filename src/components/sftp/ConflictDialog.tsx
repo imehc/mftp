@@ -25,7 +25,7 @@ interface Props {
   open: boolean;
   /** The conflicting name that already exists remotely. */
   name: string;
-  /** Wording for the incoming item, e.g. "上传的文件夹" / "解压出的文件夹". */
+  /** Wording for the incoming item, e.g. "上传的文件夹" / "要移动的文件". */
   incomingLabel: string;
   initialIncomingName?: string;
   initialExistingName?: string;
@@ -35,7 +35,7 @@ interface Props {
 
 /**
  * Resolve a remote name conflict by optionally renaming both the incoming item
- * and the existing remote folder before continuing.
+ * and the existing remote item before continuing.
  */
 export default function ConflictDialog({
   open,
@@ -68,9 +68,9 @@ export default function ConflictDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>目标已存在同名文件夹</DialogTitle>
+          <DialogTitle>目标已存在同名项目</DialogTitle>
           <DialogDescription>
-            远端已存在 “{name}”。修改要创建的名称，或先重命名远端已有文件夹。
+            远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。
           </DialogDescription>
         </DialogHeader>
 

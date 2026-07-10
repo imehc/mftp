@@ -8,12 +8,14 @@ import {
   File as FileIcon,
   FileArchive,
   Folder,
+  FolderInput,
   FolderOpen,
   FolderPlus,
   FolderUp,
   Home,
   Info,
   LoaderCircle,
+  MoreHorizontal,
   Pencil,
   RefreshCw,
   Trash2,
@@ -29,6 +31,7 @@ import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
@@ -52,9 +55,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import PromptDialog from "~/components/ui/prompt-dialog";
 import ConflictDialog, {
   type ConflictResolution,
@@ -118,6 +124,19 @@ function entryType(entry: SftpEntry): string {
 function joinPath(dir: string, name: string): string {
   return dir.endsWith("/") ? `${dir}${name}` : `${dir}/${name}`;
 }
+
+function normalizeRemotePath(path: string): string {
+  if (!path) return "/";
+  const normalized = path.replace(/\/+/g, "/").replace(/\/+$/, "");
+  return normalized || "/";
+}
+
+function isSameOrChildPath(path: string, parent: string): boolean {
+  const p = normalizeRemotePath(path);
+  const base = normalizeRemotePath(parent);
+  return p === base || (base !== "/" && p.startsWith(`${base}/`));
+}
+
 function parentPath(p: string): string {
   if (p === "/" || p === "") return "/";
   const trimmed = p.replace(/\/+$/, "");
@@ -157,6 +176,19 @@ type InfoState = {
   entry: SftpEntry;
   details: SftpFileInfo | null;
   loading: boolean;
+} | null;
+
+type ExtractState = {
+  entry: SftpEntry;
+  outName: string;
+  remoteParent: string;
+} | null;
+
+type DirectoryPickerState = {
+  title: string;
+  initialPath: string;
+  disabledPath?: string;
+  onSelect: (path: string) => void;
 } | null;
 
 /** A pending action blocked on resolving a remote name conflict. */
@@ -237,6 +269,9 @@ export default function SftpPanel({ session }: Props) {
   const [prompt, setPrompt] = useState<PromptState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const [info, setInfo] = useState<InfoState>(null);
+  const [extractTarget, setExtractTarget] = useState<ExtractState>(null);
+  const [directoryPicker, setDirectoryPicker] =
+    useState<DirectoryPickerState>(null);
   const [conflict, setConflict] = useState<ConflictState>(null);
   const startTransfer = useTransfersStore((s) => s.start);
   const finishTransfer = useTransfersStore((s) => s.finish);
@@ -570,26 +605,66 @@ export default function SftpPanel({ session }: Props) {
 
   async function onExtract(entry: SftpEntry) {
     if (!cwd) return;
-    await extractWithName(entry, archiveStem(entry.name));
+    setExtractTarget({
+      entry,
+      outName: archiveStem(entry.name),
+      remoteParent: cwd,
+    });
   }
 
-  async function extractWithName(entry: SftpEntry, outName: string) {
-    if (!cwd) return;
+  function chooseExtractParent() {
+    if (!extractTarget) return;
+    setDirectoryPicker({
+      title: "选择解压位置",
+      initialPath: extractTarget.remoteParent,
+      onSelect: (path) => {
+        setDirectoryPicker(null);
+        setExtractTarget((current) =>
+          current ? { ...current, remoteParent: path } : current,
+        );
+      },
+    });
+  }
+
+  async function confirmExtract() {
+    if (!extractTarget) return;
+    const outName = extractTarget.outName.trim();
+    if (!validPlainName(outName)) {
+      toast.error("名称不能为空，且不能包含斜杠");
+      return;
+    }
+    setExtractTarget(null);
+    await extractWithName(
+      extractTarget.entry,
+      extractTarget.remoteParent,
+      outName,
+    );
+  }
+
+  async function extractWithName(
+    entry: SftpEntry,
+    remoteParent: string,
+    outName: string,
+  ) {
     try {
-      const exists = await ipc.sftpExists(sessionId, joinPath(cwd, outName));
+      const exists = await ipc.sftpExists(
+        sessionId,
+        joinPath(remoteParent, outName),
+      );
       if (exists) {
-        showExtractConflict(entry, outName);
+        showExtractConflict(entry, remoteParent, outName);
         return;
       }
     } catch (e) {
       toast.error(String(e));
       return;
     }
-    await runExtract(entry, outName);
+    await runExtract(entry, remoteParent, outName);
   }
 
   function showExtractConflict(
     entry: SftpEntry,
+    remoteParent: string,
     outName: string,
     initialIncomingName?: string,
     initialExistingName?: string,
@@ -600,43 +675,168 @@ export default function SftpPanel({ session }: Props) {
       initialIncomingName,
       initialExistingName,
       run: async (resolution) => {
-        await resolveExtractConflict(entry, outName, resolution);
+        await resolveExtractConflict(entry, remoteParent, outName, resolution);
       },
     });
   }
 
   async function resolveExtractConflict(
     entry: SftpEntry,
+    remoteParent: string,
     outName: string,
     { incomingName, existingName }: ConflictResolution,
   ) {
-    if (!cwd) return;
     if (existingName !== outName) {
       const targetExists = await ipc.sftpExists(
         sessionId,
-        joinPath(cwd, existingName),
+        joinPath(remoteParent, existingName),
       );
       if (targetExists) {
         toast.error(`远端已存在 “${existingName}”，请重新命名`);
-        showExtractConflict(entry, outName, incomingName, existingName);
+        showExtractConflict(
+          entry,
+          remoteParent,
+          outName,
+          incomingName,
+          existingName,
+        );
         return;
       }
       await ipc.sftpRename(
         sessionId,
-        joinPath(cwd, outName),
-        joinPath(cwd, existingName),
+        joinPath(remoteParent, outName),
+        joinPath(remoteParent, existingName),
       );
     }
-    await extractWithName(entry, incomingName);
+    await extractWithName(entry, remoteParent, incomingName);
   }
 
-  async function runExtract(entry: SftpEntry, outName: string) {
-    if (!cwd) return;
+  async function runExtract(
+    entry: SftpEntry,
+    remoteParent: string,
+    outName: string,
+  ) {
     const tid = toast.loading(`正在解压 ${entry.name}…`);
     setBusy(`解压 ${entry.name}…`);
     try {
-      await ipc.sftpExtract(sessionId, entry.path, cwd, outName);
+      await ipc.sftpExtract(sessionId, entry.path, remoteParent, outName);
       toast.success(`已解压到 ${outName}`, { id: tid });
+      if (cwd) await load(cwd);
+    } catch (e) {
+      toast.error(String(e), { id: tid });
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // ---- Move remote entry ----
+
+  function onMove(entry: SftpEntry) {
+    if (!cwd) return;
+    setDirectoryPicker({
+      title: "选择移动位置",
+      initialPath: cwd,
+      disabledPath: entry.isDir ? entry.path : undefined,
+      onSelect: (path) => {
+        setDirectoryPicker(null);
+        void moveEntryTo(entry, path);
+      },
+    });
+  }
+
+  async function moveEntryTo(entry: SftpEntry, remoteParent: string) {
+    await moveEntryWithName(entry, remoteParent, entry.name);
+  }
+
+  async function moveEntryWithName(
+    entry: SftpEntry,
+    remoteParent: string,
+    entryName: string,
+  ) {
+    if (!cwd) return;
+    if (entry.isDir && isSameOrChildPath(remoteParent, entry.path)) {
+      toast.error("不能移动到自身或子文件夹中");
+      return;
+    }
+
+    const target = joinPath(remoteParent, entryName);
+    if (normalizeRemotePath(target) === normalizeRemotePath(entry.path)) {
+      toast.info(`${entry.isDir ? "文件夹" : "文件"}已在该位置`);
+      return;
+    }
+
+    try {
+      const exists = await ipc.sftpExists(sessionId, target);
+      if (exists) {
+        showMoveConflict(entry, remoteParent, entryName);
+        return;
+      }
+    } catch (e) {
+      toast.error(String(e));
+      return;
+    }
+
+    await runMoveEntry(entry, target);
+  }
+
+  function showMoveConflict(
+    entry: SftpEntry,
+    remoteParent: string,
+    entryName: string,
+    initialIncomingName?: string,
+    initialExistingName?: string,
+  ) {
+    setConflict({
+      name: entryName,
+      incomingLabel: entry.isDir ? "要移动的文件夹" : "要移动的文件",
+      initialIncomingName,
+      initialExistingName,
+      run: async (resolution) => {
+        await resolveMoveConflict(entry, remoteParent, entryName, resolution);
+      },
+    });
+  }
+
+  async function resolveMoveConflict(
+    entry: SftpEntry,
+    remoteParent: string,
+    entryName: string,
+    { incomingName, existingName }: ConflictResolution,
+  ) {
+    if (existingName !== entryName) {
+      const renamedExistingPath = joinPath(remoteParent, existingName);
+      const renamedExistingExists = await ipc.sftpExists(
+        sessionId,
+        renamedExistingPath,
+      );
+      if (renamedExistingExists) {
+        toast.error(`远端已存在 “${existingName}”，请重新命名`);
+        showMoveConflict(
+          entry,
+          remoteParent,
+          entryName,
+          incomingName,
+          existingName,
+        );
+        return;
+      }
+      await ipc.sftpRename(
+        sessionId,
+        joinPath(remoteParent, entryName),
+        renamedExistingPath,
+      );
+    }
+
+    await moveEntryWithName(entry, remoteParent, incomingName);
+  }
+
+  async function runMoveEntry(entry: SftpEntry, target: string) {
+    if (!cwd) return;
+    const tid = toast.loading(`正在移动 ${entry.name}…`);
+    setBusy(`移动 ${entry.name}…`);
+    try {
+      await ipc.sftpRename(sessionId, entry.path, target);
+      toast.success(`已移动 ${entry.name}`, { id: tid });
       await load(cwd);
     } catch (e) {
       toast.error(String(e), { id: tid });
@@ -757,12 +957,14 @@ export default function SftpPanel({ session }: Props) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={onUpload}>
-              <FileIcon data-icon="inline-start" /> 上传文件
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={onUploadDir}>
-              <FolderUp data-icon="inline-start" /> 上传文件夹
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem onSelect={onUpload}>
+                <FileIcon /> 上传文件
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={onUploadDir}>
+                <FolderUp /> 上传文件夹
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -804,7 +1006,7 @@ export default function SftpPanel({ session }: Props) {
                 label="名称"
                 sortKey="name"
                 sort={sort}
-                className="flex-1"
+                className="min-w-48 flex-1"
                 onSort={toggleSort}
               />
               <SortHeader
@@ -825,7 +1027,7 @@ export default function SftpPanel({ session }: Props) {
                 label="大小"
                 sortKey="size"
                 sort={sort}
-                className="w-20"
+                className="w-16"
                 onSort={toggleSort}
               />
               <span className="w-40 text-right">操作</span>
@@ -840,6 +1042,7 @@ export default function SftpPanel({ session }: Props) {
                 onInfo={showInfo}
                 onDownload={onDownload}
                 onExtract={onExtract}
+                onMove={onMove}
                 onRename={(e) => setPrompt({ kind: "rename", entry: e })}
                 onDelete={setDeleteTarget}
               />
@@ -897,6 +1100,68 @@ export default function SftpPanel({ session }: Props) {
           prompt?.kind === "downloadDir" &&
           void downloadDirWithName(prompt.entry, name)
         }
+      />
+
+      <Dialog
+        open={!!extractTarget && !directoryPicker}
+        onOpenChange={(o) => !o && !directoryPicker && setExtractTarget(null)}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>解压</DialogTitle>
+            <DialogDescription className="truncate">
+              {extractTarget?.entry.name ?? ""}
+            </DialogDescription>
+          </DialogHeader>
+          {extractTarget ? (
+            <FieldGroup className="gap-3">
+              <Field>
+                <FieldLabel>文件夹名称</FieldLabel>
+                <Input
+                  value={extractTarget.outName}
+                  onChange={(e) =>
+                    setExtractTarget((current) =>
+                      current
+                        ? { ...current, outName: e.target.value }
+                        : current,
+                    )
+                  }
+                />
+              </Field>
+              <Field>
+                <FieldLabel>位置</FieldLabel>
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="min-w-0 flex-1 truncate rounded-md bg-muted px-2 py-1.5 font-mono text-xs">
+                    {extractTarget.remoteParent}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={chooseExtractParent}
+                  >
+                    <FolderOpen data-icon="inline-start" /> 选择
+                  </Button>
+                </div>
+              </Field>
+            </FieldGroup>
+          ) : null}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setExtractTarget(null)}>
+              取消
+            </Button>
+            <Button onClick={confirmExtract}>解压</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <RemoteDirectoryPicker
+        open={!!directoryPicker}
+        title={directoryPicker?.title ?? ""}
+        sessionId={sessionId}
+        initialPath={directoryPicker?.initialPath ?? cwd ?? "/"}
+        disabledPath={directoryPicker?.disabledPath}
+        onOpenChange={(o) => !o && setDirectoryPicker(null)}
+        onSelect={(path) => directoryPicker?.onSelect(path)}
       />
 
       <ConflictDialog
@@ -1057,6 +1322,7 @@ interface RowProps {
   onInfo: (entry: SftpEntry) => void;
   onDownload: (entry: SftpEntry) => void;
   onExtract: (entry: SftpEntry) => void;
+  onMove: (entry: SftpEntry) => void;
   onRename: (entry: SftpEntry) => void;
   onDelete: (entry: SftpEntry) => void;
 }
@@ -1074,6 +1340,7 @@ const SftpRow = memo(function SftpRow({
   onInfo,
   onDownload,
   onExtract,
+  onMove,
   onRename,
   onDelete,
 }: RowProps) {
@@ -1081,7 +1348,7 @@ const SftpRow = memo(function SftpRow({
   return (
     <div className="group flex items-center gap-2 border-b border-border/40 px-3 py-1.5 text-sm [content-visibility:auto] [contain-intrinsic-size:auto_36px] hover:bg-muted/50">
       <button
-        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+        className="min-w-48 flex flex-1 items-center gap-2 text-left"
         onDoubleClick={() => entry.isDir && onEnter(entry.path)}
         disabled={!entry.isDir || disabled}
       >
@@ -1104,28 +1371,10 @@ const SftpRow = memo(function SftpRow({
       <span className="w-16 truncate text-left text-xs text-muted-foreground">
         {entryType(entry)}
       </span>
-      <span className="w-20 text-left text-xs text-muted-foreground">
+      <span className="w-16 text-left text-xs text-muted-foreground">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
       <div className="flex w-40 justify-end gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
-        {canExtract ? (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title="解压"
-            onClick={() => onExtract(entry)}
-          >
-            <FolderOpen />
-          </Button>
-        ) : null}
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          title="简介"
-          onClick={() => onInfo(entry)}
-        >
-          <Info />
-        </Button>
         <Button
           variant="ghost"
           size="icon-xs"
@@ -1137,20 +1386,207 @@ const SftpRow = memo(function SftpRow({
         <Button
           variant="ghost"
           size="icon-xs"
-          title="重命名"
-          onClick={() => onRename(entry)}
+          title="简介"
+          onClick={() => onInfo(entry)}
         >
-          <Pencil />
+          <Info />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          title="删除"
-          onClick={() => onDelete(entry)}
-        >
-          <Trash2 className="text-destructive" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon-xs" title="更多">
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+              {canExtract ? (
+                <DropdownMenuItem onSelect={() => onExtract(entry)}>
+                  <FolderOpen /> 解压
+                </DropdownMenuItem>
+              ) : null}
+              <DropdownMenuItem onSelect={() => onMove(entry)}>
+                <FolderInput /> 移动
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onRename(entry)}>
+                <Pencil /> 重命名
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onSelect={() => onDelete(entry)}
+              >
+                <Trash2 /> 删除
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
 });
+
+function RemoteDirectoryPicker({
+  open,
+  title,
+  sessionId,
+  initialPath,
+  disabledPath,
+  onOpenChange,
+  onSelect,
+}: {
+  open: boolean;
+  title: string;
+  sessionId: string;
+  initialPath: string;
+  disabledPath?: string;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (path: string) => void;
+}) {
+  const [path, setPath] = useState(initialPath);
+  const [pathInput, setPathInput] = useState(initialPath);
+  const [entries, setEntries] = useState<SftpEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const directories = useMemo(
+    () =>
+      entries
+        .filter((entry) => entry.isDir)
+        .sort((a, b) => nameCollator.compare(a.name, b.name)),
+    [entries],
+  );
+  const cannotSelect =
+    !!disabledPath && isSameOrChildPath(path, disabledPath);
+
+  const loadPath = useCallback(
+    async (nextPath: string) => {
+      const normalized = normalizeRemotePath(nextPath.trim());
+      setLoading(true);
+      try {
+        const list = await ipc.sftpList(sessionId, normalized);
+        setEntries(list);
+        setPath(normalized);
+        setPathInput(normalized);
+      } catch (e) {
+        toast.error(String(e));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sessionId],
+  );
+
+  useEffect(() => {
+    if (open) void loadPath(initialPath);
+  }, [open, initialPath, loadPath]);
+
+  async function goHome() {
+    setLoading(true);
+    try {
+      const home = await ipc.sftpHome(sessionId);
+      await loadPath(home);
+    } catch (e) {
+      toast.error(String(e));
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+
+        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              title="主目录"
+              onClick={goHome}
+              disabled={loading}
+            >
+              <Home />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              title="上级目录"
+              onClick={() => void loadPath(parentPath(path))}
+              disabled={loading || path === "/"}
+            >
+              <ArrowUp />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              title="刷新"
+              onClick={() => void loadPath(path)}
+              disabled={loading}
+            >
+              <RefreshCw className={cn(loading && "animate-spin")} />
+            </Button>
+            <form
+              className="flex min-w-0 flex-1 items-center gap-1"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void loadPath(pathInput);
+              }}
+            >
+              <Input
+                className="font-mono text-xs"
+                value={pathInput}
+                onChange={(event) => setPathInput(event.target.value)}
+              />
+              <Button type="submit" variant="outline" disabled={loading}>
+                <FolderOpen data-icon="inline-start" /> 打开
+              </Button>
+            </form>
+          </div>
+          <div className="min-h-64 overflow-y-auto rounded-md border border-border">
+            {loading && directories.length === 0 ? (
+              <div className="flex h-64 items-center justify-center gap-2 text-sm text-muted-foreground">
+                <LoaderCircle className="size-4 animate-spin" />
+                加载中…
+              </div>
+            ) : directories.length === 0 ? (
+              <Empty className="h-64">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <FolderOpen />
+                  </EmptyMedia>
+                  <EmptyTitle>没有子文件夹</EmptyTitle>
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              directories.map((entry) => {
+                const disabled =
+                  !!disabledPath && isSameOrChildPath(entry.path, disabledPath);
+                return (
+                  <button
+                    key={entry.path}
+                    type="button"
+                    className="flex w-full items-center gap-2 border-b border-border/40 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={loading || disabled}
+                    onClick={() => void loadPath(entry.path)}
+                  >
+                    <Folder className="size-4 shrink-0 text-primary" />
+                    <span className="min-w-0 truncate">{entry.name}</span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            取消
+          </Button>
+          <Button disabled={cannotSelect} onClick={() => onSelect(path)}>
+            选择当前文件夹
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
