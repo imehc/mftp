@@ -255,7 +255,10 @@ const sftpDefaultColumnSizing: Record<string, number> = {
 };
 
 function computeInitialSftpColumnSizing(width: number): ColumnSizingState {
-  const available = Math.max(0, width - sftpRowPaddingX);
+  // ResizeObserver can report fractional CSS pixels. Keep the distribution
+  // arithmetic integral so the remainder loop cannot oscillate forever around
+  // zero (for example 0.33 -> -0.67 -> 0.33).
+  const available = Math.max(0, Math.round(width - sftpRowPaddingX));
   if (available === 0) return sftpDefaultColumnSizing;
 
   const totalDefault = Object.values(sftpDefaultColumnSizing).reduce(
@@ -286,7 +289,9 @@ function computeInitialSftpColumnSizing(width: number): ColumnSizingState {
     scaled[key] = Math.min(maxSizes[key] ?? scaled[key], Math.max(minSizes[key] ?? 0, scaled[key]));
   }
 
-  let diff = available - Object.values(scaled).reduce((sum, value) => sum + value, 0);
+  let diff = Math.round(
+    available - Object.values(scaled).reduce((sum, value) => sum + value, 0),
+  );
   const order = ["name", "mtime", "type", "size", "actions"];
   while (diff !== 0) {
     let adjusted = false;
@@ -536,21 +541,17 @@ export default function SftpPanel({ session }: Props) {
     if (typeof selected !== "string") return;
     const name = baseName(selected);
     const transferId = nextTransferId();
-    const tid = toast.loading(`上传 ${name}…`);
     startTransfer(transferId, `上传 ${name}`);
     try {
       await ipc.sftpUpload(sessionId, selected, joinPath(cwd, name), transferId);
       finishTransfer(transferId, "success");
-      toast.success(`已上传 ${name}`, { id: tid });
       await load(cwd);
     } catch (e) {
       const message = String(e);
       if (message === "传输已取消") {
         finishTransfer(transferId, "cancelled");
-        toast.info(`已取消上传 ${name}`, { id: tid });
       } else {
         finishTransfer(transferId, "error", message);
-        toast.error(message, { id: tid });
       }
     }
   }
@@ -560,20 +561,16 @@ export default function SftpPanel({ session }: Props) {
     const dest = await saveDialog({ defaultPath: entry.name, title: "保存到" });
     if (typeof dest !== "string") return;
     const transferId = nextTransferId();
-    const tid = toast.loading(`下载 ${entry.name}…`);
     startTransfer(transferId, `下载 ${entry.name}`);
     try {
       await ipc.sftpDownload(sessionId, entry.path, dest, transferId);
       finishTransfer(transferId, "success");
-      toast.success(`已下载 ${entry.name}`, { id: tid });
     } catch (e) {
       const message = String(e);
       if (message === "传输已取消") {
         finishTransfer(transferId, "cancelled");
-        toast.info(`已取消下载 ${entry.name}`, { id: tid });
       } else {
         finishTransfer(transferId, "error", message);
-        toast.error(message, { id: tid });
       }
     }
   }
@@ -604,7 +601,6 @@ export default function SftpPanel({ session }: Props) {
     const dest = joinLocalPath(parent, trimmedName);
     const transferMode = directoryTransferMode;
     const transferId = nextTransferId();
-    const tid = toast.loading(`下载文件夹 ${entry.name}…`);
     startTransfer(transferId, `下载 ${entry.name}`);
     try {
       await ipc.sftpDownloadDir(
@@ -615,15 +611,12 @@ export default function SftpPanel({ session }: Props) {
         transferId,
       );
       finishTransfer(transferId, "success");
-      toast.success(`已下载文件夹 ${entry.name}`, { id: tid });
     } catch (e) {
       const message = String(e);
       if (message === "传输已取消") {
         finishTransfer(transferId, "cancelled");
-        toast.info(`已取消下载 ${entry.name}`, { id: tid });
       } else {
         finishTransfer(transferId, "error", message);
-        toast.error(message, { id: tid });
       }
     }
   }
@@ -730,7 +723,6 @@ export default function SftpPanel({ session }: Props) {
   async function runUploadDir(localDir: string, remoteName: string) {
     if (!cwd) return;
     const transferId = nextTransferId();
-    const tid = toast.loading(`正在上传文件夹 ${remoteName}…`);
     const transferMode = directoryTransferMode;
     startTransfer(transferId, `上传 ${remoteName}`);
     try {
@@ -743,16 +735,13 @@ export default function SftpPanel({ session }: Props) {
         transferId,
       );
       finishTransfer(transferId, "success");
-      toast.success(`已上传文件夹 ${remoteName}`, { id: tid });
       await load(cwd);
     } catch (e) {
       const message = String(e);
       if (message === "传输已取消") {
         finishTransfer(transferId, "cancelled");
-        toast.info(`已取消上传 ${remoteName}`, { id: tid });
       } else {
         finishTransfer(transferId, "error", message);
-        toast.error(message, { id: tid });
       }
     }
   }
@@ -1723,6 +1712,7 @@ function RemoteDirectoryPicker({
               <RefreshCw className={cn(loading && "animate-spin")} />
             </Button>
             <form
+              autoComplete="off"
               className="flex min-w-0 flex-1 items-center gap-1"
               onSubmit={(event) => {
                 event.preventDefault();

@@ -115,6 +115,10 @@ export const sftpDownloadDir = (
   });
 export const sftpCancelTransfer = (transferId: string) =>
   invoke<void>("sftp_cancel_transfer", { transferId });
+export const sftpPauseTransfer = (transferId: string) =>
+  invoke<void>("sftp_pause_transfer", { transferId });
+export const sftpResumeTransfer = (transferId: string) =>
+  invoke<void>("sftp_resume_transfer", { transferId });
 export const sftpExtract = (
   sessionId: string,
   remoteArchive: string,

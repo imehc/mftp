@@ -1,4 +1,11 @@
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { listen } from "@tauri-apps/api/event";
 import { gsap } from "gsap";
 import {
@@ -6,10 +13,12 @@ import {
   ChevronDown,
   ListChecks,
   LoaderCircle,
+  Pause,
+  Play,
   RefreshCw,
+  Trash2,
   XCircle,
 } from "lucide-react";
-import { toast } from "sonner";
 import type { TransferProgress } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { cn } from "~/lib/utils";
@@ -64,11 +73,27 @@ export default function TransferPanel() {
   const updateProgressBatch = useTransfersStore((s) => s.updateProgressBatch);
   const markCancelling = useTransfersStore((s) => s.markCancelling);
   const cancelFailed = useTransfersStore((s) => s.cancelFailed);
+  const setPaused = useTransfersStore((s) => s.setPaused);
+  const setControlPending = useTransfersStore((s) => s.setControlPending);
+  const setControlError = useTransfersStore((s) => s.setControlError);
   const clearFinished = useTransfersStore((s) => s.clearFinished);
   const [open, setOpen] = useState(true);
 
   const activeTransferCount = transfers.filter((t) => t.status === "running").length;
+  const pausedTransferCount = transfers.filter(
+    (t) => t.status === "running" && t.paused,
+  ).length;
+  const transferringCount = activeTransferCount - pausedTransferCount;
+  const finishedTransferCount = transfers.length - activeTransferCount;
   const latestTransfer = transfers.find((t) => t.status === "running") ?? transfers[0];
+  const transferStatusLabel =
+    activeTransferCount === 0
+      ? "空闲"
+      : transferringCount === 0
+        ? `${pausedTransferCount} 个已暂停`
+        : pausedTransferCount > 0
+          ? `${transferringCount} 进行中 · ${pausedTransferCount} 已暂停`
+          : `${transferringCount} 个进行中`;
 
   useEffect(() => {
     let cancelled = false;
@@ -151,71 +176,102 @@ export default function TransferPanel() {
     return () => gsap.killTweensOf(content);
   }, [open]);
 
-  async function cancelTransfer(id: string) {
-    markCancelling(id);
-    try {
-      await ipc.sftpCancelTransfer(id);
-    } catch (e) {
-      toast.error(String(e));
-      cancelFailed(id);
-    }
-  }
+  const cancelTransfer = useCallback(
+    async (id: string) => {
+      setControlError(id);
+      markCancelling(id);
+      try {
+        await ipc.sftpCancelTransfer(id);
+      } catch (error) {
+        cancelFailed(id);
+        setControlError(id, String(error));
+      }
+    },
+    [cancelFailed, markCancelling, setControlError],
+  );
+
+  const togglePause = useCallback(
+    async (transfer: TransferState) => {
+      if (transfer.controlPending || transfer.cancelling) return;
+      setControlError(transfer.id);
+      setControlPending(transfer.id, true);
+      try {
+        if (transfer.paused) {
+          await ipc.sftpResumeTransfer(transfer.id);
+          setPaused(transfer.id, false);
+        } else {
+          await ipc.sftpPauseTransfer(transfer.id);
+          setPaused(transfer.id, true);
+        }
+      } catch (error) {
+        setControlError(transfer.id, String(error));
+      } finally {
+        setControlPending(transfer.id, false);
+      }
+    },
+    [setControlError, setControlPending, setPaused],
+  );
 
   if (transfers.length === 0) return null;
 
   return (
     <div className="border-t border-border bg-sidebar">
-      <button
-        type="button"
-        className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-sidebar-accent"
-        onClick={() => setOpen((value) => !value)}
-        aria-expanded={open}
-        aria-controls="transfer-panel-content"
-      >
-        {activeTransferCount > 0 ? (
-          <RefreshCw className="size-3 animate-spin" />
-        ) : (
-          <ListChecks className="size-3" />
-        )}
-        <span className="font-medium text-foreground">传输</span>
-        <span className="shrink-0">
-          {activeTransferCount > 0 ? `${activeTransferCount} 个进行中` : "空闲"}
-        </span>
-        {latestTransfer ? (
-          <span className="min-w-0 flex-1 truncate">
-            {latestTransfer.label} · {formatTransfer(latestTransfer)}
-          </span>
-        ) : (
-          <span className="flex-1" />
-        )}
-        <ChevronDown
-          className={cn(
-            "size-3 transition-transform duration-300 motion-reduce:transition-none",
-            open && "rotate-180",
+      <div className="flex items-center gap-1 pr-1">
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-sidebar-accent"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-controls="transfer-panel-content"
+        >
+          {transferringCount > 0 ? (
+            <RefreshCw className="size-3 animate-spin" />
+          ) : pausedTransferCount > 0 ? (
+            <Pause className="size-3" />
+          ) : (
+            <ListChecks className="size-3" />
           )}
-        />
-      </button>
+          <span className="font-medium text-foreground">传输</span>
+          <span className="shrink-0">{transferStatusLabel}</span>
+          {latestTransfer ? (
+            <span className="min-w-0 flex-1 truncate">
+              {latestTransfer.label} · {formatTransfer(latestTransfer)}
+            </span>
+          ) : (
+            <span className="flex-1" />
+          )}
+          <ChevronDown
+            className={cn(
+              "size-3 transition-transform duration-300 motion-reduce:transition-none",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+        {finishedTransferCount > 0 ? (
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={clearFinished}
+            title={`清除 ${finishedTransferCount} 个已完成任务`}
+            aria-label={`清除 ${finishedTransferCount} 个已完成任务`}
+          >
+            <Trash2 data-icon="inline-start" />
+            清除 {finishedTransferCount}
+          </Button>
+        ) : null}
+      </div>
       <div
         id="transfer-panel-content"
         ref={contentRef}
         className="overflow-hidden"
       >
-        <div className="flex max-h-64 flex-col gap-2 overflow-y-auto px-2 pb-2">
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFinished}
-              disabled={transfers.length === activeTransferCount}
-            >
-              清除已完成
-            </Button>
-          </div>
+        <div className="flex max-h-64 flex-col gap-2 overflow-y-auto px-2 pb-2 pt-1">
           {transfers.map((item) => (
             <TransferItem
               key={item.id}
               transfer={item}
               onCancel={cancelTransfer}
+              onTogglePause={togglePause}
             />
           ))}
         </div>
@@ -227,9 +283,11 @@ export default function TransferPanel() {
 const TransferItem = memo(function TransferItem({
   transfer,
   onCancel,
+  onTogglePause,
 }: {
   transfer: TransferState;
   onCancel: (id: string) => void;
+  onTogglePause: (transfer: TransferState) => void;
 }) {
   const total = transfer.total ?? 0;
   const progress =
@@ -241,6 +299,8 @@ const TransferItem = memo(function TransferItem({
       <XCircle className="size-4 shrink-0 text-muted-foreground" />
     ) : transfer.status === "error" ? (
       <XCircle className="size-4 shrink-0 text-destructive" />
+    ) : transfer.paused ? (
+      <Pause className="size-4 shrink-0 text-muted-foreground" />
     ) : (
       <RefreshCw className="size-4 shrink-0 animate-spin text-muted-foreground" />
     );
@@ -253,19 +313,36 @@ const TransferItem = memo(function TransferItem({
           {transfer.label}
         </span>
         {transfer.status === "running" && transfer.cancellable !== false ? (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title="取消"
-            onClick={() => onCancel(transfer.id)}
-            disabled={transfer.cancelling}
-          >
-            {transfer.cancelling ? (
-              <LoaderCircle className="animate-spin" />
-            ) : (
-              <XCircle />
-            )}
-          </Button>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              title={transfer.paused ? "继续" : "暂停"}
+              onClick={() => onTogglePause(transfer)}
+              disabled={transfer.controlPending || transfer.cancelling}
+            >
+              {transfer.controlPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : transfer.paused ? (
+                <Play />
+              ) : (
+                <Pause />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              title="取消"
+              onClick={() => onCancel(transfer.id)}
+              disabled={transfer.cancelling || transfer.controlPending}
+            >
+              {transfer.cancelling ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                <XCircle />
+              )}
+            </Button>
+          </div>
         ) : null}
       </div>
       <div className="truncate text-muted-foreground tabular-nums">
@@ -278,13 +355,15 @@ const TransferItem = memo(function TransferItem({
             style={{ width: `${progress}%` }}
           />
         </div>
-      ) : transfer.status === "running" ? (
+      ) : transfer.status === "running" && !transfer.paused ? (
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
           <div className="h-full w-1/3 rounded-full bg-primary/70 duration-700 animate-in slide-in-from-left-full" />
         </div>
       ) : null}
-      {transfer.error ? (
-        <div className="truncate text-destructive">{transfer.error}</div>
+      {transfer.error || transfer.controlError ? (
+        <div className="truncate text-destructive">
+          {transfer.error ?? transfer.controlError}
+        </div>
       ) : null}
     </div>
   );

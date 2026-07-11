@@ -32,6 +32,7 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
           <DialogTitle>输入密钥口令</DialogTitle>
         </DialogHeader>
         <form
+          autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit(value);

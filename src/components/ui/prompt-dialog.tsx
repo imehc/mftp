@@ -42,6 +42,7 @@ export default function PromptDialog({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <form
+          autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
             const v = value.trim();

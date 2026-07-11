@@ -347,6 +347,16 @@ pub fn sftp_cancel_transfer(state: State<AppState>, transfer_id: String) -> AppR
 }
 
 #[tauri::command]
+pub fn sftp_pause_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
+    state.manager.pause_transfer(&transfer_id)
+}
+
+#[tauri::command]
+pub fn sftp_resume_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
+    state.manager.resume_transfer(&transfer_id)
+}
+
+#[tauri::command]
 pub async fn sftp_extract(
     state: State<'_, AppState>,
     session_id: String,

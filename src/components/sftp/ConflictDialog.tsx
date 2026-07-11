@@ -75,6 +75,7 @@ export default function ConflictDialog({
         </DialogHeader>
 
         <form
+          autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
             if (!invalid) onResolve({ incomingName, existingName });

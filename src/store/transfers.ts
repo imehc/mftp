@@ -13,6 +13,10 @@ export interface TransferState {
   error?: string;
   cancelling?: boolean;
   cancellable?: boolean;
+  paused?: boolean;
+  pausedPhase?: string;
+  controlPending?: boolean;
+  controlError?: string;
 }
 
 interface TransfersState {
@@ -30,6 +34,9 @@ interface TransfersState {
   ) => void;
   markCancelling: (id: string) => void;
   cancelFailed: (id: string) => void;
+  setPaused: (id: string, paused: boolean) => void;
+  setControlPending: (id: string, pending: boolean) => void;
+  setControlError: (id: string, error?: string) => void;
   clearFinished: () => void;
 }
 
@@ -49,6 +56,8 @@ export const useTransfersStore = create<TransfersState>((set) => ({
           updatedAt: performance.now(),
           status: "running",
           cancellable: options?.cancellable ?? true,
+          paused: false,
+          controlPending: false,
         },
         ...state.transfers.filter((item) => item.id !== id),
       ],
@@ -65,6 +74,15 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       transfers: state.transfers.map((item) => {
         const progress = progressById.get(item.id);
         if (!progress || item.status !== "running") return item;
+
+        if (item.paused) {
+          return {
+            ...item,
+            transferred: progress.transferred,
+            total: progress.total ?? null,
+            speed: null,
+          };
+        }
 
         const phaseChanged = progress.phase !== item.phase;
         return {
@@ -99,9 +117,17 @@ export const useTransfersStore = create<TransfersState>((set) => ({
                   : status === "cancelled"
                     ? "已取消"
                     : "失败",
+              transferred:
+                status === "success" && item.total != null
+                  ? item.total
+                  : item.transferred,
               error,
               speed: null,
               cancelling: false,
+              paused: false,
+              pausedPhase: undefined,
+              controlPending: false,
+              controlError: undefined,
               updatedAt: performance.now(),
             }
           : item,
@@ -113,7 +139,15 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     set((state) => ({
       transfers: state.transfers.map((item) =>
         item.id === id
-          ? { ...item, phase: "正在取消", cancelling: true, speed: null }
+          ? {
+              ...item,
+              phase: "正在取消",
+              cancelling: true,
+              paused: false,
+              pausedPhase: undefined,
+              speed: null,
+              controlError: undefined,
+            }
           : item,
       ),
     }));
@@ -123,6 +157,50 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     set((state) => ({
       transfers: state.transfers.map((item) =>
         item.id === id ? { ...item, cancelling: false } : item,
+      ),
+    }));
+  },
+
+  setPaused(id, paused) {
+    set((state) => ({
+      transfers: state.transfers.map((item) => {
+        if (item.id !== id || item.status !== "running") return item;
+        if (paused) {
+          return {
+            ...item,
+            paused: true,
+            pausedPhase: item.phase,
+            phase: "已暂停",
+            speed: null,
+            controlError: undefined,
+            updatedAt: performance.now(),
+          };
+        }
+        return {
+          ...item,
+          paused: false,
+          phase: item.pausedPhase ?? "继续传输中",
+          pausedPhase: undefined,
+          speed: null,
+          controlError: undefined,
+          updatedAt: performance.now(),
+        };
+      }),
+    }));
+  },
+
+  setControlPending(id, pending) {
+    set((state) => ({
+      transfers: state.transfers.map((item) =>
+        item.id === id ? { ...item, controlPending: pending } : item,
+      ),
+    }));
+  },
+
+  setControlError(id, error) {
+    set((state) => ({
+      transfers: state.transfers.map((item) =>
+        item.id === id ? { ...item, controlError: error } : item,
       ),
     }));
   },
