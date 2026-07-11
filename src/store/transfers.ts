@@ -22,7 +22,7 @@ interface TransfersState {
     label: string,
     options?: { cancellable?: boolean },
   ) => void;
-  updateProgress: (progress: TransferProgress) => void;
+  updateProgressBatch: (progresses: TransferProgress[]) => void;
   finish: (
     id: string,
     status: "success" | "error" | "cancelled",
@@ -55,26 +55,34 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     }));
   },
 
-  updateProgress(progress) {
+  updateProgressBatch(progresses) {
+    if (progresses.length === 0) return;
     const now = performance.now();
+    const progressById = new Map(
+      progresses.map((progress) => [progress.id, progress]),
+    );
     set((state) => ({
-      transfers: state.transfers.map((item) =>
-        item.id === progress.id
-          ? {
-              ...item,
-              phase: progress.phase,
-              transferred: progress.transferred,
-              total: progress.total ?? null,
-              speed:
-                now > item.updatedAt && progress.transferred >= item.transferred
-                  ? ((progress.transferred - item.transferred) /
-                      (now - item.updatedAt)) *
-                    1000
-                  : item.speed,
-              updatedAt: now,
-            }
-          : item,
-      ),
+      transfers: state.transfers.map((item) => {
+        const progress = progressById.get(item.id);
+        if (!progress || item.status !== "running") return item;
+
+        const phaseChanged = progress.phase !== item.phase;
+        return {
+          ...item,
+          phase: progress.phase,
+          transferred: progress.transferred,
+          total: progress.total ?? null,
+          speed:
+            !phaseChanged &&
+            now > item.updatedAt &&
+            progress.transferred >= item.transferred
+              ? ((progress.transferred - item.transferred) /
+                  (now - item.updatedAt)) *
+                1000
+              : null,
+          updatedAt: now,
+        };
+      }),
     }));
   },
 

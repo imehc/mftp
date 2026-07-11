@@ -61,7 +61,7 @@ function formatTransfer(progress: TransferState): string {
 export default function TransferPanel() {
   const contentRef = useRef<HTMLDivElement>(null);
   const transfers = useTransfersStore((s) => s.transfers);
-  const updateProgress = useTransfersStore((s) => s.updateProgress);
+  const updateProgressBatch = useTransfersStore((s) => s.updateProgressBatch);
   const markCancelling = useTransfersStore((s) => s.markCancelling);
   const cancelFailed = useTransfersStore((s) => s.cancelFailed);
   const clearFinished = useTransfersStore((s) => s.clearFinished);
@@ -73,17 +73,33 @@ export default function TransferPanel() {
   useEffect(() => {
     let cancelled = false;
     let dispose: (() => void) | null = null;
+    let flushTimer: ReturnType<typeof setTimeout> | null = null;
+    const pendingProgress = new Map<string, TransferProgress>();
+
+    const flushProgress = () => {
+      flushTimer = null;
+      if (pendingProgress.size === 0) return;
+      const updates = Array.from(pendingProgress.values());
+      pendingProgress.clear();
+      updateProgressBatch(updates);
+    };
+
     void listen<TransferProgress>("sftp-transfer-progress", (event) => {
-      updateProgress(event.payload);
+      pendingProgress.set(event.payload.id, event.payload);
+      if (!flushTimer) {
+        flushTimer = setTimeout(flushProgress, 100);
+      }
     }).then((unlisten) => {
       if (cancelled) unlisten();
       else dispose = unlisten;
     });
     return () => {
       cancelled = true;
+      if (flushTimer) clearTimeout(flushTimer);
+      pendingProgress.clear();
       dispose?.();
     };
-  }, [updateProgress]);
+  }, [updateProgressBatch]);
 
   useEffect(() => {
     if (activeTransferCount > 0) setOpen(true);

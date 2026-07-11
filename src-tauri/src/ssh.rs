@@ -20,6 +20,8 @@ const SFTP_KEEPALIVE_INTERVAL_SECS: u32 = 15;
 const SFTP_TRANSFER_RETRIES: usize = 3;
 const SFTP_TRANSFER_BUFFER_SIZE: usize = 256 * 1024;
 const SFTP_TRANSFER_KEEPALIVE_SECS: u64 = 5;
+const REMOTE_COMMAND_CONFIRM_RETRIES: usize = 60;
+const REMOTE_COMMAND_CONFIRM_INTERVAL_MS: u64 = 500;
 const LIBSSH2_ERROR_SOCKET_SEND: i32 = -7;
 const LIBSSH2_ERROR_TIMEOUT: i32 = -9;
 const LIBSSH2_ERROR_SOCKET_DISCONNECT: i32 = -13;
@@ -591,7 +593,7 @@ struct ProgressReader<'a, R: Read> {
     phase: &'a str,
     transferred: &'a mut u64,
     total: Option<u64>,
-    last_emit: Instant,
+    last_emit: &'a mut Instant,
 }
 
 impl<R: Read> Read for ProgressReader<'_, R> {
@@ -607,7 +609,7 @@ impl<R: Read> Read for ProgressReader<'_, R> {
                     *self.transferred,
                     self.total,
                 );
-                self.last_emit = Instant::now();
+                *self.last_emit = Instant::now();
             }
         }
         Ok(n)
@@ -715,9 +717,11 @@ fn pack_clean_tar_gz(
         return Err(AppError("本地路径不是文件夹".into()));
     }
 
+    emit_transfer_progress(app, transfer_id, "扫描文件中", 0, None);
     let total = archive_total_file_bytes(local_dir)?;
     let total_for_progress = if total == 0 { Some(1) } else { Some(total) };
     let mut transferred = 0u64;
+    let mut last_emit = Instant::now();
     emit_transfer_progress(app, transfer_id, "压缩中", 0, total_for_progress);
 
     let file = std::fs::File::create(dest)?;
@@ -759,11 +763,15 @@ fn pack_clean_tar_gz(
                 phase: "压缩中",
                 transferred: &mut transferred,
                 total: total_for_progress,
-                last_emit: Instant::now(),
+                last_emit: &mut last_emit,
             };
             builder
                 .append_data(&mut header, &archive_path, reader)
                 .map_err(|e| AppError(format!("打包失败: {e}")))?;
+            if last_emit.elapsed() >= Duration::from_millis(120) {
+                emit_transfer_progress(app, transfer_id, "压缩中", transferred, total_for_progress);
+                last_emit = Instant::now();
+            }
         } else {
             builder
                 .append_path_with_name(local, &archive_path)
@@ -1241,6 +1249,35 @@ impl Manager {
             return Err(AppError(format!("远端命令失败 (exit {code}): {msg}")));
         }
         Ok(stdout)
+    }
+
+    /// Confirm an ambiguous remote command result using a marker created only
+    /// after the command succeeds. This covers SSH channels that time out while
+    /// waiting for EOF/exit status even though the remote process completed.
+    fn confirm_remote_command_marker(&self, session_id: &str, marker: &str) -> bool {
+        // Keep the original session alive while the remote command may still
+        // be finishing, but verify its marker through an independent session.
+        let confirmed = (|| -> AppResult<bool> {
+            let material = self.material(session_id)?;
+            let session = connect(&material)?;
+            let sftp = session.sftp()?;
+
+            for attempt in 0..=REMOTE_COMMAND_CONFIRM_RETRIES {
+                if sftp.lstat(Path::new(marker)).is_ok() {
+                    return Ok(true);
+                }
+                if attempt < REMOTE_COMMAND_CONFIRM_RETRIES {
+                    std::thread::sleep(Duration::from_millis(REMOTE_COMMAND_CONFIRM_INTERVAL_MS));
+                }
+            }
+            Ok(false)
+        })()
+        .unwrap_or(false);
+
+        // Future SFTP operations should not reuse the session whose exec
+        // channel produced the ambiguous socket error.
+        self.sftp.lock().remove(session_id);
+        confirmed
     }
 
     fn sftp_birth_time(&self, session_id: &str, path: &str) -> Option<u64> {
@@ -1722,12 +1759,26 @@ impl Manager {
         }
 
         emit_transfer_progress(app, transfer_id, "远端解压中", 0, None);
+        let completion_marker = join_remote(remote_parent, &format!(".mftp-up-{}.done", uuid_v4()));
         let cmd = format!(
-            "tar -xzf {} -C {}",
+            "tar -xzf {} -C {} && : > {}",
             shell_quote(&remote_archive),
-            shell_quote(remote_parent)
+            shell_quote(remote_parent),
+            shell_quote(&completion_marker),
         );
-        let extract_res = self.exec_checked(session_id, &cmd).map(|_| ());
+        let extract_res = match self.exec_checked(session_id, &cmd) {
+            Ok(_) => Ok(()),
+            Err(error) if stale_app_error(&error) => {
+                emit_transfer_progress(app, transfer_id, "确认远端解压结果", 0, None);
+                if self.confirm_remote_command_marker(session_id, &completion_marker) {
+                    Ok(())
+                } else {
+                    Err(error)
+                }
+            }
+            Err(error) => Err(error),
+        };
+        let _ = self.remove_remote_path_if_file(session_id, &completion_marker);
         let _ = self.remove_remote_path_if_file(session_id, &remote_archive);
         extract_res
     }
@@ -1756,6 +1807,7 @@ impl Manager {
         let total = plan.total_file_bytes;
         let total_for_progress = if total == 0 { Some(1) } else { Some(total) };
         let mut uploaded = 0u64;
+        let mut last_emit = Instant::now();
         emit_transfer_progress(app, transfer_id, "创建目录中", 0, total_for_progress);
 
         for entry in plan.entries {
@@ -1766,13 +1818,16 @@ impl Manager {
             match entry.kind {
                 UploadEntryKind::Directory => {
                     self.sftp_mkdir_existing_ok(session_id, &entry.remote)?;
-                    emit_transfer_progress(
-                        app,
-                        transfer_id,
-                        "上传文件夹中",
-                        uploaded,
-                        total_for_progress,
-                    );
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            "上传文件夹中",
+                            uploaded,
+                            total_for_progress,
+                        );
+                        last_emit = Instant::now();
+                    }
                 }
                 UploadEntryKind::File { size } => {
                     self.sftp_mkdir_existing_ok(session_id, &remote_parent_of(&entry.remote))?;
@@ -1799,23 +1854,29 @@ impl Manager {
                         return Err(e);
                     }
                     uploaded = uploaded.saturating_add(size);
-                    emit_transfer_progress(
-                        app,
-                        transfer_id,
-                        "上传文件夹中",
-                        uploaded,
-                        total_for_progress,
-                    );
+                    if last_emit.elapsed() >= Duration::from_millis(120) || uploaded >= total {
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            "上传文件夹中",
+                            uploaded,
+                            total_for_progress,
+                        );
+                        last_emit = Instant::now();
+                    }
                 }
                 UploadEntryKind::Symlink { target } => {
                     self.sftp_symlink_overwrite(session_id, &target, &entry.remote)?;
-                    emit_transfer_progress(
-                        app,
-                        transfer_id,
-                        "上传文件夹中",
-                        uploaded,
-                        total_for_progress,
-                    );
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            "上传文件夹中",
+                            uploaded,
+                            total_for_progress,
+                        );
+                        last_emit = Instant::now();
+                    }
                 }
             }
         }
@@ -2146,6 +2207,7 @@ impl Manager {
         let total = plan.total_file_bytes;
         let total_for_progress = if total == 0 { Some(1) } else { Some(total) };
         let mut downloaded = 0u64;
+        let mut last_emit = Instant::now();
         emit_transfer_progress(app, transfer_id, "创建目录中", 0, total_for_progress);
 
         for entry in plan.entries {
@@ -2156,13 +2218,16 @@ impl Manager {
             match entry.kind {
                 DownloadEntryKind::Directory => {
                     std::fs::create_dir_all(&entry.local)?;
-                    emit_transfer_progress(
-                        app,
-                        transfer_id,
-                        "下载文件夹中",
-                        downloaded,
-                        total_for_progress,
-                    );
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            "下载文件夹中",
+                            downloaded,
+                            total_for_progress,
+                        );
+                        last_emit = Instant::now();
+                    }
                 }
                 DownloadEntryKind::File { size } => {
                     if let Some(parent) = entry.local.parent() {
@@ -2190,26 +2255,32 @@ impl Manager {
                         return Err(e);
                     }
                     downloaded = downloaded.saturating_add(size);
-                    emit_transfer_progress(
-                        app,
-                        transfer_id,
-                        "下载文件夹中",
-                        downloaded,
-                        total_for_progress,
-                    );
+                    if last_emit.elapsed() >= Duration::from_millis(120) || downloaded >= total {
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            "下载文件夹中",
+                            downloaded,
+                            total_for_progress,
+                        );
+                        last_emit = Instant::now();
+                    }
                 }
                 DownloadEntryKind::Symlink { target } => {
                     if let Some(parent) = entry.local.parent() {
                         std::fs::create_dir_all(parent)?;
                     }
                     create_local_symlink_overwrite(&target, &entry.local)?;
-                    emit_transfer_progress(
-                        app,
-                        transfer_id,
-                        "下载文件夹中",
-                        downloaded,
-                        total_for_progress,
-                    );
+                    if last_emit.elapsed() >= Duration::from_millis(120) {
+                        emit_transfer_progress(
+                            app,
+                            transfer_id,
+                            "下载文件夹中",
+                            downloaded,
+                            total_for_progress,
+                        );
+                        last_emit = Instant::now();
+                    }
                 }
             }
         }
