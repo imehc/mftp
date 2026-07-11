@@ -124,6 +124,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                 value={form.label}
                 onChange={(e) => set("label", e.target.value)}
                 placeholder="My Server"
+                autoCapitalize="off"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck={false}
               />
             </Field>
 
@@ -135,6 +139,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                   value={form.host}
                   onChange={(e) => set("host", e.target.value)}
                   placeholder="example.com"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  spellCheck={false}
                 />
               </Field>
               <Field>
@@ -155,6 +163,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                 value={form.username}
                 onChange={(e) => set("username", e.target.value)}
                 placeholder="留空则使用 SSH 配置或本机用户"
+                autoCapitalize="off"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck={false}
               />
               <FieldDescription>
                 留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。

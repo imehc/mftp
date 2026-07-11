@@ -43,7 +43,7 @@ const directoryTransferModes = [
   { value: "direct", label: "直接传输", icon: FolderTree },
 ] as const;
 
-export default function ThemeMenu() {
+export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }) {
   const { theme = "system", setTheme } = useTheme();
   const directoryTransferMode = useSettingsStore(
     (s) => s.directoryTransferMode,
@@ -68,16 +68,23 @@ export default function ThemeMenu() {
         <Button
           variant="ghost"
           className={cn(
-            "h-9 w-full justify-start gap-2 rounded-md px-2 text-left",
+            "h-9 w-full gap-2 rounded-md px-2 text-left",
+            collapsed ? "justify-center" : "justify-start",
             "aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-accent-foreground",
           )}
           title="设置"
         >
           <Settings data-icon="inline-start" />
-          <span className="min-w-0 flex-1 truncate">设置</span>
+          {collapsed ? null : (
+            <span className="min-w-0 flex-1 truncate">设置</span>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start">
+      <DropdownMenuContent
+        side="top"
+        align="start"
+        className="min-w-44 whitespace-nowrap"
+      >
         <DropdownMenuGroup>
           <DropdownMenuItem disabled={checkingUpdate} onSelect={onCheckUpdate}>
             <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
@@ -90,7 +97,7 @@ export default function ThemeMenu() {
             <Archive />
             文件夹传输
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
+          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
             <DropdownMenuRadioGroup
               value={directoryTransferMode}
               onValueChange={(value) => {
@@ -120,7 +127,7 @@ export default function ThemeMenu() {
             <Palette />
             主题
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
+          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
             <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
               {themes.map((item) => {
                 const Icon = item.icon;

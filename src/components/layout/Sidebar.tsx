@@ -1,5 +1,8 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { gsap } from "gsap";
 import {
+  PanelLeftClose,
+  PanelLeftOpen,
   LoaderCircle,
   Pencil,
   Plus,
@@ -44,7 +47,13 @@ import PassphrasePrompt from "~/components/hosts/PassphrasePrompt";
 import ThemeMenu from "~/components/layout/ThemeMenu";
 import TransferPanel from "~/components/layout/TransferPanel";
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
+}
+
+export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
+  const sidebarRef = useRef<HTMLElement>(null);
   const hosts = useHostsStore((s) => s.hosts);
   const keys = useHostsStore((s) => s.keys);
   const deleteHost = useHostsStore((s) => s.deleteHost);
@@ -142,13 +151,72 @@ export default function Sidebar() {
     return host.username ? `${host.username}@${target}` : target;
   }
 
+  useLayoutEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduceMotion) {
+      gsap.set(sidebar, { clearProps: "opacity,transform" });
+      return;
+    }
+
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        sidebar,
+        { opacity: 0.86, x: collapsed ? -4 : 4 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.28,
+          ease: "power2.out",
+          clearProps: "opacity,transform",
+        },
+      );
+    }, sidebar);
+
+    return () => context.revert();
+  }, [collapsed]);
+
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-sidebar">
-      <div className="flex items-center justify-between px-3 py-2.5">
-        <span className="flex items-center gap-1.5 text-sm font-semibold">
+    <aside
+      ref={sidebarRef}
+      className={cn(
+        "flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-sidebar",
+        collapsed ? "items-stretch" : "",
+      )}
+    >
+      <div
+        className={cn(
+          "flex items-center px-3 py-2.5",
+          collapsed ? "flex-col gap-1.5 px-2" : "justify-between",
+        )}
+      >
+        <span
+          className={cn(
+            "flex items-center gap-1.5 text-sm font-semibold",
+            collapsed && "sr-only",
+          )}
+        >
           <Server className="size-4" /> 主机
         </span>
-        <div className="flex gap-0.5">
+        <div className={cn("flex gap-0.5", collapsed && "flex-col")}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={onToggleCollapsed}
+              >
+                {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {collapsed ? "展开侧边栏" : "折叠侧边栏"}
+            </TooltipContent>
+          </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -159,7 +227,7 @@ export default function Sidebar() {
                 <KeyRound />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>密钥管理</TooltipContent>
+            <TooltipContent side="right">密钥管理</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -174,12 +242,12 @@ export default function Sidebar() {
                 <Plus />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>新建主机</TooltipContent>
+            <TooltipContent side="right">新建主机</TooltipContent>
           </Tooltip>
         </div>
       </div>
 
-      <div className="px-2 pb-2">
+      <div className={cn("px-2 pb-2", collapsed && "hidden")}>
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -188,8 +256,18 @@ export default function Sidebar() {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-2">
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto pb-2",
+          collapsed ? "px-1.5" : "px-2",
+        )}
+      >
         {filtered.length === 0 ? (
+          collapsed ? (
+            <div className="flex justify-center py-4 text-muted-foreground">
+              <Server className="size-4" />
+            </div>
+          ) : (
           <Empty className="py-10">
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -203,8 +281,9 @@ export default function Sidebar() {
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
+          )
         ) : (
-          <ul className="flex flex-col gap-0.5">
+          <ul className={cn("flex flex-col", collapsed ? "gap-1" : "gap-0.5")}>
             {filtered.map((host) => {
               const session = sessionByHost.get(host.id);
               const isConnected = session?.status === "connected";
@@ -213,36 +292,70 @@ export default function Sidebar() {
               const isActive = !!session && session.id === activeId;
               return (
                 <li key={host.id} className="group">
-                  <div
-                    className={cn(
-                      "relative flex items-center rounded-lg px-2 py-1.5 hover:bg-sidebar-accent",
-                      isActive && "bg-sidebar-accent",
-                    )}
-                  >
-                    <button
-                      className="min-w-0 flex-1 text-left"
-                      onDoubleClick={() => connect(host)}
-                      title={session ? "双击切换到连接" : "双击连接"}
+                  {collapsed ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className={cn(
+                            "relative flex h-9 w-full items-center justify-center rounded-lg hover:bg-sidebar-accent",
+                            isActive && "bg-sidebar-accent",
+                          )}
+                          onDoubleClick={() => connect(host)}
+                          onClick={() => {
+                            if (session) setActive(session.id);
+                          }}
+                        >
+                          {isConnecting || isDisconnecting ? (
+                            <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+                          ) : (
+                            <Server className="size-4" />
+                          )}
+                          {isConnected && !isDisconnecting ? (
+                            <span className="absolute right-2 top-2 size-1.5 rounded-full bg-green-500" />
+                          ) : null}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <div className="flex flex-col gap-0.5">
+                          <span>{host.label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {hostAddress(host)}
+                          </span>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <div
+                      className={cn(
+                        "relative flex items-center rounded-lg px-2 py-1.5 hover:bg-sidebar-accent",
+                        isActive && "bg-sidebar-accent",
+                      )}
                     >
-                      <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
-                        <span className="truncate">{host.label}</span>
-                        {isConnecting || isDisconnecting ? (
-                          <LoaderCircle className="size-3 shrink-0 animate-spin text-muted-foreground" />
-                        ) : isConnected ? (
-                          <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
-                        ) : null}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {isConnected
-                          ? isDisconnecting
-                            ? `断开中 · ${hostAddress(host)}`
-                            : `已连接 · ${hostAddress(host)}`
-                          : isConnecting
-                            ? `连接中 · ${hostAddress(host)}`
-                            : hostAddress(host)}
-                      </p>
-                    </button>
-                    <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 gap-0.5 rounded-md bg-sidebar-accent/95 group-hover:pointer-events-auto group-hover:flex">
+                      <button
+                        className="min-w-0 flex-1 text-left"
+                        onDoubleClick={() => connect(host)}
+                        title={session ? "双击切换到连接" : "双击连接"}
+                      >
+                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
+                          <span className="truncate">{host.label}</span>
+                          {isConnecting || isDisconnecting ? (
+                            <LoaderCircle className="size-3 shrink-0 animate-spin text-muted-foreground" />
+                          ) : isConnected ? (
+                            <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
+                          ) : null}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {isConnected
+                            ? isDisconnecting
+                              ? `断开中 · ${hostAddress(host)}`
+                              : `已连接 · ${hostAddress(host)}`
+                            : isConnecting
+                              ? `连接中 · ${hostAddress(host)}`
+                              : hostAddress(host)}
+                        </p>
+                      </button>
+                      <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 gap-0.5 rounded-md bg-sidebar-accent/95 group-hover:pointer-events-auto group-hover:flex">
                       <Button
                         variant="ghost"
                         size="icon-xs"
@@ -287,8 +400,9 @@ export default function Sidebar() {
                       >
                         <Trash2 className="text-destructive" />
                       </Button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </li>
               );
             })}
@@ -296,10 +410,10 @@ export default function Sidebar() {
         )}
       </div>
 
-      <TransferPanel />
+      {collapsed ? null : <TransferPanel />}
 
-      <div className="border-t border-border p-2">
-        <ThemeMenu />
+      <div className={cn("border-t border-border p-2", collapsed && "px-1.5")}>
+        <ThemeMenu collapsed={collapsed} />
       </div>
 
       <HostForm open={formOpen} onOpenChange={setFormOpen} host={editing} />

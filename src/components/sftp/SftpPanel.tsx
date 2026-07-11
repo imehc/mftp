@@ -1,5 +1,22 @@
-import { useCallback, useEffect, useMemo, useState, memo } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  memo,
+  type CSSProperties,
+  type MouseEventHandler,
+  type TouchEventHandler,
+} from "react";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import {
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type ColumnSizingState,
+} from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   ArrowUp,
   ChevronDown,
@@ -211,6 +228,93 @@ interface SortState {
   direction: SortDirection;
 }
 
+const sftpColumns: ColumnDef<SftpEntry>[] = [
+  { id: "name", size: 360, minSize: 20, maxSize: 720 },
+  { id: "mtime", size: 160, minSize: 20, maxSize: 280 },
+  { id: "type", size: 72, minSize: 20, maxSize: 160 },
+  { id: "size", size: 80, minSize: 20, maxSize: 160 },
+  { id: "actions", size: 64, minSize: 20, maxSize: 96, enableResizing: false },
+];
+
+const sftpColumnLabels: Record<string, string> = {
+  name: "名称",
+  mtime: "修改日期",
+  type: "类型",
+  size: "大小",
+  actions: "操作",
+};
+
+const sftpHeaderHeight = 32;
+const sftpRowPaddingX = 24;
+const sftpDefaultColumnSizing: Record<string, number> = {
+  name: 360,
+  mtime: 160,
+  type: 72,
+  size: 80,
+  actions: 64,
+};
+
+function computeInitialSftpColumnSizing(width: number): ColumnSizingState {
+  const available = Math.max(0, width - sftpRowPaddingX);
+  if (available === 0) return sftpDefaultColumnSizing;
+
+  const totalDefault = Object.values(sftpDefaultColumnSizing).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
+  const scaled: ColumnSizingState = {};
+  for (const [key, value] of Object.entries(sftpDefaultColumnSizing)) {
+    scaled[key] = Math.round((value / totalDefault) * available);
+  }
+
+  const minSizes: Record<string, number> = {
+    name: 20,
+    mtime: 20,
+    type: 20,
+    size: 20,
+    actions: 20,
+  };
+  const maxSizes: Record<string, number> = {
+    name: 720,
+    mtime: 280,
+    type: 160,
+    size: 160,
+    actions: 96,
+  };
+
+  for (const key of Object.keys(scaled)) {
+    scaled[key] = Math.min(maxSizes[key] ?? scaled[key], Math.max(minSizes[key] ?? 0, scaled[key]));
+  }
+
+  let diff = available - Object.values(scaled).reduce((sum, value) => sum + value, 0);
+  const order = ["name", "mtime", "type", "size", "actions"];
+  while (diff !== 0) {
+    let adjusted = false;
+    for (const key of order) {
+      const next = (scaled[key] ?? 0) + Math.sign(diff);
+      if (next < (minSizes[key] ?? 0) || next > (maxSizes[key] ?? Infinity)) continue;
+      scaled[key] = next;
+      diff -= Math.sign(diff);
+      adjusted = true;
+      if (diff === 0) break;
+    }
+    if (!adjusted) break;
+  }
+
+  return scaled;
+}
+
+function sameColumnSizing(
+  current: ColumnSizingState,
+  next: ColumnSizingState,
+): boolean {
+  const keys = Object.keys(next);
+  return (
+    keys.length === Object.keys(current).length &&
+    keys.every((key) => current[key] === next[key])
+  );
+}
+
 const nameCollator = new Intl.Collator(undefined, {
   numeric: true,
   sensitivity: "base",
@@ -260,12 +364,15 @@ function compareEntries(a: SftpEntry, b: SftpEntry, sort: SortState): number {
 
 export default function SftpPanel({ session }: Props) {
   const sessionId = session.id;
+  const listScrollRef = useRef<HTMLDivElement | null>(null);
+  const userResizedColumnsRef = useRef(false);
   const [cwd, setCwd] = useState<string | null>(null);
   const [entries, setEntries] = useState<SftpEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState<LoadingAction | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({ key: "name", direction: "asc" });
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [prompt, setPrompt] = useState<PromptState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const [info, setInfo] = useState<InfoState>(null);
@@ -283,6 +390,55 @@ export default function SftpPanel({ session }: Props) {
     () => [...entries].sort((a, b) => compareEntries(a, b, sort)),
     [entries, sort],
   );
+
+  const table = useReactTable({
+    data: sortedEntries,
+    columns: sftpColumns,
+    getCoreRowModel: getCoreRowModel(),
+    columnResizeMode: "onChange",
+    state: { columnSizing },
+    onColumnSizingChange: setColumnSizing,
+    enableColumnResizing: true,
+  });
+  const rows = table.getRowModel().rows;
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => listScrollRef.current,
+    estimateSize: () => 36,
+    overscan: 12,
+    scrollMargin: sftpHeaderHeight,
+  });
+  const headerGroup = table.getHeaderGroups()[0];
+  const listColumnStyle = {
+    "--sftp-list-columns": headerGroup.headers
+      .map((header) => `${header.getSize()}px`)
+      .join(" "),
+  } as CSSProperties;
+
+  useEffect(() => {
+    const element = listScrollRef.current;
+    if (!element) return;
+
+    userResizedColumnsRef.current = false;
+
+    const fitColumns = (width: number) => {
+      if (userResizedColumnsRef.current) return;
+      const next = computeInitialSftpColumnSizing(width);
+      setColumnSizing((current) =>
+        sameColumnSizing(current, next) ? current : next,
+      );
+    };
+
+    fitColumns(element.clientWidth);
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry?.contentRect.width ?? element.clientWidth;
+      fitColumns(width);
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, [sessionId]);
 
   const toggleSort = useCallback((key: SortKey) => {
     setSort((current) =>
@@ -976,9 +1132,8 @@ export default function SftpPanel({ session }: Props) {
         </div>
       ) : null}
 
-      {/* Listing — a plain div list (not <table>) so content-visibility can
-          skip painting off-screen rows, keeping scrolling smooth. */}
-      <div className="relative flex-1 overflow-y-auto">
+      {/* Listing */}
+      <div ref={listScrollRef} className="relative flex-1 overflow-y-auto">
         {loading && entries.length === 0 ? (
           <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
             <LoaderCircle className="size-4 animate-spin" />
@@ -1000,53 +1155,63 @@ export default function SftpPanel({ session }: Props) {
               "sftp-list-content transition-opacity duration-150 ease-out",
               loading && !busy && "opacity-60",
             )}
+            style={listColumnStyle}
           >
-            <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
-              <SortHeader
-                label="名称"
-                sortKey="name"
-                sort={sort}
-                className="min-w-48 flex-1"
-                onSort={toggleSort}
-              />
-              <SortHeader
-                label="修改日期"
-                sortKey="mtime"
-                sort={sort}
-                className="w-36"
-                onSort={toggleSort}
-              />
-              <SortHeader
-                label="类型"
-                sortKey="type"
-                sort={sort}
-                className="w-16"
-                onSort={toggleSort}
-              />
-              <SortHeader
-                label="大小"
-                sortKey="size"
-                sort={sort}
-                className="w-16"
-                onSort={toggleSort}
-              />
-              <span className="w-40 text-right">操作</span>
+            <div className="sticky top-0 z-10 grid grid-cols-[var(--sftp-list-columns)] border-b border-border bg-background px-3 text-xs font-medium text-muted-foreground">
+              {headerGroup.headers.map((header) => {
+                const id = header.column.id;
+                const sortable = id !== "actions";
+                return (
+                  <ResizableHeader
+                    key={header.id}
+                    label={sftpColumnLabels[id] ?? id}
+                    sortKey={sortable ? (id as SortKey) : undefined}
+                    sort={sort}
+                    alignEnd={id === "actions"}
+                    canResize={header.column.getCanResize()}
+                    isResizing={header.column.getIsResizing()}
+                    onResizeStart={() => {
+                      userResizedColumnsRef.current = true;
+                    }}
+                    onResizeMouseDown={header.getResizeHandler()}
+                    onResizeTouchStart={header.getResizeHandler()}
+                    onSort={toggleSort}
+                  />
+                );
+              })}
             </div>
-            {sortedEntries.map((entry) => (
-              <SftpRow
-                key={entry.path}
-                entry={entry}
-                loading={loadingAction === `enter:${entry.path}`}
-                disabled={loading}
-                onEnter={(path) => load(path, `enter:${path}`)}
-                onInfo={showInfo}
-                onDownload={onDownload}
-                onExtract={onExtract}
-                onMove={onMove}
-                onRename={(e) => setPrompt({ kind: "rename", entry: e })}
-                onDelete={setDeleteTarget}
-              />
-            ))}
+            <div
+              className="relative"
+              style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const row = rows[virtualRow.index];
+                if (!row) return null;
+                const entry = row.original;
+                return (
+                  <div
+                    key={row.id}
+                    className="absolute left-0 top-0 w-full"
+                      style={{
+                      transform: `translateY(${virtualRow.start - sftpHeaderHeight}px)`,
+                    }}
+                  >
+                    <SftpRow
+                      entry={entry}
+                      loading={loadingAction === `enter:${entry.path}`}
+                      disabled={loading}
+                      onEnter={(path) => load(path, `enter:${path}`)}
+                      onInfo={showInfo}
+                      onDownload={onDownload}
+                      onExtract={onExtract}
+                      onMove={onMove}
+                      onRename={(e) => setPrompt({ kind: "rename", entry: e })}
+                      onDelete={setDeleteTarget}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
         {loading && entries.length > 0 && !busy ? (
@@ -1220,38 +1385,75 @@ export default function SftpPanel({ session }: Props) {
   );
 }
 
-function SortHeader({
+function ResizableHeader({
   label,
   sortKey,
   sort,
-  className,
+  alignEnd = false,
+  canResize,
+  isResizing,
+  onResizeStart,
+  onResizeMouseDown,
+  onResizeTouchStart,
   onSort,
 }: {
   label: string;
-  sortKey: SortKey;
+  sortKey?: SortKey;
   sort: SortState;
-  className?: string;
+  alignEnd?: boolean;
+  canResize: boolean;
+  isResizing: boolean;
+  onResizeStart: () => void;
+  onResizeMouseDown: MouseEventHandler<HTMLDivElement>;
+  onResizeTouchStart: TouchEventHandler<HTMLDivElement>;
   onSort: (key: SortKey) => void;
 }) {
-  const active = sort.key === sortKey;
+  const active = sortKey != null && sort.key === sortKey;
   const Icon = sort.direction === "asc" ? ChevronUp : ChevronDown;
 
   return (
-    <button
-      type="button"
-      className={cn(
-        "flex min-w-0 items-center gap-1 text-left hover:text-foreground",
-        active && "text-foreground",
-        className,
-      )}
-      aria-sort={
-        active ? (sort.direction === "asc" ? "ascending" : "descending") : "none"
-      }
-      onClick={() => onSort(sortKey)}
-    >
-      <span className="truncate">{label}</span>
-      {active ? <Icon className="size-3 shrink-0" /> : null}
-    </button>
+    <div className="relative min-w-0 border-r border-border/70 last:border-r-0">
+      <button
+        type="button"
+        className={cn(
+          "flex h-8 w-full min-w-0 items-center gap-1 px-2 text-left hover:text-foreground disabled:pointer-events-none",
+          alignEnd && "justify-end text-right",
+          active && "text-foreground",
+        )}
+        aria-sort={
+          active
+            ? sort.direction === "asc"
+              ? "ascending"
+              : "descending"
+            : "none"
+        }
+        disabled={!sortKey}
+        onClick={() => sortKey && onSort(sortKey)}
+      >
+        <span className="truncate">{label}</span>
+        {active ? <Icon className="size-3 shrink-0" /> : null}
+      </button>
+      {canResize ? (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          className={cn(
+            "absolute top-0 right-0 h-full w-2 cursor-col-resize touch-none select-none",
+            "after:absolute after:top-1 after:right-0 after:h-6 after:w-px after:bg-border",
+            "hover:after:bg-foreground/50",
+            isResizing && "after:bg-primary",
+          )}
+          onMouseDown={(event) => {
+            onResizeStart();
+            onResizeMouseDown(event);
+          }}
+          onTouchStart={(event) => {
+            onResizeStart();
+            onResizeTouchStart(event);
+          }}
+        />
+      ) : null}
+    </div>
   );
 }
 
@@ -1328,9 +1530,8 @@ interface RowProps {
 }
 
 /**
- * A single directory row. Memoized and wrapped with `content-visibility: auto`
- * so the browser skips layout/paint for rows scrolled off-screen — this is
- * what keeps large listings smooth.
+ * A single directory row. Memoized; large listings are windowed by TanStack
+ * Virtual in the parent.
  */
 const SftpRow = memo(function SftpRow({
   entry,
@@ -1345,10 +1546,16 @@ const SftpRow = memo(function SftpRow({
   onDelete,
 }: RowProps) {
   const canExtract = !entry.isDir && isArchive(entry.name);
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <div className="group flex items-center gap-2 border-b border-border/40 px-3 py-1.5 text-sm [content-visibility:auto] [contain-intrinsic-size:auto_36px] hover:bg-muted/50">
+    <div
+      className={cn(
+        "group grid grid-cols-[var(--sftp-list-columns)] items-center border-b border-border/40 px-3 py-1.5 text-sm hover:bg-muted/50",
+        menuOpen && "bg-muted/50",
+      )}
+    >
       <button
-        className="min-w-48 flex flex-1 items-center gap-2 text-left"
+        className="flex min-w-0 items-center gap-2 px-2 text-left"
         onDoubleClick={() => entry.isDir && onEnter(entry.path)}
         disabled={!entry.isDir || disabled}
       >
@@ -1365,33 +1572,17 @@ const SftpRow = memo(function SftpRow({
           {entry.name}
         </span>
       </button>
-      <span className="w-36 truncate text-left text-xs text-muted-foreground">
+      <span className="truncate px-2 text-left text-xs text-muted-foreground">
         {formatMtime(entry.mtime)}
       </span>
-      <span className="w-16 truncate text-left text-xs text-muted-foreground">
+      <span className="truncate px-2 text-left text-xs text-muted-foreground">
         {entryType(entry)}
       </span>
-      <span className="w-16 text-left text-xs text-muted-foreground">
+      <span className="truncate px-2 text-left text-xs text-muted-foreground">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
-      <div className="flex w-40 justify-end gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          title="下载"
-          onClick={() => onDownload(entry)}
-        >
-          <Download />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          title="简介"
-          onClick={() => onInfo(entry)}
-        >
-          <Info />
-        </Button>
-        <DropdownMenu>
+      <div className="flex min-w-0 justify-end px-1">
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-xs" title="更多">
               <MoreHorizontal />
@@ -1399,6 +1590,12 @@ const SftpRow = memo(function SftpRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
+              <DropdownMenuItem onSelect={() => onDownload(entry)}>
+                <Download /> 下载
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onInfo(entry)}>
+                <Info /> 简介
+              </DropdownMenuItem>
               {canExtract ? (
                 <DropdownMenuItem onSelect={() => onExtract(entry)}>
                   <FolderOpen /> 解压

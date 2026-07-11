@@ -1,9 +1,9 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { gsap } from "gsap";
 import {
   CheckCircle2,
   ChevronDown,
-  ChevronUp,
   ListChecks,
   LoaderCircle,
   RefreshCw,
@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import type { TransferProgress } from "~/types";
 import * as ipc from "~/lib/ipc";
+import { cn } from "~/lib/utils";
 import {
   type TransferState,
   useTransfersStore,
@@ -58,6 +59,7 @@ function formatTransfer(progress: TransferState): string {
 }
 
 export default function TransferPanel() {
+  const contentRef = useRef<HTMLDivElement>(null);
   const transfers = useTransfersStore((s) => s.transfers);
   const updateProgress = useTransfersStore((s) => s.updateProgress);
   const markCancelling = useTransfersStore((s) => s.markCancelling);
@@ -87,6 +89,52 @@ export default function TransferPanel() {
     if (activeTransferCount > 0) setOpen(true);
   }, [activeTransferCount]);
 
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
+    gsap.killTweensOf(content);
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reduceMotion) {
+      gsap.set(content, {
+        display: open ? "block" : "none",
+        clearProps: "height,opacity,transform",
+      });
+      return;
+    }
+
+    if (open) {
+      gsap.set(content, { display: "block", height: "auto" });
+      const height = content.offsetHeight;
+      gsap.fromTo(
+        content,
+        { height: 0, opacity: 0, y: -6 },
+        {
+          height,
+          opacity: 1,
+          y: 0,
+          duration: 0.34,
+          ease: "power3.out",
+          onComplete: () => gsap.set(content, { height: "auto" }),
+        },
+      );
+    } else {
+      gsap.to(content, {
+        height: 0,
+        opacity: 0,
+        y: -4,
+        duration: 0.22,
+        ease: "power2.inOut",
+        onComplete: () => gsap.set(content, { display: "none" }),
+      });
+    }
+
+    return () => gsap.killTweensOf(content);
+  }, [open]);
+
   async function cancelTransfer(id: string) {
     markCancelling(id);
     try {
@@ -105,6 +153,8 @@ export default function TransferPanel() {
         type="button"
         className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-sidebar-accent"
         onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-controls="transfer-panel-content"
       >
         {activeTransferCount > 0 ? (
           <RefreshCw className="size-3 animate-spin" />
@@ -122,9 +172,18 @@ export default function TransferPanel() {
         ) : (
           <span className="flex-1" />
         )}
-        {open ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+        <ChevronDown
+          className={cn(
+            "size-3 transition-transform duration-300 motion-reduce:transition-none",
+            open && "rotate-180",
+          )}
+        />
       </button>
-      {open ? (
+      <div
+        id="transfer-panel-content"
+        ref={contentRef}
+        className="overflow-hidden"
+      >
         <div className="flex max-h-64 flex-col gap-2 overflow-y-auto px-2 pb-2">
           <div className="flex justify-end">
             <Button
@@ -144,7 +203,7 @@ export default function TransferPanel() {
             />
           ))}
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }
