@@ -2,6 +2,7 @@
 fn connect(mat: &AuthMaterial) -> AppResult<Session> {
     let tcp = connect_tcp(&mat.host, mat.port)?;
     let mut sess = Session::new()?;
+    sess.set_timeout(SSH_OPERATION_TIMEOUT_MS);
     sess.set_tcp_stream(tcp);
     sess.handshake()?;
     match &mat.method {
@@ -70,7 +71,7 @@ fn connect_tcp(host: &str, port: u16) -> AppResult<TcpStream> {
 
     let mut errors = Vec::new();
     for addr in addrs {
-        match TcpStream::connect(addr) {
+        match TcpStream::connect_timeout(&addr, Duration::from_secs(SSH_CONNECT_TIMEOUT_SECS)) {
             Ok(tcp) => {
                 let _ = tcp.set_nodelay(true);
                 return Ok(tcp);
@@ -315,6 +316,10 @@ fn stale_app_error(err: &AppError) -> bool {
     msg.contains("timed out waiting on socket")
         || msg.contains("operation timed out")
         || msg.contains("socket timeout")
+        || msg.contains("failed to write whole buffer")
+        || msg.contains("sftp write stalled")
+        || msg.contains("resource temporarily unavailable")
+        || msg.contains("would block")
         || msg.contains("socket disconnect")
         || msg.contains("connection reset")
         || msg.contains("broken pipe")

@@ -26,18 +26,32 @@ impl Manager {
                 transfer.check()?;
             }
 
-            let conn = self.sftp_conn(session_id)?;
+            let conn = match self.sftp_conn(session_id) {
+                Ok(conn) => conn,
+                Err(error) if attempts < SFTP_TRANSFER_RETRIES && stale_app_error(&error) => {
+                    attempts += 1;
+                    emit_transfer_progress(
+                        app,
+                        transfer_id,
+                        &format!("网络波动，正在重连（{attempts}/{SFTP_TRANSFER_RETRIES}）"),
+                        completed_before + file_transferred,
+                        total,
+                    );
+                    std::thread::sleep(transfer_retry_delay(attempts));
+                    continue;
+                }
+                Err(error) => return Err(error),
+            };
             let result: AppResult<TransferIoOutcome> = {
                 let conn_guard = conn.lock();
-                if file_transferred > 0 {
-                    file_transferred = conn_guard
-                        .sftp
-                        .stat(Path::new(remote))
-                        .ok()
-                        .and_then(|stat| stat.size)
-                        .unwrap_or(0)
-                        .min(file_size);
-                }
+                // Always re-read the server-side size. A short write may have
+                // committed bytes before returning an error, so the local
+                // counter alone is not a safe resume offset.
+                file_transferred = match conn_guard.sftp.stat(Path::new(remote)) {
+                    Ok(stat) => stat.size.unwrap_or(0).min(file_size),
+                    Err(error) if stale_session_error(&error) => return Err(error.into()),
+                    Err(_) => 0,
+                };
                 let mut remote_file = if file_transferred == 0 {
                     conn_guard.sftp.create(Path::new(remote))?
                 } else {
@@ -50,7 +64,6 @@ impl Manager {
                 };
                 let mut local_file = std::fs::File::open(local)?;
                 let mut buf = [0u8; SFTP_TRANSFER_BUFFER_SIZE];
-                let mut last_keepalive = Instant::now();
 
                 if file_transferred > 0 {
                     remote_file.seek(SeekFrom::Start(file_transferred))?;
@@ -76,8 +89,25 @@ impl Manager {
                         remote_file.flush()?;
                         break Ok(TransferIoOutcome::Complete);
                     }
-                    remote_file.write_all(&buf[..n])?;
-                    file_transferred += n as u64;
+                    match write_sftp_buffer(
+                        &mut remote_file,
+                        &buf[..n],
+                        &conn_guard.session,
+                        transfer,
+                    ) {
+                        SftpWriteOutcome::Complete { written } => {
+                            file_transferred += written as u64;
+                        }
+                        SftpWriteOutcome::Paused { written } => {
+                            file_transferred += written as u64;
+                            remote_file.flush()?;
+                            break Ok(TransferIoOutcome::Paused);
+                        }
+                        SftpWriteOutcome::Failed { written, error } => {
+                            file_transferred += written as u64;
+                            break Err(error);
+                        }
+                    }
                     if last_emit.elapsed() >= Duration::from_millis(120) {
                         emit_transfer_progress(
                             app,
@@ -87,11 +117,6 @@ impl Manager {
                             total,
                         );
                         last_emit = Instant::now();
-                    }
-                    if last_keepalive.elapsed() >= Duration::from_secs(SFTP_TRANSFER_KEEPALIVE_SECS)
-                    {
-                        let _ = conn_guard.session.keepalive_send();
-                        last_keepalive = Instant::now();
                     }
                 }
             };
@@ -109,11 +134,11 @@ impl Manager {
                     emit_transfer_progress(
                         app,
                         transfer_id,
-                        "重连后继续上传",
+                        &format!("网络波动，正在续传（{attempts}/{SFTP_TRANSFER_RETRIES}）"),
                         completed_before + file_transferred,
                         total,
                     );
-                    std::thread::sleep(Duration::from_millis(250));
+                    std::thread::sleep(transfer_retry_delay(attempts));
                 }
                 Err(e) => return Err(e),
             }
