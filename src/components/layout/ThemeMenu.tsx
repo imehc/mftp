@@ -1,11 +1,12 @@
-import { useState } from "react";
 import {
   Archive,
+  Download,
   FolderTree,
   Monitor,
   Moon,
   Palette,
   RefreshCw,
+  RotateCcw,
   Settings,
   Sun,
 } from "lucide-react";
@@ -24,12 +25,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { checkForUpdateManually } from "~/lib/updater";
+import {
+  checkForUpdateManually,
+  restartToApplyUpdate,
+} from "~/lib/updater";
 import {
   type DirectoryTransferMode,
   useSettingsStore,
 } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
+import {
+  type UpdaterStatus,
+  useUpdaterStore,
+} from "~/store/updater";
 import { cn } from "~/lib/utils";
 
 const themes = [
@@ -43,6 +51,16 @@ const directoryTransferModes = [
   { value: "direct", label: "直接传输", icon: FolderTree },
 ] as const;
 
+const updateMenuLabels: Record<UpdaterStatus, string> = {
+  idle: "检查更新",
+  checking: "正在检查更新…",
+  available: "查看可用更新",
+  downloading: "查看更新下载进度",
+  ready: "重启应用并更新",
+  restarting: "正在重启应用…",
+  error: "重新检查更新",
+};
+
 export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }) {
   const { theme = "system", setTheme } = useTheme();
   const directoryTransferMode = useSettingsStore(
@@ -54,13 +72,19 @@ export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }
   const hasRunningTransfer = useTransfersStore((s) =>
     s.transfers.some((item) => item.status === "running"),
   );
-  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const updaterStatus = useUpdaterStore((s) => s.status);
 
   function onCheckUpdate() {
-    if (checkingUpdate) return;
-    setCheckingUpdate(true);
-    void checkForUpdateManually().finally(() => setCheckingUpdate(false));
+    if (updaterStatus === "ready") {
+      void restartToApplyUpdate();
+      return;
+    }
+    void checkForUpdateManually();
   }
+
+  const checkingUpdate = updaterStatus === "checking";
+  const restarting = updaterStatus === "restarting";
+  const updateMenuLabel = updateMenuLabels[updaterStatus];
 
   return (
     <DropdownMenu>
@@ -86,9 +110,18 @@ export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }
         className="min-w-44 whitespace-nowrap"
       >
         <DropdownMenuGroup>
-          <DropdownMenuItem disabled={checkingUpdate} onSelect={onCheckUpdate}>
-            <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
-            检查更新
+          <DropdownMenuItem
+            disabled={checkingUpdate || restarting}
+            onSelect={onCheckUpdate}
+          >
+            {updaterStatus === "ready" ? (
+              <RotateCcw />
+            ) : updaterStatus === "downloading" ? (
+              <Download />
+            ) : (
+              <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
+            )}
+            {updateMenuLabel}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
