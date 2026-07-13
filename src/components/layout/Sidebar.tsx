@@ -1,6 +1,24 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { gsap } from "gsap";
 import {
+  GripVertical,
   PanelLeftClose,
   PanelLeftOpen,
   LoaderCircle,
@@ -52,11 +70,52 @@ interface SidebarProps {
   onToggleCollapsed: () => void;
 }
 
+function SortableHostRow({
+  id,
+  children,
+}: {
+  id: string;
+  children: ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={cn("group relative", isDragging && "z-10 opacity-80")}
+    >
+      <button
+        type="button"
+        className="absolute left-0 top-1/2 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
+        aria-label="拖动排序"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="size-3.5" />
+      </button>
+      <div className="pl-5">{children}</div>
+    </li>
+  );
+}
+
 export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   const sidebarRef = useRef<HTMLElement>(null);
   const hosts = useHostsStore((s) => s.hosts);
   const keys = useHostsStore((s) => s.keys);
   const deleteHost = useHostsStore((s) => s.deleteHost);
+  const reorderHosts = useHostsStore((s) => s.reorderHosts);
   const openSession = useSessionsStore((s) => s.openSession);
   const closeSession = useSessionsStore((s) => s.closeSession);
   const setActive = useSessionsStore((s) => s.setActive);
@@ -71,6 +130,10 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
   const [deleteTarget, setDeleteTarget] = useState<Host | null>(null);
   const [disconnecting, setDisconnecting] = useState<Set<string>>(
     () => new Set(),
+  );
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const filtered = useMemo(() => {
@@ -93,6 +156,25 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     }
     return map;
   }, [sessions]);
+
+  const canSortHosts = !collapsed && !query.trim() && filtered.length > 1;
+  const sortableHostIds = useMemo(() => hosts.map((host) => host.id), [hosts]);
+
+  async function onHostDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = sortableHostIds.indexOf(String(active.id));
+    const newIndex = sortableHostIds.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const orderedIds = arrayMove(sortableHostIds, oldIndex, newIndex);
+    try {
+      await reorderHosts(orderedIds);
+    } catch (error) {
+      toast.error(`排序保存失败: ${error}`);
+    }
+  }
 
   async function connect(host: Host) {
     const existing = sessionByHost.get(host.id);
@@ -179,6 +261,122 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
 
     return () => context.revert();
   }, [collapsed]);
+
+  function renderHostRow(host: Host) {
+    const session = sessionByHost.get(host.id);
+    const isConnected = session?.status === "connected";
+    const isConnecting = session?.status === "connecting";
+    const isDisconnecting = disconnecting.has(host.id);
+    const isActive = !!session && session.id === activeId;
+
+    if (collapsed) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                "relative flex h-9 w-full items-center justify-center rounded-lg hover:bg-sidebar-accent",
+                isActive && "bg-sidebar-accent",
+              )}
+              onDoubleClick={() => connect(host)}
+              onClick={() => {
+                if (session) setActive(session.id);
+              }}
+            >
+              {isConnecting || isDisconnecting ? (
+                <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+              ) : (
+                <Server className="size-4" />
+              )}
+              {isConnected && !isDisconnecting ? (
+                <span className="absolute right-2 top-2 size-1.5 rounded-full bg-green-500" />
+              ) : null}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <div className="flex flex-col gap-0.5">
+              <span>{host.label}</span>
+              <span className="text-xs text-muted-foreground">
+                {hostAddress(host)}
+              </span>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <div
+        className={cn(
+          "relative flex items-center rounded-lg px-2 py-1.5 hover:bg-sidebar-accent",
+          isActive && "bg-sidebar-accent",
+        )}
+      >
+        <button
+          className="min-w-0 flex-1 text-left"
+          onDoubleClick={() => connect(host)}
+          title={session ? "双击切换到连接" : "双击连接"}
+        >
+          <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
+            <span className="truncate">{host.label}</span>
+            {isConnecting || isDisconnecting ? (
+              <LoaderCircle className="size-3 shrink-0 animate-spin text-muted-foreground" />
+            ) : isConnected ? (
+              <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
+            ) : null}
+          </p>
+          <p className="truncate text-xs text-muted-foreground">
+            {isConnected
+              ? isDisconnecting
+                ? `断开中 · ${hostAddress(host)}`
+                : `已连接 · ${hostAddress(host)}`
+              : isConnecting
+                ? `连接中 · ${hostAddress(host)}`
+                : hostAddress(host)}
+          </p>
+        </button>
+        <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 gap-0.5 rounded-md bg-sidebar-accent/95 group-hover:pointer-events-auto group-hover:flex">
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            title={isDisconnecting ? "断开中" : isConnected ? "断开连接" : "连接"}
+            disabled={isConnecting || isDisconnecting}
+            onClick={() =>
+              isConnected ? void disconnect(host) : void connect(host)
+            }
+          >
+            {isConnecting || isDisconnecting ? (
+              <LoaderCircle className="animate-spin" />
+            ) : isConnected ? (
+              <Unplug />
+            ) : (
+              <Zap />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            title="编辑"
+            onClick={() => {
+              setEditing(host);
+              setFormOpen(true);
+            }}
+          >
+            <Pencil />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            title="删除"
+            onClick={() => setDeleteTarget(host)}
+          >
+            <Trash2 className="text-destructive" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <aside
@@ -283,130 +481,36 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
           </Empty>
           )
         ) : (
-          <ul className={cn("flex flex-col", collapsed ? "gap-1" : "gap-0.5")}>
-            {filtered.map((host) => {
-              const session = sessionByHost.get(host.id);
-              const isConnected = session?.status === "connected";
-              const isConnecting = session?.status === "connecting";
-              const isDisconnecting = disconnecting.has(host.id);
-              const isActive = !!session && session.id === activeId;
-              return (
+          canSortHosts ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={onHostDragEnd}
+            >
+              <SortableContext
+                items={sortableHostIds}
+                strategy={verticalListSortingStrategy}
+              >
+                <ul className="flex flex-col gap-0.5">
+                  {filtered.map((host) => (
+                    <SortableHostRow key={host.id} id={host.id}>
+                      {renderHostRow(host)}
+                    </SortableHostRow>
+                  ))}
+                </ul>
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <ul
+              className={cn("flex flex-col", collapsed ? "gap-1" : "gap-0.5")}
+            >
+              {filtered.map((host) => (
                 <li key={host.id} className="group">
-                  {collapsed ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className={cn(
-                            "relative flex h-9 w-full items-center justify-center rounded-lg hover:bg-sidebar-accent",
-                            isActive && "bg-sidebar-accent",
-                          )}
-                          onDoubleClick={() => connect(host)}
-                          onClick={() => {
-                            if (session) setActive(session.id);
-                          }}
-                        >
-                          {isConnecting || isDisconnecting ? (
-                            <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
-                          ) : (
-                            <Server className="size-4" />
-                          )}
-                          {isConnected && !isDisconnecting ? (
-                            <span className="absolute right-2 top-2 size-1.5 rounded-full bg-green-500" />
-                          ) : null}
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <div className="flex flex-col gap-0.5">
-                          <span>{host.label}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {hostAddress(host)}
-                          </span>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <div
-                      className={cn(
-                        "relative flex items-center rounded-lg px-2 py-1.5 hover:bg-sidebar-accent",
-                        isActive && "bg-sidebar-accent",
-                      )}
-                    >
-                      <button
-                        className="min-w-0 flex-1 text-left"
-                        onDoubleClick={() => connect(host)}
-                        title={session ? "双击切换到连接" : "双击连接"}
-                      >
-                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
-                          <span className="truncate">{host.label}</span>
-                          {isConnecting || isDisconnecting ? (
-                            <LoaderCircle className="size-3 shrink-0 animate-spin text-muted-foreground" />
-                          ) : isConnected ? (
-                            <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
-                          ) : null}
-                        </p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {isConnected
-                            ? isDisconnecting
-                              ? `断开中 · ${hostAddress(host)}`
-                              : `已连接 · ${hostAddress(host)}`
-                            : isConnecting
-                              ? `连接中 · ${hostAddress(host)}`
-                              : hostAddress(host)}
-                        </p>
-                      </button>
-                      <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 gap-0.5 rounded-md bg-sidebar-accent/95 group-hover:pointer-events-auto group-hover:flex">
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={
-                          isDisconnecting
-                            ? "断开中"
-                            : isConnected
-                              ? "断开连接"
-                              : "连接"
-                        }
-                        disabled={isConnecting || isDisconnecting}
-                        onClick={() =>
-                          isConnected
-                            ? void disconnect(host)
-                            : void connect(host)
-                        }
-                      >
-                        {isConnecting || isDisconnecting ? (
-                          <LoaderCircle className="animate-spin" />
-                        ) : isConnected ? (
-                          <Unplug />
-                        ) : (
-                          <Zap />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title="编辑"
-                        onClick={() => {
-                          setEditing(host);
-                          setFormOpen(true);
-                        }}
-                      >
-                        <Pencil />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title="删除"
-                        onClick={() => setDeleteTarget(host)}
-                      >
-                        <Trash2 className="text-destructive" />
-                      </Button>
-                      </div>
-                    </div>
-                  )}
+                  {renderHostRow(host)}
                 </li>
-              );
-            })}
-          </ul>
+              ))}
+            </ul>
+          )
         )}
       </div>
 

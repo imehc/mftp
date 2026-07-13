@@ -65,6 +65,7 @@ pub fn run() {
             commands::host_create,
             commands::host_update,
             commands::host_delete,
+            commands::hosts_reorder,
             commands::keys_list,
             commands::key_import,
             commands::key_delete,

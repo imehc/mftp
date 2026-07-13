@@ -10,6 +10,7 @@ interface HostsState {
   createHost: (input: HostInput) => Promise<Host>;
   updateHost: (id: string, input: HostInput) => Promise<Host>;
   deleteHost: (id: string) => Promise<void>;
+  reorderHosts: (orderedIds: string[]) => Promise<void>;
   importKey: (
     label: string,
     sourcePath: string,
@@ -51,6 +52,28 @@ export const useHostsStore = create<HostsState>((set, get) => ({
   async deleteHost(id) {
     await ipc.hostDelete(id);
     set({ hosts: get().hosts.filter((h) => h.id !== id) });
+  },
+
+  async reorderHosts(orderedIds) {
+    const order = new Map(orderedIds.map((id, index) => [id, index]));
+    const previous = get().hosts;
+    set({
+      hosts: [
+        ...previous.filter((host) => order.has(host.id)),
+        ...previous.filter((host) => !order.has(host.id)),
+      ].sort((a, b) => {
+        const aOrder = order.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+        const bOrder = order.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+        return aOrder - bOrder;
+      }),
+    });
+    try {
+      const hosts = await ipc.hostsReorder(orderedIds);
+      set({ hosts });
+    } catch (error) {
+      set({ hosts: previous });
+      throw error;
+    }
   },
 
   async importKey(label, sourcePath, hasPassphrase) {

@@ -44,27 +44,43 @@ function formatSpeed(bytesPerSecond: number): string {
   return `${formatSize(bytesPerSecond)}/s`;
 }
 
-function formatTransfer(progress: TransferState): string {
-  const total = progress.total ?? 0;
-  const speed = progress.speed ? formatSpeed(progress.speed) : null;
-  if (!total) {
-    return [
-      progress.phase,
-      progress.transferred ? formatSize(progress.transferred) : null,
-      speed,
-    ]
-      .filter(Boolean)
-      .join(" · ");
+function formatDuration(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "--";
+  const rounded = Math.ceil(seconds);
+  if (rounded < 60) return `${rounded} 秒`;
+  const minutes = Math.floor(rounded / 60);
+  const remainingSeconds = rounded % 60;
+  if (minutes < 60) {
+    return remainingSeconds > 0
+      ? `${minutes} 分 ${remainingSeconds} 秒`
+      : `${minutes} 分`;
   }
-  const percent = Math.min(100, Math.round((progress.transferred / total) * 100));
-  return [
-    progress.phase,
-    `${percent}%`,
-    `${formatSize(progress.transferred)} / ${formatSize(total)}`,
-    speed,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes > 0 ? `${hours} 小时 ${remainingMinutes} 分` : `${hours} 小时`;
+}
+
+function transferMetrics(progress: TransferState) {
+  const total = progress.total ?? 0;
+  const percent =
+    total > 0 ? Math.min(100, Math.round((progress.transferred / total) * 100)) : null;
+  const speed = progress.speed && progress.speed > 0 ? progress.speed : null;
+  const eta =
+    progress.status === "running" && !progress.paused && total > 0 && speed
+      ? formatDuration((total - progress.transferred) / speed)
+      : null;
+
+  return {
+    percent,
+    size:
+      total > 0
+        ? `${formatSize(progress.transferred)} / ${formatSize(total)}`
+        : progress.transferred
+          ? formatSize(progress.transferred)
+          : null,
+    speed: speed ? formatSpeed(speed) : null,
+    eta,
+  };
 }
 
 export default function TransferPanel() {
@@ -86,6 +102,7 @@ export default function TransferPanel() {
   const transferringCount = activeTransferCount - pausedTransferCount;
   const finishedTransferCount = transfers.length - activeTransferCount;
   const latestTransfer = transfers.find((t) => t.status === "running") ?? transfers[0];
+  const latestMetrics = latestTransfer ? transferMetrics(latestTransfer) : null;
   const transferStatusLabel =
     activeTransferCount === 0
       ? "空闲"
@@ -233,9 +250,9 @@ export default function TransferPanel() {
           )}
           <span className="font-medium text-foreground">传输</span>
           <span className="shrink-0">{transferStatusLabel}</span>
-          {latestTransfer ? (
-            <span className="min-w-0 flex-1 truncate">
-              {latestTransfer.label} · {formatTransfer(latestTransfer)}
+          {latestTransfer && latestMetrics?.percent != null ? (
+            <span className="min-w-0 flex-1 truncate tabular-nums">
+              {latestTransfer.label} · {latestMetrics.percent}%
             </span>
           ) : (
             <span className="flex-1" />
@@ -292,6 +309,7 @@ const TransferItem = memo(function TransferItem({
   const total = transfer.total ?? 0;
   const progress =
     total > 0 ? Math.min(100, (transfer.transferred / total) * 100) : null;
+  const metrics = transferMetrics(transfer);
   const statusIcon =
     transfer.status === "success" ? (
       <CheckCircle2 className="size-4 shrink-0 text-muted-foreground" />
@@ -345,8 +363,12 @@ const TransferItem = memo(function TransferItem({
           </div>
         ) : null}
       </div>
-      <div className="truncate text-muted-foreground tabular-nums">
-        {formatTransfer(transfer)}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-muted-foreground tabular-nums">
+        <span className="font-medium text-foreground">{transfer.phase}</span>
+        {metrics.percent !== null ? <span>{metrics.percent}%</span> : null}
+        {metrics.size ? <span>{metrics.size}</span> : null}
+        {metrics.speed ? <span>{metrics.speed}</span> : null}
+        {metrics.eta ? <span>剩余 {metrics.eta}</span> : null}
       </div>
       {progress !== null ? (
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">

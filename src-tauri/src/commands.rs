@@ -42,6 +42,11 @@ pub fn host_delete(state: State<AppState>, id: String) -> AppResult<()> {
     state.storage.delete_host(&id)
 }
 
+#[tauri::command]
+pub fn hosts_reorder(state: State<AppState>, ordered_ids: Vec<String>) -> AppResult<Vec<Host>> {
+    state.storage.reorder_hosts(ordered_ids)
+}
+
 // ---------- Keys ----------
 
 #[tauri::command]

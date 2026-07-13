@@ -116,6 +116,23 @@ impl Storage {
         Self::write_json(&self.hosts_file(), &hosts)
     }
 
+    pub fn reorder_hosts(&self, ordered_ids: Vec<String>) -> AppResult<Vec<Host>> {
+        let hosts = self.list_hosts()?;
+        let mut reordered = Vec::with_capacity(hosts.len());
+        let mut remaining = hosts;
+
+        for id in ordered_ids {
+            let Some(index) = remaining.iter().position(|host| host.id == id) else {
+                return Err(AppError(format!("host not found: {id}")));
+            };
+            reordered.push(remaining.remove(index));
+        }
+
+        reordered.extend(remaining);
+        Self::write_json(&self.hosts_file(), &reordered)?;
+        Ok(reordered)
+    }
+
     // ---- Keys ----
 
     pub fn list_keys(&self) -> AppResult<Vec<SshKey>> {

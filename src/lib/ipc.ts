@@ -10,6 +10,8 @@ export const hostCreate = (input: HostInput) =>
 export const hostUpdate = (id: string, input: HostInput) =>
   invoke<Host>("host_update", { id, input });
 export const hostDelete = (id: string) => invoke<void>("host_delete", { id });
+export const hostsReorder = (orderedIds: string[]) =>
+  invoke<Host[]>("hosts_reorder", { orderedIds });
 
 // ---- Keys ----
 export const keysList = () => invoke<SshKey[]>("keys_list");
