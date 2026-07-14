@@ -66,6 +66,7 @@ impl Manager {
                     }
                     local_file.write_all(&buf[..n])?;
                     transferred += n as u64;
+                    attempts = 0;
                     if last_emit.elapsed() >= Duration::from_millis(120) {
                         emit_transfer_progress(app, transfer_id, "下载压缩包中", transferred, None);
                         last_emit = Instant::now();

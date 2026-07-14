@@ -121,6 +121,8 @@ export const sftpPauseTransfer = (transferId: string) =>
   invoke<void>("sftp_pause_transfer", { transferId });
 export const sftpResumeTransfer = (transferId: string) =>
   invoke<void>("sftp_resume_transfer", { transferId });
+export const sftpResetConnection = (sessionId: string) =>
+  invoke<void>("sftp_reset_connection", { sessionId });
 export const sftpExtract = (
   sessionId: string,
   remoteArchive: string,

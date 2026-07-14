@@ -540,20 +540,29 @@ export default function SftpPanel({ session }: Props) {
     });
     if (typeof selected !== "string") return;
     const name = baseName(selected);
+    const remote = joinPath(cwd, name);
+    const refreshPath = cwd;
     const transferId = nextTransferId();
-    startTransfer(transferId, `上传 ${name}`);
-    try {
-      await ipc.sftpUpload(sessionId, selected, joinPath(cwd, name), transferId);
-      finishTransfer(transferId, "success");
-      await load(cwd);
-    } catch (e) {
-      const message = String(e);
-      if (message === "传输已取消") {
-        finishTransfer(transferId, "cancelled");
-      } else {
-        finishTransfer(transferId, "error", message);
+    const label = `上传 ${name}`;
+    const run = async (resetConnection = false): Promise<void> => {
+      if (resetConnection) {
+        await ipc.sftpResetConnection(sessionId);
       }
-    }
+      startTransfer(transferId, label, { retry: () => run(true) });
+      try {
+        await ipc.sftpUpload(sessionId, selected, remote, transferId);
+        finishTransfer(transferId, "success");
+        await load(refreshPath);
+      } catch (e) {
+        const message = String(e);
+        if (message === "传输已取消") {
+          finishTransfer(transferId, "cancelled");
+        } else {
+          finishTransfer(transferId, "error", message);
+        }
+      }
+    };
+    await run();
   }
 
   async function onDownload(entry: SftpEntry) {
@@ -561,18 +570,25 @@ export default function SftpPanel({ session }: Props) {
     const dest = await saveDialog({ defaultPath: entry.name, title: "保存到" });
     if (typeof dest !== "string") return;
     const transferId = nextTransferId();
-    startTransfer(transferId, `下载 ${entry.name}`);
-    try {
-      await ipc.sftpDownload(sessionId, entry.path, dest, transferId);
-      finishTransfer(transferId, "success");
-    } catch (e) {
-      const message = String(e);
-      if (message === "传输已取消") {
-        finishTransfer(transferId, "cancelled");
-      } else {
-        finishTransfer(transferId, "error", message);
+    const label = `下载 ${entry.name}`;
+    const run = async (resetConnection = false): Promise<void> => {
+      if (resetConnection) {
+        await ipc.sftpResetConnection(sessionId);
       }
-    }
+      startTransfer(transferId, label, { retry: () => run(true) });
+      try {
+        await ipc.sftpDownload(sessionId, entry.path, dest, transferId);
+        finishTransfer(transferId, "success");
+      } catch (e) {
+        const message = String(e);
+        if (message === "传输已取消") {
+          finishTransfer(transferId, "cancelled");
+        } else {
+          finishTransfer(transferId, "error", message);
+        }
+      }
+    };
+    await run();
   }
 
   // ---- Folder download ----
@@ -601,24 +617,31 @@ export default function SftpPanel({ session }: Props) {
     const dest = joinLocalPath(parent, trimmedName);
     const transferMode = directoryTransferMode;
     const transferId = nextTransferId();
-    startTransfer(transferId, `下载 ${entry.name}`);
-    try {
-      await ipc.sftpDownloadDir(
-        sessionId,
-        entry.path,
-        dest,
-        transferMode,
-        transferId,
-      );
-      finishTransfer(transferId, "success");
-    } catch (e) {
-      const message = String(e);
-      if (message === "传输已取消") {
-        finishTransfer(transferId, "cancelled");
-      } else {
-        finishTransfer(transferId, "error", message);
+    const label = `下载 ${entry.name}`;
+    const run = async (resetConnection = false): Promise<void> => {
+      if (resetConnection) {
+        await ipc.sftpResetConnection(sessionId);
       }
-    }
+      startTransfer(transferId, label, { retry: () => run(true) });
+      try {
+        await ipc.sftpDownloadDir(
+          sessionId,
+          entry.path,
+          dest,
+          transferMode,
+          transferId,
+        );
+        finishTransfer(transferId, "success");
+      } catch (e) {
+        const message = String(e);
+        if (message === "传输已取消") {
+          finishTransfer(transferId, "cancelled");
+        } else {
+          finishTransfer(transferId, "error", message);
+        }
+      }
+    };
+    await run();
   }
 
   // ---- Folder upload ----
@@ -724,26 +747,34 @@ export default function SftpPanel({ session }: Props) {
     if (!cwd) return;
     const transferId = nextTransferId();
     const transferMode = directoryTransferMode;
-    startTransfer(transferId, `上传 ${remoteName}`);
-    try {
-      await ipc.sftpUploadDir(
-        sessionId,
-        localDir,
-        cwd,
-        remoteName,
-        transferMode,
-        transferId,
-      );
-      finishTransfer(transferId, "success");
-      await load(cwd);
-    } catch (e) {
-      const message = String(e);
-      if (message === "传输已取消") {
-        finishTransfer(transferId, "cancelled");
-      } else {
-        finishTransfer(transferId, "error", message);
+    const remoteParent = cwd;
+    const label = `上传 ${remoteName}`;
+    const run = async (resetConnection = false): Promise<void> => {
+      if (resetConnection) {
+        await ipc.sftpResetConnection(sessionId);
       }
-    }
+      startTransfer(transferId, label, { retry: () => run(true) });
+      try {
+        await ipc.sftpUploadDir(
+          sessionId,
+          localDir,
+          remoteParent,
+          remoteName,
+          transferMode,
+          transferId,
+        );
+        finishTransfer(transferId, "success");
+        await load(remoteParent);
+      } catch (e) {
+        const message = String(e);
+        if (message === "传输已取消") {
+          finishTransfer(transferId, "cancelled");
+        } else {
+          finishTransfer(transferId, "error", message);
+        }
+      }
+    };
+    await run();
   }
 
   // ---- Remote extract ----

@@ -89,6 +89,7 @@ pub fn run() {
             commands::sftp_cancel_transfer,
             commands::sftp_pause_transfer,
             commands::sftp_resume_transfer,
+            commands::sftp_reset_connection,
             commands::sftp_extract,
         ])
         .build(tauri::generate_context!())

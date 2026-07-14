@@ -31,6 +31,10 @@ impl Manager {
         }
     }
 
+    pub fn reset_sftp_conn(&self, session_id: &str) {
+        self.sftp.lock().remove(session_id);
+    }
+
     pub fn sftp_home(&self, session_id: &str) -> AppResult<String> {
         let conn = self.sftp_conn(session_id)?;
         let conn = conn.lock();
@@ -186,6 +190,7 @@ impl Manager {
                     }
                     local_file.write_all(&buf[..n])?;
                     transferred += n as u64;
+                    attempts = 0;
                     if last_emit.elapsed() >= Duration::from_millis(120) {
                         emit_transfer_progress(app, transfer_id, "下载中", transferred, total);
                         last_emit = Instant::now();

@@ -92,6 +92,7 @@ export default function TransferPanel() {
   const setPaused = useTransfersStore((s) => s.setPaused);
   const setControlPending = useTransfersStore((s) => s.setControlPending);
   const setControlError = useTransfersStore((s) => s.setControlError);
+  const setRetrying = useTransfersStore((s) => s.setRetrying);
   const clearFinished = useTransfersStore((s) => s.clearFinished);
   const [open, setOpen] = useState(true);
 
@@ -229,6 +230,20 @@ export default function TransferPanel() {
     [setControlError, setControlPending, setPaused],
   );
 
+  const retryTransfer = useCallback(
+    async (transfer: TransferState) => {
+      if (!transfer.retry || transfer.retrying) return;
+      setRetrying(transfer.id, true);
+      try {
+        await transfer.retry();
+      } catch (error) {
+        setControlError(transfer.id, String(error));
+        setRetrying(transfer.id, false);
+      }
+    },
+    [setControlError, setRetrying],
+  );
+
   if (transfers.length === 0) return null;
 
   return (
@@ -289,6 +304,7 @@ export default function TransferPanel() {
               transfer={item}
               onCancel={cancelTransfer}
               onTogglePause={togglePause}
+              onRetry={retryTransfer}
             />
           ))}
         </div>
@@ -301,10 +317,12 @@ const TransferItem = memo(function TransferItem({
   transfer,
   onCancel,
   onTogglePause,
+  onRetry,
 }: {
   transfer: TransferState;
   onCancel: (id: string) => void;
   onTogglePause: (transfer: TransferState) => void;
+  onRetry: (transfer: TransferState) => void;
 }) {
   const total = transfer.total ?? 0;
   const progress =
@@ -361,6 +379,21 @@ const TransferItem = memo(function TransferItem({
               )}
             </Button>
           </div>
+        ) : transfer.status === "error" && transfer.retry ? (
+          <Button
+            variant="ghost"
+            size="xs"
+            title="重试"
+            onClick={() => onRetry(transfer)}
+            disabled={transfer.retrying}
+          >
+            {transfer.retrying ? (
+              <LoaderCircle className="animate-spin" data-icon="inline-start" />
+            ) : (
+              <RefreshCw data-icon="inline-start" />
+            )}
+            重试
+          </Button>
         ) : null}
       </div>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-muted-foreground tabular-nums">

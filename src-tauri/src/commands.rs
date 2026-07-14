@@ -362,6 +362,12 @@ pub fn sftp_resume_transfer(state: State<AppState>, transfer_id: String) -> AppR
 }
 
 #[tauri::command]
+pub fn sftp_reset_connection(state: State<AppState>, session_id: String) -> AppResult<()> {
+    state.manager.reset_sftp_conn(&session_id);
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn sftp_extract(
     state: State<'_, AppState>,
     session_id: String,

@@ -17,6 +17,8 @@ export interface TransferState {
   pausedPhase?: string;
   controlPending?: boolean;
   controlError?: string;
+  retry?: () => void | Promise<void>;
+  retrying?: boolean;
 }
 
 interface TransfersState {
@@ -24,7 +26,7 @@ interface TransfersState {
   start: (
     id: string,
     label: string,
-    options?: { cancellable?: boolean },
+    options?: { cancellable?: boolean; retry?: () => void | Promise<void> },
   ) => void;
   updateProgressBatch: (progresses: TransferProgress[]) => void;
   finish: (
@@ -37,6 +39,7 @@ interface TransfersState {
   setPaused: (id: string, paused: boolean) => void;
   setControlPending: (id: string, pending: boolean) => void;
   setControlError: (id: string, error?: string) => void;
+  setRetrying: (id: string, retrying: boolean) => void;
   clearFinished: () => void;
 }
 
@@ -58,6 +61,9 @@ export const useTransfersStore = create<TransfersState>((set) => ({
           cancellable: options?.cancellable ?? true,
           paused: false,
           controlPending: false,
+          controlError: undefined,
+          retry: options?.retry,
+          retrying: false,
         },
         ...state.transfers.filter((item) => item.id !== id),
       ],
@@ -128,6 +134,8 @@ export const useTransfersStore = create<TransfersState>((set) => ({
               pausedPhase: undefined,
               controlPending: false,
               controlError: undefined,
+              retry: status === "error" ? item.retry : undefined,
+              retrying: false,
               updatedAt: performance.now(),
             }
           : item,
@@ -201,6 +209,14 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     set((state) => ({
       transfers: state.transfers.map((item) =>
         item.id === id ? { ...item, controlError: error } : item,
+      ),
+    }));
+  },
+
+  setRetrying(id, retrying) {
+    set((state) => ({
+      transfers: state.transfers.map((item) =>
+        item.id === id ? { ...item, retrying } : item,
       ),
     }));
   },

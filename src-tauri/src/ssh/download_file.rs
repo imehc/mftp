@@ -60,6 +60,7 @@ impl Manager {
                     }
                     local_file.write_all(&buf[..n])?;
                     file_transferred += n as u64;
+                    attempts = 0;
                     if last_emit.elapsed() >= Duration::from_millis(120) {
                         emit_transfer_progress(
                             app,

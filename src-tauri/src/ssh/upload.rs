@@ -97,9 +97,15 @@ impl Manager {
                     ) {
                         SftpWriteOutcome::Complete { written } => {
                             file_transferred += written as u64;
+                            if written > 0 {
+                                attempts = 0;
+                            }
                         }
                         SftpWriteOutcome::Paused { written } => {
                             file_transferred += written as u64;
+                            if written > 0 {
+                                attempts = 0;
+                            }
                             remote_file.flush()?;
                             break Ok(TransferIoOutcome::Paused);
                         }
