@@ -41,7 +41,7 @@ fn emit_transfer_progress(
 pub enum AuthMethod {
     Password(Option<String>),
     Key {
-        path: PathBuf,
+        private_key: String,
         passphrase: Option<String>,
     },
 }

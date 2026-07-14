@@ -21,8 +21,11 @@ fn build_auth(
                 .key_id
                 .clone()
                 .ok_or_else(|| AppError("host has no key selected".into()))?;
-            let path = state.storage.key_path(&key_id)?;
-            AuthMethod::Key { path, passphrase }
+            let private_key = state.storage.key_private_key(&key_id)?;
+            AuthMethod::Key {
+                private_key,
+                passphrase,
+            }
         }
     };
     resolve_auth_material(AuthMaterial {

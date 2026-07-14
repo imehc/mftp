@@ -1,15 +1,15 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{Host, HostInput, SshKey};
+use crate::models::{AuthType, Host, HostInput, SshKey};
+use rusqlite::{params, Connection, OptionalExtension};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/// On-disk layout under the app data dir:
-///   hosts.json           Vec<Host>
-///   keys.json            Vec<SshKey>
-///   keys/<filename>      raw private key files
+const DB_FILE: &str = "mftp.sqlite3";
+
 pub struct Storage {
     root: PathBuf,
+    db_path: PathBuf,
 }
 
 pub fn now_ms() -> i64 {
@@ -22,17 +22,73 @@ pub fn now_ms() -> i64 {
 impl Storage {
     pub fn new(root: PathBuf) -> AppResult<Self> {
         fs::create_dir_all(&root)?;
-        fs::create_dir_all(root.join("keys"))?;
-        Ok(Storage { root })
+        let storage = Storage {
+            db_path: root.join(DB_FILE),
+            root,
+        };
+        storage.init_db()?;
+        restrict_file_permissions(&storage.db_path);
+        storage.migrate_legacy_json()?;
+        Ok(storage)
+    }
+
+    fn conn(&self) -> AppResult<Connection> {
+        let conn = Connection::open(&self.db_path)?;
+        conn.pragma_update(None, "foreign_keys", "ON")?;
+        Ok(conn)
+    }
+
+    fn init_db(&self) -> AppResult<()> {
+        let conn = self.conn()?;
+        conn.execute_batch(
+            r#"
+            PRAGMA journal_mode = WAL;
+            PRAGMA synchronous = NORMAL;
+
+            CREATE TABLE IF NOT EXISTS app_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS hosts (
+                id TEXT PRIMARY KEY,
+                label TEXT NOT NULL,
+                host TEXT NOT NULL,
+                port INTEGER NOT NULL,
+                username TEXT NOT NULL,
+                auth_type TEXT NOT NULL,
+                password TEXT,
+                key_id TEXT,
+                default_path TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS ssh_keys (
+                id TEXT PRIMARY KEY,
+                label TEXT NOT NULL,
+                filename TEXT NOT NULL,
+                private_key TEXT NOT NULL,
+                has_passphrase INTEGER NOT NULL,
+                created_at INTEGER NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_hosts_sort_order ON hosts(sort_order);
+            "#,
+        )?;
+        Ok(())
     }
 
     fn hosts_file(&self) -> PathBuf {
         self.root.join("hosts.json")
     }
+
     fn keys_file(&self) -> PathBuf {
         self.root.join("keys.json")
     }
-    pub fn keys_dir(&self) -> PathBuf {
+
+    fn legacy_keys_dir(&self) -> PathBuf {
         self.root.join("keys")
     }
 
@@ -47,33 +103,146 @@ impl Storage {
         Ok(serde_json::from_str(&raw)?)
     }
 
-    fn write_json<T: serde::Serialize>(path: &Path, value: &T) -> AppResult<()> {
-        let raw = serde_json::to_string_pretty(value)?;
-        // Write to a temp file then rename for atomicity.
-        let tmp = path.with_extension("tmp");
-        fs::write(&tmp, raw)?;
-        fs::rename(&tmp, path)?;
+    fn migration_done(&self, conn: &Connection) -> AppResult<bool> {
+        let value: Option<String> = conn
+            .query_row(
+                "SELECT value FROM app_meta WHERE key = 'legacy_json_migrated'",
+                [],
+                |row| row.get(0),
+            )
+            .optional()?;
+        Ok(value.as_deref() == Some("1"))
+    }
+
+    fn set_migration_done(&self, conn: &Connection) -> AppResult<()> {
+        conn.execute(
+            "INSERT INTO app_meta(key, value) VALUES('legacy_json_migrated', '1')
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            [],
+        )?;
         Ok(())
     }
 
-    // ---- Hosts ----
+    fn migrate_legacy_json(&self) -> AppResult<()> {
+        let mut conn = self.conn()?;
+        if self.migration_done(&conn)? {
+            return Ok(());
+        }
+
+        let existing_hosts: i64 = conn.query_row("SELECT COUNT(*) FROM hosts", [], |row| row.get(0))?;
+        let existing_keys: i64 =
+            conn.query_row("SELECT COUNT(*) FROM ssh_keys", [], |row| row.get(0))?;
+        if existing_hosts > 0 || existing_keys > 0 {
+            self.set_migration_done(&conn)?;
+            return Ok(());
+        }
+
+        let hosts: Vec<Host> = Self::read_json(&self.hosts_file())?;
+        let keys: Vec<SshKey> = Self::read_json(&self.keys_file())?;
+        let tx = conn.transaction()?;
+
+        for (index, host) in hosts.iter().enumerate() {
+            tx.execute(
+                r#"
+                INSERT OR IGNORE INTO hosts(
+                    id, label, host, port, username, auth_type, password, key_id,
+                    default_path, sort_order, created_at, updated_at
+                )
+                VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
+                "#,
+                params![
+                    host.id,
+                    host.label,
+                    host.host,
+                    host.port,
+                    host.username,
+                    auth_type_to_db(host.auth_type.clone()),
+                    host.password,
+                    host.key_id,
+                    host.default_path,
+                    index as i64,
+                    host.created_at,
+                    host.updated_at,
+                ],
+            )?;
+        }
+
+        for key in keys {
+            let key_path = self.legacy_keys_dir().join(&key.filename);
+            let private_key = fs::read_to_string(&key_path).map_err(|error| {
+                AppError(format!(
+                    "迁移密钥失败：无法读取 {}: {error}",
+                    key_path.display()
+                ))
+            })?;
+            tx.execute(
+                r#"
+                INSERT OR IGNORE INTO ssh_keys(
+                    id, label, filename, private_key, has_passphrase, created_at
+                )
+                VALUES(?1, ?2, ?3, ?4, ?5, ?6)
+                "#,
+                params![
+                    key.id,
+                    key.label,
+                    key.filename,
+                    private_key,
+                    bool_to_int(key.has_passphrase),
+                    key.created_at,
+                ],
+            )?;
+        }
+
+        tx.execute(
+            "INSERT INTO app_meta(key, value) VALUES('legacy_json_migrated', '1')",
+            [],
+        )?;
+        tx.commit()?;
+        Ok(())
+    }
 
     pub fn list_hosts(&self) -> AppResult<Vec<Host>> {
-        Self::read_json(&self.hosts_file())
+        let conn = self.conn()?;
+        let mut stmt = conn.prepare(
+            r#"
+            SELECT id, label, host, port, username, auth_type, password, key_id,
+                   default_path, created_at, updated_at
+            FROM hosts
+            ORDER BY sort_order ASC, created_at ASC
+            "#,
+        )?;
+        let hosts = stmt
+            .query_map([], host_from_row)?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(hosts)
     }
 
     pub fn get_host(&self, id: &str) -> AppResult<Host> {
-        self.list_hosts()?
-            .into_iter()
-            .find(|h| h.id == id)
-            .ok_or_else(|| AppError(format!("host not found: {id}")))
+        let conn = self.conn()?;
+        conn.query_row(
+            r#"
+            SELECT id, label, host, port, username, auth_type, password, key_id,
+                   default_path, created_at, updated_at
+            FROM hosts
+            WHERE id = ?1
+            "#,
+            params![id],
+            host_from_row,
+        )
+        .optional()?
+        .ok_or_else(|| AppError(format!("host not found: {id}")))
     }
 
     pub fn create_host(&self, input: HostInput) -> AppResult<Host> {
-        let mut hosts = self.list_hosts()?;
+        let conn = self.conn()?;
         let ts = now_ms();
+        let id = uuid::Uuid::new_v4().to_string();
+        let sort_order: i64 =
+            conn.query_row("SELECT COALESCE(MAX(sort_order), -1) + 1 FROM hosts", [], |row| {
+                row.get(0)
+            })?;
         let host = Host {
-            id: uuid::Uuid::new_v4().to_string(),
+            id,
             label: input.label,
             host: input.host,
             port: input.port,
@@ -85,93 +254,144 @@ impl Storage {
             created_at: ts,
             updated_at: ts,
         };
-        hosts.push(host.clone());
-        Self::write_json(&self.hosts_file(), &hosts)?;
+        conn.execute(
+            r#"
+            INSERT INTO hosts(
+                id, label, host, port, username, auth_type, password, key_id,
+                default_path, sort_order, created_at, updated_at
+            )
+            VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
+            "#,
+            params![
+                host.id,
+                host.label,
+                host.host,
+                host.port,
+                host.username,
+                auth_type_to_db(host.auth_type.clone()),
+                host.password,
+                host.key_id,
+                host.default_path,
+                sort_order,
+                host.created_at,
+                host.updated_at,
+            ],
+        )?;
         Ok(host)
     }
 
     pub fn update_host(&self, id: &str, input: HostInput) -> AppResult<Host> {
-        let mut hosts = self.list_hosts()?;
-        let h = hosts
-            .iter_mut()
-            .find(|h| h.id == id)
-            .ok_or_else(|| AppError(format!("host not found: {id}")))?;
-        h.label = input.label;
-        h.host = input.host;
-        h.port = input.port;
-        h.username = input.username;
-        h.auth_type = input.auth_type;
-        h.password = input.password;
-        h.key_id = input.key_id;
-        h.default_path = input.default_path;
-        h.updated_at = now_ms();
-        let updated = h.clone();
-        Self::write_json(&self.hosts_file(), &hosts)?;
-        Ok(updated)
+        let conn = self.conn()?;
+        let ts = now_ms();
+        let changed = conn.execute(
+            r#"
+            UPDATE hosts
+            SET label = ?2,
+                host = ?3,
+                port = ?4,
+                username = ?5,
+                auth_type = ?6,
+                password = ?7,
+                key_id = ?8,
+                default_path = ?9,
+                updated_at = ?10
+            WHERE id = ?1
+            "#,
+            params![
+                id,
+                input.label,
+                input.host,
+                input.port,
+                input.username,
+                auth_type_to_db(input.auth_type),
+                input.password,
+                input.key_id,
+                input.default_path,
+                ts,
+            ],
+        )?;
+        if changed == 0 {
+            return Err(AppError(format!("host not found: {id}")));
+        }
+        self.get_host(id)
     }
 
     pub fn delete_host(&self, id: &str) -> AppResult<()> {
-        let mut hosts = self.list_hosts()?;
-        hosts.retain(|h| h.id != id);
-        Self::write_json(&self.hosts_file(), &hosts)
+        let conn = self.conn()?;
+        conn.execute("DELETE FROM hosts WHERE id = ?1", params![id])?;
+        Ok(())
     }
 
     pub fn reorder_hosts(&self, ordered_ids: Vec<String>) -> AppResult<Vec<Host>> {
-        let hosts = self.list_hosts()?;
-        let mut reordered = Vec::with_capacity(hosts.len());
-        let mut remaining = hosts;
-
-        for id in ordered_ids {
-            let Some(index) = remaining.iter().position(|host| host.id == id) else {
+        let mut conn = self.conn()?;
+        let tx = conn.transaction()?;
+        for (index, id) in ordered_ids.iter().enumerate() {
+            let changed = tx.execute(
+                "UPDATE hosts SET sort_order = ?2 WHERE id = ?1",
+                params![id, index as i64],
+            )?;
+            if changed == 0 {
                 return Err(AppError(format!("host not found: {id}")));
-            };
-            reordered.push(remaining.remove(index));
+            }
         }
-
-        reordered.extend(remaining);
-        Self::write_json(&self.hosts_file(), &reordered)?;
-        Ok(reordered)
+        tx.commit()?;
+        self.list_hosts()
     }
 
-    // ---- Keys ----
-
     pub fn list_keys(&self) -> AppResult<Vec<SshKey>> {
-        Self::read_json(&self.keys_file())
+        let conn = self.conn()?;
+        let mut stmt = conn.prepare(
+            r#"
+            SELECT id, label, filename, has_passphrase, created_at
+            FROM ssh_keys
+            ORDER BY created_at ASC
+            "#,
+        )?;
+        let keys = stmt
+            .query_map([], ssh_key_from_row)?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(keys)
     }
 
     pub fn get_key(&self, id: &str) -> AppResult<SshKey> {
-        self.list_keys()?
-            .into_iter()
-            .find(|k| k.id == id)
-            .ok_or_else(|| AppError(format!("key not found: {id}")))
+        let conn = self.conn()?;
+        conn.query_row(
+            r#"
+            SELECT id, label, filename, has_passphrase, created_at
+            FROM ssh_keys
+            WHERE id = ?1
+            "#,
+            params![id],
+            ssh_key_from_row,
+        )
+        .optional()?
+        .ok_or_else(|| AppError(format!("key not found: {id}")))
     }
 
-    /// Path to the private key file for a given key id.
-    pub fn key_path(&self, id: &str) -> AppResult<PathBuf> {
-        let key = self.get_key(id)?;
-        Ok(self.keys_dir().join(key.filename))
+    pub fn key_private_key(&self, id: &str) -> AppResult<String> {
+        let conn = self.conn()?;
+        conn.query_row(
+            "SELECT private_key FROM ssh_keys WHERE id = ?1",
+            params![id],
+            |row| row.get(0),
+        )
+        .optional()?
+        .ok_or_else(|| AppError(format!("key not found: {id}")))
     }
 
-    /// Import a private key: copy contents into keys/ and record metadata.
     pub fn import_key(
         &self,
         label: String,
         source_path: &str,
         has_passphrase: bool,
     ) -> AppResult<SshKey> {
-        let contents = fs::read(source_path)?;
+        let private_key = fs::read_to_string(source_path)?;
         let id = uuid::Uuid::new_v4().to_string();
-        let orig_name = Path::new(source_path)
+        let filename = Path::new(source_path)
             .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("id_key");
-        // Prefix with id to avoid collisions.
-        let filename = format!("{id}_{orig_name}");
-        let dest = self.keys_dir().join(&filename);
-        fs::write(&dest, &contents)?;
-        restrict_permissions(&dest);
-
-        let mut keys = self.list_keys()?;
+            .and_then(|name| name.to_str())
+            .unwrap_or("id_key")
+            .to_string();
         let key = SshKey {
             id,
             label,
@@ -179,26 +399,90 @@ impl Storage {
             has_passphrase,
             created_at: now_ms(),
         };
-        keys.push(key.clone());
-        Self::write_json(&self.keys_file(), &keys)?;
+        let conn = self.conn()?;
+        conn.execute(
+            r#"
+            INSERT INTO ssh_keys(
+                id, label, filename, private_key, has_passphrase, created_at
+            )
+            VALUES(?1, ?2, ?3, ?4, ?5, ?6)
+            "#,
+            params![
+                key.id,
+                key.label,
+                key.filename,
+                private_key,
+                bool_to_int(key.has_passphrase),
+                key.created_at,
+            ],
+        )?;
         Ok(key)
     }
 
     pub fn delete_key(&self, id: &str) -> AppResult<()> {
-        let mut keys = self.list_keys()?;
-        if let Some(k) = keys.iter().find(|k| k.id == id) {
-            let _ = fs::remove_file(self.keys_dir().join(&k.filename));
-        }
-        keys.retain(|k| k.id != id);
-        Self::write_json(&self.keys_file(), &keys)
+        let conn = self.conn()?;
+        conn.execute("DELETE FROM ssh_keys WHERE id = ?1", params![id])?;
+        Ok(())
     }
 }
 
+fn auth_type_to_db(auth_type: AuthType) -> &'static str {
+    match auth_type {
+        AuthType::Password => "password",
+        AuthType::Key => "key",
+    }
+}
+
+fn auth_type_from_db(value: String) -> AppResult<AuthType> {
+    match value.as_str() {
+        "password" => Ok(AuthType::Password),
+        "key" => Ok(AuthType::Key),
+        _ => Err(AppError(format!("unknown auth type: {value}"))),
+    }
+}
+
+fn bool_to_int(value: bool) -> i64 {
+    if value {
+        1
+    } else {
+        0
+    }
+}
+
+fn host_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<Host> {
+    let auth_type: String = row.get(5)?;
+    Ok(Host {
+        id: row.get(0)?,
+        label: row.get(1)?,
+        host: row.get(2)?,
+        port: row.get::<_, u16>(3)?,
+        username: row.get(4)?,
+        auth_type: auth_type_from_db(auth_type)
+            .map_err(|error| rusqlite::Error::ToSqlConversionFailure(Box::new(error)))?,
+        password: row.get(6)?,
+        key_id: row.get(7)?,
+        default_path: row.get(8)?,
+        created_at: row.get(9)?,
+        updated_at: row.get(10)?,
+    })
+}
+
+fn ssh_key_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<SshKey> {
+    let has_passphrase: i64 = row.get(3)?;
+    Ok(SshKey {
+        id: row.get(0)?,
+        label: row.get(1)?,
+        filename: row.get(2)?,
+        has_passphrase: has_passphrase != 0,
+        created_at: row.get(4)?,
+    })
+}
+
 #[cfg(unix)]
-fn restrict_permissions(path: &Path) {
+fn restrict_file_permissions(path: &Path) {
     use std::os::unix::fs::PermissionsExt;
     let _ = fs::set_permissions(path, fs::Permissions::from_mode(0o600));
 }
 
 #[cfg(not(unix))]
-fn restrict_permissions(_path: &Path) {}
+fn restrict_file_permissions(_path: &Path) {}

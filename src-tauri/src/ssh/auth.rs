@@ -10,8 +10,16 @@ fn connect(mat: &AuthMaterial) -> AppResult<Session> {
             sess.userauth_password(&mat.username, pw)?;
         }
         AuthMethod::Password(None) => authenticate_with_local_defaults(&sess, mat)?,
-        AuthMethod::Key { path, passphrase } => {
-            sess.userauth_pubkey_file(&mat.username, None, path, passphrase.as_deref())?;
+        AuthMethod::Key {
+            private_key,
+            passphrase,
+        } => {
+            sess.userauth_pubkey_memory(
+                &mat.username,
+                None,
+                private_key,
+                passphrase.as_deref(),
+            )?;
         }
     }
     if !sess.authenticated() {
