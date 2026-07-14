@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "next-themes";
-import App from "./App";
+import { RouterProvider } from "@tanstack/react-router";
+import { router } from "./router";
 import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { checkForUpdateOnLaunch } from "~/lib/updater";
@@ -11,7 +12,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <TooltipProvider>
-        <App />
+        <RouterProvider router={router} />
       </TooltipProvider>
       <Toaster position="bottom-right" />
     </ThemeProvider>

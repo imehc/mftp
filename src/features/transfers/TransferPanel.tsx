@@ -297,7 +297,7 @@ export default function TransferPanel() {
         ref={contentRef}
         className="overflow-hidden"
       >
-        <div className="flex max-h-64 flex-col gap-2 overflow-y-auto px-2 pb-2 pt-1">
+        <div className="flex max-h-[min(16rem,32vh)] flex-col gap-2 overflow-y-auto px-2 pb-2 pt-1">
           {transfers.map((item) => (
             <TransferItem
               key={item.id}

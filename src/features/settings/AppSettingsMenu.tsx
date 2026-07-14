@@ -4,7 +4,6 @@ import {
   FolderTree,
   Monitor,
   Moon,
-  Palette,
   RefreshCw,
   RotateCcw,
   Settings,
@@ -17,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
@@ -41,27 +41,27 @@ import {
 import { cn } from "~/lib/utils";
 
 const themes = [
-  { value: "system", label: "跟随系统", icon: Monitor },
+  { value: "system", label: "系统", icon: Monitor },
   { value: "light", label: "浅色", icon: Sun },
   { value: "dark", label: "深色", icon: Moon },
 ] as const;
 
 const directoryTransferModes = [
   { value: "archive", label: "压缩包", icon: Archive },
-  { value: "direct", label: "直接传输", icon: FolderTree },
+  { value: "direct", label: "直接", icon: FolderTree },
 ] as const;
 
-const updateMenuLabels: Record<UpdaterStatus, string> = {
+const updateLabels: Record<UpdaterStatus, string> = {
   idle: "检查更新",
-  checking: "正在检查更新…",
-  available: "查看可用更新",
-  downloading: "查看更新下载进度",
-  ready: "重启应用并更新",
-  restarting: "正在重启应用…",
-  error: "重新检查更新",
+  checking: "正在检查",
+  available: "查看更新",
+  downloading: "下载中",
+  ready: "重启更新",
+  restarting: "重启中",
+  error: "重新检查",
 };
 
-export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }) {
+export default function AppSettingsMenu() {
   const { theme = "system", setTheme } = useTheme();
   const directoryTransferMode = useSettingsStore(
     (s) => s.directoryTransferMode,
@@ -73,6 +73,8 @@ export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }
     s.transfers.some((item) => item.status === "running"),
   );
   const updaterStatus = useUpdaterStore((s) => s.status);
+  const checkingUpdate = updaterStatus === "checking";
+  const restarting = updaterStatus === "restarting";
 
   function onCheckUpdate() {
     if (updaterStatus === "ready") {
@@ -82,33 +84,15 @@ export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }
     void checkForUpdateManually();
   }
 
-  const checkingUpdate = updaterStatus === "checking";
-  const restarting = updaterStatus === "restarting";
-  const updateMenuLabel = updateMenuLabels[updaterStatus];
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={cn(
-            "h-9 w-full gap-2 rounded-md px-2 text-left",
-            collapsed ? "justify-center" : "justify-start",
-            "aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-accent-foreground",
-          )}
-          title="设置"
-        >
+        <Button variant="outline" size="sm">
           <Settings data-icon="inline-start" />
-          {collapsed ? null : (
-            <span className="min-w-0 flex-1 truncate">设置</span>
-          )}
+          设置
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        side="top"
-        align="start"
-        className="min-w-44 whitespace-nowrap"
-      >
+      <DropdownMenuContent align="end" className="min-w-44 whitespace-nowrap">
         <DropdownMenuGroup>
           <DropdownMenuItem
             disabled={checkingUpdate || restarting}
@@ -121,7 +105,7 @@ export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }
             ) : (
               <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
             )}
-            {updateMenuLabel}
+            {updateLabels[updaterStatus]}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -155,25 +139,18 @@ export default function ThemeMenu({ collapsed = false }: { collapsed?: boolean }
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Palette />
-            主题
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
-            <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-              {themes.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <DropdownMenuRadioItem key={item.value} value={item.value}>
-                    <Icon />
-                    {item.label}
-                  </DropdownMenuRadioItem>
-                );
-              })}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <DropdownMenuLabel>主题</DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+          {themes.map((item) => {
+            const Icon = item.icon;
+            return (
+              <DropdownMenuRadioItem key={item.value} value={item.value}>
+                <Icon />
+                {item.label}
+              </DropdownMenuRadioItem>
+            );
+          })}
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

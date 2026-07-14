@@ -59,11 +59,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import HostForm from "~/components/hosts/HostForm";
-import KeyManager from "~/components/keys/KeyManager";
-import PassphrasePrompt from "~/components/hosts/PassphrasePrompt";
-import ThemeMenu from "~/components/layout/ThemeMenu";
-import TransferPanel from "~/components/layout/TransferPanel";
+import HostForm from "~/features/ssh-sftp/components/hosts/HostForm";
+import KeyManager from "~/features/ssh-sftp/components/keys/KeyManager";
+import PassphrasePrompt from "~/features/ssh-sftp/components/hosts/PassphrasePrompt";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -512,12 +510,6 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
             </ul>
           )
         )}
-      </div>
-
-      {collapsed ? null : <TransferPanel />}
-
-      <div className={cn("border-t border-border p-2", collapsed && "px-1.5")}>
-        <ThemeMenu collapsed={collapsed} />
       </div>
 
       <HostForm open={formOpen} onOpenChange={setFormOpen} host={editing} />

@@ -1,0 +1,29 @@
+import { useEffect } from "react";
+import { Outlet, createRootRoute, useNavigate } from "@tanstack/react-router";
+import { useHostsStore } from "~/store/hosts";
+import { useSettingsStore } from "~/store/settings";
+
+const START_ROUTE_RESOLVED_KEY = "mftp-start-route-resolved";
+
+function RootLayout() {
+  const navigate = useNavigate();
+  const loadAll = useHostsStore((s) => s.loadAll);
+  const lastTool = useSettingsStore((s) => s.lastTool);
+
+  useEffect(() => {
+    void loadAll();
+  }, [loadAll]);
+
+  useEffect(() => {
+    if (sessionStorage.getItem(START_ROUTE_RESOLVED_KEY)) return;
+    sessionStorage.setItem(START_ROUTE_RESOLVED_KEY, "1");
+    if (window.location.pathname !== "/" || lastTool !== "ssh-sftp") return;
+    void navigate({ to: "/tools/ssh-sftp", replace: true });
+  }, [lastTool, navigate]);
+
+  return <Outlet />;
+}
+
+export const Route = createRootRoute({
+  component: RootLayout,
+});

@@ -81,7 +81,7 @@ import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import PromptDialog from "~/components/ui/prompt-dialog";
 import ConflictDialog, {
   type ConflictResolution,
-} from "~/components/sftp/ConflictDialog";
+} from "~/features/ssh-sftp/components/sftp/ConflictDialog";
 import { cn } from "~/lib/utils";
 
 interface Props {

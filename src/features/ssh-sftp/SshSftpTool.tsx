@@ -1,18 +1,20 @@
 import { useEffect, useRef } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   Group,
   Panel,
   Separator,
   type PanelImperativeHandle,
 } from "react-resizable-panels";
-import { useHostsStore } from "~/store/hosts";
 import { useSettingsStore } from "~/store/settings";
 import { useSessionsStore } from "~/store/sessions";
-import Sidebar from "~/components/layout/Sidebar";
-import TabBar from "~/components/terminal/TabBar";
-import Terminal from "~/components/terminal/Terminal";
-import SftpPanel from "~/components/sftp/SftpPanel";
-import { TerminalSquare } from "lucide-react";
+import Sidebar from "~/features/ssh-sftp/components/Sidebar";
+import TransferPanel from "~/features/transfers/TransferPanel";
+import TabBar from "~/features/ssh-sftp/components/terminal/TabBar";
+import Terminal from "~/features/ssh-sftp/components/terminal/Terminal";
+import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
+import { Home, TerminalSquare } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import {
   Empty,
   EmptyDescription,
@@ -23,9 +25,8 @@ import {
 
 const SIDEBAR_COLLAPSED_SIZE = 52;
 
-export default function App() {
+export default function SshSftpTool() {
   const sidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
-  const loadAll = useHostsStore((s) => s.loadAll);
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
   const sidebarSize = useSettingsStore((s) => s.sidebarSize);
@@ -34,12 +35,20 @@ export default function App() {
   const setSidebarCollapsed = useSettingsStore((s) => s.setSidebarCollapsed);
 
   useEffect(() => {
-    loadAll();
-  }, [loadAll]);
-
-  useEffect(() => {
     if (sidebarCollapsed) sidebarPanelRef.current?.collapse();
   }, [sidebarCollapsed]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 760px)");
+    const syncCompactSidebar = () => {
+      if (!media.matches) return;
+      setSidebarCollapsed(true);
+      sidebarPanelRef.current?.collapse();
+    };
+    syncCompactSidebar();
+    media.addEventListener("change", syncCompactSidebar);
+    return () => media.removeEventListener("change", syncCompactSidebar);
+  }, [setSidebarCollapsed]);
 
   const defaultLayout = {
     sidebar: sidebarSize,
@@ -47,7 +56,21 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
+      <header className="flex h-9 shrink-0 items-center justify-between border-b border-border px-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Button variant="ghost" size="xs" asChild>
+            <Link to="/">
+              <Home data-icon="inline-start" />
+              首页
+            </Link>
+          </Button>
+          <div className="hidden h-4 w-px bg-border sm:block" />
+          <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
+            SSH / SFTP
+          </div>
+        </div>
+      </header>
       <Group
         orientation="horizontal"
         defaultLayout={defaultLayout}
@@ -60,7 +83,7 @@ export default function App() {
             setSidebarSize(sidebar);
           }
         }}
-        className="panel-group h-full w-full overflow-hidden"
+        className="panel-group min-h-0 flex-1 overflow-hidden"
       >
         <Panel
           panelRef={sidebarPanelRef}
@@ -75,7 +98,7 @@ export default function App() {
               setSidebarCollapsed(collapsed);
             }
           }}
-          minSize="220px"
+          minSize="180px"
           maxSize="480px"
           collapsedSize={`${SIDEBAR_COLLAPSED_SIZE}px`}
           collapsible
@@ -99,7 +122,7 @@ export default function App() {
         >
           <span className="absolute left-1/2 top-1/2 h-8 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-transparent transition-colors group-hover:bg-foreground/30" />
         </Separator>
-        <Panel id="workspace" minSize="360px" className="h-full overflow-hidden">
+        <Panel id="workspace" minSize="260px" className="h-full overflow-hidden">
           <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
             <TabBar />
             <div className="relative flex-1 overflow-hidden">
@@ -139,6 +162,7 @@ export default function App() {
           </main>
         </Panel>
       </Group>
+      <TransferPanel />
     </div>
   );
 }
