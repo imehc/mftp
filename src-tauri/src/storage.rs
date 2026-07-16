@@ -7,6 +7,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 const DB_FILE: &str = "mftp.sqlite3";
 
+mod activity;
+mod lan;
+
 pub struct Storage {
     root: PathBuf,
     db_path: PathBuf,
@@ -32,7 +35,7 @@ impl Storage {
         Ok(storage)
     }
 
-    fn conn(&self) -> AppResult<Connection> {
+    pub(super) fn conn(&self) -> AppResult<Connection> {
         let conn = Connection::open(&self.db_path)?;
         conn.pragma_update(None, "foreign_keys", "ON")?;
         Ok(conn)
@@ -75,7 +78,66 @@ impl Storage {
             );
 
             CREATE INDEX IF NOT EXISTS idx_hosts_sort_order ON hosts(sort_order);
+
+            CREATE TABLE IF NOT EXISTS lan_transfer_settings (
+                id INTEGER PRIMARY KEY CHECK(id = 1),
+                device_name TEXT NOT NULL,
+                port INTEGER NOT NULL,
+                bind_host TEXT NOT NULL DEFAULT '',
+                download_dir TEXT NOT NULL,
+                auto_start INTEGER NOT NULL,
+                security_mode TEXT NOT NULL,
+                default_permission TEXT NOT NULL,
+                max_concurrent_transfers INTEGER NOT NULL DEFAULT 3
+            );
+
+            CREATE TABLE IF NOT EXISTS lan_shared_dirs (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                path TEXT NOT NULL,
+                created_at INTEGER NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS lan_trusted_devices (
+                id TEXT PRIMARY KEY,
+                label TEXT NOT NULL,
+                ip TEXT NOT NULL,
+                created_at INTEGER NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS lan_access_logs (
+                id TEXT PRIMARY KEY,
+                created_at INTEGER NOT NULL,
+                ip TEXT NOT NULL,
+                request_type TEXT NOT NULL,
+                result TEXT NOT NULL,
+                detail TEXT
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_lan_access_logs_created_at
+            ON lan_access_logs(created_at DESC);
+
+            DROP TABLE IF EXISTS lan_transfer_history;
+
             "#,
+        )?;
+        add_column_if_missing(
+            &conn,
+            "lan_transfer_settings",
+            "bind_host",
+            "TEXT NOT NULL DEFAULT ''",
+        )?;
+        add_column_if_missing(
+            &conn,
+            "lan_transfer_settings",
+            "max_concurrent_transfers",
+            "INTEGER NOT NULL DEFAULT 3",
+        )?;
+        add_column_if_missing(
+            &conn,
+            "lan_access_logs",
+            "source",
+            "TEXT NOT NULL DEFAULT 'lan'",
         )?;
         Ok(())
     }
@@ -129,7 +191,8 @@ impl Storage {
             return Ok(());
         }
 
-        let existing_hosts: i64 = conn.query_row("SELECT COUNT(*) FROM hosts", [], |row| row.get(0))?;
+        let existing_hosts: i64 =
+            conn.query_row("SELECT COUNT(*) FROM hosts", [], |row| row.get(0))?;
         let existing_keys: i64 =
             conn.query_row("SELECT COUNT(*) FROM ssh_keys", [], |row| row.get(0))?;
         if existing_hosts > 0 || existing_keys > 0 {
@@ -237,10 +300,11 @@ impl Storage {
         let conn = self.conn()?;
         let ts = now_ms();
         let id = uuid::Uuid::new_v4().to_string();
-        let sort_order: i64 =
-            conn.query_row("SELECT COALESCE(MAX(sort_order), -1) + 1 FROM hosts", [], |row| {
-                row.get(0)
-            })?;
+        let sort_order: i64 = conn.query_row(
+            "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM hosts",
+            [],
+            |row| row.get(0),
+        )?;
         let host = Host {
             id,
             label: input.label,
@@ -424,6 +488,10 @@ impl Storage {
         conn.execute("DELETE FROM ssh_keys WHERE id = ?1", params![id])?;
         Ok(())
     }
+
+    pub fn db_path(&self) -> &Path {
+        &self.db_path
+    }
 }
 
 fn auth_type_to_db(auth_type: AuthType) -> &'static str {
@@ -441,12 +509,31 @@ fn auth_type_from_db(value: String) -> AppResult<AuthType> {
     }
 }
 
-fn bool_to_int(value: bool) -> i64 {
+pub(super) fn bool_to_int(value: bool) -> i64 {
     if value {
         1
     } else {
         0
     }
+}
+
+fn add_column_if_missing(
+    conn: &Connection,
+    table: &str,
+    column: &str,
+    definition: &str,
+) -> AppResult<()> {
+    let mut stmt = conn.prepare(&format!("PRAGMA table_info({table})"))?;
+    let columns = stmt
+        .query_map([], |row| row.get::<_, String>(1))?
+        .collect::<Result<Vec<_>, _>>()?;
+    if !columns.iter().any(|item| item == column) {
+        conn.execute(
+            &format!("ALTER TABLE {table} ADD COLUMN {column} {definition}"),
+            [],
+        )?;
+    }
+    Ok(())
 }
 
 fn host_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<Host> {

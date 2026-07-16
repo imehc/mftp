@@ -17,8 +17,10 @@ function RootLayout() {
   useEffect(() => {
     if (sessionStorage.getItem(START_ROUTE_RESOLVED_KEY)) return;
     sessionStorage.setItem(START_ROUTE_RESOLVED_KEY, "1");
-    if (window.location.pathname !== "/" || lastTool !== "ssh-sftp") return;
-    void navigate({ to: "/tools/ssh-sftp", replace: true });
+    if (window.location.pathname !== "/" || !lastTool) return;
+    const to =
+      lastTool === "lan-transfer" ? "/tools/lan-transfer" : "/tools/ssh-sftp";
+    void navigate({ to, replace: true });
   }, [lastTool, navigate]);
 
   return <Outlet />;

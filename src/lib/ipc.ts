@@ -1,6 +1,24 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { DirectoryTransferMode } from "~/store/settings";
-import type { Host, HostInput, SftpEntry, SftpFileInfo, SshKey } from "~/types";
+import type {
+  Host,
+  HostInput,
+  ActivityLog,
+  LanAuthRequest,
+  LanConnectedDevice,
+  LanDiscoveredDevice,
+  LanNetworkAddress,
+  LanSharedDir,
+  LanSharedDirInput,
+  LanTransferSettings,
+  LanTransferStatus,
+  LanTransferTask,
+  LanTrustedDevice,
+  LanTrustedDeviceInput,
+  SftpEntry,
+  SftpFileInfo,
+  SshKey,
+} from "~/types";
 
 // ---- Hosts ----
 export const hostsList = () => invoke<Host[]>("hosts_list");
@@ -21,6 +39,53 @@ export const keyImport = (
   hasPassphrase: boolean,
 ) => invoke<SshKey>("key_import", { label, sourcePath, hasPassphrase });
 export const keyDelete = (id: string) => invoke<void>("key_delete", { id });
+
+// ---- LAN Transfer ----
+export const lanTransferSettings = () =>
+  invoke<LanTransferSettings>("lan_transfer_settings");
+export const lanTransferSaveSettings = (settings: LanTransferSettings) =>
+  invoke<LanTransferSettings>("lan_transfer_save_settings", { settings });
+export const lanTransferStatus = () =>
+  invoke<LanTransferStatus>("lan_transfer_status");
+export const lanTransferNetworkAddresses = () =>
+  invoke<LanNetworkAddress[]>("lan_transfer_network_addresses");
+export const lanTransferDiscoverDevices = () =>
+  invoke<LanDiscoveredDevice[]>("lan_transfer_discover_devices");
+export const lanTransferConnectedDevices = () =>
+  invoke<LanConnectedDevice[]>("lan_transfer_connected_devices");
+export const lanTransferPendingAuthRequests = () =>
+  invoke<LanAuthRequest[]>("lan_transfer_pending_auth_requests");
+export const lanTransferApproveAuthRequest = (id: string, permission: string) =>
+  invoke<boolean>("lan_transfer_approve_auth_request", { id, permission });
+export const lanTransferRejectAuthRequest = (id: string) =>
+  invoke<boolean>("lan_transfer_reject_auth_request", { id });
+export const lanTransferDisconnectDevice = (id: string) =>
+  invoke<void>("lan_transfer_disconnect_device", { id });
+export const lanTransferTasks = () =>
+  invoke<LanTransferTask[]>("lan_transfer_tasks");
+export const lanTransferCancelTask = (id: string) =>
+  invoke<void>("lan_transfer_cancel_task", { id });
+export const lanTransferStart = () =>
+  invoke<LanTransferStatus>("lan_transfer_start");
+export const lanTransferStop = () =>
+  invoke<LanTransferStatus>("lan_transfer_stop");
+export const lanTransferSharedDirs = () =>
+  invoke<LanSharedDir[]>("lan_transfer_shared_dirs");
+export const lanTransferAddSharedDir = (input: LanSharedDirInput) =>
+  invoke<LanSharedDir>("lan_transfer_add_shared_dir", { input });
+export const lanTransferDeleteSharedDir = (id: string) =>
+  invoke<void>("lan_transfer_delete_shared_dir", { id });
+export const lanTransferTrustedDevices = () =>
+  invoke<LanTrustedDevice[]>("lan_transfer_trusted_devices");
+export const lanTransferAddTrustedDevice = (input: LanTrustedDeviceInput) =>
+  invoke<LanTrustedDevice>("lan_transfer_add_trusted_device", { input });
+export const lanTransferDeleteTrustedDevice = (id: string) =>
+  invoke<void>("lan_transfer_delete_trusted_device", { id });
+export const activityLogs = (limit?: number) =>
+  invoke<ActivityLog[]>("activity_logs", { limit: limit ?? null });
+export const activityLogsClear = () => invoke<void>("activity_logs_clear");
+export const activityLogDelete = (id: string) =>
+  invoke<void>("activity_log_delete", { id });
 
 // ---- SSH ----
 export const sshConnect = (hostId: string, passphrase?: string) =>

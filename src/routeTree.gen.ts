@@ -9,9 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LogsRouteImport } from './routes/logs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
+import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 
+const LogsRoute = LogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -22,35 +29,55 @@ const ToolsSshSftpRoute = ToolsSshSftpRouteImport.update({
   path: '/tools/ssh-sftp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsLanTransferRoute = ToolsLanTransferRouteImport.update({
+  id: '/tools/lan-transfer',
+  path: '/tools/lan-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/logs': typeof LogsRoute
+  '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/logs': typeof LogsRoute
+  '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/logs': typeof LogsRoute
+  '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tools/ssh-sftp'
+  fullPaths: '/' | '/logs' | '/tools/lan-transfer' | '/tools/ssh-sftp'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tools/ssh-sftp'
-  id: '__root__' | '/' | '/tools/ssh-sftp'
+  to: '/' | '/logs' | '/tools/lan-transfer' | '/tools/ssh-sftp'
+  id: '__root__' | '/' | '/logs' | '/tools/lan-transfer' | '/tools/ssh-sftp'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LogsRoute: typeof LogsRoute
+  ToolsLanTransferRoute: typeof ToolsLanTransferRoute
   ToolsSshSftpRoute: typeof ToolsSshSftpRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/logs': {
+      id: '/logs'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof LogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +92,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsSshSftpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/lan-transfer': {
+      id: '/tools/lan-transfer'
+      path: '/tools/lan-transfer'
+      fullPath: '/tools/lan-transfer'
+      preLoaderRoute: typeof ToolsLanTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LogsRoute: LogsRoute,
+  ToolsLanTransferRoute: ToolsLanTransferRoute,
   ToolsSshSftpRoute: ToolsSshSftpRoute,
 }
 export const routeTree = rootRouteImport

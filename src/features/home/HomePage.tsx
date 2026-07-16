@@ -2,10 +2,13 @@ import { Link } from "@tanstack/react-router";
 import {
   Activity,
   ArrowRight,
+  FileClock,
   Home,
   TerminalSquare,
+  Wifi,
 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import AppSettingsMenu from "~/features/settings/AppSettingsMenu";
 import TransferPanel from "~/features/transfers/TransferPanel";
 import { useHostsStore } from "~/store/hosts";
@@ -59,6 +62,12 @@ export default function HomePage() {
             {failedTransfers.length > 0 ? (
               <Badge variant="destructive">{failedTransfers.length} 失败</Badge>
             ) : null}
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/logs" preload="viewport">
+                <FileClock data-icon="inline-start" />
+                日志
+              </Link>
+            </Button>
             <AppSettingsMenu />
           </div>
         </header>
@@ -83,6 +92,28 @@ export default function HomePage() {
                       <Badge variant="outline">{hosts.length} 主机</Badge>
                       <Badge variant="outline">{activeSessions.length} 连接</Badge>
                       <Badge variant="outline">{runningTransfers.length} 传输</Badge>
+                    </span>
+                  </span>
+                </div>
+                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+              </Link>
+              <Link
+                to="/tools/lan-transfer"
+                preload="viewport"
+                onClick={() => setLastTool("lan-transfer")}
+                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
+                    <Wifi className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">
+                      局域网传输
+                    </span>
+                    <span className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge variant="outline">HTTP</Badge>
+                      <Badge variant="outline">浏览器访问</Badge>
                     </span>
                   </span>
                 </div>

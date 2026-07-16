@@ -1,9 +1,11 @@
 mod commands;
 mod error;
+mod lan_transfer;
 mod models;
 mod ssh;
 mod storage;
 
+use lan_transfer::LanTransferManager;
 use ssh::Manager;
 use std::fs;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -16,6 +18,7 @@ use tauri::Manager as _;
 pub struct AppState {
     pub storage: Storage,
     pub manager: Arc<Manager>,
+    pub lan_transfer: Arc<LanTransferManager>,
 }
 
 fn cleanup_stale_local_transfer_files() {
@@ -47,15 +50,40 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let temp_journal = data_dir.join("transfer-temp-files.json");
             let storage = Storage::new(data_dir).map_err(|e| e.to_string())?;
             let manager = Manager::new(temp_journal);
+            let lan_transfer = Arc::new(LanTransferManager::new());
+            if let Ok(settings) = storage.lan_transfer_settings() {
+                if settings.auto_start {
+                    let shares = storage.list_lan_shared_dirs().unwrap_or_default();
+                    let trusted_ips = storage
+                        .list_lan_trusted_devices()
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|device| device.ip)
+                        .collect();
+                    if let Err(error) = lan_transfer.start(
+                        settings,
+                        shares,
+                        trusted_ips,
+                        storage.db_path().to_path_buf(),
+                    ) {
+                        eprintln!("failed to auto start LAN transfer: {error}");
+                    }
+                }
+            }
             app.manage(AppState {
                 storage,
                 manager: Arc::new(manager),
+                lan_transfer,
             });
             Ok(())
         })
@@ -69,6 +97,29 @@ pub fn run() {
             commands::keys_list,
             commands::key_import,
             commands::key_delete,
+            commands::lan_transfer_settings,
+            commands::lan_transfer_save_settings,
+            commands::lan_transfer_status,
+            commands::lan_transfer_network_addresses,
+            commands::lan_transfer_discover_devices,
+            commands::lan_transfer_connected_devices,
+            commands::lan_transfer_pending_auth_requests,
+            commands::lan_transfer_approve_auth_request,
+            commands::lan_transfer_reject_auth_request,
+            commands::lan_transfer_disconnect_device,
+            commands::lan_transfer_tasks,
+            commands::lan_transfer_cancel_task,
+            commands::lan_transfer_start,
+            commands::lan_transfer_stop,
+            commands::lan_transfer_shared_dirs,
+            commands::lan_transfer_add_shared_dir,
+            commands::lan_transfer_delete_shared_dir,
+            commands::lan_transfer_trusted_devices,
+            commands::lan_transfer_add_trusted_device,
+            commands::lan_transfer_delete_trusted_device,
+            commands::activity_logs,
+            commands::activity_logs_clear,
+            commands::activity_log_delete,
             commands::ssh_connect,
             commands::ssh_open_shell,
             commands::ssh_write,
@@ -106,6 +157,7 @@ pub fn run() {
         }
         if let Some(state) = app_handle.try_state::<AppState>() {
             state.manager.shutdown_all();
+            state.lan_transfer.stop();
         }
         cleanup_stale_local_transfer_files();
     });

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import {
   Archive,
   Download,
@@ -10,6 +12,7 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -63,6 +66,8 @@ const updateLabels: Record<UpdaterStatus, string> = {
 
 export default function AppSettingsMenu() {
   const { theme = "system", setTheme } = useTheme();
+  const [autostartEnabled, setAutostartEnabled] = useState(false);
+  const [autostartBusy, setAutostartBusy] = useState(false);
   const directoryTransferMode = useSettingsStore(
     (s) => s.directoryTransferMode,
   );
@@ -76,12 +81,43 @@ export default function AppSettingsMenu() {
   const checkingUpdate = updaterStatus === "checking";
   const restarting = updaterStatus === "restarting";
 
+  useEffect(() => {
+    void refreshAutostart();
+  }, []);
+
+  async function refreshAutostart() {
+    try {
+      setAutostartEnabled(await isEnabled());
+    } catch {
+      setAutostartEnabled(false);
+    }
+  }
+
   function onCheckUpdate() {
     if (updaterStatus === "ready") {
       void restartToApplyUpdate();
       return;
     }
     void checkForUpdateManually();
+  }
+
+  async function toggleAutostart() {
+    setAutostartBusy(true);
+    try {
+      if (autostartEnabled) {
+        await disable();
+        setAutostartEnabled(false);
+        toast.success("已关闭开机自启");
+      } else {
+        await enable();
+        setAutostartEnabled(true);
+        toast.success("已开启开机自启");
+      }
+    } catch (error) {
+      toast.error(String(error));
+    } finally {
+      setAutostartBusy(false);
+    }
   }
 
   return (
@@ -94,6 +130,16 @@ export default function AppSettingsMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-44 whitespace-nowrap">
         <DropdownMenuGroup>
+          <DropdownMenuItem
+            disabled={autostartBusy}
+            onSelect={(event) => {
+              event.preventDefault();
+              void toggleAutostart();
+            }}
+          >
+            <Monitor />
+            {autostartEnabled ? "关闭开机自启" : "开启开机自启"}
+          </DropdownMenuItem>
           <DropdownMenuItem
             disabled={checkingUpdate || restarting}
             onSelect={onCheckUpdate}

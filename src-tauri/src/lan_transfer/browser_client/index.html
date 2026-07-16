@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#09090b" />
+  <title>MFTP 局域网传输</title>
+  <link rel="stylesheet" href="/browser.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="app-header">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">M</div>
+        <div class="brand-copy">
+          <h1>{{DEVICE_NAME}}</h1>
+          <p>MFTP 局域网传输</p>
+        </div>
+      </div>
+      <div class="header-status" aria-label="服务状态">
+        <span class="badge badge-success"><span class="status-dot" aria-hidden="true"></span>服务运行中</span>
+        <span id="permission" class="badge">读写</span>
+      </div>
+    </header>
+
+    <div class="auth-shell">
+      {{AUTH_BLOCK}}
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </div>
+
+    <div class="workspace">
+      <section id="shares-panel" class="panel panel-main">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">文件空间</p>
+            <h2 class="panel-title">共享目录</h2>
+          </div>
+          <button id="refresh-shares" class="button button-ghost" type="button">刷新</button>
+        </div>
+        <div class="panel-body">
+          <div id="shares" class="shares"></div>
+        </div>
+      </section>
+
+      <aside id="upload-panel" class="panel panel-upload">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">发送到设备</p>
+            <h2 class="panel-title">上传文件</h2>
+          </div>
+          <span class="panel-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
+          </span>
+        </div>
+        <div class="panel-body">
+          <div class="upload">
+            <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="点击选择文件，或拖拽文件到这里">
+              <span class="dropzone-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L7 8m5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+              </span>
+              <strong>点击选择文件，或拖拽文件到这里</strong>
+              <span>支持一次选择多个文件</span>
+              <input id="file" type="file" multiple />
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section id="transfers-panel" class="panel transfers-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">实时状态</p>
+          <h2 class="panel-title">传输任务</h2>
+        </div>
+        <button id="clear-transfers" class="button button-ghost" type="button">清除完成项</button>
+      </div>
+      <div class="panel-body">
+        <div id="compat" class="compat"></div>
+        <div id="transfers" class="transfer-list"></div>
+      </div>
+    </section>
+  </main>
+  <script src="/browser.js" defer></script>
+</body>
+</html>

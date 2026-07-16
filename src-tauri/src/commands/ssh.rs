@@ -1,4 +1,4 @@
-use super::run_blocking;
+use super::{record_operation, run_blocking};
 use crate::error::{AppError, AppResult};
 use crate::models::{AuthType, Host};
 use crate::ssh::{resolve_auth_material, AuthMaterial, AuthMethod};
@@ -47,6 +47,13 @@ pub fn ssh_connect(
     let mat = build_auth(&state, &host, passphrase)?;
     let session_id = uuid::Uuid::new_v4().to_string();
     state.manager.register(&session_id, mat);
+    let _ = state.storage.record_activity_log(
+        "ssh",
+        &host.host,
+        "connect",
+        "success",
+        Some(&host.label),
+    );
     Ok(session_id)
 }
 
@@ -59,7 +66,17 @@ pub async fn ssh_open_shell(
     rows: u32,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || manager.open_shell(app, &session_id, cols, rows)).await
+    let log_session = session_id.clone();
+    let result = run_blocking(move || manager.open_shell(app, &session_id, cols, rows)).await;
+    record_operation(
+        &state.storage,
+        "ssh",
+        &log_session,
+        "open_shell",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -83,9 +100,19 @@ pub fn ssh_resize(
 #[tauri::command]
 pub async fn ssh_disconnect(state: State<'_, AppState>, session_id: String) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let result = run_blocking(move || {
         manager.disconnect(&session_id);
         Ok(())
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "ssh",
+        &log_session,
+        "disconnect",
+        None,
+        &result,
+    );
+    result
 }

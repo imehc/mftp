@@ -5,11 +5,14 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutFooter,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import {
   Field,
   FieldGroup,
@@ -110,12 +113,12 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden sm:max-w-md">
-        <DialogHeader>
+      <DialogLayoutContent className="sm:max-w-md">
+        <DialogLayoutHeader>
           <DialogTitle>{host ? "编辑主机" : "新建主机"}</DialogTitle>
-        </DialogHeader>
+        </DialogLayoutHeader>
 
-        <div className="min-h-0 overflow-y-auto pr-1">
+        <DialogLayoutBody className="pr-1">
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="host-label">名称</FieldLabel>
@@ -253,17 +256,17 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
               </FieldDescription>
             ) : null}
           </FieldGroup>
-        </div>
+        </DialogLayoutBody>
 
-        <DialogFooter>
+        <DialogLayoutFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             取消
           </Button>
           <Button onClick={save} disabled={saving}>
             {saving ? "保存中…" : "保存"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </DialogLayoutFooter>
+      </DialogLayoutContent>
     </Dialog>
   );
 }

@@ -1,12 +1,15 @@
 use crate::error::{AppError, AppResult};
+use crate::storage::Storage;
 
 mod hosts;
 mod keys;
+mod lan_transfer;
 mod sftp;
 mod ssh;
 
 pub use hosts::*;
 pub use keys::*;
+pub use lan_transfer::*;
 pub use sftp::*;
 pub use ssh::*;
 
@@ -18,4 +21,19 @@ where
     tauri::async_runtime::spawn_blocking(f)
         .await
         .map_err(|e| AppError(format!("background task failed: {e}")))?
+}
+
+pub(crate) fn record_operation<T>(
+    storage: &Storage,
+    source: &str,
+    address: &str,
+    action: &str,
+    detail: Option<&str>,
+    result: &AppResult<T>,
+) {
+    let (status, error_detail) = match result {
+        Ok(_) => ("success", None),
+        Err(error) => ("failed", Some(error.0.as_str())),
+    };
+    let _ = storage.record_activity_log(source, address, action, status, error_detail.or(detail));
 }

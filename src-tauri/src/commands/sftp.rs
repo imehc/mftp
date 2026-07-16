@@ -1,4 +1,4 @@
-use super::run_blocking;
+use super::{record_operation, run_blocking};
 use crate::error::AppResult;
 use crate::models::{SftpEntry, SftpFileInfo};
 use crate::ssh::DirectoryTransferMode;
@@ -48,7 +48,18 @@ pub async fn sftp_mkdir(
     path: String,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || manager.sftp_mkdir(&session_id, &path)).await
+    let log_session = session_id.clone();
+    let log_path = path.clone();
+    let result = run_blocking(move || manager.sftp_mkdir(&session_id, &path)).await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "mkdir",
+        Some(&log_path),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -59,7 +70,18 @@ pub async fn sftp_rename(
     to: String,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || manager.sftp_rename(&session_id, &from, &to)).await
+    let log_session = session_id.clone();
+    let detail = format!("{from} → {to}");
+    let result = run_blocking(move || manager.sftp_rename(&session_id, &from, &to)).await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "rename",
+        Some(&detail),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -72,7 +94,9 @@ pub async fn sftp_delete(
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let log_path = path.clone();
+    let result = run_blocking(move || {
         manager.sftp_delete(
             &session_id,
             &path,
@@ -81,7 +105,16 @@ pub async fn sftp_delete(
             transfer_id.as_deref(),
         )
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "delete",
+        Some(&log_path),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -94,7 +127,9 @@ pub async fn sftp_download(
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let detail = format!("{remote} → {local}");
+    let result = run_blocking(move || {
         manager.sftp_download(
             &session_id,
             &remote,
@@ -103,7 +138,16 @@ pub async fn sftp_download(
             transfer_id.as_deref(),
         )
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "download",
+        Some(&detail),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -116,7 +160,9 @@ pub async fn sftp_upload(
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let detail = format!("{local} → {remote}");
+    let result = run_blocking(move || {
         manager.sftp_upload(
             &session_id,
             &local,
@@ -125,7 +171,16 @@ pub async fn sftp_upload(
             transfer_id.as_deref(),
         )
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "upload",
+        Some(&detail),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -150,7 +205,9 @@ pub async fn sftp_upload_dir(
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let detail = format!("{local_dir} → {remote_parent}/{remote_name}");
+    let result = run_blocking(move || {
         manager.sftp_upload_dir(
             &session_id,
             &local_dir,
@@ -161,7 +218,16 @@ pub async fn sftp_upload_dir(
             transfer_id.as_deref(),
         )
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "upload_dir",
+        Some(&detail),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -175,7 +241,9 @@ pub async fn sftp_download_dir(
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let detail = format!("{remote_dir} → {local_dir}");
+    let result = run_blocking(move || {
         manager.sftp_download_dir(
             &session_id,
             &remote_dir,
@@ -185,7 +253,16 @@ pub async fn sftp_download_dir(
             transfer_id.as_deref(),
         )
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "download_dir",
+        Some(&detail),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -219,7 +296,9 @@ pub async fn sftp_extract(
     out_name: Option<String>,
 ) -> AppResult<()> {
     let manager = state.manager.clone();
-    run_blocking(move || {
+    let log_session = session_id.clone();
+    let detail = format!("{remote_archive} → {remote_parent}");
+    let result = run_blocking(move || {
         manager.sftp_extract(
             &session_id,
             &remote_archive,
@@ -227,5 +306,14 @@ pub async fn sftp_extract(
             out_name.as_deref(),
         )
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "sftp",
+        &log_session,
+        "extract",
+        Some(&detail),
+        &result,
+    );
+    result
 }
