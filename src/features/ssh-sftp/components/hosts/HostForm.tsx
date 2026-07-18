@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { Host, HostInput } from "~/types";
+import { useForm } from "@tanstack/react-form";
+import type { Host } from "~/types";
 import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -14,7 +15,7 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 import {
-  Field,
+  Field as UiField,
   FieldGroup,
   FieldLabel,
   FieldDescription,
@@ -28,6 +29,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { firstFormError } from "~/lib/form-errors";
+import {
+  hostFormSchema,
+  hostFormValuesToInput,
+  hostToFormValues,
+} from "~/features/ssh-sftp/components/hosts/HostForm.schema";
 
 interface Props {
   open: boolean;
@@ -36,80 +43,35 @@ interface Props {
   host: Host | null;
 }
 
-const empty: HostInput = {
-  label: "",
-  host: "",
-  port: 22,
-  username: "",
-  authType: "password",
-  password: "",
-  keyId: null,
-  defaultPath: "",
-};
-
 export default function HostForm({ open, onOpenChange, host }: Props) {
   const keys = useHostsStore((s) => s.keys);
   const createHost = useHostsStore((s) => s.createHost);
   const updateHost = useHostsStore((s) => s.updateHost);
 
-  const [form, setForm] = useState<HostInput>(empty);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const form = useForm({
+    defaultValues: hostToFormValues(null),
+    validators: {
+      onSubmit: hostFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setSubmitError(null);
+      try {
+        const payload = hostFormValuesToInput(value);
+        if (host) await updateHost(host.id, payload);
+        else await createHost(payload);
+        onOpenChange(false);
+      } catch (e) {
+        setSubmitError(String(e));
+      }
+    },
+  });
 
   useEffect(() => {
     if (!open) return;
-    if (host) {
-      setForm({
-        label: host.label,
-        host: host.host,
-        port: host.port,
-        username: host.username,
-        authType: host.authType,
-        password: host.password ?? "",
-        keyId: host.keyId ?? null,
-        defaultPath: host.defaultPath ?? "",
-      });
-    } else {
-      setForm(empty);
-    }
-    setError(null);
-  }, [open, host]);
-
-  const set = <K extends keyof HostInput>(key: K, value: HostInput[K]) =>
-    setForm((f) => ({ ...f, [key]: value }));
-
-  async function save() {
-    if (!form.label.trim() || !form.host.trim()) {
-      setError("名称、地址为必填项");
-      return;
-    }
-    if (form.authType === "key" && !form.keyId) {
-      setError("请选择一个密钥，或先在密钥管理中导入");
-      return;
-    }
-    setSaving(true);
-    setError(null);
-    try {
-      const payload: HostInput = {
-        ...form,
-        label: form.label.trim(),
-        host: form.host.trim(),
-        username: form.username.trim(),
-        password: form.authType === "password" ? form.password : null,
-        keyId: form.authType === "key" ? form.keyId : null,
-        defaultPath: form.defaultPath?.trim() ? form.defaultPath.trim() : null,
-      };
-      if (host) await updateHost(host.id, payload);
-      else await createHost(payload);
-      onOpenChange(false);
-    } catch (e) {
-      setError(String(e));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const missingKeys = form.authType === "key" && keys.length === 0;
+    form.reset(hostToFormValues(host));
+    setSubmitError(null);
+  }, [form, host, open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -120,139 +82,202 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
 
         <DialogLayoutBody className="pr-1">
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="host-label">名称</FieldLabel>
-              <Input
-                id="host-label"
-                value={form.label}
-                onChange={(e) => set("label", e.target.value)}
-                placeholder="My Server"
-                autoCapitalize="off"
-                autoCorrect="off"
-                autoComplete="off"
-                spellCheck={false}
-              />
-            </Field>
+            <form.Field name="label">
+              {(field) => {
+                const error = firstFormError(field.state.meta.errors);
+                return (
+                  <UiField data-invalid={!!error}>
+                    <FieldLabel htmlFor="host-label">名称</FieldLabel>
+                    <Input
+                      id="host-label"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="My Server"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-invalid={!!error}
+                    />
+                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  </UiField>
+                );
+              }}
+            </form.Field>
 
             <div className="grid grid-cols-[1fr_100px] gap-3">
-              <Field>
-                <FieldLabel htmlFor="host-addr">地址</FieldLabel>
-                <Input
-                  id="host-addr"
-                  value={form.host}
-                  onChange={(e) => set("host", e.target.value)}
-                  placeholder="example.com"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="host-port">端口</FieldLabel>
-                <Input
-                  id="host-port"
-                  type="number"
-                  value={form.port}
-                  onChange={(e) => set("port", Number(e.target.value) || 22)}
-                />
-              </Field>
+              <form.Field name="host">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <UiField data-invalid={!!error}>
+                      <FieldLabel htmlFor="host-addr">地址</FieldLabel>
+                      <Input
+                        id="host-addr"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="example.com"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        autoComplete="off"
+                        spellCheck={false}
+                        aria-invalid={!!error}
+                      />
+                      {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    </UiField>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="port">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <UiField data-invalid={!!error}>
+                      <FieldLabel htmlFor="host-port">端口</FieldLabel>
+                      <Input
+                        id="host-port"
+                        type="number"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(Number(e.target.value) || 22)}
+                        aria-invalid={!!error}
+                      />
+                      {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    </UiField>
+                  );
+                }}
+              </form.Field>
             </div>
 
-            <Field>
-              <FieldLabel htmlFor="host-user">用户名</FieldLabel>
-              <Input
-                id="host-user"
-                value={form.username}
-                onChange={(e) => set("username", e.target.value)}
-                placeholder="留空则使用 SSH 配置或本机用户"
-                autoCapitalize="off"
-                autoCorrect="off"
-                autoComplete="off"
-                spellCheck={false}
-              />
-              <FieldDescription>
-                留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。
-              </FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>认证方式</FieldLabel>
-              <ToggleGroup
-                type="single"
-                value={form.authType}
-                onValueChange={(v) =>
-                  v && set("authType", v as HostInput["authType"])
-                }
-                variant="outline"
-                className="w-full"
-              >
-                <ToggleGroupItem value="password" className="flex-1">
-                  密码
-                </ToggleGroupItem>
-                <ToggleGroupItem value="key" className="flex-1">
-                  密钥
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </Field>
-
-            {form.authType === "password" ? (
-              <Field>
-                <FieldLabel htmlFor="host-pw">密码</FieldLabel>
-                <Input
-                  id="host-pw"
-                  type="password"
-                  value={form.password ?? ""}
-                  onChange={(e) => set("password", e.target.value)}
-                  placeholder="••••••••"
-                />
-              </Field>
-            ) : (
-              <Field>
-                <FieldLabel>密钥</FieldLabel>
-                <Select
-                  value={form.keyId ?? ""}
-                  onValueChange={(v) => set("keyId", v || null)}
-                  disabled={missingKeys}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="选择密钥…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {keys.map((k) => (
-                        <SelectItem key={k.id} value={k.id}>
-                          {k.label}
-                          {k.hasPassphrase ? " (需口令)" : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                {missingKeys ? (
+            <form.Field name="username">
+              {(field) => (
+                <UiField>
+                  <FieldLabel htmlFor="host-user">用户名</FieldLabel>
+                  <Input
+                    id="host-user"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="留空则使用 SSH 配置或本机用户"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
                   <FieldDescription>
-                    暂无密钥，请先在密钥管理中导入。
+                    留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。
                   </FieldDescription>
-                ) : null}
-              </Field>
-            )}
+                </UiField>
+              )}
+            </form.Field>
 
-            <Field>
-              <FieldLabel htmlFor="host-defpath">默认目录</FieldLabel>
-              <Input
-                id="host-defpath"
-                value={form.defaultPath ?? ""}
-                onChange={(e) => set("defaultPath", e.target.value)}
-                placeholder="/var/www（留空则用主目录）"
-              />
-              <FieldDescription>
-                打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。
-              </FieldDescription>
-            </Field>
+            <form.Field name="authType">
+              {(field) => (
+                <UiField>
+                  <FieldLabel>认证方式</FieldLabel>
+                  <ToggleGroup
+                    type="single"
+                    value={field.state.value}
+                    onValueChange={(v) => {
+                      if (v === "password" || v === "key") field.handleChange(v);
+                    }}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <ToggleGroupItem value="password" className="flex-1">
+                      密码
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="key" className="flex-1">
+                      密钥
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </UiField>
+              )}
+            </form.Field>
 
-            {error ? (
+            <form.Subscribe selector={(state) => state.values.authType}>
+              {(authType) =>
+                authType === "password" ? (
+                  <form.Field name="password">
+                    {(field) => (
+                      <UiField>
+                        <FieldLabel htmlFor="host-pw">密码</FieldLabel>
+                        <Input
+                          id="host-pw"
+                          type="password"
+                          value={field.state.value ?? ""}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="••••••••"
+                        />
+                      </UiField>
+                    )}
+                  </form.Field>
+                ) : (
+                  <form.Field name="keyId">
+                    {(field) => {
+                      const missingKeys = keys.length === 0;
+                      const error = firstFormError(field.state.meta.errors);
+                      return (
+                        <UiField data-invalid={!!error}>
+                          <FieldLabel>密钥</FieldLabel>
+                          <Select
+                            value={field.state.value ?? ""}
+                            onValueChange={(v) => field.handleChange(v || null)}
+                            disabled={missingKeys}
+                          >
+                            <SelectTrigger className="w-full" aria-invalid={!!error}>
+                              <SelectValue placeholder="选择密钥…" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                {keys.map((k) => (
+                                  <SelectItem key={k.id} value={k.id}>
+                                    {k.label}
+                                    {k.hasPassphrase ? " (需口令)" : ""}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          {missingKeys ? (
+                            <FieldDescription>
+                              暂无密钥，请先在密钥管理中导入。
+                            </FieldDescription>
+                          ) : error ? (
+                            <FieldDescription>{error}</FieldDescription>
+                          ) : null}
+                        </UiField>
+                      );
+                    }}
+                  </form.Field>
+                )
+              }
+            </form.Subscribe>
+
+            <form.Field name="defaultPath">
+              {(field) => (
+                <UiField>
+                  <FieldLabel htmlFor="host-defpath">默认目录</FieldLabel>
+                  <Input
+                    id="host-defpath"
+                    value={field.state.value ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="/var/www（留空则用主目录）"
+                  />
+                  <FieldDescription>
+                    打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。
+                  </FieldDescription>
+                </UiField>
+              )}
+            </form.Field>
+
+            {submitError ? (
               <FieldDescription className="text-destructive">
-                {error}
+                {submitError}
               </FieldDescription>
             ) : null}
           </FieldGroup>
@@ -262,9 +287,13 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             取消
           </Button>
-          <Button onClick={save} disabled={saving}>
-            {saving ? "保存中…" : "保存"}
-          </Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button onClick={() => void form.handleSubmit()} disabled={isSubmitting}>
+                {isSubmitting ? "保存中…" : "保存"}
+              </Button>
+            )}
+          </form.Subscribe>
         </DialogLayoutFooter>
       </DialogLayoutContent>
     </Dialog>

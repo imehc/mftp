@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -8,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { FieldDescription } from "~/components/ui/field";
+import { firstFormError } from "~/lib/form-errors";
 
 interface Props {
   open: boolean;
@@ -29,11 +33,21 @@ export default function PromptDialog({
   onOpenChange,
   onConfirm,
 }: Props) {
-  const [value, setValue] = useState(initialValue);
+  const form = useForm({
+    defaultValues: { value: initialValue },
+    validators: {
+      onSubmit: z.object({
+        value: z.string().trim().min(1, "请输入内容"),
+      }),
+    },
+    onSubmit: ({ value }) => {
+      onConfirm(value.value.trim());
+    },
+  });
 
   useEffect(() => {
-    if (open) setValue(initialValue);
-  }, [open, initialValue]);
+    if (open) form.reset({ value: initialValue });
+  }, [form, open, initialValue]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,17 +59,32 @@ export default function PromptDialog({
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            const v = value.trim();
-            if (v) onConfirm(v);
+            void form.handleSubmit();
           }}
           className="flex flex-col gap-3"
         >
-          <Input
-            autoFocus
-            value={value}
-            placeholder={placeholder}
-            onChange={(e) => setValue(e.target.value)}
-          />
+          <form.Field name="value">
+            {(field) => {
+              const error = firstFormError(field.state.meta.errors);
+              return (
+                <div className="flex flex-col gap-1.5">
+                  <Input
+                    autoFocus
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    placeholder={placeholder}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={!!error}
+                  />
+                  {error ? (
+                    <FieldDescription className="text-destructive">
+                      {error}
+                    </FieldDescription>
+                  ) : null}
+                </div>
+              );
+            }}
+          </form.Field>
           <DialogFooter>
             <Button
               type="button"

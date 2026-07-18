@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -15,6 +17,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "~/components/ui/dialog";
+import { firstFormError } from "~/lib/form-errors";
 
 export interface ConflictResolution {
   incomingName: string;
@@ -46,23 +49,74 @@ export default function ConflictDialog({
   onOpenChange,
   onResolve,
 }: Props) {
-  const [incomingValue, setIncomingValue] = useState(name);
-  const [existingValue, setExistingValue] = useState(name);
+  const schema = useMemo(
+    () =>
+      z
+        .object({
+          incomingName: z.string(),
+          existingName: z.string(),
+        })
+        .superRefine((value, ctx) => {
+          const incomingName = value.incomingName.trim();
+          const existingName = value.existingName.trim();
+          const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
+          const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
+          if (incomingInvalid) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["incomingName"],
+              message: "名称不能为空，且不能包含斜杠。",
+            });
+          }
+          if (existingInvalid) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["existingName"],
+              message: "名称不能为空，且不能包含斜杠。",
+            });
+          }
+          if (incomingName !== "" && incomingName === existingName) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["existingName"],
+              message: "两个名称不能相同。",
+            });
+          }
+          if (incomingName === name && existingName === name) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["existingName"],
+              message: "至少修改其中一个名称。",
+            });
+          }
+        }),
+    [name],
+  );
+
+  const form = useForm({
+    defaultValues: {
+      incomingName: name,
+      existingName: name,
+    },
+    validators: {
+      onSubmit: schema,
+    },
+    onSubmit: ({ value }) => {
+      onResolve({
+        incomingName: value.incomingName.trim(),
+        existingName: value.existingName.trim(),
+      });
+    },
+  });
 
   useEffect(() => {
     if (open) {
-      setIncomingValue(initialIncomingName ?? name);
-      setExistingValue(initialExistingName ?? name);
+      form.reset({
+        incomingName: initialIncomingName ?? name,
+        existingName: initialExistingName ?? name,
+      });
     }
-  }, [open, name, initialIncomingName, initialExistingName]);
-
-  const incomingName = incomingValue.trim();
-  const existingName = existingValue.trim();
-  const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
-  const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
-  const unchanged = incomingName === name && existingName === name;
-  const duplicated = incomingName !== "" && incomingName === existingName;
-  const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
+  }, [form, open, name, initialIncomingName, initialExistingName]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -78,43 +132,72 @@ export default function ConflictDialog({
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!invalid) onResolve({ incomingName, existingName });
+            void form.handleSubmit();
           }}
         >
           <FieldGroup>
-            <Field data-invalid={incomingInvalid || duplicated}>
-              <FieldLabel htmlFor="conflict-incoming-name">
-                {incomingLabel}名称
-              </FieldLabel>
-              <Input
-                id="conflict-incoming-name"
-                autoFocus
-                value={incomingValue}
-                onChange={(e) => setIncomingValue(e.target.value)}
-                aria-invalid={incomingInvalid || duplicated}
-              />
-            </Field>
+            <form.Field name="incomingName">
+              {(field) => {
+                const error = firstFormError(field.state.meta.errors);
+                return (
+                  <Field data-invalid={!!error}>
+                    <FieldLabel htmlFor="conflict-incoming-name">
+                      {incomingLabel}名称
+                    </FieldLabel>
+                    <Input
+                      id="conflict-incoming-name"
+                      autoFocus
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={!!error}
+                    />
+                  </Field>
+                );
+              }}
+            </form.Field>
 
-            <Field data-invalid={existingInvalid || duplicated}>
-              <FieldLabel htmlFor="conflict-existing-name">
-                远端已有名称
-              </FieldLabel>
-              <Input
-                id="conflict-existing-name"
-                value={existingValue}
-                onChange={(e) => setExistingValue(e.target.value)}
-                aria-invalid={existingInvalid || duplicated}
-              />
-              <FieldDescription className={invalid ? "text-destructive" : ""}>
-                {unchanged
-                  ? "至少修改其中一个名称。"
-                  : duplicated
-                    ? "两个名称不能相同。"
-                    : incomingInvalid || existingInvalid
-                      ? "名称不能为空，且不能包含斜杠。"
-                      : "确认后会按上面的名称继续。"}
-              </FieldDescription>
-            </Field>
+            <form.Field name="existingName">
+              {(field) => {
+                const error = firstFormError(field.state.meta.errors);
+                return (
+                  <Field data-invalid={!!error}>
+                    <FieldLabel htmlFor="conflict-existing-name">
+                      远端已有名称
+                    </FieldLabel>
+                    <Input
+                      id="conflict-existing-name"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={!!error}
+                    />
+                    <form.Subscribe selector={(state) => state.values}>
+                      {(values) => {
+                        const incomingName = values.incomingName.trim();
+                        const existingName = values.existingName.trim();
+                        const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
+                        const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
+                        const unchanged = incomingName === name && existingName === name;
+                        const duplicated = incomingName !== "" && incomingName === existingName;
+                        const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
+                        return (
+                          <FieldDescription className={invalid ? "text-destructive" : ""}>
+                            {unchanged
+                              ? "至少修改其中一个名称。"
+                              : duplicated
+                                ? "两个名称不能相同。"
+                                : incomingInvalid || existingInvalid
+                                  ? "名称不能为空，且不能包含斜杠。"
+                                  : "确认后会按上面的名称继续。"}
+                          </FieldDescription>
+                        );
+                      }}
+                    </form.Subscribe>
+                  </Field>
+                );
+              }}
+            </form.Field>
 
             <DialogFooter>
               <Button
@@ -124,9 +207,22 @@ export default function ConflictDialog({
               >
                 取消
               </Button>
-              <Button type="submit" disabled={invalid}>
-                确认
-              </Button>
+              <form.Subscribe selector={(state) => state.values}>
+                {(values) => {
+                  const incomingName = values.incomingName.trim();
+                  const existingName = values.existingName.trim();
+                  const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
+                  const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
+                  const unchanged = incomingName === name && existingName === name;
+                  const duplicated = incomingName !== "" && incomingName === existingName;
+                  const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
+                  return (
+                    <Button type="submit" disabled={invalid}>
+                      确认
+                    </Button>
+                  );
+                }}
+              </form.Subscribe>
             </DialogFooter>
           </FieldGroup>
         </form>

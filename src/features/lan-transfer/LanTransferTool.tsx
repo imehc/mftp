@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { open } from "@tauri-apps/plugin-dialog";
 import {
   Copy,
-  FolderOpen,
   Home,
   LoaderCircle,
   Power,
@@ -16,17 +15,9 @@ import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
-import { Input } from "~/components/ui/input";
 import LanDiscoveredDevicesPanel from "~/features/lan-transfer/LanDiscoveredDevicesPanel";
 import LanPendingAuthRequestsPanel from "~/features/lan-transfer/LanPendingAuthRequestsPanel";
+import LanShareDialog from "~/features/lan-transfer/LanShareDialog";
 import LanSharedDirsSection from "~/features/lan-transfer/LanSharedDirsSection";
 import LanTransferSidebar from "~/features/lan-transfer/LanTransferSidebar";
 import LanTransferSettingsDialog from "~/features/lan-transfer/LanTransferSettingsDialog";
@@ -41,9 +32,11 @@ import type {
   LanConnectedDevice,
   LanNetworkAddress,
   LanSharedDir,
+  LanSharedDirInput,
   LanTransferSettings,
   LanTransferStatus,
   LanTransferTask,
+  LanTrustedDeviceInput,
   LanTrustedDevice,
   LanAuthRequest,
 } from "~/types";
@@ -70,12 +63,6 @@ export default function LanTransferTool() {
   const [authRequests, setAuthRequests] = useState<LanAuthRequest[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [draftSettings, setDraftSettings] =
-    useState<LanTransferSettings>(DEFAULT_SETTINGS);
-  const [shareName, setShareName] = useState("");
-  const [sharePath, setSharePath] = useState("");
-  const [trustedLabel, setTrustedLabel] = useState("");
-  const [trustedIp, setTrustedIp] = useState("");
   const [busy, setBusy] = useState(false);
 
   const running = status?.running ?? false;
@@ -88,10 +75,6 @@ export default function LanTransferTool() {
   const bindHostUnavailable = Boolean(
     settings?.bindHost &&
       !addresses.some((address) => address.ip === settings.bindHost),
-  );
-  const draftBindHostUnavailable = Boolean(
-    draftSettings.bindHost &&
-      !addresses.some((address) => address.ip === draftSettings.bindHost),
   );
 
   useEffect(() => {
@@ -115,7 +98,6 @@ export default function LanTransferTool() {
     try {
       const next = await loadLanTransferCore();
       setSettings(next.settings);
-      setDraftSettings(next.settings);
       setStatus(next.status);
       setShares(next.shares);
       setAddresses(next.addresses);
@@ -190,18 +172,11 @@ export default function LanTransferTool() {
     }
   }
 
-  async function saveSettings() {
+  async function saveSettings(values: LanTransferSettings) {
     setBusy(true);
     try {
-      const next = await ipc.lanTransferSaveSettings({
-        ...draftSettings,
-        maxConcurrentTransfers: Math.min(
-          16,
-          Math.max(1, Math.floor(Number(draftSettings.maxConcurrentTransfers) || 3)),
-        ),
-      });
+      const next = await ipc.lanTransferSaveSettings(values);
       setSettings(next);
-      setDraftSettings(next);
       setSettingsOpen(false);
       toast.success("已保存配置");
     } catch (error) {
@@ -220,7 +195,6 @@ export default function LanTransferTool() {
         bindHost: "",
       });
       setSettings(next);
-      setDraftSettings(next);
       toast.success(running ? "已改为自动绑定，重启服务后生效" : "已改为自动绑定");
     } catch (error) {
       toast.error(String(error));
@@ -229,20 +203,11 @@ export default function LanTransferTool() {
     }
   }
 
-  async function addShare() {
-    if (!shareName.trim() || !sharePath.trim()) {
-      toast.error("请选择共享目录并填写名称");
-      return;
-    }
+  async function addShare(input: LanSharedDirInput) {
     setBusy(true);
     try {
-      const dir = await ipc.lanTransferAddSharedDir({
-        name: shareName.trim(),
-        path: sharePath.trim(),
-      });
+      const dir = await ipc.lanTransferAddSharedDir(input);
       setShares((items) => [...items, dir]);
-      setShareName("");
-      setSharePath("");
       setShareOpen(false);
       toast.success("已添加共享目录");
     } catch (error) {
@@ -252,19 +217,10 @@ export default function LanTransferTool() {
     }
   }
 
-  async function addTrustedDevice() {
-    if (!trustedIp.trim()) {
-      toast.error("请输入 IP 地址");
-      return;
-    }
+  async function addTrustedDevice(input: LanTrustedDeviceInput) {
     try {
-      const device = await ipc.lanTransferAddTrustedDevice({
-        label: trustedLabel.trim() || trustedIp.trim(),
-        ip: trustedIp.trim(),
-      });
+      const device = await ipc.lanTransferAddTrustedDevice(input);
       setTrustedDevices((items) => [...items, device]);
-      setTrustedLabel("");
-      setTrustedIp("");
       toast.success("已添加白名单");
     } catch (error) {
       toast.error(String(error));
@@ -357,33 +313,16 @@ export default function LanTransferTool() {
   }
 
   async function chooseDownloadDir() {
-    if (running) return;
+    if (running) return null;
     const selected = await open({
       multiple: false,
       directory: true,
       title: "选择接收目录",
     });
-    if (typeof selected === "string") {
-      setDraftSettings((current) => ({ ...current, downloadDir: selected }));
-    }
-  }
-
-  async function chooseShareDir() {
-    const selected = await open({
-      multiple: false,
-      directory: true,
-      title: "选择共享目录",
-    });
-    if (typeof selected !== "string") return;
-    setSharePath(selected);
-    if (!shareName.trim()) {
-      const parts = selected.split(/[\\/]/).filter(Boolean);
-      setShareName(parts[parts.length - 1] ?? "共享目录");
-    }
+    return typeof selected === "string" ? selected : null;
   }
 
   function openSettings() {
-    setDraftSettings(settings ?? DEFAULT_SETTINGS);
     setSettingsOpen(true);
   }
 
@@ -519,15 +458,9 @@ export default function LanTransferTool() {
       <LanTransferSettingsDialog
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
-        draftSettings={draftSettings}
-        setDraftSettings={setDraftSettings}
+        settings={settings ?? DEFAULT_SETTINGS}
         addresses={addresses}
-        draftBindHostUnavailable={draftBindHostUnavailable}
         trustedDevices={trustedDevices}
-        trustedLabel={trustedLabel}
-        setTrustedLabel={setTrustedLabel}
-        trustedIp={trustedIp}
-        setTrustedIp={setTrustedIp}
         running={running}
         busy={busy}
         chooseDownloadDir={chooseDownloadDir}
@@ -537,47 +470,12 @@ export default function LanTransferTool() {
       />
 
 
-      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>添加共享目录</DialogTitle>
-          </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="lan-share-name">名称</FieldLabel>
-              <Input
-                id="lan-share-name"
-                value={shareName}
-                onChange={(event) => setShareName(event.target.value)}
-                placeholder="共享目录"
-              />
-            </Field>
-            <Field>
-              <FieldLabel>本地目录</FieldLabel>
-              <div className="flex gap-2">
-                <Input
-                  readOnly
-                  value={sharePath}
-                  placeholder="未选择"
-                  className="flex-1"
-                />
-                <Button variant="outline" onClick={chooseShareDir}>
-                  <FolderOpen data-icon="inline-start" />
-                  选择
-                </Button>
-              </div>
-            </Field>
-          </FieldGroup>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShareOpen(false)}>
-              取消
-            </Button>
-            <Button onClick={addShare} disabled={busy}>
-              添加
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LanShareDialog
+        open={shareOpen}
+        busy={busy}
+        onOpenChange={setShareOpen}
+        onAdd={addShare}
+      />
     </main>
   );
 }

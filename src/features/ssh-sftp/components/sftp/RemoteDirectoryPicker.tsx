@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import {
   ArrowUp,
   Folder,
@@ -26,6 +28,8 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Input } from "~/components/ui/input";
+import { FieldDescription } from "~/components/ui/field";
+import { firstFormError } from "~/lib/form-errors";
 import * as ipc from "~/lib/ipc";
 import type { SftpEntry } from "~/types";
 import {
@@ -56,9 +60,19 @@ export default function RemoteDirectoryPicker({
   onSelect,
 }: RemoteDirectoryPickerProps) {
   const [path, setPath] = useState(initialPath);
-  const [pathInput, setPathInput] = useState(initialPath);
   const [entries, setEntries] = useState<SftpEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const pathForm = useForm({
+    defaultValues: { path: initialPath },
+    validators: {
+      onSubmit: z.object({
+        path: z.string().trim().min(1, "请输入路径"),
+      }),
+    },
+    onSubmit: async ({ value }) => {
+      await loadPath(value.path);
+    },
+  });
 
   const directories = useMemo(
     () =>
@@ -78,14 +92,14 @@ export default function RemoteDirectoryPicker({
         const list = await ipc.sftpList(sessionId, normalized);
         setEntries(list);
         setPath(normalized);
-        setPathInput(normalized);
+        pathForm.reset({ path: normalized });
       } catch (e) {
         toast.error(String(e));
       } finally {
         setLoading(false);
       }
     },
-    [sessionId],
+    [pathForm, sessionId],
   );
 
   useEffect(() => {
@@ -144,14 +158,30 @@ export default function RemoteDirectoryPicker({
               className="flex min-w-0 flex-1 items-center gap-1"
               onSubmit={(event) => {
                 event.preventDefault();
-                void loadPath(pathInput);
+                void pathForm.handleSubmit();
               }}
             >
-              <Input
-                className="font-mono text-xs"
-                value={pathInput}
-                onChange={(event) => setPathInput(event.target.value)}
-              />
+              <pathForm.Field name="path">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <div className="min-w-0 flex-1">
+                      <Input
+                        className="font-mono text-xs"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        aria-invalid={!!error}
+                      />
+                      {error ? (
+                        <FieldDescription className="text-destructive">
+                          {error}
+                        </FieldDescription>
+                      ) : null}
+                    </div>
+                  );
+                }}
+              </pathForm.Field>
               <Button type="submit" variant="outline" disabled={loading}>
                 <FolderOpen data-icon="inline-start" /> 打开
               </Button>

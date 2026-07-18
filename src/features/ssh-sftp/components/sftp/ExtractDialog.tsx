@@ -1,4 +1,7 @@
+import { useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import { FolderOpen } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
@@ -10,7 +13,9 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { FieldDescription } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { firstFormError } from "~/lib/form-errors";
 import type { ExtractState } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 
 interface ExtractDialogProps {
@@ -28,6 +33,25 @@ export default function ExtractDialog({
   chooseExtractParent,
   confirmExtract,
 }: ExtractDialogProps) {
+  const form = useForm({
+    defaultValues: { outName: "" },
+    validators: {
+      onSubmit: z.object({
+        outName: z.string().trim().min(1, "名称不能为空").refine(
+          (value) => !/[\\/]/.test(value),
+          "名称不能包含斜杠",
+        ),
+      }),
+    },
+    onSubmit: () => {
+      confirmExtract();
+    },
+  });
+
+  useEffect(() => {
+    if (extractTarget) form.reset({ outName: extractTarget.outName });
+  }, [extractTarget, form]);
+
   return (
     <Dialog
       open={!!extractTarget && !directoryPickerOpen}
@@ -42,17 +66,28 @@ export default function ExtractDialog({
         </DialogHeader>
         {extractTarget ? (
           <FieldGroup className="gap-3">
-            <Field>
-              <FieldLabel>文件夹名称</FieldLabel>
-              <Input
-                value={extractTarget.outName}
-                onChange={(event) =>
-                  setExtractTarget((current) =>
-                    current ? { ...current, outName: event.target.value } : current,
-                  )
-                }
-              />
-            </Field>
+            <form.Field name="outName">
+              {(field) => {
+                const error = firstFormError(field.state.meta.errors);
+                return (
+                  <Field data-invalid={!!error}>
+                    <FieldLabel>文件夹名称</FieldLabel>
+                    <Input
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => {
+                        field.handleChange(event.target.value);
+                        setExtractTarget((current) =>
+                          current ? { ...current, outName: event.target.value } : current,
+                        );
+                      }}
+                      aria-invalid={!!error}
+                    />
+                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  </Field>
+                );
+              }}
+            </form.Field>
             <Field>
               <FieldLabel>位置</FieldLabel>
               <div className="flex min-w-0 items-center gap-2">
@@ -70,7 +105,7 @@ export default function ExtractDialog({
           <Button variant="ghost" onClick={() => setExtractTarget(null)}>
             取消
           </Button>
-          <Button onClick={confirmExtract}>解压</Button>
+          <Button onClick={() => void form.handleSubmit()}>解压</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

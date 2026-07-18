@@ -1,7 +1,17 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import { CheckCircle2, RefreshCw, Shield, ShieldOff } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import type { LanAuthRequest } from "~/types";
 
 interface Props {
@@ -26,6 +36,64 @@ function formatAge(value: number) {
   return `${Math.floor(diff / 3_600_000)} 小时前`;
 }
 
+const permissionFormSchema = z.object({
+  permission: z.enum(["readOnly", "readWrite", "uploadOnly"]),
+});
+
+function LanAuthRequestPermissionForm({
+  request,
+  approve,
+}: {
+  request: LanAuthRequest;
+  approve: (id: string, permission: string) => void;
+}) {
+  const form = useForm({
+    defaultValues: { permission: "readWrite" },
+    validators: {
+      onSubmit: permissionFormSchema,
+    },
+    onSubmit: ({ value }) => {
+      approve(request.id, value.permission);
+    },
+  });
+
+  return (
+    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+      <form.Field name="permission">
+        {(field) => (
+          <Select
+            value={field.state.value}
+            onValueChange={(value) => {
+              if (
+                value === "readOnly" ||
+                value === "readWrite" ||
+                value === "uploadOnly"
+              ) {
+                field.handleChange(value);
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="readOnly">只读</SelectItem>
+                <SelectItem value="readWrite">读写</SelectItem>
+                <SelectItem value="uploadOnly">仅上传</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      </form.Field>
+      <Button onClick={() => void form.handleSubmit()}>
+        <CheckCircle2 data-icon="inline-start" />
+        允许
+      </Button>
+    </div>
+  );
+}
+
 export default function LanPendingAuthRequestsPanel({
   requests,
   refreshing,
@@ -33,7 +101,6 @@ export default function LanPendingAuthRequestsPanel({
   approve,
   reject,
 }: Props) {
-  const [permissions, setPermissions] = useState<Record<string, string>>({});
   const sorted = useMemo(
     () => [...requests].sort((a, b) => b.requestedAt - a.requestedAt),
     [requests],
@@ -61,7 +128,6 @@ export default function LanPendingAuthRequestsPanel({
         ) : (
           <div className="grid gap-1.5">
             {sorted.map((request) => {
-              const permission = permissions[request.id] ?? "readWrite";
               return (
                 <div
                   key={request.id}
@@ -88,28 +154,7 @@ export default function LanPendingAuthRequestsPanel({
                       <ShieldOff className="text-destructive" />
                     </Button>
                   </div>
-                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-                    <select
-                      value={permission}
-                      onChange={(event) =>
-                        setPermissions((current) => ({
-                          ...current,
-                          [request.id]: event.target.value,
-                        }))
-                      }
-                      className="h-8 rounded-md border border-border bg-background px-2 text-sm outline-none"
-                    >
-                      <option value="readOnly">只读</option>
-                      <option value="readWrite">读写</option>
-                      <option value="uploadOnly">仅上传</option>
-                    </select>
-                    <Button
-                      onClick={() => void approve(request.id, permission)}
-                    >
-                      <CheckCircle2 data-icon="inline-start" />
-                      允许
-                    </Button>
-                  </div>
+                  <LanAuthRequestPermissionForm request={request} approve={approve} />
                 </div>
               );
             })}

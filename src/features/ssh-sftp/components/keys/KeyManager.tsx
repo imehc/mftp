@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { KeyRound, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import {
-  Field,
+  Field as UiField,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
@@ -24,6 +27,11 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Separator } from "~/components/ui/separator";
+import { firstFormError } from "~/lib/form-errors";
+import {
+  emptyKeyImportFormValues,
+  keyImportSchema,
+} from "~/features/ssh-sftp/components/keys/KeyManager.schema";
 
 interface Props {
   open: boolean;
@@ -35,10 +43,25 @@ export default function KeyManager({ open, onOpenChange }: Props) {
   const importKey = useHostsStore((s) => s.importKey);
   const deleteKey = useHostsStore((s) => s.deleteKey);
 
-  const [label, setLabel] = useState("");
-  const [sourcePath, setSourcePath] = useState<string | null>(null);
-  const [hasPassphrase, setHasPassphrase] = useState(false);
   const [busy, setBusy] = useState(false);
+  const form = useForm({
+    defaultValues: emptyKeyImportFormValues,
+    validators: {
+      onSubmit: keyImportSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setBusy(true);
+      try {
+        await importKey(value.label.trim(), value.sourcePath.trim(), value.hasPassphrase);
+        toast.success(`已导入密钥 ${value.label.trim()}`);
+        form.reset(emptyKeyImportFormValues);
+      } catch (e) {
+        toast.error(String(e));
+      } finally {
+        setBusy(false);
+      }
+    },
+  });
 
   async function pickFile() {
     const selected = await openDialog({
@@ -47,30 +70,11 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       title: "选择私钥文件",
     });
     if (typeof selected === "string") {
-      setSourcePath(selected);
-      if (!label) {
+      form.setFieldValue("sourcePath", selected);
+      if (!form.getFieldValue("label")) {
         const name = selected.split(/[\\/]/).pop() ?? "key";
-        setLabel(name);
+        form.setFieldValue("label", name);
       }
-    }
-  }
-
-  async function doImport() {
-    if (!sourcePath || !label.trim()) {
-      toast.error("请选择私钥文件并填写名称");
-      return;
-    }
-    setBusy(true);
-    try {
-      await importKey(label.trim(), sourcePath, hasPassphrase);
-      toast.success(`已导入密钥 ${label.trim()}`);
-      setLabel("");
-      setSourcePath(null);
-      setHasPassphrase(false);
-    } catch (e) {
-      toast.error(String(e));
-    } finally {
-      setBusy(false);
     }
   }
 
@@ -92,39 +96,63 @@ export default function KeyManager({ open, onOpenChange }: Props) {
 
         <div className="rounded-lg border border-border p-3">
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="key-label">名称</FieldLabel>
-              <Input
-                id="key-label"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                placeholder="id_ed25519"
-              />
-            </Field>
-            <Field>
-              <FieldLabel>私钥文件</FieldLabel>
-              <div className="flex gap-2">
-                <Input
-                  readOnly
-                  value={sourcePath ?? ""}
-                  placeholder="未选择"
-                  className="flex-1"
-                />
-                <Button variant="outline" onClick={pickFile}>
-                  <Upload data-icon="inline-start" /> 选择
-                </Button>
-              </div>
-            </Field>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={hasPassphrase}
-                onChange={(e) => setHasPassphrase(e.target.checked)}
-                className="size-4 accent-primary"
-              />
-              该私钥有口令保护（连接时输入）
-            </label>
-            <Button onClick={doImport} disabled={busy}>
+            <form.Field name="label">
+              {(field) => {
+                const error = firstFormError(field.state.meta.errors);
+                return (
+                  <UiField data-invalid={!!error}>
+                    <FieldLabel htmlFor="key-label">名称</FieldLabel>
+                    <Input
+                      id="key-label"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="id_ed25519"
+                      aria-invalid={!!error}
+                    />
+                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  </UiField>
+                );
+              }}
+            </form.Field>
+            <form.Field name="sourcePath">
+              {(field) => {
+                const error = firstFormError(field.state.meta.errors);
+                return (
+                  <UiField data-invalid={!!error}>
+                    <FieldLabel>私钥文件</FieldLabel>
+                    <div className="flex gap-2">
+                      <Input
+                        readOnly
+                        value={field.state.value}
+                        placeholder="未选择"
+                        className="flex-1"
+                        aria-invalid={!!error}
+                      />
+                      <Button variant="outline" onClick={pickFile}>
+                        <Upload data-icon="inline-start" /> 选择
+                      </Button>
+                    </div>
+                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  </UiField>
+                );
+              }}
+            </form.Field>
+            <form.Field name="hasPassphrase">
+              {(field) => (
+                <UiField orientation="horizontal">
+                  <Checkbox
+                    id="key-has-passphrase"
+                    checked={field.state.value}
+                    onCheckedChange={(checked) => field.handleChange(checked === true)}
+                  />
+                  <FieldLabel htmlFor="key-has-passphrase">
+                    该私钥有口令保护（连接时输入）
+                  </FieldLabel>
+                </UiField>
+              )}
+            </form.Field>
+            <Button onClick={() => void form.handleSubmit()} disabled={busy}>
               {busy ? "导入中…" : "导入密钥"}
             </Button>
           </FieldGroup>

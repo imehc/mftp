@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import type { Host } from "~/types";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Field, FieldLabel } from "~/components/ui/field";
+import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { firstFormError } from "~/lib/form-errors";
 
 interface Props {
   /** The host awaiting a passphrase, or null when hidden. */
@@ -19,11 +22,21 @@ interface Props {
 }
 
 export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
-  const [value, setValue] = useState("");
+  const form = useForm({
+    defaultValues: { passphrase: "" },
+    validators: {
+      onSubmit: z.object({
+        passphrase: z.string().min(1, "请输入口令"),
+      }),
+    },
+    onSubmit: ({ value }) => {
+      onSubmit(value.passphrase);
+    },
+  });
 
   useEffect(() => {
-    if (host) setValue("");
-  }, [host]);
+    if (host) form.reset({ passphrase: "" });
+  }, [form, host]);
 
   return (
     <Dialog open={!!host} onOpenChange={(o) => !o && onClose()}>
@@ -35,23 +48,33 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            onSubmit(value);
+            void form.handleSubmit();
           }}
           className="flex flex-col gap-3"
         >
-          <Field>
-            <FieldLabel htmlFor="passphrase">
-              {host?.label} 的私钥口令
-            </FieldLabel>
-            <Input
-              id="passphrase"
-              type="password"
-              autoFocus
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder="passphrase"
-            />
-          </Field>
+          <form.Field name="passphrase">
+            {(field) => {
+              const error = firstFormError(field.state.meta.errors);
+              return (
+                <Field data-invalid={!!error}>
+                  <FieldLabel htmlFor="passphrase">
+                    {host?.label} 的私钥口令
+                  </FieldLabel>
+                  <Input
+                    id="passphrase"
+                    type="password"
+                    autoFocus
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="passphrase"
+                    aria-invalid={!!error}
+                  />
+                  {error ? <FieldDescription>{error}</FieldDescription> : null}
+                </Field>
+              );
+            }}
+          </form.Field>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose}>
               取消
