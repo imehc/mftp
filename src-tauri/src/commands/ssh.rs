@@ -38,6 +38,7 @@ fn build_auth(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn ssh_connect(
     state: State<AppState>,
     host_id: String,
@@ -58,6 +59,7 @@ pub fn ssh_connect(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn ssh_open_shell(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -80,6 +82,7 @@ pub async fn ssh_open_shell(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn ssh_write(state: State<AppState>, session_id: String, data: String) -> AppResult<()> {
     let bytes = STANDARD
         .decode(data.as_bytes())
@@ -88,6 +91,7 @@ pub fn ssh_write(state: State<AppState>, session_id: String, data: String) -> Ap
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn ssh_resize(
     state: State<AppState>,
     session_id: String,
@@ -98,6 +102,7 @@ pub fn ssh_resize(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn ssh_disconnect(state: State<'_, AppState>, session_id: String) -> AppResult<()> {
     let manager = state.manager.clone();
     let log_session = session_id.clone();

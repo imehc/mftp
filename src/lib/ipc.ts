@@ -1,155 +1,162 @@
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "~/bindings";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
-  Host,
   HostInput,
-  ActivityLog,
-  LanAuthRequest,
-  LanConnectedDevice,
-  LanDiscoveredDevice,
-  LanNetworkAddress,
-  LanSharedDir,
   LanSharedDirInput,
   LanTransferSettings,
-  LanTransferStatus,
-  LanTransferTask,
-  LanTrustedDevice,
   LanTrustedDeviceInput,
-  SftpEntry,
-  SftpFileInfo,
-  SshKey,
 } from "~/types";
 
+type CommandResult<T, E> =
+  | { status: "ok"; data: T }
+  | { status: "error"; error: E };
+
+const unwrapCommand = async <T, E>(
+  promise: Promise<CommandResult<T, E>>,
+): Promise<T> => {
+  const result = await promise;
+  if (result.status === "ok") {
+    return result.data;
+  }
+  throw result.error;
+};
+
+const voidCommand = async <E>(
+  promise: Promise<CommandResult<null, E>>,
+): Promise<void> => {
+  await unwrapCommand(promise);
+};
+
 // ---- Hosts ----
-export const hostsList = () => invoke<Host[]>("hosts_list");
-export const hostGet = (id: string) => invoke<Host>("host_get", { id });
+export const hostsList = () => unwrapCommand(commands.hostsList());
+export const hostGet = (id: string) => unwrapCommand(commands.hostGet(id));
 export const hostCreate = (input: HostInput) =>
-  invoke<Host>("host_create", { input });
+  unwrapCommand(commands.hostCreate(input));
 export const hostUpdate = (id: string, input: HostInput) =>
-  invoke<Host>("host_update", { id, input });
-export const hostDelete = (id: string) => invoke<void>("host_delete", { id });
+  unwrapCommand(commands.hostUpdate(id, input));
+export const hostDelete = (id: string) => voidCommand(commands.hostDelete(id));
 export const hostsReorder = (orderedIds: string[]) =>
-  invoke<Host[]>("hosts_reorder", { orderedIds });
+  unwrapCommand(commands.hostsReorder(orderedIds));
 
 // ---- Keys ----
-export const keysList = () => invoke<SshKey[]>("keys_list");
+export const keysList = () => unwrapCommand(commands.keysList());
 export const keyImport = (
   label: string,
   sourcePath: string,
   hasPassphrase: boolean,
-) => invoke<SshKey>("key_import", { label, sourcePath, hasPassphrase });
-export const keyDelete = (id: string) => invoke<void>("key_delete", { id });
+) => unwrapCommand(commands.keyImport(label, sourcePath, hasPassphrase));
+export const keyDelete = (id: string) => voidCommand(commands.keyDelete(id));
 
 // ---- LAN Transfer ----
 export const lanTransferSettings = () =>
-  invoke<LanTransferSettings>("lan_transfer_settings");
+  unwrapCommand(commands.lanTransferSettings());
 export const lanTransferSaveSettings = (settings: LanTransferSettings) =>
-  invoke<LanTransferSettings>("lan_transfer_save_settings", { settings });
+  unwrapCommand(commands.lanTransferSaveSettings(settings));
 export const lanTransferStatus = () =>
-  invoke<LanTransferStatus>("lan_transfer_status");
+  unwrapCommand(commands.lanTransferStatus());
 export const lanTransferNetworkAddresses = () =>
-  invoke<LanNetworkAddress[]>("lan_transfer_network_addresses");
+  unwrapCommand(commands.lanTransferNetworkAddresses());
 export const lanTransferDiscoverDevices = () =>
-  invoke<LanDiscoveredDevice[]>("lan_transfer_discover_devices");
+  unwrapCommand(commands.lanTransferDiscoverDevices());
 export const lanTransferConnectedDevices = () =>
-  invoke<LanConnectedDevice[]>("lan_transfer_connected_devices");
+  unwrapCommand(commands.lanTransferConnectedDevices());
 export const lanTransferPendingAuthRequests = () =>
-  invoke<LanAuthRequest[]>("lan_transfer_pending_auth_requests");
+  unwrapCommand(commands.lanTransferPendingAuthRequests());
 export const lanTransferApproveAuthRequest = (id: string, permission: string) =>
-  invoke<boolean>("lan_transfer_approve_auth_request", { id, permission });
+  unwrapCommand(commands.lanTransferApproveAuthRequest(id, permission));
 export const lanTransferRejectAuthRequest = (id: string) =>
-  invoke<boolean>("lan_transfer_reject_auth_request", { id });
+  unwrapCommand(commands.lanTransferRejectAuthRequest(id));
 export const lanTransferDisconnectDevice = (id: string) =>
-  invoke<void>("lan_transfer_disconnect_device", { id });
+  voidCommand(commands.lanTransferDisconnectDevice(id));
 export const lanTransferTasks = () =>
-  invoke<LanTransferTask[]>("lan_transfer_tasks");
+  unwrapCommand(commands.lanTransferTasks());
 export const lanTransferCancelTask = (id: string) =>
-  invoke<void>("lan_transfer_cancel_task", { id });
+  voidCommand(commands.lanTransferCancelTask(id));
 export const lanTransferStart = () =>
-  invoke<LanTransferStatus>("lan_transfer_start");
+  unwrapCommand(commands.lanTransferStart());
 export const lanTransferStop = () =>
-  invoke<LanTransferStatus>("lan_transfer_stop");
+  unwrapCommand(commands.lanTransferStop());
 export const lanTransferSharedDirs = () =>
-  invoke<LanSharedDir[]>("lan_transfer_shared_dirs");
+  unwrapCommand(commands.lanTransferSharedDirs());
 export const lanTransferAddSharedDir = (input: LanSharedDirInput) =>
-  invoke<LanSharedDir>("lan_transfer_add_shared_dir", { input });
+  unwrapCommand(commands.lanTransferAddSharedDir(input));
 export const lanTransferDeleteSharedDir = (id: string) =>
-  invoke<void>("lan_transfer_delete_shared_dir", { id });
+  voidCommand(commands.lanTransferDeleteSharedDir(id));
 export const lanTransferTrustedDevices = () =>
-  invoke<LanTrustedDevice[]>("lan_transfer_trusted_devices");
+  unwrapCommand(commands.lanTransferTrustedDevices());
 export const lanTransferAddTrustedDevice = (input: LanTrustedDeviceInput) =>
-  invoke<LanTrustedDevice>("lan_transfer_add_trusted_device", { input });
+  unwrapCommand(commands.lanTransferAddTrustedDevice(input));
 export const lanTransferDeleteTrustedDevice = (id: string) =>
-  invoke<void>("lan_transfer_delete_trusted_device", { id });
+  voidCommand(commands.lanTransferDeleteTrustedDevice(id));
 export const activityLogs = (limit?: number) =>
-  invoke<ActivityLog[]>("activity_logs", { limit: limit ?? null });
-export const activityLogsClear = () => invoke<void>("activity_logs_clear");
+  unwrapCommand(commands.activityLogs(limit ?? null));
+export const activityLogsClear = () => voidCommand(commands.activityLogsClear());
 export const activityLogDelete = (id: string) =>
-  invoke<void>("activity_log_delete", { id });
+  voidCommand(commands.activityLogDelete(id));
 
 // ---- SSH ----
 export const sshConnect = (hostId: string, passphrase?: string) =>
-  invoke<string>("ssh_connect", { hostId, passphrase: passphrase ?? null });
+  unwrapCommand(commands.sshConnect(hostId, passphrase ?? null));
 export const sshOpenShell = (sessionId: string, cols: number, rows: number) =>
-  invoke<void>("ssh_open_shell", { sessionId, cols, rows });
+  voidCommand(commands.sshOpenShell(sessionId, cols, rows));
 export const sshWrite = (sessionId: string, data: string) =>
-  invoke<void>("ssh_write", { sessionId, data });
+  voidCommand(commands.sshWrite(sessionId, data));
 export const sshResize = (sessionId: string, cols: number, rows: number) =>
-  invoke<void>("ssh_resize", { sessionId, cols, rows });
+  voidCommand(commands.sshResize(sessionId, cols, rows));
 export const sshDisconnect = (sessionId: string) =>
-  invoke<void>("ssh_disconnect", { sessionId });
+  voidCommand(commands.sshDisconnect(sessionId));
 
 // ---- SFTP ----
 export const sftpHome = (sessionId: string) =>
-  invoke<string>("sftp_home", { sessionId });
+  unwrapCommand(commands.sftpHome(sessionId));
 export const sftpStartDir = (sessionId: string, preferred?: string | null) =>
-  invoke<string>("sftp_start_dir", { sessionId, preferred: preferred ?? null });
+  unwrapCommand(commands.sftpStartDir(sessionId, preferred ?? null));
 export const sftpList = (sessionId: string, path: string) =>
-  invoke<SftpEntry[]>("sftp_list", { sessionId, path });
+  unwrapCommand(commands.sftpList(sessionId, path));
 export const sftpInfo = (sessionId: string, path: string) =>
-  invoke<SftpFileInfo>("sftp_info", { sessionId, path });
+  unwrapCommand(commands.sftpInfo(sessionId, path));
 export const sftpMkdir = (sessionId: string, path: string) =>
-  invoke<void>("sftp_mkdir", { sessionId, path });
+  voidCommand(commands.sftpMkdir(sessionId, path));
 export const sftpRename = (sessionId: string, from: string, to: string) =>
-  invoke<void>("sftp_rename", { sessionId, from, to });
+  voidCommand(commands.sftpRename(sessionId, from, to));
 export const sftpDelete = (
   sessionId: string,
   path: string,
   isDir: boolean,
   transferId?: string,
 ) =>
-  invoke<void>("sftp_delete", {
+  voidCommand(commands.sftpDelete(
     sessionId,
     path,
     isDir,
-    transferId: transferId ?? null,
-  });
+    transferId ?? null,
+  ));
 export const sftpDownload = (
   sessionId: string,
   remote: string,
   local: string,
   transferId?: string,
 ) =>
-  invoke<void>("sftp_download", {
+  voidCommand(commands.sftpDownload(
     sessionId,
     remote,
     local,
-    transferId: transferId ?? null,
-  });
+    transferId ?? null,
+  ));
 export const sftpUpload = (
   sessionId: string,
   local: string,
   remote: string,
   transferId?: string,
 ) =>
-  invoke<void>("sftp_upload", {
+  voidCommand(commands.sftpUpload(
     sessionId,
     local,
     remote,
-    transferId: transferId ?? null,
-  });
+    transferId ?? null,
+  ));
 export const sftpExists = (sessionId: string, path: string) =>
-  invoke<boolean>("sftp_exists", { sessionId, path });
+  unwrapCommand(commands.sftpExists(sessionId, path));
 export const sftpUploadDir = (
   sessionId: string,
   localDir: string,
@@ -158,14 +165,14 @@ export const sftpUploadDir = (
   transferMode: DirectoryTransferMode,
   transferId?: string,
 ) =>
-  invoke<void>("sftp_upload_dir", {
+  voidCommand(commands.sftpUploadDir(
     sessionId,
     localDir,
     remoteParent,
     remoteName,
     transferMode,
-    transferId: transferId ?? null,
-  });
+    transferId ?? null,
+  ));
 export const sftpDownloadDir = (
   sessionId: string,
   remoteDir: string,
@@ -173,30 +180,30 @@ export const sftpDownloadDir = (
   transferMode: DirectoryTransferMode,
   transferId?: string,
 ) =>
-  invoke<void>("sftp_download_dir", {
+  voidCommand(commands.sftpDownloadDir(
     sessionId,
     remoteDir,
     localDir,
     transferMode,
-    transferId: transferId ?? null,
-  });
+    transferId ?? null,
+  ));
 export const sftpCancelTransfer = (transferId: string) =>
-  invoke<void>("sftp_cancel_transfer", { transferId });
+  voidCommand(commands.sftpCancelTransfer(transferId));
 export const sftpPauseTransfer = (transferId: string) =>
-  invoke<void>("sftp_pause_transfer", { transferId });
+  voidCommand(commands.sftpPauseTransfer(transferId));
 export const sftpResumeTransfer = (transferId: string) =>
-  invoke<void>("sftp_resume_transfer", { transferId });
+  voidCommand(commands.sftpResumeTransfer(transferId));
 export const sftpResetConnection = (sessionId: string) =>
-  invoke<void>("sftp_reset_connection", { sessionId });
+  voidCommand(commands.sftpResetConnection(sessionId));
 export const sftpExtract = (
   sessionId: string,
   remoteArchive: string,
   remoteParent: string,
   outName?: string | null,
 ) =>
-  invoke<void>("sftp_extract", {
+  voidCommand(commands.sftpExtract(
     sessionId,
     remoteArchive,
     remoteParent,
-    outName: outName ?? null,
-  });
+    outName ?? null,
+  ));

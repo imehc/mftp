@@ -1,7 +1,8 @@
 use serde::Serialize;
+use specta::Type;
 
 /// Unified error type surfaced to the frontend as a plain string.
-#[derive(Debug)]
+#[derive(Debug, Type)]
 pub struct AppError(pub String);
 
 impl std::fmt::Display for AppError {

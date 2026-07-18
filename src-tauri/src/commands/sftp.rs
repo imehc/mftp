@@ -6,12 +6,14 @@ use crate::AppState;
 use tauri::{AppHandle, State};
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_home(state: State<'_, AppState>, session_id: String) -> AppResult<String> {
     let manager = state.manager.clone();
     run_blocking(move || manager.sftp_home(&session_id)).await
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_start_dir(
     state: State<'_, AppState>,
     session_id: String,
@@ -22,6 +24,7 @@ pub async fn sftp_start_dir(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_list(
     state: State<'_, AppState>,
     session_id: String,
@@ -32,6 +35,7 @@ pub async fn sftp_list(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_info(
     state: State<'_, AppState>,
     session_id: String,
@@ -42,6 +46,7 @@ pub async fn sftp_info(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_mkdir(
     state: State<'_, AppState>,
     session_id: String,
@@ -63,6 +68,7 @@ pub async fn sftp_mkdir(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_rename(
     state: State<'_, AppState>,
     session_id: String,
@@ -85,6 +91,7 @@ pub async fn sftp_rename(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_delete(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -118,6 +125,7 @@ pub async fn sftp_delete(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_download(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -151,6 +159,7 @@ pub async fn sftp_download(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_upload(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -184,6 +193,7 @@ pub async fn sftp_upload(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_exists(
     state: State<'_, AppState>,
     session_id: String,
@@ -194,6 +204,7 @@ pub async fn sftp_exists(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_upload_dir(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -231,6 +242,7 @@ pub async fn sftp_upload_dir(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_download_dir(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -266,28 +278,33 @@ pub async fn sftp_download_dir(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn sftp_cancel_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
     state.manager.cancel_transfer(&transfer_id);
     Ok(())
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn sftp_pause_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
     state.manager.pause_transfer(&transfer_id)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn sftp_resume_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
     state.manager.resume_transfer(&transfer_id)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn sftp_reset_connection(state: State<AppState>, session_id: String) -> AppResult<()> {
     state.manager.reset_sftp_conn(&session_id);
     Ok(())
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn sftp_extract(
     state: State<'_, AppState>,
     session_id: String,
