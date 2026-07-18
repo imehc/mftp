@@ -1,4 +1,5 @@
 import { memo, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Download,
   File as FileIcon,
@@ -54,6 +55,7 @@ const SftpRow = memo(function SftpRow({
   onRename,
   onDelete,
 }: RowProps) {
+  const { t } = useLingui();
   const canExtract = !entry.isDir && isArchive(entry.name);
   const [menuOpen, setMenuOpen] = useState(false);
   return (
@@ -93,34 +95,34 @@ const SftpRow = memo(function SftpRow({
       <div className="flex min-w-0 justify-end px-1">
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-xs" title="更多">
+            <Button variant="ghost" size="icon-xs" title={t`更多`}>
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
               <DropdownMenuItem onSelect={() => onDownload(entry)}>
-                <Download /> 下载
+                <Download /> <Trans>下载</Trans>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onInfo(entry)}>
-                <Info /> 简介
+                <Info /> <Trans>简介</Trans>
               </DropdownMenuItem>
               {canExtract ? (
                 <DropdownMenuItem onSelect={() => onExtract(entry)}>
-                  <FolderOpen /> 解压
+                  <FolderOpen /> <Trans>解压</Trans>
                 </DropdownMenuItem>
               ) : null}
               <DropdownMenuItem onSelect={() => onMove(entry)}>
-                <FolderInput /> 移动
+                <FolderInput /> <Trans>移动</Trans>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onRename(entry)}>
-                <Pencil /> 重命名
+                <Pencil /> <Trans>重命名</Trans>
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 onSelect={() => onDelete(entry)}
               >
-                <Trash2 /> 删除
+                <Trash2 /> <Trans>删除</Trans>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

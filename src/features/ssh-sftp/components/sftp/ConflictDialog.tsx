@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -49,6 +50,7 @@ export default function ConflictDialog({
   onOpenChange,
   onResolve,
 }: Props) {
+  const { t } = useLingui();
   const schema = useMemo(
     () =>
       z
@@ -65,32 +67,32 @@ export default function ConflictDialog({
             ctx.addIssue({
               code: "custom",
               path: ["incomingName"],
-              message: "名称不能为空，且不能包含斜杠。",
+              message: t`名称不能为空，且不能包含斜杠。`,
             });
           }
           if (existingInvalid) {
             ctx.addIssue({
               code: "custom",
               path: ["existingName"],
-              message: "名称不能为空，且不能包含斜杠。",
+              message: t`名称不能为空，且不能包含斜杠。`,
             });
           }
           if (incomingName !== "" && incomingName === existingName) {
             ctx.addIssue({
               code: "custom",
               path: ["existingName"],
-              message: "两个名称不能相同。",
+              message: t`两个名称不能相同。`,
             });
           }
           if (incomingName === name && existingName === name) {
             ctx.addIssue({
               code: "custom",
               path: ["existingName"],
-              message: "至少修改其中一个名称。",
+              message: t`至少修改其中一个名称。`,
             });
           }
         }),
-    [name],
+    [name, t],
   );
 
   const form = useForm({
@@ -122,9 +124,11 @@ export default function ConflictDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>目标已存在同名项目</DialogTitle>
+          <DialogTitle>
+            <Trans>目标已存在同名项目</Trans>
+          </DialogTitle>
           <DialogDescription>
-            远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。
+            <Trans>远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -142,7 +146,7 @@ export default function ConflictDialog({
                 return (
                   <Field data-invalid={!!error}>
                     <FieldLabel htmlFor="conflict-incoming-name">
-                      {incomingLabel}名称
+                      <Trans>{incomingLabel}名称</Trans>
                     </FieldLabel>
                     <Input
                       id="conflict-incoming-name"
@@ -163,7 +167,7 @@ export default function ConflictDialog({
                 return (
                   <Field data-invalid={!!error}>
                     <FieldLabel htmlFor="conflict-existing-name">
-                      远端已有名称
+                      <Trans>远端已有名称</Trans>
                     </FieldLabel>
                     <Input
                       id="conflict-existing-name"
@@ -184,12 +188,12 @@ export default function ConflictDialog({
                         return (
                           <FieldDescription className={invalid ? "text-destructive" : ""}>
                             {unchanged
-                              ? "至少修改其中一个名称。"
+                              ? t`至少修改其中一个名称。`
                               : duplicated
-                                ? "两个名称不能相同。"
+                                ? t`两个名称不能相同。`
                                 : incomingInvalid || existingInvalid
-                                  ? "名称不能为空，且不能包含斜杠。"
-                                  : "确认后会按上面的名称继续。"}
+                                  ? t`名称不能为空，且不能包含斜杠。`
+                                  : t`确认后会按上面的名称继续。`}
                           </FieldDescription>
                         );
                       }}
@@ -205,7 +209,7 @@ export default function ConflictDialog({
                 variant="ghost"
                 onClick={() => onOpenChange(false)}
               >
-                取消
+                <Trans>取消</Trans>
               </Button>
               <form.Subscribe selector={(state) => state.values}>
                 {(values) => {
@@ -218,7 +222,7 @@ export default function ConflictDialog({
                   const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
                   return (
                     <Button type="submit" disabled={invalid}>
-                      确认
+                      <Trans>确认</Trans>
                     </Button>
                   );
                 }}

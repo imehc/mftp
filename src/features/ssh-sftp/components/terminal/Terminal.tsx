@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { listen } from "@tauri-apps/api/event";
@@ -35,6 +36,7 @@ function base64ToBytes(b64: string): Uint8Array {
 }
 
 export default function Terminal({ session }: Props) {
+  const { t } = useLingui();
   const containerRef = useRef<HTMLDivElement>(null);
   const patch = useSessionsStore((s) => s.patch);
   const [shellOpening, setShellOpening] = useState(false);
@@ -77,14 +79,14 @@ export default function Terminal({ session }: Props) {
     });
     const unlistenClosed = listen<string>(`ssh://closed/${sessionId}`, () => {
       if (!disposed) {
-        term.write("\r\n\x1b[31m[连接已关闭]\x1b[0m\r\n");
+        term.write(`\r\n\x1b[31m[${t`连接已关闭`}]\x1b[0m\r\n`);
         patch(
           sessionId,
           shellOpenConfirmed
             ? { status: "closed" }
             : {
                 status: "error",
-                error: "远端连接在终端打开前已关闭",
+                error: t`远端连接在终端打开前已关闭`,
               },
         );
       }
@@ -103,7 +105,7 @@ export default function Terminal({ session }: Props) {
       .catch((e) => {
         if (!disposed) setShellOpening(false);
         patch(sessionId, { status: "error", error: String(e) });
-        toast.error(`打开终端失败: ${e}`);
+        toast.error(t`打开终端失败：${e}`);
       });
 
     // Terminal -> backend: forward keystrokes as base64.
@@ -143,7 +145,7 @@ export default function Terminal({ session }: Props) {
     return (
       <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
         <LoaderCircle className="size-4 animate-spin" />
-        <span>正在连接 {session.title}…</span>
+        <span><Trans>正在连接 {session.title}…</Trans></span>
       </div>
     );
   }
@@ -154,7 +156,9 @@ export default function Terminal({ session }: Props) {
           <EmptyMedia variant="icon">
             <TriangleAlert className="text-destructive" />
           </EmptyMedia>
-          <EmptyTitle>连接失败</EmptyTitle>
+          <EmptyTitle>
+            <Trans>连接失败</Trans>
+          </EmptyTitle>
           <EmptyDescription className="break-words">
             {session.error}
           </EmptyDescription>
@@ -170,7 +174,7 @@ export default function Terminal({ session }: Props) {
         <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
           <div className="flex items-center gap-2 rounded-md border border-border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-sm">
             <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
-            正在打开终端…
+            <Trans>正在打开终端…</Trans>
           </div>
         </div>
       ) : null}

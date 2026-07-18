@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { KeyRound, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -30,7 +31,7 @@ import { Separator } from "~/components/ui/separator";
 import { firstFormError } from "~/lib/form-errors";
 import {
   emptyKeyImportFormValues,
-  keyImportSchema,
+  createKeyImportSchema,
 } from "~/features/ssh-sftp/components/keys/KeyManager.schema";
 
 interface Props {
@@ -39,6 +40,7 @@ interface Props {
 }
 
 export default function KeyManager({ open, onOpenChange }: Props) {
+  const { t } = useLingui();
   const keys = useHostsStore((s) => s.keys);
   const importKey = useHostsStore((s) => s.importKey);
   const deleteKey = useHostsStore((s) => s.deleteKey);
@@ -47,13 +49,13 @@ export default function KeyManager({ open, onOpenChange }: Props) {
   const form = useForm({
     defaultValues: emptyKeyImportFormValues,
     validators: {
-      onSubmit: keyImportSchema,
+      onSubmit: createKeyImportSchema(t),
     },
     onSubmit: async ({ value }) => {
       setBusy(true);
       try {
         await importKey(value.label.trim(), value.sourcePath.trim(), value.hasPassphrase);
-        toast.success(`已导入密钥 ${value.label.trim()}`);
+        toast.success(t`已导入密钥 ${value.label.trim()}`);
         form.reset(emptyKeyImportFormValues);
       } catch (e) {
         toast.error(String(e));
@@ -67,7 +69,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
     const selected = await openDialog({
       multiple: false,
       directory: false,
-      title: "选择私钥文件",
+      title: t`选择私钥文件`,
     });
     if (typeof selected === "string") {
       form.setFieldValue("sourcePath", selected);
@@ -81,7 +83,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
   async function remove(id: string, name: string) {
     try {
       await deleteKey(id);
-      toast.success(`已删除 ${name}`);
+      toast.success(t`已删除 ${name}`);
     } catch (e) {
       toast.error(String(e));
     }
@@ -91,7 +93,9 @@ export default function KeyManager({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>密钥管理</DialogTitle>
+          <DialogTitle>
+            <Trans>密钥管理</Trans>
+          </DialogTitle>
         </DialogHeader>
 
         <div className="rounded-lg border border-border p-3">
@@ -101,7 +105,9 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                 const error = firstFormError(field.state.meta.errors);
                 return (
                   <UiField data-invalid={!!error}>
-                    <FieldLabel htmlFor="key-label">名称</FieldLabel>
+                    <FieldLabel htmlFor="key-label">
+                      <Trans>名称</Trans>
+                    </FieldLabel>
                     <Input
                       id="key-label"
                       value={field.state.value}
@@ -120,17 +126,19 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                 const error = firstFormError(field.state.meta.errors);
                 return (
                   <UiField data-invalid={!!error}>
-                    <FieldLabel>私钥文件</FieldLabel>
+                    <FieldLabel>
+                      <Trans>私钥文件</Trans>
+                    </FieldLabel>
                     <div className="flex gap-2">
                       <Input
                         readOnly
                         value={field.state.value}
-                        placeholder="未选择"
+                        placeholder={t`未选择`}
                         className="flex-1"
                         aria-invalid={!!error}
                       />
                       <Button variant="outline" onClick={pickFile}>
-                        <Upload data-icon="inline-start" /> 选择
+                        <Upload data-icon="inline-start" /> <Trans>选择</Trans>
                       </Button>
                     </div>
                     {error ? <FieldDescription>{error}</FieldDescription> : null}
@@ -147,13 +155,13 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                     onCheckedChange={(checked) => field.handleChange(checked === true)}
                   />
                   <FieldLabel htmlFor="key-has-passphrase">
-                    该私钥有口令保护（连接时输入）
+                    <Trans>该私钥有口令保护（连接时输入）</Trans>
                   </FieldLabel>
                 </UiField>
               )}
             </form.Field>
             <Button onClick={() => void form.handleSubmit()} disabled={busy}>
-              {busy ? "导入中…" : "导入密钥"}
+              {busy ? t`导入中…` : t`导入密钥`}
             </Button>
           </FieldGroup>
         </div>
@@ -162,7 +170,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
 
         <div className="flex flex-col gap-1">
           <p className="text-xs font-medium text-muted-foreground">
-            已导入 ({keys.length})
+            <Trans>已导入 ({keys.length})</Trans>
           </p>
           {keys.length === 0 ? (
             <Empty className="py-6">
@@ -170,8 +178,12 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                 <EmptyMedia variant="icon">
                   <KeyRound />
                 </EmptyMedia>
-                <EmptyTitle>暂无密钥</EmptyTitle>
-                <EmptyDescription>导入私钥后可在主机中选用。</EmptyDescription>
+                <EmptyTitle>
+                  <Trans>暂无密钥</Trans>
+                </EmptyTitle>
+                <EmptyDescription>
+                  <Trans>导入私钥后可在主机中选用。</Trans>
+                </EmptyDescription>
               </EmptyHeader>
             </Empty>
           ) : (
@@ -185,7 +197,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">{k.label}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {k.hasPassphrase ? "口令保护" : "无口令"}
+                      {k.hasPassphrase ? t`口令保护` : t`无口令`}
                     </p>
                   </div>
                   <Button

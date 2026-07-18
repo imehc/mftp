@@ -1,5 +1,6 @@
 import { startTransition, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { open } from "@tauri-apps/plugin-dialog";
 import {
   Copy,
@@ -53,6 +54,7 @@ const DEFAULT_SETTINGS: LanTransferSettings = {
 };
 
 export default function LanTransferTool() {
+  const { t } = useLingui();
   const [settings, setSettings] = useState<LanTransferSettings | null>(null);
   const [status, setStatus] = useState<LanTransferStatus | null>(null);
   const [shares, setShares] = useState<LanSharedDir[]>([]);
@@ -102,7 +104,7 @@ export default function LanTransferTool() {
       setShares(next.shares);
       setAddresses(next.addresses);
     } catch (error) {
-      toast.error(`局域网传输加载失败：${String(error)}`);
+      toast.error(t`局域网传输加载失败：${String(error)}`);
     }
   }
 
@@ -117,7 +119,7 @@ export default function LanTransferTool() {
       });
     } catch (error) {
       // Secondary panels can retry through their own refresh controls.
-      toast.error(`局域网传输辅助数据加载失败：${String(error)}`);
+      toast.error(t`局域网传输辅助数据加载失败：${String(error)}`);
     }
   }
 
@@ -145,10 +147,10 @@ export default function LanTransferTool() {
     setBusy(true);
     try {
       const next = await ipc.lanTransferStart();
-    setStatus(next);
-    setDevices(await ipc.lanTransferConnectedDevices());
-    void refreshDiscovery();
-    toast.success("服务已启动");
+      setStatus(next);
+      setDevices(await ipc.lanTransferConnectedDevices());
+      void refreshDiscovery();
+      toast.success(t`服务已启动`);
     } catch (error) {
       toast.error(String(error));
     } finally {
@@ -164,7 +166,7 @@ export default function LanTransferTool() {
       setDevices([]);
       setTasks([]);
       setAuthRequests([]);
-      toast.success("服务已停止");
+      toast.success(t`服务已停止`);
     } catch (error) {
       toast.error(String(error));
     } finally {
@@ -178,7 +180,7 @@ export default function LanTransferTool() {
       const next = await ipc.lanTransferSaveSettings(values);
       setSettings(next);
       setSettingsOpen(false);
-      toast.success("已保存配置");
+      toast.success(t`已保存配置`);
     } catch (error) {
       toast.error(String(error));
     } finally {
@@ -195,7 +197,7 @@ export default function LanTransferTool() {
         bindHost: "",
       });
       setSettings(next);
-      toast.success(running ? "已改为自动绑定，重启服务后生效" : "已改为自动绑定");
+      toast.success(running ? t`已改为自动绑定，重启服务后生效` : t`已改为自动绑定`);
     } catch (error) {
       toast.error(String(error));
     } finally {
@@ -209,7 +211,7 @@ export default function LanTransferTool() {
       const dir = await ipc.lanTransferAddSharedDir(input);
       setShares((items) => [...items, dir]);
       setShareOpen(false);
-      toast.success("已添加共享目录");
+      toast.success(t`已添加共享目录`);
     } catch (error) {
       toast.error(String(error));
     } finally {
@@ -221,7 +223,7 @@ export default function LanTransferTool() {
     try {
       const device = await ipc.lanTransferAddTrustedDevice(input);
       setTrustedDevices((items) => [...items, device]);
-      toast.success("已添加白名单");
+      toast.success(t`已添加白名单`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -231,7 +233,7 @@ export default function LanTransferTool() {
     try {
       await ipc.lanTransferDeleteTrustedDevice(id);
       setTrustedDevices((items) => items.filter((item) => item.id !== id));
-      toast.success("已删除白名单");
+      toast.success(t`已删除白名单`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -241,7 +243,7 @@ export default function LanTransferTool() {
     try {
       await ipc.lanTransferDeleteSharedDir(id);
       setShares((items) => items.filter((item) => item.id !== id));
-      toast.success("已删除共享目录");
+      toast.success(t`已删除共享目录`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -256,7 +258,7 @@ export default function LanTransferTool() {
       ]);
       setStatus(nextStatus);
       setDevices(nextDevices);
-      toast.success("已断开设备");
+      toast.success(t`已断开设备`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -266,7 +268,7 @@ export default function LanTransferTool() {
     try {
       await ipc.lanTransferCancelTask(id);
       setTasks(await ipc.lanTransferTasks());
-      toast.success("已取消任务");
+      toast.success(t`已取消任务`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -290,7 +292,7 @@ export default function LanTransferTool() {
       ]);
       setStatus(nextStatus);
       setDevices(nextDevices);
-      toast.success("已允许访问");
+      toast.success(t`已允许访问`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -300,7 +302,7 @@ export default function LanTransferTool() {
     try {
       await ipc.lanTransferRejectAuthRequest(id);
       await refreshAuthRequests();
-      toast.success("已拒绝访问");
+      toast.success(t`已拒绝访问`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -309,7 +311,7 @@ export default function LanTransferTool() {
   async function copyUrl() {
     if (!status?.url) return;
     await navigator.clipboard.writeText(status.url);
-    toast.success("已复制地址");
+    toast.success(t`已复制地址`);
   }
 
   async function chooseDownloadDir() {
@@ -317,7 +319,7 @@ export default function LanTransferTool() {
     const selected = await open({
       multiple: false,
       directory: true,
-      title: "选择接收目录",
+      title: t`选择接收目录`,
     });
     return typeof selected === "string" ? selected : null;
   }
@@ -333,16 +335,16 @@ export default function LanTransferTool() {
           <Button variant="ghost" size="xs" asChild>
             <Link to="/">
               <Home data-icon="inline-start" />
-              首页
+              <Trans>首页</Trans>
             </Link>
           </Button>
           <div className="hidden h-4 w-px bg-border sm:block" />
           <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
-            局域网传输
+            <Trans>局域网传输</Trans>
           </div>
         </div>
         <Badge variant={running ? "secondary" : "outline"}>
-          {running ? "运行中" : "已停止"}
+          {running ? t`运行中` : t`已停止`}
         </Badge>
       </header>
 
@@ -356,15 +358,19 @@ export default function LanTransferTool() {
               <div className="min-w-0">
                 <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                   <h1 className="truncate text-sm font-semibold">
-                    {settings?.deviceName || "局域网传输"}
+                    {settings?.deviceName || t`局域网传输`}
                   </h1>
                   {status?.confirmationCode ? (
-                    <Badge variant="outline">确认码 {status.confirmationCode}</Badge>
+                    <Badge variant="outline">
+                      <Trans>确认码 {status.confirmationCode}</Trans>
+                    </Badge>
                   ) : null}
-                  <Badge variant="outline">{status?.onlineConnections ?? 0} 在线</Badge>
+                  <Badge variant="outline">
+                    <Trans>{status?.onlineConnections ?? 0} 在线</Trans>
+                  </Badge>
                 </div>
                 <p className="truncate text-xs text-muted-foreground">
-                  {status?.url ?? "启动服务后显示浏览器访问地址"}
+                  {status?.url ?? t`启动服务后显示浏览器访问地址`}
                 </p>
               </div>
             </div>
@@ -376,15 +382,15 @@ export default function LanTransferTool() {
                 disabled={!status?.url}
               >
                 <Copy data-icon="inline-start" />
-                复制
+                <Trans>复制</Trans>
               </Button>
               <Button variant="outline" size="sm" onClick={openSettings}>
                 <Settings data-icon="inline-start" />
-                设置
+                <Trans>设置</Trans>
               </Button>
               <Button variant="outline" size="sm" onClick={refresh}>
                 <RefreshCw data-icon="inline-start" />
-                刷新
+                <Trans>刷新</Trans>
               </Button>
               <Button size="sm" onClick={running ? stop : start} disabled={busy}>
                 {busy ? (
@@ -392,7 +398,7 @@ export default function LanTransferTool() {
                 ) : (
                   <Power data-icon="inline-start" />
                 )}
-                {running ? "停止" : "启动"}
+                {running ? t`停止` : t`启动`}
               </Button>
             </div>
           </div>
@@ -401,9 +407,11 @@ export default function LanTransferTool() {
         {bindHostUnavailable ? (
           <Alert variant="destructive">
             <ShieldAlert />
-            <AlertTitle>绑定 IP 不可用</AlertTitle>
+            <AlertTitle>
+              <Trans>绑定 IP 不可用</Trans>
+            </AlertTitle>
             <AlertDescription>
-              当前配置的 {settings?.bindHost} 不在可用网卡列表中，访问地址可能失效。
+              <Trans>当前配置的 {settings?.bindHost} 不在可用网卡列表中，访问地址可能失效。</Trans>
             </AlertDescription>
             <div className="mt-2">
               <Button
@@ -412,7 +420,7 @@ export default function LanTransferTool() {
                 onClick={switchBindAuto}
                 disabled={busy}
               >
-                改为自动选择
+                <Trans>改为自动选择</Trans>
               </Button>
             </div>
           </Alert>

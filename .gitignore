@@ -30,3 +30,5 @@ src-tauri/target
 *.sw?
 .claude/
 .tanstack/
+
+src/locales/**/messages.ts

@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { SftpEntry } from "~/types";
 
 interface DeleteConfirmDialogProps {
@@ -21,21 +22,26 @@ export default function DeleteConfirmDialog({
   onOpenChange,
   onConfirm,
 }: DeleteConfirmDialogProps) {
+  const { t } = useLingui();
   return (
     <AlertDialog open={!!target} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            删除{target?.isDir ? "文件夹" : "文件"}
+            {target?.isDir ? t`删除文件夹` : t`删除文件`}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            确定删除 “{target?.name}”？
-            {target?.isDir ? "该文件夹及其全部内容将被永久删除。" : ""}
+            <Trans>确定删除 “{target?.name}”？</Trans>
+            {target?.isDir ? t`该文件夹及其全部内容将被永久删除。` : ""}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>取消</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>删除</AlertDialogAction>
+          <AlertDialogCancel>
+            <Trans>取消</Trans>
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>
+            <Trans>删除</Trans>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

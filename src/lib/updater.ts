@@ -1,7 +1,9 @@
 import { createElement, type ReactNode } from "react";
+import { msg } from "@lingui/core/macro";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type DownloadEvent, type Update } from "@tauri-apps/plugin-updater";
 import { toast } from "sonner";
+import { translate } from "~/i18n/translate";
 import {
   resetUpdaterState,
   setUpdaterState,
@@ -39,7 +41,7 @@ export async function checkForUpdateOnLaunch() {
 
 export async function checkForUpdateManually() {
   if (!isTauriRuntime()) {
-    toast.error("只能在桌面应用中检查更新");
+    toast.error(translate(msg`只能在桌面应用中检查更新`));
     return;
   }
 
@@ -80,7 +82,7 @@ export async function checkForUpdateManually() {
     const update = await checkWithTimeout();
     if (!update) {
       resetUpdaterState();
-      toast.success("当前已是最新版本", { id: UPDATE_TOAST_ID });
+      toast.success(translate(msg`当前已是最新版本`), { id: UPDATE_TOAST_ID });
       return;
     }
 
@@ -107,14 +109,14 @@ export async function restartToApplyUpdate() {
     await relaunch();
   } catch (error) {
     console.warn("update relaunch failed", error);
-    const message = `重启失败：${formatError(error)}`;
+    const message = translate(msg`重启失败：${formatError(error)}`);
     setUpdaterState({ status: "ready", error: message });
     toast.error(message, {
       id: UPDATE_TOAST_ID,
       duration: Number.POSITIVE_INFINITY,
       closeButton: true,
       action: {
-        label: "重试",
+        label: translate(msg`重试`),
         onClick: () => void restartToApplyUpdate(),
       },
     });
@@ -140,7 +142,7 @@ function registerAvailableUpdate(update: Update) {
 }
 
 function showCheckingToast() {
-  toast.loading("正在检查更新…", {
+  toast.loading(translate(msg`正在检查更新…`), {
     id: UPDATE_TOAST_ID,
     duration: Number.POSITIVE_INFINITY,
   });
@@ -150,17 +152,17 @@ function showAvailableUpdateToast() {
   const state = useUpdaterStore.getState();
   if (state.status !== "available" || !state.version) return;
 
-  toast.info(`发现新版本 ${state.version}`, {
+  toast.info(translate(msg`发现新版本 ${state.version}`), {
     id: UPDATE_TOAST_ID,
     description: releaseNotesContent(state.releaseNotes),
     duration: Number.POSITIVE_INFINITY,
     closeButton: true,
     action: {
-      label: "下载更新",
+      label: translate(msg`下载更新`),
       onClick: () => void startUpdateDownload(),
     },
     cancel: {
-      label: "稍后",
+      label: translate(msg`稍后`),
       onClick: discardAvailableUpdate,
     },
     onDismiss: () => {
@@ -188,7 +190,7 @@ async function startUpdateDownload() {
   const update = activeUpdate;
   if (!update) {
     resetUpdaterState();
-    toast.error("更新信息已失效，请重新检查更新", {
+    toast.error(translate(msg`更新信息已失效，请重新检查更新`), {
       id: UPDATE_TOAST_ID,
     });
     return;
@@ -225,13 +227,13 @@ async function downloadAndInstall(update: Update) {
     showReadyToRestartToast();
   } catch (error) {
     console.warn("update install failed", error);
-    const message = `更新失败：${formatError(error)}`;
+    const message = translate(msg`更新失败：${formatError(error)}`);
     setUpdaterState({ status: "error", error: message });
     toast.error(message, {
       id: UPDATE_TOAST_ID,
       closeButton: true,
       action: {
-        label: "重新检查",
+        label: translate(msg`重新检查`),
         onClick: () => void resetAfterFailedUpdate(),
       },
     });
@@ -265,8 +267,8 @@ function showDownloadProgressToast() {
 
   toast.loading(
     state.phase === "installing"
-      ? `正在准备版本 ${state.version}`
-      : `正在下载版本 ${state.version}`,
+      ? translate(msg`正在准备版本 ${state.version}`)
+      : translate(msg`正在下载版本 ${state.version}`),
     {
       id: UPDATE_TOAST_ID,
       description: downloadProgressContent(state),
@@ -283,25 +285,25 @@ function showReadyToRestartToast() {
   const state = useUpdaterStore.getState();
   if (state.status !== "ready" || !state.version) return;
 
-  toast.success(`版本 ${state.version} 已准备好`, {
+  toast.success(translate(msg`版本 ${state.version} 已准备好`), {
     id: UPDATE_TOAST_ID,
-    description: "重启应用即可完成更新。",
+    description: translate(msg`重启应用即可完成更新。`),
     duration: Number.POSITIVE_INFINITY,
     closeButton: false,
     dismissible: true,
     action: {
-      label: "重启并更新",
+      label: translate(msg`重启并更新`),
       onClick: () => void restartToApplyUpdate(),
     },
     cancel: {
-      label: "稍后",
+      label: translate(msg`稍后`),
       onClick: () => toast.dismiss(UPDATE_TOAST_ID),
     },
   });
 }
 
 function showRestartingToast() {
-  toast.loading("正在重启并应用更新…", {
+  toast.loading(translate(msg`正在重启并应用更新…`), {
     id: UPDATE_TOAST_ID,
     duration: Number.POSITIVE_INFINITY,
     closeButton: false,
@@ -324,7 +326,7 @@ function checkWithTimeout() {
   return withTimeout(
     check({ timeout: UPDATE_CHECK_TIMEOUT_MS }),
     UPDATE_CHECK_TIMEOUT_MS,
-    "检查更新超时，请确认 GitHub Release 更新源是否可访问",
+    translate(msg`检查更新超时，请确认 GitHub Release 更新源是否可访问`),
   );
 }
 
@@ -340,7 +342,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, message: string) {
 }
 
 function releaseNotesContent(notes: string[]): ReactNode {
-  if (notes.length === 0) return "查看 GitHub Release 获取更新内容";
+  if (notes.length === 0) return translate(msg`查看 GitHub Release 获取更新内容`);
 
   return createElement(
     "div",
@@ -352,15 +354,17 @@ function releaseNotesContent(notes: string[]): ReactNode {
 }
 
 function downloadProgressContent(state: ReturnType<typeof useUpdaterStore.getState>) {
-  if (state.phase === "installing") return "下载完成，正在安装更新…";
+  if (state.phase === "installing") return translate(msg`下载完成，正在安装更新…`);
 
-  if (!state.total) return `已下载 ${formatBytes(state.downloaded)}`;
+  if (!state.total) return translate(msg`已下载 ${formatBytes(state.downloaded)}`);
 
   const percent = Math.min(
     100,
     Math.round((state.downloaded / state.total) * 100),
   );
-  return `${percent}%（${formatBytes(state.downloaded)} / ${formatBytes(state.total)}）`;
+  return translate(
+    msg`${percent}%（${formatBytes(state.downloaded)} / ${formatBytes(state.total)}）`,
+  );
 }
 
 export function formatReleaseNotes(body?: string) {
@@ -409,7 +413,7 @@ function formatError(error: unknown) {
 function updateErrorTitle(error: unknown) {
   const message = formatError(error);
   if (message.includes("None of the fallback platforms")) {
-    return "检查更新失败：当前平台没有可用更新包";
+    return translate(msg`检查更新失败：当前平台没有可用更新包`);
   }
 
   if (
@@ -417,8 +421,8 @@ function updateErrorTitle(error: unknown) {
     message.includes("timed out") ||
     message.includes("超时")
   ) {
-    return "检查更新失败：无法连接更新源";
+    return translate(msg`检查更新失败：无法连接更新源`);
   }
 
-  return `检查更新失败：${message}`;
+  return translate(msg`检查更新失败：${message}`);
 }

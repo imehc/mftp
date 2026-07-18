@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Group,
   Panel,
@@ -26,6 +27,7 @@ import {
 const SIDEBAR_COLLAPSED_SIZE = 52;
 
 export default function SshSftpTool() {
+  const { t } = useLingui();
   const sidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
@@ -62,7 +64,7 @@ export default function SshSftpTool() {
           <Button variant="ghost" size="xs" asChild>
             <Link to="/">
               <Home data-icon="inline-start" />
-              首页
+              <Trans>首页</Trans>
             </Link>
           </Button>
           <div className="hidden h-4 w-px bg-border sm:block" />
@@ -118,7 +120,7 @@ export default function SshSftpTool() {
         </Panel>
         <Separator
           className="group relative w-1 shrink-0 bg-border/60 transition-colors hover:bg-border data-[resize-handle-active]:bg-primary/50"
-          aria-label="调整左侧面板宽度"
+          aria-label={t`调整左侧面板宽度`}
         >
           <span className="absolute left-1/2 top-1/2 h-8 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-transparent transition-colors group-hover:bg-foreground/30" />
         </Separator>
@@ -132,9 +134,11 @@ export default function SshSftpTool() {
                     <EmptyMedia variant="icon">
                       <TerminalSquare />
                     </EmptyMedia>
-                    <EmptyTitle>还没有打开的连接</EmptyTitle>
+                    <EmptyTitle>
+                      <Trans>还没有打开的连接</Trans>
+                    </EmptyTitle>
                     <EmptyDescription>
-                      在左侧选择主机并点击连接，或新建主机
+                      <Trans>在左侧选择主机并点击连接，或新建主机</Trans>
                     </EmptyDescription>
                   </EmptyHeader>
                 </Empty>

@@ -1,0 +1,1623 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-18 00:00+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lingui\n"
+"Language: zh-CN\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:197
+msgid " · 推荐"
+msgstr " · 推荐"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:255
+msgid " (需口令)"
+msgstr " (需口令)"
+
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:30
+msgid "，目录变更需重启服务后完整生效"
+msgstr "，目录变更需重启服务后完整生效"
+
+#. placeholder {0}: hosts.length
+#: src/features/home/HomePage.tsx:100
+msgid "{0} 主机"
+msgstr "{0} 主机"
+
+#. placeholder {0}: runningTransfers.length
+#: src/features/home/HomePage.tsx:65
+#: src/features/home/HomePage.tsx:106
+msgid "{0} 传输"
+msgstr "{0} 传输"
+
+#. placeholder {0}: Math.floor(diff / 60_000)
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:21
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:38
+msgid "{0} 分钟前"
+msgstr "{0} 分钟前"
+
+#. placeholder {0}: status?.onlineConnections ?? 0
+#: src/features/lan-transfer/LanTransferTool.tsx:369
+msgid "{0} 在线"
+msgstr "{0} 在线"
+
+#. placeholder {0}: failedTransfers.length
+#: src/features/home/HomePage.tsx:69
+msgid "{0} 失败"
+msgstr "{0} 失败"
+
+#. placeholder {0}: Math.floor(diff / 3_600_000)
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:22
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:39
+msgid "{0} 小时前"
+msgstr "{0} 小时前"
+
+#. placeholder {0}: host?.label
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:65
+msgid "{0} 的私钥口令"
+msgstr "{0} 的私钥口令"
+
+#. placeholder {0}: Math.floor(diff / 1000)
+#. placeholder {0}: Math.max(1, Math.ceil(diff / 1000))
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:20
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:37
+msgid "{0} 秒前"
+msgstr "{0} 秒前"
+
+#. placeholder {0}: activeSessions.length
+#: src/features/home/HomePage.tsx:62
+#: src/features/home/HomePage.tsx:103
+msgid "{0} 连接"
+msgstr "{0} 连接"
+
+#~ msgid "{activeSessionsCount} 连接"
+#~ msgstr "{activeSessionsCount} 连接"
+
+#~ msgid "{failedTransfersCount} 失败"
+#~ msgstr "{failedTransfersCount} 失败"
+
+#~ msgid "{hostsCount} 主机"
+#~ msgstr "{hostsCount} 主机"
+
+#: src/features/transfers/TransferPanel.tsx:65
+msgid "{hours} 小时"
+msgstr "{hours} 小时"
+
+#: src/features/transfers/TransferPanel.tsx:64
+msgid "{hours} 小时 {remainingMinutes} 分"
+msgstr "{hours} 小时 {remainingMinutes} 分"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:149
+msgid "{incomingLabel}名称"
+msgstr "{incomingLabel}名称"
+
+#: src/features/transfers/TransferPanel.tsx:59
+msgid "{minutes} 分"
+msgstr "{minutes} 分"
+
+#: src/features/transfers/TransferPanel.tsx:58
+msgid "{minutes} 分 {remainingSeconds} 秒"
+msgstr "{minutes} 分 {remainingSeconds} 秒"
+
+#: src/features/transfers/TransferPanel.tsx:117
+msgid "{pausedTransferCount} 个已暂停"
+msgstr "{pausedTransferCount} 个已暂停"
+
+#. placeholder {0}: formatBytes(state.downloaded)
+#. placeholder {1}: formatBytes(state.total)
+#: src/lib/updater.ts:366
+msgid "{percent}%（{0} / {1}）"
+msgstr "{percent}%（{0} / {1}）"
+
+#: src/features/transfers/TransferPanel.tsx:53
+msgid "{rounded} 秒"
+msgstr "{rounded} 秒"
+
+#~ msgid "{runningTransfersCount} 传输"
+#~ msgstr "{runningTransfersCount} 传输"
+
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:29
+msgid "{sharesCount} 个目录"
+msgstr "{sharesCount} 个目录"
+
+#: src/features/transfers/TransferPanel.tsx:120
+msgid "{transferringCount} 个进行中"
+msgstr "{transferringCount} 个进行中"
+
+#: src/features/transfers/TransferPanel.tsx:119
+msgid "{transferringCount} 进行中 · {pausedTransferCount} 已暂停"
+msgstr "{transferringCount} 进行中 · {pausedTransferCount} 已暂停"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:287
+msgid "/var/www（留空则用主目录）"
+msgstr "/var/www（留空则用主目录）"
+
+#: src/i18n/locales.ts:10
+msgid "English"
+msgstr "English"
+
+#~ msgid "HTTP"
+#~ msgstr "HTTP"
+
+#~ msgid "MFTP"
+#~ msgstr "MFTP"
+
+#~ msgid "SSH / SFTP"
+#~ msgstr "SSH / SFTP"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:64
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:271
+msgid "上传"
+msgstr "上传"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:54
+msgid "上传 {name}"
+msgstr "上传 {name}"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:254
+msgid "上传 {remoteName}"
+msgstr "上传 {remoteName}"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:277
+msgid "上传文件"
+msgstr "上传文件"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:280
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:408
+msgid "上传文件夹"
+msgstr "上传文件夹"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:200
+msgid "上传的文件夹"
+msgstr "上传的文件夹"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:143
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:234
+msgid "上级目录"
+msgstr "上级目录"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:65
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:105
+msgid "下载"
+msgstr "下载"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:81
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:126
+msgid "下载 {0}"
+msgstr "下载 {0}"
+
+#: src/features/settings/AppSettingsMenu.tsx:86
+msgid "下载中"
+msgstr "下载中"
+
+#: src/lib/updater.ts:357
+msgid "下载完成，正在安装更新…"
+msgstr "下载完成，正在安装更新…"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:420
+msgid "下载文件夹"
+msgstr "下载文件夹"
+
+#: src/lib/updater.ts:161
+msgid "下载更新"
+msgstr "下载更新"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:29
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:34
+msgid "不可用"
+msgstr "不可用"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:197
+msgid "不能移动到自身或子文件夹中"
+msgstr "不能移动到自身或子文件夹中"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:84
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:193
+msgid "两个名称不能相同。"
+msgstr "两个名称不能相同。"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:402
+msgid "主机"
+msgstr "主机"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:134
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:221
+msgid "主目录"
+msgstr "主目录"
+
+#: src/features/settings/AppSettingsMenu.tsx:237
+msgid "主题"
+msgstr "主题"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:30
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:86
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:390
+#: src/features/lan-transfer/LanTransferSidebar.tsx:26
+msgid "仅上传"
+msgstr "仅上传"
+
+#: src/features/transfers/TransferPanel.tsx:273
+msgid "传输"
+msgstr "传输"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:169
+msgid "传输任务"
+msgstr "传输任务"
+
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:99
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:75
+msgid "位置"
+msgstr "位置"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
+msgid "保存"
+msgstr "保存"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
+msgid "保存中…"
+msgstr "保存中…"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:78
+msgid "保存到"
+msgstr "保存到"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:157
+msgid "修改日期"
+msgstr "修改日期"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:78
+msgid "修改时间"
+msgstr "修改时间"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:401
+msgid "停止"
+msgstr "停止"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:94
+msgid "允许"
+msgstr "允许"
+
+#: src/features/logs/ActivityLogsPage.tsx:128
+msgid "全部时间"
+msgstr "全部时间"
+
+#: src/features/logs/ActivityLogsPage.tsx:126
+msgid "全部来源"
+msgstr "全部来源"
+
+#: src/features/logs/ActivityLogsPage.tsx:127
+msgid "全部结果"
+msgstr "全部结果"
+
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:26
+#: src/features/lan-transfer/LanShareDialog.tsx:72
+#: src/features/lan-transfer/LanShareDialog.tsx:98
+msgid "共享目录"
+msgstr "共享目录"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:257
+#: src/features/settings/AppSettingsMenu.tsx:168
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
+msgid "关闭"
+msgstr "关闭"
+
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
+msgid "关闭中"
+msgstr "关闭中"
+
+#: src/store/transfers.ts:57
+msgid "准备中"
+msgstr "准备中"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:19
+msgid "刚刚"
+msgstr "刚刚"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:392
+msgid "创建"
+msgstr "创建"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:77
+msgid "创建时间"
+msgstr "创建时间"
+
+#: src/features/logs/LogPageLayout.tsx:88
+#: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:43
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:125
+#: src/features/ssh-sftp/components/Sidebar.tsx:372
+#: src/features/ssh-sftp/components/Sidebar.tsx:558
+msgid "删除"
+msgstr "删除"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:320
+msgid "删除 {0}"
+msgstr "删除 {0}"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:318
+msgid "删除 {0}…"
+msgstr "删除 {0}…"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:547
+msgid "删除主机"
+msgstr "删除主机"
+
+#: src/features/logs/LogPageLayout.tsx:80
+msgid "删除后无法恢复。"
+msgstr "删除后无法恢复。"
+
+#: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:31
+msgid "删除文件"
+msgstr "删除文件"
+
+#: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:31
+msgid "删除文件夹"
+msgstr "删除文件夹"
+
+#: src/features/logs/LogPageLayout.tsx:67
+#: src/features/logs/LogPageLayout.tsx:68
+msgid "删除日志"
+msgstr "删除日志"
+
+#: src/features/logs/LogPageLayout.tsx:77
+msgid "删除这条日志？"
+msgstr "删除这条日志？"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:48
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:125
+#: src/features/lan-transfer/LanTransferTool.tsx:393
+#: src/features/logs/LogPageLayout.tsx:111
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:152
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:247
+msgid "刷新"
+msgstr "刷新"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:223
+msgid "剩余 "
+msgstr "剩余 "
+
+#. placeholder {0}: metrics.eta
+#: src/features/transfers/TransferPanel.tsx:413
+msgid "剩余 {0}"
+msgstr "剩余 {0}"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:196
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:299
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:246
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:251
+msgid "加载中…"
+msgstr "加载中…"
+
+#: src/features/logs/ActivityLogsPage.tsx:152
+msgid "动作"
+msgstr "动作"
+
+#: src/features/settings/AppSettingsMenu.tsx:97
+msgid "压缩包"
+msgstr "压缩包"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:320
+msgid "双击切换到连接"
+msgstr "双击切换到连接"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:320
+msgid "双击连接"
+msgstr "双击连接"
+
+#. placeholder {0}: state.version
+#: src/lib/updater.ts:155
+msgid "发现新版本 {0}"
+msgstr "发现新版本 {0}"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:37
+msgid "发现设备"
+msgstr "发现设备"
+
+#: src/components/ui/prompt-dialog.tsx:96
+#: src/features/lan-transfer/LanShareDialog.tsx:135
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:444
+#: src/features/logs/LogPageLayout.tsx:85
+#: src/features/logs/LogPageLayout.tsx:129
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:306
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:84
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:212
+#: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:40
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:114
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:232
+#: src/features/ssh-sftp/components/Sidebar.tsx:555
+#: src/features/transfers/TransferPanel.tsx:380
+msgid "取消"
+msgstr "取消"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:200
+msgid "口令保护"
+msgstr "口令保护"
+
+#: src/lib/updater.ts:44
+msgid "只能在桌面应用中检查更新"
+msgstr "只能在桌面应用中检查更新"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:29
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:84
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:388
+#: src/features/lan-transfer/LanTransferSidebar.tsx:25
+msgid "只读"
+msgstr "只读"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:357
+msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
+msgstr "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:402
+msgid "同时传输数"
+msgstr "同时传输数"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:40
+msgid "同网段 MFTP 客户端，点击可直接打开访问地址"
+msgstr "同网段 MFTP 客户端，点击可直接打开访问地址"
+
+#: src/features/lan-transfer/LanShareDialog.tsx:91
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:277
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:93
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:109
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:72
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:156
+msgid "名称"
+msgstr "名称"
+
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:42
+msgid "名称不能为空"
+msgstr "名称不能为空"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:74
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:113
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:185
+msgid "名称不能为空，且不能包含斜杠"
+msgstr "名称不能为空，且不能包含斜杠"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:70
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:77
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:195
+msgid "名称不能为空，且不能包含斜杠。"
+msgstr "名称不能为空，且不能包含斜杠。"
+
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:44
+msgid "名称不能包含斜杠"
+msgstr "名称不能包含斜杠"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:401
+msgid "启动"
+msgstr "启动"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:373
+msgid "启动服务后显示浏览器访问地址"
+msgstr "启动服务后显示浏览器访问地址"
+
+#: src/features/ssh-sftp/SshSftpTool.tsx:141
+msgid "在左侧选择主机并点击连接，或新建主机"
+msgstr "在左侧选择主机并点击连接，或新建主机"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
+msgid "在线"
+msgstr "在线"
+
+#: src/features/logs/ActivityLogsPage.tsx:151
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:120
+msgid "地址"
+msgstr "地址"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:385
+msgid "复制"
+msgstr "复制"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:74
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:159
+msgid "大小"
+msgstr "大小"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:58
+#: src/features/logs/ActivityLogsPage.tsx:127
+#: src/features/logs/ActivityLogsPage.tsx:165
+#: src/store/transfers.ts:127
+msgid "失败"
+msgstr "失败"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:239
+msgid "安全模式"
+msgstr "安全模式"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:57
+#: src/store/transfers.ts:124
+msgid "完成"
+msgstr "完成"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:76
+msgid "完整路径"
+msgstr "完整路径"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:202
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:219
+msgid "密码"
+msgstr "密码"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:205
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:240
+msgid "密钥"
+msgstr "密钥"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:97
+#: src/features/ssh-sftp/components/Sidebar.tsx:430
+msgid "密钥管理"
+msgstr "密钥管理"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:164
+msgid "导入中…"
+msgstr "导入中…"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:164
+msgid "导入密钥"
+msgstr "导入密钥"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:185
+msgid "导入私钥后可在主机中选用。"
+msgstr "导入私钥后可在主机中选用。"
+
+#: src/features/logs/ActivityLogsPage.tsx:126
+msgid "局域网"
+msgstr "局域网"
+
+#: src/features/home/HomePage.tsx:125
+#: src/features/lan-transfer/LanTransferTool.tsx:343
+#: src/features/lan-transfer/LanTransferTool.tsx:361
+msgid "局域网传输"
+msgstr "局域网传输"
+
+#. placeholder {0}: String(error)
+#: src/features/lan-transfer/LanTransferTool.tsx:107
+msgid "局域网传输加载失败：{0}"
+msgstr "局域网传输加载失败：{0}"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:118
+msgid "局域网传输设置"
+msgstr "局域网传输设置"
+
+#. placeholder {0}: String(error)
+#: src/features/lan-transfer/LanTransferTool.tsx:122
+msgid "局域网传输辅助数据加载失败：{0}"
+msgstr "局域网传输辅助数据加载失败：{0}"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:416
+msgid "展开侧边栏"
+msgstr "展开侧边栏"
+
+#: src/features/home/HomePage.tsx:52
+msgid "工具与运行状态"
+msgstr "工具与运行状态"
+
+#. placeholder {0}: formatBytes(state.downloaded)
+#: src/lib/updater.ts:359
+msgid "已下载 {0}"
+msgstr "已下载 {0}"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:183
+msgid "已保存配置"
+msgstr "已保存配置"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:347
+msgid "已停止"
+msgstr "已停止"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:295
+msgid "已允许访问"
+msgstr "已允许访问"
+
+#: src/features/settings/AppSettingsMenu.tsx:133
+msgid "已关闭开机自启"
+msgstr "已关闭开机自启"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:325
+msgid "已删除 {0}"
+msgstr "已删除 {0}"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:86
+msgid "已删除 {name}"
+msgstr "已删除 {name}"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:224
+msgid "已删除主机 {name}"
+msgstr "已删除主机 {name}"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:246
+msgid "已删除共享目录"
+msgstr "已删除共享目录"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:236
+msgid "已删除白名单"
+msgstr "已删除白名单"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:59
+#: src/store/transfers.ts:126
+msgid "已取消"
+msgstr "已取消"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:271
+msgid "已取消任务"
+msgstr "已取消任务"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:314
+msgid "已复制地址"
+msgstr "已复制地址"
+
+#. placeholder {0}: keys.length
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:173
+msgid "已导入 ({0})"
+msgstr "已导入 ({0})"
+
+#. placeholder {0}: value.label.trim()
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:58
+msgid "已导入密钥 {0}"
+msgstr "已导入密钥 {0}"
+
+#: src/features/settings/AppSettingsMenu.tsx:129
+msgid "已开启开机自启"
+msgstr "已开启开机自启"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:305
+msgid "已拒绝访问"
+msgstr "已拒绝访问"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:200
+msgid "已改为自动绑定"
+msgstr "已改为自动绑定"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:200
+msgid "已改为自动绑定，重启服务后生效"
+msgstr "已改为自动绑定，重启服务后生效"
+
+#. placeholder {0}: host.label
+#: src/features/ssh-sftp/components/Sidebar.tsx:207
+msgid "已断开 {0}"
+msgstr "已断开 {0}"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:261
+msgid "已断开设备"
+msgstr "已断开设备"
+
+#: src/store/transfers.ts:183
+msgid "已暂停"
+msgstr "已暂停"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:214
+msgid "已添加共享目录"
+msgstr "已添加共享目录"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:226
+msgid "已添加白名单"
+msgstr "已添加白名单"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:278
+msgid "已移动 {0}"
+msgstr "已移动 {0}"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:164
+msgid "已解压到 {outName}"
+msgstr "已解压到 {outName}"
+
+#. placeholder {0}: hostAddress(host)
+#: src/features/ssh-sftp/components/Sidebar.tsx:334
+msgid "已连接 · {0}"
+msgstr "已连接 · {0}"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:252
+msgid "并发上限"
+msgstr "并发上限"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:430
+msgid "应用启动后自动开启服务"
+msgstr "应用启动后自动开启服务"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:257
+#: src/features/settings/AppSettingsMenu.tsx:165
+msgid "开启"
+msgstr "开启"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:257
+#: src/features/lan-transfer/LanTransferSidebar.tsx:31
+msgid "开放"
+msgstr "开放"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:354
+msgid "开放模式会跳过确认码"
+msgstr "开放模式会跳过确认码"
+
+#: src/features/settings/AppSettingsMenu.tsx:155
+msgid "开机自启"
+msgstr "开机自启"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:188
+msgid "当前不可用"
+msgstr "当前不可用"
+
+#: src/lib/updater.ts:85
+msgid "当前已是最新版本"
+msgstr "当前已是最新版本"
+
+#. placeholder {0}: settings?.bindHost
+#: src/features/lan-transfer/LanTransferTool.tsx:414
+msgid "当前配置的 {0} 不在可用网卡列表中，访问地址可能失效。"
+msgstr "当前配置的 {0} 不在可用网卡列表中，访问地址可能失效。"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:117
+msgid "待授权请求"
+msgstr "待授权请求"
+
+#: src/features/logs/ActivityLogsPage.tsx:127
+#: src/features/logs/ActivityLogsPage.tsx:165
+msgid "成功"
+msgstr "成功"
+
+#: src/features/logs/LogPageLayout.tsx:124
+msgid "所有日志记录都会被删除，且无法恢复。"
+msgstr "所有日志记录都会被删除，且无法恢复。"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:81
+msgid "所有者"
+msgstr "所有者"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:188
+msgid "打开"
+msgstr "打开"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:290
+msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
+msgstr "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
+
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:68
+msgid "打开文件管理"
+msgstr "打开文件管理"
+
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:68
+msgid "打开终端"
+msgstr "打开终端"
+
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:108
+msgid "打开终端失败：{e}"
+msgstr "打开终端失败：{e}"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:111
+msgid "扫码访问"
+msgstr "扫码访问"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:416
+msgid "折叠侧边栏"
+msgstr "折叠侧边栏"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:102
+msgid "拖动排序"
+msgstr "拖动排序"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:483
+msgid "换个关键词试试"
+msgstr "换个关键词试试"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:176
+msgid "排序保存失败：{error}"
+msgstr "排序保存失败：{error}"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:236
+msgid "接收"
+msgstr "接收"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:212
+#: src/features/lan-transfer/LanTransferSidebar.tsx:260
+msgid "接收目录"
+msgstr "接收目录"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:457
+msgid "搜索…"
+msgstr "搜索…"
+
+#: src/features/logs/ActivityLogsPage.tsx:124
+msgid "搜索地址、动作、详情"
+msgstr "搜索地址、动作、详情"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:160
+msgid "操作"
+msgstr "操作"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:423
+msgid "改为自动选择"
+msgstr "改为自动选择"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:53
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:262
+msgid "文件"
+msgstr "文件"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:452
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:50
+msgid "文件夹"
+msgstr "文件夹"
+
+#: src/features/settings/AppSettingsMenu.tsx:191
+msgid "文件夹传输"
+msgstr "文件夹传输"
+
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:79
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:391
+msgid "文件夹名称"
+msgstr "文件夹名称"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:203
+msgid "文件夹已在该位置"
+msgstr "文件夹已在该位置"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:203
+msgid "文件已在该位置"
+msgstr "文件已在该位置"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:344
+msgid "断开中"
+msgstr "断开中"
+
+#. placeholder {0}: hostAddress(host)
+#: src/features/ssh-sftp/components/Sidebar.tsx:333
+msgid "断开中 · {0}"
+msgstr "断开中 · {0}"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:209
+msgid "断开失败：{e}"
+msgstr "断开失败：{e}"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:344
+msgid "断开连接"
+msgstr "断开连接"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:266
+msgid "新建"
+msgstr "新建"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
+#: src/features/ssh-sftp/components/Sidebar.tsx:447
+msgid "新建主机"
+msgstr "新建主机"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:390
+msgid "新建文件夹"
+msgstr "新建文件夹"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:480
+msgid "无匹配结果"
+msgstr "无匹配结果"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:200
+msgid "无口令"
+msgstr "无口令"
+
+#: src/features/home/HomePage.tsx:75
+#: src/features/logs/ActivityLogsPage.tsx:115
+msgid "日志"
+msgstr "日志"
+
+#: src/features/logs/ActivityLogsPage.tsx:95
+msgid "日志已删除"
+msgstr "日志已删除"
+
+#: src/features/logs/ActivityLogsPage.tsx:85
+msgid "日志已清空"
+msgstr "日志已清空"
+
+#: src/features/logs/ActivityLogsPage.tsx:128
+#: src/features/logs/ActivityLogsPage.tsx:149
+msgid "时间"
+msgstr "时间"
+
+#: src/features/transfers/TransferPanel.tsx:365
+msgid "暂停"
+msgstr "暂停"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:175
+msgid "暂无任务"
+msgstr "暂无任务"
+
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:41
+msgid "暂无共享目录"
+msgstr "暂无共享目录"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:54
+msgid "暂无发现设备"
+msgstr "暂无发现设备"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:182
+msgid "暂无密钥"
+msgstr "暂无密钥"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:263
+msgid "暂无密钥，请先在密钥管理中导入。"
+msgstr "暂无密钥，请先在密钥管理中导入。"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:131
+msgid "暂无待授权请求"
+msgstr "暂无待授权请求"
+
+#: src/features/logs/ActivityLogsPage.tsx:135
+msgid "暂无日志"
+msgstr "暂无日志"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:318
+msgid "暂无白名单"
+msgstr "暂无白名单"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:132
+msgid "暂无设备"
+msgstr "暂无设备"
+
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:98
+msgid "更多"
+msgstr "更多"
+
+#: src/lib/updater.ts:193
+msgid "更新信息已失效，请重新检查更新"
+msgstr "更新信息已失效，请重新检查更新"
+
+#. placeholder {0}: formatError(error)
+#: src/lib/updater.ts:230
+msgid "更新失败：{0}"
+msgstr "更新失败：{0}"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:169
+msgid "服务已停止"
+msgstr "服务已停止"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:153
+msgid "服务已启动"
+msgstr "服务已启动"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:118
+msgid "服务未启动"
+msgstr "服务未启动"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:438
+msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
+msgstr "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
+
+#: src/features/lan-transfer/LanShareDialog.tsx:118
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:218
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:136
+msgid "未选择"
+msgstr "未选择"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:422
+msgid "本地文件夹名称"
+msgstr "本地文件夹名称"
+
+#: src/features/lan-transfer/LanShareDialog.tsx:112
+msgid "本地目录"
+msgstr "本地目录"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:80
+msgid "权限"
+msgstr "权限"
+
+#: src/features/logs/ActivityLogsPage.tsx:126
+#: src/features/logs/ActivityLogsPage.tsx:150
+msgid "来源"
+msgstr "来源"
+
+#: src/lib/updater.ts:345
+msgid "查看 GitHub Release 获取更新内容"
+msgstr "查看 GitHub Release 获取更新内容"
+
+#: src/features/settings/AppSettingsMenu.tsx:85
+msgid "查看更新"
+msgstr "查看更新"
+
+#: src/features/settings/AppSettingsMenu.tsx:83
+msgid "检查更新"
+msgstr "检查更新"
+
+#: src/lib/updater.ts:427
+msgid "检查更新失败：{message}"
+msgstr "检查更新失败：{message}"
+
+#: src/lib/updater.ts:416
+msgid "检查更新失败：当前平台没有可用更新包"
+msgstr "检查更新失败：当前平台没有可用更新包"
+
+#: src/lib/updater.ts:424
+msgid "检查更新失败：无法连接更新源"
+msgstr "检查更新失败：无法连接更新源"
+
+#: src/lib/updater.ts:329
+msgid "检查更新超时，请确认 GitHub Release 更新源是否可访问"
+msgstr "检查更新超时，请确认 GitHub Release 更新源是否可访问"
+
+#. placeholder {0}: state.version
+#: src/lib/updater.ts:271
+msgid "正在下载版本 {0}"
+msgstr "正在下载版本 {0}"
+
+#. placeholder {0}: state.version
+#: src/lib/updater.ts:270
+msgid "正在准备版本 {0}"
+msgstr "正在准备版本 {0}"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:317
+msgid "正在删除 {0}…"
+msgstr "正在删除 {0}…"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:249
+msgid "正在刷新…"
+msgstr "正在刷新…"
+
+#: src/store/transfers.ts:154
+msgid "正在取消"
+msgstr "正在取消"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:248
+msgid "正在打开上级目录…"
+msgstr "正在打开上级目录…"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:247
+msgid "正在打开主目录…"
+msgstr "正在打开主目录…"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:250
+msgid "正在打开文件夹…"
+msgstr "正在打开文件夹…"
+
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:177
+msgid "正在打开终端…"
+msgstr "正在打开终端…"
+
+#: src/features/settings/AppSettingsMenu.tsx:84
+msgid "正在检查"
+msgstr "正在检查"
+
+#: src/lib/updater.ts:145
+msgid "正在检查更新…"
+msgstr "正在检查更新…"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:274
+msgid "正在移动 {0}…"
+msgstr "正在移动 {0}…"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:160
+msgid "正在解压 {0}…"
+msgstr "正在解压 {0}…"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:68
+msgid "正在读取最新信息…"
+msgstr "正在读取最新信息…"
+
+#. placeholder {0}: session.title
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:148
+msgid "正在连接 {0}…"
+msgstr "正在连接 {0}…"
+
+#: src/lib/updater.ts:306
+msgid "正在重启并应用更新…"
+msgstr "正在重启并应用更新…"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:205
+msgid "没有子文件夹"
+msgstr "没有子文件夹"
+
+#: src/features/home/HomePage.tsx:59
+msgid "活动中"
+msgstr "活动中"
+
+#: src/features/settings/AppSettingsMenu.tsx:93
+msgid "浅色"
+msgstr "浅色"
+
+#: src/features/home/HomePage.tsx:130
+msgid "浏览器访问"
+msgstr "浏览器访问"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:120
+msgid "浏览器访问申请、弹窗确认和白名单回落请求"
+msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
+
+#: src/features/settings/AppSettingsMenu.tsx:94
+msgid "深色"
+msgstr "深色"
+
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:35
+#: src/features/lan-transfer/LanShareDialog.tsx:143
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:310
+msgid "添加"
+msgstr "添加"
+
+#: src/features/lan-transfer/LanShareDialog.tsx:81
+msgid "添加共享目录"
+msgstr "添加共享目录"
+
+#: src/features/logs/LogPageLayout.tsx:115
+msgid "清空"
+msgstr "清空"
+
+#: src/features/logs/LogPageLayout.tsx:121
+msgid "清空日志"
+msgstr "清空日志"
+
+#: src/features/transfers/TransferPanel.tsx:299
+msgid "清除 {finishedTransferCount}"
+msgstr "清除 {finishedTransferCount}"
+
+#: src/features/transfers/TransferPanel.tsx:295
+#: src/features/transfers/TransferPanel.tsx:296
+msgid "清除 {finishedTransferCount} 个已完成任务"
+msgstr "清除 {finishedTransferCount} 个已完成任务"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:483
+msgid "点击右上角 + 新建主机"
+msgstr "点击右上角 + 新建主机"
+
+#. placeholder {0}: state.version
+#: src/lib/updater.ts:288
+msgid "版本 {0} 已准备好"
+msgstr "版本 {0} 已准备好"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:166
+msgid "用户名"
+msgstr "用户名"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:173
+msgid "留空则使用 SSH 配置或本机用户"
+msgstr "留空则使用 SSH 配置或本机用户"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:180
+msgid "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
+msgstr "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:256
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:268
+#: src/features/lan-transfer/LanTransferSidebar.tsx:32
+msgid "白名单"
+msgstr "白名单"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:128
+msgid "目标已存在同名项目"
+msgstr "目标已存在同名项目"
+
+#: src/features/settings/AppSettingsMenu.tsx:98
+msgid "直接"
+msgstr "直接"
+
+#: src/components/ui/prompt-dialog.tsx:98
+msgid "确定"
+msgstr "确定"
+
+#. placeholder {0}: target?.name
+#: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:34
+msgid "确定删除 “{0}”？"
+msgstr "确定删除 “{0}”？"
+
+#. placeholder {0}: deleteTarget?.label
+#: src/features/ssh-sftp/components/Sidebar.tsx:550
+msgid "确定删除主机 “{0}”？此操作不可撤销。"
+msgstr "确定删除主机 “{0}”？此操作不可撤销。"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:225
+msgid "确认"
+msgstr "确认"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:196
+msgid "确认后会按上面的名称继续。"
+msgstr "确认后会按上面的名称继续。"
+
+#: src/features/logs/LogPageLayout.tsx:132
+msgid "确认清空"
+msgstr "确认清空"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:255
+#: src/features/lan-transfer/LanTransferSidebar.tsx:33
+msgid "确认码"
+msgstr "确认码"
+
+#. placeholder {0}: status.confirmationCode
+#: src/features/lan-transfer/LanTransferTool.tsx:365
+msgid "确认码 {0}"
+msgstr "确认码 {0}"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
+msgid "离线"
+msgstr "离线"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:130
+msgid "私钥文件"
+msgstr "私钥文件"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:73
+msgid "种类"
+msgstr "种类"
+
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:116
+msgid "移动"
+msgstr "移动"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:275
+msgid "移动 {0}…"
+msgstr "移动 {0}…"
+
+#: src/lib/updater.ts:165
+#: src/lib/updater.ts:299
+msgid "稍后"
+msgstr "稍后"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:308
+msgid "空目录"
+msgstr "空目录"
+
+#: src/features/home/HomePage.tsx:59
+#: src/features/transfers/TransferPanel.tsx:115
+msgid "空闲"
+msgstr "空闲"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:145
+#: src/features/lan-transfer/LanTransferSidebar.tsx:240
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:145
+msgid "端口"
+msgstr "端口"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:37
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:108
+msgid "简介"
+msgstr "简介"
+
+#: src/i18n/locales.ts:9
+msgid "简体中文"
+msgstr "简体中文"
+
+#: src/features/logs/ActivityLogsPage.tsx:116
+msgid "管理 SSH、SFTP 和局域网传输活动"
+msgstr "管理 SSH、SFTP 和局域网传输活动"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:158
+msgid "类型"
+msgstr "类型"
+
+#: src/features/settings/AppSettingsMenu.tsx:92
+msgid "系统"
+msgstr "系统"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:244
+msgid "绑定"
+msgstr "绑定"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:171
+msgid "绑定 IP"
+msgstr "绑定 IP"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:411
+msgid "绑定 IP 不可用"
+msgstr "绑定 IP 不可用"
+
+#: src/features/logs/ActivityLogsPage.tsx:127
+#: src/features/logs/ActivityLogsPage.tsx:153
+msgid "结果"
+msgstr "结果"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:411
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:423
+#: src/features/transfers/TransferPanel.tsx:365
+msgid "继续"
+msgstr "继续"
+
+#: src/store/transfers.ts:192
+msgid "继续传输中"
+msgstr "继续传输中"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:361
+msgid "编辑"
+msgstr "编辑"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
+msgid "编辑主机"
+msgstr "编辑主机"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:223
+msgid "耗时 "
+msgstr "耗时 "
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:245
+msgid "自动"
+msgstr "自动"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:256
+msgid "自动启动"
+msgstr "自动启动"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:181
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:185
+msgid "自动选择"
+msgstr "自动选择"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:91
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:191
+msgid "至少修改其中一个名称。"
+msgstr "至少修改其中一个名称。"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:230
+msgid "要移动的文件"
+msgstr "要移动的文件"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:230
+msgid "要移动的文件夹"
+msgstr "要移动的文件夹"
+
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:65
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:117
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:112
+msgid "解压"
+msgstr "解压"
+
+#. placeholder {0}: entry.name
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:161
+msgid "解压 {0}…"
+msgstr "解压 {0}…"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:115
+msgid "解压出的文件夹"
+msgstr "解压出的文件夹"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:190
+msgid "认证方式"
+msgstr "认证方式"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:127
+msgid "设备名"
+msgstr "设备名"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:389
+#: src/features/settings/AppSettingsMenu.tsx:147
+msgid "设置"
+msgstr "设置"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:98
+msgid "访问"
+msgstr "访问"
+
+#: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:79
+msgid "访问时间"
+msgstr "访问时间"
+
+#: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:35
+msgid "该文件夹及其全部内容将被永久删除。"
+msgstr "该文件夹及其全部内容将被永久删除。"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:158
+msgid "该私钥有口令保护（连接时输入）"
+msgstr "该私钥有口令保护（连接时输入）"
+
+#: src/features/logs/ActivityLogsPage.tsx:154
+msgid "详情"
+msgstr "详情"
+
+#: src/features/settings/AppSettingsMenu.tsx:221
+msgid "语言"
+msgstr "语言"
+
+#: src/components/ui/prompt-dialog.tsx:42
+msgid "请输入内容"
+msgstr "请输入内容"
+
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:31
+msgid "请输入口令"
+msgstr "请输入口令"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:71
+msgid "请输入路径"
+msgstr "请输入路径"
+
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:31
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:85
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:389
+#: src/features/lan-transfer/LanTransferSidebar.tsx:27
+msgid "读写"
+msgstr "读写"
+
+#: src/features/ssh-sftp/SshSftpTool.tsx:123
+msgid "调整左侧面板宽度"
+msgstr "调整左侧面板宽度"
+
+#: src/i18n/locales.ts:8
+msgid "跟随系统"
+msgstr "跟随系统"
+
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:48
+msgid "输入密钥口令"
+msgstr "输入密钥口令"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:347
+msgid "运行中"
+msgstr "运行中"
+
+#: src/features/logs/ActivityLogsPage.tsx:128
+msgid "近 7 天"
+msgstr "近 7 天"
+
+#: src/features/logs/LogPageLayout.tsx:29
+#: src/features/logs/LogPageLayout.tsx:29
+msgid "返回首页"
+msgstr "返回首页"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:480
+msgid "还没有主机"
+msgstr "还没有主机"
+
+#: src/features/ssh-sftp/SshSftpTool.tsx:138
+msgid "还没有打开的连接"
+msgstr "还没有打开的连接"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:56
+msgid "进行中"
+msgstr "进行中"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:136
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:252
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:221
+msgid "远端已存在 “{existingName}”，请重新命名"
+msgstr "远端已存在 “{existingName}”，请重新命名"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:131
+msgid "远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。"
+msgstr "远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:170
+msgid "远端已有名称"
+msgstr "远端已有名称"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:410
+msgid "远端文件夹名称"
+msgstr "远端文件夹名称"
+
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:89
+msgid "远端连接在终端打开前已关闭"
+msgstr "远端连接在终端打开前已关闭"
+
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:87
+#: src/features/ssh-sftp/components/Sidebar.tsx:344
+msgid "连接"
+msgstr "连接"
+
+#. placeholder {0}: hostAddress(host)
+#: src/features/ssh-sftp/components/Sidebar.tsx:336
+msgid "连接中 · {0}"
+msgstr "连接中 · {0}"
+
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:160
+msgid "连接失败"
+msgstr "连接失败"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:197
+#: src/features/ssh-sftp/components/Sidebar.tsx:534
+msgid "连接失败：{e}"
+msgstr "连接失败：{e}"
+
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:82
+msgid "连接已关闭"
+msgstr "连接已关闭"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:126
+msgid "连接设备"
+msgstr "连接设备"
+
+#: src/features/lan-transfer/LanShareDialog.tsx:124
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:228
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:141
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:106
+msgid "选择"
+msgstr "选择"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:47
+msgid "选择上传文件"
+msgstr "选择上传文件"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:158
+msgid "选择上传文件夹"
+msgstr "选择上传文件夹"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:120
+msgid "选择保存位置"
+msgstr "选择保存位置"
+
+#: src/features/lan-transfer/LanShareDialog.tsx:66
+msgid "选择共享目录"
+msgstr "选择共享目录"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:248
+msgid "选择密钥…"
+msgstr "选择密钥…"
+
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:235
+msgid "选择当前文件夹"
+msgstr "选择当前文件夹"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:322
+msgid "选择接收目录"
+msgstr "选择接收目录"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:72
+msgid "选择私钥文件"
+msgstr "选择私钥文件"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:176
+msgid "选择移动位置"
+msgstr "选择移动位置"
+
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
+msgid "选择解压位置"
+msgstr "选择解压位置"
+
+#: src/features/settings/AppSettingsMenu.tsx:88
+msgid "重启中"
+msgstr "重启中"
+
+#. placeholder {0}: formatError(error)
+#: src/lib/updater.ts:112
+msgid "重启失败：{0}"
+msgstr "重启失败：{0}"
+
+#: src/lib/updater.ts:295
+msgid "重启并更新"
+msgstr "重启并更新"
+
+#: src/lib/updater.ts:290
+msgid "重启应用即可完成更新。"
+msgstr "重启应用即可完成更新。"
+
+#: src/features/settings/AppSettingsMenu.tsx:87
+msgid "重启更新"
+msgstr "重启更新"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:398
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:400
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:119
+msgid "重命名"
+msgstr "重命名"
+
+#: src/features/settings/AppSettingsMenu.tsx:89
+#: src/lib/updater.ts:236
+msgid "重新检查"
+msgstr "重新检查"
+
+#: src/features/transfers/TransferPanel.tsx:395
+#: src/features/transfers/TransferPanel.tsx:404
+#: src/lib/updater.ts:119
+msgid "重试"
+msgstr "重试"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:51
+msgid "链接"
+msgstr "链接"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:338
+#: src/features/ssh-sftp/SshSftpTool.tsx:67
+msgid "首页"
+msgstr "首页"
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:368
+#: src/features/lan-transfer/LanTransferSidebar.tsx:248
+msgid "默认权限"
+msgstr "默认权限"
+
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:280
+msgid "默认目录"
+msgstr "默认目录"

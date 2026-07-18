@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import { FolderOpen } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -33,13 +34,14 @@ export default function ExtractDialog({
   chooseExtractParent,
   confirmExtract,
 }: ExtractDialogProps) {
+  const { t } = useLingui();
   const form = useForm({
     defaultValues: { outName: "" },
     validators: {
       onSubmit: z.object({
-        outName: z.string().trim().min(1, "名称不能为空").refine(
+        outName: z.string().trim().min(1, t`名称不能为空`).refine(
           (value) => !/[\\/]/.test(value),
-          "名称不能包含斜杠",
+          t`名称不能包含斜杠`,
         ),
       }),
     },
@@ -59,7 +61,9 @@ export default function ExtractDialog({
     >
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>解压</DialogTitle>
+          <DialogTitle>
+            <Trans>解压</Trans>
+          </DialogTitle>
           <DialogDescription className="truncate">
             {extractTarget?.entry.name ?? ""}
           </DialogDescription>
@@ -71,7 +75,9 @@ export default function ExtractDialog({
                 const error = firstFormError(field.state.meta.errors);
                 return (
                   <Field data-invalid={!!error}>
-                    <FieldLabel>文件夹名称</FieldLabel>
+                    <FieldLabel>
+                      <Trans>文件夹名称</Trans>
+                    </FieldLabel>
                     <Input
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -89,13 +95,15 @@ export default function ExtractDialog({
               }}
             </form.Field>
             <Field>
-              <FieldLabel>位置</FieldLabel>
+              <FieldLabel>
+                <Trans>位置</Trans>
+              </FieldLabel>
               <div className="flex min-w-0 items-center gap-2">
                 <div className="min-w-0 flex-1 truncate rounded-md bg-muted px-2 py-1.5 font-mono text-xs">
                   {extractTarget.remoteParent}
                 </div>
                 <Button type="button" variant="outline" onClick={chooseExtractParent}>
-                  <FolderOpen data-icon="inline-start" /> 选择
+                  <FolderOpen data-icon="inline-start" /> <Trans>选择</Trans>
                 </Button>
               </div>
             </Field>
@@ -103,9 +111,11 @@ export default function ExtractDialog({
         ) : null}
         <DialogFooter>
           <Button variant="ghost" onClick={() => setExtractTarget(null)}>
-            取消
+            <Trans>取消</Trans>
           </Button>
-          <Button onClick={() => void form.handleSubmit()}>解压</Button>
+          <Button onClick={() => void form.handleSubmit()}>
+            <Trans>解压</Trans>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

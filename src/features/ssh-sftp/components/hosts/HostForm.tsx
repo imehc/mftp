@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { Host } from "~/types";
 import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
@@ -31,7 +32,7 @@ import {
 } from "~/components/ui/select";
 import { firstFormError } from "~/lib/form-errors";
 import {
-  hostFormSchema,
+  createHostFormSchema,
   hostFormValuesToInput,
   hostToFormValues,
 } from "~/features/ssh-sftp/components/hosts/HostForm.schema";
@@ -44,6 +45,7 @@ interface Props {
 }
 
 export default function HostForm({ open, onOpenChange, host }: Props) {
+  const { t } = useLingui();
   const keys = useHostsStore((s) => s.keys);
   const createHost = useHostsStore((s) => s.createHost);
   const updateHost = useHostsStore((s) => s.updateHost);
@@ -52,7 +54,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
   const form = useForm({
     defaultValues: hostToFormValues(null),
     validators: {
-      onSubmit: hostFormSchema,
+      onSubmit: createHostFormSchema(t),
     },
     onSubmit: async ({ value }) => {
       setSubmitError(null);
@@ -77,7 +79,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent className="sm:max-w-md">
         <DialogLayoutHeader>
-          <DialogTitle>{host ? "编辑主机" : "新建主机"}</DialogTitle>
+          <DialogTitle>{host ? t`编辑主机` : t`新建主机`}</DialogTitle>
         </DialogLayoutHeader>
 
         <DialogLayoutBody className="pr-1">
@@ -87,7 +89,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                 const error = firstFormError(field.state.meta.errors);
                 return (
                   <UiField data-invalid={!!error}>
-                    <FieldLabel htmlFor="host-label">名称</FieldLabel>
+                    <FieldLabel htmlFor="host-label">
+                      <Trans>名称</Trans>
+                    </FieldLabel>
                     <Input
                       id="host-label"
                       value={field.state.value}
@@ -112,7 +116,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                   const error = firstFormError(field.state.meta.errors);
                   return (
                     <UiField data-invalid={!!error}>
-                      <FieldLabel htmlFor="host-addr">地址</FieldLabel>
+                      <FieldLabel htmlFor="host-addr">
+                        <Trans>地址</Trans>
+                      </FieldLabel>
                       <Input
                         id="host-addr"
                         value={field.state.value}
@@ -135,7 +141,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                   const error = firstFormError(field.state.meta.errors);
                   return (
                     <UiField data-invalid={!!error}>
-                      <FieldLabel htmlFor="host-port">端口</FieldLabel>
+                      <FieldLabel htmlFor="host-port">
+                        <Trans>端口</Trans>
+                      </FieldLabel>
                       <Input
                         id="host-port"
                         type="number"
@@ -154,20 +162,22 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
             <form.Field name="username">
               {(field) => (
                 <UiField>
-                  <FieldLabel htmlFor="host-user">用户名</FieldLabel>
+                  <FieldLabel htmlFor="host-user">
+                    <Trans>用户名</Trans>
+                  </FieldLabel>
                   <Input
                     id="host-user"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="留空则使用 SSH 配置或本机用户"
+                    placeholder={t`留空则使用 SSH 配置或本机用户`}
                     autoCapitalize="off"
                     autoCorrect="off"
                     autoComplete="off"
                     spellCheck={false}
                   />
                   <FieldDescription>
-                    留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。
+                    <Trans>留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。</Trans>
                   </FieldDescription>
                 </UiField>
               )}
@@ -176,7 +186,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
             <form.Field name="authType">
               {(field) => (
                 <UiField>
-                  <FieldLabel>认证方式</FieldLabel>
+                  <FieldLabel>
+                    <Trans>认证方式</Trans>
+                  </FieldLabel>
                   <ToggleGroup
                     type="single"
                     value={field.state.value}
@@ -187,10 +199,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     className="w-full"
                   >
                     <ToggleGroupItem value="password" className="flex-1">
-                      密码
+                      <Trans>密码</Trans>
                     </ToggleGroupItem>
                     <ToggleGroupItem value="key" className="flex-1">
-                      密钥
+                      <Trans>密钥</Trans>
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </UiField>
@@ -203,7 +215,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                   <form.Field name="password">
                     {(field) => (
                       <UiField>
-                        <FieldLabel htmlFor="host-pw">密码</FieldLabel>
+                        <FieldLabel htmlFor="host-pw">
+                          <Trans>密码</Trans>
+                        </FieldLabel>
                         <Input
                           id="host-pw"
                           type="password"
@@ -222,21 +236,23 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                       const error = firstFormError(field.state.meta.errors);
                       return (
                         <UiField data-invalid={!!error}>
-                          <FieldLabel>密钥</FieldLabel>
+                          <FieldLabel>
+                            <Trans>密钥</Trans>
+                          </FieldLabel>
                           <Select
                             value={field.state.value ?? ""}
                             onValueChange={(v) => field.handleChange(v || null)}
                             disabled={missingKeys}
                           >
                             <SelectTrigger className="w-full" aria-invalid={!!error}>
-                              <SelectValue placeholder="选择密钥…" />
+                              <SelectValue placeholder={t`选择密钥…`} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
                                 {keys.map((k) => (
                                   <SelectItem key={k.id} value={k.id}>
                                     {k.label}
-                                    {k.hasPassphrase ? " (需口令)" : ""}
+                                    {k.hasPassphrase ? t` (需口令)` : ""}
                                   </SelectItem>
                                 ))}
                               </SelectGroup>
@@ -244,7 +260,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                           </Select>
                           {missingKeys ? (
                             <FieldDescription>
-                              暂无密钥，请先在密钥管理中导入。
+                              <Trans>暂无密钥，请先在密钥管理中导入。</Trans>
                             </FieldDescription>
                           ) : error ? (
                             <FieldDescription>{error}</FieldDescription>
@@ -260,16 +276,18 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
             <form.Field name="defaultPath">
               {(field) => (
                 <UiField>
-                  <FieldLabel htmlFor="host-defpath">默认目录</FieldLabel>
+                  <FieldLabel htmlFor="host-defpath">
+                    <Trans>默认目录</Trans>
+                  </FieldLabel>
                   <Input
                     id="host-defpath"
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="/var/www（留空则用主目录）"
+                    placeholder={t`/var/www（留空则用主目录）`}
                   />
                   <FieldDescription>
-                    打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。
+                    <Trans>打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。</Trans>
                   </FieldDescription>
                 </UiField>
               )}
@@ -285,12 +303,12 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
 
         <DialogLayoutFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            取消
+            <Trans>取消</Trans>
           </Button>
           <form.Subscribe selector={(state) => state.isSubmitting}>
             {(isSubmitting) => (
               <Button onClick={() => void form.handleSubmit()} disabled={isSubmitting}>
-                {isSubmitting ? "保存中…" : "保存"}
+                {isSubmitting ? t`保存中…` : t`保存`}
               </Button>
             )}
           </form.Subscribe>

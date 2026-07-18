@@ -8,6 +8,7 @@ import {
   type MouseEventHandler,
   type TouchEventHandler,
 } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   getCoreRowModel,
   useReactTable,
@@ -61,7 +62,7 @@ import {
   loadingLabel,
   parentPath,
   sameColumnSizing,
-  sftpColumnLabels,
+  sftpColumnLabel,
   sftpColumns,
   sftpHeaderHeight,
   type ConflictState,
@@ -79,6 +80,7 @@ interface Props {
 
 
 export default function SftpPanel({ session }: Props) {
+  const { t } = useLingui();
   const sessionId = session.id;
   const listScrollRef = useRef<HTMLDivElement | null>(null);
   const userResizedColumnsRef = useRef(false);
@@ -216,7 +218,7 @@ export default function SftpPanel({ session }: Props) {
         <Button
           variant="ghost"
           size="icon-sm"
-          title="主目录"
+          title={t`主目录`}
           onClick={goHome}
           disabled={loading}
         >
@@ -229,7 +231,7 @@ export default function SftpPanel({ session }: Props) {
         <Button
           variant="ghost"
           size="icon-sm"
-          title="上级目录"
+          title={t`上级目录`}
           onClick={() => cwd && load(parentPath(cwd), "parent")}
           disabled={loading || !cwd || cwd === "/"}
         >
@@ -242,7 +244,7 @@ export default function SftpPanel({ session }: Props) {
         <Button
           variant="ghost"
           size="icon-sm"
-          title="刷新"
+          title={t`刷新`}
           onClick={() => cwd && load(cwd, "refresh")}
           disabled={loading || !cwd}
         >
@@ -261,21 +263,21 @@ export default function SftpPanel({ session }: Props) {
           onClick={() => setPrompt({ kind: "mkdir" })}
           disabled={!cwd || !!busy}
         >
-          <FolderPlus data-icon="inline-start" /> 新建
+          <FolderPlus data-icon="inline-start" /> <Trans>新建</Trans>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" disabled={!cwd || !!busy}>
-              <Upload data-icon="inline-start" /> 上传
+              <Upload data-icon="inline-start" /> <Trans>上传</Trans>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
               <DropdownMenuItem onSelect={onUpload}>
-                <FileIcon /> 上传文件
+                <FileIcon /> <Trans>上传文件</Trans>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onUploadDir}>
-                <FolderUp /> 上传文件夹
+                <FolderUp /> <Trans>上传文件夹</Trans>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -294,7 +296,7 @@ export default function SftpPanel({ session }: Props) {
         {loading && entries.length === 0 ? (
           <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
             <LoaderCircle className="size-4 animate-spin" />
-            加载中…
+            <Trans>加载中…</Trans>
           </div>
         ) : !loading && entries.length === 0 ? (
           <Empty className="h-full">
@@ -302,7 +304,9 @@ export default function SftpPanel({ session }: Props) {
               <EmptyMedia variant="icon">
                 <FolderOpen />
               </EmptyMedia>
-              <EmptyTitle>空目录</EmptyTitle>
+              <EmptyTitle>
+                <Trans>空目录</Trans>
+              </EmptyTitle>
             </EmptyHeader>
           </Empty>
         ) : (
@@ -321,7 +325,7 @@ export default function SftpPanel({ session }: Props) {
                 return (
                   <ResizableHeader
                     key={header.id}
-                    label={sftpColumnLabels[id] ?? id}
+                    label={sftpColumnLabel(id)}
                     sortKey={sortable ? (id as SortKey) : undefined}
                     sort={sort}
                     alignEnd={id === "actions"}
@@ -383,17 +387,17 @@ export default function SftpPanel({ session }: Props) {
 
       <PromptDialog
         open={prompt?.kind === "mkdir"}
-        title="新建文件夹"
-        placeholder="文件夹名称"
-        confirmText="创建"
+        title={t`新建文件夹`}
+        placeholder={t`文件夹名称`}
+        confirmText={t`创建`}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={doMkdir}
       />
       <PromptDialog
         open={prompt?.kind === "rename"}
-        title="重命名"
+        title={t`重命名`}
         initialValue={prompt?.kind === "rename" ? prompt.entry.name : ""}
-        confirmText="重命名"
+        confirmText={t`重命名`}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>
           prompt?.kind === "rename" && doRename(prompt.entry, name)
@@ -401,10 +405,10 @@ export default function SftpPanel({ session }: Props) {
       />
       <PromptDialog
         open={prompt?.kind === "uploadDir"}
-        title="上传文件夹"
+        title={t`上传文件夹`}
         initialValue={prompt?.kind === "uploadDir" ? prompt.initialName : ""}
-        placeholder="远端文件夹名称"
-        confirmText="继续"
+        placeholder={t`远端文件夹名称`}
+        confirmText={t`继续`}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>
           prompt?.kind === "uploadDir" &&
@@ -413,10 +417,10 @@ export default function SftpPanel({ session }: Props) {
       />
       <PromptDialog
         open={prompt?.kind === "downloadDir"}
-        title="下载文件夹"
+        title={t`下载文件夹`}
         initialValue={prompt?.kind === "downloadDir" ? prompt.initialName : ""}
-        placeholder="本地文件夹名称"
-        confirmText="继续"
+        placeholder={t`本地文件夹名称`}
+        confirmText={t`继续`}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>
           prompt?.kind === "downloadDir" &&
@@ -445,7 +449,7 @@ export default function SftpPanel({ session }: Props) {
       <ConflictDialog
         open={!!conflict}
         name={conflict?.name ?? ""}
-        incomingLabel={conflict?.incomingLabel ?? "文件夹"}
+        incomingLabel={conflict?.incomingLabel ?? t`文件夹`}
         initialIncomingName={conflict?.initialIncomingName}
         initialExistingName={conflict?.initialExistingName}
         onOpenChange={(o) => !o && setConflict(null)}

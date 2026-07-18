@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DndContext,
   KeyboardSensor,
@@ -75,6 +76,7 @@ function SortableHostRow({
   id: string;
   children: ReactNode;
 }) {
+  const { t } = useLingui();
   const {
     attributes,
     listeners,
@@ -97,7 +99,7 @@ function SortableHostRow({
       <button
         type="button"
         className="absolute left-0 top-1/2 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
-        aria-label="拖动排序"
+        aria-label={t`拖动排序`}
         {...attributes}
         {...listeners}
       >
@@ -109,6 +111,7 @@ function SortableHostRow({
 }
 
 export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
+  const { t } = useLingui();
   const sidebarRef = useRef<HTMLElement>(null);
   const hosts = useHostsStore((s) => s.hosts);
   const keys = useHostsStore((s) => s.keys);
@@ -170,7 +173,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     try {
       await reorderHosts(orderedIds);
     } catch (error) {
-      toast.error(`排序保存失败: ${error}`);
+      toast.error(t`排序保存失败：${error}`);
     }
   }
 
@@ -191,7 +194,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     try {
       await openSession(host);
     } catch (e) {
-      toast.error(`连接失败: ${e}`);
+      toast.error(t`连接失败：${e}`);
     }
   }
 
@@ -201,9 +204,9 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     setDisconnecting((current) => new Set(current).add(host.id));
     try {
       await closeSession(session.id);
-      toast.success(`已断开 ${host.label}`);
+      toast.success(t`已断开 ${host.label}`);
     } catch (e) {
-      toast.error(`断开失败: ${e}`);
+      toast.error(t`断开失败：${e}`);
     } finally {
       setDisconnecting((current) => {
         const next = new Set(current);
@@ -218,7 +221,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     const name = deleteTarget.label;
     try {
       await deleteHost(deleteTarget.id);
-      toast.success(`已删除主机 ${name}`);
+      toast.success(t`已删除主机 ${name}`);
     } catch (e) {
       toast.error(String(e));
     } finally {
@@ -314,7 +317,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
         <button
           className="min-w-0 flex-1 text-left"
           onDoubleClick={() => connect(host)}
-          title={session ? "双击切换到连接" : "双击连接"}
+          title={session ? t`双击切换到连接` : t`双击连接`}
         >
           <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
             <span className="truncate">{host.label}</span>
@@ -327,10 +330,10 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
           <p className="truncate text-xs text-muted-foreground">
             {isConnected
               ? isDisconnecting
-                ? `断开中 · ${hostAddress(host)}`
-                : `已连接 · ${hostAddress(host)}`
+                ? t`断开中 · ${hostAddress(host)}`
+                : t`已连接 · ${hostAddress(host)}`
               : isConnecting
-                ? `连接中 · ${hostAddress(host)}`
+                ? t`连接中 · ${hostAddress(host)}`
                 : hostAddress(host)}
           </p>
         </button>
@@ -338,7 +341,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
           <Button
             variant="ghost"
             size="icon-xs"
-            title={isDisconnecting ? "断开中" : isConnected ? "断开连接" : "连接"}
+            title={isDisconnecting ? t`断开中` : isConnected ? t`断开连接` : t`连接`}
             disabled={isConnecting || isDisconnecting}
             onClick={() =>
               isConnected ? void disconnect(host) : void connect(host)
@@ -355,7 +358,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
           <Button
             variant="ghost"
             size="icon-xs"
-            title="编辑"
+            title={t`编辑`}
             onClick={() => {
               setEditing(host);
               setFormOpen(true);
@@ -366,7 +369,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
           <Button
             variant="ghost"
             size="icon-xs"
-            title="删除"
+            title={t`删除`}
             onClick={() => setDeleteTarget(host)}
           >
             <Trash2 className="text-destructive" />
@@ -396,7 +399,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
             collapsed && "sr-only",
           )}
         >
-          <Server className="size-4" /> 主机
+          <Server className="size-4" /> <Trans>主机</Trans>
         </span>
         <div className={cn("flex gap-0.5", collapsed && "flex-col")}>
           <Tooltip>
@@ -410,7 +413,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              {collapsed ? "展开侧边栏" : "折叠侧边栏"}
+              {collapsed ? t`展开侧边栏` : t`折叠侧边栏`}
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -423,7 +426,9 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
                 <KeyRound />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">密钥管理</TooltipContent>
+            <TooltipContent side="right">
+              <Trans>密钥管理</Trans>
+            </TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -438,7 +443,9 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
                 <Plus />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">新建主机</TooltipContent>
+            <TooltipContent side="right">
+              <Trans>新建主机</Trans>
+            </TooltipContent>
           </Tooltip>
         </div>
       </div>
@@ -447,7 +454,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="搜索…"
+          placeholder={t`搜索…`}
           className="h-7"
         />
       </div>
@@ -470,10 +477,10 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
                 <Server />
               </EmptyMedia>
               <EmptyTitle>
-                {hosts.length === 0 ? "还没有主机" : "无匹配结果"}
+                {hosts.length === 0 ? t`还没有主机` : t`无匹配结果`}
               </EmptyTitle>
               <EmptyDescription>
-                {hosts.length === 0 ? "点击右上角 + 新建主机" : "换个关键词试试"}
+                {hosts.length === 0 ? t`点击右上角 + 新建主机` : t`换个关键词试试`}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -524,7 +531,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
             try {
               await openSession(host, passphrase);
             } catch (e) {
-              toast.error(`连接失败: ${e}`);
+              toast.error(t`连接失败：${e}`);
             }
           }
         }}
@@ -536,14 +543,20 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>删除主机</AlertDialogTitle>
+            <AlertDialogTitle>
+              <Trans>删除主机</Trans>
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              确定删除主机 “{deleteTarget?.label}”？此操作不可撤销。
+              <Trans>确定删除主机 “{deleteTarget?.label}”？此操作不可撤销。</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>删除</AlertDialogAction>
+            <AlertDialogCancel>
+              <Trans>取消</Trans>
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              <Trans>删除</Trans>
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

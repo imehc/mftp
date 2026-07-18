@@ -6,6 +6,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { listen } from "@tauri-apps/api/event";
 import { gsap } from "gsap";
 import {
@@ -27,6 +29,7 @@ import {
   useTransfersStore,
 } from "~/store/transfers";
 import { Button } from "~/components/ui/button";
+import { translate } from "~/i18n/translate";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -47,17 +50,19 @@ function formatSpeed(bytesPerSecond: number): string {
 function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "--";
   const rounded = Math.ceil(seconds);
-  if (rounded < 60) return `${rounded} 秒`;
+  if (rounded < 60) return translate(msg`${rounded} 秒`);
   const minutes = Math.floor(rounded / 60);
   const remainingSeconds = rounded % 60;
   if (minutes < 60) {
     return remainingSeconds > 0
-      ? `${minutes} 分 ${remainingSeconds} 秒`
-      : `${minutes} 分`;
+      ? translate(msg`${minutes} 分 ${remainingSeconds} 秒`)
+      : translate(msg`${minutes} 分`);
   }
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  return remainingMinutes > 0 ? `${hours} 小时 ${remainingMinutes} 分` : `${hours} 小时`;
+  return remainingMinutes > 0
+    ? translate(msg`${hours} 小时 ${remainingMinutes} 分`)
+    : translate(msg`${hours} 小时`);
 }
 
 function transferMetrics(progress: TransferState) {
@@ -84,6 +89,7 @@ function transferMetrics(progress: TransferState) {
 }
 
 export default function TransferPanel() {
+  const { t } = useLingui();
   const contentRef = useRef<HTMLDivElement>(null);
   const transfers = useTransfersStore((s) => s.transfers);
   const updateProgressBatch = useTransfersStore((s) => s.updateProgressBatch);
@@ -106,12 +112,12 @@ export default function TransferPanel() {
   const latestMetrics = latestTransfer ? transferMetrics(latestTransfer) : null;
   const transferStatusLabel =
     activeTransferCount === 0
-      ? "空闲"
+      ? t`空闲`
       : transferringCount === 0
-        ? `${pausedTransferCount} 个已暂停`
+        ? t`${pausedTransferCount} 个已暂停`
         : pausedTransferCount > 0
-          ? `${transferringCount} 进行中 · ${pausedTransferCount} 已暂停`
-          : `${transferringCount} 个进行中`;
+          ? t`${transferringCount} 进行中 · ${pausedTransferCount} 已暂停`
+          : t`${transferringCount} 个进行中`;
 
   useEffect(() => {
     let cancelled = false;
@@ -263,7 +269,9 @@ export default function TransferPanel() {
           ) : (
             <ListChecks className="size-3" />
           )}
-          <span className="font-medium text-foreground">传输</span>
+          <span className="font-medium text-foreground">
+            <Trans>传输</Trans>
+          </span>
           <span className="shrink-0">{transferStatusLabel}</span>
           {latestTransfer && latestMetrics?.percent != null ? (
             <span className="min-w-0 flex-1 truncate tabular-nums">
@@ -284,11 +292,11 @@ export default function TransferPanel() {
             variant="ghost"
             size="xs"
             onClick={clearFinished}
-            title={`清除 ${finishedTransferCount} 个已完成任务`}
-            aria-label={`清除 ${finishedTransferCount} 个已完成任务`}
+            title={t`清除 ${finishedTransferCount} 个已完成任务`}
+            aria-label={t`清除 ${finishedTransferCount} 个已完成任务`}
           >
             <Trash2 data-icon="inline-start" />
-            清除 {finishedTransferCount}
+            <Trans>清除 {finishedTransferCount}</Trans>
           </Button>
         ) : null}
       </div>
@@ -324,6 +332,7 @@ const TransferItem = memo(function TransferItem({
   onTogglePause: (transfer: TransferState) => void;
   onRetry: (transfer: TransferState) => void;
 }) {
+  const { t } = useLingui();
   const total = transfer.total ?? 0;
   const progress =
     total > 0 ? Math.min(100, (transfer.transferred / total) * 100) : null;
@@ -353,7 +362,7 @@ const TransferItem = memo(function TransferItem({
             <Button
               variant="ghost"
               size="icon-xs"
-              title={transfer.paused ? "继续" : "暂停"}
+              title={transfer.paused ? t`继续` : t`暂停`}
               onClick={() => onTogglePause(transfer)}
               disabled={transfer.controlPending || transfer.cancelling}
             >
@@ -368,7 +377,7 @@ const TransferItem = memo(function TransferItem({
             <Button
               variant="ghost"
               size="icon-xs"
-              title="取消"
+              title={t`取消`}
               onClick={() => onCancel(transfer.id)}
               disabled={transfer.cancelling || transfer.controlPending}
             >
@@ -383,7 +392,7 @@ const TransferItem = memo(function TransferItem({
           <Button
             variant="ghost"
             size="xs"
-            title="重试"
+            title={t`重试`}
             onClick={() => onRetry(transfer)}
             disabled={transfer.retrying}
           >
@@ -392,7 +401,7 @@ const TransferItem = memo(function TransferItem({
             ) : (
               <RefreshCw data-icon="inline-start" />
             )}
-            重试
+            <Trans>重试</Trans>
           </Button>
         ) : null}
       </div>
@@ -401,7 +410,7 @@ const TransferItem = memo(function TransferItem({
         {metrics.percent !== null ? <span>{metrics.percent}%</span> : null}
         {metrics.size ? <span>{metrics.size}</span> : null}
         {metrics.speed ? <span>{metrics.speed}</span> : null}
-        {metrics.eta ? <span>剩余 {metrics.eta}</span> : null}
+        {metrics.eta ? <span><Trans>剩余 {metrics.eta}</Trans></span> : null}
       </div>
       {progress !== null ? (
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">

@@ -7,34 +7,27 @@
 
 | 模块 | 功能 |
 | --- | --- |
-| 主机管理 | 主机连接配置的增删改查，本地 JSON 持久化 |
 | SSH 终端 | 多标签、交互式 shell（xterm.js + ssh2 shell 通道），可调整大小 |
-| SFTP 文件管理 | 浏览、上传、下载、删除、新建文件夹、重命名 |
-| 密钥管理 | 导入私钥（文件选择器）、口令保护、按主机选用 |
+| SFTP 文件管理 | 浏览、上传、下载、文件夹传输、删除、新建文件夹、重命名、移动、解压、冲突改名 |
+| 局域网传输 | 启动本机接收服务，二维码/浏览器访问，共享目录、白名单、确认码、权限控制 |
 
 ## 快速开始
 
 ```bash
 pnpm install
 pnpm tauri dev     # 开发运行（桌面窗口）
-pnpm tauri build   # 打包
+pnpm build         # 前端构建（会先编译多语言词典）
+pnpm tauri build   # 打包（同样会先编译多语言词典）
 ```
-
-## 使用
-
-1. 侧栏点击 **+** 新建主机，填写地址/用户名，选择密码或密钥认证。
-2. 密钥认证：先点 **钥匙** 图标进入密钥管理，导入私钥（可标记口令保护）。
-3. 双击主机或点闪电图标连接 → 打开终端标签。
-4. 标签上的文件夹图标可切换到该连接的 **SFTP** 文件管理视图。
 
 ## 技术栈
 
-- 前端：React 19、TypeScript、Tailwind v4、shadcn/ui、zustand、@xterm/xterm
+- 前端：React 19、TypeScript、Vite、Tailwind v4、shadcn/ui、zustand、Lingui、@xterm/xterm
 - 后端：Tauri v2、Rust、ssh2（vendored-openssl）、tauri-plugin-dialog
 
 ## 注意事项
 
-- macOS未签名包可能提示“mftp 已损坏，无法打开”，可执行：
+- macOS 未签名包可能提示“mftp 已损坏，无法打开”，可执行：
 > ```bash
 > xattr -dr com.apple.quarantine /Applications/mftp.app
 > ```

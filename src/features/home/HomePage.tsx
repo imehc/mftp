@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Trans } from "@lingui/react/macro";
 import {
   Activity,
   ArrowRight,
@@ -48,24 +49,30 @@ export default function HomePage() {
             <div className="min-w-0">
               <h1 className="truncate text-base font-semibold">MFTP</h1>
               <p className="hidden text-xs text-muted-foreground sm:block">
-                工具与运行状态
+                <Trans>工具与运行状态</Trans>
               </p>
             </div>
           </div>
           <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto">
             <Badge variant={hasActivity ? "secondary" : "outline"}>
               <Activity data-icon="inline-start" />
-              {hasActivity ? "活动中" : "空闲"}
+              {hasActivity ? <Trans>活动中</Trans> : <Trans>空闲</Trans>}
             </Badge>
-            <Badge variant="outline">{activeSessions.length} 连接</Badge>
-            <Badge variant="outline">{runningTransfers.length} 传输</Badge>
+            <Badge variant="outline">
+              <Trans>{activeSessions.length} 连接</Trans>
+            </Badge>
+            <Badge variant="outline">
+              <Trans>{runningTransfers.length} 传输</Trans>
+            </Badge>
             {failedTransfers.length > 0 ? (
-              <Badge variant="destructive">{failedTransfers.length} 失败</Badge>
+              <Badge variant="destructive">
+                <Trans>{failedTransfers.length} 失败</Trans>
+              </Badge>
             ) : null}
             <Button variant="outline" size="sm" asChild>
               <Link to="/logs" preload="viewport">
                 <FileClock data-icon="inline-start" />
-                日志
+                <Trans>日志</Trans>
               </Link>
             </Button>
             <AppSettingsMenu />
@@ -89,9 +96,15 @@ export default function HomePage() {
                       SSH / SFTP
                     </span>
                     <span className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge variant="outline">{hosts.length} 主机</Badge>
-                      <Badge variant="outline">{activeSessions.length} 连接</Badge>
-                      <Badge variant="outline">{runningTransfers.length} 传输</Badge>
+                      <Badge variant="outline">
+                        <Trans>{hosts.length} 主机</Trans>
+                      </Badge>
+                      <Badge variant="outline">
+                        <Trans>{activeSessions.length} 连接</Trans>
+                      </Badge>
+                      <Badge variant="outline">
+                        <Trans>{runningTransfers.length} 传输</Trans>
+                      </Badge>
                     </span>
                   </span>
                 </div>
@@ -109,11 +122,13 @@ export default function HomePage() {
                   </span>
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">
-                      局域网传输
+                      <Trans>局域网传输</Trans>
                     </span>
                     <span className="mt-1 flex flex-wrap gap-1.5">
                       <Badge variant="outline">HTTP</Badge>
-                      <Badge variant="outline">浏览器访问</Badge>
+                      <Badge variant="outline">
+                        <Trans>浏览器访问</Trans>
+                      </Badge>
                     </span>
                   </span>
                 </div>

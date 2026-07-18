@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import type { Host } from "~/types";
 import { Button } from "~/components/ui/button";
@@ -22,11 +23,12 @@ interface Props {
 }
 
 export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
+  const { t } = useLingui();
   const form = useForm({
     defaultValues: { passphrase: "" },
     validators: {
       onSubmit: z.object({
-        passphrase: z.string().min(1, "请输入口令"),
+        passphrase: z.string().min(1, t`请输入口令`),
       }),
     },
     onSubmit: ({ value }) => {
@@ -42,7 +44,9 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
     <Dialog open={!!host} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>输入密钥口令</DialogTitle>
+          <DialogTitle>
+            <Trans>输入密钥口令</Trans>
+          </DialogTitle>
         </DialogHeader>
         <form
           autoComplete="off"
@@ -58,7 +62,7 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
               return (
                 <Field data-invalid={!!error}>
                   <FieldLabel htmlFor="passphrase">
-                    {host?.label} 的私钥口令
+                    <Trans>{host?.label} 的私钥口令</Trans>
                   </FieldLabel>
                   <Input
                     id="passphrase"
@@ -77,9 +81,11 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
           </form.Field>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose}>
-              取消
+              <Trans>取消</Trans>
             </Button>
-            <Button type="submit">连接</Button>
+            <Button type="submit">
+              <Trans>连接</Trans>
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

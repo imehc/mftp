@@ -1,3 +1,5 @@
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { QRCodeSVG } from "qrcode.react";
 import { Monitor, Unplug, XCircle } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
@@ -8,6 +10,7 @@ import type {
   LanTransferStatus,
   LanTransferTask,
 } from "~/types";
+import { translate } from "~/i18n/translate";
 
 interface LanTransferSidebarProps {
   settings: LanTransferSettings | null;
@@ -19,15 +22,15 @@ interface LanTransferSidebarProps {
 }
 
 function permissionLabel(value?: string | null) {
-  if (value === "readOnly") return "只读";
-  if (value === "uploadOnly") return "仅上传";
-  return "读写";
+  if (value === "readOnly") return translate(msg`只读`);
+  if (value === "uploadOnly") return translate(msg`仅上传`);
+  return translate(msg`读写`);
 }
 
 function securityModeLabel(value?: string | null) {
-  if (value === "open") return "开放";
-  if (value === "trusted") return "白名单";
-  return "确认码";
+  if (value === "open") return translate(msg`开放`);
+  if (value === "trusted") return translate(msg`白名单`);
+  return translate(msg`确认码`);
 }
 
 function formatBytes(value: number) {
@@ -50,16 +53,16 @@ function formatDuration(ms: number) {
 }
 
 function taskStatusLabel(value: string) {
-  if (value === "running") return "进行中";
-  if (value === "success") return "完成";
-  if (value === "failed") return "失败";
-  if (value === "canceled") return "已取消";
+  if (value === "running") return translate(msg`进行中`);
+  if (value === "success") return translate(msg`完成`);
+  if (value === "failed") return translate(msg`失败`);
+  if (value === "canceled") return translate(msg`已取消`);
   return value;
 }
 
 function taskDirectionLabel(value: string) {
-  if (value === "upload") return "上传";
-  if (value === "download") return "下载";
+  if (value === "upload") return translate(msg`上传`);
+  if (value === "download") return translate(msg`下载`);
   return value;
 }
 
@@ -86,11 +89,14 @@ export default function LanTransferSidebar({
   disconnectDevice,
   cancelTask,
 }: LanTransferSidebarProps) {
+  const { t } = useLingui();
   return (
     <aside className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
       <section className="rounded-lg border border-border bg-card p-2.5">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold">访问</h2>
+          <h2 className="text-sm font-semibold">
+            <Trans>访问</Trans>
+          </h2>
           <Badge variant="outline">
             {securityModeLabel(settings?.securityMode)}
           </Badge>
@@ -101,25 +107,29 @@ export default function LanTransferSidebar({
               <QRCodeSVG value={status.url} size={118} />
             </div>
             <div className="min-w-0 text-xs text-muted-foreground">
-              <div className="font-medium text-foreground">扫码访问</div>
+              <div className="font-medium text-foreground">
+                <Trans>扫码访问</Trans>
+              </div>
               <div className="truncate">{status.url}</div>
             </div>
           </div>
         ) : (
           <div className="flex min-h-36 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
-            服务未启动
+            <Trans>服务未启动</Trans>
           </div>
         )}
       </section>
 
       <section className="rounded-lg border border-border bg-card p-2.5">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold">连接设备</h2>
+          <h2 className="text-sm font-semibold">
+            <Trans>连接设备</Trans>
+          </h2>
           <Badge variant="outline">{devices.length}</Badge>
         </div>
         {devices.length === 0 ? (
           <div className="flex min-h-20 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
-            暂无设备
+            <Trans>暂无设备</Trans>
           </div>
         ) : (
           <div className="flex max-h-44 flex-col gap-1 overflow-auto">
@@ -155,12 +165,14 @@ export default function LanTransferSidebar({
 
       <section className="rounded-lg border border-border bg-card p-2.5">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold">传输任务</h2>
+          <h2 className="text-sm font-semibold">
+            <Trans>传输任务</Trans>
+          </h2>
           <Badge variant="outline">{tasks.length}</Badge>
         </div>
         {tasks.length === 0 ? (
           <div className="flex min-h-20 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
-            暂无任务
+            <Trans>暂无任务</Trans>
           </div>
         ) : (
           <div className="flex max-h-48 flex-col gap-1.5 overflow-auto">
@@ -208,7 +220,7 @@ export default function LanTransferSidebar({
                       {speed > 0 ? `${formatBytes(speed)}/s` : "-"}
                     </span>
                     <span className="shrink-0 tabular-nums">
-                      {task.status === "running" ? "剩余 " : "耗时 "}
+                      {task.status === "running" ? t`剩余 ` : t`耗时 `}
                       {taskEta(task)}
                     </span>
                   </div>
@@ -220,30 +232,32 @@ export default function LanTransferSidebar({
       </section>
 
       <section className="rounded-lg border border-border bg-card p-2.5">
-        <h2 className="mb-2 text-sm font-semibold">接收</h2>
+        <h2 className="mb-2 text-sm font-semibold">
+          <Trans>接收</Trans>
+        </h2>
         <div className="flex flex-col gap-1.5 text-xs">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">端口</span>
+            <span className="text-muted-foreground"><Trans>端口</Trans></span>
             <span className="tabular-nums">{settings?.port ?? "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">绑定</span>
-            <span className="truncate text-right">{settings?.bindHost || "自动"}</span>
+            <span className="text-muted-foreground"><Trans>绑定</Trans></span>
+            <span className="truncate text-right">{settings?.bindHost || t`自动`}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">默认权限</span>
+            <span className="text-muted-foreground"><Trans>默认权限</Trans></span>
             <span>{permissionLabel(settings?.defaultPermission)}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">并发上限</span>
+            <span className="text-muted-foreground"><Trans>并发上限</Trans></span>
             <span>{settings?.maxConcurrentTransfers ?? 3}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">自动启动</span>
-            <span>{settings?.autoStart ? "开启" : "关闭"}</span>
+            <span className="text-muted-foreground"><Trans>自动启动</Trans></span>
+            <span>{settings?.autoStart ? t`开启` : t`关闭`}</span>
           </div>
           <div className="min-w-0">
-            <div className="text-muted-foreground">接收目录</div>
+            <div className="text-muted-foreground"><Trans>接收目录</Trans></div>
             <div className="mt-1 truncate">{settings?.downloadDir ?? "-"}</div>
           </div>
         </div>

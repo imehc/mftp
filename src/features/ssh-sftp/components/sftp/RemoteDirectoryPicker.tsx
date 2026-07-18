@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import {
   ArrowUp,
@@ -59,6 +60,7 @@ export default function RemoteDirectoryPicker({
   onOpenChange,
   onSelect,
 }: RemoteDirectoryPickerProps) {
+  const { t } = useLingui();
   const [path, setPath] = useState(initialPath);
   const [entries, setEntries] = useState<SftpEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -66,7 +68,7 @@ export default function RemoteDirectoryPicker({
     defaultValues: { path: initialPath },
     validators: {
       onSubmit: z.object({
-        path: z.string().trim().min(1, "请输入路径"),
+        path: z.string().trim().min(1, t`请输入路径`),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -129,7 +131,7 @@ export default function RemoteDirectoryPicker({
             <Button
               variant="ghost"
               size="icon-sm"
-              title="主目录"
+              title={t`主目录`}
               onClick={goHome}
               disabled={loading}
             >
@@ -138,7 +140,7 @@ export default function RemoteDirectoryPicker({
             <Button
               variant="ghost"
               size="icon-sm"
-              title="上级目录"
+              title={t`上级目录`}
               onClick={() => void loadPath(parentPath(path))}
               disabled={loading || path === "/"}
             >
@@ -147,7 +149,7 @@ export default function RemoteDirectoryPicker({
             <Button
               variant="ghost"
               size="icon-sm"
-              title="刷新"
+              title={t`刷新`}
               onClick={() => void loadPath(path)}
               disabled={loading}
             >
@@ -183,7 +185,7 @@ export default function RemoteDirectoryPicker({
                 }}
               </pathForm.Field>
               <Button type="submit" variant="outline" disabled={loading}>
-                <FolderOpen data-icon="inline-start" /> 打开
+                <FolderOpen data-icon="inline-start" /> <Trans>打开</Trans>
               </Button>
             </form>
           </div>
@@ -191,7 +193,7 @@ export default function RemoteDirectoryPicker({
             {loading && directories.length === 0 ? (
               <div className="flex h-64 items-center justify-center gap-2 text-sm text-muted-foreground">
                 <LoaderCircle className="size-4 animate-spin" />
-                加载中…
+                <Trans>加载中…</Trans>
               </div>
             ) : directories.length === 0 ? (
               <Empty className="h-64">
@@ -199,7 +201,9 @@ export default function RemoteDirectoryPicker({
                   <EmptyMedia variant="icon">
                     <FolderOpen />
                   </EmptyMedia>
-                  <EmptyTitle>没有子文件夹</EmptyTitle>
+                  <EmptyTitle>
+                    <Trans>没有子文件夹</Trans>
+                  </EmptyTitle>
                 </EmptyHeader>
               </Empty>
             ) : (
@@ -225,10 +229,10 @@ export default function RemoteDirectoryPicker({
 
         <DialogLayoutFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            取消
+            <Trans>取消</Trans>
           </Button>
           <Button disabled={cannotSelect} onClick={() => onSelect(path)}>
-            选择当前文件夹
+            <Trans>选择当前文件夹</Trans>
           </Button>
         </DialogLayoutFooter>
       </DialogLayoutContent>

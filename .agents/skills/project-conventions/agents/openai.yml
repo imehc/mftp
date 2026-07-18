@@ -1,3 +1,0 @@
-interface:
-  display_name: "Project Conventions"
-  short_description: "项目工程规范：600 行上限与功能块拆分、注释、先分析后计划再写码、组件复用、架构/全局级处理、本地国际化(Lingui)、IPC契约与类型同步、错误纪律(禁unwrap)、测试、lint/风格、SQLite迁移、移动端适配、结构/性能/边界审查。"

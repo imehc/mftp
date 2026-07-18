@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { FileClock, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
@@ -10,10 +11,10 @@ import { LogDeleteButton, LogPageActions, LogPageLayout, LogTableViewport } from
 import * as ipc from "~/lib/ipc";
 import type { ActivityLog } from "~/types";
 
-function sourceLabel(value: string) {
+function sourceLabel(value: string, t: ReturnType<typeof useLingui>["t"]) {
   if (value === "ssh") return "SSH";
   if (value === "sftp") return "SFTP";
-  return "局域网";
+  return t`局域网`;
 }
 
 function OverflowTooltipText({ value }: { value?: string | null }) {
@@ -54,6 +55,7 @@ function OverflowTooltipText({ value }: { value?: string | null }) {
 }
 
 export default function ActivityLogsPage() {
+  const { t } = useLingui();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("all");
@@ -80,7 +82,7 @@ export default function ActivityLogsPage() {
     try {
       await ipc.activityLogsClear();
       setLogs([]);
-      toast.success("日志已清空");
+      toast.success(t`日志已清空`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -90,7 +92,7 @@ export default function ActivityLogsPage() {
     try {
       await ipc.activityLogDelete(id);
       setLogs((current) => current.filter((log) => log.id !== id));
-      toast.success("日志已删除");
+      toast.success(t`日志已删除`);
     } catch (error) {
       toast.error(String(error));
     }
@@ -110,8 +112,8 @@ export default function ActivityLogsPage() {
 
   return (
     <LogPageLayout
-      title="日志"
-      description="管理 SSH、SFTP 和局域网传输活动"
+      title={t`日志`}
+      description={t`管理 SSH、SFTP 和局域网传输活动`}
       actions={<LogPageActions loading={loading} onRefresh={() => void load()} onClear={clear} />}
       filters={
         <>
@@ -119,18 +121,18 @@ export default function ActivityLogsPage() {
             <InputGroupAddon>
               <Search />
             </InputGroupAddon>
-            <InputGroupInput value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索地址、动作、详情" />
+            <InputGroupInput value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t`搜索地址、动作、详情`} />
           </InputGroup>
-          <Select value={source} onValueChange={setSource}><SelectTrigger className="min-w-28"><SelectValue placeholder="来源" /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all">全部来源</SelectItem><SelectItem value="lan">局域网</SelectItem><SelectItem value="ssh">SSH</SelectItem><SelectItem value="sftp">SFTP</SelectItem></SelectGroup></SelectContent></Select>
-          <Select value={result} onValueChange={setResult}><SelectTrigger className="min-w-28"><SelectValue placeholder="结果" /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all">全部结果</SelectItem><SelectItem value="success">成功</SelectItem><SelectItem value="failed">失败</SelectItem></SelectGroup></SelectContent></Select>
-          <Select value={range} onValueChange={setRange}><SelectTrigger className="min-w-28"><SelectValue placeholder="时间" /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all">全部时间</SelectItem><SelectItem value="7d">近 7 天</SelectItem></SelectGroup></SelectContent></Select>
+          <Select value={source} onValueChange={setSource}><SelectTrigger className="min-w-28"><SelectValue placeholder={t`来源`} /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all"><Trans>全部来源</Trans></SelectItem><SelectItem value="lan"><Trans>局域网</Trans></SelectItem><SelectItem value="ssh">SSH</SelectItem><SelectItem value="sftp">SFTP</SelectItem></SelectGroup></SelectContent></Select>
+          <Select value={result} onValueChange={setResult}><SelectTrigger className="min-w-28"><SelectValue placeholder={t`结果`} /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all"><Trans>全部结果</Trans></SelectItem><SelectItem value="success"><Trans>成功</Trans></SelectItem><SelectItem value="failed"><Trans>失败</Trans></SelectItem></SelectGroup></SelectContent></Select>
+          <Select value={range} onValueChange={setRange}><SelectTrigger className="min-w-28"><SelectValue placeholder={t`时间`} /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all"><Trans>全部时间</Trans></SelectItem><SelectItem value="7d"><Trans>近 7 天</Trans></SelectItem></SelectGroup></SelectContent></Select>
           <Badge className="flex h-8 items-center px-2.5" variant="outline">{filtered.length} / {logs.length}</Badge>
         </>
       }
     >
       <LogTableViewport>
         {filtered.length === 0 ? (
-          <div className="flex min-h-56 items-center justify-center gap-2 text-sm text-muted-foreground"><FileClock />暂无日志</div>
+          <div className="flex min-h-56 items-center justify-center gap-2 text-sm text-muted-foreground"><FileClock /><Trans>暂无日志</Trans></div>
         ) : (
           <Table className="min-w-[920px] table-fixed">
             <colgroup>
@@ -144,12 +146,12 @@ export default function ActivityLogsPage() {
             </colgroup>
             <TableHeader className="bg-card [&_th]:bg-card">
               <TableRow className="sticky top-0 z-20 bg-card shadow-xs">
-                <TableHead>时间</TableHead>
-                <TableHead>来源</TableHead>
-                <TableHead>地址</TableHead>
-                <TableHead>动作</TableHead>
-                <TableHead>结果</TableHead>
-                <TableHead>详情</TableHead>
+                <TableHead><Trans>时间</Trans></TableHead>
+                <TableHead><Trans>来源</Trans></TableHead>
+                <TableHead><Trans>地址</Trans></TableHead>
+                <TableHead><Trans>动作</Trans></TableHead>
+                <TableHead><Trans>结果</Trans></TableHead>
+                <TableHead><Trans>详情</Trans></TableHead>
                 <TableHead className="sticky right-0 w-12" />
               </TableRow>
             </TableHeader>
@@ -157,10 +159,10 @@ export default function ActivityLogsPage() {
               {filtered.map((log) => (
                 <TableRow className="group" key={log.id}>
                   <TableCell className="text-xs tabular-nums">{new Date(log.createdAt).toLocaleString()}</TableCell>
-                  <TableCell><Badge variant="outline">{sourceLabel(log.source)}</Badge></TableCell>
+                  <TableCell><Badge variant="outline">{sourceLabel(log.source, t)}</Badge></TableCell>
                   <TableCell className="truncate text-xs tabular-nums">{log.ip}</TableCell>
                   <TableCell className="truncate">{log.requestType}</TableCell>
-                  <TableCell>{log.result}</TableCell>
+                  <TableCell>{log.result === "success" ? t`成功` : t`失败`}</TableCell>
                   <TableCell className="max-w-56 text-muted-foreground">
                     <OverflowTooltipText value={log.detail} />
                   </TableCell>

@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { msg } from "@lingui/core/macro";
+import { translate } from "~/i18n/translate";
 import type { TransferProgress } from "~/types";
 
 export interface TransferState {
@@ -52,7 +54,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         {
           id,
           label,
-          phase: "准备中",
+          phase: translate(msg`准备中`),
           transferred: 0,
           total: null,
           speed: null,
@@ -119,10 +121,10 @@ export const useTransfersStore = create<TransfersState>((set) => ({
               status,
               phase:
                 status === "success"
-                  ? "完成"
+                  ? translate(msg`完成`)
                   : status === "cancelled"
-                    ? "已取消"
-                    : "失败",
+                    ? translate(msg`已取消`)
+                    : translate(msg`失败`),
               transferred:
                 status === "success" && item.total != null
                   ? item.total
@@ -149,7 +151,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         item.id === id
           ? {
               ...item,
-              phase: "正在取消",
+              phase: translate(msg`正在取消`),
               cancelling: true,
               paused: false,
               pausedPhase: undefined,
@@ -178,7 +180,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
             ...item,
             paused: true,
             pausedPhase: item.phase,
-            phase: "已暂停",
+            phase: translate(msg`已暂停`),
             speed: null,
             controlError: undefined,
             updatedAt: performance.now(),
@@ -187,7 +189,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         return {
           ...item,
           paused: false,
-          phase: item.pausedPhase ?? "继续传输中",
+          phase: item.pausedPhase ?? translate(msg`继续传输中`),
           pausedPhase: undefined,
           speed: null,
           controlError: undefined,

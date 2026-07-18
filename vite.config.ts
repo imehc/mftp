@@ -1,6 +1,11 @@
 import { defineConfig } from "vite";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import {
+  lingui,
+  linguiTransformerBabelPreset,
+} from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 
@@ -9,11 +14,15 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig(async () => ({
   plugins: [
-    TanStackRouterVite({
+    tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
     }),
     react(),
+    babel({
+      presets: [linguiTransformerBabelPreset()],
+    }),
+    lingui(),
     tailwindcss(),
   ],
 
@@ -45,6 +54,20 @@ export default defineConfig(async () => ({
           if (!id.includes("node_modules")) return;
           if (id.includes("/@xterm/")) return "vendor-xterm";
           if (id.includes("/@tauri-apps/")) return "vendor-tauri";
+          if (id.includes("/@lingui/")) return "vendor-i18n";
+          if (id.includes("/@tanstack/")) return "vendor-tanstack";
+          if (id.includes("/@dnd-kit/")) return "vendor-dnd";
+          if (id.includes("/zod/") || id.includes("/@standard-schema/")) {
+            return "vendor-schema";
+          }
+          if (
+            id.includes("/gsap/") ||
+            id.includes("/qrcode.react/") ||
+            id.includes("/qrcode/") ||
+            id.includes("/react-resizable-panels/")
+          ) {
+            return "vendor-interaction";
+          }
           if (id.includes("/react/") || id.includes("/react-dom/")) {
             return "vendor-react";
           }

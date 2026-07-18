@@ -1,4 +1,6 @@
 import type { ColumnDef, ColumnSizingState } from "@tanstack/react-table";
+import { msg } from "@lingui/core/macro";
+import { translate } from "~/i18n/translate";
 import type { SftpEntry, SftpFileInfo } from "~/types";
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
 
@@ -24,12 +26,12 @@ export function formatMtime(seconds: number): string {
 }
 
 export function formatInfoTime(seconds: number | null | undefined): string {
-  if (!seconds) return "不可用";
+  if (!seconds) return translate(msg`不可用`);
   return new Date(seconds * 1000).toLocaleString();
 }
 
 export function formatInfoSize(entry: Pick<SftpEntry, "isDir" | "size">): string {
-  return entry.isDir ? "不可用" : formatSize(entry.size);
+  return entry.isDir ? translate(msg`不可用`) : formatSize(entry.size);
 }
 
 export function formatMode(mode: number): string {
@@ -45,10 +47,10 @@ export function formatOwner(info: Pick<SftpFileInfo, "uid" | "gid">): string {
 }
 
 export function entryType(entry: SftpEntry): string {
-  if (entry.isDir) return "文件夹";
-  if (entry.isSymlink) return "链接";
+  if (entry.isDir) return translate(msg`文件夹`);
+  if (entry.isSymlink) return translate(msg`链接`);
   const dot = entry.name.lastIndexOf(".");
-  if (dot <= 0 || dot === entry.name.length - 1) return "文件";
+  if (dot <= 0 || dot === entry.name.length - 1) return translate(msg`文件`);
   return entry.name.slice(dot + 1).toLowerCase();
 }
 
@@ -150,13 +152,14 @@ export const sftpColumns: ColumnDef<SftpEntry>[] = [
   { id: "actions", size: 64, minSize: 20, maxSize: 96, enableResizing: false },
 ];
 
-export const sftpColumnLabels: Record<string, string> = {
-  name: "名称",
-  mtime: "修改日期",
-  type: "类型",
-  size: "大小",
-  actions: "操作",
-};
+export function sftpColumnLabel(id: string): string {
+  if (id === "name") return translate(msg`名称`);
+  if (id === "mtime") return translate(msg`修改日期`);
+  if (id === "type") return translate(msg`类型`);
+  if (id === "size") return translate(msg`大小`);
+  if (id === "actions") return translate(msg`操作`);
+  return id;
+}
 
 export const sftpHeaderHeight = 32;
 const sftpRowPaddingX = 24;
@@ -240,12 +243,12 @@ export const nameCollator = new Intl.Collator(undefined, {
 });
 
 export function loadingLabel(action: LoadingAction | null): string {
-  if (!action) return "加载中…";
-  if (action === "home") return "正在打开主目录…";
-  if (action === "parent") return "正在打开上级目录…";
-  if (action === "refresh") return "正在刷新…";
-  if (action.startsWith("enter:")) return "正在打开文件夹…";
-  return "加载中…";
+  if (!action) return translate(msg`加载中…`);
+  if (action === "home") return translate(msg`正在打开主目录…`);
+  if (action === "parent") return translate(msg`正在打开上级目录…`);
+  if (action === "refresh") return translate(msg`正在刷新…`);
+  if (action.startsWith("enter:")) return translate(msg`正在打开文件夹…`);
+  return translate(msg`加载中…`);
 }
 
 export function defaultSortDirection(key: SortKey): SortDirection {
@@ -256,7 +259,7 @@ export function entrySortType(entry: SftpEntry): string {
   if (entry.isDir) return "0:folder";
   if (entry.isSymlink) return "1:symlink";
   const type = entryType(entry);
-  return type === "文件" ? "2:file" : `3:${type}`;
+  return type === translate(msg`文件`) ? "2:file" : `3:${type}`;
 }
 
 export function compareEntries(a: SftpEntry, b: SftpEntry, sort: SortState): number {

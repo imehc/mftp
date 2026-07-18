@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLingui } from "@lingui/react/macro";
 import { FolderOpen, LoaderCircle, TerminalSquare, X } from "lucide-react";
 import { useSessionsStore } from "~/store/sessions";
 import { cn } from "~/lib/utils";
@@ -11,6 +12,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default function TabBar() {
+  const { t } = useLingui();
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
   const setActive = useSessionsStore((s) => s.setActive);
@@ -63,7 +65,7 @@ export default function TabBar() {
 
               {s.status === "connected" && (
                 <button
-                  title={s.view === "terminal" ? "打开文件管理" : "打开终端"}
+                  title={s.view === "terminal" ? t`打开文件管理` : t`打开终端`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setView(s.id, s.view === "terminal" ? "sftp" : "terminal");
@@ -80,7 +82,7 @@ export default function TabBar() {
               )}
 
               <button
-                title={isClosing ? "关闭中" : "关闭"}
+                title={isClosing ? t`关闭中` : t`关闭`}
                 onClick={(e) => {
                   e.stopPropagation();
                   void closeTab(s.id);

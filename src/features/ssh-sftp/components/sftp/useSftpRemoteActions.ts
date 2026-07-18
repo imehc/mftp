@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
 import type { SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
@@ -37,6 +38,7 @@ export function useSftpRemoteActions({
   setConflict,
   setDirectoryPicker,
 }: UseSftpRemoteActionsOptions) {
+  const { t } = useLingui();
   const [extractTarget, setExtractTarget] = useState<ExtractState>(null);
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const startTransfer = useTransfersStore((state) => state.start);
@@ -54,7 +56,7 @@ export function useSftpRemoteActions({
   function chooseExtractParent() {
     if (!extractTarget) return;
     setDirectoryPicker({
-      title: "选择解压位置",
+      title: t`选择解压位置`,
       initialPath: extractTarget.remoteParent,
       onSelect: (path) => {
         setDirectoryPicker(null);
@@ -69,7 +71,7 @@ export function useSftpRemoteActions({
     if (!extractTarget) return;
     const outName = extractTarget.outName.trim();
     if (!validPlainName(outName)) {
-      toast.error("名称不能为空，且不能包含斜杠");
+      toast.error(t`名称不能为空，且不能包含斜杠`);
       return;
     }
     setExtractTarget(null);
@@ -110,7 +112,7 @@ export function useSftpRemoteActions({
   ) {
     setConflict({
       name: outName,
-      incomingLabel: "解压出的文件夹",
+      incomingLabel: t`解压出的文件夹`,
       initialIncomingName,
       initialExistingName,
       run: async (resolution) => {
@@ -131,7 +133,7 @@ export function useSftpRemoteActions({
         joinPath(remoteParent, existingName),
       );
       if (targetExists) {
-        toast.error(`远端已存在 “${existingName}”，请重新命名`);
+        toast.error(t`远端已存在 “${existingName}”，请重新命名`);
         showExtractConflict(
           entry,
           remoteParent,
@@ -155,11 +157,11 @@ export function useSftpRemoteActions({
     remoteParent: string,
     outName: string,
   ) {
-    const tid = toast.loading(`正在解压 ${entry.name}…`);
-    setBusy(`解压 ${entry.name}…`);
+    const tid = toast.loading(t`正在解压 ${entry.name}…`);
+    setBusy(t`解压 ${entry.name}…`);
     try {
       await ipc.sftpExtract(sessionId, entry.path, remoteParent, outName);
-      toast.success(`已解压到 ${outName}`, { id: tid });
+      toast.success(t`已解压到 ${outName}`, { id: tid });
       if (cwd) await load(cwd);
     } catch (e) {
       toast.error(String(e), { id: tid });
@@ -171,7 +173,7 @@ export function useSftpRemoteActions({
   function onMove(entry: SftpEntry) {
     if (!cwd) return;
     setDirectoryPicker({
-      title: "选择移动位置",
+      title: t`选择移动位置`,
       initialPath: cwd,
       disabledPath: entry.isDir ? entry.path : undefined,
       onSelect: (path) => {
@@ -192,13 +194,13 @@ export function useSftpRemoteActions({
   ) {
     if (!cwd) return;
     if (entry.isDir && isSameOrChildPath(remoteParent, entry.path)) {
-      toast.error("不能移动到自身或子文件夹中");
+      toast.error(t`不能移动到自身或子文件夹中`);
       return;
     }
 
     const target = joinPath(remoteParent, entryName);
     if (normalizeRemotePath(target) === normalizeRemotePath(entry.path)) {
-      toast.info(`${entry.isDir ? "文件夹" : "文件"}已在该位置`);
+      toast.info(entry.isDir ? t`文件夹已在该位置` : t`文件已在该位置`);
       return;
     }
 
@@ -225,7 +227,7 @@ export function useSftpRemoteActions({
   ) {
     setConflict({
       name: entryName,
-      incomingLabel: entry.isDir ? "要移动的文件夹" : "要移动的文件",
+      incomingLabel: entry.isDir ? t`要移动的文件夹` : t`要移动的文件`,
       initialIncomingName,
       initialExistingName,
       run: async (resolution) => {
@@ -247,7 +249,7 @@ export function useSftpRemoteActions({
         renamedExistingPath,
       );
       if (renamedExistingExists) {
-        toast.error(`远端已存在 “${existingName}”，请重新命名`);
+        toast.error(t`远端已存在 “${existingName}”，请重新命名`);
         showMoveConflict(
           entry,
           remoteParent,
@@ -269,11 +271,11 @@ export function useSftpRemoteActions({
 
   async function runMoveEntry(entry: SftpEntry, target: string) {
     if (!cwd) return;
-    const tid = toast.loading(`正在移动 ${entry.name}…`);
-    setBusy(`移动 ${entry.name}…`);
+    const tid = toast.loading(t`正在移动 ${entry.name}…`);
+    setBusy(t`移动 ${entry.name}…`);
     try {
       await ipc.sftpRename(sessionId, entry.path, target);
-      toast.success(`已移动 ${entry.name}`, { id: tid });
+      toast.success(t`已移动 ${entry.name}`, { id: tid });
       await load(cwd);
     } catch (e) {
       toast.error(String(e), { id: tid });
@@ -312,15 +314,15 @@ export function useSftpRemoteActions({
     if (!entry || !cwd) return;
     setDeleteTarget(null);
     const transferId = entry.isDir ? nextTransferId() : undefined;
-    const tid = toast.loading(`正在删除 ${entry.name}…`);
-    setBusy(`删除 ${entry.name}…`);
+    const tid = toast.loading(t`正在删除 ${entry.name}…`);
+    setBusy(t`删除 ${entry.name}…`);
     if (transferId) {
-      startTransfer(transferId, `删除 ${entry.name}`, { cancellable: false });
+      startTransfer(transferId, t`删除 ${entry.name}`, { cancellable: false });
     }
     try {
       await ipc.sftpDelete(sessionId, entry.path, entry.isDir, transferId);
       if (transferId) finishTransfer(transferId, "success");
-      toast.success(`已删除 ${entry.name}`, { id: tid });
+      toast.success(t`已删除 ${entry.name}`, { id: tid });
       await load(cwd);
     } catch (e) {
       const message = String(e);

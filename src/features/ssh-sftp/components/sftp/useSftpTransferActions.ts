@@ -1,4 +1,5 @@
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import { useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
 import type { SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
@@ -31,6 +32,7 @@ export function useSftpTransferActions({
   setPrompt,
   setConflict,
 }: UseSftpTransferActionsOptions) {
+  const { t } = useLingui();
   const startTransfer = useTransfersStore((state) => state.start);
   const finishTransfer = useTransfersStore((state) => state.finish);
   const directoryTransferMode = useSettingsStore(
@@ -42,14 +44,14 @@ export function useSftpTransferActions({
     const selected = await openDialog({
       multiple: false,
       directory: false,
-      title: "选择上传文件",
+      title: t`选择上传文件`,
     });
     if (typeof selected !== "string") return;
     const name = baseName(selected);
     const remote = joinPath(cwd, name);
     const refreshPath = cwd;
     const transferId = nextTransferId();
-    const label = `上传 ${name}`;
+    const label = t`上传 ${name}`;
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -73,10 +75,10 @@ export function useSftpTransferActions({
 
   async function onDownload(entry: SftpEntry) {
     if (entry.isDir) return onDownloadDir(entry);
-    const dest = await saveDialog({ defaultPath: entry.name, title: "保存到" });
+    const dest = await saveDialog({ defaultPath: entry.name, title: t`保存到` });
     if (typeof dest !== "string") return;
     const transferId = nextTransferId();
-    const label = `下载 ${entry.name}`;
+    const label = t`下载 ${entry.name}`;
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -108,20 +110,20 @@ export function useSftpTransferActions({
   async function downloadDirWithName(entry: SftpEntry, folderName: string) {
     const trimmedName = folderName.trim();
     if (!validPlainName(trimmedName)) {
-      toast.error("名称不能为空，且不能包含斜杠");
+      toast.error(t`名称不能为空，且不能包含斜杠`);
       return;
     }
     setPrompt(null);
     const parent = await openDialog({
       multiple: false,
       directory: true,
-      title: "选择保存位置",
+      title: t`选择保存位置`,
     });
     if (typeof parent !== "string") return;
     const dest = joinLocalPath(parent, trimmedName);
     const transferMode = directoryTransferMode;
     const transferId = nextTransferId();
-    const label = `下载 ${entry.name}`;
+    const label = t`下载 ${entry.name}`;
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -153,7 +155,7 @@ export function useSftpTransferActions({
     const selected = await openDialog({
       multiple: false,
       directory: true,
-      title: "选择上传文件夹",
+      title: t`选择上传文件夹`,
     });
     if (typeof selected !== "string") return;
     const name = baseName(selected);
@@ -180,7 +182,7 @@ export function useSftpTransferActions({
 
   async function uploadDirWithPromptName(localDir: string, remoteName: string) {
     if (!validPlainName(remoteName)) {
-      toast.error("名称不能为空，且不能包含斜杠");
+      toast.error(t`名称不能为空，且不能包含斜杠`);
       return;
     }
     setPrompt(null);
@@ -195,7 +197,7 @@ export function useSftpTransferActions({
   ) {
     setConflict({
       name: remoteName,
-      incomingLabel: "上传的文件夹",
+      incomingLabel: t`上传的文件夹`,
       initialIncomingName,
       initialExistingName,
       run: async (resolution) => {
@@ -216,7 +218,7 @@ export function useSftpTransferActions({
         joinPath(cwd, existingName),
       );
       if (targetExists) {
-        toast.error(`远端已存在 “${existingName}”，请重新命名`);
+        toast.error(t`远端已存在 “${existingName}”，请重新命名`);
         showUploadConflict(localDir, remoteName, incomingName, existingName);
         return;
       }
@@ -249,7 +251,7 @@ export function useSftpTransferActions({
     const transferId = nextTransferId();
     const transferMode = directoryTransferMode;
     const remoteParent = cwd;
-    const label = `上传 ${remoteName}`;
+    const label = t`上传 ${remoteName}`;
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -29,15 +30,16 @@ export default function PromptDialog({
   title,
   placeholder,
   initialValue = "",
-  confirmText = "确定",
+  confirmText,
   onOpenChange,
   onConfirm,
 }: Props) {
+  const { t } = useLingui();
   const form = useForm({
     defaultValues: { value: initialValue },
     validators: {
       onSubmit: z.object({
-        value: z.string().trim().min(1, "请输入内容"),
+        value: z.string().trim().min(1, t`请输入内容`),
       }),
     },
     onSubmit: ({ value }) => {
@@ -91,9 +93,9 @@ export default function PromptDialog({
               variant="ghost"
               onClick={() => onOpenChange(false)}
             >
-              取消
+              <Trans>取消</Trans>
             </Button>
-            <Button type="submit">{confirmText}</Button>
+            <Button type="submit">{confirmText ?? t`确定`}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
