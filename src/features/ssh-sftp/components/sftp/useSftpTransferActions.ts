@@ -25,6 +25,11 @@ interface UseSftpTransferActionsOptions {
   setConflict: (value: ConflictState) => void;
 }
 
+interface UploadDirOptions {
+  displayName?: string;
+  afterUpload?: () => Promise<void>;
+}
+
 export function useSftpTransferActions({
   sessionId,
   cwd,
@@ -212,26 +217,66 @@ export function useSftpTransferActions({
     { incomingName, existingName }: ConflictResolution,
   ) {
     if (!cwd) return;
-    if (existingName !== remoteName) {
-      const targetExists = await ipc.sftpExists(
-        sessionId,
-        joinPath(cwd, existingName),
-      );
-      if (targetExists) {
-        toast.error(t`远端已存在 “${existingName}”，请重新命名`);
-        showUploadConflict(localDir, remoteName, incomingName, existingName);
-        return;
-      }
-      await ipc.sftpRename(
-        sessionId,
-        joinPath(cwd, remoteName),
-        joinPath(cwd, existingName),
-      );
+    const targetDir = cwd;
+
+    if (existingName === remoteName) {
+      await uploadDirWithName(localDir, incomingName);
+      return;
     }
-    await uploadDirWithName(localDir, incomingName);
+
+    const existingTargetTaken = await ipc.sftpExists(
+      sessionId,
+      joinPath(targetDir, existingName),
+    );
+    if (existingTargetTaken) {
+      toast.error(t`远端已存在 “${existingName}”，请重新命名`);
+      showUploadConflict(localDir, remoteName, incomingName, existingName);
+      return;
+    }
+
+    if (incomingName !== remoteName) {
+      await uploadDirWithName(localDir, incomingName, {
+        afterUpload: async () => {
+          await ipc.sftpRename(
+            sessionId,
+            joinPath(targetDir, remoteName),
+            joinPath(targetDir, existingName),
+          );
+          await load(targetDir);
+        },
+      });
+      return;
+    }
+
+    const stagingName = pickStagingName(remoteName);
+    await uploadDirWithName(localDir, stagingName, {
+      displayName: remoteName,
+      afterUpload: async () => {
+        await ipc.sftpRename(
+          sessionId,
+          joinPath(targetDir, remoteName),
+          joinPath(targetDir, existingName),
+        );
+        await ipc.sftpRename(
+          sessionId,
+          joinPath(targetDir, stagingName),
+          joinPath(targetDir, remoteName),
+        );
+        await load(targetDir);
+      },
+    });
   }
 
-  async function uploadDirWithName(localDir: string, remoteName: string) {
+  function pickStagingName(remoteName: string): string {
+    const suffix = nextTransferId().slice(0, 8);
+    return `.${remoteName}.mftp-uploading-${suffix}`;
+  }
+
+  async function uploadDirWithName(
+    localDir: string,
+    remoteName: string,
+    options?: UploadDirOptions,
+  ) {
     if (!cwd) return;
     try {
       const exists = await ipc.sftpExists(sessionId, joinPath(cwd, remoteName));
@@ -243,15 +288,19 @@ export function useSftpTransferActions({
       toast.error(String(e));
       return;
     }
-    await runUploadDir(localDir, remoteName);
+    await runUploadDir(localDir, remoteName, options);
   }
 
-  async function runUploadDir(localDir: string, remoteName: string) {
+  async function runUploadDir(
+    localDir: string,
+    remoteName: string,
+    options?: UploadDirOptions,
+  ) {
     if (!cwd) return;
     const transferId = nextTransferId();
     const transferMode = directoryTransferMode;
     const remoteParent = cwd;
-    const label = t`上传 ${remoteName}`;
+    const label = t`上传 ${options?.displayName ?? remoteName}`;
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -266,6 +315,9 @@ export function useSftpTransferActions({
           transferMode,
           transferId,
         );
+        if (options?.afterUpload) {
+          await options.afterUpload();
+        }
         finishTransfer(transferId, "success");
         await load(remoteParent);
       } catch (e) {

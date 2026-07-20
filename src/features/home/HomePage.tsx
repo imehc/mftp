@@ -79,7 +79,7 @@ export default function HomePage() {
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 gap-3">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
           <section className="flex flex-col gap-3">
             <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,240px),320px))] justify-start gap-2">
               <Link
@@ -135,9 +135,12 @@ export default function HomePage() {
                 <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
               </Link>
             </div>
-
-            <TransferPanel />
           </section>
+
+          {/* Spacer pushes the transfer list to the bottom of the viewport. */}
+          <div className="flex-1" />
+
+          <TransferPanel />
         </div>
       </div>
     </main>
