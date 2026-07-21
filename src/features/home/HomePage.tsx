@@ -82,7 +82,7 @@ export default function HomePage() {
 
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           <section className="flex flex-col gap-3">
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,240px),320px))] justify-start gap-2">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-2">
               <Link
                 to="/tools/ssh-sftp"
                 onClick={() => setLastTool("ssh-sftp")}
