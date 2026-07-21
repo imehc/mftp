@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr ", directory changes take full effect after restarting the service"
 
 #. placeholder {0}: hosts.length
-#: src/features/home/HomePage.tsx:100
+#: src/features/home/HomePage.tsx:101
 msgid "{0} 主机"
 msgstr "{0} hosts"
 
 #. placeholder {0}: runningTransfers.length
-#: src/features/home/HomePage.tsx:65
-#: src/features/home/HomePage.tsx:106
+#: src/features/home/HomePage.tsx:66
+#: src/features/home/HomePage.tsx:107
 msgid "{0} 传输"
 msgstr "{0} transfers"
 
@@ -48,9 +48,16 @@ msgid "{0} 在线"
 msgstr "{0} online"
 
 #. placeholder {0}: failedTransfers.length
-#: src/features/home/HomePage.tsx:69
+#: src/features/home/HomePage.tsx:70
 msgid "{0} 失败"
 msgstr "{0} failed"
+
+#. placeholder {0}: input.length
+#. placeholder {0}: output.length
+#: src/features/crypto/CryptoTool.tsx:230
+#: src/features/crypto/CryptoTool.tsx:271
+msgid "{0} 字符"
+msgstr "{0} chars"
 
 #. placeholder {0}: Math.floor(diff / 3_600_000)
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:22
@@ -71,19 +78,10 @@ msgid "{0} 秒前"
 msgstr "{0} seconds ago"
 
 #. placeholder {0}: activeSessions.length
-#: src/features/home/HomePage.tsx:62
-#: src/features/home/HomePage.tsx:103
+#: src/features/home/HomePage.tsx:63
+#: src/features/home/HomePage.tsx:104
 msgid "{0} 连接"
 msgstr "{0} connections"
-
-#~ msgid "{activeSessionsCount} 连接"
-#~ msgstr "{activeSessionsCount} connections"
-
-#~ msgid "{failedTransfersCount} 失败"
-#~ msgstr "{failedTransfersCount} failed"
-
-#~ msgid "{hostsCount} 主机"
-#~ msgstr "{hostsCount} hosts"
 
 #: src/features/transfers/TransferPanel.tsx:65
 msgid "{hours} 小时"
@@ -119,9 +117,6 @@ msgstr "{percent}% ({0} / {1})"
 msgid "{rounded} 秒"
 msgstr "{rounded} sec"
 
-#~ msgid "{runningTransfersCount} 传输"
-#~ msgstr "{runningTransfersCount} transfers"
-
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:29
 msgid "{sharesCount} 个目录"
 msgstr "{sharesCount} folders"
@@ -142,27 +137,23 @@ msgstr "/var/www (leave empty to use home directory)"
 msgid "English"
 msgstr "English"
 
-#~ msgid "HTTP"
-#~ msgstr "HTTP"
-
-#~ msgid "MFTP"
-#~ msgstr "MFTP"
-
-#~ msgid "SSH / SFTP"
-#~ msgstr "SSH / SFTP"
+#: src/features/crypto/CryptoTool.tsx:208
+msgid "URL Safe"
+msgstr "URL Safe"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:64
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:271
 msgid "上传"
 msgstr "Upload"
 
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:54
+#. placeholder {0}: options?.displayName ?? remoteName
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:303
+msgid "上传 {0}"
+msgstr "Upload {0}"
+
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:59
 msgid "上传 {name}"
 msgstr "Upload {name}"
-
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:254
-msgid "上传 {remoteName}"
-msgstr "Upload {remoteName}"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:277
 msgid "上传文件"
@@ -173,7 +164,7 @@ msgstr "Upload File"
 msgid "上传文件夹"
 msgstr "Upload Folder"
 
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:200
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:205
 msgid "上传的文件夹"
 msgstr "Uploaded Folder"
 
@@ -188,8 +179,8 @@ msgid "下载"
 msgstr "Download"
 
 #. placeholder {0}: entry.name
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:81
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:126
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:86
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:131
 msgid "下载 {0}"
 msgstr "Download {0}"
 
@@ -236,6 +227,10 @@ msgstr "Home Directory"
 msgid "主题"
 msgstr "Theme"
 
+#: src/features/crypto/CryptoTool.tsx:134
+msgid "互换"
+msgstr "Swap"
+
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:30
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:86
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:390
@@ -256,6 +251,10 @@ msgstr "Transfer Tasks"
 msgid "位置"
 msgstr "Location"
 
+#: src/features/crypto/CryptoTool.tsx:211
+msgid "使用 -_ 替换 +/，并省略填充"
+msgstr "Replace +/ with -_ and omit padding"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
 msgid "保存"
@@ -265,7 +264,7 @@ msgstr "Save"
 msgid "保存中…"
 msgstr "Saving..."
 
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:78
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:83
 msgid "保存到"
 msgstr "Save To"
 
@@ -312,6 +311,10 @@ msgstr "Close"
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
 msgid "关闭中"
 msgstr "Closing"
+
+#: src/features/crypto/CryptoTool.tsx:63
+msgid "内容无效，无法解码"
+msgstr "Invalid content, cannot decode"
 
 #: src/store/transfers.ts:57
 msgid "准备中"
@@ -389,6 +392,12 @@ msgstr "Remaining "
 #: src/features/transfers/TransferPanel.tsx:413
 msgid "剩余 {0}"
 msgstr "Remaining {0}"
+
+#: src/features/crypto/CryptoTool.tsx:101
+#: src/features/crypto/CryptoTool.tsx:118
+#: src/features/home/HomePage.tsx:150
+msgid "加解密"
+msgstr "Encode / Decode"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:196
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:299
@@ -479,8 +488,8 @@ msgid "名称不能为空"
 msgstr "Name is required"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:74
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:113
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:185
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:118
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:190
 msgid "名称不能为空，且不能包含斜杠"
 msgstr "Name is required and cannot contain slashes"
 
@@ -518,6 +527,16 @@ msgstr "Address"
 #: src/features/lan-transfer/LanTransferTool.tsx:385
 msgid "复制"
 msgstr "Copy"
+
+#: src/features/crypto/CryptoTool.tsx:237
+#: src/features/crypto/CryptoTool.tsx:238
+msgid "复制输入"
+msgstr "Copy input"
+
+#: src/features/crypto/CryptoTool.tsx:279
+#: src/features/crypto/CryptoTool.tsx:280
+msgid "复制输出"
+msgstr "Copy output"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:74
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:159
@@ -571,11 +590,15 @@ msgstr "Import Key"
 msgid "导入私钥后可在主机中选用。"
 msgstr "Import a private key to use it with hosts."
 
+#: src/features/crypto/CryptoTool.tsx:131
+msgid "将结果写回输入并切换模式"
+msgstr "Write result back to input and switch mode"
+
 #: src/features/logs/ActivityLogsPage.tsx:126
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/HomePage.tsx:125
+#: src/features/home/HomePage.tsx:126
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -599,7 +622,7 @@ msgstr "LAN transfer auxiliary data failed to load: {0}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/HomePage.tsx:52
+#: src/features/home/HomePage.tsx:53
 msgid "工具与运行状态"
 msgstr "Tools and activity"
 
@@ -657,6 +680,14 @@ msgstr "Task cancelled"
 #: src/features/lan-transfer/LanTransferTool.tsx:314
 msgid "已复制地址"
 msgstr "Address copied"
+
+#: src/features/crypto/CryptoTool.tsx:235
+msgid "已复制输入"
+msgstr "Input copied"
+
+#: src/features/crypto/CryptoTool.tsx:277
+msgid "已复制输出"
+msgstr "Output copied"
 
 #. placeholder {0}: keys.length
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:173
@@ -905,7 +936,7 @@ msgstr "No Matches"
 msgid "无口令"
 msgstr "No Passphrase"
 
-#: src/features/home/HomePage.tsx:75
+#: src/features/home/HomePage.tsx:76
 #: src/features/logs/ActivityLogsPage.tsx:115
 msgid "日志"
 msgstr "Logs"
@@ -922,6 +953,10 @@ msgstr "Logs cleared"
 #: src/features/logs/ActivityLogsPage.tsx:149
 msgid "时间"
 msgstr "Time"
+
+#: src/features/crypto/CryptoTool.tsx:66
+msgid "暂不支持该算法"
+msgstr "Algorithm not supported yet"
 
 #: src/features/transfers/TransferPanel.tsx:365
 msgid "暂停"
@@ -998,6 +1033,10 @@ msgstr "The service is running. Stop it before changing port, receive directory,
 msgid "未选择"
 msgstr "Not selected"
 
+#: src/features/crypto/CryptoTool.tsx:105
+msgid "本地处理"
+msgstr "Local"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:422
 msgid "本地文件夹名称"
 msgstr "Local Folder Name"
@@ -1042,6 +1081,10 @@ msgstr "Update check failed: cannot connect to update source"
 #: src/lib/updater.ts:329
 msgid "检查更新超时，请确认 GitHub Release 更新源是否可访问"
 msgstr "Update check timed out. Confirm the GitHub Release update source is accessible."
+
+#: src/features/crypto/CryptoTool.tsx:177
+msgid "模式"
+msgstr "Mode"
 
 #. placeholder {0}: state.version
 #: src/lib/updater.ts:271
@@ -1117,7 +1160,7 @@ msgstr "Restarting and applying update..."
 msgid "没有子文件夹"
 msgstr "No child folders"
 
-#: src/features/home/HomePage.tsx:59
+#: src/features/home/HomePage.tsx:60
 msgid "活动中"
 msgstr "Active"
 
@@ -1125,7 +1168,7 @@ msgstr "Active"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/home/HomePage.tsx:130
+#: src/features/home/HomePage.tsx:131
 msgid "浏览器访问"
 msgstr "Browser Access"
 
@@ -1147,6 +1190,7 @@ msgstr "Add"
 msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
+#: src/features/crypto/CryptoTool.tsx:143
 #: src/features/logs/LogPageLayout.tsx:115
 msgid "清空"
 msgstr "Clear"
@@ -1265,7 +1309,7 @@ msgstr "Later"
 msgid "空目录"
 msgstr "Empty Directory"
 
-#: src/features/home/HomePage.tsx:59
+#: src/features/home/HomePage.tsx:60
 #: src/features/transfers/TransferPanel.tsx:115
 msgid "空闲"
 msgstr "Idle"
@@ -1284,6 +1328,10 @@ msgstr "Info"
 #: src/i18n/locales.ts:9
 msgid "简体中文"
 msgstr "Simplified Chinese"
+
+#: src/features/crypto/CryptoTool.tsx:153
+msgid "算法"
+msgstr "Algorithm"
 
 #: src/features/logs/ActivityLogsPage.tsx:116
 msgid "管理 SSH、SFTP 和局域网传输活动"
@@ -1314,6 +1362,10 @@ msgstr "Bind IP Unavailable"
 msgid "结果"
 msgstr "Result"
 
+#: src/features/crypto/CryptoTool.tsx:290
+msgid "结果会实时显示在这里"
+msgstr "Result appears here in real time"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:411
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:423
 #: src/features/transfers/TransferPanel.tsx:365
@@ -1323,6 +1375,15 @@ msgstr "Continue"
 #: src/store/transfers.ts:192
 msgid "继续传输中"
 msgstr "Resuming Transfer"
+
+#: src/features/crypto/CryptoTool.tsx:191
+#: src/features/home/HomePage.tsx:154
+msgid "编码"
+msgstr "Encode"
+
+#: src/features/crypto/CryptoTool.tsx:65
+msgid "编码失败"
+msgstr "Encoding failed"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:361
 msgid "编辑"
@@ -1376,6 +1437,11 @@ msgstr "Extracting {0}..."
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:115
 msgid "解压出的文件夹"
 msgstr "Extracted Folder"
+
+#: src/features/crypto/CryptoTool.tsx:194
+#: src/features/home/HomePage.tsx:157
+msgid "解码"
+msgstr "Decode"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:190
 msgid "认证方式"
@@ -1441,9 +1507,25 @@ msgstr "Resize left panel"
 msgid "跟随系统"
 msgstr "Follow System"
 
+#: src/features/crypto/CryptoTool.tsx:226
+msgid "输入"
+msgstr "Input"
+
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:48
 msgid "输入密钥口令"
 msgstr "Enter Key Passphrase"
+
+#: src/features/crypto/CryptoTool.tsx:250
+msgid "输入要编码的文本"
+msgstr "Enter text to encode"
+
+#: src/features/crypto/CryptoTool.tsx:251
+msgid "输入要解码的内容"
+msgstr "Enter content to decode"
+
+#: src/features/crypto/CryptoTool.tsx:264
+msgid "输出"
+msgstr "Output"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:347
 msgid "运行中"
@@ -1472,7 +1554,7 @@ msgstr "In Progress"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:136
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:252
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:221
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:232
 msgid "远端已存在 “{existingName}”，请重新命名"
 msgstr "Remote item “{existingName}” already exists. Choose a different name."
 
@@ -1526,15 +1608,15 @@ msgstr "Connected Devices"
 msgid "选择"
 msgstr "Choose"
 
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:47
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:52
 msgid "选择上传文件"
 msgstr "Select File to Upload"
 
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:158
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:163
 msgid "选择上传文件夹"
 msgstr "Select Folder to Upload"
 
-#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:120
+#: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:125
 msgid "选择保存位置"
 msgstr "Select Save Location"
 
@@ -1561,6 +1643,14 @@ msgstr "Select Private Key File"
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:176
 msgid "选择移动位置"
 msgstr "Select Move Location"
+
+#: src/features/crypto/CryptoTool.tsx:161
+msgid "选择算法"
+msgstr "Select algorithm"
+
+#: src/features/crypto/CryptoTool.tsx:121
+msgid "选择算法对文本进行编码或解码"
+msgstr "Choose an algorithm to encode or decode text"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
 msgid "选择解压位置"
@@ -1608,6 +1698,7 @@ msgstr "Retry"
 msgid "链接"
 msgstr "Link"
 
+#: src/features/crypto/CryptoTool.tsx:96
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/ssh-sftp/SshSftpTool.tsx:67
 msgid "首页"

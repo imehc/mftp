@@ -11,7 +11,7 @@
     "tauri": "tauri",
     "version:check": "node scripts/version.mjs check",
     "version:bump": "node scripts/version.mjs bump",
-    "extract": "lingui extract",
+    "extract": "lingui extract --clean",
     "compile": "lingui compile --typescript"
   },
   "dependencies": {

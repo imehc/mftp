@@ -13,6 +13,7 @@ import { Route as LogsRouteImport } from './routes/logs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
+import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
 
 const LogsRoute = LogsRouteImport.update({
   id: '/logs',
@@ -34,16 +35,23 @@ const ToolsLanTransferRoute = ToolsLanTransferRouteImport.update({
   path: '/tools/lan-transfer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
+  id: '/tools/crypto',
+  path: '/tools/crypto',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
 }
@@ -51,20 +59,30 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/logs' | '/tools/lan-transfer' | '/tools/ssh-sftp'
+  fullPaths:
+    '/' | '/logs' | '/tools/crypto' | '/tools/lan-transfer' | '/tools/ssh-sftp'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/logs' | '/tools/lan-transfer' | '/tools/ssh-sftp'
-  id: '__root__' | '/' | '/logs' | '/tools/lan-transfer' | '/tools/ssh-sftp'
+  to:
+    '/' | '/logs' | '/tools/crypto' | '/tools/lan-transfer' | '/tools/ssh-sftp'
+  id:
+    | '__root__'
+    | '/'
+    | '/logs'
+    | '/tools/crypto'
+    | '/tools/lan-transfer'
+    | '/tools/ssh-sftp'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LogsRoute: typeof LogsRoute
+  ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
   ToolsSshSftpRoute: typeof ToolsSshSftpRoute
 }
@@ -99,12 +117,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsLanTransferRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/crypto': {
+      id: '/tools/crypto'
+      path: '/tools/crypto'
+      fullPath: '/tools/crypto'
+      preLoaderRoute: typeof ToolsCryptoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LogsRoute: LogsRoute,
+  ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,
   ToolsSshSftpRoute: ToolsSshSftpRoute,
 }

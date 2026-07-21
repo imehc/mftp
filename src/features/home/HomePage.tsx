@@ -5,6 +5,7 @@ import {
   ArrowRight,
   FileClock,
   Home,
+  LockKeyhole,
   TerminalSquare,
   Wifi,
 } from "lucide-react";
@@ -128,6 +129,32 @@ export default function HomePage() {
                       <Badge variant="outline">HTTP</Badge>
                       <Badge variant="outline">
                         <Trans>浏览器访问</Trans>
+                      </Badge>
+                    </span>
+                  </span>
+                </div>
+                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+              </Link>
+              <Link
+                to="/tools/crypto"
+                preload="viewport"
+                onClick={() => setLastTool("crypto")}
+                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
+                    <LockKeyhole className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">
+                      <Trans>加解密</Trans>
+                    </span>
+                    <span className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge variant="outline">
+                        <Trans>编码</Trans>
+                      </Badge>
+                      <Badge variant="outline">
+                        <Trans>解码</Trans>
                       </Badge>
                     </span>
                   </span>

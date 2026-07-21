@@ -18,9 +18,12 @@ function RootLayout() {
     if (sessionStorage.getItem(START_ROUTE_RESOLVED_KEY)) return;
     sessionStorage.setItem(START_ROUTE_RESOLVED_KEY, "1");
     if (window.location.pathname !== "/" || !lastTool) return;
-    const to =
-      lastTool === "lan-transfer" ? "/tools/lan-transfer" : "/tools/ssh-sftp";
-    void navigate({ to, replace: true });
+    const toolPaths = {
+      "ssh-sftp": "/tools/ssh-sftp",
+      "lan-transfer": "/tools/lan-transfer",
+      crypto: "/tools/crypto",
+    } as const;
+    void navigate({ to: toolPaths[lastTool], replace: true });
   }, [lastTool, navigate]);
 
   return <Outlet />;

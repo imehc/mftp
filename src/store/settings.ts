@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type DirectoryTransferMode = "archive" | "direct";
-export type ToolRoute = "ssh-sftp" | "lan-transfer";
+export type ToolRoute = "ssh-sftp" | "lan-transfer" | "crypto";
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {
