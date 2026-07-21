@@ -133,9 +133,37 @@ msgstr "{transferringCount} 进行中 · {pausedTransferCount} 已暂停"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www（留空则用主目录）"
 
+#: src/features/settings/AppSettingsMenu.tsx:113
+msgid "DesignByte"
+msgstr "DesignByte"
+
 #: src/i18n/locales.ts:10
 msgid "English"
 msgstr "English"
+
+#: src/features/settings/AppSettingsMenu.tsx:120
+msgid "Geist"
+msgstr "Geist"
+
+#: src/features/settings/AppSettingsMenu.tsx:123
+msgid "Montserrat"
+msgstr "Montserrat"
+
+#: src/features/settings/AppSettingsMenu.tsx:114
+msgid "MX-Brutalist"
+msgstr "MX-Brutalist"
+
+#: src/features/settings/AppSettingsMenu.tsx:121
+msgid "Outfit"
+msgstr "Outfit"
+
+#: src/features/settings/AppSettingsMenu.tsx:122
+msgid "Plus Jakarta"
+msgstr "Plus Jakarta"
+
+#: src/features/settings/AppSettingsMenu.tsx:116
+msgid "Tiesen"
+msgstr "Tiesen"
 
 #: src/features/crypto/CryptoTool.tsx:208
 msgid "URL Safe"
@@ -184,7 +212,7 @@ msgstr "下载"
 msgid "下载 {0}"
 msgstr "下载 {0}"
 
-#: src/features/settings/AppSettingsMenu.tsx:86
+#: src/features/settings/AppSettingsMenu.tsx:101
 msgid "下载中"
 msgstr "下载中"
 
@@ -223,7 +251,7 @@ msgstr "主机"
 msgid "主目录"
 msgstr "主目录"
 
-#: src/features/settings/AppSettingsMenu.tsx:237
+#: src/features/settings/AppSettingsMenu.tsx:298
 msgid "主题"
 msgstr "主题"
 
@@ -313,7 +341,7 @@ msgid "共享目录"
 msgstr "共享目录"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:168
+#: src/features/settings/AppSettingsMenu.tsx:207
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
 msgid "关闭"
 msgstr "关闭"
@@ -424,7 +452,7 @@ msgstr "加载中…"
 msgid "动作"
 msgstr "动作"
 
-#: src/features/settings/AppSettingsMenu.tsx:97
+#: src/features/settings/AppSettingsMenu.tsx:128
 msgid "压缩包"
 msgstr "压缩包"
 
@@ -566,6 +594,10 @@ msgstr "复制输入"
 msgid "复制输出"
 msgstr "复制输出"
 
+#: src/features/settings/AppSettingsMenu.tsx:279
+msgid "外观"
+msgstr "外观"
+
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:74
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:159
 msgid "大小"
@@ -577,6 +609,10 @@ msgstr "大小"
 #: src/store/transfers.ts:127
 msgid "失败"
 msgstr "失败"
+
+#: src/features/settings/AppSettingsMenu.tsx:337
+msgid "字体"
+msgstr "字体"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:239
 msgid "安全模式"
@@ -675,7 +711,7 @@ msgstr "已停止"
 msgid "已允许访问"
 msgstr "已允许访问"
 
-#: src/features/settings/AppSettingsMenu.tsx:133
+#: src/features/settings/AppSettingsMenu.tsx:172
 msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
@@ -731,7 +767,7 @@ msgstr "已导入 ({0})"
 msgid "已导入密钥 {0}"
 msgstr "已导入密钥 {0}"
 
-#: src/features/settings/AppSettingsMenu.tsx:129
+#: src/features/settings/AppSettingsMenu.tsx:168
 msgid "已开启开机自启"
 msgstr "已开启开机自启"
 
@@ -799,7 +835,7 @@ msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:165
+#: src/features/settings/AppSettingsMenu.tsx:204
 msgid "开启"
 msgstr "开启"
 
@@ -812,7 +848,7 @@ msgstr "开放"
 msgid "开放模式会跳过确认码"
 msgstr "开放模式会跳过确认码"
 
-#: src/features/settings/AppSettingsMenu.tsx:155
+#: src/features/settings/AppSettingsMenu.tsx:194
 msgid "开机自启"
 msgstr "开机自启"
 
@@ -932,7 +968,7 @@ msgstr "文件"
 msgid "文件夹"
 msgstr "文件夹"
 
-#: src/features/settings/AppSettingsMenu.tsx:191
+#: src/features/settings/AppSettingsMenu.tsx:230
 msgid "文件夹传输"
 msgstr "文件夹传输"
 
@@ -1109,11 +1145,11 @@ msgstr "来源"
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "查看 GitHub Release 获取更新内容"
 
-#: src/features/settings/AppSettingsMenu.tsx:85
+#: src/features/settings/AppSettingsMenu.tsx:100
 msgid "查看更新"
 msgstr "查看更新"
 
-#: src/features/settings/AppSettingsMenu.tsx:83
+#: src/features/settings/AppSettingsMenu.tsx:98
 msgid "检查更新"
 msgstr "检查更新"
 
@@ -1176,7 +1212,7 @@ msgstr "正在打开文件夹…"
 msgid "正在打开终端…"
 msgstr "正在打开终端…"
 
-#: src/features/settings/AppSettingsMenu.tsx:84
+#: src/features/settings/AppSettingsMenu.tsx:99
 msgid "正在检查"
 msgstr "正在检查"
 
@@ -1215,7 +1251,7 @@ msgstr "没有子文件夹"
 msgid "活动中"
 msgstr "活动中"
 
-#: src/features/settings/AppSettingsMenu.tsx:93
+#: src/features/settings/AppSettingsMenu.tsx:108
 msgid "浅色"
 msgstr "浅色"
 
@@ -1227,7 +1263,7 @@ msgstr "浏览器访问"
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
 
-#: src/features/settings/AppSettingsMenu.tsx:94
+#: src/features/settings/AppSettingsMenu.tsx:109
 msgid "深色"
 msgstr "深色"
 
@@ -1290,7 +1326,7 @@ msgstr "白名单"
 msgid "目标已存在同名项目"
 msgstr "目标已存在同名项目"
 
-#: src/features/settings/AppSettingsMenu.tsx:98
+#: src/features/settings/AppSettingsMenu.tsx:129
 msgid "直接"
 msgstr "直接"
 
@@ -1392,7 +1428,7 @@ msgstr "管理 SSH、SFTP 和局域网传输活动"
 msgid "类型"
 msgstr "类型"
 
-#: src/features/settings/AppSettingsMenu.tsx:92
+#: src/features/settings/AppSettingsMenu.tsx:107
 msgid "系统"
 msgstr "系统"
 
@@ -1527,7 +1563,7 @@ msgid "设备名"
 msgstr "设备名"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:389
-#: src/features/settings/AppSettingsMenu.tsx:147
+#: src/features/settings/AppSettingsMenu.tsx:186
 msgid "设置"
 msgstr "设置"
 
@@ -1556,7 +1592,7 @@ msgstr "该私钥有口令保护（连接时输入）"
 msgid "详情"
 msgstr "详情"
 
-#: src/features/settings/AppSettingsMenu.tsx:221
+#: src/features/settings/AppSettingsMenu.tsx:260
 msgid "语言"
 msgstr "语言"
 
@@ -1590,6 +1626,14 @@ msgstr "读写"
 #: src/features/ssh-sftp/SshSftpTool.tsx:123
 msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
+
+#: src/features/settings/AppSettingsMenu.tsx:115
+msgid "赛博朋克"
+msgstr "赛博朋克"
+
+#: src/features/settings/AppSettingsMenu.tsx:119
+msgid "跟随主题"
+msgstr "跟随主题"
 
 #: src/i18n/locales.ts:8
 msgid "跟随系统"
@@ -1763,7 +1807,7 @@ msgstr "选择算法对文本进行编码或解码"
 msgid "选择解压位置"
 msgstr "选择解压位置"
 
-#: src/features/settings/AppSettingsMenu.tsx:88
+#: src/features/settings/AppSettingsMenu.tsx:103
 msgid "重启中"
 msgstr "重启中"
 
@@ -1780,7 +1824,7 @@ msgstr "重启并更新"
 msgid "重启应用即可完成更新。"
 msgstr "重启应用即可完成更新。"
 
-#: src/features/settings/AppSettingsMenu.tsx:87
+#: src/features/settings/AppSettingsMenu.tsx:102
 msgid "重启更新"
 msgstr "重启更新"
 
@@ -1790,7 +1834,7 @@ msgstr "重启更新"
 msgid "重命名"
 msgstr "重命名"
 
-#: src/features/settings/AppSettingsMenu.tsx:89
+#: src/features/settings/AppSettingsMenu.tsx:104
 #: src/lib/updater.ts:236
 msgid "重新检查"
 msgstr "重新检查"
@@ -1811,6 +1855,10 @@ msgstr "链接"
 #: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "首页"
+
+#: src/features/settings/AppSettingsMenu.tsx:112
+msgid "默认"
+msgstr "默认"
 
 #: src/features/web-browser/WebBrowserTool.tsx:403
 msgid "默认地址"

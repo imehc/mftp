@@ -7,7 +7,10 @@ import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
 import { checkForUpdateOnLaunch } from "~/lib/updater";
+import { applyStoredColorTheme } from "~/lib/color-theme";
 import "./App.css";
+
+applyStoredColorTheme();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

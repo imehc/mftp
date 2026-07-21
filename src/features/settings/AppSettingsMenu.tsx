@@ -7,10 +7,12 @@ import {
   Languages,
   Monitor,
   Moon,
+  Palette,
   RefreshCw,
   RotateCcw,
   Settings,
   Sun,
+  Type,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
@@ -22,7 +24,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
@@ -35,6 +36,16 @@ import {
   checkForUpdateManually,
   restartToApplyUpdate,
 } from "~/lib/updater";
+import {
+  applyColorTheme,
+  applyFontPreset,
+  colorThemes,
+  fontPresets,
+  resolveColorTheme,
+  resolveFontPreset,
+  type ColorTheme,
+  type FontPreset,
+} from "~/lib/color-theme";
 import {
   type AppLocale,
   type DirectoryTransferMode,
@@ -67,6 +78,10 @@ export default function AppSettingsMenu() {
   const [autostartBusy, setAutostartBusy] = useState(false);
   const locale = useSettingsStore((s) => s.locale);
   const setLocale = useSettingsStore((s) => s.setLocale);
+  const colorTheme = useSettingsStore((s) => s.colorTheme);
+  const setColorTheme = useSettingsStore((s) => s.setColorTheme);
+  const fontPreset = useSettingsStore((s) => s.fontPreset);
+  const setFontPreset = useSettingsStore((s) => s.setFontPreset);
   const directoryTransferMode = useSettingsStore(
     (s) => s.directoryTransferMode,
   );
@@ -93,6 +108,22 @@ export default function AppSettingsMenu() {
     light: t`浅色`,
     dark: t`深色`,
   } as const;
+  const colorThemeLabels = {
+    default: t`默认`,
+    designbyte: t`DesignByte`,
+    "mx-brutalist": t`MX-Brutalist`,
+    cyberpunk: t`赛博朋克`,
+    tiesen: t`Tiesen`,
+  } as const;
+  const fontPresetLabels = {
+    theme: t`跟随主题`,
+    geist: t`Geist`,
+    outfit: t`Outfit`,
+    jakarta: t`Plus Jakarta`,
+    montserrat: t`Montserrat`,
+  } as const;
+  const ThemeIcon =
+    themes.find((item) => item.value === theme)?.icon ?? Monitor;
   const directoryTransferModeLabels = {
     archive: t`压缩包`,
     direct: t`直接`,
@@ -101,6 +132,14 @@ export default function AppSettingsMenu() {
   useEffect(() => {
     void refreshAutostart();
   }, []);
+
+  useEffect(() => {
+    applyColorTheme(resolveColorTheme(colorTheme));
+  }, [colorTheme]);
+
+  useEffect(() => {
+    applyFontPreset(resolveFontPreset(fontPreset));
+  }, [fontPreset]);
 
   async function refreshAutostart() {
     try {
@@ -234,18 +273,82 @@ export default function AppSettingsMenu() {
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel>{t`主题`}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-          {themes.map((item) => {
-            const Icon = item.icon;
-            return (
-              <DropdownMenuRadioItem key={item.value} value={item.value}>
-                <Icon />
-                {themeLabels[item.value]}
-              </DropdownMenuRadioItem>
-            );
-          })}
-        </DropdownMenuRadioGroup>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <ThemeIcon />
+            {t`外观`}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
+            <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+              {themes.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <DropdownMenuRadioItem key={item.value} value={item.value}>
+                    <Icon />
+                    {themeLabels[item.value]}
+                  </DropdownMenuRadioItem>
+                );
+              })}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Palette />
+            {t`主题`}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="max-h-80 min-w-52 overflow-y-auto whitespace-nowrap">
+            <DropdownMenuRadioGroup
+              value={resolveColorTheme(colorTheme)}
+              onValueChange={(value) => setColorTheme(value as ColorTheme)}
+            >
+              {colorThemes.map((item) => (
+                <DropdownMenuRadioItem key={item.value} value={item.value}>
+                  <span
+                    aria-hidden
+                    className="flex shrink-0 overflow-hidden rounded-md border border-border"
+                  >
+                    <span
+                      className="size-3.5"
+                      style={{ backgroundColor: item.swatches.background }}
+                    />
+                    <span
+                      className="size-3.5"
+                      style={{ backgroundColor: item.swatches.primary }}
+                    />
+                    <span
+                      className="size-3.5"
+                      style={{ backgroundColor: item.swatches.accent }}
+                    />
+                    <span
+                      className="size-3.5"
+                      style={{ backgroundColor: item.swatches.secondary }}
+                    />
+                  </span>
+                  {colorThemeLabels[item.value]}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Type />
+            {t`字体`}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="min-w-40 whitespace-nowrap">
+            <DropdownMenuRadioGroup
+              value={resolveFontPreset(fontPreset)}
+              onValueChange={(value) => setFontPreset(value as FontPreset)}
+            >
+              {fontPresets.map((item) => (
+                <DropdownMenuRadioItem key={item} value={item}>
+                  {fontPresetLabels[item]}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
       </DropdownMenuContent>
     </DropdownMenu>
   );

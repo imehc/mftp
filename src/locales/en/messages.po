@@ -133,9 +133,37 @@ msgstr "{transferringCount} in progress · {pausedTransferCount} paused"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
 
+#: src/features/settings/AppSettingsMenu.tsx:113
+msgid "DesignByte"
+msgstr "DesignByte"
+
 #: src/i18n/locales.ts:10
 msgid "English"
 msgstr "English"
+
+#: src/features/settings/AppSettingsMenu.tsx:120
+msgid "Geist"
+msgstr "Geist"
+
+#: src/features/settings/AppSettingsMenu.tsx:123
+msgid "Montserrat"
+msgstr "Montserrat"
+
+#: src/features/settings/AppSettingsMenu.tsx:114
+msgid "MX-Brutalist"
+msgstr "MX-Brutalist"
+
+#: src/features/settings/AppSettingsMenu.tsx:121
+msgid "Outfit"
+msgstr "Outfit"
+
+#: src/features/settings/AppSettingsMenu.tsx:122
+msgid "Plus Jakarta"
+msgstr "Plus Jakarta"
+
+#: src/features/settings/AppSettingsMenu.tsx:116
+msgid "Tiesen"
+msgstr "Tiesen"
 
 #: src/features/crypto/CryptoTool.tsx:208
 msgid "URL Safe"
@@ -184,7 +212,7 @@ msgstr "Download"
 msgid "下载 {0}"
 msgstr "Download {0}"
 
-#: src/features/settings/AppSettingsMenu.tsx:86
+#: src/features/settings/AppSettingsMenu.tsx:101
 msgid "下载中"
 msgstr "Downloading"
 
@@ -223,7 +251,7 @@ msgstr "Hosts"
 msgid "主目录"
 msgstr "Home Directory"
 
-#: src/features/settings/AppSettingsMenu.tsx:237
+#: src/features/settings/AppSettingsMenu.tsx:298
 msgid "主题"
 msgstr "Theme"
 
@@ -313,7 +341,7 @@ msgid "共享目录"
 msgstr "Shared Folders"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:168
+#: src/features/settings/AppSettingsMenu.tsx:207
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
 msgid "关闭"
 msgstr "Close"
@@ -424,7 +452,7 @@ msgstr "Loading..."
 msgid "动作"
 msgstr "Action"
 
-#: src/features/settings/AppSettingsMenu.tsx:97
+#: src/features/settings/AppSettingsMenu.tsx:128
 msgid "压缩包"
 msgstr "Archive"
 
@@ -566,6 +594,10 @@ msgstr "Copy input"
 msgid "复制输出"
 msgstr "Copy output"
 
+#: src/features/settings/AppSettingsMenu.tsx:279
+msgid "外观"
+msgstr "Appearance"
+
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:74
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:159
 msgid "大小"
@@ -577,6 +609,10 @@ msgstr "Size"
 #: src/store/transfers.ts:127
 msgid "失败"
 msgstr "Failed"
+
+#: src/features/settings/AppSettingsMenu.tsx:337
+msgid "字体"
+msgstr "Font"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:239
 msgid "安全模式"
@@ -675,7 +711,7 @@ msgstr "Stopped"
 msgid "已允许访问"
 msgstr "Access allowed"
 
-#: src/features/settings/AppSettingsMenu.tsx:133
+#: src/features/settings/AppSettingsMenu.tsx:172
 msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
@@ -731,7 +767,7 @@ msgstr "Imported ({0})"
 msgid "已导入密钥 {0}"
 msgstr "Key {0} imported"
 
-#: src/features/settings/AppSettingsMenu.tsx:129
+#: src/features/settings/AppSettingsMenu.tsx:168
 msgid "已开启开机自启"
 msgstr "Launch at Login enabled"
 
@@ -799,7 +835,7 @@ msgid "应用启动后自动开启服务"
 msgstr "Start service automatically when the app launches"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:165
+#: src/features/settings/AppSettingsMenu.tsx:204
 msgid "开启"
 msgstr "On"
 
@@ -812,7 +848,7 @@ msgstr "Open"
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
-#: src/features/settings/AppSettingsMenu.tsx:155
+#: src/features/settings/AppSettingsMenu.tsx:194
 msgid "开机自启"
 msgstr "Launch at Login"
 
@@ -932,7 +968,7 @@ msgstr "File"
 msgid "文件夹"
 msgstr "Folder"
 
-#: src/features/settings/AppSettingsMenu.tsx:191
+#: src/features/settings/AppSettingsMenu.tsx:230
 msgid "文件夹传输"
 msgstr "Folder Transfer"
 
@@ -1109,11 +1145,11 @@ msgstr "Source"
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "View GitHub Releases for update notes"
 
-#: src/features/settings/AppSettingsMenu.tsx:85
+#: src/features/settings/AppSettingsMenu.tsx:100
 msgid "查看更新"
 msgstr "View Update"
 
-#: src/features/settings/AppSettingsMenu.tsx:83
+#: src/features/settings/AppSettingsMenu.tsx:98
 msgid "检查更新"
 msgstr "Check for Updates"
 
@@ -1176,7 +1212,7 @@ msgstr "Opening folder..."
 msgid "正在打开终端…"
 msgstr "Opening terminal..."
 
-#: src/features/settings/AppSettingsMenu.tsx:84
+#: src/features/settings/AppSettingsMenu.tsx:99
 msgid "正在检查"
 msgstr "Checking"
 
@@ -1215,7 +1251,7 @@ msgstr "No child folders"
 msgid "活动中"
 msgstr "Active"
 
-#: src/features/settings/AppSettingsMenu.tsx:93
+#: src/features/settings/AppSettingsMenu.tsx:108
 msgid "浅色"
 msgstr "Light"
 
@@ -1227,7 +1263,7 @@ msgstr "Browser Access"
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "Browser access requests, confirmation prompts, and trusted-device fallback requests"
 
-#: src/features/settings/AppSettingsMenu.tsx:94
+#: src/features/settings/AppSettingsMenu.tsx:109
 msgid "深色"
 msgstr "Dark"
 
@@ -1290,7 +1326,7 @@ msgstr "Trusted Devices"
 msgid "目标已存在同名项目"
 msgstr "An Item With This Name Already Exists"
 
-#: src/features/settings/AppSettingsMenu.tsx:98
+#: src/features/settings/AppSettingsMenu.tsx:129
 msgid "直接"
 msgstr "Direct"
 
@@ -1392,7 +1428,7 @@ msgstr "Manage SSH, SFTP, and LAN transfer activity"
 msgid "类型"
 msgstr "Type"
 
-#: src/features/settings/AppSettingsMenu.tsx:92
+#: src/features/settings/AppSettingsMenu.tsx:107
 msgid "系统"
 msgstr "System"
 
@@ -1527,7 +1563,7 @@ msgid "设备名"
 msgstr "Device Name"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:389
-#: src/features/settings/AppSettingsMenu.tsx:147
+#: src/features/settings/AppSettingsMenu.tsx:186
 msgid "设置"
 msgstr "Settings"
 
@@ -1556,7 +1592,7 @@ msgstr "This private key is passphrase-protected (enter it when connecting)."
 msgid "详情"
 msgstr "Details"
 
-#: src/features/settings/AppSettingsMenu.tsx:221
+#: src/features/settings/AppSettingsMenu.tsx:260
 msgid "语言"
 msgstr "Language"
 
@@ -1590,6 +1626,14 @@ msgstr "Read/Write"
 #: src/features/ssh-sftp/SshSftpTool.tsx:123
 msgid "调整左侧面板宽度"
 msgstr "Resize left panel"
+
+#: src/features/settings/AppSettingsMenu.tsx:115
+msgid "赛博朋克"
+msgstr "Cyberpunk"
+
+#: src/features/settings/AppSettingsMenu.tsx:119
+msgid "跟随主题"
+msgstr "Match Theme"
 
 #: src/i18n/locales.ts:8
 msgid "跟随系统"
@@ -1763,7 +1807,7 @@ msgstr "Choose an algorithm to encode or decode text"
 msgid "选择解压位置"
 msgstr "Select Extract Location"
 
-#: src/features/settings/AppSettingsMenu.tsx:88
+#: src/features/settings/AppSettingsMenu.tsx:103
 msgid "重启中"
 msgstr "Restarting"
 
@@ -1780,7 +1824,7 @@ msgstr "Restart and Update"
 msgid "重启应用即可完成更新。"
 msgstr "Restart the app to complete the update."
 
-#: src/features/settings/AppSettingsMenu.tsx:87
+#: src/features/settings/AppSettingsMenu.tsx:102
 msgid "重启更新"
 msgstr "Restart to Update"
 
@@ -1790,7 +1834,7 @@ msgstr "Restart to Update"
 msgid "重命名"
 msgstr "Rename"
 
-#: src/features/settings/AppSettingsMenu.tsx:89
+#: src/features/settings/AppSettingsMenu.tsx:104
 #: src/lib/updater.ts:236
 msgid "重新检查"
 msgstr "Check Again"
@@ -1811,6 +1855,10 @@ msgstr "Link"
 #: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "Home"
+
+#: src/features/settings/AppSettingsMenu.tsx:112
+msgid "默认"
+msgstr "Default"
 
 #: src/features/web-browser/WebBrowserTool.tsx:403
 msgid "默认地址"
