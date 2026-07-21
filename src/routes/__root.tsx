@@ -22,6 +22,7 @@ function RootLayout() {
       "ssh-sftp": "/tools/ssh-sftp",
       "lan-transfer": "/tools/lan-transfer",
       crypto: "/tools/crypto",
+      "web-browser": "/tools/web-browser",
     } as const;
     void navigate({ to: toolPaths[lastTool], replace: true });
   }, [lastTool, navigate]);

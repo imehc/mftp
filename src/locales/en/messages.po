@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr ", directory changes take full effect after restarting the service"
 
 #. placeholder {0}: hosts.length
-#: src/features/home/HomePage.tsx:101
+#: src/features/home/HomePage.tsx:102
 msgid "{0} 主机"
 msgstr "{0} hosts"
 
 #. placeholder {0}: runningTransfers.length
-#: src/features/home/HomePage.tsx:66
-#: src/features/home/HomePage.tsx:107
+#: src/features/home/HomePage.tsx:67
+#: src/features/home/HomePage.tsx:108
 msgid "{0} 传输"
 msgstr "{0} transfers"
 
@@ -48,7 +48,7 @@ msgid "{0} 在线"
 msgstr "{0} online"
 
 #. placeholder {0}: failedTransfers.length
-#: src/features/home/HomePage.tsx:70
+#: src/features/home/HomePage.tsx:71
 msgid "{0} 失败"
 msgstr "{0} failed"
 
@@ -78,8 +78,8 @@ msgid "{0} 秒前"
 msgstr "{0} seconds ago"
 
 #. placeholder {0}: activeSessions.length
-#: src/features/home/HomePage.tsx:63
-#: src/features/home/HomePage.tsx:104
+#: src/features/home/HomePage.tsx:64
+#: src/features/home/HomePage.tsx:105
 msgid "{0} 连接"
 msgstr "{0} connections"
 
@@ -255,8 +255,13 @@ msgstr "Location"
 msgid "使用 -_ 替换 +/，并省略填充"
 msgstr "Replace +/ with -_ and omit padding"
 
+#: src/features/web-browser/WebBrowserTool.tsx:409
+msgid "例如 https://192.168.1.1"
+msgstr "e.g. https://192.168.1.1"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
+#: src/features/web-browser/WebBrowserTool.tsx:429
 msgid "保存"
 msgstr "Save"
 
@@ -283,6 +288,11 @@ msgstr "Stop"
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:94
 msgid "允许"
 msgstr "Allow"
+
+#: src/features/web-browser/WebBrowserTool.tsx:306
+#: src/features/web-browser/WebBrowserTool.tsx:307
+msgid "全屏预览"
+msgstr "Fullscreen preview"
 
 #: src/features/logs/ActivityLogsPage.tsx:128
 msgid "全部时间"
@@ -381,6 +391,10 @@ msgstr "Delete this log?"
 #: src/features/logs/LogPageLayout.tsx:111
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:152
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:247
+#: src/features/web-browser/WebBrowserTool.tsx:264
+#: src/features/web-browser/WebBrowserTool.tsx:265
+#: src/features/web-browser/WebBrowserTool.tsx:338
+#: src/features/web-browser/WebBrowserTool.tsx:339
 msgid "刷新"
 msgstr "Refresh"
 
@@ -395,7 +409,7 @@ msgstr "Remaining {0}"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/HomePage.tsx:150
+#: src/features/home/HomePage.tsx:175
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -444,6 +458,7 @@ msgstr "Discovered Devices"
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:232
 #: src/features/ssh-sftp/components/Sidebar.tsx:555
 #: src/features/transfers/TransferPanel.tsx:380
+#: src/features/web-browser/WebBrowserTool.tsx:426
 msgid "取消"
 msgstr "Cancel"
 
@@ -461,6 +476,10 @@ msgstr "Updates can only be checked in the desktop app"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:25
 msgid "只读"
 msgstr "Read Only"
+
+#: src/features/web-browser/WebBrowserTool.tsx:367
+msgid "可直接访问默认地址，或在地址栏输入新的网页链接。"
+msgstr "Open the default address, or enter a new URL in the address bar."
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:357
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
@@ -511,9 +530,18 @@ msgstr "Start"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
+#: src/features/web-browser/WebBrowserTool.tsx:371
+msgid "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
+msgstr "Enter a URL in the address bar, or set a default address first."
+
 #: src/features/ssh-sftp/SshSftpTool.tsx:141
 msgid "在左侧选择主机并点击连接，或新建主机"
 msgstr "Select a host on the left and connect, or create a new host"
+
+#: src/features/web-browser/WebBrowserTool.tsx:285
+#: src/features/web-browser/WebBrowserTool.tsx:286
+msgid "在系统浏览器中打开"
+msgstr "Open in system browser"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
 msgid "在线"
@@ -594,11 +622,15 @@ msgstr "Import a private key to use it with hosts."
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
+#: src/features/web-browser/WebBrowserTool.tsx:141
+msgid "尚未设置默认地址"
+msgstr "Default address is not set"
+
 #: src/features/logs/ActivityLogsPage.tsx:126
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/HomePage.tsx:126
+#: src/features/home/HomePage.tsx:127
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -622,7 +654,7 @@ msgstr "LAN transfer auxiliary data failed to load: {0}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/HomePage.tsx:53
+#: src/features/home/HomePage.tsx:54
 msgid "工具与运行状态"
 msgstr "Tools and activity"
 
@@ -736,6 +768,10 @@ msgstr "Shared folder added"
 msgid "已添加白名单"
 msgstr "Trusted device added"
 
+#: src/features/web-browser/WebBrowserTool.tsx:175
+msgid "已清除默认地址"
+msgstr "Default address cleared"
+
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:278
 msgid "已移动 {0}"
@@ -744,6 +780,10 @@ msgstr "Moved {0}"
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:164
 msgid "已解压到 {outName}"
 msgstr "Extracted to {outName}"
+
+#: src/features/web-browser/WebBrowserTool.tsx:167
+msgid "已设为默认地址"
+msgstr "Set as default address"
 
 #. placeholder {0}: hostAddress(host)
 #: src/features/ssh-sftp/components/Sidebar.tsx:334
@@ -826,6 +866,12 @@ msgstr "Open Terminal"
 msgid "打开终端失败：{e}"
 msgstr "Failed to open terminal: {e}"
 
+#: src/features/web-browser/WebBrowserTool.tsx:274
+#: src/features/web-browser/WebBrowserTool.tsx:275
+#: src/features/web-browser/WebBrowserTool.tsx:380
+msgid "打开默认地址"
+msgstr "Open default address"
+
 #: src/features/lan-transfer/LanTransferSidebar.tsx:111
 msgid "扫码访问"
 msgstr "Scan to Access"
@@ -870,6 +916,11 @@ msgstr "Actions"
 #: src/features/lan-transfer/LanTransferTool.tsx:423
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
+
+#: src/features/home/HomePage.tsx:156
+#: src/features/web-browser/WebBrowserTool.tsx:222
+msgid "数据连接"
+msgstr "Data connection"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:53
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:262
@@ -936,7 +987,7 @@ msgstr "No Matches"
 msgid "无口令"
 msgstr "No Passphrase"
 
-#: src/features/home/HomePage.tsx:76
+#: src/features/home/HomePage.tsx:77
 #: src/features/logs/ActivityLogsPage.tsx:115
 msgid "日志"
 msgstr "Logs"
@@ -1160,7 +1211,7 @@ msgstr "Restarting and applying update..."
 msgid "没有子文件夹"
 msgstr "No child folders"
 
-#: src/features/home/HomePage.tsx:60
+#: src/features/home/HomePage.tsx:61
 msgid "活动中"
 msgstr "Active"
 
@@ -1168,7 +1219,7 @@ msgstr "Active"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/home/HomePage.tsx:131
+#: src/features/home/HomePage.tsx:132
 msgid "浏览器访问"
 msgstr "Browser Access"
 
@@ -1309,7 +1360,7 @@ msgstr "Later"
 msgid "空目录"
 msgstr "Empty Directory"
 
-#: src/features/home/HomePage.tsx:60
+#: src/features/home/HomePage.tsx:61
 #: src/features/transfers/TransferPanel.tsx:115
 msgid "空闲"
 msgstr "Idle"
@@ -1377,7 +1428,7 @@ msgid "继续传输中"
 msgstr "Resuming Transfer"
 
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/HomePage.tsx:154
+#: src/features/home/HomePage.tsx:179
 msgid "编码"
 msgstr "Encode"
 
@@ -1392,6 +1443,25 @@ msgstr "Edit"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
 msgid "编辑主机"
 msgstr "Edit Host"
+
+#: src/features/web-browser/WebBrowserTool.tsx:243
+msgid "网址"
+msgstr "URL"
+
+#: src/features/home/HomePage.tsx:152
+#: src/features/web-browser/WebBrowserTool.tsx:217
+msgid "网页访问"
+msgstr "Web access"
+
+#: src/features/web-browser/WebBrowserTool.tsx:228
+#: src/features/web-browser/WebBrowserTool.tsx:229
+#: src/features/web-browser/WebBrowserTool.tsx:397
+msgid "网页访问设置"
+msgstr "Web access settings"
+
+#: src/features/web-browser/WebBrowserTool.tsx:325
+msgid "网页预览"
+msgstr "Web preview"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:223
 msgid "耗时 "
@@ -1439,13 +1509,18 @@ msgid "解压出的文件夹"
 msgstr "Extracted Folder"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/HomePage.tsx:157
+#: src/features/home/HomePage.tsx:182
 msgid "解码"
 msgstr "Decode"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:190
 msgid "认证方式"
 msgstr "Authentication"
+
+#: src/features/web-browser/WebBrowserTool.tsx:295
+#: src/features/web-browser/WebBrowserTool.tsx:296
+msgid "设为默认地址"
+msgstr "Set as default"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:127
 msgid "设备名"
@@ -1456,7 +1531,12 @@ msgstr "Device Name"
 msgid "设置"
 msgstr "Settings"
 
+#: src/features/web-browser/WebBrowserTool.tsx:384
+msgid "设置默认地址"
+msgstr "Set default address"
+
 #: src/features/lan-transfer/LanTransferSidebar.tsx:98
+#: src/features/web-browser/WebBrowserTool.tsx:257
 msgid "访问"
 msgstr "Access"
 
@@ -1488,6 +1568,14 @@ msgstr "Enter content"
 msgid "请输入口令"
 msgstr "Enter passphrase"
 
+#: src/features/web-browser/WebBrowserTool.tsx:118
+#: src/features/web-browser/WebBrowserTool.tsx:150
+#: src/features/web-browser/WebBrowserTool.tsx:163
+#: src/features/web-browser/WebBrowserTool.tsx:180
+#: src/features/web-browser/WebBrowserTool.tsx:192
+msgid "请输入有效的 http 或 https 地址"
+msgstr "Enter a valid http or https URL"
+
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:71
 msgid "请输入路径"
 msgstr "Enter a path"
@@ -1511,9 +1599,17 @@ msgstr "Follow System"
 msgid "输入"
 msgstr "Input"
 
+#: src/features/web-browser/WebBrowserTool.tsx:363
+msgid "输入地址开始访问"
+msgstr "Enter an address to start"
+
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:48
 msgid "输入密钥口令"
 msgstr "Enter Key Passphrase"
+
+#: src/features/web-browser/WebBrowserTool.tsx:249
+msgid "输入网址，例如 192.168.1.1 或 https://example.com"
+msgstr "Enter a URL, e.g. 192.168.1.1 or https://example.com"
 
 #: src/features/crypto/CryptoTool.tsx:250
 msgid "输入要编码的文本"
@@ -1547,6 +1643,10 @@ msgstr "No hosts yet"
 #: src/features/ssh-sftp/SshSftpTool.tsx:138
 msgid "还没有打开的连接"
 msgstr "No open connections yet"
+
+#: src/features/web-browser/WebBrowserTool.tsx:414
+msgid "进入「网页访问」模块时将优先打开该地址。留空表示不自动打开。"
+msgstr "This address opens first when you enter Web access. Leave empty to skip auto-open."
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:56
 msgid "进行中"
@@ -1600,6 +1700,13 @@ msgstr "Connection Closed"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:126
 msgid "连接设备"
 msgstr "Connected Devices"
+
+#: src/features/web-browser/WebBrowserTool.tsx:306
+#: src/features/web-browser/WebBrowserTool.tsx:307
+#: src/features/web-browser/WebBrowserTool.tsx:348
+#: src/features/web-browser/WebBrowserTool.tsx:349
+msgid "退出全屏预览"
+msgstr "Exit fullscreen preview"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:124
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:228
@@ -1701,8 +1808,17 @@ msgstr "Link"
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/ssh-sftp/SshSftpTool.tsx:67
+#: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "Home"
+
+#: src/features/web-browser/WebBrowserTool.tsx:403
+msgid "默认地址"
+msgstr "Default address"
+
+#: src/features/web-browser/WebBrowserTool.tsx:186
+msgid "默认地址已保存"
+msgstr "Default address saved"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:368
 #: src/features/lan-transfer/LanTransferSidebar.tsx:248
