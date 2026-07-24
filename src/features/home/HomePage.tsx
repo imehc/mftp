@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
 import {
   Activity,
+  Archive,
   ArrowRight,
   FileClock,
   Globe,
@@ -180,6 +181,36 @@ export default function HomePage() {
                       </Badge>
                       <Badge variant="outline">
                         <Trans>解码</Trans>
+                      </Badge>
+                    </span>
+                  </span>
+                </div>
+                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+              </Link>
+              <Link
+                to="/tools/media-compress"
+                search={{ mode: "image" }}
+                preload="viewport"
+                onClick={() => setLastTool("media-compress")}
+                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
+                    <Archive className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">
+                      <Trans>媒体压缩</Trans>
+                    </span>
+                    <span className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge variant="outline">
+                        <Trans>图片</Trans>
+                      </Badge>
+                      <Badge variant="outline">
+                        <Trans>视频</Trans>
+                      </Badge>
+                      <Badge variant="outline">
+                        <Trans>本地</Trans>
                       </Badge>
                     </span>
                   </span>

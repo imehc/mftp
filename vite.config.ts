@@ -52,6 +52,7 @@ export default defineConfig(async () => ({
       output: {
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
+          if (id.includes("/mediabunny/")) return "vendor-media";
           if (id.includes("/@xterm/")) return "vendor-xterm";
           if (id.includes("/@tauri-apps/")) return "vendor-tauri";
           if (id.includes("/@lingui/")) return "vendor-i18n";

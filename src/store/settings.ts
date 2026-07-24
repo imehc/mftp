@@ -8,7 +8,7 @@ import {
 } from "~/lib/color-theme";
 
 export type DirectoryTransferMode = "archive" | "direct";
-export type ToolRoute = "ssh-sftp" | "lan-transfer" | "crypto" | "web-browser";
+export type ToolRoute = "ssh-sftp" | "lan-transfer" | "crypto" | "web-browser" | "media-compress";
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {
@@ -54,13 +54,26 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      version: 2,
+      version: 3,
       migrate: (persisted) => {
-        const state = persisted as Partial<SettingsState> | undefined;
+        const state = (persisted ?? {}) as Record<string, unknown>;
+        const legacyTool =
+          typeof state.lastTool === "string" ? state.lastTool : null;
+        const lastTool: ToolRoute | null =
+          legacyTool === "video-compress" || legacyTool === "image-compress"
+            ? "media-compress"
+            : legacyTool === "ssh-sftp" ||
+                legacyTool === "lan-transfer" ||
+                legacyTool === "crypto" ||
+                legacyTool === "web-browser" ||
+                legacyTool === "media-compress"
+              ? legacyTool
+              : null;
         return {
           ...state,
-          colorTheme: resolveColorTheme(state?.colorTheme),
-          fontPreset: resolveFontPreset(state?.fontPreset),
+          lastTool,
+          colorTheme: resolveColorTheme(state.colorTheme),
+          fontPreset: resolveFontPreset(state.fontPreset),
         } as SettingsState;
       },
     },

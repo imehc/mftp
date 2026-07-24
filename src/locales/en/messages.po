@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr ", directory changes take full effect after restarting the service"
 
 #. placeholder {0}: hosts.length
-#: src/features/home/HomePage.tsx:102
+#: src/features/home/HomePage.tsx:103
 msgid "{0} 主机"
 msgstr "{0} hosts"
 
 #. placeholder {0}: runningTransfers.length
-#: src/features/home/HomePage.tsx:67
-#: src/features/home/HomePage.tsx:108
+#: src/features/home/HomePage.tsx:68
+#: src/features/home/HomePage.tsx:109
 msgid "{0} 传输"
 msgstr "{0} transfers"
 
@@ -48,7 +48,7 @@ msgid "{0} 在线"
 msgstr "{0} online"
 
 #. placeholder {0}: failedTransfers.length
-#: src/features/home/HomePage.tsx:71
+#: src/features/home/HomePage.tsx:72
 msgid "{0} 失败"
 msgstr "{0} failed"
 
@@ -78,8 +78,8 @@ msgid "{0} 秒前"
 msgstr "{0} seconds ago"
 
 #. placeholder {0}: activeSessions.length
-#: src/features/home/HomePage.tsx:64
-#: src/features/home/HomePage.tsx:105
+#: src/features/home/HomePage.tsx:65
+#: src/features/home/HomePage.tsx:106
 msgid "{0} 连接"
 msgstr "{0} connections"
 
@@ -133,6 +133,10 @@ msgstr "{transferringCount} in progress · {pausedTransferCount} paused"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:268
+msgid "AVIF（不支持）"
+msgstr "AVIF (unsupported)"
+
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "DesignByte"
 msgstr "DesignByte"
@@ -149,6 +153,10 @@ msgstr "Geist"
 msgid "Montserrat"
 msgstr "Montserrat"
 
+#: src/features/media-compress/video/VideoCompressPanel.tsx:270
+msgid "MP4 · MOV · M4V，文件不会上传"
+msgstr "MP4 · MOV · M4V — files stay on device"
+
 #: src/features/settings/AppSettingsMenu.tsx:114
 msgid "MX-Brutalist"
 msgstr "MX-Brutalist"
@@ -160,6 +168,14 @@ msgstr "Outfit"
 #: src/features/settings/AppSettingsMenu.tsx:122
 msgid "Plus Jakarta"
 msgstr "Plus Jakarta"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:223
+msgid "PNG · JPG · WebP，默认保持原格式输出"
+msgstr "PNG · JPG · WebP — keeps source format by default"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:285
+msgid "PNG 为无损格式，压缩程度影响有限"
+msgstr "PNG is lossless; quality has limited effect"
 
 #: src/features/settings/AppSettingsMenu.tsx:116
 msgid "Tiesen"
@@ -202,6 +218,7 @@ msgid "上级目录"
 msgstr "Parent Directory"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:65
+#: src/features/media-compress/components/CompressResultCard.tsx:69
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:105
 msgid "下载"
 msgstr "Download"
@@ -266,6 +283,16 @@ msgstr "Swap"
 msgid "仅上传"
 msgstr "Upload Only"
 
+#: src/features/media-compress/video/VideoCompressPanel.tsx:128
+#: src/features/media-compress/video/VideoCompressPanel.tsx:129
+msgid "仅支持 MP4、MOV、M4V 格式"
+msgstr "Only MP4, MOV, and M4V are supported"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:109
+#: src/features/media-compress/image/ImageCompressPanel.tsx:110
+msgid "仅支持 PNG、JPG、WebP 格式"
+msgstr "Only PNG, JPG, and WebP are supported"
+
 #: src/features/transfers/TransferPanel.tsx:273
 msgid "传输"
 msgstr "Transfers"
@@ -300,6 +327,10 @@ msgstr "Saving..."
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:83
 msgid "保存到"
 msgstr "Save To"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:354
+msgid "保留音频"
+msgstr "Keep audio"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:157
 msgid "修改日期"
@@ -350,13 +381,23 @@ msgstr "Close"
 msgid "关闭中"
 msgstr "Closing"
 
+#: src/features/media-compress/video/VideoCompressPanel.tsx:362
+msgid "关闭可进一步减小体积"
+msgstr "Turn off to further reduce size"
+
 #: src/features/crypto/CryptoTool.tsx:63
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:306
+#: src/features/media-compress/video/VideoCompressPanel.tsx:241
 #: src/store/transfers.ts:57
 msgid "准备中"
 msgstr "Preparing"
+
+#: src/features/media-compress/components/CompressResultCard.tsx:59
+msgid "减小 {delta}%"
+msgstr "Reduced {delta}%"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:19
 msgid "刚刚"
@@ -437,7 +478,7 @@ msgstr "Remaining {0}"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/HomePage.tsx:175
+#: src/features/home/HomePage.tsx:176
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -452,9 +493,55 @@ msgstr "Loading..."
 msgid "动作"
 msgstr "Action"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:302
+msgid "压缩中"
+msgstr "Compressing"
+
 #: src/features/settings/AppSettingsMenu.tsx:128
 msgid "压缩包"
 msgstr "Archive"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:173
+#: src/features/media-compress/video/VideoCompressPanel.tsx:197
+msgid "压缩完成"
+msgstr "Compression complete"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:379
+msgid "压缩完成后在此预览输出"
+msgstr "Output preview appears here after compression"
+
+#: src/features/media-compress/components/CompressQualityField.tsx:35
+msgid "压缩程度"
+msgstr "Compression level"
+
+#: src/features/media-compress/components/CompressResultCard.tsx:50
+msgid "压缩结果"
+msgstr "Compressed result"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:371
+msgid "压缩结果预览"
+msgstr "Compressed preview"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:344
+msgid "原图"
+msgstr "Original"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:353
+msgid "原图预览"
+msgstr "Original preview"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:318
+msgid "原始分辨率"
+msgstr "Original resolution"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:419
+msgid "原视频"
+msgstr "Original video"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:143
+#: src/features/media-compress/video/VideoCompressPanel.tsx:160
+msgid "参数未变化，无需重新压缩"
+msgstr "Parameters unchanged, no recompression needed"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:320
 msgid "双击切换到连接"
@@ -478,6 +565,8 @@ msgstr "Discovered Devices"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:444
 #: src/features/logs/LogPageLayout.tsx:85
 #: src/features/logs/LogPageLayout.tsx:129
+#: src/features/media-compress/image/ImageCompressPanel.tsx:312
+#: src/features/media-compress/video/VideoCompressPanel.tsx:388
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:306
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:84
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:212
@@ -558,6 +647,15 @@ msgstr "Start"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
+#: src/features/home/HomePage.tsx:207
+#: src/features/media-compress/components/CompressModeTabs.tsx:17
+msgid "图片"
+msgstr "Image"
+
+#: src/features/media-compress/MediaCompressTool.tsx:50
+msgid "图片 / 视频本地压缩，后续可扩展更多格式"
+msgstr "Compress images and videos locally; more formats later"
+
 #: src/features/web-browser/WebBrowserTool.tsx:371
 msgid "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
 msgstr "Enter a URL in the address bar, or set a default address first."
@@ -610,6 +708,12 @@ msgstr "Size"
 msgid "失败"
 msgstr "Failed"
 
+#: src/features/home/HomePage.tsx:203
+#: src/features/media-compress/MediaCompressTool.tsx:30
+#: src/features/media-compress/MediaCompressTool.tsx:47
+msgid "媒体压缩"
+msgstr "Media Compress"
+
 #: src/features/settings/AppSettingsMenu.tsx:337
 msgid "字体"
 msgstr "Font"
@@ -619,6 +723,8 @@ msgid "安全模式"
 msgstr "Security Mode"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
+#: src/features/media-compress/image/ImageCompressPanel.tsx:304
+#: src/features/media-compress/video/VideoCompressPanel.tsx:236
 #: src/store/transfers.ts:124
 msgid "完成"
 msgstr "Completed"
@@ -666,7 +772,7 @@ msgstr "Default address is not set"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/HomePage.tsx:127
+#: src/features/home/HomePage.tsx:128
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -690,7 +796,7 @@ msgstr "LAN transfer auxiliary data failed to load: {0}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/HomePage.tsx:54
+#: src/features/home/HomePage.tsx:55
 msgid "工具与运行状态"
 msgstr "Tools and activity"
 
@@ -698,6 +804,10 @@ msgstr "Tools and activity"
 #: src/lib/updater.ts:359
 msgid "已下载 {0}"
 msgstr "Downloaded {0}"
+
+#: src/features/media-compress/components/CompressResultCard.tsx:37
+msgid "已保存"
+msgstr "Saved"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:183
 msgid "已保存配置"
@@ -744,6 +854,11 @@ msgstr "Cancelled"
 #: src/features/lan-transfer/LanTransferTool.tsx:271
 msgid "已取消任务"
 msgstr "Task cancelled"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:179
+#: src/features/media-compress/video/VideoCompressPanel.tsx:206
+msgid "已取消压缩"
+msgstr "Compression cancelled"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:314
 msgid "已复制地址"
@@ -839,6 +954,11 @@ msgstr "Start service automatically when the app launches"
 msgid "开启"
 msgstr "On"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:328
+#: src/features/media-compress/video/VideoCompressPanel.tsx:404
+msgid "开始压缩"
+msgstr "Start compression"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:257
 #: src/features/lan-transfer/LanTransferSidebar.tsx:31
 msgid "开放"
@@ -852,6 +972,14 @@ msgstr "Open mode skips confirmation codes"
 msgid "开机自启"
 msgstr "Launch at Login"
 
+#: src/features/media-compress/video/VideoCompressPanel.tsx:248
+msgid "当前 WebView 不支持 WebCodecs，无法压缩视频。"
+msgstr "This WebView does not support WebCodecs, so video compression is unavailable."
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:360
+msgid "当前 WebView 不支持音频转码"
+msgstr "Audio transcoding is not supported in this WebView"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:188
 msgid "当前不可用"
 msgstr "Currently unavailable"
@@ -859,6 +987,14 @@ msgstr "Currently unavailable"
 #: src/lib/updater.ts:85
 msgid "当前已是最新版本"
 msgstr "Already on the latest version"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:155
+msgid "当前环境不支持 WebCodecs"
+msgstr "WebCodecs is not supported in this environment"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:138
+msgid "当前环境不支持导出 AVIF"
+msgstr "AVIF export is not supported in this environment"
 
 #. placeholder {0}: settings?.bindHost
 #: src/features/lan-transfer/LanTransferTool.tsx:414
@@ -920,6 +1056,14 @@ msgstr "Collapse Sidebar"
 msgid "拖动排序"
 msgstr "Drag to reorder"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:222
+msgid "拖放图片到此处，或选择文件"
+msgstr "Drop an image here, or choose a file"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:269
+msgid "拖放视频到此处，或选择文件"
+msgstr "Drop a video here, or choose a file"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:483
 msgid "换个关键词试试"
 msgstr "Try a different keyword"
@@ -953,7 +1097,7 @@ msgstr "Actions"
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
-#: src/features/home/HomePage.tsx:156
+#: src/features/home/HomePage.tsx:157
 #: src/features/web-browser/WebBrowserTool.tsx:222
 msgid "数据连接"
 msgstr "Data connection"
@@ -1023,7 +1167,7 @@ msgstr "No Matches"
 msgid "无口令"
 msgstr "No Passphrase"
 
-#: src/features/home/HomePage.tsx:77
+#: src/features/home/HomePage.tsx:78
 #: src/features/logs/ActivityLogsPage.tsx:115
 msgid "日志"
 msgstr "Logs"
@@ -1089,6 +1233,10 @@ msgstr "No devices"
 msgid "更多"
 msgstr "More"
 
+#: src/features/media-compress/components/CompressQualityField.tsx:56
+msgid "更小"
+msgstr "Smaller"
+
 #: src/lib/updater.ts:193
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
@@ -1120,7 +1268,12 @@ msgstr "The service is running. Stop it before changing port, receive directory,
 msgid "未选择"
 msgstr "Not selected"
 
+#: src/features/home/HomePage.tsx:213
+msgid "本地"
+msgstr "Local"
+
 #: src/features/crypto/CryptoTool.tsx:105
+#: src/features/media-compress/MediaCompressTool.tsx:34
 msgid "本地处理"
 msgstr "Local"
 
@@ -1247,7 +1400,7 @@ msgstr "Restarting and applying update..."
 msgid "没有子文件夹"
 msgstr "No child folders"
 
-#: src/features/home/HomePage.tsx:61
+#: src/features/home/HomePage.tsx:62
 msgid "活动中"
 msgstr "Active"
 
@@ -1255,7 +1408,7 @@ msgstr "Active"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/home/HomePage.tsx:132
+#: src/features/home/HomePage.tsx:133
 msgid "浏览器访问"
 msgstr "Browser Access"
 
@@ -1279,6 +1432,8 @@ msgstr "Add Shared Folder"
 
 #: src/features/crypto/CryptoTool.tsx:143
 #: src/features/logs/LogPageLayout.tsx:115
+#: src/features/media-compress/image/ImageCompressPanel.tsx:212
+#: src/features/media-compress/video/VideoCompressPanel.tsx:259
 msgid "清空"
 msgstr "Clear"
 
@@ -1294,6 +1449,10 @@ msgstr "Clear {finishedTransferCount}"
 #: src/features/transfers/TransferPanel.tsx:296
 msgid "清除 {finishedTransferCount} 个已完成任务"
 msgstr "Clear {finishedTransferCount} completed tasks"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:358
+msgid "源视频没有音轨"
+msgstr "Source video has no audio track"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:483
 msgid "点击右上角 + 新建主机"
@@ -1366,6 +1525,11 @@ msgstr "Confirmation Code"
 msgid "确认码 {0}"
 msgstr "Confirmation Code {0}"
 
+#: src/features/home/HomePage.tsx:210
+#: src/features/media-compress/components/CompressModeTabs.tsx:19
+msgid "视频"
+msgstr "Video"
+
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
 msgid "离线"
 msgstr "Offline"
@@ -1396,7 +1560,7 @@ msgstr "Later"
 msgid "空目录"
 msgstr "Empty Directory"
 
-#: src/features/home/HomePage.tsx:61
+#: src/features/home/HomePage.tsx:62
 #: src/features/transfers/TransferPanel.tsx:115
 msgid "空闲"
 msgstr "Idle"
@@ -1432,6 +1596,11 @@ msgstr "Type"
 msgid "系统"
 msgstr "System"
 
+#. placeholder {0}: Math.round(ratio * 100)
+#: src/features/media-compress/components/CompressEstimateBar.tsx:50
+msgid "约原体积的 {0}%"
+msgstr "About {0}% of original size"
+
 #: src/features/lan-transfer/LanTransferSidebar.tsx:244
 msgid "绑定"
 msgstr "Bind"
@@ -1464,9 +1633,13 @@ msgid "继续传输中"
 msgstr "Resuming Transfer"
 
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/HomePage.tsx:179
+#: src/features/home/HomePage.tsx:180
 msgid "编码"
 msgstr "Encode"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:234
+msgid "编码中"
+msgstr "Encoding"
 
 #: src/features/crypto/CryptoTool.tsx:65
 msgid "编码失败"
@@ -1484,7 +1657,7 @@ msgstr "Edit Host"
 msgid "网址"
 msgstr "URL"
 
-#: src/features/home/HomePage.tsx:152
+#: src/features/home/HomePage.tsx:153
 #: src/features/web-browser/WebBrowserTool.tsx:217
 msgid "网页访问"
 msgstr "Web access"
@@ -1544,8 +1717,12 @@ msgstr "Extracting {0}..."
 msgid "解压出的文件夹"
 msgstr "Extracted Folder"
 
+#: src/features/media-compress/video/VideoCompressPanel.tsx:232
+msgid "解析中"
+msgstr "Demuxing"
+
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/HomePage.tsx:182
+#: src/features/home/HomePage.tsx:183
 msgid "解码"
 msgstr "Decode"
 
@@ -1596,6 +1773,14 @@ msgstr "Details"
 msgid "语言"
 msgstr "Language"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:134
+msgid "请先选择图片文件"
+msgstr "Choose an image first"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:151
+msgid "请先选择视频文件"
+msgstr "Choose a video first"
+
 #: src/components/ui/prompt-dialog.tsx:42
 msgid "请输入内容"
 msgstr "Enter content"
@@ -1622,6 +1807,14 @@ msgstr "Enter a path"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:27
 msgid "读写"
 msgstr "Read/Write"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:238
+msgid "读取中"
+msgstr "Reading"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:240
+msgid "读取信息"
+msgstr "Reading metadata"
 
 #: src/features/ssh-sftp/SshSftpTool.tsx:123
 msgid "调整左侧面板宽度"
@@ -1666,6 +1859,14 @@ msgstr "Enter content to decode"
 #: src/features/crypto/CryptoTool.tsx:264
 msgid "输出"
 msgstr "Output"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:296
+msgid "输出分辨率"
+msgstr "Output resolution"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:244
+msgid "输出格式"
+msgstr "Output format"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:347
 msgid "运行中"
@@ -1775,6 +1976,19 @@ msgstr "Select Save Location"
 msgid "选择共享目录"
 msgstr "Select Shared Folder"
 
+#: src/features/media-compress/image/ImageCompressPanel.tsx:280
+#: src/features/media-compress/video/VideoCompressPanel.tsx:334
+msgid "选择压缩程度"
+msgstr "Select compression level"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:224
+msgid "选择图片"
+msgstr "Choose image"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:297
+msgid "选择图片后显示预估体积"
+msgstr "Estimated size appears after choosing an image"
+
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:248
 msgid "选择密钥…"
 msgstr "Select key..."
@@ -1786,6 +2000,18 @@ msgstr "Select Current Folder"
 #: src/features/lan-transfer/LanTransferTool.tsx:322
 msgid "选择接收目录"
 msgstr "Select Receive Directory"
+
+#: src/features/media-compress/components/CompressDropzone.tsx:78
+msgid "选择文件"
+msgstr "Choose file"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:271
+msgid "选择视频"
+msgstr "Choose video"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:374
+msgid "选择视频后显示预估体积"
+msgstr "Estimated size appears after choosing a video"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:72
 msgid "选择私钥文件"
@@ -1806,6 +2032,14 @@ msgstr "Choose an algorithm to encode or decode text"
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
 msgid "选择解压位置"
 msgstr "Select Extract Location"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:313
+msgid "选择输出分辨率"
+msgstr "Select output resolution"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:260
+msgid "选择输出格式"
+msgstr "Select output format"
 
 #: src/features/settings/AppSettingsMenu.tsx:103
 msgid "重启中"
@@ -1849,12 +2083,28 @@ msgstr "Retry"
 msgid "链接"
 msgstr "Link"
 
+#. placeholder {0}: formatBytes(estimatedBytes)
+#: src/features/media-compress/components/CompressEstimateBar.tsx:45
+msgid "预估 {0}"
+msgstr "Est. {0}"
+
+#. placeholder {0}: formatBytes(estimatedMin)
+#. placeholder {1}: formatBytes(estimatedMax)
+#: src/features/media-compress/components/CompressEstimateBar.tsx:41
+msgid "预估 {0} ~ {1}"
+msgstr "Est. {0} ~ {1}"
+
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/lan-transfer/LanTransferTool.tsx:338
+#: src/features/media-compress/MediaCompressTool.tsx:25
 #: src/features/ssh-sftp/SshSftpTool.tsx:67
 #: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "Home"
+
+#: src/features/media-compress/components/CompressQualityField.tsx:60
+msgid "高质量"
+msgstr "High quality"
 
 #: src/features/settings/AppSettingsMenu.tsx:112
 msgid "默认"
