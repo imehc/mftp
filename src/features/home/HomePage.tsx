@@ -2,17 +2,18 @@ import { Link } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
 import {
   Activity,
-  Archive,
   ArrowRight,
   FileClock,
-  Globe,
   Home,
-  LockKeyhole,
-  TerminalSquare,
-  Wifi,
 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  homeCategoryLabels,
+  homeEntries,
+  type HomeCategory,
+  type HomeStats,
+} from "~/features/home/entries";
 import AppSettingsMenu from "~/features/settings/AppSettingsMenu";
 import TransferPanel from "~/features/transfers/TransferPanel";
 import { useHostsStore } from "~/store/hosts";
@@ -40,6 +41,16 @@ export default function HomePage() {
     activeSessions.length > 0 ||
     runningTransfers.length > 0 ||
     failedTransfers.length > 0;
+
+  const stats: HomeStats = {
+    hostCount: hosts.length,
+    activeSessionCount: activeSessions.length,
+    runningTransferCount: runningTransfers.length,
+  };
+
+  const categories = [
+    ...new Set(homeEntries.map((entry) => entry.category)),
+  ] as HomeCategory[];
 
   return (
     <main className="h-screen overflow-auto bg-background text-foreground">
@@ -83,142 +94,49 @@ export default function HomePage() {
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <section className="flex flex-col gap-3">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-2">
-              <Link
-                to="/tools/ssh-sftp"
-                onClick={() => setLastTool("ssh-sftp")}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
-              >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
-                    <TerminalSquare className="size-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">
-                      SSH / SFTP
-                    </span>
-                    <span className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge variant="outline">
-                        <Trans>{hosts.length} 主机</Trans>
-                      </Badge>
-                      <Badge variant="outline">
-                        <Trans>{activeSessions.length} 连接</Trans>
-                      </Badge>
-                      <Badge variant="outline">
-                        <Trans>{runningTransfers.length} 传输</Trans>
-                      </Badge>
-                    </span>
-                  </span>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-              </Link>
-              <Link
-                to="/tools/lan-transfer"
-                preload="viewport"
-                onClick={() => setLastTool("lan-transfer")}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
-              >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
-                    <Wifi className="size-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">
-                      <Trans>局域网传输</Trans>
-                    </span>
-                    <span className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge variant="outline">HTTP</Badge>
-                      <Badge variant="outline">
-                        <Trans>浏览器访问</Trans>
-                      </Badge>
-                    </span>
-                  </span>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-              </Link>
-
-              <Link
-                to="/tools/web-browser"
-                preload="viewport"
-                onClick={() => setLastTool("web-browser")}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
-              >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
-                    <Globe className="size-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">
-                      <Trans>网页访问</Trans>
-                    </span>
-                    <span className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge variant="outline">
-                        <Trans>数据连接</Trans>
-                      </Badge>
-                    </span>
-                  </span>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-              </Link>
-              <Link
-                to="/tools/crypto"
-                preload="viewport"
-                onClick={() => setLastTool("crypto")}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
-              >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
-                    <LockKeyhole className="size-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">
-                      <Trans>加解密</Trans>
-                    </span>
-                    <span className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge variant="outline">
-                        <Trans>编码</Trans>
-                      </Badge>
-                      <Badge variant="outline">
-                        <Trans>解码</Trans>
-                      </Badge>
-                    </span>
-                  </span>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-              </Link>
-              <Link
-                to="/tools/media-compress"
-                search={{ mode: "image" }}
-                preload="viewport"
-                onClick={() => setLastTool("media-compress")}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
-              >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
-                    <Archive className="size-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">
-                      <Trans>媒体压缩</Trans>
-                    </span>
-                    <span className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge variant="outline">
-                        <Trans>图片</Trans>
-                      </Badge>
-                      <Badge variant="outline">
-                        <Trans>视频</Trans>
-                      </Badge>
-                      <Badge variant="outline">
-                        <Trans>本地</Trans>
-                      </Badge>
-                    </span>
-                  </span>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-              </Link>
-            </div>
-          </section>
+          {categories.map((category) => (
+            <section key={category} className="flex flex-col gap-2">
+              {categories.length > 1 ? (
+                <h2 className="text-xs font-medium text-muted-foreground">
+                  {homeCategoryLabels[category]}
+                </h2>
+              ) : null}
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-2">
+                {homeEntries
+                  .filter((entry) => entry.category === category)
+                  .map((entry) => {
+                    const Icon = entry.icon;
+                    return (
+                      <Link
+                        key={entry.id}
+                        {...entry.link}
+                        onClick={() =>
+                          entry.toolId ? setLastTool(entry.toolId) : undefined
+                        }
+                        className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
+                            <Icon className="size-4" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-semibold">
+                              {entry.title}
+                            </span>
+                            {entry.badges ? (
+                              <span className="mt-1 flex flex-wrap gap-1.5">
+                                {entry.badges(stats)}
+                              </span>
+                            ) : null}
+                          </span>
+                        </div>
+                        <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+                      </Link>
+                    );
+                  })}
+              </div>
+            </section>
+          ))}
 
           {/* Spacer pushes the transfer list to the bottom of the viewport. */}
           <div className="flex-1" />
