@@ -18,6 +18,7 @@ import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-com
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
+import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 
 const LogsRoute = LogsRouteImport.update({
   id: '/logs',
@@ -64,10 +65,16 @@ const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
   path: '/tools/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
+  id: '/games/billiards',
+  path: '/games/billiards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/games/billiards': typeof GamesBilliardsRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/games/billiards': typeof GamesBilliardsRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/games/billiards': typeof GamesBilliardsRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/logs'
+    | '/games/billiards'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/logs'
+    | '/games/billiards'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/logs'
+    | '/games/billiards'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LogsRoute: typeof LogsRoute
+  GamesBilliardsRoute: typeof GamesBilliardsRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
@@ -212,12 +225,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/billiards': {
+      id: '/games/billiards'
+      path: '/games/billiards'
+      fullPath: '/games/billiards'
+      preLoaderRoute: typeof GamesBilliardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LogsRoute: LogsRoute,
+  GamesBilliardsRoute: GamesBilliardsRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,

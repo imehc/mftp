@@ -26,14 +26,14 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr ", directory changes take full effect after restarting the service"
 
 #. placeholder {0}: stats.hostCount
-#: src/features/home/entries.tsx:50
+#: src/features/home/entries.tsx:56
 msgid "{0} 主机"
 msgstr "{0} hosts"
 
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
-#: src/features/home/entries.tsx:56
-#: src/features/home/HomePage.tsx:79
+#: src/features/home/entries.tsx:62
+#: src/features/home/HomePage.tsx:125
 msgid "{0} 传输"
 msgstr "{0} transfers"
 
@@ -49,7 +49,7 @@ msgid "{0} 在线"
 msgstr "{0} online"
 
 #. placeholder {0}: failedTransfers.length
-#: src/features/home/HomePage.tsx:83
+#: src/features/home/HomePage.tsx:129
 msgid "{0} 失败"
 msgstr "{0} failed"
 
@@ -66,6 +66,11 @@ msgstr "{0} chars"
 msgid "{0} 小时前"
 msgstr "{0} hours ago"
 
+#. placeholder {0}: record.payload.shots
+#: src/features/games/billiards/BilliardsGame.tsx:379
+msgid "{0} 杆"
+msgstr "{0} shots"
+
 #. placeholder {0}: host?.label
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:65
 msgid "{0} 的私钥口令"
@@ -80,8 +85,8 @@ msgstr "{0} seconds ago"
 
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
-#: src/features/home/entries.tsx:53
-#: src/features/home/HomePage.tsx:76
+#: src/features/home/entries.tsx:59
+#: src/features/home/HomePage.tsx:122
 msgid "{0} 连接"
 msgstr "{0} connections"
 
@@ -134,6 +139,10 @@ msgstr "{transferringCount} in progress · {pausedTransferCount} paused"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:287
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
+
+#: src/features/games/billiards/BilliardsGame.tsx:650
+msgid "AI 思考中…"
+msgstr "AI thinking..."
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:268
 msgid "AVIF（不支持）"
@@ -261,12 +270,21 @@ msgstr "Cannot move into itself or a child folder"
 msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
+#: src/features/games/billiards/BilliardsGame.tsx:771
+msgid "中杆"
+msgstr "Center"
+
+#: src/features/games/billiards/BilliardsGame.tsx:254
+#: src/features/games/billiards/BilliardsGame.tsx:329
+msgid "中等"
+msgstr "Medium"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:402
 #: src/features/ssh-sftp/SshSftpTool.tsx:114
 msgid "主机"
 msgstr "Hosts"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:124
+#: src/features/ssh-sftp/SshSftpTool.tsx:133
 msgid "主机列表"
 msgstr "Host list"
 
@@ -282,6 +300,15 @@ msgstr "Theme"
 #: src/features/crypto/CryptoTool.tsx:134
 msgid "互换"
 msgstr "Swap"
+
+#: src/features/games/billiards/BilliardsGame.tsx:247
+#: src/features/home/entries.tsx:152
+msgid "人机"
+msgstr "Vs AI"
+
+#: src/features/games/billiards/BilliardsGame.tsx:306
+msgid "人机对战"
+msgstr "Play vs AI"
 
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:30
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:86
@@ -312,6 +339,10 @@ msgstr "Transfer Tasks"
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:75
 msgid "位置"
 msgstr "Location"
+
+#: src/features/games/billiards/BilliardsGame.tsx:459
+msgid "你"
+msgstr "You"
 
 #: src/features/crypto/CryptoTool.tsx:211
 msgid "使用 -_ 替换 +/，并省略填充"
@@ -372,6 +403,11 @@ msgstr "All Sources"
 msgid "全部结果"
 msgstr "All Results"
 
+#. placeholder {0}: state.shotCount
+#: src/features/games/billiards/BilliardsGame.tsx:619
+msgid "共 {0} 杆"
+msgstr "{0} shots total"
+
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:26
 #: src/features/lan-transfer/LanShareDialog.tsx:72
 #: src/features/lan-transfer/LanShareDialog.tsx:98
@@ -395,6 +431,10 @@ msgstr "Turn off to further reduce size"
 #: src/features/crypto/CryptoTool.tsx:63
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
+
+#: src/features/games/billiards/BilliardsGame.tsx:738
+msgid "再来一局"
+msgstr "One more game"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:306
 #: src/features/media-compress/video/VideoCompressPanel.tsx:241
@@ -483,9 +523,13 @@ msgstr "Remaining "
 msgid "剩余 {0}"
 msgstr "Remaining {0}"
 
+#: src/features/games/billiards/BilliardsGame.tsx:628
+msgid "剩余 {remaining} 球"
+msgstr "{remaining} balls left"
+
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/entries.tsx:96
+#: src/features/home/entries.tsx:106
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -499,6 +543,10 @@ msgstr "Loading..."
 #: src/features/logs/ActivityLogsPage.tsx:152
 msgid "动作"
 msgstr "Action"
+
+#: src/features/games/billiards/BilliardsGame.tsx:354
+msgid "历史记录"
+msgstr "History"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:302
 msgid "压缩中"
@@ -550,6 +598,15 @@ msgstr "Original video"
 msgid "参数未变化，无需重新压缩"
 msgstr "Parameters unchanged, no recompression needed"
 
+#: src/features/games/billiards/BilliardsGame.tsx:244
+#: src/features/home/entries.tsx:155
+msgid "双人"
+msgstr "2P"
+
+#: src/features/games/billiards/BilliardsGame.tsx:344
+msgid "双人对战"
+msgstr "Two-Player Match"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:320
 msgid "双击切换到连接"
 msgstr "Double-click to switch to connection"
@@ -568,6 +625,8 @@ msgid "发现设备"
 msgstr "Discovered Devices"
 
 #: src/components/ui/prompt-dialog.tsx:96
+#: src/features/games/billiards/BilliardsGame.tsx:180
+#: src/features/games/billiards/BilliardsGame.tsx:205
 #: src/features/lan-transfer/LanShareDialog.tsx:135
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:444
 #: src/features/logs/LogPageLayout.tsx:85
@@ -605,9 +664,18 @@ msgstr "Read Only"
 msgid "可直接访问默认地址，或在地址栏输入新的网页链接。"
 msgstr "Open the default address, or enter a new URL in the address bar."
 
+#: src/features/games/billiards/BilliardsGame.tsx:122
+#: src/features/home/entries.tsx:148
+msgid "台球"
+msgstr "Billiards"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:357
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "Devices on the same LAN can access directly. Use only on trusted networks, and limit access with the default permission."
+
+#: src/features/games/billiards/BilliardsGame.tsx:347
+msgid "同屏轮流"
+msgstr "Hot seat"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:402
 msgid "同时传输数"
@@ -654,7 +722,12 @@ msgstr "Start"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
-#: src/features/home/entries.tsx:122
+#: src/features/games/billiards/BilliardsGame.tsx:252
+#: src/features/games/billiards/BilliardsGame.tsx:332
+msgid "困难"
+msgstr "Hard"
+
+#: src/features/home/entries.tsx:132
 #: src/features/media-compress/components/CompressModeTabs.tsx:17
 msgid "图片"
 msgstr "Image"
@@ -715,7 +788,7 @@ msgstr "Size"
 msgid "失败"
 msgstr "Failed"
 
-#: src/features/home/entries.tsx:118
+#: src/features/home/entries.tsx:128
 #: src/features/media-compress/MediaCompressTool.tsx:30
 #: src/features/media-compress/MediaCompressTool.tsx:47
 msgid "媒体压缩"
@@ -755,6 +828,11 @@ msgstr "Key"
 msgid "密钥管理"
 msgstr "Key Manager"
 
+#: src/features/games/billiards/BilliardsGame.tsx:615
+#: src/features/games/billiards/BilliardsGame.tsx:704
+msgid "对局结束"
+msgstr "Match over"
+
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:164
 msgid "导入中…"
 msgstr "Importing..."
@@ -771,7 +849,11 @@ msgstr "Import a private key to use it with hosts."
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
-#: src/features/home/entries.tsx:24
+#: src/features/games/billiards/BilliardsGame.tsx:200
+msgid "将返回模式选择,当前对局的进度将会丢失。"
+msgstr "You will return to mode selection; current match progress will be lost."
+
+#: src/features/home/entries.tsx:26
 msgid "小游戏"
 msgstr "Games"
 
@@ -783,7 +865,7 @@ msgstr "Default address is not set"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:67
+#: src/features/home/entries.tsx:77
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -807,11 +889,11 @@ msgstr "LAN transfer auxiliary data failed to load: {0}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/entries.tsx:23
+#: src/features/home/entries.tsx:25
 msgid "工具"
 msgstr "Tools"
 
-#: src/features/home/HomePage.tsx:66
+#: src/features/home/HomePage.tsx:112
 msgid "工具与运行状态"
 msgstr "Tools and activity"
 
@@ -969,6 +1051,10 @@ msgstr "Start service automatically when the app launches"
 msgid "开启"
 msgstr "On"
 
+#: src/features/games/billiards/BilliardsGame.tsx:312
+msgid "开始"
+msgstr "Start"
+
 #: src/features/media-compress/image/ImageCompressPanel.tsx:328
 #: src/features/media-compress/video/VideoCompressPanel.tsx:404
 msgid "开始压缩"
@@ -999,6 +1085,10 @@ msgstr "Audio transcoding is not supported in this WebView"
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
+#: src/features/games/billiards/BilliardsGame.tsx:175
+msgid "当前对局的进度将会丢失。"
+msgstr "Current match progress will be lost."
+
 #: src/lib/updater.ts:87
 msgid "当前已是最新版本"
 msgstr "Already on the latest version"
@@ -1019,6 +1109,10 @@ msgstr "The configured {0} is not in the available network adapter list, so the 
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:117
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
+
+#: src/features/games/billiards/BilliardsGame.tsx:710
+msgid "总杆数"
+msgstr "Total shots"
 
 #: src/features/logs/ActivityLogsPage.tsx:127
 #: src/features/logs/ActivityLogsPage.tsx:165
@@ -1071,6 +1165,10 @@ msgstr "Scan to Access"
 msgid "折叠侧边栏"
 msgstr "Collapse Sidebar"
 
+#: src/features/games/billiards/BilliardsGame.tsx:768
+msgid "拉杆"
+msgstr "Draw"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:102
 msgid "拖动排序"
 msgstr "Drag to reorder"
@@ -1082,6 +1180,10 @@ msgstr "Drop an image here, or choose a file"
 #: src/features/media-compress/video/VideoCompressPanel.tsx:269
 msgid "拖放视频到此处，或选择文件"
 msgstr "Drop a video here, or choose a file"
+
+#: src/features/games/billiards/BilliardsGame.tsx:793
+msgid "按住桌面向母球后方拖动蓄力,松手击球"
+msgstr "Press and drag behind the cue ball to charge, release to shoot"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:483
 msgid "换个关键词试试"
@@ -1100,6 +1202,10 @@ msgstr "Receive"
 msgid "接收目录"
 msgstr "Receive Directory"
 
+#: src/features/games/billiards/BilliardsGame.tsx:774
+msgid "推杆"
+msgstr "Follow"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:457
 msgid "搜索…"
 msgstr "Search..."
@@ -1116,7 +1222,7 @@ msgstr "Actions"
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
-#: src/features/home/entries.tsx:86
+#: src/features/home/entries.tsx:96
 #: src/features/web-browser/WebBrowserTool.tsx:222
 msgid "数据连接"
 msgstr "Data connection"
@@ -1186,7 +1292,7 @@ msgstr "No Matches"
 msgid "无口令"
 msgstr "No Passphrase"
 
-#: src/features/home/HomePage.tsx:89
+#: src/features/home/HomePage.tsx:135
 #: src/features/logs/ActivityLogsPage.tsx:115
 msgid "日志"
 msgstr "Logs"
@@ -1287,7 +1393,7 @@ msgstr "The service is running. Stop it before changing port, receive directory,
 msgid "未选择"
 msgstr "Not selected"
 
-#: src/features/home/entries.tsx:128
+#: src/features/home/entries.tsx:138
 msgid "本地"
 msgstr "Local"
 
@@ -1364,6 +1470,10 @@ msgstr "Deleting {0}..."
 msgid "正在刷新…"
 msgstr "Refreshing..."
 
+#: src/features/games/billiards/BilliardsGame.tsx:219
+msgid "正在加载物理引擎…"
+msgstr "Loading physics engine..."
+
 #: src/store/transfers.ts:154
 msgid "正在取消"
 msgstr "Cancelling"
@@ -1419,7 +1529,7 @@ msgstr "Restarting and applying update..."
 msgid "没有子文件夹"
 msgstr "No child folders"
 
-#: src/features/home/HomePage.tsx:73
+#: src/features/home/HomePage.tsx:119
 msgid "活动中"
 msgstr "Active"
 
@@ -1427,7 +1537,7 @@ msgstr "Active"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/home/entries.tsx:72
+#: src/features/home/entries.tsx:82
 msgid "浏览器访问"
 msgstr "Browser Access"
 
@@ -1449,7 +1559,17 @@ msgstr "Add"
 msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
+#: src/features/games/billiards/BilliardsGame.tsx:261
+msgid "清台"
+msgstr "Cleared"
+
+#: src/features/games/billiards/BilliardsGame.tsx:609
+#: src/features/games/billiards/BilliardsGame.tsx:698
+msgid "清台完成!"
+msgstr "Table cleared!"
+
 #: src/features/crypto/CryptoTool.tsx:143
+#: src/features/games/billiards/BilliardsGame.tsx:361
 #: src/features/logs/LogPageLayout.tsx:115
 #: src/features/media-compress/image/ImageCompressPanel.tsx:212
 #: src/features/media-compress/video/VideoCompressPanel.tsx:259
@@ -1481,6 +1601,43 @@ msgstr "Click + in the top right to create a host"
 #: src/lib/updater.ts:290
 msgid "版本 {0} 已准备好"
 msgstr "Version {0} is ready"
+
+#. placeholder {0}: state.foulCounts[seat] ?? 0
+#: src/features/games/billiards/BilliardsGame.tsx:728
+msgid "犯规 {0}"
+msgstr "Fouls {0}"
+
+#: src/features/games/billiards/BilliardsGame.tsx:400
+msgid "犯规:提前打进黑八"
+msgstr "Foul: potted the 8-ball early"
+
+#: src/features/games/billiards/BilliardsGame.tsx:396
+msgid "犯规:未碰到任何球"
+msgstr "Foul: no ball contacted"
+
+#: src/features/games/billiards/BilliardsGame.tsx:394
+msgid "犯规:母球落袋"
+msgstr "Foul: cue ball potted"
+
+#: src/features/games/billiards/BilliardsGame.tsx:398
+msgid "犯规:首先碰到的不是本方球"
+msgstr "Foul: wrong ball hit first"
+
+#: src/features/games/billiards/BilliardsGame.tsx:460
+msgid "玩家 1"
+msgstr "Player 1"
+
+#: src/features/games/billiards/BilliardsGame.tsx:266
+msgid "玩家 1 胜"
+msgstr "Player 1 wins"
+
+#: src/features/games/billiards/BilliardsGame.tsx:460
+msgid "玩家 2"
+msgstr "Player 2"
+
+#: src/features/games/billiards/BilliardsGame.tsx:268
+msgid "玩家 2 胜"
+msgstr "Player 2 wins"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:166
 msgid "用户名"
@@ -1544,7 +1701,7 @@ msgstr "Confirmation Code"
 msgid "确认码 {0}"
 msgstr "Confirmation Code {0}"
 
-#: src/features/home/entries.tsx:125
+#: src/features/home/entries.tsx:135
 #: src/features/media-compress/components/CompressModeTabs.tsx:19
 msgid "视频"
 msgstr "Video"
@@ -1579,7 +1736,7 @@ msgstr "Later"
 msgid "空目录"
 msgstr "Empty Directory"
 
-#: src/features/home/HomePage.tsx:73
+#: src/features/home/HomePage.tsx:119
 #: src/features/transfers/TransferPanel.tsx:115
 msgid "空闲"
 msgstr "Idle"
@@ -1590,6 +1747,12 @@ msgstr "Idle"
 msgid "端口"
 msgstr "Port"
 
+#. placeholder {0}: state.shotCount + 1
+#: src/features/games/billiards/BilliardsGame.tsx:625
+#: src/features/games/billiards/BilliardsGame.tsx:646
+msgid "第 {0} 杆"
+msgstr "Shot {0}"
+
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:37
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:108
 msgid "简介"
@@ -1598,6 +1761,11 @@ msgstr "Info"
 #: src/i18n/locales.ts:9
 msgid "简体中文"
 msgstr "Simplified Chinese"
+
+#: src/features/games/billiards/BilliardsGame.tsx:250
+#: src/features/games/billiards/BilliardsGame.tsx:326
+msgid "简单"
+msgstr "Easy"
 
 #: src/features/crypto/CryptoTool.tsx:153
 msgid "算法"
@@ -1619,6 +1787,14 @@ msgstr "System"
 #: src/features/media-compress/components/CompressEstimateBar.tsx:50
 msgid "约原体积的 {0}%"
 msgstr "About {0}% of original size"
+
+#: src/features/games/billiards/BilliardsGame.tsx:243
+msgid "练习"
+msgstr "Practice"
+
+#: src/features/games/billiards/BilliardsGame.tsx:296
+msgid "练习模式"
+msgstr "Practice Mode"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:244
 msgid "绑定"
@@ -1652,7 +1828,7 @@ msgid "继续传输中"
 msgstr "Resuming Transfer"
 
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/entries.tsx:100
+#: src/features/home/entries.tsx:110
 msgid "编码"
 msgstr "Encode"
 
@@ -1676,7 +1852,7 @@ msgstr "Edit Host"
 msgid "网址"
 msgstr "URL"
 
-#: src/features/home/entries.tsx:83
+#: src/features/home/entries.tsx:93
 #: src/features/web-browser/WebBrowserTool.tsx:217
 msgid "网页访问"
 msgstr "Web access"
@@ -1695,6 +1871,10 @@ msgstr "Web preview"
 msgid "耗时 "
 msgstr "Elapsed "
 
+#: src/features/games/billiards/BilliardsGame.tsx:263
+msgid "胜"
+msgstr "Win"
+
 #: src/features/lan-transfer/LanTransferSidebar.tsx:245
 msgid "自动"
 msgstr "Auto"
@@ -1708,10 +1888,23 @@ msgstr "Auto Start"
 msgid "自动选择"
 msgstr "Automatic"
 
+#: src/features/games/billiards/BilliardsGame.tsx:299
+msgid "自由清台"
+msgstr "Clear the table freely"
+
+#: src/features/games/billiards/BilliardsGame.tsx:655
+msgid "自由球:拖动母球放置"
+msgstr "Ball in hand: drag the cue ball to place it"
+
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:91
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:191
 msgid "至少修改其中一个名称。"
 msgstr "Change at least one name."
+
+#: src/features/games/billiards/BilliardsGame.tsx:612
+#: src/features/games/billiards/BilliardsGame.tsx:701
+msgid "获胜"
+msgstr "wins"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:230
 msgid "要移动的文件"
@@ -1741,7 +1934,7 @@ msgid "解析中"
 msgstr "Demuxing"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/entries.tsx:103
+#: src/features/home/entries.tsx:113
 msgid "解码"
 msgstr "Decode"
 
@@ -1835,9 +2028,13 @@ msgstr "Reading"
 msgid "读取信息"
 msgstr "Reading metadata"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:224
+#: src/features/ssh-sftp/SshSftpTool.tsx:233
 msgid "调整左侧面板宽度"
 msgstr "Resize left panel"
+
+#: src/features/games/billiards/BilliardsGame.tsx:263
+msgid "负"
+msgstr "Loss"
 
 #: src/features/settings/AppSettingsMenu.tsx:116
 msgid "赛博朋克"
@@ -1894,6 +2091,10 @@ msgstr "Running"
 #: src/features/logs/ActivityLogsPage.tsx:128
 msgid "近 7 天"
 msgstr "Last 7 Days"
+
+#: src/features/games/billiards/BilliardsGame.tsx:746
+msgid "返回选择"
+msgstr "Back to Menu"
 
 #: src/features/logs/LogPageLayout.tsx:29
 #: src/features/logs/LogPageLayout.tsx:29
@@ -1965,12 +2166,24 @@ msgstr "Connection Closed"
 msgid "连接设备"
 msgstr "Connected Devices"
 
+#: src/features/games/billiards/BilliardsGame.tsx:208
+msgid "退出"
+msgstr "Exit"
+
 #: src/features/web-browser/WebBrowserTool.tsx:306
 #: src/features/web-browser/WebBrowserTool.tsx:307
 #: src/features/web-browser/WebBrowserTool.tsx:348
 #: src/features/web-browser/WebBrowserTool.tsx:349
 msgid "退出全屏预览"
 msgstr "Exit fullscreen preview"
+
+#: src/features/games/billiards/BilliardsGame.tsx:191
+msgid "退出对局"
+msgstr "Exit Match"
+
+#: src/features/games/billiards/BilliardsGame.tsx:197
+msgid "退出当前对局?"
+msgstr "Exit the current match?"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:124
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:228
@@ -2087,6 +2300,15 @@ msgstr "Restart to Update"
 msgid "重命名"
 msgstr "Rename"
 
+#: src/features/games/billiards/BilliardsGame.tsx:166
+#: src/features/games/billiards/BilliardsGame.tsx:183
+msgid "重开"
+msgstr "Restart"
+
+#: src/features/games/billiards/BilliardsGame.tsx:172
+msgid "重新开始对局?"
+msgstr "Restart the match?"
+
 #: src/features/settings/AppSettingsMenu.tsx:105
 #: src/lib/updater.ts:238
 msgid "重新检查"
@@ -2114,10 +2336,11 @@ msgid "预估 {0} ~ {1}"
 msgstr "Est. {0} ~ {1}"
 
 #: src/features/crypto/CryptoTool.tsx:96
+#: src/features/games/billiards/BilliardsGame.tsx:116
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/media-compress/MediaCompressTool.tsx:25
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
-#: src/features/ssh-sftp/SshSftpTool.tsx:168
+#: src/features/ssh-sftp/SshSftpTool.tsx:177
 #: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "Home"
@@ -2125,6 +2348,10 @@ msgstr "Home"
 #: src/features/media-compress/components/CompressQualityField.tsx:60
 msgid "高质量"
 msgstr "High quality"
+
+#: src/features/games/billiards/BilliardsGame.tsx:663
+msgid "黑八已重置"
+msgstr "8-ball re-spotted"
 
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "默认"

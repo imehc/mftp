@@ -20,6 +20,10 @@ interface SettingsState {
   webBrowserDefaultUrl: string;
   colorTheme: ColorTheme;
   fontPreset: FontPreset;
+  /** Home page games section is collapsed by default. */
+  showGames: boolean;
+  /** Master volume for game sound effects, 0..1. */
+  gamesVolume: number;
   setDirectoryTransferMode: (mode: DirectoryTransferMode) => void;
   setLocale: (locale: AppLocale) => void;
   setSidebarSize: (size: number) => void;
@@ -28,6 +32,8 @@ interface SettingsState {
   setWebBrowserDefaultUrl: (url: string) => void;
   setColorTheme: (theme: ColorTheme) => void;
   setFontPreset: (font: FontPreset) => void;
+  setShowGames: (show: boolean) => void;
+  setGamesVolume: (volume: number) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -41,6 +47,8 @@ export const useSettingsStore = create<SettingsState>()(
       webBrowserDefaultUrl: "",
       colorTheme: "default",
       fontPreset: "theme",
+      showGames: false,
+      gamesVolume: 0.7,
       setDirectoryTransferMode: (mode) =>
         set({ directoryTransferMode: mode }),
       setLocale: (locale) => set({ locale }),
@@ -51,6 +59,8 @@ export const useSettingsStore = create<SettingsState>()(
       setWebBrowserDefaultUrl: (url) => set({ webBrowserDefaultUrl: url }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
       setFontPreset: (font) => set({ fontPreset: font }),
+      setShowGames: (show) => set({ showGames: show }),
+      setGamesVolume: (gamesVolume) => set({ gamesVolume }),
     }),
     {
       name: "mftp-settings",

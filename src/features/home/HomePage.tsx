@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -8,6 +9,12 @@ import {
 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "~/components/ui/tabs";
 import {
   availableHomeEntries,
   homeCategoryLabels,
@@ -26,6 +33,38 @@ export default function HomePage() {
   const sessions = useSessionsStore((s) => s.sessions);
   const transfers = useTransfersStore((s) => s.transfers);
   const setLastTool = useSettingsStore((s) => s.setLastTool);
+  const showGames = useSettingsStore((s) => s.showGames);
+  const setShowGames = useSettingsStore((s) => s.setShowGames);
+  const [activeTab, setActiveTab] = useState<HomeCategory>("tools");
+  const longPressTimer = useRef<number | null>(null);
+
+  // The games tab is hidden by default; ⌘/Ctrl+. toggles it (desktop),
+  // long-pressing the MFTP header title does the same (mobile).
+  const toggleGames = () => {
+    const next = !showGames;
+    setShowGames(next);
+    setActiveTab(next ? "games" : "tools");
+  };
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === ".") {
+        event.preventDefault();
+        toggleGames();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+  const startLongPress = () => {
+    cancelLongPress();
+    longPressTimer.current = window.setTimeout(toggleGames, 600);
+  };
+  const cancelLongPress = () => {
+    if (longPressTimer.current !== null) {
+      window.clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
 
   const activeSessions = sessions.filter(
     (session) =>
@@ -56,7 +95,14 @@ export default function HomePage() {
     <main className="h-full overflow-auto bg-background text-foreground">
       <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-2.5 px-2.5 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
         <header className="flex items-center justify-between gap-2 border-b border-border pb-2">
-          <div className="flex min-w-0 items-center gap-2">
+          <div
+            className="flex min-w-0 items-center gap-2"
+            title="⌘/Ctrl + . 显示或隐藏小游戏"
+            onPointerDown={startLongPress}
+            onPointerUp={cancelLongPress}
+            onPointerLeave={cancelLongPress}
+            onPointerCancel={cancelLongPress}
+          >
             <div className="flex size-8 items-center justify-center rounded-md border border-border bg-card">
               <Home className="size-4" />
             </div>
@@ -93,56 +139,75 @@ export default function HomePage() {
           </div>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
-          {categories.map((category) => (
-            <section key={category} className="flex flex-col gap-2">
-              {categories.length > 1 ? (
-                <h2 className="text-xs font-medium text-muted-foreground">
-                  {homeCategoryLabels[category]}
-                </h2>
-              ) : null}
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-2">
-                {availableHomeEntries
-                  .filter((entry) => entry.category === category)
-                  .map((entry) => {
-                    const Icon = entry.icon;
-                    return (
-                      <Link
-                        key={entry.id}
-                        {...entry.link}
-                        onClick={() =>
-                          entry.toolId ? setLastTool(entry.toolId) : undefined
-                        }
-                        className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
-                      >
-                        <div className="flex min-w-0 items-center gap-2.5">
-                          <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
-                            <Icon className="size-4" />
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block truncate text-sm font-semibold">
-                              {entry.title}
-                            </span>
-                            {entry.badges ? (
-                              <span className="mt-1 flex flex-wrap gap-1.5">
-                                {entry.badges(stats)}
-                              </span>
-                            ) : null}
-                          </span>
-                        </div>
-                        <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-                      </Link>
-                    );
-                  })}
-              </div>
-            </section>
-          ))}
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as HomeCategory)}
+          className="flex min-h-0 flex-1 flex-col gap-3"
+        >
+          {(() => {
+            const visibleCategories = showGames
+              ? categories
+              : categories.filter((category) => category !== "games");
+            return (
+              <>
+                {visibleCategories.length > 1 ? (
+                  <TabsList>
+                    {visibleCategories.map((category) => (
+                      <TabsTrigger key={category} value={category}>
+                        {homeCategoryLabels[category]}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                ) : null}
+                {visibleCategories.map((category) => (
+                  <TabsContent key={category} value={category}>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-2">
+                      {availableHomeEntries
+                        .filter((entry) => entry.category === category)
+                        .map((entry) => {
+                          const Icon = entry.icon;
+                          return (
+                            <Link
+                              key={entry.id}
+                              {...entry.link}
+                              onClick={() =>
+                                entry.toolId
+                                  ? setLastTool(entry.toolId)
+                                  : undefined
+                              }
+                              className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
+                            >
+                              <div className="flex min-w-0 items-center gap-2.5">
+                                <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
+                                  <Icon className="size-4" />
+                                </span>
+                                <span className="min-w-0">
+                                  <span className="block truncate text-sm font-semibold">
+                                    {entry.title}
+                                  </span>
+                                  {entry.badges ? (
+                                    <span className="mt-1 flex flex-wrap gap-1.5">
+                                      {entry.badges(stats)}
+                                    </span>
+                                  ) : null}
+                                </span>
+                              </div>
+                              <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+                            </Link>
+                          );
+                        })}
+                    </div>
+                  </TabsContent>
+                ))}
+              </>
+            );
+          })()}
 
           {/* Spacer pushes the transfer list to the bottom of the viewport. */}
           <div className="flex-1" />
 
           <TransferPanel />
-        </div>
+        </Tabs>
       </div>
     </main>
   );
