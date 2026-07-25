@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useLingui } from "@lingui/react/macro";
 import { useLingui as useLinguiRuntime } from "@lingui/react";
 import { Button } from "~/components/ui/button";
+import { isDesktopPlatform } from "~/lib/platform";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -130,6 +131,7 @@ export default function AppSettingsMenu() {
   } as const;
 
   useEffect(() => {
+    if (!isDesktopPlatform()) return;
     void refreshAutostart();
   }, []);
 
@@ -187,43 +189,53 @@ export default function AppSettingsMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-44 whitespace-nowrap">
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger disabled={autostartBusy}>
-              <Monitor />
-              {t`开机自启`}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
-              <DropdownMenuRadioGroup
-                value={autostartEnabled ? "enabled" : "disabled"}
-                onValueChange={(value) => {
-                  void setAutostartMode(value === "enabled");
-                }}
+        {isDesktopPlatform() ? (
+          <>
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger disabled={autostartBusy}>
+                  <Monitor />
+                  {t`开机自启`}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
+                  <DropdownMenuRadioGroup
+                    value={autostartEnabled ? "enabled" : "disabled"}
+                    onValueChange={(value) => {
+                      void setAutostartMode(value === "enabled");
+                    }}
+                  >
+                    <DropdownMenuRadioItem
+                      value="enabled"
+                      disabled={autostartBusy}
+                    >
+                      {t`开启`}
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="disabled"
+                      disabled={autostartBusy}
+                    >
+                      {t`关闭`}
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem
+                disabled={checkingUpdate || restarting}
+                onSelect={onCheckUpdate}
               >
-                <DropdownMenuRadioItem value="enabled" disabled={autostartBusy}>
-                  {t`开启`}
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="disabled" disabled={autostartBusy}>
-                  {t`关闭`}
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          <DropdownMenuItem
-            disabled={checkingUpdate || restarting}
-            onSelect={onCheckUpdate}
-          >
-            {updaterStatus === "ready" ? (
-              <RotateCcw />
-            ) : updaterStatus === "downloading" ? (
-              <Download />
-            ) : (
-              <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
-            )}
-            {updateLabels[updaterStatus]}
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+                {updaterStatus === "ready" ? (
+                  <RotateCcw />
+                ) : updaterStatus === "downloading" ? (
+                  <Download />
+                ) : (
+                  <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
+                )}
+                {updateLabels[updaterStatus]}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger disabled={hasRunningTransfer}>
             <Archive />

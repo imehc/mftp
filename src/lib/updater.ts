@@ -4,6 +4,7 @@ import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type DownloadEvent, type Update } from "@tauri-apps/plugin-updater";
 import { toast } from "sonner";
 import { translate } from "~/i18n/translate";
+import { isDesktopPlatform } from "~/lib/platform";
 import {
   resetUpdaterState,
   setUpdaterState,
@@ -23,6 +24,7 @@ export async function checkForUpdateOnLaunch() {
     checkedOnLaunch ||
     !import.meta.env.PROD ||
     !isTauriRuntime() ||
+    !isDesktopPlatform() ||
     useUpdaterStore.getState().status !== "idle"
   ) {
     return;
@@ -40,7 +42,7 @@ export async function checkForUpdateOnLaunch() {
 }
 
 export async function checkForUpdateManually() {
-  if (!isTauriRuntime()) {
+  if (!isTauriRuntime() || !isDesktopPlatform()) {
     toast.error(translate(msg`只能在桌面应用中检查更新`));
     return;
   }

@@ -9,6 +9,8 @@
     "build": "pnpm run compile && tsr generate && tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "android:dev": "bash scripts/android.sh dev",
+    "android:build": "bash scripts/android.sh build",
     "version:check": "node scripts/version.mjs check",
     "version:bump": "node scripts/version.mjs bump",
     "extract": "lingui extract --clean",

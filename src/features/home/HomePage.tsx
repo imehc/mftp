@@ -53,7 +53,7 @@ export default function HomePage() {
   ] as HomeCategory[];
 
   return (
-    <main className="h-screen overflow-auto bg-background text-foreground">
+    <main className="h-full overflow-auto bg-background text-foreground">
       <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-2.5 px-2.5 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
         <header className="flex items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex min-w-0 items-center gap-2">

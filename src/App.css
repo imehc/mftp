@@ -138,6 +138,18 @@
   html {
     @apply font-sans;
     }
+
+  /* App shell: fills the viewport and keeps content out of the status bar /
+     gesture bar on mobile. --safe-* vars are injected natively on Android
+     (MainActivity), with env() as fallback for webviews that support it. */
+  .app-shell {
+    height: 100dvh;
+    padding-top: var(--safe-top, env(safe-area-inset-top, 0px));
+    padding-bottom: var(--safe-bottom, env(safe-area-inset-bottom, 0px));
+    padding-left: var(--safe-left, env(safe-area-inset-left, 0px));
+    padding-right: var(--safe-right, env(safe-area-inset-right, 0px));
+    overflow: hidden;
+  }
 }
 
 @layer components {

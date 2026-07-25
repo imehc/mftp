@@ -111,7 +111,7 @@ msgstr "{pausedTransferCount} paused"
 
 #. placeholder {0}: formatBytes(state.downloaded)
 #. placeholder {1}: formatBytes(state.total)
-#: src/lib/updater.ts:366
+#: src/lib/updater.ts:368
 msgid "{percent}%（{0} / {1}）"
 msgstr "{percent}% ({0} / {1})"
 
@@ -139,7 +139,7 @@ msgstr "/var/www (leave empty to use home directory)"
 msgid "AVIF（不支持）"
 msgstr "AVIF (unsupported)"
 
-#: src/features/settings/AppSettingsMenu.tsx:113
+#: src/features/settings/AppSettingsMenu.tsx:114
 msgid "DesignByte"
 msgstr "DesignByte"
 
@@ -147,11 +147,11 @@ msgstr "DesignByte"
 msgid "English"
 msgstr "English"
 
-#: src/features/settings/AppSettingsMenu.tsx:120
+#: src/features/settings/AppSettingsMenu.tsx:121
 msgid "Geist"
 msgstr "Geist"
 
-#: src/features/settings/AppSettingsMenu.tsx:123
+#: src/features/settings/AppSettingsMenu.tsx:124
 msgid "Montserrat"
 msgstr "Montserrat"
 
@@ -159,15 +159,15 @@ msgstr "Montserrat"
 msgid "MP4 · MOV · M4V，文件不会上传"
 msgstr "MP4 · MOV · M4V — files stay on device"
 
-#: src/features/settings/AppSettingsMenu.tsx:114
+#: src/features/settings/AppSettingsMenu.tsx:115
 msgid "MX-Brutalist"
 msgstr "MX-Brutalist"
 
-#: src/features/settings/AppSettingsMenu.tsx:121
+#: src/features/settings/AppSettingsMenu.tsx:122
 msgid "Outfit"
 msgstr "Outfit"
 
-#: src/features/settings/AppSettingsMenu.tsx:122
+#: src/features/settings/AppSettingsMenu.tsx:123
 msgid "Plus Jakarta"
 msgstr "Plus Jakarta"
 
@@ -179,7 +179,7 @@ msgstr "PNG · JPG · WebP — keeps source format by default"
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG is lossless; quality has limited effect"
 
-#: src/features/settings/AppSettingsMenu.tsx:116
+#: src/features/settings/AppSettingsMenu.tsx:117
 msgid "Tiesen"
 msgstr "Tiesen"
 
@@ -231,11 +231,11 @@ msgstr "Download"
 msgid "下载 {0}"
 msgstr "Download {0}"
 
-#: src/features/settings/AppSettingsMenu.tsx:101
+#: src/features/settings/AppSettingsMenu.tsx:102
 msgid "下载中"
 msgstr "Downloading"
 
-#: src/lib/updater.ts:357
+#: src/lib/updater.ts:359
 msgid "下载完成，正在安装更新…"
 msgstr "Download complete, installing update..."
 
@@ -243,7 +243,7 @@ msgstr "Download complete, installing update..."
 msgid "下载文件夹"
 msgstr "Download Folder"
 
-#: src/lib/updater.ts:161
+#: src/lib/updater.ts:163
 msgid "下载更新"
 msgstr "Download Update"
 
@@ -262,15 +262,20 @@ msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:402
+#: src/features/ssh-sftp/SshSftpTool.tsx:114
 msgid "主机"
 msgstr "Hosts"
+
+#: src/features/ssh-sftp/SshSftpTool.tsx:124
+msgid "主机列表"
+msgstr "Host list"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:134
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:221
 msgid "主目录"
 msgstr "Home Directory"
 
-#: src/features/settings/AppSettingsMenu.tsx:298
+#: src/features/settings/AppSettingsMenu.tsx:310
 msgid "主题"
 msgstr "Theme"
 
@@ -374,7 +379,7 @@ msgid "共享目录"
 msgstr "Shared Folders"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:207
+#: src/features/settings/AppSettingsMenu.tsx:217
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
 msgid "关闭"
 msgstr "Close"
@@ -499,7 +504,7 @@ msgstr "Action"
 msgid "压缩中"
 msgstr "Compressing"
 
-#: src/features/settings/AppSettingsMenu.tsx:128
+#: src/features/settings/AppSettingsMenu.tsx:129
 msgid "压缩包"
 msgstr "Archive"
 
@@ -554,7 +559,7 @@ msgid "双击连接"
 msgstr "Double-click to connect"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:155
+#: src/lib/updater.ts:157
 msgid "发现新版本 {0}"
 msgstr "New version {0} found"
 
@@ -585,7 +590,7 @@ msgstr "Cancel"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/lib/updater.ts:44
+#: src/lib/updater.ts:46
 msgid "只能在桌面应用中检查更新"
 msgstr "Updates can only be checked in the desktop app"
 
@@ -662,7 +667,7 @@ msgstr "Compress images and videos locally; more formats later"
 msgid "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
 msgstr "Enter a URL in the address bar, or set a default address first."
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:141
+#: src/features/ssh-sftp/SshSftpTool.tsx:49
 msgid "在左侧选择主机并点击连接，或新建主机"
 msgstr "Select a host on the left and connect, or create a new host"
 
@@ -694,7 +699,7 @@ msgstr "Copy input"
 msgid "复制输出"
 msgstr "Copy output"
 
-#: src/features/settings/AppSettingsMenu.tsx:279
+#: src/features/settings/AppSettingsMenu.tsx:291
 msgid "外观"
 msgstr "Appearance"
 
@@ -716,7 +721,7 @@ msgstr "Failed"
 msgid "媒体压缩"
 msgstr "Media Compress"
 
-#: src/features/settings/AppSettingsMenu.tsx:337
+#: src/features/settings/AppSettingsMenu.tsx:349
 msgid "字体"
 msgstr "Font"
 
@@ -811,7 +816,7 @@ msgid "工具与运行状态"
 msgstr "Tools and activity"
 
 #. placeholder {0}: formatBytes(state.downloaded)
-#: src/lib/updater.ts:359
+#: src/lib/updater.ts:361
 msgid "已下载 {0}"
 msgstr "Downloaded {0}"
 
@@ -831,7 +836,7 @@ msgstr "Stopped"
 msgid "已允许访问"
 msgstr "Access allowed"
 
-#: src/features/settings/AppSettingsMenu.tsx:172
+#: src/features/settings/AppSettingsMenu.tsx:174
 msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
@@ -892,7 +897,7 @@ msgstr "Imported ({0})"
 msgid "已导入密钥 {0}"
 msgstr "Key {0} imported"
 
-#: src/features/settings/AppSettingsMenu.tsx:168
+#: src/features/settings/AppSettingsMenu.tsx:170
 msgid "已开启开机自启"
 msgstr "Launch at Login enabled"
 
@@ -960,7 +965,7 @@ msgid "应用启动后自动开启服务"
 msgstr "Start service automatically when the app launches"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:204
+#: src/features/settings/AppSettingsMenu.tsx:211
 msgid "开启"
 msgstr "On"
 
@@ -978,7 +983,7 @@ msgstr "Open"
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
-#: src/features/settings/AppSettingsMenu.tsx:194
+#: src/features/settings/AppSettingsMenu.tsx:198
 msgid "开机自启"
 msgstr "Launch at Login"
 
@@ -994,7 +999,7 @@ msgstr "Audio transcoding is not supported in this WebView"
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
-#: src/lib/updater.ts:85
+#: src/lib/updater.ts:87
 msgid "当前已是最新版本"
 msgstr "Already on the latest version"
 
@@ -1035,6 +1040,10 @@ msgstr "Open"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:290
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "Open this directory when starting SFTP. If it does not exist, fall back to the home directory, then the root directory."
+
+#: src/features/ssh-sftp/SshSftpTool.tsx:111
+msgid "打开主机列表"
+msgstr "Open host list"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:68
 msgid "打开文件管理"
@@ -1122,7 +1131,7 @@ msgstr "File"
 msgid "文件夹"
 msgstr "Folder"
 
-#: src/features/settings/AppSettingsMenu.tsx:230
+#: src/features/settings/AppSettingsMenu.tsx:242
 msgid "文件夹传输"
 msgstr "Folder Transfer"
 
@@ -1247,12 +1256,12 @@ msgstr "More"
 msgid "更小"
 msgstr "Smaller"
 
-#: src/lib/updater.ts:193
+#: src/lib/updater.ts:195
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
 #. placeholder {0}: formatError(error)
-#: src/lib/updater.ts:230
+#: src/lib/updater.ts:232
 msgid "更新失败：{0}"
 msgstr "Update failed: {0}"
 
@@ -1304,31 +1313,31 @@ msgstr "Permissions"
 msgid "来源"
 msgstr "Source"
 
-#: src/lib/updater.ts:345
+#: src/lib/updater.ts:347
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "View GitHub Releases for update notes"
 
-#: src/features/settings/AppSettingsMenu.tsx:100
+#: src/features/settings/AppSettingsMenu.tsx:101
 msgid "查看更新"
 msgstr "View Update"
 
-#: src/features/settings/AppSettingsMenu.tsx:98
+#: src/features/settings/AppSettingsMenu.tsx:99
 msgid "检查更新"
 msgstr "Check for Updates"
 
-#: src/lib/updater.ts:427
+#: src/lib/updater.ts:429
 msgid "检查更新失败：{message}"
 msgstr "Update check failed: {message}"
 
-#: src/lib/updater.ts:416
+#: src/lib/updater.ts:418
 msgid "检查更新失败：当前平台没有可用更新包"
 msgstr "Update check failed: no update package is available for this platform"
 
-#: src/lib/updater.ts:424
+#: src/lib/updater.ts:426
 msgid "检查更新失败：无法连接更新源"
 msgstr "Update check failed: cannot connect to update source"
 
-#: src/lib/updater.ts:329
+#: src/lib/updater.ts:331
 msgid "检查更新超时，请确认 GitHub Release 更新源是否可访问"
 msgstr "Update check timed out. Confirm the GitHub Release update source is accessible."
 
@@ -1337,12 +1346,12 @@ msgid "模式"
 msgstr "Mode"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:271
+#: src/lib/updater.ts:273
 msgid "正在下载版本 {0}"
 msgstr "Downloading version {0}"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:270
+#: src/lib/updater.ts:272
 msgid "正在准备版本 {0}"
 msgstr "Preparing version {0}"
 
@@ -1375,11 +1384,11 @@ msgstr "Opening folder..."
 msgid "正在打开终端…"
 msgstr "Opening terminal..."
 
-#: src/features/settings/AppSettingsMenu.tsx:99
+#: src/features/settings/AppSettingsMenu.tsx:100
 msgid "正在检查"
 msgstr "Checking"
 
-#: src/lib/updater.ts:145
+#: src/lib/updater.ts:147
 msgid "正在检查更新…"
 msgstr "Checking for updates..."
 
@@ -1402,7 +1411,7 @@ msgstr "Reading latest information..."
 msgid "正在连接 {0}…"
 msgstr "Connecting to {0}..."
 
-#: src/lib/updater.ts:306
+#: src/lib/updater.ts:308
 msgid "正在重启并应用更新…"
 msgstr "Restarting and applying update..."
 
@@ -1414,7 +1423,7 @@ msgstr "No child folders"
 msgid "活动中"
 msgstr "Active"
 
-#: src/features/settings/AppSettingsMenu.tsx:108
+#: src/features/settings/AppSettingsMenu.tsx:109
 msgid "浅色"
 msgstr "Light"
 
@@ -1426,7 +1435,7 @@ msgstr "Browser Access"
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "Browser access requests, confirmation prompts, and trusted-device fallback requests"
 
-#: src/features/settings/AppSettingsMenu.tsx:109
+#: src/features/settings/AppSettingsMenu.tsx:110
 msgid "深色"
 msgstr "Dark"
 
@@ -1469,7 +1478,7 @@ msgid "点击右上角 + 新建主机"
 msgstr "Click + in the top right to create a host"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:288
+#: src/lib/updater.ts:290
 msgid "版本 {0} 已准备好"
 msgstr "Version {0} is ready"
 
@@ -1495,7 +1504,7 @@ msgstr "Trusted Devices"
 msgid "目标已存在同名项目"
 msgstr "An Item With This Name Already Exists"
 
-#: src/features/settings/AppSettingsMenu.tsx:129
+#: src/features/settings/AppSettingsMenu.tsx:130
 msgid "直接"
 msgstr "Direct"
 
@@ -1561,8 +1570,8 @@ msgstr "Move"
 msgid "移动 {0}…"
 msgstr "Moving {0}..."
 
-#: src/lib/updater.ts:165
-#: src/lib/updater.ts:299
+#: src/lib/updater.ts:167
+#: src/lib/updater.ts:301
 msgid "稍后"
 msgstr "Later"
 
@@ -1602,7 +1611,7 @@ msgstr "Manage SSH, SFTP, and LAN transfer activity"
 msgid "类型"
 msgstr "Type"
 
-#: src/features/settings/AppSettingsMenu.tsx:107
+#: src/features/settings/AppSettingsMenu.tsx:108
 msgid "系统"
 msgstr "System"
 
@@ -1750,7 +1759,7 @@ msgid "设备名"
 msgstr "Device Name"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:389
-#: src/features/settings/AppSettingsMenu.tsx:186
+#: src/features/settings/AppSettingsMenu.tsx:188
 msgid "设置"
 msgstr "Settings"
 
@@ -1779,7 +1788,7 @@ msgstr "This private key is passphrase-protected (enter it when connecting)."
 msgid "详情"
 msgstr "Details"
 
-#: src/features/settings/AppSettingsMenu.tsx:260
+#: src/features/settings/AppSettingsMenu.tsx:272
 msgid "语言"
 msgstr "Language"
 
@@ -1826,15 +1835,15 @@ msgstr "Reading"
 msgid "读取信息"
 msgstr "Reading metadata"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:123
+#: src/features/ssh-sftp/SshSftpTool.tsx:224
 msgid "调整左侧面板宽度"
 msgstr "Resize left panel"
 
-#: src/features/settings/AppSettingsMenu.tsx:115
+#: src/features/settings/AppSettingsMenu.tsx:116
 msgid "赛博朋克"
 msgstr "Cyberpunk"
 
-#: src/features/settings/AppSettingsMenu.tsx:119
+#: src/features/settings/AppSettingsMenu.tsx:120
 msgid "跟随主题"
 msgstr "Match Theme"
 
@@ -1895,7 +1904,7 @@ msgstr "Back to Home"
 msgid "还没有主机"
 msgstr "No hosts yet"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:138
+#: src/features/ssh-sftp/SshSftpTool.tsx:46
 msgid "还没有打开的连接"
 msgstr "No open connections yet"
 
@@ -2051,24 +2060,24 @@ msgstr "Select output resolution"
 msgid "选择输出格式"
 msgstr "Select output format"
 
-#: src/features/settings/AppSettingsMenu.tsx:103
+#: src/features/settings/AppSettingsMenu.tsx:104
 msgid "重启中"
 msgstr "Restarting"
 
 #. placeholder {0}: formatError(error)
-#: src/lib/updater.ts:112
+#: src/lib/updater.ts:114
 msgid "重启失败：{0}"
 msgstr "Restart failed: {0}"
 
-#: src/lib/updater.ts:295
+#: src/lib/updater.ts:297
 msgid "重启并更新"
 msgstr "Restart and Update"
 
-#: src/lib/updater.ts:290
+#: src/lib/updater.ts:292
 msgid "重启应用即可完成更新。"
 msgstr "Restart the app to complete the update."
 
-#: src/features/settings/AppSettingsMenu.tsx:102
+#: src/features/settings/AppSettingsMenu.tsx:103
 msgid "重启更新"
 msgstr "Restart to Update"
 
@@ -2078,14 +2087,14 @@ msgstr "Restart to Update"
 msgid "重命名"
 msgstr "Rename"
 
-#: src/features/settings/AppSettingsMenu.tsx:104
-#: src/lib/updater.ts:236
+#: src/features/settings/AppSettingsMenu.tsx:105
+#: src/lib/updater.ts:238
 msgid "重新检查"
 msgstr "Check Again"
 
 #: src/features/transfers/TransferPanel.tsx:395
 #: src/features/transfers/TransferPanel.tsx:404
-#: src/lib/updater.ts:119
+#: src/lib/updater.ts:121
 msgid "重试"
 msgstr "Retry"
 
@@ -2107,7 +2116,8 @@ msgstr "Est. {0} ~ {1}"
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/media-compress/MediaCompressTool.tsx:25
-#: src/features/ssh-sftp/SshSftpTool.tsx:67
+#: src/features/ssh-sftp/SshSftpTool.tsx:103
+#: src/features/ssh-sftp/SshSftpTool.tsx:168
 #: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "Home"
@@ -2116,7 +2126,7 @@ msgstr "Home"
 msgid "高质量"
 msgstr "High quality"
 
-#: src/features/settings/AppSettingsMenu.tsx:112
+#: src/features/settings/AppSettingsMenu.tsx:113
 msgid "默认"
 msgstr "Default"
 

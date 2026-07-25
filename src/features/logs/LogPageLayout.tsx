@@ -22,7 +22,7 @@ export function LogPageLayout({
 }: LogPageLayoutProps) {
   const { t } = useLingui();
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <main className="flex h-full flex-col overflow-hidden bg-background text-foreground">
       <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">
           <Button variant="ghost" size="icon-sm" asChild>

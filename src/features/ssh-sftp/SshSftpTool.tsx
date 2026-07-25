@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -14,8 +14,10 @@ import TransferPanel from "~/features/transfers/TransferPanel";
 import TabBar from "~/features/ssh-sftp/components/terminal/TabBar";
 import Terminal from "~/features/ssh-sftp/components/terminal/Terminal";
 import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
-import { Home, TerminalSquare } from "lucide-react";
+import { Home, PanelLeft, TerminalSquare } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { Sheet, SheetContent, SheetTitle } from "~/components/ui/sheet";
+import { useMediaQuery } from "~/lib/use-media-query";
 import {
   Empty,
   EmptyDescription,
@@ -26,11 +28,126 @@ import {
 
 const SIDEBAR_COLLAPSED_SIZE = 52;
 
-export default function SshSftpTool() {
-  const { t } = useLingui();
-  const sidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
+function Workspace() {
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
+
+  return (
+    <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+      <TabBar />
+      <div className="relative flex-1 overflow-hidden">
+        {sessions.length === 0 ? (
+          <Empty className="h-full">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <TerminalSquare />
+              </EmptyMedia>
+              <EmptyTitle>
+                <Trans>还没有打开的连接</Trans>
+              </EmptyTitle>
+              <EmptyDescription>
+                <Trans>在左侧选择主机并点击连接，或新建主机</Trans>
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : null}
+        {/* Keep every session mounted so terminals preserve their state. */}
+        {sessions.map((session) => (
+          <div
+            key={session.id}
+            className="absolute inset-0"
+            style={{ display: session.id === activeId ? "block" : "none" }}
+          >
+            {/* Terminal stays mounted to keep the shell alive across view switches. */}
+            <div
+              className="h-full"
+              style={{
+                display: session.view === "terminal" ? "block" : "none",
+              }}
+            >
+              <Terminal session={session} />
+            </div>
+            {session.view === "sftp" && <SftpPanel session={session} />}
+          </div>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+/** Compact layout: sidebar lives in a drawer instead of a resizable panel. */
+function CompactSshSftpTool() {
+  const { t } = useLingui();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const sessions = useSessionsStore((s) => s.sessions);
+  const activeId = useSessionsStore((s) => s.activeId);
+
+  // Close the drawer once a session is opened/activated from the sidebar.
+  const sessionCount = sessions.length;
+  const previousRef = useRef({ sessionCount, activeId });
+  useEffect(() => {
+    const previous = previousRef.current;
+    previousRef.current = { sessionCount, activeId };
+    if (sessionCount > previous.sessionCount || activeId !== previous.activeId) {
+      setDrawerOpen(false);
+    }
+  }, [sessionCount, activeId]);
+
+  return (
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground">
+      <header className="flex h-9 shrink-0 items-center justify-between border-b border-border px-2">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <Button variant="ghost" size="xs" asChild>
+            <Link to="/">
+              <Home data-icon="inline-start" />
+              <Trans>首页</Trans>
+            </Link>
+          </Button>
+          <div className="h-4 w-px bg-border" />
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={() => setDrawerOpen(true)}
+            aria-label={t`打开主机列表`}
+          >
+            <PanelLeft data-icon="inline-start" />
+            <Trans>主机</Trans>
+          </Button>
+        </div>
+        <div className="truncate text-xs font-medium text-muted-foreground">
+          SSH / SFTP
+        </div>
+      </header>
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent
+          side="left"
+          showCloseButton={false}
+          className="w-80 max-w-[85vw] gap-0 p-0"
+          style={{
+            paddingTop: "var(--safe-top, 0px)",
+            paddingBottom: "var(--safe-bottom, 0px)",
+          }}
+        >
+          <SheetTitle className="sr-only">
+            <Trans>主机列表</Trans>
+          </SheetTitle>
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <Sidebar collapsed={false} onToggleCollapsed={() => setDrawerOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <Workspace />
+      </div>
+      <TransferPanel />
+    </div>
+  );
+}
+
+export default function SshSftpTool() {
+  const { t } = useLingui();
+  const compact = useMediaQuery("(max-width: 760px)");
+  const sidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
   const sidebarSize = useSettingsStore((s) => s.sidebarSize);
   const sidebarCollapsed = useSettingsStore((s) => s.sidebarCollapsed);
   const setSidebarSize = useSettingsStore((s) => s.setSidebarSize);
@@ -40,25 +157,17 @@ export default function SshSftpTool() {
     if (sidebarCollapsed) sidebarPanelRef.current?.collapse();
   }, [sidebarCollapsed]);
 
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 760px)");
-    const syncCompactSidebar = () => {
-      if (!media.matches) return;
-      setSidebarCollapsed(true);
-      sidebarPanelRef.current?.collapse();
-    };
-    syncCompactSidebar();
-    media.addEventListener("change", syncCompactSidebar);
-    return () => media.removeEventListener("change", syncCompactSidebar);
-  }, [setSidebarCollapsed]);
-
   const defaultLayout = {
     sidebar: sidebarSize,
     workspace: Math.max(0, 100 - sidebarSize),
   };
 
+  if (compact) {
+    return <CompactSshSftpTool />;
+  }
+
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground">
       <header className="flex h-9 shrink-0 items-center justify-between border-b border-border px-2">
         <div className="flex min-w-0 items-center gap-2">
           <Button variant="ghost" size="xs" asChild>
@@ -125,45 +234,7 @@ export default function SshSftpTool() {
           <span className="absolute left-1/2 top-1/2 h-8 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-transparent transition-colors group-hover:bg-foreground/30" />
         </Separator>
         <Panel id="workspace" minSize="260px" className="h-full overflow-hidden">
-          <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
-            <TabBar />
-            <div className="relative flex-1 overflow-hidden">
-              {sessions.length === 0 ? (
-                <Empty className="h-full">
-                  <EmptyHeader>
-                    <EmptyMedia variant="icon">
-                      <TerminalSquare />
-                    </EmptyMedia>
-                    <EmptyTitle>
-                      <Trans>还没有打开的连接</Trans>
-                    </EmptyTitle>
-                    <EmptyDescription>
-                      <Trans>在左侧选择主机并点击连接，或新建主机</Trans>
-                    </EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
-              ) : null}
-              {/* Keep every session mounted so terminals preserve their state. */}
-              {sessions.map((session) => (
-                <div
-                  key={session.id}
-                  className="absolute inset-0"
-                  style={{ display: session.id === activeId ? "block" : "none" }}
-                >
-                  {/* Terminal stays mounted to keep the shell alive across view switches. */}
-                  <div
-                    className="h-full"
-                    style={{
-                      display: session.view === "terminal" ? "block" : "none",
-                    }}
-                  >
-                    <Terminal session={session} />
-                  </div>
-                  {session.view === "sftp" && <SftpPanel session={session} />}
-                </div>
-              ))}
-            </div>
-          </main>
+          <Workspace />
         </Panel>
       </Group>
       <TransferPanel />

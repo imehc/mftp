@@ -12,6 +12,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 use storage::Storage;
+#[cfg(all(debug_assertions, desktop))]
 use specta_typescript::Typescript;
 use tauri::Manager as _;
 use tauri_specta::{collect_commands, Builder};
@@ -110,7 +111,9 @@ pub fn run() {
     cleanup_stale_local_transfer_files();
     let specta_builder = specta_builder();
 
-    #[cfg(debug_assertions)]
+    // Exporting bindings writes into the source tree, which only exists on
+    // the dev machine — running it on mobile panics at startup.
+    #[cfg(all(debug_assertions, desktop))]
     specta_builder
         .export(Typescript::default(), "../src/bindings.ts")
         .expect("failed to export TypeScript bindings");
@@ -119,12 +122,17 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_process::init());
+
+    #[cfg(desktop)]
+    let app = app
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ))
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build());
+
+    let app = app
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let temp_journal = data_dir.join("transfer-temp-files.json");

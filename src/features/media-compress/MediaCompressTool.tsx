@@ -16,7 +16,7 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
   const navigate = useNavigate();
 
   return (
-    <main className="flex h-screen flex-col bg-background text-foreground">
+    <main className="flex h-full flex-col bg-background text-foreground">
       <header className="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-border px-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <Button variant="ghost" size="xs" asChild>
