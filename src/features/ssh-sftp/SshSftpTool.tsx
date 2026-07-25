@@ -126,6 +126,7 @@ function CompactSshSftpTool() {
           style={{
             paddingTop: "var(--safe-top, 0px)",
             paddingBottom: "var(--safe-bottom, 0px)",
+            paddingLeft: "var(--safe-left, 0px)",
           }}
         >
           <SheetTitle className="sr-only">

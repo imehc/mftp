@@ -9,6 +9,7 @@ import {
   Wifi,
 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
+import { isMobilePlatform } from "~/lib/platform";
 import type { ToolRoute } from "~/store/settings";
 
 export interface HomeStats {
@@ -24,6 +25,8 @@ export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
   games: <Trans>小游戏</Trans>,
 };
 
+export type HomePlatform = "desktop" | "mobile";
+
 export interface HomeEntry {
   id: string;
   category: HomeCategory;
@@ -31,6 +34,8 @@ export interface HomeEntry {
   link: LinkOptions;
   /** Set when entering this route should be remembered as the last used tool. */
   toolId?: ToolRoute;
+  /** Platforms where the entry is available; omit for all platforms. */
+  platforms?: readonly HomePlatform[];
   icon: ComponentType<{ className?: string }>;
   title: ReactNode;
   badges?: (stats: HomeStats) => ReactNode;
@@ -63,6 +68,10 @@ export const homeEntries: HomeEntry[] = [
     category: "tools",
     link: linkOptions({ to: "/tools/lan-transfer", preload: "viewport" }),
     toolId: "lan-transfer",
+    // Hidden on mobile: the LAN server/mDNS would trigger network-permission
+    // prompts (iOS local network, CN wireless data) for a feature that can't
+    // fully work there anyway.
+    platforms: ["desktop"],
     icon: Wifi,
     title: <Trans>局域网传输</Trans>,
     badges: () => (
@@ -132,6 +141,13 @@ export const homeEntries: HomeEntry[] = [
   },
 ];
 
+const currentPlatform: HomePlatform = isMobilePlatform() ? "mobile" : "desktop";
+
+/** Home entries available on the current platform. */
+export const availableHomeEntries: HomeEntry[] = homeEntries.filter(
+  (entry) => !entry.platforms || entry.platforms.includes(currentPlatform),
+);
+
 export function getToolEntry(tool: ToolRoute): HomeEntry | undefined {
-  return homeEntries.find((entry) => entry.toolId === tool);
+  return availableHomeEntries.find((entry) => entry.toolId === tool);
 }

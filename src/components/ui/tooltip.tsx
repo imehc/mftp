@@ -21,7 +21,20 @@ function TooltipProvider({
 function Tooltip({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+  // Tooltips are a hover affordance; on touch-only devices Radix opens them
+  // on tap (via focus), which just gets in the way — keep them closed there.
+  const [isTouchOnly] = React.useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: none)").matches,
+  )
+  return (
+    <TooltipPrimitive.Root
+      data-slot="tooltip"
+      {...props}
+      {...(isTouchOnly ? { open: false } : {})}
+    />
+  )
 }
 
 function TooltipTrigger({

@@ -9,8 +9,8 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
+  availableHomeEntries,
   homeCategoryLabels,
-  homeEntries,
   type HomeCategory,
   type HomeStats,
 } from "~/features/home/entries";
@@ -49,7 +49,7 @@ export default function HomePage() {
   };
 
   const categories = [
-    ...new Set(homeEntries.map((entry) => entry.category)),
+    ...new Set(availableHomeEntries.map((entry) => entry.category)),
   ] as HomeCategory[];
 
   return (
@@ -102,7 +102,7 @@ export default function HomePage() {
                 </h2>
               ) : null}
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-2">
-                {homeEntries
+                {availableHomeEntries
                   .filter((entry) => entry.category === category)
                   .map((entry) => {
                     const Icon = entry.icon;

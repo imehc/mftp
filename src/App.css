@@ -139,9 +139,18 @@
     @apply font-sans;
     }
 
+  /* Safe-area insets: env() covers iOS (WKWebView + viewport-fit=cover) and
+     resolves to 0px on desktop; Android injects real values natively
+     (MainActivity) as inline styles on <html>, which override this rule. */
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+
   /* App shell: fills the viewport and keeps content out of the status bar /
-     gesture bar on mobile. --safe-* vars are injected natively on Android
-     (MainActivity), with env() as fallback for webviews that support it. */
+     gesture bar on mobile. */
   .app-shell {
     height: 100dvh;
     padding-top: var(--safe-top, env(safe-area-inset-top, 0px));

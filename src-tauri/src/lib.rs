@@ -139,6 +139,11 @@ pub fn run() {
             let storage = Storage::new(data_dir).map_err(|e| e.to_string())?;
             let manager = Manager::new(temp_journal);
             let lan_transfer = Arc::new(LanTransferManager::new());
+            // LAN transfer is a desktop-only feature; auto-starting its
+            // server on mobile would open sockets at launch and trigger
+            // network-permission prompts (iOS local network) for a feature
+            // the mobile UI doesn't expose.
+            #[cfg(desktop)]
             if let Ok(settings) = storage.lan_transfer_settings() {
                 if settings.auto_start {
                     let shares = storage.list_lan_shared_dirs().unwrap_or_default();
