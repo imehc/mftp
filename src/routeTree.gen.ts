@@ -18,6 +18,7 @@ import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-com
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
+import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 
 const LogsRoute = LogsRouteImport.update({
@@ -65,6 +66,11 @@ const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
   path: '/tools/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesGomokuRoute = GamesGomokuRouteImport.update({
+  id: '/games/gomoku',
+  path: '/games/gomoku',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
   id: '/games/billiards',
   path: '/games/billiards',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
   '/games/billiards': typeof GamesBilliardsRoute
+  '/games/gomoku': typeof GamesGomokuRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
   '/games/billiards': typeof GamesBilliardsRoute
+  '/games/gomoku': typeof GamesGomokuRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
   '/games/billiards': typeof GamesBilliardsRoute
+  '/games/gomoku': typeof GamesGomokuRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/logs'
     | '/games/billiards'
+    | '/games/gomoku'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/logs'
     | '/games/billiards'
+    | '/games/gomoku'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/logs'
     | '/games/billiards'
+    | '/games/gomoku'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LogsRoute: typeof LogsRoute
   GamesBilliardsRoute: typeof GamesBilliardsRoute
+  GamesGomokuRoute: typeof GamesGomokuRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/gomoku': {
+      id: '/games/gomoku'
+      path: '/games/gomoku'
+      fullPath: '/games/gomoku'
+      preLoaderRoute: typeof GamesGomokuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/billiards': {
       id: '/games/billiards'
       path: '/games/billiards'
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LogsRoute: LogsRoute,
   GamesBilliardsRoute: GamesBilliardsRoute,
+  GamesGomokuRoute: GamesGomokuRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,

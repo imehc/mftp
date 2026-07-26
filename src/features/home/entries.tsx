@@ -3,6 +3,7 @@ import { linkOptions, type LinkOptions } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
 import {
   Archive,
+  Circle,
   CircleDot,
   Globe,
   LockKeyhole,
@@ -153,6 +154,26 @@ export const homeEntries: HomeEntry[] = [
         </Badge>
         <Badge variant="outline">
           <Trans>双人</Trans>
+        </Badge>
+      </>
+    ),
+  },
+  {
+    id: "gomoku",
+    category: "games",
+    link: linkOptions({ to: "/games/gomoku", preload: "viewport" }),
+    icon: Circle,
+    title: <Trans>五子棋</Trans>,
+    badges: () => (
+      <>
+        <Badge variant="outline">
+          <Trans>人机</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>双人</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>联机</Trans>
         </Badge>
       </>
     ),
