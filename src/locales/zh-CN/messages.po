@@ -33,7 +33,7 @@ msgstr "{0} 主机"
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
 #: src/features/home/entries.tsx:63
-#: src/features/home/HomePage.tsx:125
+#: src/features/home/HomePage.tsx:121
 msgid "{0} 传输"
 msgstr "{0} 传输"
 
@@ -49,7 +49,7 @@ msgid "{0} 在线"
 msgstr "{0} 在线"
 
 #. placeholder {0}: failedTransfers.length
-#: src/features/home/HomePage.tsx:129
+#: src/features/home/HomePage.tsx:125
 msgid "{0} 失败"
 msgstr "{0} 失败"
 
@@ -67,7 +67,7 @@ msgid "{0} 小时前"
 msgstr "{0} 小时前"
 
 #. placeholder {0}: record.payload.moves
-#: src/features/games/gomoku/GomokuGame.tsx:246
+#: src/features/games/gomoku/GomokuGame.tsx:282
 msgid "{0} 手"
 msgstr "{0} 手"
 
@@ -91,7 +91,7 @@ msgstr "{0} 秒前"
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
 #: src/features/home/entries.tsx:60
-#: src/features/home/HomePage.tsx:122
+#: src/features/home/HomePage.tsx:118
 msgid "{0} 连接"
 msgstr "{0} 连接"
 
@@ -114,6 +114,10 @@ msgstr "{minutes} 分"
 #: src/features/transfers/TransferPanel.tsx:58
 msgid "{minutes} 分 {remainingSeconds} 秒"
 msgstr "{minutes} 分 {remainingSeconds} 秒"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:127
+msgid "{name} 的房间"
+msgstr "{name} 的房间"
 
 #: src/features/transfers/TransferPanel.tsx:117
 msgid "{pausedTransferCount} 个已暂停"
@@ -146,7 +150,7 @@ msgid "/var/www（留空则用主目录）"
 msgstr "/var/www（留空则用主目录）"
 
 #: src/features/games/billiards/BilliardsGame.tsx:650
-#: src/features/games/gomoku/GomokuGame.tsx:370
+#: src/features/games/gomoku/GomokuGame.tsx:459
 msgid "AI 思考中…"
 msgstr "AI 思考中…"
 
@@ -165,6 +169,10 @@ msgstr "English"
 #: src/features/settings/AppSettingsMenu.tsx:121
 msgid "Geist"
 msgstr "Geist"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:305
+msgid "IP:端口 直连"
+msgstr "IP:端口 直连"
 
 #: src/features/settings/AppSettingsMenu.tsx:124
 msgid "Montserrat"
@@ -271,6 +279,10 @@ msgstr "不可用"
 msgid "不能移动到自身或子文件夹中"
 msgstr "不能移动到自身或子文件夹中"
 
+#: src/features/games/gomoku/GomokuGame.tsx:789
+msgid "与对方的连接已断开。"
+msgstr "与对方的连接已断开。"
+
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:84
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:193
 msgid "两个名称不能相同。"
@@ -282,8 +294,8 @@ msgstr "中杆"
 
 #: src/features/games/billiards/BilliardsGame.tsx:254
 #: src/features/games/billiards/BilliardsGame.tsx:329
-#: src/features/games/gomoku/GomokuGame.tsx:188
-#: src/features/games/gomoku/GomokuGame.tsx:449
+#: src/features/games/gomoku/GomokuGame.tsx:208
+#: src/features/games/gomoku/GomokuGame.tsx:617
 msgid "中等"
 msgstr "中等"
 
@@ -309,20 +321,20 @@ msgstr "主题"
 msgid "互换"
 msgstr "互换"
 
-#: src/features/games/gomoku/GomokuGame.tsx:78
+#: src/features/games/gomoku/GomokuGame.tsx:91
 #: src/features/home/entries.tsx:166
 msgid "五子棋"
 msgstr "五子棋"
 
 #: src/features/games/billiards/BilliardsGame.tsx:247
-#: src/features/games/gomoku/GomokuGame.tsx:442
+#: src/features/games/gomoku/GomokuGame.tsx:610
 #: src/features/home/entries.tsx:153
 #: src/features/home/entries.tsx:170
 msgid "人机"
 msgstr "人机"
 
 #: src/features/games/billiards/BilliardsGame.tsx:306
-#: src/features/games/gomoku/GomokuGame.tsx:168
+#: src/features/games/gomoku/GomokuGame.tsx:185
 msgid "人机对战"
 msgstr "人机对战"
 
@@ -343,6 +355,10 @@ msgstr "仅支持 MP4、MOV、M4V 格式"
 msgid "仅支持 PNG、JPG、WebP 格式"
 msgstr "仅支持 PNG、JPG、WebP 格式"
 
+#: src/features/games/engine/online/OnlineLobby.tsx:323
+msgid "仅限同一局域网内联机"
+msgstr "仅限同一局域网内联机"
+
 #: src/features/transfers/TransferPanel.tsx:273
 msgid "传输"
 msgstr "传输"
@@ -357,9 +373,18 @@ msgid "位置"
 msgstr "位置"
 
 #: src/features/games/billiards/BilliardsGame.tsx:459
-#: src/features/games/gomoku/GomokuGame.tsx:423
+#: src/features/games/gomoku/GomokuGame.tsx:552
+#: src/features/games/gomoku/GomokuGame.tsx:560
 msgid "你"
 msgstr "你"
+
+#: src/features/games/gomoku/GomokuGame.tsx:593
+msgid "你赢了"
+msgstr "你赢了"
+
+#: src/features/games/gomoku/GomokuGame.tsx:595
+msgid "你输了"
+msgstr "你输了"
 
 #: src/features/crypto/CryptoTool.tsx:211
 msgid "使用 -_ 替换 +/，并省略填充"
@@ -403,9 +428,9 @@ msgstr "停止"
 msgid "允许"
 msgstr "允许"
 
-#: src/features/games/gomoku/GomokuGame.tsx:221
-msgid "入口已保留"
-msgstr "入口已保留"
+#: src/features/games/gomoku/GomokuGame.tsx:225
+msgid "先手（执黑）"
+msgstr "先手（执黑）"
 
 #: src/features/web-browser/WebBrowserTool.tsx:306
 #: src/features/web-browser/WebBrowserTool.tsx:307
@@ -425,7 +450,7 @@ msgid "全部结果"
 msgstr "全部结果"
 
 #. placeholder {0}: state.moveCount
-#: src/features/games/gomoku/GomokuGame.tsx:398
+#: src/features/games/gomoku/GomokuGame.tsx:505
 msgid "共 {0} 手"
 msgstr "共 {0} 手"
 
@@ -459,7 +484,7 @@ msgid "内容无效，无法解码"
 msgstr "内容无效，无法解码"
 
 #: src/features/games/billiards/BilliardsGame.tsx:738
-#: src/features/games/gomoku/GomokuGame.tsx:403
+#: src/features/games/gomoku/GomokuGame.tsx:518
 msgid "再来一局"
 msgstr "再来一局"
 
@@ -480,6 +505,14 @@ msgstr "刚刚"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:392
 msgid "创建"
 msgstr "创建"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:244
+msgid "创建并等待对手"
+msgstr "创建并等待对手"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:227
+msgid "创建房间"
+msgstr "创建房间"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:77
 msgid "创建时间"
@@ -554,6 +587,11 @@ msgstr "剩余 {0}"
 msgid "剩余 {remaining} 球"
 msgstr "剩余 {remaining} 球"
 
+#: src/features/games/engine/online/OnlineLobby.tsx:293
+#: src/features/games/engine/online/OnlineLobby.tsx:360
+msgid "加入"
+msgstr "加入"
+
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
 #: src/features/home/entries.tsx:107
@@ -572,7 +610,7 @@ msgid "动作"
 msgstr "动作"
 
 #: src/features/games/billiards/BilliardsGame.tsx:354
-#: src/features/games/gomoku/GomokuGame.tsx:228
+#: src/features/games/gomoku/GomokuGame.tsx:264
 msgid "历史记录"
 msgstr "历史记录"
 
@@ -627,14 +665,14 @@ msgid "参数未变化，无需重新压缩"
 msgstr "参数未变化，无需重新压缩"
 
 #: src/features/games/billiards/BilliardsGame.tsx:244
-#: src/features/games/gomoku/GomokuGame.tsx:438
+#: src/features/games/gomoku/GomokuGame.tsx:606
 #: src/features/home/entries.tsx:156
 #: src/features/home/entries.tsx:173
 msgid "双人"
 msgstr "双人"
 
 #: src/features/games/billiards/BilliardsGame.tsx:344
-#: src/features/games/gomoku/GomokuGame.tsx:203
+#: src/features/games/gomoku/GomokuGame.tsx:240
 msgid "双人对战"
 msgstr "双人对战"
 
@@ -645,6 +683,10 @@ msgstr "双击切换到连接"
 #: src/features/ssh-sftp/components/Sidebar.tsx:320
 msgid "双击连接"
 msgstr "双击连接"
+
+#: src/features/games/gomoku/GomokuGame.tsx:739
+msgid "双方棋局状态不一致，本局无法继续。"
+msgstr "双方棋局状态不一致，本局无法继续。"
 
 #. placeholder {0}: state.version
 #: src/lib/updater.ts:157
@@ -658,8 +700,10 @@ msgstr "发现设备"
 #: src/components/ui/prompt-dialog.tsx:96
 #: src/features/games/billiards/BilliardsGame.tsx:180
 #: src/features/games/billiards/BilliardsGame.tsx:205
-#: src/features/games/gomoku/GomokuGame.tsx:101
-#: src/features/games/gomoku/GomokuGame.tsx:126
+#: src/features/games/engine/online/OnlineLobby.tsx:202
+#: src/features/games/engine/online/OnlineLobby.tsx:350
+#: src/features/games/gomoku/GomokuGame.tsx:115
+#: src/features/games/gomoku/GomokuGame.tsx:141
 #: src/features/lan-transfer/LanShareDialog.tsx:135
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:444
 #: src/features/logs/LogPageLayout.tsx:85
@@ -707,9 +751,18 @@ msgid "同一局域网内设备可直接访问。仅在可信网络中使用，�
 msgstr "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 
 #: src/features/games/billiards/BilliardsGame.tsx:347
-#: src/features/games/gomoku/GomokuGame.tsx:206
+#: src/features/games/gomoku/GomokuGame.tsx:243
 msgid "同屏轮流"
 msgstr "同屏轮流"
+
+#: src/features/games/gomoku/GomokuGame.tsx:877
+#: src/features/games/gomoku/GomokuGame.tsx:897
+msgid "同意"
+msgstr "同意"
+
+#: src/features/games/gomoku/GomokuGame.tsx:889
+msgid "同意后双方交换先后手，立即开始新对局。"
+msgstr "同意后双方交换先后手，立即开始新对局。"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:402
 msgid "同时传输数"
@@ -748,6 +801,10 @@ msgstr "名称不能为空，且不能包含斜杠。"
 msgid "名称不能包含斜杠"
 msgstr "名称不能包含斜杠"
 
+#: src/features/games/gomoku/GomokuGame.tsx:228
+msgid "后手（执白）"
+msgstr "后手（执白）"
+
 #: src/features/lan-transfer/LanTransferTool.tsx:401
 msgid "启动"
 msgstr "启动"
@@ -758,8 +815,8 @@ msgstr "启动服务后显示浏览器访问地址"
 
 #: src/features/games/billiards/BilliardsGame.tsx:252
 #: src/features/games/billiards/BilliardsGame.tsx:332
-#: src/features/games/gomoku/GomokuGame.tsx:191
-#: src/features/games/gomoku/GomokuGame.tsx:447
+#: src/features/games/gomoku/GomokuGame.tsx:211
+#: src/features/games/gomoku/GomokuGame.tsx:615
 msgid "困难"
 msgstr "困难"
 
@@ -793,6 +850,10 @@ msgstr "在线"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:120
 msgid "地址"
 msgstr "地址"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:166
+msgid "地址格式应为 IP:端口"
+msgstr "地址格式应为 IP:端口"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:385
 msgid "复制"
@@ -864,10 +925,38 @@ msgstr "密钥"
 msgid "密钥管理"
 msgstr "密钥管理"
 
+#: src/features/games/gomoku/GomokuGame.tsx:906
+msgid "对局中断"
+msgstr "对局中断"
+
 #: src/features/games/billiards/BilliardsGame.tsx:615
 #: src/features/games/billiards/BilliardsGame.tsx:704
 msgid "对局结束"
 msgstr "对局结束"
+
+#: src/features/games/gomoku/GomokuGame.tsx:554
+msgid "对方"
+msgstr "对方"
+
+#: src/features/games/gomoku/GomokuGame.tsx:786
+msgid "对方已离开房间。"
+msgstr "对方已离开房间。"
+
+#: src/features/games/gomoku/GomokuGame.tsx:886
+msgid "对方想再来一局"
+msgstr "对方想再来一局"
+
+#: src/features/games/gomoku/GomokuGame.tsx:782
+msgid "对方拒绝了再来一局"
+msgstr "对方拒绝了再来一局"
+
+#: src/features/games/gomoku/GomokuGame.tsx:776
+msgid "对方拒绝了悔棋"
+msgstr "对方拒绝了悔棋"
+
+#: src/features/games/gomoku/GomokuGame.tsx:863
+msgid "对方请求悔棋"
+msgstr "对方请求悔棋"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:164
 msgid "导入中…"
@@ -881,12 +970,17 @@ msgstr "导入密钥"
 msgid "导入私钥后可在主机中选用。"
 msgstr "导入私钥后可在主机中选用。"
 
+#. placeholder {0}: undoFlow?.kind === "incoming" ? undoFlow.plies : 0
+#: src/features/games/gomoku/GomokuGame.tsx:866
+msgid "将撤销 {0} 手棋，是否同意？"
+msgstr "将撤销 {0} 手棋，是否同意？"
+
 #: src/features/crypto/CryptoTool.tsx:131
 msgid "将结果写回输入并切换模式"
 msgstr "将结果写回输入并切换模式"
 
 #: src/features/games/billiards/BilliardsGame.tsx:200
-#: src/features/games/gomoku/GomokuGame.tsx:121
+#: src/features/games/gomoku/GomokuGame.tsx:136
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "将返回模式选择,当前对局的进度将会丢失。"
 
@@ -898,6 +992,7 @@ msgstr "小游戏"
 msgid "尚未设置默认地址"
 msgstr "尚未设置默认地址"
 
+#: src/features/games/gomoku/GomokuGame.tsx:257
 #: src/features/logs/ActivityLogsPage.tsx:126
 msgid "局域网"
 msgstr "局域网"
@@ -930,7 +1025,7 @@ msgstr "展开侧边栏"
 msgid "工具"
 msgstr "工具"
 
-#: src/features/home/HomePage.tsx:112
+#: src/features/home/HomePage.tsx:108
 msgid "工具与运行状态"
 msgstr "工具与运行状态"
 
@@ -1075,9 +1170,8 @@ msgstr "已设为默认地址"
 msgid "已连接 · {0}"
 msgstr "已连接 · {0}"
 
-#: src/features/games/gomoku/GomokuGame.tsx:353
-#: src/features/games/gomoku/GomokuGame.tsx:390
-#: src/features/games/gomoku/GomokuGame.tsx:456
+#: src/features/games/gomoku/GomokuGame.tsx:584
+#: src/features/games/gomoku/GomokuGame.tsx:624
 msgid "平局"
 msgstr "平局"
 
@@ -1095,7 +1189,7 @@ msgid "开启"
 msgstr "开启"
 
 #: src/features/games/billiards/BilliardsGame.tsx:312
-#: src/features/games/gomoku/GomokuGame.tsx:171
+#: src/features/games/gomoku/GomokuGame.tsx:191
 msgid "开始"
 msgstr "开始"
 
@@ -1130,7 +1224,7 @@ msgid "当前不可用"
 msgstr "当前不可用"
 
 #: src/features/games/billiards/BilliardsGame.tsx:175
-#: src/features/games/gomoku/GomokuGame.tsx:96
+#: src/features/games/gomoku/GomokuGame.tsx:110
 msgid "当前对局的进度将会丢失。"
 msgstr "当前对局的进度将会丢失。"
 
@@ -1159,10 +1253,28 @@ msgstr "待授权请求"
 msgid "总杆数"
 msgstr "总杆数"
 
+#: src/features/games/gomoku/GomokuGame.tsx:484
+msgid "悔棋"
+msgstr "悔棋"
+
 #: src/features/logs/ActivityLogsPage.tsx:127
 #: src/features/logs/ActivityLogsPage.tsx:165
 msgid "成功"
 msgstr "成功"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:233
+msgid "房间名（可选）"
+msgstr "房间名（可选）"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:190
+#: src/features/games/engine/online/OnlineLobby.tsx:311
+#: src/features/games/engine/online/OnlineLobby.tsx:346
+msgid "房间码"
+msgstr "房间码"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:239
+msgid "房间码（可选）"
+msgstr "房间码（可选）"
 
 #: src/features/logs/LogPageLayout.tsx:124
 msgid "所有日志记录都会被删除，且无法恢复。"
@@ -1213,6 +1325,11 @@ msgstr "折叠侧边栏"
 #: src/features/games/billiards/BilliardsGame.tsx:768
 msgid "拉杆"
 msgstr "拉杆"
+
+#: src/features/games/gomoku/GomokuGame.tsx:874
+#: src/features/games/gomoku/GomokuGame.tsx:894
+msgid "拒绝"
+msgstr "拒绝"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:102
 msgid "拖动排序"
@@ -1337,7 +1454,7 @@ msgstr "无匹配结果"
 msgid "无口令"
 msgstr "无口令"
 
-#: src/features/home/HomePage.tsx:135
+#: src/features/home/HomePage.tsx:131
 #: src/features/logs/ActivityLogsPage.tsx:115
 msgid "日志"
 msgstr "日志"
@@ -1354,6 +1471,10 @@ msgstr "日志已清空"
 #: src/features/logs/ActivityLogsPage.tsx:149
 msgid "时间"
 msgstr "时间"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:214
+msgid "昵称"
+msgstr "昵称"
 
 #: src/features/crypto/CryptoTool.tsx:66
 msgid "暂不支持该算法"
@@ -1539,6 +1660,10 @@ msgstr "正在打开文件夹…"
 msgid "正在打开终端…"
 msgstr "正在打开终端…"
 
+#: src/features/games/engine/online/OnlineLobby.tsx:260
+msgid "正在搜索…未发现房间时可用下方地址直连"
+msgstr "正在搜索…未发现房间时可用下方地址直连"
+
 #: src/features/settings/AppSettingsMenu.tsx:100
 msgid "正在检查"
 msgstr "正在检查"
@@ -1574,7 +1699,7 @@ msgstr "正在重启并应用更新…"
 msgid "没有子文件夹"
 msgstr "没有子文件夹"
 
-#: src/features/home/HomePage.tsx:119
+#: src/features/home/HomePage.tsx:115
 msgid "活动中"
 msgstr "活动中"
 
@@ -1589,6 +1714,10 @@ msgstr "浏览器访问"
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:120
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
+
+#: src/features/games/gomoku/GomokuGame.tsx:733
+msgid "消息发送失败，连接可能已断开。"
+msgstr "消息发送失败，连接可能已断开。"
 
 #: src/features/settings/AppSettingsMenu.tsx:110
 msgid "深色"
@@ -1615,7 +1744,7 @@ msgstr "清台完成!"
 
 #: src/features/crypto/CryptoTool.tsx:143
 #: src/features/games/billiards/BilliardsGame.tsx:361
-#: src/features/games/gomoku/GomokuGame.tsx:231
+#: src/features/games/gomoku/GomokuGame.tsx:267
 #: src/features/logs/LogPageLayout.tsx:115
 #: src/features/media-compress/image/ImageCompressPanel.tsx:212
 #: src/features/media-compress/video/VideoCompressPanel.tsx:259
@@ -1669,6 +1798,11 @@ msgstr "犯规:母球落袋"
 msgid "犯规:首先碰到的不是本方球"
 msgstr "犯规:首先碰到的不是本方球"
 
+#: src/features/games/engine/online/OnlineLobby.tsx:112
+#: src/features/games/engine/online/OnlineLobby.tsx:219
+msgid "玩家"
+msgstr "玩家"
+
 #: src/features/games/billiards/BilliardsGame.tsx:460
 msgid "玩家 1"
 msgstr "玩家 1"
@@ -1703,11 +1837,11 @@ msgstr "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统�
 msgid "白名单"
 msgstr "白名单"
 
-#: src/features/games/gomoku/GomokuGame.tsx:432
+#: src/features/games/gomoku/GomokuGame.tsx:570
 msgid "白棋"
 msgstr "白棋"
 
-#: src/features/games/gomoku/GomokuGame.tsx:458
+#: src/features/games/gomoku/GomokuGame.tsx:639
 msgid "白棋胜"
 msgstr "白棋胜"
 
@@ -1718,6 +1852,10 @@ msgstr "目标已存在同名项目"
 #: src/features/settings/AppSettingsMenu.tsx:130
 msgid "直接"
 msgstr "直接"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:315
+msgid "直连"
+msgstr "直连"
 
 #: src/components/ui/prompt-dialog.tsx:98
 msgid "确定"
@@ -1790,7 +1928,7 @@ msgstr "稍后"
 msgid "空目录"
 msgstr "空目录"
 
-#: src/features/home/HomePage.tsx:119
+#: src/features/home/HomePage.tsx:115
 #: src/features/transfers/TransferPanel.tsx:115
 msgid "空闲"
 msgstr "空闲"
@@ -1802,7 +1940,7 @@ msgid "端口"
 msgstr "端口"
 
 #. placeholder {0}: state.moveCount + (state.finished ? 0 : 1)
-#: src/features/games/gomoku/GomokuGame.tsx:366
+#: src/features/games/gomoku/GomokuGame.tsx:455
 msgid "第 {0} 手"
 msgstr "第 {0} 手"
 
@@ -1811,6 +1949,22 @@ msgstr "第 {0} 手"
 #: src/features/games/billiards/BilliardsGame.tsx:646
 msgid "第 {0} 杆"
 msgstr "第 {0} 杆"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:199
+msgid "等待对手加入…"
+msgstr "等待对手加入…"
+
+#: src/features/games/gomoku/GomokuGame.tsx:516
+msgid "等待对方…"
+msgstr "等待对方…"
+
+#: src/features/games/gomoku/GomokuGame.tsx:472
+msgid "等待对方同意悔棋…"
+msgstr "等待对方同意悔棋…"
+
+#: src/features/games/gomoku/GomokuGame.tsx:467
+msgid "等待对方落子…"
+msgstr "等待对方落子…"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:37
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:108
@@ -1823,8 +1977,8 @@ msgstr "简体中文"
 
 #: src/features/games/billiards/BilliardsGame.tsx:250
 #: src/features/games/billiards/BilliardsGame.tsx:326
-#: src/features/games/gomoku/GomokuGame.tsx:185
-#: src/features/games/gomoku/GomokuGame.tsx:445
+#: src/features/games/gomoku/GomokuGame.tsx:205
+#: src/features/games/gomoku/GomokuGame.tsx:613
 msgid "简单"
 msgstr "简单"
 
@@ -1932,21 +2086,18 @@ msgstr "网页预览"
 msgid "耗时 "
 msgstr "耗时 "
 
-#: src/features/games/gomoku/GomokuGame.tsx:439
+#: src/features/games/gomoku/GomokuGame.tsx:607
 #: src/features/home/entries.tsx:176
 msgid "联机"
 msgstr "联机"
 
-#: src/features/games/gomoku/GomokuGame.tsx:218
+#: src/features/games/gomoku/GomokuGame.tsx:254
 msgid "联机对战"
 msgstr "联机对战"
 
-#: src/features/games/gomoku/GomokuGame.tsx:214
-msgid "联机对战将在联机传输通道完成后开放"
-msgstr "联机对战将在联机传输通道完成后开放"
-
 #: src/features/games/billiards/BilliardsGame.tsx:263
-#: src/features/games/gomoku/GomokuGame.tsx:457
+#: src/features/games/gomoku/GomokuGame.tsx:627
+#: src/features/games/gomoku/GomokuGame.tsx:634
 msgid "胜"
 msgstr "胜"
 
@@ -1978,8 +2129,7 @@ msgstr "至少修改其中一个名称。"
 
 #: src/features/games/billiards/BilliardsGame.tsx:612
 #: src/features/games/billiards/BilliardsGame.tsx:701
-#: src/features/games/gomoku/GomokuGame.tsx:357
-#: src/features/games/gomoku/GomokuGame.tsx:393
+#: src/features/games/gomoku/GomokuGame.tsx:600
 msgid "获胜"
 msgstr "获胜"
 
@@ -2110,7 +2260,8 @@ msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
 
 #: src/features/games/billiards/BilliardsGame.tsx:263
-#: src/features/games/gomoku/GomokuGame.tsx:457
+#: src/features/games/gomoku/GomokuGame.tsx:629
+#: src/features/games/gomoku/GomokuGame.tsx:636
 msgid "负"
 msgstr "负"
 
@@ -2126,7 +2277,7 @@ msgstr "跟随主题"
 msgid "跟随系统"
 msgstr "跟随系统"
 
-#: src/features/games/gomoku/GomokuGame.tsx:362
+#: src/features/games/gomoku/GomokuGame.tsx:451
 msgid "轮到"
 msgstr "轮到"
 
@@ -2141,6 +2292,10 @@ msgstr "输入地址开始访问"
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:48
 msgid "输入密钥口令"
 msgstr "输入密钥口令"
+
+#: src/features/games/engine/online/OnlineLobby.tsx:336
+msgid "输入房间码"
+msgstr "输入房间码"
 
 #: src/features/web-browser/WebBrowserTool.tsx:249
 msgid "输入网址，例如 192.168.1.1 或 https://example.com"
@@ -2175,7 +2330,8 @@ msgid "近 7 天"
 msgstr "近 7 天"
 
 #: src/features/games/billiards/BilliardsGame.tsx:746
-#: src/features/games/gomoku/GomokuGame.tsx:411
+#: src/features/games/gomoku/GomokuGame.tsx:527
+#: src/features/games/gomoku/GomokuGame.tsx:912
 msgid "返回选择"
 msgstr "返回选择"
 
@@ -2250,7 +2406,7 @@ msgid "连接设备"
 msgstr "连接设备"
 
 #: src/features/games/billiards/BilliardsGame.tsx:208
-#: src/features/games/gomoku/GomokuGame.tsx:129
+#: src/features/games/gomoku/GomokuGame.tsx:144
 msgid "退出"
 msgstr "退出"
 
@@ -2262,12 +2418,12 @@ msgid "退出全屏预览"
 msgstr "退出全屏预览"
 
 #: src/features/games/billiards/BilliardsGame.tsx:191
-#: src/features/games/gomoku/GomokuGame.tsx:112
+#: src/features/games/gomoku/GomokuGame.tsx:127
 msgid "退出对局"
 msgstr "退出对局"
 
 #: src/features/games/billiards/BilliardsGame.tsx:197
-#: src/features/games/gomoku/GomokuGame.tsx:118
+#: src/features/games/gomoku/GomokuGame.tsx:133
 msgid "退出当前对局?"
 msgstr "退出当前对局?"
 
@@ -2388,13 +2544,13 @@ msgstr "重命名"
 
 #: src/features/games/billiards/BilliardsGame.tsx:166
 #: src/features/games/billiards/BilliardsGame.tsx:183
-#: src/features/games/gomoku/GomokuGame.tsx:87
-#: src/features/games/gomoku/GomokuGame.tsx:104
+#: src/features/games/gomoku/GomokuGame.tsx:101
+#: src/features/games/gomoku/GomokuGame.tsx:118
 msgid "重开"
 msgstr "重开"
 
 #: src/features/games/billiards/BilliardsGame.tsx:172
-#: src/features/games/gomoku/GomokuGame.tsx:93
+#: src/features/games/gomoku/GomokuGame.tsx:107
 msgid "重新开始对局?"
 msgstr "重新开始对局?"
 
@@ -2413,6 +2569,10 @@ msgstr "重试"
 msgid "链接"
 msgstr "链接"
 
+#: src/features/games/engine/online/OnlineLobby.tsx:252
+msgid "附近的房间"
+msgstr "附近的房间"
+
 #. placeholder {0}: formatBytes(estimatedBytes)
 #: src/features/media-compress/components/CompressEstimateBar.tsx:45
 msgid "预估 {0}"
@@ -2426,7 +2586,7 @@ msgstr "预估 {0} ~ {1}"
 
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/games/billiards/BilliardsGame.tsx:116
-#: src/features/games/gomoku/GomokuGame.tsx:72
+#: src/features/games/gomoku/GomokuGame.tsx:85
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/media-compress/MediaCompressTool.tsx:25
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
@@ -2443,11 +2603,11 @@ msgstr "高质量"
 msgid "黑八已重置"
 msgstr "黑八已重置"
 
-#: src/features/games/gomoku/GomokuGame.tsx:427
+#: src/features/games/gomoku/GomokuGame.tsx:565
 msgid "黑棋"
 msgstr "黑棋"
 
-#: src/features/games/gomoku/GomokuGame.tsx:458
+#: src/features/games/gomoku/GomokuGame.tsx:639
 msgid "黑棋胜"
 msgstr "黑棋胜"
 

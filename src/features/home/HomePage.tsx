@@ -36,10 +36,10 @@ export default function HomePage() {
   const showGames = useSettingsStore((s) => s.showGames);
   const setShowGames = useSettingsStore((s) => s.setShowGames);
   const [activeTab, setActiveTab] = useState<HomeCategory>("tools");
-  const longPressTimer = useRef<number | null>(null);
+  const lastTapAt = useRef(0);
 
   // The games tab is hidden by default; ⌘/Ctrl+. toggles it (desktop),
-  // long-pressing the MFTP header title does the same (mobile).
+  // double-tapping the MFTP header title does the same (mobile).
   const toggleGames = () => {
     const next = !showGames;
     setShowGames(next);
@@ -55,14 +55,13 @@ export default function HomePage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
-  const startLongPress = () => {
-    cancelLongPress();
-    longPressTimer.current = window.setTimeout(toggleGames, 600);
-  };
-  const cancelLongPress = () => {
-    if (longPressTimer.current !== null) {
-      window.clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
+  const handleTitleTap = () => {
+    const now = performance.now();
+    if (now - lastTapAt.current < 300) {
+      lastTapAt.current = 0;
+      toggleGames();
+    } else {
+      lastTapAt.current = now;
     }
   };
 
@@ -98,10 +97,7 @@ export default function HomePage() {
           <div
             className="flex min-w-0 items-center gap-2"
             title="⌘/Ctrl + . 显示或隐藏小游戏"
-            onPointerDown={startLongPress}
-            onPointerUp={cancelLongPress}
-            onPointerLeave={cancelLongPress}
-            onPointerCancel={cancelLongPress}
+            onPointerDown={handleTitleTap}
           >
             <div className="flex size-8 items-center justify-center rounded-md border border-border bg-card">
               <Home className="size-4" />

@@ -1,5 +1,7 @@
 package com.imehc.mftp
 
+import android.content.Context
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.activity.enableEdgeToEdge
@@ -9,10 +11,31 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : TauriActivity() {
   private var webView: WebView? = null
   private var safeAreaJs: String? = null
+  // Android filters multicast packets unless a MulticastLock is held;
+  // without it mDNS discovery (game rooms / LAN devices) sees nothing.
+  private var multicastLock: WifiManager.MulticastLock? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
+    try {
+      val wifi =
+        applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+      multicastLock = wifi.createMulticastLock("mftp-mdns").apply {
+        setReferenceCounted(false)
+        acquire()
+      }
+    } catch (_: Exception) {
+      // No Wi-Fi service (TV/emulator edge cases): discovery degrades to
+      // direct-connect, which needs no multicast.
+    }
+  }
+
+  override fun onDestroy() {
+    try {
+      multicastLock?.release()
+    } catch (_: Exception) {}
+    super.onDestroy()
   }
 
   override fun onWebViewCreate(webView: WebView) {

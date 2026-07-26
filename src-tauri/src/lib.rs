@@ -1,10 +1,12 @@
 mod commands;
 mod error;
+mod game_room;
 mod lan_transfer;
 mod models;
 mod ssh;
 mod storage;
 
+use game_room::GameRoomManager;
 use lan_transfer::LanTransferManager;
 use ssh::Manager;
 use std::fs;
@@ -14,6 +16,7 @@ use std::time::{Duration, SystemTime};
 use storage::Storage;
 #[cfg(all(debug_assertions, desktop))]
 use specta_typescript::Typescript;
+use tauri::Emitter as _;
 use tauri::Manager as _;
 use tauri_specta::{collect_commands, Builder};
 
@@ -22,6 +25,7 @@ pub struct AppState {
     pub storage: Storage,
     pub manager: Arc<Manager>,
     pub lan_transfer: Arc<LanTransferManager>,
+    pub game_room: Arc<GameRoomManager>,
 }
 
 fn specta_builder() -> Builder<tauri::Wry> {
@@ -82,6 +86,12 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::sftp_resume_transfer,
             commands::sftp_reset_connection,
             commands::sftp_extract,
+            commands::game_room_status,
+            commands::game_room_create,
+            commands::game_room_join,
+            commands::game_room_discover,
+            commands::game_room_send,
+            commands::game_room_leave,
         ])
 }
 
@@ -139,6 +149,30 @@ pub fn run() {
             let storage = Storage::new(data_dir).map_err(|e| e.to_string())?;
             let manager = Manager::new(temp_journal);
             let lan_transfer = Arc::new(LanTransferManager::new());
+            // Forward room events to the webview; payloads stay opaque.
+            let game_room = {
+                let handle = app.handle().clone();
+                Arc::new(GameRoomManager::new(Arc::new(move |event| {
+                    use game_room::RoomEvent;
+                    let _ = match event {
+                        RoomEvent::PeerJoined { name } => handle.emit(
+                            "game-room://peer",
+                            serde_json::json!({ "connected": true, "name": name }),
+                        ),
+                        RoomEvent::PeerLeft => handle.emit(
+                            "game-room://peer",
+                            serde_json::json!({ "connected": false, "name": null }),
+                        ),
+                        RoomEvent::Message { payload } => {
+                            handle.emit("game-room://message", payload)
+                        }
+                        RoomEvent::Closed { reason } => handle.emit(
+                            "game-room://closed",
+                            serde_json::json!({ "reason": reason }),
+                        ),
+                    };
+                })))
+            };
             // LAN transfer is a desktop-only feature; auto-starting its
             // server on mobile would open sockets at launch and trigger
             // network-permission prompts (iOS local network) for a feature
@@ -167,6 +201,7 @@ pub fn run() {
                 storage,
                 manager: Arc::new(manager),
                 lan_transfer,
+                game_room,
             });
             Ok(())
         })
@@ -186,6 +221,7 @@ pub fn run() {
         if let Some(state) = app_handle.try_state::<AppState>() {
             state.manager.shutdown_all();
             state.lan_transfer.stop();
+            state.game_room.leave();
         }
         cleanup_stale_local_transfer_files();
     });

@@ -1,12 +1,14 @@
 use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
+mod game_room;
 mod hosts;
 mod keys;
 mod lan_transfer;
 mod sftp;
 mod ssh;
 
+pub use game_room::*;
 pub use hosts::*;
 pub use keys::*;
 pub use lan_transfer::*;

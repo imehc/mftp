@@ -94,6 +94,27 @@ export const activityLogsClear = () => voidCommand(commands.activityLogsClear())
 export const activityLogDelete = (id: string) =>
   voidCommand(commands.activityLogDelete(id));
 
+// ---- Game rooms ----
+export const gameRoomStatus = () => unwrapCommand(commands.gameRoomStatus());
+export const gameRoomCreate = (
+  gameId: string,
+  roomName: string,
+  code: string | null,
+  playerName: string,
+) => unwrapCommand(commands.gameRoomCreate(gameId, roomName, code, playerName));
+export const gameRoomJoin = (
+  host: string,
+  port: number,
+  gameId: string,
+  code: string | null,
+  playerName: string,
+) => unwrapCommand(commands.gameRoomJoin(host, port, gameId, code, playerName));
+export const gameRoomDiscover = (gameId: string) =>
+  unwrapCommand(commands.gameRoomDiscover(gameId));
+export const gameRoomSend = (payload: string) =>
+  voidCommand(commands.gameRoomSend(payload));
+export const gameRoomLeave = () => voidCommand(commands.gameRoomLeave());
+
 // ---- SSH ----
 export const sshConnect = (hostId: string, passphrase?: string) =>
   unwrapCommand(commands.sshConnect(hostId, passphrase ?? null));

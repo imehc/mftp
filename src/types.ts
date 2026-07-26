@@ -2,6 +2,8 @@ export type {
   ActivityLog,
   AppError,
   AuthType,
+  GameRoomStatus,
+  GameRoomSummary,
   Host,
   HostInput,
   LanAuthRequest,

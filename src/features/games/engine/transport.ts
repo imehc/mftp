@@ -1,11 +1,10 @@
 /**
- * Phase 3 contract for online play. Nothing here is implemented yet —
- * the interface is defined now so games are written against it and the
- * deterministic `GameDefinition.applyMove` contract (moves-only sync).
+ * Contract for online play, implemented by `online/session.ts` on top of
+ * the Rust `game_room` relay and consumed through `RemoteController`.
  *
- * Planned model: turn-based lockstep. Both peers run the same
- * deterministic resolver; only `(seq, seat, move)` crosses the wire,
- * with a state hash per move to detect divergence early.
+ * Model: turn-based lockstep. Both peers run the same deterministic
+ * resolver; only `(seq, seat, move)` crosses the wire, with a state hash
+ * per move to detect divergence early.
  */
 import type { SeatIndex } from "./types";
 

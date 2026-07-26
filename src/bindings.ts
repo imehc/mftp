@@ -58,6 +58,12 @@ export const commands = {
 	sftpResumeTransfer: (transferId: string) => typedError<null, AppError>(__TAURI_INVOKE("sftp_resume_transfer", { transferId })),
 	sftpResetConnection: (sessionId: string) => typedError<null, AppError>(__TAURI_INVOKE("sftp_reset_connection", { sessionId })),
 	sftpExtract: (sessionId: string, remoteArchive: string, remoteParent: string, outName: string | null) => typedError<null, AppError>(__TAURI_INVOKE("sftp_extract", { sessionId, remoteArchive, remoteParent, outName })),
+	gameRoomStatus: () => typedError<GameRoomStatus, AppError>(__TAURI_INVOKE("game_room_status")),
+	gameRoomCreate: (gameId: string, roomName: string, code: string | null, playerName: string) => typedError<GameRoomStatus, AppError>(__TAURI_INVOKE("game_room_create", { gameId, roomName, code, playerName })),
+	gameRoomJoin: (host: string, port: number, gameId: string, code: string | null, playerName: string) => typedError<GameRoomStatus, AppError>(__TAURI_INVOKE("game_room_join", { host, port, gameId, code, playerName })),
+	gameRoomDiscover: (gameId: string) => typedError<GameRoomSummary[], AppError>(__TAURI_INVOKE("game_room_discover", { gameId })),
+	gameRoomSend: (payload: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_send", { payload })),
+	gameRoomLeave: () => typedError<null, AppError>(__TAURI_INVOKE("game_room_leave")),
 };
 
 /* Types */
@@ -75,6 +81,33 @@ export type ActivityLog = {
 export type AppError = string;
 
 export type AuthType = "password" | "key";
+
+export type GameRoomStatus = {
+	// "idle" | "hosting" | "joined"
+	phase: string,
+	roomId: string | null,
+	gameId: string | null,
+	roomName: string | null,
+	host: string | null,
+	port: number | null,
+	// 0 = host (first seat), 1 = guest.
+	seat: number | null,
+	playerName: string | null,
+	peerName: string | null,
+	hasCode: boolean,
+	// Only present for the host, so the UI can show the code to share.
+	code: string | null,
+};
+
+export type GameRoomSummary = {
+	roomId: string,
+	gameId: string,
+	roomName: string,
+	hostName: string,
+	ip: string,
+	port: number,
+	hasCode: boolean,
+};
 
 export type Host = {
 	id: string,

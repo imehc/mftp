@@ -97,18 +97,75 @@ export class AiController<S, M> implements PlayerController<S, M> {
 }
 
 /**
- * Phase 3 placeholder: a controller that resolves moves from a
- * MatchTransport (see transport.ts). Declared now so game screens can be
- * written against the full controller union.
+ * Resolves moves that arrive from the network. The online session pushes
+ * peer moves in with `push`; the match loop's `requestMove` consumes them
+ * in arrival order (TCP keeps them ordered). `fail` poisons the
+ * controller so a dropped connection surfaces as a match error instead of
+ * an eternal hang.
  */
 export class RemoteController<S, M> implements PlayerController<S, M> {
   readonly kind = "remote" as const;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  requestMove(_ctx: MoveRequestContext<S>): Promise<M> {
-    return Promise.reject(
-      new Error("Online play is not implemented yet (phase 3)"),
-    );
+  private queue: M[] = [];
+  private failure: unknown = null;
+  private waiter: {
+    resolve: (move: M) => void;
+    reject: (reason: unknown) => void;
+    cleanup: () => void;
+  } | null = null;
+
+  requestMove(ctx: MoveRequestContext<S>): Promise<M> {
+    if (this.failure !== null) return Promise.reject(this.failure);
+    const queued = this.queue.shift();
+    if (queued !== undefined) return Promise.resolve(queued);
+    this.cancelWaiter(new DOMException("Superseded", "AbortError"));
+    return new Promise<M>((resolve, reject) => {
+      const onAbort = () => {
+        this.waiter = null;
+        reject(ctx.signal.reason ?? new DOMException("Aborted", "AbortError"));
+      };
+      ctx.signal.addEventListener("abort", onAbort, { once: true });
+      this.waiter = {
+        resolve,
+        reject,
+        cleanup: () => ctx.signal.removeEventListener("abort", onAbort),
+      };
+    });
+  }
+
+  /** Feed a move received from the peer. */
+  push(move: M): void {
+    const waiter = this.waiter;
+    if (waiter) {
+      this.waiter = null;
+      waiter.cleanup();
+      waiter.resolve(move);
+    } else {
+      this.queue.push(move);
+    }
+  }
+
+  /** Poison the controller: pending and future requests reject. */
+  fail(reason: unknown): void {
+    this.failure = reason;
+    const waiter = this.waiter;
+    if (waiter) {
+      this.waiter = null;
+      waiter.cleanup();
+      waiter.reject(reason);
+    }
+  }
+
+  dispose(): void {
+    this.cancelWaiter(new DOMException("Disposed", "AbortError"));
+  }
+
+  private cancelWaiter(reason: unknown): void {
+    const waiter = this.waiter;
+    if (!waiter) return;
+    this.waiter = null;
+    waiter.cleanup();
+    waiter.reject(reason);
   }
 }
 

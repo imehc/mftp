@@ -222,3 +222,34 @@ pub struct ActivityLog {
     #[serde(default)]
     pub detail: Option<String>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct GameRoomStatus {
+    /// "idle" | "hosting" | "joined"
+    pub phase: String,
+    pub room_id: Option<String>,
+    pub game_id: Option<String>,
+    pub room_name: Option<String>,
+    pub host: Option<String>,
+    pub port: Option<u16>,
+    /// 0 = host (first seat), 1 = guest.
+    pub seat: Option<u8>,
+    pub player_name: Option<String>,
+    pub peer_name: Option<String>,
+    pub has_code: bool,
+    /// Only present for the host, so the UI can show the code to share.
+    pub code: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct GameRoomSummary {
+    pub room_id: String,
+    pub game_id: String,
+    pub room_name: String,
+    pub host_name: String,
+    pub ip: String,
+    pub port: u16,
+    pub has_code: bool,
+}
