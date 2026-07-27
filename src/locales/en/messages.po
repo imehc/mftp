@@ -67,12 +67,12 @@ msgid "{0} 小时前"
 msgstr "{0} hours ago"
 
 #. placeholder {0}: record.payload.moves
-#: src/features/games/gomoku/GomokuGame.tsx:282
+#: src/features/games/gomoku/GomokuModeMenu.tsx:134
 msgid "{0} 手"
 msgstr "{0} moves"
 
 #. placeholder {0}: record.payload.shots
-#: src/features/games/billiards/BilliardsGame.tsx:379
+#: src/features/games/billiards/BilliardsModeMenu.tsx:156
 msgid "{0} 杆"
 msgstr "{0} shots"
 
@@ -149,8 +149,8 @@ msgstr "{transferringCount} in progress · {pausedTransferCount} paused"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
 
-#: src/features/games/billiards/BilliardsGame.tsx:650
-#: src/features/games/gomoku/GomokuGame.tsx:459
+#: src/features/games/billiards/BilliardsMatch.tsx:298
+#: src/features/games/gomoku/GomokuMatch.tsx:194
 msgid "AI 思考中…"
 msgstr "AI thinking..."
 
@@ -279,7 +279,7 @@ msgstr "Unavailable"
 msgid "不能移动到自身或子文件夹中"
 msgstr "Cannot move into itself or a child folder"
 
-#: src/features/games/gomoku/GomokuGame.tsx:789
+#: src/features/games/gomoku/GomokuOnline.tsx:179
 msgid "与对方的连接已断开。"
 msgstr "Connection to the opponent was lost."
 
@@ -288,14 +288,14 @@ msgstr "Connection to the opponent was lost."
 msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
-#: src/features/games/billiards/BilliardsGame.tsx:771
+#: src/features/games/billiards/BilliardsMatch.tsx:419
 msgid "中杆"
 msgstr "Center"
 
-#: src/features/games/billiards/BilliardsGame.tsx:254
-#: src/features/games/billiards/BilliardsGame.tsx:329
-#: src/features/games/gomoku/GomokuGame.tsx:208
-#: src/features/games/gomoku/GomokuGame.tsx:617
+#: src/features/games/billiards/BilliardsModeMenu.tsx:27
+#: src/features/games/billiards/BilliardsModeMenu.tsx:106
+#: src/features/games/gomoku/GomokuModeMenu.tsx:56
+#: src/features/games/gomoku/labels.tsx:86
 msgid "中等"
 msgstr "Medium"
 
@@ -321,20 +321,20 @@ msgstr "Theme"
 msgid "互换"
 msgstr "Swap"
 
-#: src/features/games/gomoku/GomokuGame.tsx:91
+#: src/features/games/gomoku/GomokuGame.tsx:41
 #: src/features/home/entries.tsx:166
 msgid "五子棋"
 msgstr "Gomoku"
 
-#: src/features/games/billiards/BilliardsGame.tsx:247
-#: src/features/games/gomoku/GomokuGame.tsx:610
+#: src/features/games/billiards/BilliardsModeMenu.tsx:20
+#: src/features/games/gomoku/labels.tsx:79
 #: src/features/home/entries.tsx:153
 #: src/features/home/entries.tsx:170
 msgid "人机"
 msgstr "Vs AI"
 
-#: src/features/games/billiards/BilliardsGame.tsx:306
-#: src/features/games/gomoku/GomokuGame.tsx:185
+#: src/features/games/billiards/BilliardsModeMenu.tsx:83
+#: src/features/games/gomoku/GomokuModeMenu.tsx:33
 msgid "人机对战"
 msgstr "Play vs AI"
 
@@ -372,17 +372,17 @@ msgstr "Transfer Tasks"
 msgid "位置"
 msgstr "Location"
 
-#: src/features/games/billiards/BilliardsGame.tsx:459
-#: src/features/games/gomoku/GomokuGame.tsx:552
-#: src/features/games/gomoku/GomokuGame.tsx:560
+#: src/features/games/billiards/BilliardsMatch.tsx:107
+#: src/features/games/gomoku/labels.tsx:21
+#: src/features/games/gomoku/labels.tsx:29
 msgid "你"
 msgstr "You"
 
-#: src/features/games/gomoku/GomokuGame.tsx:593
+#: src/features/games/gomoku/labels.tsx:62
 msgid "你赢了"
 msgstr "You win"
 
-#: src/features/games/gomoku/GomokuGame.tsx:595
+#: src/features/games/gomoku/labels.tsx:64
 msgid "你输了"
 msgstr "You lose"
 
@@ -428,7 +428,7 @@ msgstr "Stop"
 msgid "允许"
 msgstr "Allow"
 
-#: src/features/games/gomoku/GomokuGame.tsx:225
+#: src/features/games/gomoku/GomokuModeMenu.tsx:73
 msgid "先手（执黑）"
 msgstr "First (Black)"
 
@@ -450,12 +450,12 @@ msgid "全部结果"
 msgstr "All Results"
 
 #. placeholder {0}: state.moveCount
-#: src/features/games/gomoku/GomokuGame.tsx:505
+#: src/features/games/gomoku/GomokuMatch.tsx:240
 msgid "共 {0} 手"
 msgstr "{0} moves total"
 
 #. placeholder {0}: state.shotCount
-#: src/features/games/billiards/BilliardsGame.tsx:619
+#: src/features/games/billiards/BilliardsMatch.tsx:267
 msgid "共 {0} 杆"
 msgstr "{0} shots total"
 
@@ -483,8 +483,8 @@ msgstr "Turn off to further reduce size"
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
-#: src/features/games/billiards/BilliardsGame.tsx:738
-#: src/features/games/gomoku/GomokuGame.tsx:518
+#: src/features/games/billiards/BilliardsMatch.tsx:386
+#: src/features/games/gomoku/GomokuMatch.tsx:253
 msgid "再来一局"
 msgstr "One more game"
 
@@ -583,7 +583,7 @@ msgstr "Remaining "
 msgid "剩余 {0}"
 msgstr "Remaining {0}"
 
-#: src/features/games/billiards/BilliardsGame.tsx:628
+#: src/features/games/billiards/BilliardsMatch.tsx:276
 msgid "剩余 {remaining} 球"
 msgstr "{remaining} balls left"
 
@@ -609,8 +609,8 @@ msgstr "Loading..."
 msgid "动作"
 msgstr "Action"
 
-#: src/features/games/billiards/BilliardsGame.tsx:354
-#: src/features/games/gomoku/GomokuGame.tsx:264
+#: src/features/games/billiards/BilliardsModeMenu.tsx:131
+#: src/features/games/gomoku/GomokuModeMenu.tsx:112
 msgid "历史记录"
 msgstr "History"
 
@@ -664,15 +664,15 @@ msgstr "Original video"
 msgid "参数未变化，无需重新压缩"
 msgstr "Parameters unchanged, no recompression needed"
 
-#: src/features/games/billiards/BilliardsGame.tsx:244
-#: src/features/games/gomoku/GomokuGame.tsx:606
+#: src/features/games/billiards/BilliardsModeMenu.tsx:17
+#: src/features/games/gomoku/labels.tsx:75
 #: src/features/home/entries.tsx:156
 #: src/features/home/entries.tsx:173
 msgid "双人"
 msgstr "2P"
 
-#: src/features/games/billiards/BilliardsGame.tsx:344
-#: src/features/games/gomoku/GomokuGame.tsx:240
+#: src/features/games/billiards/BilliardsModeMenu.tsx:121
+#: src/features/games/gomoku/GomokuModeMenu.tsx:88
 msgid "双人对战"
 msgstr "Two-Player Match"
 
@@ -684,7 +684,7 @@ msgstr "Double-click to switch to connection"
 msgid "双击连接"
 msgstr "Double-click to connect"
 
-#: src/features/games/gomoku/GomokuGame.tsx:739
+#: src/features/games/gomoku/GomokuOnline.tsx:129
 msgid "双方棋局状态不一致，本局无法继续。"
 msgstr "The two boards have diverged; this game cannot continue."
 
@@ -698,12 +698,12 @@ msgid "发现设备"
 msgstr "Discovered Devices"
 
 #: src/components/ui/prompt-dialog.tsx:96
-#: src/features/games/billiards/BilliardsGame.tsx:180
-#: src/features/games/billiards/BilliardsGame.tsx:205
+#: src/features/games/billiards/BilliardsGame.tsx:135
+#: src/features/games/billiards/BilliardsGame.tsx:160
 #: src/features/games/engine/online/OnlineLobby.tsx:202
 #: src/features/games/engine/online/OnlineLobby.tsx:350
-#: src/features/games/gomoku/GomokuGame.tsx:115
-#: src/features/games/gomoku/GomokuGame.tsx:141
+#: src/features/games/gomoku/GomokuGame.tsx:65
+#: src/features/games/gomoku/GomokuGame.tsx:91
 #: src/features/lan-transfer/LanShareDialog.tsx:135
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:444
 #: src/features/logs/LogPageLayout.tsx:85
@@ -741,7 +741,7 @@ msgstr "Read Only"
 msgid "可直接访问默认地址，或在地址栏输入新的网页链接。"
 msgstr "Open the default address, or enter a new URL in the address bar."
 
-#: src/features/games/billiards/BilliardsGame.tsx:122
+#: src/features/games/billiards/BilliardsGame.tsx:77
 #: src/features/home/entries.tsx:149
 msgid "台球"
 msgstr "Billiards"
@@ -750,17 +750,17 @@ msgstr "Billiards"
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "Devices on the same LAN can access directly. Use only on trusted networks, and limit access with the default permission."
 
-#: src/features/games/billiards/BilliardsGame.tsx:347
-#: src/features/games/gomoku/GomokuGame.tsx:243
+#: src/features/games/billiards/BilliardsModeMenu.tsx:124
+#: src/features/games/gomoku/GomokuModeMenu.tsx:91
 msgid "同屏轮流"
 msgstr "Hot seat"
 
-#: src/features/games/gomoku/GomokuGame.tsx:877
-#: src/features/games/gomoku/GomokuGame.tsx:897
+#: src/features/games/gomoku/GomokuOnline.tsx:267
+#: src/features/games/gomoku/GomokuOnline.tsx:287
 msgid "同意"
 msgstr "Accept"
 
-#: src/features/games/gomoku/GomokuGame.tsx:889
+#: src/features/games/gomoku/GomokuOnline.tsx:279
 msgid "同意后双方交换先后手，立即开始新对局。"
 msgstr "Once accepted, colors swap and a new game starts immediately."
 
@@ -801,7 +801,7 @@ msgstr "Name is required and cannot contain slashes."
 msgid "名称不能包含斜杠"
 msgstr "Name cannot contain slashes"
 
-#: src/features/games/gomoku/GomokuGame.tsx:228
+#: src/features/games/gomoku/GomokuModeMenu.tsx:76
 msgid "后手（执白）"
 msgstr "Second (White)"
 
@@ -813,10 +813,10 @@ msgstr "Start"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
-#: src/features/games/billiards/BilliardsGame.tsx:252
-#: src/features/games/billiards/BilliardsGame.tsx:332
-#: src/features/games/gomoku/GomokuGame.tsx:211
-#: src/features/games/gomoku/GomokuGame.tsx:615
+#: src/features/games/billiards/BilliardsModeMenu.tsx:25
+#: src/features/games/billiards/BilliardsModeMenu.tsx:109
+#: src/features/games/gomoku/GomokuModeMenu.tsx:59
+#: src/features/games/gomoku/labels.tsx:84
 msgid "困难"
 msgstr "Hard"
 
@@ -925,36 +925,36 @@ msgstr "Key"
 msgid "密钥管理"
 msgstr "Key Manager"
 
-#: src/features/games/gomoku/GomokuGame.tsx:906
+#: src/features/games/gomoku/GomokuOnline.tsx:296
 msgid "对局中断"
 msgstr "Game Interrupted"
 
-#: src/features/games/billiards/BilliardsGame.tsx:615
-#: src/features/games/billiards/BilliardsGame.tsx:704
+#: src/features/games/billiards/BilliardsMatch.tsx:263
+#: src/features/games/billiards/BilliardsMatch.tsx:352
 msgid "对局结束"
 msgstr "Match over"
 
-#: src/features/games/gomoku/GomokuGame.tsx:554
+#: src/features/games/gomoku/labels.tsx:23
 msgid "对方"
 msgstr "Opponent"
 
-#: src/features/games/gomoku/GomokuGame.tsx:786
+#: src/features/games/gomoku/GomokuOnline.tsx:176
 msgid "对方已离开房间。"
 msgstr "The opponent left the room."
 
-#: src/features/games/gomoku/GomokuGame.tsx:886
+#: src/features/games/gomoku/GomokuOnline.tsx:276
 msgid "对方想再来一局"
 msgstr "Opponent wants a rematch"
 
-#: src/features/games/gomoku/GomokuGame.tsx:782
+#: src/features/games/gomoku/GomokuOnline.tsx:172
 msgid "对方拒绝了再来一局"
 msgstr "Opponent declined the rematch"
 
-#: src/features/games/gomoku/GomokuGame.tsx:776
+#: src/features/games/gomoku/GomokuOnline.tsx:166
 msgid "对方拒绝了悔棋"
 msgstr "Opponent declined the undo"
 
-#: src/features/games/gomoku/GomokuGame.tsx:863
+#: src/features/games/gomoku/GomokuOnline.tsx:253
 msgid "对方请求悔棋"
 msgstr "Opponent requests an undo"
 
@@ -971,7 +971,7 @@ msgid "导入私钥后可在主机中选用。"
 msgstr "Import a private key to use it with hosts."
 
 #. placeholder {0}: undoFlow?.kind === "incoming" ? undoFlow.plies : 0
-#: src/features/games/gomoku/GomokuGame.tsx:866
+#: src/features/games/gomoku/GomokuOnline.tsx:256
 msgid "将撤销 {0} 手棋，是否同意？"
 msgstr "This will take back {0} move(s). Accept?"
 
@@ -979,8 +979,8 @@ msgstr "This will take back {0} move(s). Accept?"
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
-#: src/features/games/billiards/BilliardsGame.tsx:200
-#: src/features/games/gomoku/GomokuGame.tsx:136
+#: src/features/games/billiards/BilliardsGame.tsx:155
+#: src/features/games/gomoku/GomokuGame.tsx:86
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "You will return to mode selection; current match progress will be lost."
 
@@ -992,7 +992,7 @@ msgstr "Games"
 msgid "尚未设置默认地址"
 msgstr "Default address is not set"
 
-#: src/features/games/gomoku/GomokuGame.tsx:257
+#: src/features/games/gomoku/GomokuModeMenu.tsx:105
 #: src/features/logs/ActivityLogsPage.tsx:126
 msgid "局域网"
 msgstr "LAN"
@@ -1170,8 +1170,8 @@ msgstr "Set as default address"
 msgid "已连接 · {0}"
 msgstr "Connected · {0}"
 
-#: src/features/games/gomoku/GomokuGame.tsx:584
-#: src/features/games/gomoku/GomokuGame.tsx:624
+#: src/features/games/gomoku/labels.tsx:53
+#: src/features/games/gomoku/labels.tsx:93
 msgid "平局"
 msgstr "Draw"
 
@@ -1188,8 +1188,8 @@ msgstr "Start service automatically when the app launches"
 msgid "开启"
 msgstr "On"
 
-#: src/features/games/billiards/BilliardsGame.tsx:312
-#: src/features/games/gomoku/GomokuGame.tsx:191
+#: src/features/games/billiards/BilliardsModeMenu.tsx:89
+#: src/features/games/gomoku/GomokuModeMenu.tsx:39
 msgid "开始"
 msgstr "Start"
 
@@ -1223,8 +1223,8 @@ msgstr "Audio transcoding is not supported in this WebView"
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
-#: src/features/games/billiards/BilliardsGame.tsx:175
-#: src/features/games/gomoku/GomokuGame.tsx:110
+#: src/features/games/billiards/BilliardsGame.tsx:130
+#: src/features/games/gomoku/GomokuGame.tsx:60
 msgid "当前对局的进度将会丢失。"
 msgstr "Current match progress will be lost."
 
@@ -1249,11 +1249,11 @@ msgstr "The configured {0} is not in the available network adapter list, so the 
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
-#: src/features/games/billiards/BilliardsGame.tsx:710
+#: src/features/games/billiards/BilliardsMatch.tsx:358
 msgid "总杆数"
 msgstr "Total shots"
 
-#: src/features/games/gomoku/GomokuGame.tsx:484
+#: src/features/games/gomoku/GomokuMatch.tsx:219
 msgid "悔棋"
 msgstr "Undo"
 
@@ -1322,12 +1322,12 @@ msgstr "Scan to Access"
 msgid "折叠侧边栏"
 msgstr "Collapse Sidebar"
 
-#: src/features/games/billiards/BilliardsGame.tsx:768
+#: src/features/games/billiards/BilliardsMatch.tsx:416
 msgid "拉杆"
 msgstr "Draw"
 
-#: src/features/games/gomoku/GomokuGame.tsx:874
-#: src/features/games/gomoku/GomokuGame.tsx:894
+#: src/features/games/gomoku/GomokuOnline.tsx:264
+#: src/features/games/gomoku/GomokuOnline.tsx:284
 msgid "拒绝"
 msgstr "Decline"
 
@@ -1343,7 +1343,7 @@ msgstr "Drop an image here, or choose a file"
 msgid "拖放视频到此处，或选择文件"
 msgstr "Drop a video here, or choose a file"
 
-#: src/features/games/billiards/BilliardsGame.tsx:793
+#: src/features/games/billiards/BilliardsMatch.tsx:441
 msgid "按住桌面向母球后方拖动蓄力,松手击球"
 msgstr "Press and drag behind the cue ball to charge, release to shoot"
 
@@ -1364,7 +1364,7 @@ msgstr "Receive"
 msgid "接收目录"
 msgstr "Receive Directory"
 
-#: src/features/games/billiards/BilliardsGame.tsx:774
+#: src/features/games/billiards/BilliardsMatch.tsx:422
 msgid "推杆"
 msgstr "Follow"
 
@@ -1636,7 +1636,7 @@ msgstr "Deleting {0}..."
 msgid "正在刷新…"
 msgstr "Refreshing..."
 
-#: src/features/games/billiards/BilliardsGame.tsx:219
+#: src/features/games/billiards/BilliardsGame.tsx:174
 msgid "正在加载物理引擎…"
 msgstr "Loading physics engine..."
 
@@ -1715,7 +1715,7 @@ msgstr "Browser Access"
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "Browser access requests, confirmation prompts, and trusted-device fallback requests"
 
-#: src/features/games/gomoku/GomokuGame.tsx:733
+#: src/features/games/gomoku/GomokuOnline.tsx:123
 msgid "消息发送失败，连接可能已断开。"
 msgstr "Failed to send; the connection may be down."
 
@@ -1733,18 +1733,18 @@ msgstr "Add"
 msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
-#: src/features/games/billiards/BilliardsGame.tsx:261
+#: src/features/games/billiards/BilliardsModeMenu.tsx:34
 msgid "清台"
 msgstr "Cleared"
 
-#: src/features/games/billiards/BilliardsGame.tsx:609
-#: src/features/games/billiards/BilliardsGame.tsx:698
+#: src/features/games/billiards/BilliardsMatch.tsx:257
+#: src/features/games/billiards/BilliardsMatch.tsx:346
 msgid "清台完成!"
 msgstr "Table cleared!"
 
 #: src/features/crypto/CryptoTool.tsx:143
-#: src/features/games/billiards/BilliardsGame.tsx:361
-#: src/features/games/gomoku/GomokuGame.tsx:267
+#: src/features/games/billiards/BilliardsModeMenu.tsx:138
+#: src/features/games/gomoku/GomokuModeMenu.tsx:119
 #: src/features/logs/LogPageLayout.tsx:115
 #: src/features/media-compress/image/ImageCompressPanel.tsx:212
 #: src/features/media-compress/video/VideoCompressPanel.tsx:259
@@ -1778,23 +1778,23 @@ msgid "版本 {0} 已准备好"
 msgstr "Version {0} is ready"
 
 #. placeholder {0}: state.foulCounts[seat] ?? 0
-#: src/features/games/billiards/BilliardsGame.tsx:728
+#: src/features/games/billiards/BilliardsMatch.tsx:376
 msgid "犯规 {0}"
 msgstr "Fouls {0}"
 
-#: src/features/games/billiards/BilliardsGame.tsx:400
+#: src/features/games/billiards/BilliardsMatch.tsx:48
 msgid "犯规:提前打进黑八"
 msgstr "Foul: potted the 8-ball early"
 
-#: src/features/games/billiards/BilliardsGame.tsx:396
+#: src/features/games/billiards/BilliardsMatch.tsx:44
 msgid "犯规:未碰到任何球"
 msgstr "Foul: no ball contacted"
 
-#: src/features/games/billiards/BilliardsGame.tsx:394
+#: src/features/games/billiards/BilliardsMatch.tsx:42
 msgid "犯规:母球落袋"
 msgstr "Foul: cue ball potted"
 
-#: src/features/games/billiards/BilliardsGame.tsx:398
+#: src/features/games/billiards/BilliardsMatch.tsx:46
 msgid "犯规:首先碰到的不是本方球"
 msgstr "Foul: wrong ball hit first"
 
@@ -1803,19 +1803,19 @@ msgstr "Foul: wrong ball hit first"
 msgid "玩家"
 msgstr "Player"
 
-#: src/features/games/billiards/BilliardsGame.tsx:460
+#: src/features/games/billiards/BilliardsMatch.tsx:108
 msgid "玩家 1"
 msgstr "Player 1"
 
-#: src/features/games/billiards/BilliardsGame.tsx:266
+#: src/features/games/billiards/BilliardsModeMenu.tsx:39
 msgid "玩家 1 胜"
 msgstr "Player 1 wins"
 
-#: src/features/games/billiards/BilliardsGame.tsx:460
+#: src/features/games/billiards/BilliardsMatch.tsx:108
 msgid "玩家 2"
 msgstr "Player 2"
 
-#: src/features/games/billiards/BilliardsGame.tsx:268
+#: src/features/games/billiards/BilliardsModeMenu.tsx:41
 msgid "玩家 2 胜"
 msgstr "Player 2 wins"
 
@@ -1837,11 +1837,11 @@ msgstr "When empty, User from ~/.ssh/config is used first, then the current syst
 msgid "白名单"
 msgstr "Trusted Devices"
 
-#: src/features/games/gomoku/GomokuGame.tsx:570
+#: src/features/games/gomoku/labels.tsx:39
 msgid "白棋"
 msgstr "White"
 
-#: src/features/games/gomoku/GomokuGame.tsx:639
+#: src/features/games/gomoku/labels.tsx:108
 msgid "白棋胜"
 msgstr "White wins"
 
@@ -1940,13 +1940,13 @@ msgid "端口"
 msgstr "Port"
 
 #. placeholder {0}: state.moveCount + (state.finished ? 0 : 1)
-#: src/features/games/gomoku/GomokuGame.tsx:455
+#: src/features/games/gomoku/GomokuMatch.tsx:190
 msgid "第 {0} 手"
 msgstr "Move {0}"
 
 #. placeholder {0}: state.shotCount + 1
-#: src/features/games/billiards/BilliardsGame.tsx:625
-#: src/features/games/billiards/BilliardsGame.tsx:646
+#: src/features/games/billiards/BilliardsMatch.tsx:273
+#: src/features/games/billiards/BilliardsMatch.tsx:294
 msgid "第 {0} 杆"
 msgstr "Shot {0}"
 
@@ -1954,15 +1954,15 @@ msgstr "Shot {0}"
 msgid "等待对手加入…"
 msgstr "Waiting for an opponent..."
 
-#: src/features/games/gomoku/GomokuGame.tsx:516
+#: src/features/games/gomoku/GomokuMatch.tsx:251
 msgid "等待对方…"
 msgstr "Waiting for opponent..."
 
-#: src/features/games/gomoku/GomokuGame.tsx:472
+#: src/features/games/gomoku/GomokuMatch.tsx:207
 msgid "等待对方同意悔棋…"
 msgstr "Waiting for the opponent to accept the undo..."
 
-#: src/features/games/gomoku/GomokuGame.tsx:467
+#: src/features/games/gomoku/GomokuMatch.tsx:202
 msgid "等待对方落子…"
 msgstr "Waiting for the opponent's move..."
 
@@ -1975,10 +1975,10 @@ msgstr "Info"
 msgid "简体中文"
 msgstr "Simplified Chinese"
 
-#: src/features/games/billiards/BilliardsGame.tsx:250
-#: src/features/games/billiards/BilliardsGame.tsx:326
-#: src/features/games/gomoku/GomokuGame.tsx:205
-#: src/features/games/gomoku/GomokuGame.tsx:613
+#: src/features/games/billiards/BilliardsModeMenu.tsx:23
+#: src/features/games/billiards/BilliardsModeMenu.tsx:103
+#: src/features/games/gomoku/GomokuModeMenu.tsx:53
+#: src/features/games/gomoku/labels.tsx:82
 msgid "简单"
 msgstr "Easy"
 
@@ -2003,11 +2003,11 @@ msgstr "System"
 msgid "约原体积的 {0}%"
 msgstr "About {0}% of original size"
 
-#: src/features/games/billiards/BilliardsGame.tsx:243
+#: src/features/games/billiards/BilliardsModeMenu.tsx:16
 msgid "练习"
 msgstr "Practice"
 
-#: src/features/games/billiards/BilliardsGame.tsx:296
+#: src/features/games/billiards/BilliardsModeMenu.tsx:73
 msgid "练习模式"
 msgstr "Practice Mode"
 
@@ -2086,18 +2086,18 @@ msgstr "Web preview"
 msgid "耗时 "
 msgstr "Elapsed "
 
-#: src/features/games/gomoku/GomokuGame.tsx:607
+#: src/features/games/gomoku/labels.tsx:76
 #: src/features/home/entries.tsx:176
 msgid "联机"
 msgstr "Online"
 
-#: src/features/games/gomoku/GomokuGame.tsx:254
+#: src/features/games/gomoku/GomokuModeMenu.tsx:102
 msgid "联机对战"
 msgstr "Online match"
 
-#: src/features/games/billiards/BilliardsGame.tsx:263
-#: src/features/games/gomoku/GomokuGame.tsx:627
-#: src/features/games/gomoku/GomokuGame.tsx:634
+#: src/features/games/billiards/BilliardsModeMenu.tsx:36
+#: src/features/games/gomoku/labels.tsx:96
+#: src/features/games/gomoku/labels.tsx:103
 msgid "胜"
 msgstr "Win"
 
@@ -2114,11 +2114,11 @@ msgstr "Auto Start"
 msgid "自动选择"
 msgstr "Automatic"
 
-#: src/features/games/billiards/BilliardsGame.tsx:299
+#: src/features/games/billiards/BilliardsModeMenu.tsx:76
 msgid "自由清台"
 msgstr "Clear the table freely"
 
-#: src/features/games/billiards/BilliardsGame.tsx:655
+#: src/features/games/billiards/BilliardsMatch.tsx:303
 msgid "自由球:拖动母球放置"
 msgstr "Ball in hand: drag the cue ball to place it"
 
@@ -2127,9 +2127,9 @@ msgstr "Ball in hand: drag the cue ball to place it"
 msgid "至少修改其中一个名称。"
 msgstr "Change at least one name."
 
-#: src/features/games/billiards/BilliardsGame.tsx:612
-#: src/features/games/billiards/BilliardsGame.tsx:701
-#: src/features/games/gomoku/GomokuGame.tsx:600
+#: src/features/games/billiards/BilliardsMatch.tsx:260
+#: src/features/games/billiards/BilliardsMatch.tsx:349
+#: src/features/games/gomoku/labels.tsx:69
 msgid "获胜"
 msgstr "wins"
 
@@ -2259,9 +2259,9 @@ msgstr "Reading metadata"
 msgid "调整左侧面板宽度"
 msgstr "Resize left panel"
 
-#: src/features/games/billiards/BilliardsGame.tsx:263
-#: src/features/games/gomoku/GomokuGame.tsx:629
-#: src/features/games/gomoku/GomokuGame.tsx:636
+#: src/features/games/billiards/BilliardsModeMenu.tsx:36
+#: src/features/games/gomoku/labels.tsx:98
+#: src/features/games/gomoku/labels.tsx:105
 msgid "负"
 msgstr "Loss"
 
@@ -2277,7 +2277,7 @@ msgstr "Match Theme"
 msgid "跟随系统"
 msgstr "Follow System"
 
-#: src/features/games/gomoku/GomokuGame.tsx:451
+#: src/features/games/gomoku/GomokuMatch.tsx:186
 msgid "轮到"
 msgstr "Turn"
 
@@ -2329,9 +2329,9 @@ msgstr "Running"
 msgid "近 7 天"
 msgstr "Last 7 Days"
 
-#: src/features/games/billiards/BilliardsGame.tsx:746
-#: src/features/games/gomoku/GomokuGame.tsx:527
-#: src/features/games/gomoku/GomokuGame.tsx:912
+#: src/features/games/billiards/BilliardsMatch.tsx:394
+#: src/features/games/gomoku/GomokuMatch.tsx:262
+#: src/features/games/gomoku/GomokuOnline.tsx:302
 msgid "返回选择"
 msgstr "Back to Menu"
 
@@ -2405,8 +2405,8 @@ msgstr "Connection Closed"
 msgid "连接设备"
 msgstr "Connected Devices"
 
-#: src/features/games/billiards/BilliardsGame.tsx:208
-#: src/features/games/gomoku/GomokuGame.tsx:144
+#: src/features/games/billiards/BilliardsGame.tsx:163
+#: src/features/games/gomoku/GomokuGame.tsx:94
 msgid "退出"
 msgstr "Exit"
 
@@ -2417,13 +2417,13 @@ msgstr "Exit"
 msgid "退出全屏预览"
 msgstr "Exit fullscreen preview"
 
-#: src/features/games/billiards/BilliardsGame.tsx:191
-#: src/features/games/gomoku/GomokuGame.tsx:127
+#: src/features/games/billiards/BilliardsGame.tsx:146
+#: src/features/games/gomoku/GomokuGame.tsx:77
 msgid "退出对局"
 msgstr "Exit Match"
 
-#: src/features/games/billiards/BilliardsGame.tsx:197
-#: src/features/games/gomoku/GomokuGame.tsx:133
+#: src/features/games/billiards/BilliardsGame.tsx:152
+#: src/features/games/gomoku/GomokuGame.tsx:83
 msgid "退出当前对局?"
 msgstr "Exit the current match?"
 
@@ -2542,15 +2542,15 @@ msgstr "Restart to Update"
 msgid "重命名"
 msgstr "Rename"
 
-#: src/features/games/billiards/BilliardsGame.tsx:166
-#: src/features/games/billiards/BilliardsGame.tsx:183
-#: src/features/games/gomoku/GomokuGame.tsx:101
-#: src/features/games/gomoku/GomokuGame.tsx:118
+#: src/features/games/billiards/BilliardsGame.tsx:121
+#: src/features/games/billiards/BilliardsGame.tsx:138
+#: src/features/games/gomoku/GomokuGame.tsx:51
+#: src/features/games/gomoku/GomokuGame.tsx:68
 msgid "重开"
 msgstr "Restart"
 
-#: src/features/games/billiards/BilliardsGame.tsx:172
-#: src/features/games/gomoku/GomokuGame.tsx:107
+#: src/features/games/billiards/BilliardsGame.tsx:127
+#: src/features/games/gomoku/GomokuGame.tsx:57
 msgid "重新开始对局?"
 msgstr "Restart the match?"
 
@@ -2585,8 +2585,8 @@ msgid "预估 {0} ~ {1}"
 msgstr "Est. {0} ~ {1}"
 
 #: src/features/crypto/CryptoTool.tsx:96
-#: src/features/games/billiards/BilliardsGame.tsx:116
-#: src/features/games/gomoku/GomokuGame.tsx:85
+#: src/features/games/billiards/BilliardsGame.tsx:71
+#: src/features/games/gomoku/GomokuGame.tsx:35
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/media-compress/MediaCompressTool.tsx:25
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
@@ -2599,15 +2599,15 @@ msgstr "Home"
 msgid "高质量"
 msgstr "High quality"
 
-#: src/features/games/billiards/BilliardsGame.tsx:663
+#: src/features/games/billiards/BilliardsMatch.tsx:311
 msgid "黑八已重置"
 msgstr "8-ball re-spotted"
 
-#: src/features/games/gomoku/GomokuGame.tsx:565
+#: src/features/games/gomoku/labels.tsx:34
 msgid "黑棋"
 msgstr "Black"
 
-#: src/features/games/gomoku/GomokuGame.tsx:639
+#: src/features/games/gomoku/labels.tsx:108
 msgid "黑棋胜"
 msgstr "Black wins"
 

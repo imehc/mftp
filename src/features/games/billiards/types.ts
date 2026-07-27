@@ -1,5 +1,21 @@
 /** Billiards-specific state, move, and presentation types. */
+import type { Difficulty } from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
+
+export const BILLIARDS_GAME_ID = "billiards";
+
+export type BilliardsMode =
+  | { kind: "practice" }
+  | { kind: "ai"; difficulty: Difficulty }
+  | { kind: "hotseat" };
+
+export interface BilliardsHistoryPayload {
+  mode: BilliardsMode["kind"];
+  difficulty?: Difficulty;
+  winnerSeat: number | null;
+  shots: number;
+  fouls: number[];
+}
 
 export type BilliardsVariant = "eight-ball" | "practice";
 export type BallGroup = "solids" | "stripes";
