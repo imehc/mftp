@@ -22,6 +22,14 @@ impl Storage {
             )
             .optional()?
         {
+            // Older versions auto-persisted a fallback name ("MFTP", or a raw
+            // hostname like "Mac.lan"); replace those with the pretty device
+            // name. Names the user typed themselves are left alone.
+            if is_auto_generated_device_name(&settings.device_name) {
+                let mut settings = settings;
+                settings.device_name = default_device_name();
+                return self.save_lan_transfer_settings(settings);
+            }
             return Ok(settings);
         }
 
@@ -150,10 +158,44 @@ fn lan_transfer_settings_from_row(
     })
 }
 
+fn is_auto_generated_device_name(name: &str) -> bool {
+    let name = name.trim();
+    if name.is_empty() || name == "MFTP" {
+        return true;
+    }
+    let raw = whoami::fallible::hostname().unwrap_or_default();
+    let raw = raw.trim();
+    (!raw.is_empty() && name == raw) || Some(name) == hostname_device_name().as_deref()
+}
+
+fn default_device_name() -> String {
+    // Prefer the user-facing "pretty" device name (macOS Computer Name such as
+    // "xxx 的 MacBook Pro", Windows friendly name); hostnames like "Mac.lan"
+    // are a last resort. Env vars are unreliable in GUI processes.
+    let pretty = whoami::devicename();
+    let pretty = pretty.trim();
+    if !pretty.is_empty() && pretty != "localhost" {
+        return pretty.to_string();
+    }
+    hostname_device_name().unwrap_or_else(|| {
+        std::env::var("COMPUTERNAME")
+            .or_else(|_| std::env::var("HOSTNAME"))
+            .unwrap_or_else(|_| "MFTP".to_string())
+    })
+}
+
+fn hostname_device_name() -> Option<String> {
+    let hostname = whoami::fallible::hostname().unwrap_or_default();
+    let hostname = hostname
+        .trim()
+        .trim_end_matches(".local")
+        .trim_end_matches(".lan")
+        .to_string();
+    (!hostname.is_empty() && hostname != "localhost").then_some(hostname)
+}
+
 fn default_lan_transfer_settings() -> LanTransferSettings {
-    let device_name = std::env::var("COMPUTERNAME")
-        .or_else(|_| std::env::var("HOSTNAME"))
-        .unwrap_or_else(|_| "MFTP".to_string());
+    let device_name = default_device_name();
     let download_dir = dirs::download_dir()
         .or_else(dirs::home_dir)
         .unwrap_or_else(std::env::temp_dir)
