@@ -186,7 +186,13 @@ export default function BilliardsGame() {
         <BilliardsMatch
           key={`${JSON.stringify(mode)}-${matchKey}`}
           mode={mode}
-          onRematch={() => setMatchKey((k) => k + 1)}
+          onRematch={() => {
+            // Swap who breaks each rematch so the AI and player alternate.
+            setMode((m) =>
+              m?.kind === "ai" ? { ...m, playerBreaks: !m.playerBreaks } : m,
+            );
+            setMatchKey((k) => k + 1);
+          }}
           onExit={() => setMode(null)}
         />
       )}

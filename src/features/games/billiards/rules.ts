@@ -45,11 +45,14 @@ export function createInitialBalls(): BallState[] {
   return balls.sort((a, b) => a.id - b.id);
 }
 
-export function createInitialState(variant: BilliardsVariant): BilliardsState {
+export function createInitialState(
+  variant: BilliardsVariant,
+  firstSeat: SeatIndex = 0,
+): BilliardsState {
   return {
     variant,
     balls: createInitialBalls(),
-    turnSeat: 0,
+    turnSeat: firstSeat,
     groups: variant === "practice" ? [null] : [null, null],
     openTable: true,
     breakDone: false,

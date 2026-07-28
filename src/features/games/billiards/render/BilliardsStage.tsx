@@ -37,6 +37,11 @@ import { buildTable, OUTER_H, OUTER_W, PPM, px } from "./table";
 export interface BilliardsStageHandle {
   /** Animate a resolved move; resolves when the table is at rest again. */
   playPresentation(presentation: BilliardsPresentation): Promise<void>;
+  /**
+   * Show and swing the cue stick for a non-interactive (AI) shot: aim,
+   * pull back to the shot power, then strike. Resolves after the strike.
+   */
+  animateAiCue(angle: number, power: number): Promise<void>;
 }
 
 export interface BilliardsStageProps {
@@ -56,6 +61,7 @@ interface Scene {
   setBalls(balls: BallState[]): void;
   setInteraction(interactive: boolean, ballInHand: boolean): void;
   playPresentation(presentation: BilliardsPresentation): Promise<void>;
+  animateAiCue(angle: number, power: number): Promise<void>;
   destroy(): void;
 }
 
@@ -98,6 +104,8 @@ function createScene(
   let aimAngle = Math.PI; // default: facing the rack from the head spot
   const cuePull = { value: 0 };
   let playing = false;
+  /** AI shot in progress: show the cue stick even though not interactive. */
+  let aiAiming = false;
   /** Slingshot drag in progress (aim + charge in one gesture). */
   let dragging = false;
   /** Ball-in-hand: provisional cue position, shown as the real ball. */
@@ -172,6 +180,13 @@ function createScene(
 
     if (playing) return;
 
+    if (aiAiming) {
+      // AI turn: no aim guides, just the cue stick swinging at the ball.
+      const cue = cuePos();
+      if (cue) drawCueStick(px(cue.x), px(cue.y));
+      return;
+    }
+
     if (placing) {
       // Ball-in-hand: show the actual cue ball at the provisional spot
       // with a ring that flags invalid positions.
@@ -225,6 +240,11 @@ function createScene(
     }
 
     // Cue stick behind the ball, pulled back with power.
+    drawCueStick(cx, cy);
+  }
+
+  /** Position the cue stick behind (cx, cy), aimed along aimAngle. */
+  function drawCueStick(cx: number, cy: number): void {
     cueLayer.visible = true;
     cueLayer.position.set(cx, cy);
     cueLayer.rotation = aimAngle + Math.PI;
@@ -367,6 +387,35 @@ function createScene(
     });
   }
 
+  function animateAiCue(angle: number, power: number): Promise<void> {
+    aimAngle = angle;
+    cuePull.value = 0;
+    aiAiming = true;
+    redrawOverlays();
+    return new Promise((resolve) => {
+      // Pull back over 0.4 s, then strike forward in 0.09 s.
+      gsap.to(cuePull, {
+        value: power,
+        duration: 0.4,
+        ease: "power2.inOut",
+        onUpdate: redrawOverlays,
+        onComplete: () => {
+          gsap.to(cuePull, {
+            value: 0,
+            duration: 0.09,
+            ease: "power4.in",
+            onUpdate: redrawOverlays,
+            onComplete: () => {
+              aiAiming = false;
+              redrawOverlays();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
   return {
     setBalls(next) {
       balls = next;
@@ -391,6 +440,7 @@ function createScene(
       redrawOverlays();
     },
     playPresentation,
+    animateAiCue,
     destroy() {
       gsap.killTweensOf(cuePull);
       app.renderer.off("resize", relayout);
@@ -459,6 +509,8 @@ export const BilliardsStage = forwardRef<BilliardsStageHandle, BilliardsStagePro
       () => ({
         playPresentation: (presentation) =>
           sceneRef.current?.playPresentation(presentation) ?? Promise.resolve(),
+        animateAiCue: (angle, power) =>
+          sceneRef.current?.animateAiCue(angle, power) ?? Promise.resolve(),
       }),
       [],
     );

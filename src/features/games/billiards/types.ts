@@ -6,7 +6,7 @@ export const BILLIARDS_GAME_ID = "billiards";
 
 export type BilliardsMode =
   | { kind: "practice" }
-  | { kind: "ai"; difficulty: Difficulty }
+  | { kind: "ai"; difficulty: Difficulty; playerBreaks: boolean }
   | { kind: "hotseat" };
 
 export interface BilliardsHistoryPayload {

@@ -57,6 +57,7 @@ export function BilliardsModeMenu({
   onStart: (mode: BilliardsMode) => void;
 }) {
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+  const [playerBreaks, setPlayerBreaks] = useState(true);
   const records = useGameHistory<BilliardsHistoryPayload>(BILLIARDS_GAME_ID);
   const clearGame = useGamesHistoryStore((s) => s.clearGame);
   return (
@@ -84,7 +85,7 @@ export function BilliardsModeMenu({
             </span>
             <Button
               size="xs"
-              onClick={() => onStart({ kind: "ai", difficulty })}
+              onClick={() => onStart({ kind: "ai", difficulty, playerBreaks })}
             >
               <Trans>开始</Trans>
             </Button>
@@ -107,6 +108,23 @@ export function BilliardsModeMenu({
             </ToggleGroupItem>
             <ToggleGroupItem value="hard" className="flex-1">
               <Trans>困难</Trans>
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="sm"
+            value={playerBreaks ? "me" : "ai"}
+            onValueChange={(value) => {
+              if (value) setPlayerBreaks(value === "me");
+            }}
+            className="w-full"
+          >
+            <ToggleGroupItem value="me" className="flex-1">
+              <Trans>我先开</Trans>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="ai" className="flex-1">
+              <Trans>AI 先开</Trans>
             </ToggleGroupItem>
           </ToggleGroup>
         </div>

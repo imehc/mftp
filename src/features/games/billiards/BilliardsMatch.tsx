@@ -73,10 +73,16 @@ export function BilliardsMatch({
           : [local, new AiController(billiardsAiStrategy, mode.difficulty)];
     const runner = new MatchRunner(
       game,
-      createInitialState(variant),
+      createInitialState(
+        variant,
+        mode.kind === "ai" && !mode.playerBreaks ? 1 : 0,
+      ),
       controllers,
       {
-        onMoveResolved: async ({ resolution }) => {
+        onMoveResolved: async ({ seat, move, resolution }) => {
+          if (move.type === "shot" && controllers[seat]?.kind === "ai") {
+            await stageRef.current?.animateAiCue(move.angle, move.power);
+          }
           await stageRef.current?.playPresentation(resolution.presentation);
         },
         onError: (error) => console.error("billiards match error", error),
