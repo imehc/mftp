@@ -29,7 +29,7 @@ export const MAX_SIM_SECONDS = 40;
 /** Cloth rolling resistance approximation (rapier linear damping). */
 export const LINEAR_DAMPING = 0.72;
 export const ANGULAR_DAMPING = 1.2;
-export const BALL_RESTITUTION = 0.94;
+export const BALL_RESTITUTION = 0.9;
 export const BALL_FRICTION = 0.06;
 export const CUSHION_RESTITUTION = 0.7;
 export const CUSHION_FRICTION = 0.14;
@@ -37,7 +37,7 @@ export const CUSHION_FRICTION = 0.14;
 /** Cue speed (m/s) at power = 1 — roughly a hard break. */
 export const MAX_SHOT_SPEED = 8.5;
 /** Extra impulse factor for follow/draw (高低杆), applied at first contact. */
-export const FOLLOW_DRAW_FACTOR = 0.55;
+export const FOLLOW_DRAW_FACTOR = 0.7;
 
 /** Cushion collider thickness (extends outward from the play area). */
 export const CUSHION_THICKNESS = 0.06;
@@ -56,9 +56,22 @@ export interface PocketSpec {
 /**
  * Capture sensor = radius * this scale: the ball must genuinely enter
  * the mouth before it falls; at 1.0 a ball grazing the cushion line
- * near a pocket would get sucked in from the table surface.
+ * near a pocket would get sucked in from the table surface. With jaw
+ * points guarding each mouth (see below), only a reasonably centred
+ * ball threads through to reach the sensor.
  */
-export const POCKET_CAPTURE_SCALE = 0.72;
+export const POCKET_CAPTURE_SCALE = 0.6;
+
+/**
+ * Pocket jaws: a small rounded collider at each of a mouth's two inner
+ * cushion tips. A fast or badly-angled ball clips a jaw and rattles back
+ * onto the table instead of dropping — this is what stops "enough power
+ * always pots several". JAW_RADIUS is the main difficulty knob: larger =
+ * narrower mouth = harder to pot. Corner tips sit ~0.141m apart, side
+ * tips ~0.168m, ball radius 0.042.
+ */
+export const JAW_RADIUS = 0.02;
+export const JAW_RESTITUTION = 0.6;
 
 const CORNER_OFFSET = 0.024;
 const CORNER_POCKET_RADIUS = 0.098;

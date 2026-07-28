@@ -20,6 +20,8 @@ import {
   CUSHION_THICKNESS,
   FIXED_DT,
   FOLLOW_DRAW_FACTOR,
+  JAW_RADIUS,
+  JAW_RESTITUTION,
   LINEAR_DAMPING,
   MAX_SHOT_SPEED,
   MAX_SIM_SECONDS,
@@ -101,6 +103,32 @@ export function cushionSegments(): CushionSegment[] {
   return segments;
 }
 
+/**
+ * Rounded jaw points: two per pocket mouth, sitting at the inner tips of
+ * the cushions that frame the opening. A ball entering too fast or at a
+ * bad angle clips one and rattles back onto the table instead of falling.
+ * Order is fixed (corners in POCKET-diagonal order, then the two sides)
+ * to keep the collider construction deterministic for lockstep.
+ */
+export function jawPoints(): Array<[number, number]> {
+  const hw = TABLE_W / 2;
+  const hh = TABLE_H / 2;
+  const points: Array<[number, number]> = [];
+  // Corner mouths: one tip on the long rail, one on the short rail.
+  for (const sx of [-1, 1]) {
+    for (const sy of [-1, 1]) {
+      points.push([sx * (hw - CORNER_MOUTH), sy * hh]);
+      points.push([sx * hw, sy * (hh - CORNER_MOUTH)]);
+    }
+  }
+  // Side mouths on the long rails: symmetric tips either side of centre.
+  for (const sy of [-1, 1]) {
+    points.push([SIDE_MOUTH, sy * hh]);
+    points.push([-SIDE_MOUTH, sy * hh]);
+  }
+  return points;
+}
+
 const BALL_DENSITY = BALL_MASS / (Math.PI * BALL_RADIUS * BALL_RADIUS);
 
 /**
@@ -138,6 +166,17 @@ export function simulateShot(
           .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),
       );
       pocketHandles.set(collider.handle, pocket.id);
+    }
+
+    // Rounded jaw points guard each mouth: a solid collider (not a
+    // sensor) at each cushion tip so misaligned/fast balls rattle out.
+    for (const [jx, jy] of jawPoints()) {
+      world.createCollider(
+        RAPIER.ColliderDesc.ball(JAW_RADIUS)
+          .setTranslation(jx, jy)
+          .setRestitution(JAW_RESTITUTION)
+          .setFriction(CUSHION_FRICTION),
+      );
     }
 
     // Outer containment frame so nothing can leave the world.
@@ -251,19 +290,35 @@ export function simulateShot(
         events.push({ type: "cushion", t, ball, impact: relSpeed(ball, undefined) });
       });
 
-      // 高低杆: nudge the cue ball along (follow) or against (draw) its
-      // pre-impact travel direction at the moment of first contact — a
-      // 2D stand-in for top/bottom spin taking effect after impact.
+      // 高低杆: at first cue-object contact, add follow/draw spin along
+      // the line of centres (the impact normal), not the aim line. After
+      // impact the cue naturally departs along the tangent line; pushing
+      // ±normal is real top/bottom spin — follow drives it forward through
+      // the object ball's line, draw pulls it back — and stays visible on
+      // thin cuts where an aim-line nudge would be lost.
       if (followDrawArmed && cueContactThisStep && cueBody.isValid()) {
         const preSpeed = Math.hypot(cuePreVel.x, cuePreVel.y);
+        const objBody =
+          firstContact !== null ? bodyByBall.get(firstContact) : undefined;
         if (preSpeed > 1e-3) {
-          // Impulse ∝ pre-impact speed, directed along (or against) the
-          // pre-impact travel direction: cuePreVel already encodes both.
-          const scale = shot.followDraw * FOLLOW_DRAW_FACTOR * BALL_MASS;
-          cueBody.applyImpulse(
-            { x: cuePreVel.x * scale, y: cuePreVel.y * scale },
-            true,
-          );
+          // Impact normal = unit vector from cue to the struck ball. Fall
+          // back to the pre-impact travel direction if the object body is
+          // somehow gone (e.g. potted on the same step).
+          const cuePos = cueBody.translation();
+          let nx = cuePreVel.x / preSpeed;
+          let ny = cuePreVel.y / preSpeed;
+          if (objBody) {
+            const objPos = objBody.translation();
+            const dx = objPos.x - cuePos.x;
+            const dy = objPos.y - cuePos.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist > 1e-6) {
+              nx = dx / dist;
+              ny = dy / dist;
+            }
+          }
+          const mag = shot.followDraw * FOLLOW_DRAW_FACTOR * preSpeed * BALL_MASS;
+          cueBody.applyImpulse({ x: nx * mag, y: ny * mag }, true);
         }
         followDrawArmed = false;
       }
