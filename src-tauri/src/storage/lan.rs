@@ -163,7 +163,7 @@ fn is_auto_generated_device_name(name: &str) -> bool {
     if name.is_empty() || name == "MFTP" {
         return true;
     }
-    let raw = whoami::fallible::hostname().unwrap_or_default();
+    let raw = whoami::hostname().unwrap_or_default();
     let raw = raw.trim();
     (!raw.is_empty() && name == raw) || Some(name) == hostname_device_name().as_deref()
 }
@@ -172,7 +172,7 @@ fn default_device_name() -> String {
     // Prefer the user-facing "pretty" device name (macOS Computer Name such as
     // "xxx 的 MacBook Pro", Windows friendly name); hostnames like "Mac.lan"
     // are a last resort. Env vars are unreliable in GUI processes.
-    let pretty = whoami::devicename();
+    let pretty = whoami::devicename().unwrap_or_default();
     let pretty = pretty.trim();
     if !pretty.is_empty() && pretty != "localhost" {
         return pretty.to_string();
@@ -185,7 +185,7 @@ fn default_device_name() -> String {
 }
 
 fn hostname_device_name() -> Option<String> {
-    let hostname = whoami::fallible::hostname().unwrap_or_default();
+    let hostname = whoami::hostname().unwrap_or_default();
     let hostname = hostname
         .trim()
         .trim_end_matches(".local")

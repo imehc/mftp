@@ -9,61 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LogsRouteImport } from './routes/logs'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ToolsWebBrowserRouteImport } from './routes/tools/web-browser'
-import { Route as ToolsVideoCompressRouteImport } from './routes/tools/video-compress'
-import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
-import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-compress'
-import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
-import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
-import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
-import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
+import { Route as LogsRouteImport } from './routes/logs'
 import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
+import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
+import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
+import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
+import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
+import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-compress'
+import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
+import { Route as ToolsVideoCompressRouteImport } from './routes/tools/video-compress'
+import { Route as ToolsWebBrowserRouteImport } from './routes/tools/web-browser'
 
-const LogsRoute = LogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsWebBrowserRoute = ToolsWebBrowserRouteImport.update({
-  id: '/tools/web-browser',
-  path: '/tools/web-browser',
+const LogsRoute = LogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsVideoCompressRoute = ToolsVideoCompressRouteImport.update({
-  id: '/tools/video-compress',
-  path: '/tools/video-compress',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsSshSftpRoute = ToolsSshSftpRouteImport.update({
-  id: '/tools/ssh-sftp',
-  path: '/tools/ssh-sftp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsMediaCompressRoute = ToolsMediaCompressRouteImport.update({
-  id: '/tools/media-compress',
-  path: '/tools/media-compress',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsLanTransferRoute = ToolsLanTransferRouteImport.update({
-  id: '/tools/lan-transfer',
-  path: '/tools/lan-transfer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsImageCompressRoute = ToolsImageCompressRouteImport.update({
-  id: '/tools/image-compress',
-  path: '/tools/image-compress',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
-  id: '/tools/crypto',
-  path: '/tools/crypto',
+const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
+  id: '/games/billiards',
+  path: '/games/billiards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesGomokuRoute = GamesGomokuRouteImport.update({
@@ -71,9 +41,39 @@ const GamesGomokuRoute = GamesGomokuRouteImport.update({
   path: '/games/gomoku',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
-  id: '/games/billiards',
-  path: '/games/billiards',
+const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
+  id: '/tools/crypto',
+  path: '/tools/crypto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsImageCompressRoute = ToolsImageCompressRouteImport.update({
+  id: '/tools/image-compress',
+  path: '/tools/image-compress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsLanTransferRoute = ToolsLanTransferRouteImport.update({
+  id: '/tools/lan-transfer',
+  path: '/tools/lan-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsMediaCompressRoute = ToolsMediaCompressRouteImport.update({
+  id: '/tools/media-compress',
+  path: '/tools/media-compress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSshSftpRoute = ToolsSshSftpRouteImport.update({
+  id: '/tools/ssh-sftp',
+  path: '/tools/ssh-sftp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsVideoCompressRoute = ToolsVideoCompressRouteImport.update({
+  id: '/tools/video-compress',
+  path: '/tools/video-compress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWebBrowserRoute = ToolsWebBrowserRouteImport.update({
+  id: '/tools/web-browser',
+  path: '/tools/web-browser',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -175,13 +175,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/logs': {
-      id: '/logs'
-      path: '/logs'
-      fullPath: '/logs'
-      preLoaderRoute: typeof LogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -189,53 +182,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/web-browser': {
-      id: '/tools/web-browser'
-      path: '/tools/web-browser'
-      fullPath: '/tools/web-browser'
-      preLoaderRoute: typeof ToolsWebBrowserRouteImport
+    '/logs': {
+      id: '/logs'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof LogsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/video-compress': {
-      id: '/tools/video-compress'
-      path: '/tools/video-compress'
-      fullPath: '/tools/video-compress'
-      preLoaderRoute: typeof ToolsVideoCompressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/ssh-sftp': {
-      id: '/tools/ssh-sftp'
-      path: '/tools/ssh-sftp'
-      fullPath: '/tools/ssh-sftp'
-      preLoaderRoute: typeof ToolsSshSftpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/media-compress': {
-      id: '/tools/media-compress'
-      path: '/tools/media-compress'
-      fullPath: '/tools/media-compress'
-      preLoaderRoute: typeof ToolsMediaCompressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/lan-transfer': {
-      id: '/tools/lan-transfer'
-      path: '/tools/lan-transfer'
-      fullPath: '/tools/lan-transfer'
-      preLoaderRoute: typeof ToolsLanTransferRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/image-compress': {
-      id: '/tools/image-compress'
-      path: '/tools/image-compress'
-      fullPath: '/tools/image-compress'
-      preLoaderRoute: typeof ToolsImageCompressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/crypto': {
-      id: '/tools/crypto'
-      path: '/tools/crypto'
-      fullPath: '/tools/crypto'
-      preLoaderRoute: typeof ToolsCryptoRouteImport
+    '/games/billiards': {
+      id: '/games/billiards'
+      path: '/games/billiards'
+      fullPath: '/games/billiards'
+      preLoaderRoute: typeof GamesBilliardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/gomoku': {
@@ -245,11 +203,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamesGomokuRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/games/billiards': {
-      id: '/games/billiards'
-      path: '/games/billiards'
-      fullPath: '/games/billiards'
-      preLoaderRoute: typeof GamesBilliardsRouteImport
+    '/tools/crypto': {
+      id: '/tools/crypto'
+      path: '/tools/crypto'
+      fullPath: '/tools/crypto'
+      preLoaderRoute: typeof ToolsCryptoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/image-compress': {
+      id: '/tools/image-compress'
+      path: '/tools/image-compress'
+      fullPath: '/tools/image-compress'
+      preLoaderRoute: typeof ToolsImageCompressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/lan-transfer': {
+      id: '/tools/lan-transfer'
+      path: '/tools/lan-transfer'
+      fullPath: '/tools/lan-transfer'
+      preLoaderRoute: typeof ToolsLanTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/media-compress': {
+      id: '/tools/media-compress'
+      path: '/tools/media-compress'
+      fullPath: '/tools/media-compress'
+      preLoaderRoute: typeof ToolsMediaCompressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/ssh-sftp': {
+      id: '/tools/ssh-sftp'
+      path: '/tools/ssh-sftp'
+      fullPath: '/tools/ssh-sftp'
+      preLoaderRoute: typeof ToolsSshSftpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/video-compress': {
+      id: '/tools/video-compress'
+      path: '/tools/video-compress'
+      fullPath: '/tools/video-compress'
+      preLoaderRoute: typeof ToolsVideoCompressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/web-browser': {
+      id: '/tools/web-browser'
+      path: '/tools/web-browser'
+      fullPath: '/tools/web-browser'
+      preLoaderRoute: typeof ToolsWebBrowserRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
