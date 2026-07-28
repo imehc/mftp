@@ -6,6 +6,7 @@ import {
   Circle,
   CircleDot,
   Globe,
+  Grid3x3,
   LockKeyhole,
   TerminalSquare,
   Wifi,
@@ -164,6 +165,26 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/gomoku", preload: "viewport" }),
     icon: Circle,
     title: <Trans>五子棋</Trans>,
+    badges: () => (
+      <>
+        <Badge variant="outline">
+          <Trans>人机</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>双人</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>联机</Trans>
+        </Badge>
+      </>
+    ),
+  },
+  {
+    id: "go",
+    category: "games",
+    link: linkOptions({ to: "/games/go", preload: "viewport" }),
+    icon: Grid3x3,
+    title: <Trans>围棋</Trans>,
     badges: () => (
       <>
         <Badge variant="outline">
