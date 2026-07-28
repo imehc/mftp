@@ -2297,7 +2297,7 @@ dependencies = [
 
 [[package]]
 name = "mftp"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "base64 0.22.1",
  "dirs 5.0.1",
