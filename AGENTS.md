@@ -157,7 +157,6 @@ pnpm build
 ```bash
 pnpm build
 cargo test --manifest-path src-tauri/Cargo.toml --locked
-bash scripts/check_lines.sh
 ```
 
 ## Code Review 标准
