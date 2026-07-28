@@ -27,7 +27,7 @@ serde_json = "1"
 ssh2 = { version = "0.9", features = ["vendored-openssl"] }
 uuid = { version = "1", features = ["v4"] }
 base64 = "0.22"
-dirs = "5"
+dirs = "6"
 parking_lot = "0.12"
 walkdir = "2"
 tar = "0.4"
