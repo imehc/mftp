@@ -35,7 +35,7 @@ flate2 = "1"
 tauri-plugin-process = "2"
 rusqlite = { version = "0.40.1", features = ["bundled"] }
 local-ip-address = "0.6.13"
-whoami = { version = "1", default-features = false }
+whoami = { version = "2", default-features = false }
 fs2 = "0.4.3"
 mdns-sd = "=0.20.3"
 tauri-specta = { version = "=2.0.0-rc.24", features = ["typescript"] }
