@@ -1,9 +1,4 @@
-/**
- * Online (LAN) flow: lobby handoff, the networked match wrapper with
- * undo / rematch consent dialogs, and connection-loss handling.
- * Board size is negotiated through the game id (go-9 / go-13 / go-19)
- * so both peers always build identical initial states.
- */
+/** LAN xiangqi flow with lockstep moves, undo consent, and rematches. */
 import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
@@ -26,45 +21,44 @@ import { OnlineLobby } from "../engine/online/OnlineLobby";
 import { hashString, OnlineMatchSession } from "../engine/online/session";
 import type { RemoteMove } from "../engine/transport";
 import type { PlayerController, SeatIndex } from "../engine/types";
-import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
-import { GoMatchView } from "./GoMatch";
-import { createInitialGoState, goGame } from "./rules";
+import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
+import { XiangqiMatchView } from "./XiangqiMatch";
+import { createInitialXiangqiState, xiangqiGame } from "./rules";
 import {
-  GO_GAME_ID,
-  type BoardSize,
-  type GoMode,
-  type GoMove,
-  type GoSession,
-  type GoState,
+  XIANGQI_GAME_ID,
+  type XiangqiMode,
+  type XiangqiMove,
+  type XiangqiSession,
+  type XiangqiState,
 } from "./types";
 
-/** Divergence tripwire compared against the peer's RemoteMove.stateHash. */
-function hashGoState(state: GoState): string {
-  const cells = state.board
-    .map((stone) => (stone === null ? "." : String(stone)))
-    .join("");
+function hashXiangqiState(state: XiangqiState): string {
+  const board = state.board
+    .map((piece) => (piece ? `${piece.side}:${piece.kind}` : "."))
+    .join(",");
+  const repetitions = Object.entries(state.positionCounts)
+    .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+    .map(([position, count]) => `${position}:${count}`)
+    .join(";");
   return hashString(
-    `${cells}|${state.turnSeat}|${state.moveCount}|${state.koPoint}|${state.consecutivePasses}|${hashString(state.positionHistory.join("|"))}`,
+    `${board}|${state.turnSeat}|${state.moveCount}|${state.halfmoveClock}|${Number(state.inCheck)}|${Number(state.finished)}|${state.winnerSeat ?? "-"}|${state.resultReason ?? "-"}|${hashString(repetitions)}`,
   );
 }
 
-export function GoOnlineFlow({
-  boardSize,
+export function XiangqiOnlineFlow({
   onExit,
   onFinishedChange,
 }: {
-  boardSize: BoardSize;
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
   const [ready, setReady] = useState<{
-    session: OnlineMatchSession<GoMove>;
+    session: OnlineMatchSession<XiangqiMove>;
     status: GameRoomStatus;
   } | null>(null);
   const readyRef = useRef(ready);
   readyRef.current = ready;
 
-  // Leaving online mode always tears the room down.
   useEffect(
     () => () => {
       readyRef.current?.session.close();
@@ -74,17 +68,11 @@ export function GoOnlineFlow({
   );
 
   if (!ready) {
-    return (
-      <OnlineLobby<GoMove>
-        gameId={`${GO_GAME_ID}-${boardSize}`}
-        onReady={setReady}
-      />
-    );
+    return <OnlineLobby<XiangqiMove> gameId={XIANGQI_GAME_ID} onReady={setReady} />;
   }
   return (
     <OnlineMatch
       session={ready.session}
-      boardSize={boardSize}
       onExit={onExit}
       onFinishedChange={onFinishedChange}
     />
@@ -98,25 +86,23 @@ type UndoFlow =
 
 function OnlineMatch({
   session,
-  boardSize,
   onExit,
   onFinishedChange,
 }: {
-  session: OnlineMatchSession<GoMove>;
-  boardSize: BoardSize;
+  session: OnlineMatchSession<XiangqiMove>;
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
   const { t } = useLingui();
-  const volume = useSettingsStore((s) => s.gamesVolume);
+  const volume = useSettingsStore((state) => state.gamesVolume);
   const [nonce, setNonce] = useState(0);
-  const [match, setMatch] = useState<GoSession | null>(null);
+  const [match, setMatch] = useState<XiangqiSession | null>(null);
   const [undoFlow, setUndoFlow] = useState<UndoFlow>(null);
   const [rematchWaiting, setRematchWaiting] = useState(false);
   const [rematchIncoming, setRematchIncoming] = useState(false);
   const [endReason, setEndReason] = useState<string | null>(null);
-  const lastRemoteRef = useRef<RemoteMove<GoMove> | null>(null);
-  const matchRef = useRef<GoSession | null>(null);
+  const lastRemoteRef = useRef<RemoteMove<XiangqiMove> | null>(null);
+  const matchRef = useRef<XiangqiSession | null>(null);
   matchRef.current = match;
 
   useEffect(() => {
@@ -124,39 +110,43 @@ function OnlineMatch({
     setUndoFlow(null);
     setRematchWaiting(false);
     setRematchIncoming(false);
-    // 换先: seats swap every rematch. Both peers bump `nonce` through the
-    // consent flow, so parity — and thus the seat mapping — stays in
-    // lockstep without extra protocol.
+    setEndReason(null);
     const seatThisRound: SeatIndex =
       nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
-    const local = new LocalController<GoState, GoMove>();
-    const remote = new RemoteController<GoState, GoMove>();
-    const controllers: PlayerController<GoState, GoMove>[] =
+    const local = new LocalController<XiangqiState, XiangqiMove>();
+    const remote = new RemoteController<XiangqiState, XiangqiMove>();
+    const controllers: PlayerController<XiangqiState, XiangqiMove>[] =
       seatThisRound === 0 ? [local, remote] : [remote, local];
     const runner = new MatchRunner(
-      goGame,
-      createInitialGoState(boardSize),
+      xiangqiGame,
+      createInitialXiangqiState(),
       controllers,
       {
         onMoveResolved: ({ seat, move, moveIndex, resolution }) => {
-          if (resolution.presentation.captured.length > 0) playCaptureSound(volume);
-          else playStoneSound(volume);
-          if (resolution.state.finished) playFinishSound(volume);
-          const hash = hashGoState(resolution.state);
+          playMoveSound(volume, resolution.presentation.captured !== null);
+          if (resolution.state.resultReason === "checkmate") {
+            playCheckSound(volume, true);
+          } else if (resolution.state.inCheck) {
+            playCheckSound(volume);
+          } else if (resolution.state.finished) {
+            playFinishSound(volume);
+          }
+          const stateHash = hashXiangqiState(resolution.state);
           if (seat === seatThisRound) {
             void session
-              .sendMove({ seq: moveIndex, seat, move, stateHash: hash })
-              .catch(() => {
-                setEndReason(t`消息发送失败，连接可能已断开。`);
-              });
+              .sendMove({ seq: moveIndex, seat, move, stateHash })
+              .catch(() => setEndReason(t`消息发送失败，连接可能已断开。`));
           } else if (
             lastRemoteRef.current &&
-            lastRemoteRef.current.stateHash !== hash
+            lastRemoteRef.current.stateHash !== stateHash
           ) {
             setEndReason(t`双方棋局状态不一致，本局无法继续。`);
           }
         },
-        onError: (error) => console.error("go online match error", error),
+        onError: (error) => {
+          console.error("xiangqi online match error", error);
+          setEndReason(t`双方棋局状态不一致，本局无法继续。`);
+        },
       },
     );
     const offMove = session.onRemoteMove((remoteMove) => {
@@ -170,28 +160,31 @@ function OnlineMatch({
       runner.dispose();
       setMatch(null);
     };
-    // nonce drives rematches; the rest is stable for the session lifetime.
+    // The room and volume callback stay stable; nonce alone starts a rematch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nonce, session, boardSize]);
+  }, [nonce, session]);
+
+  const applyUndo = (atMove: number, plies: number): void => {
+    const runner = matchRef.current?.runner;
+    if (!runner) return;
+    const target = Math.max(0, atMove - plies);
+    const current = runner.getSnapshot().moveCount;
+    if (current > target) runner.undo(current - target);
+  };
 
   useEffect(() => {
-    const applyUndo = (atMove: number, plies: number) => {
-      const runner = matchRef.current?.runner;
-      if (!runner) return;
-      if (runner.getSnapshot().moveCount === atMove) runner.undo(plies);
-    };
-    const offControl = session.onControl((msg) => {
-      if (msg.t === "undo-request") {
-        setUndoFlow({ kind: "incoming", atMove: msg.atMove, plies: msg.plies });
-      } else if (msg.t === "undo-response") {
+    const offControl = session.onControl((message) => {
+      if (message.t === "undo-request") {
+        setUndoFlow({ kind: "incoming", atMove: message.atMove, plies: message.plies });
+      } else if (message.t === "undo-response") {
         setUndoFlow((flow) => (flow?.kind === "waiting" ? null : flow));
-        if (msg.accept) applyUndo(msg.atMove, msg.plies);
+        if (message.accept) applyUndo(message.atMove, message.plies);
         else toast(t`对方拒绝了悔棋`);
-      } else if (msg.t === "rematch-request") {
+      } else if (message.t === "rematch-request") {
         setRematchIncoming(true);
-      } else if (msg.t === "rematch-response") {
+      } else if (message.t === "rematch-response") {
         setRematchWaiting(false);
-        if (msg.accept) setNonce((n) => n + 1);
+        if (message.accept) setNonce((value) => value + 1);
         else toast(t`对方拒绝了再来一局`);
       }
     });
@@ -206,11 +199,11 @@ function OnlineMatch({
       offPresence();
       offClosed();
     };
-    // applyUndo only reads refs; resubscribing per render is pointless.
+    // applyUndo only reads refs, so resubscribing per render is unnecessary.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, t]);
 
-  const requestUndo = (plies: number) => {
+  const requestUndo = (plies: number): void => {
     const runner = matchRef.current?.runner;
     if (!runner || undoFlow !== null) return;
     const atMove = runner.getSnapshot().moveCount;
@@ -220,14 +213,11 @@ function OnlineMatch({
       .catch(() => setUndoFlow(null));
   };
 
-  const respondUndo = (accept: boolean) => {
+  const respondUndo = (accept: boolean): void => {
     const flow = undoFlow;
     if (flow?.kind !== "incoming") return;
     setUndoFlow(null);
-    const runner = matchRef.current?.runner;
-    if (accept && runner && runner.getSnapshot().moveCount === flow.atMove) {
-      runner.undo(flow.plies);
-    }
+    if (accept) applyUndo(flow.atMove, flow.plies);
     void session
       .sendControl({
         t: "undo-response",
@@ -238,7 +228,7 @@ function OnlineMatch({
       .catch(() => {});
   };
 
-  const requestRematch = () => {
+  const requestRematch = (): void => {
     if (rematchWaiting) return;
     setRematchWaiting(true);
     void session
@@ -246,19 +236,19 @@ function OnlineMatch({
       .catch(() => setRematchWaiting(false));
   };
 
-  const respondRematch = (accept: boolean) => {
+  const respondRematch = (accept: boolean): void => {
     setRematchIncoming(false);
     void session.sendControl({ t: "rematch-response", accept }).catch(() => {});
-    if (accept) setNonce((n) => n + 1);
+    if (accept) setNonce((value) => value + 1);
   };
 
   if (!match) return <div className="flex-1" />;
-  const mode: GoMode = { kind: "online", boardSize };
+  const mode: XiangqiMode = { kind: "online" };
   const gameSeat: SeatIndex =
     nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
   return (
     <>
-      <GoMatchView
+      <XiangqiMatchView
         key={nonce}
         mode={mode}
         session={match}
@@ -276,58 +266,37 @@ function OnlineMatch({
       <AlertDialog open={undoFlow?.kind === "incoming"}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>对方请求悔棋</Trans>
-            </AlertDialogTitle>
+            <AlertDialogTitle><Trans>对方请求悔棋</Trans></AlertDialogTitle>
             <AlertDialogDescription>
-              <Trans>
-                将撤销 {undoFlow?.kind === "incoming" ? undoFlow.plies : 0}{" "}
-                手棋，是否同意？
-              </Trans>
+              <Trans>将撤销 {undoFlow?.kind === "incoming" ? undoFlow.plies : 0} 手棋，是否同意？</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => respondUndo(false)}>
-              <Trans>拒绝</Trans>
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={() => respondUndo(true)}>
-              <Trans>同意</Trans>
-            </AlertDialogAction>
+            <AlertDialogCancel onClick={() => respondUndo(false)}><Trans>拒绝</Trans></AlertDialogCancel>
+            <AlertDialogAction onClick={() => respondUndo(true)}><Trans>同意</Trans></AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={rematchIncoming}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>对方想再来一局</Trans>
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              <Trans>同意后双方交换先后手，立即开始新对局。</Trans>
-            </AlertDialogDescription>
+            <AlertDialogTitle><Trans>对方想再来一局</Trans></AlertDialogTitle>
+            <AlertDialogDescription><Trans>同意后双方交换先后手，立即开始新对局。</Trans></AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => respondRematch(false)}>
-              <Trans>拒绝</Trans>
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={() => respondRematch(true)}>
-              <Trans>同意</Trans>
-            </AlertDialogAction>
+            <AlertDialogCancel onClick={() => respondRematch(false)}><Trans>拒绝</Trans></AlertDialogCancel>
+            <AlertDialogAction onClick={() => respondRematch(true)}><Trans>同意</Trans></AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={endReason !== null}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>对局中断</Trans>
-            </AlertDialogTitle>
+            <AlertDialogTitle><Trans>对局中断</Trans></AlertDialogTitle>
             <AlertDialogDescription>{endReason}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={onExit}>
-              <Trans>返回选择</Trans>
-            </AlertDialogAction>
+            <AlertDialogAction onClick={onExit}><Trans>返回选择</Trans></AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

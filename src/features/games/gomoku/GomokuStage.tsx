@@ -358,7 +358,7 @@ function createScene(
   const stoneLayer = new Container();
   const markerLayer = new Graphics();
   // Winning-line rings live on their own layer so they can blink as a
-  // whole before the React result overlay covers the board.
+  // whole before the React result bar appears below the board.
   const winLayer = new Graphics();
   const ghost = new Sprite(stoneTexture[0]);
   ghost.anchor.set(0.5, STONE_CY / STONE_TEX);
@@ -415,7 +415,7 @@ function createScene(
     if (state.winningLine.length > 0) {
       if (!winAnimated) {
         winAnimated = true;
-        // Pulse a few times, ending solid; the result overlay waits for it.
+        // Pulse a few times, ending solid; the result bar waits for it.
         gsap.fromTo(
           winLayer,
           { alpha: 0.1 },

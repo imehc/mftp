@@ -14,6 +14,7 @@ import { Route as LogsRouteImport } from './routes/logs'
 import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
+import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
@@ -45,6 +46,11 @@ const GamesGoRoute = GamesGoRouteImport.update({
 const GamesGomokuRoute = GamesGomokuRouteImport.update({
   id: '/games/gomoku',
   path: '/games/gomoku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesXiangqiRoute = GamesXiangqiRouteImport.update({
+  id: '/games/xiangqi',
+  path: '/games/xiangqi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
+  '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
+  '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
+  '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
+    | '/games/xiangqi'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
+    | '/games/xiangqi'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
+    | '/games/xiangqi'
     | '/tools/crypto'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   GamesBilliardsRoute: typeof GamesBilliardsRoute
   GamesGoRoute: typeof GamesGoRoute
   GamesGomokuRoute: typeof GamesGomokuRoute
+  GamesXiangqiRoute: typeof GamesXiangqiRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/games/gomoku'
       fullPath: '/games/gomoku'
       preLoaderRoute: typeof GamesGomokuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/xiangqi': {
+      id: '/games/xiangqi'
+      path: '/games/xiangqi'
+      fullPath: '/games/xiangqi'
+      preLoaderRoute: typeof GamesXiangqiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/crypto': {
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesBilliardsRoute: GamesBilliardsRoute,
   GamesGoRoute: GamesGoRoute,
   GamesGomokuRoute: GamesGomokuRoute,
+  GamesXiangqiRoute: GamesXiangqiRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,

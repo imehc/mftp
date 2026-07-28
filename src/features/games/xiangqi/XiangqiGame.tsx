@@ -1,17 +1,16 @@
-/** Go screen shell: header actions and mode switching. */
 import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
-import { Grid3x3 } from "lucide-react";
+import { Crown } from "lucide-react";
 import { GameHomeButton, GameMatchActions } from "../engine/GameHeaderControls";
 import { GameVolumeControl } from "../engine/GameVolumeControl";
-import { unlockGoAudio } from "./audio";
-import { GoMatch } from "./GoMatch";
-import { GoModeMenu } from "./GoModeMenu";
-import { GoOnlineFlow } from "./GoOnline";
-import type { GoMode } from "./types";
+import { unlockXiangqiAudio } from "./audio";
+import { XiangqiMatch } from "./XiangqiMatch";
+import { XiangqiModeMenu } from "./XiangqiModeMenu";
+import { XiangqiOnlineFlow } from "./XiangqiOnline";
+import type { XiangqiMode } from "./types";
 
-export default function GoGame() {
-  const [mode, setMode] = useState<GoMode | null>(null);
+export default function XiangqiGame() {
+  const [mode, setMode] = useState<XiangqiMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
   const [matchFinished, setMatchFinished] = useState(false);
 
@@ -32,8 +31,8 @@ export default function GoGame() {
           <GameHomeButton matchActive={mode !== null} matchFinished={matchFinished} />
           <div className="h-4 w-px bg-border" />
           <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <Grid3x3 className="size-3.5" />
-            <Trans>围棋</Trans>
+            <Crown className="size-3.5" />
+            <Trans>中国象棋</Trans>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -49,21 +48,20 @@ export default function GoGame() {
         </div>
       </header>
       {mode === null ? (
-        <GoModeMenu
+        <XiangqiModeMenu
           onStart={(nextMode) => {
-            unlockGoAudio();
+            unlockXiangqiAudio();
             setMatchFinished(false);
             setMode(nextMode);
           }}
         />
       ) : mode.kind === "online" ? (
-        <GoOnlineFlow
-          boardSize={mode.boardSize}
+        <XiangqiOnlineFlow
           onExit={exitMatch}
           onFinishedChange={setMatchFinished}
         />
       ) : (
-        <GoMatch
+        <XiangqiMatch
           key={`${JSON.stringify(mode)}-${matchKey}`}
           mode={mode}
           onRematch={() => {

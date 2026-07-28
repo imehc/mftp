@@ -46,7 +46,13 @@ function hashGomokuState(state: GomokuState): string {
   return hashString(`${cells}|${state.turnSeat}|${state.moveCount}`);
 }
 
-export function GomokuOnlineFlow({ onExit }: { onExit: () => void }) {
+export function GomokuOnlineFlow({
+  onExit,
+  onFinishedChange,
+}: {
+  onExit: () => void;
+  onFinishedChange: (finished: boolean) => void;
+}) {
   const [ready, setReady] = useState<{
     session: OnlineMatchSession<GomokuMove>;
     status: GameRoomStatus;
@@ -66,7 +72,13 @@ export function GomokuOnlineFlow({ onExit }: { onExit: () => void }) {
   if (!ready) {
     return <OnlineLobby<GomokuMove> gameId={GOMOKU_GAME_ID} onReady={setReady} />;
   }
-  return <OnlineMatch session={ready.session} onExit={onExit} />;
+  return (
+    <OnlineMatch
+      session={ready.session}
+      onExit={onExit}
+      onFinishedChange={onFinishedChange}
+    />
+  );
 }
 
 type UndoFlow =
@@ -77,9 +89,11 @@ type UndoFlow =
 function OnlineMatch({
   session,
   onExit,
+  onFinishedChange,
 }: {
   session: OnlineMatchSession<GomokuMove>;
   onExit: () => void;
+  onFinishedChange: (finished: boolean) => void;
 }) {
   const { t } = useLingui();
   const volume = useSettingsStore((s) => s.gamesVolume);
@@ -245,6 +259,7 @@ function OnlineMatch({
         }}
         onRematch={requestRematch}
         onExit={onExit}
+        onFinishedChange={onFinishedChange}
       />
       <AlertDialog open={undoFlow?.kind === "incoming"}>
         <AlertDialogContent>

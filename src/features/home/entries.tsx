@@ -5,6 +5,7 @@ import {
   Archive,
   Circle,
   CircleDot,
+  Crown,
   Globe,
   Grid3x3,
   LockKeyhole,
@@ -185,6 +186,26 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/go", preload: "viewport" }),
     icon: Grid3x3,
     title: <Trans>围棋</Trans>,
+    badges: () => (
+      <>
+        <Badge variant="outline">
+          <Trans>人机</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>双人</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>联机</Trans>
+        </Badge>
+      </>
+    ),
+  },
+  {
+    id: "xiangqi",
+    category: "games",
+    link: linkOptions({ to: "/games/xiangqi", preload: "viewport" }),
+    icon: Crown,
+    title: <Trans>中国象棋</Trans>,
     badges: () => (
       <>
         <Badge variant="outline">

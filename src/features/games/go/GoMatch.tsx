@@ -1,6 +1,6 @@
 /**
  * Local match wiring (vs-AI / hotseat) and the shared match view used by
- * both local and online play: status bar, board stage, result overlay.
+ * both local and online play: status bar, board stage, and result bar.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -12,6 +12,7 @@ import { AiController, LocalController } from "../engine/controllers";
 import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
+import { GameResultBar } from "../engine/GameResultBar";
 import { goAiStrategy } from "./ai";
 import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
 import { GoStage } from "./GoStage";
@@ -39,10 +40,12 @@ export function GoMatch({
   mode,
   onRematch,
   onExit,
+  onFinishedChange,
 }: {
   mode: GoMode;
   onRematch: () => void;
   onExit: () => void;
+  onFinishedChange: (finished: boolean) => void;
 }) {
   const [session, setSession] = useState<GoSession | null>(null);
   const volume = useSettingsStore((s) => s.gamesVolume);
@@ -88,6 +91,7 @@ export function GoMatch({
       session={session}
       onRematch={onRematch}
       onExit={onExit}
+      onFinishedChange={onFinishedChange}
     />
   );
 }
@@ -98,12 +102,14 @@ export function GoMatchView({
   onRematch,
   onExit,
   online,
+  onFinishedChange,
 }: {
   mode: GoMode;
   session: GoSession;
   onRematch: () => void;
   onExit: () => void;
   online?: OnlineViewProps;
+  onFinishedChange: (finished: boolean) => void;
 }) {
   const { runner, local } = session;
   const { t } = useLingui();
@@ -145,6 +151,10 @@ export function GoMatchView({
     }
     return points;
   }, [activeIsLocal, state]);
+
+  useEffect(() => {
+    onFinishedChange(state.finished);
+  }, [onFinishedChange, state.finished]);
 
   useEffect(() => {
     if (!state.finished) {
@@ -250,7 +260,7 @@ export function GoMatchView({
           </Button>
         </div>
       </div>
-      <div className="relative min-h-0 flex-1 p-1.5">
+      <div className="relative z-0 min-h-0 flex-1 overflow-hidden p-1.5">
         <GoStage
           boardSize={state.boardSize}
           board={state.board}
@@ -264,48 +274,25 @@ export function GoMatchView({
             if (legalPoints[index]) local.submit(move);
           }}
         />
-        {state.finished && showResult ? (
-          <div className="absolute inset-0 z-20 flex animate-in items-center justify-center bg-black/35 p-4 backdrop-blur-[2px] fade-in duration-300">
-            <div className="flex w-full max-w-[18rem] animate-in flex-col gap-3 rounded-lg border border-white/25 bg-background/95 p-4 text-foreground shadow-2xl fade-in zoom-in-95 duration-300">
-              <div className="text-center">
-                <div className="text-base font-semibold">
-                  {matchResultLabel(mode, snapshot.winnerSeat, online)}
-                </div>
-                {state.finalScore ? (
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {scoreLine(state)}
-                  </div>
-                ) : null}
-                <div className="mt-1 text-xs text-muted-foreground">
-                  <Trans>共 {state.moveCount} 手</Trans>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  className="flex-1"
-                  disabled={online?.rematchWaiting}
-                  onClick={onRematch}
-                >
-                  {online?.rematchWaiting ? (
-                    <Trans>等待对方…</Trans>
-                  ) : (
-                    <Trans>再来一局</Trans>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={onExit}
-                >
-                  <Trans>返回选择</Trans>
-                </Button>
-              </div>
-            </div>
-          </div>
-        ) : null}
       </div>
+      {state.finished && showResult ? (
+        <GameResultBar
+          title={matchResultLabel(mode, snapshot.winnerSeat, online)}
+          celebrate={
+            snapshot.winnerSeat !== null &&
+            (mode.kind === "hotseat" || snapshot.winnerSeat === localSeat)
+          }
+          details={
+            <span className="flex flex-wrap justify-center gap-x-2 sm:justify-start">
+              {state.finalScore ? <span>{scoreLine(state)}</span> : null}
+              <span><Trans>共 {state.moveCount} 手</Trans></span>
+            </span>
+          }
+          rematchWaiting={online?.rematchWaiting}
+          onRematch={onRematch}
+          onExit={onExit}
+        />
+      ) : null}
     </>
   );
 }
