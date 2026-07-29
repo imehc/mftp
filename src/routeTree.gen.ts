@@ -16,6 +16,7 @@ import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
+import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-compress'
@@ -58,6 +59,11 @@ const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
   path: '/tools/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsFormatterRoute = ToolsFormatterRouteImport.update({
+  id: '/tools/formatter',
+  path: '/tools/formatter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsImageCompressRoute = ToolsImageCompressRouteImport.update({
   id: '/tools/image-compress',
   path: '/tools/image-compress',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
+  '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
+  '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
+  '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/tools/crypto'
+    | '/tools/formatter'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
     | '/tools/media-compress'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/tools/crypto'
+    | '/tools/formatter'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
     | '/tools/media-compress'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/tools/crypto'
+    | '/tools/formatter'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
     | '/tools/media-compress'
@@ -191,6 +203,7 @@ export interface RootRouteChildren {
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
+  ToolsFormatterRoute: typeof ToolsFormatterRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
   ToolsMediaCompressRoute: typeof ToolsMediaCompressRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/formatter': {
+      id: '/tools/formatter'
+      path: '/tools/formatter'
+      fullPath: '/tools/formatter'
+      preLoaderRoute: typeof ToolsFormatterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-compress': {
       id: '/tools/image-compress'
       path: '/tools/image-compress'
@@ -303,6 +323,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesGomokuRoute: GamesGomokuRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
+  ToolsFormatterRoute: ToolsFormatterRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,
   ToolsMediaCompressRoute: ToolsMediaCompressRoute,

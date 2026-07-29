@@ -3,6 +3,7 @@ import { linkOptions, type LinkOptions } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
 import {
   Archive,
+  Braces,
   Circle,
   CircleDot,
   Crown,
@@ -139,6 +140,22 @@ export const homeEntries: HomeEntry[] = [
         </Badge>
         <Badge variant="outline">
           <Trans>本地</Trans>
+        </Badge>
+      </>
+    ),
+  },
+  {
+    id: "formatter",
+    category: "tools",
+    link: linkOptions({ to: "/tools/formatter", preload: "viewport" }),
+    toolId: "formatter",
+    icon: Braces,
+    title: <Trans>格式化</Trans>,
+    badges: () => (
+      <>
+        <Badge variant="outline">JSON</Badge>
+        <Badge variant="outline">
+          <Trans>搜索</Trans>
         </Badge>
       </>
     ),

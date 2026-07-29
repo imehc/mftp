@@ -8,7 +8,7 @@ import {
 } from "~/lib/color-theme";
 
 export type DirectoryTransferMode = "archive" | "direct";
-export type ToolRoute = "ssh-sftp" | "lan-transfer" | "crypto" | "web-browser" | "media-compress";
+export type ToolRoute = "ssh-sftp" | "lan-transfer" | "crypto" | "web-browser" | "media-compress" | "formatter";
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {
@@ -76,7 +76,8 @@ export const useSettingsStore = create<SettingsState>()(
                 legacyTool === "lan-transfer" ||
                 legacyTool === "crypto" ||
                 legacyTool === "web-browser" ||
-                legacyTool === "media-compress"
+                legacyTool === "media-compress" ||
+                legacyTool === "formatter"
               ? legacyTool
               : null;
         return {

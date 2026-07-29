@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr ", directory changes take full effect after restarting the service"
 
 #. placeholder {0}: stats.hostCount
-#: src/features/home/entries.tsx:59
+#: src/features/home/entries.tsx:60
 msgid "{0} 主机"
 msgstr "{0} hosts"
 
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
-#: src/features/home/entries.tsx:65
+#: src/features/home/entries.tsx:66
 #: src/features/home/HomePage.tsx:121
 msgid "{0} 传输"
 msgstr "{0} transfers"
@@ -55,8 +55,10 @@ msgstr "{0} failed"
 
 #. placeholder {0}: input.length
 #. placeholder {0}: output.length
+#. placeholder {0}: value.length
 #: src/features/crypto/CryptoTool.tsx:230
 #: src/features/crypto/CryptoTool.tsx:271
+#: src/features/formatter/FormatterTool.tsx:407
 msgid "{0} 字符"
 msgstr "{0} chars"
 
@@ -78,6 +80,11 @@ msgstr "{0} moves"
 msgid "{0} 杆"
 msgstr "{0} shots"
 
+#. placeholder {0}: language.label
+#: src/features/formatter/FormatterTool.tsx:144
+msgid "{0} 格式有效"
+msgstr "Valid {0}"
+
 #. placeholder {0}: host?.label
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:65
 msgid "{0} 的私钥口令"
@@ -90,9 +97,14 @@ msgstr "Private key passphrase for {0}"
 msgid "{0} 秒前"
 msgstr "{0} seconds ago"
 
+#. placeholder {0}: value ? value.split("\n").length : 0
+#: src/features/formatter/FormatterTool.tsx:404
+msgid "{0} 行"
+msgstr "{0} lines"
+
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
-#: src/features/home/entries.tsx:62
+#: src/features/home/entries.tsx:63
 #: src/features/home/HomePage.tsx:118
 msgid "{0} 连接"
 msgstr "{0} connections"
@@ -150,6 +162,14 @@ msgstr "{transferringCount} in progress · {pausedTransferCount} paused"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:287
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
+
+#: src/features/formatter/FormatterTool.tsx:314
+msgid "2 空格"
+msgstr "2 Spaces"
+
+#: src/features/formatter/FormatterTool.tsx:317
+msgid "4 空格"
+msgstr "4 Spaces"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:127
 msgid "AI 先开"
@@ -226,6 +246,10 @@ msgstr "URL Safe"
 msgid "三次重复局面"
 msgstr "Threefold repetition"
 
+#: src/features/formatter/FormatterTool.tsx:82
+msgid "上一个"
+msgstr "Previous"
+
 #: src/features/games/go/GoMatch.tsx:237
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "The last move was a pass: pass again to end the game, or play to reset the count"
@@ -261,6 +285,10 @@ msgstr "Uploaded Folder"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:234
 msgid "上级目录"
 msgstr "Parent Directory"
+
+#: src/features/formatter/FormatterTool.tsx:81
+msgid "下一个"
+msgstr "Next"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:65
 #: src/features/media-compress/components/CompressResultCard.tsx:76
@@ -311,7 +339,7 @@ msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:35
-#: src/features/home/entries.tsx:208
+#: src/features/home/entries.tsx:225
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -357,7 +385,7 @@ msgid "互换"
 msgstr "Swap"
 
 #: src/features/games/gomoku/GomokuGame.tsx:36
-#: src/features/home/entries.tsx:168
+#: src/features/home/entries.tsx:185
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -365,10 +393,10 @@ msgstr "Gomoku"
 #: src/features/games/go/labels.tsx:87
 #: src/features/games/gomoku/labels.tsx:79
 #: src/features/games/xiangqi/labels.tsx:75
-#: src/features/home/entries.tsx:155
 #: src/features/home/entries.tsx:172
-#: src/features/home/entries.tsx:192
-#: src/features/home/entries.tsx:212
+#: src/features/home/entries.tsx:189
+#: src/features/home/entries.tsx:209
+#: src/features/home/entries.tsx:229
 msgid "人机"
 msgstr "Vs AI"
 
@@ -494,14 +522,26 @@ msgstr "Play first (Red)"
 msgid "先手（执黑）"
 msgstr "First (Black)"
 
+#: src/features/formatter/FormatterTool.tsx:85
+msgid "全字匹配"
+msgstr "By word"
+
 #: src/features/web-browser/WebBrowserTool.tsx:306
 #: src/features/web-browser/WebBrowserTool.tsx:307
 msgid "全屏预览"
 msgstr "Fullscreen preview"
 
+#: src/features/formatter/FormatterTool.tsx:83
+msgid "全部"
+msgstr "All"
+
 #: src/features/logs/ActivityLogsPage.tsx:128
 msgid "全部时间"
 msgstr "All Time"
+
+#: src/features/formatter/FormatterTool.tsx:88
+msgid "全部替换"
+msgstr "Replace all"
 
 #: src/features/logs/ActivityLogsPage.tsx:126
 msgid "全部来源"
@@ -529,6 +569,7 @@ msgstr "{0} shots total"
 msgid "共享目录"
 msgstr "Shared Folders"
 
+#: src/features/formatter/FormatterTool.tsx:89
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
 #: src/features/settings/AppSettingsMenu.tsx:217
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
@@ -542,6 +583,19 @@ msgstr "Closing"
 #: src/features/media-compress/video/VideoCompressPanel.tsx:367
 msgid "关闭可进一步减小体积"
 msgstr "Turn off to further reduce size"
+
+#: src/features/formatter/FormatterTool.tsx:400
+msgid "内容"
+msgstr "Content"
+
+#. placeholder {0}: language.label
+#: src/features/formatter/FormatterTool.tsx:70
+msgid "内容不是有效的 {0}"
+msgstr "Content is not valid {0}"
+
+#: src/features/formatter/FormatterTool.tsx:176
+msgid "内容不是有效的转义字符串"
+msgstr "Content is not a valid escaped string"
 
 #: src/features/crypto/CryptoTool.tsx:63
 msgid "内容无效，无法解码"
@@ -665,7 +719,7 @@ msgstr "Join"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/entries.tsx:109
+#: src/features/home/entries.tsx:110
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -680,6 +734,10 @@ msgstr "Loading..."
 msgid "动作"
 msgstr "Action"
 
+#: src/features/formatter/FormatterTool.tsx:84
+msgid "区分大小写"
+msgstr "Match case"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:149
 #: src/features/games/go/GoModeMenu.tsx:136
 #: src/features/games/gomoku/GomokuModeMenu.tsx:112
@@ -687,7 +745,8 @@ msgstr "Action"
 msgid "历史记录"
 msgstr "History"
 
-#: src/features/home/entries.tsx:135
+#: src/features/formatter/FormatterTool.tsx:340
+#: src/features/home/entries.tsx:136
 msgid "压缩"
 msgstr "Compress"
 
@@ -757,10 +816,10 @@ msgstr "Parameters unchanged, nothing to redo"
 #: src/features/games/go/labels.tsx:83
 #: src/features/games/gomoku/labels.tsx:75
 #: src/features/games/xiangqi/labels.tsx:71
-#: src/features/home/entries.tsx:158
 #: src/features/home/entries.tsx:175
-#: src/features/home/entries.tsx:195
-#: src/features/home/entries.tsx:215
+#: src/features/home/entries.tsx:192
+#: src/features/home/entries.tsx:212
+#: src/features/home/entries.tsx:232
 msgid "双人"
 msgstr "2P"
 
@@ -839,7 +898,7 @@ msgid "可直接访问默认地址，或在地址栏输入新的网页链接。"
 msgstr "Open the default address, or enter a new URL in the address bar."
 
 #: src/features/games/billiards/BilliardsGame.tsx:59
-#: src/features/home/entries.tsx:151
+#: src/features/home/entries.tsx:168
 msgid "台球"
 msgstr "Billiards"
 
@@ -947,7 +1006,7 @@ msgid "困难"
 msgstr "Hard"
 
 #: src/features/games/go/GoGame.tsx:36
-#: src/features/home/entries.tsx:188
+#: src/features/home/entries.tsx:205
 msgid "围棋"
 msgstr "Go"
 
@@ -987,6 +1046,10 @@ msgstr "Image Resize"
 #: src/features/media-compress/resize/ImageResizePanel.tsx:245
 msgid "图片文件"
 msgstr "Image files"
+
+#: src/features/formatter/FormatterTool.tsx:243
+msgid "在内容中搜索（Ctrl+F）"
+msgstr "Search in content (Ctrl+F)"
 
 #: src/features/web-browser/WebBrowserTool.tsx:371
 msgid "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
@@ -1034,6 +1097,7 @@ msgstr "Result"
 msgid "处理结果预览"
 msgstr "Result preview"
 
+#: src/features/formatter/FormatterTool.tsx:255
 #: src/features/lan-transfer/LanTransferTool.tsx:385
 msgid "复制"
 msgstr "Copy"
@@ -1064,7 +1128,7 @@ msgstr "Size"
 msgid "失败"
 msgstr "Failed"
 
-#: src/features/home/entries.tsx:131
+#: src/features/home/entries.tsx:132
 #: src/features/media-compress/MediaCompressTool.tsx:31
 #: src/features/media-compress/MediaCompressTool.tsx:48
 msgid "媒体处理"
@@ -1171,6 +1235,10 @@ msgstr "Import Key"
 msgid "导入私钥后可在主机中选用。"
 msgstr "Import a private key to use it with hosts."
 
+#: src/features/formatter/FormatterTool.tsx:378
+msgid "将内容转义为字符串字面量"
+msgstr "Escape content as a string literal"
+
 #: src/features/games/xiangqi/XiangqiMatch.tsx:198
 msgid "将军"
 msgstr "Check"
@@ -1198,7 +1266,7 @@ msgstr "Write result back to input and switch mode"
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "You will return to mode selection; current match progress will be lost."
 
-#: src/features/home/entries.tsx:29
+#: src/features/home/entries.tsx:30
 msgid "小游戏"
 msgstr "Games"
 
@@ -1217,7 +1285,7 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:80
+#: src/features/home/entries.tsx:81
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -1241,7 +1309,7 @@ msgstr "LAN transfer auxiliary data failed to load: {0}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/entries.tsx:28
+#: src/features/home/entries.tsx:29
 msgid "工具"
 msgstr "Tools"
 
@@ -1308,6 +1376,10 @@ msgstr "Task cancelled"
 #: src/features/media-compress/video/VideoCompressPanel.tsx:206
 msgid "已取消压缩"
 msgstr "Compression cancelled"
+
+#: src/features/formatter/FormatterTool.tsx:195
+msgid "已复制"
+msgstr "Copied"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:314
 msgid "已复制地址"
@@ -1450,6 +1522,10 @@ msgstr "Audio transcoding is not supported in this WebView"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:188
 msgid "当前不可用"
 msgstr "Currently unavailable"
+
+#: src/features/formatter/FormatterTool.tsx:90
+msgid "当前匹配"
+msgstr "Current match"
 
 #: src/features/games/engine/GameHeaderControls.tsx:46
 msgid "当前对局尚未结束，返回首页将丢失进度。"
@@ -1624,6 +1700,11 @@ msgstr "Follow"
 msgid "提子 {0}:{1}"
 msgstr "Captures {0}:{1}"
 
+#: src/features/formatter/FormatterTool.tsx:246
+#: src/features/home/entries.tsx:158
+msgid "搜索"
+msgstr "Search"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:457
 msgid "搜索…"
 msgstr "Search..."
@@ -1640,7 +1721,7 @@ msgstr "Actions"
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
-#: src/features/home/entries.tsx:138
+#: src/features/home/entries.tsx:139
 msgid "改尺寸"
 msgstr "Resize"
 
@@ -1648,7 +1729,7 @@ msgstr "Resize"
 msgid "放大"
 msgstr "Larger"
 
-#: src/features/home/entries.tsx:99
+#: src/features/home/entries.tsx:100
 #: src/features/web-browser/WebBrowserTool.tsx:222
 msgid "数据连接"
 msgstr "Data connection"
@@ -1805,6 +1886,14 @@ msgstr "Update information expired. Check for updates again."
 msgid "更新失败：{0}"
 msgstr "Update failed: {0}"
 
+#: src/features/formatter/FormatterTool.tsx:87
+msgid "替换"
+msgstr "Replace"
+
+#: src/features/formatter/FormatterTool.tsx:80
+msgid "替换为"
+msgstr "Replace with"
+
 #: src/features/lan-transfer/LanTransferTool.tsx:169
 msgid "服务已停止"
 msgstr "Service stopped"
@@ -1827,11 +1916,12 @@ msgstr "The service is running. Stop it before changing port, receive directory,
 msgid "未选择"
 msgstr "Not selected"
 
-#: src/features/home/entries.tsx:141
+#: src/features/home/entries.tsx:142
 msgid "本地"
 msgstr "Local"
 
 #: src/features/crypto/CryptoTool.tsx:105
+#: src/features/formatter/FormatterTool.tsx:217
 #: src/features/media-compress/MediaCompressTool.tsx:35
 msgid "本地处理"
 msgstr "Local"
@@ -1853,6 +1943,10 @@ msgstr "Permissions"
 msgid "来源"
 msgstr "Source"
 
+#: src/features/formatter/FormatterTool.tsx:79
+msgid "查找"
+msgstr "Find"
+
 #: src/lib/updater.ts:347
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "View GitHub Releases for update notes"
@@ -1860,6 +1954,25 @@ msgstr "View GitHub Releases for update notes"
 #: src/features/settings/AppSettingsMenu.tsx:101
 msgid "查看更新"
 msgstr "View Update"
+
+#: src/features/formatter/FormatterTool.tsx:349
+msgid "校验"
+msgstr "Validate"
+
+#: src/features/formatter/FormatterTool.tsx:213
+#: src/features/formatter/FormatterTool.tsx:230
+#: src/features/formatter/FormatterTool.tsx:331
+#: src/features/home/entries.tsx:153
+msgid "格式化"
+msgstr "Formatter"
+
+#: src/features/formatter/FormatterTool.tsx:233
+msgid "格式化、压缩与校验结构化数据"
+msgstr "Format, minify and validate structured data"
+
+#: src/features/formatter/FormatterTool.tsx:421
+msgid "格式化内容编辑器"
+msgstr "Formatter content editor"
 
 #: src/features/settings/AppSettingsMenu.tsx:99
 msgid "检查更新"
@@ -1892,6 +2005,10 @@ msgstr "楚 河"
 #: src/features/crypto/CryptoTool.tsx:177
 msgid "模式"
 msgstr "Mode"
+
+#: src/features/formatter/FormatterTool.tsx:86
+msgid "正则"
+msgstr "Regexp"
 
 #. placeholder {0}: state.version
 #: src/lib/updater.ts:273
@@ -1987,7 +2104,7 @@ msgstr "Active"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/home/entries.tsx:85
+#: src/features/home/entries.tsx:86
 msgid "浏览器访问"
 msgstr "Browser Access"
 
@@ -2015,6 +2132,10 @@ msgstr "Add"
 msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
+#: src/features/formatter/FormatterTool.tsx:381
+msgid "添加转义"
+msgstr "Escape"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:34
 msgid "清台"
 msgstr "Cleared"
@@ -2025,6 +2146,7 @@ msgid "清台完成!"
 msgstr "Table cleared!"
 
 #: src/features/crypto/CryptoTool.tsx:143
+#: src/features/formatter/FormatterTool.tsx:264
 #: src/features/games/billiards/BilliardsModeMenu.tsx:156
 #: src/features/games/go/GoModeMenu.tsx:143
 #: src/features/games/gomoku/GomokuModeMenu.tsx:119
@@ -2235,6 +2357,10 @@ msgstr "Move"
 msgid "移动 {0}…"
 msgstr "Moving {0}..."
 
+#: src/features/formatter/FormatterTool.tsx:391
+msgid "移除转义"
+msgstr "Unescape"
+
 #: src/lib/updater.ts:167
 #: src/lib/updater.ts:301
 msgid "稍后"
@@ -2267,6 +2393,12 @@ msgstr "Move {0}"
 #: src/features/games/billiards/BilliardsMatch.tsx:309
 msgid "第 {0} 杆"
 msgstr "Shot {0}"
+
+#. placeholder {0}: result.line
+#. placeholder {1}: result.column
+#: src/features/formatter/FormatterTool.tsx:69
+msgid "第 {0} 行第 {1} 列附近有语法错误"
+msgstr "Syntax error near line {0}, column {1}"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:199
 msgid "等待对手加入…"
@@ -2319,6 +2451,11 @@ msgstr "Manage SSH, SFTP, and LAN transfer activity"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:158
 msgid "类型"
 msgstr "Type"
+
+#. placeholder {0}: language.label
+#: src/features/formatter/FormatterTool.tsx:420
+msgid "粘贴或输入 {0} 内容"
+msgstr "Paste or type {0} content"
 
 #: src/features/settings/AppSettingsMenu.tsx:108
 msgid "系统"
@@ -2377,7 +2514,7 @@ msgid "继续传输中"
 msgstr "Resuming Transfer"
 
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/entries.tsx:113
+#: src/features/home/entries.tsx:114
 msgid "编码"
 msgstr "Encode"
 
@@ -2409,11 +2546,15 @@ msgstr "Resize method"
 msgid "缩放比例"
 msgstr "Scale"
 
+#: src/features/formatter/FormatterTool.tsx:299
+msgid "缩进"
+msgstr "Indent"
+
 #: src/features/web-browser/WebBrowserTool.tsx:243
 msgid "网址"
 msgstr "URL"
 
-#: src/features/home/entries.tsx:96
+#: src/features/home/entries.tsx:97
 #: src/features/web-browser/WebBrowserTool.tsx:217
 msgid "网页访问"
 msgstr "Web access"
@@ -2435,9 +2576,9 @@ msgstr "Elapsed "
 #: src/features/games/go/labels.tsx:84
 #: src/features/games/gomoku/labels.tsx:76
 #: src/features/games/xiangqi/labels.tsx:72
-#: src/features/home/entries.tsx:178
-#: src/features/home/entries.tsx:198
-#: src/features/home/entries.tsx:218
+#: src/features/home/entries.tsx:195
+#: src/features/home/entries.tsx:215
+#: src/features/home/entries.tsx:235
 msgid "联机"
 msgstr "Online"
 
@@ -2519,7 +2660,7 @@ msgid "解析中"
 msgstr "Demuxing"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/entries.tsx:116
+#: src/features/home/entries.tsx:117
 msgid "解码"
 msgstr "Decode"
 
@@ -2566,6 +2707,7 @@ msgstr "This private key is passphrase-protected (enter it when connecting)."
 msgid "详情"
 msgstr "Details"
 
+#: src/features/formatter/FormatterTool.tsx:274
 #: src/features/settings/AppSettingsMenu.tsx:272
 msgid "语言"
 msgstr "Language"
@@ -2644,6 +2786,14 @@ msgstr "Match Theme"
 msgid "跟随系统"
 msgstr "Follow System"
 
+#: src/features/formatter/FormatterTool.tsx:92
+msgid "跳转"
+msgstr "Go"
+
+#: src/features/formatter/FormatterTool.tsx:91
+msgid "跳转到行"
+msgstr "Go to line"
+
 #: src/features/games/go/GoMatch.tsx:205
 #: src/features/games/gomoku/GomokuMatch.tsx:196
 #: src/features/games/xiangqi/XiangqiMatch.tsx:193
@@ -2720,6 +2870,10 @@ msgstr "Back to Home"
 #: src/features/games/engine/GameHeaderControls.tsx:44
 msgid "返回首页?"
 msgstr "Return home?"
+
+#: src/features/formatter/FormatterTool.tsx:388
+msgid "还原被转义的字符串内容"
+msgstr "Restore escaped string content"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:480
 msgid "还没有主机"
@@ -2901,9 +3055,17 @@ msgstr "Choose an algorithm to encode or decode text"
 msgid "选择缩放比例"
 msgstr "Select scale"
 
+#: src/features/formatter/FormatterTool.tsx:309
+msgid "选择缩进"
+msgstr "Select indent"
+
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
 msgid "选择解压位置"
 msgstr "Select Extract Location"
+
+#: src/features/formatter/FormatterTool.tsx:284
+msgid "选择语言"
+msgstr "Select language"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:318
 msgid "选择输出分辨率"
@@ -2912,6 +3074,14 @@ msgstr "Select output resolution"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:265
 msgid "选择输出格式"
 msgstr "Select output format"
+
+#: src/features/formatter/FormatterTool.tsx:358
+msgid "递归按字母升序排序对象键"
+msgstr "Recursively sort object keys A→Z"
+
+#: src/features/formatter/FormatterTool.tsx:359
+msgid "递归按字母降序排序对象键"
+msgstr "Recursively sort object keys Z→A"
 
 #: src/features/settings/AppSettingsMenu.tsx:104
 msgid "重启中"
@@ -2964,6 +3134,14 @@ msgstr "Retry"
 msgid "链接"
 msgstr "Link"
 
+#: src/features/formatter/FormatterTool.tsx:368
+msgid "键升序"
+msgstr "Keys A→Z"
+
+#: src/features/formatter/FormatterTool.tsx:370
+msgid "键降序"
+msgstr "Keys Z→A"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:252
 msgid "附近的房间"
 msgstr "Nearby Rooms"
@@ -2980,6 +3158,7 @@ msgid "预估 {0} ~ {1}"
 msgstr "Est. {0} ~ {1}"
 
 #: src/features/crypto/CryptoTool.tsx:96
+#: src/features/formatter/FormatterTool.tsx:208
 #: src/features/games/engine/GameHeaderControls.tsx:29
 #: src/features/games/engine/GameHeaderControls.tsx:39
 #: src/features/lan-transfer/LanTransferTool.tsx:338
