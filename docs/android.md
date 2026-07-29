@@ -22,17 +22,60 @@ pnpm android:dev
 # 打 debug APK（debug 签名，可直接 adb install；--target aarch64 只编 arm64，最快）
 pnpm android:build --debug --target aarch64
 
-# 打正式 release APK + AAB（会用 release 签名，见下文）
+# 打 universal release APK + AAB（包含所有 ABI，会用 release 签名）
 pnpm android:build
 
-# 只打 arm64 的 release 包
-pnpm android:build --target aarch64
+# 只编译 arm64-v8a release APK（文件名仍为 app-universal-release.apk）
+pnpm android:build --target aarch64 --apk
+
+# 只打 arm64-v8a release APK，并生成 app-arm64-release.apk
+pnpm android:build --target aarch64 --split-per-abi --apk
+
+# 按 ABI 分别生成 release APK
+pnpm android:build --split-per-abi --apk
 ```
 
 产物路径：
 
-- APK：`src-tauri/gen/android/app/build/outputs/apk/universal/<debug|release>/`
-- AAB：`src-tauri/gen/android/app/build/outputs/bundle/universalRelease/`
+- universal APK：`src-tauri/gen/android/app/build/outputs/apk/universal/<debug|release>/`
+- ARM64 APK：`src-tauri/gen/android/app/build/outputs/apk/arm64/<debug|release>/`
+- 分 ABI APK：`src-tauri/gen/android/app/build/outputs/apk/<arm64|armv7|x86|x86_64>/<debug|release>/`
+- universal AAB：`src-tauri/gen/android/app/build/outputs/bundle/universalRelease/`
+
+`aarch64` 对应 Android ABI `arm64-v8a`。Tauri 的 `--target aarch64` 只限制编译和打包的目标 ABI，默认 Gradle flavor 仍名为 `universal`，所以产物会叫 `app-universal-release.apk`，但 APK 内实际只有 `arm64-v8a`。同时添加 `--split-per-abi` 后，产物目录和文件名才会变成 `arm64/release/app-arm64-release.apk`。
+
+仅构建 ARM64 可以显著减小 APK 体积；需要兼容较老的 32 位 ARM 设备时，再构建包含全部 ABI 的 universal 包，或使用 `--split-per-abi` 分别构建。
+
+## 真机安装
+
+Android SDK 已包含 `adb`。macOS 默认路径为 `~/Library/Android/sdk/platform-tools/adb`；当前终端找不到 `adb` 时，先执行：
+
+```bash
+export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
+adb version
+adb devices
+```
+
+需要永久生效时，将上面的 `export PATH=...` 加入 `~/.zshrc`，然后执行 `source ~/.zshrc`。
+
+连接手机并开启 USB 调试后，可以直接安装 ARM64 release APK：
+
+```bash
+adb install -r \
+  src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk
+```
+
+使用 `adb install` 可以获得比手机文件管理器更准确的安装错误码。当前应用的 `minSdk` 为 24、`targetSdk` 为 36，支持 Android 7.0 及以上系统，包括 Android 16。
+
+如果返回 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`，说明手机中已安装相同包名但签名不同的版本，常见情况是先前安装过 debug APK。Android 不允许使用 release 签名覆盖 debug 签名，需要先卸载旧版本：
+
+```bash
+adb uninstall com.imehc.mftp
+adb install \
+  src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk
+```
+
+卸载会清除应用本地数据。正式分发后必须始终使用同一把 release key 签名，才能保留数据并覆盖升级。
 
 ## Release 签名
 
@@ -78,5 +121,6 @@ Android 端与桌面端的功能差异（代码中已处理，无需手动关注
 
 - **`Blocking waiting for file lock`**：有另一个 cargo/gradle 构建在跑（包括 IDE 里的），等它结束或杀掉即可。
 - **`aarch64-linux-android-ranlib: command not found`**：没有通过 `scripts/android.sh` 运行。请始终使用 `pnpm android:dev` / `pnpm android:build`。
-- **release APK 装不上**：检查是不是 `*-unsigned.apk`（`keystore.properties` 缺失时的产物）。
+- **release APK 装不上**：先确认文件不是 `*-unsigned.apk`，再用 `adb install -r <apk-path>` 获取准确错误码。`INSTALL_FAILED_UPDATE_INCOMPATIBLE` 表示已安装版本的签名不同，需要卸载旧版本或改用原签名 key 构建。
+- **`zsh: command not found: adb`**：将 `$HOME/Library/Android/sdk/platform-tools` 加入 `PATH`，或使用 `/Users/<you>/Library/Android/sdk/platform-tools/adb` 绝对路径执行。
 - Gradle 输出中的 deprecation 警告来自 Tauri 生成的模板，可忽略。
