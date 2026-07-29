@@ -17,6 +17,10 @@ interface CompressResultCardProps {
   blob: Blob;
   preview?: ReactNode;
   onSizeChange?: (actualSize: number) => void;
+  /** Card heading; defaults to 压缩结果. */
+  title?: ReactNode;
+  /** Extra badges rendered before the size badge. */
+  extraBadges?: ReactNode;
 }
 
 export function CompressResultCard({
@@ -26,6 +30,8 @@ export function CompressResultCard({
   blob,
   preview,
   onSizeChange,
+  title,
+  extraBadges,
 }: CompressResultCardProps) {
   const { t } = useLingui();
   const delta = sizeDeltaPercent(originalSize, size);
@@ -47,10 +53,11 @@ export function CompressResultCard({
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 text-xs font-medium text-muted-foreground">
           <h2 className="truncate">
-            <Trans>压缩结果</Trans>
+            {title ?? <Trans>压缩结果</Trans>}
           </h2>
         </div>
         <div className="flex min-w-0 shrink-0 items-center gap-1.5 overflow-x-auto whitespace-nowrap">
+          {extraBadges}
           <Badge variant="outline" className="shrink-0">
             {formatBytes(size)}
           </Badge>

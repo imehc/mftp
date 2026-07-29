@@ -123,19 +123,19 @@ export const homeEntries: HomeEntry[] = [
     category: "tools",
     link: linkOptions({
       to: "/tools/media-compress",
-      search: { mode: "image" },
+      search: { mode: "resize" },
       preload: "viewport",
     }),
     toolId: "media-compress",
     icon: Archive,
-    title: <Trans>媒体压缩</Trans>,
+    title: <Trans>媒体处理</Trans>,
     badges: () => (
       <>
         <Badge variant="outline">
-          <Trans>图片</Trans>
+          <Trans>压缩</Trans>
         </Badge>
         <Badge variant="outline">
-          <Trans>视频</Trans>
+          <Trans>改尺寸</Trans>
         </Badge>
         <Badge variant="outline">
           <Trans>本地</Trans>

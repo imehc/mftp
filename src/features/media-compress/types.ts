@@ -5,10 +5,10 @@ export type CompressPhase =
   | "done"
   | "error";
 
-export type CompressModeId = "image" | "video";
+export type CompressModeId = "image" | "video" | "resize";
 
 export interface CompressModeMeta {
   id: CompressModeId;
   /** lucide icon name resolved in UI */
-  icon: "image" | "video";
+  icon: "image" | "video" | "resize";
 }

@@ -2,7 +2,12 @@ import type { ReactNode, RefObject } from "react";
 import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import { Upload } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+import {
+  pickFileNative,
+  type NativeFilePickOptions,
+} from "~/features/media-compress/format";
 import { cn } from "~/lib/utils";
 
 interface CompressDropzoneProps {
@@ -15,6 +20,12 @@ interface CompressDropzoneProps {
   description: ReactNode;
   footer?: ReactNode;
   pickLabel?: ReactNode;
+  /**
+   * Extension filter for the native dialog on desktop Tauri, where the
+   * WebView does not enforce the accept attribute. Browser/mobile keeps
+   * the hidden input fallback.
+   */
+  nativeFilter?: NativeFilePickOptions;
 }
 
 export function CompressDropzone({
@@ -27,8 +38,26 @@ export function CompressDropzone({
   description,
   footer,
   pickLabel,
+  nativeFilter,
 }: CompressDropzoneProps) {
   const [dragOver, setDragOver] = useState(false);
+
+  async function onPick() {
+    if (nativeFilter) {
+      try {
+        const picked = await pickFileNative(nativeFilter);
+        if (picked === false) return;
+        if (picked) {
+          onFile(picked);
+          return;
+        }
+      } catch (error) {
+        toast.error(String(error));
+        return;
+      }
+    }
+    inputRef.current?.click();
+  }
 
   return (
     <section
@@ -71,7 +100,7 @@ export function CompressDropzone({
         <Button
           type="button"
           size="sm"
-          onClick={() => inputRef.current?.click()}
+          onClick={() => void onPick()}
           disabled={disabled}
         >
           <Upload data-icon="inline-start" />

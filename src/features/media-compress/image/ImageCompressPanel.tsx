@@ -216,6 +216,11 @@ export default function ImageCompressPanel() {
       <CompressDropzone
         inputRef={inputRef}
         accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+        nativeFilter={{
+          title: t`选择图片`,
+          filterName: t`图片文件`,
+          extensions: ["png", "jpg", "jpeg", "webp"],
+        }}
         disabled={phase === "compressing"}
         onFile={(next) => void applyFile(next)}
         icon={<ImageIcon className="size-5 text-muted-foreground" />}

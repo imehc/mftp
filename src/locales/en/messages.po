@@ -162,7 +162,7 @@ msgstr "AI Breaks First"
 msgid "AI 思考中…"
 msgstr "AI thinking..."
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:268
+#: src/features/media-compress/image/ImageCompressPanel.tsx:273
 msgid "AVIF（不支持）"
 msgstr "AVIF (unsupported)"
 
@@ -186,7 +186,7 @@ msgstr "IP:port direct"
 msgid "Montserrat"
 msgstr "Montserrat"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:270
+#: src/features/media-compress/video/VideoCompressPanel.tsx:275
 msgid "MP4 · MOV · M4V，文件不会上传"
 msgstr "MP4 · MOV · M4V — files stay on device"
 
@@ -202,11 +202,15 @@ msgstr "Outfit"
 msgid "Plus Jakarta"
 msgstr "Plus Jakarta"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:223
+#: src/features/media-compress/resize/ImageResizePanel.tsx:252
+msgid "PNG · JPG · WebP，保持原格式输出"
+msgstr "PNG · JPG · WebP — keeps source format"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:228
 msgid "PNG · JPG · WebP，默认保持原格式输出"
 msgstr "PNG · JPG · WebP — keeps source format by default"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:285
+#: src/features/media-compress/image/ImageCompressPanel.tsx:290
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG is lossless; quality has limited effect"
 
@@ -259,7 +263,7 @@ msgid "上级目录"
 msgstr "Parent Directory"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:65
-#: src/features/media-compress/components/CompressResultCard.tsx:69
+#: src/features/media-compress/components/CompressResultCard.tsx:76
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:105
 msgid "下载"
 msgstr "Download"
@@ -311,11 +315,11 @@ msgstr "The two names cannot be the same."
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
-#: src/features/games/xiangqi/XiangqiStage.tsx:412
+#: src/features/games/xiangqi/XiangqiStage.tsx:449
 msgid "中国象棋棋盘"
 msgstr "Chinese chess board"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:406
+#: src/features/games/billiards/BilliardsMatch.tsx:412
 msgid "中杆"
 msgstr "Center"
 
@@ -389,6 +393,9 @@ msgstr "Only MP4, MOV, and M4V are supported"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:109
 #: src/features/media-compress/image/ImageCompressPanel.tsx:110
+#: src/features/media-compress/resize/ImageResizePanel.tsx:146
+#: src/features/media-compress/resize/ImageResizePanel.tsx:147
+#: src/features/media-compress/resize/resize.ts:178
 msgid "仅支持 PNG、JPG、WebP 格式"
 msgstr "Only PNG, JPG, and WebP are supported"
 
@@ -453,7 +460,7 @@ msgstr "Saving..."
 msgid "保存到"
 msgstr "Save To"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:354
+#: src/features/media-compress/video/VideoCompressPanel.tsx:359
 msgid "保留音频"
 msgstr "Keep audio"
 
@@ -505,9 +512,9 @@ msgid "全部结果"
 msgstr "All Results"
 
 #. placeholder {0}: state.moveCount
-#: src/features/games/go/GoMatch.tsx:284
+#: src/features/games/go/GoMatch.tsx:288
 #: src/features/games/gomoku/GomokuMatch.tsx:246
-#: src/features/games/xiangqi/XiangqiMatch.tsx:239
+#: src/features/games/xiangqi/XiangqiMatch.tsx:243
 msgid "共 {0} 手"
 msgstr "{0} moves total"
 
@@ -532,7 +539,7 @@ msgstr "Close"
 msgid "关闭中"
 msgstr "Closing"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:362
+#: src/features/media-compress/video/VideoCompressPanel.tsx:367
 msgid "关闭可进一步减小体积"
 msgstr "Turn off to further reduce size"
 
@@ -540,17 +547,25 @@ msgstr "Turn off to further reduce size"
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
-#: src/features/games/engine/GameResultBar.tsx:39
+#: src/features/games/engine/GameResultBar.tsx:45
 msgid "再来一局"
 msgstr "One more game"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:306
+#: src/features/media-compress/resize/ImageResizePanel.tsx:364
+msgid "最大边长"
+msgstr "Longest side"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:373
+msgid "最小边长"
+msgstr "Shortest side"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:311
 #: src/features/media-compress/video/VideoCompressPanel.tsx:241
 #: src/store/transfers.ts:57
 msgid "准备中"
 msgstr "Preparing"
 
-#: src/features/media-compress/components/CompressResultCard.tsx:59
+#: src/features/media-compress/components/CompressResultCard.tsx:66
 msgid "减小 {delta}%"
 msgstr "Reduced {delta}%"
 
@@ -672,7 +687,11 @@ msgstr "Action"
 msgid "历史记录"
 msgstr "History"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:302
+#: src/features/home/entries.tsx:135
+msgid "压缩"
+msgstr "Compress"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:307
 msgid "压缩中"
 msgstr "Compressing"
 
@@ -685,7 +704,7 @@ msgstr "Archive"
 msgid "压缩完成"
 msgstr "Compression complete"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:379
+#: src/features/media-compress/image/ImageCompressPanel.tsx:384
 msgid "压缩完成后在此预览输出"
 msgstr "Output preview appears here after compression"
 
@@ -693,27 +712,35 @@ msgstr "Output preview appears here after compression"
 msgid "压缩程度"
 msgstr "Compression level"
 
-#: src/features/media-compress/components/CompressResultCard.tsx:50
+#: src/features/media-compress/components/CompressResultCard.tsx:56
 msgid "压缩结果"
 msgstr "Compressed result"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:371
+#: src/features/media-compress/image/ImageCompressPanel.tsx:376
 msgid "压缩结果预览"
 msgstr "Compressed preview"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:344
+#: src/features/media-compress/image/ImageCompressPanel.tsx:349
+#: src/features/media-compress/resize/ImageResizePanel.tsx:444
 msgid "原图"
 msgstr "Original"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:353
+#. placeholder {0}: meta.width
+#. placeholder {1}: meta.height
+#: src/features/media-compress/resize/ImageResizePanel.tsx:400
+msgid "原图 {0} × {1} px"
+msgstr "Original {0} × {1} px"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:358
+#: src/features/media-compress/resize/ImageResizePanel.tsx:460
 msgid "原图预览"
 msgstr "Original preview"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:318
+#: src/features/media-compress/video/VideoCompressPanel.tsx:323
 msgid "原始分辨率"
 msgstr "Original resolution"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:419
+#: src/features/media-compress/video/VideoCompressPanel.tsx:424
 msgid "原视频"
 msgstr "Original video"
 
@@ -721,6 +748,10 @@ msgstr "Original video"
 #: src/features/media-compress/video/VideoCompressPanel.tsx:160
 msgid "参数未变化，无需重新压缩"
 msgstr "Parameters unchanged, no recompression needed"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:184
+msgid "参数未变化，无需重新处理"
+msgstr "Parameters unchanged, nothing to redo"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:17
 #: src/features/games/go/labels.tsx:83
@@ -774,8 +805,8 @@ msgstr "Discovered Devices"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:444
 #: src/features/logs/LogPageLayout.tsx:85
 #: src/features/logs/LogPageLayout.tsx:129
-#: src/features/media-compress/image/ImageCompressPanel.tsx:312
-#: src/features/media-compress/video/VideoCompressPanel.tsx:388
+#: src/features/media-compress/image/ImageCompressPanel.tsx:317
+#: src/features/media-compress/video/VideoCompressPanel.tsx:393
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:306
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:84
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:212
@@ -920,14 +951,42 @@ msgstr "Hard"
 msgid "围棋"
 msgstr "Go"
 
-#: src/features/home/entries.tsx:135
-#: src/features/media-compress/components/CompressModeTabs.tsx:17
-msgid "图片"
-msgstr "Image"
+#: src/features/media-compress/resize/ResizeControls.tsx:40
+msgid "固定最大边"
+msgstr "Fixed longest side"
 
-#: src/features/media-compress/MediaCompressTool.tsx:50
-msgid "图片 / 视频本地压缩，后续可扩展更多格式"
-msgstr "Compress images and videos locally; more formats later"
+#: src/features/media-compress/resize/ResizeControls.tsx:42
+msgid "固定最小边"
+msgstr "Fixed shortest side"
+
+#: src/features/media-compress/resize/ResizeControls.tsx:36
+msgid "固定宽度"
+msgstr "Fixed width"
+
+#: src/features/media-compress/resize/ResizeControls.tsx:34
+msgid "固定尺寸"
+msgstr "Exact size"
+
+#: src/features/media-compress/resize/ResizeControls.tsx:38
+msgid "固定高度"
+msgstr "Fixed height"
+
+#: src/features/media-compress/MediaCompressTool.tsx:51
+msgid "图片 / 视频本地压缩与图片改尺寸"
+msgstr "Local image/video compression and image resizing"
+
+#: src/features/media-compress/components/CompressModeTabs.tsx:17
+msgid "图片压缩"
+msgstr "Image Compress"
+
+#: src/features/media-compress/components/CompressModeTabs.tsx:21
+msgid "图片改尺寸"
+msgstr "Image Resize"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:221
+#: src/features/media-compress/resize/ImageResizePanel.tsx:245
+msgid "图片文件"
+msgstr "Image files"
 
 #: src/features/web-browser/WebBrowserTool.tsx:371
 msgid "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
@@ -954,6 +1013,26 @@ msgstr "Address"
 #: src/features/games/engine/online/OnlineLobby.tsx:166
 msgid "地址格式应为 IP:端口"
 msgstr "Address must be in IP:port form"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:201
+msgid "处理完成"
+msgstr "Processing complete"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:494
+msgid "处理完成后在此预览输出"
+msgstr "Output preview appears here after processing"
+
+#: src/features/media-compress/resize/resize.ts:168
+msgid "处理已取消"
+msgstr "Processing cancelled"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:469
+msgid "处理结果"
+msgstr "Result"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:486
+msgid "处理结果预览"
+msgstr "Result preview"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:385
 msgid "复制"
@@ -986,10 +1065,10 @@ msgid "失败"
 msgstr "Failed"
 
 #: src/features/home/entries.tsx:131
-#: src/features/media-compress/MediaCompressTool.tsx:30
-#: src/features/media-compress/MediaCompressTool.tsx:47
-msgid "媒体压缩"
-msgstr "Media Compress"
+#: src/features/media-compress/MediaCompressTool.tsx:31
+#: src/features/media-compress/MediaCompressTool.tsx:48
+msgid "媒体处理"
+msgstr "Media Tools"
 
 #: src/features/settings/AppSettingsMenu.tsx:349
 msgid "字体"
@@ -1000,7 +1079,7 @@ msgid "安全模式"
 msgstr "Security Mode"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
-#: src/features/media-compress/image/ImageCompressPanel.tsx:304
+#: src/features/media-compress/image/ImageCompressPanel.tsx:309
 #: src/features/media-compress/video/VideoCompressPanel.tsx:236
 #: src/store/transfers.ts:124
 msgid "完成"
@@ -1009,6 +1088,14 @@ msgstr "Completed"
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:76
 msgid "完整路径"
 msgstr "Full Path"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:346
+msgid "宽度"
+msgstr "Width"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:383
+msgid "宽高与原图比例不同时，图片会被拉伸变形"
+msgstr "If the aspect ratio differs from the original, the image will be stretched"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:202
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:219
@@ -1119,6 +1206,10 @@ msgstr "Games"
 msgid "尚未设置默认地址"
 msgstr "Default address is not set"
 
+#: src/features/media-compress/resize/ImageResizePanel.tsx:317
+msgid "尺寸模式"
+msgstr "Size mode"
+
 #: src/features/games/go/GoModeMenu.tsx:129
 #: src/features/games/gomoku/GomokuModeMenu.tsx:105
 #: src/features/games/xiangqi/XiangqiModeMenu.tsx:92
@@ -1163,7 +1254,7 @@ msgstr "Tools and activity"
 msgid "已下载 {0}"
 msgstr "Downloaded {0}"
 
-#: src/features/media-compress/components/CompressResultCard.tsx:37
+#: src/features/media-compress/components/CompressResultCard.tsx:43
 msgid "已保存"
 msgstr "Saved"
 
@@ -1326,10 +1417,14 @@ msgstr "On"
 msgid "开始"
 msgstr "Start"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:328
-#: src/features/media-compress/video/VideoCompressPanel.tsx:404
+#: src/features/media-compress/image/ImageCompressPanel.tsx:333
+#: src/features/media-compress/video/VideoCompressPanel.tsx:409
 msgid "开始压缩"
 msgstr "Start compression"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:424
+msgid "开始处理"
+msgstr "Start"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:257
 #: src/features/lan-transfer/LanTransferSidebar.tsx:31
@@ -1348,7 +1443,7 @@ msgstr "Launch at Login"
 msgid "当前 WebView 不支持 WebCodecs，无法压缩视频。"
 msgstr "This WebView does not support WebCodecs, so video compression is unavailable."
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:360
+#: src/features/media-compress/video/VideoCompressPanel.tsx:365
 msgid "当前 WebView 不支持音频转码"
 msgstr "Audio transcoding is not supported in this WebView"
 
@@ -1385,7 +1480,7 @@ msgstr "The configured {0} is not in the available network adapter list, so the 
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:370
+#: src/features/games/billiards/BilliardsMatch.tsx:376
 msgid "总杆数"
 msgstr "Total shots"
 
@@ -1464,7 +1559,7 @@ msgstr "Scan to Access"
 msgid "折叠侧边栏"
 msgstr "Collapse Sidebar"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:403
+#: src/features/games/billiards/BilliardsMatch.tsx:409
 msgid "拉杆"
 msgstr "Draw"
 
@@ -1481,17 +1576,26 @@ msgstr "Decline"
 msgid "拖动排序"
 msgstr "Drag to reorder"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:222
+#: src/features/media-compress/image/ImageCompressPanel.tsx:227
+#: src/features/media-compress/resize/ImageResizePanel.tsx:251
 msgid "拖放图片到此处，或选择文件"
 msgstr "Drop an image here, or choose a file"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:269
+#: src/features/media-compress/video/VideoCompressPanel.tsx:274
 msgid "拖放视频到此处，或选择文件"
 msgstr "Drop a video here, or choose a file"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:428
+#: src/features/games/billiards/BilliardsMatch.tsx:434
 msgid "按住桌面向母球后方拖动蓄力,松手击球"
 msgstr "Press and drag behind the cue ball to charge, release to shoot"
+
+#: src/features/media-compress/resize/ResizeControls.tsx:77
+msgid "按尺寸"
+msgstr "By size"
+
+#: src/features/media-compress/resize/ResizeControls.tsx:72
+msgid "按比例"
+msgstr "By ratio"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:483
 msgid "换个关键词试试"
@@ -1510,7 +1614,7 @@ msgstr "Receive"
 msgid "接收目录"
 msgstr "Receive Directory"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:409
+#: src/features/games/billiards/BilliardsMatch.tsx:415
 msgid "推杆"
 msgstr "Follow"
 
@@ -1535,6 +1639,14 @@ msgstr "Actions"
 #: src/features/lan-transfer/LanTransferTool.tsx:423
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
+
+#: src/features/home/entries.tsx:138
+msgid "改尺寸"
+msgstr "Resize"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:310
+msgid "放大"
+msgstr "Larger"
 
 #: src/features/home/entries.tsx:99
 #: src/features/web-browser/WebBrowserTool.tsx:222
@@ -1605,6 +1717,10 @@ msgstr "No Matches"
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:200
 msgid "无口令"
 msgstr "No Passphrase"
+
+#: src/features/media-compress/resize/resize.ts:218
+msgid "无法创建画布上下文"
+msgstr "Cannot create canvas context"
 
 #: src/features/home/HomePage.tsx:131
 #: src/features/logs/ActivityLogsPage.tsx:115
@@ -1716,7 +1832,7 @@ msgid "本地"
 msgstr "Local"
 
 #: src/features/crypto/CryptoTool.tsx:105
-#: src/features/media-compress/MediaCompressTool.tsx:34
+#: src/features/media-compress/MediaCompressTool.tsx:35
 msgid "本地处理"
 msgstr "Local"
 
@@ -1769,7 +1885,7 @@ msgstr "Update check timed out. Confirm the GitHub Release update source is acce
 msgid "棋盘大小"
 msgstr "Board Size"
 
-#: src/features/games/xiangqi/XiangqiStage.tsx:410
+#: src/features/games/xiangqi/XiangqiStage.tsx:447
 msgid "楚 河"
 msgstr "楚 河"
 
@@ -1855,7 +1971,7 @@ msgstr "Connecting to {0}..."
 msgid "正在重启并应用更新…"
 msgstr "Restarting and applying update..."
 
-#: src/features/games/xiangqi/XiangqiStage.tsx:411
+#: src/features/games/xiangqi/XiangqiStage.tsx:448
 msgid "汉 界"
 msgstr "汉 界"
 
@@ -1915,6 +2031,7 @@ msgstr "Table cleared!"
 #: src/features/games/xiangqi/XiangqiModeMenu.tsx:99
 #: src/features/logs/LogPageLayout.tsx:115
 #: src/features/media-compress/image/ImageCompressPanel.tsx:212
+#: src/features/media-compress/resize/ImageResizePanel.tsx:236
 #: src/features/media-compress/video/VideoCompressPanel.tsx:259
 msgid "清空"
 msgstr "Clear"
@@ -1936,7 +2053,7 @@ msgstr "Clear {finishedTransferCount} completed tasks"
 msgid "游戏音量"
 msgstr "Game volume"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:358
+#: src/features/media-compress/video/VideoCompressPanel.tsx:363
 msgid "源视频没有音轨"
 msgstr "Source video has no audio track"
 
@@ -1950,7 +2067,7 @@ msgid "版本 {0} 已准备好"
 msgstr "Version {0} is ready"
 
 #. placeholder {0}: state.foulCounts[seat] ?? 0
-#: src/features/games/billiards/BilliardsMatch.tsx:378
+#: src/features/games/billiards/BilliardsMatch.tsx:384
 msgid "犯规 {0}"
 msgstr "Fouls {0}"
 
@@ -2019,9 +2136,31 @@ msgstr "White"
 msgid "白棋胜"
 msgstr "White wins"
 
+#: src/features/media-compress/resize/ImageResizePanel.tsx:367
+msgid "目标最大边长"
+msgstr "Target longest side"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:376
+msgid "目标最小边长"
+msgstr "Target shortest side"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:349
+msgid "目标宽度"
+msgstr "Target width"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:180
+#: src/features/media-compress/resize/ImageResizePanel.tsx:430
+#: src/features/media-compress/resize/resize.ts:181
+msgid "目标尺寸需在 1–10000 像素之间"
+msgstr "Target size must be between 1 and 10000 pixels"
+
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:128
 msgid "目标已存在同名项目"
 msgstr "An Item With This Name Already Exists"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:358
+msgid "目标高度"
+msgstr "Target height"
 
 #: src/features/settings/AppSettingsMenu.tsx:130
 msgid "直接"
@@ -2067,10 +2206,13 @@ msgstr "Confirmation Code"
 msgid "确认码 {0}"
 msgstr "Confirmation Code {0}"
 
-#: src/features/home/entries.tsx:138
 #: src/features/media-compress/components/CompressModeTabs.tsx:19
-msgid "视频"
-msgstr "Video"
+msgid "视频压缩"
+msgstr "Video Compress"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:268
+msgid "视频文件"
+msgstr "Video files"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
 msgid "离线"
@@ -2130,7 +2272,7 @@ msgstr "Shot {0}"
 msgid "等待对手加入…"
 msgstr "Waiting for an opponent..."
 
-#: src/features/games/engine/GameResultBar.tsx:39
+#: src/features/games/engine/GameResultBar.tsx:45
 msgid "等待对方…"
 msgstr "Waiting for opponent..."
 
@@ -2254,6 +2396,18 @@ msgstr "Edit"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
 msgid "编辑主机"
 msgstr "Edit Host"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:307
+msgid "缩小"
+msgstr "Smaller"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:273
+msgid "缩放方式"
+msgstr "Resize method"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:286
+msgid "缩放比例"
+msgstr "Scale"
 
 #: src/features/web-browser/WebBrowserTool.tsx:243
 msgid "网址"
@@ -2417,6 +2571,7 @@ msgid "语言"
 msgstr "Language"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:134
+#: src/features/media-compress/resize/ImageResizePanel.tsx:176
 msgid "请先选择图片文件"
 msgstr "Choose an image first"
 
@@ -2439,6 +2594,10 @@ msgstr "Enter passphrase"
 #: src/features/web-browser/WebBrowserTool.tsx:192
 msgid "请输入有效的 http 或 https 地址"
 msgstr "Enter a valid http or https URL"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:409
+msgid "请输入有效的目标尺寸"
+msgstr "Enter a valid target size"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:71
 msgid "请输入路径"
@@ -2523,11 +2682,17 @@ msgstr "Enter content to decode"
 msgid "输出"
 msgstr "Output"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:296
+#. placeholder {0}: target.width
+#. placeholder {1}: target.height
+#: src/features/media-compress/resize/ImageResizePanel.tsx:394
+msgid "输出 {0} × {1} px"
+msgstr "Output {0} × {1} px"
+
+#: src/features/media-compress/video/VideoCompressPanel.tsx:301
 msgid "输出分辨率"
 msgstr "Output resolution"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:244
+#: src/features/media-compress/image/ImageCompressPanel.tsx:249
 msgid "输出格式"
 msgstr "Output format"
 
@@ -2539,7 +2704,7 @@ msgstr "Running"
 msgid "近 7 天"
 msgstr "Last 7 Days"
 
-#: src/features/games/engine/GameResultBar.tsx:48
+#: src/features/games/engine/GameResultBar.tsx:54
 #: src/features/games/go/GoOnline.tsx:329
 #: src/features/games/gomoku/GomokuOnline.tsx:317
 #: src/features/games/xiangqi/XiangqiOnline.tsx:299
@@ -2667,22 +2832,33 @@ msgstr "Select Save Location"
 msgid "选择共享目录"
 msgstr "Select Shared Folder"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:280
-#: src/features/media-compress/video/VideoCompressPanel.tsx:334
+#: src/features/media-compress/image/ImageCompressPanel.tsx:285
+#: src/features/media-compress/video/VideoCompressPanel.tsx:339
 msgid "选择压缩程度"
 msgstr "Select compression level"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:224
+#: src/features/media-compress/image/ImageCompressPanel.tsx:220
+#: src/features/media-compress/image/ImageCompressPanel.tsx:229
+#: src/features/media-compress/resize/ImageResizePanel.tsx:244
+#: src/features/media-compress/resize/ImageResizePanel.tsx:253
 msgid "选择图片"
 msgstr "Choose image"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:297
+#: src/features/media-compress/resize/ImageResizePanel.tsx:411
+msgid "选择图片后显示输出尺寸"
+msgstr "Output size appears after choosing an image"
+
+#: src/features/media-compress/image/ImageCompressPanel.tsx:302
 msgid "选择图片后显示预估体积"
 msgstr "Estimated size appears after choosing an image"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:248
 msgid "选择密钥…"
 msgstr "Select key..."
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:326
+msgid "选择尺寸模式"
+msgstr "Select size mode"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:235
 msgid "选择当前文件夹"
@@ -2692,15 +2868,16 @@ msgstr "Select Current Folder"
 msgid "选择接收目录"
 msgstr "Select Receive Directory"
 
-#: src/features/media-compress/components/CompressDropzone.tsx:78
+#: src/features/media-compress/components/CompressDropzone.tsx:107
 msgid "选择文件"
 msgstr "Choose file"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:271
+#: src/features/media-compress/video/VideoCompressPanel.tsx:267
+#: src/features/media-compress/video/VideoCompressPanel.tsx:276
 msgid "选择视频"
 msgstr "Choose video"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:374
+#: src/features/media-compress/video/VideoCompressPanel.tsx:379
 msgid "选择视频后显示预估体积"
 msgstr "Estimated size appears after choosing a video"
 
@@ -2720,15 +2897,19 @@ msgstr "Select algorithm"
 msgid "选择算法对文本进行编码或解码"
 msgstr "Choose an algorithm to encode or decode text"
 
+#: src/features/media-compress/resize/ImageResizePanel.tsx:302
+msgid "选择缩放比例"
+msgstr "Select scale"
+
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
 msgid "选择解压位置"
 msgstr "Select Extract Location"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:313
+#: src/features/media-compress/video/VideoCompressPanel.tsx:318
 msgid "选择输出分辨率"
 msgstr "Select output resolution"
 
-#: src/features/media-compress/image/ImageCompressPanel.tsx:260
+#: src/features/media-compress/image/ImageCompressPanel.tsx:265
 msgid "选择输出格式"
 msgstr "Select output format"
 
@@ -2802,12 +2983,16 @@ msgstr "Est. {0} ~ {1}"
 #: src/features/games/engine/GameHeaderControls.tsx:29
 #: src/features/games/engine/GameHeaderControls.tsx:39
 #: src/features/lan-transfer/LanTransferTool.tsx:338
-#: src/features/media-compress/MediaCompressTool.tsx:25
+#: src/features/media-compress/MediaCompressTool.tsx:26
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
 #: src/features/ssh-sftp/SshSftpTool.tsx:177
 #: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "Home"
+
+#: src/features/media-compress/resize/ImageResizePanel.tsx:355
+msgid "高度"
+msgstr "Height"
 
 #: src/features/media-compress/components/CompressQualityField.tsx:60
 msgid "高质量"

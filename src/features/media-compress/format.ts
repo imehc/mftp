@@ -1,3 +1,5 @@
+import { isMobilePlatform } from "~/lib/platform";
+
 export function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) return "-";
   if (bytes < 1024) return `${Math.round(bytes)} B`;
@@ -103,4 +105,51 @@ export function sizeDeltaPercent(
     return null;
   }
   return Math.round(((originalBytes - resultBytes) / originalBytes) * 100);
+}
+
+const PICKED_FILE_MIME: Record<string, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  mp4: "video/mp4",
+  mov: "video/quicktime",
+  m4v: "video/x-m4v",
+};
+
+export interface NativeFilePickOptions {
+  title?: string;
+  /** File-type label shown by the native dialog. */
+  filterName: string;
+  /** Allowed extensions without the dot, e.g. ["png", "jpg"]. */
+  extensions: string[];
+}
+
+/**
+ * Pick a single file with a native dialog that enforces extension filters.
+ * Desktop WebViews (WKWebView in particular) ignore the HTML accept
+ * attribute, so the hidden <input type="file"> lets users pick anything.
+ * Returns null when the native picker is unavailable (browser / mobile,
+ * where the system picker honors accept) — caller should fall back to the
+ * input element; returns false when the user cancelled the dialog.
+ */
+export async function pickFileNative(
+  options: NativeFilePickOptions,
+): Promise<File | null | false> {
+  if (!isTauriRuntime() || isMobilePlatform()) return null;
+
+  const { open } = await import("@tauri-apps/plugin-dialog");
+  const selected = await open({
+    multiple: false,
+    directory: false,
+    title: options.title,
+    filters: [{ name: options.filterName, extensions: options.extensions }],
+  });
+  if (typeof selected !== "string" || !selected) return false;
+
+  const { readFile } = await import("@tauri-apps/plugin-fs");
+  const bytes = await readFile(selected);
+  const name = baseName(selected);
+  const ext = name.split(".").pop()?.toLowerCase() ?? "";
+  return new File([bytes], name, { type: PICKED_FILE_MIME[ext] ?? "" });
 }

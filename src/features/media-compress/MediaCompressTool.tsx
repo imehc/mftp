@@ -5,6 +5,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { CompressModeTabs } from "~/features/media-compress/components/CompressModeTabs";
 import ImageCompressPanel from "~/features/media-compress/image/ImageCompressPanel";
+import ImageResizePanel from "~/features/media-compress/resize/ImageResizePanel";
 import type { CompressModeId } from "~/features/media-compress/types";
 import VideoCompressPanel from "~/features/media-compress/video/VideoCompressPanel";
 
@@ -27,7 +28,7 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
           </Button>
           <div className="hidden h-4 w-px bg-border sm:block" />
           <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
-            <Trans>媒体压缩</Trans>
+            <Trans>媒体处理</Trans>
           </div>
         </div>
         <Badge variant="outline">
@@ -44,10 +45,10 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
               </div>
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold">
-                  <Trans>媒体压缩</Trans>
+                  <Trans>媒体处理</Trans>
                 </h1>
                 <p className="truncate text-xs text-muted-foreground">
-                  <Trans>图片 / 视频本地压缩，后续可扩展更多格式</Trans>
+                  <Trans>图片 / 视频本地压缩与图片改尺寸</Trans>
                 </p>
               </div>
             </div>
@@ -69,6 +70,9 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
         </div>
         <div hidden={mode !== "video"}>
           <VideoCompressPanel />
+        </div>
+        <div hidden={mode !== "resize"}>
+          <ImageResizePanel />
         </div>
       </div>
     </main>

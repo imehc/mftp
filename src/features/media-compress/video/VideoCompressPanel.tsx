@@ -263,6 +263,11 @@ export default function VideoCompressPanel() {
       <CompressDropzone
         inputRef={inputRef}
         accept=".mp4,.mov,.m4v,video/mp4,video/quicktime"
+        nativeFilter={{
+          title: t`选择视频`,
+          filterName: t`视频文件`,
+          extensions: ["mp4", "mov", "m4v"],
+        }}
         disabled={phase === "compressing" || !codecOk}
         onFile={(next) => void applyFile(next)}
         icon={<FileVideo className="size-5 text-muted-foreground" />}

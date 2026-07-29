@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { Clapperboard, ImageIcon } from "lucide-react";
+import { Clapperboard, ImageIcon, ImageUpscale } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { COMPRESS_MODES } from "~/features/media-compress/modes";
 import type { CompressModeId } from "~/features/media-compress/types";
@@ -14,9 +14,11 @@ interface CompressModeTabsProps {
 function modeLabel(id: CompressModeId) {
   switch (id) {
     case "image":
-      return <Trans>图片</Trans>;
+      return <Trans>图片压缩</Trans>;
     case "video":
-      return <Trans>视频</Trans>;
+      return <Trans>视频压缩</Trans>;
+    case "resize":
+      return <Trans>图片改尺寸</Trans>;
   }
 }
 
@@ -26,6 +28,8 @@ function modeIcon(id: CompressModeId) {
       return <ImageIcon className="size-3.5" />;
     case "video":
       return <Clapperboard className="size-3.5" />;
+    case "resize":
+      return <ImageUpscale className="size-3.5" />;
   }
 }
 

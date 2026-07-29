@@ -160,7 +160,7 @@ export async function probeImageFile(file: File): Promise<ImageMeta> {
   }
 }
 
-function canvasToBlob(
+export function canvasToBlob(
   canvas: HTMLCanvasElement,
   mimeType: string,
   quality?: number,
