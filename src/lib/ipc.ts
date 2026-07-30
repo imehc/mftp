@@ -1,7 +1,9 @@
 import { commands } from "~/bindings";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
+  ExportSection,
   HostInput,
+  ImportMode,
   LanSharedDirInput,
   LanTransferSettings,
   LanTrustedDeviceInput,
@@ -238,3 +240,16 @@ export const vaultEntryUpdate = (id: string, input: VaultEntryInput) =>
   unwrapCommand(commands.vaultEntryUpdate(id, input));
 export const vaultEntryDelete = (id: string) =>
   voidCommand(commands.vaultEntryDelete(id));
+
+// ---- Export / Import ----
+export const dataExport = (
+  sections: ExportSection[],
+  password: string | null,
+) => unwrapCommand(commands.dataExport(sections, password));
+export const dataInspect = (raw: string) =>
+  unwrapCommand(commands.dataInspect(raw));
+export const dataImport = (
+  raw: string,
+  password: string | null,
+  mode: ImportMode,
+) => unwrapCommand(commands.dataImport(raw, password, mode));

@@ -8,9 +8,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 const DB_FILE: &str = "mftp.sqlite3";
 
 mod activity;
+mod export;
+mod import;
 mod lan;
 mod vault;
 
+#[derive(Clone)]
 pub struct Storage {
     root: PathBuf,
     db_path: PathBuf,

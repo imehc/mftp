@@ -3,7 +3,9 @@ import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import {
   Archive,
   Download,
+  FileUp,
   FolderTree,
+  HardDriveDownload,
   Languages,
   Monitor,
   Moon,
@@ -59,6 +61,11 @@ import {
 } from "~/store/updater";
 import { localeLabels, localeOptions } from "~/i18n/locales";
 import { cn } from "~/lib/utils";
+import ExportDialog from "~/features/export/ExportDialog";
+import ImportDialog from "~/features/export/ImportDialog";
+import { exportSections } from "~/features/export/sections";
+
+const allExportSections = exportSections.map((meta) => meta.id);
 
 const themes = [
   { value: "system", icon: Monitor },
@@ -77,6 +84,8 @@ export default function AppSettingsMenu() {
   const { theme = "system", setTheme } = useTheme();
   const [autostartEnabled, setAutostartEnabled] = useState(false);
   const [autostartBusy, setAutostartBusy] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const locale = useSettingsStore((s) => s.locale);
   const setLocale = useSettingsStore((s) => s.setLocale);
   const colorTheme = useSettingsStore((s) => s.colorTheme);
@@ -266,6 +275,17 @@ export default function AppSettingsMenu() {
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onSelect={() => setExportOpen(true)}>
+            <HardDriveDownload />
+            {t`导出数据`}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+            <FileUp />
+            {t`导入数据`}
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Languages />
@@ -362,6 +382,12 @@ export default function AppSettingsMenu() {
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>
+      <ExportDialog
+        open={exportOpen}
+        defaultSections={allExportSections}
+        onOpenChange={setExportOpen}
+      />
+      <ImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </DropdownMenu>
   );
 }

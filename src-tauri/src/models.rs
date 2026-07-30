@@ -289,3 +289,45 @@ pub struct VaultEntryInput {
     #[serde(default)]
     pub notes: Option<String>,
 }
+
+/// A data section that can be exported; add a variant per exportable module.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ExportSection {
+    Vault,
+    Hosts,
+}
+
+/// How imported records are applied to existing data.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ImportMode {
+    /// Clear the section first, then insert everything from the file.
+    Overwrite,
+    /// Update records with matching ids, insert the rest.
+    Merge,
+    /// Insert everything as new records with fresh ids.
+    Append,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ImportPreview {
+    pub encrypted: bool,
+    /// Empty for encrypted files until they are decrypted during import.
+    pub sections: Vec<ExportSection>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ImportSectionReport {
+    pub section: ExportSection,
+    pub inserted: u32,
+    pub updated: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ImportReport {
+    pub sections: Vec<ImportSectionReport>,
+}

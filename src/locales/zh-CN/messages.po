@@ -186,7 +186,7 @@ msgstr "AI 思考中…"
 msgid "AVIF（不支持）"
 msgstr "AVIF（不支持）"
 
-#: src/features/settings/AppSettingsMenu.tsx:114
+#: src/features/settings/AppSettingsMenu.tsx:123
 msgid "DesignByte"
 msgstr "DesignByte"
 
@@ -194,7 +194,7 @@ msgstr "DesignByte"
 msgid "English"
 msgstr "English"
 
-#: src/features/settings/AppSettingsMenu.tsx:121
+#: src/features/settings/AppSettingsMenu.tsx:130
 msgid "Geist"
 msgstr "Geist"
 
@@ -202,7 +202,7 @@ msgstr "Geist"
 msgid "IP:端口 直连"
 msgstr "IP:端口 直连"
 
-#: src/features/settings/AppSettingsMenu.tsx:124
+#: src/features/settings/AppSettingsMenu.tsx:133
 msgid "Montserrat"
 msgstr "Montserrat"
 
@@ -210,15 +210,15 @@ msgstr "Montserrat"
 msgid "MP4 · MOV · M4V，文件不会上传"
 msgstr "MP4 · MOV · M4V，文件不会上传"
 
-#: src/features/settings/AppSettingsMenu.tsx:115
+#: src/features/settings/AppSettingsMenu.tsx:124
 msgid "MX-Brutalist"
 msgstr "MX-Brutalist"
 
-#: src/features/settings/AppSettingsMenu.tsx:122
+#: src/features/settings/AppSettingsMenu.tsx:131
 msgid "Outfit"
 msgstr "Outfit"
 
-#: src/features/settings/AppSettingsMenu.tsx:123
+#: src/features/settings/AppSettingsMenu.tsx:132
 msgid "Plus Jakarta"
 msgstr "Plus Jakarta"
 
@@ -234,7 +234,11 @@ msgstr "PNG · JPG · WebP，默认保持原格式输出"
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG 为无损格式，压缩程度影响有限"
 
-#: src/features/settings/AppSettingsMenu.tsx:117
+#: src/features/export/sections.tsx:21
+msgid "SSH / SFTP 主机连接配置"
+msgstr "SSH / SFTP 主机连接配置"
+
+#: src/features/settings/AppSettingsMenu.tsx:126
 msgid "Tiesen"
 msgstr "Tiesen"
 
@@ -302,7 +306,7 @@ msgstr "下载"
 msgid "下载 {0}"
 msgstr "下载 {0}"
 
-#: src/features/settings/AppSettingsMenu.tsx:102
+#: src/features/settings/AppSettingsMenu.tsx:111
 msgid "下载中"
 msgstr "下载中"
 
@@ -338,6 +342,10 @@ msgstr "与对方的连接已断开。"
 msgid "两个名称不能相同。"
 msgstr "两个名称不能相同。"
 
+#: src/features/export/ExportDialog.tsx:149
+msgid "两次输入的密码不一致"
+msgstr "两次输入的密码不一致"
+
 #: src/features/games/xiangqi/XiangqiGame.tsx:35
 #: src/features/home/entries.tsx:230
 msgid "中国象棋"
@@ -362,6 +370,7 @@ msgstr "中杆"
 msgid "中等"
 msgstr "中等"
 
+#: src/features/export/sections.tsx:20
 #: src/features/ssh-sftp/components/Sidebar.tsx:402
 #: src/features/ssh-sftp/SshSftpTool.tsx:114
 msgid "主机"
@@ -376,7 +385,7 @@ msgstr "主机列表"
 msgid "主目录"
 msgstr "主目录"
 
-#: src/features/settings/AppSettingsMenu.tsx:310
+#: src/features/settings/AppSettingsMenu.tsx:330
 msgid "主题"
 msgstr "主题"
 
@@ -526,6 +535,10 @@ msgstr "全字匹配"
 msgid "全部"
 msgstr "全部"
 
+#: src/features/export/ImportDialog.tsx:52
+msgid "全部作为新记录插入"
+msgstr "全部作为新记录插入"
+
 #: src/features/vault/VaultTool.tsx:217
 msgid "全部分类"
 msgstr "全部分类"
@@ -566,7 +579,7 @@ msgstr "共享目录"
 
 #: src/features/formatter/FormatterTool.tsx:89
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:217
+#: src/features/settings/AppSettingsMenu.tsx:226
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
 msgid "关闭"
 msgstr "关闭"
@@ -719,6 +732,14 @@ msgstr "剩余 {remaining} 球"
 msgid "加入"
 msgstr "加入"
 
+#: src/features/export/ExportDialog.tsx:123
+msgid "加密导出"
+msgstr "加密导出"
+
+#: src/features/export/ImportDialog.tsx:122
+msgid "加密文件，请输入密码"
+msgstr "加密文件，请输入密码"
+
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
 #: src/features/home/entries.tsx:97
@@ -756,7 +777,7 @@ msgstr "压缩"
 msgid "压缩中"
 msgstr "压缩中"
 
-#: src/features/settings/AppSettingsMenu.tsx:129
+#: src/features/settings/AppSettingsMenu.tsx:138
 msgid "压缩包"
 msgstr "压缩包"
 
@@ -857,6 +878,8 @@ msgid "发现设备"
 msgstr "发现设备"
 
 #: src/components/ui/prompt-dialog.tsx:96
+#: src/features/export/ExportDialog.tsx:165
+#: src/features/export/ImportDialog.tsx:177
 #: src/features/games/engine/GameHeaderControls.tsx:50
 #: src/features/games/engine/GameHeaderControls.tsx:103
 #: src/features/games/engine/GameHeaderControls.tsx:123
@@ -900,6 +923,10 @@ msgstr "只读"
 #: src/features/home/entries.tsx:173
 msgid "台球"
 msgstr "台球"
+
+#: src/features/export/ImportDialog.tsx:159
+msgid "合并"
+msgstr "合并"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:357
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
@@ -1114,7 +1141,7 @@ msgstr "复制输入"
 msgid "复制输出"
 msgstr "复制输出"
 
-#: src/features/settings/AppSettingsMenu.tsx:291
+#: src/features/settings/AppSettingsMenu.tsx:311
 msgid "外观"
 msgstr "外观"
 
@@ -1136,7 +1163,7 @@ msgstr "失败"
 msgid "媒体处理"
 msgstr "媒体处理"
 
-#: src/features/settings/AppSettingsMenu.tsx:349
+#: src/features/settings/AppSettingsMenu.tsx:369
 msgid "字体"
 msgstr "字体"
 
@@ -1163,6 +1190,10 @@ msgstr "宽度"
 msgid "宽高与原图比例不同时，图片会被拉伸变形"
 msgstr "宽高与原图比例不同时，图片会被拉伸变形"
 
+#: src/features/export/ExportDialog.tsx:132
+#: src/features/export/ExportDialog.tsx:133
+#: src/features/export/ImportDialog.tsx:128
+#: src/features/export/ImportDialog.tsx:129
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:202
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:219
 #: src/features/vault/VaultEntryDialog.tsx:138
@@ -1170,6 +1201,7 @@ msgstr "宽高与原图比例不同时，图片会被拉伸变形"
 msgid "密码"
 msgstr "密码"
 
+#: src/features/export/sections.tsx:15
 #: src/features/home/entries.tsx:156
 #: src/features/vault/VaultTool.tsx:162
 #: src/features/vault/VaultTool.tsx:179
@@ -1233,17 +1265,43 @@ msgstr "对方拒绝了悔棋"
 msgid "对方请求悔棋"
 msgstr "对方请求悔棋"
 
+#: src/features/export/ImportDialog.tsx:184
+msgid "导入"
+msgstr "导入"
+
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:164
 msgid "导入中…"
 msgstr "导入中…"
+
+#: src/features/export/ImportDialog.tsx:86
+msgid "导入完成：新增 {inserted}，更新 {updated}"
+msgstr "导入完成：新增 {inserted}，更新 {updated}"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:164
 msgid "导入密钥"
 msgstr "导入密钥"
 
+#: src/features/export/ImportDialog.tsx:104
+#: src/features/settings/AppSettingsMenu.tsx:285
+msgid "导入数据"
+msgstr "导入数据"
+
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:185
 msgid "导入私钥后可在主机中选用。"
 msgstr "导入私钥后可在主机中选用。"
+
+#: src/features/export/ExportDialog.tsx:172
+msgid "导出"
+msgstr "导出"
+
+#: src/features/export/ExportDialog.tsx:155
+msgid "导出为明文 JSON 文件，请妥善保管。"
+msgstr "导出为明文 JSON 文件，请妥善保管。"
+
+#: src/features/export/ExportDialog.tsx:96
+#: src/features/settings/AppSettingsMenu.tsx:281
+msgid "导出数据"
+msgstr "导出数据"
 
 #: src/features/formatter/FormatterTool.tsx:378
 msgid "将内容转义为字符串字面量"
@@ -1345,7 +1403,7 @@ msgstr "已停止"
 msgid "已允许访问"
 msgstr "已允许访问"
 
-#: src/features/settings/AppSettingsMenu.tsx:174
+#: src/features/settings/AppSettingsMenu.tsx:183
 msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
@@ -1422,7 +1480,11 @@ msgstr "已导入 ({0})"
 msgid "已导入密钥 {0}"
 msgstr "已导入密钥 {0}"
 
-#: src/features/settings/AppSettingsMenu.tsx:170
+#: src/features/export/ExportDialog.tsx:81
+msgid "已导出"
+msgstr "已导出"
+
+#: src/features/settings/AppSettingsMenu.tsx:179
 msgid "已开启开机自启"
 msgstr "已开启开机自启"
 
@@ -1489,7 +1551,7 @@ msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:257
-#: src/features/settings/AppSettingsMenu.tsx:211
+#: src/features/settings/AppSettingsMenu.tsx:220
 msgid "开启"
 msgstr "开启"
 
@@ -1518,7 +1580,7 @@ msgstr "开放"
 msgid "开放模式会跳过确认码"
 msgstr "开放模式会跳过确认码"
 
-#: src/features/settings/AppSettingsMenu.tsx:198
+#: src/features/settings/AppSettingsMenu.tsx:207
 msgid "开机自启"
 msgstr "开机自启"
 
@@ -1757,7 +1819,7 @@ msgstr "文件"
 msgid "文件夹"
 msgstr "文件夹"
 
-#: src/features/settings/AppSettingsMenu.tsx:242
+#: src/features/settings/AppSettingsMenu.tsx:251
 msgid "文件夹传输"
 msgstr "文件夹传输"
 
@@ -1791,6 +1853,7 @@ msgstr "断开失败：{e}"
 msgid "断开连接"
 msgstr "断开连接"
 
+#: src/features/export/ImportDialog.tsx:162
 #: src/features/vault/VaultTool.tsx:194
 msgid "新增"
 msgstr "新增"
@@ -1986,13 +2049,17 @@ msgstr "查找"
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "查看 GitHub Release 获取更新内容"
 
-#: src/features/settings/AppSettingsMenu.tsx:101
+#: src/features/settings/AppSettingsMenu.tsx:110
 msgid "查看更新"
 msgstr "查看更新"
 
 #: src/features/vault/VaultEntryDialog.tsx:135
 msgid "标题"
 msgstr "标题"
+
+#: src/features/export/sections.tsx:16
+msgid "标题、网址、账号、密码、分类、备注"
+msgstr "标题、网址、账号、密码、分类、备注"
 
 #: src/features/formatter/FormatterTool.tsx:349
 msgid "校验"
@@ -2013,7 +2080,7 @@ msgstr "格式化、压缩与校验结构化数据"
 msgid "格式化内容编辑器"
 msgstr "格式化内容编辑器"
 
-#: src/features/settings/AppSettingsMenu.tsx:99
+#: src/features/settings/AppSettingsMenu.tsx:108
 msgid "检查更新"
 msgstr "检查更新"
 
@@ -2096,7 +2163,7 @@ msgstr "正在打开终端…"
 msgid "正在搜索…未发现房间时可用下方地址直连"
 msgstr "正在搜索…未发现房间时可用下方地址直连"
 
-#: src/features/settings/AppSettingsMenu.tsx:100
+#: src/features/settings/AppSettingsMenu.tsx:109
 msgid "正在检查"
 msgstr "正在检查"
 
@@ -2143,7 +2210,7 @@ msgstr "没有子文件夹"
 msgid "活动中"
 msgstr "活动中"
 
-#: src/features/settings/AppSettingsMenu.tsx:109
+#: src/features/settings/AppSettingsMenu.tsx:118
 msgid "浅色"
 msgstr "浅色"
 
@@ -2161,7 +2228,7 @@ msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
 msgid "消息发送失败，连接可能已断开。"
 msgstr "消息发送失败，连接可能已断开。"
 
-#: src/features/settings/AppSettingsMenu.tsx:110
+#: src/features/settings/AppSettingsMenu.tsx:119
 msgid "深色"
 msgstr "深色"
 
@@ -2204,6 +2271,10 @@ msgstr "清空"
 #: src/features/logs/LogPageLayout.tsx:121
 msgid "清空日志"
 msgstr "清空日志"
+
+#: src/features/export/ImportDialog.tsx:50
+msgid "清空现有数据后写入文件内容"
+msgstr "清空现有数据后写入文件内容"
 
 #: src/features/transfers/TransferPanel.tsx:299
 msgid "清除 {finishedTransferCount}"
@@ -2331,13 +2402,17 @@ msgstr "目标已存在同名项目"
 msgid "目标高度"
 msgstr "目标高度"
 
-#: src/features/settings/AppSettingsMenu.tsx:130
+#: src/features/settings/AppSettingsMenu.tsx:139
 msgid "直接"
 msgstr "直接"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:315
 msgid "直连"
 msgstr "直连"
+
+#: src/features/export/ImportDialog.tsx:51
+msgid "相同记录更新，其余插入"
+msgstr "相同记录更新，其余插入"
 
 #: src/components/ui/prompt-dialog.tsx:98
 msgid "确定"
@@ -2360,6 +2435,11 @@ msgstr "确认"
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:196
 msgid "确认后会按上面的名称继续。"
 msgstr "确认后会按上面的名称继续。"
+
+#: src/features/export/ExportDialog.tsx:140
+#: src/features/export/ExportDialog.tsx:141
+msgid "确认密码"
+msgstr "确认密码"
 
 #: src/features/logs/LogPageLayout.tsx:132
 msgid "确认清空"
@@ -2504,7 +2584,7 @@ msgstr "类型"
 msgid "粘贴或输入 {0} 内容"
 msgstr "粘贴或输入 {0} 内容"
 
-#: src/features/settings/AppSettingsMenu.tsx:108
+#: src/features/settings/AppSettingsMenu.tsx:117
 msgid "系统"
 msgstr "系统"
 
@@ -2677,6 +2757,10 @@ msgstr "要移动的文件"
 msgid "要移动的文件夹"
 msgstr "要移动的文件夹"
 
+#: src/features/export/ImportDialog.tsx:156
+msgid "覆盖"
+msgstr "覆盖"
+
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:65
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:117
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:112
@@ -2710,7 +2794,7 @@ msgid "设备名"
 msgstr "设备名"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:389
-#: src/features/settings/AppSettingsMenu.tsx:188
+#: src/features/settings/AppSettingsMenu.tsx:197
 msgid "设置"
 msgstr "设置"
 
@@ -2735,7 +2819,7 @@ msgid "详情"
 msgstr "详情"
 
 #: src/features/formatter/FormatterTool.tsx:274
-#: src/features/settings/AppSettingsMenu.tsx:272
+#: src/features/settings/AppSettingsMenu.tsx:292
 msgid "语言"
 msgstr "语言"
 
@@ -2799,11 +2883,11 @@ msgstr "负"
 msgid "账号"
 msgstr "账号"
 
-#: src/features/settings/AppSettingsMenu.tsx:116
+#: src/features/settings/AppSettingsMenu.tsx:125
 msgid "赛博朋克"
 msgstr "赛博朋克"
 
-#: src/features/settings/AppSettingsMenu.tsx:120
+#: src/features/settings/AppSettingsMenu.tsx:129
 msgid "跟随主题"
 msgstr "跟随主题"
 
@@ -3028,6 +3112,7 @@ msgstr "选择当前文件夹"
 msgid "选择接收目录"
 msgstr "选择接收目录"
 
+#: src/features/export/ImportDialog.tsx:114
 #: src/features/media-compress/components/CompressDropzone.tsx:107
 msgid "选择文件"
 msgstr "选择文件"
@@ -3089,7 +3174,7 @@ msgstr "递归按字母升序排序对象键"
 msgid "递归按字母降序排序对象键"
 msgstr "递归按字母降序排序对象键"
 
-#: src/features/settings/AppSettingsMenu.tsx:104
+#: src/features/settings/AppSettingsMenu.tsx:113
 msgid "重启中"
 msgstr "重启中"
 
@@ -3106,7 +3191,7 @@ msgstr "重启并更新"
 msgid "重启应用即可完成更新。"
 msgstr "重启应用即可完成更新。"
 
-#: src/features/settings/AppSettingsMenu.tsx:103
+#: src/features/settings/AppSettingsMenu.tsx:112
 msgid "重启更新"
 msgstr "重启更新"
 
@@ -3125,7 +3210,7 @@ msgstr "重开"
 msgid "重新开始对局?"
 msgstr "重新开始对局?"
 
-#: src/features/settings/AppSettingsMenu.tsx:105
+#: src/features/settings/AppSettingsMenu.tsx:114
 #: src/lib/updater.ts:238
 msgid "重新检查"
 msgstr "重新检查"
@@ -3213,7 +3298,7 @@ msgstr "黑棋胜"
 msgid "黑胜"
 msgstr "黑胜"
 
-#: src/features/settings/AppSettingsMenu.tsx:113
+#: src/features/settings/AppSettingsMenu.tsx:122
 msgid "默认"
 msgstr "默认"
 

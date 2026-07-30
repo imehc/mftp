@@ -68,6 +68,15 @@ export const commands = {
 	vaultEntryCreate: (input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_create", { input })),
 	vaultEntryUpdate: (id: string, input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_update", { id, input })),
 	vaultEntryDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("vault_entry_delete", { id })),
+	/**
+	 *  Serialize the selected sections as a JSON document, optionally encrypted
+	 *  with a password (Argon2id + ChaCha20-Poly1305). The frontend handles the
+	 *  save dialog / file write so browser dev mode works too.
+	 */
+	dataExport: (sections: ExportSection[], password: string | null) => typedError<string, AppError>(__TAURI_INVOKE("data_export", { sections, password })),
+	// Detect whether a file is an mftp export and whether it is encrypted.
+	dataInspect: (raw: string) => typedError<ImportPreview, AppError>(__TAURI_INVOKE("data_inspect", { raw })),
+	dataImport: (raw: string, password: string | null, mode: ImportMode) => typedError<ImportReport, AppError>(__TAURI_INVOKE("data_import", { raw, password, mode })),
 };
 
 /* Types */
@@ -85,6 +94,9 @@ export type ActivityLog = {
 export type AppError = string;
 
 export type AuthType = "password" | "key";
+
+// A data section that can be exported; add a variant per exportable module.
+export type ExportSection = "vault" | "hosts";
 
 export type GameRoomStatus = {
 	// "idle" | "hosting" | "joined"
@@ -138,6 +150,31 @@ export type HostInput = {
 	password?: string | null,
 	keyId?: string | null,
 	defaultPath?: string | null,
+};
+
+// How imported records are applied to existing data.
+export type ImportMode = 
+// Clear the section first, then insert everything from the file.
+"overwrite" | 
+// Update records with matching ids, insert the rest.
+"merge" | 
+// Insert everything as new records with fresh ids.
+"append";
+
+export type ImportPreview = {
+	encrypted: boolean,
+	// Empty for encrypted files until they are decrypted during import.
+	sections: ExportSection[],
+};
+
+export type ImportReport = {
+	sections: ImportSectionReport[],
+};
+
+export type ImportSectionReport = {
+	section: ExportSection,
+	inserted: number,
+	updated: number,
 };
 
 export type LanAuthRequest = {

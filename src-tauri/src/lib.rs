@@ -96,6 +96,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::vault_entry_create,
             commands::vault_entry_update,
             commands::vault_entry_delete,
+            commands::data_export,
+            commands::data_inspect,
+            commands::data_import,
         ])
 }
 
