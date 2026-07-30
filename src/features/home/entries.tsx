@@ -7,7 +7,6 @@ import {
   Circle,
   CircleDot,
   Crown,
-  Globe,
   Grid3x3,
   LockKeyhole,
   TerminalSquare,
@@ -86,19 +85,6 @@ export const homeEntries: HomeEntry[] = [
           <Trans>浏览器访问</Trans>
         </Badge>
       </>
-    ),
-  },
-  {
-    id: "web-browser",
-    category: "tools",
-    link: linkOptions({ to: "/tools/web-browser", preload: "viewport" }),
-    toolId: "web-browser",
-    icon: Globe,
-    title: <Trans>网页访问</Trans>,
-    badges: () => (
-      <Badge variant="outline">
-        <Trans>数据连接</Trans>
-      </Badge>
     ),
   },
   {

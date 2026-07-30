@@ -8,7 +8,12 @@ import {
 } from "~/lib/color-theme";
 
 export type DirectoryTransferMode = "archive" | "direct";
-export type ToolRoute = "ssh-sftp" | "lan-transfer" | "crypto" | "web-browser" | "media-compress" | "formatter";
+export type ToolRoute =
+  | "ssh-sftp"
+  | "lan-transfer"
+  | "crypto"
+  | "media-compress"
+  | "formatter";
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {
@@ -17,7 +22,6 @@ interface SettingsState {
   sidebarSize: number;
   sidebarCollapsed: boolean;
   lastTool: ToolRoute | null;
-  webBrowserDefaultUrl: string;
   colorTheme: ColorTheme;
   fontPreset: FontPreset;
   /** Home page games section is collapsed by default. */
@@ -29,7 +33,6 @@ interface SettingsState {
   setSidebarSize: (size: number) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setLastTool: (tool: ToolRoute | null) => void;
-  setWebBrowserDefaultUrl: (url: string) => void;
   setColorTheme: (theme: ColorTheme) => void;
   setFontPreset: (font: FontPreset) => void;
   setShowGames: (show: boolean) => void;
@@ -44,7 +47,6 @@ export const useSettingsStore = create<SettingsState>()(
       sidebarSize: 20,
       sidebarCollapsed: false,
       lastTool: null,
-      webBrowserDefaultUrl: "",
       colorTheme: "default",
       fontPreset: "theme",
       showGames: false,
@@ -56,7 +58,6 @@ export const useSettingsStore = create<SettingsState>()(
       setSidebarCollapsed: (collapsed) =>
         set({ sidebarCollapsed: collapsed }),
       setLastTool: (tool) => set({ lastTool: tool }),
-      setWebBrowserDefaultUrl: (url) => set({ webBrowserDefaultUrl: url }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
       setFontPreset: (font) => set({ fontPreset: font }),
       setShowGames: (show) => set({ showGames: show }),
@@ -64,9 +65,10 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      version: 3,
+      version: 4,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
+        delete state.webBrowserDefaultUrl;
         const legacyTool =
           typeof state.lastTool === "string" ? state.lastTool : null;
         const lastTool: ToolRoute | null =
@@ -75,7 +77,6 @@ export const useSettingsStore = create<SettingsState>()(
             : legacyTool === "ssh-sftp" ||
                 legacyTool === "lan-transfer" ||
                 legacyTool === "crypto" ||
-                legacyTool === "web-browser" ||
                 legacyTool === "media-compress" ||
                 legacyTool === "formatter"
               ? legacyTool

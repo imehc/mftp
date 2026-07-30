@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr "，目录变更需重启服务后完整生效"
 
 #. placeholder {0}: stats.hostCount
-#: src/features/home/entries.tsx:60
+#: src/features/home/entries.tsx:59
 msgid "{0} 主机"
 msgstr "{0} 主机"
 
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
-#: src/features/home/entries.tsx:66
+#: src/features/home/entries.tsx:65
 #: src/features/home/HomePage.tsx:121
 msgid "{0} 传输"
 msgstr "{0} 传输"
@@ -104,7 +104,7 @@ msgstr "{0} 行"
 
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
-#: src/features/home/entries.tsx:63
+#: src/features/home/entries.tsx:62
 #: src/features/home/HomePage.tsx:118
 msgid "{0} 连接"
 msgstr "{0} 连接"
@@ -339,7 +339,7 @@ msgid "两个名称不能相同。"
 msgstr "两个名称不能相同。"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:35
-#: src/features/home/entries.tsx:225
+#: src/features/home/entries.tsx:211
 msgid "中国象棋"
 msgstr "中国象棋"
 
@@ -385,7 +385,7 @@ msgid "互换"
 msgstr "互换"
 
 #: src/features/games/gomoku/GomokuGame.tsx:36
-#: src/features/home/entries.tsx:185
+#: src/features/home/entries.tsx:171
 msgid "五子棋"
 msgstr "五子棋"
 
@@ -393,10 +393,10 @@ msgstr "五子棋"
 #: src/features/games/go/labels.tsx:87
 #: src/features/games/gomoku/labels.tsx:79
 #: src/features/games/xiangqi/labels.tsx:75
-#: src/features/home/entries.tsx:172
-#: src/features/home/entries.tsx:189
-#: src/features/home/entries.tsx:209
-#: src/features/home/entries.tsx:229
+#: src/features/home/entries.tsx:158
+#: src/features/home/entries.tsx:175
+#: src/features/home/entries.tsx:195
+#: src/features/home/entries.tsx:215
 msgid "人机"
 msgstr "人机"
 
@@ -470,13 +470,8 @@ msgstr "你输了"
 msgid "使用 -_ 替换 +/，并省略填充"
 msgstr "使用 -_ 替换 +/，并省略填充"
 
-#: src/features/web-browser/WebBrowserTool.tsx:409
-msgid "例如 https://192.168.1.1"
-msgstr "例如 https://192.168.1.1"
-
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
-#: src/features/web-browser/WebBrowserTool.tsx:429
 msgid "保存"
 msgstr "保存"
 
@@ -525,11 +520,6 @@ msgstr "先手（执黑）"
 #: src/features/formatter/FormatterTool.tsx:85
 msgid "全字匹配"
 msgstr "全字匹配"
-
-#: src/features/web-browser/WebBrowserTool.tsx:306
-#: src/features/web-browser/WebBrowserTool.tsx:307
-msgid "全屏预览"
-msgstr "全屏预览"
 
 #: src/features/formatter/FormatterTool.tsx:83
 msgid "全部"
@@ -692,10 +682,6 @@ msgstr "删除这条日志？"
 #: src/features/logs/LogPageLayout.tsx:111
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:152
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:247
-#: src/features/web-browser/WebBrowserTool.tsx:264
-#: src/features/web-browser/WebBrowserTool.tsx:265
-#: src/features/web-browser/WebBrowserTool.tsx:338
-#: src/features/web-browser/WebBrowserTool.tsx:339
 msgid "刷新"
 msgstr "刷新"
 
@@ -719,7 +705,7 @@ msgstr "加入"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/entries.tsx:110
+#: src/features/home/entries.tsx:96
 msgid "加解密"
 msgstr "加解密"
 
@@ -746,7 +732,7 @@ msgid "历史记录"
 msgstr "历史记录"
 
 #: src/features/formatter/FormatterTool.tsx:340
-#: src/features/home/entries.tsx:136
+#: src/features/home/entries.tsx:122
 msgid "压缩"
 msgstr "压缩"
 
@@ -816,10 +802,10 @@ msgstr "参数未变化，无需重新处理"
 #: src/features/games/go/labels.tsx:83
 #: src/features/games/gomoku/labels.tsx:75
 #: src/features/games/xiangqi/labels.tsx:71
-#: src/features/home/entries.tsx:175
-#: src/features/home/entries.tsx:192
-#: src/features/home/entries.tsx:212
-#: src/features/home/entries.tsx:232
+#: src/features/home/entries.tsx:161
+#: src/features/home/entries.tsx:178
+#: src/features/home/entries.tsx:198
+#: src/features/home/entries.tsx:218
 msgid "双人"
 msgstr "双人"
 
@@ -874,7 +860,6 @@ msgstr "发现设备"
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:232
 #: src/features/ssh-sftp/components/Sidebar.tsx:555
 #: src/features/transfers/TransferPanel.tsx:380
-#: src/features/web-browser/WebBrowserTool.tsx:426
 msgid "取消"
 msgstr "取消"
 
@@ -893,12 +878,8 @@ msgstr "只能在桌面应用中检查更新"
 msgid "只读"
 msgstr "只读"
 
-#: src/features/web-browser/WebBrowserTool.tsx:367
-msgid "可直接访问默认地址，或在地址栏输入新的网页链接。"
-msgstr "可直接访问默认地址，或在地址栏输入新的网页链接。"
-
 #: src/features/games/billiards/BilliardsGame.tsx:59
-#: src/features/home/entries.tsx:168
+#: src/features/home/entries.tsx:154
 msgid "台球"
 msgstr "台球"
 
@@ -1006,7 +987,7 @@ msgid "困难"
 msgstr "困难"
 
 #: src/features/games/go/GoGame.tsx:36
-#: src/features/home/entries.tsx:205
+#: src/features/home/entries.tsx:191
 msgid "围棋"
 msgstr "围棋"
 
@@ -1051,18 +1032,9 @@ msgstr "图片文件"
 msgid "在内容中搜索（Ctrl+F）"
 msgstr "在内容中搜索（Ctrl+F）"
 
-#: src/features/web-browser/WebBrowserTool.tsx:371
-msgid "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
-msgstr "在地址栏输入网址，或先在设置中配置进入模块时的默认地址。"
-
 #: src/features/ssh-sftp/SshSftpTool.tsx:49
 msgid "在左侧选择主机并点击连接，或新建主机"
 msgstr "在左侧选择主机并点击连接，或新建主机"
-
-#: src/features/web-browser/WebBrowserTool.tsx:285
-#: src/features/web-browser/WebBrowserTool.tsx:286
-msgid "在系统浏览器中打开"
-msgstr "在系统浏览器中打开"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
 msgid "在线"
@@ -1128,7 +1100,7 @@ msgstr "大小"
 msgid "失败"
 msgstr "失败"
 
-#: src/features/home/entries.tsx:132
+#: src/features/home/entries.tsx:118
 #: src/features/media-compress/MediaCompressTool.tsx:31
 #: src/features/media-compress/MediaCompressTool.tsx:48
 msgid "媒体处理"
@@ -1266,13 +1238,9 @@ msgstr "将结果写回输入并切换模式"
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "将返回模式选择,当前对局的进度将会丢失。"
 
-#: src/features/home/entries.tsx:30
+#: src/features/home/entries.tsx:29
 msgid "小游戏"
 msgstr "小游戏"
-
-#: src/features/web-browser/WebBrowserTool.tsx:141
-msgid "尚未设置默认地址"
-msgstr "尚未设置默认地址"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:317
 msgid "尺寸模式"
@@ -1285,7 +1253,7 @@ msgstr "尺寸模式"
 msgid "局域网"
 msgstr "局域网"
 
-#: src/features/home/entries.tsx:81
+#: src/features/home/entries.tsx:80
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -1309,7 +1277,7 @@ msgstr "局域网传输辅助数据加载失败：{0}"
 msgid "展开侧边栏"
 msgstr "展开侧边栏"
 
-#: src/features/home/entries.tsx:29
+#: src/features/home/entries.tsx:28
 msgid "工具"
 msgstr "工具"
 
@@ -1440,10 +1408,6 @@ msgstr "已添加共享目录"
 msgid "已添加白名单"
 msgstr "已添加白名单"
 
-#: src/features/web-browser/WebBrowserTool.tsx:175
-msgid "已清除默认地址"
-msgstr "已清除默认地址"
-
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:278
 msgid "已移动 {0}"
@@ -1452,10 +1416,6 @@ msgstr "已移动 {0}"
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:164
 msgid "已解压到 {outName}"
 msgstr "已解压到 {outName}"
-
-#: src/features/web-browser/WebBrowserTool.tsx:167
-msgid "已设为默认地址"
-msgstr "已设为默认地址"
 
 #. placeholder {0}: hostAddress(host)
 #: src/features/ssh-sftp/components/Sidebar.tsx:334
@@ -1621,12 +1581,6 @@ msgstr "打开终端"
 msgid "打开终端失败：{e}"
 msgstr "打开终端失败：{e}"
 
-#: src/features/web-browser/WebBrowserTool.tsx:274
-#: src/features/web-browser/WebBrowserTool.tsx:275
-#: src/features/web-browser/WebBrowserTool.tsx:380
-msgid "打开默认地址"
-msgstr "打开默认地址"
-
 #: src/features/lan-transfer/LanTransferSidebar.tsx:111
 msgid "扫码访问"
 msgstr "扫码访问"
@@ -1701,7 +1655,7 @@ msgid "提子 {0}:{1}"
 msgstr "提子 {0}:{1}"
 
 #: src/features/formatter/FormatterTool.tsx:246
-#: src/features/home/entries.tsx:158
+#: src/features/home/entries.tsx:144
 msgid "搜索"
 msgstr "搜索"
 
@@ -1721,18 +1675,13 @@ msgstr "操作"
 msgid "改为自动选择"
 msgstr "改为自动选择"
 
-#: src/features/home/entries.tsx:139
+#: src/features/home/entries.tsx:125
 msgid "改尺寸"
 msgstr "改尺寸"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:310
 msgid "放大"
 msgstr "放大"
-
-#: src/features/home/entries.tsx:100
-#: src/features/web-browser/WebBrowserTool.tsx:222
-msgid "数据连接"
-msgstr "数据连接"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:53
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:262
@@ -1916,7 +1865,7 @@ msgstr "服务运行中，端口、接收目录、安全模式和权限需停止
 msgid "未选择"
 msgstr "未选择"
 
-#: src/features/home/entries.tsx:142
+#: src/features/home/entries.tsx:128
 msgid "本地"
 msgstr "本地"
 
@@ -1962,7 +1911,7 @@ msgstr "校验"
 #: src/features/formatter/FormatterTool.tsx:213
 #: src/features/formatter/FormatterTool.tsx:230
 #: src/features/formatter/FormatterTool.tsx:331
-#: src/features/home/entries.tsx:153
+#: src/features/home/entries.tsx:139
 msgid "格式化"
 msgstr "格式化"
 
@@ -2104,7 +2053,7 @@ msgstr "活动中"
 msgid "浅色"
 msgstr "浅色"
 
-#: src/features/home/entries.tsx:86
+#: src/features/home/entries.tsx:85
 msgid "浏览器访问"
 msgstr "浏览器访问"
 
@@ -2514,7 +2463,7 @@ msgid "继续传输中"
 msgstr "继续传输中"
 
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/entries.tsx:114
+#: src/features/home/entries.tsx:100
 msgid "编码"
 msgstr "编码"
 
@@ -2550,25 +2499,6 @@ msgstr "缩放比例"
 msgid "缩进"
 msgstr "缩进"
 
-#: src/features/web-browser/WebBrowserTool.tsx:243
-msgid "网址"
-msgstr "网址"
-
-#: src/features/home/entries.tsx:97
-#: src/features/web-browser/WebBrowserTool.tsx:217
-msgid "网页访问"
-msgstr "网页访问"
-
-#: src/features/web-browser/WebBrowserTool.tsx:228
-#: src/features/web-browser/WebBrowserTool.tsx:229
-#: src/features/web-browser/WebBrowserTool.tsx:397
-msgid "网页访问设置"
-msgstr "网页访问设置"
-
-#: src/features/web-browser/WebBrowserTool.tsx:325
-msgid "网页预览"
-msgstr "网页预览"
-
 #: src/features/lan-transfer/LanTransferSidebar.tsx:223
 msgid "耗时 "
 msgstr "耗时 "
@@ -2576,9 +2506,9 @@ msgstr "耗时 "
 #: src/features/games/go/labels.tsx:84
 #: src/features/games/gomoku/labels.tsx:76
 #: src/features/games/xiangqi/labels.tsx:72
-#: src/features/home/entries.tsx:195
-#: src/features/home/entries.tsx:215
-#: src/features/home/entries.tsx:235
+#: src/features/home/entries.tsx:181
+#: src/features/home/entries.tsx:201
+#: src/features/home/entries.tsx:221
 msgid "联机"
 msgstr "联机"
 
@@ -2660,18 +2590,13 @@ msgid "解析中"
 msgstr "解析中"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/entries.tsx:117
+#: src/features/home/entries.tsx:103
 msgid "解码"
 msgstr "解码"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:190
 msgid "认证方式"
 msgstr "认证方式"
-
-#: src/features/web-browser/WebBrowserTool.tsx:295
-#: src/features/web-browser/WebBrowserTool.tsx:296
-msgid "设为默认地址"
-msgstr "设为默认地址"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:127
 msgid "设备名"
@@ -2682,12 +2607,7 @@ msgstr "设备名"
 msgid "设置"
 msgstr "设置"
 
-#: src/features/web-browser/WebBrowserTool.tsx:384
-msgid "设置默认地址"
-msgstr "设置默认地址"
-
 #: src/features/lan-transfer/LanTransferSidebar.tsx:98
-#: src/features/web-browser/WebBrowserTool.tsx:257
 msgid "访问"
 msgstr "访问"
 
@@ -2728,14 +2648,6 @@ msgstr "请输入内容"
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:31
 msgid "请输入口令"
 msgstr "请输入口令"
-
-#: src/features/web-browser/WebBrowserTool.tsx:118
-#: src/features/web-browser/WebBrowserTool.tsx:150
-#: src/features/web-browser/WebBrowserTool.tsx:163
-#: src/features/web-browser/WebBrowserTool.tsx:180
-#: src/features/web-browser/WebBrowserTool.tsx:192
-msgid "请输入有效的 http 或 https 地址"
-msgstr "请输入有效的 http 或 https 地址"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:409
 msgid "请输入有效的目标尺寸"
@@ -2804,10 +2716,6 @@ msgstr "轮到"
 msgid "输入"
 msgstr "输入"
 
-#: src/features/web-browser/WebBrowserTool.tsx:363
-msgid "输入地址开始访问"
-msgstr "输入地址开始访问"
-
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:48
 msgid "输入密钥口令"
 msgstr "输入密钥口令"
@@ -2815,10 +2723,6 @@ msgstr "输入密钥口令"
 #: src/features/games/engine/online/OnlineLobby.tsx:336
 msgid "输入房间码"
 msgstr "输入房间码"
-
-#: src/features/web-browser/WebBrowserTool.tsx:249
-msgid "输入网址，例如 192.168.1.1 或 https://example.com"
-msgstr "输入网址，例如 192.168.1.1 或 https://example.com"
 
 #: src/features/crypto/CryptoTool.tsx:250
 msgid "输入要编码的文本"
@@ -2883,10 +2787,6 @@ msgstr "还没有主机"
 msgid "还没有打开的连接"
 msgstr "还没有打开的连接"
 
-#: src/features/web-browser/WebBrowserTool.tsx:414
-msgid "进入「网页访问」模块时将优先打开该地址。留空表示不自动打开。"
-msgstr "进入「网页访问」模块时将优先打开该地址。留空表示不自动打开。"
-
 #: src/features/lan-transfer/LanTransferSidebar.tsx:56
 msgid "进行中"
 msgstr "进行中"
@@ -2947,13 +2847,6 @@ msgstr "连续六十回合未吃子"
 #: src/features/games/engine/GameHeaderControls.tsx:124
 msgid "退出"
 msgstr "退出"
-
-#: src/features/web-browser/WebBrowserTool.tsx:306
-#: src/features/web-browser/WebBrowserTool.tsx:307
-#: src/features/web-browser/WebBrowserTool.tsx:348
-#: src/features/web-browser/WebBrowserTool.tsx:349
-msgid "退出全屏预览"
-msgstr "退出全屏预览"
 
 #: src/features/games/engine/GameHeaderControls.tsx:73
 msgid "退出对局"
@@ -3165,7 +3058,6 @@ msgstr "预估 {0} ~ {1}"
 #: src/features/media-compress/MediaCompressTool.tsx:26
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
 #: src/features/ssh-sftp/SshSftpTool.tsx:177
-#: src/features/web-browser/WebBrowserTool.tsx:212
 msgid "首页"
 msgstr "首页"
 
@@ -3206,14 +3098,6 @@ msgstr "黑胜"
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "默认"
 msgstr "默认"
-
-#: src/features/web-browser/WebBrowserTool.tsx:403
-msgid "默认地址"
-msgstr "默认地址"
-
-#: src/features/web-browser/WebBrowserTool.tsx:186
-msgid "默认地址已保存"
-msgstr "默认地址已保存"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:368
 #: src/features/lan-transfer/LanTransferSidebar.tsx:248
