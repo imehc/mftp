@@ -92,6 +92,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::game_room_discover,
             commands::game_room_send,
             commands::game_room_leave,
+            commands::vault_entries_list,
+            commands::vault_entry_create,
+            commands::vault_entry_update,
+            commands::vault_entry_delete,
         ])
 }
 

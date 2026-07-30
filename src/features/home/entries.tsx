@@ -8,6 +8,7 @@ import {
   CircleDot,
   Crown,
   Grid3x3,
+  KeyRound,
   LockKeyhole,
   TerminalSquare,
   Wifi,
@@ -142,6 +143,24 @@ export const homeEntries: HomeEntry[] = [
         <Badge variant="outline">JSON</Badge>
         <Badge variant="outline">
           <Trans>搜索</Trans>
+        </Badge>
+      </>
+    ),
+  },
+  {
+    id: "vault",
+    category: "tools",
+    link: linkOptions({ to: "/tools/vault", preload: "viewport" }),
+    toolId: "vault",
+    icon: KeyRound,
+    title: <Trans>密码本</Trans>,
+    badges: () => (
+      <>
+        <Badge variant="outline">
+          <Trans>本地</Trans>
+        </Badge>
+        <Badge variant="outline">
+          <Trans>快速复制</Trans>
         </Badge>
       </>
     ),

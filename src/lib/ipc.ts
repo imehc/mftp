@@ -5,6 +5,7 @@ import type {
   LanSharedDirInput,
   LanTransferSettings,
   LanTrustedDeviceInput,
+  VaultEntryInput,
 } from "~/types";
 
 type CommandResult<T, E> =
@@ -228,3 +229,12 @@ export const sftpExtract = (
     remoteParent,
     outName ?? null,
   ));
+
+// ---- Vault ----
+export const vaultEntriesList = () => unwrapCommand(commands.vaultEntriesList());
+export const vaultEntryCreate = (input: VaultEntryInput) =>
+  unwrapCommand(commands.vaultEntryCreate(input));
+export const vaultEntryUpdate = (id: string, input: VaultEntryInput) =>
+  unwrapCommand(commands.vaultEntryUpdate(id, input));
+export const vaultEntryDelete = (id: string) =>
+  voidCommand(commands.vaultEntryDelete(id));

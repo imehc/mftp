@@ -64,6 +64,10 @@ export const commands = {
 	gameRoomDiscover: (gameId: string) => typedError<GameRoomSummary[], AppError>(__TAURI_INVOKE("game_room_discover", { gameId })),
 	gameRoomSend: (payload: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_send", { payload })),
 	gameRoomLeave: () => typedError<null, AppError>(__TAURI_INVOKE("game_room_leave")),
+	vaultEntriesList: () => typedError<VaultEntry[], AppError>(__TAURI_INVOKE("vault_entries_list")),
+	vaultEntryCreate: (input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_create", { input })),
+	vaultEntryUpdate: (id: string, input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_update", { id, input })),
+	vaultEntryDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("vault_entry_delete", { id })),
 };
 
 /* Types */
@@ -265,6 +269,28 @@ export type TransferProgress = {
 	phase: string,
 	transferred: number,
 	total: number | null,
+};
+
+export type VaultEntry = {
+	id: string,
+	title: string,
+	url?: string | null,
+	username?: string | null,
+	password?: string | null,
+	category?: string | null,
+	notes?: string | null,
+	createdAt: number,
+	updatedAt: number,
+};
+
+// Payload for creating/updating a vault entry (id/timestamps managed by backend).
+export type VaultEntryInput = {
+	title: string,
+	url?: string | null,
+	username?: string | null,
+	password?: string | null,
+	category?: string | null,
+	notes?: string | null,
 };
 
 /* Tauri Specta runtime */

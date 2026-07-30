@@ -13,7 +13,8 @@ export type ToolRoute =
   | "lan-transfer"
   | "crypto"
   | "media-compress"
-  | "formatter";
+  | "formatter"
+  | "vault";
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {
@@ -78,7 +79,8 @@ export const useSettingsStore = create<SettingsState>()(
                 legacyTool === "lan-transfer" ||
                 legacyTool === "crypto" ||
                 legacyTool === "media-compress" ||
-                legacyTool === "formatter"
+                legacyTool === "formatter" ||
+                legacyTool === "vault"
               ? legacyTool
               : null;
         return {

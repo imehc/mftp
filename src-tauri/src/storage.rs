@@ -9,6 +9,7 @@ const DB_FILE: &str = "mftp.sqlite3";
 
 mod activity;
 mod lan;
+mod vault;
 
 pub struct Storage {
     root: PathBuf,
@@ -117,6 +118,18 @@ impl Storage {
             CREATE INDEX IF NOT EXISTS idx_lan_access_logs_created_at
             ON lan_access_logs(created_at DESC);
 
+            CREATE TABLE IF NOT EXISTS vault_entries (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                url TEXT,
+                username TEXT,
+                password TEXT,
+                category TEXT,
+                notes TEXT,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+            );
+
             DROP TABLE IF EXISTS lan_transfer_history;
 
             "#,
@@ -139,6 +152,7 @@ impl Storage {
             "source",
             "TEXT NOT NULL DEFAULT 'lan'",
         )?;
+        vault::relax_vault_not_null_columns(&conn)?;
         Ok(())
     }
 

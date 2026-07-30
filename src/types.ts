@@ -21,6 +21,8 @@ export type {
   SftpFileInfo,
   SshKey,
   TransferProgress,
+  VaultEntry,
+  VaultEntryInput,
 } from "~/bindings";
 
 /** An open terminal/sftp session tab. */

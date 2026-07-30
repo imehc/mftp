@@ -21,6 +21,7 @@ import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-com
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-compress'
 import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
+import { Route as ToolsVaultRouteImport } from './routes/tools/vault'
 import { Route as ToolsVideoCompressRouteImport } from './routes/tools/video-compress'
 
 const IndexRoute = IndexRouteImport.update({
@@ -83,6 +84,11 @@ const ToolsSshSftpRoute = ToolsSshSftpRouteImport.update({
   path: '/tools/ssh-sftp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsVaultRoute = ToolsVaultRouteImport.update({
+  id: '/tools/vault',
+  path: '/tools/vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsVideoCompressRoute = ToolsVideoCompressRouteImport.update({
   id: '/tools/video-compress',
   path: '/tools/video-compress',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
+  '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
 }
 export interface FileRoutesByTo {
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
+  '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
 }
 export interface FileRoutesById {
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
+  '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
 }
 export interface FileRouteTypes {
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/tools/lan-transfer'
     | '/tools/media-compress'
     | '/tools/ssh-sftp'
+    | '/tools/vault'
     | '/tools/video-compress'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/tools/lan-transfer'
     | '/tools/media-compress'
     | '/tools/ssh-sftp'
+    | '/tools/vault'
     | '/tools/video-compress'
   id:
     | '__root__'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/tools/lan-transfer'
     | '/tools/media-compress'
     | '/tools/ssh-sftp'
+    | '/tools/vault'
     | '/tools/video-compress'
   fileRoutesById: FileRoutesById
 }
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
   ToolsMediaCompressRoute: typeof ToolsMediaCompressRoute
   ToolsSshSftpRoute: typeof ToolsSshSftpRoute
+  ToolsVaultRoute: typeof ToolsVaultRoute
   ToolsVideoCompressRoute: typeof ToolsVideoCompressRoute
 }
 
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsSshSftpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/vault': {
+      id: '/tools/vault'
+      path: '/tools/vault'
+      fullPath: '/tools/vault'
+      preLoaderRoute: typeof ToolsVaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/video-compress': {
       id: '/tools/video-compress'
       path: '/tools/video-compress'
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsLanTransferRoute: ToolsLanTransferRoute,
   ToolsMediaCompressRoute: ToolsMediaCompressRoute,
   ToolsSshSftpRoute: ToolsSshSftpRoute,
+  ToolsVaultRoute: ToolsVaultRoute,
   ToolsVideoCompressRoute: ToolsVideoCompressRoute,
 }
 export const routeTree = rootRouteImport

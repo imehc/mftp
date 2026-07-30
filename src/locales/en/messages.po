@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr ", directory changes take full effect after restarting the service"
 
 #. placeholder {0}: stats.hostCount
-#: src/features/home/entries.tsx:59
+#: src/features/home/entries.tsx:60
 msgid "{0} 主机"
 msgstr "{0} hosts"
 
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
-#: src/features/home/entries.tsx:65
+#: src/features/home/entries.tsx:66
 #: src/features/home/HomePage.tsx:121
 msgid "{0} 传输"
 msgstr "{0} transfers"
@@ -104,7 +104,7 @@ msgstr "{0} lines"
 
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
-#: src/features/home/entries.tsx:62
+#: src/features/home/entries.tsx:63
 #: src/features/home/HomePage.tsx:118
 msgid "{0} 连接"
 msgstr "{0} connections"
@@ -339,7 +339,7 @@ msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:35
-#: src/features/home/entries.tsx:211
+#: src/features/home/entries.tsx:230
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -385,7 +385,7 @@ msgid "互换"
 msgstr "Swap"
 
 #: src/features/games/gomoku/GomokuGame.tsx:36
-#: src/features/home/entries.tsx:171
+#: src/features/home/entries.tsx:190
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -393,10 +393,10 @@ msgstr "Gomoku"
 #: src/features/games/go/labels.tsx:87
 #: src/features/games/gomoku/labels.tsx:79
 #: src/features/games/xiangqi/labels.tsx:75
-#: src/features/home/entries.tsx:158
-#: src/features/home/entries.tsx:175
-#: src/features/home/entries.tsx:195
-#: src/features/home/entries.tsx:215
+#: src/features/home/entries.tsx:177
+#: src/features/home/entries.tsx:194
+#: src/features/home/entries.tsx:214
+#: src/features/home/entries.tsx:234
 msgid "人机"
 msgstr "Vs AI"
 
@@ -472,6 +472,7 @@ msgstr "Replace +/ with -_ and omit padding"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
+#: src/features/vault/VaultEntryDialog.tsx:178
 msgid "保存"
 msgstr "Save"
 
@@ -524,6 +525,10 @@ msgstr "By word"
 #: src/features/formatter/FormatterTool.tsx:83
 msgid "全部"
 msgstr "All"
+
+#: src/features/vault/VaultTool.tsx:217
+msgid "全部分类"
+msgstr "All categories"
 
 #: src/features/logs/ActivityLogsPage.tsx:128
 msgid "全部时间"
@@ -613,6 +618,11 @@ msgstr "Preparing"
 msgid "减小 {delta}%"
 msgstr "Reduced {delta}%"
 
+#: src/features/vault/VaultEntryDialog.tsx:143
+#: src/features/vault/VaultTool.tsx:211
+msgid "分类"
+msgstr "Category"
+
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:19
 msgid "刚刚"
 msgstr "Just now"
@@ -638,6 +648,8 @@ msgstr "Created Time"
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:125
 #: src/features/ssh-sftp/components/Sidebar.tsx:372
 #: src/features/ssh-sftp/components/Sidebar.tsx:558
+#: src/features/vault/VaultTool.tsx:291
+#: src/features/vault/VaultTool.tsx:402
 msgid "删除"
 msgstr "Delete"
 
@@ -672,6 +684,10 @@ msgstr "Delete Folder"
 msgid "删除日志"
 msgstr "Delete Log"
 
+#: src/features/vault/VaultTool.tsx:391
+msgid "删除该账号？"
+msgstr "Delete this account?"
+
 #: src/features/logs/LogPageLayout.tsx:77
 msgid "删除这条日志？"
 msgstr "Delete this log?"
@@ -705,7 +721,7 @@ msgstr "Join"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/entries.tsx:96
+#: src/features/home/entries.tsx:97
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -732,7 +748,7 @@ msgid "历史记录"
 msgstr "History"
 
 #: src/features/formatter/FormatterTool.tsx:340
-#: src/features/home/entries.tsx:122
+#: src/features/home/entries.tsx:123
 msgid "压缩"
 msgstr "Compress"
 
@@ -802,10 +818,10 @@ msgstr "Parameters unchanged, nothing to redo"
 #: src/features/games/go/labels.tsx:83
 #: src/features/games/gomoku/labels.tsx:75
 #: src/features/games/xiangqi/labels.tsx:71
-#: src/features/home/entries.tsx:161
-#: src/features/home/entries.tsx:178
-#: src/features/home/entries.tsx:198
-#: src/features/home/entries.tsx:218
+#: src/features/home/entries.tsx:180
+#: src/features/home/entries.tsx:197
+#: src/features/home/entries.tsx:217
+#: src/features/home/entries.tsx:237
 msgid "双人"
 msgstr "2P"
 
@@ -860,6 +876,8 @@ msgstr "Discovered Devices"
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:232
 #: src/features/ssh-sftp/components/Sidebar.tsx:555
 #: src/features/transfers/TransferPanel.tsx:380
+#: src/features/vault/VaultEntryDialog.tsx:173
+#: src/features/vault/VaultTool.tsx:399
 msgid "取消"
 msgstr "Cancel"
 
@@ -879,7 +897,7 @@ msgid "只读"
 msgstr "Read Only"
 
 #: src/features/games/billiards/BilliardsGame.tsx:59
-#: src/features/home/entries.tsx:154
+#: src/features/home/entries.tsx:173
 msgid "台球"
 msgstr "Billiards"
 
@@ -987,7 +1005,7 @@ msgid "困难"
 msgstr "Hard"
 
 #: src/features/games/go/GoGame.tsx:36
-#: src/features/home/entries.tsx:191
+#: src/features/home/entries.tsx:210
 msgid "围棋"
 msgstr "Go"
 
@@ -1069,10 +1087,22 @@ msgstr "Result"
 msgid "处理结果预览"
 msgstr "Result preview"
 
+#: src/features/vault/VaultEntryDialog.tsx:155
+msgid "备注"
+msgstr "Notes"
+
 #: src/features/formatter/FormatterTool.tsx:255
 #: src/features/lan-transfer/LanTransferTool.tsx:385
 msgid "复制"
 msgstr "Copy"
+
+#: src/features/vault/VaultTool.tsx:339
+msgid "复制密码"
+msgstr "Copy password"
+
+#: src/features/vault/VaultTool.tsx:311
+msgid "复制账号"
+msgstr "Copy username"
 
 #: src/features/crypto/CryptoTool.tsx:237
 #: src/features/crypto/CryptoTool.tsx:238
@@ -1100,7 +1130,7 @@ msgstr "Size"
 msgid "失败"
 msgstr "Failed"
 
-#: src/features/home/entries.tsx:118
+#: src/features/home/entries.tsx:119
 #: src/features/media-compress/MediaCompressTool.tsx:31
 #: src/features/media-compress/MediaCompressTool.tsx:48
 msgid "媒体处理"
@@ -1135,8 +1165,16 @@ msgstr "If the aspect ratio differs from the original, the image will be stretch
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:202
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:219
+#: src/features/vault/VaultEntryDialog.tsx:138
+#: src/features/vault/VaultTool.tsx:323
 msgid "密码"
 msgstr "Password"
+
+#: src/features/home/entries.tsx:156
+#: src/features/vault/VaultTool.tsx:162
+#: src/features/vault/VaultTool.tsx:179
+msgid "密码本"
+msgstr "Passwords"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:205
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:240
@@ -1238,7 +1276,7 @@ msgstr "Write result back to input and switch mode"
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "You will return to mode selection; current match progress will be lost."
 
-#: src/features/home/entries.tsx:29
+#: src/features/home/entries.tsx:30
 msgid "小游戏"
 msgstr "Games"
 
@@ -1253,7 +1291,7 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:80
+#: src/features/home/entries.tsx:81
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -1277,7 +1315,7 @@ msgstr "LAN transfer auxiliary data failed to load: {0}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/entries.tsx:28
+#: src/features/home/entries.tsx:29
 msgid "工具"
 msgstr "Tools"
 
@@ -1291,6 +1329,7 @@ msgid "已下载 {0}"
 msgstr "Downloaded {0}"
 
 #: src/features/media-compress/components/CompressResultCard.tsx:43
+#: src/features/vault/VaultTool.tsx:131
 msgid "已保存"
 msgstr "Saved"
 
@@ -1309,6 +1348,10 @@ msgstr "Access allowed"
 #: src/features/settings/AppSettingsMenu.tsx:174
 msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
+
+#: src/features/vault/VaultTool.tsx:142
+msgid "已删除"
+msgstr "Deleted"
 
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:325
@@ -1352,6 +1395,14 @@ msgstr "Copied"
 #: src/features/lan-transfer/LanTransferTool.tsx:314
 msgid "已复制地址"
 msgstr "Address copied"
+
+#: src/features/vault/VaultTool.tsx:341
+msgid "已复制密码"
+msgstr "Password copied"
+
+#: src/features/vault/VaultTool.tsx:313
+msgid "已复制账号"
+msgstr "Username copied"
 
 #: src/features/crypto/CryptoTool.tsx:235
 msgid "已复制输入"
@@ -1516,6 +1567,10 @@ msgstr "The configured {0} is not in the available network adapter list, so the 
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
+#: src/features/home/entries.tsx:163
+msgid "快速复制"
+msgstr "Quick copy"
+
 #: src/features/games/billiards/BilliardsMatch.tsx:376
 msgid "总杆数"
 msgstr "Total shots"
@@ -1580,6 +1635,10 @@ msgstr "Open Terminal"
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:108
 msgid "打开终端失败：{e}"
 msgstr "Failed to open terminal: {e}"
+
+#: src/features/vault/VaultTool.tsx:267
+msgid "打开网址"
+msgstr "Open URL"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:111
 msgid "扫码访问"
@@ -1655,7 +1714,8 @@ msgid "提子 {0}:{1}"
 msgstr "Captures {0}:{1}"
 
 #: src/features/formatter/FormatterTool.tsx:246
-#: src/features/home/entries.tsx:144
+#: src/features/home/entries.tsx:145
+#: src/features/vault/VaultTool.tsx:205
 msgid "搜索"
 msgstr "Search"
 
@@ -1667,6 +1727,10 @@ msgstr "Search..."
 msgid "搜索地址、动作、详情"
 msgstr "Search address, action, or details"
 
+#: src/features/vault/VaultTool.tsx:203
+msgid "搜索标题、账号、网址"
+msgstr "Search title, username, URL"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:160
 msgid "操作"
 msgstr "Actions"
@@ -1675,7 +1739,7 @@ msgstr "Actions"
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
-#: src/features/home/entries.tsx:125
+#: src/features/home/entries.tsx:126
 msgid "改尺寸"
 msgstr "Resize"
 
@@ -1727,6 +1791,14 @@ msgstr "Disconnect failed: {e}"
 msgid "断开连接"
 msgstr "Disconnect"
 
+#: src/features/vault/VaultTool.tsx:194
+msgid "新增"
+msgstr "Add"
+
+#: src/features/vault/VaultEntryDialog.tsx:124
+msgid "新增账号"
+msgstr "Add account"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:266
 msgid "新建"
 msgstr "New"
@@ -1774,6 +1846,10 @@ msgstr "Time"
 msgid "昵称"
 msgstr "Nickname"
 
+#: src/features/vault/VaultTool.tsx:331
+msgid "显示密码"
+msgstr "Show password"
+
 #: src/features/crypto/CryptoTool.tsx:66
 msgid "暂不支持该算法"
 msgstr "Algorithm not supported yet"
@@ -1817,6 +1893,10 @@ msgstr "No trusted devices"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:132
 msgid "暂无设备"
 msgstr "No devices"
+
+#: src/features/vault/VaultTool.tsx:233
+msgid "暂无账号"
+msgstr "No accounts"
 
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:98
 msgid "更多"
@@ -1865,9 +1945,15 @@ msgstr "The service is running. Stop it before changing port, receive directory,
 msgid "未选择"
 msgstr "Not selected"
 
-#: src/features/home/entries.tsx:128
+#: src/features/home/entries.tsx:129
+#: src/features/home/entries.tsx:160
+#: src/features/vault/VaultTool.tsx:166
 msgid "本地"
 msgstr "Local"
+
+#: src/features/vault/VaultTool.tsx:182
+msgid "本地保存账号密码，点击即可复制"
+msgstr "Store credentials locally, click to copy"
 
 #: src/features/crypto/CryptoTool.tsx:105
 #: src/features/formatter/FormatterTool.tsx:217
@@ -1904,6 +1990,10 @@ msgstr "View GitHub Releases for update notes"
 msgid "查看更新"
 msgstr "View Update"
 
+#: src/features/vault/VaultEntryDialog.tsx:135
+msgid "标题"
+msgstr "Title"
+
 #: src/features/formatter/FormatterTool.tsx:349
 msgid "校验"
 msgstr "Validate"
@@ -1911,7 +2001,7 @@ msgstr "Validate"
 #: src/features/formatter/FormatterTool.tsx:213
 #: src/features/formatter/FormatterTool.tsx:230
 #: src/features/formatter/FormatterTool.tsx:331
-#: src/features/home/entries.tsx:139
+#: src/features/home/entries.tsx:140
 msgid "格式化"
 msgstr "Formatter"
 
@@ -2041,6 +2131,10 @@ msgstr "Restarting and applying update..."
 msgid "汉 界"
 msgstr "汉 界"
 
+#: src/features/vault/VaultTool.tsx:239
+msgid "没有匹配的结果"
+msgstr "No matching results"
+
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:205
 msgid "没有子文件夹"
 msgstr "No child folders"
@@ -2053,7 +2147,7 @@ msgstr "Active"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/home/entries.tsx:85
+#: src/features/home/entries.tsx:86
 msgid "浏览器访问"
 msgstr "Browser Access"
 
@@ -2127,6 +2221,10 @@ msgstr "Game volume"
 #: src/features/media-compress/video/VideoCompressPanel.tsx:363
 msgid "源视频没有音轨"
 msgstr "Source video has no audio track"
+
+#: src/features/vault/VaultTool.tsx:237
+msgid "点击“新增”保存第一条账号密码"
+msgstr "Click \"Add\" to save your first account"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:483
 msgid "点击右上角 + 新建主机"
@@ -2463,7 +2561,7 @@ msgid "继续传输中"
 msgstr "Resuming Transfer"
 
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/entries.tsx:100
+#: src/features/home/entries.tsx:101
 msgid "编码"
 msgstr "Encode"
 
@@ -2476,12 +2574,17 @@ msgid "编码失败"
 msgstr "Encoding failed"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:361
+#: src/features/vault/VaultTool.tsx:280
 msgid "编辑"
 msgstr "Edit"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
 msgid "编辑主机"
 msgstr "Edit Host"
+
+#: src/features/vault/VaultEntryDialog.tsx:124
+msgid "编辑账号"
+msgstr "Edit account"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:307
 msgid "缩小"
@@ -2499,6 +2602,10 @@ msgstr "Scale"
 msgid "缩进"
 msgstr "Indent"
 
+#: src/features/vault/VaultEntryDialog.tsx:140
+msgid "网址"
+msgstr "URL"
+
 #: src/features/lan-transfer/LanTransferSidebar.tsx:223
 msgid "耗时 "
 msgstr "Elapsed "
@@ -2506,9 +2613,9 @@ msgstr "Elapsed "
 #: src/features/games/go/labels.tsx:84
 #: src/features/games/gomoku/labels.tsx:76
 #: src/features/games/xiangqi/labels.tsx:72
-#: src/features/home/entries.tsx:181
-#: src/features/home/entries.tsx:201
-#: src/features/home/entries.tsx:221
+#: src/features/home/entries.tsx:200
+#: src/features/home/entries.tsx:220
+#: src/features/home/entries.tsx:240
 msgid "联机"
 msgstr "Online"
 
@@ -2590,7 +2697,7 @@ msgid "解析中"
 msgstr "Demuxing"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/entries.tsx:103
+#: src/features/home/entries.tsx:104
 msgid "解码"
 msgstr "Decode"
 
@@ -2642,6 +2749,7 @@ msgid "请先选择视频文件"
 msgstr "Choose a video first"
 
 #: src/components/ui/prompt-dialog.tsx:42
+#: src/features/vault/VaultEntryDialog.tsx:62
 msgid "请输入内容"
 msgstr "Enter content"
 
@@ -2685,6 +2793,11 @@ msgstr "Resize left panel"
 #: src/features/games/xiangqi/labels.tsx:98
 msgid "负"
 msgstr "Loss"
+
+#: src/features/vault/VaultEntryDialog.tsx:137
+#: src/features/vault/VaultTool.tsx:303
+msgid "账号"
+msgstr "Username"
 
 #: src/features/settings/AppSettingsMenu.tsx:116
 msgid "赛博朋克"
@@ -3039,6 +3152,10 @@ msgstr "Keys Z→A"
 msgid "附近的房间"
 msgstr "Nearby Rooms"
 
+#: src/features/vault/VaultTool.tsx:331
+msgid "隐藏密码"
+msgstr "Hide password"
+
 #. placeholder {0}: formatBytes(estimatedBytes)
 #: src/features/media-compress/components/CompressEstimateBar.tsx:45
 msgid "预估 {0}"
@@ -3058,6 +3175,7 @@ msgstr "Est. {0} ~ {1}"
 #: src/features/media-compress/MediaCompressTool.tsx:26
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
 #: src/features/ssh-sftp/SshSftpTool.tsx:177
+#: src/features/vault/VaultTool.tsx:157
 msgid "首页"
 msgstr "Home"
 

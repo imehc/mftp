@@ -7,6 +7,7 @@ mod keys;
 mod lan_transfer;
 mod sftp;
 mod ssh;
+mod vault;
 
 pub use game_room::*;
 pub use hosts::*;
@@ -14,6 +15,7 @@ pub use keys::*;
 pub use lan_transfer::*;
 pub use sftp::*;
 pub use ssh::*;
+pub use vault::*;
 
 pub(crate) async fn run_blocking<T, F>(f: F) -> AppResult<T>
 where
