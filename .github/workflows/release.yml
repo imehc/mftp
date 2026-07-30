@@ -214,9 +214,108 @@ jobs:
           includeUpdaterJson: true
           updaterJsonPreferNsis: true
 
+  android:
+    name: Build Android arm64-v8a
+    needs: [release-info, test, build]
+    if: needs.release-info.outputs.should_release == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android NDK
+        shell: bash
+        run: |
+          NDK_VERSION="27.0.12077973"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}"
+          {
+            echo "NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}"
+            echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Write release keystore
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 secret is required to build a signed release APK."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/mftp-release.jks"
+          cat > src-tauri/gen/android/keystore.properties <<PROPS
+          storeFile=$RUNNER_TEMP/mftp-release.jks
+          keyAlias=$ANDROID_KEY_ALIAS
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          PROPS
+
+      - name: Build arm64-v8a release APK
+        shell: bash
+        run: |
+          # NDK r23+ ships llvm-* tools only, but vendored OpenSSL (ssh2) still
+          # invokes <triple>-ranlib/<triple>-ar; same shims as scripts/android.sh.
+          TOOLCHAIN_BIN="$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          SHIM_DIR="$PWD/src-tauri/target/.ndk-shims"
+          mkdir -p "$SHIM_DIR"
+          for triple in aarch64-linux-android arm-linux-androideabi armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
+            ln -sf "$TOOLCHAIN_BIN/llvm-ranlib" "$SHIM_DIR/$triple-ranlib"
+            ln -sf "$TOOLCHAIN_BIN/llvm-ar" "$SHIM_DIR/$triple-ar"
+          done
+          export PATH="$SHIM_DIR:$TOOLCHAIN_BIN:$PATH"
+          pnpm tauri android build --target aarch64 --split-per-abi --apk
+
+      - name: Upload APK to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.release-info.outputs.version }}
+        run: |
+          APK="src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk"
+          if [ ! -f "$APK" ]; then
+            echo "Expected signed APK not found at $APK"
+            ls -R src-tauri/gen/android/app/build/outputs/apk || true
+            exit 1
+          fi
+          cp "$APK" "mftp_${VERSION}_arm64-v8a.apk"
+          gh release upload "v${VERSION}" "mftp_${VERSION}_arm64-v8a.apk" --clobber
+
   publish:
     name: Publish release
-    needs: [release-info, build]
+    needs: [release-info, build, android]
     if: needs.release-info.outputs.should_release == 'true'
     runs-on: ubuntu-22.04
     steps:

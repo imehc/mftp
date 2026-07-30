@@ -381,12 +381,14 @@ export function formatReleaseNotes(body?: string) {
     if (/^(?:\*\*)?full changelog(?:\*\*)?:/i.test(line)) continue;
     if (/made their first contribution/i.test(line)) continue;
 
+    line = line.replace(/^(?:[-*+]\s+|\d+[.)]\s+)/, "");
+
+    // Only surface user-facing changes: feat / fix / perf commits.
+    const typeMatch = /^(feat|fix|perf)(?:\([^)]*\))?!?:\s*/i.exec(line);
+    if (!typeMatch) continue;
+
     line = line
-      .replace(/^(?:[-*+]\s+|\d+[.)]\s+)/, "")
-      .replace(
-        /^(?:feat|fix|perf|refactor|style|docs|test|build|ci|chore|revert)(?:\([^)]*\))?!?:\s*/i,
-        "",
-      )
+      .slice(typeMatch[0].length)
       .replace(/\[([^\]]+)]\([^)]+\)/g, "$1")
       .replace(/\s+by\s+@\S+(?:\s+in\s+https?:\/\/\S+)?$/i, "")
       .replace(/\s+\(#[0-9]+\)$/, "")
