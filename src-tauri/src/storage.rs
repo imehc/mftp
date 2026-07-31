@@ -129,6 +129,7 @@ impl Storage {
                 password TEXT,
                 category TEXT,
                 notes TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
                 created_at INTEGER NOT NULL,
                 updated_at INTEGER NOT NULL
             );
@@ -156,6 +157,18 @@ impl Storage {
             "TEXT NOT NULL DEFAULT 'lan'",
         )?;
         vault::relax_vault_not_null_columns(&conn)?;
+        // sort_order arrived after release builds existed; the relax rebuild
+        // above copies columns positionally, so this must run after it.
+        add_column_if_missing(
+            &conn,
+            "vault_entries",
+            "sort_order",
+            "INTEGER NOT NULL DEFAULT 0",
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_vault_entries_sort_order ON vault_entries(sort_order)",
+            [],
+        )?;
         Ok(())
     }
 

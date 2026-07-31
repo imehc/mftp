@@ -24,6 +24,11 @@ fn import_vault(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult
     if mode == ImportMode::Overwrite {
         conn.execute("DELETE FROM vault_entries", [])?;
     }
+    let mut next_order: i64 = conn.query_row(
+        "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM vault_entries",
+        [],
+        |row| row.get(0),
+    )?;
     for mut entry in entries {
         if mode == ImportMode::Append {
             entry.id = uuid::Uuid::new_v4().to_string();
@@ -55,8 +60,9 @@ fn import_vault(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult
         conn.execute(
             r#"
             INSERT INTO vault_entries(
-                id, title, url, username, password, category, notes, created_at, updated_at
-            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+                id, title, url, username, password, category, notes, sort_order,
+                created_at, updated_at
+            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
             "#,
             params![
                 entry.id,
@@ -66,10 +72,12 @@ fn import_vault(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult
                 entry.password,
                 entry.category,
                 entry.notes,
+                next_order,
                 entry.created_at,
                 entry.updated_at,
             ],
         )?;
+        next_order += 1;
         counts.inserted += 1;
     }
     Ok(counts)

@@ -68,6 +68,7 @@ export const commands = {
 	vaultEntryCreate: (input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_create", { input })),
 	vaultEntryUpdate: (id: string, input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_update", { id, input })),
 	vaultEntryDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("vault_entry_delete", { id })),
+	vaultEntriesReorder: (orderedIds: string[]) => typedError<VaultEntry[], AppError>(__TAURI_INVOKE("vault_entries_reorder", { orderedIds })),
 	/**
 	 *  Serialize the selected sections as a JSON document, optionally encrypted
 	 *  with a password (Argon2id + ChaCha20-Poly1305). The frontend handles the

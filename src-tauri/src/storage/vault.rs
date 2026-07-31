@@ -67,7 +67,7 @@ impl Storage {
     pub fn list_vault_entries(&self) -> AppResult<Vec<VaultEntry>> {
         let conn = self.conn()?;
         let mut stmt = conn.prepare(&format!(
-            "SELECT {SELECT_COLUMNS} FROM vault_entries ORDER BY updated_at DESC"
+            "SELECT {SELECT_COLUMNS} FROM vault_entries ORDER BY sort_order ASC, updated_at DESC"
         ))?;
         let rows = stmt
             .query_map([], row_to_entry)?
@@ -89,11 +89,18 @@ impl Storage {
             updated_at: now,
         };
         let conn = self.conn()?;
+        // New entries go to the top, matching the list UI which prepends them.
+        let sort_order: i64 = conn.query_row(
+            "SELECT COALESCE(MIN(sort_order), 1) - 1 FROM vault_entries",
+            [],
+            |row| row.get(0),
+        )?;
         conn.execute(
             r#"
             INSERT INTO vault_entries(
-                id, title, url, username, password, category, notes, created_at, updated_at
-            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+                id, title, url, username, password, category, notes, sort_order,
+                created_at, updated_at
+            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
             "#,
             params![
                 entry.id,
@@ -103,6 +110,7 @@ impl Storage {
                 entry.password,
                 entry.category,
                 entry.notes,
+                sort_order,
                 entry.created_at,
                 entry.updated_at,
             ],
@@ -145,6 +153,22 @@ impl Storage {
         )
         .optional()?
         .ok_or_else(|| AppError("vault entry not found".into()))
+    }
+
+    pub fn reorder_vault_entries(&self, ordered_ids: Vec<String>) -> AppResult<Vec<VaultEntry>> {
+        let mut conn = self.conn()?;
+        let tx = conn.transaction()?;
+        for (index, id) in ordered_ids.iter().enumerate() {
+            let changed = tx.execute(
+                "UPDATE vault_entries SET sort_order = ?2 WHERE id = ?1",
+                params![id, index as i64],
+            )?;
+            if changed == 0 {
+                return Err(AppError(format!("vault entry not found: {id}")));
+            }
+        }
+        tx.commit()?;
+        self.list_vault_entries()
     }
 
     pub fn delete_vault_entry(&self, id: &str) -> AppResult<()> {

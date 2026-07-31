@@ -27,6 +27,15 @@ pub fn vault_entry_update(
 
 #[tauri::command]
 #[specta::specta]
+pub fn vault_entries_reorder(
+    state: State<AppState>,
+    ordered_ids: Vec<String>,
+) -> AppResult<Vec<VaultEntry>> {
+    state.storage.reorder_vault_entries(ordered_ids)
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn vault_entry_delete(state: State<AppState>, id: String) -> AppResult<()> {
     state.storage.delete_vault_entry(&id)
 }

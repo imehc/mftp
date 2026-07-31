@@ -240,6 +240,8 @@ export const vaultEntryUpdate = (id: string, input: VaultEntryInput) =>
   unwrapCommand(commands.vaultEntryUpdate(id, input));
 export const vaultEntryDelete = (id: string) =>
   voidCommand(commands.vaultEntryDelete(id));
+export const vaultEntriesReorder = (orderedIds: string[]) =>
+  unwrapCommand(commands.vaultEntriesReorder(orderedIds));
 
 // ---- Export / Import ----
 export const dataExport = (

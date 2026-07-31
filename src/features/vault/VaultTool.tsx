@@ -1,11 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   Copy,
   Eye,
   EyeOff,
   Globe,
+  GripVertical,
   Home,
   KeyRound,
   Pencil,
@@ -42,8 +60,10 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import VaultEntryDialog from "~/features/vault/VaultEntryDialog";
+import { cn } from "~/lib/utils";
 import {
   vaultEntriesList,
+  vaultEntriesReorder,
   vaultEntryCreate,
   vaultEntryDelete,
   vaultEntryUpdate,
@@ -59,6 +79,53 @@ function formatError(error: unknown): string {
   return String(error);
 }
 
+function SortableEntryCard({
+  id,
+  sortable,
+  children,
+}: {
+  id: string;
+  sortable: boolean;
+  children: ReactNode;
+}) {
+  const { t } = useLingui();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id, disabled: !sortable });
+  const style = {
+    // Translate only: Transform would also apply the strategy's scale and
+    // squash cards whose heights differ.
+    transform: CSS.Translate.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn("relative", isDragging && "z-10 opacity-80")}
+    >
+      {sortable ? (
+        <button
+          type="button"
+          className="absolute left-1 top-1/2 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-accent"
+          aria-label={t`拖动排序`}
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="size-3.5" />
+        </button>
+      ) : null}
+      {children}
+    </div>
+  );
+}
+
 export default function VaultTool() {
   const { t } = useLingui();
   const [entries, setEntries] = useState<VaultEntry[]>([]);
@@ -68,6 +135,10 @@ export default function VaultTool() {
   const [editing, setEditing] = useState<VaultEntry | null>(null);
   const [deleting, setDeleting] = useState<VaultEntry | null>(null);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   useEffect(() => {
     vaultEntriesList()
@@ -96,6 +167,32 @@ export default function VaultTool() {
     });
   }, [entries, search, category]);
 
+  const canSort =
+    !search.trim() && category === ALL_CATEGORIES && entries.length > 1;
+  const sortableIds = useMemo(() => entries.map((e) => e.id), [entries]);
+
+  async function onDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = sortableIds.indexOf(String(active.id));
+    const newIndex = sortableIds.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const previous = entries;
+    setEntries(arrayMove(entries, oldIndex, newIndex));
+    try {
+      const next = await vaultEntriesReorder(
+        arrayMove(sortableIds, oldIndex, newIndex),
+      );
+      setEntries(next);
+    } catch (cause) {
+      setEntries(previous);
+      const error = formatError(cause);
+      toast.error(t`排序保存失败：${error}`);
+    }
+  }
+
   async function copyText(value: string, successMessage: string) {
     if (!value) return;
     try {
@@ -120,7 +217,7 @@ export default function VaultTool() {
       if (editing) {
         const updated = await vaultEntryUpdate(editing.id, input);
         setEntries((prev) =>
-          [updated, ...prev.filter((e) => e.id !== updated.id)],
+          prev.map((e) => (e.id === updated.id ? updated : e)),
         );
       } else {
         const created = await vaultEntryCreate(input);
@@ -242,129 +339,148 @@ export default function VaultTool() {
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="flex flex-col gap-2">
-            {filtered.map((entry) => {
-              const visible = visibleIds.has(entry.id);
-              return (
-                <section
-                  key={entry.id}
-                  className="rounded-lg border border-border bg-card p-2.5"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <h2 className="truncate text-sm font-semibold">
-                        {entry.title}
-                      </h2>
-                      {entry.category ? (
-                        <Badge variant="outline">{entry.category}</Badge>
-                      ) : null}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {entry.url ? (
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          title={t`打开网址`}
-                          onClick={() => {
-                            void openUrl(entry.url!).catch((error) =>
-                              toast.error(formatError(error)),
-                            );
-                          }}
-                        >
-                          <Globe />
-                        </Button>
-                      ) : null}
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        title={t`编辑`}
-                        onClick={() => {
-                          setEditing(entry);
-                          setDialogOpen(true);
-                        }}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onDragEnd}
+          >
+            <SortableContext
+              items={sortableIds}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-2">
+                {filtered.map((entry) => {
+                  const visible = visibleIds.has(entry.id);
+                  return (
+                    <SortableEntryCard
+                      key={entry.id}
+                      id={entry.id}
+                      sortable={canSort}
+                    >
+                      <section
+                        className={cn(
+                          "rounded-lg border border-border bg-card p-2.5",
+                          canSort && "pl-6",
+                        )}
                       >
-                        <Pencil />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        title={t`删除`}
-                        onClick={() => setDeleting(entry)}
-                      >
-                        <Trash2 />
-                      </Button>
-                    </div>
-                  </div>
-                  {entry.username || entry.password ? (
-                    <div className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
-                      {entry.username ? (
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="shrink-0 text-xs text-muted-foreground">
-                            <Trans>账号</Trans>
-                          </span>
-                          <span className="min-w-0 truncate font-mono text-xs">
-                            {entry.username}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            title={t`复制账号`}
-                            onClick={() =>
-                              void copyText(entry.username!, t`已复制账号`)
-                            }
-                          >
-                            <Copy />
-                          </Button>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <h2 className="truncate text-sm font-semibold">
+                              {entry.title}
+                            </h2>
+                            {entry.category ? (
+                              <Badge variant="outline">{entry.category}</Badge>
+                            ) : null}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {entry.url ? (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                title={t`打开网址`}
+                                onClick={() => {
+                                  void openUrl(entry.url!).catch((error) =>
+                                    toast.error(formatError(error)),
+                                  );
+                                }}
+                              >
+                                <Globe />
+                              </Button>
+                            ) : null}
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              title={t`编辑`}
+                              onClick={() => {
+                                setEditing(entry);
+                                setDialogOpen(true);
+                              }}
+                            >
+                              <Pencil />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              title={t`删除`}
+                              onClick={() => setDeleting(entry)}
+                            >
+                              <Trash2 />
+                            </Button>
+                          </div>
                         </div>
-                      ) : null}
-                      {entry.password ? (
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="shrink-0 text-xs text-muted-foreground">
-                            <Trans>密码</Trans>
-                          </span>
-                          <span className="min-w-0 truncate font-mono text-xs">
-                            {visible ? entry.password : "••••••••"}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            title={visible ? t`隐藏密码` : t`显示密码`}
-                            onClick={() => toggleVisible(entry.id)}
-                          >
-                            {visible ? <EyeOff /> : <Eye />}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            title={t`复制密码`}
-                            onClick={() =>
-                              void copyText(entry.password!, t`已复制密码`)
-                            }
-                          >
-                            <Copy />
-                          </Button>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  {entry.url || entry.notes ? (
-                    <div className="mt-1 flex flex-col gap-0.5">
-                      {entry.url ? (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {entry.url}
-                        </p>
-                      ) : null}
-                      {entry.notes ? (
-                        <p className="line-clamp-2 whitespace-pre-wrap text-xs text-muted-foreground">
-                          {entry.notes}
-                        </p>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })}
-          </div>
+                        {entry.username || entry.password ? (
+                          <div className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
+                            {entry.username ? (
+                              <div className="flex min-w-0 items-center gap-1.5">
+                                <span className="shrink-0 text-xs text-muted-foreground">
+                                  <Trans>账号</Trans>
+                                </span>
+                                <span className="min-w-0 truncate font-mono text-xs">
+                                  {entry.username}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  title={t`复制账号`}
+                                  onClick={() =>
+                                    void copyText(entry.username!, t`已复制账号`)
+                                  }
+                                >
+                                  <Copy />
+                                </Button>
+                              </div>
+                            ) : null}
+                            {entry.password ? (
+                              <div className="flex min-w-0 items-center gap-1.5">
+                                <span className="shrink-0 text-xs text-muted-foreground">
+                                  <Trans>密码</Trans>
+                                </span>
+                                <span className="min-w-0 truncate font-mono text-xs">
+                                  {visible ? entry.password : "••••••••"}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  title={visible ? t`隐藏密码` : t`显示密码`}
+                                  onClick={() => toggleVisible(entry.id)}
+                                >
+                                  {visible ? <EyeOff /> : <Eye />}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  title={t`复制密码`}
+                                  onClick={() =>
+                                    void copyText(entry.password!, t`已复制密码`)
+                                  }
+                                >
+                                  <Copy />
+                                </Button>
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : null}
+                        {entry.url || entry.notes ? (
+                          <div className="mt-1 flex flex-col gap-0.5">
+                            {entry.url ? (
+                              <p className="truncate text-xs text-muted-foreground">
+                                {entry.url}
+                              </p>
+                            ) : null}
+                            {entry.notes ? (
+                              <p className="line-clamp-2 whitespace-pre-wrap text-xs text-muted-foreground">
+                                {entry.notes}
+                              </p>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </section>
+                    </SortableEntryCard>
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
