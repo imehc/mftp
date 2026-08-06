@@ -50,6 +50,8 @@ export interface BilliardsStageProps {
   interactive: boolean;
   /** Local player must place the cue ball (drag on the table). */
   ballInHand: boolean;
+  /** Follow/draw spin: -0.7 draw, 0 neutral, +0.7 follow. */
+  followDraw: number;
   /** Live charge preview (0..1) while dragging, 0 on release/cancel. */
   onPowerPreview(power: number): void;
   /** Fired when a drag is released with enough charge. */
@@ -59,6 +61,7 @@ export interface BilliardsStageProps {
 
 interface Scene {
   setBalls(balls: BallState[]): void;
+  setFollowDraw(followDraw: number): void;
   setInteraction(interactive: boolean, ballInHand: boolean): void;
   playPresentation(presentation: BilliardsPresentation): Promise<void>;
   animateAiCue(angle: number, power: number): Promise<void>;
@@ -84,15 +87,68 @@ function createScene(
   // --- overlays -------------------------------------------------------
   const guideLayer = new Graphics();
   const cueLayer = new Container();
+  const cueShadow = new Graphics();
   const cueStick = new Graphics();
   // Tapered stick pointing in +x; pivot at the tip.
   const stickLen = px(1.05);
-  cueStick
-    .poly([0, -3.4, stickLen, -6.5, stickLen, 6.5, 0, 3.4])
-    .fill(0x9a6b45)
-    .poly([0, -3.4, px(0.12), -3.9, px(0.12), 3.9, 0, 3.4])
-    .fill(0xd9c6a5);
-  cueLayer.addChild(cueStick);
+  const TIP_HW = 3.2;
+  const BUTT_HW = 6.8;
+  /** Half-width of the tapered shaft at distance `x` from the tip. */
+  const stickHW = (x: number): number =>
+    TIP_HW + (BUTT_HW - TIP_HW) * (x / stickLen);
+  /** Fill a tapered band of the stick between two distances from the tip. */
+  const band = (
+    g: Graphics,
+    x0: number,
+    x1: number,
+    color: number,
+    alpha = 1,
+  ): void => {
+    g.poly([
+      x0, -stickHW(x0),
+      x1, -stickHW(x1),
+      x1, stickHW(x1),
+      x0, stickHW(x0),
+    ]).fill({ color, alpha });
+  };
+  /**
+   * Lengthwise strip between two fractions of the half-width, used for the
+   * specular line and the underside shading that make the stick read round.
+   */
+  const strip = (a: number, b: number, color: number, alpha: number): void => {
+    cueStick
+      .poly([
+        0, stickHW(0) * a,
+        stickLen, stickHW(stickLen) * a,
+        stickLen, stickHW(stickLen) * b,
+        0, stickHW(0) * b,
+      ])
+      .fill({ color, alpha });
+  };
+
+  // Material sections, tip → butt.
+  band(cueStick, 0, px(0.014), 0x3f6597); // chalked leather tip
+  band(cueStick, px(0.014), px(0.038), 0xf3ede1); // ivory ferrule
+  band(cueStick, px(0.038), px(0.60), 0xd7b183); // pale maple shaft
+  band(cueStick, px(0.60), px(0.638), 0x2c2c2c); // joint collar
+  band(cueStick, px(0.638), px(0.80), 0x6d3a23); // rosewood forearm
+  band(cueStick, px(0.80), px(0.95), 0x3b2b21); // linen wrap
+  band(cueStick, px(0.95), stickLen - px(0.022), 0x5b2f1e); // butt sleeve
+  band(cueStick, stickLen - px(0.022), stickLen, 0x1b1b1b); // rubber bumper
+  // Silver accent rings either side of the wrap.
+  band(cueStick, px(0.792), px(0.80), 0xcfc9ba);
+  band(cueStick, px(0.95), px(0.958), 0xcfc9ba);
+
+  // Cylindrical shading: light from the top-left, shadow along the underside.
+  strip(-1, -0.62, 0xffffff, 0.1);
+  strip(-0.62, -0.3, 0xffffff, 0.2);
+  strip(-0.42, -0.32, 0xffffff, 0.26);
+  strip(0.34, 0.72, 0x000000, 0.18);
+  strip(0.72, 1, 0x000000, 0.3);
+
+  // Soft drop shadow so the cue floats above the felt.
+  band(cueShadow, 0, stickLen, 0x000000, 0.22);
+  cueLayer.addChild(cueShadow, cueStick);
   cueLayer.visible = false;
   const ghostLayer = new Graphics();
   root.addChild(guideLayer, cueLayer, ghostLayer);
@@ -101,6 +157,7 @@ function createScene(
   let balls: BallState[] = [];
   let interactive = false;
   let ballInHand = false;
+  let followDraw = 0;
   let aimAngle = Math.PI; // default: facing the rack from the head spot
   const cuePull = { value: 0 };
   let playing = false;
@@ -158,8 +215,8 @@ function createScene(
     color: number,
     alpha: number,
   ): void {
-    const dash = 9;
-    const gap = 7;
+    const dash = 8;
+    const gap = 5;
     const dx = x1 - x0;
     const dy = y1 - y0;
     const len = Math.hypot(dx, dy);
@@ -170,7 +227,7 @@ function createScene(
       const e = Math.min(d + dash, len);
       g.moveTo(x0 + ux * d, y0 + uy * d).lineTo(x0 + ux * e, y0 + uy * e);
     }
-    g.stroke({ width: 2, color, alpha });
+    g.stroke({ width: 1.5, color, alpha });
   }
 
   function redrawOverlays(): void {
@@ -201,25 +258,31 @@ function createScene(
         cueView.position.set(px(placing.x), px(placing.y));
       }
       ghostLayer
-        .circle(px(placing.x), px(placing.y), r * 1.55)
+        .circle(px(placing.x), px(placing.y), r * 1.5)
         .stroke({
-          width: 2,
+          width: 1.5,
           color: placing.valid ? 0x9fe8bd : 0xd93025,
-          alpha: 0.9,
+          alpha: 0.85,
         });
       return;
     }
     if (!interactive || ballInHand) return;
 
-    const guide = computeAimGuide(balls, aimAngle);
+    const guide = computeAimGuide(balls, aimAngle, followDraw);
     if (!guide) return;
 
     const cx = px(guide.cue.x);
     const cy = px(guide.cue.y);
     const ix = px(guide.contact.x);
     const iy = px(guide.contact.y);
-    drawDashedLine(guideLayer, cx, cy, ix, iy, 0xffffff, 0.75);
-    guideLayer.circle(ix, iy, r).stroke({ width: 2, color: 0xffffff, alpha: 0.85 });
+    drawDashedLine(guideLayer, cx, cy, ix, iy, 0xffffff, 0.65);
+    // Ghost ball: thin ring with a faint fill so it reads as a position,
+    // not as another ball.
+    guideLayer
+      .circle(ix, iy, r)
+      .fill({ color: 0xffffff, alpha: 0.06 })
+      .circle(ix, iy, r)
+      .stroke({ width: 1.2, color: 0xffffff, alpha: 0.75 });
 
     if (guide.target) {
       const len = px(0.16 + 0.4 * guide.target.fullness);
@@ -229,14 +292,14 @@ function createScene(
           px(guide.target.center.x) + guide.target.dir.x * len,
           px(guide.target.center.y) + guide.target.dir.y * len,
         )
-        .stroke({ width: 3, color: 0xffe57f, alpha: 0.9 });
+        .stroke({ width: 1.8, color: 0xffe57f, alpha: 0.85 });
     }
     if (guide.cueDeflection && guide.target) {
       const len = px(0.1 + 0.28 * (1 - guide.target.fullness));
       guideLayer
         .moveTo(ix, iy)
         .lineTo(ix + guide.cueDeflection.x * len, iy + guide.cueDeflection.y * len)
-        .stroke({ width: 2, color: 0xffffff, alpha: 0.4 });
+        .stroke({ width: 1.2, color: 0xffffff, alpha: 0.35 });
     }
 
     // Cue stick behind the ball, pulled back with power.
@@ -424,6 +487,10 @@ function createScene(
         redrawOverlays();
       }
     },
+    setFollowDraw(nextFollowDraw) {
+      followDraw = nextFollowDraw;
+      redrawOverlays();
+    },
     setInteraction(nextInteractive, nextBallInHand) {
       interactive = nextInteractive;
       ballInHand = nextBallInHand;
@@ -483,6 +550,7 @@ export const BilliardsStage = forwardRef<BilliardsStageHandle, BilliardsStagePro
         });
         sceneRef.current = scene;
         scene.setBalls(propsRef.current.balls);
+        scene.setFollowDraw(propsRef.current.followDraw);
         scene.setInteraction(
           propsRef.current.interactive,
           propsRef.current.ballInHand,
@@ -500,6 +568,9 @@ export const BilliardsStage = forwardRef<BilliardsStageHandle, BilliardsStagePro
     useEffect(() => {
       sceneRef.current?.setBalls(props.balls);
     }, [props.balls]);
+    useEffect(() => {
+      sceneRef.current?.setFollowDraw(props.followDraw);
+    }, [props.followDraw]);
     useEffect(() => {
       sceneRef.current?.setInteraction(props.interactive, props.ballInHand);
     }, [props.interactive, props.ballInHand]);

@@ -344,6 +344,7 @@ function MatchView({
           balls={state.balls}
           interactive={activeIsLocal}
           ballInHand={ballInHand}
+          followDraw={followDraw}
           onPowerPreview={setPowerPreview}
           onShot={(angle, power) => {
             if (!activeIsLocal || state.ballInHand) return;

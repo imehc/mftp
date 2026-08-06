@@ -53,8 +53,8 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        CFBundleShortVersionString: 0.1.9
-        CFBundleVersion: "0.1.9"
+        CFBundleShortVersionString: 0.1.10
+        CFBundleVersion: "0.1.10"
         NSLocalNetworkUsageDescription: mftp 需要访问本地网络,以便发现附近设备并进行局域网文件传输。
         NSBonjourServices: [_mftp._tcp]
     entitlements:

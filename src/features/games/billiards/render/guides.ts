@@ -2,9 +2,9 @@
  * Aim guide geometry (pure math, no physics engine): sweep the cue ball
  * along the aim direction to its first contact — ball or cushion — and
  * derive the ghost-ball position, the object ball's departure line, and
- * the cue ball's tangent deflection.
+ * the cue ball's deflection (matching the restitution+spin model from physics).
  */
-import { BALL_RADIUS, TABLE_H, TABLE_W } from "../constants";
+import { BALL_RADIUS, BALL_RESTITUTION, FOLLOW_DRAW_FACTOR, TABLE_H, TABLE_W } from "../constants";
 import type { BallState } from "../types";
 
 export interface Vec2 {
@@ -33,6 +33,7 @@ export interface AimGuide {
 export function computeAimGuide(
   balls: readonly BallState[],
   angle: number,
+  followDraw: number = 0,
 ): AimGuide | null {
   const cueBall = balls.find((ball) => ball.id === 0 && !ball.potted);
   if (!cueBall) return null;
@@ -84,16 +85,22 @@ export function computeAimGuide(
   const targetDir = { x: targetDirRaw.x / targetLen, y: targetDirRaw.y / targetLen };
   const fullness = Math.max(0, dir.x * targetDir.x + dir.y * targetDir.y);
 
-  // Cue ball keeps the tangent (perpendicular) velocity component.
-  const tangent = {
-    x: dir.x - fullness * targetDir.x,
-    y: dir.y - fullness * targetDir.y,
-  };
-  const tangentLen = Math.hypot(tangent.x, tangent.y);
+  // Cue ball deflection matching the real collision model:
+  //   v_cue' ∝ sinθ·t̂ + ((1-e)/2·fullness + followDraw·FOLLOW_DRAW_FACTOR)·n̂
+  // where t̂ = normalized tangent, n̂ = targetDir (away from contact).
+  const sinTheta = Math.sqrt(Math.max(0, 1 - fullness * fullness));
+  const tangentX = dir.x - fullness * targetDir.x;
+  const tangentY = dir.y - fullness * targetDir.y;
+  const tangentLen = Math.hypot(tangentX, tangentY);
+  const tHatX = tangentLen > 1e-6 ? tangentX / tangentLen : 0;
+  const tHatY = tangentLen > 1e-6 ? tangentY / tangentLen : 0;
+  const restitutionTerm = ((1 - BALL_RESTITUTION) / 2) * fullness;
+  const spinTerm = followDraw * FOLLOW_DRAW_FACTOR;
+  const nx = sinTheta * tHatX + (restitutionTerm + spinTerm) * targetDir.x;
+  const ny = sinTheta * tHatY + (restitutionTerm + spinTerm) * targetDir.y;
+  const nLen = Math.hypot(nx, ny);
   const cueDeflection =
-    tangentLen > 1e-6
-      ? { x: tangent.x / tangentLen, y: tangent.y / tangentLen }
-      : null;
+    nLen > 1e-6 ? { x: nx / nLen, y: ny / nLen } : null;
 
   return {
     cue,
