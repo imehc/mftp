@@ -3,9 +3,9 @@ use crate::models::{ExportSection, ImportPreview};
 use argon2::{Algorithm, Argon2, Params, Version};
 use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
-use chacha20poly1305::aead::rand_core::RngCore;
-use chacha20poly1305::aead::{Aead, KeyInit, OsRng};
+use chacha20poly1305::aead::{Aead, Generate, KeyInit};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
+use std::convert::TryFrom;
 use serde_json::{json, Map, Value};
 
 use super::{now_ms, Storage};
@@ -28,16 +28,21 @@ fn derive_key(password: &str, salt: &[u8], m: u32, t: u32, p: u32) -> AppResult<
 }
 
 fn encrypt_envelope(plain: &Value, password: &str) -> AppResult<Value> {
+    // `Generate` uses the system CSPRNG re-exported by `aead` (already a
+    // dependency via `chacha20poly1305`), so no extra crate is needed.
+    let nonce = Nonce::generate();
+    // Salt needs 16 bytes; build it from two CSPRNG-generated nonces.
+    let salt_tail = Nonce::generate();
     let mut salt = [0u8; 16];
-    let mut nonce = [0u8; 12];
-    OsRng.fill_bytes(&mut salt);
-    OsRng.fill_bytes(&mut nonce);
+    salt[..12].copy_from_slice(nonce.as_slice());
+    salt[12..].copy_from_slice(&salt_tail.as_slice()[..4]);
     let key = derive_key(password, &salt, KDF_M_COST, KDF_T_COST, KDF_P_COST)?;
-    let cipher = ChaCha20Poly1305::new(Key::from_slice(&key));
+    let key = Key::try_from(&key[..]).expect("key is 32 bytes");
+    let cipher = ChaCha20Poly1305::new(&key);
     let plaintext =
         serde_json::to_vec(plain).map_err(|e| AppError(format!("serialize failed: {e}")))?;
     let ciphertext = cipher
-        .encrypt(Nonce::from_slice(&nonce), plaintext.as_slice())
+        .encrypt(&nonce, plaintext.as_slice())
         .map_err(|_| AppError("encryption failed".into()))?;
     Ok(json!({
         "app": "mftp",
@@ -93,9 +98,12 @@ pub(super) fn decrypt_envelope(doc: &Map<String, Value>, password: &str) -> AppR
     }
     let nonce = b64_field(doc, "nonce")?;
     let data = b64_field(doc, "data")?;
-    let cipher = ChaCha20Poly1305::new(Key::from_slice(&key));
+    let key = Key::try_from(&key[..]).map_err(|_| AppError("derived key has wrong length".into()))?;
+    let cipher = ChaCha20Poly1305::new(&key);
+    let nonce =
+        Nonce::try_from(nonce.as_slice()).map_err(|_| AppError("wrong password or corrupted file".into()))?;
     let plaintext = cipher
-        .decrypt(Nonce::from_slice(&nonce), data.as_slice())
+        .decrypt(&nonce, data.as_slice())
         .map_err(|_| AppError("wrong password or corrupted file".into()))?;
     serde_json::from_slice(&plaintext).map_err(|e| AppError(format!("invalid decrypted data: {e}")))
 }
