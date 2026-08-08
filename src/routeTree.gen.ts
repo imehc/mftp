@@ -16,7 +16,6 @@ import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
-import { Route as ToolsDiskCleanRouteImport } from './routes/tools/disk-clean'
 import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
@@ -58,11 +57,6 @@ const GamesXiangqiRoute = GamesXiangqiRouteImport.update({
 const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
   id: '/tools/crypto',
   path: '/tools/crypto',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsDiskCleanRoute = ToolsDiskCleanRouteImport.update({
-  id: '/tools/disk-clean',
-  path: '/tools/disk-clean',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsFormatterRoute = ToolsFormatterRouteImport.update({
@@ -109,7 +103,6 @@ export interface FileRoutesByFullPath {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
-  '/tools/disk-clean': typeof ToolsDiskCleanRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -126,7 +119,6 @@ export interface FileRoutesByTo {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
-  '/tools/disk-clean': typeof ToolsDiskCleanRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -144,7 +136,6 @@ export interface FileRoutesById {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/tools/crypto': typeof ToolsCryptoRoute
-  '/tools/disk-clean': typeof ToolsDiskCleanRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
@@ -163,7 +154,6 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/tools/crypto'
-    | '/tools/disk-clean'
     | '/tools/formatter'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -180,7 +170,6 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/tools/crypto'
-    | '/tools/disk-clean'
     | '/tools/formatter'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -197,7 +186,6 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/tools/crypto'
-    | '/tools/disk-clean'
     | '/tools/formatter'
     | '/tools/image-compress'
     | '/tools/lan-transfer'
@@ -215,7 +203,6 @@ export interface RootRouteChildren {
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
-  ToolsDiskCleanRoute: typeof ToolsDiskCleanRoute
   ToolsFormatterRoute: typeof ToolsFormatterRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
@@ -274,13 +261,6 @@ declare module '@tanstack/react-router' {
       path: '/tools/crypto'
       fullPath: '/tools/crypto'
       preLoaderRoute: typeof ToolsCryptoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/disk-clean': {
-      id: '/tools/disk-clean'
-      path: '/tools/disk-clean'
-      fullPath: '/tools/disk-clean'
-      preLoaderRoute: typeof ToolsDiskCleanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/formatter': {
@@ -343,7 +323,6 @@ const rootRouteChildren: RootRouteChildren = {
   GamesGomokuRoute: GamesGomokuRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
-  ToolsDiskCleanRoute: ToolsDiskCleanRoute,
   ToolsFormatterRoute: ToolsFormatterRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,

@@ -20,7 +20,6 @@ export const TOOL_ROUTES = [
   "media-compress",
   "formatter",
   "vault",
-  "disk-clean",
 ] as const;
 
 export type ToolRoute = (typeof TOOL_ROUTES)[number];

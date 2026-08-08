@@ -18,9 +18,6 @@ export const GAME_ROOM_PEER = "game-room://peer";
 export const GAME_ROOM_MESSAGE = "game-room://message";
 export const GAME_ROOM_CLOSED = "game-room://closed";
 
-/** Disk-clean scan progress. Payload: `ScanProgress`. */
-export const DISK_CLEAN_PROGRESS = "disk-clean://progress";
-
 /**
  * SSH terminal events are per-session, so the name carries the session id.
  * Built by `src-tauri/src/ssh/shell_worker.rs` with the same shape.

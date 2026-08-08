@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr "，目录变更需重启服务后完整生效"
 
 #. placeholder {0}: stats.hostCount
-#: src/features/home/entries.tsx:61
+#: src/features/home/entries.tsx:60
 msgid "{0} 主机"
 msgstr "{0} 主机"
 
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
-#: src/features/home/entries.tsx:67
+#: src/features/home/entries.tsx:66
 #: src/features/home/HomePage.tsx:121
 msgid "{0} 传输"
 msgstr "{0} 传输"
@@ -104,15 +104,10 @@ msgstr "{0} 行"
 
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
-#: src/features/home/entries.tsx:64
+#: src/features/home/entries.tsx:63
 #: src/features/home/HomePage.tsx:118
 msgid "{0} 连接"
 msgstr "{0} 连接"
-
-#. placeholder {0}: counters.skipped
-#: src/features/disk-clean/DiskCleanTool.tsx:150
-msgid "{0} 项无权限已跳过，可在「系统设置 > 隐私与安全性 > 完全磁盘访问权限」中授权"
-msgstr "{0} 项无权限已跳过，可在「系统设置 > 隐私与安全性 > 完全磁盘访问权限」中授权"
 
 #: src/features/transfers/TransferPanel.tsx:56
 msgid "{hours} 小时"
@@ -191,17 +186,9 @@ msgstr "AI 思考中…"
 msgid "AVIF（不支持）"
 msgstr "AVIF（不支持）"
 
-#: src/features/disk-clean/rulesMeta.tsx:25
-msgid "Cargo registry 缓存"
-msgstr "Cargo registry 缓存"
-
 #: src/features/settings/AppSettingsMenu.tsx:123
 msgid "DesignByte"
 msgstr "DesignByte"
-
-#: src/features/disk-clean/rulesMeta.tsx:46
-msgid "Docker 数据"
-msgstr "Docker 数据"
 
 #: src/i18n/locales.ts:10
 msgid "English"
@@ -210,22 +197,6 @@ msgstr "English"
 #: src/features/settings/AppSettingsMenu.tsx:130
 msgid "Geist"
 msgstr "Geist"
-
-#: src/features/disk-clean/rulesMeta.tsx:26
-msgid "Go 模块缓存"
-msgstr "Go 模块缓存"
-
-#: src/features/disk-clean/rulesMeta.tsx:27
-msgid "Gradle 缓存"
-msgstr "Gradle 缓存"
-
-#: src/features/disk-clean/rulesMeta.tsx:21
-msgid "Homebrew 缓存"
-msgstr "Homebrew 缓存"
-
-#: src/features/disk-clean/rulesMeta.tsx:34
-msgid "iOS 模拟器运行时"
-msgstr "iOS 模拟器运行时"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:305
 msgid "IP:端口 直连"
@@ -243,17 +214,9 @@ msgstr "MP4 · MOV · M4V，文件不会上传"
 msgid "MX-Brutalist"
 msgstr "MX-Brutalist"
 
-#: src/features/disk-clean/rulesMeta.tsx:23
-msgid "npm 缓存"
-msgstr "npm 缓存"
-
 #: src/features/settings/AppSettingsMenu.tsx:131
 msgid "Outfit"
 msgstr "Outfit"
-
-#: src/features/disk-clean/rulesMeta.tsx:42
-msgid "Parallels 虚拟机"
-msgstr "Parallels 虚拟机"
 
 #: src/features/settings/AppSettingsMenu.tsx:132
 msgid "Plus Jakarta"
@@ -271,10 +234,6 @@ msgstr "PNG · JPG · WebP，默认保持原格式输出"
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG 为无损格式，压缩程度影响有限"
 
-#: src/features/disk-clean/rulesMeta.tsx:24
-msgid "pnpm 存储"
-msgstr "pnpm 存储"
-
 #: src/features/export/sections.tsx:21
 msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP 主机连接配置"
@@ -286,14 +245,6 @@ msgstr "Tiesen"
 #: src/features/crypto/CryptoTool.tsx:208
 msgid "URL Safe"
 msgstr "URL Safe"
-
-#: src/features/disk-clean/rulesMeta.tsx:20
-msgid "Xcode 派生数据"
-msgstr "Xcode 派生数据"
-
-#: src/features/disk-clean/rulesMeta.tsx:28
-msgid "Xcode 设备支持"
-msgstr "Xcode 设备支持"
 
 #: src/features/games/xiangqi/labels.tsx:43
 msgid "三次重复局面"
@@ -396,7 +347,7 @@ msgid "两次输入的密码不一致"
 msgstr "两次输入的密码不一致"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:35
-#: src/features/home/entries.tsx:252
+#: src/features/home/entries.tsx:230
 msgid "中国象棋"
 msgstr "中国象棋"
 
@@ -443,7 +394,7 @@ msgid "互换"
 msgstr "互换"
 
 #: src/features/games/gomoku/GomokuGame.tsx:36
-#: src/features/home/entries.tsx:212
+#: src/features/home/entries.tsx:190
 msgid "五子棋"
 msgstr "五子棋"
 
@@ -451,10 +402,10 @@ msgstr "五子棋"
 #: src/features/games/go/labels.tsx:87
 #: src/features/games/gomoku/labels.tsx:79
 #: src/features/games/xiangqi/labels.tsx:75
-#: src/features/home/entries.tsx:199
-#: src/features/home/entries.tsx:216
-#: src/features/home/entries.tsx:236
-#: src/features/home/entries.tsx:256
+#: src/features/home/entries.tsx:177
+#: src/features/home/entries.tsx:194
+#: src/features/home/entries.tsx:214
+#: src/features/home/entries.tsx:234
 msgid "人机"
 msgstr "人机"
 
@@ -608,11 +559,6 @@ msgstr "全部来源"
 msgid "全部结果"
 msgstr "全部结果"
 
-#. placeholder {0}: formatBytes(counters.totalBytes)
-#: src/features/disk-clean/DiskCleanTool.tsx:144
-msgid "共 {0}"
-msgstr "共 {0}"
-
 #. placeholder {0}: state.moveCount
 #: src/features/games/go/GoMatch.tsx:288
 #: src/features/games/gomoku/GomokuMatch.tsx:246
@@ -684,10 +630,6 @@ msgstr "准备中"
 #: src/features/media-compress/components/CompressResultCard.tsx:66
 msgid "减小 {delta}%"
 msgstr "减小 {delta}%"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:275
-msgid "分析目录"
-msgstr "分析目录"
 
 #: src/features/vault/VaultEntryDialog.tsx:143
 #: src/features/vault/VaultTool.tsx:308
@@ -772,10 +714,6 @@ msgstr "删除这条日志？"
 msgid "刷新"
 msgstr "刷新"
 
-#: src/features/disk-clean/rulesMeta.tsx:19
-msgid "前端构建缓存"
-msgstr "前端构建缓存"
-
 #: src/features/lan-transfer/LanTransferSidebar.tsx:217
 msgid "剩余 "
 msgstr "剩余 "
@@ -804,7 +742,7 @@ msgstr "加密文件，请输入密码"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/entries.tsx:98
+#: src/features/home/entries.tsx:97
 msgid "加解密"
 msgstr "加解密"
 
@@ -831,7 +769,7 @@ msgid "历史记录"
 msgstr "历史记录"
 
 #: src/features/formatter/FormatterTool.tsx:340
-#: src/features/home/entries.tsx:124
+#: src/features/home/entries.tsx:123
 msgid "压缩"
 msgstr "压缩"
 
@@ -901,10 +839,10 @@ msgstr "参数未变化，无需重新处理"
 #: src/features/games/go/labels.tsx:83
 #: src/features/games/gomoku/labels.tsx:75
 #: src/features/games/xiangqi/labels.tsx:71
-#: src/features/home/entries.tsx:202
-#: src/features/home/entries.tsx:219
-#: src/features/home/entries.tsx:239
-#: src/features/home/entries.tsx:259
+#: src/features/home/entries.tsx:180
+#: src/features/home/entries.tsx:197
+#: src/features/home/entries.tsx:217
+#: src/features/home/entries.tsx:237
 msgid "双人"
 msgstr "双人"
 
@@ -940,9 +878,6 @@ msgid "发现设备"
 msgstr "发现设备"
 
 #: src/components/ui/prompt-dialog.tsx:96
-#: src/features/disk-clean/AnalyzePanel.tsx:73
-#: src/features/disk-clean/DiskCleanTool.tsx:242
-#: src/features/disk-clean/RemoveConfirmDialog.tsx:68
 #: src/features/export/ExportDialog.tsx:165
 #: src/features/export/ImportDialog.tsx:177
 #: src/features/games/engine/GameHeaderControls.tsx:50
@@ -973,10 +908,6 @@ msgstr "取消"
 msgid "口令保护"
 msgstr "口令保护"
 
-#: src/features/disk-clean/RulePicker.tsx:64
-msgid "只统计，不删除"
-msgstr "只统计，不删除"
-
 #: src/lib/updater.ts:47
 msgid "只能在桌面应用中检查更新"
 msgstr "只能在桌面应用中检查更新"
@@ -988,12 +919,8 @@ msgstr "只能在桌面应用中检查更新"
 msgid "只读"
 msgstr "只读"
 
-#: src/features/disk-clean/DiskCleanTool.tsx:92
-msgid "可用空间"
-msgstr "可用空间"
-
 #: src/features/games/billiards/BilliardsGame.tsx:59
-#: src/features/home/entries.tsx:195
+#: src/features/home/entries.tsx:173
 msgid "台球"
 msgstr "台球"
 
@@ -1105,7 +1032,7 @@ msgid "困难"
 msgstr "困难"
 
 #: src/features/games/go/GoGame.tsx:36
-#: src/features/home/entries.tsx:232
+#: src/features/home/entries.tsx:210
 msgid "围棋"
 msgstr "围棋"
 
@@ -1146,21 +1073,6 @@ msgstr "图片改尺寸"
 msgid "图片文件"
 msgstr "图片文件"
 
-#: src/features/disk-clean/AnalyzePanel.tsx:132
-#: src/features/disk-clean/AnalyzePanel.tsx:133
-#: src/features/disk-clean/ScanResultTable.tsx:149
-#: src/features/disk-clean/ScanResultTable.tsx:150
-msgid "在 Finder 中显示"
-msgstr "在 Finder 中显示"
-
-#: src/features/disk-clean/rulesMeta.tsx:31
-msgid "在 Finder 中清空"
-msgstr "在 Finder 中清空"
-
-#: src/features/disk-clean/rulesMeta.tsx:43
-msgid "在 Parallels 控制中心删除"
-msgstr "在 Parallels 控制中心删除"
-
 #: src/features/formatter/FormatterTool.tsx:243
 msgid "在内容中搜索（Ctrl+F）"
 msgstr "在内容中搜索（Ctrl+F）"
@@ -1168,10 +1080,6 @@ msgstr "在内容中搜索（Ctrl+F）"
 #: src/features/ssh-sftp/SshSftpTool.tsx:49
 msgid "在左侧选择主机并点击连接，或新建主机"
 msgstr "在左侧选择主机并点击连接，或新建主机"
-
-#: src/features/disk-clean/rulesMeta.tsx:39
-msgid "在微信设置中清理"
-msgstr "在微信设置中清理"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
 msgid "在线"
@@ -1249,7 +1157,7 @@ msgstr "大小"
 msgid "失败"
 msgstr "失败"
 
-#: src/features/home/entries.tsx:120
+#: src/features/home/entries.tsx:119
 #: src/features/media-compress/MediaCompressTool.tsx:31
 #: src/features/media-compress/MediaCompressTool.tsx:48
 msgid "媒体处理"
@@ -1258,10 +1166,6 @@ msgstr "媒体处理"
 #: src/features/settings/AppSettingsMenu.tsx:369
 msgid "字体"
 msgstr "字体"
-
-#: src/features/disk-clean/RulePicker.tsx:10
-msgid "安全"
-msgstr "安全"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:239
 msgid "安全模式"
@@ -1298,7 +1202,7 @@ msgid "密码"
 msgstr "密码"
 
 #: src/features/export/sections.tsx:15
-#: src/features/home/entries.tsx:157
+#: src/features/home/entries.tsx:156
 #: src/features/vault/VaultTool.tsx:259
 #: src/features/vault/VaultTool.tsx:276
 msgid "密码本"
@@ -1422,16 +1326,6 @@ msgstr "将撤销 {0} 手棋，是否同意？"
 msgid "将死"
 msgstr "将死"
 
-#. placeholder {0}: formatBytes(bytes)
-#: src/features/disk-clean/RemoveConfirmDialog.tsx:49
-msgid "将永久删除 {0}，无法恢复。"
-msgstr "将永久删除 {0}，无法恢复。"
-
-#. placeholder {0}: formatBytes(bytes)
-#: src/features/disk-clean/RemoveConfirmDialog.tsx:53
-msgid "将移到废纸篓，可释放 {0}。"
-msgstr "将移到废纸篓，可释放 {0}。"
-
 #: src/features/crypto/CryptoTool.tsx:131
 msgid "将结果写回输入并切换模式"
 msgstr "将结果写回输入并切换模式"
@@ -1440,7 +1334,7 @@ msgstr "将结果写回输入并切换模式"
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "将返回模式选择,当前对局的进度将会丢失。"
 
-#: src/features/home/entries.tsx:31
+#: src/features/home/entries.tsx:30
 msgid "小游戏"
 msgstr "小游戏"
 
@@ -1455,7 +1349,7 @@ msgstr "尺寸模式"
 msgid "局域网"
 msgstr "局域网"
 
-#: src/features/home/entries.tsx:82
+#: src/features/home/entries.tsx:81
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -1479,7 +1373,7 @@ msgstr "局域网传输辅助数据加载失败：{0}"
 msgid "展开侧边栏"
 msgstr "展开侧边栏"
 
-#: src/features/home/entries.tsx:30
+#: src/features/home/entries.tsx:29
 msgid "工具"
 msgstr "工具"
 
@@ -1538,8 +1432,6 @@ msgstr "已删除共享目录"
 msgid "已删除白名单"
 msgstr "已删除白名单"
 
-#: src/features/disk-clean/AnalyzePanel.tsx:97
-#: src/features/disk-clean/DiskCleanTool.tsx:136
 #: src/features/lan-transfer/LanTransferSidebar.tsx:53
 #: src/store/transfers.ts:126
 msgid "已取消"
@@ -1596,11 +1488,6 @@ msgstr "已导出"
 msgid "已开启开机自启"
 msgstr "已开启开机自启"
 
-#. placeholder {0}: counters.scannedFiles
-#: src/features/disk-clean/DiskCleanTool.tsx:118
-msgid "已扫描 {0} 个文件 · <0/>"
-msgstr "已扫描 {0} 个文件 · <0/>"
-
 #: src/features/lan-transfer/LanTransferTool.tsx:305
 msgid "已拒绝访问"
 msgstr "已拒绝访问"
@@ -1634,11 +1521,6 @@ msgstr "已添加共享目录"
 msgid "已添加白名单"
 msgstr "已添加白名单"
 
-#. placeholder {0}: formatBytes(report.freedBytes)
-#: src/features/disk-clean/DiskCleanTool.tsx:201
-msgid "已清理 {0}"
-msgstr "已清理 {0}"
-
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:278
 msgid "已移动 {0}"
@@ -1652,12 +1534,6 @@ msgstr "已解压到 {outName}"
 #: src/features/ssh-sftp/components/Sidebar.tsx:333
 msgid "已连接 · {0}"
 msgstr "已连接 · {0}"
-
-#. placeholder {0}: selectedPaths.size
-#. placeholder {1}: formatBytes(selectedBytes)
-#: src/features/disk-clean/DiskCleanTool.tsx:293
-msgid "已选 {0} 项 · {1}"
-msgstr "已选 {0} 项 · {1}"
 
 #: src/features/games/go/labels.tsx:61
 #: src/features/games/go/labels.tsx:101
@@ -1673,11 +1549,6 @@ msgstr "并发上限"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:430
 msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
-
-#: src/features/disk-clean/rulesMeta.tsx:30
-#: src/features/home/entries.tsx:185
-msgid "废纸篓"
-msgstr "废纸篓"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:251
 #: src/features/settings/AppSettingsMenu.tsx:220
@@ -1699,10 +1570,6 @@ msgstr "开始压缩"
 #: src/features/media-compress/resize/ImageResizePanel.tsx:424
 msgid "开始处理"
 msgstr "开始处理"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:246
-msgid "开始扫描"
-msgstr "开始扫描"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:257
 #: src/features/lan-transfer/LanTransferSidebar.tsx:32
@@ -1762,11 +1629,7 @@ msgstr "当前配置的 {0} 不在可用网卡列表中，访问地址可能失�
 msgid "待授权请求"
 msgstr "待授权请求"
 
-#: src/features/disk-clean/rulesMeta.tsx:38
-msgid "微信数据"
-msgstr "微信数据"
-
-#: src/features/home/entries.tsx:164
+#: src/features/home/entries.tsx:163
 msgid "快速复制"
 msgstr "快速复制"
 
@@ -1811,10 +1674,6 @@ msgstr "所有日志记录都会被删除，且无法恢复。"
 msgid "所有者"
 msgstr "所有者"
 
-#: src/features/disk-clean/RulePicker.tsx:12
-msgid "手动"
-msgstr "手动"
-
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:188
 msgid "打开"
 msgstr "打开"
@@ -1843,17 +1702,9 @@ msgstr "打开终端失败：{e}"
 msgid "打开网址"
 msgstr "打开网址"
 
-#: src/features/disk-clean/DiskCleanTool.tsx:129
-msgid "扫描失败"
-msgstr "扫描失败"
-
 #: src/features/lan-transfer/LanTransferSidebar.tsx:105
 msgid "扫码访问"
 msgstr "扫码访问"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:227
-msgid "找出可安全删除的缓存"
-msgstr "找出可安全删除的缓存"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:415
 msgid "折叠侧边栏"
@@ -1898,10 +1749,6 @@ msgstr "按尺寸"
 msgid "按比例"
 msgstr "按比例"
 
-#: src/features/disk-clean/DiskCleanTool.tsx:272
-msgid "按规则清理"
-msgstr "按规则清理"
-
 #: src/features/ssh-sftp/components/Sidebar.tsx:482
 msgid "换个关键词试试"
 msgstr "换个关键词试试"
@@ -1931,7 +1778,7 @@ msgid "提子 {0}:{1}"
 msgstr "提子 {0}:{1}"
 
 #: src/features/formatter/FormatterTool.tsx:246
-#: src/features/home/entries.tsx:146
+#: src/features/home/entries.tsx:145
 #: src/features/vault/VaultTool.tsx:302
 msgid "搜索"
 msgstr "搜索"
@@ -1956,7 +1803,7 @@ msgstr "操作"
 msgid "改为自动选择"
 msgstr "改为自动选择"
 
-#: src/features/home/entries.tsx:127
+#: src/features/home/entries.tsx:126
 msgid "改尺寸"
 msgstr "改尺寸"
 
@@ -2163,8 +2010,8 @@ msgstr "服务运行中，端口、接收目录、安全模式和权限需停止
 msgid "未选择"
 msgstr "未选择"
 
-#: src/features/home/entries.tsx:130
-#: src/features/home/entries.tsx:161
+#: src/features/home/entries.tsx:129
+#: src/features/home/entries.tsx:160
 #: src/features/vault/VaultTool.tsx:263
 msgid "本地"
 msgstr "本地"
@@ -2223,7 +2070,7 @@ msgstr "校验"
 #: src/features/formatter/FormatterTool.tsx:213
 #: src/features/formatter/FormatterTool.tsx:230
 #: src/features/formatter/FormatterTool.tsx:331
-#: src/features/home/entries.tsx:141
+#: src/features/home/entries.tsx:140
 msgid "格式化"
 msgstr "格式化"
 
@@ -2281,10 +2128,6 @@ msgstr "正在下载版本 {0}"
 msgid "正在准备版本 {0}"
 msgstr "正在准备版本 {0}"
 
-#: src/features/disk-clean/AnalyzePanel.tsx:91
-msgid "正在分析…"
-msgstr "正在分析…"
-
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:317
 msgid "正在删除 {0}…"
@@ -2321,10 +2164,6 @@ msgstr "正在打开终端…"
 #: src/features/games/engine/online/OnlineLobby.tsx:260
 msgid "正在搜索…未发现房间时可用下方地址直连"
 msgstr "正在搜索…未发现房间时可用下方地址直连"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:116
-msgid "正在查找…"
-msgstr "正在查找…"
 
 #: src/features/settings/AppSettingsMenu.tsx:109
 msgid "正在检查"
@@ -2377,7 +2216,7 @@ msgstr "活动中"
 msgid "浅色"
 msgstr "浅色"
 
-#: src/features/home/entries.tsx:87
+#: src/features/home/entries.tsx:86
 msgid "浏览器访问"
 msgstr "浏览器访问"
 
@@ -2417,15 +2256,6 @@ msgstr "清台"
 #: src/features/games/billiards/BilliardsMatch.tsx:362
 msgid "清台完成!"
 msgstr "清台完成!"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:256
-#: src/features/disk-clean/RemoveConfirmDialog.tsx:71
-msgid "清理"
-msgstr "清理"
-
-#: src/features/disk-clean/RemoveConfirmDialog.tsx:45
-msgid "清理 {count} 项"
-msgstr "清理 {count} 项"
 
 #: src/features/crypto/CryptoTool.tsx:143
 #: src/features/formatter/FormatterTool.tsx:264
@@ -2520,21 +2350,9 @@ msgstr "玩家 2"
 msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
-#: src/features/disk-clean/rulesMeta.tsx:47
-msgid "用 docker system prune 清理"
-msgstr "用 docker system prune 清理"
-
-#: src/features/disk-clean/rulesMeta.tsx:35
-msgid "用 Xcode > Settings > Platforms 删除"
-msgstr "用 Xcode > Settings > Platforms 删除"
-
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:166
 msgid "用户名"
 msgstr "用户名"
-
-#: src/features/disk-clean/rulesMeta.tsx:22
-msgid "用户日志"
-msgstr "用户日志"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:173
 msgid "留空则使用 SSH 配置或本机用户"
@@ -2590,10 +2408,6 @@ msgstr "目标高度"
 msgid "直接"
 msgstr "直接"
 
-#: src/features/disk-clean/RemoveConfirmDialog.tsx:64
-msgid "直接永久删除，不经废纸篓"
-msgstr "直接永久删除，不经废纸篓"
-
 #: src/features/games/engine/online/OnlineLobby.tsx:315
 msgid "直连"
 msgstr "直连"
@@ -2642,11 +2456,6 @@ msgstr "确认码"
 #: src/features/lan-transfer/LanTransferTool.tsx:365
 msgid "确认码 {0}"
 msgstr "确认码 {0}"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:224
-#: src/features/home/entries.tsx:178
-msgid "磁盘清理"
-msgstr "磁盘清理"
 
 #: src/features/media-compress/components/CompressModeTabs.tsx:19
 msgid "视频压缩"
@@ -2833,12 +2642,8 @@ msgstr "继续"
 msgid "继续传输中"
 msgstr "继续传输中"
 
-#: src/features/home/entries.tsx:182
-msgid "缓存"
-msgstr "缓存"
-
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/entries.tsx:102
+#: src/features/home/entries.tsx:101
 msgid "编码"
 msgstr "编码"
 
@@ -2890,9 +2695,9 @@ msgstr "耗时 "
 #: src/features/games/go/labels.tsx:84
 #: src/features/games/gomoku/labels.tsx:76
 #: src/features/games/xiangqi/labels.tsx:72
-#: src/features/home/entries.tsx:222
-#: src/features/home/entries.tsx:242
-#: src/features/home/entries.tsx:262
+#: src/features/home/entries.tsx:200
+#: src/features/home/entries.tsx:220
+#: src/features/home/entries.tsx:240
 msgid "联机"
 msgstr "联机"
 
@@ -2978,7 +2783,7 @@ msgid "解析中"
 msgstr "解析中"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/entries.tsx:105
+#: src/features/home/entries.tsx:104
 msgid "解码"
 msgstr "解码"
 
@@ -3029,10 +2834,6 @@ msgstr "请先选择图片文件"
 msgid "请先选择视频文件"
 msgstr "请先选择视频文件"
 
-#: src/features/disk-clean/useDiskScan.ts:143
-msgid "请先选择要清理的项目"
-msgstr "请先选择要清理的项目"
-
 #: src/components/ui/prompt-dialog.tsx:42
 #: src/features/vault/VaultEntryDialog.tsx:62
 msgid "请输入内容"
@@ -3068,10 +2869,6 @@ msgstr "读取信息"
 #: src/features/ssh-sftp/SshSftpTool.tsx:233
 msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
-
-#: src/features/disk-clean/RulePicker.tsx:11
-msgid "谨慎"
-msgstr "谨慎"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:36
 #: src/features/games/go/labels.tsx:106
@@ -3167,8 +2964,6 @@ msgstr "近 7 天"
 msgid "返回选择"
 msgstr "返回选择"
 
-#: src/features/disk-clean/DiskCleanTool.tsx:218
-#: src/features/disk-clean/DiskCleanTool.tsx:218
 #: src/features/games/engine/GameHeaderControls.tsx:52
 #: src/features/logs/LogPageLayout.tsx:29
 #: src/features/logs/LogPageLayout.tsx:29
@@ -3190,10 +2985,6 @@ msgstr "还没有主机"
 #: src/features/ssh-sftp/SshSftpTool.tsx:46
 msgid "还没有打开的连接"
 msgstr "还没有打开的连接"
-
-#: src/features/disk-clean/AnalyzePanel.tsx:109
-msgid "这一层没有内容"
-msgstr "这一层没有内容"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:50
 msgid "进行中"
@@ -3264,10 +3055,6 @@ msgstr "退出对局"
 msgid "退出当前对局?"
 msgstr "退出当前对局?"
 
-#: src/features/disk-clean/AnalyzePanel.tsx:67
-msgid "选一个目录，按体积排行"
-msgstr "选一个目录，按体积排行"
-
 #: src/features/lan-transfer/LanShareDialog.tsx:124
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:228
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:141
@@ -3332,10 +3119,6 @@ msgstr "选择接收目录"
 msgid "选择文件"
 msgstr "选择文件"
 
-#: src/features/disk-clean/AnalyzePanel.tsx:82
-msgid "选择目录"
-msgstr "选择目录"
-
 #: src/features/media-compress/video/VideoCompressPanel.tsx:267
 #: src/features/media-compress/video/VideoCompressPanel.tsx:276
 msgid "选择视频"
@@ -3369,10 +3152,6 @@ msgstr "选择缩放比例"
 msgid "选择缩进"
 msgstr "选择缩进"
 
-#: src/features/disk-clean/useDiskAnalyze.ts:84
-msgid "选择要分析的目录"
-msgstr "选择要分析的目录"
-
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
 msgid "选择解压位置"
 msgstr "选择解压位置"
@@ -3396,10 +3175,6 @@ msgstr "递归按字母升序排序对象键"
 #: src/features/formatter/FormatterTool.tsx:359
 msgid "递归按字母降序排序对象键"
 msgstr "递归按字母降序排序对象键"
-
-#: src/features/disk-clean/DiskCleanTool.tsx:199
-msgid "部分项目未能清理"
-msgstr "部分项目未能清理"
 
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "重启中"
@@ -3427,10 +3202,6 @@ msgstr "重启更新"
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:119
 msgid "重命名"
 msgstr "重命名"
-
-#: src/features/disk-clean/ScanResultTable.tsx:140
-msgid "重建慢"
-msgstr "重建慢"
 
 #: src/features/games/engine/GameHeaderControls.tsx:64
 #: src/features/games/engine/GameHeaderControls.tsx:104

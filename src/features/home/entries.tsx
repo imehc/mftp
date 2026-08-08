@@ -8,14 +8,13 @@ import {
   CircleDot,
   Crown,
   Grid3x3,
-  HardDrive,
   KeyRound,
   LockKeyhole,
   TerminalSquare,
   Wifi,
 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
-import { isMacPlatform, isMobilePlatform } from "~/lib/platform";
+import { isMobilePlatform } from "~/lib/platform";
 import type { ToolRoute } from "~/store/settings";
 
 export interface HomeStats {
@@ -31,7 +30,7 @@ export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
   games: <Trans>小游戏</Trans>,
 };
 
-export type HomePlatform = "desktop" | "mobile" | "macos";
+export type HomePlatform = "desktop" | "mobile";
 
 export interface HomeEntry {
   id: string;
@@ -167,27 +166,6 @@ export const homeEntries: HomeEntry[] = [
     ),
   },
   {
-    id: "disk-clean",
-    category: "tools",
-    link: linkOptions({ to: "/tools/disk-clean", preload: "viewport" }),
-    toolId: "disk-clean",
-    // macOS only: the backend registers no disk_clean_* commands elsewhere,
-    // so the page would fail at the IPC layer rather than degrade.
-    platforms: ["macos"],
-    icon: HardDrive,
-    title: <Trans>磁盘清理</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>缓存</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>废纸篓</Trans>
-        </Badge>
-      </>
-    ),
-  },
-  {
     id: "billiards",
     category: "games",
     link: linkOptions({ to: "/games/billiards", preload: "viewport" }),
@@ -266,20 +244,11 @@ export const homeEntries: HomeEntry[] = [
   },
 ];
 
-// macOS satisfies both "desktop" and "macos", so membership is a set rather
-// than a single value — a macOS-only entry must not appear on Windows/Linux,
-// where the backend registers no commands for it.
-const currentPlatforms: readonly HomePlatform[] = isMobilePlatform()
-  ? ["mobile"]
-  : isMacPlatform()
-    ? ["desktop", "macos"]
-    : ["desktop"];
+const currentPlatform: HomePlatform = isMobilePlatform() ? "mobile" : "desktop";
 
 /** Home entries available on the current platform. */
 export const availableHomeEntries: HomeEntry[] = homeEntries.filter(
-  (entry) =>
-    !entry.platforms ||
-    entry.platforms.some((platform) => currentPlatforms.includes(platform)),
+  (entry) => !entry.platforms || entry.platforms.includes(currentPlatform),
 );
 
 export function getToolEntry(tool: ToolRoute): HomeEntry | undefined {

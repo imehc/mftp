@@ -255,24 +255,3 @@ export const dataImport = (
   password: string | null,
   mode: ImportMode,
 ) => unwrapCommand(commands.dataImport(raw, password, mode));
-
-// ---- Disk Clean (macOS only) ----
-// Infallible on the Rust side, so it returns the catalog directly rather than
-// a Result envelope — do not wrap it in `unwrapCommand`.
-export const diskCleanRules = () => commands.diskCleanRules();
-export const diskCleanScan = (ruleIds: string[]) =>
-  unwrapCommand(commands.diskCleanScan(ruleIds));
-export const diskCleanAnalyze = (root: string, depth: number) =>
-  unwrapCommand(commands.diskCleanAnalyze(root, depth));
-export const diskCleanJob = (jobId: string) =>
-  unwrapCommand(commands.diskCleanJob(jobId));
-export const diskCleanCancel = (jobId: string) =>
-  voidCommand(commands.diskCleanCancel(jobId));
-export const diskCleanRemove = (
-  jobId: string,
-  paths: string[],
-  permanent: boolean,
-) => unwrapCommand(commands.diskCleanRemove(jobId, paths, permanent));
-export const diskCleanReveal = (path: string) =>
-  voidCommand(commands.diskCleanReveal(path));
-export const diskCleanVolume = () => unwrapCommand(commands.diskCleanVolume());

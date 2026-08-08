@@ -48,7 +48,3 @@ specta-typescript = "=0.0.11"
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
 tauri-plugin-autostart = "2.5.1"
-
-# macOS-only dependencies
-[target.'cfg(target_os = "macos")'.dependencies]
-trash = "5"

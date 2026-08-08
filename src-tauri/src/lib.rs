@@ -1,6 +1,4 @@
 mod commands;
-#[cfg(target_os = "macos")]
-mod disk_clean;
 mod error;
 mod game_room;
 mod lan_transfer;
@@ -22,48 +20,18 @@ use tauri::Emitter as _;
 use tauri::Manager as _;
 use tauri_specta::{collect_commands, Builder};
 
-#[cfg(target_os = "macos")]
-use disk_clean::DiskCleanManager;
-
 /// Shared application state available to all commands.
 pub struct AppState {
     pub storage: Storage,
     pub manager: Arc<Manager>,
     pub lan_transfer: Arc<LanTransferManager>,
     pub game_room: Arc<GameRoomManager>,
-    #[cfg(target_os = "macos")]
-    pub disk_clean: Arc<DiskCleanManager>,
 }
 
 fn specta_builder() -> Builder<tauri::Wry> {
-    // Only the macOS branch below reassigns this, so `mut` is dead elsewhere.
-    #[cfg_attr(not(target_os = "macos"), allow(unused_mut))]
-    let mut builder = Builder::<tauri::Wry>::new().typ::<models::TransferProgress>();
-
-    #[cfg(target_os = "macos")]
-    {
-        builder = builder
-            .typ::<models::ScanProgress>()
-            .typ::<models::CleanRule>()
-            .typ::<models::RuleTier>()
-            .typ::<models::RebuildCost>()
-            .typ::<models::ScanResult>()
-            .typ::<models::ScannedItem>()
-            .typ::<models::ScanPhase>()
-            .typ::<models::ScanJob>()
-            .typ::<models::RemoveReport>()
-            .typ::<models::RemovedItem>()
-            .typ::<models::FailedItem>()
-            .typ::<models::VolumeStat>()
-            .typ::<models::TreeNode>();
-    }
-
-    // `collect_commands!` rejects `#[cfg]` on its entries, so the shared list
-    // lives in a local macro and the macOS-only commands are appended as raw
-    // tokens by the caller below.
-    macro_rules! all_commands {
-        ($($extra:tt)*) => {
-            collect_commands![
+    Builder::<tauri::Wry>::new()
+        .typ::<models::TransferProgress>()
+        .commands(collect_commands![
             commands::hosts_list,
             commands::host_get,
             commands::host_create,
@@ -132,27 +100,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::data_export,
             commands::data_inspect,
             commands::data_import,
-            $($extra)*
-            ]
-        };
-    }
-
-    #[cfg(target_os = "macos")]
-    let builder = builder.commands(all_commands![
-        commands::disk_clean_rules,
-        commands::disk_clean_scan,
-        commands::disk_clean_analyze,
-        commands::disk_clean_job,
-        commands::disk_clean_cancel,
-        commands::disk_clean_remove,
-        commands::disk_clean_reveal,
-        commands::disk_clean_volume,
-    ]);
-
-    #[cfg(not(target_os = "macos"))]
-    let builder = builder.commands(all_commands![]);
-
-    builder
+        ])
 }
 
 fn cleanup_stale_local_transfer_files() {
@@ -262,8 +210,6 @@ pub fn run() {
                 manager: Arc::new(manager),
                 lan_transfer,
                 game_room,
-                #[cfg(target_os = "macos")]
-                disk_clean: Arc::new(DiskCleanManager::new()),
             });
             Ok(())
         })
@@ -284,8 +230,6 @@ pub fn run() {
             state.manager.shutdown_all();
             state.lan_transfer.stop();
             state.game_room.leave();
-            #[cfg(target_os = "macos")]
-            state.disk_clean.shutdown_all();
         }
         cleanup_stale_local_transfer_files();
     });

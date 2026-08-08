@@ -1,8 +1,6 @@
 use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
-#[cfg(target_os = "macos")]
-mod disk_clean;
 mod export;
 mod game_room;
 mod hosts;
@@ -12,8 +10,6 @@ mod sftp;
 mod ssh;
 mod vault;
 
-#[cfg(target_os = "macos")]
-pub use disk_clean::*;
 pub use export::*;
 pub use game_room::*;
 pub use hosts::*;
