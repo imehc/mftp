@@ -11,6 +11,7 @@ import type {
   LanTransferTask,
 } from "~/types";
 import { translate } from "~/i18n/translate";
+import { formatBytes } from "~/lib/format";
 
 interface LanTransferSidebarProps {
   settings: LanTransferSettings | null;
@@ -31,13 +32,6 @@ function securityModeLabel(value?: string | null) {
   if (value === "open") return translate(msg`开放`);
   if (value === "trusted") return translate(msg`白名单`);
   return translate(msg`确认码`);
-}
-
-function formatBytes(value: number) {
-  if (value >= 1024 * 1024 * 1024) return `${(value / 1024 / 1024 / 1024).toFixed(1)} GB`;
-  if (value >= 1024 * 1024) return `${(value / 1024 / 1024).toFixed(1)} MB`;
-  if (value >= 1024) return `${(value / 1024).toFixed(1)} KB`;
-  return `${value} B`;
 }
 
 function formatDuration(ms: number) {

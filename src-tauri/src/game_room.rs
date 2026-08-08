@@ -36,12 +36,18 @@ use wire::{
 
 #[derive(Debug, Clone)]
 pub enum RoomEvent {
-    PeerJoined { name: String },
+    PeerJoined {
+        name: String,
+    },
     PeerLeft,
     /// Opaque payload from the peer webview; never parsed on this side.
-    Message { payload: String },
+    Message {
+        payload: String,
+    },
     /// Guest only: the room is gone (host left or connection lost).
-    Closed { reason: String },
+    Closed {
+        reason: String,
+    },
 }
 
 pub type EventSink = Arc<dyn Fn(RoomEvent) + Send + Sync>;
@@ -163,7 +169,14 @@ impl GameRoomManager {
             let (host_ip_c, has_code) = (host_ip.clone(), code.is_some());
             thread::spawn(move || {
                 run_responder(
-                    stop, room_id, game_id, room_name, player_name, host_ip_c, port, has_code,
+                    stop,
+                    room_id,
+                    game_id,
+                    room_name,
+                    player_name,
+                    host_ip_c,
+                    port,
+                    has_code,
                 );
             });
         }

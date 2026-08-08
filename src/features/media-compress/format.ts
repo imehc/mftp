@@ -1,17 +1,7 @@
 import { isMobilePlatform } from "~/lib/platform";
 
-export function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes < 0) return "-";
-  if (bytes < 1024) return `${Math.round(bytes)} B`;
-  const units = ["KB", "MB", "GB", "TB"] as const;
-  let value = bytes / 1024;
-  let unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit += 1;
-  }
-  return `${value.toFixed(value >= 100 ? 0 : 1)} ${units[unit]}`;
-}
+// Re-exported so the existing importers of this module keep working.
+export { formatBytes } from "~/lib/format";
 
 export function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "--:--";

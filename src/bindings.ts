@@ -78,6 +78,31 @@ export const commands = {
 	// Detect whether a file is an mftp export and whether it is encrypted.
 	dataInspect: (raw: string) => typedError<ImportPreview, AppError>(__TAURI_INVOKE("data_inspect", { raw })),
 	dataImport: (raw: string, password: string | null, mode: ImportMode) => typedError<ImportReport, AppError>(__TAURI_INVOKE("data_import", { raw, password, mode })),
+	// Rules catalog: every rule the frontend can show.
+	diskCleanRules: () => __TAURI_INVOKE<CleanRule[]>("disk_clean_rules"),
+	/**
+	 *  Start a rule-driven scan. Returns a job id; progress arrives on
+	 *  `disk-clean://progress`.
+	 */
+	diskCleanScan: (ruleIds: string[]) => typedError<string, string>(__TAURI_INVOKE("disk_clean_scan", { ruleIds })),
+	/**
+	 *  Start an arbitrary-directory analysis. The frontend picks the dir via a
+	 *  native dialog and passes the path here.
+	 */
+	diskCleanAnalyze: (root: string, depth: number) => typedError<string, string>(__TAURI_INVOKE("disk_clean_analyze", { root, depth })),
+	// Poll a job. Fallback for when a progress event is missed.
+	diskCleanJob: (jobId: string) => typedError<ScanJob, string>(__TAURI_INVOKE("disk_clean_job", { jobId })),
+	// Tell a running job to stop.
+	diskCleanCancel: (jobId: string) => typedError<null, string>(__TAURI_INVOKE("disk_clean_cancel", { jobId })),
+	/**
+	 *  Delete paths. Every path is gated against the scan's declared roots
+	 *  plus the hard denial list.
+	 */
+	diskCleanRemove: (jobId: string, paths: string[], permanent: boolean) => typedError<RemoveReport, string>(__TAURI_INVOKE("disk_clean_remove", { jobId, paths, permanent })),
+	// Open the containing folder in Finder and select the target.
+	diskCleanReveal: (path: string) => typedError<null, string>(__TAURI_INVOKE("disk_clean_reveal", { path })),
+	// Total and free space on the volume holding `$HOME`.
+	diskCleanVolume: () => typedError<VolumeStat, string>(__TAURI_INVOKE("disk_clean_volume")),
 };
 
 /* Types */
@@ -96,8 +121,29 @@ export type AppError = string;
 
 export type AuthType = "password" | "key";
 
+/**
+ *  One cleanable location. `globs` are relative to `$HOME` unless they
+ *  start with `/`.
+ */
+export type CleanRule = {
+	id: string,
+	tier: RuleTier,
+	globs: string[],
+	rebuildCost: RebuildCost,
+	/**
+	 *  Lingui key for the "do this by hand instead" hint. Always set for
+	 *  `Manual`, always `None` otherwise.
+	 */
+	externalHint: string | null,
+};
+
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts";
+
+export type FailedItem = {
+	path: string,
+	reason: string,
+};
 
 export type GameRoomStatus = {
 	// "idle" | "hosting" | "joined"
@@ -269,6 +315,96 @@ export type LanTrustedDeviceInput = {
 	ip: string,
 };
 
+// What it costs the user to get the deleted bytes back.
+export type RebuildCost = 
+// Regenerated automatically on next use, no network.
+"none" | 
+// Local rebuild, seconds to a minute.
+"cheap" | 
+// Requires a network refetch or a long rebuild.
+"expensive";
+
+// Outcome of one delete request.
+export type RemoveReport = {
+	removed: RemovedItem[],
+	failed: FailedItem[],
+	freedBytes: number,
+	// True when files went to the Trash and can still be put back.
+	recoverable: boolean,
+};
+
+export type RemovedItem = {
+	path: string,
+	bytes: number,
+};
+
+// How dangerous a rule is to apply.
+export type RuleTier = 
+// Pure build output. Deleting costs a rebuild, nothing else.
+"safe" | 
+// Recoverable but expensive to refetch (package caches, device support).
+"caution" | 
+/**
+ *  Analyse only — never offer a delete button. The app cannot remove
+ *  these safely, so it points the user at the vendor's own UI instead.
+ */
+"manual";
+
+/**
+ *  A scan job as the frontend sees it. Polling fallback for when an event
+ *  is missed.
+ */
+export type ScanJob = {
+	jobId: string,
+	phase: ScanPhase,
+	// Present once a rule scan finishes successfully.
+	result: ScanResult | null,
+	/**
+	 *  Present once a directory analysis finishes successfully. A job sets
+	 *  either `result` or `tree`, never both.
+	 */
+	tree: TreeNode | null,
+	// Present when the job failed for a reason other than cancellation.
+	error: string | null,
+};
+
+export type ScanPhase = 
+/**
+ *  Resolving rule globs against the filesystem. Separate from `Running`
+ *  because it can take tens of seconds on a large `$HOME` and produces no
+ *  counters — without its own phase the UI cannot tell "working" from
+ *  "hung".
+ */
+"expanding" | "running" | "completed" | "canceled" | 
+// Terminated by an error rather than by the user.
+"failed";
+
+// Live scan progress, emitted at most once per 120ms.
+export type ScanProgress = {
+	jobId: string,
+	scannedFiles: number,
+	scannedDirs: number,
+	totalBytes: number,
+	skipped: number,
+	phase: ScanPhase,
+};
+
+// Final scan results.
+export type ScanResult = {
+	jobId: string,
+	items: ScannedItem[],
+	totalBytes: number,
+	scannedFiles: number,
+	scannedDirs: number,
+	skipped: number,
+};
+
+export type ScannedItem = {
+	path: string,
+	bytes: number,
+	ruleId: string | null,
+};
+
 // A remote directory entry returned by SFTP listing.
 export type SftpEntry = {
 	name: string,
@@ -309,6 +445,15 @@ export type TransferProgress = {
 	total: number | null,
 };
 
+// A recursive directory tree node.
+export type TreeNode = {
+	name: string,
+	path: string,
+	bytes: number,
+	isDir: boolean,
+	children: TreeNode[],
+};
+
 export type VaultEntry = {
 	id: string,
 	title: string,
@@ -329,6 +474,13 @@ export type VaultEntryInput = {
 	password?: string | null,
 	category?: string | null,
 	notes?: string | null,
+};
+
+// Total and free bytes on the volume holding `$HOME`.
+export type VolumeStat = {
+	totalBytes: number,
+	freeBytes: number,
+	usedBytes: number,
 };
 
 /* Tauri Specta runtime */

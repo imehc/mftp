@@ -60,22 +60,28 @@ fn handshake_relay_and_rejoin() {
     let joined = join(&guest, "gomoku", "1234", "客人").unwrap();
     assert_eq!(joined.seat, Some(1));
     assert_eq!(joined.peer_name.as_deref(), Some("主机"));
-    wait_event(&host_rx, "peer joined", |e| {
-        matches!(e, RoomEvent::PeerJoined { name } if name == "客人")
-    });
+    wait_event(
+        &host_rx,
+        "peer joined",
+        |e| matches!(e, RoomEvent::PeerJoined { name } if name == "客人"),
+    );
 
     let (third, _third_rx) = manager();
     let err = join(&third, "gomoku", "1234", "第三人").unwrap_err();
     assert!(err.contains("已满"), "unexpected error: {err}");
 
     host.send("{\"t\":\"move\",\"seq\":0}".into()).unwrap();
-    wait_event(&guest_rx, "guest message", |e| {
-        matches!(e, RoomEvent::Message { payload } if payload.contains("\"seq\":0"))
-    });
+    wait_event(
+        &guest_rx,
+        "guest message",
+        |e| matches!(e, RoomEvent::Message { payload } if payload.contains("\"seq\":0")),
+    );
     guest.send("{\"t\":\"undo-request\"}".into()).unwrap();
-    wait_event(&host_rx, "host message", |e| {
-        matches!(e, RoomEvent::Message { payload } if payload.contains("undo-request"))
-    });
+    wait_event(
+        &host_rx,
+        "host message",
+        |e| matches!(e, RoomEvent::Message { payload } if payload.contains("undo-request")),
+    );
 
     guest.leave();
     wait_event(&host_rx, "peer left", |e| matches!(e, RoomEvent::PeerLeft));

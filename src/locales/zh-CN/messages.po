@@ -26,13 +26,13 @@ msgid "，目录变更需重启服务后完整生效"
 msgstr "，目录变更需重启服务后完整生效"
 
 #. placeholder {0}: stats.hostCount
-#: src/features/home/entries.tsx:60
+#: src/features/home/entries.tsx:61
 msgid "{0} 主机"
 msgstr "{0} 主机"
 
 #. placeholder {0}: runningTransfers.length
 #. placeholder {0}: stats.runningTransferCount
-#: src/features/home/entries.tsx:66
+#: src/features/home/entries.tsx:67
 #: src/features/home/HomePage.tsx:121
 msgid "{0} 传输"
 msgstr "{0} 传输"
@@ -104,16 +104,21 @@ msgstr "{0} 行"
 
 #. placeholder {0}: activeSessions.length
 #. placeholder {0}: stats.activeSessionCount
-#: src/features/home/entries.tsx:63
+#: src/features/home/entries.tsx:64
 #: src/features/home/HomePage.tsx:118
 msgid "{0} 连接"
 msgstr "{0} 连接"
 
-#: src/features/transfers/TransferPanel.tsx:65
+#. placeholder {0}: counters.skipped
+#: src/features/disk-clean/DiskCleanTool.tsx:150
+msgid "{0} 项无权限已跳过，可在「系统设置 > 隐私与安全性 > 完全磁盘访问权限」中授权"
+msgstr "{0} 项无权限已跳过，可在「系统设置 > 隐私与安全性 > 完全磁盘访问权限」中授权"
+
+#: src/features/transfers/TransferPanel.tsx:56
 msgid "{hours} 小时"
 msgstr "{hours} 小时"
 
-#: src/features/transfers/TransferPanel.tsx:64
+#: src/features/transfers/TransferPanel.tsx:55
 msgid "{hours} 小时 {remainingMinutes} 分"
 msgstr "{hours} 小时 {remainingMinutes} 分"
 
@@ -121,11 +126,11 @@ msgstr "{hours} 小时 {remainingMinutes} 分"
 msgid "{incomingLabel}名称"
 msgstr "{incomingLabel}名称"
 
-#: src/features/transfers/TransferPanel.tsx:59
+#: src/features/transfers/TransferPanel.tsx:50
 msgid "{minutes} 分"
 msgstr "{minutes} 分"
 
-#: src/features/transfers/TransferPanel.tsx:58
+#: src/features/transfers/TransferPanel.tsx:49
 msgid "{minutes} 分 {remainingSeconds} 秒"
 msgstr "{minutes} 分 {remainingSeconds} 秒"
 
@@ -133,17 +138,17 @@ msgstr "{minutes} 分 {remainingSeconds} 秒"
 msgid "{name} 的房间"
 msgstr "{name} 的房间"
 
-#: src/features/transfers/TransferPanel.tsx:117
+#: src/features/transfers/TransferPanel.tsx:108
 msgid "{pausedTransferCount} 个已暂停"
 msgstr "{pausedTransferCount} 个已暂停"
 
 #. placeholder {0}: formatBytes(state.downloaded)
 #. placeholder {1}: formatBytes(state.total)
-#: src/lib/updater.ts:368
+#: src/lib/updater.ts:369
 msgid "{percent}%（{0} / {1}）"
 msgstr "{percent}%（{0} / {1}）"
 
-#: src/features/transfers/TransferPanel.tsx:53
+#: src/features/transfers/TransferPanel.tsx:44
 msgid "{rounded} 秒"
 msgstr "{rounded} 秒"
 
@@ -151,11 +156,11 @@ msgstr "{rounded} 秒"
 msgid "{sharesCount} 个目录"
 msgstr "{sharesCount} 个目录"
 
-#: src/features/transfers/TransferPanel.tsx:120
+#: src/features/transfers/TransferPanel.tsx:111
 msgid "{transferringCount} 个进行中"
 msgstr "{transferringCount} 个进行中"
 
-#: src/features/transfers/TransferPanel.tsx:119
+#: src/features/transfers/TransferPanel.tsx:110
 msgid "{transferringCount} 进行中 · {pausedTransferCount} 已暂停"
 msgstr "{transferringCount} 进行中 · {pausedTransferCount} 已暂停"
 
@@ -186,9 +191,17 @@ msgstr "AI 思考中…"
 msgid "AVIF（不支持）"
 msgstr "AVIF（不支持）"
 
+#: src/features/disk-clean/rulesMeta.tsx:25
+msgid "Cargo registry 缓存"
+msgstr "Cargo registry 缓存"
+
 #: src/features/settings/AppSettingsMenu.tsx:123
 msgid "DesignByte"
 msgstr "DesignByte"
+
+#: src/features/disk-clean/rulesMeta.tsx:46
+msgid "Docker 数据"
+msgstr "Docker 数据"
 
 #: src/i18n/locales.ts:10
 msgid "English"
@@ -197,6 +210,22 @@ msgstr "English"
 #: src/features/settings/AppSettingsMenu.tsx:130
 msgid "Geist"
 msgstr "Geist"
+
+#: src/features/disk-clean/rulesMeta.tsx:26
+msgid "Go 模块缓存"
+msgstr "Go 模块缓存"
+
+#: src/features/disk-clean/rulesMeta.tsx:27
+msgid "Gradle 缓存"
+msgstr "Gradle 缓存"
+
+#: src/features/disk-clean/rulesMeta.tsx:21
+msgid "Homebrew 缓存"
+msgstr "Homebrew 缓存"
+
+#: src/features/disk-clean/rulesMeta.tsx:34
+msgid "iOS 模拟器运行时"
+msgstr "iOS 模拟器运行时"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:305
 msgid "IP:端口 直连"
@@ -214,9 +243,17 @@ msgstr "MP4 · MOV · M4V，文件不会上传"
 msgid "MX-Brutalist"
 msgstr "MX-Brutalist"
 
+#: src/features/disk-clean/rulesMeta.tsx:23
+msgid "npm 缓存"
+msgstr "npm 缓存"
+
 #: src/features/settings/AppSettingsMenu.tsx:131
 msgid "Outfit"
 msgstr "Outfit"
+
+#: src/features/disk-clean/rulesMeta.tsx:42
+msgid "Parallels 虚拟机"
+msgstr "Parallels 虚拟机"
 
 #: src/features/settings/AppSettingsMenu.tsx:132
 msgid "Plus Jakarta"
@@ -234,6 +271,10 @@ msgstr "PNG · JPG · WebP，默认保持原格式输出"
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG 为无损格式，压缩程度影响有限"
 
+#: src/features/disk-clean/rulesMeta.tsx:24
+msgid "pnpm 存储"
+msgstr "pnpm 存储"
+
 #: src/features/export/sections.tsx:21
 msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP 主机连接配置"
@@ -245,6 +286,14 @@ msgstr "Tiesen"
 #: src/features/crypto/CryptoTool.tsx:208
 msgid "URL Safe"
 msgstr "URL Safe"
+
+#: src/features/disk-clean/rulesMeta.tsx:20
+msgid "Xcode 派生数据"
+msgstr "Xcode 派生数据"
+
+#: src/features/disk-clean/rulesMeta.tsx:28
+msgid "Xcode 设备支持"
+msgstr "Xcode 设备支持"
 
 #: src/features/games/xiangqi/labels.tsx:43
 msgid "三次重复局面"
@@ -258,7 +307,7 @@ msgstr "上一个"
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "上一手已停手：再停一手即终局，落子则重新计数"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:64
+#: src/features/lan-transfer/LanTransferSidebar.tsx:58
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:271
 msgid "上传"
 msgstr "上传"
@@ -294,7 +343,7 @@ msgstr "上级目录"
 msgid "下一个"
 msgstr "下一个"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:65
+#: src/features/lan-transfer/LanTransferSidebar.tsx:59
 #: src/features/media-compress/components/CompressResultCard.tsx:76
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:105
 msgid "下载"
@@ -310,7 +359,7 @@ msgstr "下载 {0}"
 msgid "下载中"
 msgstr "下载中"
 
-#: src/lib/updater.ts:359
+#: src/lib/updater.ts:360
 msgid "下载完成，正在安装更新…"
 msgstr "下载完成，正在安装更新…"
 
@@ -318,12 +367,12 @@ msgstr "下载完成，正在安装更新…"
 msgid "下载文件夹"
 msgstr "下载文件夹"
 
-#: src/lib/updater.ts:163
+#: src/lib/updater.ts:164
 msgid "下载更新"
 msgstr "下载更新"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:29
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:34
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:22
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:27
 msgid "不可用"
 msgstr "不可用"
 
@@ -347,7 +396,7 @@ msgid "两次输入的密码不一致"
 msgstr "两次输入的密码不一致"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:35
-#: src/features/home/entries.tsx:230
+#: src/features/home/entries.tsx:252
 msgid "中国象棋"
 msgstr "中国象棋"
 
@@ -355,7 +404,7 @@ msgstr "中国象棋"
 msgid "中国象棋棋盘"
 msgstr "中国象棋棋盘"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:412
+#: src/features/games/billiards/BilliardsMatch.tsx:413
 msgid "中杆"
 msgstr "中杆"
 
@@ -371,7 +420,7 @@ msgid "中等"
 msgstr "中等"
 
 #: src/features/export/sections.tsx:20
-#: src/features/ssh-sftp/components/Sidebar.tsx:402
+#: src/features/ssh-sftp/components/Sidebar.tsx:401
 #: src/features/ssh-sftp/SshSftpTool.tsx:114
 msgid "主机"
 msgstr "主机"
@@ -394,7 +443,7 @@ msgid "互换"
 msgstr "互换"
 
 #: src/features/games/gomoku/GomokuGame.tsx:36
-#: src/features/home/entries.tsx:190
+#: src/features/home/entries.tsx:212
 msgid "五子棋"
 msgstr "五子棋"
 
@@ -402,10 +451,10 @@ msgstr "五子棋"
 #: src/features/games/go/labels.tsx:87
 #: src/features/games/gomoku/labels.tsx:79
 #: src/features/games/xiangqi/labels.tsx:75
-#: src/features/home/entries.tsx:177
-#: src/features/home/entries.tsx:194
-#: src/features/home/entries.tsx:214
-#: src/features/home/entries.tsx:234
+#: src/features/home/entries.tsx:199
+#: src/features/home/entries.tsx:216
+#: src/features/home/entries.tsx:236
+#: src/features/home/entries.tsx:256
 msgid "人机"
 msgstr "人机"
 
@@ -419,7 +468,7 @@ msgstr "人机对战"
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:30
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:86
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:390
-#: src/features/lan-transfer/LanTransferSidebar.tsx:26
+#: src/features/lan-transfer/LanTransferSidebar.tsx:27
 msgid "仅上传"
 msgstr "仅上传"
 
@@ -440,11 +489,11 @@ msgstr "仅支持 PNG、JPG、WebP 格式"
 msgid "仅限同一局域网内联机"
 msgstr "仅限同一局域网内联机"
 
-#: src/features/transfers/TransferPanel.tsx:273
+#: src/features/transfers/TransferPanel.tsx:262
 msgid "传输"
 msgstr "传输"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:169
+#: src/features/lan-transfer/LanTransferSidebar.tsx:163
 msgid "传输任务"
 msgstr "传输任务"
 
@@ -497,7 +546,7 @@ msgstr "保存到"
 msgid "保留音频"
 msgstr "保留音频"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:157
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:150
 msgid "修改日期"
 msgstr "修改日期"
 
@@ -539,7 +588,7 @@ msgstr "全部"
 msgid "全部作为新记录插入"
 msgstr "全部作为新记录插入"
 
-#: src/features/vault/VaultTool.tsx:217
+#: src/features/vault/VaultTool.tsx:314
 msgid "全部分类"
 msgstr "全部分类"
 
@@ -558,6 +607,11 @@ msgstr "全部来源"
 #: src/features/logs/ActivityLogsPage.tsx:127
 msgid "全部结果"
 msgstr "全部结果"
+
+#. placeholder {0}: formatBytes(counters.totalBytes)
+#: src/features/disk-clean/DiskCleanTool.tsx:144
+msgid "共 {0}"
+msgstr "共 {0}"
 
 #. placeholder {0}: state.moveCount
 #: src/features/games/go/GoMatch.tsx:288
@@ -578,7 +632,7 @@ msgid "共享目录"
 msgstr "共享目录"
 
 #: src/features/formatter/FormatterTool.tsx:89
-#: src/features/lan-transfer/LanTransferSidebar.tsx:257
+#: src/features/lan-transfer/LanTransferSidebar.tsx:251
 #: src/features/settings/AppSettingsMenu.tsx:226
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
 msgid "关闭"
@@ -631,8 +685,12 @@ msgstr "准备中"
 msgid "减小 {delta}%"
 msgstr "减小 {delta}%"
 
+#: src/features/disk-clean/DiskCleanTool.tsx:275
+msgid "分析目录"
+msgstr "分析目录"
+
 #: src/features/vault/VaultEntryDialog.tsx:143
-#: src/features/vault/VaultTool.tsx:211
+#: src/features/vault/VaultTool.tsx:308
 msgid "分类"
 msgstr "分类"
 
@@ -659,10 +717,10 @@ msgstr "创建时间"
 #: src/features/logs/LogPageLayout.tsx:88
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:43
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:125
-#: src/features/ssh-sftp/components/Sidebar.tsx:372
-#: src/features/ssh-sftp/components/Sidebar.tsx:558
-#: src/features/vault/VaultTool.tsx:291
-#: src/features/vault/VaultTool.tsx:402
+#: src/features/ssh-sftp/components/Sidebar.tsx:371
+#: src/features/ssh-sftp/components/Sidebar.tsx:557
+#: src/features/vault/VaultTool.tsx:404
+#: src/features/vault/VaultTool.tsx:518
 msgid "删除"
 msgstr "删除"
 
@@ -676,7 +734,7 @@ msgstr "删除 {0}"
 msgid "删除 {0}…"
 msgstr "删除 {0}…"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:547
+#: src/features/ssh-sftp/components/Sidebar.tsx:546
 msgid "删除主机"
 msgstr "删除主机"
 
@@ -697,7 +755,7 @@ msgstr "删除文件夹"
 msgid "删除日志"
 msgstr "删除日志"
 
-#: src/features/vault/VaultTool.tsx:391
+#: src/features/vault/VaultTool.tsx:507
 msgid "删除该账号？"
 msgstr "删除该账号？"
 
@@ -714,12 +772,16 @@ msgstr "删除这条日志？"
 msgid "刷新"
 msgstr "刷新"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:223
+#: src/features/disk-clean/rulesMeta.tsx:19
+msgid "前端构建缓存"
+msgstr "前端构建缓存"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:217
 msgid "剩余 "
 msgstr "剩余 "
 
 #. placeholder {0}: metrics.eta
-#: src/features/transfers/TransferPanel.tsx:413
+#: src/features/transfers/TransferPanel.tsx:402
 msgid "剩余 {0}"
 msgstr "剩余 {0}"
 
@@ -742,14 +804,14 @@ msgstr "加密文件，请输入密码"
 
 #: src/features/crypto/CryptoTool.tsx:101
 #: src/features/crypto/CryptoTool.tsx:118
-#: src/features/home/entries.tsx:97
+#: src/features/home/entries.tsx:98
 msgid "加解密"
 msgstr "加解密"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:196
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:299
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:246
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:251
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:239
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:244
 msgid "加载中…"
 msgstr "加载中…"
 
@@ -769,7 +831,7 @@ msgid "历史记录"
 msgstr "历史记录"
 
 #: src/features/formatter/FormatterTool.tsx:340
-#: src/features/home/entries.tsx:123
+#: src/features/home/entries.tsx:124
 msgid "压缩"
 msgstr "压缩"
 
@@ -839,10 +901,10 @@ msgstr "参数未变化，无需重新处理"
 #: src/features/games/go/labels.tsx:83
 #: src/features/games/gomoku/labels.tsx:75
 #: src/features/games/xiangqi/labels.tsx:71
-#: src/features/home/entries.tsx:180
-#: src/features/home/entries.tsx:197
-#: src/features/home/entries.tsx:217
-#: src/features/home/entries.tsx:237
+#: src/features/home/entries.tsx:202
+#: src/features/home/entries.tsx:219
+#: src/features/home/entries.tsx:239
+#: src/features/home/entries.tsx:259
 msgid "双人"
 msgstr "双人"
 
@@ -853,11 +915,11 @@ msgstr "双人"
 msgid "双人对战"
 msgstr "双人对战"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:320
+#: src/features/ssh-sftp/components/Sidebar.tsx:319
 msgid "双击切换到连接"
 msgstr "双击切换到连接"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:320
+#: src/features/ssh-sftp/components/Sidebar.tsx:319
 msgid "双击连接"
 msgstr "双击连接"
 
@@ -869,7 +931,7 @@ msgid "双方棋局状态不一致，本局无法继续。"
 msgstr "双方棋局状态不一致，本局无法继续。"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:157
+#: src/lib/updater.ts:158
 msgid "发现新版本 {0}"
 msgstr "发现新版本 {0}"
 
@@ -878,6 +940,9 @@ msgid "发现设备"
 msgstr "发现设备"
 
 #: src/components/ui/prompt-dialog.tsx:96
+#: src/features/disk-clean/AnalyzePanel.tsx:73
+#: src/features/disk-clean/DiskCleanTool.tsx:242
+#: src/features/disk-clean/RemoveConfirmDialog.tsx:68
 #: src/features/export/ExportDialog.tsx:165
 #: src/features/export/ImportDialog.tsx:177
 #: src/features/games/engine/GameHeaderControls.tsx:50
@@ -897,10 +962,10 @@ msgstr "发现设备"
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:40
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:114
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:232
-#: src/features/ssh-sftp/components/Sidebar.tsx:555
-#: src/features/transfers/TransferPanel.tsx:380
+#: src/features/ssh-sftp/components/Sidebar.tsx:554
+#: src/features/transfers/TransferPanel.tsx:369
 #: src/features/vault/VaultEntryDialog.tsx:173
-#: src/features/vault/VaultTool.tsx:399
+#: src/features/vault/VaultTool.tsx:515
 msgid "取消"
 msgstr "取消"
 
@@ -908,19 +973,27 @@ msgstr "取消"
 msgid "口令保护"
 msgstr "口令保护"
 
-#: src/lib/updater.ts:46
+#: src/features/disk-clean/RulePicker.tsx:64
+msgid "只统计，不删除"
+msgstr "只统计，不删除"
+
+#: src/lib/updater.ts:47
 msgid "只能在桌面应用中检查更新"
 msgstr "只能在桌面应用中检查更新"
 
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:29
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:84
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:388
-#: src/features/lan-transfer/LanTransferSidebar.tsx:25
+#: src/features/lan-transfer/LanTransferSidebar.tsx:26
 msgid "只读"
 msgstr "只读"
 
+#: src/features/disk-clean/DiskCleanTool.tsx:92
+msgid "可用空间"
+msgstr "可用空间"
+
 #: src/features/games/billiards/BilliardsGame.tsx:59
-#: src/features/home/entries.tsx:173
+#: src/features/home/entries.tsx:195
 msgid "台球"
 msgstr "台球"
 
@@ -967,7 +1040,7 @@ msgstr "同网段 MFTP 客户端，点击可直接打开访问地址"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:93
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:109
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:72
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:156
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:149
 msgid "名称"
 msgstr "名称"
 
@@ -1032,7 +1105,7 @@ msgid "困难"
 msgstr "困难"
 
 #: src/features/games/go/GoGame.tsx:36
-#: src/features/home/entries.tsx:210
+#: src/features/home/entries.tsx:232
 msgid "围棋"
 msgstr "围棋"
 
@@ -1073,6 +1146,21 @@ msgstr "图片改尺寸"
 msgid "图片文件"
 msgstr "图片文件"
 
+#: src/features/disk-clean/AnalyzePanel.tsx:132
+#: src/features/disk-clean/AnalyzePanel.tsx:133
+#: src/features/disk-clean/ScanResultTable.tsx:149
+#: src/features/disk-clean/ScanResultTable.tsx:150
+msgid "在 Finder 中显示"
+msgstr "在 Finder 中显示"
+
+#: src/features/disk-clean/rulesMeta.tsx:31
+msgid "在 Finder 中清空"
+msgstr "在 Finder 中清空"
+
+#: src/features/disk-clean/rulesMeta.tsx:43
+msgid "在 Parallels 控制中心删除"
+msgstr "在 Parallels 控制中心删除"
+
 #: src/features/formatter/FormatterTool.tsx:243
 msgid "在内容中搜索（Ctrl+F）"
 msgstr "在内容中搜索（Ctrl+F）"
@@ -1080,6 +1168,10 @@ msgstr "在内容中搜索（Ctrl+F）"
 #: src/features/ssh-sftp/SshSftpTool.tsx:49
 msgid "在左侧选择主机并点击连接，或新建主机"
 msgstr "在左侧选择主机并点击连接，或新建主机"
+
+#: src/features/disk-clean/rulesMeta.tsx:39
+msgid "在微信设置中清理"
+msgstr "在微信设置中清理"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:73
 msgid "在线"
@@ -1123,11 +1215,11 @@ msgstr "备注"
 msgid "复制"
 msgstr "复制"
 
-#: src/features/vault/VaultTool.tsx:339
+#: src/features/vault/VaultTool.tsx:452
 msgid "复制密码"
 msgstr "复制密码"
 
-#: src/features/vault/VaultTool.tsx:311
+#: src/features/vault/VaultTool.tsx:424
 msgid "复制账号"
 msgstr "复制账号"
 
@@ -1146,18 +1238,18 @@ msgid "外观"
 msgstr "外观"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:74
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:159
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:152
 msgid "大小"
 msgstr "大小"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:58
+#: src/features/lan-transfer/LanTransferSidebar.tsx:52
 #: src/features/logs/ActivityLogsPage.tsx:127
 #: src/features/logs/ActivityLogsPage.tsx:165
 #: src/store/transfers.ts:127
 msgid "失败"
 msgstr "失败"
 
-#: src/features/home/entries.tsx:119
+#: src/features/home/entries.tsx:120
 #: src/features/media-compress/MediaCompressTool.tsx:31
 #: src/features/media-compress/MediaCompressTool.tsx:48
 msgid "媒体处理"
@@ -1167,11 +1259,15 @@ msgstr "媒体处理"
 msgid "字体"
 msgstr "字体"
 
+#: src/features/disk-clean/RulePicker.tsx:10
+msgid "安全"
+msgstr "安全"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:239
 msgid "安全模式"
 msgstr "安全模式"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:57
+#: src/features/lan-transfer/LanTransferSidebar.tsx:51
 #: src/features/media-compress/image/ImageCompressPanel.tsx:309
 #: src/features/media-compress/video/VideoCompressPanel.tsx:236
 #: src/store/transfers.ts:124
@@ -1197,14 +1293,14 @@ msgstr "宽高与原图比例不同时，图片会被拉伸变形"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:202
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:219
 #: src/features/vault/VaultEntryDialog.tsx:138
-#: src/features/vault/VaultTool.tsx:323
+#: src/features/vault/VaultTool.tsx:436
 msgid "密码"
 msgstr "密码"
 
 #: src/features/export/sections.tsx:15
-#: src/features/home/entries.tsx:156
-#: src/features/vault/VaultTool.tsx:162
-#: src/features/vault/VaultTool.tsx:179
+#: src/features/home/entries.tsx:157
+#: src/features/vault/VaultTool.tsx:259
+#: src/features/vault/VaultTool.tsx:276
 msgid "密码本"
 msgstr "密码本"
 
@@ -1214,7 +1310,7 @@ msgid "密钥"
 msgstr "密钥"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:97
-#: src/features/ssh-sftp/components/Sidebar.tsx:430
+#: src/features/ssh-sftp/components/Sidebar.tsx:429
 msgid "密钥管理"
 msgstr "密钥管理"
 
@@ -1225,7 +1321,7 @@ msgid "对局中断"
 msgstr "对局中断"
 
 #: src/features/games/billiards/BilliardsMatch.tsx:278
-#: src/features/games/billiards/BilliardsMatch.tsx:365
+#: src/features/games/billiards/BilliardsMatch.tsx:366
 msgid "对局结束"
 msgstr "对局结束"
 
@@ -1326,6 +1422,16 @@ msgstr "将撤销 {0} 手棋，是否同意？"
 msgid "将死"
 msgstr "将死"
 
+#. placeholder {0}: formatBytes(bytes)
+#: src/features/disk-clean/RemoveConfirmDialog.tsx:49
+msgid "将永久删除 {0}，无法恢复。"
+msgstr "将永久删除 {0}，无法恢复。"
+
+#. placeholder {0}: formatBytes(bytes)
+#: src/features/disk-clean/RemoveConfirmDialog.tsx:53
+msgid "将移到废纸篓，可释放 {0}。"
+msgstr "将移到废纸篓，可释放 {0}。"
+
 #: src/features/crypto/CryptoTool.tsx:131
 msgid "将结果写回输入并切换模式"
 msgstr "将结果写回输入并切换模式"
@@ -1334,7 +1440,7 @@ msgstr "将结果写回输入并切换模式"
 msgid "将返回模式选择,当前对局的进度将会丢失。"
 msgstr "将返回模式选择,当前对局的进度将会丢失。"
 
-#: src/features/home/entries.tsx:30
+#: src/features/home/entries.tsx:31
 msgid "小游戏"
 msgstr "小游戏"
 
@@ -1349,7 +1455,7 @@ msgstr "尺寸模式"
 msgid "局域网"
 msgstr "局域网"
 
-#: src/features/home/entries.tsx:81
+#: src/features/home/entries.tsx:82
 #: src/features/lan-transfer/LanTransferTool.tsx:343
 #: src/features/lan-transfer/LanTransferTool.tsx:361
 msgid "局域网传输"
@@ -1369,11 +1475,11 @@ msgstr "局域网传输设置"
 msgid "局域网传输辅助数据加载失败：{0}"
 msgstr "局域网传输辅助数据加载失败：{0}"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:416
+#: src/features/ssh-sftp/components/Sidebar.tsx:415
 msgid "展开侧边栏"
 msgstr "展开侧边栏"
 
-#: src/features/home/entries.tsx:29
+#: src/features/home/entries.tsx:30
 msgid "工具"
 msgstr "工具"
 
@@ -1382,12 +1488,12 @@ msgid "工具与运行状态"
 msgstr "工具与运行状态"
 
 #. placeholder {0}: formatBytes(state.downloaded)
-#: src/lib/updater.ts:361
+#: src/lib/updater.ts:362
 msgid "已下载 {0}"
 msgstr "已下载 {0}"
 
 #: src/features/media-compress/components/CompressResultCard.tsx:43
-#: src/features/vault/VaultTool.tsx:131
+#: src/features/vault/VaultTool.tsx:228
 msgid "已保存"
 msgstr "已保存"
 
@@ -1407,7 +1513,7 @@ msgstr "已允许访问"
 msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
-#: src/features/vault/VaultTool.tsx:142
+#: src/features/vault/VaultTool.tsx:239
 msgid "已删除"
 msgstr "已删除"
 
@@ -1420,7 +1526,7 @@ msgstr "已删除 {0}"
 msgid "已删除 {name}"
 msgstr "已删除 {name}"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:224
+#: src/features/ssh-sftp/components/Sidebar.tsx:225
 msgid "已删除主机 {name}"
 msgstr "已删除主机 {name}"
 
@@ -1432,7 +1538,9 @@ msgstr "已删除共享目录"
 msgid "已删除白名单"
 msgstr "已删除白名单"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:59
+#: src/features/disk-clean/AnalyzePanel.tsx:97
+#: src/features/disk-clean/DiskCleanTool.tsx:136
+#: src/features/lan-transfer/LanTransferSidebar.tsx:53
 #: src/store/transfers.ts:126
 msgid "已取消"
 msgstr "已取消"
@@ -1454,11 +1562,11 @@ msgstr "已复制"
 msgid "已复制地址"
 msgstr "已复制地址"
 
-#: src/features/vault/VaultTool.tsx:341
+#: src/features/vault/VaultTool.tsx:454
 msgid "已复制密码"
 msgstr "已复制密码"
 
-#: src/features/vault/VaultTool.tsx:313
+#: src/features/vault/VaultTool.tsx:426
 msgid "已复制账号"
 msgstr "已复制账号"
 
@@ -1488,6 +1596,11 @@ msgstr "已导出"
 msgid "已开启开机自启"
 msgstr "已开启开机自启"
 
+#. placeholder {0}: counters.scannedFiles
+#: src/features/disk-clean/DiskCleanTool.tsx:118
+msgid "已扫描 {0} 个文件 · <0/>"
+msgstr "已扫描 {0} 个文件 · <0/>"
+
 #: src/features/lan-transfer/LanTransferTool.tsx:305
 msgid "已拒绝访问"
 msgstr "已拒绝访问"
@@ -1501,7 +1614,7 @@ msgid "已改为自动绑定，重启服务后生效"
 msgstr "已改为自动绑定，重启服务后生效"
 
 #. placeholder {0}: host.label
-#: src/features/ssh-sftp/components/Sidebar.tsx:207
+#: src/features/ssh-sftp/components/Sidebar.tsx:208
 msgid "已断开 {0}"
 msgstr "已断开 {0}"
 
@@ -1521,6 +1634,11 @@ msgstr "已添加共享目录"
 msgid "已添加白名单"
 msgstr "已添加白名单"
 
+#. placeholder {0}: formatBytes(report.freedBytes)
+#: src/features/disk-clean/DiskCleanTool.tsx:201
+msgid "已清理 {0}"
+msgstr "已清理 {0}"
+
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:278
 msgid "已移动 {0}"
@@ -1531,9 +1649,15 @@ msgid "已解压到 {outName}"
 msgstr "已解压到 {outName}"
 
 #. placeholder {0}: hostAddress(host)
-#: src/features/ssh-sftp/components/Sidebar.tsx:334
+#: src/features/ssh-sftp/components/Sidebar.tsx:333
 msgid "已连接 · {0}"
 msgstr "已连接 · {0}"
+
+#. placeholder {0}: selectedPaths.size
+#. placeholder {1}: formatBytes(selectedBytes)
+#: src/features/disk-clean/DiskCleanTool.tsx:293
+msgid "已选 {0} 项 · {1}"
+msgstr "已选 {0} 项 · {1}"
 
 #: src/features/games/go/labels.tsx:61
 #: src/features/games/go/labels.tsx:101
@@ -1542,7 +1666,7 @@ msgstr "已连接 · {0}"
 msgid "平局"
 msgstr "平局"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:252
+#: src/features/lan-transfer/LanTransferSidebar.tsx:246
 msgid "并发上限"
 msgstr "并发上限"
 
@@ -1550,7 +1674,12 @@ msgstr "并发上限"
 msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:257
+#: src/features/disk-clean/rulesMeta.tsx:30
+#: src/features/home/entries.tsx:185
+msgid "废纸篓"
+msgstr "废纸篓"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:251
 #: src/features/settings/AppSettingsMenu.tsx:220
 msgid "开启"
 msgstr "开启"
@@ -1571,8 +1700,12 @@ msgstr "开始压缩"
 msgid "开始处理"
 msgstr "开始处理"
 
+#: src/features/disk-clean/DiskCleanTool.tsx:246
+msgid "开始扫描"
+msgstr "开始扫描"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:257
-#: src/features/lan-transfer/LanTransferSidebar.tsx:31
+#: src/features/lan-transfer/LanTransferSidebar.tsx:32
 msgid "开放"
 msgstr "开放"
 
@@ -1608,7 +1741,7 @@ msgstr "当前对局尚未结束，返回首页将丢失进度。"
 msgid "当前对局的进度将会丢失。"
 msgstr "当前对局的进度将会丢失。"
 
-#: src/lib/updater.ts:87
+#: src/lib/updater.ts:88
 msgid "当前已是最新版本"
 msgstr "当前已是最新版本"
 
@@ -1629,11 +1762,15 @@ msgstr "当前配置的 {0} 不在可用网卡列表中，访问地址可能失�
 msgid "待授权请求"
 msgstr "待授权请求"
 
-#: src/features/home/entries.tsx:163
+#: src/features/disk-clean/rulesMeta.tsx:38
+msgid "微信数据"
+msgstr "微信数据"
+
+#: src/features/home/entries.tsx:164
 msgid "快速复制"
 msgstr "快速复制"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:376
+#: src/features/games/billiards/BilliardsMatch.tsx:377
 msgid "总杆数"
 msgstr "总杆数"
 
@@ -1674,6 +1811,10 @@ msgstr "所有日志记录都会被删除，且无法恢复。"
 msgid "所有者"
 msgstr "所有者"
 
+#: src/features/disk-clean/RulePicker.tsx:12
+msgid "手动"
+msgstr "手动"
+
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:188
 msgid "打开"
 msgstr "打开"
@@ -1694,23 +1835,31 @@ msgstr "打开文件管理"
 msgid "打开终端"
 msgstr "打开终端"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:108
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:109
 msgid "打开终端失败：{e}"
 msgstr "打开终端失败：{e}"
 
-#: src/features/vault/VaultTool.tsx:267
+#: src/features/vault/VaultTool.tsx:380
 msgid "打开网址"
 msgstr "打开网址"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:111
+#: src/features/disk-clean/DiskCleanTool.tsx:129
+msgid "扫描失败"
+msgstr "扫描失败"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:105
 msgid "扫码访问"
 msgstr "扫码访问"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:416
+#: src/features/disk-clean/DiskCleanTool.tsx:227
+msgid "找出可安全删除的缓存"
+msgstr "找出可安全删除的缓存"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:415
 msgid "折叠侧边栏"
 msgstr "折叠侧边栏"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:409
+#: src/features/games/billiards/BilliardsMatch.tsx:410
 msgid "拉杆"
 msgstr "拉杆"
 
@@ -1723,7 +1872,8 @@ msgstr "拉杆"
 msgid "拒绝"
 msgstr "拒绝"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:102
+#: src/features/ssh-sftp/components/Sidebar.tsx:103
+#: src/features/vault/VaultTool.tsx:117
 msgid "拖动排序"
 msgstr "拖动排序"
 
@@ -1736,7 +1886,7 @@ msgstr "拖放图片到此处，或选择文件"
 msgid "拖放视频到此处，或选择文件"
 msgstr "拖放视频到此处，或选择文件"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:434
+#: src/features/games/billiards/BilliardsMatch.tsx:435
 msgid "按住桌面向母球后方拖动蓄力,松手击球"
 msgstr "按住桌面向母球后方拖动蓄力,松手击球"
 
@@ -1748,24 +1898,29 @@ msgstr "按尺寸"
 msgid "按比例"
 msgstr "按比例"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:483
+#: src/features/disk-clean/DiskCleanTool.tsx:272
+msgid "按规则清理"
+msgstr "按规则清理"
+
+#: src/features/ssh-sftp/components/Sidebar.tsx:482
 msgid "换个关键词试试"
 msgstr "换个关键词试试"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:176
+#: src/features/ssh-sftp/components/Sidebar.tsx:177
+#: src/features/vault/VaultTool.tsx:192
 msgid "排序保存失败：{error}"
 msgstr "排序保存失败：{error}"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:236
+#: src/features/lan-transfer/LanTransferSidebar.tsx:230
 msgid "接收"
 msgstr "接收"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:212
-#: src/features/lan-transfer/LanTransferSidebar.tsx:260
+#: src/features/lan-transfer/LanTransferSidebar.tsx:254
 msgid "接收目录"
 msgstr "接收目录"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:415
+#: src/features/games/billiards/BilliardsMatch.tsx:416
 msgid "推杆"
 msgstr "推杆"
 
@@ -1776,12 +1931,12 @@ msgid "提子 {0}:{1}"
 msgstr "提子 {0}:{1}"
 
 #: src/features/formatter/FormatterTool.tsx:246
-#: src/features/home/entries.tsx:145
-#: src/features/vault/VaultTool.tsx:205
+#: src/features/home/entries.tsx:146
+#: src/features/vault/VaultTool.tsx:302
 msgid "搜索"
 msgstr "搜索"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:457
+#: src/features/ssh-sftp/components/Sidebar.tsx:456
 msgid "搜索…"
 msgstr "搜索…"
 
@@ -1789,11 +1944,11 @@ msgstr "搜索…"
 msgid "搜索地址、动作、详情"
 msgstr "搜索地址、动作、详情"
 
-#: src/features/vault/VaultTool.tsx:203
+#: src/features/vault/VaultTool.tsx:300
 msgid "搜索标题、账号、网址"
 msgstr "搜索标题、账号、网址"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:160
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:153
 msgid "操作"
 msgstr "操作"
 
@@ -1801,7 +1956,7 @@ msgstr "操作"
 msgid "改为自动选择"
 msgstr "改为自动选择"
 
-#: src/features/home/entries.tsx:126
+#: src/features/home/entries.tsx:127
 msgid "改尺寸"
 msgstr "改尺寸"
 
@@ -1809,13 +1964,13 @@ msgstr "改尺寸"
 msgid "放大"
 msgstr "放大"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:53
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:262
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:46
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:255
 msgid "文件"
 msgstr "文件"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:452
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:50
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:43
 msgid "文件夹"
 msgstr "文件夹"
 
@@ -1836,25 +1991,25 @@ msgstr "文件夹已在该位置"
 msgid "文件已在该位置"
 msgstr "文件已在该位置"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:344
+#: src/features/ssh-sftp/components/Sidebar.tsx:343
 msgid "断开中"
 msgstr "断开中"
 
 #. placeholder {0}: hostAddress(host)
-#: src/features/ssh-sftp/components/Sidebar.tsx:333
+#: src/features/ssh-sftp/components/Sidebar.tsx:332
 msgid "断开中 · {0}"
 msgstr "断开中 · {0}"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:209
+#: src/features/ssh-sftp/components/Sidebar.tsx:210
 msgid "断开失败：{e}"
 msgstr "断开失败：{e}"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:344
+#: src/features/ssh-sftp/components/Sidebar.tsx:343
 msgid "断开连接"
 msgstr "断开连接"
 
 #: src/features/export/ImportDialog.tsx:162
-#: src/features/vault/VaultTool.tsx:194
+#: src/features/vault/VaultTool.tsx:291
 msgid "新增"
 msgstr "新增"
 
@@ -1867,7 +2022,7 @@ msgid "新建"
 msgstr "新建"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
-#: src/features/ssh-sftp/components/Sidebar.tsx:447
+#: src/features/ssh-sftp/components/Sidebar.tsx:446
 msgid "新建主机"
 msgstr "新建主机"
 
@@ -1875,7 +2030,7 @@ msgstr "新建主机"
 msgid "新建文件夹"
 msgstr "新建文件夹"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:480
+#: src/features/ssh-sftp/components/Sidebar.tsx:479
 msgid "无匹配结果"
 msgstr "无匹配结果"
 
@@ -1909,7 +2064,7 @@ msgstr "时间"
 msgid "昵称"
 msgstr "昵称"
 
-#: src/features/vault/VaultTool.tsx:331
+#: src/features/vault/VaultTool.tsx:444
 msgid "显示密码"
 msgstr "显示密码"
 
@@ -1917,11 +2072,11 @@ msgstr "显示密码"
 msgid "暂不支持该算法"
 msgstr "暂不支持该算法"
 
-#: src/features/transfers/TransferPanel.tsx:365
+#: src/features/transfers/TransferPanel.tsx:354
 msgid "暂停"
 msgstr "暂停"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:175
+#: src/features/lan-transfer/LanTransferSidebar.tsx:169
 msgid "暂无任务"
 msgstr "暂无任务"
 
@@ -1953,11 +2108,11 @@ msgstr "暂无日志"
 msgid "暂无白名单"
 msgstr "暂无白名单"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:132
+#: src/features/lan-transfer/LanTransferSidebar.tsx:126
 msgid "暂无设备"
 msgstr "暂无设备"
 
-#: src/features/vault/VaultTool.tsx:233
+#: src/features/vault/VaultTool.tsx:330
 msgid "暂无账号"
 msgstr "暂无账号"
 
@@ -1969,12 +2124,12 @@ msgstr "更多"
 msgid "更小"
 msgstr "更小"
 
-#: src/lib/updater.ts:195
+#: src/lib/updater.ts:196
 msgid "更新信息已失效，请重新检查更新"
 msgstr "更新信息已失效，请重新检查更新"
 
 #. placeholder {0}: formatError(error)
-#: src/lib/updater.ts:232
+#: src/lib/updater.ts:233
 msgid "更新失败：{0}"
 msgstr "更新失败：{0}"
 
@@ -1994,7 +2149,7 @@ msgstr "服务已停止"
 msgid "服务已启动"
 msgstr "服务已启动"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:118
+#: src/features/lan-transfer/LanTransferSidebar.tsx:112
 msgid "服务未启动"
 msgstr "服务未启动"
 
@@ -2008,13 +2163,13 @@ msgstr "服务运行中，端口、接收目录、安全模式和权限需停止
 msgid "未选择"
 msgstr "未选择"
 
-#: src/features/home/entries.tsx:129
-#: src/features/home/entries.tsx:160
-#: src/features/vault/VaultTool.tsx:166
+#: src/features/home/entries.tsx:130
+#: src/features/home/entries.tsx:161
+#: src/features/vault/VaultTool.tsx:263
 msgid "本地"
 msgstr "本地"
 
-#: src/features/vault/VaultTool.tsx:182
+#: src/features/vault/VaultTool.tsx:279
 msgid "本地保存账号密码，点击即可复制"
 msgstr "本地保存账号密码，点击即可复制"
 
@@ -2045,7 +2200,7 @@ msgstr "来源"
 msgid "查找"
 msgstr "查找"
 
-#: src/lib/updater.ts:347
+#: src/lib/updater.ts:348
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "查看 GitHub Release 获取更新内容"
 
@@ -2068,7 +2223,7 @@ msgstr "校验"
 #: src/features/formatter/FormatterTool.tsx:213
 #: src/features/formatter/FormatterTool.tsx:230
 #: src/features/formatter/FormatterTool.tsx:331
-#: src/features/home/entries.tsx:140
+#: src/features/home/entries.tsx:141
 msgid "格式化"
 msgstr "格式化"
 
@@ -2084,19 +2239,19 @@ msgstr "格式化内容编辑器"
 msgid "检查更新"
 msgstr "检查更新"
 
-#: src/lib/updater.ts:429
+#: src/lib/updater.ts:426
 msgid "检查更新失败：{message}"
 msgstr "检查更新失败：{message}"
 
-#: src/lib/updater.ts:418
+#: src/lib/updater.ts:415
 msgid "检查更新失败：当前平台没有可用更新包"
 msgstr "检查更新失败：当前平台没有可用更新包"
 
-#: src/lib/updater.ts:426
+#: src/lib/updater.ts:423
 msgid "检查更新失败：无法连接更新源"
 msgstr "检查更新失败：无法连接更新源"
 
-#: src/lib/updater.ts:331
+#: src/lib/updater.ts:332
 msgid "检查更新超时，请确认 GitHub Release 更新源是否可访问"
 msgstr "检查更新超时，请确认 GitHub Release 更新源是否可访问"
 
@@ -2117,21 +2272,25 @@ msgid "正则"
 msgstr "正则"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:273
+#: src/lib/updater.ts:274
 msgid "正在下载版本 {0}"
 msgstr "正在下载版本 {0}"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:272
+#: src/lib/updater.ts:273
 msgid "正在准备版本 {0}"
 msgstr "正在准备版本 {0}"
+
+#: src/features/disk-clean/AnalyzePanel.tsx:91
+msgid "正在分析…"
+msgstr "正在分析…"
 
 #. placeholder {0}: entry.name
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:317
 msgid "正在删除 {0}…"
 msgstr "正在删除 {0}…"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:249
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:242
 msgid "正在刷新…"
 msgstr "正在刷新…"
 
@@ -2143,19 +2302,19 @@ msgstr "正在加载物理引擎…"
 msgid "正在取消"
 msgstr "正在取消"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:248
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:241
 msgid "正在打开上级目录…"
 msgstr "正在打开上级目录…"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:247
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:240
 msgid "正在打开主目录…"
 msgstr "正在打开主目录…"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:250
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:243
 msgid "正在打开文件夹…"
 msgstr "正在打开文件夹…"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:177
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:178
 msgid "正在打开终端…"
 msgstr "正在打开终端…"
 
@@ -2163,11 +2322,15 @@ msgstr "正在打开终端…"
 msgid "正在搜索…未发现房间时可用下方地址直连"
 msgstr "正在搜索…未发现房间时可用下方地址直连"
 
+#: src/features/disk-clean/DiskCleanTool.tsx:116
+msgid "正在查找…"
+msgstr "正在查找…"
+
 #: src/features/settings/AppSettingsMenu.tsx:109
 msgid "正在检查"
 msgstr "正在检查"
 
-#: src/lib/updater.ts:147
+#: src/lib/updater.ts:148
 msgid "正在检查更新…"
 msgstr "正在检查更新…"
 
@@ -2186,11 +2349,11 @@ msgid "正在读取最新信息…"
 msgstr "正在读取最新信息…"
 
 #. placeholder {0}: session.title
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:148
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:149
 msgid "正在连接 {0}…"
 msgstr "正在连接 {0}…"
 
-#: src/lib/updater.ts:308
+#: src/lib/updater.ts:309
 msgid "正在重启并应用更新…"
 msgstr "正在重启并应用更新…"
 
@@ -2198,7 +2361,7 @@ msgstr "正在重启并应用更新…"
 msgid "汉 界"
 msgstr "汉 界"
 
-#: src/features/vault/VaultTool.tsx:239
+#: src/features/vault/VaultTool.tsx:336
 msgid "没有匹配的结果"
 msgstr "没有匹配的结果"
 
@@ -2214,7 +2377,7 @@ msgstr "活动中"
 msgid "浅色"
 msgstr "浅色"
 
-#: src/features/home/entries.tsx:86
+#: src/features/home/entries.tsx:87
 msgid "浏览器访问"
 msgstr "浏览器访问"
 
@@ -2251,9 +2414,18 @@ msgid "清台"
 msgstr "清台"
 
 #: src/features/games/billiards/BilliardsMatch.tsx:272
-#: src/features/games/billiards/BilliardsMatch.tsx:361
+#: src/features/games/billiards/BilliardsMatch.tsx:362
 msgid "清台完成!"
 msgstr "清台完成!"
+
+#: src/features/disk-clean/DiskCleanTool.tsx:256
+#: src/features/disk-clean/RemoveConfirmDialog.tsx:71
+msgid "清理"
+msgstr "清理"
+
+#: src/features/disk-clean/RemoveConfirmDialog.tsx:45
+msgid "清理 {count} 项"
+msgstr "清理 {count} 项"
 
 #: src/features/crypto/CryptoTool.tsx:143
 #: src/features/formatter/FormatterTool.tsx:264
@@ -2276,12 +2448,12 @@ msgstr "清空日志"
 msgid "清空现有数据后写入文件内容"
 msgstr "清空现有数据后写入文件内容"
 
-#: src/features/transfers/TransferPanel.tsx:299
+#: src/features/transfers/TransferPanel.tsx:288
 msgid "清除 {finishedTransferCount}"
 msgstr "清除 {finishedTransferCount}"
 
-#: src/features/transfers/TransferPanel.tsx:295
-#: src/features/transfers/TransferPanel.tsx:296
+#: src/features/transfers/TransferPanel.tsx:284
+#: src/features/transfers/TransferPanel.tsx:285
 msgid "清除 {finishedTransferCount} 个已完成任务"
 msgstr "清除 {finishedTransferCount} 个已完成任务"
 
@@ -2293,21 +2465,21 @@ msgstr "游戏音量"
 msgid "源视频没有音轨"
 msgstr "源视频没有音轨"
 
-#: src/features/vault/VaultTool.tsx:237
+#: src/features/vault/VaultTool.tsx:334
 msgid "点击“新增”保存第一条账号密码"
 msgstr "点击“新增”保存第一条账号密码"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:483
+#: src/features/ssh-sftp/components/Sidebar.tsx:482
 msgid "点击右上角 + 新建主机"
 msgstr "点击右上角 + 新建主机"
 
 #. placeholder {0}: state.version
-#: src/lib/updater.ts:290
+#: src/lib/updater.ts:291
 msgid "版本 {0} 已准备好"
 msgstr "版本 {0} 已准备好"
 
 #. placeholder {0}: state.foulCounts[seat] ?? 0
-#: src/features/games/billiards/BilliardsMatch.tsx:384
+#: src/features/games/billiards/BilliardsMatch.tsx:385
 msgid "犯规 {0}"
 msgstr "犯规 {0}"
 
@@ -2348,9 +2520,21 @@ msgstr "玩家 2"
 msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
+#: src/features/disk-clean/rulesMeta.tsx:47
+msgid "用 docker system prune 清理"
+msgstr "用 docker system prune 清理"
+
+#: src/features/disk-clean/rulesMeta.tsx:35
+msgid "用 Xcode > Settings > Platforms 删除"
+msgstr "用 Xcode > Settings > Platforms 删除"
+
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:166
 msgid "用户名"
 msgstr "用户名"
+
+#: src/features/disk-clean/rulesMeta.tsx:22
+msgid "用户日志"
+msgstr "用户日志"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:173
 msgid "留空则使用 SSH 配置或本机用户"
@@ -2362,7 +2546,7 @@ msgstr "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统�
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:256
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:268
-#: src/features/lan-transfer/LanTransferSidebar.tsx:32
+#: src/features/lan-transfer/LanTransferSidebar.tsx:33
 msgid "白名单"
 msgstr "白名单"
 
@@ -2406,6 +2590,10 @@ msgstr "目标高度"
 msgid "直接"
 msgstr "直接"
 
+#: src/features/disk-clean/RemoveConfirmDialog.tsx:64
+msgid "直接永久删除，不经废纸篓"
+msgstr "直接永久删除，不经废纸篓"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:315
 msgid "直连"
 msgstr "直连"
@@ -2424,7 +2612,7 @@ msgid "确定删除 “{0}”？"
 msgstr "确定删除 “{0}”？"
 
 #. placeholder {0}: deleteTarget?.label
-#: src/features/ssh-sftp/components/Sidebar.tsx:550
+#: src/features/ssh-sftp/components/Sidebar.tsx:549
 msgid "确定删除主机 “{0}”？此操作不可撤销。"
 msgstr "确定删除主机 “{0}”？此操作不可撤销。"
 
@@ -2446,7 +2634,7 @@ msgid "确认清空"
 msgstr "确认清空"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:255
-#: src/features/lan-transfer/LanTransferSidebar.tsx:33
+#: src/features/lan-transfer/LanTransferSidebar.tsx:34
 msgid "确认码"
 msgstr "确认码"
 
@@ -2454,6 +2642,11 @@ msgstr "确认码"
 #: src/features/lan-transfer/LanTransferTool.tsx:365
 msgid "确认码 {0}"
 msgstr "确认码 {0}"
+
+#: src/features/disk-clean/DiskCleanTool.tsx:224
+#: src/features/home/entries.tsx:178
+msgid "磁盘清理"
+msgstr "磁盘清理"
 
 #: src/features/media-compress/components/CompressModeTabs.tsx:19
 msgid "视频压缩"
@@ -2488,8 +2681,8 @@ msgstr "移动 {0}…"
 msgid "移除转义"
 msgstr "移除转义"
 
-#: src/lib/updater.ts:167
-#: src/lib/updater.ts:301
+#: src/lib/updater.ts:168
+#: src/lib/updater.ts:302
 msgid "稍后"
 msgstr "稍后"
 
@@ -2498,12 +2691,12 @@ msgid "空目录"
 msgstr "空目录"
 
 #: src/features/home/HomePage.tsx:115
-#: src/features/transfers/TransferPanel.tsx:115
+#: src/features/transfers/TransferPanel.tsx:106
 msgid "空闲"
 msgstr "空闲"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:145
-#: src/features/lan-transfer/LanTransferSidebar.tsx:240
+#: src/features/lan-transfer/LanTransferSidebar.tsx:234
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:145
 msgid "端口"
 msgstr "端口"
@@ -2575,7 +2768,7 @@ msgstr "算法"
 msgid "管理 SSH、SFTP 和局域网传输活动"
 msgstr "管理 SSH、SFTP 和局域网传输活动"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:158
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:151
 msgid "类型"
 msgstr "类型"
 
@@ -2609,7 +2802,7 @@ msgstr "练习"
 msgid "练习模式"
 msgstr "练习模式"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:244
+#: src/features/lan-transfer/LanTransferSidebar.tsx:238
 msgid "绑定"
 msgstr "绑定"
 
@@ -2632,7 +2825,7 @@ msgstr "结果会实时显示在这里"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:411
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:423
-#: src/features/transfers/TransferPanel.tsx:365
+#: src/features/transfers/TransferPanel.tsx:354
 msgid "继续"
 msgstr "继续"
 
@@ -2640,8 +2833,12 @@ msgstr "继续"
 msgid "继续传输中"
 msgstr "继续传输中"
 
+#: src/features/home/entries.tsx:182
+msgid "缓存"
+msgstr "缓存"
+
 #: src/features/crypto/CryptoTool.tsx:191
-#: src/features/home/entries.tsx:101
+#: src/features/home/entries.tsx:102
 msgid "编码"
 msgstr "编码"
 
@@ -2653,8 +2850,8 @@ msgstr "编码中"
 msgid "编码失败"
 msgstr "编码失败"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:361
-#: src/features/vault/VaultTool.tsx:280
+#: src/features/ssh-sftp/components/Sidebar.tsx:360
+#: src/features/vault/VaultTool.tsx:393
 msgid "编辑"
 msgstr "编辑"
 
@@ -2686,16 +2883,16 @@ msgstr "缩进"
 msgid "网址"
 msgstr "网址"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:223
+#: src/features/lan-transfer/LanTransferSidebar.tsx:217
 msgid "耗时 "
 msgstr "耗时 "
 
 #: src/features/games/go/labels.tsx:84
 #: src/features/games/gomoku/labels.tsx:76
 #: src/features/games/xiangqi/labels.tsx:72
-#: src/features/home/entries.tsx:200
-#: src/features/home/entries.tsx:220
-#: src/features/home/entries.tsx:240
+#: src/features/home/entries.tsx:222
+#: src/features/home/entries.tsx:242
+#: src/features/home/entries.tsx:262
 msgid "联机"
 msgstr "联机"
 
@@ -2715,11 +2912,11 @@ msgstr "联机对战"
 msgid "胜"
 msgstr "胜"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:245
+#: src/features/lan-transfer/LanTransferSidebar.tsx:239
 msgid "自动"
 msgstr "自动"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:256
+#: src/features/lan-transfer/LanTransferSidebar.tsx:250
 msgid "自动启动"
 msgstr "自动启动"
 
@@ -2742,7 +2939,7 @@ msgid "至少修改其中一个名称。"
 msgstr "至少修改其中一个名称。"
 
 #: src/features/games/billiards/BilliardsMatch.tsx:275
-#: src/features/games/billiards/BilliardsMatch.tsx:363
+#: src/features/games/billiards/BilliardsMatch.tsx:364
 #: src/features/games/go/labels.tsx:77
 #: src/features/games/gomoku/labels.tsx:69
 #: src/features/games/xiangqi/labels.tsx:65
@@ -2781,7 +2978,7 @@ msgid "解析中"
 msgstr "解析中"
 
 #: src/features/crypto/CryptoTool.tsx:194
-#: src/features/home/entries.tsx:104
+#: src/features/home/entries.tsx:105
 msgid "解码"
 msgstr "解码"
 
@@ -2798,7 +2995,7 @@ msgstr "设备名"
 msgid "设置"
 msgstr "设置"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:98
+#: src/features/lan-transfer/LanTransferSidebar.tsx:92
 msgid "访问"
 msgstr "访问"
 
@@ -2832,6 +3029,10 @@ msgstr "请先选择图片文件"
 msgid "请先选择视频文件"
 msgstr "请先选择视频文件"
 
+#: src/features/disk-clean/useDiskScan.ts:143
+msgid "请先选择要清理的项目"
+msgstr "请先选择要清理的项目"
+
 #: src/components/ui/prompt-dialog.tsx:42
 #: src/features/vault/VaultEntryDialog.tsx:62
 msgid "请输入内容"
@@ -2852,7 +3053,7 @@ msgstr "请输入路径"
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:31
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:85
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:389
-#: src/features/lan-transfer/LanTransferSidebar.tsx:27
+#: src/features/lan-transfer/LanTransferSidebar.tsx:28
 msgid "读写"
 msgstr "读写"
 
@@ -2868,6 +3069,10 @@ msgstr "读取信息"
 msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
 
+#: src/features/disk-clean/RulePicker.tsx:11
+msgid "谨慎"
+msgstr "谨慎"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:36
 #: src/features/games/go/labels.tsx:106
 #: src/features/games/go/labels.tsx:113
@@ -2879,7 +3084,7 @@ msgid "负"
 msgstr "负"
 
 #: src/features/vault/VaultEntryDialog.tsx:137
-#: src/features/vault/VaultTool.tsx:303
+#: src/features/vault/VaultTool.tsx:416
 msgid "账号"
 msgstr "账号"
 
@@ -2962,6 +3167,8 @@ msgstr "近 7 天"
 msgid "返回选择"
 msgstr "返回选择"
 
+#: src/features/disk-clean/DiskCleanTool.tsx:218
+#: src/features/disk-clean/DiskCleanTool.tsx:218
 #: src/features/games/engine/GameHeaderControls.tsx:52
 #: src/features/logs/LogPageLayout.tsx:29
 #: src/features/logs/LogPageLayout.tsx:29
@@ -2976,7 +3183,7 @@ msgstr "返回首页?"
 msgid "还原被转义的字符串内容"
 msgstr "还原被转义的字符串内容"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:480
+#: src/features/ssh-sftp/components/Sidebar.tsx:479
 msgid "还没有主机"
 msgstr "还没有主机"
 
@@ -2984,7 +3191,11 @@ msgstr "还没有主机"
 msgid "还没有打开的连接"
 msgstr "还没有打开的连接"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:56
+#: src/features/disk-clean/AnalyzePanel.tsx:109
+msgid "这一层没有内容"
+msgstr "这一层没有内容"
+
+#: src/features/lan-transfer/LanTransferSidebar.tsx:50
 msgid "进行中"
 msgstr "进行中"
 
@@ -3006,34 +3217,34 @@ msgstr "远端已有名称"
 msgid "远端文件夹名称"
 msgstr "远端文件夹名称"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:89
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:90
 msgid "远端连接在终端打开前已关闭"
 msgstr "远端连接在终端打开前已关闭"
 
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:87
-#: src/features/ssh-sftp/components/Sidebar.tsx:344
+#: src/features/ssh-sftp/components/Sidebar.tsx:343
 msgid "连接"
 msgstr "连接"
 
 #. placeholder {0}: hostAddress(host)
-#: src/features/ssh-sftp/components/Sidebar.tsx:336
+#: src/features/ssh-sftp/components/Sidebar.tsx:335
 msgid "连接中 · {0}"
 msgstr "连接中 · {0}"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:160
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:161
 msgid "连接失败"
 msgstr "连接失败"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:197
-#: src/features/ssh-sftp/components/Sidebar.tsx:534
+#: src/features/ssh-sftp/components/Sidebar.tsx:198
+#: src/features/ssh-sftp/components/Sidebar.tsx:533
 msgid "连接失败：{e}"
 msgstr "连接失败：{e}"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:82
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:83
 msgid "连接已关闭"
 msgstr "连接已关闭"
 
-#: src/features/lan-transfer/LanTransferSidebar.tsx:126
+#: src/features/lan-transfer/LanTransferSidebar.tsx:120
 msgid "连接设备"
 msgstr "连接设备"
 
@@ -3052,6 +3263,10 @@ msgstr "退出对局"
 #: src/features/games/engine/GameHeaderControls.tsx:117
 msgid "退出当前对局?"
 msgstr "退出当前对局?"
+
+#: src/features/disk-clean/AnalyzePanel.tsx:67
+msgid "选一个目录，按体积排行"
+msgstr "选一个目录，按体积排行"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:124
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:228
@@ -3117,6 +3332,10 @@ msgstr "选择接收目录"
 msgid "选择文件"
 msgstr "选择文件"
 
+#: src/features/disk-clean/AnalyzePanel.tsx:82
+msgid "选择目录"
+msgstr "选择目录"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:267
 #: src/features/media-compress/video/VideoCompressPanel.tsx:276
 msgid "选择视频"
@@ -3150,6 +3369,10 @@ msgstr "选择缩放比例"
 msgid "选择缩进"
 msgstr "选择缩进"
 
+#: src/features/disk-clean/useDiskAnalyze.ts:84
+msgid "选择要分析的目录"
+msgstr "选择要分析的目录"
+
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:59
 msgid "选择解压位置"
 msgstr "选择解压位置"
@@ -3174,20 +3397,24 @@ msgstr "递归按字母升序排序对象键"
 msgid "递归按字母降序排序对象键"
 msgstr "递归按字母降序排序对象键"
 
+#: src/features/disk-clean/DiskCleanTool.tsx:199
+msgid "部分项目未能清理"
+msgstr "部分项目未能清理"
+
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "重启中"
 msgstr "重启中"
 
 #. placeholder {0}: formatError(error)
-#: src/lib/updater.ts:114
+#: src/lib/updater.ts:115
 msgid "重启失败：{0}"
 msgstr "重启失败：{0}"
 
-#: src/lib/updater.ts:297
+#: src/lib/updater.ts:298
 msgid "重启并更新"
 msgstr "重启并更新"
 
-#: src/lib/updater.ts:292
+#: src/lib/updater.ts:293
 msgid "重启应用即可完成更新。"
 msgstr "重启应用即可完成更新。"
 
@@ -3201,6 +3428,10 @@ msgstr "重启更新"
 msgid "重命名"
 msgstr "重命名"
 
+#: src/features/disk-clean/ScanResultTable.tsx:140
+msgid "重建慢"
+msgstr "重建慢"
+
 #: src/features/games/engine/GameHeaderControls.tsx:64
 #: src/features/games/engine/GameHeaderControls.tsx:104
 msgid "重开"
@@ -3211,17 +3442,17 @@ msgid "重新开始对局?"
 msgstr "重新开始对局?"
 
 #: src/features/settings/AppSettingsMenu.tsx:114
-#: src/lib/updater.ts:238
+#: src/lib/updater.ts:239
 msgid "重新检查"
 msgstr "重新检查"
 
-#: src/features/transfers/TransferPanel.tsx:395
-#: src/features/transfers/TransferPanel.tsx:404
-#: src/lib/updater.ts:121
+#: src/features/transfers/TransferPanel.tsx:384
+#: src/features/transfers/TransferPanel.tsx:393
+#: src/lib/updater.ts:122
 msgid "重试"
 msgstr "重试"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:51
+#: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:44
 msgid "链接"
 msgstr "链接"
 
@@ -3237,7 +3468,7 @@ msgstr "键降序"
 msgid "附近的房间"
 msgstr "附近的房间"
 
-#: src/features/vault/VaultTool.tsx:331
+#: src/features/vault/VaultTool.tsx:444
 msgid "隐藏密码"
 msgstr "隐藏密码"
 
@@ -3260,7 +3491,7 @@ msgstr "预估 {0} ~ {1}"
 #: src/features/media-compress/MediaCompressTool.tsx:26
 #: src/features/ssh-sftp/SshSftpTool.tsx:103
 #: src/features/ssh-sftp/SshSftpTool.tsx:177
-#: src/features/vault/VaultTool.tsx:157
+#: src/features/vault/VaultTool.tsx:254
 msgid "首页"
 msgstr "首页"
 
@@ -3303,7 +3534,7 @@ msgid "默认"
 msgstr "默认"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:368
-#: src/features/lan-transfer/LanTransferSidebar.tsx:248
+#: src/features/lan-transfer/LanTransferSidebar.tsx:242
 msgid "默认权限"
 msgstr "默认权限"
 

@@ -59,10 +59,8 @@ pub(super) fn discover_rooms(game_id: &str, exclude_room: Option<&str>) -> Vec<G
             while started.elapsed() < DISCOVER_WINDOW {
                 match receiver.recv_timeout(Duration::from_millis(180)) {
                     Ok(ServiceEvent::ServiceResolved(info)) => {
-                        let prop =
-                            |key: &str| info.get_property_val_str(key).map(str::to_string);
-                        let (Some(room_id), Some(room_game)) = (prop("id"), prop("game"))
-                        else {
+                        let prop = |key: &str| info.get_property_val_str(key).map(str::to_string);
+                        let (Some(room_id), Some(room_game)) = (prop("id"), prop("game")) else {
                             continue;
                         };
                         if room_game != game_id {

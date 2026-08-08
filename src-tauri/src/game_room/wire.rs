@@ -24,7 +24,11 @@ const PING_INTERVAL: Duration = Duration::from_secs(5);
 pub(super) const IDLE_TIMEOUT: Duration = Duration::from_secs(15);
 
 #[derive(Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "kebab-case", rename_all_fields = "camelCase")]
+#[serde(
+    tag = "type",
+    rename_all = "kebab-case",
+    rename_all_fields = "camelCase"
+)]
 pub(super) enum WireMsg {
     Hello {
         game_id: String,
@@ -233,9 +237,7 @@ pub(super) fn read_loop(
                     _ => {}
                 }
             }
-            Err(ref e)
-                if e.kind() == ErrorKind::WouldBlock || e.kind() == ErrorKind::TimedOut =>
-            {
+            Err(ref e) if e.kind() == ErrorKind::WouldBlock || e.kind() == ErrorKind::TimedOut => {
                 return "connection-lost"
             }
             Err(_) => return "connection-lost",

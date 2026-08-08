@@ -24,6 +24,9 @@ import {
 import type { TransferProgress } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { cn } from "~/lib/utils";
+import { formatBytes } from "~/lib/format";
+import { prefersReducedMotion } from "~/lib/motion";
+import { SFTP_TRANSFER_PROGRESS } from "~/lib/events";
 import {
   type TransferState,
   useTransfersStore,
@@ -31,20 +34,8 @@ import {
 import { Button } from "~/components/ui/button";
 import { translate } from "~/i18n/translate";
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  const units = ["KB", "MB", "GB", "TB"];
-  let v = bytes / 1024;
-  let i = 0;
-  while (v >= 1024 && i < units.length - 1) {
-    v /= 1024;
-    i++;
-  }
-  return `${v.toFixed(1)} ${units[i]}`;
-}
-
 function formatSpeed(bytesPerSecond: number): string {
-  return `${formatSize(bytesPerSecond)}/s`;
+  return `${formatBytes(bytesPerSecond)}/s`;
 }
 
 function formatDuration(seconds: number): string {
@@ -79,9 +70,9 @@ function transferMetrics(progress: TransferState) {
     percent,
     size:
       total > 0
-        ? `${formatSize(progress.transferred)} / ${formatSize(total)}`
+        ? `${formatBytes(progress.transferred)} / ${formatBytes(total)}`
         : progress.transferred
-          ? formatSize(progress.transferred)
+          ? formatBytes(progress.transferred)
           : null,
     speed: speed ? formatSpeed(speed) : null,
     eta,
@@ -133,7 +124,7 @@ export default function TransferPanel() {
       updateProgressBatch(updates);
     };
 
-    void listen<TransferProgress>("sftp-transfer-progress", (event) => {
+    void listen<TransferProgress>(SFTP_TRANSFER_PROGRESS, (event) => {
       pendingProgress.set(event.payload.id, event.payload);
       if (!flushTimer) {
         flushTimer = setTimeout(flushProgress, 100);
@@ -159,9 +150,7 @@ export default function TransferPanel() {
     if (!content) return;
 
     gsap.killTweensOf(content);
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduceMotion = prefersReducedMotion();
 
     if (reduceMotion) {
       gsap.set(content, {

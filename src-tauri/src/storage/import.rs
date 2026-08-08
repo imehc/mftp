@@ -1,7 +1,5 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{
-    Host, ImportMode, ImportReport, ImportSectionReport, VaultEntry,
-};
+use crate::models::{Host, ImportMode, ImportReport, ImportSectionReport, VaultEntry};
 use rusqlite::{params, Connection};
 use serde_json::Value;
 use std::collections::HashSet;

@@ -8,13 +8,25 @@ import {
 } from "~/lib/color-theme";
 
 export type DirectoryTransferMode = "archive" | "direct";
-export type ToolRoute =
-  | "ssh-sftp"
-  | "lan-transfer"
-  | "crypto"
-  | "media-compress"
-  | "formatter"
-  | "vault";
+/**
+ * Single source of truth for tool routes. `migrate` re-validates the persisted
+ * `lastTool` against this list, so a tool missing here silently loses
+ * launch-time restore — keep it in sync when adding a route.
+ */
+export const TOOL_ROUTES = [
+  "ssh-sftp",
+  "lan-transfer",
+  "crypto",
+  "media-compress",
+  "formatter",
+  "vault",
+  "disk-clean",
+] as const;
+
+export type ToolRoute = (typeof TOOL_ROUTES)[number];
+
+const isToolRoute = (value: string): value is ToolRoute =>
+  (TOOL_ROUTES as readonly string[]).includes(value);
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {
@@ -72,15 +84,12 @@ export const useSettingsStore = create<SettingsState>()(
         delete state.webBrowserDefaultUrl;
         const legacyTool =
           typeof state.lastTool === "string" ? state.lastTool : null;
+        // The two compress tools merged into one route; everything else is
+        // kept only if it still exists in TOOL_ROUTES.
         const lastTool: ToolRoute | null =
           legacyTool === "video-compress" || legacyTool === "image-compress"
             ? "media-compress"
-            : legacyTool === "ssh-sftp" ||
-                legacyTool === "lan-transfer" ||
-                legacyTool === "crypto" ||
-                legacyTool === "media-compress" ||
-                legacyTool === "formatter" ||
-                legacyTool === "vault"
+            : legacyTool && isToolRoute(legacyTool)
               ? legacyTool
               : null;
         return {

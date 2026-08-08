@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { prefersReducedMotion } from "~/lib/motion";
 
 const FALLBACK_PRIMARY = "#d84b3e";
 const COLORS = [
@@ -217,10 +218,7 @@ function drawParticle(
 }
 
 function launchVictoryConfetti(): void {
-  if (
-    activeCelebrationCanvas?.isConnected ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  ) {
+  if (activeCelebrationCanvas?.isConnected || prefersReducedMotion()) {
     return;
   }
 

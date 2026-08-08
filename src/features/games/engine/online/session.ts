@@ -8,6 +8,11 @@
  * game gets both without touching Rust.
  */
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import {
+  GAME_ROOM_CLOSED,
+  GAME_ROOM_MESSAGE,
+  GAME_ROOM_PEER,
+} from "~/lib/events";
 import { gameRoomLeave, gameRoomSend } from "~/lib/ipc";
 import type { GameRoomStatus } from "~/types";
 import type { MatchTransport, RemoteMove } from "../transport";
@@ -50,11 +55,11 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
   ): Promise<OnlineMatchSession<M>> {
     const session = new OnlineMatchSession<M>(status);
     session.unlisteners = await Promise.all([
-      listen<string>("game-room://message", (event) => {
+      listen<string>(GAME_ROOM_MESSAGE, (event) => {
         session.dispatch(event.payload);
       }),
       listen<{ connected: boolean; name: string | null }>(
-        "game-room://peer",
+        GAME_ROOM_PEER,
         (event) => {
           if (event.payload.name) session.peerName = event.payload.name;
           for (const handler of session.presenceHandlers) {
@@ -62,7 +67,7 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
           }
         },
       ),
-      listen<{ reason: string }>("game-room://closed", (event) => {
+      listen<{ reason: string }>(GAME_ROOM_CLOSED, (event) => {
         for (const handler of session.closedHandlers) {
           handler(event.payload.reason);
         }

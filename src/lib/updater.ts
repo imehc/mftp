@@ -5,6 +5,7 @@ import { check, type DownloadEvent, type Update } from "@tauri-apps/plugin-updat
 import { toast } from "sonner";
 import { translate } from "~/i18n/translate";
 import { isDesktopPlatform } from "~/lib/platform";
+import { formatBytes } from "~/lib/format";
 import {
   resetUpdaterState,
   setUpdaterState,
@@ -401,12 +402,6 @@ export function formatReleaseNotes(body?: string) {
   }
 
   return notes;
-}
-
-function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
 function formatError(error: unknown) {

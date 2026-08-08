@@ -331,3 +331,19 @@ pub struct ImportSectionReport {
 pub struct ImportReport {
     pub sections: Vec<ImportSectionReport>,
 }
+
+// --- disk-clean DTOs re-exported so specta can see them ---
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::analyze::TreeNode;
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::remove::{FailedItem, RemoveReport, RemovedItem};
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::rules::CleanRule;
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::rules::RebuildCost;
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::rules::RuleTier;
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::scan::{ScanPhase, ScanProgress, ScanResult, ScannedItem};
+#[cfg(target_os = "macos")]
+pub use crate::disk_clean::{ScanJob, VolumeStat};

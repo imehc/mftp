@@ -9,6 +9,7 @@ import { LoaderCircle, TriangleAlert } from "lucide-react";
 import type { Session } from "~/types";
 import { useSessionsStore } from "~/store/sessions";
 import * as ipc from "~/lib/ipc";
+import { sshClosedEvent, sshDataEvent } from "~/lib/events";
 import {
   Empty,
   EmptyDescription,
@@ -74,10 +75,10 @@ export default function Terminal({ session }: Props) {
     setShellOpening(true);
 
     // Backend -> terminal: decode base64 payloads and write.
-    const unlistenData = listen<string>(`ssh://data/${sessionId}`, (e) => {
+    const unlistenData = listen<string>(sshDataEvent(sessionId), (e) => {
       if (!disposed) term.write(base64ToBytes(e.payload));
     });
-    const unlistenClosed = listen<string>(`ssh://closed/${sessionId}`, () => {
+    const unlistenClosed = listen<string>(sshClosedEvent(sessionId), () => {
       if (!disposed) {
         term.write(`\r\n\x1b[31m[${t`连接已关闭`}]\x1b[0m\r\n`);
         patch(

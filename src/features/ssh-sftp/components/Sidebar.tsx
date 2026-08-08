@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import type { Host } from "~/types";
 import { useHostsStore } from "~/store/hosts";
 import { useSessionsStore } from "~/store/sessions";
+import { prefersReducedMotion } from "~/lib/motion";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -238,9 +239,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     const sidebar = sidebarRef.current;
     if (!sidebar) return;
 
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduceMotion = prefersReducedMotion();
     if (reduceMotion) {
       gsap.set(sidebar, { clearProps: "opacity,transform" });
       return;

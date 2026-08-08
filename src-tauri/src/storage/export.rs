@@ -5,8 +5,8 @@ use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
 use chacha20poly1305::aead::{Aead, Generate, KeyInit};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
-use std::convert::TryFrom;
 use serde_json::{json, Map, Value};
+use std::convert::TryFrom;
 
 use super::{now_ms, Storage};
 
@@ -17,8 +17,8 @@ const KDF_T_COST: u32 = 2;
 const KDF_P_COST: u32 = 1;
 
 fn derive_key(password: &str, salt: &[u8], m: u32, t: u32, p: u32) -> AppResult<[u8; 32]> {
-    let params = Params::new(m, t, p, Some(32))
-        .map_err(|e| AppError(format!("invalid kdf params: {e}")))?;
+    let params =
+        Params::new(m, t, p, Some(32)).map_err(|e| AppError(format!("invalid kdf params: {e}")))?;
     let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
     let mut key = [0u8; 32];
     argon
@@ -98,10 +98,11 @@ pub(super) fn decrypt_envelope(doc: &Map<String, Value>, password: &str) -> AppR
     }
     let nonce = b64_field(doc, "nonce")?;
     let data = b64_field(doc, "data")?;
-    let key = Key::try_from(&key[..]).map_err(|_| AppError("derived key has wrong length".into()))?;
+    let key =
+        Key::try_from(&key[..]).map_err(|_| AppError("derived key has wrong length".into()))?;
     let cipher = ChaCha20Poly1305::new(&key);
-    let nonce =
-        Nonce::try_from(nonce.as_slice()).map_err(|_| AppError("wrong password or corrupted file".into()))?;
+    let nonce = Nonce::try_from(nonce.as_slice())
+        .map_err(|_| AppError("wrong password or corrupted file".into()))?;
     let plaintext = cipher
         .decrypt(&nonce, data.as_slice())
         .map_err(|_| AppError("wrong password or corrupted file".into()))?;
