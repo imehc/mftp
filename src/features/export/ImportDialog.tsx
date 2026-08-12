@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { exportSections } from "~/features/export/sections";
 import { dataImport, dataInspect } from "~/lib/ipc";
@@ -121,8 +121,7 @@ export default function ImportDialog({ open, onOpenChange }: Props) {
                   <LockKeyhole className="size-3.5" />
                   <Trans>加密文件，请输入密码</Trans>
                 </p>
-                <Input
-                  type="password"
+                <PasswordInput
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t`密码`}

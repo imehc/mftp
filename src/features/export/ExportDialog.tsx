@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import { Label } from "~/components/ui/label";
 import { exportSections } from "~/features/export/sections";
 import { downloadBlob } from "~/features/media-compress/format";
@@ -125,16 +125,14 @@ export default function ExportDialog({
           </Label>
           {encrypted ? (
             <div className="flex flex-col gap-2">
-              <Input
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t`密码`}
                 aria-label={t`密码`}
                 autoComplete="new-password"
               />
-              <Input
-                type="password"
+              <PasswordInput
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder={t`确认密码`}

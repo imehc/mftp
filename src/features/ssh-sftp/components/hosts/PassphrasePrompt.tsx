@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import type { Host } from "~/types";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
   Dialog,
@@ -64,9 +64,8 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
                   <FieldLabel htmlFor="passphrase">
                     <Trans>{host?.label} 的私钥口令</Trans>
                   </FieldLabel>
-                  <Input
+                  <PasswordInput
                     id="passphrase"
-                    type="password"
                     autoFocus
                     value={field.state.value}
                     onBlur={field.handleBlur}

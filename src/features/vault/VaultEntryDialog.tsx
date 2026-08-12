@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { firstFormError } from "~/lib/form-errors";
@@ -95,9 +96,17 @@ export default function VaultEntryDialog({
     <form.Field name={name}>
       {(field) => {
         const error = firstFormError(field.state.meta.errors);
-        return (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={`vault-${name}`}>{label}</Label>
+        const Control =
+          props?.type === "password" ? (
+            <PasswordInput
+              id={`vault-${name}`}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              aria-invalid={!!error}
+              {...props}
+            />
+          ) : (
             <Input
               id={`vault-${name}`}
               value={field.state.value}
@@ -107,6 +116,11 @@ export default function VaultEntryDialog({
               autoComplete="off"
               {...props}
             />
+          );
+        return (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor={`vault-${name}`}>{label}</Label>
+            {Control}
             {error ? (
               <p className="text-xs text-destructive">{error}</p>
             ) : null}

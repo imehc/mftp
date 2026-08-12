@@ -7,7 +7,7 @@ import {
   linguiTransformerBabelPreset,
 } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -91,7 +91,7 @@ export default defineConfig(async () => ({
   },
   resolve: {
     alias: {
-      "~": resolve(__dirname, "src"),
+      "~": resolve(import.meta.dirname, "src"),
     },
   },
 }));

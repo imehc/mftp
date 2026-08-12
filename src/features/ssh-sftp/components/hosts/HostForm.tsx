@@ -5,6 +5,7 @@ import type { Host } from "~/types";
 import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import {
   Dialog,
   DialogTitle,
@@ -218,9 +219,8 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                         <FieldLabel htmlFor="host-pw">
                           <Trans>密码</Trans>
                         </FieldLabel>
-                        <Input
+                        <PasswordInput
                           id="host-pw"
-                          type="password"
                           value={field.state.value ?? ""}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}

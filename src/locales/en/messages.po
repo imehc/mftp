@@ -342,7 +342,7 @@ msgstr "Connection to the opponent was lost."
 msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
-#: src/features/export/ExportDialog.tsx:149
+#: src/features/export/ExportDialog.tsx:147
 msgid "两次输入的密码不一致"
 msgstr "Passwords do not match"
 
@@ -481,7 +481,7 @@ msgstr "Replace +/ with -_ and omit padding"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:311
-#: src/features/vault/VaultEntryDialog.tsx:178
+#: src/features/vault/VaultEntryDialog.tsx:192
 msgid "保存"
 msgstr "Save"
 
@@ -631,7 +631,7 @@ msgstr "Preparing"
 msgid "减小 {delta}%"
 msgstr "Reduced {delta}%"
 
-#: src/features/vault/VaultEntryDialog.tsx:143
+#: src/features/vault/VaultEntryDialog.tsx:157
 #: src/features/vault/VaultTool.tsx:308
 msgid "分类"
 msgstr "Category"
@@ -878,8 +878,8 @@ msgid "发现设备"
 msgstr "Discovered Devices"
 
 #: src/components/ui/prompt-dialog.tsx:96
-#: src/features/export/ExportDialog.tsx:165
-#: src/features/export/ImportDialog.tsx:177
+#: src/features/export/ExportDialog.tsx:163
+#: src/features/export/ImportDialog.tsx:176
 #: src/features/games/engine/GameHeaderControls.tsx:50
 #: src/features/games/engine/GameHeaderControls.tsx:103
 #: src/features/games/engine/GameHeaderControls.tsx:123
@@ -892,14 +892,14 @@ msgstr "Discovered Devices"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:317
 #: src/features/media-compress/video/VideoCompressPanel.tsx:393
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:306
-#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:84
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:83
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:212
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:40
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:114
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:232
 #: src/features/ssh-sftp/components/Sidebar.tsx:554
 #: src/features/transfers/TransferPanel.tsx:369
-#: src/features/vault/VaultEntryDialog.tsx:173
+#: src/features/vault/VaultEntryDialog.tsx:187
 #: src/features/vault/VaultTool.tsx:515
 msgid "取消"
 msgstr "Cancel"
@@ -924,7 +924,7 @@ msgstr "Read Only"
 msgid "台球"
 msgstr "Billiards"
 
-#: src/features/export/ImportDialog.tsx:159
+#: src/features/export/ImportDialog.tsx:158
 msgid "合并"
 msgstr "Merge"
 
@@ -964,7 +964,7 @@ msgstr "MFTP clients on the same subnet. Click to open the access URL."
 
 #: src/features/lan-transfer/LanShareDialog.tsx:91
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:277
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:93
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:94
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:109
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:72
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:149
@@ -1086,7 +1086,7 @@ msgid "在线"
 msgstr "Online"
 
 #: src/features/logs/ActivityLogsPage.tsx:151
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:120
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:121
 msgid "地址"
 msgstr "Address"
 
@@ -1114,7 +1114,7 @@ msgstr "Result"
 msgid "处理结果预览"
 msgstr "Result preview"
 
-#: src/features/vault/VaultEntryDialog.tsx:155
+#: src/features/vault/VaultEntryDialog.tsx:169
 msgid "备注"
 msgstr "Notes"
 
@@ -1190,13 +1190,13 @@ msgstr "Width"
 msgid "宽高与原图比例不同时，图片会被拉伸变形"
 msgstr "If the aspect ratio differs from the original, the image will be stretched"
 
+#: src/features/export/ExportDialog.tsx:131
 #: src/features/export/ExportDialog.tsx:132
-#: src/features/export/ExportDialog.tsx:133
+#: src/features/export/ImportDialog.tsx:127
 #: src/features/export/ImportDialog.tsx:128
-#: src/features/export/ImportDialog.tsx:129
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:202
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:219
-#: src/features/vault/VaultEntryDialog.tsx:138
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:203
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:220
+#: src/features/vault/VaultEntryDialog.tsx:152
 #: src/features/vault/VaultTool.tsx:436
 msgid "密码"
 msgstr "Password"
@@ -1208,7 +1208,7 @@ msgstr "Password"
 msgid "密码本"
 msgstr "Passwords"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:205
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:206
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:240
 msgid "密钥"
 msgstr "Key"
@@ -1265,7 +1265,7 @@ msgstr "Opponent declined the undo"
 msgid "对方请求悔棋"
 msgstr "Opponent requests an undo"
 
-#: src/features/export/ImportDialog.tsx:184
+#: src/features/export/ImportDialog.tsx:183
 msgid "导入"
 msgstr "Import"
 
@@ -1290,11 +1290,11 @@ msgstr "Import data"
 msgid "导入私钥后可在主机中选用。"
 msgstr "Import a private key to use it with hosts."
 
-#: src/features/export/ExportDialog.tsx:172
+#: src/features/export/ExportDialog.tsx:170
 msgid "导出"
 msgstr "Export"
 
-#: src/features/export/ExportDialog.tsx:155
+#: src/features/export/ExportDialog.tsx:153
 msgid "导出为明文 JSON 文件，请妥善保管。"
 msgstr "Exports a plaintext JSON file; keep it safe."
 
@@ -1855,12 +1855,12 @@ msgstr "Disconnect failed: {e}"
 msgid "断开连接"
 msgstr "Disconnect"
 
-#: src/features/export/ImportDialog.tsx:162
+#: src/features/export/ImportDialog.tsx:161
 #: src/features/vault/VaultTool.tsx:291
 msgid "新增"
 msgstr "Add"
 
-#: src/features/vault/VaultEntryDialog.tsx:124
+#: src/features/vault/VaultEntryDialog.tsx:138
 msgid "新增账号"
 msgstr "Add account"
 
@@ -1868,7 +1868,7 @@ msgstr "Add account"
 msgid "新建"
 msgstr "New"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:83
 #: src/features/ssh-sftp/components/Sidebar.tsx:446
 msgid "新建主机"
 msgstr "New Host"
@@ -1911,6 +1911,7 @@ msgstr "Time"
 msgid "昵称"
 msgstr "Nickname"
 
+#: src/components/ui/password-input.tsx:18
 #: src/features/vault/VaultTool.tsx:444
 msgid "显示密码"
 msgstr "Show password"
@@ -2055,7 +2056,7 @@ msgstr "View GitHub Releases for update notes"
 msgid "查看更新"
 msgstr "View Update"
 
-#: src/features/vault/VaultEntryDialog.tsx:135
+#: src/features/vault/VaultEntryDialog.tsx:149
 msgid "标题"
 msgstr "Title"
 
@@ -2350,15 +2351,15 @@ msgstr "Player 2"
 msgid "玩家 2 胜"
 msgstr "Player 2 wins"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:166
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:167
 msgid "用户名"
 msgstr "Username"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:173
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:174
 msgid "留空则使用 SSH 配置或本机用户"
 msgstr "Leave empty to use SSH config or local user"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:180
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:181
 msgid "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
 msgstr "When empty, User from ~/.ssh/config is used first, then the current system user."
 
@@ -2438,8 +2439,8 @@ msgstr "Confirm"
 msgid "确认后会按上面的名称继续。"
 msgstr "After confirmation, the operation will continue with the names above."
 
-#: src/features/export/ExportDialog.tsx:140
-#: src/features/export/ExportDialog.tsx:141
+#: src/features/export/ExportDialog.tsx:138
+#: src/features/export/ExportDialog.tsx:139
 msgid "确认密码"
 msgstr "Confirm password"
 
@@ -2506,7 +2507,7 @@ msgstr "Idle"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:145
 #: src/features/lan-transfer/LanTransferSidebar.tsx:234
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:145
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:146
 msgid "端口"
 msgstr "Port"
 
@@ -2660,11 +2661,11 @@ msgstr "Encoding failed"
 msgid "编辑"
 msgstr "Edit"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:82
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:83
 msgid "编辑主机"
 msgstr "Edit Host"
 
-#: src/features/vault/VaultEntryDialog.tsx:124
+#: src/features/vault/VaultEntryDialog.tsx:138
 msgid "编辑账号"
 msgstr "Edit account"
 
@@ -2684,7 +2685,7 @@ msgstr "Scale"
 msgid "缩进"
 msgstr "Indent"
 
-#: src/features/vault/VaultEntryDialog.tsx:140
+#: src/features/vault/VaultEntryDialog.tsx:154
 msgid "网址"
 msgstr "URL"
 
@@ -2759,7 +2760,7 @@ msgstr "File to Move"
 msgid "要移动的文件夹"
 msgstr "Folder to Move"
 
-#: src/features/export/ImportDialog.tsx:156
+#: src/features/export/ImportDialog.tsx:155
 msgid "覆盖"
 msgstr "Overwrite"
 
@@ -2787,7 +2788,7 @@ msgstr "Demuxing"
 msgid "解码"
 msgstr "Decode"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:190
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:191
 msgid "认证方式"
 msgstr "Authentication"
 
@@ -2835,7 +2836,7 @@ msgid "请先选择视频文件"
 msgstr "Choose a video first"
 
 #: src/components/ui/prompt-dialog.tsx:42
-#: src/features/vault/VaultEntryDialog.tsx:62
+#: src/features/vault/VaultEntryDialog.tsx:63
 msgid "请输入内容"
 msgstr "Enter content"
 
@@ -2880,7 +2881,7 @@ msgstr "Resize left panel"
 msgid "负"
 msgstr "Loss"
 
-#: src/features/vault/VaultEntryDialog.tsx:137
+#: src/features/vault/VaultEntryDialog.tsx:151
 #: src/features/vault/VaultTool.tsx:416
 msgid "账号"
 msgstr "Username"
@@ -3012,7 +3013,7 @@ msgstr "Remote Folder Name"
 msgid "远端连接在终端打开前已关闭"
 msgstr "The remote connection closed before the terminal opened"
 
-#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:87
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:86
 #: src/features/ssh-sftp/components/Sidebar.tsx:343
 msgid "连接"
 msgstr "Connect"
@@ -3239,6 +3240,7 @@ msgstr "Keys Z→A"
 msgid "附近的房间"
 msgstr "Nearby Rooms"
 
+#: src/components/ui/password-input.tsx:18
 #: src/features/vault/VaultTool.tsx:444
 msgid "隐藏密码"
 msgstr "Hide password"
