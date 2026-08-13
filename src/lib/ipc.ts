@@ -129,6 +129,8 @@ export const sshResize = (sessionId: string, cols: number, rows: number) =>
   voidCommand(commands.sshResize(sessionId, cols, rows));
 export const sshDisconnect = (sessionId: string) =>
   voidCommand(commands.sshDisconnect(sessionId));
+export const sshSystemStats = (sessionId: string) =>
+  unwrapCommand(commands.sshSystemStats(sessionId));
 
 // ---- SFTP ----
 export const sftpHome = (sessionId: string) =>

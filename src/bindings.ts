@@ -41,6 +41,7 @@ export const commands = {
 	sshWrite: (sessionId: string, data: string) => typedError<null, AppError>(__TAURI_INVOKE("ssh_write", { sessionId, data })),
 	sshResize: (sessionId: string, cols: number, rows: number) => typedError<null, AppError>(__TAURI_INVOKE("ssh_resize", { sessionId, cols, rows })),
 	sshDisconnect: (sessionId: string) => typedError<null, AppError>(__TAURI_INVOKE("ssh_disconnect", { sessionId })),
+	sshSystemStats: (sessionId: string) => typedError<SystemStats, AppError>(__TAURI_INVOKE("ssh_system_stats", { sessionId })),
 	sftpHome: (sessionId: string) => typedError<string, AppError>(__TAURI_INVOKE("sftp_home", { sessionId })),
 	sftpStartDir: (sessionId: string, preferred: string | null) => typedError<string, AppError>(__TAURI_INVOKE("sftp_start_dir", { sessionId, preferred })),
 	sftpList: (sessionId: string, path: string) => typedError<SftpEntry[], AppError>(__TAURI_INVOKE("sftp_list", { sessionId, path })),
@@ -300,6 +301,77 @@ export type SshKey = {
 	filename: string,
 	hasPassphrase: boolean,
 	createdAt: number,
+};
+
+// CPU usage percentages computed over a ~1s measurement window.
+export type SystemCpu = {
+	user: number,
+	nice: number,
+	system: number,
+	idle: number,
+	// user + nice + system (i.e. everything but idle)
+	used: number,
+};
+
+export type SystemDisk = {
+	filesystem: string,
+	mount: string,
+	total: number,
+	used: number,
+	available: number,
+};
+
+export type SystemDiskIoRate = {
+	name: string,
+	readBytesPerSec: number,
+	writeBytesPerSec: number,
+};
+
+export type SystemLoad = {
+	load1: number,
+	load5: number,
+	load15: number,
+};
+
+export type SystemMemory = {
+	total: number,
+	used: number,
+	available: number,
+	free: number,
+	// Buffers + page cache, as reported by `free`.
+	cached: number,
+	swapTotal: number,
+	swapUsed: number,
+};
+
+export type SystemNetworkRate = {
+	name: string,
+	rxBytesPerSec: number,
+	txBytesPerSec: number,
+};
+
+export type SystemProcess = {
+	pid: number,
+	user: string,
+	cpu: number,
+	memory: number,
+	command: string,
+};
+
+export type SystemStats = {
+	// Raw `uname -s` value (e.g. "Linux"). Monitor is Linux-only today.
+	os: string,
+	hostname?: string | null,
+	uptimeSecs?: number | null,
+	cpu: SystemCpu,
+	// Number of `cpuN` entries in /proc/stat; None when undetectable.
+	cpuCores?: number | null,
+	load?: SystemLoad | null,
+	memory: SystemMemory,
+	disks: SystemDisk[],
+	network: SystemNetworkRate[],
+	diskIo: SystemDiskIoRate[],
+	topProcesses: SystemProcess[],
 };
 
 export type TransferProgress = {

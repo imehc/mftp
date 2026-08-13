@@ -24,17 +24,25 @@ export type {
   SftpEntry,
   SftpFileInfo,
   SshKey,
+  SystemCpu,
+  SystemDisk,
+  SystemDiskIoRate,
+  SystemLoad,
+  SystemMemory,
+  SystemNetworkRate,
+  SystemProcess,
+  SystemStats,
   TransferProgress,
   VaultEntry,
   VaultEntryInput,
 } from "~/bindings";
 
-/** An open terminal/sftp session tab. */
+/** An open terminal/sftp/sysmon session tab. */
 export interface Session {
   id: string;
   hostId: string;
   title: string;
   status: "connecting" | "connected" | "closed" | "error";
   error?: string;
-  view: "terminal" | "sftp";
+  view: "terminal" | "sftp" | "monitor";
 }

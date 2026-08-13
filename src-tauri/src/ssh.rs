@@ -49,3 +49,4 @@ include!("ssh/download_direct.rs");
 include!("ssh/extract.rs");
 include!("ssh/path_utils.rs");
 include!("ssh/shell_worker.rs");
+include!("ssh/monitor.rs");

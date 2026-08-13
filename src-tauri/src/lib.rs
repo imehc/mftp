@@ -69,6 +69,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ssh_write,
             commands::ssh_resize,
             commands::ssh_disconnect,
+            commands::ssh_system_stats,
             commands::sftp_home,
             commands::sftp_start_dir,
             commands::sftp_list,

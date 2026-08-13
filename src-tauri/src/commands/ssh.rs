@@ -1,6 +1,6 @@
 use super::{record_operation, run_blocking};
 use crate::error::{AppError, AppResult};
-use crate::models::{AuthType, Host};
+use crate::models::{AuthType, Host, SystemStats};
 use crate::ssh::{resolve_auth_material, AuthMaterial, AuthMethod};
 use crate::AppState;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
@@ -120,4 +120,14 @@ pub async fn ssh_disconnect(state: State<'_, AppState>, session_id: String) -> A
         &result,
     );
     result
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn ssh_system_stats(
+    state: State<'_, AppState>,
+    session_id: String,
+) -> AppResult<SystemStats> {
+    let manager = state.manager.clone();
+    run_blocking(move || manager.system_stats(&session_id)).await
 }

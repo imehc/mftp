@@ -32,7 +32,8 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
     }
 
     const tabId = nextTabId();
-    // Optimistically add a connecting tab.
+    // Optimistically add a connecting tab. Default to the file view since it
+    // is the most used workflow; the terminal is one click away.
     const draft: Session = {
       id: tabId,
       hostId: host.id,
