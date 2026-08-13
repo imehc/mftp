@@ -62,6 +62,23 @@ export default defineConfig(async () => ({
           if (id.includes("/@lingui/")) return "vendor-i18n";
           if (id.includes("/@tanstack/")) return "vendor-tanstack";
           if (id.includes("/@dnd-kit/")) return "vendor-dnd";
+          // recharts + its heavy transitive deps (redux/immer/d3 via
+          // victory-vendor). Only the lazy monitor panel imports it, so this
+          // chunk stays out of the initial load.
+          if (
+            id.includes("/recharts/") ||
+            id.includes("/victory-vendor/") ||
+            id.includes("/d3-") ||
+            id.includes("/@reduxjs/") ||
+            id.includes("/react-redux/") ||
+            id.includes("/immer/") ||
+            id.includes("/reselect/") ||
+            id.includes("/decimal.js-light/") ||
+            id.includes("/es-toolkit/") ||
+            id.includes("/eventemitter3/")
+          ) {
+            return "vendor-charts";
+          }
           if (id.includes("/zod/") || id.includes("/@standard-schema/")) {
             return "vendor-schema";
           }

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const packagePath = path.join(root, "package.json");
@@ -122,6 +123,16 @@ function bumpVersion(target) {
   );
 
   console.log(`Version bumped from ${current} to ${version}.`);
+
+  // Run `cargo check` here instead of chaining it in the package.json script:
+  // pnpm appends positional args (e.g. `patch`) to the END of the whole script
+  // command, so a trailing `cargo check` in the script would receive the bump
+  // target and fail. Running it inside the script keeps the target local to argv.
+  const check = spawnSync("cargo", ["check"], {
+    cwd: path.join(root, "src-tauri"),
+    stdio: "inherit",
+  });
+  if (check.status !== 0) process.exit(check.status ?? 1);
 }
 
 const [command, target] = process.argv.slice(2);

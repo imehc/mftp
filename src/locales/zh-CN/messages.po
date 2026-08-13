@@ -80,6 +80,11 @@ msgstr "{0} 手"
 msgid "{0} 杆"
 msgstr "{0} 杆"
 
+#. placeholder {0}: stats.cpuCores
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:156
+msgid "{0} 核"
+msgstr "{0} 核"
+
 #. placeholder {0}: language.label
 #: src/features/formatter/FormatterTool.tsx:144
 msgid "{0} 格式有效"
@@ -163,6 +168,14 @@ msgstr "{transferringCount} 进行中 · {pausedTransferCount} 已暂停"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www（留空则用主目录）"
 
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:118
+msgid "10 秒"
+msgstr "10 秒"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:116
+msgid "2 秒"
+msgstr "2 秒"
+
 #: src/features/formatter/FormatterTool.tsx:314
 msgid "2 空格"
 msgstr "2 空格"
@@ -170,6 +183,10 @@ msgstr "2 空格"
 #: src/features/formatter/FormatterTool.tsx:317
 msgid "4 空格"
 msgstr "4 空格"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:117
+msgid "5 秒"
+msgstr "5 秒"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:127
 msgid "AI 先开"
@@ -185,6 +202,11 @@ msgstr "AI 思考中…"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:273
 msgid "AVIF（不支持）"
 msgstr "AVIF（不支持）"
+
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:159
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:178
+msgid "CPU"
+msgstr "CPU"
 
 #: src/features/settings/AppSettingsMenu.tsx:123
 msgid "DesignByte"
@@ -218,6 +240,10 @@ msgstr "MX-Brutalist"
 msgid "Outfit"
 msgstr "Outfit"
 
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:153
+msgid "PID"
+msgstr "PID"
+
 #: src/features/settings/AppSettingsMenu.tsx:132
 msgid "Plus Jakarta"
 msgstr "Plus Jakarta"
@@ -242,6 +268,10 @@ msgstr "SSH / SFTP 主机连接配置"
 msgid "Tiesen"
 msgstr "Tiesen"
 
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:145
+msgid "Top 进程"
+msgstr "Top 进程"
+
 #: src/features/crypto/CryptoTool.tsx:208
 msgid "URL Safe"
 msgstr "URL Safe"
@@ -259,6 +289,7 @@ msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "上一手已停手：再停一手即终局，落子则重新计数"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:58
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:231
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:271
 msgid "上传"
 msgstr "上传"
@@ -296,6 +327,7 @@ msgstr "下一个"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:59
 #: src/features/media-compress/components/CompressResultCard.tsx:76
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:225
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:105
 msgid "下载"
 msgstr "下载"
@@ -372,11 +404,11 @@ msgstr "中等"
 
 #: src/features/export/sections.tsx:20
 #: src/features/ssh-sftp/components/Sidebar.tsx:401
-#: src/features/ssh-sftp/SshSftpTool.tsx:114
+#: src/features/ssh-sftp/SshSftpTool.tsx:116
 msgid "主机"
 msgstr "主机"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:133
+#: src/features/ssh-sftp/SshSftpTool.tsx:135
 msgid "主机列表"
 msgstr "主机列表"
 
@@ -397,6 +429,12 @@ msgstr "互换"
 #: src/features/home/entries.tsx:190
 msgid "五子棋"
 msgstr "五子棋"
+
+#. placeholder {0}: formatBytes(stats.memory.swapUsed)
+#. placeholder {1}: formatBytes(stats.memory.swapTotal)
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:205
+msgid "交换 {0} / {1}"
+msgstr "交换 {0} / {1}"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:20
 #: src/features/games/go/labels.tsx:87
@@ -580,17 +618,23 @@ msgstr "共享目录"
 #: src/features/formatter/FormatterTool.tsx:89
 #: src/features/lan-transfer/LanTransferSidebar.tsx:251
 #: src/features/settings/AppSettingsMenu.tsx:226
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:115
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:113
 msgid "关闭"
 msgstr "关闭"
 
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:85
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:113
 msgid "关闭中"
 msgstr "关闭中"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:367
 msgid "关闭可进一步减小体积"
 msgstr "关闭可进一步减小体积"
+
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:162
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:194
+msgid "内存"
+msgstr "内存"
 
 #: src/features/formatter/FormatterTool.tsx:400
 msgid "内容"
@@ -621,6 +665,10 @@ msgstr "最大边长"
 msgid "最小边长"
 msgstr "最小边长"
 
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:251
+msgid "写入"
+msgstr "写入"
+
 #: src/features/media-compress/image/ImageCompressPanel.tsx:311
 #: src/features/media-compress/video/VideoCompressPanel.tsx:241
 #: src/store/transfers.ts:57
@@ -635,6 +683,10 @@ msgstr "减小 {delta}%"
 #: src/features/vault/VaultTool.tsx:308
 msgid "分类"
 msgstr "分类"
+
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:88
+msgid "切换视图：{viewLabel}"
+msgstr "切换视图：{viewLabel}"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:19
 msgid "刚刚"
@@ -709,10 +761,15 @@ msgstr "删除这条日志？"
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:125
 #: src/features/lan-transfer/LanTransferTool.tsx:393
 #: src/features/logs/LogPageLayout.tsx:111
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:93
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:152
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:247
 msgid "刷新"
 msgstr "刷新"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:104
+msgid "刷新间隔"
+msgstr "刷新间隔"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:217
 msgid "剩余 "
@@ -919,6 +976,11 @@ msgstr "只能在桌面应用中检查更新"
 msgid "只读"
 msgstr "只读"
 
+#. placeholder {0}: formatBytes(disk.available)
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:97
+msgid "可用 {0}"
+msgstr "可用 {0}"
+
 #: src/features/games/billiards/BilliardsGame.tsx:59
 #: src/features/home/entries.tsx:173
 msgid "台球"
@@ -1008,6 +1070,10 @@ msgstr "启动"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "启动服务后显示浏览器访问地址"
 
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:165
+msgid "命令"
+msgstr "命令"
+
 #: src/features/games/xiangqi/labels.tsx:89
 msgid "和"
 msgstr "和"
@@ -1077,7 +1143,7 @@ msgstr "图片文件"
 msgid "在内容中搜索（Ctrl+F）"
 msgstr "在内容中搜索（Ctrl+F）"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:49
+#: src/features/ssh-sftp/SshSftpTool.tsx:50
 msgid "在左侧选择主机并点击连接，或新建主机"
 msgstr "在左侧选择主机并点击连接，或新建主机"
 
@@ -1682,17 +1748,9 @@ msgstr "打开"
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:111
+#: src/features/ssh-sftp/SshSftpTool.tsx:113
 msgid "打开主机列表"
 msgstr "打开主机列表"
-
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:68
-msgid "打开文件管理"
-msgstr "打开文件管理"
-
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:68
-msgid "打开终端"
-msgstr "打开终端"
 
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:109
 msgid "打开终端失败：{e}"
@@ -1838,6 +1896,10 @@ msgstr "文件夹已在该位置"
 msgid "文件已在该位置"
 msgstr "文件已在该位置"
 
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:48
+msgid "文件管理"
+msgstr "文件管理"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:343
 msgid "断开中"
 msgstr "断开中"
@@ -1948,6 +2010,11 @@ msgstr "暂无密钥，请先在密钥管理中导入。"
 msgid "暂无待授权请求"
 msgstr "暂无待授权请求"
 
+#: src/features/ssh-sftp/components/monitor/MonitorCharts.tsx:147
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:31
+msgid "暂无数据"
+msgstr "暂无数据"
+
 #: src/features/logs/ActivityLogsPage.tsx:135
 msgid "暂无日志"
 msgstr "暂无日志"
@@ -1971,6 +2038,10 @@ msgstr "更多"
 #: src/features/media-compress/components/CompressQualityField.tsx:56
 msgid "更小"
 msgstr "更小"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:100
+msgid "更新于 {updatedLabel}"
+msgstr "更新于 {updatedLabel}"
 
 #: src/lib/updater.ts:196
 msgid "更新信息已失效，请重新检查更新"
@@ -2351,6 +2422,17 @@ msgstr "玩家 2"
 msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:156
+msgid "用户"
+msgstr "用户"
+
+#. placeholder {0}: pct(stats.cpu.user)
+#. placeholder {1}: pct(stats.cpu.system)
+#. placeholder {2}: pct(stats.cpu.idle)
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:183
+msgid "用户 {0} · 系统 {1} · 空闲 {2}"
+msgstr "用户 {0} · 系统 {1} · 空闲 {2}"
+
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:167
 msgid "用户名"
 msgstr "用户名"
@@ -2378,6 +2460,10 @@ msgstr "白棋"
 #: src/features/games/gomoku/labels.tsx:108
 msgid "白棋胜"
 msgstr "白棋胜"
+
+#: src/features/ssh-sftp/components/monitor/useSystemMonitor.ts:64
+msgid "监控采集超时"
+msgstr "监控采集超时"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:367
 msgid "目标最大边长"
@@ -2457,6 +2543,14 @@ msgstr "确认码"
 #: src/features/lan-transfer/LanTransferTool.tsx:365
 msgid "确认码 {0}"
 msgstr "确认码 {0}"
+
+#: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:65
+msgid "磁盘"
+msgstr "磁盘"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:239
+msgid "磁盘 I/O"
+msgstr "磁盘 I/O"
 
 #: src/features/media-compress/components/CompressModeTabs.tsx:19
 msgid "视频压缩"
@@ -2591,6 +2685,10 @@ msgstr "粘贴或输入 {0} 内容"
 msgid "系统"
 msgstr "系统"
 
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:49
+msgid "系统监控"
+msgstr "系统监控"
+
 #: src/features/games/xiangqi/labels.tsx:29
 msgid "红方"
 msgstr "红方"
@@ -2611,6 +2709,10 @@ msgstr "练习"
 #: src/features/games/billiards/BilliardsModeMenu.tsx:74
 msgid "练习模式"
 msgstr "练习模式"
+
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:47
+msgid "终端"
+msgstr "终端"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:238
 msgid "绑定"
@@ -2688,6 +2790,10 @@ msgstr "缩进"
 #: src/features/vault/VaultEntryDialog.tsx:154
 msgid "网址"
 msgstr "网址"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:219
+msgid "网络"
+msgstr "网络"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:217
 msgid "耗时 "
@@ -2859,6 +2965,10 @@ msgstr "请输入路径"
 msgid "读写"
 msgstr "读写"
 
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:245
+msgid "读取"
+msgstr "读取"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:238
 msgid "读取中"
 msgstr "读取中"
@@ -2867,7 +2977,7 @@ msgstr "读取中"
 msgid "读取信息"
 msgstr "读取信息"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:233
+#: src/features/ssh-sftp/SshSftpTool.tsx:235
 msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
 
@@ -2880,6 +2990,13 @@ msgstr "调整左侧面板宽度"
 #: src/features/games/xiangqi/labels.tsx:98
 msgid "负"
 msgstr "负"
+
+#. placeholder {0}: stats.load.load1.toFixed(2)
+#. placeholder {1}: stats.load.load5.toFixed(2)
+#. placeholder {2}: stats.load.load15.toFixed(2)
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:166
+msgid "负载 {0} / {1} / {2}"
+msgstr "负载 {0} / {1} / {2}"
 
 #: src/features/vault/VaultEntryDialog.tsx:151
 #: src/features/vault/VaultTool.tsx:416
@@ -2950,6 +3067,11 @@ msgstr "输出分辨率"
 msgid "输出格式"
 msgstr "输出格式"
 
+#. placeholder {0}: formatUptime(t, stats.uptimeSecs)
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:161
+msgid "运行 {0}"
+msgstr "运行 {0}"
+
 #: src/features/lan-transfer/LanTransferTool.tsx:347
 msgid "运行中"
 msgstr "运行中"
@@ -2983,7 +3105,7 @@ msgstr "还原被转义的字符串内容"
 msgid "还没有主机"
 msgstr "还没有主机"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:46
+#: src/features/ssh-sftp/SshSftpTool.tsx:47
 msgid "还没有打开的连接"
 msgstr "还没有打开的连接"
 
@@ -3043,6 +3165,10 @@ msgstr "连接设备"
 #: src/features/games/xiangqi/labels.tsx:44
 msgid "连续六十回合未吃子"
 msgstr "连续六十回合未吃子"
+
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:130
+msgid "连续失败，已暂停刷新"
+msgstr "连续失败，已暂停刷新"
 
 #: src/features/games/engine/GameHeaderControls.tsx:124
 msgid "退出"
@@ -3177,6 +3303,10 @@ msgstr "递归按字母升序排序对象键"
 msgid "递归按字母降序排序对象键"
 msgstr "递归按字母降序排序对象键"
 
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:100
+msgid "采集数据…"
+msgstr "采集数据…"
+
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "重启中"
 msgstr "重启中"
@@ -3218,6 +3348,7 @@ msgstr "重新开始对局?"
 msgid "重新检查"
 msgstr "重新检查"
 
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:136
 #: src/features/transfers/TransferPanel.tsx:384
 #: src/features/transfers/TransferPanel.tsx:393
 #: src/lib/updater.ts:122
@@ -3262,8 +3393,8 @@ msgstr "预估 {0} ~ {1}"
 #: src/features/games/engine/GameHeaderControls.tsx:39
 #: src/features/lan-transfer/LanTransferTool.tsx:338
 #: src/features/media-compress/MediaCompressTool.tsx:26
-#: src/features/ssh-sftp/SshSftpTool.tsx:103
-#: src/features/ssh-sftp/SshSftpTool.tsx:177
+#: src/features/ssh-sftp/SshSftpTool.tsx:105
+#: src/features/ssh-sftp/SshSftpTool.tsx:179
 #: src/features/vault/VaultTool.tsx:254
 msgid "首页"
 msgstr "首页"

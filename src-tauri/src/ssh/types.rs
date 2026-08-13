@@ -171,4 +171,8 @@ pub struct Manager {
     transfers: Arc<Mutex<HashMap<String, Arc<TransferFlag>>>>,
     local_temps: Mutex<HashSet<PathBuf>>,
     local_temp_journal: PathBuf,
+    /// Last monitor snapshot per session (see `monitor.rs`): lets a stats
+    /// poll compute rates against the previous poll instead of sleeping
+    /// between two snapshots inside every call. Cleared on disconnect.
+    monitor: Mutex<HashMap<String, MonitorSample>>,
 }

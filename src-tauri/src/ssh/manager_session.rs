@@ -67,6 +67,7 @@ impl Manager {
         }
         self.sftp.lock().remove(session_id);
         self.auth.lock().remove(session_id);
+        self.clear_monitor_cache(session_id);
     }
 
     pub fn shutdown_all(&self) {

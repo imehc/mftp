@@ -39,6 +39,7 @@ impl Manager {
             transfers: Arc::new(Mutex::new(HashMap::new())),
             local_temps: Mutex::new(HashSet::new()),
             local_temp_journal,
+            monitor: Mutex::new(HashMap::new()),
         }
     }
 

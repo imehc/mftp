@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -14,6 +14,11 @@ import TransferPanel from "~/features/transfers/TransferPanel";
 import TabBar from "~/features/ssh-sftp/components/terminal/TabBar";
 import Terminal from "~/features/ssh-sftp/components/terminal/Terminal";
 import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
+// Lazy: the monitor pulls in the chart library, which the rest of the app
+// never needs; only pay for it when a monitor view is actually opened.
+const SystemMonitorPanel = lazy(
+  () => import("~/features/ssh-sftp/components/monitor/SystemMonitorPanel"),
+);
 import { Home, PanelLeft, TerminalSquare } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "~/components/ui/sheet";
@@ -68,6 +73,11 @@ function Workspace() {
               <Terminal session={session} />
             </div>
             {session.view === "sftp" && <SftpPanel session={session} />}
+            {session.view === "monitor" && (
+              <Suspense fallback={null}>
+                <SystemMonitorPanel session={session} />
+              </Suspense>
+            )}
           </div>
         ))}
       </div>
