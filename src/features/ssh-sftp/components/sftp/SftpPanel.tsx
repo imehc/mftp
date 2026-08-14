@@ -9,11 +9,7 @@ import {
   type TouchEventHandler,
 } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  getCoreRowModel,
-  useReactTable,
-  type ColumnSizingState,
-} from "@tanstack/react-table";
+import { useTable, type ColumnSizingState } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   ArrowUp,
@@ -64,6 +60,7 @@ import {
   sameColumnSizing,
   sftpColumnLabel,
   sftpColumns,
+  sftpFeatures,
   sftpHeaderHeight,
   type ConflictState,
   type DirectoryPickerState,
@@ -136,10 +133,10 @@ export default function SftpPanel({ session }: Props) {
     [entries, sort],
   );
 
-  const table = useReactTable({
+  const table = useTable({
     data: sortedEntries,
     columns: sftpColumns,
-    getCoreRowModel: getCoreRowModel(),
+    features: sftpFeatures,
     columnResizeMode: "onChange",
     state: { columnSizing },
     onColumnSizingChange: setColumnSizing,

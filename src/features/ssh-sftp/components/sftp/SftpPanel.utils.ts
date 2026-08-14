@@ -1,4 +1,10 @@
-import type { ColumnDef, ColumnSizingState } from "@tanstack/react-table";
+import {
+  columnResizingFeature,
+  columnSizingFeature,
+  tableFeatures,
+  type ColumnDef,
+  type ColumnSizingState,
+} from "@tanstack/react-table";
 import { msg } from "@lingui/core/macro";
 import { translate } from "~/i18n/translate";
 import type { SftpEntry, SftpFileInfo } from "~/types";
@@ -156,7 +162,12 @@ export interface SortState {
   direction: SortDirection;
 }
 
-export const sftpColumns: ColumnDef<SftpEntry>[] = [
+export const sftpFeatures = tableFeatures({
+  columnSizingFeature,
+  columnResizingFeature,
+});
+
+export const sftpColumns: ColumnDef<typeof sftpFeatures, SftpEntry>[] = [
   { id: "name", size: 360, minSize: 20, maxSize: 720 },
   { id: "mtime", size: 160, minSize: 20, maxSize: 280 },
   { id: "type", size: 72, minSize: 20, maxSize: 160 },
