@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FolderOpen, ShieldAlert, Trash2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -194,7 +195,11 @@ export default function LanTransferSettingsDialog({
                               value={address.ip}
                             >
                               {address.ip} · {address.interfaceName}
-                              {address.recommended ? t` · 推荐` : ""}
+                              {address.recommended ? (
+                                <Badge variant="secondary" className="ml-1.5">
+                                  <Trans>推荐</Trans>
+                                </Badge>
+                              ) : null}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -254,7 +259,14 @@ export default function LanTransferSettingsDialog({
                   >
                     <ToggleGroupItem value="code"><Trans>确认码</Trans></ToggleGroupItem>
                     <ToggleGroupItem value="trusted"><Trans>白名单</Trans></ToggleGroupItem>
-                    <ToggleGroupItem value="open"><Trans>开放</Trans></ToggleGroupItem>
+                    <ToggleGroupItem value="open">
+                      <Trans
+                        context="LAN security mode"
+                        comment="Security mode that allows LAN access without authentication"
+                      >
+                        开放
+                      </Trans>
+                    </ToggleGroupItem>
                   </ToggleGroup>
                 </UiField>
               )}
@@ -332,6 +344,9 @@ export default function LanTransferSettingsDialog({
                             <Button
                               variant="ghost"
                               size="icon-xs"
+                              title={t`删除白名单`}
+                              aria-label={t`删除白名单`}
+                              className="max-sm:min-h-11 max-sm:min-w-11"
                               onClick={() => void deleteTrustedDevice(device.id)}
                             >
                               <Trash2 className="text-destructive" />

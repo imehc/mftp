@@ -3,7 +3,7 @@
  * both local and online play: status bar, board stage, and result bar.
  */
 import { useEffect, useRef, useState } from "react";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -193,11 +193,15 @@ export function GomokuMatchView({
             </Badge>
           ) : (
             <Badge variant="secondary">
-              <Trans>轮到</Trans> {seatName(mode, state.turnSeat, online)}
+              <Trans>轮到 {seatName(mode, state.turnSeat, online)}</Trans>
             </Badge>
           )}
           <Badge variant="outline">
-            <Trans>第 {state.moveCount + (state.finished ? 0 : 1)} 手</Trans>
+            <Plural
+              value={{ moveNumber: state.moveCount + (state.finished ? 0 : 1) }}
+              one="第 # 手"
+              other="第 # 手"
+            />
           </Badge>
           {aiThinking ? (
             <Badge variant="outline">
@@ -243,7 +247,7 @@ export function GomokuMatchView({
       {state.finished && showResult ? (
         <GameResultBar
           title={matchResultLabel(mode, snapshot.winnerSeat, online)}
-          details={<Trans>共 {state.moveCount} 手</Trans>}
+          details={<Plural value={{ moveCount: state.moveCount }} one="共 # 手" other="共 # 手" />}
           celebrate={
             snapshot.winnerSeat !== null &&
             (mode.kind === "hotseat" || snapshot.winnerSeat === localSeat)

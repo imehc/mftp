@@ -157,7 +157,7 @@ export default function VideoCompressPanel() {
     }
 
     if (phase === "done" && lastParamsRef.current === paramsKey) {
-      toast.message(t`参数未变化，无需重新压缩`);
+      toast.message(t`参数未变化，无需重新处理`);
       return;
     }
 

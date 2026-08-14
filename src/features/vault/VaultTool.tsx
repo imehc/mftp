@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DndContext,
@@ -24,7 +23,6 @@ import {
   EyeOff,
   Globe,
   GripVertical,
-  Home,
   KeyRound,
   Pencil,
   Plus,
@@ -33,6 +31,7 @@ import {
 } from "lucide-react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { toast } from "sonner";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -246,23 +245,7 @@ export default function VaultTool() {
 
   return (
     <main className="flex h-full flex-col bg-background text-foreground">
-      <header className="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-border px-2">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <Button variant="ghost" size="xs" asChild>
-            <Link to="/">
-              <Home data-icon="inline-start" />
-              <Trans>首页</Trans>
-            </Link>
-          </Button>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
-            <Trans>密码本</Trans>
-          </div>
-        </div>
-        <Badge variant="outline">
-          <Trans>本地</Trans>
-        </Badge>
-      </header>
+      <ToolPageHeader title={<Trans>密码本</Trans>} trailing={<Badge variant="outline"><Trans>本地</Trans></Badge>} />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
         <section className="rounded-lg border border-border bg-card p-2.5">
@@ -288,7 +271,7 @@ export default function VaultTool() {
               }}
             >
               <Plus data-icon="inline-start" />
-              <Trans>新增</Trans>
+              <Trans>新建</Trans>
             </Button>
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -331,9 +314,9 @@ export default function VaultTool() {
               </EmptyTitle>
               <EmptyDescription>
                 {entries.length === 0 ? (
-                  <Trans>点击“新增”保存第一条账号密码</Trans>
+                  <Trans>点击“新建”保存第一条账号密码</Trans>
                 ) : (
-                  <Trans>没有匹配的结果</Trans>
+                  <Trans>无匹配结果</Trans>
                 )}
               </EmptyDescription>
             </EmptyHeader>

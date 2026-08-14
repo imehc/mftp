@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   Activity,
   ArrowRight,
@@ -29,6 +29,7 @@ import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
 
 export default function HomePage() {
+  const { t } = useLingui();
   const hosts = useHostsStore((s) => s.hosts);
   const sessions = useSessionsStore((s) => s.sessions);
   const transfers = useTransfersStore((s) => s.transfers);
@@ -40,11 +41,11 @@ export default function HomePage() {
 
   // The games tab is hidden by default; ⌘/Ctrl+. toggles it (desktop),
   // double-tapping the MFTP header title does the same (mobile).
-  const toggleGames = () => {
+  const toggleGames = useCallback(() => {
     const next = !showGames;
     setShowGames(next);
     setActiveTab(next ? "games" : "tools");
-  };
+  }, [setShowGames, showGames]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === ".") {
@@ -54,7 +55,7 @@ export default function HomePage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  });
+  }, [toggleGames]);
   const handleTitleTap = () => {
     const now = performance.now();
     if (now - lastTapAt.current < 300) {
@@ -96,7 +97,7 @@ export default function HomePage() {
         <header className="flex items-center justify-between gap-2 border-b border-border pb-2">
           <div
             className="flex min-w-0 items-center gap-2"
-            title="⌘/Ctrl + . 显示或隐藏小游戏"
+            title={t`双击或按 ⌘/Ctrl + . 显示或隐藏小游戏`}
             onPointerDown={handleTitleTap}
           >
             <div className="flex size-8 items-center justify-center rounded-md border border-border bg-card">
@@ -115,18 +116,30 @@ export default function HomePage() {
               {hasActivity ? <Trans>活动中</Trans> : <Trans>空闲</Trans>}
             </Badge>
             <Badge variant="outline">
-              <Trans>{activeSessions.length} 连接</Trans>
+              <Plural
+                value={{ activeSessionCount: activeSessions.length }}
+                one="# 连接"
+                other="# 连接"
+              />
             </Badge>
             <Badge variant="outline">
-              <Trans>{runningTransfers.length} 传输</Trans>
+              <Plural
+                value={{ runningTransferCount: runningTransfers.length }}
+                one="# 传输"
+                other="# 传输"
+              />
             </Badge>
             {failedTransfers.length > 0 ? (
               <Badge variant="destructive">
-                <Trans>{failedTransfers.length} 失败</Trans>
+                <Plural
+                  value={{ failedTransferCount: failedTransfers.length }}
+                  one="# 失败"
+                  other="# 失败"
+                />
               </Badge>
             ) : null}
             <Button variant="outline" size="sm" asChild>
-              <Link to="/logs" preload="viewport">
+              <Link to="/logs" preload="intent">
                 <FileClock data-icon="inline-start" />
                 <Trans>日志</Trans>
               </Link>

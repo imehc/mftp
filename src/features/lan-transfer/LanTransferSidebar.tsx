@@ -1,5 +1,5 @@
 import { msg } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { QRCodeSVG } from "qrcode.react";
 import { Monitor, Unplug, XCircle } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
@@ -12,6 +12,7 @@ import type {
 } from "~/types";
 import { translate } from "~/i18n/translate";
 import { formatBytes } from "~/lib/format";
+import { lanPermissionLabel } from "~/features/lan-transfer/labels";
 
 interface LanTransferSidebarProps {
   settings: LanTransferSettings | null;
@@ -22,14 +23,16 @@ interface LanTransferSidebarProps {
   cancelTask: (id: string) => void;
 }
 
-function permissionLabel(value?: string | null) {
-  if (value === "readOnly") return translate(msg`只读`);
-  if (value === "uploadOnly") return translate(msg`仅上传`);
-  return translate(msg`读写`);
-}
-
 function securityModeLabel(value?: string | null) {
-  if (value === "open") return translate(msg`开放`);
+  if (value === "open") {
+    return translate(
+      msg({
+        context: "LAN security mode",
+        comment: "Security mode that allows LAN access without authentication",
+        message: "开放",
+      }),
+    );
+  }
   if (value === "trusted") return translate(msg`白名单`);
   return translate(msg`确认码`);
 }
@@ -119,7 +122,13 @@ export default function LanTransferSidebar({
           <h2 className="text-sm font-semibold">
             <Trans>连接设备</Trans>
           </h2>
-          <Badge variant="outline">{devices.length}</Badge>
+          <Badge variant="outline">
+            <Plural
+              value={{ deviceCount: devices.length }}
+              one="# 设备"
+              other="# 设备"
+            />
+          </Badge>
         </div>
         {devices.length === 0 ? (
           <div className="flex min-h-20 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
@@ -140,13 +149,16 @@ export default function LanTransferSidebar({
                     </span>
                   </div>
                   <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {device.ip} · {permissionLabel(device.permission)} ·{" "}
+                    {device.ip} · {lanPermissionLabel(device.permission)} ·{" "}
                     {device.currentOperation}
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon-xs"
+                  title={t`断开连接`}
+                  aria-label={t`断开连接`}
+                  className="max-sm:min-h-11 max-sm:min-w-11"
                   onClick={() => void disconnectDevice(device.id)}
                 >
                   <Unplug className="text-destructive" />
@@ -162,7 +174,13 @@ export default function LanTransferSidebar({
           <h2 className="text-sm font-semibold">
             <Trans>传输任务</Trans>
           </h2>
-          <Badge variant="outline">{tasks.length}</Badge>
+          <Badge variant="outline">
+            <Plural
+              value={{ taskCount: tasks.length }}
+              one="# 任务"
+              other="# 任务"
+            />
+          </Badge>
         </div>
         {tasks.length === 0 ? (
           <div className="flex min-h-20 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
@@ -193,6 +211,9 @@ export default function LanTransferSidebar({
                         <Button
                           variant="ghost"
                           size="icon-xs"
+                          title={t`取消传输`}
+                          aria-label={t`取消传输`}
+                          className="max-sm:min-h-11 max-sm:min-w-11"
                           onClick={() => void cancelTask(task.id)}
                         >
                           <XCircle className="text-destructive" />
@@ -214,8 +235,9 @@ export default function LanTransferSidebar({
                       {speed > 0 ? `${formatBytes(speed)}/s` : "-"}
                     </span>
                     <span className="shrink-0 tabular-nums">
-                      {task.status === "running" ? t`剩余 ` : t`耗时 `}
-                      {taskEta(task)}
+                      {task.status === "running"
+                        ? t`剩余 ${taskEta(task)}`
+                        : t`耗时 ${taskEta(task)}`}
                     </span>
                   </div>
                 </div>
@@ -240,7 +262,7 @@ export default function LanTransferSidebar({
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground"><Trans>默认权限</Trans></span>
-            <span>{permissionLabel(settings?.defaultPermission)}</span>
+            <span>{lanPermissionLabel(settings?.defaultPermission)}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground"><Trans>并发上限</Trans></span>
@@ -248,7 +270,15 @@ export default function LanTransferSidebar({
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground"><Trans>自动启动</Trans></span>
-            <span>{settings?.autoStart ? t`开启` : t`关闭`}</span>
+            <span>
+              {settings?.autoStart
+                ? t`开启`
+                : t({
+                    context: "setting state",
+                    comment: "Status showing that LAN auto-start is disabled",
+                    message: "关闭",
+                  })}
+            </span>
           </div>
           <div className="min-w-0">
             <div className="text-muted-foreground"><Trans>接收目录</Trans></div>

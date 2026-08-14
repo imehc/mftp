@@ -1,17 +1,16 @@
 import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowDownUp,
   Binary,
   Copy,
   Eraser,
-  Home,
   LockKeyhole,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
   Field,
@@ -88,23 +87,7 @@ export default function CryptoTool() {
 
   return (
     <main className="flex h-full flex-col bg-background text-foreground">
-      <header className="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-border px-2">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <Button variant="ghost" size="xs" asChild>
-            <Link to="/">
-              <Home data-icon="inline-start" />
-              <Trans>首页</Trans>
-            </Link>
-          </Button>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
-            <Trans>加解密</Trans>
-          </div>
-        </div>
-        <Badge variant="outline">
-          <Trans>本地处理</Trans>
-        </Badge>
-      </header>
+      <ToolPageHeader title={<Trans>加解密</Trans>} trailing={<Badge variant="outline"><Trans>本地处理</Trans></Badge>} />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
         <section className="rounded-lg border border-border bg-card p-2.5">
@@ -227,7 +210,11 @@ export default function CryptoTool() {
               </label>
               <div className="flex items-center gap-1">
                 <Badge variant="outline">
-                  <Trans>{input.length} 字符</Trans>
+                  <Plural
+                    value={{ characterCount: input.length }}
+                    one="# 个字符"
+                    other="# 个字符"
+                  />
                 </Badge>
                 <Button
                   variant="ghost"
@@ -268,7 +255,11 @@ export default function CryptoTool() {
                   <Badge variant="destructive">{errorMessage}</Badge>
                 ) : (
                   <Badge variant="outline">
-                    <Trans>{output.length} 字符</Trans>
+                    <Plural
+                      value={{ characterCount: output.length }}
+                      one="# 个字符"
+                      other="# 个字符"
+                    />
                   </Badge>
                 )}
                 <Button

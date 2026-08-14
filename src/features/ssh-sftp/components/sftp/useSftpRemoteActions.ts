@@ -157,8 +157,9 @@ export function useSftpRemoteActions({
     remoteParent: string,
     outName: string,
   ) {
-    const tid = toast.loading(t`正在解压 ${entry.name}…`);
-    setBusy(t`解压 ${entry.name}…`);
+    const name = entry.name;
+    const tid = toast.loading(t`正在解压 ${name}…`);
+    setBusy(t`正在解压 ${name}…`);
     try {
       await ipc.sftpExtract(sessionId, entry.path, remoteParent, outName);
       toast.success(t`已解压到 ${outName}`, { id: tid });
@@ -271,11 +272,12 @@ export function useSftpRemoteActions({
 
   async function runMoveEntry(entry: SftpEntry, target: string) {
     if (!cwd) return;
-    const tid = toast.loading(t`正在移动 ${entry.name}…`);
-    setBusy(t`移动 ${entry.name}…`);
+    const name = entry.name;
+    const tid = toast.loading(t`正在移动 ${name}…`);
+    setBusy(t`正在移动 ${name}…`);
     try {
       await ipc.sftpRename(sessionId, entry.path, target);
-      toast.success(t`已移动 ${entry.name}`, { id: tid });
+      toast.success(t`已移动 ${name}`, { id: tid });
       await load(cwd);
     } catch (e) {
       toast.error(String(e), { id: tid });
@@ -314,15 +316,16 @@ export function useSftpRemoteActions({
     if (!entry || !cwd) return;
     setDeleteTarget(null);
     const transferId = entry.isDir ? nextTransferId() : undefined;
-    const tid = toast.loading(t`正在删除 ${entry.name}…`);
-    setBusy(t`删除 ${entry.name}…`);
+    const name = entry.name;
+    const tid = toast.loading(t`正在删除 ${name}…`);
+    setBusy(t`正在删除 ${name}…`);
     if (transferId) {
-      startTransfer(transferId, t`删除 ${entry.name}`, { cancellable: false });
+      startTransfer(transferId, t`删除 ${name}`, { cancellable: false });
     }
     try {
       await ipc.sftpDelete(sessionId, entry.path, entry.isDir, transferId);
       if (transferId) finishTransfer(transferId, "success");
-      toast.success(t`已删除 ${entry.name}`, { id: tid });
+      toast.success(t`已删除 ${name}`, { id: tid });
       await load(cwd);
     } catch (e) {
       const message = String(e);

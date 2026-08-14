@@ -72,11 +72,7 @@ export function matchResultLabel(
       <Trans>你输了</Trans>
     );
   }
-  return (
-    <span>
-      {seatName(mode, winnerSeat, online)} <Trans>获胜</Trans>
-    </span>
-  );
+  return <Trans>{seatName(mode, winnerSeat, online)} 获胜</Trans>;
 }
 
 export function historyModeLabel(payload: GoHistoryPayload) {

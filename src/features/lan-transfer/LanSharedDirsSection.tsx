@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import type { LanSharedDir } from "~/types";
@@ -26,8 +26,15 @@ export default function LanSharedDirsSection({
             <Trans>共享目录</Trans>
           </h2>
           <p className="truncate text-xs text-muted-foreground">
-            <Trans>{sharesCount} 个目录</Trans>
-            {running ? t`，目录变更需重启服务后完整生效` : ""}
+            {running ? (
+              <Plural
+                value={{ sharesCount }}
+                one="# 个目录，目录变更需重启服务后完整生效"
+                other="# 个目录，目录变更需重启服务后完整生效"
+              />
+            ) : (
+              <Plural value={{ sharesCount }} one="# 个目录" other="# 个目录" />
+            )}
           </p>
         </div>
         <Button size="sm" onClick={openShare}>
@@ -56,6 +63,9 @@ export default function LanSharedDirsSection({
                 <Button
                   variant="ghost"
                   size="icon-xs"
+                  title={t`删除共享目录`}
+                  aria-label={t`删除共享目录`}
+                  className="max-sm:min-h-11 max-sm:min-w-11"
                   onClick={() => void deleteShare(share.id)}
                 >
                   <Trash2 className="text-destructive" />

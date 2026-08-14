@@ -300,7 +300,8 @@ export function useSftpTransferActions({
     const transferId = nextTransferId();
     const transferMode = directoryTransferMode;
     const remoteParent = cwd;
-    const label = t`上传 ${options?.displayName ?? remoteName}`;
+    const name = options?.displayName ?? remoteName;
+    const label = t`上传 ${name}`;
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);

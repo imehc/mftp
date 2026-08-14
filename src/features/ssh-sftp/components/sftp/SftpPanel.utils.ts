@@ -27,9 +27,28 @@ export function formatInfoSize(entry: Pick<SftpEntry, "isDir" | "size">): string
   return entry.isDir ? translate(msg`不可用`) : formatSize(entry.size);
 }
 
-export function formatMode(mode: number): string {
-  if (!mode) return "—";
-  return `0${(mode & 0o777).toString(8)}`;
+export interface FileModePermissions {
+  raw: string;
+  owner: number;
+  group: number;
+  others: number;
+  setUserId: boolean;
+  setGroupId: boolean;
+  sticky: boolean;
+}
+
+export function parseFileMode(mode: number): FileModePermissions | null {
+  if (!mode) return null;
+  const permissionBits = mode & 0o7777;
+  return {
+    raw: `0${permissionBits.toString(8).padStart(3, "0")}`,
+    owner: (permissionBits >> 6) & 0o7,
+    group: (permissionBits >> 3) & 0o7,
+    others: permissionBits & 0o7,
+    setUserId: (permissionBits & 0o4000) !== 0,
+    setGroupId: (permissionBits & 0o2000) !== 0,
+    sticky: (permissionBits & 0o1000) !== 0,
+  };
 }
 
 export function formatOwner(info: Pick<SftpFileInfo, "uid" | "gid">): string {

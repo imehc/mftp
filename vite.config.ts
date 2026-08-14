@@ -51,6 +51,10 @@ export default defineConfig(async () => ({
     rolldownOptions: {
       output: {
         manualChunks(id) {
+          // Keep Vite's dynamic-import preload helper in a tiny shared chunk.
+          // Otherwise its first heavy consumer can pull an entire feature
+          // vendor chunk (Pixi) into the initial HTML modulepreload list.
+          if (id.includes("vite/preload-helper")) return "runtime-preload";
           if (!id.includes("node_modules")) return;
           if (id.includes("/pixi.js/") || id.includes("/@pixi/")) {
             return "vendor-pixi";
@@ -74,8 +78,7 @@ export default defineConfig(async () => ({
             id.includes("/immer/") ||
             id.includes("/reselect/") ||
             id.includes("/decimal.js-light/") ||
-            id.includes("/es-toolkit/") ||
-            id.includes("/eventemitter3/")
+            id.includes("/es-toolkit/")
           ) {
             return "vendor-charts";
           }

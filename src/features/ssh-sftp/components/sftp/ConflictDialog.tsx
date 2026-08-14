@@ -67,14 +67,14 @@ export default function ConflictDialog({
             ctx.addIssue({
               code: "custom",
               path: ["incomingName"],
-              message: t`名称不能为空，且不能包含斜杠。`,
+              message: t`名称不能为空，且不能包含斜杠`,
             });
           }
           if (existingInvalid) {
             ctx.addIssue({
               code: "custom",
               path: ["existingName"],
-              message: t`名称不能为空，且不能包含斜杠。`,
+              message: t`名称不能为空，且不能包含斜杠`,
             });
           }
           if (incomingName !== "" && incomingName === existingName) {
@@ -192,7 +192,7 @@ export default function ConflictDialog({
                               : duplicated
                                 ? t`两个名称不能相同。`
                                 : incomingInvalid || existingInvalid
-                                  ? t`名称不能为空，且不能包含斜杠。`
+                                  ? t`名称不能为空，且不能包含斜杠`
                                   : t`确认后会按上面的名称继续。`}
                           </FieldDescription>
                         );

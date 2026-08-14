@@ -4,7 +4,7 @@
  * stage, the non-modal result bar, and the spin/power bottom bar.
  */
 import { useEffect, useRef, useState } from "react";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { Badge } from "~/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { cn } from "~/lib/utils";
@@ -39,13 +39,13 @@ interface Session {
 function foulLabel(foul: FoulReason) {
   switch (foul) {
     case "cue-potted":
-      return <Trans>犯规:母球落袋</Trans>;
+      return <Trans>犯规：母球落袋</Trans>;
     case "no-contact":
-      return <Trans>犯规:未碰到任何球</Trans>;
+      return <Trans>犯规：未碰到任何球</Trans>;
     case "wrong-first-contact":
-      return <Trans>犯规:首先碰到的不是本方球</Trans>;
+      return <Trans>犯规：首先碰到的不是本方球</Trans>;
     case "potted-eight-early":
-      return <Trans>犯规:提前打进黑八</Trans>;
+      return <Trans>犯规：提前打进黑八</Trans>;
   }
 }
 
@@ -269,26 +269,24 @@ function MatchView({
           <div className="flex flex-wrap items-center justify-center gap-1.5">
             <Badge variant="secondary">
               {state.variant === "practice" ? (
-                <Trans>清台完成!</Trans>
+                <Trans>清台完成！</Trans>
               ) : snapshot.winnerSeat !== null ? (
-                <span>
-                  {seatName(mode, snapshot.winnerSeat)} <Trans>获胜</Trans>
-                </span>
+                <Trans>{seatName(mode, snapshot.winnerSeat)} 获胜</Trans>
               ) : (
                 <Trans>对局结束</Trans>
               )}
             </Badge>
             <Badge variant="outline">
-              <Trans>共 {state.shotCount} 杆</Trans>
+              <Plural value={{ shotCount: state.shotCount }} one="共 # 杆" other="共 # 杆" />
             </Badge>
           </div>
         ) : mode.kind === "practice" ? (
           <div className="flex flex-wrap items-center justify-center gap-1.5">
             <Badge variant="outline">
-              <Trans>第 {state.shotCount + 1} 杆</Trans>
+              <Plural value={{ shotNumber: state.shotCount + 1 }} one="第 # 杆" other="第 # 杆" />
             </Badge>
             <Badge variant="outline">
-              <Trans>剩余 {remaining} 球</Trans>
+              <Plural value={{ remainingBallCount: remaining }} one="剩余 # 球" other="剩余 # 球" />
             </Badge>
             <BallTray state={state} ids={ALL_TRAY} />
             {outcome?.foul ? (
@@ -306,7 +304,7 @@ function MatchView({
             />
             <div className="flex max-w-[50vw] flex-wrap items-center justify-center gap-1.5">
               <Badge variant="outline">
-                <Trans>第 {state.shotCount + 1} 杆</Trans>
+                <Plural value={{ shotNumber: state.shotCount + 1 }} one="第 # 杆" other="第 # 杆" />
               </Badge>
               {aiThinking ? (
                 <Badge variant="outline">
@@ -315,7 +313,7 @@ function MatchView({
               ) : null}
               {ballInHand ? (
                 <Badge variant="secondary">
-                  <Trans>自由球:拖动母球放置</Trans>
+                  <Trans>自由球：拖动母球放置</Trans>
                 </Badge>
               ) : null}
               {outcome?.foul ? (
@@ -359,9 +357,9 @@ function MatchView({
         <GameResultBar
           title={
             state.variant === "practice" ? (
-              <Trans>清台完成!</Trans>
+              <Trans>清台完成！</Trans>
             ) : snapshot.winnerSeat !== null ? (
-              <span>{seatName(mode, snapshot.winnerSeat)} <Trans>获胜</Trans></span>
+              <Trans>{seatName(mode, snapshot.winnerSeat)} 获胜</Trans>
             ) : (
               <Trans>对局结束</Trans>
             )
@@ -374,7 +372,7 @@ function MatchView({
           }
           details={
             <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start">
-              <span><Trans>总杆数</Trans> {state.shotCount}</span>
+              <Plural value={{ shotCount: state.shotCount }} one="总杆数 #" other="总杆数 #" />
               {mode.kind !== "practice"
                 ? [0, 1].map((seat) => {
                     const tray = seatTray(state, seat);
@@ -382,7 +380,11 @@ function MatchView({
                       <span key={seat} className="inline-flex items-center gap-1.5">
                         {seatName(mode, seat)}
                         {tray ? <BallTray state={state} ids={tray} /> : null}
-                        <Trans>犯规 {state.foulCounts[seat] ?? 0}</Trans>
+                        <Plural
+                          value={{ foulCount: state.foulCounts[seat] ?? 0 }}
+                          one="犯规 # 次"
+                          other="犯规 # 次"
+                        />
                       </span>
                     );
                   })
@@ -407,7 +409,9 @@ function MatchView({
             }}
           >
             <ToggleGroupItem value="-0.7">
-              <Trans>拉杆</Trans>
+              <Trans comment="Billiards cue action that applies draw/backspin to the cue ball">
+                拉杆
+              </Trans>
             </ToggleGroupItem>
             <ToggleGroupItem value="0">
               <Trans>中杆</Trans>
@@ -432,7 +436,7 @@ function MatchView({
             ) : (
               <span className="truncate text-xs text-muted-foreground">
                 {activeIsLocal && !ballInHand ? (
-                  <Trans>按住桌面向母球后方拖动蓄力,松手击球</Trans>
+                  <Trans>按住桌面向母球后方拖动蓄力，松手击球</Trans>
                 ) : null}
               </span>
             )}

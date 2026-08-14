@@ -1,14 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FileClock, Search } from "lucide-react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "~/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "~/components/ui/input-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { LogDeleteButton, LogPageActions, LogPageLayout, LogTableViewport } from "~/features/logs/LogPageLayout";
 import * as ipc from "~/lib/ipc";
+import { useMediaQuery } from "~/lib/use-media-query";
 import type { ActivityLog } from "~/types";
 
 function sourceLabel(value: string, t: ReturnType<typeof useLingui>["t"]) {
@@ -18,41 +26,19 @@ function sourceLabel(value: string, t: ReturnType<typeof useLingui>["t"]) {
 }
 
 function OverflowTooltipText({ value }: { value?: string | null }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [overflowing, setOverflowing] = useState(false);
   const text = value || "-";
-
-  const updateOverflow = useCallback(() => {
-    const element = ref.current;
-    if (!element) return;
-    setOverflowing(element.scrollWidth > element.clientWidth);
-  }, []);
-
-  useEffect(() => {
-    updateOverflow();
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new ResizeObserver(updateOverflow);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [text, updateOverflow]);
-
-  const content = (
-    <span ref={ref} className="block max-w-56 truncate" onMouseEnter={updateOverflow}>
-      {text}
-    </span>
-  );
-
-  if (!overflowing) return content;
-
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{content}</TooltipTrigger>
+      <TooltipTrigger asChild>
+        <span className="block truncate">{text}</span>
+      </TooltipTrigger>
       <TooltipContent className="max-w-sm whitespace-normal break-words">{text}</TooltipContent>
     </Tooltip>
   );
 }
+
+const desktopGridColumns =
+  "grid-cols-[9rem_5rem_minmax(6rem,0.8fr)_minmax(7rem,1fr)_4.5rem_minmax(8rem,1.5fr)_2.75rem]";
 
 export default function ActivityLogsPage() {
   const { t } = useLingui();
@@ -62,6 +48,8 @@ export default function ActivityLogsPage() {
   const [result, setResult] = useState("all");
   const [range, setRange] = useState("all");
   const [loading, setLoading] = useState(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const desktop = useMediaQuery("(min-width: 768px)");
 
   async function load() {
     setLoading(true);
@@ -109,6 +97,19 @@ export default function ActivityLogsPage() {
       return [log.source, log.ip, log.requestType, log.result, log.detail ?? ""].join(" ").toLowerCase().includes(q);
     });
   }, [logs, query, range, result, source]);
+  const rowVirtualizer = useVirtualizer({
+    count: desktop ? filtered.length : 0,
+    getScrollElement: () => viewportRef.current,
+    estimateSize: () => 49,
+    overscan: 12,
+    scrollMargin: 41,
+  });
+  const cardVirtualizer = useVirtualizer({
+    count: desktop ? 0 : filtered.length,
+    getScrollElement: () => viewportRef.current,
+    estimateSize: () => 124,
+    overscan: 8,
+  });
 
   return (
     <LogPageLayout
@@ -130,49 +131,84 @@ export default function ActivityLogsPage() {
         </>
       }
     >
-      <LogTableViewport>
+      <LogTableViewport viewportRef={viewportRef}>
         {filtered.length === 0 ? (
-          <div className="flex min-h-56 items-center justify-center gap-2 text-sm text-muted-foreground"><FileClock /><Trans>暂无日志</Trans></div>
+          <Empty className="min-h-56">
+            <EmptyHeader>
+              <EmptyMedia variant="icon"><FileClock /></EmptyMedia>
+              <EmptyTitle><Trans>暂无日志</Trans></EmptyTitle>
+              <EmptyDescription><Trans>调整筛选条件或刷新后再试。</Trans></EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
-          <Table className="min-w-[920px] table-fixed">
-            <colgroup>
-              <col className="w-40" />
-              <col className="w-24" />
-              <col className="w-36" />
-              <col className="w-32" />
-              <col className="w-24" />
-              <col />
-              <col className="w-12" />
-            </colgroup>
-            <TableHeader className="bg-card [&_th]:bg-card">
-              <TableRow className="sticky top-0 z-20 bg-card shadow-xs">
-                <TableHead><Trans>时间</Trans></TableHead>
-                <TableHead><Trans>来源</Trans></TableHead>
-                <TableHead><Trans>地址</Trans></TableHead>
-                <TableHead><Trans>动作</Trans></TableHead>
-                <TableHead><Trans>结果</Trans></TableHead>
-                <TableHead><Trans>详情</Trans></TableHead>
-                <TableHead className="sticky right-0 w-12" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((log) => (
-                <TableRow className="group" key={log.id}>
-                  <TableCell className="text-xs tabular-nums">{new Date(log.createdAt).toLocaleString()}</TableCell>
-                  <TableCell><Badge variant="outline">{sourceLabel(log.source, t)}</Badge></TableCell>
-                  <TableCell className="truncate text-xs tabular-nums">{log.ip}</TableCell>
-                  <TableCell className="truncate">{log.requestType}</TableCell>
-                  <TableCell>{log.result === "success" ? t`成功` : t`失败`}</TableCell>
-                  <TableCell className="max-w-56 text-muted-foreground">
-                    <OverflowTooltipText value={log.detail} />
-                  </TableCell>
-                  <TableCell className="sticky right-0 w-12 bg-card transition-colors group-hover:bg-muted/50">
+          <>
+            <div
+              className="relative md:hidden"
+              style={{ height: `${cardVirtualizer.getTotalSize()}px` }}
+            >
+              {cardVirtualizer.getVirtualItems().map((virtualCard) => {
+                const log = filtered[virtualCard.index];
+                if (!log) return null;
+                return (
+                <div
+                  key={log.id}
+                  ref={cardVirtualizer.measureElement}
+                  data-index={virtualCard.index}
+                  className="absolute left-0 top-0 w-full px-2 pb-2"
+                  style={{ transform: `translateY(${virtualCard.start}px)` }}
+                >
+                <article className="rounded-md border border-border p-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge variant="outline">{sourceLabel(log.source, t)}</Badge>
+                        <Badge variant={log.result === "success" ? "secondary" : "destructive"}>
+                          {log.result === "success" ? t`成功` : t`失败`}
+                        </Badge>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {new Date(log.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="mt-2 break-words text-sm font-medium">{log.requestType}</p>
+                      <p className="mt-1 break-all text-xs tabular-nums text-muted-foreground">{log.ip}</p>
+                    </div>
                     <LogDeleteButton onDelete={() => deleteLog(log.id)} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                  {log.detail ? (
+                    <p className="mt-2 whitespace-pre-wrap break-words text-xs text-muted-foreground">{log.detail}</p>
+                  ) : null}
+                </article>
+                </div>
+              );
+              })}
+            </div>
+            <div className="hidden min-w-0 md:block">
+              <div className={`sticky top-0 z-20 grid h-10 items-center border-b border-border bg-card px-2 text-xs font-medium text-muted-foreground shadow-xs ${desktopGridColumns}`}>
+                <span><Trans>时间</Trans></span><span><Trans>来源</Trans></span><span><Trans>地址</Trans></span><span><Trans>动作</Trans></span><span><Trans>结果</Trans></span><span><Trans>详情</Trans></span><span />
+              </div>
+              <div className="relative" style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const log = filtered[virtualRow.index];
+                  if (!log) return null;
+                  return (
+                    <div
+                      key={log.id}
+                      className={`absolute left-0 top-0 grid w-full items-center border-b border-border/60 px-2 text-sm transition-colors hover:bg-muted/50 ${desktopGridColumns}`}
+                      style={{ height: `${virtualRow.size}px`, transform: `translateY(${virtualRow.start - 41}px)` }}
+                    >
+                      <span className="truncate text-xs tabular-nums">{new Date(log.createdAt).toLocaleString()}</span>
+                      <span><Badge variant="outline">{sourceLabel(log.source, t)}</Badge></span>
+                      <span className="truncate text-xs tabular-nums">{log.ip}</span>
+                      <span className="truncate">{log.requestType}</span>
+                      <span>{log.result === "success" ? t`成功` : t`失败`}</span>
+                      <span className="min-w-0 text-muted-foreground"><OverflowTooltipText value={log.detail} /></span>
+                      <span className="flex justify-end"><LogDeleteButton onDelete={() => deleteLog(log.id)} /></span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
         )}
       </LogTableViewport>
     </LogPageLayout>

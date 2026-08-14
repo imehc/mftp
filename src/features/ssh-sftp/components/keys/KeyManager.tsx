@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { KeyRound, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -170,7 +170,11 @@ export default function KeyManager({ open, onOpenChange }: Props) {
 
         <div className="flex flex-col gap-1">
           <p className="text-xs font-medium text-muted-foreground">
-            <Trans>已导入 ({keys.length})</Trans>
+            <Plural
+              value={{ importedKeyCount: keys.length }}
+              one="已导入 # 个密钥"
+              other="已导入 # 个密钥"
+            />
           </p>
           {keys.length === 0 ? (
             <Empty className="py-6">

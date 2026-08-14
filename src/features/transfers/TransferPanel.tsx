@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { msg } from "@lingui/core/macro";
+import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { listen } from "@tauri-apps/api/event";
 import { gsap } from "gsap";
@@ -41,19 +41,55 @@ function formatSpeed(bytesPerSecond: number): string {
 function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "--";
   const rounded = Math.ceil(seconds);
-  if (rounded < 60) return translate(msg`${rounded} 秒`);
+  if (rounded < 60) {
+    return translate(
+      msg({
+        message: plural({ rounded }, { one: "# 秒", other: "# 秒" }),
+      }),
+    );
+  }
   const minutes = Math.floor(rounded / 60);
   const remainingSeconds = rounded % 60;
   if (minutes < 60) {
-    return remainingSeconds > 0
-      ? translate(msg`${minutes} 分 ${remainingSeconds} 秒`)
-      : translate(msg`${minutes} 分`);
+    if (remainingSeconds > 0) {
+      return translate(
+        msg({
+          message: plural(
+            { minutes },
+            {
+              one: `# 分 ${remainingSeconds} 秒`,
+              other: `# 分 ${remainingSeconds} 秒`,
+            },
+          ),
+        }),
+      );
+    }
+    return translate(
+      msg({
+        message: plural({ minutes }, { one: "# 分", other: "# 分" }),
+      }),
+    );
   }
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  return remainingMinutes > 0
-    ? translate(msg`${hours} 小时 ${remainingMinutes} 分`)
-    : translate(msg`${hours} 小时`);
+  if (remainingMinutes > 0) {
+    return translate(
+      msg({
+        message: plural(
+          { hours },
+          {
+            one: `# 小时 ${remainingMinutes} 分`,
+            other: `# 小时 ${remainingMinutes} 分`,
+          },
+        ),
+      }),
+    );
+  }
+  return translate(
+    msg({
+      message: plural({ hours }, { one: "# 小时", other: "# 小时" }),
+    }),
+  );
 }
 
 function transferMetrics(progress: TransferState) {
@@ -105,10 +141,34 @@ export default function TransferPanel() {
     activeTransferCount === 0
       ? t`空闲`
       : transferringCount === 0
-        ? t`${pausedTransferCount} 个已暂停`
+        ? t({
+            message: plural(
+              { pausedTransferCount },
+              { one: "# 个已暂停", other: "# 个已暂停" },
+            ),
+          })
         : pausedTransferCount > 0
-          ? t`${transferringCount} 进行中 · ${pausedTransferCount} 已暂停`
-          : t`${transferringCount} 个进行中`;
+          ? t({
+              message: plural(
+                { transferringCount },
+                {
+                  one: `# 个进行中 · ${pausedTransferCount} 个已暂停`,
+                  other: `# 个进行中 · ${pausedTransferCount} 个已暂停`,
+                },
+              ),
+            })
+          : t({
+              message: plural(
+                { transferringCount },
+                { one: "# 个进行中", other: "# 个进行中" },
+              ),
+            });
+  const clearFinishedLabel = t({
+    message: plural(
+      { finishedTransferCount },
+      { one: "清除 # 个已完成任务", other: "清除 # 个已完成任务" },
+    ),
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -281,8 +341,8 @@ export default function TransferPanel() {
             variant="ghost"
             size="xs"
             onClick={clearFinished}
-            title={t`清除 ${finishedTransferCount} 个已完成任务`}
-            aria-label={t`清除 ${finishedTransferCount} 个已完成任务`}
+            title={clearFinishedLabel}
+            aria-label={clearFinishedLabel}
           >
             <Trash2 data-icon="inline-start" />
             <Trans>清除 {finishedTransferCount}</Trans>

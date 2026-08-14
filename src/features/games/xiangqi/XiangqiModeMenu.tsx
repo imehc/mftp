@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { Bot, Radio, Users } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
@@ -109,7 +109,12 @@ export function XiangqiModeMenu({
                     {historyModeLabel(record.payload)}
                   </span>
                   <span className="text-right text-muted-foreground">
-                    {historyResult(record.payload)} · <Trans>{record.payload.moves} 手</Trans>
+                    {historyResult(record.payload)} ·{" "}
+                    <Plural
+                      value={{ moveCount: record.payload.moves }}
+                      one="# 手"
+                      other="# 手"
+                    />
                   </span>
                 </li>
               ))}

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, type Ref } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft, RefreshCw, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -47,9 +47,18 @@ export function LogPageLayout({
   );
 }
 
-export function LogTableViewport({ children }: { children: ReactNode }) {
+export function LogTableViewport({
+  children,
+  viewportRef,
+}: {
+  children: ReactNode;
+  viewportRef?: Ref<HTMLDivElement>;
+}) {
   return (
-    <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-card [&_[data-slot=table-container]]:overflow-visible">
+    <div
+      ref={viewportRef}
+      className="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-card [&_[data-slot=table-container]]:overflow-visible"
+    >
       {children}
     </div>
   );

@@ -33,6 +33,7 @@ import { createBallLayer } from "./balls";
 import { computeAimGuide } from "./guides";
 import { runPresentation } from "./playback";
 import { buildTable, OUTER_H, OUTER_W, PPM, px } from "./table";
+import { createCueView } from "./cue";
 
 export interface BilliardsStageHandle {
   /** Animate a resolved move; resolves when the table is at rest again. */
@@ -86,70 +87,7 @@ function createScene(
 
   // --- overlays -------------------------------------------------------
   const guideLayer = new Graphics();
-  const cueLayer = new Container();
-  const cueShadow = new Graphics();
-  const cueStick = new Graphics();
-  // Tapered stick pointing in +x; pivot at the tip.
-  const stickLen = px(1.05);
-  const TIP_HW = 3.2;
-  const BUTT_HW = 6.8;
-  /** Half-width of the tapered shaft at distance `x` from the tip. */
-  const stickHW = (x: number): number =>
-    TIP_HW + (BUTT_HW - TIP_HW) * (x / stickLen);
-  /** Fill a tapered band of the stick between two distances from the tip. */
-  const band = (
-    g: Graphics,
-    x0: number,
-    x1: number,
-    color: number,
-    alpha = 1,
-  ): void => {
-    g.poly([
-      x0, -stickHW(x0),
-      x1, -stickHW(x1),
-      x1, stickHW(x1),
-      x0, stickHW(x0),
-    ]).fill({ color, alpha });
-  };
-  /**
-   * Lengthwise strip between two fractions of the half-width, used for the
-   * specular line and the underside shading that make the stick read round.
-   */
-  const strip = (a: number, b: number, color: number, alpha: number): void => {
-    cueStick
-      .poly([
-        0, stickHW(0) * a,
-        stickLen, stickHW(stickLen) * a,
-        stickLen, stickHW(stickLen) * b,
-        0, stickHW(0) * b,
-      ])
-      .fill({ color, alpha });
-  };
-
-  // Material sections, tip → butt.
-  band(cueStick, 0, px(0.014), 0x3f6597); // chalked leather tip
-  band(cueStick, px(0.014), px(0.038), 0xf3ede1); // ivory ferrule
-  band(cueStick, px(0.038), px(0.60), 0xd7b183); // pale maple shaft
-  band(cueStick, px(0.60), px(0.638), 0x2c2c2c); // joint collar
-  band(cueStick, px(0.638), px(0.80), 0x6d3a23); // rosewood forearm
-  band(cueStick, px(0.80), px(0.95), 0x3b2b21); // linen wrap
-  band(cueStick, px(0.95), stickLen - px(0.022), 0x5b2f1e); // butt sleeve
-  band(cueStick, stickLen - px(0.022), stickLen, 0x1b1b1b); // rubber bumper
-  // Silver accent rings either side of the wrap.
-  band(cueStick, px(0.792), px(0.80), 0xcfc9ba);
-  band(cueStick, px(0.95), px(0.958), 0xcfc9ba);
-
-  // Cylindrical shading: light from the top-left, shadow along the underside.
-  strip(-1, -0.62, 0xffffff, 0.1);
-  strip(-0.62, -0.3, 0xffffff, 0.2);
-  strip(-0.42, -0.32, 0xffffff, 0.26);
-  strip(0.34, 0.72, 0x000000, 0.18);
-  strip(0.72, 1, 0x000000, 0.3);
-
-  // Soft drop shadow so the cue floats above the felt.
-  band(cueShadow, 0, stickLen, 0x000000, 0.22);
-  cueLayer.addChild(cueShadow, cueStick);
-  cueLayer.visible = false;
+  const { layer: cueLayer, stick: cueStick } = createCueView();
   const ghostLayer = new Graphics();
   root.addChild(guideLayer, cueLayer, ghostLayer);
 

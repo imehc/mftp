@@ -60,11 +60,7 @@ export function matchResultLabel(
   if (localSeat != null) {
     return winnerSeat === localSeat ? <Trans>你赢了</Trans> : <Trans>你输了</Trans>;
   }
-  return (
-    <span>
-      {sideName(mode, winnerSeat, online)} <Trans>获胜</Trans>
-    </span>
-  );
+  return <Trans>{sideName(mode, winnerSeat, online)} 获胜</Trans>;
 }
 
 export function historyModeLabel(payload: XiangqiHistoryPayload) {
@@ -86,7 +82,9 @@ export function historyModeLabel(payload: XiangqiHistoryPayload) {
 }
 
 export function historyResult(payload: XiangqiHistoryPayload) {
-  if (payload.winnerSeat === null) return <Trans>和</Trans>;
+  if (payload.winnerSeat === null) {
+    return <Trans>和棋</Trans>;
+  }
   if (payload.mode === "ai") {
     return payload.winnerSeat === (payload.localSeat ?? 0) ? (
       <Trans>胜</Trans>

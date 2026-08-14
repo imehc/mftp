@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { openSearchPanel } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
@@ -11,7 +10,6 @@ import {
   CheckCheck,
   Copy,
   Eraser,
-  Home,
   Minimize2,
   Quote,
   RemoveFormatting,
@@ -22,6 +20,7 @@ import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   Select,
@@ -86,7 +85,11 @@ export default function FormatterTool() {
         regexp: t`正则`,
         replace: t`替换`,
         "replace all": t`全部替换`,
-        close: t`关闭`,
+        close: t({
+          context: "editor panel action",
+          comment: "Button that closes the CodeMirror search panel",
+          message: "关闭",
+        }),
         "current match": t`当前匹配`,
         "Go to line": t`跳转到行`,
         go: t`跳转`,
@@ -200,23 +203,7 @@ export default function FormatterTool() {
 
   return (
     <main className="flex h-full flex-col bg-background text-foreground">
-      <header className="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-border px-2">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <Button variant="ghost" size="xs" asChild>
-            <Link to="/">
-              <Home data-icon="inline-start" />
-              <Trans>首页</Trans>
-            </Link>
-          </Button>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
-            <Trans>格式化</Trans>
-          </div>
-        </div>
-        <Badge variant="outline">
-          <Trans>本地处理</Trans>
-        </Badge>
-      </header>
+      <ToolPageHeader title={<Trans>格式化</Trans>} trailing={<Badge variant="outline"><Trans>本地处理</Trans></Badge>} />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
         <section className="rounded-lg border border-border bg-card p-2.5">
@@ -311,10 +298,10 @@ export default function FormatterTool() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="2">
-                    <Trans>2 空格</Trans>
+                    <Plural value={{ spaces: 2 }} one="# 空格" other="# 空格" />
                   </SelectItem>
                   <SelectItem value="4">
-                    <Trans>4 空格</Trans>
+                    <Plural value={{ spaces: 4 }} one="# 空格" other="# 空格" />
                   </SelectItem>
                   <SelectItem value="tab">Tab</SelectItem>
                 </SelectContent>
@@ -401,10 +388,18 @@ export default function FormatterTool() {
             </span>
             <div className="flex items-center gap-1">
               <Badge variant="outline">
-                <Trans>{value ? value.split("\n").length : 0} 行</Trans>
+                <Plural
+                  value={{ lineCount: value ? value.split("\n").length : 0 }}
+                  one="# 行"
+                  other="# 行"
+                />
               </Badge>
               <Badge variant="outline">
-                <Trans>{value.length} 字符</Trans>
+                <Plural
+                  value={{ characterCount: value.length }}
+                  one="# 个字符"
+                  other="# 个字符"
+                />
               </Badge>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { Trans } from "@lingui/react/macro";
 import {
   Area,
@@ -8,8 +8,10 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  matchByDataKey,
 } from "recharts";
 import { formatBytes } from "~/lib/format";
+import { prefersReducedMotion } from "~/lib/motion";
 import type { MonitorPoint } from "~/features/ssh-sftp/components/monitor/useSystemMonitor";
 
 export type SeriesKey = Exclude<keyof MonitorPoint, "t">;
@@ -32,6 +34,8 @@ const formatAxisTime = (t: number) =>
 
 const formatValue = (unit: Unit, value: number) =>
   unit === "percent" ? `${value.toFixed(1)}%` : `${formatBytes(value)}/s`;
+
+const matchMonitorPoint = matchByDataKey("t");
 
 interface TipEntry {
   dataKey?: string | number;
@@ -108,6 +112,14 @@ export function TimeSeriesCard({
   unit,
 }: TimeSeriesCardProps) {
   const percent = unit === "percent";
+  const hasRenderedChart = useRef(false);
+  const animationActive =
+    hasRenderedChart.current && !prefersReducedMotion();
+
+  useEffect(() => {
+    if (points.length >= 2) hasRenderedChart.current = true;
+  }, [points.length]);
+
   return (
     <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3">
       <div className="flex items-start justify-between gap-2">
@@ -200,7 +212,10 @@ export function TimeSeriesCard({
                     stroke: "var(--card)",
                     strokeWidth: 2,
                   }}
-                  isAnimationActive={false}
+                  animationDuration={350}
+                  animationEasing="ease-out"
+                  animationMatchBy={matchMonitorPoint}
+                  isAnimationActive={animationActive}
                 />
               ))}
             </AreaChart>

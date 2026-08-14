@@ -18,7 +18,7 @@ function modeLabel(id: CompressModeId) {
     case "video":
       return <Trans>视频压缩</Trans>;
     case "resize":
-      return <Trans>图片改尺寸</Trans>;
+      return <Trans>调整图片尺寸</Trans>;
   }
 }
 

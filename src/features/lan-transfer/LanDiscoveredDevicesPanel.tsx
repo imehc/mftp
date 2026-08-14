@@ -1,25 +1,15 @@
-import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ExternalLink, MonitorSmartphone, RefreshCw } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import type { LanDiscoveredDevice } from "~/types";
-import { translate } from "~/i18n/translate";
+import { formatRelativeTime } from "~/lib/relative-time";
 
 interface Props {
   devices: LanDiscoveredDevice[];
   discovering: boolean;
   refresh: () => void;
   openDevice: (device: LanDiscoveredDevice) => void;
-}
-
-function formatSeen(value: number) {
-  if (!value) return "-";
-  const diff = Math.max(0, Date.now() - value);
-  if (diff < 10_000) return translate(msg`刚刚`);
-  if (diff < 60_000) return translate(msg`${Math.floor(diff / 1000)} 秒前`);
-  if (diff < 3_600_000) return translate(msg`${Math.floor(diff / 60_000)} 分钟前`);
-  return translate(msg`${Math.floor(diff / 3_600_000)} 小时前`);
 }
 
 export default function LanDiscoveredDevicesPanel({
@@ -74,7 +64,10 @@ export default function LanDiscoveredDevicesPanel({
                     </Badge>
                   </div>
                   <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {device.ip}:{device.port} · {formatSeen(device.lastSeen)}
+                    {device.ip}:{device.port} ·{" "}
+                    {formatRelativeTime(device.lastSeen, {
+                      justNowThresholdMs: 10_000,
+                    })}
                   </div>
                 </div>
                 <ExternalLink className="size-3.5 text-muted-foreground" />

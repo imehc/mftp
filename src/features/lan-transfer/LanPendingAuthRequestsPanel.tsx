@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useForm } from "@tanstack/react-form";
-import { msg } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
 import { CheckCircle2, RefreshCw, Shield, ShieldOff } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
@@ -15,7 +14,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { LanAuthRequest } from "~/types";
-import { translate } from "~/i18n/translate";
+import { formatRelativeTime } from "~/lib/relative-time";
+import { lanPermissionLabel } from "~/features/lan-transfer/labels";
 
 interface Props {
   requests: LanAuthRequest[];
@@ -23,20 +23,6 @@ interface Props {
   refresh: () => void;
   approve: (id: string, permission: string) => void;
   reject: (id: string) => void;
-}
-
-function permissionLabel(value: string) {
-  if (value === "readOnly") return translate(msg`只读`);
-  if (value === "uploadOnly") return translate(msg`仅上传`);
-  return translate(msg`读写`);
-}
-
-function formatAge(value: number) {
-  if (!value) return "-";
-  const diff = Math.max(0, Date.now() - value);
-  if (diff < 60_000) return translate(msg`${Math.max(1, Math.ceil(diff / 1000))} 秒前`);
-  if (diff < 3_600_000) return translate(msg`${Math.floor(diff / 60_000)} 分钟前`);
-  return translate(msg`${Math.floor(diff / 3_600_000)} 小时前`);
 }
 
 const permissionFormSchema = z.object({
@@ -104,6 +90,7 @@ export default function LanPendingAuthRequestsPanel({
   approve,
   reject,
 }: Props) {
+  const { t } = useLingui();
   const sorted = useMemo(
     () => [...requests].sort((a, b) => b.requestedAt - a.requestedAt),
     [requests],
@@ -145,15 +132,18 @@ export default function LanPendingAuthRequestsPanel({
                         <span className="truncate text-sm font-medium">
                           {request.deviceName}
                         </span>
-                        <Badge variant="outline">{permissionLabel(request.accessType)}</Badge>
+                        <Badge variant="outline">{lanPermissionLabel(request.accessType)}</Badge>
                       </div>
                       <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                        {request.ip} · {formatAge(request.requestedAt)}
+                        {request.ip} · {formatRelativeTime(request.requestedAt)}
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon-xs"
+                      title={t`拒绝访问`}
+                      aria-label={t`拒绝访问`}
+                      className="max-sm:min-h-11 max-sm:min-w-11"
                       onClick={() => void reject(request.id)}
                     >
                       <ShieldOff className="text-destructive" />

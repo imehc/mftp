@@ -41,7 +41,7 @@ export function GameHomeButton({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle><Trans>返回首页?</Trans></AlertDialogTitle>
+          <AlertDialogTitle><Trans>返回首页？</Trans></AlertDialogTitle>
           <AlertDialogDescription>
             <Trans>当前对局尚未结束，返回首页将丢失进度。</Trans>
           </AlertDialogDescription>
@@ -96,7 +96,7 @@ export function GameMatchActions({
             <AlertDialogTrigger asChild><RestartButton /></AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle><Trans>重新开始对局?</Trans></AlertDialogTitle>
+                <AlertDialogTitle><Trans>重新开始对局？</Trans></AlertDialogTitle>
                 <AlertDialogDescription><Trans>当前对局的进度将会丢失。</Trans></AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -114,9 +114,9 @@ export function GameMatchActions({
           <AlertDialogTrigger asChild><ExitButton /></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle><Trans>退出当前对局?</Trans></AlertDialogTitle>
+              <AlertDialogTitle><Trans>退出当前对局？</Trans></AlertDialogTitle>
               <AlertDialogDescription>
-                <Trans>将返回模式选择,当前对局的进度将会丢失。</Trans>
+                <Trans>将返回模式选择，当前对局的进度将会丢失。</Trans>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

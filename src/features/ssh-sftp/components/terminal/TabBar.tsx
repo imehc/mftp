@@ -110,7 +110,15 @@ export default function TabBar() {
               )}
 
               <button
-                title={isClosing ? t`关闭中` : t`关闭`}
+                title={
+                  isClosing
+                    ? t`关闭中`
+                    : t({
+                        context: "tab action",
+                        comment: "Button that closes an SSH session tab",
+                        message: "关闭",
+                      })
+                }
                 onClick={(e) => {
                   e.stopPropagation();
                   void closeTab(s.id);

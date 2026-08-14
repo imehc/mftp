@@ -312,7 +312,12 @@ export function OnlineLobby<M>({
             className="h-7 w-24 text-xs"
           />
           <Button size="xs" variant="outline" disabled={busy} onClick={joinManual}>
-            <Trans>直连</Trans>
+            <Trans
+              context="game connection action"
+              comment="Button that joins a game room directly using an IP address and port"
+            >
+              直连
+            </Trans>
           </Button>
         </div>
 

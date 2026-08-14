@@ -3,18 +3,8 @@
  * undo / rematch consent dialogs, and connection-loss handling.
  */
 import { useEffect, useRef, useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
 import { gameRoomLeave } from "~/lib/ipc";
 import { useSettingsStore } from "~/store/settings";
 import type { GameRoomStatus } from "~/types";
@@ -24,6 +14,7 @@ import {
 } from "../engine/controllers";
 import { MatchRunner } from "../engine/match";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
+import { OnlineMatchDialogs, type UndoFlow } from "../engine/online/OnlineMatchDialogs";
 import { hashString, OnlineMatchSession } from "../engine/online/session";
 import type { RemoteMove } from "../engine/transport";
 import type { PlayerController, SeatIndex } from "../engine/types";
@@ -80,11 +71,6 @@ export function GomokuOnlineFlow({
     />
   );
 }
-
-type UndoFlow =
-  | { kind: "waiting" }
-  | { kind: "incoming"; atMove: number; plies: number }
-  | null;
 
 function OnlineMatch({
   session,
@@ -261,64 +247,7 @@ function OnlineMatch({
         onExit={onExit}
         onFinishedChange={onFinishedChange}
       />
-      <AlertDialog open={undoFlow?.kind === "incoming"}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>对方请求悔棋</Trans>
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              <Trans>
-                将撤销 {undoFlow?.kind === "incoming" ? undoFlow.plies : 0}{" "}
-                手棋，是否同意？
-              </Trans>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => respondUndo(false)}>
-              <Trans>拒绝</Trans>
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={() => respondUndo(true)}>
-              <Trans>同意</Trans>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <AlertDialog open={rematchIncoming}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>对方想再来一局</Trans>
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              <Trans>同意后双方交换先后手，立即开始新对局。</Trans>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => respondRematch(false)}>
-              <Trans>拒绝</Trans>
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={() => respondRematch(true)}>
-              <Trans>同意</Trans>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <AlertDialog open={endReason !== null}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>对局中断</Trans>
-            </AlertDialogTitle>
-            <AlertDialogDescription>{endReason}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={onExit}>
-              <Trans>返回选择</Trans>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <OnlineMatchDialogs undoFlow={undoFlow} onRespondUndo={respondUndo} rematchIncoming={rematchIncoming} onRespondRematch={respondRematch} endReason={endReason} onExit={onExit} />
     </>
   );
 }

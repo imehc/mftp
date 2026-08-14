@@ -1,6 +1,6 @@
 /** Mode selection menu: practice, vs-AI setup, hotseat, and history. */
 import { useState } from "react";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { Bot, Target, Users } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
@@ -171,7 +171,11 @@ export function BilliardsModeMenu({
                   <span className="shrink-0 text-muted-foreground text-right">
                     {historyResult(record.payload)}
                     {" · "}
-                    <Trans>{record.payload.shots} 杆</Trans>
+                    <Plural
+                      value={{ shotCount: record.payload.shots }}
+                      one="# 杆"
+                      other="# 杆"
+                    />
                   </span>
                 </li>
               ))}

@@ -135,7 +135,7 @@ export default function VaultEntryDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {entry ? <Trans>编辑账号</Trans> : <Trans>新增账号</Trans>}
+            {entry ? <Trans>编辑账号</Trans> : <Trans>新建账号</Trans>}
           </DialogTitle>
         </DialogHeader>
         <form

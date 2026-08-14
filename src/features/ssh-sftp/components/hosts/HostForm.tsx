@@ -4,6 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type { Host } from "~/types";
 import { useHostsStore } from "~/store/hosts";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { PasswordInput } from "~/components/ui/password-input";
 import {
@@ -252,7 +253,11 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                                 {keys.map((k) => (
                                   <SelectItem key={k.id} value={k.id}>
                                     {k.label}
-                                    {k.hasPassphrase ? t` (需口令)` : ""}
+                                    {k.hasPassphrase ? (
+                                      <Badge variant="secondary" className="ml-1.5">
+                                        <Trans>需口令</Trans>
+                                      </Badge>
+                                    ) : null}
                                   </SelectItem>
                                 ))}
                               </SelectGroup>

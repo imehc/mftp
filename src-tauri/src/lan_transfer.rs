@@ -13,7 +13,9 @@ use std::sync::Arc;
 use std::thread::{self, JoinHandle};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+mod access_routes;
 mod auth;
+mod browse_routes;
 mod browser_client;
 mod browser_page;
 mod discovery;
@@ -23,6 +25,7 @@ mod http_io;
 mod logging;
 mod server;
 mod tasks;
+mod upload_routes;
 
 use auth::{
     generate_code, is_lan_ipv4, prune_devices, AuthAttemptState, AuthorizedSession,
@@ -238,22 +241,24 @@ impl LanTransferManager {
             server::run_http_server(
                 listener,
                 thread_stop,
-                device_name,
-                download_dir,
-                shares,
-                security_mode,
-                default_permission,
-                max_concurrent_transfers,
-                trusted_ips,
-                thread_confirmation_code,
-                thread_tokens,
-                thread_blocked_sessions,
-                thread_pending_auth,
-                thread_devices,
-                thread_tasks,
-                thread_active_transfers,
-                thread_attempts,
-                db_path,
+                server::ServerContext {
+                    device_name,
+                    download_dir,
+                    shares,
+                    security_mode,
+                    default_permission,
+                    max_concurrent_transfers,
+                    trusted_ips,
+                    confirmation_code: thread_confirmation_code,
+                    authorized_tokens: thread_tokens,
+                    blocked_sessions: thread_blocked_sessions,
+                    pending_auth: thread_pending_auth,
+                    devices: thread_devices,
+                    tasks: thread_tasks,
+                    active_transfers: thread_active_transfers,
+                    auth_attempts: thread_attempts,
+                    db_path,
+                },
             )
         });
         let discovery_stop = stop.clone();

@@ -3,7 +3,7 @@
  * both local and online play: status bar, board stage, and result bar.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Flag, Undo2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -202,11 +202,15 @@ export function GoMatchView({
             </Badge>
           ) : (
             <Badge variant="secondary">
-              <Trans>轮到</Trans> {seatName(mode, state.turnSeat, online)}
+              <Trans>轮到 {seatName(mode, state.turnSeat, online)}</Trans>
             </Badge>
           )}
           <Badge variant="outline">
-            <Trans>第 {state.moveCount + (state.finished ? 0 : 1)} 手</Trans>
+            <Plural
+              value={{ moveNumber: state.moveCount + (state.finished ? 0 : 1) }}
+              one="第 # 手"
+              other="第 # 手"
+            />
           </Badge>
           <Badge variant="outline">
             <Trans>提子 {state.captures[0]}:{state.captures[1]}</Trans>
@@ -285,7 +289,7 @@ export function GoMatchView({
           details={
             <span className="flex flex-wrap justify-center gap-x-2 sm:justify-start">
               {state.finalScore ? <span>{scoreLine(state)}</span> : null}
-              <span><Trans>共 {state.moveCount} 手</Trans></span>
+              <Plural value={{ moveCount: state.moveCount }} one="共 # 手" other="共 # 手" />
             </span>
           }
           rematchWaiting={online?.rematchWaiting}

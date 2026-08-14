@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from "react";
 import { linkOptions, type LinkOptions } from "@tanstack/react-router";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import {
   Archive,
   Braces,
@@ -57,13 +57,21 @@ export const homeEntries: HomeEntry[] = [
     badges: (stats) => (
       <>
         <Badge variant="outline">
-          <Trans>{stats.hostCount} 主机</Trans>
+          <Plural value={{ hostCount: stats.hostCount }} one="# 主机" other="# 主机" />
         </Badge>
         <Badge variant="outline">
-          <Trans>{stats.activeSessionCount} 连接</Trans>
+          <Plural
+            value={{ activeSessionCount: stats.activeSessionCount }}
+            one="# 连接"
+            other="# 连接"
+          />
         </Badge>
         <Badge variant="outline">
-          <Trans>{stats.runningTransferCount} 传输</Trans>
+          <Plural
+            value={{ runningTransferCount: stats.runningTransferCount }}
+            one="# 传输"
+            other="# 传输"
+          />
         </Badge>
       </>
     ),
@@ -71,7 +79,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "lan-transfer",
     category: "tools",
-    link: linkOptions({ to: "/tools/lan-transfer", preload: "viewport" }),
+    link: linkOptions({ to: "/tools/lan-transfer", preload: "intent" }),
     toolId: "lan-transfer",
     // Hidden on mobile: the LAN server/mDNS would trigger network-permission
     // prompts (iOS local network, CN wireless data) for a feature that can't
@@ -91,7 +99,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "crypto",
     category: "tools",
-    link: linkOptions({ to: "/tools/crypto", preload: "viewport" }),
+    link: linkOptions({ to: "/tools/crypto", preload: "intent" }),
     toolId: "crypto",
     icon: LockKeyhole,
     title: <Trans>加解密</Trans>,
@@ -112,7 +120,7 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({
       to: "/tools/media-compress",
       search: { mode: "resize" },
-      preload: "viewport",
+      preload: "intent",
     }),
     toolId: "media-compress",
     icon: Archive,
@@ -123,7 +131,7 @@ export const homeEntries: HomeEntry[] = [
           <Trans>压缩</Trans>
         </Badge>
         <Badge variant="outline">
-          <Trans>改尺寸</Trans>
+          <Trans>调整图片尺寸</Trans>
         </Badge>
         <Badge variant="outline">
           <Trans>本地</Trans>
@@ -134,7 +142,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "formatter",
     category: "tools",
-    link: linkOptions({ to: "/tools/formatter", preload: "viewport" }),
+    link: linkOptions({ to: "/tools/formatter", preload: "intent" }),
     toolId: "formatter",
     icon: Braces,
     title: <Trans>格式化</Trans>,
@@ -150,7 +158,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "vault",
     category: "tools",
-    link: linkOptions({ to: "/tools/vault", preload: "viewport" }),
+    link: linkOptions({ to: "/tools/vault", preload: "intent" }),
     toolId: "vault",
     icon: KeyRound,
     title: <Trans>密码本</Trans>,
@@ -168,7 +176,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "billiards",
     category: "games",
-    link: linkOptions({ to: "/games/billiards", preload: "viewport" }),
+    link: linkOptions({ to: "/games/billiards", preload: "intent" }),
     icon: CircleDot,
     title: <Trans>台球</Trans>,
     badges: () => (
@@ -185,7 +193,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "gomoku",
     category: "games",
-    link: linkOptions({ to: "/games/gomoku", preload: "viewport" }),
+    link: linkOptions({ to: "/games/gomoku", preload: "intent" }),
     icon: Circle,
     title: <Trans>五子棋</Trans>,
     badges: () => (
@@ -205,7 +213,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "go",
     category: "games",
-    link: linkOptions({ to: "/games/go", preload: "viewport" }),
+    link: linkOptions({ to: "/games/go", preload: "intent" }),
     icon: Grid3x3,
     title: <Trans>围棋</Trans>,
     badges: () => (
@@ -225,7 +233,7 @@ export const homeEntries: HomeEntry[] = [
   {
     id: "xiangqi",
     category: "games",
-    link: linkOptions({ to: "/games/xiangqi", preload: "viewport" }),
+    link: linkOptions({ to: "/games/xiangqi", preload: "intent" }),
     icon: Crown,
     title: <Trans>中国象棋</Trans>,
     badges: () => (

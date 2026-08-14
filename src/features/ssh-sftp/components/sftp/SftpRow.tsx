@@ -67,7 +67,7 @@ const SftpRow = memo(function SftpRow({
     >
       <button
         className="flex min-w-0 items-center gap-2 px-2 text-left"
-        onDoubleClick={() => entry.isDir && onEnter(entry.path)}
+        onClick={() => entry.isDir && onEnter(entry.path)}
         disabled={!entry.isDir || disabled}
       >
         {loading ? (
@@ -83,10 +83,10 @@ const SftpRow = memo(function SftpRow({
           {entry.name}
         </span>
       </button>
-      <span className="truncate px-2 text-left text-xs text-muted-foreground">
+      <span className="hidden truncate px-2 text-left text-xs text-muted-foreground sm:block">
         {formatMtime(entry.mtime)}
       </span>
-      <span className="truncate px-2 text-left text-xs text-muted-foreground">
+      <span className="hidden truncate px-2 text-left text-xs text-muted-foreground sm:block">
         {entryType(entry)}
       </span>
       <span className="truncate px-2 text-left text-xs text-muted-foreground">
@@ -95,7 +95,13 @@ const SftpRow = memo(function SftpRow({
       <div className="flex min-w-0 justify-end px-1">
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-xs" title={t`更多`}>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              title={t`更多`}
+              aria-label={t`更多文件操作`}
+              className="max-sm:min-h-11 max-sm:min-w-11"
+            >
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
@@ -105,7 +111,7 @@ const SftpRow = memo(function SftpRow({
                 <Download /> <Trans>下载</Trans>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onInfo(entry)}>
-                <Info /> <Trans>简介</Trans>
+                <Info /> <Trans>文件信息</Trans>
               </DropdownMenuItem>
               {canExtract ? (
                 <DropdownMenuItem onSelect={() => onExtract(entry)}>

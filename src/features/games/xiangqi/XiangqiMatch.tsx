@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -190,10 +190,12 @@ export function XiangqiMatchView({
             </Badge>
           ) : (
             <Badge variant="secondary">
-              <Trans>轮到</Trans> {sideName(mode, state.turnSeat, online)}
+              <Trans>轮到 {sideName(mode, state.turnSeat, online)}</Trans>
             </Badge>
           )}
-          <Badge variant="outline"><Trans>第 {state.moveCount + (state.finished ? 0 : 1)} 手</Trans></Badge>
+          <Badge variant="outline">
+            <Plural value={{ moveNumber: state.moveCount + (state.finished ? 0 : 1) }} one="第 # 手" other="第 # 手" />
+          </Badge>
           {state.inCheck ? (
             <Badge className="bg-[#b63a32] text-white"><Trans>将军</Trans></Badge>
           ) : null}
@@ -240,7 +242,7 @@ export function XiangqiMatchView({
           }
           details={
             <span>
-              {resultReasonLabel(state.resultReason)} · <Trans>共 {state.moveCount} 手</Trans>
+              {resultReasonLabel(state.resultReason)} · <Plural value={{ moveCount: state.moveCount }} one="共 # 手" other="共 # 手" />
             </span>
           }
           rematchWaiting={online?.rematchWaiting}

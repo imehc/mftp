@@ -19,8 +19,9 @@ import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
 const SystemMonitorPanel = lazy(
   () => import("~/features/ssh-sftp/components/monitor/SystemMonitorPanel"),
 );
-import { Home, PanelLeft, TerminalSquare } from "lucide-react";
+import { Home, LoaderCircle, PanelLeft, TerminalSquare } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Sheet, SheetContent, SheetTitle } from "~/components/ui/sheet";
 import { useMediaQuery } from "~/lib/use-media-query";
 import {
@@ -74,7 +75,14 @@ function Workspace() {
             </div>
             {session.view === "sftp" && <SftpPanel session={session} />}
             {session.view === "monitor" && (
-              <Suspense fallback={null}>
+              <Suspense
+                fallback={
+                  <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <LoaderCircle className="animate-spin" />
+                    <Trans>正在加载系统监控…</Trans>
+                  </div>
+                }
+              >
                 <SystemMonitorPanel session={session} />
               </Suspense>
             )}
@@ -179,20 +187,7 @@ export default function SshSftpTool() {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex h-9 shrink-0 items-center justify-between border-b border-border px-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <Button variant="ghost" size="xs" asChild>
-            <Link to="/">
-              <Home data-icon="inline-start" />
-              <Trans>首页</Trans>
-            </Link>
-          </Button>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          <div className="hidden truncate text-xs font-medium text-muted-foreground sm:block">
-            SSH / SFTP
-          </div>
-        </div>
-      </header>
+      <ToolPageHeader title="SSH / SFTP" />
       <Group
         orientation="horizontal"
         defaultLayout={defaultLayout}

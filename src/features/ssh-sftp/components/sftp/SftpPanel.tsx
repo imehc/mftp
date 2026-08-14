@@ -73,6 +73,7 @@ import {
   type SortState,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "~/lib/utils";
+import { useMediaQuery } from "~/lib/use-media-query";
 
 interface Props {
   session: Session;
@@ -82,6 +83,7 @@ interface Props {
 export default function SftpPanel({ session }: Props) {
   const { t } = useLingui();
   const sessionId = session.id;
+  const compact = useMediaQuery("(max-width: 640px)");
   const listScrollRef = useRef<HTMLDivElement | null>(null);
   const userResizedColumnsRef = useRef(false);
   const { cwd, entries, loading, loadingAction, load, goHome } =
@@ -154,7 +156,13 @@ export default function SftpPanel({ session }: Props) {
   const headerGroup = table.getHeaderGroups()[0];
   const listColumnStyle = {
     "--sftp-list-columns": headerGroup.headers
-      .map((header) => `${header.getSize()}px`)
+      .map((header) => {
+        if (!compact) return `${header.getSize()}px`;
+        if (header.column.id === "name") return "minmax(0, 1fr)";
+        if (header.column.id === "size") return "5rem";
+        if (header.column.id === "actions") return "3.5rem";
+        return "0px";
+      })
       .join(" "),
   } as CSSProperties;
 
@@ -219,6 +227,8 @@ export default function SftpPanel({ session }: Props) {
           variant="ghost"
           size="icon-sm"
           title={t`主目录`}
+          aria-label={t`主目录`}
+          className="max-sm:min-h-11 max-sm:min-w-11"
           onClick={goHome}
           disabled={loading}
         >
@@ -232,6 +242,8 @@ export default function SftpPanel({ session }: Props) {
           variant="ghost"
           size="icon-sm"
           title={t`上级目录`}
+          aria-label={t`上级目录`}
+          className="max-sm:min-h-11 max-sm:min-w-11"
           onClick={() => cwd && load(parentPath(cwd), "parent")}
           disabled={loading || !cwd || cwd === "/"}
         >
@@ -245,6 +257,8 @@ export default function SftpPanel({ session }: Props) {
           variant="ghost"
           size="icon-sm"
           title={t`刷新`}
+          aria-label={t`刷新`}
+          className="max-sm:min-h-11 max-sm:min-w-11"
           onClick={() => cwd && load(cwd, "refresh")}
           disabled={loading || !cwd}
         >
@@ -325,6 +339,7 @@ export default function SftpPanel({ session }: Props) {
                 return (
                   <ResizableHeader
                     key={header.id}
+                    hidden={compact && (id === "mtime" || id === "type")}
                     label={sftpColumnLabel(id)}
                     sortKey={sortable ? (id as SortKey) : undefined}
                     sort={sort}
@@ -475,6 +490,7 @@ export default function SftpPanel({ session }: Props) {
 }
 
 function ResizableHeader({
+  hidden,
   label,
   sortKey,
   sort,
@@ -486,6 +502,7 @@ function ResizableHeader({
   onResizeTouchStart,
   onSort,
 }: {
+  hidden?: boolean;
   label: string;
   sortKey?: SortKey;
   sort: SortState;
@@ -497,6 +514,7 @@ function ResizableHeader({
   onResizeTouchStart: TouchEventHandler<HTMLDivElement>;
   onSort: (key: SortKey) => void;
 }) {
+  if (hidden) return <span aria-hidden />;
   const active = sortKey != null && sort.key === sortKey;
   const Icon = sort.direction === "asc" ? ChevronUp : ChevronDown;
 

@@ -1,4 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { plural } from "@lingui/core/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   Activity,
   Cpu,
@@ -61,6 +62,11 @@ const PLACEHOLDER: SystemStats = {
 
 export default function SystemMonitorPanel({ session }: Props) {
   const { t } = useLingui();
+  const formatSeconds = (seconds: number) =>
+    t({
+      comment: "Refresh interval duration in seconds",
+      message: plural({ seconds }, { one: "# 秒", other: "# 秒" }),
+    });
   const {
     data,
     history,
@@ -112,10 +118,16 @@ export default function SystemMonitorPanel({ session }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0">{t`关闭`}</SelectItem>
-              <SelectItem value="2000">{t`2 秒`}</SelectItem>
-              <SelectItem value="5000">{t`5 秒`}</SelectItem>
-              <SelectItem value="10000">{t`10 秒`}</SelectItem>
+              <SelectItem value="0">
+                {t({
+                  context: "refresh interval state",
+                  comment: "Option that turns automatic monitor refresh off",
+                  message: "关闭",
+                })}
+              </SelectItem>
+              <SelectItem value="2000">{formatSeconds(2)}</SelectItem>
+              <SelectItem value="5000">{formatSeconds(5)}</SelectItem>
+              <SelectItem value="10000">{formatSeconds(10)}</SelectItem>
             </SelectContent>
           </Select>
         </span>
@@ -153,7 +165,11 @@ export default function SystemMonitorPanel({ session }: Props) {
               <span>{stats.os}</span>
               {stats.cpuCores != null ? (
                 <span>
-                  <Trans>{stats.cpuCores} 核</Trans>
+                  <Plural
+                    value={{ cpuCoreCount: stats.cpuCores }}
+                    one="# 核"
+                    other="# 核"
+                  />
                 </span>
               ) : null}
               {stats.uptimeSecs != null ? (
@@ -266,13 +282,29 @@ export default function SystemMonitorPanel({ session }: Props) {
 }
 
 function formatUptime(
-  t: (msg: TemplateStringsArray, ...values: unknown[]) => string,
+  t: ReturnType<typeof useLingui>["t"],
   seconds: number,
 ) {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  if (days > 0) return t`${days} 天 ${hours} 小时`;
-  if (hours > 0) return t`${hours} 小时 ${minutes} 分钟`;
-  return t`${minutes} 分钟`;
+  if (days > 0) {
+    return t({
+      message: plural(
+        { days },
+        { one: `# 天 ${hours} 小时`, other: `# 天 ${hours} 小时` },
+      ),
+    });
+  }
+  if (hours > 0) {
+    return t({
+      message: plural(
+        { hours },
+        { one: `# 小时 ${minutes} 分钟`, other: `# 小时 ${minutes} 分钟` },
+      ),
+    });
+  }
+  return t({
+    message: plural({ minutes }, { one: "# 分钟", other: "# 分钟" }),
+  });
 }
