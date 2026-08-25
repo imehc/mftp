@@ -15,6 +15,9 @@ import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
+import { Route as LibraryIndexRouteImport } from './routes/library/index'
+import { Route as LibraryIdRouteImport } from './routes/library/$id'
+import { Route as LibraryManageRouteImport } from './routes/library/manage'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
 import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
@@ -52,6 +55,21 @@ const GamesGomokuRoute = GamesGomokuRouteImport.update({
 const GamesXiangqiRoute = GamesXiangqiRouteImport.update({
   id: '/games/xiangqi',
   path: '/games/xiangqi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryIdRoute = LibraryIdRouteImport.update({
+  id: '/library/$id',
+  path: '/library/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryManageRoute = LibraryManageRouteImport.update({
+  id: '/library/manage',
+  path: '/library/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
@@ -102,6 +120,8 @@ export interface FileRoutesByFullPath {
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
+  '/library/$id': typeof LibraryIdRoute
+  '/library/manage': typeof LibraryManageRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -110,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
   '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
+  '/library/': typeof LibraryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +139,8 @@ export interface FileRoutesByTo {
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
+  '/library/$id': typeof LibraryIdRoute
+  '/library/manage': typeof LibraryManageRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -126,6 +149,7 @@ export interface FileRoutesByTo {
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
   '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
+  '/library': typeof LibraryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,6 +159,8 @@ export interface FileRoutesById {
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
+  '/library/$id': typeof LibraryIdRoute
+  '/library/manage': typeof LibraryManageRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -143,6 +169,7 @@ export interface FileRoutesById {
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
   '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
+  '/library/': typeof LibraryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -153,6 +180,8 @@ export interface FileRouteTypes {
     | '/games/go'
     | '/games/gomoku'
     | '/games/xiangqi'
+    | '/library/$id'
+    | '/library/manage'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -161,6 +190,7 @@ export interface FileRouteTypes {
     | '/tools/ssh-sftp'
     | '/tools/vault'
     | '/tools/video-compress'
+    | '/library/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -169,6 +199,8 @@ export interface FileRouteTypes {
     | '/games/go'
     | '/games/gomoku'
     | '/games/xiangqi'
+    | '/library/$id'
+    | '/library/manage'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -177,6 +209,7 @@ export interface FileRouteTypes {
     | '/tools/ssh-sftp'
     | '/tools/vault'
     | '/tools/video-compress'
+    | '/library'
   id:
     | '__root__'
     | '/'
@@ -185,6 +218,8 @@ export interface FileRouteTypes {
     | '/games/go'
     | '/games/gomoku'
     | '/games/xiangqi'
+    | '/library/$id'
+    | '/library/manage'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -193,6 +228,7 @@ export interface FileRouteTypes {
     | '/tools/ssh-sftp'
     | '/tools/vault'
     | '/tools/video-compress'
+    | '/library/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -202,6 +238,8 @@ export interface RootRouteChildren {
   GamesGoRoute: typeof GamesGoRoute
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
+  LibraryIdRoute: typeof LibraryIdRoute
+  LibraryManageRoute: typeof LibraryManageRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsFormatterRoute: typeof ToolsFormatterRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
@@ -210,6 +248,7 @@ export interface RootRouteChildren {
   ToolsSshSftpRoute: typeof ToolsSshSftpRoute
   ToolsVaultRoute: typeof ToolsVaultRoute
   ToolsVideoCompressRoute: typeof ToolsVideoCompressRoute
+  LibraryIndexRoute: typeof LibraryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -254,6 +293,27 @@ declare module '@tanstack/react-router' {
       path: '/games/xiangqi'
       fullPath: '/games/xiangqi'
       preLoaderRoute: typeof GamesXiangqiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/': {
+      id: '/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/$id': {
+      id: '/library/$id'
+      path: '/library/$id'
+      fullPath: '/library/$id'
+      preLoaderRoute: typeof LibraryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/manage': {
+      id: '/library/manage'
+      path: '/library/manage'
+      fullPath: '/library/manage'
+      preLoaderRoute: typeof LibraryManageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/crypto': {
@@ -322,6 +382,8 @@ const rootRouteChildren: RootRouteChildren = {
   GamesGoRoute: GamesGoRoute,
   GamesGomokuRoute: GamesGomokuRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
+  LibraryIdRoute: LibraryIdRoute,
+  LibraryManageRoute: LibraryManageRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsFormatterRoute: ToolsFormatterRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,
@@ -330,6 +392,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSshSftpRoute: ToolsSshSftpRoute,
   ToolsVaultRoute: ToolsVaultRoute,
   ToolsVideoCompressRoute: ToolsVideoCompressRoute,
+  LibraryIndexRoute: LibraryIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

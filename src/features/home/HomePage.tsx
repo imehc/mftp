@@ -19,18 +19,15 @@ import {
   availableHomeEntries,
   homeCategoryLabels,
   type HomeCategory,
-  type HomeStats,
 } from "~/features/home/entries";
 import AppSettingsMenu from "~/features/settings/AppSettingsMenu";
 import TransferPanel from "~/features/transfers/TransferPanel";
-import { useHostsStore } from "~/store/hosts";
 import { useSessionsStore } from "~/store/sessions";
 import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
 
 export default function HomePage() {
   const { t } = useLingui();
-  const hosts = useHostsStore((s) => s.hosts);
   const sessions = useSessionsStore((s) => s.sessions);
   const transfers = useTransfersStore((s) => s.transfers);
   const setLastTool = useSettingsStore((s) => s.setLastTool);
@@ -81,12 +78,6 @@ export default function HomePage() {
     runningTransfers.length > 0 ||
     failedTransfers.length > 0;
 
-  const stats: HomeStats = {
-    hostCount: hosts.length,
-    activeSessionCount: activeSessions.length,
-    runningTransferCount: runningTransfers.length,
-  };
-
   const categories = [
     ...new Set(availableHomeEntries.map((entry) => entry.category)),
   ] as HomeCategory[];
@@ -105,9 +96,6 @@ export default function HomePage() {
             </div>
             <div className="min-w-0">
               <h1 className="truncate text-base font-semibold">MFTP</h1>
-              <p className="hidden text-xs text-muted-foreground sm:block">
-                <Trans>工具与运行状态</Trans>
-              </p>
             </div>
           </div>
           <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto">
@@ -194,11 +182,6 @@ export default function HomePage() {
                                   <span className="block truncate text-sm font-semibold">
                                     {entry.title}
                                   </span>
-                                  {entry.badges ? (
-                                    <span className="mt-1 flex flex-wrap gap-1.5">
-                                      {entry.badges(stats)}
-                                    </span>
-                                  ) : null}
                                 </span>
                               </div>
                               <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />

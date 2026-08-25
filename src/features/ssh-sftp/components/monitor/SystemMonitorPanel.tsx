@@ -120,7 +120,7 @@ export default function SystemMonitorPanel({ session }: Props) {
             <SelectContent>
               <SelectItem value="0">
                 {t({
-                  context: "refresh interval state",
+                  context: "state",
                   comment: "Option that turns automatic monitor refresh off",
                   message: "关闭",
                 })}

@@ -3,6 +3,7 @@ mod error;
 mod game_room;
 mod lan_transfer;
 mod models;
+mod poetry;
 mod ssh;
 mod storage;
 
@@ -26,11 +27,15 @@ pub struct AppState {
     pub manager: Arc<Manager>,
     pub lan_transfer: Arc<LanTransferManager>,
     pub game_room: Arc<GameRoomManager>,
+    pub poetry: Arc<poetry::sync::PoetryLibrary>,
 }
 
 fn specta_builder() -> Builder<tauri::Wry> {
     Builder::<tauri::Wry>::new()
         .typ::<models::TransferProgress>()
+        // Event payloads never pass through command signatures; register
+        // explicitly or they will be missing from bindings.ts.
+        .typ::<poetry::model::PoetrySyncProgress>()
         .commands(collect_commands![
             commands::hosts_list,
             commands::host_get,
@@ -101,6 +106,23 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::data_export,
             commands::data_inspect,
             commands::data_import,
+            commands::poetry_collections,
+            commands::poetry_sync_check,
+            commands::poetry_sync_start,
+            commands::poetry_sync_import_local,
+            commands::poetry_sync_cancel,
+            commands::poetry_collection_delete,
+            commands::poetry_content_index_build,
+            commands::poetry_content_index_status,
+            commands::poetry_browse,
+            commands::poetry_poem,
+            commands::poetry_search,
+            commands::poetry_authors,
+            commands::poetry_daily,
+            commands::poetry_random,
+            commands::poetry_annotations_install,
+            commands::poetry_annotations_status,
+            commands::poetry_annotations_delete,
         ])
 }
 
@@ -155,9 +177,10 @@ pub fn run() {
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let temp_journal = data_dir.join("transfer-temp-files.json");
-            let storage = Storage::new(data_dir).map_err(|e| e.to_string())?;
+            let storage = Storage::new(data_dir.clone()).map_err(|e| e.to_string())?;
             let manager = Manager::new(temp_journal);
             let lan_transfer = Arc::new(LanTransferManager::new());
+            let poetry = Arc::new(poetry::sync::PoetryLibrary::new(data_dir));
             // Forward room events to the webview; payloads stay opaque.
             let game_room = {
                 let handle = app.handle().clone();
@@ -211,6 +234,7 @@ pub fn run() {
                 manager: Arc::new(manager),
                 lan_transfer,
                 game_room,
+                poetry,
             });
             Ok(())
         })

@@ -274,7 +274,7 @@ export default function LanTransferSidebar({
               {settings?.autoStart
                 ? t`开启`
                 : t({
-                    context: "setting state",
+                    context: "state",
                     comment: "Status showing that LAN auto-start is disabled",
                     message: "关闭",
                   })}

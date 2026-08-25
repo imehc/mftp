@@ -20,6 +20,7 @@ export const TOOL_ROUTES = [
   "media-compress",
   "formatter",
   "vault",
+  "library",
 ] as const;
 
 export type ToolRoute = (typeof TOOL_ROUTES)[number];
@@ -77,7 +78,8 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      version: 4,
+      // v5: added the "library" tool route.
+      version: 5,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;

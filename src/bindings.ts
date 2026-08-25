@@ -79,6 +79,60 @@ export const commands = {
 	// Detect whether a file is an mftp export and whether it is encrypted.
 	dataInspect: (raw: string) => typedError<ImportPreview, AppError>(__TAURI_INVOKE("data_inspect", { raw })),
 	dataImport: (raw: string, password: string | null, mode: ImportMode) => typedError<ImportReport, AppError>(__TAURI_INVOKE("data_import", { raw, password, mode })),
+	poetryCollections: () => typedError<PoetryCollectionStatus[], AppError>(__TAURI_INVOKE("poetry_collections")),
+	poetrySyncCheck: () => typedError<PoetrySyncPlan, AppError>(__TAURI_INVOKE("poetry_sync_check")),
+	poetrySyncStart: (collectionIds: string[]) => typedError<null, AppError>(__TAURI_INVOKE("poetry_sync_start", { collectionIds })),
+	poetrySyncImportLocal: (path: string, collectionIds: string[]) => typedError<null, AppError>(__TAURI_INVOKE("poetry_sync_import_local", { path, collectionIds })),
+	poetrySyncCancel: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_sync_cancel")),
+	poetryCollectionDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("poetry_collection_delete", { id })),
+	// Rebuild or drop the bigram body index; emits `indexing` progress events.
+	poetryContentIndexBuild: (enable: boolean) => typedError<null, AppError>(__TAURI_INVOKE("poetry_content_index_build", { enable })),
+	poetryContentIndexStatus: () => typedError<PoetryContentIndexStatus, AppError>(__TAURI_INVOKE("poetry_content_index_status")),
+	poetryBrowse: (req: PoetryBrowseRequest) => typedError<PoemPage, AppError>(__TAURI_INVOKE("poetry_browse", { req })),
+	poetryPoem: (uid: string) => typedError<PoemDetail, AppError>(__TAURI_INVOKE("poetry_poem", { uid })),
+	poetrySearch: (req: PoetrySearchRequest) => typedError<PoetrySearchResult, AppError>(__TAURI_INVOKE("poetry_search", { req })),
+	poetryAuthors: (req: PoetryAuthorsRequest) => typedError<AuthorSummary[], AppError>(__TAURI_INVOKE("poetry_authors", { req })),
+	poetryDaily: () => typedError<{
+	uid: string,
+	collectionId: string,
+	collectionName: string,
+	title: string,
+	author: string,
+	dynasty: string,
+	rhythmic: string,
+	chapter: string,
+	// Paragraphs preserve the source line rhythm; render one per line.
+	body: string[],
+	// Upstream notes/comment/prologue fields (fallback annotations).
+	notes: string[],
+	// Ping-ze (tonal pattern) lines when the source provides them.
+	strains: string[],
+	authorBio: AuthorBio | null,
+	// Matched entry from the external annotation pack, if installed.
+	annotation: PoemAnnotation | null,
+} | null, AppError>(__TAURI_INVOKE("poetry_daily")),
+	poetryRandom: (seed: string | null) => typedError<{
+	uid: string,
+	collectionId: string,
+	collectionName: string,
+	title: string,
+	author: string,
+	dynasty: string,
+	rhythmic: string,
+	chapter: string,
+	// Paragraphs preserve the source line rhythm; render one per line.
+	body: string[],
+	// Upstream notes/comment/prologue fields (fallback annotations).
+	notes: string[],
+	// Ping-ze (tonal pattern) lines when the source provides them.
+	strains: string[],
+	authorBio: AuthorBio | null,
+	// Matched entry from the external annotation pack, if installed.
+	annotation: PoemAnnotation | null,
+} | null, AppError>(__TAURI_INVOKE("poetry_random", { seed })),
+	poetryAnnotationsInstall: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_install")),
+	poetryAnnotationsStatus: () => typedError<PoetryAnnotationsStatus, AppError>(__TAURI_INVOKE("poetry_annotations_status")),
+	poetryAnnotationsDelete: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_delete")),
 };
 
 /* Types */
@@ -96,6 +150,19 @@ export type ActivityLog = {
 export type AppError = string;
 
 export type AuthType = "password" | "key";
+
+export type AuthorBio = {
+	name: string,
+	dynasty: string,
+	desc: string,
+};
+
+export type AuthorSummary = {
+	name: string,
+	dynasty: string,
+	desc?: string,
+	poemCount: number,
+};
 
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts";
@@ -269,6 +336,155 @@ export type LanTrustedDeviceInput = {
 	label: string,
 	ip: string,
 };
+
+export type PoemAnnotation = {
+	remark: string,
+	translation: string,
+	appreciation: string,
+	// External recitation link; surfaced as a badge only, never proxied.
+	hasAudio: boolean,
+};
+
+export type PoemDetail = {
+	uid: string,
+	collectionId: string,
+	collectionName: string,
+	title: string,
+	author: string,
+	dynasty: string,
+	rhythmic: string,
+	chapter: string,
+	// Paragraphs preserve the source line rhythm; render one per line.
+	body: string[],
+	// Upstream notes/comment/prologue fields (fallback annotations).
+	notes: string[],
+	// Ping-ze (tonal pattern) lines when the source provides them.
+	strains: string[],
+	authorBio: AuthorBio | null,
+	// Matched entry from the external annotation pack, if installed.
+	annotation: PoemAnnotation | null,
+};
+
+// Cursor is an opaque keyset token (last rowid); pass back for the next page.
+export type PoemPage = {
+	items: PoemSummary[],
+	nextCursor: string | null,
+};
+
+export type PoemSummary = {
+	uid: string,
+	collectionId: string,
+	collectionName: string,
+	title: string,
+	author: string,
+	dynasty: string,
+	// First paragraph, truncated for cards.
+	excerpt: string,
+};
+
+export type PoetryAnnotationsStatus = {
+	installed: boolean,
+	entryCount: number,
+};
+
+export type PoetryAuthorsRequest = {
+	collectionIds?: string[] | null,
+	keyword?: string | null,
+	limit?: number,
+	offset?: number,
+};
+
+export type PoetryBrowseRequest = {
+	collectionIds?: string[] | null,
+	author?: string | null,
+	cursor?: string | null,
+	limit?: number,
+};
+
+export type PoetryCollectionStatus = {
+	id: string,
+	name: string,
+	dynasty: string,
+	script: PoetryScript,
+	tier: PoetryTier,
+	installed: boolean,
+	poemCount: number,
+	// Approximate stored size (body + metadata) in bytes; 0 when absent.
+	bytesUsed: number,
+	// Upstream commit sha this collection was imported from.
+	sourceSha: string,
+};
+
+export type PoetryContentIndexStatus = {
+	enabled: boolean,
+	// Rows currently present in the bigram body index.
+	indexedPoems: number,
+};
+
+// Character script of a collection's source text.
+export type PoetryScript = "simplified" | "traditional";
+
+export type PoetrySearchRequest = {
+	query: string,
+	scope: PoetrySearchScope,
+	collectionIds?: string[] | null,
+	limit?: number,
+	offset?: number,
+};
+
+export type PoetrySearchResult = {
+	items: PoemSummary[],
+	// True when more hits exist beyond this page.
+	hasMore: boolean,
+	// Whether the bigram body index was used for body scope.
+	bodyIndexed: boolean,
+};
+
+export type PoetrySearchScope = "all" | "title" | "author" | "body";
+
+// One downloadable upstream repository (tarball channel).
+export type PoetrySourceStatus = {
+	id: string,
+	upstreamSha: string | null,
+	// Sha recorded locally at last import; None when never synced.
+	localSha: string | null,
+};
+
+export type PoetrySyncPlan = {
+	sources: PoetrySourceStatus[],
+	// Collections whose source sha differs from upstream (or missing).
+	outdated: string[],
+};
+
+/**
+ *  Progress payload for `library://sync-progress`.
+ * 
+ *  Phases: `downloading` | `extracting` | `importing` | `indexing`.
+ *  `collection_id` is `"annotations"` while installing the annotation pack.
+ */
+export type PoetrySyncProgress = {
+	collectionId: string,
+	/**
+	 *  `downloading` | `extracting` | `importing` | `indexing` |
+	 *  `done` | `error`
+	 */
+	phase: string,
+	bytesDone: number,
+	bytesTotal: number | null,
+	imported: number,
+	total: number | null,
+	// Populated only on the terminal `error` phase.
+	error?: string | null,
+};
+
+// Install tier from the catalog config; drives default checkboxes in the UI.
+export type PoetryTier = 
+// Tiny collections pre-checked on first run (<2MB combined).
+"recommended" | 
+// Checked by default in the sync dialog.
+"default" | 
+// Large collections that are never checked automatically.
+"optIn";
 
 // A remote directory entry returned by SFTP listing.
 export type SftpEntry = {

@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "sources": {
+    "upstream": {
+      "repo": "chinese-poetry/chinese-poetry",
+      "branch": "master"
+    },
+    "zhcn": {
+      "repo": "chinese-poetry/chinese-poetry-zhCN",
+      "branch": "master"
+    },
+    "gushiwen": {
+      "repo": "aopao/chinese-gushiwen",
+      "branch": "master"
+    }
+  },
+  "collections": [
+    {
+      "id": "shijing",
+      "name": "诗经",
+      "dynasty": "先秦",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["诗经/shijing.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": [],
+        "bodyKeys": ["content", "paragraphs"],
+        "chapterJoinKeys": ["chapter", "section"]
+      }
+    },
+    {
+      "id": "chuci",
+      "name": "楚辞",
+      "dynasty": "先秦",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["楚辞/chuci.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["content", "paragraphs"],
+        "chapterJoinKeys": ["section"]
+      }
+    },
+    {
+      "id": "caocao",
+      "name": "曹操诗集",
+      "dynasty": "汉魏",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["曹操诗集/caocao.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": [],
+        "bodyKeys": ["paragraphs"],
+        "defaultAuthor": "曹操"
+      }
+    },
+    {
+      "id": "youmengying",
+      "name": "幽梦影",
+      "dynasty": "清",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["幽梦影/youmengying.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": [],
+        "authorKeys": [],
+        "bodyKeys": ["content"],
+        "notesKeys": ["comment"],
+        "titleFromContent": true,
+        "defaultAuthor": "张潮"
+      }
+    },
+    {
+      "id": "huajianji",
+      "name": "花间集",
+      "dynasty": "五代",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["五代诗词/huajianji/huajianji-*-juan.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"],
+        "rhythmicKeys": ["rhythmic"],
+        "notesKeys": ["notes"]
+      }
+    },
+    {
+      "id": "nantang",
+      "name": "南唐二主词",
+      "dynasty": "五代",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["五代诗词/nantang/poetrys.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"],
+        "rhythmicKeys": ["rhythmic"],
+        "notesKeys": ["notes"]
+      }
+    },
+    {
+      "id": "nalanxingde",
+      "name": "纳兰性德诗集",
+      "dynasty": "清",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["纳兰性德/纳兰性德诗集.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["para", "paragraphs"],
+        "defaultAuthor": "纳兰性德"
+      }
+    },
+    {
+      "id": "shuimotangshi",
+      "name": "水墨唐诗",
+      "dynasty": "唐",
+      "script": "simplified",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["水墨唐诗/shuimotangshi.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"],
+        "notesKeys": ["prologue"]
+      }
+    },
+    {
+      "id": "tangshi300",
+      "name": "唐诗三百首",
+      "dynasty": "唐",
+      "script": "traditional",
+      "tier": "recommended",
+      "source": "upstream",
+      "paths": ["蒙学/tangshisanbaishou.json"],
+      "parser": {
+        "kind": "nested",
+        "itemListKey": "content",
+        "groupListKey": "content",
+        "groupLabelKey": "type",
+        "titleKeys": ["chapter", "subchapter", "title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"]
+      }
+    },
+    {
+      "id": "songci",
+      "name": "宋词",
+      "dynasty": "宋",
+      "script": "simplified",
+      "tier": "default",
+      "source": "upstream",
+      "paths": ["宋词/ci.song.*.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": [],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"],
+        "rhythmicKeys": ["rhythmic"],
+        "composeTitle": "{rhythmic}·{firstLine}",
+        "firstLineChars": 16
+      }
+    },
+    {
+      "id": "yuanqu",
+      "name": "元曲",
+      "dynasty": "元",
+      "script": "simplified",
+      "tier": "default",
+      "source": "upstream",
+      "paths": ["元曲/yuanqu.json"],
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"]
+      }
+    },
+    {
+      "id": "quantangshi",
+      "name": "全唐诗",
+      "dynasty": "唐",
+      "script": "simplified",
+      "tier": "default",
+      "source": "zhcn",
+      "paths": ["poetry/poet.tang.*.json"],
+      "authorsPath": "poetry/authors.tang.json",
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"],
+        "strainsKeys": ["strains"]
+      }
+    },
+    {
+      "id": "quansongshi",
+      "name": "全宋诗",
+      "dynasty": "宋",
+      "script": "simplified",
+      "tier": "optIn",
+      "source": "zhcn",
+      "paths": ["poetry/poet.song.*.json"],
+      "authorsPath": "poetry/authors.song.json",
+      "parser": {
+        "kind": "flat",
+        "titleKeys": ["title"],
+        "authorKeys": ["author"],
+        "bodyKeys": ["paragraphs"],
+        "strainsKeys": ["strains"]
+      }
+    }
+  ]
+}

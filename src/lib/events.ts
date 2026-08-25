@@ -24,3 +24,6 @@ export const GAME_ROOM_CLOSED = "game-room://closed";
  */
 export const sshDataEvent = (sessionId: string) => `ssh://data/${sessionId}`;
 export const sshClosedEvent = (sessionId: string) => `ssh://closed/${sessionId}`;
+
+/** Poetry library sync/import/index progress. Payload: `PoetrySyncProgress`. */
+export const LIBRARY_SYNC_PROGRESS = "library://sync-progress";

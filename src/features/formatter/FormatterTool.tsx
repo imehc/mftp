@@ -86,7 +86,7 @@ export default function FormatterTool() {
         replace: t`替换`,
         "replace all": t`全部替换`,
         close: t({
-          context: "editor panel action",
+          context: "action",
           comment: "Button that closes the CodeMirror search panel",
           message: "关闭",
         }),

@@ -114,7 +114,7 @@ export default function TabBar() {
                   isClosing
                     ? t`关闭中`
                     : t({
-                        context: "tab action",
+                        context: "action",
                         comment: "Button that closes an SSH session tab",
                         message: "关闭",
                       })

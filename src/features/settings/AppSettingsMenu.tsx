@@ -13,7 +13,6 @@ import {
   RefreshCw,
   RotateCcw,
   Settings,
-  Gamepad2,
   Sun,
   Type,
 } from "lucide-react";
@@ -93,8 +92,6 @@ export default function AppSettingsMenu() {
   const setColorTheme = useSettingsStore((s) => s.setColorTheme);
   const fontPreset = useSettingsStore((s) => s.fontPreset);
   const setFontPreset = useSettingsStore((s) => s.setFontPreset);
-  const showGames = useSettingsStore((s) => s.showGames);
-  const setShowGames = useSettingsStore((s) => s.setShowGames);
   const directoryTransferMode = useSettingsStore(
     (s) => s.directoryTransferMode,
   );
@@ -227,7 +224,7 @@ export default function AppSettingsMenu() {
                       disabled={autostartBusy}
                     >
                       {t({
-                        context: "setting state",
+                        context: "state",
                         comment:
                           "Radio option that disables automatic app startup",
                         message: "关闭",
@@ -291,13 +288,6 @@ export default function AppSettingsMenu() {
           <DropdownMenuItem onSelect={() => setImportOpen(true)}>
             <FileUp />
             {t`导入数据`}
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onSelect={() => setShowGames(!showGames)}>
-            <Gamepad2 />
-            {showGames ? t`隐藏小游戏` : t`显示小游戏`}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

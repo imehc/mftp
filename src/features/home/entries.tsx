@@ -1,8 +1,9 @@
 import type { ComponentType, ReactNode } from "react";
 import { linkOptions, type LinkOptions } from "@tanstack/react-router";
-import { Plural, Trans } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   Archive,
+  BookMarked,
   Braces,
   Circle,
   CircleDot,
@@ -13,20 +14,14 @@ import {
   TerminalSquare,
   Wifi,
 } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
 import { isMobilePlatform } from "~/lib/platform";
 import type { ToolRoute } from "~/store/settings";
 
-export interface HomeStats {
-  hostCount: number;
-  activeSessionCount: number;
-  runningTransferCount: number;
-}
-
-export type HomeCategory = "tools" | "games";
+export type HomeCategory = "tools" | "library" | "games";
 
 export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
   tools: <Trans>工具</Trans>,
+  library: <Trans>文库</Trans>,
   games: <Trans>小游戏</Trans>,
 };
 
@@ -43,7 +38,6 @@ export interface HomeEntry {
   platforms?: readonly HomePlatform[];
   icon: ComponentType<{ className?: string }>;
   title: ReactNode;
-  badges?: (stats: HomeStats) => ReactNode;
 }
 
 export const homeEntries: HomeEntry[] = [
@@ -54,27 +48,6 @@ export const homeEntries: HomeEntry[] = [
     toolId: "ssh-sftp",
     icon: TerminalSquare,
     title: "SSH / SFTP",
-    badges: (stats) => (
-      <>
-        <Badge variant="outline">
-          <Plural value={{ hostCount: stats.hostCount }} one="# 主机" other="# 主机" />
-        </Badge>
-        <Badge variant="outline">
-          <Plural
-            value={{ activeSessionCount: stats.activeSessionCount }}
-            one="# 连接"
-            other="# 连接"
-          />
-        </Badge>
-        <Badge variant="outline">
-          <Plural
-            value={{ runningTransferCount: stats.runningTransferCount }}
-            one="# 传输"
-            other="# 传输"
-          />
-        </Badge>
-      </>
-    ),
   },
   {
     id: "lan-transfer",
@@ -87,14 +60,6 @@ export const homeEntries: HomeEntry[] = [
     platforms: ["desktop"],
     icon: Wifi,
     title: <Trans>局域网传输</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">HTTP</Badge>
-        <Badge variant="outline">
-          <Trans>浏览器访问</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "crypto",
@@ -103,16 +68,6 @@ export const homeEntries: HomeEntry[] = [
     toolId: "crypto",
     icon: LockKeyhole,
     title: <Trans>加解密</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>编码</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>解码</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "media-compress",
@@ -125,19 +80,6 @@ export const homeEntries: HomeEntry[] = [
     toolId: "media-compress",
     icon: Archive,
     title: <Trans>媒体处理</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>压缩</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>调整图片尺寸</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>本地</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "formatter",
@@ -146,14 +88,6 @@ export const homeEntries: HomeEntry[] = [
     toolId: "formatter",
     icon: Braces,
     title: <Trans>格式化</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">JSON</Badge>
-        <Badge variant="outline">
-          <Trans>搜索</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "vault",
@@ -162,16 +96,17 @@ export const homeEntries: HomeEntry[] = [
     toolId: "vault",
     icon: KeyRound,
     title: <Trans>密码本</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>本地</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>快速复制</Trans>
-        </Badge>
-      </>
-    ),
+  },
+  {
+    id: "library",
+    category: "library",
+    link: linkOptions({ to: "/library", preload: "intent" }),
+    toolId: "library",
+    // Desktop-only for now: the master-detail layout has no mobile
+    // counterpart yet (D8).
+    platforms: ["desktop"],
+    icon: BookMarked,
+    title: <Trans>古诗词</Trans>,
   },
   {
     id: "billiards",
@@ -179,16 +114,6 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/billiards", preload: "intent" }),
     icon: CircleDot,
     title: <Trans>台球</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>人机</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>双人</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "gomoku",
@@ -196,19 +121,6 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/gomoku", preload: "intent" }),
     icon: Circle,
     title: <Trans>五子棋</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>人机</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>双人</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>联机</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "go",
@@ -216,19 +128,6 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/go", preload: "intent" }),
     icon: Grid3x3,
     title: <Trans>围棋</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>人机</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>双人</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>联机</Trans>
-        </Badge>
-      </>
-    ),
   },
   {
     id: "xiangqi",
@@ -236,19 +135,6 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/xiangqi", preload: "intent" }),
     icon: Crown,
     title: <Trans>中国象棋</Trans>,
-    badges: () => (
-      <>
-        <Badge variant="outline">
-          <Trans>人机</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>双人</Trans>
-        </Badge>
-        <Badge variant="outline">
-          <Trans>联机</Trans>
-        </Badge>
-      </>
-    ),
   },
 ];
 

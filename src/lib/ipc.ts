@@ -7,6 +7,9 @@ import type {
   LanSharedDirInput,
   LanTransferSettings,
   LanTrustedDeviceInput,
+  PoetryAuthorsRequest,
+  PoetryBrowseRequest,
+  PoetrySearchRequest,
   VaultEntryInput,
 } from "~/types";
 
@@ -257,3 +260,37 @@ export const dataImport = (
   password: string | null,
   mode: ImportMode,
 ) => unwrapCommand(commands.dataImport(raw, password, mode));
+
+// ---- Poetry library ----
+export const poetryCollections = () =>
+  unwrapCommand(commands.poetryCollections());
+export const poetrySyncCheck = () =>
+  unwrapCommand(commands.poetrySyncCheck());
+export const poetrySyncStart = (collectionIds: string[]) =>
+  voidCommand(commands.poetrySyncStart(collectionIds));
+export const poetrySyncImportLocal = (path: string, collectionIds: string[]) =>
+  voidCommand(commands.poetrySyncImportLocal(path, collectionIds));
+export const poetrySyncCancel = () => voidCommand(commands.poetrySyncCancel());
+export const poetryCollectionDelete = (id: string) =>
+  voidCommand(commands.poetryCollectionDelete(id));
+export const poetryContentIndexBuild = (enable: boolean) =>
+  voidCommand(commands.poetryContentIndexBuild(enable));
+export const poetryContentIndexStatus = () =>
+  unwrapCommand(commands.poetryContentIndexStatus());
+export const poetryBrowse = (req: PoetryBrowseRequest) =>
+  unwrapCommand(commands.poetryBrowse(req));
+export const poetryPoem = (uid: string) =>
+  unwrapCommand(commands.poetryPoem(uid));
+export const poetrySearch = (req: PoetrySearchRequest) =>
+  unwrapCommand(commands.poetrySearch(req));
+export const poetryAuthors = (req: PoetryAuthorsRequest) =>
+  unwrapCommand(commands.poetryAuthors(req));
+export const poetryDaily = () => unwrapCommand(commands.poetryDaily());
+export const poetryRandom = () =>
+  unwrapCommand(commands.poetryRandom(null));
+export const poetryAnnotationsInstall = () =>
+  voidCommand(commands.poetryAnnotationsInstall());
+export const poetryAnnotationsStatus = () =>
+  unwrapCommand(commands.poetryAnnotationsStatus());
+export const poetryAnnotationsDelete = () =>
+  voidCommand(commands.poetryAnnotationsDelete());
