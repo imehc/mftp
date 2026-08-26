@@ -128,7 +128,7 @@ impl CollectionAdapter for FlatAdapter {
 }
 
 /// Nested adapter: root object holds an array of groups, each holding an
-/// array of poem objects (e.g. 唐诗三百首: type → poems).
+/// array of poem objects (e.g. Three Hundred Tang Poems: type → poems).
 struct NestedAdapter;
 
 impl CollectionAdapter for NestedAdapter {

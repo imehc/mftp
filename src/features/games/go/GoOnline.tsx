@@ -113,7 +113,7 @@ function OnlineMatch({
     setUndoFlow(null);
     setRematchWaiting(false);
     setRematchIncoming(false);
-    // 换先: seats swap every rematch. Both peers bump `nonce` through the
+    // Alternating first move: seats swap every rematch. Both peers bump `nonce` through the
     // consent flow, so parity — and thus the seat mapping — stays in
     // lockstep without extra protocol.
     const seatThisRound: SeatIndex =

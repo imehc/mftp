@@ -9,7 +9,7 @@ export const BOARD_SIZES = [9, 13, 19] as const;
 export type BoardSize = (typeof BOARD_SIZES)[number];
 export const DEFAULT_BOARD_SIZE: BoardSize = 19;
 
-/** 中国规则贴目。直接比较双方面积时，白棋总分增加 7.5 目。 */
+/** Komi under Chinese rules. When comparing areas directly, white's total gains 7.5 points. */
 export const KOMI = 7.5;
 
 export type Stone = SeatIndex | null;
@@ -25,7 +25,8 @@ export interface GoState {
   koPoint: number | null;
   captures: [number, number];
   consecutivePasses: number;
-  /** 已出现的落子后盘面，用于中国规则的全局同形禁着。停一手不重复记录。 */
+  /** Board positions after each placement, for Chinese-rules superko
+   *  (global repetition forbidden). Passes are not recorded. */
   positionHistory: string[];
   finished: boolean;
   winnerSeat: SeatIndex | null;

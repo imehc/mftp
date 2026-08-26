@@ -169,8 +169,8 @@ fn is_auto_generated_device_name(name: &str) -> bool {
 }
 
 fn default_device_name() -> String {
-    // Prefer the user-facing "pretty" device name (macOS Computer Name such as
-    // "xxx 的 MacBook Pro", Windows friendly name); hostnames like "Mac.lan"
+    // Prefer the user-facing "pretty" device name (macOS Computer Name such
+    // as "xxx's MacBook Pro", Windows friendly name); hostnames like "Mac.lan"
     // are a last resort. Env vars are unreliable in GUI processes.
     let pretty = whoami::devicename().unwrap_or_default();
     let pretty = pretty.trim();

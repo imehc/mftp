@@ -137,8 +137,9 @@ export function resolvePlacement(
 }
 
 /**
- * 中国规则数子: 一方面积 = 棋盘上活子 + 只与己方相邻的空点。
- * 与双方相邻的空点 (公气/dame) 不计。双方各停一手后调用。
+ * Chinese-rules area scoring: a side's area = its stones on the board +
+ * empty points adjacent only to that side. Points adjacent to both sides
+ * (dame) count for neither. Call after both players have passed.
  */
 export function computeAreaScore(
   board: readonly Stone[],
@@ -280,7 +281,9 @@ export const goGame: GameDefinition<GoState, GoMove, GoPresentation> = {
       throw new Error("go: repeated board position");
     }
 
-    // 打劫: 只提一子且落子为单子一气时, 对方下一手不能立即回提。
+    // Ko: when the placement captures exactly one stone and forms a
+    // single-stone group with one liberty, the opponent may not immediately
+    // recapture.
     const koPoint =
       placed.captured.length === 1 &&
       placed.placedGroupSize === 1 &&

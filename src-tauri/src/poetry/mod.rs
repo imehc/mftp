@@ -1,4 +1,4 @@
-//! Poetry library (古诗词).
+//! Classical Chinese poetry library.
 //!
 //! Layout:
 //! - `catalog`   — declarative collection catalog (`catalog.json`); categories

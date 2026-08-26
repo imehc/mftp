@@ -17,7 +17,7 @@ interface CompressResultCardProps {
   blob: Blob;
   preview?: ReactNode;
   onSizeChange?: (actualSize: number) => void;
-  /** Card heading; defaults to 压缩结果. */
+  /** Card heading; defaults to a localized "Compression result" label. */
   title?: ReactNode;
   /** Extra badges rendered before the size badge. */
   extraBadges?: ReactNode;

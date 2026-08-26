@@ -290,7 +290,8 @@ export function simulateShot(
         events.push({ type: "cushion", t, ball, impact: relSpeed(ball, undefined) });
       });
 
-      // 高低杆: at first cue-object contact, add follow/draw spin along
+      // Follow/draw spin (high/low cue strike): at first cue-object contact,
+      // add follow/draw spin along
       // the line of centres (the impact normal), not the aim line. After
       // impact the cue naturally departs along the tangent line; pushing
       // ±normal is real top/bottom spin — follow drives it forward through

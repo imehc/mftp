@@ -37,7 +37,8 @@ export interface FormatterLanguage {
   unescape?: (input: string) => FormatResult;
 }
 
-// 扩展点：新语言在此追加（装对应 @codemirror/lang-* 包，实现 format 即可）。
+// Extension point: append new languages here (install the matching
+// @codemirror/lang-* package and implement `format`).
 export const formatterLanguages: FormatterLanguage[] = [
   {
     id: "json",

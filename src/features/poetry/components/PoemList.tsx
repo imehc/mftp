@@ -25,7 +25,7 @@ interface BrowseState {
 
 /**
  * Cursor-paginated, virtualized poem list. Loads a page per scroll approach;
- * never pulls the full corpus (254k 宋诗 must stay lazy).
+ * never pulls the full corpus (the 254k-entry Song poems must stay lazy).
  */
 export default function PoemList({
   resetKey,

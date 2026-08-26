@@ -61,7 +61,7 @@ export function GomokuMatch({
         mode.kind === "ai" ? mode.difficulty : "medium",
         350,
       );
-      // 执白后手: the AI takes seat 0 (black) and opens the game.
+      // Playing white means moving second: the AI takes seat 0 (black) and opens the game.
       controllers =
         mode.kind === "ai" && mode.localSeat === 1 ? [ai, local] : [local, ai];
     }
@@ -130,7 +130,7 @@ export function GomokuMatchView({
       : mode.kind === "ai"
         ? mode.localSeat
         : 0;
-  // 悔棋 rolls back to the local player's turn: two plies once the
+  // Undo rolls back to the local player's turn: two plies once the
   // opponent (AI or remote peer) has replied, one while they are still
   // deciding. Online mode routes through a consent request instead of
   // undoing directly.

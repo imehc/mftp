@@ -36,7 +36,7 @@ export const CUSHION_FRICTION = 0.14;
 
 /** Cue speed (m/s) at power = 1 — roughly a hard break. */
 export const MAX_SHOT_SPEED = 8.5;
-/** Extra impulse factor for follow/draw (高低杆), applied at first contact. */
+/** Extra impulse factor for follow/draw, applied at first contact. */
 export const FOLLOW_DRAW_FACTOR = 0.7;
 
 /** Cushion collider thickness (extends outward from the play area). */

@@ -61,7 +61,7 @@ export function GoMatch({
         mode.kind === "ai" ? mode.difficulty : "medium",
         350,
       );
-      // 执白后手: the AI takes seat 0 (black) and opens the game.
+      // Playing white means moving second: the AI takes seat 0 (black) and opens the game.
       controllers =
         mode.kind === "ai" && mode.localSeat === 1 ? [ai, local] : [local, ai];
     }

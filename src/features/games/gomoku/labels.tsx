@@ -43,7 +43,7 @@ export function seatName(
 
 /**
  * Result line from the local player's perspective where one exists
- * (vs-AI and online); hotseat keeps the neutral 黑棋/白棋 获胜 form.
+ * (vs-AI and online); hotseat keeps the neutral black-wins/white-wins form.
  */
 export function matchResultLabel(
   mode: GomokuMode,

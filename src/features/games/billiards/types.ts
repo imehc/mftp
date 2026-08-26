@@ -70,7 +70,7 @@ export type BilliardsMove =
       angle: number;
       /** 0..1, scaled to MAX_SHOT_SPEED. */
       power: number;
-      /** 高低杆: -1 (draw) .. 1 (follow). */
+      /** Follow/draw spin: -1 (draw) .. 1 (follow). */
       followDraw: number;
     }
   | { type: "place-cue"; x: number; y: number };

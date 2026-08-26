@@ -56,14 +56,16 @@ export default function FormatterTool() {
 
   const language = getFormatterLanguage(languageId);
 
-  // 随输入实时校验：非法时禁用格式化/压缩/键排序（校验与转义除外）。
+  // Live validation while typing: disable format/compress/sort-keys when the
+  // document is invalid (validate & escape are exempt).
   const isDocValid = useMemo(() => {
     if (!value.trim() || !language.validate) return true;
     return language.validate(value).ok;
   }, [language, value]);
 
   function describeError(result: Extract<FormatResult, { ok: false }>): string {
-    // 引擎报错（如 "Unrecognized token"）对用户不可读，统一换成本地化文案。
+    // Engine errors (e.g. "Unrecognized token") are unreadable for users;
+    // replace them with localized copy.
     return result.line !== undefined && result.column !== undefined
       ? t`第 ${result.line} 行第 ${result.column} 列附近有语法错误`
       : t`内容不是有效的 ${language.label}`;
@@ -72,8 +74,9 @@ export default function FormatterTool() {
   const extensions = useMemo(
     () => [
       ...language.extensions(),
-      // CodeMirror 面板（搜索等）的界面文案：key 是 CodeMirror 的英文原文，
-      // value 走 Lingui，保证面板跟随应用语言。
+      // UI strings for CodeMirror panels (search etc.): key is CodeMirror's
+      // original English text, value goes through Lingui so panels follow
+      // the app language.
       EditorState.phrases.of({
         Find: t`查找`,
         Replace: t`替换为`,
@@ -159,7 +162,8 @@ export default function FormatterTool() {
       sortDirection,
     );
     if (result.ok) {
-      // 交替升序/降序：已按当前方向排序时，再点一次切换方向仍有效果。
+      // Alternate asc/desc: re-clicking still applies (and flips the
+      // direction) even when the input is unchanged.
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     }
     applyResult(result);

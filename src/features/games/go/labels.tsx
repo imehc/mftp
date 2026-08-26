@@ -41,7 +41,7 @@ export function seatName(
   );
 }
 
-/** 中国规则面积计分，白棋在盘面面积上加 7.5 目贴目。 */
+/** Chinese-rules area scoring: white adds 7.5 komi to its board area. */
 export function scoreLine(state: GoState) {
   if (!state.finalScore) return null;
   const [black, white] = state.finalScore;

@@ -29,7 +29,7 @@ interface Props {
   open: boolean;
   /** The conflicting name that already exists remotely. */
   name: string;
-  /** Wording for the incoming item, e.g. "上传的文件夹" / "要移动的文件". */
+  /** Wording for the incoming item (localized via Lingui), e.g. "uploaded folder". */
   incomingLabel: string;
   initialIncomingName?: string;
   initialExistingName?: string;

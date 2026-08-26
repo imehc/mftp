@@ -193,7 +193,7 @@ mod tests {
         assert_eq!(to_simplified("愛"), "爱");
         assert_eq!(to_simplified("詩詞"), "诗词");
         assert_eq!(to_simplified("明月光"), "明月光");
-        // 干 is already simplified; it must pass through untouched.
+        // The character "干" is already simplified; it must pass through untouched.
         assert_eq!(to_simplified("干"), "干");
     }
 
