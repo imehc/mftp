@@ -14,27 +14,6 @@ impl DirectoryTransferMode {
     }
 }
 
-fn emit_transfer_progress(
-    app: Option<&AppHandle>,
-    transfer_id: Option<&str>,
-    phase: &str,
-    transferred: u64,
-    total: Option<u64>,
-) {
-    let (Some(app), Some(id)) = (app, transfer_id) else {
-        return;
-    };
-    let _ = app.emit(
-        "sftp-transfer-progress",
-        TransferProgress {
-            id: id.to_string(),
-            phase: phase.to_string(),
-            transferred,
-            total,
-        },
-    );
-}
-
 /// How the backend should authenticate a session. Captured at connect time so
 /// the shell and SFTP channels (separate TCP sessions) can each (re)connect.
 #[derive(Clone)]

@@ -1,5 +1,6 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{SftpEntry, SftpFileInfo, TransferProgress};
+use crate::models::{SftpEntry, SftpFileInfo};
+use crate::transfer::emit_transfer_progress;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use parking_lot::{Condvar, Mutex};
 use ssh2::{ErrorCode, FileStat, OpenFlags, OpenType, RenameFlags, Session};

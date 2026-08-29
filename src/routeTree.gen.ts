@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LogsRouteImport } from './routes/logs'
+import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
@@ -18,6 +19,7 @@ import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
 import { Route as LibraryManageRouteImport } from './routes/library/manage'
+import { Route as ToolsBtRouteImport } from './routes/tools/bt'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
 import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
@@ -35,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
 const LogsRoute = LogsRouteImport.update({
   id: '/logs',
   path: '/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewRoute = PreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
@@ -70,6 +77,11 @@ const LibraryIdRoute = LibraryIdRouteImport.update({
 const LibraryManageRoute = LibraryManageRouteImport.update({
   id: '/library/manage',
   path: '/library/manage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsBtRoute = ToolsBtRouteImport.update({
+  id: '/tools/bt',
+  path: '/tools/bt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
@@ -116,12 +128,14 @@ const ToolsVideoCompressRoute = ToolsVideoCompressRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/preview': typeof PreviewRoute
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
+  '/tools/bt': typeof ToolsBtRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -135,12 +149,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/preview': typeof PreviewRoute
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
+  '/tools/bt': typeof ToolsBtRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -155,12 +171,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/logs': typeof LogsRoute
+  '/preview': typeof PreviewRoute
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
+  '/tools/bt': typeof ToolsBtRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -176,12 +194,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/logs'
+    | '/preview'
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
+    | '/tools/bt'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -195,12 +215,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/logs'
+    | '/preview'
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
+    | '/tools/bt'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -214,12 +236,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/logs'
+    | '/preview'
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
+    | '/tools/bt'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -234,12 +258,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LogsRoute: typeof LogsRoute
+  PreviewRoute: typeof PreviewRoute
   GamesBilliardsRoute: typeof GamesBilliardsRoute
   GamesGoRoute: typeof GamesGoRoute
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   LibraryIdRoute: typeof LibraryIdRoute
   LibraryManageRoute: typeof LibraryManageRoute
+  ToolsBtRoute: typeof ToolsBtRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsFormatterRoute: typeof ToolsFormatterRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
@@ -265,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/logs'
       fullPath: '/logs'
       preLoaderRoute: typeof LogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview': {
+      id: '/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof PreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/billiards': {
@@ -314,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/library/manage'
       fullPath: '/library/manage'
       preLoaderRoute: typeof LibraryManageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/bt': {
+      id: '/tools/bt'
+      path: '/tools/bt'
+      fullPath: '/tools/bt'
+      preLoaderRoute: typeof ToolsBtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/crypto': {
@@ -378,12 +418,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LogsRoute: LogsRoute,
+  PreviewRoute: PreviewRoute,
   GamesBilliardsRoute: GamesBilliardsRoute,
   GamesGoRoute: GamesGoRoute,
   GamesGomokuRoute: GamesGomokuRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
   LibraryIdRoute: LibraryIdRoute,
   LibraryManageRoute: LibraryManageRoute,
+  ToolsBtRoute: ToolsBtRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsFormatterRoute: ToolsFormatterRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,

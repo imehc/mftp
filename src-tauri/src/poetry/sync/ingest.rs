@@ -10,13 +10,13 @@ use std::sync::Arc;
 
 use serde_json::Value;
 
+use crate::error::{AppError, AppResult};
 use crate::poetry::adapter::{adapter_for, parse_author_bios};
 use crate::poetry::catalog::{Catalog, CollectionSpec};
 use crate::poetry::db;
 use crate::poetry::model::PoetrySyncProgress;
-use crate::error::{AppError, AppResult};
 
-use super::{ProgressFn, PoetryLibrary};
+use super::{PoetryLibrary, ProgressFn};
 
 // ---------------------------------------------------------------------------
 // Import pipeline (shared by network sync and local import)
@@ -168,7 +168,8 @@ fn collect_matching(
     patterns: &[String],
     out: &mut Vec<PathBuf>,
 ) -> AppResult<()> {
-    let entries = fs::read_dir(dir).map_err(|e| AppError(format!("read {}: {e}", dir.display())))?;
+    let entries =
+        fs::read_dir(dir).map_err(|e| AppError(format!("read {}: {e}", dir.display())))?;
     for entry in entries {
         let entry = entry.map_err(|e| AppError(e.to_string()))?;
         let path = entry.path();
@@ -190,9 +191,7 @@ pub fn glob_match(pattern: &str, candidate: &str) -> bool {
     fn inner(p: &[u8], c: &[u8]) -> bool {
         match (p.first(), c.first()) {
             (None, None) => true,
-            (Some(b'*'), _) => {
-                inner(&p[1..], c) || (!c.is_empty() && inner(p, &c[1..]))
-            }
+            (Some(b'*'), _) => inner(&p[1..], c) || (!c.is_empty() && inner(p, &c[1..])),
             (Some(a), Some(b)) => a == b && inner(&p[1..], &c[1..]),
             _ => false,
         }
@@ -207,8 +206,7 @@ pub(super) fn extract_selected(
     ids: &[String],
     cancelled: &AtomicBool,
 ) -> AppResult<()> {
-    let file = fs::File::open(archive_path)
-        .map_err(|e| AppError(format!("open archive: {e}")))?;
+    let file = fs::File::open(archive_path).map_err(|e| AppError(format!("open archive: {e}")))?;
     let decoder = flate2::read::GzDecoder::new(file);
     let mut archive = tar::Archive::new(decoder);
     archive.set_preserve_permissions(false);
@@ -216,7 +214,12 @@ pub(super) fn extract_selected(
     let needed: Vec<(&str, Vec<&str>)> = ids
         .iter()
         .filter_map(|id| catalog.collection(id))
-        .map(|spec| (spec.id.as_str(), spec.paths.iter().map(String::as_str).collect()))
+        .map(|spec| {
+            (
+                spec.id.as_str(),
+                spec.paths.iter().map(String::as_str).collect(),
+            )
+        })
         .collect();
 
     let entries = archive
@@ -230,13 +233,16 @@ pub(super) fn extract_selected(
         if !entry.header().entry_type().is_file() {
             continue;
         }
-        let path = entry.path().map_err(|e| AppError(e.to_string()))?.into_owned();
+        let path = entry
+            .path()
+            .map_err(|e| AppError(e.to_string()))?
+            .into_owned();
         // Strip the leading `repo-branch/` component GitHub tarballs add.
         let rel: PathBuf = path.components().skip(1).collect();
         let rel_str = rel.to_string_lossy().replace('\\', "/");
-        let matched = needed.iter().any(|(_, patterns)| {
-            patterns.iter().any(|pattern| glob_match(pattern, &rel_str))
-        });
+        let matched = needed
+            .iter()
+            .any(|(_, patterns)| patterns.iter().any(|pattern| glob_match(pattern, &rel_str)));
         if !matched || rel.as_os_str().is_empty() {
             continue;
         }
@@ -260,7 +266,14 @@ pub(super) fn run_local_import(
 ) -> AppResult<()> {
     let catalog = Catalog::load().map_err(AppError)?;
     if source_path.is_dir() {
-        import_extracted_dir(library, progress, source_path, ids, &|_| "local".into(), cancelled)?;
+        import_extracted_dir(
+            library,
+            progress,
+            source_path,
+            ids,
+            &|_| "local".into(),
+            cancelled,
+        )?;
         return Ok(());
     }
     // Assume a tarball otherwise.
@@ -271,7 +284,14 @@ pub(super) fn run_local_import(
     fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
     let result = (|| -> AppResult<()> {
         extract_selected(source_path, &extract_dir, &catalog, ids, cancelled)?;
-        import_extracted_dir(library, progress, &extract_dir, ids, &|_| "local".into(), cancelled)
+        import_extracted_dir(
+            library,
+            progress,
+            &extract_dir,
+            ids,
+            &|_| "local".into(),
+            cancelled,
+        )
     })();
     let _ = fs::remove_dir_all(&extract_dir);
     result
@@ -294,16 +314,20 @@ mod tests {
             "五代诗词/huajianji/huajianji-*-juan.json",
             "五代诗词/huajianji/huajianji-0-preface.json"
         ));
-        assert!(glob_match("poetry/poet.tang.*.json", "poetry/poet.tang.123.json"));
-        assert!(!glob_match("poetry/poet.tang.*.json", "poetry/authors.tang.json"));
+        assert!(glob_match(
+            "poetry/poet.tang.*.json",
+            "poetry/poet.tang.123.json"
+        ));
+        assert!(!glob_match(
+            "poetry/poet.tang.*.json",
+            "poetry/authors.tang.json"
+        ));
         assert!(!glob_match("诗经/shijing.json", "楚辞/chuci.json"));
     }
 
     fn temp_root(tag: &str) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!(
-            "mftp-poetry-sync-{tag}-{}",
-            std::process::id()
-        ));
+        let dir =
+            std::env::temp_dir().join(format!("mftp-poetry-sync-{tag}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).expect("temp root");
         dir
@@ -341,17 +365,13 @@ mod tests {
         let events = Arc::new(Mutex::new(Vec::<String>::new()));
         let sink = events.clone();
         let progress = move |event: PoetrySyncProgress| {
-            sink.lock().unwrap().push(format!("{}:{}", event.collection_id, event.phase));
+            sink.lock()
+                .unwrap()
+                .push(format!("{}:{}", event.collection_id, event.phase));
         };
         let ids = vec!["shijing".to_string(), "tangshi300".to_string()];
-        run_local_import(
-            &library,
-            &progress,
-            &repo,
-            &ids,
-            &AtomicBool::new(false),
-        )
-        .expect("import succeeds");
+        run_local_import(&library, &progress, &repo, &ids, &AtomicBool::new(false))
+            .expect("import succeeds");
 
         let db = library.db();
         // Browse across both installed collections.
@@ -379,16 +399,15 @@ mod tests {
         assert_eq!(result.items[0].title, "關雎");
 
         // Nested collection imported with its chapter label.
-        let detail = db.poem_detail(&{
-            let conn = db.open().unwrap();
-            conn.query_row(
-                "SELECT uid FROM poems WHERE title='行宮'",
-                [],
-                |row| row.get::<_, String>(0),
-            )
-            .unwrap()
-        })
-        .expect("detail");
+        let detail = db
+            .poem_detail(&{
+                let conn = db.open().unwrap();
+                conn.query_row("SELECT uid FROM poems WHERE title='行宮'", [], |row| {
+                    row.get::<_, String>(0)
+                })
+                .unwrap()
+            })
+            .expect("detail");
         assert_eq!(detail.chapter, "五言絕句");
         assert_eq!(detail.body.len(), 2);
 
@@ -396,14 +415,8 @@ mod tests {
         assert!(db.discover_daily().unwrap().is_some());
 
         // Re-import is idempotent thanks to uid upserts.
-        run_local_import(
-            &library,
-            &progress,
-            &repo,
-            &ids,
-            &AtomicBool::new(false),
-        )
-        .expect("re-import");
+        run_local_import(&library, &progress, &repo, &ids, &AtomicBool::new(false))
+            .expect("re-import");
         let conn = db.open().unwrap();
         let count: i64 = conn
             .query_row("SELECT COUNT(*) FROM poems", [], |row| row.get(0))

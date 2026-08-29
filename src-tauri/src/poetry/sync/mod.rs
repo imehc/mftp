@@ -17,8 +17,8 @@ use serde_json::Value;
 use super::catalog::Catalog;
 use super::db::{PoetryDb, ANNOTATIONS_COLLECTION_ID};
 use super::model::{
-    PoetryCollectionStatus, PoetryContentIndexStatus, PoetrySyncPlan, PoetrySyncProgress,
-    PoetrySourceStatus,
+    PoetryCollectionStatus, PoetryContentIndexStatus, PoetrySourceStatus, PoetrySyncPlan,
+    PoetrySyncProgress,
 };
 use super::text;
 use crate::error::{AppError, AppResult};
@@ -29,7 +29,6 @@ mod net;
 use net::{download_tarball, fetch_source_sha, run_network_sync};
 
 use ingest::run_local_import;
-
 
 /// Event channel shared with the frontend (`src/lib/events.ts`).
 pub const SYNC_PROGRESS_EVENT: &str = "library://sync-progress";
@@ -92,7 +91,11 @@ impl PoetryLibrary {
         )?;
         let stats: std::collections::HashMap<String, (i64, i64)> = stmt
             .query_map([], |row| {
-                Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?, row.get::<_, i64>(2)?))
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, i64>(1)?,
+                    row.get::<_, i64>(2)?,
+                ))
             })?
             .collect::<Result<Vec<_>, _>>()?
             .into_iter()
@@ -100,9 +103,7 @@ impl PoetryLibrary {
             .collect();
 
         let rows: Vec<(String, i64, String)> = {
-            let mut stmt = conn.prepare(
-                "SELECT id, poem_count, source_sha FROM collections",
-            )?;
+            let mut stmt = conn.prepare("SELECT id, poem_count, source_sha FROM collections")?;
             let rows = stmt
                 .query_map([], |row| {
                     Ok((
@@ -141,15 +142,14 @@ impl PoetryLibrary {
     }
 
     pub fn content_index_status(&self) -> AppResult<PoetryContentIndexStatus> {
-        let enabled = self.db().meta_get(super::db::META_BODY_INDEX_ENABLED)?.as_deref()
+        let enabled = self
+            .db()
+            .meta_get(super::db::META_BODY_INDEX_ENABLED)?
+            .as_deref()
             == Some("1");
         let indexed = if enabled {
             let conn = self.db().open()?;
-            conn.query_row(
-                "SELECT COUNT(*) FROM poems_body_fts",
-                [],
-                |row| row.get(0),
-            )?
+            conn.query_row("SELECT COUNT(*) FROM poems_body_fts", [], |row| row.get(0))?
         } else {
             0
         };
@@ -183,7 +183,8 @@ impl PoetryLibrary {
 
         for source_id in catalog.sources.keys() {
             let source_of = |status: &PoetryCollectionStatus| {
-                catalog.collection(&status.id).map(|c| c.source.as_str()) == Some(source_id.as_str())
+                catalog.collection(&status.id).map(|c| c.source.as_str())
+                    == Some(source_id.as_str())
             };
             let remote_sha = if fetch_remote {
                 fetch_source_sha(&catalog, source_id).ok()
@@ -192,7 +193,9 @@ impl PoetryLibrary {
             };
             let local_shas: Vec<&String> = statuses
                 .iter()
-                .filter(|status| source_of(status) && status.installed && !status.source_sha.is_empty())
+                .filter(|status| {
+                    source_of(status) && status.installed && !status.source_sha.is_empty()
+                })
                 .map(|status| &status.source_sha)
                 .collect();
             if let Some(remote) = &remote_sha {
@@ -274,8 +277,13 @@ impl PoetryLibrary {
         std::thread::Builder::new()
             .name("poetry-import".into())
             .spawn(move || {
-                let result =
-                    run_local_import(&library, &progress, Path::new(&source_path), &ids, &cancelled);
+                let result = run_local_import(
+                    &library,
+                    &progress,
+                    Path::new(&source_path),
+                    &ids,
+                    &cancelled,
+                );
                 library.release_slot();
                 Self::with_terminal_events(progress, result, "poetry import failed");
             })
@@ -337,7 +345,9 @@ fn run_annotations_install(
     #[cfg(not(desktop))]
     {
         let _ = (library, progress, cancelled);
-        return Err(AppError("annotation pack downloads require the desktop app".into()));
+        return Err(AppError(
+            "annotation pack downloads require the desktop app".into(),
+        ));
     }
 
     #[cfg(desktop)]
@@ -372,23 +382,22 @@ fn run_annotations_install(
     }
 }
 
-fn extract_all(
-    archive_path: &Path,
-    extract_root: &Path,
-    cancelled: &AtomicBool,
-) -> AppResult<()> {
-    let file = fs::File::open(archive_path)
-        .map_err(|e| AppError(format!("open archive: {e}")))?;
+fn extract_all(archive_path: &Path, extract_root: &Path, cancelled: &AtomicBool) -> AppResult<()> {
+    let file = fs::File::open(archive_path).map_err(|e| AppError(format!("open archive: {e}")))?;
     let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file));
     archive.set_preserve_permissions(false);
     for entry in archive
         .entries()
-        .map_err(|e| AppError(format!("read archive: {e}")))? {
+        .map_err(|e| AppError(format!("read archive: {e}")))?
+    {
         if cancelled.load(Ordering::SeqCst) {
             return Err(AppError("cancelled".into()));
         }
         let mut entry = entry.map_err(|e| AppError(e.to_string()))?;
-        let path = entry.path().map_err(|e| AppError(e.to_string()))?.into_owned();
+        let path = entry
+            .path()
+            .map_err(|e| AppError(e.to_string()))?
+            .into_owned();
         let rel: PathBuf = path.components().skip(1).collect();
         if rel.as_os_str().is_empty() {
             continue;
@@ -397,7 +406,9 @@ fn extract_all(
         if let Some(parent) = target.parent() {
             fs::create_dir_all(parent).map_err(AppError::from)?;
         }
-        entry.unpack(&target).map_err(|e| AppError(format!("unpack: {e}")))?;
+        entry
+            .unpack(&target)
+            .map_err(|e| AppError(format!("unpack: {e}")))?;
     }
     Ok(())
 }
@@ -461,8 +472,7 @@ fn import_annotation_jsonl(
                 continue;
             };
             let writer_name = value.get("writer").and_then(Value::as_str).unwrap_or("");
-            let key =
-                text::annotation_key(&text::normalize(title), &text::normalize(writer_name));
+            let key = text::annotation_key(&text::normalize(title), &text::normalize(writer_name));
             conn.execute(
                 r#"
                 INSERT INTO annotations(match_key, title, writer, remark, translation, appreciation, audio_url)

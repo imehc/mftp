@@ -13,8 +13,7 @@ use crate::error::{AppError, AppResult};
 use crate::poetry::text;
 
 /// Column projection shared by list queries; rows are read back by name.
-const POEM_COLS: &str =
-    "p.uid AS uid, p.collection_id AS collection_id, c.name AS collection_name,
+const POEM_COLS: &str = "p.uid AS uid, p.collection_id AS collection_id, c.name AS collection_name,
      p.title AS title, p.author AS author, p.dynasty AS dynasty, p.body AS body";
 
 struct ListRow {
@@ -116,7 +115,11 @@ impl PoetryDb {
         sql.push_str(" ORDER BY p.rowid ASC LIMIT ?");
 
         let mut bind: Vec<DynParam> = vec![Box::new(cursor)];
-        bind.extend(filter_values.iter().map(|value| Box::new(value.clone()) as DynParam));
+        bind.extend(
+            filter_values
+                .iter()
+                .map(|value| Box::new(value.clone()) as DynParam),
+        );
         if author_active {
             bind.push(Box::new(req.author.clone().unwrap_or_default()));
         }
@@ -124,11 +127,15 @@ impl PoetryDb {
 
         let mut stmt = conn.prepare(&sql)?;
         let rows = stmt
-            .query_map(params_from_iter(bind.iter().map(DynParam::as_ref)), map_list_row)?
+            .query_map(
+                params_from_iter(bind.iter().map(DynParam::as_ref)),
+                map_list_row,
+            )?
             .collect::<Result<Vec<_>, _>>()?;
         let has_more = rows.len() as i64 > limit;
         let next_cursor = if has_more {
-            rows.get(limit as usize - 1).map(|row| row.rowid.to_string())
+            rows.get(limit as usize - 1)
+                .map(|row| row.rowid.to_string())
         } else {
             None
         };
@@ -137,10 +144,7 @@ impl PoetryDb {
             .take(limit as usize)
             .map(PoemSummary::from)
             .collect();
-        Ok(PoemPage {
-            items,
-            next_cursor,
-        })
+        Ok(PoemPage { items, next_cursor })
     }
 
     // ---- detail ----
@@ -190,9 +194,8 @@ impl PoetryDb {
             strains_json,
         ) = row;
 
-        let parse_strings = |json: &str| -> Vec<String> {
-            serde_json::from_str(json).unwrap_or_default()
-        };
+        let parse_strings =
+            |json: &str| -> Vec<String> { serde_json::from_str(json).unwrap_or_default() };
         let author_bio = self.author_bio_for(&conn, &author);
         let annotation = self.annotation_for(&conn, &title, &author);
 
@@ -268,7 +271,9 @@ impl PoetryDb {
         if normalized.is_empty() {
             return Ok(empty_search_result());
         }
-        let body_indexed = self.meta_get(super::db::META_BODY_INDEX_ENABLED)?.as_deref()
+        let body_indexed = self
+            .meta_get(super::db::META_BODY_INDEX_ENABLED)?
+            .as_deref()
             == Some("1");
 
         match req.scope {
@@ -344,11 +349,18 @@ impl PoetryDb {
         let conn = self.open()?;
         let mut stmt = conn.prepare(&sql)?;
         let mut bind: Vec<DynParam> = vec![Box::new(match_expr)];
-        bind.extend(filter_values.iter().map(|value| Box::new(value.clone()) as DynParam));
+        bind.extend(
+            filter_values
+                .iter()
+                .map(|value| Box::new(value.clone()) as DynParam),
+        );
         bind.push(Box::new(limit));
         bind.push(Box::new(offset as i64));
         let rows = stmt
-            .query_map(params_from_iter(bind.iter().map(DynParam::as_ref)), map_list_row)?
+            .query_map(
+                params_from_iter(bind.iter().map(DynParam::as_ref)),
+                map_list_row,
+            )?
             .collect::<Result<Vec<_>, _>>()?;
         Ok(rows.into_iter().map(PoemSummary::from).collect())
     }
@@ -367,10 +379,7 @@ impl PoetryDb {
             .filter(|ch| ch.is_alphanumeric())
             .collect();
         if body_indexed && chars.len() >= 2 {
-            let bigrams: Vec<String> = chars
-                .windows(2)
-                .map(|pair| pair.iter().collect())
-                .collect();
+            let bigrams: Vec<String> = chars.windows(2).map(|pair| pair.iter().collect()).collect();
             if let Some(result) = self.search_body_fts(req, &bigrams, offset)? {
                 return Ok(result);
             }
@@ -406,11 +415,18 @@ impl PoetryDb {
         let conn = self.open()?;
         let mut stmt = conn.prepare(&sql)?;
         let mut bind: Vec<DynParam> = vec![Box::new(match_expr)];
-        bind.extend(filter_values.iter().map(|value| Box::new(value.clone()) as DynParam));
+        bind.extend(
+            filter_values
+                .iter()
+                .map(|value| Box::new(value.clone()) as DynParam),
+        );
         bind.push(Box::new(limit));
         bind.push(Box::new(offset as i64));
         let rows = stmt
-            .query_map(params_from_iter(bind.iter().map(DynParam::as_ref)), map_list_row)?
+            .query_map(
+                params_from_iter(bind.iter().map(DynParam::as_ref)),
+                map_list_row,
+            )?
             .collect::<Result<Vec<_>, _>>()?;
         let items: Vec<PoemSummary> = rows.into_iter().map(PoemSummary::from).collect();
         Ok(Some(PoetrySearchResult {
@@ -451,11 +467,18 @@ impl PoetryDb {
             .into_iter()
             .map(|variant| Box::new(format!("%{}%", like_escape(&variant))) as DynParam)
             .collect();
-        bind.extend(filter_values.iter().map(|value| Box::new(value.clone()) as DynParam));
+        bind.extend(
+            filter_values
+                .iter()
+                .map(|value| Box::new(value.clone()) as DynParam),
+        );
         bind.push(Box::new(limit));
         bind.push(Box::new(offset as i64));
         let rows = stmt
-            .query_map(params_from_iter(bind.iter().map(DynParam::as_ref)), map_list_row)?
+            .query_map(
+                params_from_iter(bind.iter().map(DynParam::as_ref)),
+                map_list_row,
+            )?
             .collect::<Result<Vec<_>, _>>()?;
         let items: Vec<PoemSummary> = rows.into_iter().map(PoemSummary::from).collect();
         Ok(PoetrySearchResult {
@@ -472,12 +495,7 @@ impl PoetryDb {
         normalized: &str,
         body_indexed: bool,
     ) -> AppResult<Option<Vec<PoemSummary>>> {
-        let page = self.search_body(
-            req,
-            normalized,
-            body_indexed,
-            0,
-        )?;
+        let page = self.search_body(req, normalized, body_indexed, 0)?;
         Ok(Some(page.items))
     }
 
@@ -489,7 +507,11 @@ impl PoetryDb {
         let offset = req.offset as i64;
         let (filter_sql, filter_values) = collection_filter(&req.collection_ids);
         let keyword_active = req.keyword.as_deref().is_some_and(|k| !k.is_empty());
-        let keyword_clause = if keyword_active { " HAVING p.author LIKE ?" } else { "" };
+        let keyword_clause = if keyword_active {
+            " HAVING p.author LIKE ?"
+        } else {
+            ""
+        };
         let sql = format!(
             r#"
             SELECT p.author AS author,

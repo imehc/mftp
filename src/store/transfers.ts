@@ -14,6 +14,7 @@ export interface TransferState {
   status: "running" | "success" | "error" | "cancelled";
   error?: string;
   cancelling?: boolean;
+  cancellingPhase?: string;
   cancellable?: boolean;
   paused?: boolean;
   pausedPhase?: string;
@@ -21,15 +22,27 @@ export interface TransferState {
   controlError?: string;
   retry?: () => void | Promise<void>;
   retrying?: boolean;
+  /** Task source for the panel badge; defaults to sftp (legacy behavior). */
+  source?: "sftp" | "bt";
+  /** bt task mode; preview = cache download backing online playback. */
+  mode?: "download" | "preview";
 }
 
 interface TransfersState {
   transfers: TransferState[];
+  dismissed: Set<string>;
   start: (
     id: string,
     label: string,
-    options?: { cancellable?: boolean; retry?: () => void | Promise<void> },
+    options?: {
+      cancellable?: boolean;
+      retry?: () => void | Promise<void>;
+      source?: "sftp" | "bt";
+      mode?: "download" | "preview";
+    },
   ) => void;
+  restore: TransfersState["start"];
+  dismiss: (id: string) => void;
   updateProgressBatch: (progresses: TransferProgress[]) => void;
   finish: (
     id: string,
@@ -47,29 +60,43 @@ interface TransfersState {
 
 export const useTransfersStore = create<TransfersState>((set) => ({
   transfers: [],
+  dismissed: new Set(),
 
   start(id, label, options) {
-    set((state) => ({
-      transfers: [
-        {
-          id,
-          label,
-          phase: translate(msg`准备中`),
-          transferred: 0,
-          total: null,
-          speed: null,
-          updatedAt: performance.now(),
-          status: "running",
-          cancellable: options?.cancellable ?? true,
-          paused: false,
-          controlPending: false,
-          controlError: undefined,
-          retry: options?.retry,
-          retrying: false,
-        },
-        ...state.transfers.filter((item) => item.id !== id),
-      ],
-    }));
+    set((state) => {
+      const dismissed = new Set(state.dismissed);
+      dismissed.delete(id);
+      return {
+        dismissed,
+        transfers: [
+          createTransfer(id, label, options),
+          ...state.transfers.filter((item) => item.id !== id),
+        ],
+      };
+    });
+  },
+
+  restore(id, label, options) {
+    set((state) => {
+      if (state.dismissed.has(id)) return state;
+      return {
+        transfers: [
+          createTransfer(id, label, options),
+          ...state.transfers.filter((item) => item.id !== id),
+        ],
+      };
+    });
+  },
+
+  dismiss(id) {
+    set((state) => {
+      const dismissed = new Set(state.dismissed);
+      dismissed.add(id);
+      return {
+        dismissed,
+        transfers: state.transfers.filter((item) => item.id !== id),
+      };
+    });
   },
 
   updateProgressBatch(progresses) {
@@ -83,6 +110,23 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         const progress = progressById.get(item.id);
         if (!progress || item.status !== "running") return item;
 
+        // Engine-managed tasks (BT): a backend finished flag flips the task to
+// success directly.
+        if (progress.finished === true) {
+          return {
+            ...item,
+            status: "success" as const,
+            phase: translate(msg`完成`),
+            transferred: progress.total ?? progress.transferred,
+            total: progress.total ?? null,
+            speed: null,
+            cancelling: false,
+            paused: false,
+            pausedPhase: undefined,
+            updatedAt: now,
+          };
+        }
+
         if (item.paused) {
           return {
             ...item,
@@ -92,10 +136,14 @@ export const useTransfersStore = create<TransfersState>((set) => ({
           };
         }
 
-        const phaseChanged = progress.phase !== item.phase;
+        const phase =
+          item.source === "bt" && progress.phase === "bt:packaging"
+            ? translate(msg`打包中`)
+            : progress.phase;
+        const phaseChanged = phase !== item.phase;
         return {
           ...item,
-          phase: progress.phase,
+          phase,
           transferred: progress.transferred,
           total: progress.total ?? null,
           speed:
@@ -132,6 +180,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
               error,
               speed: null,
               cancelling: false,
+              cancellingPhase: undefined,
               paused: false,
               pausedPhase: undefined,
               controlPending: false,
@@ -153,6 +202,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
               ...item,
               phase: translate(msg`正在取消`),
               cancelling: true,
+              cancellingPhase: item.source === "bt" ? item.phase : undefined,
               paused: false,
               pausedPhase: undefined,
               speed: null,
@@ -166,7 +216,17 @@ export const useTransfersStore = create<TransfersState>((set) => ({
   cancelFailed(id) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
-        item.id === id ? { ...item, cancelling: false } : item,
+        item.id === id
+          ? {
+              ...item,
+              phase:
+                item.source === "bt" && item.cancellingPhase
+                  ? item.cancellingPhase
+                  : item.phase,
+              cancelling: false,
+              cancellingPhase: undefined,
+            }
+          : item,
       ),
     }));
   },
@@ -224,8 +284,40 @@ export const useTransfersStore = create<TransfersState>((set) => ({
   },
 
   clearFinished() {
-    set((state) => ({
-      transfers: state.transfers.filter((item) => item.status === "running"),
-    }));
+    set((state) => {
+      const dismissed = new Set(state.dismissed);
+      for (const item of state.transfers) {
+        if (item.status !== "running") dismissed.add(item.id);
+      }
+      return {
+        dismissed,
+        transfers: state.transfers.filter((item) => item.status === "running"),
+      };
+    });
   },
 }));
+
+function createTransfer(
+  id: string,
+  label: string,
+  options?: Parameters<TransfersState["start"]>[2],
+): TransferState {
+  return {
+    id,
+    label,
+    phase: translate(msg`准备中`),
+    transferred: 0,
+    total: null,
+    speed: null,
+    updatedAt: performance.now(),
+    status: "running",
+    cancellable: options?.cancellable ?? true,
+    paused: false,
+    controlPending: false,
+    controlError: undefined,
+    retry: options?.retry,
+    source: options?.source,
+    mode: options?.mode,
+    retrying: false,
+  };
+}

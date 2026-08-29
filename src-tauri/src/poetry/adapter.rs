@@ -89,7 +89,10 @@ impl<'a> ParserSpecShared<'a> {
         }
         if let Some(template) = &self.spec.compose_title {
             let first_line = paragraphs.first().map(String::as_str).unwrap_or("");
-            let first_line = first_line.chars().take(self.spec.first_line_chars).collect::<String>();
+            let first_line = first_line
+                .chars()
+                .take(self.spec.first_line_chars)
+                .collect::<String>();
             let composed = template
                 .replace("{rhythmic}", rhythmic)
                 .replace("{firstLine}", &first_line);
@@ -110,12 +113,9 @@ struct FlatAdapter;
 
 impl CollectionAdapter for FlatAdapter {
     fn parse(&self, spec: &CollectionSpec, data: &Value) -> Result<Vec<ParsedPoem>, String> {
-        let items = data.as_array().ok_or_else(|| {
-            format!(
-                "collection {} expects a top-level JSON array",
-                spec.id
-            )
-        })?;
+        let items = data
+            .as_array()
+            .ok_or_else(|| format!("collection {} expects a top-level JSON array", spec.id))?;
         let shared = ParserSpecShared { spec: &spec.parser };
         let mut poems = Vec::with_capacity(items.len());
         for (index, item) in items.iter().enumerate() {
@@ -134,12 +134,14 @@ struct NestedAdapter;
 impl CollectionAdapter for NestedAdapter {
     fn parse(&self, spec: &CollectionSpec, data: &Value) -> Result<Vec<ParsedPoem>, String> {
         let parser = &spec.parser;
-        let list_key = parser.item_list_key.as_deref().ok_or_else(|| {
-            format!("nested parser for {} requires itemListKey", spec.id)
-        })?;
-        let group_key = parser.group_list_key.as_deref().ok_or_else(|| {
-            format!("nested parser for {} requires groupListKey", spec.id)
-        })?;
+        let list_key = parser
+            .item_list_key
+            .as_deref()
+            .ok_or_else(|| format!("nested parser for {} requires itemListKey", spec.id))?;
+        let group_key = parser
+            .group_list_key
+            .as_deref()
+            .ok_or_else(|| format!("nested parser for {} requires groupListKey", spec.id))?;
         let groups = data
             .get(list_key)
             .and_then(Value::as_array)

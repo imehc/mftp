@@ -45,6 +45,23 @@ tauri-specta = { version = "=2.0.0-rc.24", features = ["typescript"] }
 specta = { version = "=2.0.0-rc.24", features = ["derive"] }
 specta-typescript = "=0.0.11"
 
+# BT engine. Pinned to 9.x: major versions carry breaking changes; treat
+# upgrades as standalone tasks.
+# Default features off: swap default-tls(openssl) for rust-tls;
+# http-api-client only talks to a standalone rqbit server, unused when
+# embedding the library.
+librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"] }
+# Direct dep only for Id20/metainfo types; the sha1 backend must match
+# librqbit's rust-tls choice (ring).
+librqbit-core = { version = "9.0.1", default-features = false, features = ["sha1-ring"] }
+# Async runtime support for the bt module (tauri already runs on tokio,
+# commands can await directly).
+tokio = { version = "1", features = ["sync", "time", "net", "io-util"] }
+anyhow = "1"
+# Content-Type sniffing for the loopback stream server; already a
+# transitive dep of librqbit, zero added weight.
+mime_guess = "2"
+
 # Desktop-only plugins: updater and autostart have no mobile support.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"

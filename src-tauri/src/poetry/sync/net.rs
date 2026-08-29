@@ -13,12 +13,12 @@ use std::sync::Arc;
 
 use serde_json::Value;
 
-use crate::poetry::catalog::Catalog;
-use crate::poetry::model::PoetrySyncProgress;
 use super::ingest::{extract_selected, import_extracted_dir};
 use crate::error::{AppError, AppResult};
+use crate::poetry::catalog::Catalog;
+use crate::poetry::model::PoetrySyncProgress;
 
-use super::{ProgressFn, PoetryLibrary};
+use super::{PoetryLibrary, ProgressFn};
 
 /// Resolve the current commit sha of every source referenced by `ids`.
 #[cfg(desktop)]
@@ -141,7 +141,13 @@ fn download_and_import(
             continue;
         };
         let archive_path = tmp.join(format!("{source_id}.tar.gz"));
-        download_tarball(progress, spec.repo.clone(), spec.branch.clone(), &archive_path, cancelled)?;
+        download_tarball(
+            progress,
+            spec.repo.clone(),
+            spec.branch.clone(),
+            &archive_path,
+            cancelled,
+        )?;
 
         let extract_dir = tmp.join(format!("extract-{source_id}"));
         let _ = fs::remove_dir_all(&extract_dir);
@@ -149,7 +155,14 @@ fn download_and_import(
         extract_selected(&archive_path, &extract_dir, catalog, ids, cancelled)?;
 
         let sha = shas.get(source_id).cloned().unwrap_or_default();
-        import_extracted_dir(library, progress, &extract_dir, ids, &|_| sha.clone(), cancelled)?;
+        import_extracted_dir(
+            library,
+            progress,
+            &extract_dir,
+            ids,
+            &|_| sha.clone(),
+            cancelled,
+        )?;
         let _ = fs::remove_dir_all(&extract_dir);
         let _ = fs::remove_file(&archive_path);
     }
@@ -223,8 +236,8 @@ fn stream_to_file(
     progress: &ProgressFn<'_>,
     cancelled: &AtomicBool,
 ) -> AppResult<()> {
-    let mut file = fs::File::create(part_path)
-        .map_err(|e| AppError(format!("create temp file: {e}")))?;
+    let mut file =
+        fs::File::create(part_path).map_err(|e| AppError(format!("create temp file: {e}")))?;
     let mut buffer = [0u8; 64 * 1024];
     let mut done: u64 = 0;
     let mut last_report: u64 = 0;
@@ -252,12 +265,7 @@ fn stream_to_file(
                 }
             }
             Err(error) if error.kind() == std::io::ErrorKind::Interrupted => continue,
-            Err(error) => {
-                return Err(AppError(format!(
-                    "下载中断：{}",
-                    error_chain(&error)
-                )))
-            }
+            Err(error) => return Err(AppError(format!("下载中断：{}", error_chain(&error)))),
         }
     }
     file.sync_all().map_err(AppError::from)

@@ -8,6 +8,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 const DB_FILE: &str = "mftp.sqlite3";
 
 mod activity;
+pub(crate) mod bt;
 mod export;
 mod helpers;
 mod import;
@@ -140,6 +141,27 @@ impl Storage {
                 updated_at INTEGER NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS bt_tasks (
+                info_hash TEXT PRIMARY KEY,
+                label TEXT NOT NULL,
+                dest_dir TEXT NOT NULL,
+                mode TEXT NOT NULL DEFAULT 'download',
+                pinned INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL,
+                work_dir TEXT NOT NULL DEFAULT '',
+                file_indices TEXT NOT NULL DEFAULT '[]',
+                package_mode TEXT NOT NULL DEFAULT 'direct',
+                status TEXT NOT NULL DEFAULT 'active',
+                output_path TEXT,
+                total_bytes INTEGER,
+                last_error TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS bt_cache_access (
+                info_hash TEXT PRIMARY KEY,
+                last_access INTEGER NOT NULL
+            );
+
             DROP TABLE IF EXISTS lan_transfer_history;
 
             "#,
@@ -170,6 +192,32 @@ impl Storage {
             "vault_entries",
             "sort_order",
             "INTEGER NOT NULL DEFAULT 0",
+        )?;
+        add_column_if_missing(&conn, "bt_tasks", "work_dir", "TEXT NOT NULL DEFAULT ''")?;
+        add_column_if_missing(
+            &conn,
+            "bt_tasks",
+            "file_indices",
+            "TEXT NOT NULL DEFAULT '[]'",
+        )?;
+        add_column_if_missing(
+            &conn,
+            "bt_tasks",
+            "package_mode",
+            "TEXT NOT NULL DEFAULT 'direct'",
+        )?;
+        add_column_if_missing(
+            &conn,
+            "bt_tasks",
+            "status",
+            "TEXT NOT NULL DEFAULT 'active'",
+        )?;
+        add_column_if_missing(&conn, "bt_tasks", "output_path", "TEXT")?;
+        add_column_if_missing(&conn, "bt_tasks", "total_bytes", "INTEGER")?;
+        add_column_if_missing(&conn, "bt_tasks", "last_error", "TEXT")?;
+        conn.execute(
+            "UPDATE bt_tasks SET work_dir = dest_dir WHERE work_dir = ''",
+            [],
         )?;
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_vault_entries_sort_order ON vault_entries(sort_order)",

@@ -80,7 +80,10 @@ pub fn char_tokens(input: &str) -> String {
 /// Overlapping-bigram token stream for body FTS. A lone character indexes as
 /// itself so single-char bodies stay searchable.
 pub fn bigram_tokens(input: &str) -> String {
-    let text: Vec<char> = normalize(input).chars().filter(|c| is_word_char(*c)).collect();
+    let text: Vec<char> = normalize(input)
+        .chars()
+        .filter(|c| is_word_char(*c))
+        .collect();
     let mut out = String::with_capacity(text.len() * 6);
     if text.len() == 1 {
         return text[0].to_string();
@@ -108,12 +111,7 @@ pub fn phrase_query(tokens: &str) -> Option<String> {
 /// Content-hash uid, stable across library rebuilds (D5): sha256 over
 /// collection id and normalized title/author/body, hex-truncated to 32 chars.
 /// Inputs are normalized here so callers cannot drift.
-pub fn poem_uid(
-    collection_id: &str,
-    title: &str,
-    author: &str,
-    body: &str,
-) -> String {
+pub fn poem_uid(collection_id: &str, title: &str, author: &str, body: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(collection_id.as_bytes());
     hasher.update([0u8]);

@@ -42,7 +42,9 @@ impl PoetryDb {
 
     /// Database size in bytes; 0 before the first import creates the file.
     pub fn file_size(&self) -> i64 {
-        std::fs::metadata(&self.path).map(|m| m.len() as i64).unwrap_or(0)
+        std::fs::metadata(&self.path)
+            .map(|m| m.len() as i64)
+            .unwrap_or(0)
     }
 
     pub fn open(&self) -> AppResult<Connection> {
@@ -89,12 +91,11 @@ impl PoetryDb {
     pub fn delete_collection(&self, collection_id: &str) -> AppResult<bool> {
         let mut conn = self.open()?;
         let tx = conn.transaction()?;
-        let existed: bool = tx
-            .query_row(
-                "SELECT EXISTS(SELECT 1 FROM collections WHERE id = ?1)",
-                params![collection_id],
-                |row| row.get(0),
-            )?;
+        let existed: bool = tx.query_row(
+            "SELECT EXISTS(SELECT 1 FROM collections WHERE id = ?1)",
+            params![collection_id],
+            |row| row.get(0),
+        )?;
         if !existed {
             return Ok(false);
         }
@@ -196,7 +197,14 @@ impl PoetryWriter {
                 tier = excluded.tier,
                 source_sha = excluded.source_sha
             "#,
-            params![id, name, dynasty, script_to_db(script), tier_to_db(tier), source_sha],
+            params![
+                id,
+                name,
+                dynasty,
+                script_to_db(script),
+                tier_to_db(tier),
+                source_sha
+            ],
         )?;
         Ok(())
     }
@@ -404,10 +412,8 @@ mod tests {
         }
 
         pub fn new(tag: &str) -> TempDir {
-            let dir = std::env::temp_dir().join(format!(
-                "mftp-poetry-test-{tag}-{}",
-                process::id()
-            ));
+            let dir =
+                std::env::temp_dir().join(format!("mftp-poetry-test-{tag}-{}", process::id()));
             let _ = fs::remove_dir_all(&dir);
             fs::create_dir_all(&dir).expect("create temp dir");
             TempDir(dir)
@@ -466,19 +472,32 @@ mod tests {
             let writer = db.open_writer().expect("writer");
             writer
                 .upsert_collection(
-                    "shijing", "诗经", "先秦",
-                    PoetryScript::Simplified, PoetryTier::Recommended, "sha-test",
+                    "shijing",
+                    "诗经",
+                    "先秦",
+                    PoetryScript::Simplified,
+                    PoetryTier::Recommended,
+                    "sha-test",
                 )
                 .unwrap();
             writer
-                .insert_poem("shijing", "先秦", &sample_poem("關雎", &["关关雎鸠"]), false)
+                .insert_poem(
+                    "shijing",
+                    "先秦",
+                    &sample_poem("關雎", &["关关雎鸠"]),
+                    false,
+                )
                 .unwrap();
             writer.finalize_counts("shijing").unwrap();
             writer.commit().unwrap();
         }
         let conn = db.open().unwrap();
         let count: i64 = conn
-            .query_row("SELECT poem_count FROM collections WHERE id='shijing'", [], |r| r.get(0))
+            .query_row(
+                "SELECT poem_count FROM collections WHERE id='shijing'",
+                [],
+                |r| r.get(0),
+            )
             .unwrap();
         assert_eq!(count, 1);
         let hit: i64 = conn

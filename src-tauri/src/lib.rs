@@ -1,3 +1,4 @@
+mod bt;
 mod commands;
 mod error;
 mod game_room;
@@ -6,6 +7,7 @@ mod models;
 mod poetry;
 mod ssh;
 mod storage;
+mod transfer;
 
 use game_room::GameRoomManager;
 use lan_transfer::LanTransferManager;
@@ -28,11 +30,21 @@ pub struct AppState {
     pub lan_transfer: Arc<LanTransferManager>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<poetry::sync::PoetryLibrary>,
+    pub bt: Arc<bt::BtManager>,
 }
 
 fn specta_builder() -> Builder<tauri::Wry> {
     Builder::<tauri::Wry>::new()
         .typ::<models::TransferProgress>()
+        .typ::<bt::BtProbeResult>()
+        .typ::<bt::BtTaskInfo>()
+        .typ::<bt::BtTaskStatus>()
+        .typ::<bt::BtPackageMode>()
+        .typ::<bt::BtFileMeta>()
+        .typ::<bt::BtControlAction>()
+        .typ::<bt::BtPeerInfo>()
+        .typ::<bt::BtCacheStats>()
+        .typ::<bt::BtTaskEvent>()
         // Event payloads never pass through command signatures; register
         // explicitly or they will be missing from bindings.ts.
         .typ::<poetry::model::PoetrySyncProgress>()
@@ -123,6 +135,20 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::poetry_annotations_install,
             commands::poetry_annotations_status,
             commands::poetry_annotations_delete,
+            commands::bt_probe,
+            commands::bt_add_download,
+            commands::bt_ensure_preview,
+            commands::bt_stream_url,
+            commands::bt_list,
+            commands::bt_control,
+            commands::bt_save_to_local,
+            commands::bt_cache_stats,
+            commands::bt_set_cache_quota,
+            commands::bt_clear_cache,
+            commands::bt_remove_cache,
+            commands::bt_task_peers,
+            commands::bt_cache_items,
+            commands::bt_task_stats,
         ])
 }
 
@@ -180,8 +206,7 @@ pub fn run() {
             let storage = Storage::new(data_dir.clone()).map_err(|e| e.to_string())?;
             let manager = Manager::new(temp_journal);
             let lan_transfer = Arc::new(LanTransferManager::new());
-            let poetry = Arc::new(poetry::sync::PoetryLibrary::new(data_dir));
-            // Forward room events to the webview; payloads stay opaque.
+            let poetry = Arc::new(poetry::sync::PoetryLibrary::new(data_dir)); // Forward room events to the webview; payloads stay opaque.
             let game_room = {
                 let handle = app.handle().clone();
                 Arc::new(GameRoomManager::new(Arc::new(move |event| {
@@ -230,11 +255,12 @@ pub fn run() {
                 }
             }
             app.manage(AppState {
-                storage,
+                storage: storage.clone(),
                 manager: Arc::new(manager),
                 lan_transfer,
                 game_room,
                 poetry,
+                bt: Arc::new(bt::BtManager::new(app.handle().clone(), storage)),
             });
             Ok(())
         })
@@ -255,6 +281,7 @@ pub fn run() {
             state.manager.shutdown_all();
             state.lan_transfer.stop();
             state.game_room.leave();
+            state.bt.shutdown();
         }
         cleanup_stale_local_transfer_files();
     });

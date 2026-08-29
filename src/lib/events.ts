@@ -10,8 +10,14 @@
  * exactly as the backend emits them; only the references are centralized.
  */
 
-/** SFTP upload/download progress. Payload: `TransferProgress`. */
-export const SFTP_TRANSFER_PROGRESS = "sftp-transfer-progress";
+/**
+ * Transfer progress for SFTP and BT tasks alike (shared backend channel in
+ * `src-tauri/src/transfer.rs`). Payload: `TransferProgress`.
+ *
+ * The wire value predates the `scheme://` convention; renaming it would be a
+ * coordinated two-side change with no functional gain.
+ */
+export const TRANSFER_PROGRESS = "sftp-transfer-progress";
 
 /** Emitted by `src-tauri/src/lib.rs` for the game-room lifecycle. */
 export const GAME_ROOM_PEER = "game-room://peer";
@@ -27,3 +33,6 @@ export const sshClosedEvent = (sessionId: string) => `ssh://closed/${sessionId}`
 
 /** Poetry library sync/import/index progress. Payload: `PoetrySyncProgress`. */
 export const LIBRARY_SYNC_PROGRESS = "library://sync-progress";
+
+/** BT task-level events (save-to-local done/failed). Payload: `BtTaskEvent`. */
+export const BT_TASK_EVENT = "bt://task-event";

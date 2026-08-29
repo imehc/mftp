@@ -133,6 +133,30 @@ export const commands = {
 	poetryAnnotationsInstall: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_install")),
 	poetryAnnotationsStatus: () => typedError<PoetryAnnotationsStatus, AppError>(__TAURI_INVOKE("poetry_annotations_status")),
 	poetryAnnotationsDelete: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_delete")),
+	btProbe: (source: string) => typedError<BtProbeResult, AppError>(__TAURI_INVOKE("bt_probe", { source })),
+	btAddDownload: (source: string, infoHash: string, fileIndices: number[], destDir: string) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_add_download", { source, infoHash, fileIndices, destDir })),
+	/**
+	 *  Ensure a streamable task exists for the target file (cache mode or an
+	 *  existing task); returns the task info.
+	 */
+	btEnsurePreview: (source: string, fileIndex: number) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_ensure_preview", { source, fileIndex })),
+	btStreamUrl: (infoHash: string, fileIndex: number) => typedError<string, AppError>(__TAURI_INVOKE("bt_stream_url", { infoHash, fileIndex })),
+	btList: () => typedError<BtTaskInfo[], AppError>(__TAURI_INVOKE("bt_list")),
+	btControl: (infoHash: string, action: BtControlAction, deleteFiles: boolean) => typedError<null, AppError>(__TAURI_INVOKE("bt_control", { infoHash, action, deleteFiles })),
+	/**
+	 *  Save the file currently open in the preview page. Unfinished files are
+	 *  exported automatically after their download completes.
+	 */
+	btSaveToLocal: (infoHash: string, destDir: string, fileIndex: number) => typedError<null, AppError>(__TAURI_INVOKE("bt_save_to_local", { infoHash, destDir, fileIndex })),
+	btCacheStats: () => typedError<BtCacheStats, AppError>(__TAURI_INVOKE("bt_cache_stats")),
+	btSetCacheQuota: (bytes: number) => typedError<null, AppError>(__TAURI_INVOKE("bt_set_cache_quota", { bytes })),
+	btClearCache: () => typedError<number, AppError>(__TAURI_INVOKE("bt_clear_cache")),
+	btRemoveCache: (infoHash: string) => typedError<null, AppError>(__TAURI_INVOKE("bt_remove_cache", { infoHash })),
+	btTaskPeers: (infoHash: string) => typedError<BtPeerInfo[], AppError>(__TAURI_INVOKE("bt_task_peers", { infoHash })),
+	// Cache-pool entries for the manageable cache list.
+	btCacheItems: () => typedError<BtCacheItem[], AppError>(__TAURI_INVOKE("bt_cache_items")),
+	// Live stats of one task (preview page footer polls this).
+	btTaskStats: (infoHash: string) => typedError<BtTaskStats, AppError>(__TAURI_INVOKE("bt_task_stats", { infoHash })),
 };
 
 /* Types */
@@ -163,6 +187,108 @@ export type AuthorSummary = {
 	desc?: string,
 	poemCount: number,
 };
+
+// One cache-pool entry, for the manageable cache list.
+export type BtCacheItem = {
+	infoHash: string,
+	label: string,
+	/**
+	 *  On-disk size of this entry's cache directory, i.e. how much of the file
+	 *  is cached so far.
+	 */
+	sizeBytes: number,
+	/**
+	 *  Total size of the task's selected files; None while the engine is down
+	 *  or metadata has not arrived.
+	 */
+	totalBytes: number | null,
+	lastAccess: number,
+	/**
+	 *  Pinned (save-to-local in flight) or currently streaming: exempt from
+	 *  eviction, and deleting would break the operation in progress.
+	 */
+	pinned: boolean,
+	streaming: boolean,
+};
+
+export type BtCacheStats = {
+	usedBytes: number,
+	quotaBytes: number,
+	// Task count inside the cache pool (mode='preview').
+	items: number,
+};
+
+export type BtControlAction = "Pause" | "Resume" | "Cancel" | "Remove";
+
+export type BtFileMeta = {
+	index: number,
+	path: string,
+	len: number,
+};
+
+export type BtPackageMode = "Direct" | "Archive";
+
+// Per-peer details (IP masked).
+export type BtPeerInfo = {
+	addr: string,
+	clientName: string | null,
+	fetchedBytes: number,
+	uploadedBytes: number,
+	state: string,
+};
+
+export type BtProbeResult = {
+	infoHash: string,
+	name: string,
+	files: BtFileMeta[],
+	totalLen: number,
+};
+
+/**
+ *  Payload of bt://task-event. The kind covers save, package, and removal
+ *  lifecycle notifications; detailed progress stays on TransferProgress.
+ */
+export type BtTaskEvent = {
+	infoHash: string,
+	kind: string,
+};
+
+export type BtTaskInfo = {
+	infoHash: string,
+	label: string,
+	destDir: string,
+	// 'download'; 'preview' (cache mode) added in P2.
+	mode: string,
+	pinned: boolean,
+	status: BtTaskStatus,
+	packageMode: BtPackageMode,
+	cacheAvailable: boolean,
+	error: string | null,
+	total: number | null,
+	progress: number | null,
+	finished: boolean,
+	peersLive: number,
+};
+
+/**
+ *  Engine-side task state. Kept as an enum rather than a display string so
+ *  the frontend owns the wording (i18n).
+ */
+export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" | "Error";
+
+// Live stats for one task; polled by the preview page footer.
+export type BtTaskStats = {
+	infoHash: string,
+	state: BtTaskState,
+	progress: number,
+	total: number,
+	downBps: number,
+	upBps: number,
+	peersLive: number,
+	peersQueued: number,
+};
+
+export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts";
@@ -590,11 +716,32 @@ export type SystemStats = {
 	topProcesses: SystemProcess[],
 };
 
-export type TransferProgress = {
+export type TransferProgress = TransferProgress_Serialize | TransferProgress_Deserialize;
+
+export type TransferProgress_Deserialize = {
 	id: string,
 	phase: string,
 	transferred: number,
 	total: number | null,
+	/**
+	 *  None: completion is driven by the command return value (SFTP).
+	 *  Some(true): the task is done; the frontend should mark it success
+	 *  (engine-managed tasks such as BT).
+	 */
+	finished?: boolean | null,
+};
+
+export type TransferProgress_Serialize = {
+	id: string,
+	phase: string,
+	transferred: number,
+	total: number | null,
+	/**
+	 *  None: completion is driven by the command return value (SFTP).
+	 *  Some(true): the task is done; the frontend should mark it success
+	 *  (engine-managed tasks such as BT).
+	 */
+	finished?: boolean | null,
 };
 
 export type VaultEntry = {

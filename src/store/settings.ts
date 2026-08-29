@@ -21,6 +21,7 @@ export const TOOL_ROUTES = [
   "formatter",
   "vault",
   "library",
+  "bt",
 ] as const;
 
 export type ToolRoute = (typeof TOOL_ROUTES)[number];

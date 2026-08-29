@@ -1,6 +1,7 @@
 use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
+mod bt;
 mod export;
 mod game_room;
 mod hosts;
@@ -11,6 +12,7 @@ mod sftp;
 mod ssh;
 mod vault;
 
+pub use bt::*;
 pub use export::*;
 pub use game_room::*;
 pub use hosts::*;

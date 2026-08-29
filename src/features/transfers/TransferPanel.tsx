@@ -26,7 +26,7 @@ import * as ipc from "~/lib/ipc";
 import { cn } from "~/lib/utils";
 import { formatBytes } from "~/lib/format";
 import { prefersReducedMotion } from "~/lib/motion";
-import { SFTP_TRANSFER_PROGRESS } from "~/lib/events";
+import { TRANSFER_PROGRESS } from "~/lib/events";
 import {
   type TransferState,
   useTransfersStore,
@@ -115,19 +115,27 @@ function transferMetrics(progress: TransferState) {
   };
 }
 
-export default function TransferPanel() {
+export interface TransferPanelProps {
+  animateOnMount?: boolean;
+}
+
+export default function TransferPanel({
+  animateOnMount = true,
+}: TransferPanelProps) {
   const { t } = useLingui();
   const contentRef = useRef<HTMLDivElement>(null);
   const transfers = useTransfersStore((s) => s.transfers);
   const updateProgressBatch = useTransfersStore((s) => s.updateProgressBatch);
   const markCancelling = useTransfersStore((s) => s.markCancelling);
   const cancelFailed = useTransfersStore((s) => s.cancelFailed);
+  const finishTransfer = useTransfersStore((s) => s.finish);
   const setPaused = useTransfersStore((s) => s.setPaused);
   const setControlPending = useTransfersStore((s) => s.setControlPending);
   const setControlError = useTransfersStore((s) => s.setControlError);
   const setRetrying = useTransfersStore((s) => s.setRetrying);
   const clearFinished = useTransfersStore((s) => s.clearFinished);
   const [open, setOpen] = useState(true);
+  const animationEnabledRef = useRef(animateOnMount);
 
   const activeTransferCount = transfers.filter((t) => t.status === "running").length;
   const pausedTransferCount = transfers.filter(
@@ -184,7 +192,7 @@ export default function TransferPanel() {
       updateProgressBatch(updates);
     };
 
-    void listen<TransferProgress>(SFTP_TRANSFER_PROGRESS, (event) => {
+    void listen<TransferProgress>(TRANSFER_PROGRESS, (event) => {
       pendingProgress.set(event.payload.id, event.payload);
       if (!flushTimer) {
         flushTimer = setTimeout(flushProgress, 100);
@@ -212,7 +220,7 @@ export default function TransferPanel() {
     gsap.killTweensOf(content);
     const reduceMotion = prefersReducedMotion();
 
-    if (reduceMotion) {
+    if (reduceMotion || !animationEnabledRef.current) {
       gsap.set(content, {
         display: open ? "block" : "none",
         clearProps: "height,opacity,transform",
@@ -250,36 +258,54 @@ export default function TransferPanel() {
   }, [open]);
 
   const cancelTransfer = useCallback(
-    async (id: string) => {
+    async (transfer: TransferState) => {
+      const { id } = transfer;
       setControlError(id);
       markCancelling(id);
       try {
-        await ipc.sftpCancelTransfer(id);
+        if (id.startsWith("bt:")) {
+          // Removing preview tasks clears their cache files; download tasks keep
+          // their history and user-directory files when cancelled.
+          await ipc.btControl(
+            id.slice(3),
+            transfer.mode === "preview" ? "Remove" : "Cancel",
+            transfer.mode === "preview",
+          );
+          finishTransfer(id, "cancelled");
+        } else {
+          await ipc.sftpCancelTransfer(id);
+        }
       } catch (error) {
         cancelFailed(id);
         setControlError(id, String(error));
       }
     },
-    [cancelFailed, markCancelling, setControlError],
+    [cancelFailed, finishTransfer, markCancelling, setControlError],
   );
 
   const togglePause = useCallback(
     async (transfer: TransferState) => {
       if (transfer.controlPending || transfer.cancelling) return;
-      setControlError(transfer.id);
-      setControlPending(transfer.id, true);
+      const { id } = transfer;
+      setControlError(id);
+      setControlPending(id, true);
       try {
-        if (transfer.paused) {
-          await ipc.sftpResumeTransfer(transfer.id);
-          setPaused(transfer.id, false);
+        if (id.startsWith("bt:")) {
+          await ipc.btControl(
+            id.slice(3),
+            transfer.paused ? "Resume" : "Pause",
+            false,
+          );
+        } else if (transfer.paused) {
+          await ipc.sftpResumeTransfer(id);
         } else {
-          await ipc.sftpPauseTransfer(transfer.id);
-          setPaused(transfer.id, true);
+          await ipc.sftpPauseTransfer(id);
         }
+        setPaused(id, !transfer.paused);
       } catch (error) {
-        setControlError(transfer.id, String(error));
+        setControlError(id, String(error));
       } finally {
-        setControlPending(transfer.id, false);
+        setControlPending(id, false);
       }
     },
     [setControlError, setControlPending, setPaused],
@@ -307,7 +333,10 @@ export default function TransferPanel() {
         <button
           type="button"
           className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-sidebar-accent"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => {
+            animationEnabledRef.current = true;
+            setOpen((value) => !value);
+          }}
           aria-expanded={open}
           aria-controls="transfer-panel-content"
         >
@@ -359,7 +388,7 @@ export default function TransferPanel() {
             <TransferItem
               key={item.id}
               transfer={item}
-              onCancel={cancelTransfer}
+              onCancel={() => void cancelTransfer(item)}
               onTogglePause={togglePause}
               onRetry={retryTransfer}
             />
@@ -377,7 +406,7 @@ const TransferItem = memo(function TransferItem({
   onRetry,
 }: {
   transfer: TransferState;
-  onCancel: (id: string) => void;
+  onCancel: () => void;
   onTogglePause: (transfer: TransferState) => void;
   onRetry: (transfer: TransferState) => void;
 }) {
@@ -401,13 +430,25 @@ const TransferItem = memo(function TransferItem({
 
   return (
     <div className="flex flex-col gap-1 rounded-md border border-border bg-background px-2 py-2 text-xs">
-      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
+      {/* Flex, not a fixed grid: BT rows add source/mode badges next to the
+          label, and extra grid children would wrap onto their own line. */}
+      <div className="flex items-center gap-2">
         {statusIcon}
-        <span className="min-w-0 truncate font-medium text-foreground">
+        <span className="min-w-0 flex-1 truncate font-medium text-foreground">
           {transfer.label}
         </span>
+        {transfer.source === "bt" ? (
+          <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
+            <Trans>BT</Trans>
+          </span>
+        ) : null}
+        {transfer.source === "bt" && transfer.mode === "preview" ? (
+          <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[10px] text-muted-foreground">
+            <Trans>在线预览</Trans>
+          </span>
+        ) : null}
         {transfer.status === "running" && transfer.cancellable !== false ? (
-          <div className="flex items-center gap-0.5">
+          <div className="flex shrink-0 items-center gap-0.5">
             <Button
               variant="ghost"
               size="icon-xs"
@@ -427,7 +468,7 @@ const TransferItem = memo(function TransferItem({
               variant="ghost"
               size="icon-xs"
               title={t`取消`}
-              onClick={() => onCancel(transfer.id)}
+              onClick={() => onCancel()}
               disabled={transfer.cancelling || transfer.controlPending}
             >
               {transfer.cancelling ? (
@@ -441,6 +482,7 @@ const TransferItem = memo(function TransferItem({
           <Button
             variant="ghost"
             size="xs"
+            className="shrink-0"
             title={t`重试`}
             onClick={() => onRetry(transfer)}
             disabled={transfer.retrying}

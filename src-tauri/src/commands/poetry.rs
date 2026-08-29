@@ -79,10 +79,7 @@ pub async fn poetry_sync_cancel(state: State<'_, AppState>) -> AppResult<()> {
 
 #[tauri::command]
 #[specta::specta]
-pub async fn poetry_collection_delete(
-    state: State<'_, AppState>,
-    id: String,
-) -> AppResult<()> {
+pub async fn poetry_collection_delete(state: State<'_, AppState>, id: String) -> AppResult<()> {
     let library = state.poetry.clone();
     run_blocking(move || library.delete_collection(&id)).await
 }
@@ -187,7 +184,10 @@ pub async fn poetry_content_index_status(
 
 #[tauri::command]
 #[specta::specta]
-pub async fn poetry_annotations_install(app: AppHandle, state: State<'_, AppState>) -> AppResult<()> {
+pub async fn poetry_annotations_install(
+    app: AppHandle,
+    state: State<'_, AppState>,
+) -> AppResult<()> {
     let library = state.poetry.clone();
     let emit_progress = progress_emitter(&app);
     run_blocking(move || library.begin_annotations_install(emit_progress)).await

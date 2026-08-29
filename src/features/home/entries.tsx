@@ -11,6 +11,7 @@ import {
   Grid3x3,
   KeyRound,
   LockKeyhole,
+  Magnet,
   TerminalSquare,
   Wifi,
 } from "lucide-react";
@@ -96,6 +97,17 @@ export const homeEntries: HomeEntry[] = [
     toolId: "vault",
     icon: KeyRound,
     title: <Trans>密码本</Trans>,
+  },
+  {
+    id: "bt",
+    category: "tools",
+    link: linkOptions({ to: "/tools/bt", preload: "intent" }),
+    toolId: "bt",
+    // The bt engine compiles everywhere, but the downloads page has no
+// mobile layout yet.
+    platforms: ["desktop"],
+    icon: Magnet,
+    title: <Trans>BT 下载</Trans>,
   },
   {
     id: "library",

@@ -94,6 +94,11 @@ pub struct TransferProgress {
     pub phase: String,
     pub transferred: u64,
     pub total: Option<u64>,
+    /// None: completion is driven by the command return value (SFTP).
+    /// Some(true): the task is done; the frontend should mark it success
+    /// (engine-managed tasks such as BT).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub finished: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
