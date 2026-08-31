@@ -32,3 +32,6 @@ src-tauri/target
 .tanstack/
 
 src/locales/**/messages.ts
+
+# Agent skills installed by `npx skills`; restore with `pnpm skills:sync`
+.agents/skills/*
