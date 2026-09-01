@@ -15,6 +15,7 @@ use super::export::{
     export_files, export_files_are_complete, file_is_complete, partial_archive_path,
     remove_file_if_exists, selected_export_files, ExportFile,
 };
+use super::probe::handle_to_probe;
 use super::{
     find_handle, is_completed_archive, parse_info_hash, same_dir, BtManager, TorrentHandle,
 };
@@ -44,7 +45,10 @@ impl BtManager {
         self.cache_root().map(|root| dir_size(&root)).unwrap_or(0)
     }
 
-    pub fn cache_items(&self) -> AppResult<Vec<super::BtCacheItem>> {
+    /// Cache-pool entries. Starts the engine so each entry can carry its
+    /// selected files (open / save-as in the cache list need the file index).
+    pub async fn cache_items(&self) -> AppResult<Vec<super::BtCacheItem>> {
+        let session = self.ensure_engine().await?;
         let mut items = Vec::new();
         for (hash, last_access) in self.storage.list_cache_lru()? {
             let Some(row) = self.storage.get_bt_task(&hash)? else {
@@ -62,10 +66,36 @@ impl BtManager {
                 last_access,
                 pinned: row.pinned,
                 streaming: self.is_stream_active(&hash),
+                files: self.selected_file_meta(&session, &hash, &row.file_indices),
             });
         }
         items.sort_by_key(|item| std::cmp::Reverse(item.last_access));
         Ok(items)
+    }
+
+    /// Metadata of a task's selected files. Empty when the engine has no
+    /// handle (or metadata has not arrived), which the UI reads as "no file
+    /// actions available yet" rather than an error.
+    pub(super) fn selected_file_meta(
+        &self,
+        session: &Arc<Session>,
+        info_hash: &str,
+        file_indices: &[usize],
+    ) -> Vec<super::BtFileMeta> {
+        let Ok(hash) = parse_info_hash(info_hash) else {
+            return Vec::new();
+        };
+        let Ok(Some(handle)) = find_handle(session, &hash) else {
+            return Vec::new();
+        };
+        let Ok(probe) = handle_to_probe(&handle) else {
+            return Vec::new();
+        };
+        probe
+            .files
+            .into_iter()
+            .filter(|file| file_indices.contains(&file.index))
+            .collect()
     }
 
     pub async fn clear_cache(&self) -> AppResult<usize> {
@@ -196,15 +226,17 @@ impl BtManager {
         notify: bool,
     ) -> AppResult<()> {
         let row = self.storage.get_bt_task(info_hash)?;
-        self.cancel_archive_job(info_hash);
-        self.wait_for_archive_job(info_hash).await?;
-        let _gate = self.archive_gate.lock().await;
+        self.cancel_finalize_job(info_hash);
+        self.wait_for_finalize_job(info_hash).await?;
+        let _gate = self.finalize_gate.lock().await;
 
         if let Ok(hash) = parse_info_hash(info_hash) {
             if find_handle(session, &hash)?.is_some() {
                 let remove_engine_files = delete_files
                     || row.as_ref().is_some_and(|task| {
-                        task.mode == "preview" || task.package_mode == "archive"
+                        task.mode == "preview"
+                            || task.package_mode == "archive"
+                            || super::download::stages_into_part_dir(task)
                     });
                 session
                     .delete(hash.into(), remove_engine_files)

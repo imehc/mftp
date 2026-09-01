@@ -13,14 +13,28 @@
 //! stream-while-downloading plus seeking for free.
 
 use std::sync::Arc;
+use std::time::Duration;
 
 use librqbit::Session;
 use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
+use tokio::time::timeout;
 
 /// Header size cap; request line plus a few headers is plenty.
 const MAX_HEADER_BYTES: usize = 8 * 1024;
 const READ_BUFFER: usize = 64 * 1024;
+
+/// `add_torrent` returns while the torrent is still initializing (file check
+/// and allocation run in a spawned task), and librqbit refuses to open a
+/// FileStream in that state. Waiting here beats failing the request: the
+/// player treats the first broken response as fatal and never retries.
+const READY_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// Give up on a response that has not produced a byte for this long. An open
+/// FileStream holds one of the session's blocking permits (8 by default,
+/// shared with piece writeback), so a read parked on a piece nobody is
+/// serving must not keep the connection alive forever.
+const READ_STALL_TIMEOUT: Duration = Duration::from_secs(90);
 
 pub struct StreamServer {
     port: u16,
@@ -119,6 +133,14 @@ async fn handle_connection(
         return;
     };
 
+    // Restored torrents come back parked (BtManager::pause_restored_torrents)
+    // and a fresh add is still initializing; either way, reach a state that
+    // can actually stream before committing to a response.
+    if !wait_until_streamable(&session, &handle).await {
+        let _ = write_simple(&mut stream, 503, "Torrent Not Ready").await;
+        return;
+    }
+
     // The active count exempts a task from LRU eviction; decrement on
     // close, including abrupt disconnects.
     if let Ok(mut map) = active.lock() {
@@ -137,6 +159,22 @@ async fn handle_connection(
             map.remove(&info_hash_hex);
         }
     }
+}
+
+/// Block until the torrent can serve bytes: initialization finished and the
+/// torrent is not parked. Returns false when it errored or took too long, so
+/// the caller can answer with a status instead of an empty body.
+async fn wait_until_streamable(session: &Arc<Session>, handle: &super::TorrentHandle) -> bool {
+    if !matches!(
+        timeout(READY_TIMEOUT, handle.wait_until_initialized()).await,
+        Ok(Ok(()))
+    ) {
+        return false;
+    }
+    if handle.is_paused() {
+        let _ = session.unpause(handle).await;
+    }
+    true
 }
 
 fn split_route(rest: &str) -> Option<(String, usize)> {
@@ -282,15 +320,18 @@ async fn respond_with_file_range(
     let mut buffer = vec![0u8; READ_BUFFER.min(length as usize).max(1)];
     while remaining > 0 {
         let want = buffer.len().min(remaining as usize);
-        match file_stream.read(&mut buffer[..want]).await {
-            Ok(0) => break,
-            Ok(n) => {
+        // FileStream reads block until the piece under the read head lands, so
+        // a swarm that cannot serve it would otherwise hold this connection
+        // (and a blocking permit) open indefinitely.
+        match timeout(READ_STALL_TIMEOUT, file_stream.read(&mut buffer[..want])).await {
+            Ok(Ok(0)) | Err(_) => break,
+            Ok(Ok(n)) => {
                 if stream.write_all(&buffer[..n]).await.is_err() {
                     return;
                 }
                 remaining -= n as u64;
             }
-            Err(_) => return,
+            Ok(Err(_)) => return,
         }
     }
     let _ = stream.flush().await;

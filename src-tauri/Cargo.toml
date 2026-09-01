@@ -54,6 +54,9 @@ librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"
 # Direct dep only for Id20/metainfo types; the sha1 backend must match
 # librqbit's rust-tls choice (ring).
 librqbit-core = { version = "9.0.1", default-features = false, features = ["sha1-ring"] }
+# Only to build the session's fallback tracker list; must stay on the same
+# major as librqbit's own url dep so HashSet<Url> matches.
+url = { version = "2", default-features = false }
 # Async runtime support for the bt module (tauri already runs on tokio,
 # commands can await directly).
 tokio = { version = "1", features = ["sync", "time", "net", "io-util"] }

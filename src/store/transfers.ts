@@ -2,6 +2,20 @@ import { create } from "zustand";
 import { msg } from "@lingui/core/macro";
 import { translate } from "~/i18n/translate";
 import type { TransferProgress } from "~/types";
+
+/** 后端 BT phase 是机器 key，文案归前端；未收录的 key 原样透出。 */
+const BT_PHASE_LABELS: Record<string, () => string> = {
+  "bt:metadata": () => translate(msg`获取资源信息…`),
+  "bt:downloading": () => translate(msg`下载中`),
+  "bt:seeding": () => translate(msg`做种中`),
+  "bt:paused": () => translate(msg`已暂停`),
+  "bt:error": () => translate(msg`错误`),
+  "bt:packaging": () => translate(msg`打包中`),
+};
+
+function btPhaseLabel(phase: string): string {
+  return BT_PHASE_LABELS[phase]?.() ?? phase;
+}
 export interface TransferState {
   id: string;
   label: string;
@@ -127,9 +141,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
           };
         }
         const phase =
-          item.source === "bt" && progress.phase === "bt:packaging"
-            ? translate(msg`打包中`)
-            : progress.phase;
+          item.source === "bt" ? btPhaseLabel(progress.phase) : progress.phase;
         const phaseChanged = phase !== item.phase;
         return {
           ...item,

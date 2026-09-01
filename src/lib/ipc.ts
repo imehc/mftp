@@ -323,5 +323,5 @@ export const btRemoveCache = (infoHash: string) =>
 export const btCacheItems = () => unwrapCommand(commands.btCacheItems());
 export const btTaskPeers = (infoHash: string) =>
   unwrapCommand(commands.btTaskPeers(infoHash));
-export const btTaskStats = (infoHash: string) =>
-  unwrapCommand(commands.btTaskStats(infoHash));
+export const btTaskStats = (infoHash: string, fileIndex: number | null) =>
+  unwrapCommand(commands.btTaskStats(infoHash, fileIndex));

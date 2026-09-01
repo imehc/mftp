@@ -26,8 +26,8 @@ use std::time::Duration;
 
 use anyhow::Context as _;
 use librqbit::{
-    AddTorrent, AddTorrentOptions, AddTorrentResponse, ManagedTorrent, Session, SessionOptions,
-    SessionPersistenceConfig,
+    AddTorrent, AddTorrentOptions, AddTorrentResponse, ListenerOptions, ManagedTorrent, Session,
+    SessionOptions, SessionPersistenceConfig,
 };
 use librqbit_core::hash_id::Id20;
 use std::cell::RefCell;
@@ -44,13 +44,34 @@ pub use models::{
     BtProbeResult, BtTaskEvent, BtTaskInfo, BtTaskStats, BtTaskStatus,
 };
 use probe::{handle_to_probe, probe_from_info, source_info_hash, torrent_bytes_to_probe};
-use stats::spawn_progress_pump;
+use stats::{spawn_progress_pump, task_state};
 use stream_server::StreamServer;
 
 /// Magnet cold start (DHT peer discovery + metadata) can be slow; on timeout
 /// the user cancels and retries rather than hanging forever.
 const PROBE_TIMEOUT: Duration = Duration::from_secs(90);
 const PUMP_INTERVAL: Duration = Duration::from_secs(1);
+
+/// Trackers announced for every non-private torrent on top of whatever the
+/// source carries. Bare magnets (`magnet:?xt=…` with no `tr=`) are common —
+/// including the ones this app hands out — and without trackers DHT is the
+/// only way to find peers, which is why such a task can sit at 0 forever.
+/// librqbit keeps private torrents on their own tracker (session.rs:1557).
+const FALLBACK_TRACKERS: [&str; 6] = [
+    "udp://tracker.opentrackr.org:1337/announce",
+    "udp://open.demonii.com:1337/announce",
+    "udp://tracker.openbittorrent.com:6969/announce",
+    "udp://exodus.desync.com:6969/announce",
+    "udp://tracker.torrent.eu.org:451/announce",
+    "udp://open.stealth.si:80/announce",
+];
+
+fn fallback_trackers() -> HashSet<url::Url> {
+    FALLBACK_TRACKERS
+        .iter()
+        .filter_map(|tracker| tracker.parse().ok())
+        .collect()
+}
 
 /// The alias is not re-exported at the crate root; use Arc<ManagedTorrent>.
 type TorrentHandle = Arc<ManagedTorrent>;
@@ -64,10 +85,11 @@ pub struct BtManager {
     active_streams: ActiveStreams,
     /// In-flight save-to-local tasks, guarding against duplicate queues.
     pending_saves: Arc<StdMutex<HashSet<String>>>,
-    /// Cooperative cancellation flags for archive download/finalization jobs.
-    archive_jobs: Arc<StdMutex<HashMap<String, Arc<AtomicBool>>>>,
-    /// Serializes archive finalization with task deletion.
-    archive_gate: Arc<Mutex<()>>,
+    /// Cooperative cancellation flags for the jobs that publish a finished
+    /// download: moving a plain file out, packing an archive.
+    finalize_jobs: Arc<StdMutex<HashMap<String, Arc<AtomicBool>>>>,
+    /// Serializes publication with task deletion.
+    finalize_gate: Arc<Mutex<()>>,
 }
 
 struct Engine {
@@ -114,8 +136,8 @@ impl BtManager {
             engine: Mutex::new(None),
             active_streams: Arc::new(StdMutex::new(HashMap::new())),
             pending_saves: Arc::new(StdMutex::new(HashSet::new())),
-            archive_jobs: Arc::new(StdMutex::new(HashMap::new())),
-            archive_gate: Arc::new(Mutex::new(())),
+            finalize_jobs: Arc::new(StdMutex::new(HashMap::new())),
+            finalize_gate: Arc::new(Mutex::new(())),
         }
     }
 
@@ -148,6 +170,25 @@ impl BtManager {
                 persistence: Some(SessionPersistenceConfig::Json {
                     folder: Some(session_dir),
                 }),
+                // Without a listener the engine can only dial out, so peers
+                // that are themselves behind NAT are unreachable — half the
+                // swarm on a low-seed torrent. UPnP asks the router for a
+                // port so they can dial back; it degrades silently to
+                // outgoing-only when the router refuses.
+                listen: Some(ListenerOptions {
+                    enable_upnp_port_forwarding: true,
+                    ..Default::default()
+                }),
+                // Trust the persisted bitfield (spot-checked, full re-hash on
+                // mismatch) instead of re-reading every existing file at each
+                // start, which showed up as a long "Initializing" at 0.
+                fastresume: true,
+                // Sizes the session's blocking-IO semaphore (default 8). Every
+                // open playback stream holds one permit for its whole life, and
+                // piece writeback takes permits from the same pool — with the
+                // default a couple of streams noticeably starve downloads.
+                runtime_worker_threads: Some(16),
+                trackers: fallback_trackers(),
                 ..Default::default()
             },
         )
@@ -165,9 +206,53 @@ impl BtManager {
             pump_handle,
             server,
         });
-        self.resume_archive_jobs(&session).await;
+        self.pause_restored_torrents(&session).await;
+        self.resume_finalize_jobs(&session).await;
         self.cleanup_orphan_owned_dirs(&session);
         Ok(session)
+    }
+
+    /// librqbit's persistence restores `is_paused` verbatim, so torrents that
+    /// were running at shutdown resume the moment the engine starts — history
+    /// silently burning bandwidth the user never asked for. Park everything
+    /// instead and let explicit actions (resume, preview, re-download) start
+    /// traffic. Archive tasks are exempt: `resume_finalize_jobs` needs them
+    /// downloading to finish packaging.
+    async fn pause_restored_torrents(&self, session: &Arc<Session>) {
+        let archive_pending: HashSet<String> = self
+            .storage
+            .list_bt_archive_tasks()
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|row| row.status == "active" || row.status == "packaging")
+            .map(|row| row.info_hash)
+            .collect();
+        let handles = RefCell::new(Vec::new());
+        session.with_torrents(|torrents| {
+            for (_, handle) in torrents {
+                if !archive_pending.contains(&info_hash_hex(handle)) {
+                    handles.borrow_mut().push(handle.clone());
+                }
+            }
+        });
+        for handle in handles.into_inner() {
+            let _ = session.pause(&handle).await;
+        }
+    }
+
+    /// Undo `pause_restored_torrents` for one task. Every explicit user entry
+    /// point (resume, preview, streaming, re-download) goes through this, or
+    /// the action would look like it did nothing.
+    pub(super) async fn unpause_task(&self, session: &Arc<Session>, info_hash: &str) {
+        let Ok(hash) = parse_info_hash(info_hash) else {
+            return;
+        };
+        let Ok(Some(handle)) = find_handle(session, &hash) else {
+            return;
+        };
+        if matches!(handle.stats().state, librqbit::TorrentStatsState::Paused) {
+            let _ = session.unpause(&handle).await;
+        }
     }
 
     /// Resolve magnet/torrent metadata (list-only, zero disk writes).
@@ -302,7 +387,7 @@ impl BtManager {
     /// drop the Session (the cancellation token's drop guard winds the engine
     /// down; fastresume is written incrementally, nothing to flush).
     pub fn shutdown(&self) {
-        if let Ok(jobs) = self.archive_jobs.lock() {
+        if let Ok(jobs) = self.finalize_jobs.lock() {
             for cancelled in jobs.values() {
                 cancelled.store(true, std::sync::atomic::Ordering::SeqCst);
             }
@@ -348,6 +433,7 @@ impl BtManager {
                             .await
                             .map_err(|e| AppError(format!("更新文件选择失败: {e:#}")))?;
                     }
+                    self.unpause_task(&session, &hash_hex).await;
                 }
                 None => {
                     // A completed archive no longer has an engine handle. Its
@@ -414,7 +500,10 @@ impl BtManager {
     /// Mint a streaming URL. Starts the engine when needed so the preview
     /// page stays reloadable/deep-linkable (persistence restores the task).
     pub async fn stream_url(&self, info_hash: &str, file_index: usize) -> AppResult<String> {
-        self.ensure_engine().await?;
+        let session = self.ensure_engine().await?;
+        // Restored tasks come back paused; playing one is an explicit request
+        // for traffic, otherwise the stream would stall forever.
+        self.unpause_task(&session, info_hash).await;
         let guard = self.engine.lock().await;
         let engine = guard
             .as_ref()
@@ -467,6 +556,10 @@ impl BtManager {
         };
         let persisted_total = row.total_bytes;
         let persisted_finished = matches!(persisted_status, BtTaskStatus::Completed);
+        // A staged download is not done when the last piece lands — the file
+        // still has to move into the user's folder, and only the finalize job
+        // knows when that happened.
+        let staged = download::stages_into_part_dir(&row);
         let cache_available =
             row.mode != "preview" || self.storage.has_bt_access(&row.info_hash).unwrap_or(false);
         let mut info = BtTaskInfo {
@@ -483,6 +576,8 @@ impl BtManager {
             progress: persisted_finished.then_some(persisted_total.unwrap_or(0)),
             finished: persisted_finished,
             peers_live: 0,
+            state: None,
+            files: Vec::new(),
         };
         if !matches!(persisted_status, BtTaskStatus::Cancelled) {
             let Some(session) = self.engine_running() else {
@@ -495,34 +590,37 @@ impl BtManager {
                         let stats = handle.stats();
                         let error = matches!(stats.state, librqbit::TorrentStatsState::Error)
                             .then(|| stats.error.unwrap_or_else(|| "BT 下载失败".into()));
+                        let finished = stats.finished
+                            || (stats.total_bytes > 0 && stats.progress_bytes >= stats.total_bytes);
                         *snapshot.borrow_mut() = Some((
                             stats.total_bytes,
                             stats.progress_bytes,
-                            stats.finished
-                                || (stats.total_bytes > 0
-                                    && stats.progress_bytes >= stats.total_bytes),
+                            finished,
                             stats
                                 .live
                                 .as_ref()
                                 .map(|l| l.snapshot.peer_stats.live)
                                 .unwrap_or(0),
                             error,
+                            task_state(&stats.state, finished),
                         ));
                         break;
                     }
                 }
             });
-            if let Some((total, progress, finished, peers, error)) = snapshot.into_inner() {
+            if let Some((total, progress, finished, peers, error, state)) = snapshot.into_inner() {
                 info.total = Some(total);
                 info.progress = Some(progress);
                 info.finished = finished || persisted_finished;
+                info.state = Some(state);
                 if finished
+                    && !staged
                     && matches!(info.package_mode, BtPackageMode::Direct)
                     && !matches!(info.status, BtTaskStatus::Error)
                 {
                     info.status = BtTaskStatus::Completed;
                 }
-                if matches!(info.package_mode, BtPackageMode::Archive)
+                if (staged || matches!(info.package_mode, BtPackageMode::Archive))
                     && !matches!(info.status, BtTaskStatus::Completed)
                 {
                     info.finished = false;
@@ -533,6 +631,11 @@ impl BtManager {
                     info.error = Some(error);
                     info.finished = false;
                 }
+            }
+            // Only preview rows need file identity (open / save-as act on one
+            // file); plain downloads already sit in the user's folder.
+            if info.mode == "preview" {
+                info.files = self.selected_file_meta(&session, &info.info_hash, &row.file_indices);
             }
         }
         info

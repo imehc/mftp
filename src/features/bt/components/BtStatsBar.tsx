@@ -6,6 +6,8 @@ import * as ipc from "~/lib/ipc";
 import { formatBytes } from "~/lib/format";
 export interface BtStatsBarProps {
   infoHash: string;
+  /** 被预览的文件序号：字节数只统计这个文件，种子里的其他文件不算。 */
+  fileIndex: number;
   /** 打开由父组件持有的节点明细浮层。 */
   onShowPeers: () => void;
 }
@@ -25,13 +27,17 @@ function stateLabel(stats: BtTaskStats) {
  * 播放器下方的实时传输统计。采用轮询而非事件驱动：共享的
  * 进度事件不含速度或节点数，而本栏只在页面打开期间才有意义。
  */
-export default function BtStatsBar({ infoHash, onShowPeers }: BtStatsBarProps) {
+export default function BtStatsBar({
+  infoHash,
+  fileIndex,
+  onShowPeers,
+}: BtStatsBarProps) {
   const { t } = useLingui();
   const [stats, setStats] = useState<BtTaskStats | null>(null);
   useEffect(() => {
     const poll = async () => {
       try {
-        setStats(await ipc.btTaskStats(infoHash));
+        setStats(await ipc.btTaskStats(infoHash, fileIndex));
       } catch {
         // 引擎重启或任务被移除：保留最后一次快照，
         // 而不是在播放器下方闪出错误。
@@ -40,7 +46,7 @@ export default function BtStatsBar({ infoHash, onShowPeers }: BtStatsBarProps) {
     void poll();
     const timer = setInterval(() => void poll(), POLL_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [infoHash]);
+  }, [fileIndex, infoHash]);
   if (!stats) return null;
   const percent =
     stats.total > 0

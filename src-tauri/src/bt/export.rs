@@ -79,14 +79,32 @@ fn progress_reaches_len(progress: &[u64], file_index: usize, len: u64) -> bool {
 }
 
 pub(super) fn copy_export_file(file: &ExportFile, dest_dir: &Path) -> AppResult<PathBuf> {
-    let name = file
-        .relative
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "bt-download".into());
-    let target = unique_path(dest_dir, &name);
+    let target = unique_path(dest_dir, &export_file_name(file));
     copy_without_overwrite(&file.absolute, &target)?;
     Ok(target)
+}
+
+/// Hand a finished file over to the user's folder. The staging directory lives
+/// inside that folder, so this is a same-filesystem rename: instant, no second
+/// copy of the data. The copy fallback covers the rare case where it is not
+/// (a mount point below the download folder).
+pub(super) fn move_export_file(file: &ExportFile, dest_dir: &Path) -> AppResult<PathBuf> {
+    let target = unique_path(dest_dir, &export_file_name(file));
+    if std::fs::rename(&file.absolute, &target).is_ok() {
+        return Ok(target);
+    }
+    copy_without_overwrite(&file.absolute, &target)?;
+    let _ = std::fs::remove_file(&file.absolute);
+    Ok(target)
+}
+
+/// Exports are flat: a single file keeps its own name, never the folder
+/// structure the torrent happened to wrap it in.
+fn export_file_name(file: &ExportFile) -> String {
+    file.relative
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "bt-download".into())
 }
 
 fn copy_without_overwrite(source: &Path, target: &Path) -> AppResult<()> {
@@ -377,6 +395,30 @@ mod tests {
             .join(format!(".cancelled.tar.{hash}.mftp-part"))
             .exists());
         std::fs::remove_dir_all(source_root).unwrap();
+        std::fs::remove_dir_all(destination).unwrap();
+    }
+
+    #[test]
+    fn staged_file_moves_out_without_clobbering_the_folder() {
+        let staging = temp_dir("move-staging");
+        let destination = temp_dir("move-destination");
+        let source = staging.join("source.bin");
+        File::create(&source)
+            .unwrap()
+            .write_all(b"payload")
+            .unwrap();
+        File::create(destination.join("source.bin")).unwrap();
+        let file = ExportFile {
+            index: 0,
+            absolute: source.clone(),
+            relative: "folder/source.bin".into(),
+            len: 7,
+        };
+        let target = move_export_file(&file, &destination).unwrap();
+        assert_eq!(target, destination.join("source (2).bin"));
+        assert_eq!(std::fs::read(target).unwrap(), b"payload");
+        assert!(!source.exists());
+        std::fs::remove_dir_all(staging).unwrap();
         std::fs::remove_dir_all(destination).unwrap();
     }
 

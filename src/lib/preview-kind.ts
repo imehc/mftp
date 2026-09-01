@@ -62,6 +62,20 @@ const PREVIEW_KINDS: readonly PreviewKind[] = [
   "text",
 ];
 
+/** WebView 自己能解码的容器。macOS 的 WKWebView 与 Windows 的 WebView2 都
+ * 只认这几种：mkv / avi / wmv / flv / ts 无论内部编码如何都放不出来，因此
+ * 这类文件直接给出「用外部播放器打开」的提示，而不是转半天再报错。 */
+const INLINE_VIDEO = new Set(["mp4", "m4v", "mov", "webm"]);
+const INLINE_AUDIO = new Set([
+  "mp3",
+  "m4a",
+  "aac",
+  "wav",
+  "flac",
+  "ogg",
+  "opus",
+]);
+
 export function extensionOf(path: string): string {
   const name = path.split(/[\\/]/).pop() ?? "";
   const dot = name.lastIndexOf(".");
@@ -79,6 +93,14 @@ export function previewKind(path: string): PreviewKind {
 
 export function isPreviewable(kind: PreviewKind): boolean {
   return kind !== "other";
+}
+
+/** 视频 / 音频能否直接在 WebView 里播放；其它类型一律 true（与播放无关）。 */
+export function canPlayInline(path: string, kind: PreviewKind): boolean {
+  const ext = extensionOf(path);
+  if (kind === "video") return INLINE_VIDEO.has(ext);
+  if (kind === "audio") return INLINE_AUDIO.has(ext);
+  return true;
 }
 
 /** 把一个不可信的值（URL 查询参数）收敛回预览类型。 */

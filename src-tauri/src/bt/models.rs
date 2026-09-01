@@ -38,6 +38,13 @@ pub struct BtTaskInfo {
     pub progress: Option<u64>,
     pub finished: bool,
     pub peers_live: u32,
+    /// Live engine state; None while the engine is down or the handle has not
+    /// been restored yet. The transfer panel only adopts a task once this says
+    /// it is actually downloading, so history stays out of it.
+    pub state: Option<BtTaskState>,
+    /// Selected files of a preview task, so its row can offer open / save-as.
+    /// Empty for plain downloads and while the engine has no handle.
+    pub files: Vec<BtFileMeta>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Type)]
@@ -100,6 +107,9 @@ pub struct BtCacheItem {
     /// eviction, and deleting would break the operation in progress.
     pub pinned: bool,
     pub streaming: bool,
+    /// The task's selected files, so the cache list can offer open/save-as.
+    /// Empty while the engine has no handle for this task.
+    pub files: Vec<BtFileMeta>,
 }
 
 /// Engine-side task state. Kept as an enum rather than a display string so

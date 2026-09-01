@@ -23,9 +23,9 @@ impl BtManager {
             return Err(AppError("任务已完成，无法取消".into()));
         }
 
-        self.cancel_archive_job(info_hash);
-        self.wait_for_archive_job(info_hash).await?;
-        let _gate = self.archive_gate.lock().await;
+        self.cancel_finalize_job(info_hash);
+        self.wait_for_finalize_job(info_hash).await?;
+        let _gate = self.finalize_gate.lock().await;
 
         // The archive can finish between the user's click and acquisition of
         // the finalization gate. Re-read before deleting any output.
@@ -39,7 +39,13 @@ impl BtManager {
 
         let hash = parse_info_hash(info_hash)?;
         if find_handle(session, &hash)?.is_some() {
-            let remove_engine_files = row.mode == "preview" || row.package_mode == "archive";
+            // Let the engine drop its own files whenever they live somewhere we
+            // own: the cache dir, the archive staging tree, or the part dir a
+            // plain download stages in. Only a legacy row that downloads
+            // straight into the user's folder keeps what it wrote.
+            let remove_engine_files = row.mode == "preview"
+                || row.package_mode == "archive"
+                || super::download::stages_into_part_dir(&row);
             session
                 .delete(hash.into(), remove_engine_files)
                 .await

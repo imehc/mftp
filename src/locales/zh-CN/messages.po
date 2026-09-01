@@ -76,7 +76,7 @@ msgstr "{incomingLabel}名称"
 msgid "{installedLength} 个合集 · {toLocaleStringValue} 篇 · {formatBytesValue}"
 msgstr "{installedLength} 个合集 · {toLocaleStringValue} 篇 · {formatBytesValue}"
 
-#: src/features/bt/components/CacheManager.tsx:63
+#: src/features/bt/components/CacheManager.tsx:169
 msgid "{itemsLength} 个任务"
 msgstr "{itemsLength} 个任务"
 
@@ -248,7 +248,7 @@ msgstr "AVIF（不支持）"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:320
+#: src/features/bt/BtTool.tsx:447
 #: src/features/home/entries.tsx:125
 msgid "BT 下载"
 msgstr "BT 下载"
@@ -338,7 +338,7 @@ msgstr "上一个"
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "上一手已停手：再停一手即终局，落子则重新计数"
 
-#: src/features/bt/components/BtStatsBar.tsx:71
+#: src/features/bt/components/BtStatsBar.tsx:77
 #: src/features/lan-transfer/LanTransferSidebar.tsx:56
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:272
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:288
@@ -373,9 +373,15 @@ msgstr "上级目录"
 msgid "下一个"
 msgstr "下一个"
 
-#: src/features/bt/BtPreviewScreen.tsx:163
-#: src/features/bt/components/AddTorrentDialog.tsx:308
-#: src/features/bt/components/BtStatsBar.tsx:62
+#: src/features/bt/BtPreviewScreen.tsx:157
+#: src/features/bt/BtTool.tsx:600
+#: src/features/bt/BtTool.tsx:601
+#: src/features/bt/BtTool.tsx:791
+#: src/features/bt/components/AddTorrentDialog.tsx:327
+#: src/features/bt/components/BtStatsBar.tsx:68
+#: src/features/bt/components/CacheManager.tsx:253
+#: src/features/bt/components/CacheManager.tsx:254
+#: src/features/bt/components/CacheManager.tsx:299
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
 #: src/features/media-compress/components/CompressResultCard.tsx:70
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:266
@@ -391,14 +397,25 @@ msgstr "下载 {entryName}"
 msgid "下载 {entryName2}"
 msgstr "下载 {entryName2}"
 
-#: src/features/bt/components/BtStatsBar.tsx:21
+#: src/features/bt/BtTool.tsx:782
+#: src/features/bt/components/CacheManager.tsx:290
+msgid "下载 {pendingSaveLabel}"
+msgstr "下载 {pendingSaveLabel}"
+
+#: src/features/bt/BtTool.tsx:559
+#: src/features/bt/components/BtStatsBar.tsx:23
 #: src/features/settings/AppSettingsMenu.tsx:116
+#: src/store/transfers.ts:9
 msgid "下载中"
 msgstr "下载中"
 
 #: src/lib/updater.ts:361
 msgid "下载完成，正在安装更新…"
 msgstr "下载完成，正在安装更新…"
+
+#: src/features/bt/components/AddTorrentDialog.tsx:311
+msgid "下载完成后才写入该目录"
+msgstr "下载完成后才写入该目录"
 
 #: src/features/poetry/LibraryManagePage.tsx:429
 msgid "下载所选"
@@ -526,7 +543,7 @@ msgstr "仅支持 MP4、MOV、M4V 格式"
 msgid "仅支持 PNG、JPG、WebP 格式"
 msgstr "仅支持 PNG、JPG、WebP 格式"
 
-#: src/features/preview/PreviewSurface.tsx:118
+#: src/features/preview/PreviewSurface.tsx:132
 msgid "仅显示开头部分"
 msgstr "仅显示开头部分"
 
@@ -542,7 +559,7 @@ msgstr "从左侧列表选择一篇，或试试每日一诗。"
 msgid "从本地 tar.gz 导入…"
 msgstr "从本地 tar.gz 导入…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:170
+#: src/features/bt/components/AddTorrentDialog.tsx:184
 msgid "任务已添加，可在传输面板查看进度"
 msgstr "任务已添加，可在传输面板查看进度"
 
@@ -589,7 +606,7 @@ msgstr "你输了"
 msgid "使用 -_ 替换 +/，并省略填充"
 msgstr "使用 -_ 替换 +/，并省略填充"
 
-#: src/features/bt/components/CacheManager.tsx:118
+#: src/features/bt/components/CacheManager.tsx:230
 msgid "使用中"
 msgstr "使用中"
 
@@ -619,7 +636,9 @@ msgstr "修改日期"
 msgid "修改时间"
 msgstr "修改时间"
 
-#: src/features/bt/components/BtStatsBar.tsx:18
+#: src/features/bt/BtTool.tsx:554
+#: src/features/bt/components/BtStatsBar.tsx:20
+#: src/store/transfers.ts:10
 msgid "做种中"
 msgstr "做种中"
 
@@ -691,7 +710,7 @@ msgstr "共享目录"
 
 #. Button that closes an SSH session tab
 #. Button that closes the CodeMirror search panel
-#: src/features/bt/BtPreviewScreen.tsx:168
+#: src/features/bt/BtPreviewScreen.tsx:162
 #: src/features/formatter/FormatterTool.tsx:93
 #: src/features/poetry/components/SearchBar.tsx:103
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:136
@@ -769,7 +788,7 @@ msgstr "写入、执行"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:295
 #: src/features/media-compress/video/VideoCompressPanel.tsx:218
-#: src/store/transfers.ts:304
+#: src/store/transfers.ts:316
 msgid "准备中"
 msgstr "准备中"
 
@@ -806,11 +825,11 @@ msgstr "创建房间"
 msgid "创建时间"
 msgstr "创建时间"
 
-#: src/features/bt/BtTool.tsx:426
-#: src/features/bt/BtTool.tsx:427
-#: src/features/bt/BtTool.tsx:532
-#: src/features/bt/components/CacheManager.tsx:129
-#: src/features/bt/components/CacheManager.tsx:130
+#: src/features/bt/BtTool.tsx:663
+#: src/features/bt/BtTool.tsx:664
+#: src/features/bt/BtTool.tsx:769
+#: src/features/bt/components/CacheManager.tsx:270
+#: src/features/bt/components/CacheManager.tsx:271
 #: src/features/logs/LogPageLayout.tsx:108
 #: src/features/poetry/LibraryManagePage.tsx:524
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:42
@@ -826,7 +845,7 @@ msgstr "删除"
 msgid "删除 {name}"
 msgstr "删除 {name}"
 
-#: src/features/bt/BtTool.tsx:514
+#: src/features/bt/BtTool.tsx:751
 msgid "删除 {pendingDeleteLabel}"
 msgstr "删除 {pendingDeleteLabel}"
 
@@ -839,12 +858,12 @@ msgstr "删除主机"
 msgid "删除共享目录"
 msgstr "删除共享目录"
 
-#: src/features/bt/BtTool.tsx:517
+#: src/features/bt/BtTool.tsx:754
 #: src/features/logs/LogPageLayout.tsx:100
 msgid "删除后无法恢复。"
 msgstr "删除后无法恢复。"
 
-#: src/features/bt/BtTool.tsx:526
+#: src/features/bt/BtTool.tsx:763
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:30
 msgid "删除文件"
 msgstr "删除文件"
@@ -913,12 +932,12 @@ msgstr "加密文件，请输入密码"
 msgid "加解密"
 msgstr "加解密"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:198
 #: src/features/bt/components/AddTorrentDialog.tsx:212
+#: src/features/bt/components/AddTorrentDialog.tsx:226
 #: src/features/bt/components/PeersDialog.tsx:66
 #: src/features/poetry/components/PoemList.tsx:142
 #: src/features/preview/PreviewScreen.tsx:49
-#: src/features/preview/PreviewSurface.tsx:136
+#: src/features/preview/PreviewSurface.tsx:150
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:190
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:316
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:281
@@ -1053,8 +1072,12 @@ msgid "发现设备"
 msgstr "发现设备"
 
 #: src/components/ui/prompt-dialog.tsx:101
-#: src/features/bt/BtTool.tsx:530
-#: src/features/bt/components/AddTorrentDialog.tsx:296
+#: src/features/bt/BtTool.tsx:644
+#: src/features/bt/BtTool.tsx:645
+#: src/features/bt/BtTool.tsx:767
+#: src/features/bt/BtTool.tsx:789
+#: src/features/bt/components/AddTorrentDialog.tsx:315
+#: src/features/bt/components/CacheManager.tsx:297
 #: src/features/export/ExportDialog.tsx:162
 #: src/features/export/ImportDialog.tsx:181
 #: src/features/games/engine/GameHeaderControls.tsx:52
@@ -1305,18 +1328,20 @@ msgstr "在数据管理页勾选合集并下载，即可离线浏览。"
 msgid "在线"
 msgstr "在线"
 
-#: src/features/bt/BtTool.tsx:382
+#: src/features/bt/BtTool.tsx:526
 #: src/features/bt/components/TorrentFileList.tsx:143
 #: src/features/bt/components/TorrentFileList.tsx:144
 #: src/features/transfers/TransferPanel.tsx:473
 msgid "在线预览"
 msgstr "在线预览"
 
-#: src/features/bt/BtTool.tsx:251
+#: src/features/bt/BtTool.tsx:327
+#: src/features/bt/BtTool.tsx:400
+#: src/features/bt/components/CacheManager.tsx:134
 msgid "在线预览失败"
 msgstr "在线预览失败"
 
-#: src/features/bt/components/CacheManager.tsx:60
+#: src/features/bt/components/CacheManager.tsx:166
 msgid "在线预览缓存"
 msgstr "在线预览缓存"
 
@@ -1353,7 +1378,7 @@ msgstr "处理结果预览"
 msgid "备注"
 msgstr "备注"
 
-#: src/features/bt/BtTool.tsx:501
+#: src/features/bt/BtTool.tsx:738
 #: src/features/formatter/FormatterTool.tsx:254
 #: src/features/lan-transfer/LanTransferTool.tsx:370
 msgid "复制"
@@ -1390,7 +1415,7 @@ msgstr "大小"
 #: src/features/logs/ActivityLogsPage.tsx:183
 #: src/features/logs/ActivityLogsPage.tsx:259
 #: src/features/logs/ActivityLogsPage.tsx:339
-#: src/store/transfers.ts:164
+#: src/store/transfers.ts:176
 msgid "失败"
 msgstr "失败"
 
@@ -1420,8 +1445,8 @@ msgstr "安装"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:50
 #: src/features/media-compress/image/ImageCompressPanel.tsx:293
 #: src/features/media-compress/video/VideoCompressPanel.tsx:213
-#: src/store/transfers.ts:111
-#: src/store/transfers.ts:161
+#: src/store/transfers.ts:125
+#: src/store/transfers.ts:173
 msgid "完成"
 msgstr "完成"
 
@@ -1650,7 +1675,7 @@ msgstr "已允许访问"
 msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
-#: src/features/bt/BtTool.tsx:310
+#: src/features/bt/BtTool.tsx:436
 #: src/features/poetry/LibraryManagePage.tsx:336
 #: src/features/vault/VaultTool.tsx:237
 msgid "已删除"
@@ -1677,9 +1702,9 @@ msgstr "已删除共享目录"
 msgid "已删除白名单"
 msgstr "已删除白名单"
 
-#: src/features/bt/BtTool.tsx:392
+#: src/features/bt/BtTool.tsx:536
 #: src/features/lan-transfer/LanTransferSidebar.tsx:52
-#: src/store/transfers.ts:163
+#: src/store/transfers.ts:175
 msgid "已取消"
 msgstr "已取消"
 
@@ -1692,7 +1717,7 @@ msgstr "已取消任务"
 msgid "已取消压缩"
 msgstr "已取消压缩"
 
-#: src/features/bt/BtTool.tsx:498
+#: src/features/bt/BtTool.tsx:735
 #: src/features/formatter/FormatterTool.tsx:203
 msgid "已复制"
 msgstr "已复制"
@@ -1725,7 +1750,7 @@ msgstr "已安装"
 msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "已安装 {toLocaleStringValue3} 条，约 14MB"
 
-#: src/features/bt/components/BtStatsBar.tsx:18
+#: src/features/bt/components/BtStatsBar.tsx:20
 msgid "已完成"
 msgstr "已完成"
 
@@ -1770,8 +1795,10 @@ msgstr "已断开 {hostLabel}"
 msgid "已断开设备"
 msgstr "已断开设备"
 
-#: src/features/bt/components/BtStatsBar.tsx:19
-#: src/store/transfers.ts:229
+#: src/features/bt/BtTool.tsx:552
+#: src/features/bt/components/BtStatsBar.tsx:21
+#: src/store/transfers.ts:11
+#: src/store/transfers.ts:241
 msgid "已暂停"
 msgstr "已暂停"
 
@@ -1783,7 +1810,7 @@ msgstr "已添加共享目录"
 msgid "已添加白名单"
 msgstr "已添加白名单"
 
-#: src/features/bt/components/CacheManager.tsx:88
+#: src/features/bt/components/CacheManager.tsx:194
 msgid "已清除 {removed} 个缓存任务"
 msgstr "已清除 {removed} 个缓存任务"
 
@@ -1800,7 +1827,7 @@ msgid "已解压到 {outName}"
 msgstr "已解压到 {outName}"
 
 #: src/features/bt/BtPreviewScreen.tsx:105
-#: src/features/bt/BtTool.tsx:190
+#: src/features/bt/BtTool.tsx:266
 msgid "已转存到本地"
 msgstr "已转存到本地"
 
@@ -1831,7 +1858,7 @@ msgstr "并发上限"
 msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
 
-#: src/features/preview/PreviewSurface.tsx:149
+#: src/features/preview/PreviewSurface.tsx:163
 msgid "建议下载后用外部播放器打开"
 msgstr "建议下载后用外部播放器打开"
 
@@ -1956,10 +1983,14 @@ msgstr "所有日志记录都会被删除，且无法恢复。"
 msgid "所有者"
 msgstr "所有者"
 
-#: src/store/transfers.ts:131
+#: src/store/transfers.ts:13
 msgid "打包中"
 msgstr "打包中"
 
+#: src/features/bt/BtTool.tsx:589
+#: src/features/bt/BtTool.tsx:590
+#: src/features/bt/components/CacheManager.tsx:242
+#: src/features/bt/components/CacheManager.tsx:243
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:182
 msgid "打开"
 msgstr "打开"
@@ -2104,7 +2135,7 @@ msgstr "操作"
 msgid "操作失败"
 msgstr "操作失败"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:204
+#: src/features/bt/components/AddTorrentDialog.tsx:218
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "支持磁力链接与本地 .torrent 文件"
 
@@ -2254,11 +2285,13 @@ msgstr "显示密码"
 msgid "暂不支持该算法"
 msgstr "暂不支持该算法"
 
+#: src/features/bt/BtTool.tsx:618
+#: src/features/bt/BtTool.tsx:619
 #: src/features/transfers/TransferPanel.tsx:481
 msgid "暂停"
 msgstr "暂停"
 
-#: src/features/bt/BtTool.tsx:343
+#: src/features/bt/BtTool.tsx:470
 msgid "暂无下载任务"
 msgstr "暂无下载任务"
 
@@ -2277,6 +2310,10 @@ msgstr "暂无共享目录"
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:47
 msgid "暂无发现设备"
 msgstr "暂无发现设备"
+
+#: src/features/bt/BtTool.tsx:557
+msgid "暂无可用节点"
+msgstr "暂无可用节点"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:193
 msgid "暂无密钥"
@@ -2371,6 +2408,10 @@ msgstr "服务运行中，端口、接收目录、安全模式和权限需停止
 msgid "未安装；仅点击时下载，可随时删除"
 msgstr "未安装；仅点击时下载，可随时删除"
 
+#: src/features/bt/BtTool.tsx:562
+msgid "未运行"
+msgstr "未运行"
+
 #: src/features/lan-transfer/LanShareDialog.tsx:112
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:221
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:137
@@ -2424,8 +2465,8 @@ msgstr "查看 GitHub Release 获取更新内容"
 msgid "查看更新"
 msgstr "查看更新"
 
-#: src/features/bt/BtTool.tsx:404
-#: src/features/bt/components/BtStatsBar.tsx:81
+#: src/features/bt/BtTool.tsx:575
+#: src/features/bt/components/BtStatsBar.tsx:87
 msgid "查看节点明细"
 msgstr "查看节点明细"
 
@@ -2505,7 +2546,7 @@ msgstr "正在下载版本 {stateVersion3}"
 msgid "正在下载语料"
 msgstr "正在下载语料"
 
-#: src/features/bt/BtPreviewScreen.tsx:146
+#: src/features/bt/BtPreviewScreen.tsx:140
 msgid "正在准备在线预览…"
 msgstr "正在准备在线预览…"
 
@@ -2534,7 +2575,7 @@ msgstr "正在加载物理引擎…"
 msgid "正在加载系统监控…"
 msgstr "正在加载系统监控…"
 
-#: src/store/transfers.ts:191
+#: src/store/transfers.ts:203
 msgid "正在取消"
 msgstr "正在取消"
 
@@ -2583,7 +2624,7 @@ msgstr "正在检索…"
 msgid "正在移动 {name}…"
 msgstr "正在移动 {name}…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:248
+#: src/features/bt/components/AddTorrentDialog.tsx:262
 msgid "正在获取资源信息…"
 msgstr "正在获取资源信息…"
 
@@ -2663,19 +2704,19 @@ msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
 msgid "深色"
 msgstr "深色"
 
-#: src/features/bt/BtTool.tsx:324
-#: src/features/bt/BtTool.tsx:348
+#: src/features/bt/BtTool.tsx:451
+#: src/features/bt/BtTool.tsx:475
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:48
 #: src/features/lan-transfer/LanShareDialog.tsx:141
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:334
 msgid "添加"
 msgstr "添加"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:200
+#: src/features/bt/components/AddTorrentDialog.tsx:214
 msgid "添加 BT 任务"
 msgstr "添加 BT 任务"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:173
+#: src/features/bt/components/AddTorrentDialog.tsx:187
 msgid "添加下载任务失败"
 msgstr "添加下载任务失败"
 
@@ -2696,11 +2737,11 @@ msgstr "清台"
 msgid "清台完成！"
 msgstr "清台完成！"
 
-#: src/features/bt/BtTool.tsx:281
+#: src/features/bt/BtTool.tsx:357
 msgid "清理预览缓存失败"
 msgstr "清理预览缓存失败"
 
-#: src/features/bt/components/CacheManager.tsx:96
+#: src/features/bt/components/CacheManager.tsx:202
 #: src/features/crypto/CryptoTool.tsx:120
 #: src/features/formatter/FormatterTool.tsx:263
 #: src/features/games/billiards/BilliardsModeMenu.tsx:166
@@ -2917,10 +2958,10 @@ msgstr "确认码"
 msgid "确认码 {statusConfirmationCode}"
 msgstr "确认码 {statusConfirmationCode}"
 
-#: src/features/bt/BtTool.tsx:417
-#: src/features/bt/BtTool.tsx:418
-#: src/features/bt/BtTool.tsx:488
-#: src/features/bt/components/AddTorrentDialog.tsx:220
+#: src/features/bt/BtTool.tsx:654
+#: src/features/bt/BtTool.tsx:655
+#: src/features/bt/BtTool.tsx:725
+#: src/features/bt/components/AddTorrentDialog.tsx:234
 msgid "磁力链接"
 msgstr "磁力链接"
 
@@ -3096,21 +3137,23 @@ msgstr "结果"
 msgid "结果会实时显示在这里"
 msgstr "结果会实时显示在这里"
 
+#: src/features/bt/BtTool.tsx:618
+#: src/features/bt/BtTool.tsx:619
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:436
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:448
 #: src/features/transfers/TransferPanel.tsx:481
 msgid "继续"
 msgstr "继续"
 
-#: src/store/transfers.ts:238
+#: src/store/transfers.ts:250
 msgid "继续传输中"
 msgstr "继续传输中"
 
-#: src/features/preview/PreviewSurface.tsx:134
+#: src/features/preview/PreviewSurface.tsx:148
 msgid "缓冲中…"
 msgstr "缓冲中…"
 
-#: src/features/bt/BtTool.tsx:387
+#: src/features/bt/BtTool.tsx:531
 msgid "缓存已清理"
 msgstr "缓存已清理"
 
@@ -3215,8 +3258,8 @@ msgstr "自由球：拖动母球放置"
 msgid "至少修改其中一个名称。"
 msgstr "至少修改其中一个名称。"
 
-#: src/features/bt/BtTool.tsx:407
-#: src/features/bt/components/BtStatsBar.tsx:84
+#: src/features/bt/BtTool.tsx:578
+#: src/features/bt/components/BtStatsBar.tsx:90
 msgid "节点"
 msgstr "节点"
 
@@ -3228,11 +3271,13 @@ msgstr "节点明细"
 msgid "获取语料"
 msgstr "获取语料"
 
-#: src/features/bt/components/BtStatsBar.tsx:14
+#: src/features/bt/BtTool.tsx:550
+#: src/features/bt/components/BtStatsBar.tsx:16
+#: src/store/transfers.ts:8
 msgid "获取资源信息…"
 msgstr "获取资源信息…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:88
+#: src/features/bt/components/AddTorrentDialog.tsx:89
 msgid "获取资源信息失败"
 msgstr "获取资源信息失败"
 
@@ -3263,7 +3308,7 @@ msgstr "解压"
 msgid "解压出的文件夹"
 msgstr "解压出的文件夹"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:248
+#: src/features/bt/components/AddTorrentDialog.tsx:262
 msgid "解析"
 msgstr "解析"
 
@@ -3316,11 +3361,11 @@ msgstr "诗词列表"
 msgid "该文件夹及其全部内容将被永久删除。"
 msgstr "该文件夹及其全部内容将被永久删除。"
 
-#: src/features/preview/PreviewSurface.tsx:125
+#: src/features/preview/PreviewSurface.tsx:139
 msgid "该格式不支持预览"
 msgstr "该格式不支持预览"
 
-#: src/features/preview/PreviewSurface.tsx:146
+#: src/features/preview/PreviewSurface.tsx:160
 msgid "该格式无法在线播放（mkv 等格式支持度有限）"
 msgstr "该格式无法在线播放（mkv 等格式支持度有限）"
 
@@ -3401,7 +3446,7 @@ msgstr "读取信息"
 
 #: src/features/poetry/LibraryManagePage.tsx:142
 #: src/features/poetry/LibraryPage.tsx:173
-#: src/features/preview/PreviewSurface.tsx:154
+#: src/features/preview/PreviewSurface.tsx:169
 msgid "读取失败"
 msgstr "读取失败"
 
@@ -3465,10 +3510,17 @@ msgid "跳转到行"
 msgstr "跳转到行"
 
 #: src/features/bt/BtPreviewScreen.tsx:108
-#: src/features/bt/BtPreviewScreen.tsx:134
-#: src/features/bt/BtTool.tsx:194
+#: src/features/bt/BtPreviewScreen.tsx:128
+#: src/features/bt/BtTool.tsx:270
+#: src/features/bt/BtTool.tsx:414
+#: src/features/bt/components/CacheManager.tsx:149
 msgid "转存失败"
 msgstr "转存失败"
+
+#: src/features/bt/BtTool.tsx:785
+#: src/features/bt/components/CacheManager.tsx:293
+msgid "转存完成后会从缓存中移除。"
+msgstr "转存完成后会从缓存中移除。"
 
 #: src/features/games/go/GoMatch.tsx:235
 #: src/features/games/gomoku/GomokuMatch.tsx:216
@@ -3639,9 +3691,9 @@ msgstr "选择上传文件"
 msgid "选择上传文件夹"
 msgstr "选择上传文件夹"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:281
-#: src/features/bt/components/AddTorrentDialog.tsx:288
-#: src/features/bt/components/AddTorrentDialog.tsx:289
+#: src/features/bt/components/AddTorrentDialog.tsx:295
+#: src/features/bt/components/AddTorrentDialog.tsx:302
+#: src/features/bt/components/AddTorrentDialog.tsx:303
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:129
 msgid "选择保存位置"
 msgstr "选择保存位置"
@@ -3704,8 +3756,8 @@ msgstr "选择视频后显示预估体积"
 msgid "选择私钥文件"
 msgstr "选择私钥文件"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:230
-#: src/features/bt/components/AddTorrentDialog.tsx:231
+#: src/features/bt/components/AddTorrentDialog.tsx:244
+#: src/features/bt/components/AddTorrentDialog.tsx:245
 msgid "选择种子文件"
 msgstr "选择种子文件"
 
@@ -3753,7 +3805,7 @@ msgstr "递归按字母升序排序对象键"
 msgid "递归按字母降序排序对象键"
 msgstr "递归按字母降序排序对象键"
 
-#: src/features/bt/components/CacheManager.tsx:67
+#: src/features/bt/components/CacheManager.tsx:173
 msgid "配额 GB"
 msgstr "配额 GB"
 
@@ -3801,6 +3853,9 @@ msgstr "重新开始对局？"
 msgid "重新检查"
 msgstr "重新检查"
 
+#: src/features/bt/BtTool.tsx:631
+#: src/features/bt/BtTool.tsx:632
+#: src/features/preview/PreviewSurface.tsx:173
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:165
 #: src/features/transfers/TransferPanel.tsx:512
 #: src/features/transfers/TransferPanel.tsx:521
@@ -3812,7 +3867,9 @@ msgstr "重试"
 msgid "链接"
 msgstr "链接"
 
-#: src/features/bt/components/BtStatsBar.tsx:20
+#: src/features/bt/BtTool.tsx:544
+#: src/features/bt/components/BtStatsBar.tsx:22
+#: src/store/transfers.ts:12
 msgid "错误"
 msgstr "错误"
 

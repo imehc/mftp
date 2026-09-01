@@ -17,6 +17,7 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { systemDownloadDir } from "../file-actions";
 import TorrentFileList from "./TorrentFileList";
 export interface AddTorrentDialogProps {
   open: boolean;
@@ -127,6 +128,18 @@ export default function AddTorrentDialog({
       void doProbeOnOpen(initialSource);
     });
   }, [initialProbe, initialSource, open]);
+  // 保存位置默认跟随系统下载文件夹。用 setState 回调判空，这样在解析
+  // 返回之前就自己选了目录的情况下不会被覆盖。
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    void systemDownloadDir().then((dir) => {
+      if (!cancelled && dir) setDestDir((prev) => prev || dir);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
   const toggleFile = (index: number) => {
     if (index < 0 || !probe) {
       // -1 = 来自表头行的“全选”信号：依据当前是否已全选来整体翻转。
@@ -147,6 +160,7 @@ export default function AddTorrentDialog({
     const picked = await openDialog({
       multiple: false,
       directory: true,
+      defaultPath: destDir || undefined,
     });
     if (typeof picked === "string") setDestDir(picked);
   };
@@ -291,6 +305,11 @@ export default function AddTorrentDialog({
                 <FolderOpen />
               </Button>
             </div>
+            {/* 下载中的文件在隐藏暂存目录里，下完才迁入这里；不说明的话
+                用户会以为没在下载。 */}
+            <p className="text-muted-foreground shrink-0 text-xs">
+              <Trans>下载完成后才写入该目录</Trans>
+            </p>
             <DialogFooter className="shrink-0">
               <Button variant="ghost" onClick={close}>
                 <Trans>取消</Trans>

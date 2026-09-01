@@ -1,4 +1,4 @@
-//! BT download setup and multi-file archive finalization.
+//! BT download setup, staging hand-off, and multi-file archive finalization.
 
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
@@ -9,7 +9,8 @@ use std::time::Duration;
 use librqbit::{Session, TorrentStatsState};
 
 use super::export::{
-    archive_target, pack_tar, partial_archive_path, remove_file_if_exists, selected_export_files,
+    archive_target, move_export_file, pack_tar, partial_archive_path, remove_file_if_exists,
+    selected_export_files,
 };
 use super::{
     find_handle, info_hash_hex, parse_info_hash, same_dir, BtManager, BtTaskInfo, TorrentHandle,
@@ -19,6 +20,30 @@ use crate::storage::bt::BtTaskRow;
 use crate::transfer::emit_transfer_progress_with_finish;
 
 const ARCHIVE_PHASE: &str = "bt:packaging";
+const DOWNLOAD_PHASE: &str = "bt:downloading";
+
+/// Hidden staging folder created inside the user's download directory. The
+/// engine pre-allocates every selected file at full length and fills it in
+/// piece order, so a download in progress is a sparse file that no player can
+/// open. Keeping that out of sight until it is complete is why downloads stage
+/// at all; keeping the staging dir *inside* the destination is what makes the
+/// hand-off a rename instead of a second full copy.
+const PART_DIR_NAME: &str = ".mftp-part";
+
+pub(super) fn part_root(dest_dir: &Path) -> PathBuf {
+    dest_dir.join(PART_DIR_NAME)
+}
+
+fn part_dir_for(dest_dir: &Path, info_hash: &str) -> PathBuf {
+    part_root(dest_dir).join(info_hash)
+}
+
+/// Whether this row downloads into its own part dir. False for preview rows
+/// (they own a cache dir), for archive rows (they stage in app data), and for
+/// rows created before staging existed — those keep finishing in place.
+pub(super) fn stages_into_part_dir(row: &BtTaskRow) -> bool {
+    row.mode == "download" && row.package_mode == "direct" && row.work_dir != row.dest_dir
+}
 
 impl BtManager {
     pub async fn add_download(
@@ -44,10 +69,13 @@ impl BtManager {
         } else {
             "direct"
         };
+        // Both modes download out of sight and only publish the finished
+        // result: archives need a scratch tree to pack from, plain downloads
+        // must not leave a half-written placeholder in the user's folder.
         let work_dir = if package_mode == "archive" {
             self.staging_dir_for(&expected_info_hash)?
         } else {
-            PathBuf::from(&dest_dir)
+            part_dir_for(Path::new(&dest_dir), &expected_info_hash)
         };
         std::fs::create_dir_all(&work_dir)
             .map_err(|error| AppError(format!("创建下载暂存目录失败: {error}")))?;
@@ -68,6 +96,11 @@ impl BtManager {
             let hash = parse_info_hash(&expected_info_hash)?;
             if let Some(handle) = find_handle(&session, &hash)? {
                 if matches!(handle.stats().state, TorrentStatsState::Error) {
+                    // The running finalize job holds this handle and would
+                    // report the error as the task's outcome moments after the
+                    // fresh add succeeds.
+                    self.cancel_finalize_job(&expected_info_hash);
+                    self.wait_for_finalize_job(&expected_info_hash).await?;
                     session
                         .delete(hash.into(), false)
                         .await
@@ -88,11 +121,16 @@ impl BtManager {
             .await?;
         let actual_hash = info_hash_hex(&handle);
         if actual_hash != expected_info_hash {
-            let _ = session
-                .delete(handle.info_hash().into(), package_mode == "archive")
-                .await;
+            // Whatever was written landed in a work dir we own, so drop it
+            // with the torrent instead of leaving it behind.
+            let _ = session.delete(handle.info_hash().into(), true).await;
+            let _ = std::fs::remove_dir(&work_dir);
             return Err(AppError("资源标识与解析结果不一致".into()));
         }
+
+        // Restored tasks come back parked (see pause_restored_torrents);
+        // pressing download again is an explicit request to run.
+        self.unpause_task(&session, &actual_hash).await;
 
         let total = validate_selection(&handle, &file_indices)?;
         let label = handle.name().unwrap_or_else(|| actual_hash.clone());
@@ -123,9 +161,9 @@ impl BtManager {
             last_error: None,
         };
         self.storage.upsert_bt_task(&row)?;
-        if package_mode == "archive" {
-            self.start_archive_job(&session, row.clone(), handle);
-        }
+        // Both modes need a watcher: the archive job packs on completion, the
+        // plain download moves its finished file into the user's folder.
+        self.start_finalize_job(&session, row.clone(), handle);
         Ok(self.task_info_with_live(row))
     }
 
@@ -171,8 +209,8 @@ impl BtManager {
         session: &Arc<Session>,
         info_hash: &str,
     ) -> AppResult<()> {
-        self.cancel_archive_job(info_hash);
-        self.wait_for_archive_job(info_hash).await?;
+        self.cancel_finalize_job(info_hash);
+        self.wait_for_finalize_job(info_hash).await?;
         let row = self.storage.get_bt_task(info_hash)?;
         let hash = parse_info_hash(info_hash)?;
         if find_handle(session, &hash)?.is_some() {
@@ -192,7 +230,9 @@ impl BtManager {
         Ok(())
     }
 
-    pub(super) fn start_archive_job(
+    /// Arm the watcher that turns a finished download into its published
+    /// result. One job per task; a second call while one runs is a no-op.
+    pub(super) fn start_finalize_job(
         &self,
         session: &Arc<Session>,
         row: BtTaskRow,
@@ -200,7 +240,7 @@ impl BtManager {
     ) {
         let cancelled = Arc::new(AtomicBool::new(false));
         let inserted = self
-            .archive_jobs
+            .finalize_jobs
             .lock()
             .map(|mut jobs| {
                 if jobs.contains_key(&row.info_hash) {
@@ -214,32 +254,32 @@ impl BtManager {
         if !inserted {
             return;
         }
-        let context = ArchiveContext {
+        let context = FinalizeContext {
             app: self.app.clone(),
             storage: self.storage.clone(),
             session: session.clone(),
-            jobs: self.archive_jobs.clone(),
-            gate: self.archive_gate.clone(),
+            jobs: self.finalize_jobs.clone(),
+            gate: self.finalize_gate.clone(),
             cancelled,
             row,
             handle,
         };
-        tokio::spawn(async move { run_archive_job(context).await });
+        tokio::spawn(async move { run_finalize_job(context).await });
     }
 
-    pub(super) fn cancel_archive_job(&self, info_hash: &str) {
-        if let Ok(jobs) = self.archive_jobs.lock() {
+    pub(super) fn cancel_finalize_job(&self, info_hash: &str) {
+        if let Ok(jobs) = self.finalize_jobs.lock() {
             if let Some(cancelled) = jobs.get(info_hash) {
                 cancelled.store(true, Ordering::SeqCst);
             }
         }
     }
 
-    pub(super) async fn wait_for_archive_job(&self, info_hash: &str) -> AppResult<()> {
+    pub(super) async fn wait_for_finalize_job(&self, info_hash: &str) -> AppResult<()> {
         let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
         loop {
             let running = self
-                .archive_jobs
+                .finalize_jobs
                 .lock()
                 .map(|jobs| jobs.contains_key(info_hash))
                 .unwrap_or(false);
@@ -253,7 +293,30 @@ impl BtManager {
         }
     }
 
-    pub(super) async fn resume_archive_jobs(&self, session: &Arc<Session>) {
+    pub(super) async fn resume_finalize_jobs(&self, session: &Arc<Session>) {
+        self.resume_archive_jobs(session).await;
+        self.resume_direct_jobs(session).await;
+    }
+
+    /// Re-arm plain downloads. Their file may well have completed while the app
+    /// was closed, in which case the job moves it out on the first tick.
+    /// Without a handle the engine lost the torrent; leave the row active and
+    /// let re-adding it restore both.
+    async fn resume_direct_jobs(&self, session: &Arc<Session>) {
+        let Ok(rows) = self.storage.list_bt_direct_downloads() else {
+            return;
+        };
+        for row in rows {
+            let Ok(hash) = parse_info_hash(&row.info_hash) else {
+                continue;
+            };
+            if let Ok(Some(handle)) = find_handle(session, &hash) {
+                self.start_finalize_job(session, row, handle);
+            }
+        }
+    }
+
+    async fn resume_archive_jobs(&self, session: &Arc<Session>) {
         let Ok(rows) = self.storage.list_bt_archive_tasks() else {
             return;
         };
@@ -288,7 +351,7 @@ impl BtManager {
                 continue;
             }
             if let Ok(Some(handle)) = find_handle(session, &hash) {
-                self.start_archive_job(session, row, handle);
+                self.start_finalize_job(session, row, handle);
             } else {
                 let _ = self.storage.update_bt_task_state(
                     &row.info_hash,
@@ -301,23 +364,30 @@ impl BtManager {
     }
 
     pub(super) fn remove_owned_task_dir(&self, row: &BtTaskRow) -> AppResult<()> {
-        let candidate = if row.mode == "preview" {
-            self.cache_root()?.join(&row.info_hash)
-        } else if row.package_mode == "archive" {
-            PathBuf::from(&row.work_dir)
-        } else {
-            return Ok(());
-        };
-        let allowed_root = if row.mode == "preview" {
-            self.cache_root()?
-        } else {
-            self.staging_root()?
-        };
-        remove_owned_hash_dir(&allowed_root, &candidate, &row.info_hash)
+        if row.mode == "preview" {
+            let root = self.cache_root()?;
+            return remove_owned_hash_dir(&root, &root.join(&row.info_hash), &row.info_hash);
+        }
+        if row.package_mode == "archive" {
+            return remove_owned_hash_dir(
+                &self.staging_root()?,
+                Path::new(&row.work_dir),
+                &row.info_hash,
+            );
+        }
+        if stages_into_part_dir(row) {
+            return remove_part_dir(row);
+        }
+        Ok(())
     }
 
     pub(super) fn cleanup_orphan_owned_dirs(&self, session: &Session) {
         let mut referenced = HashSet::new();
+        let mut roots: HashSet<PathBuf> = [self.cache_root(), self.staging_root()]
+            .into_iter()
+            .flatten()
+            .collect();
+        let mut part_roots = HashSet::new();
         if let Ok(rows) = self.storage.list_bt_tasks() {
             for row in rows {
                 if row.mode == "preview" {
@@ -326,6 +396,15 @@ impl BtManager {
                     }
                 } else if row.package_mode == "archive" {
                     referenced.insert(PathBuf::from(row.work_dir));
+                } else if stages_into_part_dir(&row) {
+                    // Part dirs sit in the user's own folder, so the only way
+                    // to learn their root is from the rows that use it.
+                    part_roots.insert(part_root(Path::new(&row.dest_dir)));
+                    // A finished or cancelled row has already handed its file
+                    // over; anything still on disk there is leftover bulk.
+                    if !matches!(row.status.as_str(), "completed" | "cancelled") {
+                        referenced.insert(PathBuf::from(row.work_dir));
+                    }
                 }
             }
         }
@@ -338,11 +417,9 @@ impl BtManager {
             }
         });
         referenced.extend(session_dirs.into_inner());
-        for root in [self.cache_root(), self.staging_root()]
-            .into_iter()
-            .flatten()
-        {
-            let Ok(entries) = std::fs::read_dir(&root) else {
+        roots.extend(part_roots.iter().cloned());
+        for root in &roots {
+            let Ok(entries) = std::fs::read_dir(root) else {
                 continue;
             };
             for entry in entries.flatten() {
@@ -360,10 +437,13 @@ impl BtManager {
                 }
             }
         }
+        for root in part_roots {
+            let _ = std::fs::remove_dir(root);
+        }
     }
 }
 
-struct ArchiveContext {
+struct FinalizeContext {
     app: tauri::AppHandle,
     storage: crate::storage::Storage,
     session: Arc<Session>,
@@ -374,8 +454,13 @@ struct ArchiveContext {
     handle: TorrentHandle,
 }
 
-async fn run_archive_job(context: ArchiveContext) {
-    let result = finalize_archive(&context).await;
+async fn run_finalize_job(context: FinalizeContext) {
+    let archive = context.row.package_mode == "archive";
+    let result = if archive {
+        finalize_archive(&context).await
+    } else {
+        finalize_direct(&context).await
+    };
     if let Ok(mut jobs) = context.jobs.lock() {
         jobs.remove(&context.row.info_hash);
     }
@@ -390,30 +475,115 @@ async fn run_archive_job(context: ArchiveContext) {
             None,
             Some(&message),
         );
-        super::cache::emit_event(
-            &context.app,
-            &context.row.info_hash,
-            &format!("package-failed:{message}"),
-        );
+        // Archives have a dedicated event because packaging happens long after
+        // the download; a plain download reports through its row status, which
+        // the task list is already polling.
+        if archive {
+            super::cache::emit_event(
+                &context.app,
+                &context.row.info_hash,
+                &format!("package-failed:{message}"),
+            );
+        }
     }
 }
 
-async fn finalize_archive(context: &ArchiveContext) -> AppResult<()> {
+/// Wait until every selected piece is on disk. Neither finalize path may touch
+/// the files before this returns.
+async fn wait_until_finished(handle: &TorrentHandle, cancelled: &AtomicBool) -> AppResult<()> {
     loop {
-        if context.cancelled.load(Ordering::SeqCst) {
+        if cancelled.load(Ordering::SeqCst) {
             return Err(AppError("任务已取消".into()));
         }
-        let stats = context.handle.stats();
+        let stats = handle.stats();
         if matches!(stats.state, TorrentStatsState::Error) {
             return Err(AppError(
                 stats.error.unwrap_or_else(|| "BT 下载失败".into()),
             ));
         }
         if stats.finished || (stats.total_bytes > 0 && stats.progress_bytes >= stats.total_bytes) {
-            break;
+            return Ok(());
         }
         tokio::time::sleep(Duration::from_millis(250)).await;
     }
+}
+
+/// Hand a finished single-file download over to the user's folder. Everything
+/// before this point happened inside the hidden part dir, so this rename is the
+/// moment the file becomes visible — and it is whole when it appears.
+async fn finalize_direct(context: &FinalizeContext) -> AppResult<()> {
+    wait_until_finished(&context.handle, &context.cancelled).await?;
+    let id = format!("bt:{}", context.row.info_hash);
+    let total = context
+        .row
+        .total_bytes
+        .unwrap_or_else(|| context.handle.stats().total_bytes);
+    let finish = |storage_result: AppResult<()>| -> AppResult<()> {
+        storage_result?;
+        emit_transfer_progress_with_finish(
+            &context.app,
+            &id,
+            DOWNLOAD_PHASE,
+            total,
+            Some(total),
+            true,
+        );
+        Ok(())
+    };
+    if !stages_into_part_dir(&context.row) {
+        // Row from before staging existed: the engine wrote straight into the
+        // user's folder, so there is nothing left to hand over.
+        return finish(context.storage.mark_bt_task_completed(
+            &context.row.info_hash,
+            (total > 0).then_some(total),
+            None,
+        ));
+    }
+
+    let _guard = context.gate.lock().await;
+    if context.cancelled.load(Ordering::SeqCst)
+        || context
+            .storage
+            .get_bt_task(&context.row.info_hash)?
+            .is_none()
+    {
+        return Err(AppError("任务已取消".into()));
+    }
+    // Metadata is only readable while the torrent is in the session, so resolve
+    // the paths before dropping it.
+    let files = selected_export_files(&context.handle, &context.row.file_indices)?;
+    let hash = parse_info_hash(&context.row.info_hash)?;
+    if find_handle(&context.session, &hash)?.is_some() {
+        // Stop seeding before moving: the engine has the file open, and there
+        // is nothing left to serve from a path we are about to empty.
+        context
+            .session
+            .delete(hash.into(), false)
+            .await
+            .map_err(|error| AppError(format!("结束下载失败: {error:#}")))?;
+    }
+    let dest_dir = PathBuf::from(&context.row.dest_dir);
+    let moved = tokio::task::spawn_blocking(move || {
+        files
+            .iter()
+            .map(|file| move_export_file(file, &dest_dir))
+            .collect::<AppResult<Vec<_>>>()
+    })
+    .await
+    .map_err(|error| AppError(format!("转存任务异常终止: {error}")))??;
+    let output = moved
+        .first()
+        .map(|path| path.to_string_lossy().into_owned());
+    let _ = remove_part_dir(&context.row);
+    finish(context.storage.mark_bt_task_completed(
+        &context.row.info_hash,
+        (total > 0).then_some(total),
+        output.as_deref(),
+    ))
+}
+
+async fn finalize_archive(context: &FinalizeContext) -> AppResult<()> {
+    wait_until_finished(&context.handle, &context.cancelled).await?;
 
     let reserved_target = context
         .row
@@ -531,6 +701,15 @@ fn validate_selection(handle: &TorrentHandle, file_indices: &[usize]) -> AppResu
     Ok(total)
 }
 
+/// Drop a plain download's part dir, then the part root if this was the last
+/// task using it, so the destination folder is left holding only the file.
+fn remove_part_dir(row: &BtTaskRow) -> AppResult<()> {
+    let root = part_root(Path::new(&row.dest_dir));
+    remove_owned_hash_dir(&root, Path::new(&row.work_dir), &row.info_hash)?;
+    let _ = std::fs::remove_dir(&root);
+    Ok(())
+}
+
 pub(super) fn remove_owned_hash_dir(
     root: &Path,
     candidate: &Path,
@@ -581,5 +760,73 @@ mod tests {
         assert_eq!(std::fs::read(&sentinel).unwrap(), b"keep");
         std::fs::remove_dir_all(root).unwrap();
         std::fs::remove_dir_all(user).unwrap();
+    }
+
+    fn direct_row(dest: &Path, hash: &str) -> BtTaskRow {
+        BtTaskRow {
+            info_hash: hash.into(),
+            label: "movie".into(),
+            dest_dir: dest.to_string_lossy().into_owned(),
+            mode: "download".into(),
+            pinned: false,
+            created_at: 1,
+            work_dir: part_root(dest).join(hash).to_string_lossy().into_owned(),
+            file_indices: vec![0],
+            package_mode: "direct".into(),
+            status: "active".into(),
+            output_path: None,
+            total_bytes: Some(7),
+            last_error: None,
+        }
+    }
+
+    #[test]
+    fn part_dir_hides_downloads_inside_the_destination() {
+        let dest = temp_dir("part");
+        let hash = "c".repeat(40);
+        let row = direct_row(&dest, &hash);
+        assert!(stages_into_part_dir(&row));
+        assert_eq!(
+            PathBuf::from(&row.work_dir),
+            dest.join(".mftp-part").join(&hash)
+        );
+        std::fs::remove_dir_all(dest).unwrap();
+    }
+
+    #[test]
+    fn legacy_rows_keep_finishing_in_place() {
+        let dest = temp_dir("legacy");
+        let hash = "d".repeat(40);
+        let mut row = direct_row(&dest, &hash);
+        row.work_dir = row.dest_dir.clone();
+        assert!(!stages_into_part_dir(&row));
+        std::fs::remove_dir_all(dest).unwrap();
+    }
+
+    #[test]
+    fn publishing_removes_the_part_dir_and_its_root() {
+        let dest = temp_dir("publish");
+        let hash = "e".repeat(40);
+        let row = direct_row(&dest, &hash);
+        std::fs::create_dir_all(&row.work_dir).unwrap();
+        std::fs::write(Path::new(&row.work_dir).join("movie.mp4"), b"payload").unwrap();
+        remove_part_dir(&row).unwrap();
+        assert!(!dest.join(".mftp-part").exists());
+        assert!(dest.exists());
+        std::fs::remove_dir_all(dest).unwrap();
+    }
+
+    #[test]
+    fn part_root_survives_while_another_task_stages_there() {
+        let dest = temp_dir("shared");
+        let mine = "f".repeat(40);
+        let other = "0".repeat(40);
+        let row = direct_row(&dest, &mine);
+        std::fs::create_dir_all(&row.work_dir).unwrap();
+        std::fs::create_dir_all(part_root(&dest).join(&other)).unwrap();
+        remove_part_dir(&row).unwrap();
+        assert!(!Path::new(&row.work_dir).exists());
+        assert!(part_root(&dest).join(&other).exists());
+        std::fs::remove_dir_all(dest).unwrap();
     }
 }

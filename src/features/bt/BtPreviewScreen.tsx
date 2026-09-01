@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { msg } from "@lingui/core/macro";
 import { listen } from "@tauri-apps/api/event";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { HardDriveDownload, LoaderCircle, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -15,6 +14,7 @@ import PreviewScreen from "~/features/preview/PreviewScreen";
 import { useTransfersStore } from "~/store/transfers";
 import BtStatsBar from "./components/BtStatsBar";
 import PeersDialog from "./components/PeersDialog";
+import { saveFileToLocal } from "./file-actions";
 import {
   markPreviewPreparation,
   previewSource,
@@ -121,16 +121,10 @@ export default function BtPreviewScreen({
 
   /** 把预览的文件保存到用户目录（播放仍会继续进行）。 */
   const download = async () => {
-    const picked = await openDialog({
-      multiple: false,
-      directory: true,
-    });
-    if (typeof picked !== "string") return;
-    setSaving(true);
     try {
-      await ipc.btSaveToLocal(infoHash, picked, fileIndex);
+      // 选目录被取消时不进入保存态；结果由 BT_TASK_EVENT 通知。
+      if (await saveFileToLocal(infoHash, fileIndex)) setSaving(true);
     } catch (e) {
-      setSaving(false);
       toast.error(t`转存失败`, {
         description: String(e),
       });
@@ -170,7 +164,13 @@ export default function BtPreviewScreen({
             </Button>
           </div>
         }
-        footer={<BtStatsBar infoHash={infoHash} onShowPeers={showPeers} />}
+        footer={
+          <BtStatsBar
+            infoHash={infoHash}
+            fileIndex={fileIndex}
+            onShowPeers={showPeers}
+          />
+        }
       />
       <PeersDialog
         task={

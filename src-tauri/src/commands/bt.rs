@@ -117,17 +117,19 @@ pub async fn bt_remove_cache(state: State<'_, AppState>, info_hash: String) -> A
 #[tauri::command]
 #[specta::specta]
 pub async fn bt_cache_items(state: State<'_, AppState>) -> AppResult<Vec<BtCacheItem>> {
-    state.bt.cache_items()
+    state.bt.cache_items().await
 }
 
-/// Live stats of one task (preview page footer polls this).
+/// Live stats of one task (preview page footer polls this). `file_index`
+/// narrows the byte counters to the previewed file.
 #[tauri::command]
 #[specta::specta]
 pub async fn bt_task_stats(
     state: State<'_, AppState>,
     info_hash: String,
+    file_index: Option<usize>,
 ) -> AppResult<BtTaskStats> {
-    state.bt.task_stats(&info_hash)
+    state.bt.task_stats(&info_hash, file_index)
 }
 
 #[tauri::command]

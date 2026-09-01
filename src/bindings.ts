@@ -155,8 +155,11 @@ export const commands = {
 	btTaskPeers: (infoHash: string) => typedError<BtPeerInfo[], AppError>(__TAURI_INVOKE("bt_task_peers", { infoHash })),
 	// Cache-pool entries for the manageable cache list.
 	btCacheItems: () => typedError<BtCacheItem[], AppError>(__TAURI_INVOKE("bt_cache_items")),
-	// Live stats of one task (preview page footer polls this).
-	btTaskStats: (infoHash: string) => typedError<BtTaskStats, AppError>(__TAURI_INVOKE("bt_task_stats", { infoHash })),
+	/**
+	 *  Live stats of one task (preview page footer polls this). `file_index`
+	 *  narrows the byte counters to the previewed file.
+	 */
+	btTaskStats: (infoHash: string, fileIndex: number | null) => typedError<BtTaskStats, AppError>(__TAURI_INVOKE("bt_task_stats", { infoHash, fileIndex })),
 };
 
 /* Types */
@@ -209,6 +212,11 @@ export type BtCacheItem = {
 	 */
 	pinned: boolean,
 	streaming: boolean,
+	/**
+	 *  The task's selected files, so the cache list can offer open/save-as.
+	 *  Empty while the engine has no handle for this task.
+	 */
+	files: BtFileMeta[],
 };
 
 export type BtCacheStats = {
@@ -268,6 +276,17 @@ export type BtTaskInfo = {
 	progress: number | null,
 	finished: boolean,
 	peersLive: number,
+	/**
+	 *  Live engine state; None while the engine is down or the handle has not
+	 *  been restored yet. The transfer panel only adopts a task once this says
+	 *  it is actually downloading, so history stays out of it.
+	 */
+	state: BtTaskState | null,
+	/**
+	 *  Selected files of a preview task, so its row can offer open / save-as.
+	 *  Empty for plain downloads and while the engine has no handle.
+	 */
+	files: BtFileMeta[],
 };
 
 /**

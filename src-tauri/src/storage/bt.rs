@@ -259,6 +259,54 @@ impl Storage {
         Ok(())
     }
 
+    /// Pin down a plain download's completion. Previously "completed" was only
+    /// derived from live engine stats, so every restart replayed history as
+    /// active until handles came back. Scoped to download+direct on purpose:
+    /// for preview rows 'completed' means "cache cleared"
+    /// (`mark_bt_cache_cleared`), and archive rows are finalized by the
+    /// packaging job.
+    ///
+    /// `output_path` records where the finished file was moved to; None keeps
+    /// whatever the row already had.
+    pub fn mark_bt_task_completed(
+        &self,
+        info_hash: &str,
+        total_bytes: Option<u64>,
+        output_path: Option<&str>,
+    ) -> AppResult<()> {
+        let conn = self.conn()?;
+        let total_bytes = total_bytes
+            .map(i64::try_from)
+            .transpose()
+            .map_err(|_| crate::error::AppError("BT 任务大小超出数据库范围".into()))?;
+        conn.execute(
+            "UPDATE bt_tasks
+             SET status = 'completed', last_error = NULL,
+                 total_bytes = COALESCE(?2, total_bytes),
+                 output_path = COALESCE(?3, output_path)
+             WHERE info_hash = ?1 AND status = 'active'
+               AND mode = 'download' AND package_mode = 'direct'",
+            params![info_hash, total_bytes, output_path],
+        )?;
+        Ok(())
+    }
+
+    /// Plain downloads still waiting to finish. The engine start resumes a
+    /// finalize job for each so the finished file reaches the user's folder
+    /// even when the download completed with the app closed.
+    pub fn list_bt_direct_downloads(&self) -> AppResult<Vec<BtTaskRow>> {
+        let conn = self.conn()?;
+        query_all(
+            &conn,
+            &format!(
+                "SELECT {COLS} FROM bt_tasks
+                 WHERE mode = 'download' AND package_mode = 'direct'
+                   AND status = 'active'"
+            ),
+            &[],
+        )
+    }
+
     pub fn list_bt_archive_tasks(&self) -> AppResult<Vec<BtTaskRow>> {
         let conn = self.conn()?;
         query_all(
@@ -396,6 +444,63 @@ mod tests {
         assert!(!history.pinned);
         assert!(!storage.has_bt_access(&hash).unwrap());
         assert!(storage.list_cache_lru().unwrap().is_empty());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn completing_only_touches_plain_downloads() {
+        let root = temp_root("complete");
+        let storage = Storage::new(root.clone()).unwrap();
+
+        let direct = "d".repeat(40);
+        let mut row = sample_row(&direct);
+        row.package_mode = "direct".into();
+        row.status = "active".into();
+        row.total_bytes = None;
+        row.last_error = Some("transient".into());
+        storage.upsert_bt_task(&row).unwrap();
+
+        let preview = "e".repeat(40);
+        let mut cached = sample_row(&preview);
+        cached.mode = "preview".into();
+        cached.package_mode = "direct".into();
+        cached.status = "active".into();
+        storage.upsert_bt_task(&cached).unwrap();
+
+        let archive = "f".repeat(40);
+        let mut packing = sample_row(&archive);
+        packing.status = "active".into();
+        storage.upsert_bt_task(&packing).unwrap();
+
+        assert_eq!(
+            storage
+                .list_bt_direct_downloads()
+                .unwrap()
+                .into_iter()
+                .map(|row| row.info_hash)
+                .collect::<Vec<_>>(),
+            vec![direct.clone()]
+        );
+
+        for hash in [&direct, &preview, &archive] {
+            storage
+                .mark_bt_task_completed(hash, Some(999), Some("/downloads/movie.mp4"))
+                .unwrap();
+        }
+
+        let done = storage.get_bt_task(&direct).unwrap().unwrap();
+        assert_eq!(done.status, "completed");
+        assert_eq!(done.total_bytes, Some(999));
+        assert_eq!(done.output_path.as_deref(), Some("/downloads/movie.mp4"));
+        assert_eq!(done.last_error, None);
+        assert_eq!(
+            storage.get_bt_task(&preview).unwrap().unwrap().status,
+            "active"
+        );
+        assert_eq!(
+            storage.get_bt_task(&archive).unwrap().unwrap().status,
+            "active"
+        );
         std::fs::remove_dir_all(root).unwrap();
     }
 
