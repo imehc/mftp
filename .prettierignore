@@ -1,0 +1,13 @@
+dist
+dist-ssr
+pnpm-lock.yaml
+src-tauri
+.codebuddy
+
+# Auto-generated
+src/bindings.ts
+src/routeTree.gen.ts
+src/locales/**/messages.ts
+
+# shadcn/ui components — managed by upstream, no manual edits
+src/components/ui/**

@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { msg } from "@lingui/core/macro";
 import { translate } from "~/i18n/translate";
 import type { TransferProgress } from "~/types";
-
 export interface TransferState {
   id: string;
   label: string;
@@ -22,12 +21,11 @@ export interface TransferState {
   controlError?: string;
   retry?: () => void | Promise<void>;
   retrying?: boolean;
-  /** Task source for the panel badge; defaults to sftp (legacy behavior). */
+  /** 面板徽标展示的任务来源；默认为 sftp（历史行为）。 */
   source?: "sftp" | "bt";
-  /** bt task mode; preview = cache download backing online playback. */
+  /** BT 任务模式；preview = 缓存下载，支撑在线播放。 */
   mode?: "download" | "preview";
 }
-
 interface TransfersState {
   transfers: TransferState[];
   dismissed: Set<string>;
@@ -57,11 +55,9 @@ interface TransfersState {
   setRetrying: (id: string, retrying: boolean) => void;
   clearFinished: () => void;
 }
-
 export const useTransfersStore = create<TransfersState>((set) => ({
   transfers: [],
   dismissed: new Set(),
-
   start(id, label, options) {
     set((state) => {
       const dismissed = new Set(state.dismissed);
@@ -75,7 +71,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       };
     });
   },
-
   restore(id, label, options) {
     set((state) => {
       if (state.dismissed.has(id)) return state;
@@ -87,7 +82,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       };
     });
   },
-
   dismiss(id) {
     set((state) => {
       const dismissed = new Set(state.dismissed);
@@ -98,7 +92,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       };
     });
   },
-
   updateProgressBatch(progresses) {
     if (progresses.length === 0) return;
     const now = performance.now();
@@ -110,8 +103,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         const progress = progressById.get(item.id);
         if (!progress || item.status !== "running") return item;
 
-        // Engine-managed tasks (BT): a backend finished flag flips the task to
-// success directly.
+        // 引擎托管的任务（BT）：后端 finished 标志会直接把任务标记为 success。
         if (progress.finished === true) {
           return {
             ...item,
@@ -126,7 +118,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
             updatedAt: now,
           };
         }
-
         if (item.paused) {
           return {
             ...item,
@@ -135,7 +126,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
             speed: null,
           };
         }
-
         const phase =
           item.source === "bt" && progress.phase === "bt:packaging"
             ? translate(msg`打包中`)
@@ -159,7 +149,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       }),
     }));
   },
-
   finish(id, status, error) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
@@ -193,7 +182,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       ),
     }));
   },
-
   markCancelling(id) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
@@ -212,7 +200,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       ),
     }));
   },
-
   cancelFailed(id) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
@@ -230,7 +217,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       ),
     }));
   },
-
   setPaused(id, paused) {
     set((state) => ({
       transfers: state.transfers.map((item) => {
@@ -258,31 +244,42 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       }),
     }));
   },
-
   setControlPending(id, pending) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
-        item.id === id ? { ...item, controlPending: pending } : item,
+        item.id === id
+          ? {
+              ...item,
+              controlPending: pending,
+            }
+          : item,
       ),
     }));
   },
-
   setControlError(id, error) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
-        item.id === id ? { ...item, controlError: error } : item,
+        item.id === id
+          ? {
+              ...item,
+              controlError: error,
+            }
+          : item,
       ),
     }));
   },
-
   setRetrying(id, retrying) {
     set((state) => ({
       transfers: state.transfers.map((item) =>
-        item.id === id ? { ...item, retrying } : item,
+        item.id === id
+          ? {
+              ...item,
+              retrying,
+            }
+          : item,
       ),
     }));
   },
-
   clearFinished() {
     set((state) => {
       const dismissed = new Set(state.dismissed);
@@ -296,7 +293,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     });
   },
 }));
-
 function createTransfer(
   id: string,
   label: string,

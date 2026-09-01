@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   BookOpen,
@@ -9,7 +9,13 @@ import {
 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "~/components/ui/empty";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "~/components/ui/empty";
 import { Slider } from "~/components/ui/slider";
 import {
   Sheet,
@@ -20,7 +26,6 @@ import {
 } from "~/components/ui/sheet";
 import { cn } from "~/lib/utils";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
-
 interface PoemDetailViewProps {
   detail: PoemDetailModel | null;
   loading: boolean;
@@ -29,7 +34,6 @@ interface PoemDetailViewProps {
   onFontSizeChange: (size: number) => void;
   onLineHeightChange: (height: number) => void;
 }
-
 function AnnotationSection({
   title,
   body,
@@ -40,12 +44,11 @@ function AnnotationSection({
   if (!body.trim()) return null;
   return (
     <section className="space-y-1">
-      <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+      <h3 className="text-muted-foreground text-sm font-medium">{title}</h3>
       <p className="text-sm leading-relaxed whitespace-pre-line">{body}</p>
     </section>
   );
 }
-
 function CollapsibleStrains({ strains }: { strains: string[] }) {
   const [open, setOpen] = useState(false);
   if (strains.length === 0) return null;
@@ -55,7 +58,7 @@ function CollapsibleStrains({ strains }: { strains: string[] }) {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm"
       >
         <ChevronDown
           className={cn("size-3.5 transition-transform", open && "rotate-180")}
@@ -64,7 +67,7 @@ function CollapsibleStrains({ strains }: { strains: string[] }) {
         <Trans>平仄</Trans>
       </button>
       {open ? (
-        <div className="mt-1 font-mono text-xs leading-relaxed text-muted-foreground">
+        <div className="text-muted-foreground mt-1 font-mono text-xs leading-relaxed">
           {strains.map((line, index) => (
             <p key={index}>{line}</p>
           ))}
@@ -73,7 +76,6 @@ function CollapsibleStrains({ strains }: { strains: string[] }) {
     </section>
   );
 }
-
 export function AuthorBioSheet({
   bio,
   onClose,
@@ -95,17 +97,13 @@ export function AuthorBioSheet({
     </Sheet>
   );
 }
-
 interface ReadingSettingsProps {
   fontSize: number;
   lineHeight: number;
   onFontSizeChange: (size: number) => void;
   onLineHeightChange: (height: number) => void;
 }
-
-export function ReadingSettingsPopover(
-  props: ReadingSettingsProps,
-) {
+export function ReadingSettingsPopover(props: ReadingSettingsProps) {
   const [open, setOpen] = useState(false);
   const { t } = useLingui();
   return (
@@ -120,8 +118,8 @@ export function ReadingSettingsPopover(
         <Settings2 />
       </Button>
       {open ? (
-        <div className="absolute right-0 top-full z-20 mt-1 w-56 space-y-3 rounded-md border border-border bg-popover p-3 shadow-md">
-          <label className="block space-y-1.5 text-xs text-muted-foreground">
+        <div className="border-border bg-popover absolute top-full right-0 z-20 mt-1 w-56 space-y-3 rounded-md border p-3 shadow-md">
+          <label className="text-muted-foreground block space-y-1.5 text-xs">
             <span>{t`字号`}</span>
             <Slider
               value={[props.fontSize]}
@@ -132,7 +130,7 @@ export function ReadingSettingsPopover(
               aria-label={t`字号`}
             />
           </label>
-          <label className="block space-y-1.5 text-xs text-muted-foreground">
+          <label className="text-muted-foreground block space-y-1.5 text-xs">
             <span>{t`行距`}</span>
             <Slider
               value={[props.lineHeight]}
@@ -148,7 +146,6 @@ export function ReadingSettingsPopover(
     </div>
   );
 }
-
 export default function PoemDetail({
   detail,
   loading,
@@ -158,11 +155,16 @@ export default function PoemDetail({
   onLineHeightChange,
 }: PoemDetailViewProps) {
   const [bio, setBio] = useState<AuthorBio | null>(null);
-  useEffect(() => setBio(null), [detail?.uid]);
-
+  // 当诗词切换时在渲染期间重置作者简介（React 的“在 prop 变化时
+  // 调整 state”模式），而不是用 effect。
+  const [prevUid, setPrevUid] = useState(detail?.uid);
+  if (prevUid !== detail?.uid) {
+    setPrevUid(detail?.uid);
+    setBio(null);
+  }
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center text-muted-foreground">
+      <div className="text-muted-foreground flex h-full items-center justify-center">
         <LoaderCircle className="size-5 animate-spin" aria-hidden />
       </div>
     );
@@ -184,9 +186,7 @@ export default function PoemDetail({
       </Empty>
     );
   }
-
   const annotation = detail.annotation;
-
   return (
     <div className="flex h-full flex-col">
       <header className="flex items-start justify-between gap-2 px-5 pt-4">
@@ -194,7 +194,7 @@ export default function PoemDetail({
           <h2 className="text-lg font-semibold tracking-wide">
             {detail.title}
           </h2>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             {detail.author ? (
               detail.authorBio && detail.authorBio.desc ? (
                 <button
@@ -211,7 +211,11 @@ export default function PoemDetail({
             {detail.dynasty ? <span>{detail.dynasty}</span> : null}
             {detail.rhythmic ? (
               <Badge variant="outline">
-                <Music data-icon="inline-start" className="size-3" aria-hidden />
+                <Music
+                  data-icon="inline-start"
+                  className="size-3"
+                  aria-hidden
+                />
                 {detail.rhythmic}
               </Badge>
             ) : null}
@@ -233,8 +237,11 @@ export default function PoemDetail({
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-8">
         <div
           key={detail.uid}
-          className="mx-auto max-w-prose space-y-4 pt-4 fade-in animate-in duration-200"
-          style={{ fontSize, lineHeight }}
+          className="fade-in animate-in mx-auto max-w-prose space-y-4 pt-4 duration-200"
+          style={{
+            fontSize,
+            lineHeight,
+          }}
         >
           <div>
             {detail.body.map((paragraph, index) => (
@@ -244,7 +251,7 @@ export default function PoemDetail({
           <CollapsibleStrains strains={detail.strains} />
 
           {annotation ? (
-            <div className="space-y-4 border-t border-border pt-4">
+            <div className="border-border space-y-4 border-t pt-4">
               <AnnotationSection
                 title={<Trans>注释</Trans>}
                 body={annotation.remark}
@@ -261,11 +268,11 @@ export default function PoemDetail({
           ) : null}
 
           {detail.notes.length > 0 ? (
-            <div className="border-t border-border pt-4">
-              <h3 className="mb-1 text-sm font-medium text-muted-foreground">
+            <div className="border-border border-t pt-4">
+              <h3 className="text-muted-foreground mb-1 text-sm font-medium">
                 <Trans>注释</Trans>
               </h3>
-              <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted-foreground">
+              <ul className="text-muted-foreground list-disc space-y-1 pl-4 text-sm leading-relaxed">
                 {detail.notes.map((note, index) => (
                   <li key={index}>{note}</li>
                 ))}

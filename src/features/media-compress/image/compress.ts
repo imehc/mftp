@@ -8,7 +8,7 @@ import {
 export type ImageInputFormat = "png" | "jpg" | "jpeg" | "webp";
 export type ImageOutputFormat = "jpg" | "png" | "webp" | "avif";
 
-/** Encoder quality 10–100, step 10. Higher keeps more detail. */
+/** 编码器质量 10–100，步长 10。越大保留细节越多。 */
 export type ImageQuality = number;
 
 export const IMAGE_QUALITY_MIN = 10;
@@ -62,23 +62,16 @@ const ESTIMATE_LOW: Record<ImageOutputFormat, number> = {
 };
 
 export function clampImageQuality(quality: number): number {
-  const stepped =
-    Math.round(quality / IMAGE_QUALITY_STEP) * IMAGE_QUALITY_STEP;
-  return Math.min(
-    IMAGE_QUALITY_MAX,
-    Math.max(IMAGE_QUALITY_MIN, stepped),
-  );
+  const stepped = Math.round(quality / IMAGE_QUALITY_STEP) * IMAGE_QUALITY_STEP;
+  return Math.min(IMAGE_QUALITY_MAX, Math.max(IMAGE_QUALITY_MIN, stepped));
 }
 
-/** Canvas encoder quality in 0–1. */
+/** Canvas 编码器质量，范围 0–1。 */
 export function imageQualityValue(quality: number): number {
   return clampImageQuality(quality) / 100;
 }
 
-function estimateFactor(
-  format: ImageOutputFormat,
-  quality: number,
-): number {
+function estimateFactor(format: ImageOutputFormat, quality: number): number {
   const q = clampImageQuality(quality);
   const t = (q - IMAGE_QUALITY_MIN) / (IMAGE_QUALITY_MAX - IMAGE_QUALITY_MIN);
   const high = ESTIMATE_HIGH[format];
@@ -93,7 +86,7 @@ export function isSupportedImageFile(file: File | { name: string }): boolean {
   return INPUT_EXT.has(ext);
 }
 
-/** Map source extension to export format; jpeg → jpg. Falls back to webp. */
+/** 将源文件后缀映射到导出格式；jpeg → jpg。兜底用 webp。 */
 export function detectImageOutputFormat(
   file: File | { name: string },
 ): ImageOutputFormat {
@@ -129,7 +122,7 @@ export function estimateImageOutput(
   const qualityValue = imageQualityValue(options.quality);
   const factor = estimateFactor(options.outputFormat, options.quality);
   const estimatedBytes = Math.max(1_024, Math.round(meta.size * factor));
-  // ±30 % range to reflect content-dependent variance.
+  // ±30% 区间，反映随内容变化的差异。
   const estimatedMin = Math.max(1_024, Math.round(estimatedBytes * 0.7));
   const estimatedMax = Math.round(estimatedBytes * 1.3);
   return {
@@ -214,7 +207,7 @@ export async function compressImageFile(
       throw new Error("无法创建画布上下文");
     }
 
-    // JPEG has no alpha; fill white to avoid black matte on transparent PNG.
+    // JPEG 不支持透明通道；填充白色，避免透明 PNG 出现黑色底。
     if (options.outputFormat === "jpg") {
       context.fillStyle = "#ffffff";
       context.fillRect(0, 0, canvas.width, canvas.height);
@@ -237,7 +230,9 @@ export async function compressImageFile(
       blob = await canvasToBlob(canvas, mimeType, quality);
     } catch (error) {
       if (options.outputFormat === "avif") {
-        throw new Error("当前环境不支持导出 AVIF，请改用 WebP 或 JPG");
+        throw new Error("当前环境不支持导出 AVIF，请改用 WebP 或 JPG", {
+          cause: error,
+        });
       }
       throw error;
     }
@@ -250,7 +245,7 @@ export async function compressImageFile(
     const stem = stripExtension(file.name) || "image";
     const ext = extensionForFormat(options.outputFormat);
 
-    // If compressed result is larger than original, return original instead.
+    // 若压缩后比原文件还大，则直接返回原文件。
     if (blob.size >= file.size) {
       const origMime = file.type || mimeForFormat(options.outputFormat);
       return {

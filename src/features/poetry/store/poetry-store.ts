@@ -1,28 +1,25 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type {
-  PoetryCollectionStatus,
-  PoetrySearchScope,
-} from "~/types";
+import type { PoetryCollectionStatus, PoetrySearchScope } from "~/types";
 
 interface PoetryState {
-  /** Installed-collection cache mirrored from `poetry_collections()`. */
+  /** 来自 `poetry_collections()` 的已安装合集缓存镜像。 */
   collections: PoetryCollectionStatus[];
   setCollections: (collections: PoetryCollectionStatus[]) => void;
 
-  /** Collection ids the list/detail views are filtered to; empty = all. */
+  /** 列表 / 详情视图所筛选到的合集 id；为空表示全部。 */
   activeCollectionIds: string[];
   toggleCollection: (id: string) => void;
   clearCollectionFilter: () => void;
 
-  /** Search scope + locally persisted history (latest first). */
+  /** 搜索范围 + 本地持久化的历史（最新在前）。 */
   searchScope: PoetrySearchScope;
   setSearchScope: (scope: PoetrySearchScope) => void;
   searchHistory: string[];
   pushSearchHistory: (query: string) => void;
   clearSearchHistory: () => void;
 
-  /** Reading preferences for the detail pane. */
+  /** 详情面板的阅读偏好。 */
   fontSize: number;
   lineHeight: number;
   setFontSize: (size: number) => void;
@@ -71,7 +68,7 @@ export const usePoetryStore = create<PoetryState>()(
       name: "mftp-poetry",
       version: 1,
       partialize: (state) => ({
-        // Collections are runtime cache; persist only user preferences.
+        // 合集是运行时缓存；只持久化用户偏好。
         activeCollectionIds: state.activeCollectionIds,
         searchScope: state.searchScope,
         searchHistory: state.searchHistory,

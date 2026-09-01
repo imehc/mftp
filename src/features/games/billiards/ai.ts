@@ -1,11 +1,10 @@
 /**
- * Billiards AiStrategy: enumerate pot candidates geometrically (ghost
- * ball per target×pocket), aim with difficulty-scaled gaussian noise,
- * verify the best few with the real deterministic simulation, and pick
- * the highest-scoring outcome.
+ * 台球 AI 策略：按几何方式枚举进球候选（每个目标球×袋口各算一个
+ * 虚拟球），用随难度缩放的高斯噪声瞄准，再用真实确定性模拟验证
+ * 其中最靠前的几个，选出得分最高的结果。
  *
- * Difficulty knobs: aim/power noise, how many candidates get simulated,
- * and whether position play for the next shot is scored.
+ * 难度调节项：瞄准/力度噪声、参与模拟的候选数量，以及是否对
+ * 下一杆的走位进行评分。
  */
 import {
   createRng,
@@ -30,7 +29,7 @@ interface DifficultyProfile {
   powerSigma: number;
   simCandidates: number;
   positionPlay: boolean;
-  /** Easy AI sometimes picks a deliberately worse candidate. */
+  /** 简单 AI 偶尔会故意选一个更差的候选。 */
   blunderChance: number;
 }
 
@@ -68,7 +67,7 @@ function norm(v: Vec): Vec {
   return { x: v.x / len, y: v.y / len };
 }
 
-/** Is the corridor of width 2r from `a` to `b` free of other balls? */
+/** `a` 到 `b` 这条宽度为 2r 的通道上是否没有其他球阻挡？ */
 function pathClear(
   balls: readonly BallState[],
   a: Vec,
@@ -90,7 +89,7 @@ function pathClear(
   return true;
 }
 
-/** Legal target ball ids for the seat in the current state. */
+/** 当前局面下该座位可合法击打的目标球 id。 */
 function targetBallIds(state: BilliardsState, seat: SeatIndex): number[] {
   const alive = state.balls.filter((b) => !b.potted && b.id !== 0);
   if (state.variant === "practice") return alive.map((b) => b.id);
@@ -105,7 +104,7 @@ function targetBallIds(state: BilliardsState, seat: SeatIndex): number[] {
 interface Candidate {
   angle: number;
   power: number;
-  /** Geometric plausibility, used for pre-ranking before simulation. */
+  /** 几何合理度，用于模拟前的预排序。 */
   quality: number;
 }
 
@@ -127,9 +126,9 @@ function potCandidates(
         y: ball.y - toPocket.y * BALL_RADIUS * 2,
       };
       const aim = norm({ x: ghost.x - cue.x, y: ghost.y - cue.y });
-      // Cut angle: cos of angle between the aim line and the pot line.
+      // 切角：瞄准线与进球线之间夹角的余弦。
       const cut = aim.x * toPocket.x + aim.y * toPocket.y;
-      if (cut < 0.08) continue; // effectively impossible cut
+      if (cut < 0.08) continue; // 实际不可能进的切球
       if (!pathClear(balls, cue, ghost, [0, id])) continue;
       if (!pathClear(balls, ball, pocket, [0, id])) continue;
 
@@ -140,8 +139,7 @@ function potCandidates(
         0.95,
         Math.max(0.16, 0.14 + (travel / 3.4) * 0.75),
       );
-      const quality =
-        cut / (1 + dCue * 0.45 + dPocket * 0.6);
+      const quality = cut / (1 + dCue * 0.45 + dPocket * 0.6);
       out.push({
         angle: Math.atan2(ghost.y - cue.y, ghost.x - cue.x),
         power,
@@ -152,7 +150,7 @@ function potCandidates(
   return out.sort((a, b) => b.quality - a.quality);
 }
 
-/** Cheap post-state estimate of how promising the next shot would be. */
+/** 用低成本估计后续一杆的进攻前景。 */
 function positionScore(state: BilliardsState, seat: SeatIndex): number {
   const targets = targetBallIds(state, seat);
   const best = potCandidates(state.balls, targets)[0];
@@ -222,7 +220,7 @@ export const billiardsAiStrategy: AiStrategy<BilliardsState, BilliardsMove> = {
     const cue = state.balls.find((b) => b.id === 0);
     if (!cue) throw new Error("billiards ai: cue missing");
 
-    // Break: smash the rack apex.
+    // 开球：直接砸向球堆顶点。
     if (!state.breakDone) {
       const rack = state.balls.filter((b) => !b.potted && b.id !== 0);
       const apex = rack.reduce((a, b) => (a.x < b.x ? a : b));
@@ -271,7 +269,7 @@ export const billiardsAiStrategy: AiStrategy<BilliardsState, BilliardsMove> = {
         const after: BilliardsState = { ...state, balls: sim.balls };
         score += positionScore(after, seat) * 70;
       }
-      score += candidate.quality * 10; // stable tiebreak toward easier shots
+      score += candidate.quality * 10; // 稳定的平局打破项，倾向更容易的球
 
       scored.push({ move, score });
       if (score > bestScore) {
@@ -281,7 +279,7 @@ export const billiardsAiStrategy: AiStrategy<BilliardsState, BilliardsMove> = {
       await yieldToUi();
     }
 
-    // Easy AI occasionally takes a worse option on purpose.
+    // 简单 AI 偶尔会故意选更差的选项。
     if (
       bestMove &&
       scored.length > 1 &&
@@ -294,10 +292,11 @@ export const billiardsAiStrategy: AiStrategy<BilliardsState, BilliardsMove> = {
 
     if (bestMove) return bestMove;
 
-    // No pot available: nudge the nearest legal ball (crude safety).
-    const fallbackTargets = targets.length > 0
-      ? targets
-      : state.balls.filter((b) => !b.potted && b.id !== 0).map((b) => b.id);
+    // 没有可进的球：轻碰最近的合法球（粗略的防守）。
+    const fallbackTargets =
+      targets.length > 0
+        ? targets
+        : state.balls.filter((b) => !b.potted && b.id !== 0).map((b) => b.id);
     const nearest = fallbackTargets
       .map((id) => state.balls.find((b) => b.id === id))
       .filter((b): b is BallState => !!b)

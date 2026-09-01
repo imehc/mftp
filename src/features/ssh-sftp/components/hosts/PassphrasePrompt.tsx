@@ -14,18 +14,18 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { firstFormError } from "~/lib/form-errors";
-
 interface Props {
-  /** The host awaiting a passphrase, or null when hidden. */
+  /** 等待口令的主机；隐藏时为 null。 */
   host: Host | null;
   onClose: () => void;
   onSubmit: (passphrase: string) => void;
 }
-
 export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
   const { t } = useLingui();
   const form = useForm({
-    defaultValues: { passphrase: "" },
+    defaultValues: {
+      passphrase: "",
+    },
     validators: {
       onSubmit: z.object({
         passphrase: z.string().min(1, t`请输入口令`),
@@ -35,11 +35,12 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
       onSubmit(value.passphrase);
     },
   });
-
   useEffect(() => {
-    if (host) form.reset({ passphrase: "" });
+    if (host)
+      form.reset({
+        passphrase: "",
+      });
   }, [form, host]);
-
   return (
     <Dialog open={!!host} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-sm">
@@ -59,10 +60,11 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
           <form.Field name="passphrase">
             {(field) => {
               const error = firstFormError(field.state.meta.errors);
+              const value = host?.label;
               return (
                 <Field data-invalid={!!error}>
                   <FieldLabel htmlFor="passphrase">
-                    <Trans>{host?.label} 的私钥口令</Trans>
+                    <Trans>{value} 的私钥口令</Trans>
                   </FieldLabel>
                   <PasswordInput
                     id="passphrase"

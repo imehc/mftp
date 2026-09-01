@@ -1,32 +1,30 @@
 /**
- * Billiards table geometry and physics tuning. Units are meters and
- * seconds (a 9-foot table); the renderer applies its own pixel scale.
+ * 台球桌几何与物理调参。单位为米与秒（9 英尺球桌）；渲染器自行
+ * 套用像素比例。
  *
- * Everything here feeds the deterministic simulation — changing a value
- * changes shot outcomes, which will matter for online lockstep (both
- * peers must run identical constants).
+ * 这里的一切都喂给确定性模拟——改任一数值都会改变击球结果，
+ * 这会影响到联机锁步（双方必须运行完全一致的常量）。
  */
 
-/** Playing surface (cushion face to cushion face), 9ft table. */
+/** 台面（库边内沿到内沿），9 英尺球桌。 */
 export const TABLE_W = 2.54;
 export const TABLE_H = 1.27;
 
 /**
- * Arcade-proportioned ball: a to-scale 57mm ball reads far too small in
- * a top-down view, so like most billiards games we render (and simulate)
- * an enlarged ball. Pocket mouths below are sized relative to this.
+ * 街机比例的球：按真实 57mm 比例在俯视图里会显得过小，因此和大多数
+ * 台球游戏一样，我们渲染（并模拟）放大的球。下方袋口尺寸以此为准。
  */
 export const BALL_RADIUS = 0.042;
 export const BALL_MASS = 0.17; // kg
 
-/** Fixed simulation timestep. Both live play and AI evaluation use it. */
+/** 固定模拟步长。实时对局与 AI 评估都使用它。 */
 export const FIXED_DT = 1 / 120;
-/** A ball slower than this (m/s) is considered stopped. */
+/** 速度低于此值（米/秒）的球视为已停止。 */
 export const STOP_SPEED = 0.02;
-/** Safety cap so a pathological shot can't simulate forever. */
+/** 安全上限，防止异常球局无限模拟下去。 */
 export const MAX_SIM_SECONDS = 40;
 
-/** Cloth rolling resistance approximation (rapier linear damping). */
+/** 台呢滚动阻力近似（rapier 线性阻尼）。 */
 export const LINEAR_DAMPING = 0.72;
 export const ANGULAR_DAMPING = 1.2;
 export const BALL_RESTITUTION = 0.9;
@@ -34,14 +32,14 @@ export const BALL_FRICTION = 0.06;
 export const CUSHION_RESTITUTION = 0.7;
 export const CUSHION_FRICTION = 0.14;
 
-/** Cue speed (m/s) at power = 1 — roughly a hard break. */
+/** 力度为 1 时的母球速度（米/秒）——大致相当于一记大力开球。 */
 export const MAX_SHOT_SPEED = 8.5;
-/** Extra impulse factor for follow/draw, applied at first contact. */
+/** 跟杆/缩杆的额外冲量系数，在首次接触时施加。 */
 export const FOLLOW_DRAW_FACTOR = 0.7;
 
-/** Cushion collider thickness (extends outward from the play area). */
+/** 库边碰撞体厚度（从台面区域向外延伸）。 */
 export const CUSHION_THICKNESS = 0.06;
-/** Pocket mouth: cushion inner face setback from each pocket center. */
+/** 袋口：库边内沿相对每个袋口中心的退让量。 */
 export const CORNER_MOUTH = 0.1;
 export const SIDE_MOUTH = 0.084;
 
@@ -49,26 +47,22 @@ export interface PocketSpec {
   id: number;
   x: number;
   y: number;
-  /** Visual mouth radius; capture uses POCKET_CAPTURE_SCALE of this. */
+  /** 视觉袋口半径；落袋判定取该值的 POCKET_CAPTURE_SCALE 倍。 */
   radius: number;
 }
 
 /**
- * Capture sensor = radius * this scale: the ball must genuinely enter
- * the mouth before it falls; at 1.0 a ball grazing the cushion line
- * near a pocket would get sucked in from the table surface. With jaw
- * points guarding each mouth (see below), only a reasonably centred
- * ball threads through to reach the sensor.
+ * 落袋感应区 = 半径 × 该比例：球必须先真正进到袋口才会落袋；若为 1.0，
+ * 则擦着袋口附近库边线的球会被从台面上吸进去。由于每个袋口有
+ * 颚点把守（见下），只有大致居中的球才能穿过去够到感应区。
  */
 export const POCKET_CAPTURE_SCALE = 0.6;
 
 /**
- * Pocket jaws: a small rounded collider at each of a mouth's two inner
- * cushion tips. A fast or badly-angled ball clips a jaw and rattles back
- * onto the table instead of dropping — this is what stops "enough power
- * always pots several". JAW_RADIUS is the main difficulty knob: larger =
- * narrower mouth = harder to pot. Corner tips sit ~0.141m apart, side
- * tips ~0.168m, ball radius 0.042.
+ * 袋口颚：每个袋口两条内库边的尖端各放一个小圆角碰撞体。速度快或
+ * 角度差的球会蹭到颚点弹回台面而非落袋——正是它阻止了“力够大就
+ * 总能进好几个”。JAW_RADIUS 是主要的难度旋钮：越大 = 袋口越窄 =
+ * 越难进。角袋尖端间距约 0.141 米，中袋约 0.168 米，球半径 0.042。
  */
 export const JAW_RADIUS = 0.02;
 export const JAW_RESTITUTION = 0.6;
@@ -78,7 +72,7 @@ const CORNER_POCKET_RADIUS = 0.098;
 const SIDE_POCKET_RADIUS = 0.084;
 
 export const POCKETS: readonly PocketSpec[] = [
-  // Corners (offset outward along the diagonal).
+  // 角袋（沿对角线向外偏移）。
   ...[-1, 1].flatMap((sx) =>
     [-1, 1].map((sy, i) => ({
       id: (sx < 0 ? 0 : 2) + i,
@@ -87,20 +81,19 @@ export const POCKETS: readonly PocketSpec[] = [
       radius: CORNER_POCKET_RADIUS,
     })),
   ),
-  // Side pockets on the long rails.
+  // 长边上的中袋。
   { id: 4, x: 0, y: -(TABLE_H / 2 + 0.042), radius: SIDE_POCKET_RADIUS },
   { id: 5, x: 0, y: TABLE_H / 2 + 0.042, radius: SIDE_POCKET_RADIUS },
 ];
 
-/** Foot spot: rack apex / 8-ball respot position. */
+/** 脚点：球堆顶点 / 黑八重置位置。 */
 export const FOOT_SPOT_X = TABLE_W / 4;
-/** Head string: cue ball starts here; break placement zone is behind it. */
+/** 头线：母球初始位置；开球放置区在其后方。 */
 export const HEAD_SPOT_X = -TABLE_W / 4;
 
 /**
- * Static 8-ball rack layout (row by row from the apex): 8 centered in
- * the third row, one solid and one stripe on the back corners. Fixed
- * (not shuffled) to keep initial state deterministic.
+ * 固定黑八摆球布局（从顶点起逐行）：黑八居中于第三行，后两角为
+ * 一全色一花色。固定（不随机）以保证初始状态确定。
  */
 export const RACK_LAYOUT: readonly (readonly number[])[] = [
   [1],

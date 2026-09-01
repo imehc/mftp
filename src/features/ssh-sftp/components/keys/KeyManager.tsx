@@ -33,18 +33,15 @@ import {
   emptyKeyImportFormValues,
   createKeyImportSchema,
 } from "~/features/ssh-sftp/components/keys/KeyManager.schema";
-
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
 export default function KeyManager({ open, onOpenChange }: Props) {
   const { t } = useLingui();
   const keys = useHostsStore((s) => s.keys);
   const importKey = useHostsStore((s) => s.importKey);
   const deleteKey = useHostsStore((s) => s.deleteKey);
-
   const [busy, setBusy] = useState(false);
   const form = useForm({
     defaultValues: emptyKeyImportFormValues,
@@ -54,8 +51,13 @@ export default function KeyManager({ open, onOpenChange }: Props) {
     onSubmit: async ({ value }) => {
       setBusy(true);
       try {
-        await importKey(value.label.trim(), value.sourcePath.trim(), value.hasPassphrase);
-        toast.success(t`已导入密钥 ${value.label.trim()}`);
+        await importKey(
+          value.label.trim(),
+          value.sourcePath.trim(),
+          value.hasPassphrase,
+        );
+        const trimValue = value.label.trim();
+        toast.success(t`已导入密钥 ${trimValue}`);
         form.reset(emptyKeyImportFormValues);
       } catch (e) {
         toast.error(String(e));
@@ -64,7 +66,6 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       }
     },
   });
-
   async function pickFile() {
     const selected = await openDialog({
       multiple: false,
@@ -79,7 +80,6 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       }
     }
   }
-
   async function remove(id: string, name: string) {
     try {
       await deleteKey(id);
@@ -88,7 +88,6 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       toast.error(String(e));
     }
   }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
@@ -98,7 +97,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="rounded-lg border border-border p-3">
+        <div className="border-border rounded-lg border p-3">
           <FieldGroup>
             <form.Field name="label">
               {(field) => {
@@ -116,7 +115,9 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                       placeholder="id_ed25519"
                       aria-invalid={!!error}
                     />
-                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    {error ? (
+                      <FieldDescription>{error}</FieldDescription>
+                    ) : null}
                   </UiField>
                 );
               }}
@@ -141,7 +142,9 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                         <Upload data-icon="inline-start" /> <Trans>选择</Trans>
                       </Button>
                     </div>
-                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    {error ? (
+                      <FieldDescription>{error}</FieldDescription>
+                    ) : null}
                   </UiField>
                 );
               }}
@@ -152,7 +155,9 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                   <Checkbox
                     id="key-has-passphrase"
                     checked={field.state.value}
-                    onCheckedChange={(checked) => field.handleChange(checked === true)}
+                    onCheckedChange={(checked) =>
+                      field.handleChange(checked === true)
+                    }
                   />
                   <FieldLabel htmlFor="key-has-passphrase">
                     <Trans>该私钥有口令保护（连接时输入）</Trans>
@@ -169,9 +174,11 @@ export default function KeyManager({ open, onOpenChange }: Props) {
         <Separator />
 
         <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium text-muted-foreground">
+          <p className="text-muted-foreground text-xs font-medium">
             <Plural
-              value={{ importedKeyCount: keys.length }}
+              value={{
+                importedKeyCount: keys.length,
+              }}
               one="已导入 # 个密钥"
               other="已导入 # 个密钥"
             />
@@ -195,12 +202,12 @@ export default function KeyManager({ open, onOpenChange }: Props) {
               {keys.map((k) => (
                 <li
                   key={k.id}
-                  className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5"
+                  className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-1.5"
                 >
-                  <KeyRound className="size-4 text-muted-foreground" />
+                  <KeyRound className="text-muted-foreground size-4" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">{k.label}</p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="text-muted-foreground truncate text-xs">
                       {k.hasPassphrase ? t`口令保护` : t`无口令`}
                     </p>
                   </div>

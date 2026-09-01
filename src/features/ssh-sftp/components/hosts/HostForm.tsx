@@ -7,10 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { PasswordInput } from "~/components/ui/password-input";
-import {
-  Dialog,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
   DialogLayoutContent,
@@ -38,20 +35,17 @@ import {
   hostFormValuesToInput,
   hostToFormValues,
 } from "~/features/ssh-sftp/components/hosts/HostForm.schema";
-
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Existing host to edit, or null to create. */
+  /** 要编辑的已有主机；为 null 表示新建。 */
   host: Host | null;
 }
-
 export default function HostForm({ open, onOpenChange, host }: Props) {
   const { t } = useLingui();
   const keys = useHostsStore((s) => s.keys);
   const createHost = useHostsStore((s) => s.createHost);
   const updateHost = useHostsStore((s) => s.updateHost);
-
   const [submitError, setSubmitError] = useState<string | null>(null);
   const form = useForm({
     defaultValues: hostToFormValues(null),
@@ -70,13 +64,14 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
       }
     },
   });
-
   useEffect(() => {
     if (!open) return;
-    form.reset(hostToFormValues(host));
-    setSubmitError(null);
+    // 用微任务延后，使表单重置发生在 effect 函数体之外。
+    queueMicrotask(() => {
+      form.reset(hostToFormValues(host));
+      setSubmitError(null);
+    });
   }, [form, host, open]);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent className="sm:max-w-md">
@@ -106,7 +101,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                       spellCheck={false}
                       aria-invalid={!!error}
                     />
-                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    {error ? (
+                      <FieldDescription>{error}</FieldDescription>
+                    ) : null}
                   </UiField>
                 );
               }}
@@ -133,7 +130,9 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                         spellCheck={false}
                         aria-invalid={!!error}
                       />
-                      {error ? <FieldDescription>{error}</FieldDescription> : null}
+                      {error ? (
+                        <FieldDescription>{error}</FieldDescription>
+                      ) : null}
                     </UiField>
                   );
                 }}
@@ -151,10 +150,14 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                         type="number"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(Number(e.target.value) || 22)}
+                        onChange={(e) =>
+                          field.handleChange(Number(e.target.value) || 22)
+                        }
                         aria-invalid={!!error}
                       />
-                      {error ? <FieldDescription>{error}</FieldDescription> : null}
+                      {error ? (
+                        <FieldDescription>{error}</FieldDescription>
+                      ) : null}
                     </UiField>
                   );
                 }}
@@ -179,7 +182,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     spellCheck={false}
                   />
                   <FieldDescription>
-                    <Trans>留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。</Trans>
+                    <Trans>
+                      留空时优先使用 ~/.ssh/config 的
+                      User，其次使用当前系统用户。
+                    </Trans>
                   </FieldDescription>
                 </UiField>
               )}
@@ -195,7 +201,8 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     type="single"
                     value={field.state.value}
                     onValueChange={(v) => {
-                      if (v === "password" || v === "key") field.handleChange(v);
+                      if (v === "password" || v === "key")
+                        field.handleChange(v);
                     }}
                     variant="outline"
                     className="w-full"
@@ -245,7 +252,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                             onValueChange={(v) => field.handleChange(v || null)}
                             disabled={missingKeys}
                           >
-                            <SelectTrigger className="w-full" aria-invalid={!!error}>
+                            <SelectTrigger
+                              className="w-full"
+                              aria-invalid={!!error}
+                            >
                               <SelectValue placeholder={t`选择密钥…`} />
                             </SelectTrigger>
                             <SelectContent>
@@ -254,7 +264,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                                   <SelectItem key={k.id} value={k.id}>
                                     {k.label}
                                     {k.hasPassphrase ? (
-                                      <Badge variant="secondary" className="ml-1.5">
+                                      <Badge
+                                        variant="secondary"
+                                        className="ml-1.5"
+                                      >
                                         <Trans>需口令</Trans>
                                       </Badge>
                                     ) : null}
@@ -292,7 +305,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     placeholder={t`/var/www（留空则用主目录）`}
                   />
                   <FieldDescription>
-                    <Trans>打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。</Trans>
+                    <Trans>
+                      打开 SFTP
+                      时进入此目录；若不存在则回退到主目录，再退到根目录。
+                    </Trans>
                   </FieldDescription>
                 </UiField>
               )}
@@ -312,7 +328,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
           </Button>
           <form.Subscribe selector={(state) => state.isSubmitting}>
             {(isSubmitting) => (
-              <Button onClick={() => void form.handleSubmit()} disabled={isSubmitting}>
+              <Button
+                onClick={() => void form.handleSubmit()}
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? t`保存中…` : t`保存`}
               </Button>
             )}

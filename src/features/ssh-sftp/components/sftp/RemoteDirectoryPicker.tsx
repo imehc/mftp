@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
@@ -12,10 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
   DialogLayoutContent,
@@ -40,7 +37,6 @@ import {
   parentPath,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "~/lib/utils";
-
 interface RemoteDirectoryPickerProps {
   open: boolean;
   title: string;
@@ -50,7 +46,6 @@ interface RemoteDirectoryPickerProps {
   onOpenChange: (open: boolean) => void;
   onSelect: (path: string) => void;
 }
-
 export default function RemoteDirectoryPicker({
   open,
   title,
@@ -65,49 +60,47 @@ export default function RemoteDirectoryPicker({
   const [entries, setEntries] = useState<SftpEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const pathForm = useForm({
-    defaultValues: { path: initialPath },
+    defaultValues: {
+      path: initialPath,
+    },
     validators: {
       onSubmit: z.object({
-        path: z.string().trim().min(1, t`请输入路径`),
+        path: z
+          .string()
+          .trim()
+          .min(1, t`请输入路径`),
       }),
     },
     onSubmit: async ({ value }) => {
       await loadPath(value.path);
     },
   });
-
-  const directories = useMemo(
-    () =>
-      entries
-        .filter((entry) => entry.isDir)
-        .sort((a, b) => nameCollator.compare(a.name, b.name)),
-    [entries],
-  );
-  const cannotSelect =
-    !!disabledPath && isSameOrChildPath(path, disabledPath);
-
-  const loadPath = useCallback(
-    async (nextPath: string) => {
-      const normalized = normalizeRemotePath(nextPath.trim());
-      setLoading(true);
-      try {
-        const list = await ipc.sftpList(sessionId, normalized);
-        setEntries(list);
-        setPath(normalized);
-        pathForm.reset({ path: normalized });
-      } catch (e) {
-        toast.error(String(e));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [pathForm, sessionId],
-  );
-
+  const directories = entries
+    .filter((entry) => entry.isDir)
+    .sort((a, b) => nameCollator.compare(a.name, b.name));
+  const cannotSelect = !!disabledPath && isSameOrChildPath(path, disabledPath);
+  const loadPath = async (nextPath: string) => {
+    const normalized = normalizeRemotePath(nextPath.trim());
+    setLoading(true);
+    try {
+      const list = await ipc.sftpList(sessionId, normalized);
+      setEntries(list);
+      setPath(normalized);
+      pathForm.reset({
+        path: normalized,
+      });
+    } catch (e) {
+      toast.error(String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+  // loadPath 与表单提交 / goHome 共享；用 effect event，使对话框
+  // 不会在父组件每次渲染时都重载。
+  const loadPathOnOpen = useEffectEvent(loadPath);
   useEffect(() => {
-    if (open) void loadPath(initialPath);
-  }, [open, initialPath, loadPath]);
-
+    if (open) void loadPathOnOpen(initialPath);
+  }, [open, initialPath]);
   async function goHome() {
     setLoading(true);
     try {
@@ -118,7 +111,6 @@ export default function RemoteDirectoryPicker({
       setLoading(false);
     }
   }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent className="sm:max-w-xl">
@@ -172,7 +164,9 @@ export default function RemoteDirectoryPicker({
                         className="font-mono text-xs"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) => field.handleChange(event.target.value)}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
                         aria-invalid={!!error}
                       />
                       {error ? (
@@ -189,9 +183,9 @@ export default function RemoteDirectoryPicker({
               </Button>
             </form>
           </div>
-          <div className="min-h-64 rounded-md border border-border">
+          <div className="border-border min-h-64 rounded-md border">
             {loading && directories.length === 0 ? (
-              <div className="flex h-64 items-center justify-center gap-2 text-sm text-muted-foreground">
+              <div className="text-muted-foreground flex h-64 items-center justify-center gap-2 text-sm">
                 <LoaderCircle className="size-4 animate-spin" />
                 <Trans>加载中…</Trans>
               </div>
@@ -214,11 +208,11 @@ export default function RemoteDirectoryPicker({
                   <button
                     key={entry.path}
                     type="button"
-                    className="flex w-full items-center gap-2 border-b border-border/40 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="border-border/40 hover:bg-muted/50 flex w-full items-center gap-2 border-b px-3 py-2 text-left text-sm last:border-b-0 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={loading || disabled}
                     onClick={() => void loadPath(entry.path)}
                   >
-                    <Folder className="size-4 shrink-0 text-primary" />
+                    <Folder className="text-primary size-4 shrink-0" />
                     <span className="min-w-0 truncate">{entry.name}</span>
                   </button>
                 );

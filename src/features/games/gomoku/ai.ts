@@ -1,6 +1,16 @@
-import { createRng, yieldToUi, type AiStrategy, type Difficulty } from "../engine/ai";
+import {
+  createRng,
+  yieldToUi,
+  type AiStrategy,
+  type Difficulty,
+} from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
-import { BOARD_SIZE, WIN_LENGTH, type GomokuMove, type GomokuState } from "./types";
+import {
+  BOARD_SIZE,
+  WIN_LENGTH,
+  type GomokuMove,
+  type GomokuState,
+} from "./types";
 import { cellIndex, findWinningLine, inBounds, legalMoves } from "./rules";
 
 const DIRECTIONS: Array<[number, number]> = [
@@ -10,7 +20,10 @@ const DIRECTIONS: Array<[number, number]> = [
   [1, -1],
 ];
 
-const PROFILE: Record<Difficulty, { radius: number; noise: number; blunder: number }> = {
+const PROFILE: Record<
+  Difficulty,
+  { radius: number; noise: number; blunder: number }
+> = {
   easy: { radius: 1, noise: 6, blunder: 0.24 },
   medium: { radius: 2, noise: 2.4, blunder: 0.05 },
   hard: { radius: 2, noise: 0.5, blunder: 0 },
@@ -24,11 +37,16 @@ function stateSeed(state: GomokuState, seat: SeatIndex): number {
   return h >>> 0;
 }
 
-function hasNeighbor(state: GomokuState, move: GomokuMove, radius: number): boolean {
+function hasNeighbor(
+  state: GomokuState,
+  move: GomokuMove,
+  radius: number,
+): boolean {
   if (state.moveCount === 0) return true;
   for (let row = move.row - radius; row <= move.row + radius; row++) {
     for (let col = move.col - radius; col <= move.col + radius; col++) {
-      if (!inBounds(row, col) || (row === move.row && col === move.col)) continue;
+      if (!inBounds(row, col) || (row === move.row && col === move.col))
+        continue;
       if (state.board[cellIndex(row, col)] !== null) return true;
     }
   }
@@ -66,7 +84,11 @@ function runScore(
   return stones * stones + openEnds;
 }
 
-function scoreMove(state: GomokuState, move: GomokuMove, seat: SeatIndex): number {
+function scoreMove(
+  state: GomokuState,
+  move: GomokuMove,
+  seat: SeatIndex,
+): number {
   const opponent = 1 - seat;
   const winBoard = [...state.board];
   winBoard[cellIndex(move.row, move.col)] = seat;
@@ -92,17 +114,21 @@ export const gomokuAiStrategy: AiStrategy<GomokuState, GomokuMove> = {
     const profile = PROFILE[difficulty];
     const rng = createRng(stateSeed(state, seat));
     const all = legalMoves(state);
-    const candidates = all.filter((move) => hasNeighbor(state, move, profile.radius));
+    const candidates = all.filter((move) =>
+      hasNeighbor(state, move, profile.radius),
+    );
     const pool = candidates.length > 0 ? candidates : all;
     if (rng() < profile.blunder) return pool[Math.floor(rng() * pool.length)];
 
     let best = pool[0];
     let bestScore = -Infinity;
     for (let i = 0; i < pool.length; i++) {
-      if (signal.aborted) throw signal.reason ?? new DOMException("Aborted", "AbortError");
+      if (signal.aborted)
+        throw signal.reason ?? new DOMException("Aborted", "AbortError");
       if (i % 60 === 0) await yieldToUi();
       const move = pool[i];
-      const score = scoreMove(state, move, seat) + (rng() - 0.5) * profile.noise;
+      const score =
+        scoreMove(state, move, seat) + (rng() - 0.5) * profile.noise;
       if (score > bestScore) {
         best = move;
         bestScore = score;

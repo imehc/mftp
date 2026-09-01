@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ImageIcon, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -33,12 +33,10 @@ import {
 import { formatBytes } from "~/features/media-compress/format";
 import type { CompressPhase } from "~/features/media-compress/types";
 import { useCompressResult } from "~/features/media-compress/useCompressResult";
-
 export default function ImageCompressPanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
-
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [meta, setMeta] = useState<ImageMeta | null>(null);
@@ -50,47 +48,39 @@ export default function ImageCompressPanel() {
   const [avifOk, setAvifOk] = useState(true);
   const lastParamsRef = useRef<string>("");
   const probeRunRef = useRef(0);
-  const { result, clearResult, setResult, setResultSize } =
-    useCompressResult();
-
+  const { result, clearResult, setResult, setResultSize } = useCompressResult();
   useEffect(() => {
     void isAvifExportSupported().then(setAvifOk);
   }, []);
-
   useEffect(() => {
     return () => {
       abortRef.current?.abort();
       probeRunRef.current += 1;
     };
   }, []);
-
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
-
-  const estimate = useMemo(() => {
+  const estimate = (() => {
     if (!meta) return null;
-    return estimateImageOutput(meta, { outputFormat, quality });
-  }, [meta, outputFormat, quality]);
-  const paramsKey = useMemo(
-    () => `${outputFormat}-${quality}`,
-    [outputFormat, quality],
-  );
-
+    return estimateImageOutput(meta, {
+      outputFormat,
+      quality,
+    });
+  })();
+  const paramsKey = `${outputFormat}-${quality}`;
   useEffect(() => {
     if (phase !== "done" || lastParamsRef.current === paramsKey) return;
     setPhase("idle");
     setProgress(0);
   }, [paramsKey, phase]);
-
   function resetResultState() {
     clearResult();
     setError(null);
     setProgress(0);
   }
-
   async function applyFile(next: File | null) {
     abortRef.current?.abort();
     abortRef.current = null;
@@ -103,7 +93,6 @@ export default function ImageCompressPanel() {
     setMeta(null);
     setFile(null);
     lastParamsRef.current = "";
-
     if (!next) return;
     if (!isSupportedImageFile(next)) {
       setError(t`仅支持 PNG、JPG、WebP 格式`);
@@ -111,7 +100,7 @@ export default function ImageCompressPanel() {
       return;
     }
 
-    // Keep export format in sync with the source file by default.
+    // 默认让导出格式与源文件保持一致。
     setOutputFormat(detectImageOutputFormat(next));
     setFile(next);
     setPreviewUrl(URL.createObjectURL(next));
@@ -128,7 +117,6 @@ export default function ImageCompressPanel() {
       toast.error(String(err));
     }
   }
-
   async function onCompress() {
     if (!file) {
       toast.error(t`请先选择图片文件`);
@@ -138,27 +126,26 @@ export default function ImageCompressPanel() {
       toast.error(t`当前环境不支持导出 AVIF`);
       return;
     }
-
     if (phase === "done" && lastParamsRef.current === paramsKey) {
       toast.message(t`参数未变化，无需重新处理`);
       return;
     }
-
     resetResultState();
 
-    // Abort any in-flight compression before starting a new one.
+    // 开始新的压缩前，先取消正在进行的压缩。
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
     probeRunRef.current += 1;
-
     setPhase("compressing");
     setProgress(0);
-
     try {
       const result = await compressImageFile(
         file,
-        { outputFormat, quality },
+        {
+          outputFormat,
+          quality,
+        },
         (value) => {
           if (abortRef.current !== controller) return;
           setProgress(value);
@@ -190,16 +177,13 @@ export default function ImageCompressPanel() {
       }
     }
   }
-
   function onCancel() {
     abortRef.current?.abort();
   }
-
   function onClear() {
     void applyFile(null);
     if (inputRef.current) inputRef.current.value = "";
   }
-
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-end">
@@ -223,7 +207,7 @@ export default function ImageCompressPanel() {
         }}
         disabled={phase === "compressing"}
         onFile={(next) => void applyFile(next)}
-        icon={<ImageIcon className="size-5 text-muted-foreground" />}
+        icon={<ImageIcon className="text-muted-foreground size-5" />}
         title={<Trans>拖放图片到此处，或选择文件</Trans>}
         description={<Trans>PNG · JPG · WebP，默认保持原格式输出</Trans>}
         pickLabel={<Trans>选择图片</Trans>}
@@ -242,7 +226,7 @@ export default function ImageCompressPanel() {
         }
       />
 
-      <section className="rounded-lg border border-border bg-card p-2.5">
+      <section className="border-border bg-card rounded-lg border p-2.5">
         <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
           <Field>
             <FieldLabel>
@@ -336,23 +320,23 @@ export default function ImageCompressPanel() {
         />
 
         {error ? (
-          <p className="mt-2 text-xs text-destructive">{error}</p>
+          <p className="text-destructive mt-2 text-xs">{error}</p>
         ) : null}
       </section>
 
       {(previewUrl || result.url) && (
         <section className="grid gap-2 md:grid-cols-2">
           {previewUrl ? (
-            <div className="flex flex-col rounded-lg border border-border bg-card p-2.5">
+            <div className="border-border bg-card flex flex-col rounded-lg border p-2.5">
               <div className="mb-1.5 flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-muted-foreground">
+                <span className="text-muted-foreground text-xs font-medium">
                   <Trans>原图</Trans>
                 </span>
                 {file ? (
                   <Badge variant="outline">{formatBytes(file.size)}</Badge>
                 ) : null}
               </div>
-              <div className="mt-auto h-64 w-full overflow-hidden rounded-md bg-muted/30">
+              <div className="bg-muted/30 mt-auto h-64 w-full overflow-hidden rounded-md">
                 <img
                   src={previewUrl}
                   alt={t`原图预览`}
@@ -370,7 +354,7 @@ export default function ImageCompressPanel() {
               blob={result.blob}
               onSizeChange={setResultSize}
               preview={
-                <div className="h-64 w-full overflow-hidden rounded-md bg-muted/30">
+                <div className="bg-muted/30 h-64 w-full overflow-hidden rounded-md">
                   <img
                     src={result.url}
                     alt={t`压缩结果预览`}
@@ -380,7 +364,7 @@ export default function ImageCompressPanel() {
               }
             />
           ) : (
-            <div className="flex min-h-40 items-center justify-center rounded-lg border border-dashed border-border bg-card p-2.5 text-xs text-muted-foreground">
+            <div className="border-border bg-card text-muted-foreground flex min-h-40 items-center justify-center rounded-lg border border-dashed p-2.5 text-xs">
               <Trans>压缩完成后在此预览输出</Trans>
             </div>
           )}

@@ -1,6 +1,5 @@
 /**
- * Standard billiard ball colors, shared by the Pixi stage and the HUD
- * ball trays so both always agree.
+ * 标准台球颜色，由 Pixi 舞台与 HUD 球托盘共用，以保证两边始终一致。
  */
 export const BALL_HEX: Record<number, string> = {
   0: "#f6f1e7",

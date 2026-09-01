@@ -13,7 +13,6 @@ import {
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
-
 export function GameHomeButton({
   matchActive,
   matchFinished,
@@ -41,22 +40,27 @@ export function GameHomeButton({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle><Trans>返回首页？</Trans></AlertDialogTitle>
+          <AlertDialogTitle>
+            <Trans>返回首页？</Trans>
+          </AlertDialogTitle>
           <AlertDialogDescription>
             <Trans>当前对局尚未结束，返回首页将丢失进度。</Trans>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel><Trans>取消</Trans></AlertDialogCancel>
+          <AlertDialogCancel>
+            <Trans>取消</Trans>
+          </AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Link to="/"><Trans>返回首页</Trans></Link>
+            <Link to="/">
+              <Trans>返回首页</Trans>
+            </Link>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
-
 function RestartButton({ onClick }: { onClick?: () => void }) {
   return (
     <Button variant="ghost" size="xs" onClick={onClick}>
@@ -65,7 +69,6 @@ function RestartButton({ onClick }: { onClick?: () => void }) {
     </Button>
   );
 }
-
 function ExitButton({ onClick }: { onClick?: () => void }) {
   return (
     <Button variant="ghost" size="xs" onClick={onClick}>
@@ -74,7 +77,6 @@ function ExitButton({ onClick }: { onClick?: () => void }) {
     </Button>
   );
 }
-
 export function GameMatchActions({
   matchFinished,
   canRestart,
@@ -93,15 +95,25 @@ export function GameMatchActions({
           <RestartButton onClick={onRestart} />
         ) : (
           <AlertDialog>
-            <AlertDialogTrigger asChild><RestartButton /></AlertDialogTrigger>
+            <AlertDialogTrigger asChild>
+              <RestartButton />
+            </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle><Trans>重新开始对局？</Trans></AlertDialogTitle>
-                <AlertDialogDescription><Trans>当前对局的进度将会丢失。</Trans></AlertDialogDescription>
+                <AlertDialogTitle>
+                  <Trans>重新开始对局？</Trans>
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  <Trans>当前对局的进度将会丢失。</Trans>
+                </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel><Trans>取消</Trans></AlertDialogCancel>
-                <AlertDialogAction onClick={onRestart}><Trans>重开</Trans></AlertDialogAction>
+                <AlertDialogCancel>
+                  <Trans>取消</Trans>
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={onRestart}>
+                  <Trans>重开</Trans>
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -111,17 +123,25 @@ export function GameMatchActions({
         <ExitButton onClick={onExit} />
       ) : (
         <AlertDialog>
-          <AlertDialogTrigger asChild><ExitButton /></AlertDialogTrigger>
+          <AlertDialogTrigger asChild>
+            <ExitButton />
+          </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle><Trans>退出当前对局？</Trans></AlertDialogTitle>
+              <AlertDialogTitle>
+                <Trans>退出当前对局？</Trans>
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 <Trans>将返回模式选择，当前对局的进度将会丢失。</Trans>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel><Trans>取消</Trans></AlertDialogCancel>
-              <AlertDialogAction onClick={onExit}><Trans>退出</Trans></AlertDialogAction>
+              <AlertDialogCancel>
+                <Trans>取消</Trans>
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={onExit}>
+                <Trans>退出</Trans>
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

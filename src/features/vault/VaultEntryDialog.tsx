@@ -16,17 +16,15 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { firstFormError } from "~/lib/form-errors";
 import type { VaultEntry, VaultEntryInput } from "~/types";
-
 interface Props {
   open: boolean;
-  /** Existing entry when editing; null when creating. */
+  /** 编辑时传入已有条目；新建时为 null。 */
   entry: VaultEntry | null;
-  /** Known categories offered as datalist suggestions. */
+  /** 已知的分类，作为 datalist 的候选建议。 */
   categories: string[];
   onOpenChange: (open: boolean) => void;
   onSubmit: (input: VaultEntryInput) => Promise<void>;
 }
-
 const emptyValues = {
   title: "",
   url: "",
@@ -35,7 +33,6 @@ const emptyValues = {
   category: "",
   notes: "",
 };
-
 function toFormValues(entry: VaultEntry | null) {
   if (!entry) return emptyValues;
   return {
@@ -47,7 +44,6 @@ function toFormValues(entry: VaultEntry | null) {
     notes: entry.notes ?? "",
   };
 }
-
 export default function VaultEntryDialog({
   open,
   entry,
@@ -60,7 +56,10 @@ export default function VaultEntryDialog({
     defaultValues: toFormValues(entry),
     validators: {
       onSubmit: z.object({
-        title: z.string().trim().min(1, t`请输入内容`),
+        title: z
+          .string()
+          .trim()
+          .min(1, t`请输入内容`),
         url: z.string(),
         username: z.string().trim(),
         password: z.string(),
@@ -83,15 +82,17 @@ export default function VaultEntryDialog({
       });
     },
   });
-
   useEffect(() => {
     if (open) form.reset(toFormValues(entry));
   }, [form, open, entry]);
-
   const textField = (
     name: "title" | "url" | "username" | "password" | "category",
     label: ReactNode,
-    props?: { type?: string; placeholder?: string; list?: string },
+    props?: {
+      type?: string;
+      placeholder?: string;
+      list?: string;
+    },
   ) => (
     <form.Field name={name}>
       {(field) => {
@@ -121,15 +122,12 @@ export default function VaultEntryDialog({
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={`vault-${name}`}>{label}</Label>
             {Control}
-            {error ? (
-              <p className="text-xs text-destructive">{error}</p>
-            ) : null}
+            {error ? <p className="text-destructive text-xs">{error}</p> : null}
           </div>
         );
       }}
     </form.Field>
   );
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -149,7 +147,9 @@ export default function VaultEntryDialog({
           {textField("title", <Trans>标题</Trans>)}
           <div className="grid gap-3 sm:grid-cols-2">
             {textField("username", <Trans>账号</Trans>)}
-            {textField("password", <Trans>密码</Trans>, { type: "password" })}
+            {textField("password", <Trans>密码</Trans>, {
+              type: "password",
+            })}
           </div>
           {textField("url", <Trans>网址</Trans>, {
             placeholder: "https://",

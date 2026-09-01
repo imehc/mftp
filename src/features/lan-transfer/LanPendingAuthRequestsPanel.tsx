@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
@@ -16,7 +15,6 @@ import {
 import type { LanAuthRequest } from "~/types";
 import { formatRelativeTime } from "~/lib/relative-time";
 import { lanPermissionLabel } from "~/features/lan-transfer/labels";
-
 interface Props {
   requests: LanAuthRequest[];
   refreshing: boolean;
@@ -24,11 +22,9 @@ interface Props {
   approve: (id: string, permission: string) => void;
   reject: (id: string) => void;
 }
-
 const permissionFormSchema = z.object({
   permission: z.enum(["readOnly", "readWrite", "uploadOnly"]),
 });
-
 function LanAuthRequestPermissionForm({
   request,
   approve,
@@ -37,7 +33,9 @@ function LanAuthRequestPermissionForm({
   approve: (id: string, permission: string) => void;
 }) {
   const form = useForm({
-    defaultValues: { permission: "readWrite" },
+    defaultValues: {
+      permission: "readWrite",
+    },
     validators: {
       onSubmit: permissionFormSchema,
     },
@@ -45,7 +43,6 @@ function LanAuthRequestPermissionForm({
       approve(request.id, value.permission);
     },
   });
-
   return (
     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
       <form.Field name="permission">
@@ -67,9 +64,15 @@ function LanAuthRequestPermissionForm({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="readOnly"><Trans>只读</Trans></SelectItem>
-                <SelectItem value="readWrite"><Trans>读写</Trans></SelectItem>
-                <SelectItem value="uploadOnly"><Trans>仅上传</Trans></SelectItem>
+                <SelectItem value="readOnly">
+                  <Trans>只读</Trans>
+                </SelectItem>
+                <SelectItem value="readWrite">
+                  <Trans>读写</Trans>
+                </SelectItem>
+                <SelectItem value="uploadOnly">
+                  <Trans>仅上传</Trans>
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -82,7 +85,6 @@ function LanAuthRequestPermissionForm({
     </div>
   );
 }
-
 export default function LanPendingAuthRequestsPanel({
   requests,
   refreshing,
@@ -91,30 +93,34 @@ export default function LanPendingAuthRequestsPanel({
   reject,
 }: Props) {
   const { t } = useLingui();
-  const sorted = useMemo(
-    () => [...requests].sort((a, b) => b.requestedAt - a.requestedAt),
-    [requests],
-  );
-
+  const sorted = [...requests].sort((a, b) => b.requestedAt - a.requestedAt);
   return (
-    <section className="flex flex-col rounded-lg border border-border bg-card">
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2.5 py-2">
+    <section className="border-border bg-card flex flex-col rounded-lg border">
+      <div className="border-border flex shrink-0 items-center justify-between gap-2 border-b px-2.5 py-2">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold">
             <Trans>待授权请求</Trans>
           </h2>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="text-muted-foreground truncate text-xs">
             <Trans>浏览器访问申请、弹窗确认和白名单回落请求</Trans>
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={refresh} disabled={refreshing}>
-          <RefreshCw className={refreshing ? "animate-spin" : undefined} data-icon="inline-start" />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={refresh}
+          disabled={refreshing}
+        >
+          <RefreshCw
+            className={refreshing ? "animate-spin" : undefined}
+            data-icon="inline-start"
+          />
           <Trans>刷新</Trans>
         </Button>
       </div>
       <div className="p-2">
         {sorted.length === 0 ? (
-          <div className="flex min-h-24 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
+          <div className="border-border text-muted-foreground flex min-h-24 items-center justify-center rounded-md border border-dashed text-xs">
             <Trans>暂无待授权请求</Trans>
           </div>
         ) : (
@@ -123,18 +129,20 @@ export default function LanPendingAuthRequestsPanel({
               return (
                 <div
                   key={request.id}
-                  className="grid gap-2 rounded-md border border-border px-2.5 py-2"
+                  className="border-border grid gap-2 rounded-md border px-2.5 py-2"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex min-w-0 items-center gap-1.5">
-                        <Shield className="size-3.5 shrink-0 text-muted-foreground" />
+                        <Shield className="text-muted-foreground size-3.5 shrink-0" />
                         <span className="truncate text-sm font-medium">
                           {request.deviceName}
                         </span>
-                        <Badge variant="outline">{lanPermissionLabel(request.accessType)}</Badge>
+                        <Badge variant="outline">
+                          {lanPermissionLabel(request.accessType)}
+                        </Badge>
                       </div>
-                      <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                      <div className="text-muted-foreground mt-0.5 truncate text-xs">
                         {request.ip} · {formatRelativeTime(request.requestedAt)}
                       </div>
                     </div>
@@ -149,7 +157,10 @@ export default function LanPendingAuthRequestsPanel({
                       <ShieldOff className="text-destructive" />
                     </Button>
                   </div>
-                  <LanAuthRequestPermissionForm request={request} approve={approve} />
+                  <LanAuthRequestPermissionForm
+                    request={request}
+                    approve={approve}
+                  />
                 </div>
               );
             })}

@@ -7,8 +7,8 @@ import {
 import { cn } from "~/lib/utils";
 
 /**
- * Shared dialog frame: the title and action bar stay in place while only the
- * body scrolls. Consumers compose it with the existing Dialog root/title API.
+ * 通用对话框框架：标题栏和操作栏保持不动，仅主体区域滚动。
+ * 调用方结合已有的 Dialog root/title API 组合使用。
  */
 function DialogLayoutContent({
   className,
@@ -31,7 +31,7 @@ function DialogLayoutHeader({
 }: React.ComponentProps<typeof DialogHeader>) {
   return (
     <DialogHeader
-      className={cn("border-b border-border pb-3", className)}
+      className={cn("border-border border-b pb-3", className)}
       {...props}
     />
   );

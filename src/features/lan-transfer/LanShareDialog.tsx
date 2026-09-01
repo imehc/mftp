@@ -25,19 +25,16 @@ import {
   type LanSharedDirFormValues,
 } from "~/features/lan-transfer/lanTransferForms.schema";
 import type { LanSharedDirInput } from "~/types";
-
 interface LanShareDialogProps {
   open: boolean;
   busy: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (input: LanSharedDirInput) => Promise<void>;
 }
-
 const emptyShareFormValues: LanSharedDirFormValues = {
   name: "",
   path: "",
 };
-
 export default function LanShareDialog({
   open: dialogOpen,
   busy,
@@ -54,11 +51,9 @@ export default function LanShareDialog({
       await onAdd(lanSharedDirFormValuesToInput(value));
     },
   });
-
   useEffect(() => {
     if (dialogOpen) form.reset(emptyShareFormValues);
   }, [dialogOpen, form]);
-
   async function chooseShareDir() {
     const selected = await open({
       multiple: false,
@@ -72,7 +67,6 @@ export default function LanShareDialog({
       form.setFieldValue("name", parts[parts.length - 1] ?? t`共享目录`);
     }
   }
-
   return (
     <Dialog open={dialogOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
@@ -119,7 +113,11 @@ export default function LanShareDialog({
                       className="flex-1"
                       aria-invalid={!!error}
                     />
-                    <Button type="button" variant="outline" onClick={chooseShareDir}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={chooseShareDir}
+                    >
                       <FolderOpen data-icon="inline-start" />
                       <Trans>选择</Trans>
                     </Button>

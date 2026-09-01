@@ -1,7 +1,6 @@
 /**
- * Extension -> preview kind. Shared by every module that previews files
- * (BT streams, SFTP, local pickers), so it lives in lib rather than a
- * feature folder.
+ * 扩展名 -> 预览类型。所有需要预览文件的模块共用
+ *（BT 流、SFTP、本地选择器），因此放在 lib 而非某个 feature 文件夹中。
  */
 
 export type PreviewKind = "video" | "audio" | "image" | "text" | "other";
@@ -18,8 +17,26 @@ const VIDEO = new Set([
   "ts",
   "m2ts",
 ]);
-const AUDIO = new Set(["mp3", "flac", "aac", "ogg", "wav", "m4a", "opus", "wma"]);
-const IMAGE = new Set(["jpg", "jpeg", "png", "gif", "webp", "bmp", "avif", "svg"]);
+const AUDIO = new Set([
+  "mp3",
+  "flac",
+  "aac",
+  "ogg",
+  "wav",
+  "m4a",
+  "opus",
+  "wma",
+]);
+const IMAGE = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "bmp",
+  "avif",
+  "svg",
+]);
 const TEXT = new Set([
   "txt",
   "md",
@@ -38,7 +55,12 @@ const TEXT = new Set([
   "vtt",
 ]);
 
-const PREVIEW_KINDS: readonly PreviewKind[] = ["video", "audio", "image", "text"];
+const PREVIEW_KINDS: readonly PreviewKind[] = [
+  "video",
+  "audio",
+  "image",
+  "text",
+];
 
 export function extensionOf(path: string): string {
   const name = path.split(/[\\/]/).pop() ?? "";
@@ -59,7 +81,7 @@ export function isPreviewable(kind: PreviewKind): boolean {
   return kind !== "other";
 }
 
-/** Narrow an untrusted value (URL search param) back to a kind. */
+/** 把一个不可信的值（URL 查询参数）收敛回预览类型。 */
 export function toPreviewKind(value: unknown): PreviewKind | undefined {
   return PREVIEW_KINDS.find((kind) => kind === value);
 }

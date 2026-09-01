@@ -14,8 +14,8 @@ import TransferPanel from "~/features/transfers/TransferPanel";
 import TabBar from "~/features/ssh-sftp/components/terminal/TabBar";
 import Terminal from "~/features/ssh-sftp/components/terminal/Terminal";
 import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
-// Lazy: the monitor pulls in the chart library, which the rest of the app
-// never needs; only pay for it when a monitor view is actually opened.
+// 懒加载：监控面板会引入图表库，而应用的其它部分并不需要它；
+// 仅在真正打开监控视图时才付出这个代价。
 const SystemMonitorPanel = lazy(
   () => import("~/features/ssh-sftp/components/monitor/SystemMonitorPanel"),
 );
@@ -31,13 +31,10 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-
 const SIDEBAR_COLLAPSED_SIZE = 52;
-
 function Workspace() {
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
-
   return (
     <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
       <TabBar />
@@ -57,14 +54,16 @@ function Workspace() {
             </EmptyHeader>
           </Empty>
         ) : null}
-        {/* Keep every session mounted so terminals preserve their state. */}
+        {/* 保持每个会话都挂载，以便终端保留自身状态。 */}
         {sessions.map((session) => (
           <div
             key={session.id}
             className="absolute inset-0"
-            style={{ display: session.id === activeId ? "block" : "none" }}
+            style={{
+              display: session.id === activeId ? "block" : "none",
+            }}
           >
-            {/* Terminal stays mounted to keep the shell alive across view switches. */}
+            {/* 终端保持挂载，使 shell 在视图切换间保持存活。 */}
             <div
               className="h-full"
               style={{
@@ -77,7 +76,7 @@ function Workspace() {
             {session.view === "monitor" && (
               <Suspense
                 fallback={
-                  <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <div className="text-muted-foreground flex h-full items-center justify-center gap-2 text-sm">
                     <LoaderCircle className="animate-spin" />
                     <Trans>正在加载系统监控…</Trans>
                   </div>
@@ -93,27 +92,35 @@ function Workspace() {
   );
 }
 
-/** Compact layout: sidebar lives in a drawer instead of a resizable panel. */
+/** 紧凑布局：侧边栏放在抽屉里，而不是可缩放面板。 */
 function CompactSshSftpTool() {
   const { t } = useLingui();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
 
-  // Close the drawer once a session is opened/activated from the sidebar.
+  // 从侧边栏打开 / 激活会话后关闭抽屉。
   const sessionCount = sessions.length;
-  const previousRef = useRef({ sessionCount, activeId });
+  const previousRef = useRef({
+    sessionCount,
+    activeId,
+  });
   useEffect(() => {
     const previous = previousRef.current;
-    previousRef.current = { sessionCount, activeId };
-    if (sessionCount > previous.sessionCount || activeId !== previous.activeId) {
+    previousRef.current = {
+      sessionCount,
+      activeId,
+    };
+    if (
+      sessionCount > previous.sessionCount ||
+      activeId !== previous.activeId
+    ) {
       setDrawerOpen(false);
     }
   }, [sessionCount, activeId]);
-
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex h-9 shrink-0 items-center justify-between border-b border-border px-2">
+    <div className="bg-background text-foreground flex h-full w-full flex-col overflow-hidden">
+      <header className="border-border flex h-9 shrink-0 items-center justify-between border-b px-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <Button variant="ghost" size="xs" asChild>
             <Link to="/">
@@ -121,7 +128,7 @@ function CompactSshSftpTool() {
               <Trans>首页</Trans>
             </Link>
           </Button>
-          <div className="h-4 w-px bg-border" />
+          <div className="bg-border h-4 w-px" />
           <Button
             variant="ghost"
             size="xs"
@@ -132,7 +139,7 @@ function CompactSshSftpTool() {
             <Trans>主机</Trans>
           </Button>
         </div>
-        <div className="truncate text-xs font-medium text-muted-foreground">
+        <div className="text-muted-foreground truncate text-xs font-medium">
           SSH / SFTP
         </div>
       </header>
@@ -151,7 +158,10 @@ function CompactSshSftpTool() {
             <Trans>主机列表</Trans>
           </SheetTitle>
           <div className="min-h-0 flex-1 overflow-hidden">
-            <Sidebar collapsed={false} onToggleCollapsed={() => setDrawerOpen(false)} />
+            <Sidebar
+              collapsed={false}
+              onToggleCollapsed={() => setDrawerOpen(false)}
+            />
           </div>
         </SheetContent>
       </Sheet>
@@ -162,7 +172,6 @@ function CompactSshSftpTool() {
     </div>
   );
 }
-
 export default function SshSftpTool() {
   const { t } = useLingui();
   const compact = useMediaQuery("(max-width: 760px)");
@@ -171,22 +180,18 @@ export default function SshSftpTool() {
   const sidebarCollapsed = useSettingsStore((s) => s.sidebarCollapsed);
   const setSidebarSize = useSettingsStore((s) => s.setSidebarSize);
   const setSidebarCollapsed = useSettingsStore((s) => s.setSidebarCollapsed);
-
   useEffect(() => {
     if (sidebarCollapsed) sidebarPanelRef.current?.collapse();
   }, [sidebarCollapsed]);
-
   const defaultLayout = {
     sidebar: sidebarSize,
     workspace: Math.max(0, 100 - sidebarSize),
   };
-
   if (compact) {
     return <CompactSshSftpTool />;
   }
-
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground">
+    <div className="bg-background text-foreground flex h-full w-full flex-col overflow-hidden">
       <ToolPageHeader title="SSH / SFTP" />
       <Group
         orientation="horizontal"
@@ -234,12 +239,16 @@ export default function SshSftpTool() {
           />
         </Panel>
         <Separator
-          className="group relative w-1 shrink-0 bg-border/60 transition-colors hover:bg-border data-[resize-handle-active]:bg-primary/50"
+          className="group bg-border/60 hover:bg-border data-[resize-handle-active]:bg-primary/50 relative w-1 shrink-0 transition-colors"
           aria-label={t`调整左侧面板宽度`}
         >
-          <span className="absolute left-1/2 top-1/2 h-8 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-transparent transition-colors group-hover:bg-foreground/30" />
+          <span className="group-hover:bg-foreground/30 absolute top-1/2 left-1/2 h-8 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-transparent transition-colors" />
         </Separator>
-        <Panel id="workspace" minSize="260px" className="h-full overflow-hidden">
+        <Panel
+          id="workspace"
+          minSize="260px"
+          className="h-full overflow-hidden"
+        >
           <Workspace />
         </Panel>
       </Group>

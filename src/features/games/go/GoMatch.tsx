@@ -1,8 +1,8 @@
 /**
- * Local match wiring (vs-AI / hotseat) and the shared match view used by
- * both local and online play: status bar, board stage, and result bar.
+ * 本地对局装配（人机 / 同屏）以及本地与联机共用的对局视图：状态栏、
+ * 棋盘舞台与结果条。
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Flag, Undo2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
@@ -27,7 +27,7 @@ import {
   type GoState,
 } from "./types";
 
-/** Extra view state when the match runs over the LAN room channel. */
+/** 对局走局域网房间通道时额外的视图状态。 */
 export interface OnlineViewProps {
   peerName: string;
   localSeat: SeatIndex;
@@ -35,7 +35,6 @@ export interface OnlineViewProps {
   rematchWaiting: boolean;
   onRequestUndo(plies: number): void;
 }
-
 export function GoMatch({
   mode,
   onRematch,
@@ -49,7 +48,12 @@ export function GoMatch({
 }) {
   const [session, setSession] = useState<GoSession | null>(null);
   const volume = useSettingsStore((s) => s.gamesVolume);
-
+  // runner 每个 keyed 实例只构建一次；音量通过最新值 ref 读取，
+  // 以免对局中途改音量导致 runner 重建。
+  const volumeRef = useRef(volume);
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
   useEffect(() => {
     const local = new LocalController<GoState, GoMove>();
     let controllers: PlayerController<GoState, GoMove>[];
@@ -61,29 +65,43 @@ export function GoMatch({
         mode.kind === "ai" ? mode.difficulty : "medium",
         350,
       );
-      // Playing white means moving second: the AI takes seat 0 (black) and opens the game.
+      // 执白即后手：AI 占据 0 号位（黑），由它开局。
       controllers =
         mode.kind === "ai" && mode.localSeat === 1 ? [ai, local] : [local, ai];
     }
     const boardSize = mode.kind === "online" ? 19 : mode.boardSize;
-    const runner = new MatchRunner(goGame, createInitialGoState(boardSize), controllers, {
-      onMoveResolved: ({ resolution }) => {
-        if (resolution.presentation.captured.length > 0) playCaptureSound(volume);
-        else playStoneSound(volume);
-        if (resolution.state.finished) playFinishSound(volume);
+    const runner = new MatchRunner(
+      goGame,
+      createInitialGoState(boardSize),
+      controllers,
+      {
+        onMoveResolved: ({ resolution }) => {
+          if (resolution.presentation.captured.length > 0)
+            playCaptureSound(volumeRef.current);
+          else playStoneSound(volumeRef.current);
+          if (resolution.state.finished) playFinishSound(volumeRef.current);
+        },
+        onError: (error) => console.error("go match error", error),
       },
-      onError: (error) => console.error("go match error", error),
-    });
+    );
     runner.start();
-    setSession({ runner, local });
+    // 用微任务延迟，使 setState 发生在 effect 主体之外；cancelled 标记
+    // 防止严格模式重挂载时发布已销毁的 runner。
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled)
+        setSession({
+          runner,
+          local,
+        });
+    });
     return () => {
+      cancelled = true;
       runner.dispose();
       setSession(null);
     };
-    // mode identity is stable per <GoMatch key=...> instance.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+    // 每个 <GoMatch key=...> 实例的 mode 标识是稳定的。
+  }, [mode]);
   if (!session) return <div className="flex-1" />;
   return (
     <GoMatchView
@@ -95,7 +113,6 @@ export function GoMatch({
     />
   );
 }
-
 export function GoMatchView({
   mode,
   session,
@@ -128,7 +145,7 @@ export function GoMatchView({
     runner.controllers[snapshot.activeSeat]?.kind === "ai";
   const localSeat =
     mode.kind === "online"
-      ? online?.localSeat ?? 0
+      ? (online?.localSeat ?? 0)
       : mode.kind === "ai"
         ? mode.localSeat
         : 0;
@@ -141,7 +158,7 @@ export function GoMatchView({
     snapshot.phase === "awaiting-move" &&
     state.moveCount >= undoPlies &&
     !online?.undoWaiting;
-  const legalPoints = useMemo(() => {
+  const legalPoints = (() => {
     const points = Array<boolean>(state.board.length).fill(false);
     if (!activeIsLocal) return points;
     for (const move of legalPlays(state)) {
@@ -150,21 +167,19 @@ export function GoMatchView({
       }
     }
     return points;
-  }, [activeIsLocal, state]);
-
+  })();
   useEffect(() => {
     onFinishedChange(state.finished);
   }, [onFinishedChange, state.finished]);
-
   useEffect(() => {
     if (!state.finished) {
-      setShowResult(false);
+      // 用微任务延迟，使 setState 发生在 effect 主体之外。
+      queueMicrotask(() => setShowResult(false));
       return;
     }
     const timer = setTimeout(() => setShowResult(true), 700);
     return () => clearTimeout(timer);
   }, [state.finished]);
-
   useEffect(() => {
     if (!state.finished || recordedRef.current) return;
     recordedRef.current = true;
@@ -187,14 +202,29 @@ export function GoMatchView({
               : undefined,
       } satisfies GoHistoryPayload,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.finished]);
 
-  const submitPass = () => local.submit({ kind: "pass" });
-
+    // 上面的 recordedRef 保证只记录一条；这里的每个依赖项在本 keyed
+    // 对局实例的整个生命周期内都是稳定的。
+  }, [
+    addRecord,
+    mode,
+    online,
+    snapshot.winnerSeat,
+    state.finished,
+    state.boardSize,
+    state.finalScore,
+    state.moveCount,
+  ]);
+  const submitPass = () =>
+    local.submit({
+      kind: "pass",
+    });
+  const seatNameValue = seatName(mode, state.turnSeat, online);
+  const value = state.captures[0];
+  const value2 = state.captures[1];
   return (
     <>
-      <div className="border-b border-border px-2 py-1 text-xs">
+      <div className="border-border border-b px-2 py-1 text-xs">
         <div className="flex flex-wrap items-center justify-center gap-1.5">
           {state.finished ? (
             <Badge variant="secondary">
@@ -202,18 +232,22 @@ export function GoMatchView({
             </Badge>
           ) : (
             <Badge variant="secondary">
-              <Trans>轮到 {seatName(mode, state.turnSeat, online)}</Trans>
+              <Trans>轮到 {seatNameValue}</Trans>
             </Badge>
           )}
           <Badge variant="outline">
             <Plural
-              value={{ moveNumber: state.moveCount + (state.finished ? 0 : 1) }}
+              value={{
+                moveNumber: state.moveCount + (state.finished ? 0 : 1),
+              }}
               one="第 # 手"
               other="第 # 手"
             />
           </Badge>
           <Badge variant="outline">
-            <Trans>提子 {state.captures[0]}:{state.captures[1]}</Trans>
+            <Trans>
+              提子 {value}:{value2}
+            </Trans>
           </Badge>
           {state.finished && state.finalScore ? (
             <Badge variant="outline">{scoreLine(state)}</Badge>
@@ -289,7 +323,13 @@ export function GoMatchView({
           details={
             <span className="flex flex-wrap justify-center gap-x-2 sm:justify-start">
               {state.finalScore ? <span>{scoreLine(state)}</span> : null}
-              <Plural value={{ moveCount: state.moveCount }} one="共 # 手" other="共 # 手" />
+              <Plural
+                value={{
+                  moveCount: state.moveCount,
+                }}
+                one="共 # 手"
+                other="共 # 手"
+              />
             </span>
           }
           rematchWaiting={online?.rematchWaiting}

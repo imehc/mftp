@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DndContext,
@@ -68,16 +68,19 @@ import {
   vaultEntryUpdate,
 } from "~/lib/ipc";
 import type { VaultEntry, VaultEntryInput } from "~/types";
-
 const ALL_CATEGORIES = "__all__";
-
 function formatError(error: unknown): string {
   if (error && typeof error === "object" && "message" in error) {
-    return String((error as { message: unknown }).message);
+    return String(
+      (
+        error as {
+          message: unknown;
+        }
+      ).message,
+    );
   }
   return String(error);
 }
-
 function SortableEntryCard({
   id,
   sortable,
@@ -95,14 +98,16 @@ function SortableEntryCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id, disabled: !sortable });
+  } = useSortable({
+    id,
+    disabled: !sortable,
+  });
   const style = {
-    // Translate only: Transform would also apply the strategy's scale and
-    // squash cards whose heights differ.
+    // 只做位移：若用 Transform 还会套用策略的缩放，
+    // 把高度不同的卡片压扁。
     transform: CSS.Translate.toString(transform),
     transition,
   };
-
   return (
     <div
       ref={setNodeRef}
@@ -112,7 +117,7 @@ function SortableEntryCard({
       {sortable ? (
         <button
           type="button"
-          className="absolute left-1 top-1/2 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-accent"
+          className="text-muted-foreground hover:bg-accent absolute top-1/2 left-1 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md"
           aria-label={t`拖动排序`}
           {...attributes}
           {...listeners}
@@ -124,7 +129,6 @@ function SortableEntryCard({
     </div>
   );
 }
-
 export default function VaultTool() {
   const { t } = useLingui();
   const [entries, setEntries] = useState<VaultEntry[]>([]);
@@ -135,25 +139,28 @@ export default function VaultTool() {
   const [deleting, setDeleting] = useState<VaultEntry | null>(null);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
-
   useEffect(() => {
     vaultEntriesList()
       .then(setEntries)
       .catch((error) => toast.error(formatError(error)));
   }, []);
-
-  const categories = useMemo(() => {
+  const categories = (() => {
     const set = new Set<string>();
     for (const entry of entries) {
       if (entry.category) set.add(entry.category);
     }
     return [...set].sort((a, b) => a.localeCompare(b));
-  }, [entries]);
-
-  const filtered = useMemo(() => {
+  })();
+  const filtered = (() => {
     const keyword = search.trim().toLowerCase();
     return entries.filter((entry) => {
       if (category !== ALL_CATEGORIES && entry.category !== category) {
@@ -164,20 +171,16 @@ export default function VaultTool() {
         .filter(Boolean)
         .some((text) => String(text).toLowerCase().includes(keyword));
     });
-  }, [entries, search, category]);
-
+  })();
   const canSort =
     !search.trim() && category === ALL_CATEGORIES && entries.length > 1;
-  const sortableIds = useMemo(() => entries.map((e) => e.id), [entries]);
-
+  const sortableIds = entries.map((e) => e.id);
   async function onDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
     const oldIndex = sortableIds.indexOf(String(active.id));
     const newIndex = sortableIds.indexOf(String(over.id));
     if (oldIndex < 0 || newIndex < 0) return;
-
     const previous = entries;
     setEntries(arrayMove(entries, oldIndex, newIndex));
     try {
@@ -191,7 +194,6 @@ export default function VaultTool() {
       toast.error(t`排序保存失败：${error}`);
     }
   }
-
   async function copyText(value: string, successMessage: string) {
     if (!value) return;
     try {
@@ -201,7 +203,6 @@ export default function VaultTool() {
       toast.error(formatError(error));
     }
   }
-
   function toggleVisible(id: string) {
     setVisibleIds((prev) => {
       const next = new Set(prev);
@@ -210,7 +211,6 @@ export default function VaultTool() {
       return next;
     });
   }
-
   async function handleSubmit(input: VaultEntryInput) {
     try {
       if (editing) {
@@ -229,7 +229,6 @@ export default function VaultTool() {
       toast.error(formatError(error));
     }
   }
-
   async function handleDelete() {
     if (!deleting) return;
     try {
@@ -242,23 +241,29 @@ export default function VaultTool() {
       setDeleting(null);
     }
   }
-
   return (
-    <main className="flex h-full flex-col bg-background text-foreground">
-      <ToolPageHeader title={<Trans>密码本</Trans>} trailing={<Badge variant="outline"><Trans>本地</Trans></Badge>} />
+    <main className="bg-background text-foreground flex h-full flex-col">
+      <ToolPageHeader
+        title={<Trans>密码本</Trans>}
+        trailing={
+          <Badge variant="outline">
+            <Trans>本地</Trans>
+          </Badge>
+        }
+      />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card rounded-lg border p-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background">
+              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
                 <KeyRound className="size-4" />
               </div>
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold">
                   <Trans>密码本</Trans>
                 </h1>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="text-muted-foreground truncate text-xs">
                   <Trans>本地保存账号密码，点击即可复制</Trans>
                 </p>
               </div>
@@ -276,7 +281,7 @@ export default function VaultTool() {
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -342,7 +347,7 @@ export default function VaultTool() {
                     >
                       <section
                         className={cn(
-                          "rounded-lg border border-border bg-card p-2.5",
+                          "border-border bg-card rounded-lg border p-2.5",
                           canSort && "pl-6",
                         )}
                       >
@@ -395,7 +400,7 @@ export default function VaultTool() {
                           <div className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
                             {entry.username ? (
                               <div className="flex min-w-0 items-center gap-1.5">
-                                <span className="shrink-0 text-xs text-muted-foreground">
+                                <span className="text-muted-foreground shrink-0 text-xs">
                                   <Trans>账号</Trans>
                                 </span>
                                 <span className="min-w-0 truncate font-mono text-xs">
@@ -406,7 +411,10 @@ export default function VaultTool() {
                                   size="icon-sm"
                                   title={t`复制账号`}
                                   onClick={() =>
-                                    void copyText(entry.username!, t`已复制账号`)
+                                    void copyText(
+                                      entry.username!,
+                                      t`已复制账号`,
+                                    )
                                   }
                                 >
                                   <Copy />
@@ -415,7 +423,7 @@ export default function VaultTool() {
                             ) : null}
                             {entry.password ? (
                               <div className="flex min-w-0 items-center gap-1.5">
-                                <span className="shrink-0 text-xs text-muted-foreground">
+                                <span className="text-muted-foreground shrink-0 text-xs">
                                   <Trans>密码</Trans>
                                 </span>
                                 <span className="min-w-0 truncate font-mono text-xs">
@@ -434,7 +442,10 @@ export default function VaultTool() {
                                   size="icon-sm"
                                   title={t`复制密码`}
                                   onClick={() =>
-                                    void copyText(entry.password!, t`已复制密码`)
+                                    void copyText(
+                                      entry.password!,
+                                      t`已复制密码`,
+                                    )
                                   }
                                 >
                                   <Copy />
@@ -446,12 +457,12 @@ export default function VaultTool() {
                         {entry.url || entry.notes ? (
                           <div className="mt-1 flex flex-col gap-0.5">
                             {entry.url ? (
-                              <p className="truncate text-xs text-muted-foreground">
+                              <p className="text-muted-foreground truncate text-xs">
                                 {entry.url}
                               </p>
                             ) : null}
                             {entry.notes ? (
-                              <p className="line-clamp-2 whitespace-pre-wrap text-xs text-muted-foreground">
+                              <p className="text-muted-foreground line-clamp-2 text-xs whitespace-pre-wrap">
                                 {entry.notes}
                               </p>
                             ) : null}

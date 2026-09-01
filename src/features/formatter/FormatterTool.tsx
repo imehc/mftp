@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { openSearchPanel } from "@codemirror/search";
@@ -36,15 +36,12 @@ import {
 } from "~/features/formatter/languages";
 import type { FormatResult } from "~/features/formatter/json";
 import type { SortDirection } from "~/features/formatter/json";
-
 type IndentId = "2" | "4" | "tab";
-
 const indentValues: Record<IndentId, string> = {
   "2": "  ",
   "4": "    ",
   tab: "\t",
 };
-
 export default function FormatterTool() {
   const { t } = useLingui();
   const { resolvedTheme } = useTheme();
@@ -53,75 +50,80 @@ export default function FormatterTool() {
   const [indent, setIndent] = useState<IndentId>("2");
   const [value, setValue] = useState("");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
   const language = getFormatterLanguage(languageId);
 
-  // Live validation while typing: disable format/compress/sort-keys when the
-  // document is invalid (validate & escape are exempt).
-  const isDocValid = useMemo(() => {
+  // 输入时实时校验：文档无效时禁用格式化 / 压缩 / 排序键
+  //（校验与转义不受此限制）。
+  const isDocValid = (() => {
     if (!value.trim() || !language.validate) return true;
     return language.validate(value).ok;
-  }, [language, value]);
-
-  function describeError(result: Extract<FormatResult, { ok: false }>): string {
-    // Engine errors (e.g. "Unrecognized token") are unreadable for users;
-    // replace them with localized copy.
+  })();
+  function describeError(
+    result: Extract<
+      FormatResult,
+      {
+        ok: false;
+      }
+    >,
+  ): string {
+    const resultLine = result.line;
+    const resultColumn = result.column;
+    const languageLabel = language.label;
+    // 引擎报错（如 "Unrecognized token"）对用户难以理解；
+    // 用本地化的提示文案替换。
     return result.line !== undefined && result.column !== undefined
-      ? t`第 ${result.line} 行第 ${result.column} 列附近有语法错误`
-      : t`内容不是有效的 ${language.label}`;
+      ? t`第 ${resultLine} 行第 ${resultColumn} 列附近有语法错误`
+      : t`内容不是有效的 ${languageLabel}`;
   }
-
-  const extensions = useMemo(
-    () => [
-      ...language.extensions(),
-      // UI strings for CodeMirror panels (search etc.): key is CodeMirror's
-      // original English text, value goes through Lingui so panels follow
-      // the app language.
-      EditorState.phrases.of({
-        Find: t`查找`,
-        Replace: t`替换为`,
-        next: t`下一个`,
-        previous: t`上一个`,
-        all: t`全部`,
-        "match case": t`区分大小写`,
-        "by word": t`全字匹配`,
-        regexp: t`正则`,
-        replace: t`替换`,
-        "replace all": t`全部替换`,
-        close: t({
-          context: "action",
-          comment: "Button that closes the CodeMirror search panel",
-          message: "关闭",
-        }),
-        "current match": t`当前匹配`,
-        "Go to line": t`跳转到行`,
-        go: t`跳转`,
+  const extensions = [
+    ...language.extensions(),
+    // CodeMirror 面板（搜索等）的 UI 文案：键是 CodeMirror 原来的
+    // 英文文本，值走 Lingui，使面板跟随应用语言。
+    EditorState.phrases.of({
+      Find: t`查找`,
+      Replace: t`替换为`,
+      next: t`下一个`,
+      previous: t`上一个`,
+      all: t`全部`,
+      "match case": t`区分大小写`,
+      "by word": t`全字匹配`,
+      regexp: t`正则`,
+      replace: t`替换`,
+      "replace all": t`全部替换`,
+      close: t({
+        context: "action",
+        comment: "Button that closes the CodeMirror search panel",
+        message: "关闭",
       }),
-    ],
-    [language, t],
-  );
+      "current match": t`当前匹配`,
+      "Go to line": t`跳转到行`,
+      go: t`跳转`,
+    }),
+  ];
+  const basicSetup = {
+    foldGutter: true,
+    highlightActiveLine: true,
+    searchKeymap: true,
+  };
 
-  const basicSetup = useMemo(
-    () => ({ foldGutter: true, highlightActiveLine: true, searchKeymap: true }),
-    [],
-  );
-
-  /** Read the source of truth from the editor itself, not React state,
-   * so formatting works even if a controlled-value sync is still pending. */
+  /** 直接从编辑器读取真实内容，而不是用 React state，
+   * 这样即便受控值的同步尚未完成，格式化也能正常工作。 */
   function currentDoc(): string {
     return editorRef.current?.view?.state.doc.toString() ?? value;
   }
-
   function replaceDoc(next: string) {
     const view = editorRef.current?.view;
     if (view) {
       view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: next },
+        changes: {
+          from: 0,
+          to: view.state.doc.length,
+          insert: next,
+        },
       });
     }
     setValue(next);
   }
-
   function applyResult(result: FormatResult) {
     if (result.ok) {
       replaceDoc(result.value);
@@ -129,52 +131,53 @@ export default function FormatterTool() {
     }
     toast.error(describeError(result));
   }
-
   function handleFormat() {
     const doc = currentDoc();
     if (!doc.trim()) return;
-    applyResult(language.format(doc, { indent: indentValues[indent] }));
+    applyResult(
+      language.format(doc, {
+        indent: indentValues[indent],
+      }),
+    );
   }
-
   function handleMinify() {
     const doc = currentDoc();
     if (!doc.trim() || !language.minify) return;
     applyResult(language.minify(doc));
   }
-
   function handleValidate() {
     const doc = currentDoc();
     if (!doc.trim() || !language.validate) return;
     const result = language.validate(doc);
     if (result.ok) {
-      toast.success(t`${language.label} 格式有效`);
+      const languageLabel2 = language.label;
+      toast.success(t`${languageLabel2} 格式有效`);
     } else {
       toast.error(describeError(result));
     }
   }
-
   function handleSortKeys() {
     const doc = currentDoc();
     if (!doc.trim() || !language.sortKeys) return;
     const result = language.sortKeys(
       doc,
-      { indent: indentValues[indent] },
+      {
+        indent: indentValues[indent],
+      },
       sortDirection,
     );
     if (result.ok) {
-      // Alternate asc/desc: re-clicking still applies (and flips the
-      // direction) even when the input is unchanged.
+      // 在升序 / 降序之间切换：即使输入未变，再次点击仍会
+      // 生效（并翻转方向）。
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     }
     applyResult(result);
   }
-
   function handleEscape() {
     const doc = currentDoc();
     if (!doc || !language.escape) return;
     applyResult(language.escape(doc));
   }
-
   function handleUnescape() {
     const doc = currentDoc();
     if (!doc || !language.unescape) return;
@@ -185,7 +188,6 @@ export default function FormatterTool() {
     }
     applyResult(result);
   }
-
   function handleSearch() {
     const view = editorRef.current?.view;
     if (view) {
@@ -193,7 +195,6 @@ export default function FormatterTool() {
       view.focus();
     }
   }
-
   async function handleCopy() {
     const doc = currentDoc();
     if (!doc) return;
@@ -204,23 +205,30 @@ export default function FormatterTool() {
       toast.error(String(error));
     }
   }
-
+  const languageLabel3 = language.label;
   return (
-    <main className="flex h-full flex-col bg-background text-foreground">
-      <ToolPageHeader title={<Trans>格式化</Trans>} trailing={<Badge variant="outline"><Trans>本地处理</Trans></Badge>} />
+    <main className="bg-background text-foreground flex h-full flex-col">
+      <ToolPageHeader
+        title={<Trans>格式化</Trans>}
+        trailing={
+          <Badge variant="outline">
+            <Trans>本地处理</Trans>
+          </Badge>
+        }
+      />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card rounded-lg border p-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background">
+              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
                 <Braces className="size-4" />
               </div>
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold">
                   <Trans>格式化</Trans>
                 </h1>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="text-muted-foreground truncate text-xs">
                   <Trans>格式化、压缩与校验结构化数据</Trans>
                 </p>
               </div>
@@ -258,7 +266,7 @@ export default function FormatterTool() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card rounded-lg border p-2.5">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
             <Field>
               <FieldLabel>
@@ -302,10 +310,22 @@ export default function FormatterTool() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="2">
-                    <Plural value={{ spaces: 2 }} one="# 空格" other="# 空格" />
+                    <Plural
+                      value={{
+                        spaces: 2,
+                      }}
+                      one="# 空格"
+                      other="# 空格"
+                    />
                   </SelectItem>
                   <SelectItem value="4">
-                    <Plural value={{ spaces: 4 }} one="# 空格" other="# 空格" />
+                    <Plural
+                      value={{
+                        spaces: 4,
+                      }}
+                      one="# 空格"
+                      other="# 空格"
+                    />
                   </SelectItem>
                   <SelectItem value="tab">Tab</SelectItem>
                 </SelectContent>
@@ -385,29 +405,33 @@ export default function FormatterTool() {
           </div>
         </section>
 
-        <section className="flex min-h-72 flex-1 flex-col gap-1.5 rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card flex min-h-72 flex-1 flex-col gap-1.5 rounded-lg border p-2.5">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-muted-foreground text-xs font-medium">
               <Trans>内容</Trans>
             </span>
             <div className="flex items-center gap-1">
               <Badge variant="outline">
                 <Plural
-                  value={{ lineCount: value ? value.split("\n").length : 0 }}
+                  value={{
+                    lineCount: value ? value.split("\n").length : 0,
+                  }}
                   one="# 行"
                   other="# 行"
                 />
               </Badge>
               <Badge variant="outline">
                 <Plural
-                  value={{ characterCount: value.length }}
+                  value={{
+                    characterCount: value.length,
+                  }}
                   one="# 个字符"
                   other="# 个字符"
                 />
               </Badge>
             </div>
           </div>
-          <div className="min-h-0 flex-1 overflow-hidden rounded-md border border-border">
+          <div className="border-border min-h-0 flex-1 overflow-hidden rounded-md border">
             <CodeMirror
               ref={editorRef}
               value={value}
@@ -415,8 +439,10 @@ export default function FormatterTool() {
               extensions={extensions}
               theme={resolvedTheme === "dark" ? "dark" : "light"}
               height="100%"
-              style={{ height: "100%" }}
-              placeholder={t`粘贴或输入 ${language.label} 内容`}
+              style={{
+                height: "100%",
+              }}
+              placeholder={t`粘贴或输入 ${languageLabel3} 内容`}
               aria-label={t`格式化内容编辑器`}
               basicSetup={basicSetup}
             />

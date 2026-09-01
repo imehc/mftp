@@ -22,7 +22,10 @@ export async function loadLanTransferSecondary() {
 
 export function scheduleIdleTask(task: () => void): () => void {
   const idleWindow = window as unknown as {
-    requestIdleCallback?: (callback: () => void, options: { timeout: number }) => number;
+    requestIdleCallback?: (
+      callback: () => void,
+      options: { timeout: number },
+    ) => number;
     cancelIdleCallback?: (id: number) => void;
   };
   if (idleWindow.requestIdleCallback) {

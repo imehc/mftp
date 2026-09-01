@@ -1,11 +1,8 @@
 export type ColorTheme =
-  | "default"
-  | "designbyte"
-  | "mx-brutalist"
-  | "cyberpunk"
-  | "tiesen"
+  "default" | "designbyte" | "mx-brutalist" | "cyberpunk" | "tiesen";
 
-export type FontPreset = "theme" | "geist" | "outfit" | "jakarta" | "montserrat";
+export type FontPreset =
+  "theme" | "geist" | "outfit" | "jakarta" | "montserrat";
 
 export type ThemeSwatches = {
   background: string;
@@ -77,27 +74,27 @@ const colorThemeValues = new Set<string>(colorThemes.map((item) => item.value));
 const fontPresetValues = new Set<string>(fontPresets);
 
 const legacyColorThemes: Record<string, ColorTheme> = {
-  "blue": "tiesen",
-  "emerald": "designbyte",
-  "violet": "cyberpunk",
-  "rose": "cyberpunk",
-  "amber": "mx-brutalist",
-  "cyan": "tiesen",
+  blue: "tiesen",
+  emerald: "designbyte",
+  violet: "cyberpunk",
+  rose: "cyberpunk",
+  amber: "mx-brutalist",
+  cyan: "tiesen",
   "modern-minimal": "tiesen",
   "clean-slate": "tiesen",
-  "claude": "default",
-  "caffeine": "default",
-  "corporate": "tiesen",
+  claude: "default",
+  caffeine: "default",
+  corporate: "tiesen",
   "midnight-bloom": "cyberpunk",
   "vs-code": "tiesen",
-  "spotify": "designbyte",
-  "perplexity": "tiesen",
-  "nature": "designbyte",
+  spotify: "designbyte",
+  perplexity: "tiesen",
+  nature: "designbyte",
   "pastel-dreams": "cyberpunk",
   "neo-brutalism": "mx-brutalist",
   "sunset-horizon": "mx-brutalist",
-  "slack": "default",
-  "marshmallow": "cyberpunk",
+  slack: "default",
+  marshmallow: "cyberpunk",
 };
 
 export function isColorTheme(value: unknown): value is ColorTheme {
@@ -138,7 +135,7 @@ export function applyFontPreset(font: FontPreset) {
   }
 }
 
-/** Restore theme/font from persisted settings before React paints. */
+/** 在 React 渲染前，从已持久化的设置中恢复主题 / 字体。 */
 export function applyStoredColorTheme() {
   try {
     const raw = localStorage.getItem("mftp-settings");
@@ -149,6 +146,6 @@ export function applyStoredColorTheme() {
     applyColorTheme(resolveColorTheme(parsed.state?.colorTheme));
     applyFontPreset(resolveFontPreset(parsed.state?.fontPreset));
   } catch {
-    // Ignore corrupt storage; React will re-apply after hydrate.
+    // 忽略损坏的存储；React 完成 hydrate 后会重新应用。
   }
 }

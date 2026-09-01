@@ -71,7 +71,10 @@ function playResonance(
   oscillator.type = "triangle";
   oscillator.frequency.setValueAtTime(frequency, start);
   gain.gain.setValueAtTime(0.001, start);
-  gain.gain.linearRampToValueAtTime(Math.max(0.001, volume * 0.12), start + 0.012);
+  gain.gain.linearRampToValueAtTime(
+    Math.max(0.001, volume * 0.12),
+    start + 0.012,
+  );
   gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
   oscillator.connect(gain).connect(ctx.destination);
   oscillator.start(start);
@@ -88,8 +91,20 @@ export function playMoveSound(volume: number, captured: boolean): void {
 export function playCheckSound(volume: number, checkmate = false): void {
   const ctx = getAudioContext();
   if (!ctx || volume <= 0) return;
-  playResonance(ctx, checkmate ? 164.81 : 196, checkmate ? 0.48 : 0.34, volume, 0.105);
-  playResonance(ctx, checkmate ? 246.94 : 293.66, checkmate ? 0.42 : 0.28, volume, 0.14);
+  playResonance(
+    ctx,
+    checkmate ? 164.81 : 196,
+    checkmate ? 0.48 : 0.34,
+    volume,
+    0.105,
+  );
+  playResonance(
+    ctx,
+    checkmate ? 246.94 : 293.66,
+    checkmate ? 0.42 : 0.28,
+    volume,
+    0.14,
+  );
   if (checkmate) playWoodKnock(ctx, volume, 0.12, 470);
 }
 

@@ -18,7 +18,6 @@ import {
   type LoadingAction,
   type PromptState,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-
 interface UseSftpRemoteActionsOptions {
   sessionId: string;
   cwd: string | null;
@@ -28,7 +27,6 @@ interface UseSftpRemoteActionsOptions {
   setConflict: (value: ConflictState) => void;
   setDirectoryPicker: (value: DirectoryPickerState) => void;
 }
-
 export function useSftpRemoteActions({
   sessionId,
   cwd,
@@ -43,7 +41,6 @@ export function useSftpRemoteActions({
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const startTransfer = useTransfersStore((state) => state.start);
   const finishTransfer = useTransfersStore((state) => state.finish);
-
   async function onExtract(entry: SftpEntry) {
     if (!cwd) return;
     setExtractTarget({
@@ -52,7 +49,6 @@ export function useSftpRemoteActions({
       remoteParent: cwd,
     });
   }
-
   function chooseExtractParent() {
     if (!extractTarget) return;
     setDirectoryPicker({
@@ -61,12 +57,16 @@ export function useSftpRemoteActions({
       onSelect: (path) => {
         setDirectoryPicker(null);
         setExtractTarget((current) =>
-          current ? { ...current, remoteParent: path } : current,
+          current
+            ? {
+                ...current,
+                remoteParent: path,
+              }
+            : current,
         );
       },
     });
   }
-
   async function confirmExtract() {
     if (!extractTarget) return;
     const outName = extractTarget.outName.trim();
@@ -81,7 +81,6 @@ export function useSftpRemoteActions({
       outName,
     );
   }
-
   async function extractWithName(
     entry: SftpEntry,
     remoteParent: string,
@@ -102,7 +101,6 @@ export function useSftpRemoteActions({
     }
     await runExtract(entry, remoteParent, outName);
   }
-
   function showExtractConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -120,7 +118,6 @@ export function useSftpRemoteActions({
       },
     });
   }
-
   async function resolveExtractConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -151,7 +148,6 @@ export function useSftpRemoteActions({
     }
     await extractWithName(entry, remoteParent, incomingName);
   }
-
   async function runExtract(
     entry: SftpEntry,
     remoteParent: string,
@@ -162,15 +158,18 @@ export function useSftpRemoteActions({
     setBusy(t`正在解压 ${name}…`);
     try {
       await ipc.sftpExtract(sessionId, entry.path, remoteParent, outName);
-      toast.success(t`已解压到 ${outName}`, { id: tid });
+      toast.success(t`已解压到 ${outName}`, {
+        id: tid,
+      });
       if (cwd) await load(cwd);
     } catch (e) {
-      toast.error(String(e), { id: tid });
+      toast.error(String(e), {
+        id: tid,
+      });
     } finally {
       setBusy(null);
     }
   }
-
   function onMove(entry: SftpEntry) {
     if (!cwd) return;
     setDirectoryPicker({
@@ -183,11 +182,9 @@ export function useSftpRemoteActions({
       },
     });
   }
-
   async function moveEntryTo(entry: SftpEntry, remoteParent: string) {
     await moveEntryWithName(entry, remoteParent, entry.name);
   }
-
   async function moveEntryWithName(
     entry: SftpEntry,
     remoteParent: string,
@@ -198,13 +195,11 @@ export function useSftpRemoteActions({
       toast.error(t`不能移动到自身或子文件夹中`);
       return;
     }
-
     const target = joinPath(remoteParent, entryName);
     if (normalizeRemotePath(target) === normalizeRemotePath(entry.path)) {
       toast.info(entry.isDir ? t`文件夹已在该位置` : t`文件已在该位置`);
       return;
     }
-
     try {
       const exists = await ipc.sftpExists(sessionId, target);
       if (exists) {
@@ -215,10 +210,8 @@ export function useSftpRemoteActions({
       toast.error(String(e));
       return;
     }
-
     await runMoveEntry(entry, target);
   }
-
   function showMoveConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -236,7 +229,6 @@ export function useSftpRemoteActions({
       },
     });
   }
-
   async function resolveMoveConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -266,10 +258,8 @@ export function useSftpRemoteActions({
         renamedExistingPath,
       );
     }
-
     await moveEntryWithName(entry, remoteParent, incomingName);
   }
-
   async function runMoveEntry(entry: SftpEntry, target: string) {
     if (!cwd) return;
     const name = entry.name;
@@ -277,15 +267,18 @@ export function useSftpRemoteActions({
     setBusy(t`正在移动 ${name}…`);
     try {
       await ipc.sftpRename(sessionId, entry.path, target);
-      toast.success(t`已移动 ${name}`, { id: tid });
+      toast.success(t`已移动 ${name}`, {
+        id: tid,
+      });
       await load(cwd);
     } catch (e) {
-      toast.error(String(e), { id: tid });
+      toast.error(String(e), {
+        id: tid,
+      });
     } finally {
       setBusy(null);
     }
   }
-
   async function doMkdir(name: string) {
     if (!cwd) return;
     setPrompt(null);
@@ -296,7 +289,6 @@ export function useSftpRemoteActions({
       toast.error(String(e));
     }
   }
-
   async function doRename(entry: SftpEntry, name: string) {
     if (!cwd || name === entry.name) {
       setPrompt(null);
@@ -310,7 +302,6 @@ export function useSftpRemoteActions({
       toast.error(String(e));
     }
   }
-
   async function confirmDelete() {
     const entry = deleteTarget;
     if (!entry || !cwd) return;
@@ -320,22 +311,27 @@ export function useSftpRemoteActions({
     const tid = toast.loading(t`正在删除 ${name}…`);
     setBusy(t`正在删除 ${name}…`);
     if (transferId) {
-      startTransfer(transferId, t`删除 ${name}`, { cancellable: false });
+      startTransfer(transferId, t`删除 ${name}`, {
+        cancellable: false,
+      });
     }
     try {
       await ipc.sftpDelete(sessionId, entry.path, entry.isDir, transferId);
       if (transferId) finishTransfer(transferId, "success");
-      toast.success(t`已删除 ${name}`, { id: tid });
+      toast.success(t`已删除 ${name}`, {
+        id: tid,
+      });
       await load(cwd);
     } catch (e) {
       const message = String(e);
       if (transferId) finishTransfer(transferId, "error", message);
-      toast.error(message, { id: tid });
+      toast.error(message, {
+        id: tid,
+      });
     } finally {
       setBusy(null);
     }
   }
-
   return {
     extractTarget,
     setExtractTarget,

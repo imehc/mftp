@@ -1,4 +1,8 @@
-import type { GameDefinition, MoveResolution, SeatIndex } from "../engine/types";
+import type {
+  GameDefinition,
+  MoveResolution,
+  SeatIndex,
+} from "../engine/types";
 import {
   BOARD_SIZE,
   WIN_LENGTH,
@@ -93,17 +97,23 @@ export const gomokuGame: GameDefinition<
   currentSeat: (state) => (state.finished ? null : state.turnSeat),
   winnerSeat: (state) => state.winnerSeat,
   isFinished: (state) => state.finished,
-  applyMove(state, move, seat): MoveResolution<GomokuState, GomokuPresentation> {
+  applyMove(
+    state,
+    move,
+    seat,
+  ): MoveResolution<GomokuState, GomokuPresentation> {
     if (state.finished) throw new Error("gomoku: match already finished");
     if (seat !== state.turnSeat) throw new Error("gomoku: wrong seat");
-    if (!inBounds(move.row, move.col)) throw new Error("gomoku: move out of bounds");
+    if (!inBounds(move.row, move.col))
+      throw new Error("gomoku: move out of bounds");
     const index = cellIndex(move.row, move.col);
     if (state.board[index] !== null) throw new Error("gomoku: cell occupied");
 
     const board = [...state.board];
     board[index] = seat;
     const winningLine = findWinningLine(board, move, seat);
-    const draw = winningLine.length === 0 && state.moveCount + 1 === board.length;
+    const draw =
+      winningLine.length === 0 && state.moveCount + 1 === board.length;
     const finished = winningLine.length > 0 || draw;
     return {
       state: {

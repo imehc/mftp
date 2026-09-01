@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
@@ -22,21 +22,30 @@ import {
   type XiangqiState,
 } from "./types";
 import { XiangqiStage } from "./XiangqiStage";
-
 export function XiangqiMatch({
   mode,
   onRematch,
   onExit,
   onFinishedChange,
 }: {
-  mode: Exclude<XiangqiMode, { kind: "online" }>;
+  mode: Exclude<
+    XiangqiMode,
+    {
+      kind: "online";
+    }
+  >;
   onRematch: () => void;
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
   const [session, setSession] = useState<XiangqiSession | null>(null);
   const volume = useSettingsStore((state) => state.gamesVolume);
-
+  // runner 每个 keyed 实例只构建一次；音量通过最新值 ref 读取，
+  // 以免对局中途改音量导致 runner 重建。
+  const volumeRef = useRef(volume);
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
   useEffect(() => {
     const local = new LocalController<XiangqiState, XiangqiMove>();
     let controllers: PlayerController<XiangqiState, XiangqiMove>[];
@@ -52,28 +61,39 @@ export function XiangqiMatch({
       controllers,
       {
         onMoveResolved: ({ resolution }) => {
-          playMoveSound(volume, resolution.presentation.captured !== null);
+          playMoveSound(
+            volumeRef.current,
+            resolution.presentation.captured !== null,
+          );
           if (resolution.state.resultReason === "checkmate") {
-            playCheckSound(volume, true);
+            playCheckSound(volumeRef.current, true);
           } else if (resolution.state.inCheck) {
-            playCheckSound(volume);
+            playCheckSound(volumeRef.current);
           } else if (resolution.state.finished) {
-            playFinishSound(volume);
+            playFinishSound(volumeRef.current);
           }
         },
         onError: (error) => console.error("xiangqi match error", error),
       },
     );
     runner.start();
-    setSession({ runner, local });
+    // 用微任务延迟，使 setState 发生在 effect 主体之外；cancelled 标记
+    // 防止严格模式重挂载时发布已销毁的 runner。
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled)
+        setSession({
+          runner,
+          local,
+        });
+    });
     return () => {
+      cancelled = true;
       runner.dispose();
       setSession(null);
     };
-    // The keyed XiangqiMatch instance owns one immutable mode configuration.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+    // 每个 keyed 的 XiangqiMatch 实例持有唯一的不可变 mode 配置。
+  }, [mode]);
   if (!session) return <div className="flex-1" />;
   return (
     <XiangqiMatchView
@@ -85,7 +105,6 @@ export function XiangqiMatch({
     />
   );
 }
-
 export interface XiangqiOnlineViewProps {
   peerName: string;
   localSeat: SeatIndex;
@@ -93,7 +112,6 @@ export interface XiangqiOnlineViewProps {
   rematchWaiting: boolean;
   onRequestUndo(plies: number): void;
 }
-
 export function XiangqiMatchView({
   mode,
   session,
@@ -125,36 +143,32 @@ export function XiangqiMatchView({
     runner.controllers[snapshot.activeSeat]?.kind === "ai";
   const localSeat =
     mode.kind === "online"
-      ? online?.localSeat ?? 0
+      ? (online?.localSeat ?? 0)
       : mode.kind === "ai"
         ? mode.localSeat
         : 0;
   const undoPlies =
-    (mode.kind === "ai" || mode.kind === "online") && snapshot.activeSeat === localSeat
+    (mode.kind === "ai" || mode.kind === "online") &&
+    snapshot.activeSeat === localSeat
       ? 2
       : 1;
   const canUndo =
     snapshot.phase === "awaiting-move" &&
     state.moveCount >= undoPlies &&
     !online?.undoWaiting;
-  const currentLegalMoves = useMemo(
-    () => (activeIsLocal ? legalMoves(state) : []),
-    [activeIsLocal, state],
-  );
-
+  const currentLegalMoves = activeIsLocal ? legalMoves(state) : [];
   useEffect(() => {
     onFinishedChange(state.finished);
   }, [onFinishedChange, state.finished]);
-
   useEffect(() => {
     if (!state.finished) {
-      setShowResult(false);
+      // 用微任务延迟，使 setState 发生在 effect 主体之外。
+      queueMicrotask(() => setShowResult(false));
       return;
     }
     const timer = setTimeout(() => setShowResult(true), 650);
     return () => clearTimeout(timer);
   }, [state.finished]);
-
   useEffect(() => {
     if (!state.finished || !state.resultReason || recordedRef.current) return;
     recordedRef.current = true;
@@ -176,13 +190,21 @@ export function XiangqiMatchView({
               : undefined,
       } satisfies XiangqiHistoryPayload,
     });
-    // The result is recorded exactly once for this mounted match.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.finished]);
-
+    // 本挂载对局只记录一次结果（由 recordedRef 守卫）；此 keyed 实例的
+    // 每个依赖都稳定。
+  }, [
+    addRecord,
+    mode,
+    online,
+    snapshot.winnerSeat,
+    state.finished,
+    state.moveCount,
+    state.resultReason,
+  ]);
+  const sideNameValue = sideName(mode, state.turnSeat, online);
   return (
     <>
-      <div className="border-b border-border px-2 py-1 text-xs">
+      <div className="border-border border-b px-2 py-1 text-xs">
         <div className="flex flex-wrap items-center justify-center gap-1.5">
           {state.finished ? (
             <Badge variant="secondary">
@@ -190,27 +212,48 @@ export function XiangqiMatchView({
             </Badge>
           ) : (
             <Badge variant="secondary">
-              <Trans>轮到 {sideName(mode, state.turnSeat, online)}</Trans>
+              <Trans>轮到 {sideNameValue}</Trans>
             </Badge>
           )}
           <Badge variant="outline">
-            <Plural value={{ moveNumber: state.moveCount + (state.finished ? 0 : 1) }} one="第 # 手" other="第 # 手" />
+            <Plural
+              value={{
+                moveNumber: state.moveCount + (state.finished ? 0 : 1),
+              }}
+              one="第 # 手"
+              other="第 # 手"
+            />
           </Badge>
           {state.inCheck ? (
-            <Badge className="bg-[#b63a32] text-white"><Trans>将军</Trans></Badge>
+            <Badge className="bg-[#b63a32] text-white">
+              <Trans>将军</Trans>
+            </Badge>
           ) : null}
-          {aiThinking ? <Badge variant="outline"><Trans>AI 思考中…</Trans></Badge> : null}
-          {online && !state.finished && snapshot.phase === "awaiting-move" && snapshot.activeSeat !== online.localSeat ? (
-            <Badge variant="outline"><Trans>等待对方落子…</Trans></Badge>
+          {aiThinking ? (
+            <Badge variant="outline">
+              <Trans>AI 思考中…</Trans>
+            </Badge>
+          ) : null}
+          {online &&
+          !state.finished &&
+          snapshot.phase === "awaiting-move" &&
+          snapshot.activeSeat !== online.localSeat ? (
+            <Badge variant="outline">
+              <Trans>等待对方落子…</Trans>
+            </Badge>
           ) : null}
           {online?.undoWaiting ? (
-            <Badge variant="outline"><Trans>等待对方同意悔棋…</Trans></Badge>
+            <Badge variant="outline">
+              <Trans>等待对方同意悔棋…</Trans>
+            </Badge>
           ) : null}
           <Button
             variant="outline"
             size="xs"
             disabled={!canUndo}
-            onClick={() => online ? online.onRequestUndo(undoPlies) : runner.undo(undoPlies)}
+            onClick={() =>
+              online ? online.onRequestUndo(undoPlies) : runner.undo(undoPlies)
+            }
           >
             <Undo2 data-icon="inline-start" />
             <Trans>悔棋</Trans>
@@ -242,7 +285,14 @@ export function XiangqiMatchView({
           }
           details={
             <span>
-              {resultReasonLabel(state.resultReason)} · <Plural value={{ moveCount: state.moveCount }} one="共 # 手" other="共 # 手" />
+              {resultReasonLabel(state.resultReason)} ·{" "}
+              <Plural
+                value={{
+                  moveCount: state.moveCount,
+                }}
+                one="共 # 手"
+                other="共 # 手"
+              />
             </span>
           }
           rematchWaiting={online?.rematchWaiting}

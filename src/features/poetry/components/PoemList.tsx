@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { poetryBrowse } from "~/lib/ipc";
 import type { PoemSummary } from "~/types";
 import PoemCard from "./PoemCard";
-
 const PAGE_SIZE = 60;
-
 interface PoemListProps {
-  /** Changing this key resets the list (filters/scope/query changed). */
+  /** 改变此 key 会重置列表（筛选 / 范围 / 查询发生变化）。 */
   resetKey: string;
   query?: string;
   collectionIds: string[];
@@ -16,7 +14,6 @@ interface PoemListProps {
   onSelect: (uid: string) => void;
   onCountChange?: (count: number | null) => void;
 }
-
 interface BrowseState {
   items: PoemSummary[];
   cursor: string | null;
@@ -24,8 +21,8 @@ interface BrowseState {
 }
 
 /**
- * Cursor-paginated, virtualized poem list. Loads a page per scroll approach;
- * never pulls the full corpus (the 254k-entry Song poems must stay lazy).
+ * 基于游标分页、虚拟化的诗词列表。每次滚动加载一页；
+ * 绝不一次拉取整库（25 万余首宋词必须保持惰性加载）。
  */
 export default function PoemList({
   resetKey,
@@ -44,21 +41,26 @@ export default function PoemList({
   });
   const [loading, setLoading] = useState(false);
   const loadSeq = useRef(0);
-
+  // onCountChange 是属性回调；通过 effect event 读取最新值，
+  // 使重置 effect 只依赖重置 key。
+  const notifyCountReset = useEffectEvent(() => onCountChange?.(null));
   useEffect(() => {
-    setState({ items: [], cursor: null, exhausted: false });
-    scrollRef.current?.scrollTo({ top: 0 });
-    onCountChange?.(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setState({
+      items: [],
+      cursor: null,
+      exhausted: false,
+    });
+    scrollRef.current?.scrollTo({
+      top: 0,
+    });
+    notifyCountReset();
   }, [resetKey]);
-
-  const loadMore = useCallback(async () => {
+  const loadMore = async () => {
     const seq = ++loadSeq.current;
     setLoading(true);
     try {
       const page = await poetryBrowse({
-        collectionIds:
-          collectionIds.length > 0 ? collectionIds : null,
+        collectionIds: collectionIds.length > 0 ? collectionIds : null,
         author: null,
         cursor: state.cursor,
         limit: PAGE_SIZE,
@@ -66,31 +68,29 @@ export default function PoemList({
       if (seq !== loadSeq.current) return;
       setState((prev) => ({
         items:
-          state.cursor === null
-            ? page.items
-            : [...prev.items, ...page.items],
+          state.cursor === null ? page.items : [...prev.items, ...page.items],
         cursor: page.nextCursor ?? null,
         exhausted: !page.nextCursor,
       }));
     } finally {
       if (seq === loadSeq.current) setLoading(false);
     }
-  }, [collectionIds, state.cursor]);
+  };
 
-  // Initial + follow-up loads.
+  // 初次加载与后续加载。onScroll 复用 loadMore，因此通过 effect event
+  // 读取，而不是每次渲染都重新订阅。
+  const loadMoreInEffect = useEffectEvent(loadMore);
   useEffect(() => {
     if (!state.exhausted && state.items.length === 0 && !loading) {
-      void loadMore();
+      void loadMoreInEffect();
     }
-  }, [state.exhausted, state.items.length, loading, loadMore]);
-
+  }, [state.exhausted, state.items.length, loading]);
   const virtualizer = useVirtualizer({
     count: state.items.length + (state.exhausted ? 0 : 1),
     getScrollElement: () => scrollRef.current,
     estimateSize: () => 92,
     overscan: 8,
   });
-
   return (
     <div
       ref={scrollRef}
@@ -107,7 +107,10 @@ export default function PoemList({
       }}
     >
       <div
-        style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+        style={{
+          height: virtualizer.getTotalSize(),
+          position: "relative",
+        }}
       >
         {virtualizer.getVirtualItems().map((virtualRow) => {
           const poem = state.items[virtualRow.index];
@@ -135,7 +138,7 @@ export default function PoemList({
                   />
                 </div>
               ) : (
-                <div className="flex h-[84px] items-center justify-center text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex h-[84px] items-center justify-center text-xs">
                   <Trans>加载中…</Trans>
                 </div>
               )}
@@ -144,7 +147,7 @@ export default function PoemList({
         })}
       </div>
       {state.exhausted && state.items.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">
+        <p className="text-muted-foreground py-10 text-center text-sm">
           {t`没有找到作品`}
         </p>
       ) : null}

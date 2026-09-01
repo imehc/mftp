@@ -8,13 +8,7 @@ export const BOARD_ROWS = 10;
 export const BOARD_COLS = 9;
 
 export type PieceKind =
-  | "general"
-  | "advisor"
-  | "elephant"
-  | "horse"
-  | "rook"
-  | "cannon"
-  | "soldier";
+  "general" | "advisor" | "elephant" | "horse" | "rook" | "cannon" | "soldier";
 
 export interface XiangqiPiece {
   side: SeatIndex;

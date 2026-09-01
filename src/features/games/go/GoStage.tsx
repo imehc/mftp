@@ -1,11 +1,10 @@
 /**
- * Pixi rendering + interaction for the go board.
+ * 围棋棋盘的 Pixi 渲染与交互。
  *
- * Same architecture as the gomoku stage: the board lives entirely in
- * canvas with geometry derived from CELL, textures are module-cached, and
- * React only forwards props. Unlike gomoku the grid size N is a prop
- * (9/13/19), so all geometry is computed per scene inside createScene.
- * Captured stones shrink out before being removed.
+ * 架构与 gomoku 舞台相同：棋盘完全在画布内，几何由 CELL 推导，纹理
+ * 模块级缓存，React 只透传 props。与 gomoku 不同的是网格尺寸 N 是个
+ * 属性（9/13/19），因此所有几何都在 createScene 内按场景计算。被提的
+ * 棋子先缩小再移除。
  */
 import { useEffect, useRef } from "react";
 import {
@@ -28,18 +27,18 @@ import {
 } from "./texture-utils";
 import type { BoardSize, GoMove, Stone } from "./types";
 
-/** Distance between two lines. Everything else derives from this. */
+/** 相邻两线之间的距离。其余几何都由它推导。 */
 const CELL = 40;
 
 export interface GoStageProps {
   boardSize: BoardSize;
   board: Stone[];
   lastMove: GoMove | null;
-  /** Seat whose stone the hover ghost previews. */
+  /** 悬停虚影预览的棋子所属座位。 */
   ghostSeat: SeatIndex;
-  /** Local player may place a stone right now. */
+  /** 本地玩家此时可以落子。 */
   interactive: boolean;
-  /** Legal intersections for the current player, indexed row-major. */
+  /** 当前玩家的合法交叉点，按行主序索引。 */
   legalPoints: readonly boolean[];
   onPlay(move: GoMove): void;
 }
@@ -57,7 +56,7 @@ interface Scene {
   destroy(): void;
 }
 
-/** Traditional star points per board size. */
+/** 各棋盘尺寸对应的传统星位。 */
 function starPoints(n: BoardSize): Array<[number, number]> {
   if (n === 9) {
     return [
@@ -101,7 +100,7 @@ function createScene(
   const root = new Container();
   app.stage.addChild(root);
 
-  // --- static board ---------------------------------------------------
+  // --- 静态棋盘 ---------------------------------------------------
   const boardSprite = new Sprite(getBoardTexture());
   boardSprite.anchor.set(0.5);
   const spriteSize = BOARD * (WOOD_FULL / WOOD_TEX);
@@ -115,11 +114,17 @@ function createScene(
     grid.moveTo(-half, p).lineTo(half, p);
     grid.moveTo(p, -half).lineTo(p, half);
   }
-  grid.stroke({ width: Math.max(1.2, CELL * 0.033), color: 0x45260c, alpha: 0.9 });
-  // Traditional boards frame the grid with a heavier boundary line.
-  grid
-    .rect(-half, -half, GRID, GRID)
-    .stroke({ width: Math.max(2.2, CELL * 0.062), color: 0x45260c, alpha: 0.95 });
+  grid.stroke({
+    width: Math.max(1.2, CELL * 0.033),
+    color: 0x45260c,
+    alpha: 0.9,
+  });
+  // 传统棋盘用更粗的边线框住网格。
+  grid.rect(-half, -half, GRID, GRID).stroke({
+    width: Math.max(2.2, CELL * 0.062),
+    color: 0x45260c,
+    alpha: 0.95,
+  });
   for (const [row, col] of starPoints(n)) {
     grid.circle(lineAt(col), lineAt(row), CELL * 0.09).fill({
       color: 0x38200a,
@@ -128,7 +133,7 @@ function createScene(
   }
   root.addChild(grid);
 
-  // --- dynamic layers -------------------------------------------------
+  // --- 动态图层 -------------------------------------------------
   const stoneLayer = new Container();
   const markerLayer = new Graphics();
   const ghost = new Sprite(stoneTexture[0]);
@@ -147,14 +152,13 @@ function createScene(
     interactive: false,
     legalPoints: [],
   };
-  /** Skip the placement pop while syncing the very first snapshot. */
+  /** 同步首帧快照时跳过落子弹出动画。 */
   let synced = false;
   let hoverIndex: number | null = null;
 
   function addStone(index: number, seat: SeatIndex, animate: boolean): void {
     const sprite = new Sprite(stoneTexture[seat]);
-    // Anchor at the stone circle's center so it sits exactly on the
-    // intersection while the baked shadow hangs below.
+    // 锚定在棋子圆中心，使其正好落在交叉点上，而烘焙的阴影悬于下方。
     sprite.anchor.set(0.5, STONE_CY / STONE_TEX);
     sprite.width = STONE_DIAMETER * (STONE_TEX / (STONE_R * 2));
     sprite.height = sprite.width;
@@ -218,7 +222,7 @@ function createScene(
     app.canvas.style.cursor = show ? "pointer" : "default";
   }
 
-  // --- layout ---------------------------------------------------------
+  // --- 布局 -------------------------------------------------------
   function relayout(): void {
     const w = app.screen.width;
     const h = app.screen.height;
@@ -228,7 +232,7 @@ function createScene(
   relayout();
   app.renderer.on("resize", relayout);
 
-  // --- input ----------------------------------------------------------
+  // --- 输入 -------------------------------------------------------
   app.stage.eventMode = "static";
   app.stage.hitArea = { contains: () => true };
 
@@ -276,7 +280,7 @@ function createScene(
           : null;
       for (const [index, sprite] of stones) {
         if (next.board[index] === null) {
-          // Captured stones shrink out; undone stones vanish instantly.
+          // 被提的棋子缩小消失；悔掉的棋子立即消失。
           removeStone(index, sprite, synced);
         }
       }
@@ -299,7 +303,10 @@ export function GoStage(props: GoStageProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<Scene | null>(null);
   const propsRef = useRef(props);
-  propsRef.current = props;
+  // 最新值 ref 在 effect 中同步，而非渲染期间。
+  useEffect(() => {
+    propsRef.current = props;
+  });
 
   useEffect(() => {
     const host = containerRef.current;
@@ -342,8 +349,7 @@ export function GoStage(props: GoStageProps) {
       sceneRef.current = null;
       app?.destroy(true, { children: true });
     };
-    // boardSize is fixed per mounted stage (match key changes on resize).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // boardSize 在每个已挂载舞台内固定（缩放会更换 match key）。
   }, []);
 
   useEffect(() => {

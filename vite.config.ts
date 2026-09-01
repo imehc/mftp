@@ -1,11 +1,8 @@
 import { defineConfig } from "vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import react from "@vitejs/plugin-react";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
-import {
-  lingui,
-  linguiTransformerBabelPreset,
-} from "@lingui/vite-plugin";
+import { lingui, linguiTransformerBabelPreset } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "node:path";
 
@@ -20,30 +17,30 @@ export default defineConfig(async () => ({
     }),
     react(),
     babel({
-      presets: [linguiTransformerBabelPreset()],
+      presets: [reactCompilerPreset(), linguiTransformerBabelPreset()],
     }),
     lingui(),
     tailwindcss(),
   ],
 
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
+  // 为 Tauri 开发定制的 Vite 配置，仅在 `tauri dev` 或 `tauri build` 时生效
   //
-  // 1. prevent Vite from obscuring rust errors
+  // 1. 避免 Vite 隐藏 Rust 编译错误
   clearScreen: false,
-  // 2. tauri expects a fixed port, fail if that port is not available
+  // 2. Tauri 需要固定端口，若端口被占用则直接失败
   server: {
     port: 1420,
     strictPort: true,
     host: host || false,
     hmr: host
       ? {
-        protocol: "ws",
-        host,
-        port: 1421,
-      }
+          protocol: "ws",
+          host,
+          port: 1421,
+        }
       : undefined,
     watch: {
-      // 3. tell Vite to ignore watching `src-tauri`
+      // 3. 让 Vite 忽略监听 `src-tauri` 目录
       ignored: ["**/src-tauri/**"],
     },
   },
@@ -51,9 +48,9 @@ export default defineConfig(async () => ({
     rolldownOptions: {
       output: {
         manualChunks(id) {
-          // Keep Vite's dynamic-import preload helper in a tiny shared chunk.
-          // Otherwise its first heavy consumer can pull an entire feature
-          // vendor chunk (Pixi) into the initial HTML modulepreload list.
+          // 把 Vite 的动态导入预加载辅助函数放进一个很小的共享 chunk。
+          // 否则第一个用到它的“重消费者”会把整个特性
+          // vendor chunk（Pixi）拉进首屏 HTML 的 modulepreload 列表。
           if (id.includes("vite/preload-helper")) return "runtime-preload";
           if (!id.includes("node_modules")) return;
           if (id.includes("/pixi.js/") || id.includes("/@pixi/")) {
@@ -66,9 +63,9 @@ export default defineConfig(async () => ({
           if (id.includes("/@lingui/")) return "vendor-i18n";
           if (id.includes("/@tanstack/")) return "vendor-tanstack";
           if (id.includes("/@dnd-kit/")) return "vendor-dnd";
-          // recharts + its heavy transitive deps (redux/immer/d3 via
-          // victory-vendor). Only the lazy monitor panel imports it, so this
-          // chunk stays out of the initial load.
+          // recharts 及其沉重的传递依赖（通过 victory-vendor 引入的
+          // redux/immer/d3）。只有懒加载的监控面板会用到它，因此这个
+          // chunk 不会进入首屏加载。
           if (
             id.includes("/recharts/") ||
             id.includes("/victory-vendor/") ||

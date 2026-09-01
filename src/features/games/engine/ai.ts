@@ -1,8 +1,7 @@
 /**
- * AI abstraction shared by all games: a game supplies an `AiStrategy`
- * (how to search for a move); the framework standardizes difficulty
- * levels and turns a strategy into a `PlayerController` (see
- * controllers.ts AiController).
+ * 各游戏共用的 AI 抽象：游戏提供 `AiStrategy`（如何搜索走法）；
+ * 框架统一难度档位，并把策略转成 `PlayerController`（见
+ * controllers.ts 的 AiController）。
  */
 import type { SeatIndex } from "./types";
 
@@ -12,9 +11,8 @@ export const DIFFICULTIES: readonly Difficulty[] = ["easy", "medium", "hard"];
 
 export interface AiStrategy<S, M> {
   /**
-   * Pick a move for `seat`. Implementations should honor `signal`
-   * (bail out when aborted) and yield to the UI thread during long
-   * searches (see `yieldToUi`).
+   * 为 `seat` 选择走法。实现应遵守 `signal`（中止时退出），并在
+   * 长时间搜索期间让出 UI 线程（见 `yieldToUi`）。
    */
   chooseMove(
     state: S,
@@ -24,7 +22,7 @@ export interface AiStrategy<S, M> {
   ): Promise<M>;
 }
 
-/** Cooperative yield so heavy searches don't freeze rendering. */
+/** 协作式让出，使繁重的搜索不冻结渲染。 */
 export function yieldToUi(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
@@ -48,9 +46,9 @@ export function abortableDelay(ms: number, signal: AbortSignal): Promise<void> {
 }
 
 /**
- * Deterministic PRNG (mulberry32). AI noise must not use Math.random:
- * with a seed derived from match/turn, remote peers replaying the same
- * inputs stay in lockstep, and bug reports become reproducible.
+ * 确定性伪随机数（mulberry32）。AI 的随机性不能用 Math.random：
+ * 以对局 / 回合派生种子后，远端重放相同输入能保持一致，且
+ * 缺陷报告也能复现。
  */
 export function createRng(seed: number): () => number {
   let a = seed >>> 0;
@@ -63,7 +61,7 @@ export function createRng(seed: number): () => number {
   };
 }
 
-/** Standard normal via Box-Muller, driven by the given uniform RNG. */
+/** 由给定均匀分布 RNG 经 Box-Muller 生成的标准正态分布。 */
 export function gaussian(rng: () => number): number {
   let u = 0;
   let v = 0;

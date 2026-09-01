@@ -12,10 +12,9 @@ import "./App.css";
 
 applyStoredColorTheme();
 
-// Production builds: suppress the WebView's default context menu
-// (Back / Reload etc. would break the SPA illusion). Keep it on editable
-// elements and text selections for native copy/paste, and keep it
-// entirely in dev for debugging.
+// 生产构建：屏蔽 WebView 默认的右键菜单（Back / Reload 等会破坏 SPA 的
+// 单页体验）。但在可编辑元素和文本选中处保留，以便使用原生复制 /
+// 粘贴；开发环境则完全保留，方便调试。
 if (import.meta.env.PROD) {
   window.addEventListener("contextmenu", (event) => {
     const target = event.target as HTMLElement | null;

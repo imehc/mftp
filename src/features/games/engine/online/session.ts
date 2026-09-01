@@ -1,11 +1,10 @@
 /**
- * One live online-match channel on top of the Rust `game_room` service.
+ * 在 Rust 的 `game_room` 服务之上的一条实时联机对战通道。
  *
- * The Rust side is a dumb relay: everything game-specific crosses the
- * wire as an opaque JSON string. Two lanes share it — lockstep `move`
- * frames satisfying the MatchTransport contract (../transport.ts), and
- * match-control frames (undo / rematch negotiation) — so any turn-based
- * game gets both without touching Rust.
+ * Rust 侧只是个哑中继：一切游戏相关的内容都以不透明 JSON 字符串
+ * 过线。两条通道共用它 —— 满足 MatchTransport 契约（../transport.ts）
+ * 的锁步 `move` 帧，以及对局控制帧（悔棋 / 重赛协商）—— 因此任何
+ * 回合制游戏都能两者兼得，而无需改动 Rust。
  */
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import {
@@ -18,7 +17,7 @@ import type { GameRoomStatus } from "~/types";
 import type { MatchTransport, RemoteMove } from "../transport";
 import type { SeatIndex } from "../types";
 
-/** Negotiations that ride alongside moves; both are request/response. */
+/** 与走法并行的协商；二者皆为请求 / 响应。 */
 export type MatchControlMessage =
   | { t: "undo-request"; atMove: number; plies: number }
   | { t: "undo-response"; accept: boolean; atMove: number; plies: number }
@@ -31,7 +30,7 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
   readonly matchId: string;
   readonly localSeat: SeatIndex;
   readonly roomName: string;
-  /** Updated if the peer (re)connects under a different name. */
+  /** 对手以不同名字（重）连接时更新。 */
   peerName: string;
 
   private readonly moveHandlers = new Set<(move: RemoteMove<M>) => void>();
@@ -49,7 +48,7 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
     this.peerName = status.peerName ?? "";
   }
 
-  /** Attach to the active room; listeners are live once this resolves. */
+  /** 接入当前房间；本方法 resolve 后监听器即生效。 */
   static async create<M>(
     status: GameRoomStatus,
   ): Promise<OnlineMatchSession<M>> {
@@ -114,13 +113,13 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
     return () => this.presenceHandlers.delete(handler);
   }
 
-  /** Guest side: the room itself is gone (host left / connection lost). */
+  /** 访客侧：房间本身已消失（房主离开 / 连接丢失）。 */
   onClosed(handler: (reason: string) => void): () => void {
     this.closedHandlers.add(handler);
     return () => this.closedHandlers.delete(handler);
   }
 
-  /** Detach listeners. Does not leave the room. */
+  /** 移除监听器。不会离开房间。 */
   close(): void {
     for (const unlisten of this.unlisteners) unlisten();
     this.unlisteners = [];
@@ -134,14 +133,14 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
     try {
       await gameRoomLeave();
     } catch {
-      // Already gone; leaving must never throw during teardown.
+      // 已经不在了；拆除期间离开绝不能抛错。
     }
   }
 }
 
 /**
- * djb2 over a stable serialization — the cheap divergence tripwire both
- * peers run after every applied move (see RemoteMove.stateHash).
+ * 对稳定序列化结果做 djb2 —— 这是双方每步应用后都运行的廉价
+ * 分歧探测器（见 RemoteMove.stateHash）。
  */
 export function hashString(input: string): string {
   let hash = 5381;

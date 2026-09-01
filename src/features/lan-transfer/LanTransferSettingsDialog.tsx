@@ -6,10 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import {
-  Dialog,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
   DialogLayoutContent,
@@ -45,7 +42,6 @@ import type {
   LanTrustedDevice,
   LanTrustedDeviceInput,
 } from "~/types";
-
 interface LanTransferSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -59,12 +55,10 @@ interface LanTransferSettingsDialogProps {
   deleteTrustedDevice: (id: string) => void;
   saveSettings: (values: LanTransferSettings) => Promise<void>;
 }
-
 const emptyTrustedDeviceFormValues: LanTrustedDeviceFormValues = {
   label: "",
   ip: "",
 };
-
 export default function LanTransferSettingsDialog({
   open,
   onOpenChange,
@@ -88,7 +82,6 @@ export default function LanTransferSettingsDialog({
       await saveSettings(value);
     },
   });
-
   const trustedForm = useForm({
     defaultValues: emptyTrustedDeviceFormValues,
     validators: {
@@ -99,18 +92,15 @@ export default function LanTransferSettingsDialog({
       trustedForm.reset(emptyTrustedDeviceFormValues);
     },
   });
-
   useEffect(() => {
     if (!open) return;
     form.reset(settings);
     trustedForm.reset(emptyTrustedDeviceFormValues);
   }, [form, open, settings, trustedForm]);
-
   async function pickDownloadDir() {
     const selected = await chooseDownloadDir();
     if (selected) form.setFieldValue("downloadDir", selected);
   }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent className="max-w-lg">
@@ -151,10 +141,14 @@ export default function LanTransferSettingsDialog({
                       inputMode="numeric"
                       disabled={running}
                       onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(Number(event.target.value) || 3000)}
+                      onChange={(event) =>
+                        field.handleChange(Number(event.target.value) || 3000)
+                      }
                       aria-invalid={!!error}
                     />
-                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    {error ? (
+                      <FieldDescription>{error}</FieldDescription>
+                    ) : null}
                   </UiField>
                 );
               }}
@@ -164,7 +158,9 @@ export default function LanTransferSettingsDialog({
               {(field) => {
                 const bindHostUnavailable = Boolean(
                   field.state.value &&
-                    !addresses.some((address) => address.ip === field.state.value),
+                  !addresses.some(
+                    (address) => address.ip === field.state.value,
+                  ),
                 );
                 return (
                   <UiField>
@@ -183,7 +179,9 @@ export default function LanTransferSettingsDialog({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectItem value="auto"><Trans>自动选择</Trans></SelectItem>
+                          <SelectItem value="auto">
+                            <Trans>自动选择</Trans>
+                          </SelectItem>
                           {bindHostUnavailable ? (
                             <SelectItem value={field.state.value}>
                               {field.state.value} · {t`当前不可用`}
@@ -248,7 +246,11 @@ export default function LanTransferSettingsDialog({
                     value={field.state.value}
                     onValueChange={(value) => {
                       if (!value || running) return;
-                      if (value === "code" || value === "trusted" || value === "open") {
+                      if (
+                        value === "code" ||
+                        value === "trusted" ||
+                        value === "open"
+                      ) {
                         field.handleChange(value);
                       }
                     }}
@@ -257,8 +259,12 @@ export default function LanTransferSettingsDialog({
                     disabled={running}
                     className="justify-start"
                   >
-                    <ToggleGroupItem value="code"><Trans>确认码</Trans></ToggleGroupItem>
-                    <ToggleGroupItem value="trusted"><Trans>白名单</Trans></ToggleGroupItem>
+                    <ToggleGroupItem value="code">
+                      <Trans>确认码</Trans>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="trusted">
+                      <Trans>白名单</Trans>
+                    </ToggleGroupItem>
                     <ToggleGroupItem value="open">
                       <Trans
                         context="LAN security mode"
@@ -275,7 +281,7 @@ export default function LanTransferSettingsDialog({
             <form.Subscribe selector={(state) => state.values.securityMode}>
               {(securityMode) =>
                 securityMode === "trusted" ? (
-                  <div className="rounded-lg border border-border p-2.5">
+                  <div className="border-border rounded-lg border p-2.5">
                     <div className="mb-2 text-sm font-medium">
                       <Trans>白名单</Trans>
                     </div>
@@ -285,7 +291,9 @@ export default function LanTransferSettingsDialog({
                           <Input
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(event) => field.handleChange(event.target.value)}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
                             placeholder={t`名称`}
                           />
                         )}
@@ -298,7 +306,9 @@ export default function LanTransferSettingsDialog({
                               <Input
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
-                                onChange={(event) => field.handleChange(event.target.value)}
+                                onChange={(event) =>
+                                  field.handleChange(event.target.value)
+                                }
                                 placeholder="192.168.1.10"
                                 aria-invalid={!!error}
                               />
@@ -311,7 +321,9 @@ export default function LanTransferSettingsDialog({
                           );
                         }}
                       </trustedForm.Field>
-                      <trustedForm.Subscribe selector={(state) => state.isSubmitting}>
+                      <trustedForm.Subscribe
+                        selector={(state) => state.isSubmitting}
+                      >
                         {(isSubmitting) => (
                           <Button
                             type="button"
@@ -326,18 +338,20 @@ export default function LanTransferSettingsDialog({
                     </div>
                     <div className="mt-2 flex max-h-36 flex-col gap-1 overflow-auto">
                       {trustedDevices.length === 0 ? (
-                        <div className="rounded-md border border-dashed border-border px-2 py-4 text-center text-xs text-muted-foreground">
+                        <div className="border-border text-muted-foreground rounded-md border border-dashed px-2 py-4 text-center text-xs">
                           <Trans>暂无白名单</Trans>
                         </div>
                       ) : (
                         trustedDevices.map((device) => (
                           <div
                             key={device.id}
-                            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-border px-2 py-1.5"
+                            className="border-border grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border px-2 py-1.5"
                           >
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-medium">{device.label}</div>
-                              <div className="truncate text-xs text-muted-foreground">
+                              <div className="truncate text-sm font-medium">
+                                {device.label}
+                              </div>
+                              <div className="text-muted-foreground truncate text-xs">
                                 {device.ip}
                               </div>
                             </div>
@@ -347,7 +361,9 @@ export default function LanTransferSettingsDialog({
                               title={t`删除白名单`}
                               aria-label={t`删除白名单`}
                               className="max-sm:min-h-11 max-sm:min-w-11"
-                              onClick={() => void deleteTrustedDevice(device.id)}
+                              onClick={() =>
+                                void deleteTrustedDevice(device.id)
+                              }
                             >
                               <Trash2 className="text-destructive" />
                             </Button>
@@ -369,7 +385,9 @@ export default function LanTransferSettingsDialog({
                       <Trans>开放模式会跳过确认码</Trans>
                     </AlertTitle>
                     <AlertDescription>
-                      <Trans>同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。</Trans>
+                      <Trans>
+                        同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。
+                      </Trans>
                     </AlertDescription>
                   </Alert>
                 ) : null
@@ -400,9 +418,15 @@ export default function LanTransferSettingsDialog({
                     disabled={running}
                     className="justify-start"
                   >
-                    <ToggleGroupItem value="readOnly"><Trans>只读</Trans></ToggleGroupItem>
-                    <ToggleGroupItem value="readWrite"><Trans>读写</Trans></ToggleGroupItem>
-                    <ToggleGroupItem value="uploadOnly"><Trans>仅上传</Trans></ToggleGroupItem>
+                    <ToggleGroupItem value="readOnly">
+                      <Trans>只读</Trans>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="readWrite">
+                      <Trans>读写</Trans>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="uploadOnly">
+                      <Trans>仅上传</Trans>
+                    </ToggleGroupItem>
                   </ToggleGroup>
                 </UiField>
               )}
@@ -422,12 +446,16 @@ export default function LanTransferSettingsDialog({
                       max={16}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(Number(event.target.value))}
+                      onChange={(event) =>
+                        field.handleChange(Number(event.target.value))
+                      }
                       disabled={running}
                       className="max-w-32"
                       aria-invalid={!!error}
                     />
-                    {error ? <FieldDescription>{error}</FieldDescription> : null}
+                    {error ? (
+                      <FieldDescription>{error}</FieldDescription>
+                    ) : null}
                   </UiField>
                 );
               }}
@@ -439,7 +467,9 @@ export default function LanTransferSettingsDialog({
                   <Checkbox
                     id="lan-auto-start"
                     checked={field.state.value}
-                    onCheckedChange={(checked) => field.handleChange(checked === true)}
+                    onCheckedChange={(checked) =>
+                      field.handleChange(checked === true)
+                    }
                   />
                   <FieldLabel htmlFor="lan-auto-start">
                     <Trans>应用启动后自动开启服务</Trans>
@@ -449,8 +479,10 @@ export default function LanTransferSettingsDialog({
             </form.Field>
           </FieldGroup>
           {running ? (
-            <p className="mt-3 text-xs text-muted-foreground">
-              <Trans>服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。</Trans>
+            <p className="text-muted-foreground mt-3 text-xs">
+              <Trans>
+                服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。
+              </Trans>
             </p>
           ) : null}
         </DialogLayoutBody>

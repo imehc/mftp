@@ -35,7 +35,12 @@ function main() {
   const failures = [];
 
   for (const [source, names] of bySource) {
-    const cmd = ["add", source, ...names.flatMap((name) => ["--skill", name]), "-y"];
+    const cmd = [
+      "add",
+      source,
+      ...names.flatMap((name) => ["--skill", name]),
+      "-y",
+    ];
     console.log(`\n> npx skills ${cmd.join(" ")}`);
     if (dryRun) continue;
     if (run(cmd) !== 0) failures.push(source);
@@ -43,9 +48,14 @@ function main() {
 
   if (dryRun) return;
 
-  const total = [...bySource.values()].reduce((sum, names) => sum + names.length, 0);
+  const total = [...bySource.values()].reduce(
+    (sum, names) => sum + names.length,
+    0,
+  );
   if (failures.length > 0) {
-    console.error(`\nSynced ${total} skills with ${failures.length} failing source(s): ${failures.join(", ")}`);
+    console.error(
+      `\nSynced ${total} skills with ${failures.length} failing source(s): ${failures.join(", ")}`,
+    );
     process.exit(1);
   }
   console.log(`\nSynced ${total} skills from ${bySource.size} source(s).`);

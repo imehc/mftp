@@ -4,26 +4,25 @@ import { LoaderCircle } from "lucide-react";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import type { PreviewKind } from "~/lib/preview-kind";
 import PreviewSurface from "./PreviewSurface";
-
 export interface PreviewScreenProps {
-  /** File name, shown in the header and used as the image alt text. */
+  /** 文件名，显示在标题栏，并用作图片的 alt 文本。 */
   name: string;
   kind: PreviewKind;
-  /** null while the caller is still resolving the URL. */
+  /** 调用方仍在解析 URL 时为 null。 */
   url: string | null;
   error?: string | null;
-  /** Status shown while the caller prepares a loadable URL. */
+  /** 调用方准备可加载 URL 期间显示的占位文案。 */
   loadingLabel?: ReactNode;
-  /** Header right side (e.g. close / save-to-local). */
+  /** 标题栏右侧（如关闭 / 保存到本地）。 */
   trailing?: ReactNode;
-  /** Status bar under the viewer (e.g. BT speed and peers). */
+  /** 预览区下方的状态栏（如 BT 速度与连接数）。 */
   footer?: ReactNode;
 }
 
 /**
- * Shared full-page preview: header + kind-driven viewer + optional status
- * bar. Any module can render this by resolving a URL for the file; the BT
- * module adds its own live-stats footer.
+ * 通用整页预览：标题栏 + 按类型渲染的预览区 + 可选状态栏。
+ * 任何模块只要解析出文件 URL 即可渲染；BT 模块会在底部
+ * 追加自己的实时统计。
  */
 export default function PreviewScreen({
   name,
@@ -39,13 +38,13 @@ export default function PreviewScreen({
       <ToolPageHeader title={name} trailing={trailing} />
       <div className="flex min-h-0 flex-1 flex-col gap-2 p-2.5 sm:p-3">
         {error ? (
-          <div className="flex flex-1 items-center justify-center rounded-lg border border-border p-4 text-center text-xs text-destructive">
+          <div className="border-border text-destructive flex flex-1 items-center justify-center rounded-lg border p-4 text-center text-xs">
             {error}
           </div>
         ) : url ? (
           <PreviewSurface key={url} url={url} name={name} kind={kind} />
         ) : (
-          <div className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border text-xs text-muted-foreground">
+          <div className="border-border text-muted-foreground flex flex-1 items-center justify-center gap-2 rounded-lg border text-xs">
             <LoaderCircle className="size-3.5 animate-spin" />
             {loadingLabel ?? <Trans>加载中…</Trans>}
           </div>

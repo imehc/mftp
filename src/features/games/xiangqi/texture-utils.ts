@@ -1,11 +1,12 @@
-/** Cached procedural materials for the Pixi xiangqi stage. */
+/** Pixi 中国象棋舞台的缓存程序化材质。 */
 import { CanvasSource, Texture } from "pixi.js";
 
 export const BOARD_TEXTURE_WIDTH = 864;
 export const BOARD_TEXTURE_HEIGHT = 960;
 export const BOARD_TEXTURE_PAD = 52;
 export const BOARD_SURFACE_WIDTH = BOARD_TEXTURE_WIDTH - BOARD_TEXTURE_PAD * 2;
-export const BOARD_SURFACE_HEIGHT = BOARD_TEXTURE_HEIGHT - BOARD_TEXTURE_PAD * 2;
+export const BOARD_SURFACE_HEIGHT =
+  BOARD_TEXTURE_HEIGHT - BOARD_TEXTURE_PAD * 2;
 
 export const PIECE_TEXTURE_SIZE = 184;
 export const PIECE_CENTER = PIECE_TEXTURE_SIZE / 2;
@@ -62,9 +63,15 @@ function drawElmSurface(width: number, height: number): HTMLCanvasElement {
       const broad = fbm(grainX * 0.006, y * 0.0015, 2);
       const fine = fbm(grainX * 0.072, y * 0.003, 3);
       const ring = grainX * 0.047 + fbm(x * 0.018, y * 0.016, 2) * 1.6;
-      const edge = Math.min(ring - Math.floor(ring), 1 - (ring - Math.floor(ring)));
+      const edge = Math.min(
+        ring - Math.floor(ring),
+        1 - (ring - Math.floor(ring)),
+      );
       let tone = 0.57 + (broad - 0.5) * 0.5 + (fine - 0.5) * 0.28;
-      tone -= Math.max(0, 0.05 - edge) * 3.5 * (0.4 + valueNoise(x * 0.04, y * 0.02) * 0.6);
+      tone -=
+        Math.max(0, 0.05 - edge) *
+        3.5 *
+        (0.4 + valueNoise(x * 0.04, y * 0.02) * 0.6);
       tone = Math.min(1, Math.max(0, tone));
       const offset = (y * width + x) * 4;
       pixels[offset] = dark[0] + (light[0] - dark[0]) * tone;

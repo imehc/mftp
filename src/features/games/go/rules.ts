@@ -1,4 +1,8 @@
-import type { GameDefinition, MoveResolution, SeatIndex } from "../engine/types";
+import type {
+  GameDefinition,
+  MoveResolution,
+  SeatIndex,
+} from "../engine/types";
 import {
   KOMI,
   type BoardSize,
@@ -55,7 +59,7 @@ interface Group {
   liberties: number;
 }
 
-/** Flood-fill the chain containing `index` and count its liberties. */
+/** 洪泛填充包含 `index` 的棋链并统计其气。 */
 function collectGroup(
   board: readonly Stone[],
   boardSize: number,
@@ -89,14 +93,14 @@ function collectGroup(
 export interface PlacedResult {
   board: Stone[];
   captured: Array<{ index: number; seat: SeatIndex }>;
-  /** Chain size of the placed stone after captures (ko needs it). */
+  /** 提子后所落棋子的棋链大小（劫需要用到）。 */
   placedGroupSize: number;
   placedLiberties: number;
 }
 
 /**
- * Place a stone and resolve captures. Returns null when the move is
- * illegal: occupied, suicide, or the ko point. Caller checks bounds.
+ * 落子并解决提子。以下情况返回 null：落子非法——已有子、自杀，或
+ * 处于劫点。调用方负责检查越界。
  */
 export function resolvePlacement(
   board: readonly Stone[],
@@ -127,7 +131,7 @@ export function resolvePlacement(
   }
 
   const placed = collectGroup(next, boardSize, index);
-  if (placed.liberties === 0) return null; // suicide
+  if (placed.liberties === 0) return null; // 自杀手
   return {
     board: next,
     captured,
@@ -137,9 +141,8 @@ export function resolvePlacement(
 }
 
 /**
- * Chinese-rules area scoring: a side's area = its stones on the board +
- * empty points adjacent only to that side. Points adjacent to both sides
- * (dame) count for neither. Call after both players have passed.
+ * 中国规则的目数（数子）计分：某方地域 = 盘上己方棋子 + 仅与该方
+ * 相邻的空点。双方都相邻的点（单官）双方都不计。须在双方都停手后调用。
  */
 export function computeAreaScore(
   board: readonly Stone[],
@@ -154,7 +157,7 @@ export function computeAreaScore(
   return score;
 }
 
-/** Empty intersections owned by exactly one bordering side; dame remains null. */
+/** 仅被一方包围的空交叉点归该方；单官保持 null。 */
 export function computeTerritoryOwners(
   board: readonly Stone[],
   boardSize: number,
@@ -201,7 +204,8 @@ export function isLegalPlay(state: GoState, row: number, col: number): boolean {
     state.koPoint,
   );
   return (
-    placed !== null && !state.positionHistory.includes(boardPositionKey(placed.board))
+    placed !== null &&
+    !state.positionHistory.includes(boardPositionKey(placed.board))
   );
 }
 
@@ -281,9 +285,8 @@ export const goGame: GameDefinition<GoState, GoMove, GoPresentation> = {
       throw new Error("go: repeated board position");
     }
 
-    // Ko: when the placement captures exactly one stone and forms a
-    // single-stone group with one liberty, the opponent may not immediately
-    // recapture.
+    // 劫：当落子恰好提掉一子，并形成一个仅有一气的单子棋链时，
+    // 对方不能立即回提。
     const koPoint =
       placed.captured.length === 1 &&
       placed.placedGroupSize === 1 &&

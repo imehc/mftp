@@ -1,11 +1,10 @@
 /**
- * Deterministic shot simulation on rapier2d.
+ * 基于 rapier2d 的确定性击球模拟。
  *
- * A fresh world is built from the ball positions for every shot and torn
- * down afterwards: state-in → state-out with no hidden world reuse. That
- * (plus the fixed timestep and identical construction order) is what
- * makes outcomes reproducible for AI evaluation and, later, online
- * lockstep. Rapier's WASM floats behave identically across platforms.
+ * 每次击球都从球的当前位置新建一个世界，结束后销毁：状态进 → 状态出，
+ * 不复用隐藏的世界。这一点（加上固定步长和一致的构建顺序）正是
+ * AI 评估，以及将来联机锁步时结果可复现的原因。Rapier 的 WASM 浮点
+ * 在各平台上表现一致。
  */
 import RAPIER from "@dimforge/rapier2d-compat";
 import {
@@ -36,7 +35,7 @@ import type { BallState, SimEvent, SimFrame } from "./types";
 
 let initPromise: Promise<unknown> | null = null;
 
-/** Must resolve before any simulation runs (loads the WASM module). */
+/** 任何模拟运行前必须先 resolve（用于加载 WASM 模块）。 */
 export function ensurePhysicsReady(): Promise<unknown> {
   initPromise ??= RAPIER.init();
   return initPromise;
@@ -52,24 +51,23 @@ export interface ShotSimResult {
   balls: BallState[];
   frames: SimFrame[];
   events: SimEvent[];
-  /** First object ball the cue ball touched, or null. */
+  /** 母球碰到的第一颗目标球，没有则为 null。 */
   firstContact: number | null;
   cuePotted: boolean;
   pottedInOrder: number[];
 }
 
 interface CushionSegment {
-  /** Convex hull points, CCW: inner face then outer face with 45° jaws. */
+  /** 凸包顶点，逆时针：先内沿，后外沿，含 45° 袋口颚。 */
   points: number[];
 }
 
 export type { CushionSegment };
 
 /**
- * Six cushion segments (two per long rail split by the side pocket, one
- * per short rail). Ends are cut at 45° so balls deflect off pocket jaws
- * instead of hitting flat walls. Exported so the renderer draws the
- * exact shapes the physics collides with.
+ * 六段库边（每条长边被中袋分成两段，每条短边一段）。两端切 45°，
+ * 使球从袋口颚弹开而非撞上平直的墙。导出给渲染器，以绘制与物理
+ * 碰撞完全一致的形状。
  */
 export function cushionSegments(): CushionSegment[] {
   const t = CUSHION_THICKNESS;
@@ -77,7 +75,7 @@ export function cushionSegments(): CushionSegment[] {
   const hh = TABLE_H / 2;
   const segments: CushionSegment[] = [];
 
-  // Long rails (top y=+hh, bottom y=-hh), each split at the side pocket.
+  // 长边（上 y=+hh，下 y=-hh），各在中袋处断开。
   for (const sy of [-1, 1]) {
     for (const [x0, x1] of [
       [-hw + CORNER_MOUTH, -SIDE_MOUTH],
@@ -90,7 +88,7 @@ export function cushionSegments(): CushionSegment[] {
       });
     }
   }
-  // Short rails (left x=-hw, right x=+hw).
+  // 短边（左 x=-hw，右 x=+hw）。
   for (const sx of [-1, 1]) {
     const xIn = sx * hw;
     const xOut = sx * (hw + t);
@@ -104,24 +102,22 @@ export function cushionSegments(): CushionSegment[] {
 }
 
 /**
- * Rounded jaw points: two per pocket mouth, sitting at the inner tips of
- * the cushions that frame the opening. A ball entering too fast or at a
- * bad angle clips one and rattles back onto the table instead of falling.
- * Order is fixed (corners in POCKET-diagonal order, then the two sides)
- * to keep the collider construction deterministic for lockstep.
+ * 圆角袋口颚点：每个袋口两个，位于围成开口的库边内尖端。球进得太快
+ * 或角度太差时会蹭到其中一点弹回台面而非落袋。顺序固定（角袋按
+ * POCKET 对角线顺序，再是中袋两个），以保证碰撞体构建在锁步下确定。
  */
 export function jawPoints(): Array<[number, number]> {
   const hw = TABLE_W / 2;
   const hh = TABLE_H / 2;
   const points: Array<[number, number]> = [];
-  // Corner mouths: one tip on the long rail, one on the short rail.
+  // 角袋口：一个尖端在长边，一个在短边。
   for (const sx of [-1, 1]) {
     for (const sy of [-1, 1]) {
       points.push([sx * (hw - CORNER_MOUTH), sy * hh]);
       points.push([sx * hw, sy * (hh - CORNER_MOUTH)]);
     }
   }
-  // Side mouths on the long rails: symmetric tips either side of centre.
+  // 长边上的中袋口：中心两侧对称的尖端。
   for (const sy of [-1, 1]) {
     points.push([SIDE_MOUTH, sy * hh]);
     points.push([-SIDE_MOUTH, sy * hh]);
@@ -132,8 +128,8 @@ export function jawPoints(): Array<[number, number]> {
 const BALL_DENSITY = BALL_MASS / (Math.PI * BALL_RADIUS * BALL_RADIUS);
 
 /**
- * Simulate one shot to rest. Synchronous; callers must have awaited
- * `ensurePhysicsReady()` once beforehand.
+ * 模拟一杆直到静止。同步执行；调用方必须事先 await 过一次
+ * `ensurePhysicsReady()`。
  */
 export function simulateShot(
   ballsIn: readonly BallState[],
@@ -143,17 +139,14 @@ export function simulateShot(
   world.timestep = FIXED_DT;
 
   try {
-    // Static geometry first, in fixed order (construction order is part
-    // of the determinism contract).
+    // 先按固定顺序构建静态几何（构建顺序属于确定性约定的一部分）。
     for (const segment of cushionSegments()) {
       const hull = RAPIER.ColliderDesc.convexHull(
         new Float32Array(segment.points),
       );
       if (!hull) throw new Error("billiards: invalid cushion hull");
       world.createCollider(
-        hull
-          .setRestitution(CUSHION_RESTITUTION)
-          .setFriction(CUSHION_FRICTION),
+        hull.setRestitution(CUSHION_RESTITUTION).setFriction(CUSHION_FRICTION),
       );
     }
 
@@ -168,8 +161,8 @@ export function simulateShot(
       pocketHandles.set(collider.handle, pocket.id);
     }
 
-    // Rounded jaw points guard each mouth: a solid collider (not a
-    // sensor) at each cushion tip so misaligned/fast balls rattle out.
+    // 圆角颚点把守每个袋口：每个库边尖端放一个实心碰撞体（非传感器），
+    // 让对位不准或过快的球弹出去。
     for (const [jx, jy] of jawPoints()) {
       world.createCollider(
         RAPIER.ColliderDesc.ball(JAW_RADIUS)
@@ -179,7 +172,7 @@ export function simulateShot(
       );
     }
 
-    // Outer containment frame so nothing can leave the world.
+    // 外层围框，确保任何物体都不会离开世界。
     const frame = 0.16;
     const fw = TABLE_W / 2 + frame;
     const fh = TABLE_H / 2 + frame;
@@ -194,7 +187,7 @@ export function simulateShot(
       );
     }
 
-    // Balls in id order.
+    // 按 id 顺序放入球。
     const active = ballsIn.filter((ball) => !ball.potted);
     const bodyByBall = new Map<number, RAPIER.RigidBody>();
     const ballByCollider = new Map<number, number>();
@@ -286,25 +279,27 @@ export function simulateShot(
           }
           return;
         }
-        // Remaining case: ball vs cushion/frame.
-        events.push({ type: "cushion", t, ball, impact: relSpeed(ball, undefined) });
+        // 剩余情况：球对库边/围框。
+        events.push({
+          type: "cushion",
+          t,
+          ball,
+          impact: relSpeed(ball, undefined),
+        });
       });
 
-      // Follow/draw spin (high/low cue strike): at first cue-object contact,
-      // add follow/draw spin along
-      // the line of centres (the impact normal), not the aim line. After
-      // impact the cue naturally departs along the tangent line; pushing
-      // ±normal is real top/bottom spin — follow drives it forward through
-      // the object ball's line, draw pulls it back — and stays visible on
-      // thin cuts where an aim-line nudge would be lost.
+      // 跟杆/缩杆旋转（高杆/低杆击打）：在母球与目标球首次接触的瞬间，
+      // 沿两球连心线（即碰撞法线）而非瞄准线施加跟/缩旋。撞击后母球
+      // 自然沿切线离开；沿 ±法线推才是真正的上/下旋——跟杆把它向前
+      // 推出穿过目标球线，缩杆把它拉回——并且在薄切球时依然可见，
+      // 而沿瞄准线轻推则会丢失。
       if (followDrawArmed && cueContactThisStep && cueBody.isValid()) {
         const preSpeed = Math.hypot(cuePreVel.x, cuePreVel.y);
         const objBody =
           firstContact !== null ? bodyByBall.get(firstContact) : undefined;
         if (preSpeed > 1e-3) {
-          // Impact normal = unit vector from cue to the struck ball. Fall
-          // back to the pre-impact travel direction if the object body is
-          // somehow gone (e.g. potted on the same step).
+          // 碰撞法线 = 从母球指向被击球的单位向量。若目标球因某种原因
+          // 已不存在（如同一模拟步内落袋），则回退到撞击前的运动方向。
           const cuePos = cueBody.translation();
           let nx = cuePreVel.x / preSpeed;
           let ny = cuePreVel.y / preSpeed;
@@ -318,7 +313,8 @@ export function simulateShot(
               ny = dy / dist;
             }
           }
-          const mag = shot.followDraw * FOLLOW_DRAW_FACTOR * preSpeed * BALL_MASS;
+          const mag =
+            shot.followDraw * FOLLOW_DRAW_FACTOR * preSpeed * BALL_MASS;
           cueBody.applyImpulse({ x: nx * mag, y: ny * mag }, true);
         }
         followDrawArmed = false;
@@ -368,7 +364,7 @@ export function simulateShot(
   }
 }
 
-/** True if a ball centered at (x, y) would overlap another unpotted ball. */
+/** 以 (x, y) 为中心的球是否会与另一颗未落袋的球重叠。 */
 export function overlapsAnyBall(
   balls: readonly BallState[],
   x: number,
@@ -383,7 +379,7 @@ export function overlapsAnyBall(
   );
 }
 
-/** True if (x, y) is a legal resting spot on the playing surface. */
+/** (x, y) 是否为台面上合法的静止落点。 */
 export function insidePlayArea(x: number, y: number): boolean {
   return (
     Math.abs(x) <= TABLE_W / 2 - BALL_RADIUS &&

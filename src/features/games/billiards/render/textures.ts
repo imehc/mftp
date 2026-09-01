@@ -1,16 +1,15 @@
 /**
- * Procedural canvas textures for the billiards renderer: oak grain for the
- * frame, woven cloth for the playing surface, and a lit-sphere overlay for
- * the balls. Everything is generated once at mount and cached, so the cost
- * is paid on the first frame and never again.
+ * 台球渲染器的程序化画布纹理：木框的橡木纹理、台面的编织台呢，以及
+ * 球的受光球面叠加。全部在挂载时生成一次并缓存，因此开销只付在首帧，
+ * 之后不再重复。
  *
- * The noise kernel mirrors ../../go/texture-utils — a seeded lattice hash
- * feeding value noise and fbm — so the surface is identical on every launch
- * (no Math.random, nothing that could drift between two online peers).
+ * 噪声内核镜像自 ../../go/texture-utils——由带种子的栅格哈希驱动值噪声
+ * 与 fbm——因此每次启动表面都完全一致（不用 Math.random，也就不会在
+ * 两个联机对手间出现漂移）。
  */
 import { Texture } from "pixi.js";
 
-// --- seeded noise ------------------------------------------------------
+// --- 带种子噪声 --------------------------------------------------
 
 function hash2(ix: number, iy: number): number {
   let h = (ix * 374761393 + iy * 668265263) | 0;
@@ -50,23 +49,25 @@ function fbm(x: number, y: number, octaves: number): number {
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-function makeCanvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
+function makeCanvas(
+  w: number,
+  h: number,
+): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   return [canvas, canvas.getContext("2d")!];
 }
 
-// --- wood --------------------------------------------------------------
+// --- 木面纹理 --------------------------------------------------------------
 
-/** Rail hardwood, from the dark grain line to the lit fiber between rings. */
+/** 库边硬木：从深色纹理线到环纹之间受光的木纤维。 */
 const WOOD_DARK: [number, number, number] = [46, 25, 14];
 const WOOD_LIGHT: [number, number, number] = [134, 82, 45];
 
 /**
- * Plank grain running along +x (the length of the long rails). Generated at
- * a reduced resolution and upscaled when painted — grain is smooth, so the
- * interpolation reads as polished wood rather than as blur.
+ * 沿 +x 方向（长 rails 的长度方向）延伸的木板纹理。以较低分辨率生成，
+ * 绘制时再放大——纹理平滑，因此插值看起来像打磨过的木面而非模糊。
  */
 export function makeWoodCanvas(w: number, h: number): HTMLCanvasElement {
   const [canvas, ctx] = makeCanvas(w, h);
@@ -75,8 +76,7 @@ export function makeWoodCanvas(w: number, h: number): HTMLCanvasElement {
 
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      // Waviness warps the rings so they drift like a sawn board instead of
-      // running ruler-straight down the rail.
+      // 波纹让环纹扭曲，使其像锯开的木板而非沿 rail 笔直如尺。
       const wave = Math.sin(x * 0.014 + fbm(x * 0.012, y * 0.012, 2) * 6) * 5;
       const gy = y + wave + (fbm(x * 0.005, y * 0.04, 2) - 0.5) * 20;
 
@@ -86,8 +86,7 @@ export function makeWoodCanvas(w: number, h: number): HTMLCanvasElement {
       let light =
         0.52 + (broad - 0.5) * 0.4 + (fine - 0.5) * 0.36 + (fiber - 0.5) * 0.08;
 
-      // Thin dark growth rings, broken along their length so they read as
-      // organic rather than printed.
+      // 细密的深色年轮，沿其长度被打破，使其看起来自然而非印刷。
       const ring = gy * 0.06 + fbm(x * 0.018, y * 0.018, 2) * 1.3;
       const f = ring - Math.floor(ring);
       const edge = Math.min(f, 1 - f);
@@ -106,18 +105,18 @@ export function makeWoodCanvas(w: number, h: number): HTMLCanvasElement {
   return canvas;
 }
 
-// --- cloth -------------------------------------------------------------
+// --- 台呢 -------------------------------------------------------
 
 /**
- * Worsted cloth base; the weave modulates around this. Exported because the
- * cushion jaw facings at a pocket mouth are the same cloth as the bed and
- * have to resolve to exactly this colour.
+ * 精纺台呢基色；编织纹理围绕它波动。导出是因为袋口处的库边颚面与台面
+ * 是同一种台呢，必须正好落到这个颜色。
  */
 export const CLOTH_BASE: [number, number, number] = [26, 104, 66];
 
-const wrap = (v: number, period: number): number => ((v % period) + period) % period;
+const wrap = (v: number, period: number): number =>
+  ((v % period) + period) % period;
 
-/** Value noise on a lattice that repeats every `period` cells. */
+/** 在每隔 `period` 个格点重复一次的栅格上的值噪声。 */
 function periodicNoise(x: number, y: number, period: number): number {
   const ix = Math.floor(x);
   const iy = Math.floor(y);
@@ -136,7 +135,12 @@ function periodicNoise(x: number, y: number, period: number): number {
   return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
 }
 
-function periodicFbm(x: number, y: number, period: number, octaves: number): number {
+function periodicFbm(
+  x: number,
+  y: number,
+  period: number,
+  octaves: number,
+): number {
   let sum = 0;
   let amp = 0.5;
   let norm = 0;
@@ -150,18 +154,17 @@ function periodicFbm(x: number, y: number, period: number, octaves: number): num
 }
 
 /**
- * One seamless tile of billiard cloth: a fine directional weave (warp over
- * weft) on a slow tonal drift from the nap. Every term repeats over the tile
- * so it can be laid down as a repeating pattern with no visible seam, which
- * keeps the weave at native resolution instead of upscaling one big bitmap.
+ * 一块无缝的台呢贴图：在绒毛缓慢色调漂移之上叠一层细密的方向性织纹
+ * （经线压纬线）。每一项在贴图内重复，因此可作为重复图案平铺而看不到
+ * 接缝，也让织纹保持原始分辨率，而非放大一整张大位图。
  */
 export function makeClothTile(size = 256): HTMLCanvasElement {
   const [canvas, ctx] = makeCanvas(size, size);
   const image = ctx.createImageData(size, size);
   const data = image.data;
-  /** Thread pairs across the tile — must divide `size` to stay seamless. */
+  /** 贴图内的线对——必须能整除 `size` 才能保持无缝。 */
   const THREADS = 128;
-  /** Lattice cells across the tile for the low-frequency terms. */
+  /** 贴图内用于低频项的栅格格点数。 */
   const CELLS = 8;
   const k = (Math.PI * 2 * THREADS) / size;
 
@@ -169,7 +172,7 @@ export function makeClothTile(size = 256): HTMLCanvasElement {
     for (let x = 0; x < size; x++) {
       const u = (x / size) * CELLS;
       const v = (y / size) * CELLS;
-      // Jitter is itself periodic, so the threads still meet at the seam.
+      // 抖动本身也是周期的，因此线在接缝处仍能对齐。
       const jx = periodicNoise((x / size) * 64, (y / size) * 64, 64) - 0.5;
       const jy = periodicNoise((y / size) * 64, (x / size) * 64, 64) - 0.5;
       const warp = Math.sin((x + jx * 1.5) * k);
@@ -191,22 +194,20 @@ export function makeClothTile(size = 256): HTMLCanvasElement {
   return canvas;
 }
 
-// --- ball shading ------------------------------------------------------
+// --- 球面明暗 --------------------------------------------------
 
-/** Resolution of the shared sphere-shading overlay. */
+/** 共用球面明暗叠加的分辨率。 */
 const SHADE_TEX = 192;
 
 let ballShading: Texture | null = null;
 
 /**
- * A lit sphere painted per-pixel, drawn over every ball as a fixed view-space
- * overlay (the ball's own texture rolls beneath it; a real sphere's shading
- * does not move when it spins).
+ * 逐像素绘制的受光球面，作为固定视图空间叠加画在每个球上（球自身纹理
+ * 在其下滚动；真实球面的明暗在自转时并不移动）。
  *
- * Per pixel: Lambert diffuse from an overhead key light, a Blinn-Phong
- * specular for the phenolic gloss, and a soft bounce off the cloth along the
- * lower rim. It is generated per-pixel rather than stacked as translucent
- * circles because stacked circles band at the terminator.
+ * 逐像素：来自上方主光的 Lambert 漫反射、用于酚醛高光的 Blinn-Phong
+ * 镜面反射，以及沿下缘从台呢反射的柔和反弹光。它逐像素生成而非叠加
+ * 半透明圆，因为叠加圆会在明暗分界处出现条带。
  */
 export function getBallShadingTexture(): Texture {
   if (ballShading) return ballShading;
@@ -217,12 +218,12 @@ export function getBallShadingTexture(): Texture {
   const data = image.data;
   const c = (size - 1) / 2;
 
-  // Key light (upper-left, in front) and the cloth bounce (lower-right).
+  // 主光（左上方、靠前）与台呢反弹光（右下方）。
   const kl = 1 / Math.hypot(-0.42, -0.54, 0.73);
   const lx = -0.42 * kl;
   const ly = -0.54 * kl;
   const lz = 0.73 * kl;
-  // Half-vector for a viewer straight down the +z axis.
+  // 视线沿 +z 轴直下的半程向量。
   const hn = 1 / Math.hypot(lx, ly, lz + 1);
   const hx = lx * hn;
   const hy = ly * hn;
@@ -247,19 +248,19 @@ export function getBallShadingTexture(): Texture {
       }
       const nz = Math.sqrt(1 - rr);
 
-      // Darkening: how far this point falls short of full illumination.
+      // 变暗量：该点距完全照明的不足程度。
       const diff = Math.max(0, nx * lx + ny * ly + nz * lz);
       const dark = clamp01(1 - AMBIENT - DIFFUSE * diff);
 
-      // Gloss: a tight primary glint plus a broad sheen.
+      // 光泽：一束锐利的主高光加一层宽泛的光泽。
       const ndh = Math.max(0, nx * hx + ny * hy + nz * hz);
       const spec = Math.pow(ndh, 42) * 0.9 + Math.pow(ndh, 5) * 0.09;
 
-      // Cloth bounce along the shadowed rim keeps the edge from going flat.
+      // 沿阴影边缘的台呢反弹光，避免边缘发死。
       const ndb = Math.max(0, nx * bx + ny * by + nz * bz);
       const bounce = Math.pow(ndb, 3) * (1 - nz) * 0.5;
 
-      // Composite the light over the dark so a glint stays white at the core.
+      // 把光叠在暗之上，使高光核心保持白色。
       const lightA = clamp01(spec + bounce);
       const darkA = dark * (1 - lightA);
       const alpha = clamp01(lightA + darkA);
@@ -267,12 +268,12 @@ export function getBallShadingTexture(): Texture {
         data[o + 3] = 0;
         continue;
       }
-      // Bounce carries a little cloth green; the key glint stays neutral.
+      // 反弹光带一点台呢绿；主高光保持中性。
       const mix = lightA > 0 ? clamp01(bounce / lightA) : 0;
       data[o] = (255 * (1 - mix) + 186 * mix) * (lightA / alpha);
       data[o + 1] = (255 * (1 - mix) + 226 * mix) * (lightA / alpha);
       data[o + 2] = (255 * (1 - mix) + 200 * mix) * (lightA / alpha);
-      // Feather the last texel ring so the overlay edge is not stair-stepped.
+      // 柔化最外圈像素，使叠加边缘不出现阶梯。
       data[o + 3] = 255 * alpha * clamp01((1 - Math.sqrt(rr)) * c * 0.9);
     }
   }

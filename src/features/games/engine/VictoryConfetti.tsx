@@ -69,14 +69,21 @@ function createSideBurst(
     flip: valueBetween(index + 4, 0, Math.PI * 2),
     flipSpeed: valueBetween(index + 5, 7, 15),
     gravity: valueBetween(index + 6, 480, 680),
-    height: kind === "streamer" ? valueBetween(index + 7, 23, 38) : valueBetween(index + 7, 7, 15),
+    height:
+      kind === "streamer"
+        ? valueBetween(index + 7, 23, 38)
+        : valueBetween(index + 7, 7, 15),
     kind,
     life: valueBetween(index + 8, 3.8, 5.2),
     rotation: valueBetween(index + 9, 0, Math.PI * 2),
     spin: valueBetween(index + 10, -9, 9),
-    vx: (fromLeft ? 1 : -1) * valueBetween(index + 11, width * 0.2, width * 0.58),
+    vx:
+      (fromLeft ? 1 : -1) * valueBetween(index + 11, width * 0.2, width * 0.58),
     vy: -valueBetween(index + 12, height * 0.72, height * 1.18),
-    width: kind === "streamer" ? valueBetween(index + 13, 3, 5) : valueBetween(index + 13, 6, 13),
+    width:
+      kind === "streamer"
+        ? valueBetween(index + 13, 3, 5)
+        : valueBetween(index + 13, 6, 13),
     wobble: valueBetween(index + 14, 0, Math.PI * 2),
     wobbleSpeed: valueBetween(index + 15, 5, 10),
     x: fromLeft ? width * 0.04 : width * 0.96,
@@ -131,14 +138,20 @@ function createTopShower(
     flip: valueBetween(index + 204, 0, Math.PI * 2),
     flipSpeed: valueBetween(index + 205, 6, 13),
     gravity: valueBetween(index + 206, 115, 210),
-    height: kind === "streamer" ? valueBetween(index + 207, 22, 36) : valueBetween(index + 207, 7, 15),
+    height:
+      kind === "streamer"
+        ? valueBetween(index + 207, 22, 36)
+        : valueBetween(index + 207, 7, 15),
     kind,
     life: valueBetween(index + 208, 3.7, 5.1),
     rotation: valueBetween(index + 209, 0, Math.PI * 2),
     spin: valueBetween(index + 210, -6, 6),
     vx: valueBetween(index + 211, -75, 75),
     vy: valueBetween(index + 212, 45, 135),
-    width: kind === "streamer" ? valueBetween(index + 213, 3, 5) : valueBetween(index + 213, 6, 13),
+    width:
+      kind === "streamer"
+        ? valueBetween(index + 213, 3, 5)
+        : valueBetween(index + 213, 6, 13),
     wobble: valueBetween(index + 214, 0, Math.PI * 2),
     wobbleSpeed: valueBetween(index + 215, 4, 9),
     x: valueBetween(index + 216, width * 0.04, width * 0.96),
@@ -169,7 +182,8 @@ function drawParticle(
   particle: Particle,
 ): void {
   const progress = particle.age / particle.life;
-  const fade = progress < 0.08 ? progress / 0.08 : Math.min(1, (1 - progress) / 0.22);
+  const fade =
+    progress < 0.08 ? progress / 0.08 : Math.min(1, (1 - progress) / 0.22);
   const flipScale = Math.max(0.18, Math.abs(Math.cos(particle.flip)));
 
   context.save();
@@ -313,7 +327,7 @@ function launchVictoryConfetti(): void {
 
 export function VictoryConfetti() {
   useEffect(() => {
-    // The celebration owns its lifecycle so route and game-state changes cannot interrupt it.
+    // 庆祝动画拥有自己的生命周期，使路由与对局状态变化都无法打断它。
     launchVictoryConfetti();
   }, []);
 

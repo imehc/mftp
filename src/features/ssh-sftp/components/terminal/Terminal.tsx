@@ -17,12 +17,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-
 interface Props {
   session: Session;
 }
 
-// Encode/decode helpers for the base64 transport used by the shell channel.
+// 编解码辅助函数，用于 shell 通道的 base64 传输。
 const enc = new TextEncoder();
 function bytesToBase64(bytes: Uint8Array): string {
   let bin = "";
@@ -35,99 +34,113 @@ function base64ToBytes(b64: string): Uint8Array {
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
-
 export default function Terminal({ session }: Props) {
   const { t } = useLingui();
   const containerRef = useRef<HTMLDivElement>(null);
   const patch = useSessionsStore((s) => s.patch);
   const [shellOpening, setShellOpening] = useState(false);
   const hasBackendSession = !session.id.startsWith("tab-");
-
+  // 每个会话 id 的 shell 只能打开一次；status / t 通过最新值 ref 读取，
+  // 这样状态翻转或语言切换都不会重新打开它。
+  const sessionStatusRef = useRef(session.status);
+  const tRef = useRef(t);
   useEffect(() => {
-    // Wire up a real shell once the backend session id exists. The session
-    // remains "connecting" until this succeeds, so sidebars/tabs do not turn
-    // green before the terminal is actually open.
+    sessionStatusRef.current = session.status;
+    tRef.current = t;
+  });
+  useEffect(() => {
+    // 后端会话 id 存在后，再接上真实的 shell。在此之前会话保持
+    // “connecting”，使侧边栏 / 标签不会在终端真正打开前就变绿。
     if (
-      session.status !== "connected" &&
-      !(session.status === "connecting" && !session.id.startsWith("tab-"))
+      sessionStatusRef.current !== "connected" &&
+      !(
+        sessionStatusRef.current === "connecting" &&
+        !session.id.startsWith("tab-")
+      )
     ) {
       return;
     }
     const el = containerRef.current;
     if (!el) return;
-
     const term = new XTerm({
       fontFamily:
         'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
       fontSize: 13,
       cursorBlink: true,
-      theme: { background: "#0a0a0a", foreground: "#e5e5e5" },
+      theme: {
+        background: "#0a0a0a",
+        foreground: "#e5e5e5",
+      },
       scrollback: 10_000,
     });
     const fit = new FitAddon();
     term.loadAddon(fit);
     term.open(el);
     fit.fit();
-
     const sessionId = session.id;
     let disposed = false;
     let shellOpenConfirmed = false;
     setShellOpening(true);
 
-    // Backend -> terminal: decode base64 payloads and write.
+    // 后端 → 终端：解码 base64 负载并写入。
     const unlistenData = listen<string>(sshDataEvent(sessionId), (e) => {
       if (!disposed) term.write(base64ToBytes(e.payload));
     });
     const unlistenClosed = listen<string>(sshClosedEvent(sessionId), () => {
       if (!disposed) {
-        term.write(`\r\n\x1b[31m[${t`连接已关闭`}]\x1b[0m\r\n`);
+        term.write(`\r\n\x1b[31m[${tRef.current`连接已关闭`}]\x1b[0m\r\n`);
         patch(
           sessionId,
           shellOpenConfirmed
-            ? { status: "closed" }
+            ? {
+                status: "closed",
+              }
             : {
                 status: "error",
-                error: t`远端连接在终端打开前已关闭`,
+                error: tRef.current`远端连接在终端打开前已关闭`,
               },
         );
       }
     });
 
-    // Open the remote shell sized to the current terminal.
+    // 按当前终端尺寸打开远程 shell。
     void ipc
       .sshOpenShell(sessionId, term.cols, term.rows)
       .then(() => {
         shellOpenConfirmed = true;
         if (!disposed) {
           setShellOpening(false);
-          patch(sessionId, { status: "connected" });
+          patch(sessionId, {
+            status: "connected",
+          });
         }
       })
       .catch((e) => {
         if (!disposed) setShellOpening(false);
-        patch(sessionId, { status: "error", error: String(e) });
-        toast.error(t`打开终端失败：${e}`);
+        patch(sessionId, {
+          status: "error",
+          error: String(e),
+        });
+        toast.error(tRef.current`打开终端失败：${e}`);
       });
 
-    // Terminal -> backend: forward keystrokes as base64.
+    // 终端 → 后端：将按键以 base64 转发。
     const onData = term.onData((data) => {
       void ipc.sshWrite(sessionId, bytesToBase64(enc.encode(data)));
     });
 
-    // Keep the pty sized to the container.
+    // 让 pty 尺寸跟随容器。
     const doResize = () => {
       try {
         fit.fit();
         void ipc.sshResize(sessionId, term.cols, term.rows);
       } catch {
-        /* container not measurable yet */
+        /* 容器尚不可测量 */
       }
     };
     const ro = new ResizeObserver(doResize);
     ro.observe(el);
-
     term.focus();
-
     return () => {
       disposed = true;
       setShellOpening(false);
@@ -137,16 +150,17 @@ export default function Terminal({ session }: Props) {
       void unlistenClosed.then((f) => f());
       term.dispose();
     };
-    // Re-run only when the backend session identity changes. Changing status
-    // from connecting -> connected must not reopen the shell.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.id]);
-
+    // 仅在后端会话身份变化时重跑。状态从 connecting → connected 切换
+    // 时不得重新打开 shell。
+  }, [patch, session.id]);
   if (session.status === "connecting" && !hasBackendSession) {
+    const sessionTitle = session.title;
     return (
-      <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex h-full items-center justify-center gap-2 text-sm">
         <LoaderCircle className="size-4 animate-spin" />
-        <span><Trans>正在连接 {session.title}…</Trans></span>
+        <span>
+          <Trans>正在连接 {sessionTitle}…</Trans>
+        </span>
       </div>
     );
   }
@@ -167,14 +181,13 @@ export default function Terminal({ session }: Props) {
       </Empty>
     );
   }
-
   return (
     <div className="relative h-full w-full bg-[#0a0a0a]">
       <div ref={containerRef} className="h-full w-full p-1" />
       {session.status === "connecting" || shellOpening ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
-          <div className="flex items-center gap-2 rounded-md border border-border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-sm">
-            <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+        <div className="bg-background/70 absolute inset-0 flex items-center justify-center backdrop-blur-[1px]">
+          <div className="border-border bg-popover text-popover-foreground flex items-center gap-2 rounded-md border px-3 py-2 text-sm shadow-sm">
+            <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
             <Trans>正在打开终端…</Trans>
           </div>
         </div>

@@ -15,8 +15,7 @@ import type {
 } from "~/types";
 
 type CommandResult<T, E> =
-  | { status: "ok"; data: T }
-  | { status: "error"; error: E };
+  { status: "ok"; data: T } | { status: "error"; error: E };
 
 const unwrapCommand = async <T, E>(
   promise: Promise<CommandResult<T, E>>,
@@ -34,7 +33,7 @@ const voidCommand = async <E>(
   await unwrapCommand(promise);
 };
 
-// ---- Hosts ----
+// ---- 主机 ----
 export const hostsList = () => unwrapCommand(commands.hostsList());
 export const hostGet = (id: string) => unwrapCommand(commands.hostGet(id));
 export const hostCreate = (input: HostInput) =>
@@ -45,7 +44,7 @@ export const hostDelete = (id: string) => voidCommand(commands.hostDelete(id));
 export const hostsReorder = (orderedIds: string[]) =>
   unwrapCommand(commands.hostsReorder(orderedIds));
 
-// ---- Keys ----
+// ---- 密钥 ----
 export const keysList = () => unwrapCommand(commands.keysList());
 export const keyImport = (
   label: string,
@@ -54,7 +53,7 @@ export const keyImport = (
 ) => unwrapCommand(commands.keyImport(label, sourcePath, hasPassphrase));
 export const keyDelete = (id: string) => voidCommand(commands.keyDelete(id));
 
-// ---- LAN Transfer ----
+// ---- 局域网传输 ----
 export const lanTransferSettings = () =>
   unwrapCommand(commands.lanTransferSettings());
 export const lanTransferSaveSettings = (settings: LanTransferSettings) =>
@@ -81,8 +80,7 @@ export const lanTransferCancelTask = (id: string) =>
   voidCommand(commands.lanTransferCancelTask(id));
 export const lanTransferStart = () =>
   unwrapCommand(commands.lanTransferStart());
-export const lanTransferStop = () =>
-  unwrapCommand(commands.lanTransferStop());
+export const lanTransferStop = () => unwrapCommand(commands.lanTransferStop());
 export const lanTransferSharedDirs = () =>
   unwrapCommand(commands.lanTransferSharedDirs());
 export const lanTransferAddSharedDir = (input: LanSharedDirInput) =>
@@ -97,11 +95,12 @@ export const lanTransferDeleteTrustedDevice = (id: string) =>
   voidCommand(commands.lanTransferDeleteTrustedDevice(id));
 export const activityLogs = (limit?: number) =>
   unwrapCommand(commands.activityLogs(limit ?? null));
-export const activityLogsClear = () => voidCommand(commands.activityLogsClear());
+export const activityLogsClear = () =>
+  voidCommand(commands.activityLogsClear());
 export const activityLogDelete = (id: string) =>
   voidCommand(commands.activityLogDelete(id));
 
-// ---- Game rooms ----
+// ---- 游戏房间 ----
 export const gameRoomStatus = () => unwrapCommand(commands.gameRoomStatus());
 export const gameRoomCreate = (
   gameId: string,
@@ -122,7 +121,7 @@ export const gameRoomSend = (payload: string) =>
   voidCommand(commands.gameRoomSend(payload));
 export const gameRoomLeave = () => voidCommand(commands.gameRoomLeave());
 
-// ---- SSH ----
+// ---- SSH 命令 ----
 export const sshConnect = (hostId: string, passphrase?: string) =>
   unwrapCommand(commands.sshConnect(hostId, passphrase ?? null));
 export const sshOpenShell = (sessionId: string, cols: number, rows: number) =>
@@ -136,7 +135,7 @@ export const sshDisconnect = (sessionId: string) =>
 export const sshSystemStats = (sessionId: string) =>
   unwrapCommand(commands.sshSystemStats(sessionId));
 
-// ---- SFTP ----
+// ---- SFTP 命令 ----
 export const sftpHome = (sessionId: string) =>
   unwrapCommand(commands.sftpHome(sessionId));
 export const sftpStartDir = (sessionId: string, preferred?: string | null) =>
@@ -155,36 +154,25 @@ export const sftpDelete = (
   isDir: boolean,
   transferId?: string,
 ) =>
-  voidCommand(commands.sftpDelete(
-    sessionId,
-    path,
-    isDir,
-    transferId ?? null,
-  ));
+  voidCommand(commands.sftpDelete(sessionId, path, isDir, transferId ?? null));
 export const sftpDownload = (
   sessionId: string,
   remote: string,
   local: string,
   transferId?: string,
 ) =>
-  voidCommand(commands.sftpDownload(
-    sessionId,
-    remote,
-    local,
-    transferId ?? null,
-  ));
+  voidCommand(
+    commands.sftpDownload(sessionId, remote, local, transferId ?? null),
+  );
 export const sftpUpload = (
   sessionId: string,
   local: string,
   remote: string,
   transferId?: string,
 ) =>
-  voidCommand(commands.sftpUpload(
-    sessionId,
-    local,
-    remote,
-    transferId ?? null,
-  ));
+  voidCommand(
+    commands.sftpUpload(sessionId, local, remote, transferId ?? null),
+  );
 export const sftpExists = (sessionId: string, path: string) =>
   unwrapCommand(commands.sftpExists(sessionId, path));
 export const sftpUploadDir = (
@@ -195,14 +183,16 @@ export const sftpUploadDir = (
   transferMode: DirectoryTransferMode,
   transferId?: string,
 ) =>
-  voidCommand(commands.sftpUploadDir(
-    sessionId,
-    localDir,
-    remoteParent,
-    remoteName,
-    transferMode,
-    transferId ?? null,
-  ));
+  voidCommand(
+    commands.sftpUploadDir(
+      sessionId,
+      localDir,
+      remoteParent,
+      remoteName,
+      transferMode,
+      transferId ?? null,
+    ),
+  );
 export const sftpDownloadDir = (
   sessionId: string,
   remoteDir: string,
@@ -210,13 +200,15 @@ export const sftpDownloadDir = (
   transferMode: DirectoryTransferMode,
   transferId?: string,
 ) =>
-  voidCommand(commands.sftpDownloadDir(
-    sessionId,
-    remoteDir,
-    localDir,
-    transferMode,
-    transferId ?? null,
-  ));
+  voidCommand(
+    commands.sftpDownloadDir(
+      sessionId,
+      remoteDir,
+      localDir,
+      transferMode,
+      transferId ?? null,
+    ),
+  );
 export const sftpCancelTransfer = (transferId: string) =>
   voidCommand(commands.sftpCancelTransfer(transferId));
 export const sftpPauseTransfer = (transferId: string) =>
@@ -231,15 +223,18 @@ export const sftpExtract = (
   remoteParent: string,
   outName?: string | null,
 ) =>
-  voidCommand(commands.sftpExtract(
-    sessionId,
-    remoteArchive,
-    remoteParent,
-    outName ?? null,
-  ));
+  voidCommand(
+    commands.sftpExtract(
+      sessionId,
+      remoteArchive,
+      remoteParent,
+      outName ?? null,
+    ),
+  );
 
-// ---- Vault ----
-export const vaultEntriesList = () => unwrapCommand(commands.vaultEntriesList());
+// ---- 保险库 ----
+export const vaultEntriesList = () =>
+  unwrapCommand(commands.vaultEntriesList());
 export const vaultEntryCreate = (input: VaultEntryInput) =>
   unwrapCommand(commands.vaultEntryCreate(input));
 export const vaultEntryUpdate = (id: string, input: VaultEntryInput) =>
@@ -249,7 +244,7 @@ export const vaultEntryDelete = (id: string) =>
 export const vaultEntriesReorder = (orderedIds: string[]) =>
   unwrapCommand(commands.vaultEntriesReorder(orderedIds));
 
-// ---- Export / Import ----
+// ---- 导出 / 导入 ----
 export const dataExport = (
   sections: ExportSection[],
   password: string | null,
@@ -262,11 +257,10 @@ export const dataImport = (
   mode: ImportMode,
 ) => unwrapCommand(commands.dataImport(raw, password, mode));
 
-// ---- Poetry library ----
+// ---- 诗词库 ----
 export const poetryCollections = () =>
   unwrapCommand(commands.poetryCollections());
-export const poetrySyncCheck = () =>
-  unwrapCommand(commands.poetrySyncCheck());
+export const poetrySyncCheck = () => unwrapCommand(commands.poetrySyncCheck());
 export const poetrySyncStart = (collectionIds: string[]) =>
   voidCommand(commands.poetrySyncStart(collectionIds));
 export const poetrySyncImportLocal = (path: string, collectionIds: string[]) =>
@@ -287,8 +281,7 @@ export const poetrySearch = (req: PoetrySearchRequest) =>
 export const poetryAuthors = (req: PoetryAuthorsRequest) =>
   unwrapCommand(commands.poetryAuthors(req));
 export const poetryDaily = () => unwrapCommand(commands.poetryDaily());
-export const poetryRandom = () =>
-  unwrapCommand(commands.poetryRandom(null));
+export const poetryRandom = () => unwrapCommand(commands.poetryRandom(null));
 export const poetryAnnotationsInstall = () =>
   voidCommand(commands.poetryAnnotationsInstall());
 export const poetryAnnotationsStatus = () =>
@@ -304,7 +297,8 @@ export const btAddDownload = (
   infoHash: string,
   fileIndices: number[],
   destDir: string,
-) => unwrapCommand(commands.btAddDownload(source, infoHash, fileIndices, destDir));
+) =>
+  unwrapCommand(commands.btAddDownload(source, infoHash, fileIndices, destDir));
 export const btList = () => unwrapCommand(commands.btList());
 export const btControl = (
   infoHash: string,

@@ -8,13 +8,11 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Slider } from "~/components/ui/slider";
 import { useSettingsStore } from "~/store/settings";
-
 export function GameVolumeControl() {
   const { t } = useLingui();
   const volume = useSettingsStore((state) => state.gamesVolume);
   const setVolume = useSettingsStore((state) => state.setGamesVolume);
   const label = t`游戏音量`;
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,7 +24,7 @@ export function GameVolumeControl() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="shrink-0 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground shrink-0"
             aria-label={label}
             title={label}
             onClick={() => setVolume(volume > 0 ? 0 : 0.7)}
@@ -45,7 +43,7 @@ export function GameVolumeControl() {
             aria-label={label}
             onValueChange={(values: number[]) => setVolume(values[0] / 100)}
           />
-          <span className="w-8 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+          <span className="text-muted-foreground w-8 shrink-0 text-right text-xs tabular-nums">
             {Math.round(volume * 100)}
           </span>
         </div>

@@ -1,4 +1,9 @@
-import { createRng, yieldToUi, type AiStrategy, type Difficulty } from "../engine/ai";
+import {
+  createRng,
+  yieldToUi,
+  type AiStrategy,
+  type Difficulty,
+} from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
 import {
   cellIndex,
@@ -8,7 +13,10 @@ import {
 } from "./rules";
 import type { BoardSize, GoMove, GoState } from "./types";
 
-const PROFILE: Record<Difficulty, { noise: number; blunder: number; top: number }> = {
+const PROFILE: Record<
+  Difficulty,
+  { noise: number; blunder: number; top: number }
+> = {
   easy: { noise: 30, blunder: 0.18, top: 6 },
   medium: { noise: 9, blunder: 0.03, top: 3 },
   hard: { noise: 1.5, blunder: 0, top: 1 },
@@ -22,7 +30,7 @@ function stateSeed(state: GoState, seat: SeatIndex): number {
   return h >>> 0;
 }
 
-/** Opening star-point preference so the AI develops like a human. */
+/** 开局星位偏好，让 AI 的下法更像人类。 */
 function starPoints(boardSize: BoardSize): number[] {
   const low = boardSize === 9 ? 2 : 3;
   const high = boardSize - 1 - low;
@@ -36,7 +44,12 @@ function starPoints(boardSize: BoardSize): number[] {
   return points;
 }
 
-function hasNeighbor(state: GoState, row: number, col: number, radius: number): boolean {
+function hasNeighbor(
+  state: GoState,
+  row: number,
+  col: number,
+  radius: number,
+): boolean {
   const size = state.boardSize;
   for (let r = row - radius; r <= row + radius; r++) {
     for (let c = col - radius; c <= col + radius; c++) {
@@ -57,20 +70,27 @@ function scoreCandidate(
   if (move.kind === "pass") return -1000;
   const size = state.boardSize;
   const index = cellIndex(size, move.row, move.col);
-  const placed = resolvePlacement(state.board, size, index, seat, state.koPoint);
+  const placed = resolvePlacement(
+    state.board,
+    size,
+    index,
+    seat,
+    state.koPoint,
+  );
   if (!placed) return -Infinity;
 
   const opponent = (1 - seat) as SeatIndex;
-  let score = placed.captured.length * 55 + Math.min(placed.placedLiberties, 4) * 2;
+  let score =
+    placed.captured.length * 55 + Math.min(placed.placedLiberties, 4) * 2;
 
-  // Filling settled territory loses tempo. An invasion can still override
-  // this penalty when it captures or creates a concrete attack.
+  // 在已定地域内填子会浪费先手。但当某手能提子或形成实质攻击时，
+  // 该惩罚仍可被覆盖。
   const territoryOwner = territoryOwners[index];
   if (territoryOwner === seat) score -= 18;
   else if (territoryOwner === opponent) score -= 12;
   else score += 4;
 
-  // Saving stones: liberties our new stone shares with friendly chains.
+  // 救子：新落子与己方棋链共享的气。
   const friendlySeen = new Set<number>();
   for (const adjacent of neighborsOf(size, index)) {
     if (placed.board[adjacent] !== seat || friendlySeen.has(adjacent)) continue;
@@ -79,24 +99,30 @@ function scoreCandidate(
     if (chain.liberties >= 3) score += 6;
   }
 
-  // Attacking: does the move reduce an enemy chain to one liberty (atari)?
+  // 进攻：该手是否把对方棋链逼到只剩一气（叫吃）？
   const enemySeen = new Set<number>();
   for (const adjacent of neighborsOf(size, index)) {
-    if (placed.board[adjacent] !== opponent || enemySeen.has(adjacent)) continue;
+    if (placed.board[adjacent] !== opponent || enemySeen.has(adjacent))
+      continue;
     const chain = chainLiberties(placed.board, size, adjacent);
     for (const stone of chain.stones) enemySeen.add(stone);
     if (chain.liberties === 1) score += 28;
   }
 
   if (state.moveCount < size) {
-    // Opening: value star points and the third/fourth line, avoid edges.
+    // 开局：看重星位与三/四线，避开边角。
     const stars = starPoints(size);
     if (stars.includes(index)) score += 18;
-    const edgeDist = Math.min(move.row, move.col, size - 1 - move.row, size - 1 - move.col);
+    const edgeDist = Math.min(
+      move.row,
+      move.col,
+      size - 1 - move.row,
+      size - 1 - move.col,
+    );
     if (edgeDist === 0) score -= 14;
     else if (edgeDist === 1) score -= 5;
   } else {
-    // Midgame: stay near the action, prefer the center side of the board.
+    // 中盘：贴近战斗，偏向棋盘中央一侧。
     const center = (size - 1) / 2;
     score += 4 - Math.hypot(move.row - center, move.col - center) / size;
   }
@@ -139,7 +165,7 @@ function chainLiberties(
   return { stones, liberties: liberties.size };
 }
 
-/** Pass after the opening when only low-value territory filling remains. */
+/** 开局之后，当只剩低价值的地域填充时即停手。 */
 function shouldPass(state: GoState, bestScore: number): boolean {
   return state.moveCount >= state.boardSize * 2 && bestScore < 6;
 }
@@ -151,18 +177,23 @@ export const goAiStrategy: AiStrategy<GoState, GoMove> = {
     const radius = state.moveCount < 6 ? state.boardSize : 2;
     const legal = legalPlays(state);
     if (legal.length === 0) return { kind: "pass" };
-    const territoryOwners = computeTerritoryOwners(state.board, state.boardSize);
-    const nearby = legal.filter(
-      (move) => move.kind === "play" && hasNeighbor(state, move.row, move.col, radius),
+    const territoryOwners = computeTerritoryOwners(
+      state.board,
+      state.boardSize,
     );
-    // Sparse board (opening / lone reply): no neighboring stones means the
-    // filter is empty, so fall back to every legal point. Passing is decided
-    // only by shouldPass, never by an accident of the neighbor filter.
+    const nearby = legal.filter(
+      (move) =>
+        move.kind === "play" && hasNeighbor(state, move.row, move.col, radius),
+    );
+    // 棋盘稀疏时（开局 / 单子回应）：没有相邻棋子意味着过滤结果为空，
+    // 因此回退到每个合法点。是否停手只由 shouldPass 决定，绝不会因邻
+    // 居过滤的偶然情况而停手。
     const pool = nearby.length > 0 ? nearby : legal;
 
     const scored: Array<{ move: GoMove; score: number }> = [];
     for (let i = 0; i < pool.length; i++) {
-      if (signal.aborted) throw signal.reason ?? new DOMException("Aborted", "AbortError");
+      if (signal.aborted)
+        throw signal.reason ?? new DOMException("Aborted", "AbortError");
       if (i % 16 === 0) await yieldToUi();
       const move = pool[i];
       scored.push({

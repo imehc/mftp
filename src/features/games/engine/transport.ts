@@ -1,25 +1,24 @@
 /**
- * Contract for online play, implemented by `online/session.ts` on top of
- * the Rust `game_room` relay and consumed through `RemoteController`.
+ * 联机对战的契约，由 `online/session.ts` 在 Rust 的 `game_room`
+ * 中继之上实现，并通过 RemoteController 消费。
  *
- * Model: turn-based lockstep. Both peers run the same deterministic
- * resolver; only `(seq, seat, move)` crosses the wire, with a state hash
- * per move to detect divergence early.
+ * 模型：回合制锁步。双方运行同一确定性解析器；只在线上传递
+ * (seq, seat, move)，并为每步附带状态哈希以便尽早发现分歧。
  */
 import type { SeatIndex } from "./types";
 
 export interface RemoteMove<M> {
-  /** Monotonic move counter within the match; detects loss/duplication. */
+  /** 对局内单调递增的走法计数；用于检测丢失 / 重复。 */
   seq: number;
   seat: SeatIndex;
   move: M;
-  /** Hash of the sender's post-move state, for divergence detection. */
+  /** 发送方走法后状态的哈希，用于分歧检测。 */
   stateHash: string;
 }
 
 export interface MatchTransport<M> {
   readonly matchId: string;
-  /** Seat assigned to this client. */
+  /** 分配给本客户端的座位。 */
   readonly localSeat: SeatIndex;
   sendMove(move: RemoteMove<M>): Promise<void>;
   onRemoteMove(handler: (move: RemoteMove<M>) => void): () => void;

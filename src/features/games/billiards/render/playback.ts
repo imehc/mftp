@@ -1,4 +1,4 @@
-/** Shot playback: replay recorded physics frames on the app ticker. */
+/** 击球回放：在应用 ticker 上重放记录的物理帧。 */
 import gsap from "gsap";
 import type { Application, Container, Ticker } from "pixi.js";
 import { FIXED_DT, POCKETS } from "../constants";
@@ -7,18 +7,17 @@ import { playImpactEvent } from "./audio";
 import { px } from "./table";
 
 export interface PlaybackHooks {
-  /** Move a ball view, rolling the number decal with it. */
+  /** 移动球视图，数字贴花随之滚动。 */
   moveBall(id: number, x: number, y: number, rolling: boolean): void;
-  /** View lookup for the pocket drop-in tween. */
+  /** 落袋下潜补间动画所用的视图查找。 */
   ballView(id: number): Container | undefined;
-  /** Runs synchronously when the last frame lands, right before resolve. */
+  /** 在最后一帧落定、resolve 之前同步运行。 */
   onDone(): void;
 }
 
 /**
- * Play a resolved move's frames, firing sound and pocket drop-in tweens
- * at their recorded times. `frames` must be non-empty; resolves when the
- * table is at rest again.
+ * 播放已结算走子的各帧，在记录的时刻触发音效与落袋下潜补间。
+ * `frames` 必须非空；球桌再次静止时 resolve。
  */
 export function runPresentation(
   app: Application,
@@ -51,8 +50,7 @@ export function runPresentation(
           const view = hooks.ballView(event.ball);
           const pocket = POCKETS.find((p) => p.id === event.pocket);
           if (view && pocket) {
-            // Drop-in: dive from the capture point to the pocket center
-            // while shrinking, like falling below the rim.
+            // 落袋下潜：从感应点俯冲到袋心同时缩小，像掉到袋口下方。
             gsap.killTweensOf(view);
             gsap.killTweensOf(view.scale);
             gsap.killTweensOf(view.position);
@@ -88,7 +86,7 @@ export function runPresentation(
         resolve();
         return;
       }
-      // Linear interpolation between recorded physics frames.
+      // 在相邻记录物理帧之间做线性插值。
       const a = frames[index];
       const b = frames[index + 1];
       const mix = elapsed / FIXED_DT - index;

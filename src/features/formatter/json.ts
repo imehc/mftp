@@ -3,11 +3,11 @@ export type FormatResult =
   | { ok: false; error: string; line?: number; column?: number };
 
 export interface FormatOptions {
-  /** Indentation passed to the serializer, e.g. "  " or "\t". */
+  /** 传给序列化器的缩进，例如 "  " 或 "\t"。 */
   indent: string;
 }
 
-/** Convert a 0-based character offset to 1-based line/column. */
+/** 将 0 基字符偏移转换为 1 基的行 / 列。 */
 export function offsetToLineColumn(
   input: string,
   offset: number,
@@ -24,9 +24,9 @@ export function offsetToLineColumn(
   return { line, column: clamped - lineStart + 1 };
 }
 
-/** Extract the character offset from a JSON.parse error message, if present. */
+/** 若 JSON.parse 的错误信息中包含偏移量，则提取出来。 */
 export function jsonErrorOffset(message: string): number | null {
-  // V8/WebKit both mention "position N" in SyntaxError messages.
+  // V8/WebKit 都会在 SyntaxError 信息里写明 "position N"。
   const match = /position (\d+)/i.exec(message);
   return match ? Number(match[1]) : null;
 }
@@ -45,10 +45,16 @@ function parseJson(input: string): { ok: true; value: unknown } | FormatResult {
   }
 }
 
-export function formatJson(input: string, options: FormatOptions): FormatResult {
+export function formatJson(
+  input: string,
+  options: FormatOptions,
+): FormatResult {
   const parsed = parseJson(input);
   if (!parsed.ok) return parsed;
-  return { ok: true, value: JSON.stringify(parsed.value, null, options.indent) };
+  return {
+    ok: true,
+    value: JSON.stringify(parsed.value, null, options.indent),
+  };
 }
 
 export function minifyJson(input: string): FormatResult {
@@ -57,7 +63,7 @@ export function minifyJson(input: string): FormatResult {
   return { ok: true, value: JSON.stringify(parsed.value) };
 }
 
-/** Validate only; ok means parseable, value echoes the input untouched. */
+/** 仅做校验；ok 表示可解析，value 原样返回输入内容。 */
 export function validateJson(input: string): FormatResult {
   const parsed = parseJson(input);
   if (!parsed.ok) return parsed;
@@ -92,19 +98,23 @@ export function sortJsonKeys(
   if (!parsed.ok) return parsed;
   return {
     ok: true,
-    value: JSON.stringify(sortValueKeys(parsed.value, direction), null, options.indent),
+    value: JSON.stringify(
+      sortValueKeys(parsed.value, direction),
+      null,
+      options.indent,
+    ),
   };
 }
 
-/** Escape the whole document as a JSON string literal body ({"a":1} → {\"a\":1}).
- * Valid JSON is minified first so the escaped output carries no whitespace. */
+/** 将整个文档转义为 JSON 字符串字面量主体。
+ * 合法的 JSON 会先压缩，使转义后的输出不含空白。 */
 export function escapeJsonString(input: string): FormatResult {
   const parsed = parseJson(input);
   const source = parsed.ok ? JSON.stringify(parsed.value) : input;
   return { ok: true, value: JSON.stringify(source).slice(1, -1) };
 }
 
-/** Reverse of escapeJsonString; also tolerates input wrapped in quotes. */
+/** escapeJsonString 的逆操作；也接受带外层引号包裹的输入。 */
 export function unescapeJsonString(input: string): FormatResult {
   const trimmed = input.trim();
   const literal =

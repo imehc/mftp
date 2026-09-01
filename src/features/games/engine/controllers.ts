@@ -1,19 +1,13 @@
 /**
- * PlayerController implementations. The match loop treats every seat the
- * same way; these classes adapt UI input and AI strategies (and, in phase
- * 3, remote peers) to that contract.
+ * PlayerController 的实现。对局循环对每个座位一视同仁；这些类把
+ * UI 输入和 AI 策略（以及第三阶段的远端对手）适配到该契约上。
  */
 import { abortableDelay, type AiStrategy, type Difficulty } from "./ai";
-import type {
-  MoveRequestContext,
-  PlayerController,
-  SeatIndex,
-} from "./types";
+import type { MoveRequestContext, PlayerController, SeatIndex } from "./types";
 
 /**
- * Bridges UI input into the match loop: `requestMove` parks a promise
- * that the game screen resolves by calling `submit(move)` once the
- * player has committed an action.
+ * 把 UI 输入桥接进对局循环：`requestMove` 挂起一个 promise，
+ * 待玩家提交动作后，游戏界面通过调用 `submit(move)` 来兑现它。
  */
 export class LocalController<S, M> implements PlayerController<S, M> {
   readonly kind = "local" as const;
@@ -40,12 +34,12 @@ export class LocalController<S, M> implements PlayerController<S, M> {
     });
   }
 
-  /** True while the match loop is waiting on this controller. */
+  /** 对局循环正在等待此控制器时为 true。 */
   get awaitingInput(): boolean {
     return this.pending !== null;
   }
 
-  /** Commit the player's move; returns false if no move was requested. */
+  /** 提交玩家走法；若没有待提交的走法则返回 false。 */
   submit(move: M): boolean {
     const pending = this.pending;
     if (!pending) return false;
@@ -69,9 +63,8 @@ export class LocalController<S, M> implements PlayerController<S, M> {
 }
 
 /**
- * Runs a game-supplied AiStrategy at a fixed difficulty. Pads very fast
- * searches to `minThinkMs` so AI turns read as deliberate instead of
- * instantaneous.
+ * 以固定难度运行游戏提供的 AiStrategy。把极快的搜索补足到
+ * `minThinkMs`，让 AI 回合显得是经过思考，而非瞬间落子。
  */
 export class AiController<S, M> implements PlayerController<S, M> {
   readonly kind = "ai" as const;
@@ -97,11 +90,9 @@ export class AiController<S, M> implements PlayerController<S, M> {
 }
 
 /**
- * Resolves moves that arrive from the network. The online session pushes
- * peer moves in with `push`; the match loop's `requestMove` consumes them
- * in arrival order (TCP keeps them ordered). `fail` poisons the
- * controller so a dropped connection surfaces as a match error instead of
- * an eternal hang.
+ * 处理来自网络的走法。联机会话通过 `push` 把对手走法推入；
+ * 对局循环的 `requestMove` 按到达顺序消费它们（TCP 保序）。
+ * `fail` 会让控制器失效，使断连表现为对局错误，而非无限挂起。
  */
 export class RemoteController<S, M> implements PlayerController<S, M> {
   readonly kind = "remote" as const;
@@ -133,7 +124,7 @@ export class RemoteController<S, M> implements PlayerController<S, M> {
     });
   }
 
-  /** Feed a move received from the peer. */
+  /** 喂入从对手收到的走法。 */
   push(move: M): void {
     const waiter = this.waiter;
     if (waiter) {
@@ -145,7 +136,7 @@ export class RemoteController<S, M> implements PlayerController<S, M> {
     }
   }
 
-  /** Poison the controller: pending and future requests reject. */
+  /** 令控制器失效：待处理和未来的请求都会 reject。 */
   fail(reason: unknown): void {
     this.failure = reason;
     const waiter = this.waiter;
@@ -170,9 +161,7 @@ export class RemoteController<S, M> implements PlayerController<S, M> {
 }
 
 export type AnyController<S, M> =
-  | LocalController<S, M>
-  | AiController<S, M>
-  | RemoteController<S, M>;
+  LocalController<S, M> | AiController<S, M> | RemoteController<S, M>;
 
 export function isLocalSeat<S, M>(
   controllers: readonly PlayerController<S, M>[],

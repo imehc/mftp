@@ -35,10 +35,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import {
-  checkForUpdateManually,
-  restartToApplyUpdate,
-} from "~/lib/updater";
+import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
 import {
   applyColorTheme,
   applyFontPreset,
@@ -55,29 +52,37 @@ import {
   useSettingsStore,
 } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
-import {
-  type UpdaterStatus,
-  useUpdaterStore,
-} from "~/store/updater";
+import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 import { localeLabels, localeOptions } from "~/i18n/locales";
 import { cn } from "~/lib/utils";
 import ExportDialog from "~/features/export/ExportDialog";
 import ImportDialog from "~/features/export/ImportDialog";
 import { exportSections } from "~/features/export/sections";
-
 const allExportSections = exportSections.map((meta) => meta.id);
-
 const themes = [
-  { value: "system", icon: Monitor },
-  { value: "light", icon: Sun },
-  { value: "dark", icon: Moon },
+  {
+    value: "system",
+    icon: Monitor,
+  },
+  {
+    value: "light",
+    icon: Sun,
+  },
+  {
+    value: "dark",
+    icon: Moon,
+  },
 ] as const;
-
 const directoryTransferModes = [
-  { value: "archive", icon: Archive },
-  { value: "direct", icon: FolderTree },
+  {
+    value: "archive",
+    icon: Archive,
+  },
+  {
+    value: "direct",
+    icon: FolderTree,
+  },
 ] as const;
-
 export default function AppSettingsMenu() {
   const { t } = useLingui();
   const { _ } = useLinguiRuntime();
@@ -138,20 +143,6 @@ export default function AppSettingsMenu() {
     archive: t`压缩包`,
     direct: t`直接`,
   } as const;
-
-  useEffect(() => {
-    if (!isDesktopPlatform()) return;
-    void refreshAutostart();
-  }, []);
-
-  useEffect(() => {
-    applyColorTheme(resolveColorTheme(colorTheme));
-  }, [colorTheme]);
-
-  useEffect(() => {
-    applyFontPreset(resolveFontPreset(fontPreset));
-  }, [fontPreset]);
-
   async function refreshAutostart() {
     try {
       setAutostartEnabled(await isEnabled());
@@ -159,7 +150,17 @@ export default function AppSettingsMenu() {
       setAutostartEnabled(false);
     }
   }
-
+  useEffect(() => {
+    if (!isDesktopPlatform()) return;
+    // 用微任务延后，使 setState 发生在 effect 函数体之外。
+    queueMicrotask(() => void refreshAutostart());
+  }, []);
+  useEffect(() => {
+    applyColorTheme(resolveColorTheme(colorTheme));
+  }, [colorTheme]);
+  useEffect(() => {
+    applyFontPreset(resolveFontPreset(fontPreset));
+  }, [fontPreset]);
   function onCheckUpdate() {
     if (updaterStatus === "ready") {
       void restartToApplyUpdate();
@@ -167,10 +168,8 @@ export default function AppSettingsMenu() {
     }
     void checkForUpdateManually();
   }
-
   async function setAutostartMode(nextEnabled: boolean) {
     if (nextEnabled === autostartEnabled) return;
-
     setAutostartBusy(true);
     try {
       if (nextEnabled) {
@@ -188,7 +187,6 @@ export default function AppSettingsMenu() {
       setAutostartBusy(false);
     }
   }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -343,23 +341,31 @@ export default function AppSettingsMenu() {
                 <DropdownMenuRadioItem key={item.value} value={item.value}>
                   <span
                     aria-hidden
-                    className="flex shrink-0 overflow-hidden rounded-md border border-border"
+                    className="border-border flex shrink-0 overflow-hidden rounded-md border"
                   >
                     <span
                       className="size-3.5"
-                      style={{ backgroundColor: item.swatches.background }}
+                      style={{
+                        backgroundColor: item.swatches.background,
+                      }}
                     />
                     <span
                       className="size-3.5"
-                      style={{ backgroundColor: item.swatches.primary }}
+                      style={{
+                        backgroundColor: item.swatches.primary,
+                      }}
                     />
                     <span
                       className="size-3.5"
-                      style={{ backgroundColor: item.swatches.accent }}
+                      style={{
+                        backgroundColor: item.swatches.accent,
+                      }}
                     />
                     <span
                       className="size-3.5"
-                      style={{ backgroundColor: item.swatches.secondary }}
+                      style={{
+                        backgroundColor: item.swatches.secondary,
+                      }}
                     />
                   </span>
                   {colorThemeLabels[item.value]}

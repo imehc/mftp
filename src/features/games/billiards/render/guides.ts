@@ -1,10 +1,15 @@
 /**
- * Aim guide geometry (pure math, no physics engine): sweep the cue ball
- * along the aim direction to its first contact — ball or cushion — and
- * derive the ghost-ball position, the object ball's departure line, and
- * the cue ball's deflection (matching the restitution+spin model from physics).
+ * 瞄准辅助几何（纯数学，无物理引擎）：沿瞄准方向扫描母球直到首次接触——
+ * 球或库边——并推导出虚拟球位置、目标球的离开方向，以及母球的偏转
+ * （与 physics 的恢复系数 + 旋转模型一致）。
  */
-import { BALL_RADIUS, BALL_RESTITUTION, FOLLOW_DRAW_FACTOR, TABLE_H, TABLE_W } from "../constants";
+import {
+  BALL_RADIUS,
+  BALL_RESTITUTION,
+  FOLLOW_DRAW_FACTOR,
+  TABLE_H,
+  TABLE_W,
+} from "../constants";
 import type { BallState } from "../types";
 
 export interface Vec2 {
@@ -15,18 +20,18 @@ export interface Vec2 {
 export interface AimGuide {
   cue: Vec2;
   dir: Vec2;
-  /** Cue ball center at first contact (ghost ball) or cushion stop. */
+  /** 首次接触时母球中心（虚拟球）或停在库边处。 */
   contact: Vec2;
-  /** Object ball info when the first contact is a ball. */
+  /** 首次接触为球时，目标球的信息。 */
   target: {
     id: number;
     center: Vec2;
-    /** Unit direction the object ball will depart along. */
+    /** 目标球将沿其离开的单位方向。 */
     dir: Vec2;
-    /** 0..1 — how full the hit is (cos of the cut angle). */
+    /** 0..1——击打饱满度（切角余弦）。 */
     fullness: number;
   } | null;
-  /** Unit direction of the cue ball after a ball contact (tangent). */
+  /** 母球在球接触后的单位方向（切线方向）。 */
   cueDeflection: Vec2 | null;
 }
 
@@ -40,7 +45,7 @@ export function computeAimGuide(
   const cue = { x: cueBall.x, y: cueBall.y };
   const dir = { x: Math.cos(angle), y: Math.sin(angle) };
 
-  // Nearest ball along the swept corridor.
+  // 沿扫描通道最近的球。
   let tBall = Infinity;
   let hit: BallState | null = null;
   for (const ball of balls) {
@@ -59,7 +64,7 @@ export function computeAimGuide(
     }
   }
 
-  // Cushion intersection (play area inset by the ball radius).
+  // 库边交点（台面区域按球半径内缩）。
   const bx = TABLE_W / 2 - BALL_RADIUS;
   const by = TABLE_H / 2 - BALL_RADIUS;
   let tCushion = Infinity;
@@ -82,12 +87,15 @@ export function computeAimGuide(
 
   const targetDirRaw = { x: hit.x - contact.x, y: hit.y - contact.y };
   const targetLen = Math.hypot(targetDirRaw.x, targetDirRaw.y) || 1;
-  const targetDir = { x: targetDirRaw.x / targetLen, y: targetDirRaw.y / targetLen };
+  const targetDir = {
+    x: targetDirRaw.x / targetLen,
+    y: targetDirRaw.y / targetLen,
+  };
   const fullness = Math.max(0, dir.x * targetDir.x + dir.y * targetDir.y);
 
-  // Cue ball deflection matching the real collision model:
+  // 母球偏转与真实碰撞模型一致：
   //   v_cue' ∝ sinθ·t̂ + ((1-e)/2·fullness + followDraw·FOLLOW_DRAW_FACTOR)·n̂
-  // where t̂ = normalized tangent, n̂ = targetDir (away from contact).
+  // 其中 t̂ = 归一化切线，n̂ = targetDir（背离接触点）。
   const sinTheta = Math.sqrt(Math.max(0, 1 - fullness * fullness));
   const tangentX = dir.x - fullness * targetDir.x;
   const tangentY = dir.y - fullness * targetDir.y;
@@ -99,8 +107,7 @@ export function computeAimGuide(
   const nx = sinTheta * tHatX + (restitutionTerm + spinTerm) * targetDir.x;
   const ny = sinTheta * tHatY + (restitutionTerm + spinTerm) * targetDir.y;
   const nLen = Math.hypot(nx, ny);
-  const cueDeflection =
-    nLen > 1e-6 ? { x: nx / nLen, y: ny / nLen } : null;
+  const cueDeflection = nLen > 1e-6 ? { x: nx / nLen, y: ny / nLen } : null;
 
   return {
     cue,

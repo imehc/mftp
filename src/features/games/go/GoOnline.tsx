@@ -1,8 +1,7 @@
 /**
- * Online (LAN) flow: lobby handoff, the networked match wrapper with
- * undo / rematch consent dialogs, and connection-loss handling.
- * Board size is negotiated through the game id (go-9 / go-13 / go-19)
- * so both peers always build identical initial states.
+ * 联机（局域网）流程：大厅交接、带悔棋/再来一局同意对话框的网络对局
+ * 封装，以及断线处理。棋盘尺寸通过游戏 id（go-9 / go-13 / go-19）协商，
+ * 使双方总能构建完全一致的初始局面。
  */
 import { useEffect, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
@@ -32,7 +31,7 @@ import {
   type GoState,
 } from "./types";
 
-/** Divergence tripwire compared against the peer's RemoteMove.stateHash. */
+/** 分歧触发器，与对端的 RemoteMove.stateHash 比对。 */
 function hashGoState(state: GoState): string {
   const cells = state.board
     .map((stone) => (stone === null ? "." : String(stone)))
@@ -41,7 +40,6 @@ function hashGoState(state: GoState): string {
     `${cells}|${state.turnSeat}|${state.moveCount}|${state.koPoint}|${state.consecutivePasses}|${hashString(state.positionHistory.join("|"))}`,
   );
 }
-
 export function GoOnlineFlow({
   boardSize,
   onExit,
@@ -56,9 +54,12 @@ export function GoOnlineFlow({
     status: GameRoomStatus;
   } | null>(null);
   const readyRef = useRef(ready);
-  readyRef.current = ready;
+  // 最新值 ref 在 effect 中同步，而非渲染期间。
+  useEffect(() => {
+    readyRef.current = ready;
+  });
 
-  // Leaving online mode always tears the room down.
+  // 退出联机模式总会拆除房间。
   useEffect(
     () => () => {
       readyRef.current?.session.close();
@@ -66,7 +67,6 @@ export function GoOnlineFlow({
     },
     [],
   );
-
   if (!ready) {
     return (
       <OnlineLobby<GoMove>
@@ -84,7 +84,6 @@ export function GoOnlineFlow({
     />
   );
 }
-
 function OnlineMatch({
   session,
   boardSize,
@@ -106,18 +105,31 @@ function OnlineMatch({
   const [endReason, setEndReason] = useState<string | null>(null);
   const lastRemoteRef = useRef<RemoteMove<GoMove> | null>(null);
   const matchRef = useRef<GoSession | null>(null);
-  matchRef.current = match;
-
+  useEffect(() => {
+    matchRef.current = match;
+  });
+  // 对局 effect 不能在局中重建 runner，因此音量与译文都通过最新值 ref
+  // 在其回调内部读取。
+  const volumeRef = useRef(volume);
+  const tRef = useRef(t);
+  useEffect(() => {
+    volumeRef.current = volume;
+    tRef.current = t;
+  }, [volume, t]);
   useEffect(() => {
     lastRemoteRef.current = null;
-    setUndoFlow(null);
-    setRematchWaiting(false);
-    setRematchIncoming(false);
-    // Alternating first move: seats swap every rematch. Both peers bump `nonce` through the
-    // consent flow, so parity — and thus the seat mapping — stays in
-    // lockstep without extra protocol.
+    // 用微任务延迟，使重置发生在 effect 主体之外。
+    queueMicrotask(() => {
+      setUndoFlow(null);
+      setRematchWaiting(false);
+      setRematchIncoming(false);
+    });
+    // 交替先手：每次再来一局座位互换。双方都通过同意流程自增 `nonce`，
+    // 因此奇偶（进而座位映射）保持锁步，无需额外协议。
     const seatThisRound: SeatIndex =
-      nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
+      nonce % 2 === 0
+        ? session.localSeat
+        : ((1 - session.localSeat) as SeatIndex);
     const local = new LocalController<GoState, GoMove>();
     const remote = new RemoteController<GoState, GoMove>();
     const controllers: PlayerController<GoState, GoMove>[] =
@@ -128,21 +140,27 @@ function OnlineMatch({
       controllers,
       {
         onMoveResolved: ({ seat, move, moveIndex, resolution }) => {
-          if (resolution.presentation.captured.length > 0) playCaptureSound(volume);
-          else playStoneSound(volume);
-          if (resolution.state.finished) playFinishSound(volume);
+          if (resolution.presentation.captured.length > 0)
+            playCaptureSound(volumeRef.current);
+          else playStoneSound(volumeRef.current);
+          if (resolution.state.finished) playFinishSound(volumeRef.current);
           const hash = hashGoState(resolution.state);
           if (seat === seatThisRound) {
             void session
-              .sendMove({ seq: moveIndex, seat, move, stateHash: hash })
+              .sendMove({
+                seq: moveIndex,
+                seat,
+                move,
+                stateHash: hash,
+              })
               .catch(() => {
-                setEndReason(t`消息发送失败，连接可能已断开。`);
+                setEndReason(tRef.current`消息发送失败，连接可能已断开。`);
               });
           } else if (
             lastRemoteRef.current &&
             lastRemoteRef.current.stateHash !== hash
           ) {
-            setEndReason(t`双方棋局状态不一致，本局无法继续。`);
+            setEndReason(tRef.current`双方棋局状态不一致，本局无法继续。`);
           }
         },
         onError: (error) => console.error("go online match error", error),
@@ -153,16 +171,18 @@ function OnlineMatch({
       remote.push(remoteMove.move);
     });
     runner.start();
-    setMatch({ runner, local });
+    setMatch({
+      runner,
+      local,
+    });
     return () => {
       offMove();
       runner.dispose();
       setMatch(null);
     };
-    // nonce drives rematches; the rest is stable for the session lifetime.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // nonce 驱动再来一局。volume/t 通过 ref 读取：在局中重建 runner
+    // 会重置对局。
   }, [nonce, session, boardSize]);
-
   useEffect(() => {
     const applyUndo = (atMove: number, plies: number) => {
       const runner = matchRef.current?.runner;
@@ -171,7 +191,11 @@ function OnlineMatch({
     };
     const offControl = session.onControl((msg) => {
       if (msg.t === "undo-request") {
-        setUndoFlow({ kind: "incoming", atMove: msg.atMove, plies: msg.plies });
+        setUndoFlow({
+          kind: "incoming",
+          atMove: msg.atMove,
+          plies: msg.plies,
+        });
       } else if (msg.t === "undo-response") {
         setUndoFlow((flow) => (flow?.kind === "waiting" ? null : flow));
         if (msg.accept) applyUndo(msg.atMove, msg.plies);
@@ -195,20 +219,23 @@ function OnlineMatch({
       offPresence();
       offClosed();
     };
-    // applyUndo only reads refs; resubscribing per render is pointless.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // applyUndo 只读取 ref；每次渲染重新订阅没有意义。
   }, [session, t]);
-
   const requestUndo = (plies: number) => {
     const runner = matchRef.current?.runner;
     if (!runner || undoFlow !== null) return;
     const atMove = runner.getSnapshot().moveCount;
-    setUndoFlow({ kind: "waiting" });
+    setUndoFlow({
+      kind: "waiting",
+    });
     void session
-      .sendControl({ t: "undo-request", atMove, plies })
+      .sendControl({
+        t: "undo-request",
+        atMove,
+        plies,
+      })
       .catch(() => setUndoFlow(null));
   };
-
   const respondUndo = (accept: boolean) => {
     const flow = undoFlow;
     if (flow?.kind !== "incoming") return;
@@ -226,25 +253,34 @@ function OnlineMatch({
       })
       .catch(() => {});
   };
-
   const requestRematch = () => {
     if (rematchWaiting) return;
     setRematchWaiting(true);
     void session
-      .sendControl({ t: "rematch-request" })
+      .sendControl({
+        t: "rematch-request",
+      })
       .catch(() => setRematchWaiting(false));
   };
-
   const respondRematch = (accept: boolean) => {
     setRematchIncoming(false);
-    void session.sendControl({ t: "rematch-response", accept }).catch(() => {});
+    void session
+      .sendControl({
+        t: "rematch-response",
+        accept,
+      })
+      .catch(() => {});
     if (accept) setNonce((n) => n + 1);
   };
-
   if (!match) return <div className="flex-1" />;
-  const mode: GoMode = { kind: "online", boardSize };
+  const mode: GoMode = {
+    kind: "online",
+    boardSize,
+  };
   const gameSeat: SeatIndex =
-    nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
+    nonce % 2 === 0
+      ? session.localSeat
+      : ((1 - session.localSeat) as SeatIndex);
   return (
     <>
       <GoMatchView
@@ -262,7 +298,14 @@ function OnlineMatch({
         onExit={onExit}
         onFinishedChange={onFinishedChange}
       />
-      <OnlineMatchDialogs undoFlow={undoFlow} onRespondUndo={respondUndo} rematchIncoming={rematchIncoming} onRespondRematch={respondRematch} endReason={endReason} onExit={onExit} />
+      <OnlineMatchDialogs
+        undoFlow={undoFlow}
+        onRespondUndo={respondUndo}
+        rematchIncoming={rematchIncoming}
+        onRespondRematch={respondRematch}
+        endReason={endReason}
+        onExit={onExit}
+      />
     </>
   );
 }

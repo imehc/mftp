@@ -111,12 +111,12 @@ keytool -genkey -v -keystore ~/.keystores/mftp-release.jks \
 
 `release.yml` 中的 `android` job 会在每次发版时构建签名的 arm64-v8a release APK，并以 `mftp_<version>_arm64-v8a.apk` 上传到 GitHub Release。需要在仓库 Settings → Secrets 配置：
 
-| Secret | 内容 |
-| --- | --- |
-| `ANDROID_KEYSTORE_BASE64` | `base64 -i ~/.keystores/mftp-release.jks` 的输出 |
-| `ANDROID_KEYSTORE_PASSWORD` | keystore 的 storePassword |
-| `ANDROID_KEY_ALIAS` | key 别名（当前为 `mftp`） |
-| `ANDROID_KEY_PASSWORD` | key 的 keyPassword |
+| Secret                      | 内容                                             |
+| --------------------------- | ------------------------------------------------ |
+| `ANDROID_KEYSTORE_BASE64`   | `base64 -i ~/.keystores/mftp-release.jks` 的输出 |
+| `ANDROID_KEYSTORE_PASSWORD` | keystore 的 storePassword                        |
+| `ANDROID_KEY_ALIAS`         | key 别名（当前为 `mftp`）                        |
+| `ANDROID_KEY_PASSWORD`      | key 的 keyPassword                               |
 
 缺少 `ANDROID_KEYSTORE_BASE64` 时该 job 会直接失败（不会产出未签名 APK），避免发布无法安装的包。
 

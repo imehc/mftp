@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FolderOpen, LoaderCircle, Magnet } from "lucide-react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
@@ -18,27 +18,25 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import TorrentFileList from "./TorrentFileList";
-
 export interface AddTorrentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Preview click on a media file; carries the dialog's current source. */
+  /** 在媒体文件上点击预览；携带对话框当前的来源。 */
   onPreview: (source: string, file: BtFileMeta, probe: BtProbeResult) => void;
   onAdded: (task: BtTaskInfo) => void;
-  /** Prefilled source (a task row's magnet): probed as soon as the dialog
-   *  opens, the flow afterwards is the same as adding by hand. */
+  /** 预填的来源（任务行的磁力链接）：对话框一打开就探测，
+   *  之后的流程与手动添加一致。 */
   initialSource?: string | null;
   initialProbe?: BtProbeResult | null;
 }
 
 /**
- * Add flow: magnet/.torrent input -> bt_probe file tree -> selection ->
- * destination dir -> bt_add_download. The task lands in the bottom
- * transfer panel (id prefix bt:).
+ * 添加流程：磁力链接 / .torrent 输入 → bt_probe 文件树 → 选择 →
+ * 目标目录 → bt_add_download。任务进入底部传输面板（id 前缀 bt:）。
  *
- * Opening it on an existing task's magnet reuses the very same flow: probe
- * resolves through the engine's already-managed torrent (nothing written to
- * disk) and bt_tasks is keyed by infohash, so no duplicate record appears.
+ * 用已有任务的磁力链接打开时复用同一流程：探测通过引擎已管理的
+ * 种子解析（不会写入磁盘），而 bt_tasks 以 infohash 为键，
+ * 因此不会出现重复记录。
  */
 export default function AddTorrentDialog({
   open,
@@ -55,11 +53,10 @@ export default function AddTorrentDialog({
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [destDir, setDestDir] = useState("");
   const [starting, setStarting] = useState(false);
-  // Only relevant with initialSource: on failure the input step comes back so
-  // the magnet can be re-parsed instead of spinning forever.
+  // 仅在带 initialSource 时有意义：失败时回到输入步骤，
+  // 这样磁力链接可被重新解析，而不是一直转圈。
   const [probeFailed, setProbeFailed] = useState(false);
-
-  const reset = useCallback(() => {
+  const reset = () => {
     setSource("");
     setProbing(false);
     setProbe(null);
@@ -67,70 +64,72 @@ export default function AddTorrentDialog({
     setDestDir("");
     setStarting(false);
     setProbeFailed(false);
-  }, []);
-
-  const close = useCallback(() => {
+  };
+  const close = () => {
     onOpenChange(false);
-    // Delayed reset so content does not flash empty during the close
-    // animation.
+    // 延后重置，避免关闭动画期间内容闪成空白。
     setTimeout(reset, 200);
-  }, [onOpenChange, reset]);
-
-  const doProbe = useCallback(
-    async (raw: string) => {
-      const trimmed = raw.trim();
-      if (!trimmed) return;
-      const apply = (result: BtProbeResult) => {
-        setProbe(result);
-        // Select all files by default.
-        setSelected(new Set(result.files.map((f) => f.index)));
-      };
-      setProbeFailed(false);
-      setProbing(true);
-      try {
-        const result = await ipc.btProbe(trimmed);
-        apply(result);
-      } catch (error) {
-        setProbeFailed(true);
-        toast.error(t`获取资源信息失败`, { description: String(error) });
-      } finally {
-        setProbing(false);
-      }
-    },
-    [t],
-  );
-
-  const pickTorrent = useCallback(async () => {
+  };
+  const doProbe = async (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+    const apply = (result: BtProbeResult) => {
+      setProbe(result);
+      // 默认全选所有文件。
+      setSelected(new Set(result.files.map((f) => f.index)));
+    };
+    setProbeFailed(false);
+    setProbing(true);
+    try {
+      const result = await ipc.btProbe(trimmed);
+      apply(result);
+    } catch (error) {
+      setProbeFailed(true);
+      toast.error(t`获取资源信息失败`, {
+        description: String(error),
+      });
+    } finally {
+      setProbing(false);
+    }
+  };
+  const pickTorrent = async () => {
     const picked = await openDialog({
       multiple: false,
       directory: false,
-      filters: [{ name: "Torrent", extensions: ["torrent"] }],
+      filters: [
+        {
+          name: "Torrent",
+          extensions: ["torrent"],
+        },
+      ],
     });
     if (typeof picked === "string") {
       setSource(picked);
       await doProbe(picked);
     }
-  }, [doProbe]);
+  };
 
-  // Opened from a task row: skip the input step entirely — show the loading
-  // state and probe in the background. The value is a plain string, stable
-  // across the BT page's polling re-renders.
+  // 从任务行打开：完全跳过输入步骤 —— 显示加载状态并在后台
+  // 探测。该值是普通字符串，在 BT 页轮询重渲染时保持稳定。
+  const doProbeOnOpen = useEffectEvent(doProbe);
   useEffect(() => {
     if (!open || !initialSource) return;
-    setProbe(null);
-    setSource(initialSource);
-    if (initialProbe) {
-      setProbe(initialProbe);
-      setSelected(new Set(initialProbe.files.map((file) => file.index)));
-      return;
-    }
-    void doProbe(initialSource);
-  }, [doProbe, initialProbe, initialSource, open]);
-
-  const toggleFile = useCallback((index: number) => {
+    // 用微任务延后，使重置发生在 effect 函数体之外。
+    queueMicrotask(() => {
+      setProbe(null);
+      setSource(initialSource);
+      if (initialProbe) {
+        setProbe(initialProbe);
+        setSelected(new Set(initialProbe.files.map((file) => file.index)));
+        return;
+      }
+      // 用最新闭包探测，且不在 doProbe 身份变化时重跑。
+      void doProbeOnOpen(initialSource);
+    });
+  }, [initialProbe, initialSource, open]);
+  const toggleFile = (index: number) => {
     if (index < 0 || !probe) {
-      // -1 = select-all signal from the header row: flip wholesale based on
-// whether everything is currently selected.
+      // -1 = 来自表头行的“全选”信号：依据当前是否已全选来整体翻转。
       setSelected((prev) =>
         prev.size === (probe?.files.length ?? 0)
           ? new Set()
@@ -143,21 +142,21 @@ export default function AddTorrentDialog({
       if (!next.delete(index)) next.add(index);
       return next;
     });
-  }, [probe]);
-
-  const pickDestDir = useCallback(async () => {
-    const picked = await openDialog({ multiple: false, directory: true });
+  };
+  const pickDestDir = async () => {
+    const picked = await openDialog({
+      multiple: false,
+      directory: true,
+    });
     if (typeof picked === "string") setDestDir(picked);
-  }, []);
-
-  const selectedBytes = useMemo(() => {
+  };
+  const selectedBytes = (() => {
     if (!probe) return 0;
     return probe.files
       .filter((f) => selected.has(f.index))
       .reduce((sum, f) => sum + f.len, 0);
-  }, [probe, selected]);
-
-  const startDownload = useCallback(async () => {
+  })();
+  const startDownload = async () => {
     if (!probe || !destDir.trim() || selected.size === 0) return;
     setStarting(true);
     try {
@@ -171,12 +170,13 @@ export default function AddTorrentDialog({
       toast.success(t`任务已添加，可在传输面板查看进度`);
       close();
     } catch (error) {
-      toast.error(t`添加下载任务失败`, { description: String(error) });
+      toast.error(t`添加下载任务失败`, {
+        description: String(error),
+      });
     } finally {
       setStarting(false);
     }
-  }, [close, destDir, onAdded, probe, selected, source, t]);
-
+  };
   return (
     <Dialog
       open={open}
@@ -190,8 +190,8 @@ export default function AddTorrentDialog({
           probe && "h-[min(85dvh,40rem)]",
         )}
       >
-        {/* Opened from a task row there is nothing to introduce: the header is
-            kept for assistive tech only, the torrent name shows right below. */}
+        {/* 从任务行打开时无需标题介绍：标题仅为辅助技术保留，
+            种子名就显示在下方。 */}
         <DialogHeader className={initialSource ? "sr-only" : undefined}>
           <DialogTitle>
             {initialSource ? (
@@ -207,7 +207,7 @@ export default function AddTorrentDialog({
 
         {!probe ? (
           initialSource && !probeFailed ? (
-            <div className="flex items-center justify-center gap-2 py-6 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-xs">
               <LoaderCircle className="size-3.5 animate-spin" />
               <Trans>加载中…</Trans>
             </div>
@@ -219,7 +219,8 @@ export default function AddTorrentDialog({
                   onChange={(e) => setSource(e.target.value)}
                   placeholder={t`磁力链接`}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && source.trim()) void doProbe(source);
+                    if (e.key === "Enter" && source.trim())
+                      void doProbe(source);
                   }}
                 />
                 <Button
@@ -237,7 +238,10 @@ export default function AddTorrentDialog({
                 onClick={() => void doProbe(source)}
               >
                 {probing ? (
-                  <LoaderCircle data-icon="inline-start" className="animate-spin" />
+                  <LoaderCircle
+                    data-icon="inline-start"
+                    className="animate-spin"
+                  />
                 ) : (
                   <Magnet data-icon="inline-start" />
                 )}
@@ -250,15 +254,15 @@ export default function AddTorrentDialog({
             <div
               className={cn(
                 "flex shrink-0 items-baseline justify-between gap-2 px-1",
-                // No header above it here, so leave room for the dialog's
-                // floating close button.
+                // 这里上方没有标题，因此留出空间给对话框
+                // 浮动的关闭按钮。
                 initialSource && "pr-8",
               )}
             >
               <span className="min-w-0 truncate text-sm font-medium">
                 {probe.name}
               </span>
-              <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+              <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
                 {formatBytes(selectedBytes)} / {formatBytes(probe.totalLen)}
               </span>
             </div>
@@ -296,7 +300,10 @@ export default function AddTorrentDialog({
                 onClick={() => void startDownload()}
               >
                 {starting ? (
-                  <LoaderCircle data-icon="inline-start" className="animate-spin" />
+                  <LoaderCircle
+                    data-icon="inline-start"
+                    className="animate-spin"
+                  />
                 ) : null}
                 <Trans>下载</Trans>
               </Button>

@@ -1,6 +1,9 @@
-import type { CompressModeId, CompressModeMeta } from "~/features/media-compress/types";
+import type {
+  CompressModeId,
+  CompressModeMeta,
+} from "~/features/media-compress/types";
 
-/** Registry of compress modes — append here for future formats (audio, PDF, …). */
+/** 压缩模式注册表 —— 新增格式（音频、PDF 等）时在此追加。 */
 export const COMPRESS_MODES: readonly CompressModeMeta[] = [
   { id: "resize", icon: "resize" },
   { id: "image", icon: "image" },

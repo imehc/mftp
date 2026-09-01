@@ -1,48 +1,45 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { msg } from "@lingui/core/macro";
 import type { Session, SystemStats } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { translate } from "~/i18n/translate";
 import { useSessionsStore } from "~/store/sessions";
-
 export type RefreshIntervalMs = 0 | 2000 | 5000 | 10000;
 
-/// Upper bound for one stats round-trip. The backend caps its single remote
-/// exec at 10s, so anything past this margin means the invoke itself hung.
+/// 单次统计往返的上限。后端把单次远程执行上限设为 10s，因此超过这个
+/// 余量说明 invoke 本身卡住了。
 const REFRESH_TIMEOUT_MS = 12_000;
-/// Stop auto-refresh after this many straight failures so a dead link is not
-/// hammered forever; a manual refresh resumes the loop.
+/// 连续失败达到此次数后停止自动刷新，避免一直猛打已失效的连接；
+/// 手动刷新会重新启动循环。
 const MAX_CONSECUTIVE_FAILURES = 3;
-/// Ring buffer cap: 120 points ≈ 10 minutes at the default 5s interval.
+/// 环形缓冲上限：默认 5s 间隔下约 10 分钟的 120 个点。
 const HISTORY_LIMIT = 120;
-
 export interface MonitorPoint {
-  /** Sample wall-clock time (ms). */
+  /** 采样时刻（毫秒时间戳）。 */
   t: number;
-  /** CPU used percent 0-100. */
+  /** CPU 占用百分比 0–100。 */
   cpu: number;
-  /** Memory used percent 0-100. */
+  /** 内存占用百分比 0–100。 */
   mem: number;
-  /** Network rates summed across interfaces, bytes/s. */
+  /** 各网卡速率之和，bytes/s。 */
   rx: number;
   tx: number;
-  /** Disk IO rates summed across devices, bytes/s. */
+  /** 各磁盘 I/O 速率之和，bytes/s。 */
   read: number;
   write: number;
 }
 
-// The panel unmounts whenever the user switches the session view, so chart
-// history must survive outside React state. Keyed by backend session id.
+// 用户切换会话视图时面板会卸载，因此图表历史必须存活于 React state 之外。
+// 以后端会话 id 为键。
 const historyMap = new Map<string, MonitorPoint[]>();
 
-// Prune history for sessions that no longer exist (closed tabs).
+// 清理已不存在（已关闭标签）的会话历史。
 useSessionsStore.subscribe((state) => {
   const alive = new Set(state.sessions.map((session) => session.id));
   for (const id of historyMap.keys()) {
     if (!alive.has(id)) historyMap.delete(id);
   }
 });
-
 function toPoint(stats: SystemStats): MonitorPoint {
   const memTotal = stats.memory.total;
   return {
@@ -55,7 +52,6 @@ function toPoint(stats: SystemStats): MonitorPoint {
     write: stats.diskIo.reduce((sum, d) => sum + d.writeBytesPerSec, 0),
   };
 }
-
 function fetchSystemStats(sessionId: string): Promise<SystemStats> {
   return Promise.race([
     ipc.sshSystemStats(sessionId),
@@ -67,7 +63,6 @@ function fetchSystemStats(sessionId: string): Promise<SystemStats> {
     }),
   ]);
 }
-
 export function useSystemMonitor(session: Session) {
   const sessionId = session.id;
   const [data, setData] = useState<SystemStats | null>(null);
@@ -82,10 +77,9 @@ export function useSystemMonitor(session: Session) {
   const seqRef = useRef(0);
   const inFlightRef = useRef(false);
   const failuresRef = useRef(0);
-
-  const refresh = useCallback(async () => {
-    // One request at a time: a slow link must not queue up polls behind the
-    // shared SSH connection lock (that is what made it degrade over time).
+  const refresh = async () => {
+    // 同一时刻只发一个请求：慢链路不能在共享的 SSH 连接锁后面堆积轮询
+    // （正是这点让监控随时间劣化）。
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     const seq = ++seqRef.current;
@@ -94,9 +88,10 @@ export function useSystemMonitor(session: Session) {
       const next = await fetchSystemStats(sessionId);
       if (seqRef.current !== seq) return;
       failuresRef.current = 0;
-      const points = [...(historyMap.get(sessionId) ?? []), toPoint(next)].slice(
-        -HISTORY_LIMIT,
-      );
+      const points = [
+        ...(historyMap.get(sessionId) ?? []),
+        toPoint(next),
+      ].slice(-HISTORY_LIMIT);
       historyMap.set(sessionId, points);
       setHistory(points);
       setData(next);
@@ -112,30 +107,33 @@ export function useSystemMonitor(session: Session) {
       inFlightRef.current = false;
       if (seqRef.current === seq) setLoading(false);
     }
-  }, [sessionId]);
+  };
 
-  /** Manual retry: clears the failure streak and resumes auto-refresh. */
-  const retry = useCallback(() => {
+  /** 手动重试：清除连续失败计数并恢复自动刷新。 */
+  const retry = () => {
     failuresRef.current = 0;
     setPaused(false);
     void refresh();
-  }, [refresh]);
-
+  };
+  // refresh 与 retry() / 调用方共享；通过 effect event 读取，使轮询
+  // 定时器不会在每次渲染时都被拆除。
+  const refreshInEffect = useEffectEvent(refresh);
   useEffect(() => {
-    setHistory(historyMap.get(sessionId) ?? []);
-    void refresh();
-  }, [sessionId, refresh]);
-
+    // 用微任务延后，使 setState 发生在 effect 函数体之外。
+    queueMicrotask(() => {
+      setHistory(historyMap.get(sessionId) ?? []);
+      void refreshInEffect();
+    });
+  }, [sessionId]);
   useEffect(() => {
     if (intervalMs === 0 || paused) return;
     const timer = window.setInterval(() => {
-      // Skip ticks while minimized/hidden; the next visible tick catches up.
+      // 最小化 / 隐藏时跳过快照；下一次可见时再补上。
       if (document.hidden) return;
-      void refresh();
+      void refreshInEffect();
     }, intervalMs);
     return () => window.clearInterval(timer);
-  }, [intervalMs, paused, refresh]);
-
+  }, [intervalMs, paused]);
   return {
     data,
     history,

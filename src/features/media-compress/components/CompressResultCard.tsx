@@ -9,7 +9,6 @@ import {
   formatBytes,
   sizeDeltaPercent,
 } from "~/features/media-compress/format";
-
 interface CompressResultCardProps {
   fileName: string;
   size: number;
@@ -17,12 +16,11 @@ interface CompressResultCardProps {
   blob: Blob;
   preview?: ReactNode;
   onSizeChange?: (actualSize: number) => void;
-  /** Card heading; defaults to a localized "Compression result" label. */
+  /** 卡片标题；默认使用本地化的“压缩结果”标签。 */
   title?: ReactNode;
-  /** Extra badges rendered before the size badge. */
+  /** 在体积徽标前渲染的额外徽标。 */
   extraBadges?: ReactNode;
 }
-
 export function CompressResultCard({
   fileName,
   size,
@@ -35,7 +33,6 @@ export function CompressResultCard({
 }: CompressResultCardProps) {
   const { t } = useLingui();
   const delta = sizeDeltaPercent(originalSize, size);
-
   async function onDownload() {
     try {
       const saved = await downloadBlob(blob, fileName);
@@ -47,14 +44,11 @@ export function CompressResultCard({
       toast.error(String(error));
     }
   }
-
   return (
-    <section className="flex flex-col rounded-lg border border-border bg-card p-2.5">
+    <section className="border-border bg-card flex flex-col rounded-lg border p-2.5">
       <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0 text-xs font-medium text-muted-foreground">
-          <h2 className="truncate">
-            {title ?? <Trans>压缩结果</Trans>}
-          </h2>
+        <div className="text-muted-foreground min-w-0 text-xs font-medium">
+          <h2 className="truncate">{title ?? <Trans>压缩结果</Trans>}</h2>
         </div>
         <div className="flex min-w-0 shrink-0 items-center gap-1.5 overflow-x-auto whitespace-nowrap">
           {extraBadges}

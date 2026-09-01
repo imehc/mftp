@@ -5,9 +5,9 @@ import { desktopOnlyGuard } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 
 interface LibrarySearch {
-  /** Inline full-text query; kept in the URL for back/share. */
+  /** 内联全文检索词；保留在 URL 中以便返回 / 分享。 */
   q?: string;
-  /** Selected poem uid shown in the detail pane (desktop master-detail). */
+  /** 在详情面板中展示的所选诗词 uid（桌面端主从布局）。 */
   poem?: string;
 }
 
@@ -23,7 +23,10 @@ function LibraryRoute() {
     <LibraryPage
       search={Route.useSearch()}
       onSearchChange={(patch) =>
-        void navigate({ to: "/library", search: (prev) => ({ ...prev, ...patch }) })
+        void navigate({
+          to: "/library",
+          search: (prev) => ({ ...prev, ...patch }),
+        })
       }
       onOpenPoem={(uid) =>
         void navigate({

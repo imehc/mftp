@@ -1,6 +1,6 @@
 import { isMobilePlatform } from "~/lib/platform";
 
-// Re-exported so the existing importers of this module keep working.
+// 重新导出，使本模块的既有调用方仍可正常工作。
 export { formatBytes } from "~/lib/format";
 
 export function formatDuration(seconds: number): string {
@@ -32,7 +32,7 @@ function isTauriRuntime(): boolean {
   );
 }
 
-/** Browser fallback: <a download> (works in normal browsers, not always in WebView). */
+/** 浏览器兜底：用 <a download>（普通浏览器可用，WebView 里未必）。 */
 function downloadBlobInBrowser(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
@@ -46,9 +46,9 @@ function downloadBlobInBrowser(blob: Blob, fileName: string) {
 }
 
 /**
- * Save a blob to disk. In Tauri, open a native save dialog and write bytes
- * (WebView often ignores the HTML download attribute).
- * Returns the actual bytes written on disk, or false if the user cancelled.
+ * 将 blob 保存到磁盘。在 Tauri 中打开原生保存对话框并写入字节
+ *（WebView 常忽略 HTML 的 download 属性）。
+ * 返回实际写入磁盘的字节数；用户取消则返回 false。
  */
 export async function downloadBlob(
   blob: Blob,
@@ -73,7 +73,7 @@ export async function downloadBlob(
   const bytes = new Uint8Array(await blob.arrayBuffer());
   await writeFile(target, bytes);
 
-  // Read back actual on-disk size (filesystem block alignment may differ).
+  // 读回实际磁盘占用（文件系统块对齐可能不同）。
   try {
     const info = await stat(target);
     return info.size;
@@ -82,7 +82,7 @@ export async function downloadBlob(
   }
 }
 
-/** Positive = smaller than original; negative = larger. null if unknown. */
+/** 正数表示比原文件小；负数表示更大；未知为 null。 */
 export function sizeDeltaPercent(
   originalBytes: number,
   resultBytes: number,
@@ -109,19 +109,18 @@ const PICKED_FILE_MIME: Record<string, string> = {
 
 export interface NativeFilePickOptions {
   title?: string;
-  /** File-type label shown by the native dialog. */
+  /** 原生对话框中显示的文件类型标签。 */
   filterName: string;
-  /** Allowed extensions without the dot, e.g. ["png", "jpg"]. */
+  /** 允许的后缀（不含点），如 ["png", "jpg"]。 */
   extensions: string[];
 }
 
 /**
- * Pick a single file with a native dialog that enforces extension filters.
- * Desktop WebViews (WKWebView in particular) ignore the HTML accept
- * attribute, so the hidden <input type="file"> lets users pick anything.
- * Returns null when the native picker is unavailable (browser / mobile,
- * where the system picker honors accept) — caller should fall back to the
- * input element; returns false when the user cancelled the dialog.
+ * 用原生对话框选择单个文件，并强制后缀过滤。桌面端 WebView
+ *（尤其是 WKWebView）会忽略 HTML 的 accept 属性，导致隐藏的
+ * <input type="file"> 能选任意文件。原生选择器不可用时（浏览器 / 移动端，
+ * 其系统选择器会遵守 accept）返回 null —— 调用方应回退到 input 元素；
+ * 用户取消对话框时返回 false。
  */
 export async function pickFileNative(
   options: NativeFilePickOptions,

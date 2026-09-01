@@ -1,14 +1,16 @@
 /**
- * Eight-ball rules (plus a single-seat practice variant) as a
- * GameDefinition for the games engine. All judging works off the
- * deterministic simulateShot result, so AI evaluation and (later)
- * remote peers reach identical verdicts.
+ * 黑八规则（外加单座练习变体），作为游戏引擎的 GameDefinition。
+ * 所有判定都基于确定性的 simulateShot 结果，因此 AI 评估与（将来的）
+ * 远程对手会得出一致的结论。
  *
- * Simplifications vs. WPA rules (documented in docs/games.md):
- * no rail-after-contact requirement, first potted ball decides the
- * group, 8 on break is re-spotted, ball-in-hand is anywhere.
+ * 相对 WPA 规则的简化（详见 docs/games.md）：无击球后必须碰库的
+ * 要求、第一颗落袋的球决定组别、开球进黑八重置、自由球可在任意位置。
  */
-import type { GameDefinition, MoveResolution, SeatIndex } from "../engine/types";
+import type {
+  GameDefinition,
+  MoveResolution,
+  SeatIndex,
+} from "../engine/types";
 import {
   BALL_RADIUS,
   FOOT_SPOT_X,
@@ -65,8 +67,11 @@ export function createInitialState(
   };
 }
 
-/** First free spot for a re-spotted ball: foot spot, then along +x/-x. */
-function findRespot(balls: readonly BallState[], ignoreId: number): {
+/** 重置球的第一个空位：先脚点，再沿 +x/-x 方向。 */
+function findRespot(
+  balls: readonly BallState[],
+  ignoreId: number,
+): {
   x: number;
   y: number;
 } {
@@ -182,7 +187,7 @@ function applyEightBallShot(
   const pottedNonEight = sim.pottedInOrder.filter((id) => id !== 8);
   const eightPotted = sim.pottedInOrder.includes(8);
 
-  // Fouls.
+  // 犯规判定。
   let foul: FoulReason | null = null;
   if (sim.cuePotted) {
     foul = "cue-potted";
@@ -212,14 +217,14 @@ function applyEightBallShot(
       winnerSeat = seat;
       finished = true;
     } else {
-      // Premature or fouled 8: shooter loses.
+      // 提前或带犯规打进黑八：击球方判负。
       if (foul === null) foul = "potted-eight-early";
       winnerSeat = 1 - seat;
       finished = true;
     }
   }
 
-  // Group assignment: first legal pot once the break is done.
+  // 组别分配：开球结束后第一颗合法落袋的球决定。
   let groups = state.groups;
   let openTable = state.openTable;
   if (
@@ -238,16 +243,15 @@ function applyEightBallShot(
     }
   }
 
-  // Turn keeping.
+  // 是否续杆。
   let continueTurn = false;
   if (!finished && foul === null) {
-    if (isBreak || openTable === true && groups[seat] === null) {
+    if (isBreak || (openTable === true && groups[seat] === null)) {
       continueTurn = pottedNonEight.length > 0;
     } else {
       const own = groups[seat];
       continueTurn =
-        own !== null &&
-        pottedNonEight.some((id) => ballGroup(id) === own);
+        own !== null && pottedNonEight.some((id) => ballGroup(id) === own);
     }
   }
 

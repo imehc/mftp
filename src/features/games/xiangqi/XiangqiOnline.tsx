@@ -1,4 +1,4 @@
-/** LAN xiangqi flow with lockstep moves, undo consent, and rematches. */
+/** 局域网中国象棋流程：锁步走子、悔棋同意、再来一局。 */
 import { useEffect, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
@@ -8,7 +8,10 @@ import type { GameRoomStatus } from "~/types";
 import { LocalController, RemoteController } from "../engine/controllers";
 import { MatchRunner } from "../engine/match";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
-import { OnlineMatchDialogs, type UndoFlow } from "../engine/online/OnlineMatchDialogs";
+import {
+  OnlineMatchDialogs,
+  type UndoFlow,
+} from "../engine/online/OnlineMatchDialogs";
 import { hashString, OnlineMatchSession } from "../engine/online/session";
 import type { RemoteMove } from "../engine/transport";
 import type { PlayerController, SeatIndex } from "../engine/types";
@@ -22,7 +25,6 @@ import {
   type XiangqiSession,
   type XiangqiState,
 } from "./types";
-
 function hashXiangqiState(state: XiangqiState): string {
   const board = state.board
     .map((piece) => (piece ? `${piece.side}:${piece.kind}` : "."))
@@ -35,7 +37,6 @@ function hashXiangqiState(state: XiangqiState): string {
     `${board}|${state.turnSeat}|${state.moveCount}|${state.halfmoveClock}|${Number(state.inCheck)}|${Number(state.finished)}|${state.winnerSeat ?? "-"}|${state.resultReason ?? "-"}|${hashString(repetitions)}`,
   );
 }
-
 export function XiangqiOnlineFlow({
   onExit,
   onFinishedChange,
@@ -48,8 +49,10 @@ export function XiangqiOnlineFlow({
     status: GameRoomStatus;
   } | null>(null);
   const readyRef = useRef(ready);
-  readyRef.current = ready;
-
+  // 最新值 ref 在 effect 中同步，而非渲染期间。
+  useEffect(() => {
+    readyRef.current = ready;
+  });
   useEffect(
     () => () => {
       readyRef.current?.session.close();
@@ -57,9 +60,10 @@ export function XiangqiOnlineFlow({
     },
     [],
   );
-
   if (!ready) {
-    return <OnlineLobby<XiangqiMove> gameId={XIANGQI_GAME_ID} onReady={setReady} />;
+    return (
+      <OnlineLobby<XiangqiMove> gameId={XIANGQI_GAME_ID} onReady={setReady} />
+    );
   }
   return (
     <OnlineMatch
@@ -69,7 +73,6 @@ export function XiangqiOnlineFlow({
     />
   );
 }
-
 function OnlineMatch({
   session,
   onExit,
@@ -89,16 +92,30 @@ function OnlineMatch({
   const [endReason, setEndReason] = useState<string | null>(null);
   const lastRemoteRef = useRef<RemoteMove<XiangqiMove> | null>(null);
   const matchRef = useRef<XiangqiSession | null>(null);
-  matchRef.current = match;
-
+  useEffect(() => {
+    matchRef.current = match;
+  });
+  // 对局 effect 不能在局中重建 runner，因此音量与译文都通过最新值 ref
+  // 在其回调内部读取。
+  const volumeRef = useRef(volume);
+  const tRef = useRef(t);
+  useEffect(() => {
+    volumeRef.current = volume;
+    tRef.current = t;
+  }, [volume, t]);
   useEffect(() => {
     lastRemoteRef.current = null;
-    setUndoFlow(null);
-    setRematchWaiting(false);
-    setRematchIncoming(false);
-    setEndReason(null);
+    // 用微任务延迟，使重置发生在 effect 主体之外。
+    queueMicrotask(() => {
+      setUndoFlow(null);
+      setRematchWaiting(false);
+      setRematchIncoming(false);
+      setEndReason(null);
+    });
     const seatThisRound: SeatIndex =
-      nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
+      nonce % 2 === 0
+        ? session.localSeat
+        : ((1 - session.localSeat) as SeatIndex);
     const local = new LocalController<XiangqiState, XiangqiMove>();
     const remote = new RemoteController<XiangqiState, XiangqiMove>();
     const controllers: PlayerController<XiangqiState, XiangqiMove>[] =
@@ -109,29 +126,39 @@ function OnlineMatch({
       controllers,
       {
         onMoveResolved: ({ seat, move, moveIndex, resolution }) => {
-          playMoveSound(volume, resolution.presentation.captured !== null);
+          playMoveSound(
+            volumeRef.current,
+            resolution.presentation.captured !== null,
+          );
           if (resolution.state.resultReason === "checkmate") {
-            playCheckSound(volume, true);
+            playCheckSound(volumeRef.current, true);
           } else if (resolution.state.inCheck) {
-            playCheckSound(volume);
+            playCheckSound(volumeRef.current);
           } else if (resolution.state.finished) {
-            playFinishSound(volume);
+            playFinishSound(volumeRef.current);
           }
           const stateHash = hashXiangqiState(resolution.state);
           if (seat === seatThisRound) {
             void session
-              .sendMove({ seq: moveIndex, seat, move, stateHash })
-              .catch(() => setEndReason(t`消息发送失败，连接可能已断开。`));
+              .sendMove({
+                seq: moveIndex,
+                seat,
+                move,
+                stateHash,
+              })
+              .catch(() =>
+                setEndReason(tRef.current`消息发送失败，连接可能已断开。`),
+              );
           } else if (
             lastRemoteRef.current &&
             lastRemoteRef.current.stateHash !== stateHash
           ) {
-            setEndReason(t`双方棋局状态不一致，本局无法继续。`);
+            setEndReason(tRef.current`双方棋局状态不一致，本局无法继续。`);
           }
         },
         onError: (error) => {
           console.error("xiangqi online match error", error);
-          setEndReason(t`双方棋局状态不一致，本局无法继续。`);
+          setEndReason(tRef.current`双方棋局状态不一致，本局无法继续。`);
         },
       },
     );
@@ -140,16 +167,17 @@ function OnlineMatch({
       remote.push(remoteMove.move);
     });
     runner.start();
-    setMatch({ runner, local });
+    setMatch({
+      runner,
+      local,
+    });
     return () => {
       offMove();
       runner.dispose();
       setMatch(null);
     };
-    // The room and volume callback stay stable; nonce alone starts a rematch.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // 仅 nonce 即可开启再来一局；音量/t 通过上方 ref 读取。
   }, [nonce, session]);
-
   const applyUndo = (atMove: number, plies: number): void => {
     const runner = matchRef.current?.runner;
     if (!runner) return;
@@ -157,11 +185,14 @@ function OnlineMatch({
     const current = runner.getSnapshot().moveCount;
     if (current > target) runner.undo(current - target);
   };
-
   useEffect(() => {
     const offControl = session.onControl((message) => {
       if (message.t === "undo-request") {
-        setUndoFlow({ kind: "incoming", atMove: message.atMove, plies: message.plies });
+        setUndoFlow({
+          kind: "incoming",
+          atMove: message.atMove,
+          plies: message.plies,
+        });
       } else if (message.t === "undo-response") {
         setUndoFlow((flow) => (flow?.kind === "waiting" ? null : flow));
         if (message.accept) applyUndo(message.atMove, message.plies);
@@ -185,20 +216,23 @@ function OnlineMatch({
       offPresence();
       offClosed();
     };
-    // applyUndo only reads refs, so resubscribing per render is unnecessary.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // applyUndo 只读取 ref，因此每次渲染重新订阅没有必要。
   }, [session, t]);
-
   const requestUndo = (plies: number): void => {
     const runner = matchRef.current?.runner;
     if (!runner || undoFlow !== null) return;
     const atMove = runner.getSnapshot().moveCount;
-    setUndoFlow({ kind: "waiting" });
+    setUndoFlow({
+      kind: "waiting",
+    });
     void session
-      .sendControl({ t: "undo-request", atMove, plies })
+      .sendControl({
+        t: "undo-request",
+        atMove,
+        plies,
+      })
       .catch(() => setUndoFlow(null));
   };
-
   const respondUndo = (accept: boolean): void => {
     const flow = undoFlow;
     if (flow?.kind !== "incoming") return;
@@ -213,25 +247,33 @@ function OnlineMatch({
       })
       .catch(() => {});
   };
-
   const requestRematch = (): void => {
     if (rematchWaiting) return;
     setRematchWaiting(true);
     void session
-      .sendControl({ t: "rematch-request" })
+      .sendControl({
+        t: "rematch-request",
+      })
       .catch(() => setRematchWaiting(false));
   };
-
   const respondRematch = (accept: boolean): void => {
     setRematchIncoming(false);
-    void session.sendControl({ t: "rematch-response", accept }).catch(() => {});
+    void session
+      .sendControl({
+        t: "rematch-response",
+        accept,
+      })
+      .catch(() => {});
     if (accept) setNonce((value) => value + 1);
   };
-
   if (!match) return <div className="flex-1" />;
-  const mode: XiangqiMode = { kind: "online" };
+  const mode: XiangqiMode = {
+    kind: "online",
+  };
   const gameSeat: SeatIndex =
-    nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
+    nonce % 2 === 0
+      ? session.localSeat
+      : ((1 - session.localSeat) as SeatIndex);
   return (
     <>
       <XiangqiMatchView
@@ -249,7 +291,14 @@ function OnlineMatch({
         onExit={onExit}
         onFinishedChange={onFinishedChange}
       />
-      <OnlineMatchDialogs undoFlow={undoFlow} onRespondUndo={respondUndo} rematchIncoming={rematchIncoming} onRespondRematch={respondRematch} endReason={endReason} onExit={onExit} />
+      <OnlineMatchDialogs
+        undoFlow={undoFlow}
+        onRespondUndo={respondUndo}
+        rematchIncoming={rematchIncoming}
+        onRespondRematch={respondRematch}
+        endReason={endReason}
+        onExit={onExit}
+      />
     </>
   );
 }

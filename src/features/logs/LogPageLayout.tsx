@@ -2,9 +2,17 @@ import { useState, type ReactNode, type Ref } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft, RefreshCw, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "~/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
-
 interface LogPageLayoutProps {
   title: string;
   description: string;
@@ -12,7 +20,6 @@ interface LogPageLayoutProps {
   filters: ReactNode;
   children: ReactNode;
 }
-
 export function LogPageLayout({
   title,
   description,
@@ -22,8 +29,8 @@ export function LogPageLayout({
 }: LogPageLayoutProps) {
   const { t } = useLingui();
   return (
-    <main className="flex h-full flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-3 py-2 sm:px-4">
+    <main className="bg-background text-foreground flex h-full flex-col overflow-hidden">
+      <header className="border-border flex shrink-0 items-center justify-between gap-3 border-b px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">
           <Button variant="ghost" size="icon-sm" asChild>
             <Link to="/" aria-label={t`返回首页`} title={t`返回首页`}>
@@ -32,13 +39,15 @@ export function LogPageLayout({
           </Button>
           <div className="min-w-0">
             <h1 className="truncate text-sm font-semibold">{title}</h1>
-            <p className="truncate text-xs text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground truncate text-xs">
+              {description}
+            </p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">{actions}</div>
       </header>
       <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-3 overflow-hidden p-3 sm:p-4">
-        <div className="flex shrink-0 flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2.5">
+        <div className="border-border bg-card flex shrink-0 flex-wrap items-center gap-2 rounded-lg border p-2.5">
           {filters}
         </div>
         {children}
@@ -46,7 +55,6 @@ export function LogPageLayout({
     </main>
   );
 }
-
 export function LogTableViewport({
   children,
   viewportRef,
@@ -57,14 +65,17 @@ export function LogTableViewport({
   return (
     <div
       ref={viewportRef}
-      className="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-card [&_[data-slot=table-container]]:overflow-visible"
+      className="border-border bg-card min-h-0 flex-1 overflow-auto rounded-lg border [&_[data-slot=table-container]]:overflow-visible"
     >
       {children}
     </div>
   );
 }
-
-export function LogDeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
+export function LogDeleteButton({
+  onDelete,
+}: {
+  onDelete: () => Promise<void>;
+}) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
   return (
@@ -102,7 +113,6 @@ export function LogDeleteButton({ onDelete }: { onDelete: () => Promise<void> })
     </>
   );
 }
-
 export function LogPageActions({
   loading,
   onRefresh,
@@ -115,8 +125,16 @@ export function LogPageActions({
   const [clearOpen, setClearOpen] = useState(false);
   return (
     <>
-      <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
-        <RefreshCw className={loading ? "animate-spin" : undefined} data-icon="inline-start" />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRefresh}
+        disabled={loading}
+      >
+        <RefreshCw
+          className={loading ? "animate-spin" : undefined}
+          data-icon="inline-start"
+        />
         <Trans>刷新</Trans>
       </Button>
       <Button variant="outline" size="sm" onClick={() => setClearOpen(true)}>

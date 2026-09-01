@@ -1,4 +1,4 @@
-/** Mode selection menu: vs-AI setup, hotseat, online entry, and history. */
+/** 模式选择菜单：人机设置、同屏对战、联机入口，以及历史记录。 */
 import { useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Bot, Radio, Users } from "lucide-react";
@@ -13,7 +13,6 @@ import {
   type GomokuHistoryPayload,
   type GomokuMode,
 } from "./types";
-
 export function GomokuModeMenu({
   onStart,
 }: {
@@ -26,7 +25,7 @@ export function GomokuModeMenu({
   return (
     <div className="flex flex-1 justify-center overflow-auto p-3">
       <div className="flex w-full max-w-sm flex-col gap-2 self-center">
-        <div className="flex flex-col gap-2 rounded-md border border-border p-2.5">
+        <div className="border-border flex flex-col gap-2 rounded-md border p-2.5">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-2 text-sm font-medium">
               <Bot className="size-4" />
@@ -34,7 +33,13 @@ export function GomokuModeMenu({
             </span>
             <Button
               size="xs"
-              onClick={() => onStart({ kind: "ai", difficulty, localSeat: aiSeat })}
+              onClick={() =>
+                onStart({
+                  kind: "ai",
+                  difficulty,
+                  localSeat: aiSeat,
+                })
+              }
             >
               <Trans>开始</Trans>
             </Button>
@@ -81,13 +86,17 @@ export function GomokuModeMenu({
           variant="outline"
           size="sm"
           className="justify-between"
-          onClick={() => onStart({ kind: "hotseat" })}
+          onClick={() =>
+            onStart({
+              kind: "hotseat",
+            })
+          }
         >
           <span className="flex items-center gap-2">
             <Users className="size-4" />
             <Trans>双人对战</Trans>
           </span>
-          <span className="text-xs font-normal text-muted-foreground">
+          <span className="text-muted-foreground text-xs font-normal">
             <Trans>同屏轮流</Trans>
           </span>
         </Button>
@@ -95,20 +104,24 @@ export function GomokuModeMenu({
           variant="outline"
           size="sm"
           className="justify-between"
-          onClick={() => onStart({ kind: "online" })}
+          onClick={() =>
+            onStart({
+              kind: "online",
+            })
+          }
         >
           <span className="flex items-center gap-2">
             <Radio className="size-4" />
             <Trans>联机对战</Trans>
           </span>
-          <span className="text-xs font-normal text-muted-foreground">
+          <span className="text-muted-foreground text-xs font-normal">
             <Trans>局域网</Trans>
           </span>
         </Button>
         {records.length > 0 ? (
-          <div className="flex flex-col gap-1 rounded-md border border-border p-2.5">
+          <div className="border-border flex flex-col gap-1 rounded-md border p-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">
+              <span className="text-muted-foreground text-xs font-medium">
                 <Trans>历史记录</Trans>
               </span>
               <Button
@@ -122,17 +135,19 @@ export function GomokuModeMenu({
             <ul className="flex max-h-44 flex-col gap-1 overflow-auto text-xs">
               {records.slice(0, 12).map((record) => (
                 <li key={record.id} className="grid grid-cols-3 gap-2">
-                  <span className="text-left tabular-nums text-muted-foreground">
+                  <span className="text-muted-foreground text-left tabular-nums">
                     {formatHistoryTime(record.finishedAt)}
                   </span>
                   <span className="min-w-0 truncate text-center">
                     {historyModeLabel(record.payload)}
                   </span>
-                  <span className="text-right text-muted-foreground">
+                  <span className="text-muted-foreground text-right">
                     {historyResult(record.payload)}
                     {" · "}
                     <Plural
-                      value={{ moveCount: record.payload.moves }}
+                      value={{
+                        moveCount: record.payload.moves,
+                      }}
                       one="# 手"
                       other="# 手"
                     />

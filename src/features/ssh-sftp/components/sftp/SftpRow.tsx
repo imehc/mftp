@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Download,
@@ -29,7 +29,6 @@ import {
   isArchive,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "~/lib/utils";
-
 interface RowProps {
   entry: SftpEntry;
   loading: boolean;
@@ -42,8 +41,7 @@ interface RowProps {
   onRename: (entry: SftpEntry) => void;
   onDelete: (entry: SftpEntry) => void;
 }
-
-const SftpRow = memo(function SftpRow({
+const SftpRow = function SftpRow({
   entry,
   loading,
   disabled,
@@ -61,7 +59,7 @@ const SftpRow = memo(function SftpRow({
   return (
     <div
       className={cn(
-        "group grid grid-cols-[var(--sftp-list-columns)] items-center border-b border-border/40 px-3 py-1.5 text-sm hover:bg-muted/50",
+        "group border-border/40 hover:bg-muted/50 grid grid-cols-[var(--sftp-list-columns)] items-center border-b px-3 py-1.5 text-sm",
         menuOpen && "bg-muted/50",
       )}
     >
@@ -71,25 +69,25 @@ const SftpRow = memo(function SftpRow({
         disabled={!entry.isDir || disabled}
       >
         {loading ? (
-          <LoaderCircle className="size-4 shrink-0 animate-spin text-muted-foreground" />
+          <LoaderCircle className="text-muted-foreground size-4 shrink-0 animate-spin" />
         ) : entry.isDir ? (
-          <Folder className="size-4 shrink-0 text-primary" />
+          <Folder className="text-primary size-4 shrink-0" />
         ) : canExtract ? (
-          <FileArchive className="size-4 shrink-0 text-muted-foreground" />
+          <FileArchive className="text-muted-foreground size-4 shrink-0" />
         ) : (
-          <FileIcon className="size-4 shrink-0 text-muted-foreground" />
+          <FileIcon className="text-muted-foreground size-4 shrink-0" />
         )}
         <span className={cn("truncate", entry.isDir && "cursor-pointer")}>
           {entry.name}
         </span>
       </button>
-      <span className="hidden truncate px-2 text-left text-xs text-muted-foreground sm:block">
+      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs sm:block">
         {formatMtime(entry.mtime)}
       </span>
-      <span className="hidden truncate px-2 text-left text-xs text-muted-foreground sm:block">
+      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs sm:block">
         {entryType(entry)}
       </span>
-      <span className="truncate px-2 text-left text-xs text-muted-foreground">
+      <span className="text-muted-foreground truncate px-2 text-left text-xs">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
       <div className="flex min-w-0 justify-end px-1">
@@ -136,6 +134,5 @@ const SftpRow = memo(function SftpRow({
       </div>
     </div>
   );
-});
-
+};
 export default SftpRow;

@@ -17,28 +17,28 @@ export type FormatterLanguageId = "json";
 
 export interface FormatterLanguage {
   id: FormatterLanguageId;
-  /** Display label; language names are proper nouns, no i18n needed. */
+  /** 展示名称；语言名是专有名词，无需 i18n。 */
   label: string;
-  /** CodeMirror extensions: syntax highlighting plus optional lint. */
+  /** CodeMirror 扩展：语法高亮与可选 lint。 */
   extensions: () => Extension[];
   format: (input: string, options: FormatOptions) => FormatResult;
-  /** Omit when the language has no meaningful minified form. */
+  /** 当该语言没有有意义的压缩形态时省略。 */
   minify?: (input: string) => FormatResult;
-  /** Syntax check only; must not modify the content. */
+  /** 仅做语法检查；不得修改内容。 */
   validate?: (input: string) => FormatResult;
-  /** Recursively sort object keys, reformatting with the given indent. */
+  /** 递归排序对象键，并按给定缩进重新格式化。 */
   sortKeys?: (
     input: string,
     options: FormatOptions,
     direction: SortDirection,
   ) => FormatResult;
-  /** Escape the document into a string-literal body / reverse it. */
+  /** 将文档转义成字符串字面量主体 / 或其逆操作。 */
   escape?: (input: string) => FormatResult;
   unescape?: (input: string) => FormatResult;
 }
 
-// Extension point: append new languages here (install the matching
-// @codemirror/lang-* package and implement `format`).
+// 扩展点：在此追加新语言（安装对应的
+// @codemirror/lang-* 包并实现 `format`）。
 export const formatterLanguages: FormatterLanguage[] = [
   {
     id: "json",
@@ -53,7 +53,9 @@ export const formatterLanguages: FormatterLanguage[] = [
   },
 ];
 
-export function getFormatterLanguage(id: FormatterLanguageId): FormatterLanguage {
+export function getFormatterLanguage(
+  id: FormatterLanguageId,
+): FormatterLanguage {
   const found = formatterLanguages.find((lang) => lang.id === id);
   return found ?? formatterLanguages[0];
 }

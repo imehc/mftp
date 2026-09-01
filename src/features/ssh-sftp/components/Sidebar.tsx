@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DndContext,
@@ -64,12 +64,10 @@ import {
 import HostForm from "~/features/ssh-sftp/components/hosts/HostForm";
 import KeyManager from "~/features/ssh-sftp/components/keys/KeyManager";
 import PassphrasePrompt from "~/features/ssh-sftp/components/hosts/PassphrasePrompt";
-
 interface SidebarProps {
   collapsed: boolean;
   onToggleCollapsed: () => void;
 }
-
 function SortableHostRow({
   id,
   children,
@@ -85,12 +83,13 @@ function SortableHostRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({
+    id,
+  });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
   return (
     <li
       ref={setNodeRef}
@@ -99,7 +98,7 @@ function SortableHostRow({
     >
       <button
         type="button"
-        className="absolute left-0 top-1/2 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
+        className="text-muted-foreground hover:bg-sidebar-accent absolute top-1/2 left-0 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md"
         aria-label={t`拖动排序`}
         {...attributes}
         {...listeners}
@@ -110,8 +109,10 @@ function SortableHostRow({
     </li>
   );
 }
-
-export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
+export default function Sidebar({
+  collapsed,
+  onToggleCollapsed,
+}: SidebarProps) {
   const { t } = useLingui();
   const sidebarRef = useRef<HTMLElement>(null);
   const hosts = useHostsStore((s) => s.hosts);
@@ -123,7 +124,6 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
   const setActive = useSessionsStore((s) => s.setActive);
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
-
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Host | null>(null);
@@ -134,11 +134,16 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
     () => new Set(),
   );
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
-
-  const filtered = useMemo(() => {
+  const filtered = (() => {
     const q = query.trim().toLowerCase();
     if (!q) return hosts;
     return hosts.filter(
@@ -147,9 +152,8 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
         h.host.toLowerCase().includes(q) ||
         h.username.toLowerCase().includes(q),
     );
-  }, [hosts, query]);
-
-  const sessionByHost = useMemo(() => {
+  })();
+  const sessionByHost = (() => {
     const map = new Map<string, (typeof sessions)[number]>();
     for (const session of sessions) {
       if (session.status === "connecting" || session.status === "connected") {
@@ -157,19 +161,15 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       }
     }
     return map;
-  }, [sessions]);
-
+  })();
   const canSortHosts = !collapsed && !query.trim() && filtered.length > 1;
-  const sortableHostIds = useMemo(() => hosts.map((host) => host.id), [hosts]);
-
+  const sortableHostIds = hosts.map((host) => host.id);
   async function onHostDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
     const oldIndex = sortableHostIds.indexOf(String(active.id));
     const newIndex = sortableHostIds.indexOf(String(over.id));
     if (oldIndex < 0 || newIndex < 0) return;
-
     const orderedIds = arrayMove(sortableHostIds, oldIndex, newIndex);
     try {
       await reorderHosts(orderedIds);
@@ -177,14 +177,13 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       toast.error(t`排序保存失败：${error}`);
     }
   }
-
   async function connect(host: Host) {
     const existing = sessionByHost.get(host.id);
     if (existing) {
       setActive(existing.id);
       return;
     }
-    // A key with a passphrase needs the user to enter it before connecting.
+    // 带口令的密钥需要先让用户输入口令才能连接。
     if (host.authType === "key") {
       const key = keys.find((k) => k.id === host.keyId);
       if (key?.hasPassphrase) {
@@ -198,14 +197,14 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       toast.error(t`连接失败：${e}`);
     }
   }
-
   async function disconnect(host: Host) {
     const session = sessionByHost.get(host.id);
     if (!session) return;
     setDisconnecting((current) => new Set(current).add(host.id));
     try {
       await closeSession(session.id);
-      toast.success(t`已断开 ${host.label}`);
+      const hostLabel = host.label;
+      toast.success(t`已断开 ${hostLabel}`);
     } catch (e) {
       toast.error(t`断开失败：${e}`);
     } finally {
@@ -216,7 +215,6 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       });
     }
   }
-
   async function confirmDelete() {
     if (!deleteTarget) return;
     const name = deleteTarget.label;
@@ -229,26 +227,27 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       setDeleteTarget(null);
     }
   }
-
   function hostAddress(host: Host) {
     const target = `${host.host}:${host.port}`;
     return host.username ? `${host.username}@${target}` : target;
   }
-
   useLayoutEffect(() => {
     const sidebar = sidebarRef.current;
     if (!sidebar) return;
-
     const reduceMotion = prefersReducedMotion();
     if (reduceMotion) {
-      gsap.set(sidebar, { clearProps: "opacity,transform" });
+      gsap.set(sidebar, {
+        clearProps: "opacity,transform",
+      });
       return;
     }
-
     const context = gsap.context(() => {
       gsap.fromTo(
         sidebar,
-        { opacity: 0.86, x: collapsed ? -4 : 4 },
+        {
+          opacity: 0.86,
+          x: collapsed ? -4 : 4,
+        },
         {
           opacity: 1,
           x: 0,
@@ -258,17 +257,14 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
         },
       );
     }, sidebar);
-
     return () => context.revert();
   }, [collapsed]);
-
   function renderHostRow(host: Host) {
     const session = sessionByHost.get(host.id);
     const isConnected = session?.status === "connected";
     const isConnecting = session?.status === "connecting";
     const isDisconnecting = disconnecting.has(host.id);
     const isActive = !!session && session.id === activeId;
-
     if (collapsed) {
       return (
         <Tooltip>
@@ -276,7 +272,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
             <button
               type="button"
               className={cn(
-                "relative flex h-9 w-full items-center justify-center rounded-lg hover:bg-sidebar-accent",
+                "hover:bg-sidebar-accent relative flex h-9 w-full items-center justify-center rounded-lg",
                 isActive && "bg-sidebar-accent",
               )}
               onDoubleClick={() => connect(host)}
@@ -285,19 +281,19 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
               }}
             >
               {isConnecting || isDisconnecting ? (
-                <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+                <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
               ) : (
                 <Server className="size-4" />
               )}
               {isConnected && !isDisconnecting ? (
-                <span className="absolute right-2 top-2 size-1.5 rounded-full bg-green-500" />
+                <span className="absolute top-2 right-2 size-1.5 rounded-full bg-green-500" />
               ) : null}
             </button>
           </TooltipTrigger>
           <TooltipContent side="right">
             <div className="flex flex-col gap-0.5">
               <span>{host.label}</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {hostAddress(host)}
               </span>
             </div>
@@ -305,11 +301,13 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
         </Tooltip>
       );
     }
-
+    const hostAddressValue = hostAddress(host);
+    const hostAddressValue2 = hostAddress(host);
+    const hostAddressValue3 = hostAddress(host);
     return (
       <div
         className={cn(
-          "relative flex items-center rounded-lg px-2 py-1.5 hover:bg-sidebar-accent",
+          "hover:bg-sidebar-accent relative flex items-center rounded-lg px-2 py-1.5",
           isActive && "bg-sidebar-accent",
         )}
       >
@@ -321,26 +319,28 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
           <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
             <span className="truncate">{host.label}</span>
             {isConnecting || isDisconnecting ? (
-              <LoaderCircle className="size-3 shrink-0 animate-spin text-muted-foreground" />
+              <LoaderCircle className="text-muted-foreground size-3 shrink-0 animate-spin" />
             ) : isConnected ? (
               <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
             ) : null}
           </p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="text-muted-foreground truncate text-xs">
             {isConnected
               ? isDisconnecting
-                ? t`断开中 · ${hostAddress(host)}`
-                : t`已连接 · ${hostAddress(host)}`
+                ? t`断开中 · ${hostAddressValue}`
+                : t`已连接 · ${hostAddressValue2}`
               : isConnecting
-                ? t`连接中 · ${hostAddress(host)}`
+                ? t`连接中 · ${hostAddressValue3}`
                 : hostAddress(host)}
           </p>
         </button>
-        <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 gap-0.5 rounded-md bg-sidebar-accent/95 group-hover:pointer-events-auto group-hover:flex">
+        <div className="bg-sidebar-accent/95 pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 gap-0.5 rounded-md group-hover:pointer-events-auto group-hover:flex">
           <Button
             variant="ghost"
             size="icon-xs"
-            title={isDisconnecting ? t`断开中` : isConnected ? t`断开连接` : t`连接`}
+            title={
+              isDisconnecting ? t`断开中` : isConnected ? t`断开连接` : t`连接`
+            }
             disabled={isConnecting || isDisconnecting}
             onClick={() =>
               isConnected ? void disconnect(host) : void connect(host)
@@ -377,12 +377,12 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       </div>
     );
   }
-
+  const value = deleteTarget?.label;
   return (
     <aside
       ref={sidebarRef}
       className={cn(
-        "flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-sidebar",
+        "bg-sidebar flex h-full min-h-0 min-w-0 flex-col overflow-hidden",
         collapsed ? "items-stretch" : "",
       )}
     >
@@ -466,55 +466,53 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
       >
         {filtered.length === 0 ? (
           collapsed ? (
-            <div className="flex justify-center py-4 text-muted-foreground">
+            <div className="text-muted-foreground flex justify-center py-4">
               <Server className="size-4" />
             </div>
           ) : (
-          <Empty className="py-10">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Server />
-              </EmptyMedia>
-              <EmptyTitle>
-                {hosts.length === 0 ? t`还没有主机` : t`无匹配结果`}
-              </EmptyTitle>
-              <EmptyDescription>
-                {hosts.length === 0 ? t`点击右上角 + 新建主机` : t`换个关键词试试`}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+            <Empty className="py-10">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Server />
+                </EmptyMedia>
+                <EmptyTitle>
+                  {hosts.length === 0 ? t`还没有主机` : t`无匹配结果`}
+                </EmptyTitle>
+                <EmptyDescription>
+                  {hosts.length === 0
+                    ? t`点击右上角 + 新建主机`
+                    : t`换个关键词试试`}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )
+        ) : canSortHosts ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onHostDragEnd}
+          >
+            <SortableContext
+              items={sortableHostIds}
+              strategy={verticalListSortingStrategy}
+            >
+              <ul className="flex flex-col gap-0.5">
+                {filtered.map((host) => (
+                  <SortableHostRow key={host.id} id={host.id}>
+                    {renderHostRow(host)}
+                  </SortableHostRow>
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
         ) : (
-          canSortHosts ? (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={onHostDragEnd}
-            >
-              <SortableContext
-                items={sortableHostIds}
-                strategy={verticalListSortingStrategy}
-              >
-                <ul className="flex flex-col gap-0.5">
-                  {filtered.map((host) => (
-                    <SortableHostRow key={host.id} id={host.id}>
-                      {renderHostRow(host)}
-                    </SortableHostRow>
-                  ))}
-                </ul>
-              </SortableContext>
-            </DndContext>
-          ) : (
-            <ul
-              className={cn("flex flex-col", collapsed ? "gap-1" : "gap-0.5")}
-            >
-              {filtered.map((host) => (
-                <li key={host.id} className="group">
-                  {renderHostRow(host)}
-                </li>
-              ))}
-            </ul>
-          )
+          <ul className={cn("flex flex-col", collapsed ? "gap-1" : "gap-0.5")}>
+            {filtered.map((host) => (
+              <li key={host.id} className="group">
+                {renderHostRow(host)}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 
@@ -546,7 +544,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) 
               <Trans>删除主机</Trans>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              <Trans>确定删除主机 “{deleteTarget?.label}”？此操作不可撤销。</Trans>
+              <Trans>确定删除主机 “{value}”？此操作不可撤销。</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

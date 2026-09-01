@@ -4,20 +4,20 @@
 
 ## 实现总览
 
-| 层 | 文件 | 职责 |
-|---|---|---|
-| 引擎封装 | src-tauri/src/bt/mod.rs | Session 懒启动、probe/add/control/list、进度泵 |
-| 元数据解析 | src-tauri/src/bt/probe.rs | infohash 提取、元数据 -> 文件列表 |
-| 缓存池 | src-tauri/src/bt/cache.rs | 配额、LRU 整种子淘汰、缓存条目、转存本地 |
-| 实时状态 | src-tauri/src/bt/stats.rs | 进度泵 + 单任务速率/节点快照 |
-| 流服务 | src-tauri/src/bt/stream_server.rs | loopback HTTP Range 流（token 防护） |
-| DTO | src-tauri/src/bt/models.rs | IPC 类型（specta 自动进 bindings.ts） |
-| 存储 | src-tauri/src/storage/bt.rs | bt_tasks / bt_cache_access 表、app_meta 配额 |
-| 命令 | src-tauri/src/commands/bt.rs | 13 个 bt_* IPC 命令 |
-| 共享事件 | src-tauri/src/transfer.rs | TRANSFER_PROGRESS + bt://task-event |
-| 页面 | src/features/bt/* | BtTool、添加对话框、文件树、缓存管理、节点浮层 |
-| 公共预览 | src/features/preview/* + src/lib/preview-kind.ts | 视频/音频/图片/文本预览页，供各模块复用 |
-| 路由入口 | src/routes/tools/bt.tsx + src/routes/preview.tsx + entries.tsx | desktop only |
+| 层         | 文件                                                           | 职责                                           |
+| ---------- | -------------------------------------------------------------- | ---------------------------------------------- |
+| 引擎封装   | src-tauri/src/bt/mod.rs                                        | Session 懒启动、probe/add/control/list、进度泵 |
+| 元数据解析 | src-tauri/src/bt/probe.rs                                      | infohash 提取、元数据 -> 文件列表              |
+| 缓存池     | src-tauri/src/bt/cache.rs                                      | 配额、LRU 整种子淘汰、缓存条目、转存本地       |
+| 实时状态   | src-tauri/src/bt/stats.rs                                      | 进度泵 + 单任务速率/节点快照                   |
+| 流服务     | src-tauri/src/bt/stream_server.rs                              | loopback HTTP Range 流（token 防护）           |
+| DTO        | src-tauri/src/bt/models.rs                                     | IPC 类型（specta 自动进 bindings.ts）          |
+| 存储       | src-tauri/src/storage/bt.rs                                    | bt_tasks / bt_cache_access 表、app_meta 配额   |
+| 命令       | src-tauri/src/commands/bt.rs                                   | 13 个 bt_* IPC 命令                            |
+| 共享事件   | src-tauri/src/transfer.rs                                      | TRANSFER_PROGRESS + bt://task-event            |
+| 页面       | src/features/bt/*                                              | BtTool、添加对话框、文件树、缓存管理、节点浮层 |
+| 公共预览   | src/features/preview/* + src/lib/preview-kind.ts               | 视频/音频/图片/文本预览页，供各模块复用        |
+| 路由入口   | src/routes/tools/bt.tsx + src/routes/preview.tsx + entries.tsx | desktop only                                   |
 
 ## 1. 目标
 
@@ -34,15 +34,16 @@
 
 ## 2. 技术选型结论（已调研）
 
-| 维度 | librqbit 9.x ✅ | rust-libtorrent ❌ |
-|---|---|---|
-| 维护 | 活跃（2026-08 仍在发版） | Rust 绑定基本停滞 |
-| 构建 | 纯 Rust，cargo add 即用 | C++ 绑定，交叉编译痛苦 |
-| 流式播放 | 内置 stream 能力：Range/seek，被读区间自动提升 piece 优先级 | 有 API 需自封装 |
-| Tauri 兼容 | 作者自己的桌面端即 Tauri 应用，路径已验证 | 无参考案例 |
-| 协议 | DHT、磁力、fastresume、选择性下载、UPnP、限速 | 全 |
+| 维度       | librqbit 9.x ✅                                             | rust-libtorrent ❌     |
+| ---------- | ----------------------------------------------------------- | ---------------------- |
+| 维护       | 活跃（2026-08 仍在发版）                                    | Rust 绑定基本停滞      |
+| 构建       | 纯 Rust，cargo add 即用                                     | C++ 绑定，交叉编译痛苦 |
+| 流式播放   | 内置 stream 能力：Range/seek，被读区间自动提升 piece 优先级 | 有 API 需自封装        |
+| Tauri 兼容 | 作者自己的桌面端即 Tauri 应用，路径已验证                   | 无参考案例             |
+| 协议       | DHT、磁力、fastresume、选择性下载、UPnP、限速               | 全                     |
 
 关键事实：
+
 - `Session` 为核心类型，`Api` 门面专为序列化给 UI 设计，与本项目 tauri-specta IPC 模式契合。
 - 默认（且仅支持）顺序下载——对边下边播有利。
 - 依赖 `reqwest ^0.13` 与本项目一致；引入完整 tokio 栈为新增项但无版本冲突。
@@ -101,14 +102,15 @@
 
 现有传输体系已是引擎无关设计，BT 接入改动很小：
 
-| 资产 | 位置 | 复用方式 |
-|---|---|---|
-| 进度模型 `TransferProgress` | src-tauri/src/models.rs:92 | 公共层，直接复用 |
-| 发射函数 `emit_transfer_progress` | src-tauri/src/ssh/types.rs:17 | 提升到 crate 公共层供 bt 调用 |
-| 任务 store `useTransfersStore` | src/store/transfers.ts | 只依赖 id/phase/transferred/total，零改动接入 |
-| 传输面板 `TransferPanel` | src/features/transfers/TransferPanel.tsx | 进度条/速度/ETA/暂停/取消/重试全由 store 驱动 |
+| 资产                              | 位置                                     | 复用方式                                      |
+| --------------------------------- | ---------------------------------------- | --------------------------------------------- |
+| 进度模型 `TransferProgress`       | src-tauri/src/models.rs:92               | 公共层，直接复用                              |
+| 发射函数 `emit_transfer_progress` | src-tauri/src/ssh/types.rs:17            | 提升到 crate 公共层供 bt 调用                 |
+| 任务 store `useTransfersStore`    | src/store/transfers.ts                   | 只依赖 id/phase/transferred/total，零改动接入 |
+| 传输面板 `TransferPanel`          | src/features/transfers/TransferPanel.tsx | 进度条/速度/ETA/暂停/取消/重试全由 store 驱动 |
 
 需要的改造：
+
 - 事件常量 `SFTP_TRANSFER_PROGRESS` 更名 `TRANSFER_PROGRESS`（前后端同一提交内同步改；wire 字符串可保持不变）。
 - BT 任务 id 加前缀 `bt:{infohash}` 防冲突。
 - `TransferState` 增加可选字段 `source?: "sftp" | "bt"` 与 `mode?: "download" | "preview"`，面板行内显示徽章（SFTP/BT · 下载/在线预览）。
@@ -155,13 +157,13 @@ BT 页面顶部用公共 `ToolPageHeader`（首页按钮 + 标题 + 添加），
 
 `/preview` 路由承载四类预览（视频/音频/图片/文本），任何模块都能复用：
 
-| 层 | 文件 | 职责 |
-|---|---|---|
-| 路由 | src/routes/preview.tsx | search 参数校验；有 `hash` 走 BT，否则用现成 `url` |
-| 页壳 | src/features/preview/PreviewScreen.tsx | ToolPageHeader + 预览区 + `footer` 插槽 |
-| 预览体 | src/features/preview/PreviewSurface.tsx | 按 kind 渲染 video/audio/img/文本（Range 取前 128KB） |
-| 类型判定 | src/lib/preview-kind.ts | 扩展名 → kind，供各模块共用 |
-| BT 容器 | src/features/bt/BtPreviewScreen.tsx | 换取流地址 + 速率/节点状态栏 |
+| 层       | 文件                                    | 职责                                                  |
+| -------- | --------------------------------------- | ----------------------------------------------------- |
+| 路由     | src/routes/preview.tsx                  | search 参数校验；有 `hash` 走 BT，否则用现成 `url`    |
+| 页壳     | src/features/preview/PreviewScreen.tsx  | ToolPageHeader + 预览区 + `footer` 插槽               |
+| 预览体   | src/features/preview/PreviewSurface.tsx | 按 kind 渲染 video/audio/img/文本（Range 取前 128KB） |
+| 类型判定 | src/lib/preview-kind.ts                 | 扩展名 → kind，供各模块共用                           |
+| BT 容器  | src/features/bt/BtPreviewScreen.tsx     | 换取流地址 + 速率/节点状态栏                          |
 
 BT 侧在 footer 放 `BtStatsBar`：每 1.5s 轮询 `bt_task_stats`，显示阶段、进度、↓/↑ 速率、节点数（点开节点浮层）。速率为 0 的方向不渲染；`Seeding` 且上行为 0 时显示「已完成」而非「做种中」——引擎会一直挂着已完成的种子，小文件下完后节点数归 0 属正常，不代表卡住。`bt_stream_url` 会按需拉起引擎，因此该页可直接刷新/深链进入。页头右侧放「下载」（对当前文件调 `bt_save_to_local`，未下完则等完成后自动转存，结果由 `bt-task-event` 通知）与「关闭」（回 `/tools/bt`）。播放中的缓存条目转存后不删除，避免把正在播放的文件删掉，交给 LRU 回收。
 
@@ -262,15 +264,15 @@ src/features/bt/
 
 BT 新增文案控制在一组核心词内，例如：
 
-| 场景 | 文案 |
-|---|---|
-| 添加入口 | `磁力链接或种子文件`（占位符） |
-| 预览动作 | `预览` |
-| 缓存徽章 | `在线预览` |
-| 元数据阶段 phase | `获取资源信息…` |
-| 校验 phase | `校验中` |
-| 节点徽章 | `{n} 节点` |
-| 节点浮层汇总 | `已连接 {n}` `可用 {n}` |
+| 场景             | 文案                           |
+| ---------------- | ------------------------------ |
+| 添加入口         | `磁力链接或种子文件`（占位符） |
+| 预览动作         | `预览`                         |
+| 缓存徽章         | `在线预览`                     |
+| 元数据阶段 phase | `获取资源信息…`                |
+| 校验 phase       | `校验中`                       |
+| 节点徽章         | `{n} 节点`                     |
+| 节点浮层汇总     | `已连接 {n}` `可用 {n}`        |
 
 extract 后若发现与现有条目语义重复，合并复用而非新增。
 
@@ -293,14 +295,14 @@ extract 后若发现与现有条目语义重复，合并复用而非新增。
 
 实测结论（Big Buck Bunny 263MB 磁力，live=42 peers，debug 构建）：
 
-| 指标 | 结果 |
-|---|---|
-| 依赖树 | 干净；reqwest 统一 0.13.4，无新增 C++/openssl |
-| 磁力元数据就绪 | 1.4s（热种子） |
-| `stream()` 打开开销 | ~35µs |
-| TTFB（前 256KB） | 620ms |
+| 指标                   | 结果                                                      |
+| ---------------------- | --------------------------------------------------------- |
+| 依赖树                 | 干净；reqwest 统一 0.13.4，无新增 C++/openssl             |
+| 磁力元数据就绪         | 1.4s（热种子）                                            |
+| `stream()` 打开开销    | ~35µs                                                     |
+| TTFB（前 256KB）       | 620ms                                                     |
 | seek 到 50% 后首 256KB | 2.8s（含预读窗口重建与补连 peer，速度随后爬升至 ~18MB/s） |
-| 二次运行（续传） | 已下载数据 µs 级命中，无需重校验 |
+| 二次运行（续传）       | 已下载数据 µs 级命中，无需重校验                          |
 
 API 关键确认：
 
@@ -312,6 +314,7 @@ API 关键确认：
 ### P1 — 核心下载 ✅ 已完成（待真机联调）
 
 已落地：
+
 - 后端：`src-tauri/src/bt/`（mod.rs 引擎封装 + models.rs DTO）、`commands/bt.rs` 四命令、`storage/bt.rs` bt_tasks 表；进度泵 1s 轮询经共享事件通道推送，`TransferProgress.finished` 驱动前端自动完成。
 - 传输体系：emit 函数提升至 `src-tauri/src/transfer.rs`；事件常量更名 `TRANSFER_PROGRESS`（wire 值不变）；store 增加 source/mode 字段；面板显示 BT 徽章。
 - 前端：`features/bt/`（BtTool + AddTorrentDialog + TorrentFileList）、路由 `/tools/bt`、首页入口（desktop only）。
@@ -322,12 +325,14 @@ API 关键确认：
 ### P2 — 在线播放 ✅ 已完成（待真机播放联调）
 
 已落地：
+
 - 后端：`bt/stream_server.rs` —— loopback 流服务（随机端口 + 路径 token，只绑 127.0.0.1），支持 `bytes=a-b / a- / -N` 三种 Range，数据源为引擎 `FileStream`（读端阻塞到 piece 就绪，天然边下边播 + seek）；Content-Type 经 mime_guess。
 - 播放源解析：`ensure_preview_task` —— 已有任务直接复用（含已完成的传统下载，从磁盘直读）；无任务则建缓存任务（`cache/{infohash}/`，仅选该文件）。infohash 离线可得：本地 .torrent 直接解析，磁力取 urn:btih（仅 v1 40 hex）。
 - 前端：文件行「▶在线预览」按钮 → `VideoPlayerDialog`（缓冲中遮罩 / waiting 事件驱动 / 失败降级提示）；预览任务进传输面板带「在线预览」徽章。
 - 清理：删除 P0 遗留 `examples/bt_poc.rs` 与 dev-dependencies。
 
 **待真机验证**（本机开发环境无法覆盖）：
+
 - [ ] WebView 从应用源加载 `http://127.0.0.1` 视频流不被拦截（CSP 为 null；Windows 为 http 源、macOS 为自定义协议源，理论上均放行）。若被拦，备选：Tauri 自定义协议注册 stream handler，或收紧 CSP 显式允许 `connect-src http://127.0.0.1:*`。
 - [ ] mp4 边下边播起播时间、seek 到未下载区域的恢复速度。
 - [ ] mkv 在当前系统 WebView 的实际表现（失败应走降级文案）。
@@ -337,6 +342,7 @@ API 关键确认：
 ### P3 — 缓存管理与优化 ✅ 已完成（待真机联调）
 
 已落地：
+
 - **LRU 缓存池**：`bt/cache.rs` —— 配额存 app_meta（默认 5GB，页面可调）；淘汰粒度整个种子；豁免 pinned 与有活跃播放连接的任务（stream_server 连接计数 `ActiveStreams`）；新增预览任务时触发回收。
 - **缓存转本地**：`bt_save_to_local` —— 已完成即时复制（预览任务转存后脱离缓存池，下载任务等同导出）；未完成 pin + 完成观察器自动搬移，结果经 `bt://task-event` 通知前端 toast。
 - **面板控制接入**：传输面板对 `bt:` 任务渲染暂停/继续/取消按钮（取消 = 删除任务；预览任务连带清缓存文件，下载任务保留用户文件）。
@@ -345,6 +351,7 @@ API 关键确认：
 - 页内缓存管理条（占用/配额/清空），暂放 BT 页底部而非全局设置页——设置页当前只有菜单入口，待有面板布局后再迁。
 
 未做（记录为后续可选）：
+
 - 节点明细浮层 UI（命令已备，前端表格待做）
 - 自适应预读窗口调优（引擎 32MB 窗口 + 首尾优先已覆盖主要场景）
 
@@ -352,15 +359,15 @@ API 关键确认：
 
 ## 9. 风险与对策
 
-| 风险 | 对策 |
-|---|---|
-| librqbit 大版本破坏性变更频繁 | 锁定 `=9.*`；升级视为独立任务回归测试 |
-| 磁力冷启动慢（DHT 找 peer） | probe 超时可取消；UI 明示「正在寻找节点」；文档说明预期 |
-| NAT 无端口映射导致 peer 少 | 开启 UPnP 自动映射；失败不影响功能仅影响速度 |
-| WebView 格式支持差异（mkv 等） | 可播性三级分类，失败降级引导下载后外部打开 |
-| Windows 防火墙弹窗 | 首次启动说明文案；监听端口固定以便规则配置 |
-| 内容合规 | 功能页显著位置加「请遵守当地法律法规」提示；不做任何资源推荐/搜索 |
-| 移动端后台限制 | 已决策桌面优先；移动端入口暂缓 |
+| 风险                           | 对策                                                              |
+| ------------------------------ | ----------------------------------------------------------------- |
+| librqbit 大版本破坏性变更频繁  | 锁定 `=9.*`；升级视为独立任务回归测试                             |
+| 磁力冷启动慢（DHT 找 peer）    | probe 超时可取消；UI 明示「正在寻找节点」；文档说明预期           |
+| NAT 无端口映射导致 peer 少     | 开启 UPnP 自动映射；失败不影响功能仅影响速度                      |
+| WebView 格式支持差异（mkv 等） | 可播性三级分类，失败降级引导下载后外部打开                        |
+| Windows 防火墙弹窗             | 首次启动说明文案；监听端口固定以便规则配置                        |
+| 内容合规                       | 功能页显著位置加「请遵守当地法律法规」提示；不做任何资源推荐/搜索 |
+| 移动端后台限制                 | 已决策桌面优先；移动端入口暂缓                                    |
 
 ## 10. 验证清单（手工测试矩阵）
 

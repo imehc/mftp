@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { z } from "zod";
@@ -19,17 +19,15 @@ import {
   DialogDescription,
 } from "~/components/ui/dialog";
 import { firstFormError } from "~/lib/form-errors";
-
 export interface ConflictResolution {
   incomingName: string;
   existingName: string;
 }
-
 interface Props {
   open: boolean;
-  /** The conflicting name that already exists remotely. */
+  /** 远端已存在的冲突名称。 */
   name: string;
-  /** Wording for the incoming item (localized via Lingui), e.g. "uploaded folder". */
+  /** 传入项的措辞（经 Lingui 本地化），如“上传的文件夹”。 */
   incomingLabel: string;
   initialIncomingName?: string;
   initialExistingName?: string;
@@ -38,8 +36,7 @@ interface Props {
 }
 
 /**
- * Resolve a remote name conflict by optionally renaming both the incoming item
- * and the existing remote item before continuing.
+ * 通过（可选地）重命名传入项与远端已有项来化解远程名称冲突，然后继续。
  */
 export default function ConflictDialog({
   open,
@@ -51,50 +48,45 @@ export default function ConflictDialog({
   onResolve,
 }: Props) {
   const { t } = useLingui();
-  const schema = useMemo(
-    () =>
-      z
-        .object({
-          incomingName: z.string(),
-          existingName: z.string(),
-        })
-        .superRefine((value, ctx) => {
-          const incomingName = value.incomingName.trim();
-          const existingName = value.existingName.trim();
-          const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
-          const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
-          if (incomingInvalid) {
-            ctx.addIssue({
-              code: "custom",
-              path: ["incomingName"],
-              message: t`名称不能为空，且不能包含斜杠`,
-            });
-          }
-          if (existingInvalid) {
-            ctx.addIssue({
-              code: "custom",
-              path: ["existingName"],
-              message: t`名称不能为空，且不能包含斜杠`,
-            });
-          }
-          if (incomingName !== "" && incomingName === existingName) {
-            ctx.addIssue({
-              code: "custom",
-              path: ["existingName"],
-              message: t`两个名称不能相同。`,
-            });
-          }
-          if (incomingName === name && existingName === name) {
-            ctx.addIssue({
-              code: "custom",
-              path: ["existingName"],
-              message: t`至少修改其中一个名称。`,
-            });
-          }
-        }),
-    [name, t],
-  );
-
+  const schema = z
+    .object({
+      incomingName: z.string(),
+      existingName: z.string(),
+    })
+    .superRefine((value, ctx) => {
+      const incomingName = value.incomingName.trim();
+      const existingName = value.existingName.trim();
+      const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
+      const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
+      if (incomingInvalid) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["incomingName"],
+          message: t`名称不能为空，且不能包含斜杠`,
+        });
+      }
+      if (existingInvalid) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["existingName"],
+          message: t`名称不能为空，且不能包含斜杠`,
+        });
+      }
+      if (incomingName !== "" && incomingName === existingName) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["existingName"],
+          message: t`两个名称不能相同。`,
+        });
+      }
+      if (incomingName === name && existingName === name) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["existingName"],
+          message: t`至少修改其中一个名称。`,
+        });
+      }
+    });
   const form = useForm({
     defaultValues: {
       incomingName: name,
@@ -110,7 +102,6 @@ export default function ConflictDialog({
       });
     },
   });
-
   useEffect(() => {
     if (open) {
       form.reset({
@@ -119,7 +110,6 @@ export default function ConflictDialog({
       });
     }
   }, [form, open, name, initialIncomingName, initialExistingName]);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -128,7 +118,10 @@ export default function ConflictDialog({
             <Trans>目标已存在同名项目</Trans>
           </DialogTitle>
           <DialogDescription>
-            <Trans>远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。</Trans>
+            <Trans>
+              远端已存在 “{name}
+              ”。修改要继续操作的名称，或先重命名远端已有项目。
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -180,13 +173,23 @@ export default function ConflictDialog({
                       {(values) => {
                         const incomingName = values.incomingName.trim();
                         const existingName = values.existingName.trim();
-                        const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
-                        const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
-                        const unchanged = incomingName === name && existingName === name;
-                        const duplicated = incomingName !== "" && incomingName === existingName;
-                        const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
+                        const incomingInvalid =
+                          incomingName === "" || /[\\/]/.test(incomingName);
+                        const existingInvalid =
+                          existingName === "" || /[\\/]/.test(existingName);
+                        const unchanged =
+                          incomingName === name && existingName === name;
+                        const duplicated =
+                          incomingName !== "" && incomingName === existingName;
+                        const invalid =
+                          incomingInvalid ||
+                          existingInvalid ||
+                          unchanged ||
+                          duplicated;
                         return (
-                          <FieldDescription className={invalid ? "text-destructive" : ""}>
+                          <FieldDescription
+                            className={invalid ? "text-destructive" : ""}
+                          >
                             {unchanged
                               ? t`至少修改其中一个名称。`
                               : duplicated
@@ -215,11 +218,19 @@ export default function ConflictDialog({
                 {(values) => {
                   const incomingName = values.incomingName.trim();
                   const existingName = values.existingName.trim();
-                  const incomingInvalid = incomingName === "" || /[\\/]/.test(incomingName);
-                  const existingInvalid = existingName === "" || /[\\/]/.test(existingName);
-                  const unchanged = incomingName === name && existingName === name;
-                  const duplicated = incomingName !== "" && incomingName === existingName;
-                  const invalid = incomingInvalid || existingInvalid || unchanged || duplicated;
+                  const incomingInvalid =
+                    incomingName === "" || /[\\/]/.test(incomingName);
+                  const existingInvalid =
+                    existingName === "" || /[\\/]/.test(existingName);
+                  const unchanged =
+                    incomingName === name && existingName === name;
+                  const duplicated =
+                    incomingName !== "" && incomingName === existingName;
+                  const invalid =
+                    incomingInvalid ||
+                    existingInvalid ||
+                    unchanged ||
+                    duplicated;
                   return (
                     <Button type="submit" disabled={invalid}>
                       <Trans>确认</Trans>

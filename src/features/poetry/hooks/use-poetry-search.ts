@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Debounced search input: returns the live input value plus the settled
- * query (300ms) that should trigger IPC. Keeps typing snappy on huge
- * result sets while remaining responsive to scope changes.
+ * 防抖搜索输入：返回实时输入值，以及应在 300ms 后触发 IPC 的
+ * 稳定查询。在大量结果下保持输入流畅，同时响应范围切换。
  */
 export function useDebouncedQuery(delayMs = 300) {
   const [input, setInput] = useState("");
@@ -18,10 +17,7 @@ export function useDebouncedQuery(delayMs = 300) {
     return () => clearTimeout(timerRef.current);
   }, [input, delayMs]);
 
-  useEffect(
-    () => () => clearTimeout(timerRef.current),
-    [],
-  );
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   return { input, setInput, query };
 }

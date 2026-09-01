@@ -8,7 +8,7 @@ const nextTabId = () => `tab-${++counter}`;
 interface SessionsState {
   sessions: Session[];
   activeId: string | null;
-  /** Open a new terminal tab for a host. Returns the tab id (frontend id). */
+  /** 为某个主机打开一个新的终端标签页。返回标签页 id（前端 id）。 */
   openSession: (host: Host, passphrase?: string) => Promise<string>;
   closeSession: (tabId: string) => Promise<void>;
   setActive: (tabId: string) => void;
@@ -32,8 +32,8 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
     }
 
     const tabId = nextTabId();
-    // Optimistically add a connecting tab. Default to the file view since it
-    // is the most used workflow; the terminal is one click away.
+    // 乐观地先添加一个连接中（connecting）状态的标签页。默认进入文件视图，
+    // 因为它是最常用的流程；终端只需点一下就能切过去。
     const draft: Session = {
       id: tabId,
       hostId: host.id,
@@ -65,7 +65,7 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
         return duplicate.id;
       }
       get().patch(tabId, { id: sessionId, status: "connecting" });
-      // Re-point activeId if it was the draft.
+      // 若 activeId 仍指向草稿，则重新指向真实会话 id。
       if (get().activeId === tabId) set({ activeId: sessionId });
       return sessionId;
     } catch (e) {
@@ -80,7 +80,7 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
       try {
         await ipc.sshDisconnect(s.id);
       } catch {
-        /* ignore */
+        /* 忽略该错误 */
       }
     }
     const remaining = get().sessions.filter((x) => x.id !== tabId);

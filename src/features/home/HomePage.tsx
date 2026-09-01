@@ -1,20 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import {
-  Activity,
-  ArrowRight,
-  FileClock,
-  Home,
-} from "lucide-react";
+import { Activity, ArrowRight, FileClock, Home } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "~/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   availableHomeEntries,
   homeCategoryLabels,
@@ -25,7 +15,6 @@ import TransferPanel from "~/features/transfers/TransferPanel";
 import { useSessionsStore } from "~/store/sessions";
 import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
-
 export default function HomePage() {
   const { t } = useLingui();
   const sessions = useSessionsStore((s) => s.sessions);
@@ -36,23 +25,26 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<HomeCategory>("tools");
   const lastTapAt = useRef(0);
 
-  // The games tab is hidden by default; ⌘/Ctrl+. toggles it (desktop),
-  // double-tapping the MFTP header title does the same (mobile).
-  const toggleGames = useCallback(() => {
+  // 小游戏标签默认隐藏；⌘/Ctrl+. 切换它（桌面端），
+  // 双击 MFTP 标题同样可切换（移动端）。
+  const toggleGames = () => {
     const next = !showGames;
     setShowGames(next);
     setActiveTab(next ? "games" : "tools");
-  }, [setShowGames, showGames]);
+  };
+  // 快捷键监听只在挂载时注册；通过 effect event
+  // 读取最新的 toggleGames（它与双击处理器共享）。
+  const toggleGamesOnKey = useEffectEvent(toggleGames);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === ".") {
         event.preventDefault();
-        toggleGames();
+        toggleGamesOnKey();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [toggleGames]);
+  }, []);
   const handleTitleTap = () => {
     const now = performance.now();
     if (now - lastTapAt.current < 300) {
@@ -62,7 +54,6 @@ export default function HomePage() {
       lastTapAt.current = now;
     }
   };
-
   const activeSessions = sessions.filter(
     (session) =>
       session.status === "connecting" || session.status === "connected",
@@ -77,21 +68,19 @@ export default function HomePage() {
     activeSessions.length > 0 ||
     runningTransfers.length > 0 ||
     failedTransfers.length > 0;
-
   const categories = [
     ...new Set(availableHomeEntries.map((entry) => entry.category)),
   ] as HomeCategory[];
-
   return (
-    <main className="h-full overflow-auto bg-background text-foreground">
+    <main className="bg-background text-foreground h-full overflow-auto">
       <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-2.5 px-2.5 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
-        <header className="flex items-center justify-between gap-2 border-b border-border pb-2">
+        <header className="border-border flex items-center justify-between gap-2 border-b pb-2">
           <div
             className="flex min-w-0 items-center gap-2"
             title={t`双击或按 ⌘/Ctrl + . 显示或隐藏小游戏`}
             onPointerDown={handleTitleTap}
           >
-            <div className="flex size-8 items-center justify-center rounded-md border border-border bg-card">
+            <div className="border-border bg-card flex size-8 items-center justify-center rounded-md border">
               <Home className="size-4" />
             </div>
             <div className="min-w-0">
@@ -105,14 +94,18 @@ export default function HomePage() {
             </Badge>
             <Badge variant="outline">
               <Plural
-                value={{ activeSessionCount: activeSessions.length }}
+                value={{
+                  activeSessionCount: activeSessions.length,
+                }}
                 one="# 连接"
                 other="# 连接"
               />
             </Badge>
             <Badge variant="outline">
               <Plural
-                value={{ runningTransferCount: runningTransfers.length }}
+                value={{
+                  runningTransferCount: runningTransfers.length,
+                }}
                 one="# 传输"
                 other="# 传输"
               />
@@ -120,7 +113,9 @@ export default function HomePage() {
             {failedTransfers.length > 0 ? (
               <Badge variant="destructive">
                 <Plural
-                  value={{ failedTransferCount: failedTransfers.length }}
+                  value={{
+                    failedTransferCount: failedTransfers.length,
+                  }}
                   one="# 失败"
                   other="# 失败"
                 />
@@ -172,10 +167,10 @@ export default function HomePage() {
                                   ? setLastTool(entry.toolId)
                                   : undefined
                               }
-                              className="group flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left hover:bg-accent hover:text-accent-foreground"
+                              className="group border-border bg-card hover:bg-accent hover:text-accent-foreground flex min-w-0 items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left"
                             >
                               <div className="flex min-w-0 items-center gap-2.5">
-                                <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background group-hover:bg-background">
+                                <span className="border-border bg-background group-hover:bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
                                   <Icon className="size-4" />
                                 </span>
                                 <span className="min-w-0">
@@ -184,7 +179,7 @@ export default function HomePage() {
                                   </span>
                                 </span>
                               </div>
-                              <ArrowRight className="size-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+                              <ArrowRight className="text-muted-foreground group-hover:text-accent-foreground size-4 shrink-0" />
                             </Link>
                           );
                         })}
@@ -195,7 +190,7 @@ export default function HomePage() {
             );
           })()}
 
-          {/* Spacer pushes the transfer list to the bottom of the viewport. */}
+          {/* 占位撑开，把传输列表推到视口底部。 */}
           <div className="flex-1" />
 
           <TransferPanel />

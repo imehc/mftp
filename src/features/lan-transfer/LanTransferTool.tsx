@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useEffectEvent, useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { open } from "@tauri-apps/plugin-dialog";
 import {
@@ -40,7 +40,6 @@ import type {
   LanTrustedDevice,
   LanAuthRequest,
 } from "~/types";
-
 const DEFAULT_SETTINGS: LanTransferSettings = {
   deviceName: "",
   port: 3000,
@@ -51,7 +50,6 @@ const DEFAULT_SETTINGS: LanTransferSettings = {
   defaultPermission: "readWrite",
   maxConcurrentTransfers: 3,
 };
-
 export default function LanTransferTool() {
   const { t } = useLingui();
   const [settings, setSettings] = useState<LanTransferSettings | null>(null);
@@ -65,7 +63,6 @@ export default function LanTransferTool() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-
   const running = status?.running ?? false;
   const {
     discoveredDevices,
@@ -75,26 +72,13 @@ export default function LanTransferTool() {
   } = useLanDiscovery(true);
   const bindHostUnavailable = Boolean(
     settings?.bindHost &&
-      !addresses.some((address) => address.ip === settings.bindHost),
+    !addresses.some((address) => address.ip === settings.bindHost),
   );
-
-  useEffect(() => {
-    void refreshCore();
-    return scheduleIdleTask(() => void refreshSecondary());
-  }, []);
-
-  useEffect(() => {
-    if (!running) return;
-    const timer = window.setInterval(() => {
-      void refreshRuntime();
-    }, 5000);
-    return () => window.clearInterval(timer);
-  }, [running]);
-
+  // 仅挂载时的预热；refreshCore/refreshSecondary 每次渲染都会重新定义，
+  // 因此通过 effect event 读取，而不是进入依赖数组。
   async function refresh() {
     await Promise.all([refreshCore(), refreshSecondary()]);
   }
-
   async function refreshCore() {
     try {
       const next = await loadLanTransferCore();
@@ -103,10 +87,10 @@ export default function LanTransferTool() {
       setShares(next.shares);
       setAddresses(next.addresses);
     } catch (error) {
-      toast.error(t`局域网传输加载失败：${String(error)}`);
+      const StringValue = String(error);
+      toast.error(t`局域网传输加载失败：${StringValue}`);
     }
   }
-
   async function refreshSecondary() {
     try {
       const next = await loadLanTransferSecondary();
@@ -117,31 +101,48 @@ export default function LanTransferTool() {
         setAuthRequests(next.authRequests);
       });
     } catch (error) {
-      // Secondary panels can retry through their own refresh controls.
-      toast.error(t`局域网传输辅助数据加载失败：${String(error)}`);
+      const StringValue2 = String(error);
+      // 辅助面板可各自通过刷新控件重试。
+      toast.error(t`局域网传输辅助数据加载失败：${StringValue2}`);
     }
   }
-
   async function refreshRuntime() {
     try {
-      const [nextStatus, nextDevices, nextAddresses, nextTasks, nextAuthRequests] =
-        await Promise.all([
-          ipc.lanTransferStatus(),
-          ipc.lanTransferConnectedDevices(),
-          ipc.lanTransferNetworkAddresses(),
-          ipc.lanTransferTasks(),
-          ipc.lanTransferPendingAuthRequests(),
-        ]);
+      const [
+        nextStatus,
+        nextDevices,
+        nextAddresses,
+        nextTasks,
+        nextAuthRequests,
+      ] = await Promise.all([
+        ipc.lanTransferStatus(),
+        ipc.lanTransferConnectedDevices(),
+        ipc.lanTransferNetworkAddresses(),
+        ipc.lanTransferTasks(),
+        ipc.lanTransferPendingAuthRequests(),
+      ]);
       setStatus(nextStatus);
       setDevices(nextDevices);
       setAddresses(nextAddresses);
       setTasks(nextTasks);
       setAuthRequests(nextAuthRequests);
     } catch {
-      // Runtime polling should not interrupt the current workflow.
+      // 运行时轮询不应打断当前的工作流。
     }
   }
-
+  const refreshCoreOnMount = useEffectEvent(refreshCore);
+  const refreshSecondaryOnMount = useEffectEvent(refreshSecondary);
+  useEffect(() => {
+    void refreshCoreOnMount();
+    return scheduleIdleTask(() => void refreshSecondaryOnMount());
+  }, []);
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setInterval(() => {
+      void refreshRuntime();
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [running]);
   async function start() {
     setBusy(true);
     try {
@@ -156,7 +157,6 @@ export default function LanTransferTool() {
       setBusy(false);
     }
   }
-
   async function stop() {
     setBusy(true);
     try {
@@ -172,7 +172,6 @@ export default function LanTransferTool() {
       setBusy(false);
     }
   }
-
   async function saveSettings(values: LanTransferSettings) {
     setBusy(true);
     try {
@@ -186,7 +185,6 @@ export default function LanTransferTool() {
       setBusy(false);
     }
   }
-
   async function switchBindAuto() {
     if (!settings) return;
     setBusy(true);
@@ -196,14 +194,15 @@ export default function LanTransferTool() {
         bindHost: "",
       });
       setSettings(next);
-      toast.success(running ? t`已改为自动绑定，重启服务后生效` : t`已改为自动绑定`);
+      toast.success(
+        running ? t`已改为自动绑定，重启服务后生效` : t`已改为自动绑定`,
+      );
     } catch (error) {
       toast.error(String(error));
     } finally {
       setBusy(false);
     }
   }
-
   async function addShare(input: LanSharedDirInput) {
     setBusy(true);
     try {
@@ -217,7 +216,6 @@ export default function LanTransferTool() {
       setBusy(false);
     }
   }
-
   async function addTrustedDevice(input: LanTrustedDeviceInput) {
     try {
       const device = await ipc.lanTransferAddTrustedDevice(input);
@@ -227,7 +225,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function deleteTrustedDevice(id: string) {
     try {
       await ipc.lanTransferDeleteTrustedDevice(id);
@@ -237,7 +234,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function deleteShare(id: string) {
     try {
       await ipc.lanTransferDeleteSharedDir(id);
@@ -247,7 +243,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function disconnectDevice(id: string) {
     try {
       await ipc.lanTransferDisconnectDevice(id);
@@ -262,7 +257,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function cancelTask(id: string) {
     try {
       await ipc.lanTransferCancelTask(id);
@@ -272,7 +266,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function refreshAuthRequests() {
     try {
       setAuthRequests(await ipc.lanTransferPendingAuthRequests());
@@ -280,7 +273,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function approveAuthRequest(id: string, permission: string) {
     try {
       await ipc.lanTransferApproveAuthRequest(id, permission);
@@ -296,7 +288,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function rejectAuthRequest(id: string) {
     try {
       await ipc.lanTransferRejectAuthRequest(id);
@@ -306,13 +297,11 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-
   async function copyUrl() {
     if (!status?.url) return;
     await navigator.clipboard.writeText(status.url);
     toast.success(t`已复制地址`);
   }
-
   async function chooseDownloadDir() {
     if (running) return null;
     const selected = await open({
@@ -322,20 +311,27 @@ export default function LanTransferTool() {
     });
     return typeof selected === "string" ? selected : null;
   }
-
   function openSettings() {
     setSettingsOpen(true);
   }
-
+  const statusConfirmationCode = status?.confirmationCode;
+  const value = settings?.bindHost;
   return (
-    <main className="flex h-full flex-col bg-background text-foreground">
-      <ToolPageHeader title={<Trans>局域网传输</Trans>} trailing={<Badge variant={running ? "secondary" : "outline"}>{running ? t`运行中` : t`已停止`}</Badge>} />
+    <main className="bg-background text-foreground flex h-full flex-col">
+      <ToolPageHeader
+        title={<Trans>局域网传输</Trans>}
+        trailing={
+          <Badge variant={running ? "secondary" : "outline"}>
+            {running ? t`运行中` : t`已停止`}
+          </Badge>
+        }
+      />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card rounded-lg border p-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background">
+              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
                 <Wifi />
               </div>
               <div className="min-w-0">
@@ -345,18 +341,20 @@ export default function LanTransferTool() {
                   </h1>
                   {status?.confirmationCode ? (
                     <Badge variant="outline">
-                      <Trans>确认码 {status.confirmationCode}</Trans>
+                      <Trans>确认码 {statusConfirmationCode}</Trans>
                     </Badge>
                   ) : null}
                   <Badge variant="outline">
                     <Plural
-                      value={{ onlineConnectionCount: status?.onlineConnections ?? 0 }}
+                      value={{
+                        onlineConnectionCount: status?.onlineConnections ?? 0,
+                      }}
                       one="# 个在线连接"
                       other="# 个在线连接"
                     />
                   </Badge>
                 </div>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="text-muted-foreground truncate text-xs">
                   {status?.url ?? t`启动服务后显示浏览器访问地址`}
                 </p>
               </div>
@@ -379,9 +377,16 @@ export default function LanTransferTool() {
                 <RefreshCw data-icon="inline-start" />
                 <Trans>刷新</Trans>
               </Button>
-              <Button size="sm" onClick={running ? stop : start} disabled={busy}>
+              <Button
+                size="sm"
+                onClick={running ? stop : start}
+                disabled={busy}
+              >
                 {busy ? (
-                  <LoaderCircle className="animate-spin" data-icon="inline-start" />
+                  <LoaderCircle
+                    className="animate-spin"
+                    data-icon="inline-start"
+                  />
                 ) : (
                   <Power data-icon="inline-start" />
                 )}
@@ -398,7 +403,9 @@ export default function LanTransferTool() {
               <Trans>绑定 IP 不可用</Trans>
             </AlertTitle>
             <AlertDescription>
-              <Trans>当前配置的 {settings?.bindHost} 不在可用网卡列表中，访问地址可能失效。</Trans>
+              <Trans>
+                当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。
+              </Trans>
             </AlertDescription>
             <div className="mt-2">
               <Button
@@ -463,7 +470,6 @@ export default function LanTransferTool() {
         deleteTrustedDevice={deleteTrustedDevice}
         saveSettings={saveSettings}
       />
-
 
       <LanShareDialog
         open={shareOpen}

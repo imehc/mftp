@@ -7,9 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import type {
-  InfoState,
-} from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import type { InfoState } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import {
   entryType,
   formatInfoSize,
@@ -19,12 +17,10 @@ import {
   parseFileMode,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "~/lib/utils";
-
 interface FileInfoDialogProps {
   info: InfoState;
   onOpenChange: (open: boolean) => void;
 }
-
 export default function FileInfoDialog({
   info,
   onOpenChange,
@@ -51,20 +47,14 @@ export default function FileInfoDialog({
     </Dialog>
   );
 }
-
-function FileInfoDetails({
-  entry,
-  details,
-  loading,
-}: NonNullable<InfoState>) {
+function FileInfoDetails({ entry, details, loading }: NonNullable<InfoState>) {
   const { t } = useLingui();
   const source = details ?? entry;
   const permissions = parseFileMode(source.mode);
-
   return (
     <div className="flex flex-col gap-3">
       {loading ? (
-        <div className="flex items-center gap-2 rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">
+        <div className="bg-muted text-muted-foreground flex items-center gap-2 rounded-md px-2 py-1.5 text-xs">
           <LoaderCircle className="size-3 animate-spin" />
           <Trans>正在读取最新信息…</Trans>
         </div>
@@ -75,23 +65,23 @@ function FileInfoDetails({
         <InfoItem label={t`大小`} value={formatInfoSize(source)} />
         <InfoItem label={t`位置`} value={parentPath(source.path)} mono />
         <InfoItem label={t`完整路径`} value={source.path} mono />
-        <InfoItem label={t`创建时间`} value={formatInfoTime(details?.createdAt)} />
+        <InfoItem
+          label={t`创建时间`}
+          value={formatInfoTime(details?.createdAt)}
+        />
         <InfoItem label={t`修改时间`} value={formatInfoTime(source.mtime)} />
         <InfoItem label={t`访问时间`} value={formatInfoTime(details?.atime)} />
         <dt className="text-muted-foreground">{t`权限`}</dt>
         <dd className="min-w-0">
-          {permissions ? (
-            <PermissionDetails permissions={permissions} />
-          ) : (
-            "—"
-          )}
+          {permissions ? <PermissionDetails permissions={permissions} /> : "—"}
         </dd>
-        {details ? <InfoItem label={t`所有者`} value={formatOwner(details)} /> : null}
+        {details ? (
+          <InfoItem label={t`所有者`} value={formatOwner(details)} />
+        ) : null}
       </dl>
     </div>
   );
 }
-
 function PermissionDetails({
   permissions,
 }: {
@@ -103,7 +93,6 @@ function PermissionDetails({
     permissions.setGroupId ? t`设置用户组 ID` : null,
     permissions.sticky ? t`粘滞位` : null,
   ].filter((value): value is string => value != null);
-
   const accessLabel = (bits: number) => {
     switch (bits) {
       case 0:
@@ -124,12 +113,14 @@ function PermissionDetails({
         return t`读取、写入、执行`;
     }
   };
-
   return (
-    <div className="flex flex-col gap-1.5 rounded-md bg-muted/60 px-2.5 py-2 text-xs">
+    <div className="bg-muted/60 flex flex-col gap-1.5 rounded-md px-2.5 py-2 text-xs">
       <PermissionRow label={t`所有者`} value={accessLabel(permissions.owner)} />
       <PermissionRow label={t`用户组`} value={accessLabel(permissions.group)} />
-      <PermissionRow label={t`其他用户`} value={accessLabel(permissions.others)} />
+      <PermissionRow
+        label={t`其他用户`}
+        value={accessLabel(permissions.others)}
+      />
       {specialPermissions.length > 0 ? (
         <PermissionRow
           label={t`特殊权限`}
@@ -138,15 +129,10 @@ function PermissionDetails({
           )}
         />
       ) : null}
-      <PermissionRow
-        label={t`原始值`}
-        value={permissions.raw}
-        mono
-      />
+      <PermissionRow label={t`原始值`} value={permissions.raw} mono />
     </div>
   );
 }
-
 function PermissionRow({
   label,
   value,
@@ -159,13 +145,12 @@ function PermissionRow({
   return (
     <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2">
       <span className="text-muted-foreground">{label}</span>
-      <span className={cn("break-words text-foreground", mono && "font-mono")}>
+      <span className={cn("text-foreground break-words", mono && "font-mono")}>
         {value}
       </span>
     </div>
   );
 }
-
 function InfoItem({
   label,
   value,
@@ -180,8 +165,8 @@ function InfoItem({
       <dt className="text-muted-foreground">{label}</dt>
       <dd
         className={cn(
-          "min-w-0 break-words text-foreground",
-          mono && "break-all font-mono text-xs",
+          "text-foreground min-w-0 break-words",
+          mono && "font-mono text-xs break-all",
         )}
       >
         {value}

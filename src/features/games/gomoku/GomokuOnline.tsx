@@ -1,6 +1,6 @@
 /**
- * Online (LAN) flow: lobby handoff, the networked match wrapper with
- * undo / rematch consent dialogs, and connection-loss handling.
+ * 联机（局域网）流程：大厅交接、带悔棋/再来一局同意对话框的网络对局
+ * 封装，以及断线处理。
  */
 import { useEffect, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
@@ -8,13 +8,13 @@ import { toast } from "sonner";
 import { gameRoomLeave } from "~/lib/ipc";
 import { useSettingsStore } from "~/store/settings";
 import type { GameRoomStatus } from "~/types";
-import {
-  LocalController,
-  RemoteController,
-} from "../engine/controllers";
+import { LocalController, RemoteController } from "../engine/controllers";
 import { MatchRunner } from "../engine/match";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
-import { OnlineMatchDialogs, type UndoFlow } from "../engine/online/OnlineMatchDialogs";
+import {
+  OnlineMatchDialogs,
+  type UndoFlow,
+} from "../engine/online/OnlineMatchDialogs";
 import { hashString, OnlineMatchSession } from "../engine/online/session";
 import type { RemoteMove } from "../engine/transport";
 import type { PlayerController, SeatIndex } from "../engine/types";
@@ -29,14 +29,13 @@ import {
   type GomokuState,
 } from "./types";
 
-/** Divergence tripwire compared against the peer's RemoteMove.stateHash. */
+/** 分歧触发器，与对端的 RemoteMove.stateHash 比对。 */
 function hashGomokuState(state: GomokuState): string {
   const cells = state.board
     .map((stone) => (stone === null ? "." : String(stone)))
     .join("");
   return hashString(`${cells}|${state.turnSeat}|${state.moveCount}`);
 }
-
 export function GomokuOnlineFlow({
   onExit,
   onFinishedChange,
@@ -49,9 +48,12 @@ export function GomokuOnlineFlow({
     status: GameRoomStatus;
   } | null>(null);
   const readyRef = useRef(ready);
-  readyRef.current = ready;
+  // 最新值 ref 在 effect 中同步，而非渲染期间。
+  useEffect(() => {
+    readyRef.current = ready;
+  });
 
-  // Leaving online mode always tears the room down.
+  // 退出联机模式总会拆除房间。
   useEffect(
     () => () => {
       readyRef.current?.session.close();
@@ -59,9 +61,10 @@ export function GomokuOnlineFlow({
     },
     [],
   );
-
   if (!ready) {
-    return <OnlineLobby<GomokuMove> gameId={GOMOKU_GAME_ID} onReady={setReady} />;
+    return (
+      <OnlineLobby<GomokuMove> gameId={GOMOKU_GAME_ID} onReady={setReady} />
+    );
   }
   return (
     <OnlineMatch
@@ -71,7 +74,6 @@ export function GomokuOnlineFlow({
     />
   );
 }
-
 function OnlineMatch({
   session,
   onExit,
@@ -91,18 +93,31 @@ function OnlineMatch({
   const [endReason, setEndReason] = useState<string | null>(null);
   const lastRemoteRef = useRef<RemoteMove<GomokuMove> | null>(null);
   const matchRef = useRef<GomokuSession | null>(null);
-  matchRef.current = match;
-
+  useEffect(() => {
+    matchRef.current = match;
+  });
+  // 对局 effect 不能在局中重建 runner，因此音量与译文都通过最新值 ref
+  // 在其回调内部读取。
+  const volumeRef = useRef(volume);
+  const tRef = useRef(t);
+  useEffect(() => {
+    volumeRef.current = volume;
+    tRef.current = t;
+  }, [volume, t]);
   useEffect(() => {
     lastRemoteRef.current = null;
-    setUndoFlow(null);
-    setRematchWaiting(false);
-    setRematchIncoming(false);
-    // Alternating first move: seats swap every rematch. Both peers bump `nonce` through the
-    // consent flow, so parity — and thus the seat mapping — stays in
-    // lockstep without extra protocol.
+    // 用微任务延迟，使重置发生在 effect 主体之外。
+    queueMicrotask(() => {
+      setUndoFlow(null);
+      setRematchWaiting(false);
+      setRematchIncoming(false);
+    });
+    // 交替先手：每次再来一局座位互换。双方都通过同意流程自增 `nonce`，
+    // 因此奇偶（进而座位映射）保持锁步，无需额外协议。
     const seatThisRound: SeatIndex =
-      nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
+      nonce % 2 === 0
+        ? session.localSeat
+        : ((1 - session.localSeat) as SeatIndex);
     const local = new LocalController<GomokuState, GomokuMove>();
     const remote = new RemoteController<GomokuState, GomokuMove>();
     const controllers: PlayerController<GomokuState, GomokuMove>[] =
@@ -113,20 +128,25 @@ function OnlineMatch({
       controllers,
       {
         onMoveResolved: ({ seat, move, moveIndex, resolution }) => {
-          playStoneSound(volume);
-          if (resolution.state.finished) playFinishSound(volume);
+          playStoneSound(volumeRef.current);
+          if (resolution.state.finished) playFinishSound(volumeRef.current);
           const hash = hashGomokuState(resolution.state);
           if (seat === seatThisRound) {
             void session
-              .sendMove({ seq: moveIndex, seat, move, stateHash: hash })
+              .sendMove({
+                seq: moveIndex,
+                seat,
+                move,
+                stateHash: hash,
+              })
               .catch(() => {
-                setEndReason(t`消息发送失败，连接可能已断开。`);
+                setEndReason(tRef.current`消息发送失败，连接可能已断开。`);
               });
           } else if (
             lastRemoteRef.current &&
             lastRemoteRef.current.stateHash !== hash
           ) {
-            setEndReason(t`双方棋局状态不一致，本局无法继续。`);
+            setEndReason(tRef.current`双方棋局状态不一致，本局无法继续。`);
           }
         },
         onError: (error) => console.error("gomoku online match error", error),
@@ -137,17 +157,19 @@ function OnlineMatch({
       remote.push(remoteMove.move);
     });
     runner.start();
-    setMatch({ runner, local });
+    setMatch({
+      runner,
+      local,
+    });
     return () => {
       offMove();
       runner.dispose();
       setMatch(null);
     };
-    // volume is read per-move; a change mid-match must not rebuild the runner.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // 音量按每手读取；局中改变音量不得重建 runner。
   }, [nonce, session]);
 
-  /** Roll both peers back to the same absolute move index. */
+  /** 将双方回退到同一绝对手数索引。 */
   const applyUndo = (atMove: number, plies: number) => {
     const runner = matchRef.current?.runner;
     if (!runner) return;
@@ -155,11 +177,14 @@ function OnlineMatch({
     const current = runner.getSnapshot().moveCount;
     if (current > target) runner.undo(current - target);
   };
-
   useEffect(() => {
     const offControl = session.onControl((msg) => {
       if (msg.t === "undo-request") {
-        setUndoFlow({ kind: "incoming", atMove: msg.atMove, plies: msg.plies });
+        setUndoFlow({
+          kind: "incoming",
+          atMove: msg.atMove,
+          plies: msg.plies,
+        });
       } else if (msg.t === "undo-response") {
         setUndoFlow((flow) => (flow?.kind === "waiting" ? null : flow));
         if (msg.accept) applyUndo(msg.atMove, msg.plies);
@@ -183,20 +208,23 @@ function OnlineMatch({
       offPresence();
       offClosed();
     };
-    // applyUndo only reads refs; resubscribing per render is pointless.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // applyUndo 只读取 ref；每次渲染重新订阅没有意义。
   }, [session, t]);
-
   const requestUndo = (plies: number) => {
     const runner = matchRef.current?.runner;
     if (!runner || undoFlow !== null) return;
     const atMove = runner.getSnapshot().moveCount;
-    setUndoFlow({ kind: "waiting" });
+    setUndoFlow({
+      kind: "waiting",
+    });
     void session
-      .sendControl({ t: "undo-request", atMove, plies })
+      .sendControl({
+        t: "undo-request",
+        atMove,
+        plies,
+      })
       .catch(() => setUndoFlow(null));
   };
-
   const respondUndo = (accept: boolean) => {
     const flow = undoFlow;
     if (flow?.kind !== "incoming") return;
@@ -211,25 +239,33 @@ function OnlineMatch({
       })
       .catch(() => {});
   };
-
   const requestRematch = () => {
     if (rematchWaiting) return;
     setRematchWaiting(true);
     void session
-      .sendControl({ t: "rematch-request" })
+      .sendControl({
+        t: "rematch-request",
+      })
       .catch(() => setRematchWaiting(false));
   };
-
   const respondRematch = (accept: boolean) => {
     setRematchIncoming(false);
-    void session.sendControl({ t: "rematch-response", accept }).catch(() => {});
+    void session
+      .sendControl({
+        t: "rematch-response",
+        accept,
+      })
+      .catch(() => {});
     if (accept) setNonce((n) => n + 1);
   };
-
   if (!match) return <div className="flex-1" />;
-  const mode: GomokuMode = { kind: "online" };
+  const mode: GomokuMode = {
+    kind: "online",
+  };
   const gameSeat: SeatIndex =
-    nonce % 2 === 0 ? session.localSeat : ((1 - session.localSeat) as SeatIndex);
+    nonce % 2 === 0
+      ? session.localSeat
+      : ((1 - session.localSeat) as SeatIndex);
   return (
     <>
       <GomokuMatchView
@@ -247,7 +283,14 @@ function OnlineMatch({
         onExit={onExit}
         onFinishedChange={onFinishedChange}
       />
-      <OnlineMatchDialogs undoFlow={undoFlow} onRespondUndo={respondUndo} rematchIncoming={rematchIncoming} onRespondRematch={respondRematch} endReason={endReason} onExit={onExit} />
+      <OnlineMatchDialogs
+        undoFlow={undoFlow}
+        onRespondUndo={respondUndo}
+        rematchIncoming={rematchIncoming}
+        onRespondRematch={respondRematch}
+        endReason={endReason}
+        onExit={onExit}
+      />
     </>
   );
 }

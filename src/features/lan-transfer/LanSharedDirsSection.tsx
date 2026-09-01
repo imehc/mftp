@@ -2,14 +2,12 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import type { LanSharedDir } from "~/types";
-
 interface Props {
   shares: LanSharedDir[];
   running: boolean;
   openShare: () => void;
   deleteShare: (id: string) => void;
 }
-
 export default function LanSharedDirsSection({
   shares,
   running,
@@ -19,21 +17,29 @@ export default function LanSharedDirsSection({
   const { t } = useLingui();
   const sharesCount = shares.length;
   return (
-    <section className="flex flex-col rounded-lg border border-border bg-card">
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2.5 py-2">
+    <section className="border-border bg-card flex flex-col rounded-lg border">
+      <div className="border-border flex shrink-0 items-center justify-between gap-2 border-b px-2.5 py-2">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold">
             <Trans>共享目录</Trans>
           </h2>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="text-muted-foreground truncate text-xs">
             {running ? (
               <Plural
-                value={{ sharesCount }}
+                value={{
+                  sharesCount,
+                }}
                 one="# 个目录，目录变更需重启服务后完整生效"
                 other="# 个目录，目录变更需重启服务后完整生效"
               />
             ) : (
-              <Plural value={{ sharesCount }} one="# 个目录" other="# 个目录" />
+              <Plural
+                value={{
+                  sharesCount,
+                }}
+                one="# 个目录"
+                other="# 个目录"
+              />
             )}
           </p>
         </div>
@@ -44,7 +50,7 @@ export default function LanSharedDirsSection({
       </div>
       <div className="p-2">
         {shares.length === 0 ? (
-          <div className="flex min-h-36 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
+          <div className="border-border text-muted-foreground flex min-h-36 items-center justify-center rounded-md border border-dashed text-xs">
             <Trans>暂无共享目录</Trans>
           </div>
         ) : (
@@ -52,11 +58,13 @@ export default function LanSharedDirsSection({
             {shares.map((share) => (
               <div
                 key={share.id}
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-border px-2.5 py-2"
+                className="border-border grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border px-2.5 py-2"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium">{share.name}</div>
-                  <div className="truncate text-xs text-muted-foreground">
+                  <div className="truncate text-sm font-medium">
+                    {share.name}
+                  </div>
+                  <div className="text-muted-foreground truncate text-xs">
                     {share.path}
                   </div>
                 </div>

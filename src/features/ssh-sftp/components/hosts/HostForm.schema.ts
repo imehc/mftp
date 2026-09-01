@@ -1,16 +1,20 @@
 import { z } from "zod";
 import type { Host, HostInput } from "~/types";
-
 type TranslateTag = (
   literals: TemplateStringsArray,
   ...placeholders: unknown[]
 ) => string;
-
 export function createHostFormSchema(t: TranslateTag) {
   return z
     .object({
-      label: z.string().trim().min(1, t`名称为必填项`),
-      host: z.string().trim().min(1, t`地址为必填项`),
+      label: z
+        .string()
+        .trim()
+        .min(1, t`名称为必填项`),
+      host: z
+        .string()
+        .trim()
+        .min(1, t`地址为必填项`),
       port: z
         .number()
         .int(t`端口必须是整数`)
@@ -32,14 +36,17 @@ export function createHostFormSchema(t: TranslateTag) {
       }
     });
 }
-
-export const hostFormSchema = createHostFormSchema(
-  ((literals, ...placeholders) =>
-    String.raw({ raw: literals }, ...placeholders)) as TranslateTag,
-);
-
+export const hostFormSchema = createHostFormSchema(((
+  literals,
+  ...placeholders
+) =>
+  String.raw(
+    {
+      raw: literals,
+    },
+    ...placeholders,
+  )) as TranslateTag);
 export type HostFormValues = z.infer<typeof hostFormSchema>;
-
 export const emptyHostFormValues: HostFormValues = {
   label: "",
   host: "",
@@ -50,7 +57,6 @@ export const emptyHostFormValues: HostFormValues = {
   keyId: null,
   defaultPath: "",
 };
-
 export function hostToFormValues(host: Host | null): HostFormValues {
   if (!host) return emptyHostFormValues;
   return {
@@ -64,7 +70,6 @@ export function hostToFormValues(host: Host | null): HostFormValues {
     defaultPath: host.defaultPath ?? "",
   };
 }
-
 export function hostFormValuesToInput(values: HostFormValues): HostInput {
   const defaultPath = values.defaultPath?.trim();
   return {

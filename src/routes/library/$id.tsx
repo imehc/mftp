@@ -5,9 +5,8 @@ import { desktopOnlyGuard } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 
 /**
- * Standalone detail route: the desktop UI shows details in the right pane of
- * `/library`, but direct links (e.g. after a collection was re-synced) must
- * still render a full page.
+ * 独立详情路由：桌面端 UI 在 `/library` 右侧面板展示详情，但直接链接
+ *（例如某个合集重新同步后）仍必须能渲染出完整页面。
  */
 function LibraryPoemRoute() {
   const setLastTool = useSettingsStore((s) => s.setLastTool);

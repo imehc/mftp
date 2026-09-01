@@ -1,4 +1,4 @@
-/** Mode selection menu: practice, vs-AI setup, hotseat, and history. */
+/** 模式选择菜单：练习、人机设置、同屏对战，以及历史记录。 */
 import { useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Bot, Target, Users } from "lucide-react";
@@ -11,7 +11,6 @@ import {
   type BilliardsHistoryPayload,
   type BilliardsMode,
 } from "./types";
-
 function historyModeLabel(payload: BilliardsHistoryPayload) {
   if (payload.mode === "practice") return <Trans>练习</Trans>;
   if (payload.mode === "hotseat") return <Trans>双人</Trans>;
@@ -29,7 +28,6 @@ function historyModeLabel(payload: BilliardsHistoryPayload) {
     </span>
   );
 }
-
 function historyResult(payload: BilliardsHistoryPayload) {
   if (payload.mode === "practice") return <Trans>清台</Trans>;
   if (payload.mode === "ai") {
@@ -41,7 +39,6 @@ function historyResult(payload: BilliardsHistoryPayload) {
     <Trans>玩家 2 胜</Trans>
   );
 }
-
 function formatHistoryTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
     month: "2-digit",
@@ -50,7 +47,6 @@ function formatHistoryTime(timestamp: number): string {
     minute: "2-digit",
   });
 }
-
 export function BilliardsModeMenu({
   onStart,
 }: {
@@ -67,17 +63,21 @@ export function BilliardsModeMenu({
           variant="outline"
           size="sm"
           className="justify-between"
-          onClick={() => onStart({ kind: "practice" })}
+          onClick={() =>
+            onStart({
+              kind: "practice",
+            })
+          }
         >
           <span className="flex items-center gap-2">
             <Target className="size-4" />
             <Trans>练习模式</Trans>
           </span>
-          <span className="text-xs font-normal text-muted-foreground">
+          <span className="text-muted-foreground text-xs font-normal">
             <Trans>自由清台</Trans>
           </span>
         </Button>
-        <div className="flex flex-col gap-2 rounded-md border border-border p-2.5">
+        <div className="border-border flex flex-col gap-2 rounded-md border p-2.5">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-2 text-sm font-medium">
               <Bot className="size-4" />
@@ -85,7 +85,13 @@ export function BilliardsModeMenu({
             </span>
             <Button
               size="xs"
-              onClick={() => onStart({ kind: "ai", difficulty, playerBreaks })}
+              onClick={() =>
+                onStart({
+                  kind: "ai",
+                  difficulty,
+                  playerBreaks,
+                })
+              }
             >
               <Trans>开始</Trans>
             </Button>
@@ -132,20 +138,24 @@ export function BilliardsModeMenu({
           variant="outline"
           size="sm"
           className="justify-between"
-          onClick={() => onStart({ kind: "hotseat" })}
+          onClick={() =>
+            onStart({
+              kind: "hotseat",
+            })
+          }
         >
           <span className="flex items-center gap-2">
             <Users className="size-4" />
             <Trans>双人对战</Trans>
           </span>
-          <span className="text-xs font-normal text-muted-foreground">
+          <span className="text-muted-foreground text-xs font-normal">
             <Trans>同屏轮流</Trans>
           </span>
         </Button>
         {records.length > 0 ? (
-          <div className="flex flex-col gap-1 rounded-md border border-border p-2.5">
+          <div className="border-border flex flex-col gap-1 rounded-md border p-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">
+              <span className="text-muted-foreground text-xs font-medium">
                 <Trans>历史记录</Trans>
               </span>
               <Button
@@ -158,21 +168,20 @@ export function BilliardsModeMenu({
             </div>
             <ul className="flex max-h-44 flex-col gap-1 overflow-auto text-xs">
               {records.slice(0, 12).map((record) => (
-                <li
-                  key={record.id}
-                  className="grid grid-cols-3 gap-2"
-                >
-                  <span className="shrink-0 text-muted-foreground tabular-nums text-left">
+                <li key={record.id} className="grid grid-cols-3 gap-2">
+                  <span className="text-muted-foreground shrink-0 text-left tabular-nums">
                     {formatHistoryTime(record.finishedAt)}
                   </span>
                   <span className="min-w-0 truncate text-center">
                     {historyModeLabel(record.payload)}
                   </span>
-                  <span className="shrink-0 text-muted-foreground text-right">
+                  <span className="text-muted-foreground shrink-0 text-right">
                     {historyResult(record.payload)}
                     {" · "}
                     <Plural
-                      value={{ shotCount: record.payload.shots }}
+                      value={{
+                        shotCount: record.payload.shots,
+                      }}
                       one="# 杆"
                       other="# 杆"
                     />

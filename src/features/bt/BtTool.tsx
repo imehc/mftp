@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { useNavigate } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -48,27 +48,33 @@ import {
   takePreviewLaunch,
 } from "./probe-cache";
 
-/** Rebuild a shareable magnet from the infohash; the original link is not
- *  stored (the engine keeps the torrent, not the URL it came from). */
+/** 从 infohash 重建可分享的磁力链接；原始链接不会被保存
+ *（引擎保存的是种子本身，而非它来源的 URL）。 */
 function magnetOf(task: BtTaskInfo) {
   return `magnet:?xt=urn:btih:${task.infoHash}&dn=${encodeURIComponent(task.label)}`;
 }
 
 /**
- * BT downloads page (desktop). Doubles as the history list: unfinished tasks
- * show live progress and peers, finished ones stay as records that can be
- * copied as a magnet or deleted. Online preview opens the shared preview page.
+ * BT 下载页（桌面端）。同时充当历史列表：未完成的任务显示实时进度与
+ * 节点，已完成的保留为记录，可复制成磁力链接或删除。在线预览会打开
+ * 共享预览页。
  */
 export default function BtTool() {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  // 来自预览页的一次性交接只被消费一次，因此在首次渲染时读取并
+  // 初始化状态，而不是用 effect。
+  const [handoff] = useState(() => takePreviewLaunch());
+  const [dialogOpen, setDialogOpen] = useState(!!handoff);
   const [tasks, setTasks] = useState<BtTaskInfo[]>([]);
   const [peersTask, setPeersTask] = useState<BtTaskInfo | null>(null);
-  // Magnet prefilled into the add dialog when it is opened from a task row;
-  // empty means a blank add flow.
-  const [prefill, setPrefill] = useState<string | null>(null);
-  const [prefillProbe, setPrefillProbe] = useState<BtProbeResult | null>(null);
+  // 从任务行打开添加对话框时预填的磁力链接；为空表示空白添加流程。
+  const [prefill, setPrefill] = useState<string | null>(
+    handoff?.source ?? null,
+  );
+  const [prefillProbe, setPrefillProbe] = useState<BtProbeResult | null>(
+    handoff?.probe ?? null,
+  );
   const [magnetTask, setMagnetTask] = useState<BtTaskInfo | null>(null);
   const [pendingDelete, setPendingDelete] = useState<BtTaskInfo | null>(null);
   const [deleteFiles, setDeleteFiles] = useState(false);
@@ -80,82 +86,72 @@ export default function BtTool() {
     infoHash: string;
     cleanupCache: boolean;
     preparation?: Promise<unknown>;
-  } | null>(null);
-  // Tasks already registered into the panel, mapped to the shape they were
-  // registered with; guards duplicate registration from polling while still
-  // noticing a task that changed underneath (see registerTask).
-  const registered = useRef(new Map<string, string>());
-
-  const registerTask = useCallback(
-    (task: BtTaskInfo, explicit = false) => {
-      // A preview cache can turn into a download, and a download can be
-      // re-added with more files selected. Both change this signature, and
-      // the panel row is keyed by id, so start() replaces the stale row
-      // instead of leaving a finished one behind.
-      const id = `bt:${task.infoHash}`;
-      const signature = `${task.mode}:${task.packageMode}:${task.total ?? "unknown"}`;
-      const current = useTransfersStore
-        .getState()
-        .transfers.find((item) => item.id === id);
-      const shouldStart =
-        registered.current.get(task.infoHash) !== signature ||
-        !current ||
-        (task.status !== "Error" && current.status !== "running");
-      if (shouldStart) {
-        registered.current.set(task.infoHash, signature);
-        const register = explicit ? startTransfer : restoreTransfer;
-        register(id, task.label, {
-          cancellable: true,
-          source: "bt",
-          mode: task.mode === "preview" ? "preview" : "download",
-        });
-      }
-      if (task.status === "Packaging") {
-        updateProgressBatch([
-          {
-            id,
-            phase: "bt:packaging",
-            transferred: task.progress ?? task.total ?? 0,
-            total: task.total ?? null,
-            finished: false,
-          },
-        ]);
-      } else if (task.status === "Error") {
-        finishTransfer(id, "error", task.error ?? undefined);
-      }
-    },
-    [finishTransfer, restoreTransfer, startTransfer, updateProgressBatch],
+  } | null>(
+    handoff
+      ? {
+          infoHash: handoff.probe.infoHash,
+          cleanupCache: !handoff.transferWasVisible,
+          preparation: handoff.preparation,
+        }
+      : null,
   );
-
-  const refresh = useCallback(async () => {
+  // 已注册到面板中的任务，记录其注册时的特征；既防止轮询产生的
+  // 重复注册，又能察觉底层发生变化的任务（见 registerTask）。
+  const registered = useRef(new Map<string, string>());
+  const registerTask = (task: BtTaskInfo, explicit = false) => {
+    // 预览缓存可能转为下载，下载也可能重新添加并选中更多文件。两者都会
+    // 改变此特征；而面板行以 id 为键，因此 start() 会替换掉陈旧的行，
+    // 而不是把已完成的行遗留在后面。
+    const id = `bt:${task.infoHash}`;
+    const signature = `${task.mode}:${task.packageMode}:${task.total ?? "unknown"}`;
+    const current = useTransfersStore
+      .getState()
+      .transfers.find((item) => item.id === id);
+    const shouldStart =
+      registered.current.get(task.infoHash) !== signature ||
+      !current ||
+      (task.status !== "Error" && current.status !== "running");
+    if (shouldStart) {
+      registered.current.set(task.infoHash, signature);
+      const register = explicit ? startTransfer : restoreTransfer;
+      register(id, task.label, {
+        cancellable: true,
+        source: "bt",
+        mode: task.mode === "preview" ? "preview" : "download",
+      });
+    }
+    if (task.status === "Packaging") {
+      updateProgressBatch([
+        {
+          id,
+          phase: "bt:packaging",
+          transferred: task.progress ?? task.total ?? 0,
+          total: task.total ?? null,
+          finished: false,
+        },
+      ]);
+    } else if (task.status === "Error") {
+      finishTransfer(id, "error", task.error ?? undefined);
+    }
+  };
+  const registerTaskInEffect = useEffectEvent(registerTask);
+  const refresh = async () => {
     try {
       setTasks(await ipc.btList());
     } catch {
-      // Lazy engine start may fail; keep the empty state instead of crashing.
+      // 懒启动引擎可能失败；保留空状态，而不是崩溃。
       setTasks([]);
     }
-  }, []);
-
+  };
+  // effect 侧的别名让轮询 / 监听 effect 不会在每次渲染时重跑，
+  // 又无需重新引入 useCallback。
+  const refreshInEffect = useEffectEvent(refresh);
   useEffect(() => {
-    void refresh();
-    const timer = setInterval(() => void refresh(), 2000);
+    // 用微任务移出 effect 函数体：refresh 只在 await 之后设置状态，
+    // 因此挂载时无需同步做任何事。
+    queueMicrotask(() => void refreshInEffect());
+    const timer = setInterval(() => void refreshInEffect(), 2000);
     return () => clearInterval(timer);
-  }, [refresh]);
-
-  // Back from the preview page: consume the one-time source/probe handoff so
-  // the same dialog can resume without making this cache reusable elsewhere.
-  useEffect(() => {
-    const handoff = takePreviewLaunch();
-    if (handoff) {
-      returnedPreview.current = {
-        infoHash: handoff.probe.infoHash,
-        cleanupCache: !handoff.transferWasVisible,
-        preparation: handoff.preparation,
-      };
-      setPrefill(handoff.source);
-      setPrefillProbe(handoff.probe);
-      setDialogOpen(true);
-    }
   }, []);
 
   useEffect(() => {
@@ -166,53 +162,57 @@ export default function BtTool() {
           .getState()
           .transfers.find((item) => item.id === id);
         if (transfer?.status === "running") {
-          finishTransfer(id, task.status === "Completed" ? "success" : "cancelled");
+          finishTransfer(
+            id,
+            task.status === "Completed" ? "success" : "cancelled",
+          );
         }
-        // Drop the memo so a task that starts again (re-added to another
-        // folder with the same files) gets a fresh panel row.
+        // 清除记忆，使重新启动的任务（以相同文件重新添加到另一个
+        // 文件夹）能拿到全新的面板行。
         registered.current.delete(task.infoHash);
       } else {
-        registerTask(task);
+        registerTaskInEffect(task);
       }
     }
-  }, [finishTransfer, registerTask, tasks]);
+  }, [finishTransfer, tasks]);
 
-  // Save-to-local results arrive via events from the background watcher
-  // (unfinished tasks notify only after download completes). The unlisten
-  // handle arrives asynchronously, so a cleanup running before it resolves
-  // must remember to drop it — otherwise the subscription leaks and one save
-  // toasts once per leak.
+  // 转存到本地的结果通过后台监听器的事件到达（未完成的任务要在
+  // 下载完成后才通知）。unlisten 句柄异步到达，因此在它解析前运行的
+  // 清理必须记得释放它 —— 否则订阅会泄漏，而每次保存会按泄漏次数重复提示。
   useEffect(() => {
     let cancelled = false;
     let dispose: (() => void) | null = null;
-    void listen<{ infoHash: string; kind: string }>(BT_TASK_EVENT, (event) => {
+    void listen<{
+      infoHash: string;
+      kind: string;
+    }>(BT_TASK_EVENT, (event) => {
       if (event.payload.kind === "saved") {
         toast.success(translate(msg`已转存到本地`));
         registered.current.delete(event.payload.infoHash);
-        void refresh();
+        void refreshInEffect();
       } else if (event.payload.kind.startsWith("save-failed")) {
         toast.error(translate(msg`转存失败`), {
           description: event.payload.kind.slice("save-failed:".length),
         });
-        void refresh();
+        void refreshInEffect();
       } else if (event.payload.kind === "package-completed") {
         finishTransfer(`bt:${event.payload.infoHash}`, "success");
         registered.current.delete(event.payload.infoHash);
-        void refresh();
+        void refreshInEffect();
       } else if (event.payload.kind.startsWith("package-failed:")) {
         finishTransfer(
           `bt:${event.payload.infoHash}`,
           "error",
           event.payload.kind.slice("package-failed:".length),
         );
-        void refresh();
+        void refreshInEffect();
       } else if (event.payload.kind === "removed") {
         registered.current.delete(event.payload.infoHash);
-        void refresh();
+        void refreshInEffect();
       } else if (event.payload.kind === "cancelled") {
         finishTransfer(`bt:${event.payload.infoHash}`, "cancelled");
         registered.current.delete(event.payload.infoHash);
-        void refresh();
+        void refreshInEffect();
       }
     }).then((unlisten) => {
       if (cancelled) unlisten();
@@ -222,44 +222,45 @@ export default function BtTool() {
       cancelled = true;
       dispose?.();
     };
-  }, [finishTransfer, refresh]);
+  }, [finishTransfer]);
 
-  /** Online preview: enter the route first; it prepares the cache task. */
-  const handlePreview = useCallback(
-    async (source: string, file: BtFileMeta, probe: BtProbeResult) => {
-      if (!source) return;
-      const transferWasVisible = useTransfersStore
-        .getState()
-        .transfers.some((item) => item.id === `bt:${probe.infoHash}`);
-      markPreviewLaunch(source, probe, transferWasVisible);
-      setDialogOpen(false);
-      try {
-        await navigate({
-          to: "/preview",
-          search: {
-            name: file.path.split("/").pop() ?? file.path,
-            kind: previewKind(file.path),
-            hash: probe.infoHash,
-            index: file.index,
-          },
-        });
-      } catch (error) {
-        clearPreviewLaunch();
-        toast.error(t`在线预览失败`, { description: String(error) });
-        setDialogOpen(true);
-      }
-    },
-    [navigate, t],
-  );
-
-  const openAdd = useCallback(() => {
+  /** 在线预览：先进入路由；由它准备缓存任务。 */
+  const handlePreview = async (
+    source: string,
+    file: BtFileMeta,
+    probe: BtProbeResult,
+  ) => {
+    if (!source) return;
+    const transferWasVisible = useTransfersStore
+      .getState()
+      .transfers.some((item) => item.id === `bt:${probe.infoHash}`);
+    markPreviewLaunch(source, probe, transferWasVisible);
+    setDialogOpen(false);
+    try {
+      await navigate({
+        to: "/preview",
+        search: {
+          name: file.path.split("/").pop() ?? file.path,
+          kind: previewKind(file.path),
+          hash: probe.infoHash,
+          index: file.index,
+        },
+      });
+    } catch (error) {
+      clearPreviewLaunch();
+      toast.error(t`在线预览失败`, {
+        description: String(error),
+      });
+      setDialogOpen(true);
+    }
+  };
+  const openAdd = () => {
     returnedPreview.current = null;
     setPrefill(null);
     setPrefillProbe(null);
     setDialogOpen(true);
-  }, []);
-
-  const cleanupReturnedPreview = useCallback(async () => {
+  };
+  const cleanupReturnedPreview = async () => {
     const context = returnedPreview.current;
     returnedPreview.current = null;
     if (!context?.cleanupCache) return;
@@ -277,22 +278,19 @@ export default function BtTool() {
         await refresh();
       }
     } catch (error) {
-      toast.error(t`清理预览缓存失败`, { description: String(error) });
+      toast.error(t`清理预览缓存失败`, {
+        description: String(error),
+      });
     }
-  }, [refresh, t]);
-
-  const handleAdded = useCallback(
-    (task: BtTaskInfo) => {
-      setTasks((current) => [
-        task,
-        ...current.filter((item) => item.infoHash !== task.infoHash),
-      ]);
-      registerTask(task, true);
-    },
-    [registerTask],
-  );
-
-  const confirmDelete = useCallback(async () => {
+  };
+  const handleAdded = (task: BtTaskInfo) => {
+    setTasks((current) => [
+      task,
+      ...current.filter((item) => item.infoHash !== task.infoHash),
+    ]);
+    registerTask(task, true);
+  };
+  const confirmDelete = async () => {
     if (!pendingDelete) return;
     const target = pendingDelete;
     setPendingDelete(null);
@@ -314,8 +312,8 @@ export default function BtTool() {
     } catch (error) {
       toast.error(String(error));
     }
-  }, [deleteFiles, finishTransfer, pendingDelete, refresh, t]);
-
+  };
+  const pendingDeleteLabel = pendingDelete?.label;
   return (
     <div className="flex h-full min-h-0 flex-col">
       <ToolPageHeader
@@ -328,7 +326,7 @@ export default function BtTool() {
         }
       >
         {tasks.length > 0 ? (
-          <span className="text-xs tabular-nums text-muted-foreground">
+          <span className="text-muted-foreground text-xs tabular-nums">
             {tasks.length}
           </span>
         ) : null}
@@ -351,17 +349,19 @@ export default function BtTool() {
             </Button>
           </Empty>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto rounded-lg border border-border p-1">
+          <div className="border-border flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto rounded-lg border p-1">
             {tasks.map((task) => {
               const total = task.total ?? 0;
               const progress = task.progress ?? 0;
               const terminal = task.finished || task.status === "Cancelled";
               const percent =
-                total > 0 ? Math.min(100, Math.round((progress / total) * 100)) : 0;
+                total > 0
+                  ? Math.min(100, Math.round((progress / total) * 100))
+                  : 0;
               return (
                 <div
                   key={task.infoHash}
-                  className="flex flex-col gap-1 rounded-md px-2 py-1.5 text-xs hover:bg-sidebar-accent"
+                  className="hover:bg-sidebar-accent flex flex-col gap-1 rounded-md px-2 py-1.5 text-xs"
                 >
                   <div className="flex items-center gap-2">
                     <button
@@ -378,29 +378,29 @@ export default function BtTool() {
                       {task.label}
                     </button>
                     {task.mode === "preview" ? (
-                      <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[10px] text-muted-foreground">
+                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
                         <Trans>在线预览</Trans>
                       </span>
                     ) : null}
                     {task.mode === "preview" && !task.cacheAvailable ? (
-                      <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[10px] text-muted-foreground">
+                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
                         <Trans>缓存已清理</Trans>
                       </span>
                     ) : null}
                     {task.status === "Cancelled" ? (
-                      <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[10px] text-muted-foreground">
+                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
                         <Trans>已取消</Trans>
                       </span>
                     ) : null}
                     {terminal ? (
-                      <span className="shrink-0 tabular-nums text-muted-foreground">
+                      <span className="text-muted-foreground shrink-0 tabular-nums">
                         {formatBytes(total)}
                       </span>
                     ) : (
                       <>
                         <button
                           type="button"
-                          className="shrink-0 tabular-nums text-muted-foreground hover:text-foreground hover:underline"
+                          className="text-muted-foreground hover:text-foreground shrink-0 tabular-nums hover:underline"
                           title={t`查看节点明细`}
                           onClick={() => setPeersTask(task)}
                         >
@@ -435,10 +435,12 @@ export default function BtTool() {
                     </Button>
                   </div>
                   {terminal ? null : (
-                    <div className="h-0.5 overflow-hidden rounded-full bg-muted">
+                    <div className="bg-muted h-0.5 overflow-hidden rounded-full">
                       <div
-                        className="h-full rounded-full bg-primary transition-[width]"
-                        style={{ width: `${percent}%` }}
+                        className="bg-primary h-full rounded-full transition-[width]"
+                        style={{
+                          width: `${percent}%`,
+                        }}
                       />
                     </div>
                   )}
@@ -465,11 +467,21 @@ export default function BtTool() {
         onAdded={handleAdded}
       />
       <PeersDialog
-        task={peersTask ? { infoHash: peersTask.infoHash, label: peersTask.label } : null}
+        task={
+          peersTask
+            ? {
+                infoHash: peersTask.infoHash,
+                label: peersTask.label,
+              }
+            : null
+        }
         onClose={() => setPeersTask(null)}
       />
 
-      <Dialog open={magnetTask !== null} onOpenChange={(open) => !open && setMagnetTask(null)}>
+      <Dialog
+        open={magnetTask !== null}
+        onOpenChange={(open) => !open && setMagnetTask(null)}
+      >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
@@ -499,7 +511,7 @@ export default function BtTool() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingDelete ? t`删除 ${pendingDelete.label}` : ""}
+              {pendingDelete ? t`删除 ${pendingDeleteLabel}` : ""}
             </AlertDialogTitle>
             <AlertDialogDescription>
               <Trans>删除后无法恢复。</Trans>

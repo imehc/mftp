@@ -19,8 +19,8 @@ function RootLayout() {
   useEffect(() => {
     if (sessionStorage.getItem(START_ROUTE_RESOLVED_KEY)) return;
     sessionStorage.setItem(START_ROUTE_RESOLVED_KEY, "1");
-    // On mobile, always start at home so the system back gesture returns
-    // there instead of exiting the app.
+    // 移动端始终从首页启动，这样系统的返回手势会回到首页，
+    // 而不是退出应用。
     if (isMobilePlatform()) return;
     if (window.location.pathname !== "/" || !lastTool) return;
     const entry = getToolEntry(lastTool);

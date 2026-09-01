@@ -4,15 +4,16 @@ import type {
   LanTransferSettings,
   LanTrustedDeviceInput,
 } from "~/types";
-
 export const lanSecurityModeSchema = z.enum(["code", "trusted", "open"]);
-export const lanPermissionSchema = z.enum(["readOnly", "readWrite", "uploadOnly"]);
-
+export const lanPermissionSchema = z.enum([
+  "readOnly",
+  "readWrite",
+  "uploadOnly",
+]);
 type TranslateTag = (
   literals: TemplateStringsArray,
   ...placeholders: unknown[]
 ) => string;
-
 export function createLanSettingsSchema(t: TranslateTag) {
   return z.object({
     deviceName: z.string(),
@@ -33,32 +34,40 @@ export function createLanSettingsSchema(t: TranslateTag) {
       .max(16, t`同时传输数不能大于 16`),
   }) satisfies z.ZodType<LanTransferSettings>;
 }
-
 export function createLanTrustedDeviceSchema(t: TranslateTag) {
   return z.object({
     label: z.string(),
-    ip: z.string().trim().min(1, t`请输入 IP 地址`),
+    ip: z
+      .string()
+      .trim()
+      .min(1, t`请输入 IP 地址`),
   });
 }
-
 export function createLanSharedDirSchema(t: TranslateTag) {
   return z.object({
-    name: z.string().trim().min(1, t`请输入共享目录名称`),
-    path: z.string().trim().min(1, t`请选择共享目录`),
+    name: z
+      .string()
+      .trim()
+      .min(1, t`请输入共享目录名称`),
+    path: z
+      .string()
+      .trim()
+      .min(1, t`请选择共享目录`),
   });
 }
-
 const rawText = ((literals, ...placeholders) =>
-  String.raw({ raw: literals }, ...placeholders)) as TranslateTag;
-
+  String.raw(
+    {
+      raw: literals,
+    },
+    ...placeholders,
+  )) as TranslateTag;
 export const lanSettingsSchema = createLanSettingsSchema(rawText);
 export const lanTrustedDeviceSchema = createLanTrustedDeviceSchema(rawText);
 export const lanSharedDirSchema = createLanSharedDirSchema(rawText);
-
 export type LanSettingsFormValues = z.infer<typeof lanSettingsSchema>;
 export type LanTrustedDeviceFormValues = z.infer<typeof lanTrustedDeviceSchema>;
 export type LanSharedDirFormValues = z.infer<typeof lanSharedDirSchema>;
-
 export function lanSharedDirFormValuesToInput(
   values: LanSharedDirFormValues,
 ): LanSharedDirInput {
@@ -67,7 +76,6 @@ export function lanSharedDirFormValuesToInput(
     path: values.path.trim(),
   };
 }
-
 export function lanTrustedDeviceFormValuesToInput(
   values: LanTrustedDeviceFormValues,
 ): LanTrustedDeviceInput {

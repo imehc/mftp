@@ -74,8 +74,7 @@ export function decodeBase64(
   }
 
   try {
-    const normalized =
-      variant === "url-safe" ? fromUrlSafe(compact) : compact;
+    const normalized = variant === "url-safe" ? fromUrlSafe(compact) : compact;
     if (!/^[A-Za-z0-9+/]*={0,2}$/u.test(normalized)) {
       return { ok: false, error: "invalid-base64" };
     }

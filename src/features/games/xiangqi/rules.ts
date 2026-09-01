@@ -1,4 +1,8 @@
-import type { GameDefinition, MoveResolution, SeatIndex } from "../engine/types";
+import type {
+  GameDefinition,
+  MoveResolution,
+  SeatIndex,
+} from "../engine/types";
 import {
   BOARD_COLS,
   BOARD_ROWS,
@@ -57,7 +61,9 @@ export function boardPositionKey(
 ): string {
   const pieces = board
     .map((piece) =>
-      piece ? `${piece.side}${piece.kind[0]}${piece.kind === "horse" ? "h" : ""}` : ".",
+      piece
+        ? `${piece.side}${piece.kind[0]}${piece.kind === "horse" ? "h" : ""}`
+        : ".",
     )
     .join("");
   return `${pieces}|${turnSeat}`;
@@ -166,7 +172,11 @@ function generalTargets(
   }
 
   for (const direction of [-1, 1]) {
-    for (let nextRow = row + direction; inBounds(nextRow, col); nextRow += direction) {
+    for (
+      let nextRow = row + direction;
+      inBounds(nextRow, col);
+      nextRow += direction
+    ) {
       const index = boardIndex(nextRow, col);
       const occupant = board[index];
       if (!occupant) continue;
@@ -193,7 +203,12 @@ export function pseudoTargets(
 
   const targets: number[] = [];
   if (piece.kind === "advisor") {
-    for (const [dr, dc] of [[-1, -1], [-1, 1], [1, -1], [1, 1]]) {
+    for (const [dr, dc] of [
+      [-1, -1],
+      [-1, 1],
+      [1, -1],
+      [1, 1],
+    ]) {
       const nextRow = row + dr;
       const nextCol = col + dc;
       if (inPalace(piece.side, nextRow, nextCol)) {
@@ -201,7 +216,12 @@ export function pseudoTargets(
       }
     }
   } else if (piece.kind === "elephant") {
-    for (const [dr, dc] of [[-2, -2], [-2, 2], [2, -2], [2, 2]]) {
+    for (const [dr, dc] of [
+      [-2, -2],
+      [-2, 2],
+      [2, -2],
+      [2, 2],
+    ]) {
       const nextRow = row + dr;
       const nextCol = col + dc;
       const staysHome = piece.side === 0 ? nextRow >= 5 : nextRow <= 4;
@@ -253,7 +273,9 @@ function findGeneral(
   board: readonly (XiangqiPiece | null)[],
   side: SeatIndex,
 ): number {
-  return board.findIndex((piece) => piece?.side === side && piece.kind === "general");
+  return board.findIndex(
+    (piece) => piece?.side === side && piece.kind === "general",
+  );
 }
 
 export function isInCheck(
@@ -314,7 +336,11 @@ export const xiangqiGame: GameDefinition<
   currentSeat: (state) => (state.finished ? null : state.turnSeat),
   winnerSeat: (state) => state.winnerSeat,
   isFinished: (state) => state.finished,
-  applyMove(state, move, seat): MoveResolution<XiangqiState, XiangqiPresentation> {
+  applyMove(
+    state,
+    move,
+    seat,
+  ): MoveResolution<XiangqiState, XiangqiPresentation> {
     if (state.finished) throw new Error("xiangqi: match already finished");
     if (seat !== state.turnSeat) throw new Error("xiangqi: wrong seat");
     if (!isLegalMove(state, move)) throw new Error("xiangqi: illegal move");

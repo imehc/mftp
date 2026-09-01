@@ -1,4 +1,4 @@
-/** Gomoku screen shell: header actions and mode switching. */
+/** 五子棋界面外壳：顶部操作与模式切换。 */
 import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import { CircleDot } from "lucide-react";
@@ -9,29 +9,28 @@ import { GomokuMatch } from "./GomokuMatch";
 import { GomokuModeMenu } from "./GomokuModeMenu";
 import { GomokuOnlineFlow } from "./GomokuOnline";
 import type { GomokuMode } from "./types";
-
 export default function GomokuGame() {
   const [mode, setMode] = useState<GomokuMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
   const [matchFinished, setMatchFinished] = useState(false);
-
   const exitMatch = () => {
     setMatchFinished(false);
     setMode(null);
   };
-
   const restartMatch = () => {
     setMatchFinished(false);
     setMatchKey((key) => key + 1);
   };
-
   return (
-    <main className="flex h-full flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex items-center justify-between gap-2 border-b border-border px-2 py-1.5">
+    <main className="bg-background text-foreground flex h-full flex-col overflow-hidden">
+      <header className="border-border flex items-center justify-between gap-2 border-b px-2 py-1.5">
         <div className="flex items-center gap-1">
-          <GameHomeButton matchActive={mode !== null} matchFinished={matchFinished} />
-          <div className="h-4 w-px bg-border" />
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <GameHomeButton
+            matchActive={mode !== null}
+            matchFinished={matchFinished}
+          />
+          <div className="bg-border h-4 w-px" />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
             <CircleDot className="size-3.5" />
             <Trans>五子棋</Trans>
           </div>
@@ -68,7 +67,10 @@ export default function GomokuGame() {
           onRematch={() => {
             setMode((current) =>
               current?.kind === "ai"
-                ? { ...current, localSeat: current.localSeat === 0 ? 1 : 0 }
+                ? {
+                    ...current,
+                    localSeat: current.localSeat === 0 ? 1 : 0,
+                  }
                 : current,
             );
             setMatchFinished(false);

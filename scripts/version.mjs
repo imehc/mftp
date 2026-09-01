@@ -8,8 +8,21 @@ const cargoPath = path.join(root, "src-tauri", "Cargo.toml");
 const tauriConfigPath = path.join(root, "src-tauri", "tauri.conf.json");
 // iOS project files hardcode the version at `tauri ios init` time (Android
 // instead reads it from tauri.properties on every build), so keep them synced.
-const iosProjectPath = path.join(root, "src-tauri", "gen", "apple", "project.yml");
-const iosPlistPath = path.join(root, "src-tauri", "gen", "apple", "mftp_iOS", "Info.plist");
+const iosProjectPath = path.join(
+  root,
+  "src-tauri",
+  "gen",
+  "apple",
+  "project.yml",
+);
+const iosPlistPath = path.join(
+  root,
+  "src-tauri",
+  "gen",
+  "apple",
+  "mftp_iOS",
+  "Info.plist",
+);
 const semver = /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
 
 function readJson(file) {
@@ -19,20 +32,29 @@ function readJson(file) {
 function readCargoVersion() {
   const raw = fs.readFileSync(cargoPath, "utf8");
   const match = raw.match(/^\[package\][\s\S]*?^version\s*=\s*"([^"]+)"/m);
-  if (!match) throw new Error("Missing package version in src-tauri/Cargo.toml");
+  if (!match)
+    throw new Error("Missing package version in src-tauri/Cargo.toml");
   return match[1];
 }
 
 function readIosVersions() {
   const yml = fs.readFileSync(iosProjectPath, "utf8");
-  const ymlMatch = yml.match(/^\s*CFBundleShortVersionString:\s*"?([^"\s]+)"?\s*$/m);
-  if (!ymlMatch) throw new Error("Missing CFBundleShortVersionString in gen/apple/project.yml");
+  const ymlMatch = yml.match(
+    /^\s*CFBundleShortVersionString:\s*"?([^"\s]+)"?\s*$/m,
+  );
+  if (!ymlMatch)
+    throw new Error(
+      "Missing CFBundleShortVersionString in gen/apple/project.yml",
+    );
 
   const plist = fs.readFileSync(iosPlistPath, "utf8");
   const plistMatch = plist.match(
     /<key>CFBundleShortVersionString<\/key>\s*<string>([^<]+)<\/string>/,
   );
-  if (!plistMatch) throw new Error("Missing CFBundleShortVersionString in gen/apple Info.plist");
+  if (!plistMatch)
+    throw new Error(
+      "Missing CFBundleShortVersionString in gen/apple Info.plist",
+    );
 
   return { iosProject: ymlMatch[1], iosPlist: plistMatch[1] };
 }
@@ -67,7 +89,9 @@ function checkVersions() {
 function nextVersion(current, target) {
   if (semver.test(target)) return target;
 
-  const [major, minor, patch] = current.split(".").map((part) => Number.parseInt(part, 10));
+  const [major, minor, patch] = current
+    .split(".")
+    .map((part) => Number.parseInt(part, 10));
   if (![major, minor, patch].every(Number.isInteger)) {
     throw new Error(`Cannot bump non-numeric version: ${current}`);
   }
@@ -85,7 +109,8 @@ function nextVersion(current, target) {
 }
 
 function bumpVersion(target) {
-  if (!target) throw new Error("Usage: pnpm version:bump patch|minor|major|x.y.z");
+  if (!target)
+    throw new Error("Usage: pnpm version:bump patch|minor|major|x.y.z");
 
   checkVersions();
   const current = readVersions().packageJson;
@@ -97,19 +122,28 @@ function bumpVersion(target) {
 
   const tauriConfig = readJson(tauriConfigPath);
   tauriConfig.version = version;
-  fs.writeFileSync(tauriConfigPath, `${JSON.stringify(tauriConfig, null, 2)}\n`);
+  fs.writeFileSync(
+    tauriConfigPath,
+    `${JSON.stringify(tauriConfig, null, 2)}\n`,
+  );
 
   const cargo = fs.readFileSync(cargoPath, "utf8");
   fs.writeFileSync(
     cargoPath,
-    cargo.replace(/(^\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m, `$1${version}$2`),
+    cargo.replace(
+      /(^\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m,
+      `$1${version}$2`,
+    ),
   );
 
   const yml = fs.readFileSync(iosProjectPath, "utf8");
   fs.writeFileSync(
     iosProjectPath,
     yml
-      .replace(/^(\s*CFBundleShortVersionString:\s*)"?[^"\s]+"?\s*$/m, `$1${version}`)
+      .replace(
+        /^(\s*CFBundleShortVersionString:\s*)"?[^"\s]+"?\s*$/m,
+        `$1${version}`,
+      )
       .replace(/^(\s*CFBundleVersion:\s*)"?[^"\s]+"?\s*$/m, `$1"${version}"`),
   );
 

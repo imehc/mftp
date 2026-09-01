@@ -10,8 +10,8 @@ import PoemDetail from "./components/PoemDetail";
 import { usePoetryStore } from "./store/poetry-store";
 
 /**
- * Full-page detail for direct visits to `/library/$id`. The normal desktop
- * flow shows the detail pane inside `/library` instead.
+ * 直接访问 `/library/$id` 时的整页详情。桌面端的常规
+ * 流程是在 `/library` 内部展示详情面板。
  */
 export default function PoemDetailPage({ uid }: { uid: string }) {
   const fontSize = usePoetryStore((s) => s.fontSize);
@@ -20,11 +20,13 @@ export default function PoemDetailPage({ uid }: { uid: string }) {
   const setLineHeight = usePoetryStore((s) => s.setLineHeight);
   const [detail, setDetail] = useState<PoemDetailModel | null>(null);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     let cancelled = false;
-    setDetail(null);
-    setError(null);
+    // 用微任务延后，使重置发生在 effect 函数体之外。
+    queueMicrotask(() => {
+      setDetail(null);
+      setError(null);
+    });
     void poetryPoem(uid)
       .then((poem) => !cancelled && setDetail(poem))
       .catch((err) => !cancelled && setError(String(err)));
@@ -32,14 +34,19 @@ export default function PoemDetailPage({ uid }: { uid: string }) {
       cancelled = true;
     };
   }, [uid]);
-
   return (
-    <main className="flex h-full flex-col bg-background text-foreground">
+    <main className="bg-background text-foreground flex h-full flex-col">
       <ToolPageHeader
         title={detail?.title ?? <Trans>古诗词</Trans>}
         trailing={
           <Button variant="ghost" size="xs" asChild>
-            <Link to="/library" search={{ q: undefined, poem: undefined }}>
+            <Link
+              to="/library"
+              search={{
+                q: undefined,
+                poem: undefined,
+              }}
+            >
               <ArrowLeft data-icon="inline-start" />
               <Trans>返回古诗词</Trans>
             </Link>
@@ -47,7 +54,7 @@ export default function PoemDetailPage({ uid }: { uid: string }) {
         }
       />
       {error ? (
-        <p className="flex-1 pt-10 text-center text-sm text-muted-foreground">
+        <p className="text-muted-foreground flex-1 pt-10 text-center text-sm">
           {error}
         </p>
       ) : (

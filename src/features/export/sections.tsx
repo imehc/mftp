@@ -1,14 +1,13 @@
 import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
 import type { ExportSection } from "~/bindings";
-
 export interface ExportSectionMeta {
   id: ExportSection;
   title: ReactNode;
   description: ReactNode;
 }
 
-/** Registry of exportable data sections; add one entry per new module. */
+/** 可导出数据分区的注册表；每个新模块在此添加一条。 */
 export const exportSections: ExportSectionMeta[] = [
   {
     id: "vault",

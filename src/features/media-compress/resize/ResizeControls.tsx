@@ -15,7 +15,6 @@ import {
   type ResizeMethod,
 } from "~/features/media-compress/resize/resize";
 import { cn } from "~/lib/utils";
-
 export const DIMENSION_MODES: readonly DimensionMode[] = [
   "exact",
   "width",
@@ -23,11 +22,9 @@ export const DIMENSION_MODES: readonly DimensionMode[] = [
   "longest",
   "shortest",
 ];
-
 export function isDimensionMode(value: string): value is DimensionMode {
   return (DIMENSION_MODES as readonly string[]).includes(value);
 }
-
 export function dimensionModeLabel(mode: DimensionMode): ReactNode {
   switch (mode) {
     case "exact":
@@ -42,20 +39,17 @@ export function dimensionModeLabel(mode: DimensionMode): ReactNode {
       return <Trans>固定最小边</Trans>;
   }
 }
-
 export function parseDimensionInput(value: string): number | null {
   if (!value.trim()) return null;
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 1) return null;
   return Math.round(parsed);
 }
-
 interface ResizeMethodTabsProps {
   value: ResizeMethod;
   onChange: (method: ResizeMethod) => void;
   disabled?: boolean;
 }
-
 export function ResizeMethodTabs({
   value,
   onChange,
@@ -77,11 +71,10 @@ export function ResizeMethodTabs({
       label: <Trans>按尺寸</Trans>,
     },
   ];
-
   return (
     <div
       role="tablist"
-      className="inline-flex self-start rounded-md border border-border bg-muted/40 p-0.5"
+      className="border-border bg-muted/40 inline-flex self-start rounded-md border p-0.5"
     >
       {methods.map((method) => {
         const active = method.id === value;
@@ -105,7 +98,6 @@ export function ResizeMethodTabs({
     </div>
   );
 }
-
 interface DimensionInputProps {
   label: ReactNode;
   value: string;
@@ -113,7 +105,6 @@ interface DimensionInputProps {
   ariaLabel: string;
   onChange: (value: string) => void;
 }
-
 export function DimensionInput({
   label,
   value,

@@ -63,12 +63,13 @@ src-tauri/src/
 - 看似多余但实际必要的兼容或防御逻辑。
 - 复杂正则、位运算、魔法数字。
 
-注释语言必须统一：本项目现状以英文注释为主，新增注释默认跟随所在文件/模块的既有语言，同一文件内不要中英混用。完成一个多文件功能后，用脚本对全部新增/改动文件做一次横切扫描（注释语言、硬编码文案、行数上限），不要凭记忆抽查——前后端两侧都漏过。
+注释语言：后端 Rust（`src-tauri/**`）统一用英文注释；前端（`src/**/*.{ts,tsx,css}`）统一用中文注释。同一文件内不要中英混用。完成一个多文件功能后，用脚本对全部新增/改动文件做一次横切扫描（注释语言、硬编码文案、行数上限），不要凭记忆抽查——前后端两侧都漏过。
 
 ### 前端
 
 组件与架构：
 
+- React Compiler 已在 `vite.config.ts` 启用（`babel-plugin-react-compiler`），组件自动记忆化。Never 手写 `useMemo`/`useCallback`/`memo` 做性能优化，除非 memoize 的开销远超渲染本身（如超大列表行级比较），并需注释说明原因。
 - 先复用，再新建。优先级：`src/components/ui` → 已装第三方库 → 已有 feature 组件/hooks/store/lib → 新建。
 - 第三次出现相似实现时，抽公共组件或 hook。
 - 影响面广的问题在全局收口层处理：i18n provider、`lib/ipc.ts`、错误处理、路由配置、store。
@@ -127,6 +128,8 @@ i18n：
 按改动范围选择验证：
 
 - 前端改动：`pnpm build`
+- 前端改动（提交前）：`pnpm lint`（0 error 才可提交，warning 逐步清零）
+- 格式：`pnpm format`（Prettier + Tailwind 类名排序，pre-commit 已接入 lint-staged）
 - i18n 文案改动：`pnpm run extract && pnpm run compile && pnpm build`
 - 后端改动：`cargo check --manifest-path src-tauri/Cargo.toml`
 - 后端核心逻辑：`cargo test --manifest-path src-tauri/Cargo.toml --locked`

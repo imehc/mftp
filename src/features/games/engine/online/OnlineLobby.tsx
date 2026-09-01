@@ -30,12 +30,10 @@ import {
 } from "~/lib/ipc";
 import type { GameRoomStatus, GameRoomSummary } from "~/types";
 import { OnlineMatchSession } from "./session";
-
 export interface OnlineLobbyReady<M> {
   session: OnlineMatchSession<M>;
   status: GameRoomStatus;
 }
-
 export function OnlineLobby<M>({
   gameId,
   onReady,
@@ -59,7 +57,7 @@ export function OnlineLobby<M>({
   const sessionRef = useRef<OnlineMatchSession<M> | null>(null);
   const handedOffRef = useRef(false);
 
-  // Default the nickname to the device name used by LAN transfer.
+  // 把昵称默认设为 LAN 传输所用的设备名。
   useEffect(() => {
     let cancelled = false;
     void lanTransferSettings()
@@ -74,7 +72,7 @@ export function OnlineLobby<M>({
     };
   }, []);
 
-  // Poll discovery while browsing; each scan itself blocks ~1.2s in Rust.
+  // 浏览时轮询发现；每次扫描本身在 Rust 中阻塞约 1.2s。
   useEffect(() => {
     if (hosting) return;
     let cancelled = false;
@@ -85,7 +83,7 @@ export function OnlineLobby<M>({
         const found = await gameRoomDiscover(gameId);
         if (!cancelled) setRooms(found);
       } catch {
-        // No Tauri bridge (plain browser) — leave the list empty.
+        // 没有 Tauri 桥接（普通浏览器）—— 列表留空。
       }
       if (!cancelled) {
         setScanning(false);
@@ -99,7 +97,7 @@ export function OnlineLobby<M>({
     };
   }, [gameId, hosting]);
 
-  // Tear the room down unless the session was handed to the match screen.
+  // 除非会话已交给对局界面，否则拆除房间。
   useEffect(
     () => () => {
       if (handedOffRef.current) return;
@@ -108,15 +106,15 @@ export function OnlineLobby<M>({
     },
     [],
   );
-
   const playerName = () => nickname.trim() || t`玩家`;
-
   const handOff = (session: OnlineMatchSession<M>, status: GameRoomStatus) => {
     if (handedOffRef.current) return;
     handedOffRef.current = true;
-    onReady({ session, status });
+    onReady({
+      session,
+      status,
+    });
   };
-
   const create = async () => {
     setBusy(true);
     setError(null);
@@ -143,7 +141,6 @@ export function OnlineLobby<M>({
       setBusy(false);
     }
   };
-
   const join = async (host: string, port: number, code: string | null) => {
     setBusy(true);
     setError(null);
@@ -158,7 +155,6 @@ export function OnlineLobby<M>({
       setBusy(false);
     }
   };
-
   const joinManual = () => {
     const [host, portRaw] = manualAddr.trim().split(":");
     const port = Number(portRaw);
@@ -168,25 +164,25 @@ export function OnlineLobby<M>({
     }
     void join(host, port, manualCode.trim() || null);
   };
-
   const cancelHosting = () => {
     sessionRef.current?.close();
     sessionRef.current = null;
     setHosting(null);
     void gameRoomLeave().catch(() => {});
   };
-
   if (hosting) {
     return (
       <div className="flex flex-1 justify-center overflow-auto p-3">
-        <div className="flex w-full max-w-sm flex-col gap-3 self-center rounded-md border border-border p-4">
-          <div className="text-center text-sm font-medium">{hosting.roomName}</div>
-          <div className="text-center text-xs text-muted-foreground">
+        <div className="border-border flex w-full max-w-sm flex-col gap-3 self-center rounded-md border p-4">
+          <div className="text-center text-sm font-medium">
+            {hosting.roomName}
+          </div>
+          <div className="text-muted-foreground text-center text-xs">
             {hosting.host}:{hosting.port}
           </div>
           {hosting.code ? (
             <div className="text-center">
-              <div className="text-xs text-muted-foreground">
+              <div className="text-muted-foreground text-xs">
                 <Trans>房间码</Trans>
               </div>
               <div className="font-mono text-2xl font-semibold tracking-widest">
@@ -194,7 +190,7 @@ export function OnlineLobby<M>({
               </div>
             </div>
           ) : null}
-          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
             <span className="size-2 animate-pulse rounded-full bg-emerald-500" />
             <Trans>等待对手加入…</Trans>
           </div>
@@ -205,12 +201,11 @@ export function OnlineLobby<M>({
       </div>
     );
   }
-
   return (
     <div className="flex flex-1 justify-center overflow-auto p-3">
       <div className="flex w-full max-w-sm flex-col gap-2 self-center">
         <label className="flex items-center gap-2 text-xs">
-          <span className="shrink-0 text-muted-foreground">
+          <span className="text-muted-foreground shrink-0">
             <Trans>昵称</Trans>
           </span>
           <Input
@@ -221,7 +216,7 @@ export function OnlineLobby<M>({
           />
         </label>
 
-        <div className="flex flex-col gap-2 rounded-md border border-border p-2.5">
+        <div className="border-border flex flex-col gap-2 rounded-md border p-2.5">
           <span className="flex items-center gap-2 text-sm font-medium">
             <Users className="size-4" />
             <Trans>创建房间</Trans>
@@ -245,18 +240,18 @@ export function OnlineLobby<M>({
           </Button>
         </div>
 
-        <div className="flex flex-col gap-1.5 rounded-md border border-border p-2.5">
+        <div className="border-border flex flex-col gap-1.5 rounded-md border p-2.5">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-2 text-sm font-medium">
               <Radio className="size-4" />
               <Trans>附近的房间</Trans>
             </span>
             <RefreshCw
-              className={`size-3.5 text-muted-foreground ${scanning ? "animate-spin" : ""}`}
+              className={`text-muted-foreground size-3.5 ${scanning ? "animate-spin" : ""}`}
             />
           </div>
           {rooms.length === 0 ? (
-            <div className="py-1 text-center text-xs text-muted-foreground">
+            <div className="text-muted-foreground py-1 text-center text-xs">
               <Trans>正在搜索…未发现房间时可用下方地址直连</Trans>
             </div>
           ) : (
@@ -264,16 +259,16 @@ export function OnlineLobby<M>({
               {rooms.map((room) => (
                 <li
                   key={room.roomId}
-                  className="flex items-center justify-between gap-2 rounded border border-border/60 px-2 py-1"
+                  className="border-border/60 flex items-center justify-between gap-2 rounded border px-2 py-1"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 truncate text-xs font-medium">
                       {room.roomName}
                       {room.hasCode ? (
-                        <KeyRound className="size-3 shrink-0 text-muted-foreground" />
+                        <KeyRound className="text-muted-foreground size-3 shrink-0" />
                       ) : null}
                     </div>
-                    <div className="truncate text-[10px] text-muted-foreground">
+                    <div className="text-muted-foreground truncate text-[10px]">
                       {room.hostName} · {room.ip}:{room.port}
                     </div>
                   </div>
@@ -311,7 +306,12 @@ export function OnlineLobby<M>({
             placeholder={t`房间码`}
             className="h-7 w-24 text-xs"
           />
-          <Button size="xs" variant="outline" disabled={busy} onClick={joinManual}>
+          <Button
+            size="xs"
+            variant="outline"
+            disabled={busy}
+            onClick={joinManual}
+          >
             <Trans
               context="game connection action"
               comment="Button that joins a game room directly using an IP address and port"
@@ -322,9 +322,12 @@ export function OnlineLobby<M>({
         </div>
 
         {error ? (
-          <div className="text-center text-xs text-destructive">{error}</div>
+          <div className="text-destructive text-center text-xs">{error}</div>
         ) : null}
-        <Badge variant="outline" className="self-center text-[10px] font-normal">
+        <Badge
+          variant="outline"
+          className="self-center text-[10px] font-normal"
+        >
           <Trans>仅限同一局域网内联机</Trans>
         </Badge>
       </div>

@@ -1,4 +1,4 @@
-/** Billiards-specific state, move, and presentation types. */
+/** 台球特有的状态、走子与呈现类型。 */
 import type { Difficulty } from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
 
@@ -20,7 +20,7 @@ export interface BilliardsHistoryPayload {
 export type BilliardsVariant = "eight-ball" | "practice";
 export type BallGroup = "solids" | "stripes";
 
-/** Ball ids: 0 = cue, 1-7 solids, 8 = eight, 9-15 stripes. */
+/** 球 id：0 = 母球，1-7 全色，8 = 黑八，9-15 花色。 */
 export interface BallState {
   id: number;
   x: number;
@@ -29,18 +29,15 @@ export interface BallState {
 }
 
 export type FoulReason =
-  | "cue-potted"
-  | "no-contact"
-  | "wrong-first-contact"
-  | "potted-eight-early";
+  "cue-potted" | "no-contact" | "wrong-first-contact" | "potted-eight-early";
 
 export interface ShotOutcome {
   foul: FoulReason | null;
-  /** Ball ids potted by the shot, in pocket order (cue excluded). */
+  /** 本杆落袋的球 id，按进袋顺序（不含母球）。 */
   potted: number[];
-  /** Shooter keeps the table for the next shot. */
+  /** 击球方下一杆继续留在台上。 */
   continueTurn: boolean;
-  /** The 8 was potted on the break and put back on the foot spot. */
+  /** 开球时黑八落袋并被放回脚点。 */
   respottedEight: boolean;
 }
 
@@ -48,38 +45,38 @@ export interface BilliardsState {
   variant: BilliardsVariant;
   balls: BallState[];
   turnSeat: SeatIndex;
-  /** Assigned group per seat; null until the table is "closed". */
+  /** 每个座位的已分配组别；球桌“封闭”前为 null。 */
   groups: (BallGroup | null)[];
   openTable: boolean;
   breakDone: boolean;
   ballInHand: boolean;
   winnerSeat: SeatIndex | null;
   finished: boolean;
-  /** Number of shots taken so far (cue placements excluded). */
+  /** 迄今已出杆数（不含母球放置）。 */
   shotCount: number;
-  /** Cumulative fouls per seat, for the settlement screen. */
+  /** 每个座位累计的犯规数，用于结算界面。 */
   foulCounts: number[];
-  /** Outcome of the previous shot, for HUD messaging. */
+  /** 上一杆的判定结果，用于 HUD 提示。 */
   lastOutcome: ShotOutcome | null;
 }
 
 export type BilliardsMove =
   | {
       type: "shot";
-      /** Aim angle in radians (table coordinates). */
+      /** 瞄准角（弧度，台面坐标系）。 */
       angle: number;
-      /** 0..1, scaled to MAX_SHOT_SPEED. */
+      /** 0..1，映射到 MAX_SHOT_SPEED。 */
       power: number;
-      /** Follow/draw spin: -1 (draw) .. 1 (follow). */
+      /** 跟杆/缩杆旋转：-1（缩杆）.. 1（跟杆）。 */
       followDraw: number;
     }
   | { type: "place-cue"; x: number; y: number };
 
-/** One recorded simulation step (positions of every unpotted ball). */
+/** 一步被记录的模拟（每颗未落袋球的位置）。 */
 export interface SimFrame {
-  /** Simulation time in seconds since the shot. */
+  /** 自击球起的模拟时间（秒）。 */
   t: number;
-  /** Flat [id, x, y, ...] triplets — compact enough to record per step. */
+  /** 扁平的 [id, x, y, ...] 三元组——足够紧凑，可按步记录。 */
   balls: number[];
 }
 
@@ -104,6 +101,10 @@ export function remainingGroupBalls(
   group: BallGroup,
 ): number {
   return state.balls.filter(
-    (ball) => !ball.potted && ball.id !== 0 && ball.id !== 8 && ballGroup(ball.id) === group,
+    (ball) =>
+      !ball.potted &&
+      ball.id !== 0 &&
+      ball.id !== 8 &&
+      ballGroup(ball.id) === group,
   ).length;
 }

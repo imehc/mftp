@@ -6,14 +6,14 @@ import type { PoetrySyncProgress } from "~/types";
 export interface SyncProgressState {
   active: boolean;
   collectionId: string | null;
-  /** downloading | importing | indexing | done | error */
+  /** downloading（下载中）/ importing（导入中）/ indexing（建索引中）/ done（完成）/ error（出错） */
   phase: string | null;
   bytesDone: number;
   bytesTotal: number | null;
   imported: number;
-  /** Known total for the current importing phase, when reported. */
+  /** 当前导入阶段已知的合计总数，上报时存在。 */
   total: number | null;
-  /** Set only on the terminal `error` phase. */
+  /** 仅在终态 `error` 阶段设置。 */
   errorMessage: string | null;
   updatedAt: number;
 }
@@ -31,8 +31,8 @@ const IDLE: SyncProgressState = {
 };
 
 /**
- * Subscribes to `library://sync-progress` for the manage page and sync
- * badges. Events arrive per-collection; the latest wins.
+ * 为数据管理页和同步徽标订阅 `library://sync-progress`。事件按合集
+ * 到达；以最新一次为准。
  */
 export function usePoetrySyncProgress(): SyncProgressState {
   const [state, setState] = useState<SyncProgressState>(IDLE);
@@ -56,7 +56,7 @@ export function usePoetrySyncProgress(): SyncProgressState {
           updatedAt: Date.now(),
         });
         clearTimeout(timeoutRef.current);
-        // Terminal events end the job; streaming events go quiet after 30s.
+        // 终态事件结束任务；流式事件在 30 秒后无更新则归于静默。
         if (!terminal) {
           timeoutRef.current = setTimeout(() => setState(IDLE), 30_000);
         }

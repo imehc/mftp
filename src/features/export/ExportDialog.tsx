@@ -16,21 +16,19 @@ import { exportSections } from "~/features/export/sections";
 import { downloadBlob } from "~/features/media-compress/format";
 import { dataExport } from "~/lib/ipc";
 import type { ExportSection } from "~/bindings";
-
 interface Props {
   open: boolean;
-  /** Sections preselected when the dialog opens. */
+  /** 对话框打开时默认选中的数据分区。 */
   defaultSections: ExportSection[];
   onOpenChange: (open: boolean) => void;
 }
-
 function exportFileName(): string {
   const now = new Date();
   const pad = (n: number) => String(n).padStart(2, "0");
   return `mftp-export-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.json`;
 }
 
-/** Shared export dialog: pick data sections, save them as one JSON file. */
+/** 通用导出对话框：选择数据分区，保存为单个 JSON 文件。 */
 export default function ExportDialog({
   open,
   defaultSections,
@@ -43,16 +41,18 @@ export default function ExportDialog({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Reset state each time the dialog opens; defaultSections is stable per caller.
+  // 每次打开对话框时重置状态；defaultSections 对调用方是稳定的。
+  // 用微任务延后，让重置发生在 effect 函数体之外。
   useEffect(() => {
     if (open) {
-      setSelected(new Set(defaultSections));
-      setEncrypted(false);
-      setPassword("");
-      setConfirmPassword("");
+      queueMicrotask(() => {
+        setSelected(new Set(defaultSections));
+        setEncrypted(false);
+        setPassword("");
+        setConfirmPassword("");
+      });
     }
   }, [open, defaultSections]);
-
   function toggle(id: ExportSection) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -61,10 +61,8 @@ export default function ExportDialog({
       return next;
     });
   }
-
   const passwordInvalid =
     encrypted && (!password || password !== confirmPassword);
-
   async function handleExport() {
     const sections = exportSections
       .map((meta) => meta.id)
@@ -74,7 +72,9 @@ export default function ExportDialog({
     try {
       const json = await dataExport(sections, encrypted ? password : null);
       const written = await downloadBlob(
-        new Blob([json], { type: "application/json" }),
+        new Blob([json], {
+          type: "application/json",
+        }),
         exportFileName(),
       );
       if (written !== false) {
@@ -87,7 +87,6 @@ export default function ExportDialog({
       setBusy(false);
     }
   }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
@@ -100,7 +99,7 @@ export default function ExportDialog({
           {exportSections.map((meta) => (
             <Label
               key={meta.id}
-              className="flex items-start gap-2 rounded-md border border-border p-2.5 font-normal"
+              className="border-border flex items-start gap-2 rounded-md border p-2.5 font-normal"
             >
               <Checkbox
                 checked={selected.has(meta.id)}
@@ -108,7 +107,7 @@ export default function ExportDialog({
               />
               <span className="flex min-w-0 flex-col gap-0.5">
                 <span className="text-sm font-medium">{meta.title}</span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-muted-foreground text-xs">
                   {meta.description}
                 </span>
               </span>
@@ -143,13 +142,13 @@ export default function ExportDialog({
                 }
               />
               {confirmPassword.length > 0 && password !== confirmPassword ? (
-                <p className="text-xs text-destructive">
+                <p className="text-destructive text-xs">
                   <Trans>两次输入的密码不一致</Trans>
                 </p>
               ) : null}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               <Trans>导出为明文 JSON 文件，请妥善保管。</Trans>
             </p>
           )}

@@ -11,7 +11,7 @@ import {
 
 export type VideoResolution = "original" | "1080p" | "720p" | "480p" | "360p";
 
-/** Bitrate quality 10–100, step 10. Higher keeps more detail. */
+/** 码率质量 10–100，步长 10。越大保留细节越多。 */
 export type VideoQuality = number;
 
 export const VIDEO_QUALITY_MIN = 10;
@@ -108,12 +108,8 @@ function isCanceledError(error: unknown, signal?: AbortSignal): boolean {
 }
 
 export function clampVideoQuality(quality: number): number {
-  const stepped =
-    Math.round(quality / VIDEO_QUALITY_STEP) * VIDEO_QUALITY_STEP;
-  return Math.min(
-    VIDEO_QUALITY_MAX,
-    Math.max(VIDEO_QUALITY_MIN, stepped),
-  );
+  const stepped = Math.round(quality / VIDEO_QUALITY_STEP) * VIDEO_QUALITY_STEP;
+  return Math.min(VIDEO_QUALITY_MAX, Math.max(VIDEO_QUALITY_MIN, stepped));
 }
 
 const RESOLUTION_SIZE: Record<
@@ -135,15 +131,13 @@ export function isSupportedVideoFile(file: File | { name: string }): boolean {
 
 export function webCodecsSupported(): boolean {
   return (
-    typeof VideoEncoder !== "undefined" &&
-    typeof VideoDecoder !== "undefined"
+    typeof VideoEncoder !== "undefined" && typeof VideoDecoder !== "undefined"
   );
 }
 
 export function audioCodecsSupported(): boolean {
   return (
-    typeof AudioEncoder !== "undefined" &&
-    typeof AudioDecoder !== "undefined"
+    typeof AudioEncoder !== "undefined" && typeof AudioDecoder !== "undefined"
   );
 }
 
@@ -162,7 +156,7 @@ export function resolveOutputSize(
     return { width: sourceWidth, height: sourceHeight };
   }
   const target = RESOLUTION_SIZE[resolution];
-  // Fit inside target box, keep aspect ratio, never upscale.
+  // 在目标框内缩放，保持宽高比，且不放大。
   const scale = Math.min(
     1,
     target.width / sourceWidth,
@@ -205,7 +199,7 @@ export function estimateVideoOutput(
   const capped = Math.min(originalBitrate, maxBitrateForPixels(width, height));
   const targetBitrate = Math.max(50_000, Math.round(capped * ratio));
 
-  // Guard against extremely low bpp at high resolution (matches MeTool heuristic).
+  // 避免高分辨率下码率过低（与 MeTool 的启发式一致）。
   const fps = 30;
   if (
     options.resolution === "original" &&
@@ -219,7 +213,7 @@ export function estimateVideoOutput(
     });
   }
 
-  // ±40 % range — video compression varies hugely with content complexity.
+  // ±40% 区间 —— 视频压缩随内容复杂度差异很大。
   const estimatedMin = Math.max(8_192, Math.round(estimatedBytes * 0.6));
   const estimatedMax = Math.round(estimatedBytes * 1.4);
 
@@ -274,12 +268,9 @@ export async function probeVideoFile(
       },
     );
 
-    // Wait until dimensions are ready on some WebViews.
+    // 部分 WebView 上需等待尺寸就绪。
     let tries = 0;
-    while (
-      (video.videoWidth === 0 || video.videoHeight === 0) &&
-      tries < 40
-    ) {
+    while ((video.videoWidth === 0 || video.videoHeight === 0) && tries < 40) {
       await raceAbort(
         new Promise((resolve) => window.setTimeout(resolve, 50)),
         signal,
@@ -352,12 +343,12 @@ export async function compressVideoFile(
   let height = estimate.outputHeight;
   const targetBitrate = estimate.targetBitrate;
 
-  // Recompute if original resolution was forced down inside estimate.
+  // 若原始分辨率在预估中被强制降低，则重新计算。
   if (
     options.resolution === "original" &&
     (width !== meta.width || height !== meta.height)
   ) {
-    // keep forced dimensions
+    // 保留被强制设定的尺寸
   } else if (options.resolution !== "original") {
     const size = resolveOutputSize(meta.width, meta.height, options.resolution);
     width = size.width;
@@ -378,7 +369,8 @@ export async function compressVideoFile(
     target,
   });
 
-  const keepAudio = options.keepAudio && meta.hasAudio && audioCodecsSupported();
+  const keepAudio =
+    options.keepAudio && meta.hasAudio && audioCodecsSupported();
   const videoOptions: {
     codec: "avc";
     bitrate: number;
@@ -393,15 +385,15 @@ export async function compressVideoFile(
     width !== meta.width ||
     height !== meta.height
   ) {
-    // Prefer height constraint like MeTool; mediabunny keeps aspect ratio.
+    // 像 MeTool 那样优先约束高度；mediabunny 会自动保持宽高比。
     videoOptions.height = height;
     if (width > 0) videoOptions.width = width;
   }
 
   let conversion: Conversion | null = null;
 
-  // Mediabunny initialization can spend time demuxing before a Conversion exists.
-  // Disposing the input lets cancel update UI immediately and prevents stale writes.
+  // Mediabunny 初始化时可能在 Conversion 产生前花费时间解封装。
+  // 释放 input 能让取消立即更新 UI，并避免陈旧的写入。
   const abort = () => {
     void conversion?.cancel();
     input.dispose();
@@ -451,7 +443,7 @@ export async function compressVideoFile(
     const blob = new Blob([buffer], { type: "video/mp4" });
     const stem = file.name.replace(/\.[^.]+$/, "") || "video";
 
-    // If compressed result is larger than original, return original instead.
+    // 若压缩后比原文件还大，则直接返回原文件。
     if (blob.size >= file.size) {
       return {
         blob: file,
@@ -477,7 +469,7 @@ export async function compressVideoFile(
     try {
       input.dispose();
     } catch {
-      // ignore
+      // 忽略该错误
     }
   }
 }

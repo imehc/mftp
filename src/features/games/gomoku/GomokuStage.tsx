@@ -1,19 +1,16 @@
 /**
- * Pixi rendering + interaction for the gomoku board.
+ * 五子棋棋盘的 Pixi 渲染与交互。
  *
- * The board lives entirely in canvas so line spacing, margins and cell
- * geometry are computed in one place from CELL/MARGIN — every gap is
- * mathematically identical, unlike the previous CSS grid where percentage
- * padding resolved against the parent width and fr-tracks rounded to
- * different pixel sizes.
+ * 棋盘完全在画布内，因此线间距、边距与格子几何都在一处由 CELL/MARGIN
+ * 算出——每个间隙在数学上都一致，不像之前用 CSS 网格时百分比内边距
+ * 相对于父宽度解析、fr 轨道被取整成不同像素大小。
  *
- * The kaya wood surface is a procedurally generated canvas texture
- * (seeded value-noise grain, so it renders the same every launch) with
- * rounded corners and a baked drop shadow. Stones are two pre-rendered
- * radial-gradient textures shared by all sprites.
+ * 榧木盘面是一张程序化生成的画布纹理（带种子的数值噪声木纹，因此每次
+ * 启动渲染一致），带圆角与烘焙投影。棋子是两张预渲染的径向渐变纹理，
+ * 供所有精灵共用。
  *
- * React only mounts/unmounts the Application and forwards props; taps,
- * hover ghosts and the placement pop happen directly in Pixi.
+ * React 只负责挂载/卸载 Application 并透传 props；点击、悬停虚影与落子
+ * 弹出动画都直接在 Pixi 中进行。
  */
 import { useEffect, useRef } from "react";
 import {
@@ -34,17 +31,17 @@ import {
 } from "./GomokuStage.textures";
 import { BOARD_SIZE, type GomokuMove, type Stone } from "./types";
 
-// --- board geometry (world units) -------------------------------------
+// --- 棋盘几何（世界单位）-------------------------------------
 const N = BOARD_SIZE;
-/** Distance between two lines. Everything else derives from this. */
+/** 相邻两线之间的距离。其余几何都由它推导。 */
 const CELL = 48;
-/** Span of the line grid (outer line to outer line). */
+/** 网格跨度（外线到外线）。 */
 const GRID = CELL * (N - 1);
-/** Wood visible beyond the outer lines, identical on all four sides. */
+/** 外线之外可见的木边，四边一致。 */
 const MARGIN = CELL * 0.75;
-/** Full wooden board edge length. */
+/** 整块木盘边长。 */
 const BOARD = GRID + MARGIN * 2;
-/** World-space extent used to fit the board (leaves room for the shadow). */
+/** 用于适配棋盘的世界空间范围（为投影预留空间）。 */
 const FIT_EXTENT = BOARD + CELL * 1.6;
 
 const STONE_DIAMETER = CELL * 0.94;
@@ -56,17 +53,17 @@ const STAR_POINTS: Array<[number, number]> = [
   [11, 11],
 ];
 
-/** Intersection center in world coordinates (board centered at origin). */
+/** 交叉点中心的世界坐标（棋盘以原点为中心）。 */
 const lineAt = (i: number): number => i * CELL - GRID / 2;
 
-// --- scene ------------------------------------------------------------
+// --- 场景 ------------------------------------------------------------
 export interface GomokuStageProps {
   board: Stone[];
   lastMove: GomokuMove | null;
   winningLine: number[];
-  /** Seat whose stone the hover ghost previews. */
+  /** 悬停虚影预览的棋子所属座位。 */
   ghostSeat: SeatIndex;
-  /** Local player may place a stone right now. */
+  /** 本地玩家此时可以落子。 */
   interactive: boolean;
   onPlay(move: GomokuMove): void;
 }
@@ -93,7 +90,7 @@ function createScene(
   const root = new Container();
   app.stage.addChild(root);
 
-  // --- static board ---------------------------------------------------
+  // --- 静态棋盘 ---------------------------------------------------
   const boardSprite = new Sprite(boardTexture);
   boardSprite.anchor.set(0.5);
   const spriteSize = BOARD * BOARD_TEXTURE_SCALE;
@@ -109,7 +106,7 @@ function createScene(
     grid.moveTo(p, -half).lineTo(p, half);
   }
   grid.stroke({ width: 1.6, color: 0x45260c, alpha: 0.9 });
-  // Traditional boards frame the grid with a heavier boundary line.
+  // 传统棋盘用更粗的边线框住网格。
   grid
     .rect(-half, -half, GRID, GRID)
     .stroke({ width: 3, color: 0x45260c, alpha: 0.95 });
@@ -121,11 +118,11 @@ function createScene(
   }
   root.addChild(grid);
 
-  // --- dynamic layers -------------------------------------------------
+  // --- 动态图层 -------------------------------------------------
   const stoneLayer = new Container();
   const markerLayer = new Graphics();
-  // Winning-line rings live on their own layer so they can blink as a
-  // whole before the React result bar appears below the board.
+  // 获胜连线环置于独立图层，以便在棋盘下方的 React 结果条出现前
+  // 整体闪烁。
   const winLayer = new Graphics();
   const ghost = new Sprite(stoneTexture[0]);
   ghost.anchor.set(0.5, STONE_CENTER_Y / STONE_TEXTURE_SIZE);
@@ -143,16 +140,15 @@ function createScene(
     ghostSeat: 0,
     interactive: false,
   };
-  /** Skip the placement pop while syncing the very first snapshot. */
+  /** 同步首帧快照时跳过落子弹出动画。 */
   let synced = false;
   let hoverIndex: number | null = null;
-  /** True once the current win has been announced with the blink. */
+  /** 当前获胜已通过闪烁宣告后置为真。 */
   let winAnimated = false;
 
   function addStone(index: number, seat: SeatIndex, animate: boolean): void {
     const sprite = new Sprite(stoneTexture[seat]);
-    // Anchor at the stone circle's center so it sits exactly on the
-    // intersection while the baked shadow hangs below.
+    // 锚定在棋子圆中心，使其正好落在交叉点上，而烘焙的阴影悬于下方。
     sprite.anchor.set(0.5, STONE_CENTER_Y / STONE_TEXTURE_SIZE);
     sprite.width = STONE_DIAMETER * (STONE_TEXTURE_SIZE / (STONE_RADIUS * 2));
     sprite.height = sprite.width;
@@ -182,11 +178,17 @@ function createScene(
     if (state.winningLine.length > 0) {
       if (!winAnimated) {
         winAnimated = true;
-        // Pulse a few times, ending solid; the result bar waits for it.
+        // 闪烁数次后以实心结束；结果条会等它放完。
         gsap.fromTo(
           winLayer,
           { alpha: 0.1 },
-          { alpha: 1, duration: 0.26, repeat: 4, yoyo: true, ease: "power1.inOut" },
+          {
+            alpha: 1,
+            duration: 0.26,
+            repeat: 4,
+            yoyo: true,
+            ease: "power1.inOut",
+          },
         );
       }
     } else {
@@ -221,7 +223,7 @@ function createScene(
     app.canvas.style.cursor = show ? "pointer" : "default";
   }
 
-  // --- layout ---------------------------------------------------------
+  // --- 布局 -------------------------------------------------------
   function relayout(): void {
     const w = app.screen.width;
     const h = app.screen.height;
@@ -231,7 +233,7 @@ function createScene(
   relayout();
   app.renderer.on("resize", relayout);
 
-  // --- input ----------------------------------------------------------
+  // --- 输入 -------------------------------------------------------
   app.stage.eventMode = "static";
   app.stage.hitArea = { contains: () => true };
 
@@ -299,7 +301,10 @@ export function GomokuStage(props: GomokuStageProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<Scene | null>(null);
   const propsRef = useRef(props);
-  propsRef.current = props;
+  // 最新值 ref 在 effect 中同步，而非渲染期间。
+  useEffect(() => {
+    propsRef.current = props;
+  });
 
   useEffect(() => {
     const host = containerRef.current;
@@ -340,8 +345,7 @@ export function GomokuStage(props: GomokuStageProps) {
       disposed = true;
       sceneRef.current?.destroy();
       sceneRef.current = null;
-      // texture: false — board/stone textures are module-cached and reused
-      // by the next mount.
+      // texture: false —— 棋盘/棋子纹理为模块级缓存，会在下次挂载时复用。
       app?.destroy(true, { children: true });
     };
   }, []);

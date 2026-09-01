@@ -1,4 +1,9 @@
-import { createRng, yieldToUi, type AiStrategy, type Difficulty } from "../engine/ai";
+import {
+  createRng,
+  yieldToUi,
+  type AiStrategy,
+  type Difficulty,
+} from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
 import {
   applyMoveToBoard,
@@ -7,7 +12,12 @@ import {
   legalMoves,
   legalMovesForSeat,
 } from "./rules";
-import type { PieceKind, XiangqiMove, XiangqiPiece, XiangqiState } from "./types";
+import type {
+  PieceKind,
+  XiangqiMove,
+  XiangqiPiece,
+  XiangqiState,
+} from "./types";
 
 const PIECE_VALUE: Record<PieceKind, number> = {
   general: 100_000,
@@ -32,7 +42,8 @@ function stateSeed(state: XiangqiState, seat: SeatIndex): number {
   let hash = (state.moveCount + 1) * 131 + seat;
   state.board.forEach((piece, index) => {
     if (!piece) return;
-    hash = Math.imul(hash ^ (index + 17), 33) + piece.side * 7 + piece.kind.length;
+    hash =
+      Math.imul(hash ^ (index + 17), 33) + piece.side * 7 + piece.kind.length;
   });
   return hash >>> 0;
 }
@@ -135,12 +146,17 @@ export const xiangqiAiStrategy: AiStrategy<XiangqiState, XiangqiMove> = {
     const rng = createRng(stateSeed(state, seat));
     const moves = legalMoves(state);
     if (moves.length === 0) throw new Error("xiangqi AI has no legal move");
-    const pool = orderedMoves(state.board, moves, Math.max(profile.branch, moves.length));
+    const pool = orderedMoves(
+      state.board,
+      moves,
+      Math.max(profile.branch, moves.length),
+    );
     if (rng() < profile.blunder) return pool[Math.floor(rng() * pool.length)];
 
     const scored: Array<{ move: XiangqiMove; score: number }> = [];
     for (let index = 0; index < pool.length; index++) {
-      if (signal.aborted) throw signal.reason ?? new DOMException("Aborted", "AbortError");
+      if (signal.aborted)
+        throw signal.reason ?? new DOMException("Aborted", "AbortError");
       if (index % 4 === 0) await yieldToUi();
       const move = pool[index];
       const board = applyMoveToBoard(state.board, move);

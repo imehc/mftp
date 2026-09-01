@@ -13,7 +13,6 @@ import {
 } from "~/components/ui/dialog";
 import { FieldDescription } from "~/components/ui/field";
 import { firstFormError } from "~/lib/form-errors";
-
 interface Props {
   open: boolean;
   title: string;
@@ -24,7 +23,7 @@ interface Props {
   onConfirm: (value: string) => void;
 }
 
-/** A small single-input dialog used for actions like "new folder" / "rename". */
+/** 一个小型单输入对话框，用于“新建文件夹”/“重命名”这类操作。 */
 export default function PromptDialog({
   open,
   title,
@@ -36,21 +35,27 @@ export default function PromptDialog({
 }: Props) {
   const { t } = useLingui();
   const form = useForm({
-    defaultValues: { value: initialValue },
+    defaultValues: {
+      value: initialValue,
+    },
     validators: {
       onSubmit: z.object({
-        value: z.string().trim().min(1, t`请输入内容`),
+        value: z
+          .string()
+          .trim()
+          .min(1, t`请输入内容`),
       }),
     },
     onSubmit: ({ value }) => {
       onConfirm(value.value.trim());
     },
   });
-
   useEffect(() => {
-    if (open) form.reset({ value: initialValue });
+    if (open)
+      form.reset({
+        value: initialValue,
+      });
   }, [form, open, initialValue]);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">

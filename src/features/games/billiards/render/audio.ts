@@ -1,12 +1,11 @@
 /**
- * Impact feedback: WebAudio-synthesized billiard sounds (no external
- * assets — a filtered noise burst reads convincingly as a ball "clack"),
- * plus light haptics where the platform supports it (Android; iOS
- * WebViews expose no vibration API and are skipped automatically).
+ * 击球反馈：用 WebAudio 合成台球音效（无需外部素材——一段经过滤波的
+ * 噪声爆发听起来就很像球的“咔哒”声），并在平台支持时叠加轻微震动
+ * （Android；iOS 的 WebView 没有振动 API，自动跳过）。
  *
- * WebViews often start the AudioContext suspended; every play attempt
- * nudges resume() so sound recovers as soon as the platform allows it.
- * All output flows through a master gain — see setGameAudioVolume.
+ * WebView 常常以 suspended 状态启动 AudioContext；每次播放尝试都会
+ * 触发 resume()，以便平台一旦允许就恢复出声。所有输出都经过主增益——
+ * 见 setGameAudioVolume。
  */
 import type { SimEvent } from "../types";
 
@@ -25,12 +24,12 @@ function ensureContext(): AudioContext | null {
   return ctx;
 }
 
-/** Call from a user gesture at least once (iOS autoplay policy). */
+/** 至少在用户手势中调用一次（iOS 自动播放策略）。 */
 export function unlockAudio(): void {
   ensureContext();
 }
 
-/** Master volume 0..1; 0 also skips synthesis entirely. */
+/** 主音量 0..1；为 0 时直接跳过合成。 */
 export function setGameAudioVolume(value: number): void {
   volume = clamp01(value);
   if (master) master.gain.value = volume;
@@ -70,7 +69,7 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
-/** Normalized impact loudness from a relative speed in m/s. */
+/** 由相对速度（米/秒）归一化得到的撞击响度。 */
 function loudness(impact: number): number {
   return clamp01(impact / 5);
 }
@@ -101,6 +100,6 @@ export function playImpactEvent(event: SimEvent): void {
 }
 
 function vibrate(ms: number): void {
-  // Android WebView only; iOS has no navigator.vibrate.
+  // 仅 Android WebView；iOS 没有 navigator.vibrate。
   navigator.vibrate?.(ms);
 }

@@ -40,11 +40,11 @@ export interface GomokuHistoryPayload {
   difficulty?: Difficulty;
   winnerSeat: SeatIndex | null;
   moves: number;
-  /** Local player's seat where one exists (ai: 0, online: varies). */
+  /** 本地玩家的座位（存在时）：人机为 0，联机不定。 */
   localSeat?: SeatIndex;
 }
 
-/** A live match: the runner plus the controller local input feeds into. */
+/** 一局对战：runner 加上本地输入喂入的 controller。 */
 export interface GomokuSession {
   runner: MatchRunner<GomokuState, GomokuMove, GomokuMove>;
   local: LocalController<GomokuState, GomokuMove>;

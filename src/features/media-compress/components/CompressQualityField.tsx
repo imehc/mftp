@@ -3,7 +3,6 @@ import { Trans } from "@lingui/react/macro";
 import { Field, FieldLabel } from "~/components/ui/field";
 import { Slider } from "~/components/ui/slider";
 import { cn } from "~/lib/utils";
-
 interface CompressQualityFieldProps {
   value: number;
   min: number;
@@ -12,11 +11,10 @@ interface CompressQualityFieldProps {
   disabled?: boolean;
   ariaLabel: string;
   onChange: (value: number) => void;
-  /** Replaces the right-end “high quality” label when set. */
+  /** 设置后替换右端“高质量”标签。 */
   rightHint?: ReactNode;
   className?: string;
 }
-
 export function CompressQualityField({
   value,
   min,
@@ -34,7 +32,7 @@ export function CompressQualityField({
         <FieldLabel>
           <Trans>压缩程度</Trans>
         </FieldLabel>
-        <span className="text-xs tabular-nums text-muted-foreground">
+        <span className="text-muted-foreground text-xs tabular-nums">
           {value}%
         </span>
       </div>
@@ -51,7 +49,7 @@ export function CompressQualityField({
         aria-label={ariaLabel}
         className="mt-1"
       />
-      <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
         <span>
           <Trans>更小</Trans>
         </span>

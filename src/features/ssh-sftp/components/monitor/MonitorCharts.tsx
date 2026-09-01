@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import {
   Area,
@@ -13,35 +13,31 @@ import {
 import { formatBytes } from "~/lib/format";
 import { prefersReducedMotion } from "~/lib/motion";
 import type { MonitorPoint } from "~/features/ssh-sftp/components/monitor/useSystemMonitor";
-
 export type SeriesKey = Exclude<keyof MonitorPoint, "t">;
-
 export interface SeriesDef {
   key: SeriesKey;
-  /** CSS var carrying the series color (light/dark values set on panel root). */
+  /** 承载系列颜色的 CSS 变量（明 / 暗色值设置在面板根上）。 */
   colorVar: string;
-  /** Legend + tooltip label. Required when a card has two series. */
+  /** 图例 + 提示框标签。一张卡片有两条系列时必填。 */
   label?: ReactNode;
-  /** Live value shown beside the legend label. */
+  /** 图例标签旁的实时数值。 */
   current?: string;
 }
 
-/** Percent charts pin the axis to 0-100; rate charts auto-scale bytes/s. */
+/** 百分比图表把坐标轴固定在 0–100；速率图表按 bytes/s 自适应。 */
 type Unit = "percent" | "rate";
-
 const formatAxisTime = (t: number) =>
-  new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
+  new Date(t).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 const formatValue = (unit: Unit, value: number) =>
   unit === "percent" ? `${value.toFixed(1)}%` : `${formatBytes(value)}/s`;
-
 const matchMonitorPoint = matchByDataKey("t");
-
 interface TipEntry {
   dataKey?: string | number;
   value?: number | string;
 }
-
 function ChartTip({
   active,
   payload,
@@ -57,8 +53,8 @@ function ChartTip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-md border border-border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-md">
-      <p className="mb-1 text-muted-foreground">
+    <div className="border-border bg-popover text-popover-foreground rounded-md border px-2.5 py-1.5 text-xs shadow-md">
+      <p className="text-muted-foreground mb-1">
         {label != null ? new Date(label).toLocaleTimeString() : ""}
       </p>
       <div className="flex flex-col gap-0.5">
@@ -70,7 +66,9 @@ function ChartTip({
               <span
                 aria-hidden
                 className="size-2 shrink-0 rounded-full"
-                style={{ background: `var(${def.colorVar})` }}
+                style={{
+                  background: `var(${def.colorVar})`,
+                }}
               />
               {def.label ? (
                 <span className="text-muted-foreground">{def.label}</span>
@@ -85,13 +83,12 @@ function ChartTip({
     </div>
   );
 }
-
 interface TimeSeriesCardProps {
   title: ReactNode;
   icon?: ReactNode;
-  /** Big current value at the right of the header (single-series cards). */
+  /** 标题栏右侧的大号当前值（单系列卡片）。 */
   headline?: ReactNode;
-  /** Small secondary line under the header. */
+  /** 标题栏下方的小号辅助行。 */
   subline?: ReactNode;
   series: SeriesDef[];
   points: MonitorPoint[];
@@ -99,8 +96,8 @@ interface TimeSeriesCardProps {
 }
 
 /**
- * One monitor chart card: header (title + live value), optional legend row
- * with live values for two-series cards, and a time-series area chart.
+ * 一张监控图表卡片：标题栏（标题 + 实时值）、可选图例行（双系列卡片
+ * 显示实时值），以及时序面积图。
  */
 export function TimeSeriesCard({
   title,
@@ -112,23 +109,21 @@ export function TimeSeriesCard({
   unit,
 }: TimeSeriesCardProps) {
   const percent = unit === "percent";
-  const hasRenderedChart = useRef(false);
-  const animationActive =
-    hasRenderedChart.current && !prefersReducedMotion();
-
-  useEffect(() => {
-    if (points.length >= 2) hasRenderedChart.current = true;
-  }, [points.length]);
-
+  // 用“是否渲染过一次”的渲染态来记录，而不是在渲染期间读 ref；
+  // 动画从第二次渲染起才生效。
+  const [renderedPoints, setRenderedPoints] = useState(0);
+  if (renderedPoints < 2 && points.length >= 2)
+    setRenderedPoints(points.length);
+  const animationActive = renderedPoints >= 2 && !prefersReducedMotion();
   return (
-    <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3">
+    <section className="border-border bg-card flex flex-col gap-2 rounded-lg border p-3">
       <div className="flex items-start justify-between gap-2">
         <span className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
           {icon}
           <span className="min-w-0 truncate">{title}</span>
         </span>
         {headline != null ? (
-          <span className="shrink-0 text-xl font-semibold leading-none">
+          <span className="shrink-0 text-xl leading-none font-semibold">
             {headline}
           </span>
         ) : null}
@@ -140,7 +135,9 @@ export function TimeSeriesCard({
               <span
                 aria-hidden
                 className="size-2 rounded-full"
-                style={{ background: `var(${s.colorVar})` }}
+                style={{
+                  background: `var(${s.colorVar})`,
+                }}
               />
               <span className="text-muted-foreground">{s.label}</span>
               {s.current ? (
@@ -151,18 +148,23 @@ export function TimeSeriesCard({
         </div>
       ) : null}
       {subline ? (
-        <p className="text-xs text-muted-foreground">{subline}</p>
+        <p className="text-muted-foreground text-xs">{subline}</p>
       ) : null}
       <div className="h-32 sm:h-36">
         {points.length < 2 ? (
-          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+          <div className="text-muted-foreground flex h-full items-center justify-center text-xs">
             <Trans>暂无数据</Trans>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={points}
-              margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
+              margin={{
+                top: 4,
+                right: 4,
+                bottom: 0,
+                left: 0,
+              }}
             >
               <CartesianGrid vertical={false} stroke="var(--border)" />
               <XAxis
@@ -172,8 +174,13 @@ export function TimeSeriesCard({
                 tickFormatter={formatAxisTime}
                 minTickGap={48}
                 tickLine={false}
-                axisLine={{ stroke: "var(--border)" }}
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                axisLine={{
+                  stroke: "var(--border)",
+                }}
+                tick={{
+                  fontSize: 10,
+                  fill: "var(--muted-foreground)",
+                }}
                 height={18}
               />
               <YAxis
@@ -185,7 +192,10 @@ export function TimeSeriesCard({
                 }
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                tick={{
+                  fontSize: 10,
+                  fill: "var(--muted-foreground)",
+                }}
               />
               <Tooltip
                 content={<ChartTip series={series} unit={unit} />}

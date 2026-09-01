@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { msg } from "@lingui/core/macro";
@@ -20,7 +20,6 @@ import {
   previewSource,
   previewTransferWasVisible,
 } from "./probe-cache";
-
 export interface BtPreviewScreenProps {
   infoHash: string;
   fileIndex: number;
@@ -29,9 +28,8 @@ export interface BtPreviewScreenProps {
 }
 
 /**
- * BT side of the shared preview page: mints the loopback stream URL for one
- * file and adds the live stats footer. The engine restarts itself when the
- * page is opened cold (reload or deep link).
+ * 共享预览页的 BT 侧：为单个文件生成回环流 URL，并
+ * 追加实时统计底栏。页面冷启动（刷新或深链接）时引擎会自行重启。
  */
 export default function BtPreviewScreen({
   infoHash,
@@ -48,56 +46,59 @@ export default function BtPreviewScreen({
     key: string;
     promise: Promise<string>;
   } | null>(null);
-  // Stays true until the save event arrives: unfinished tasks are exported
-  // only after the download completes.
+  // 在收到保存事件前保持 true：未完成的任务要等下载完成后才会导出。
   const [saving, setSaving] = useState(false);
-
   useEffect(() => {
     let cancelled = false;
-    setUrl(null);
-    setError(null);
-    void (async () => {
-      try {
-        const preparationKey = `${infoHash}:${fileIndex}`;
-        if (preparationRef.current?.key !== preparationKey) {
-          preparationRef.current = {
-            key: preparationKey,
-            promise: (async () => {
-              const source = previewSource(infoHash);
-              if (source) {
-                await ipc.btEnsurePreview(source, fileIndex);
-              }
-              return ipc.btStreamUrl(infoHash, fileIndex);
-            })(),
-          };
-          markPreviewPreparation(infoHash, preparationRef.current.promise);
+    // 用微任务延后，使重置与拉取都发生在 effect 函数体之外；此处的
+    // 状态更新要么在 await 之后，要么已被 `cancelled` 保护。
+    queueMicrotask(() => {
+      setUrl(null);
+      setError(null);
+      void (async () => {
+        try {
+          const preparationKey = `${infoHash}:${fileIndex}`;
+          if (preparationRef.current?.key !== preparationKey) {
+            preparationRef.current = {
+              key: preparationKey,
+              promise: (async () => {
+                const source = previewSource(infoHash);
+                if (source) {
+                  await ipc.btEnsurePreview(source, fileIndex);
+                }
+                return ipc.btStreamUrl(infoHash, fileIndex);
+              })(),
+            };
+            markPreviewPreparation(infoHash, preparationRef.current.promise);
+          }
+          const resolved = await preparationRef.current.promise;
+          if (!cancelled) setUrl(resolved);
+        } catch (e) {
+          if (!cancelled) setError(String(e));
         }
-        const resolved = await preparationRef.current.promise;
-        if (!cancelled) setUrl(resolved);
-      } catch (e) {
-        if (!cancelled) setError(String(e));
-      }
-    })();
+      })();
+    });
     return () => {
       cancelled = true;
     };
   }, [fileIndex, infoHash]);
-
-  const showPeers = useCallback(() => setPeersOpen(true), []);
-  const closePreview = useCallback(() => {
+  const showPeers = () => setPeersOpen(true);
+  const closePreview = () => {
     if (previewTransferWasVisible(infoHash) === false) {
       dismissTransfer(`bt:${infoHash}`);
     }
-  }, [dismissTransfer, infoHash]);
+  };
 
-  // Both the immediate and the deferred export report through the task event,
-  // so success is reported from one place for either path. The unlisten
-  // handle arrives asynchronously: without the flag a cleanup that runs first
-  // leaks the subscription and every later save toasts once per leak.
+  // 即时与延后的导出都通过任务事件上报，因此无论走哪条路径，成功
+  // 都从同一处报告。unlisten 句柄异步到达：没有该标志的话，先运行的
+  // 清理会泄漏订阅，且之后的每次保存都会重复弹出一次提示。
   useEffect(() => {
     let cancelled = false;
     let dispose: (() => void) | null = null;
-    void listen<{ infoHash: string; kind: string }>(BT_TASK_EVENT, (event) => {
+    void listen<{
+      infoHash: string;
+      kind: string;
+    }>(BT_TASK_EVENT, (event) => {
       if (event.payload.infoHash !== infoHash) return;
       if (event.payload.kind === "saved") {
         setSaving(false);
@@ -118,19 +119,23 @@ export default function BtPreviewScreen({
     };
   }, [infoHash]);
 
-  /** Save the previewed file into a user directory (playback keeps running). */
-  const download = useCallback(async () => {
-    const picked = await openDialog({ multiple: false, directory: true });
+  /** 把预览的文件保存到用户目录（播放仍会继续进行）。 */
+  const download = async () => {
+    const picked = await openDialog({
+      multiple: false,
+      directory: true,
+    });
     if (typeof picked !== "string") return;
     setSaving(true);
     try {
       await ipc.btSaveToLocal(infoHash, picked, fileIndex);
     } catch (e) {
       setSaving(false);
-      toast.error(t`转存失败`, { description: String(e) });
+      toast.error(t`转存失败`, {
+        description: String(e),
+      });
     }
-  }, [fileIndex, infoHash, t]);
-
+  };
   return (
     <>
       <PreviewScreen
@@ -148,7 +153,10 @@ export default function BtPreviewScreen({
               disabled={saving}
             >
               {saving ? (
-                <LoaderCircle data-icon="inline-start" className="animate-spin" />
+                <LoaderCircle
+                  data-icon="inline-start"
+                  className="animate-spin"
+                />
               ) : (
                 <HardDriveDownload data-icon="inline-start" />
               )}
@@ -165,7 +173,14 @@ export default function BtPreviewScreen({
         footer={<BtStatsBar infoHash={infoHash} onShowPeers={showPeers} />}
       />
       <PeersDialog
-        task={peersOpen ? { infoHash, label: name } : null}
+        task={
+          peersOpen
+            ? {
+                infoHash,
+                label: name,
+              }
+            : null
+        }
         onClose={() => setPeersOpen(false)}
       />
     </>

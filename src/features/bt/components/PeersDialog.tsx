@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircle } from "lucide-react";
 import type { BtPeerInfo } from "~/types";
@@ -10,72 +10,68 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-
 export interface PeersDialogProps {
-  task: { infoHash: string; label: string } | null;
+  task: {
+    infoHash: string;
+    label: string;
+  } | null;
   onClose: () => void;
 }
-
 const POLL_INTERVAL_MS = 2000;
 
 /**
- * Peer details overlay: polls every 2s (peer churn is frequent and event
- * pushes would be noisy). IPs are masked server-side; display only.
+ * 节点明细浮层：每 2 秒轮询一次（节点变化频繁，事件推送会很吵）。
+ * IP 已在服务端脱敏，仅用于展示。
  */
 export default function PeersDialog({ task, onClose }: PeersDialogProps) {
   const [peers, setPeers] = useState<BtPeerInfo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const poll = useCallback(async (hash: string) => {
-    try {
-      setPeers(await ipc.btTaskPeers(hash));
-      setError(null);
-    } catch (e) {
-      setError(String(e));
-    }
-  }, []);
-
   useEffect(() => {
     if (!task) return;
-    setPeers(null);
-    setError(null);
-    void poll(task.infoHash);
-    timer.current = setInterval(() => void poll(task.infoHash), POLL_INTERVAL_MS);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-      timer.current = null;
+    const poll = async (hash: string) => {
+      try {
+        setPeers(await ipc.btTaskPeers(hash));
+        setError(null);
+      } catch (e) {
+        setError(String(e));
+      }
     };
-  }, [poll, task]);
-
+    // 用微任务延后，使重置发生在 effect 函数体之外。
+    queueMicrotask(() => {
+      setPeers(null);
+      setError(null);
+      void poll(task.infoHash);
+    });
+    const timer = setInterval(() => void poll(task.infoHash), POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [task]);
   if (!task) return null;
-
   return (
     <Dialog open onOpenChange={(value) => !value && onClose()}>
       <DialogContent className="flex max-h-[80vh] flex-col gap-2 sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="min-w-0 truncate pr-6" title={task.label}>
             <Trans>节点明细</Trans>
-            <span className="ml-2 text-xs font-normal text-muted-foreground">
+            <span className="text-muted-foreground ml-2 text-xs font-normal">
               {task.label}
             </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="min-h-40 flex-1 overflow-y-auto rounded-md border border-border">
+        <div className="border-border min-h-40 flex-1 overflow-y-auto rounded-md border">
           {error ? (
-            <div className="p-4 text-xs text-destructive">{error}</div>
+            <div className="text-destructive p-4 text-xs">{error}</div>
           ) : peers === null ? (
-            <div className="flex items-center justify-center gap-2 p-6 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex items-center justify-center gap-2 p-6 text-xs">
               <LoaderCircle className="size-3.5 animate-spin" />
               <Trans>加载中…</Trans>
             </div>
           ) : peers.length === 0 ? (
-            <div className="p-4 text-center text-xs text-muted-foreground">
+            <div className="text-muted-foreground p-4 text-center text-xs">
               <Trans>暂无连接的节点</Trans>
             </div>
           ) : (
             <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-muted text-muted-foreground">
+              <thead className="bg-muted text-muted-foreground sticky top-0">
                 <tr>
                   <th className="px-2 py-1.5 font-medium">IP</th>
                   <th className="px-2 py-1.5 font-medium">
@@ -94,9 +90,12 @@ export default function PeersDialog({ task, onClose }: PeersDialogProps) {
               </thead>
               <tbody className="tabular-nums">
                 {peers.map((peer) => (
-                  <tr key={peer.addr} className="border-t border-border">
+                  <tr key={peer.addr} className="border-border border-t">
                     <td className="px-2 py-1.5">{peer.addr}</td>
-                    <td className="max-w-32 truncate px-2 py-1.5" title={peer.clientName ?? undefined}>
+                    <td
+                      className="max-w-32 truncate px-2 py-1.5"
+                      title={peer.clientName ?? undefined}
+                    >
                       {peer.clientName ?? "--"}
                     </td>
                     <td className="px-2 py-1.5 text-right">
@@ -105,7 +104,7 @@ export default function PeersDialog({ task, onClose }: PeersDialogProps) {
                     <td className="px-2 py-1.5 text-right">
                       {formatBytes(peer.uploadedBytes)}
                     </td>
-                    <td className="px-2 py-1.5 text-muted-foreground">
+                    <td className="text-muted-foreground px-2 py-1.5">
                       {peer.state}
                     </td>
                   </tr>
@@ -114,7 +113,7 @@ export default function PeersDialog({ task, onClose }: PeersDialogProps) {
             </table>
           )}
         </div>
-        <span className="text-right text-[10px] text-muted-foreground">
+        <span className="text-muted-foreground text-right text-[10px]">
           <Trans>每 2 秒刷新 · IP 已脱敏</Trans>
         </span>
       </DialogContent>

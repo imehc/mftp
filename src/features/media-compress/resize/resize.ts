@@ -8,47 +8,36 @@ import {
   stripExtension,
 } from "~/features/media-compress/image/compress";
 import { translate } from "~/i18n/translate";
-
 export type ResizeMethod = "ratio" | "dimension";
-
 export type DimensionMode =
-  | "exact"
-  | "width"
-  | "height"
-  | "longest"
-  | "shortest";
-
+  "exact" | "width" | "height" | "longest" | "shortest";
 export const RATIO_MIN = 1;
 export const RATIO_MAX = 200;
 export const RATIO_STEP = 1;
 export const DEFAULT_RATIO = 50;
-
 export const DIMENSION_MIN = 1;
-/** Per-side cap; mobile WebViews reject very large canvases. */
+/** 单边上限；移动端 WebView 对超大画布会拒绝。 */
 export const DIMENSION_MAX = 10_000;
 
-/** Re-encode quality for lossy formats; PNG stays lossless. */
+/** 有损格式的重新编码质量；PNG 仍保持无损。 */
 const RESIZE_ENCODE_QUALITY = 0.92;
-
 export interface ResizeSize {
   width: number;
   height: number;
 }
-
 export interface ResizeOptions {
   method: ResizeMethod;
-  /** Percentage 1–200; used when method is "ratio". */
+  /** 百分比 1–200；method 为 "ratio" 时使用。 */
   ratio: number;
-  /** Sub-mode; used when method is "dimension". */
+  /** 子模式；method 为 "dimension" 时使用。 */
   dimensionMode: DimensionMode;
-  /** Target width for "exact" / "width" modes. */
+  /** "exact" / "width" 模式下的目标宽度。 */
   width: number | null;
-  /** Target height for "exact" / "height" modes. */
+  /** "exact" / "height" 模式下的目标高度。 */
   height: number | null;
-  /** Target edge length for "longest" / "shortest" modes. */
+  /** "longest" / "shortest" 模式下的目标边长。 */
   edge: number | null;
 }
-
 export interface ImageResizeResult {
   blob: Blob;
   size: number;
@@ -57,36 +46,30 @@ export interface ImageResizeResult {
   width: number;
   height: number;
 }
-
 export function clampRatio(value: number): number {
   if (!Number.isFinite(value)) return DEFAULT_RATIO;
   return Math.min(RATIO_MAX, Math.max(RATIO_MIN, Math.round(value)));
 }
-
 export function clampDimension(value: number): number {
   if (!Number.isFinite(value)) return DIMENSION_MIN;
   return Math.min(DIMENSION_MAX, Math.max(DIMENSION_MIN, Math.round(value)));
 }
-
 function isPositiveInt(value: number | null): value is number {
   return value != null && Number.isFinite(value) && value >= 1;
 }
-
 function roundSide(value: number): number {
   return Math.max(1, Math.round(value));
 }
 
 /**
- * Resolve the output size for the given source and options.
- * Returns null when the required input for the active mode is missing.
- * The result is NOT clamped — use isTargetSizeAllowed to validate.
+ * 根据源尺寸与选项解析输出尺寸。当前模式所需输入缺失时返回 null。
+ * 结果未做裁剪 —— 用 isTargetSizeAllowed 校验。
  */
 export function computeTargetSize(
   source: ResizeSize,
   options: ResizeOptions,
 ): ResizeSize | null {
   if (source.width < 1 || source.height < 1) return null;
-
   if (options.method === "ratio") {
     const scale = clampRatio(options.ratio) / 100;
     return {
@@ -94,7 +77,6 @@ export function computeTargetSize(
       height: roundSide(source.height * scale),
     };
   }
-
   switch (options.dimensionMode) {
     case "exact": {
       if (!isPositiveInt(options.width) || !isPositiveInt(options.height)) {
@@ -124,7 +106,7 @@ export function computeTargetSize(
     case "longest": {
       if (!isPositiveInt(options.edge)) return null;
       const edge = Math.round(options.edge);
-      // Square images take the width branch.
+      // 正方形图片走宽度分支。
       if (source.width >= source.height) {
         return {
           width: edge,
@@ -153,7 +135,7 @@ export function computeTargetSize(
   }
 }
 
-/** Both sides within [DIMENSION_MIN, DIMENSION_MAX]. */
+/** 两边都在 [DIMENSION_MIN, DIMENSION_MAX] 范围内。 */
 export function isTargetSizeAllowed(target: ResizeSize): boolean {
   return (
     target.width >= DIMENSION_MIN &&
@@ -162,13 +144,11 @@ export function isTargetSizeAllowed(target: ResizeSize): boolean {
     target.height <= DIMENSION_MAX
   );
 }
-
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
     throw new DOMException(translate(msg`处理已取消`), "AbortError");
   }
 }
-
 export async function resizeImageFile(
   file: File,
   target: ResizeSize,
@@ -181,13 +161,11 @@ export async function resizeImageFile(
     throw new Error(translate(msg`目标尺寸需在 1–10000 像素之间`));
   }
   throwIfAborted(signal);
-
   const bitmap = await createImageBitmap(file);
   try {
     throwIfAborted(signal);
 
-    // Progressive halving before the final draw: a single high-smoothing
-    // pass still aliases when shrinking beyond ~2×.
+    // 最终绘制前逐级减半：即便单次高平滑，超过约 2× 缩小时仍会有锯齿。
     let current: ImageBitmap | HTMLCanvasElement = bitmap;
     let currentWidth = bitmap.width;
     let currentHeight = bitmap.height;
@@ -209,7 +187,6 @@ export async function resizeImageFile(
       currentWidth = nextWidth;
       currentHeight = nextHeight;
     }
-
     const canvas = document.createElement("canvas");
     canvas.width = target.width;
     canvas.height = target.height;
@@ -217,9 +194,8 @@ export async function resizeImageFile(
     if (!context) {
       throw new Error(translate(msg`无法创建画布上下文`));
     }
-
     const outputFormat = detectImageOutputFormat(file);
-    // JPEG has no alpha; fill white to avoid black matte on transparent PNG.
+    // JPEG 不支持透明通道；填充白色，避免透明 PNG 出现黑色底。
     if (outputFormat === "jpg") {
       context.fillStyle = "#ffffff";
       context.fillRect(0, 0, canvas.width, canvas.height);
@@ -237,9 +213,7 @@ export async function resizeImageFile(
       target.width,
       target.height,
     );
-
     throwIfAborted(signal);
-
     const mimeType = mimeForFormat(outputFormat);
     const blob = await canvasToBlob(
       canvas,
@@ -247,7 +221,6 @@ export async function resizeImageFile(
       outputFormat === "png" ? undefined : RESIZE_ENCODE_QUALITY,
     );
     throwIfAborted(signal);
-
     const stem = stripExtension(file.name) || "image";
     return {
       blob,

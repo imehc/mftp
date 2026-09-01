@@ -9,7 +9,7 @@ export interface PreviewProbeHandoff {
 
 let previewLaunch: PreviewProbeHandoff | null = null;
 
-/** Remembers where the dialog was when it handed off to the preview page. */
+/** 记录对话框移交给预览页时的位置。 */
 export function markPreviewLaunch(
   source: string,
   probe: BtProbeResult,
@@ -18,7 +18,7 @@ export function markPreviewLaunch(
   previewLaunch = { source, probe, transferWasVisible };
 }
 
-/** Reads the active preview handoff without consuming the return state. */
+/** 读取当前活跃的预览交接信息，但不消费返回状态。 */
 export function previewSource(infoHash: string): string | null {
   return previewLaunch?.probe.infoHash === infoHash
     ? previewLaunch.source
@@ -44,7 +44,7 @@ export function clearPreviewLaunch() {
   previewLaunch = null;
 }
 
-/** Consumed once by the BT page on mount; null on a plain visit. */
+/** 由 BT 页在挂载时消费一次；普通访问时为 null。 */
 export function takePreviewLaunch(): PreviewProbeHandoff | null {
   const handoff = previewLaunch;
   previewLaunch = null;

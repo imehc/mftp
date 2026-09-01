@@ -9,7 +9,6 @@ import {
   type NativeFilePickOptions,
 } from "~/features/media-compress/format";
 import { cn } from "~/lib/utils";
-
 interface CompressDropzoneProps {
   inputRef: RefObject<HTMLInputElement | null>;
   accept: string;
@@ -21,13 +20,11 @@ interface CompressDropzoneProps {
   footer?: ReactNode;
   pickLabel?: ReactNode;
   /**
-   * Extension filter for the native dialog on desktop Tauri, where the
-   * WebView does not enforce the accept attribute. Browser/mobile keeps
-   * the hidden input fallback.
+   * 桌面端 Tauri 原生对话框的后缀过滤，因为 WebView 不强制
+   * accept 属性。浏览器 / 移动端保留隐藏 input 作为兜底。
    */
   nativeFilter?: NativeFilePickOptions;
 }
-
 export function CompressDropzone({
   inputRef,
   accept,
@@ -41,7 +38,6 @@ export function CompressDropzone({
   nativeFilter,
 }: CompressDropzoneProps) {
   const [dragOver, setDragOver] = useState(false);
-
   async function onPick() {
     if (nativeFilter) {
       try {
@@ -58,7 +54,6 @@ export function CompressDropzone({
     }
     inputRef.current?.click();
   }
-
   return (
     <section
       className={cn(
@@ -90,12 +85,12 @@ export function CompressDropzone({
         }}
       />
       <div className="flex flex-col items-center justify-center gap-2 py-4 text-center sm:py-6">
-        <div className="flex size-10 items-center justify-center rounded-md border border-border bg-background">
+        <div className="border-border bg-background flex size-10 items-center justify-center rounded-md border">
           {icon}
         </div>
         <div>
           <p className="text-sm font-medium">{title}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>
         </div>
         <Button
           type="button"

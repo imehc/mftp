@@ -1,20 +1,27 @@
-/** Seat / result / history label helpers shared by the go screens. */
+/** 围棋各界面共用的座位 / 结果 / 历史记录标签辅助函数。 */
 import { Trans } from "@lingui/react/macro";
 import { Circle } from "lucide-react";
 import type { SeatIndex } from "../engine/types";
-import { KOMI, type GoHistoryPayload, type GoMode, type GoState } from "./types";
-
+import {
+  KOMI,
+  type GoHistoryPayload,
+  type GoMode,
+  type GoState,
+} from "./types";
 export function seatName(
   mode: GoMode,
   seat: SeatIndex,
-  online?: { peerName: string; localSeat: SeatIndex },
+  online?: {
+    peerName: string;
+    localSeat: SeatIndex;
+  },
 ) {
   if (mode.kind === "online" && online) {
     return (
       <span className="inline-flex items-center gap-1">
         <Circle
           className={
-            seat === 0 ? "size-3 fill-current" : "size-3 fill-background"
+            seat === 0 ? "size-3 fill-current" : "fill-background size-3"
           }
         />
         {seat === online.localSeat ? (
@@ -35,13 +42,13 @@ export function seatName(
     </span>
   ) : (
     <span className="inline-flex items-center gap-1">
-      <Circle className="size-3 fill-background" />
+      <Circle className="fill-background size-3" />
       <Trans>白棋</Trans>
     </span>
   );
 }
 
-/** Chinese-rules area scoring: white adds 7.5 komi to its board area. */
+/** 中国规则数子计分：白方在盘面地域上加 7.5 贴目。 */
 export function scoreLine(state: GoState) {
   if (!state.finalScore) return null;
   const [black, white] = state.finalScore;
@@ -52,11 +59,13 @@ export function scoreLine(state: GoState) {
     </Trans>
   );
 }
-
 export function matchResultLabel(
   mode: GoMode,
   winnerSeat: SeatIndex | null,
-  online?: { peerName: string; localSeat: SeatIndex },
+  online?: {
+    peerName: string;
+    localSeat: SeatIndex;
+  },
 ) {
   if (winnerSeat === null) return <Trans>平局</Trans>;
   const localSeat =
@@ -72,9 +81,9 @@ export function matchResultLabel(
       <Trans>你输了</Trans>
     );
   }
-  return <Trans>{seatName(mode, winnerSeat, online)} 获胜</Trans>;
+  const seatNameValue = seatName(mode, winnerSeat, online);
+  return <Trans>{seatNameValue} 获胜</Trans>;
 }
-
 export function historyModeLabel(payload: GoHistoryPayload) {
   if (payload.mode === "hotseat") return <Trans>双人</Trans>;
   if (payload.mode === "online") return <Trans>联机</Trans>;
@@ -92,7 +101,6 @@ export function historyModeLabel(payload: GoHistoryPayload) {
     </span>
   );
 }
-
 export function historyResult(payload: GoHistoryPayload) {
   if (payload.winnerSeat === null) return <Trans>平局</Trans>;
   if (payload.mode === "ai") {
@@ -109,9 +117,12 @@ export function historyResult(payload: GoHistoryPayload) {
       <Trans>负</Trans>
     );
   }
-  return payload.winnerSeat === 0 ? <Trans>黑棋胜</Trans> : <Trans>白棋胜</Trans>;
+  return payload.winnerSeat === 0 ? (
+    <Trans>黑棋胜</Trans>
+  ) : (
+    <Trans>白棋胜</Trans>
+  );
 }
-
 export function formatHistoryTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
     month: "2-digit",

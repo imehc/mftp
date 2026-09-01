@@ -1,22 +1,12 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import {
-  ArrowDownUp,
-  Binary,
-  Copy,
-  Eraser,
-  LockKeyhole,
-} from "lucide-react";
+import { ArrowDownUp, Binary, Copy, Eraser, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Checkbox } from "~/components/ui/checkbox";
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from "~/components/ui/field";
+import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -31,31 +21,32 @@ import {
   decodeBase64,
   encodeBase64,
 } from "~/features/crypto/base64";
-
 type CryptoAlgorithm = "base64";
 type CryptoMode = "encode" | "decode";
-
 export default function CryptoTool() {
   const { t } = useLingui();
   const [algorithm, setAlgorithm] = useState<CryptoAlgorithm>("base64");
   const [mode, setMode] = useState<CryptoMode>("encode");
   const [urlSafe, setUrlSafe] = useState(false);
   const [input, setInput] = useState("");
-
   const variant: Base64Variant = urlSafe ? "url-safe" : "standard";
-
-  const outcome = useMemo(() => {
+  const outcome = (() => {
     if (!input) {
-      return { ok: true as const, value: "" };
+      return {
+        ok: true as const,
+        value: "",
+      };
     }
     if (algorithm !== "base64") {
-      return { ok: false as const, error: "unsupported" as const };
+      return {
+        ok: false as const,
+        error: "unsupported" as const,
+      };
     }
     return mode === "encode"
       ? encodeBase64(input, variant)
       : decodeBase64(input, variant);
-  }, [algorithm, input, mode, variant]);
-
+  })();
   const output = outcome.ok ? outcome.value : "";
   const errorMessage = !outcome.ok
     ? outcome.error === "invalid-base64"
@@ -64,7 +55,6 @@ export default function CryptoTool() {
         ? t`编码失败`
         : t`暂不支持该算法`
     : null;
-
   async function copyText(value: string, successMessage: string) {
     if (!value) return;
     try {
@@ -74,33 +64,37 @@ export default function CryptoTool() {
       toast.error(String(error));
     }
   }
-
   function clearAll() {
     setInput("");
   }
-
   function swapInputOutput() {
     if (!outcome.ok || !output) return;
     setInput(output);
     setMode((current) => (current === "encode" ? "decode" : "encode"));
   }
-
   return (
-    <main className="flex h-full flex-col bg-background text-foreground">
-      <ToolPageHeader title={<Trans>加解密</Trans>} trailing={<Badge variant="outline"><Trans>本地处理</Trans></Badge>} />
+    <main className="bg-background text-foreground flex h-full flex-col">
+      <ToolPageHeader
+        title={<Trans>加解密</Trans>}
+        trailing={
+          <Badge variant="outline">
+            <Trans>本地处理</Trans>
+          </Badge>
+        }
+      />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card rounded-lg border p-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background">
+              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
                 <LockKeyhole className="size-4" />
               </div>
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold">
                   <Trans>加解密</Trans>
                 </h1>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="text-muted-foreground truncate text-xs">
                   <Trans>选择算法对文本进行编码或解码</Trans>
                 </p>
               </div>
@@ -129,7 +123,7 @@ export default function CryptoTool() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-border bg-card p-2.5">
+        <section className="border-border bg-card rounded-lg border p-2.5">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] lg:items-end">
             <Field>
               <FieldLabel>
@@ -200,18 +194,20 @@ export default function CryptoTool() {
         </section>
 
         <section className="grid min-h-0 flex-1 gap-2 md:grid-cols-2">
-          <div className="flex min-h-56 flex-col gap-1.5 rounded-lg border border-border bg-card p-2.5">
+          <div className="border-border bg-card flex min-h-56 flex-col gap-1.5 rounded-lg border p-2.5">
             <div className="flex items-center justify-between gap-2">
               <label
                 htmlFor="crypto-input"
-                className="text-xs font-medium text-muted-foreground"
+                className="text-muted-foreground text-xs font-medium"
               >
                 <Trans>输入</Trans>
               </label>
               <div className="flex items-center gap-1">
                 <Badge variant="outline">
                   <Plural
-                    value={{ characterCount: input.length }}
+                    value={{
+                      characterCount: input.length,
+                    }}
                     one="# 个字符"
                     other="# 个字符"
                   />
@@ -233,20 +229,18 @@ export default function CryptoTool() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder={
-                mode === "encode"
-                  ? t`输入要编码的文本`
-                  : t`输入要解码的内容`
+                mode === "encode" ? t`输入要编码的文本` : t`输入要解码的内容`
               }
               className="min-h-0 flex-1 resize-none font-mono text-sm"
               aria-invalid={!!errorMessage}
             />
           </div>
 
-          <div className="flex min-h-56 flex-col gap-1.5 rounded-lg border border-border bg-card p-2.5">
+          <div className="border-border bg-card flex min-h-56 flex-col gap-1.5 rounded-lg border p-2.5">
             <div className="flex items-center justify-between gap-2">
               <label
                 htmlFor="crypto-output"
-                className="text-xs font-medium text-muted-foreground"
+                className="text-muted-foreground text-xs font-medium"
               >
                 <Trans>输出</Trans>
               </label>
@@ -256,7 +250,9 @@ export default function CryptoTool() {
                 ) : (
                   <Badge variant="outline">
                     <Plural
-                      value={{ characterCount: output.length }}
+                      value={{
+                        characterCount: output.length,
+                      }}
                       one="# 个字符"
                       other="# 个字符"
                     />

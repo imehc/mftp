@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Panel, Separator } from "react-resizable-panels";
@@ -42,13 +42,14 @@ import PoemList from "./components/PoemList";
 import SearchBar from "./components/SearchBar";
 import { useDebouncedQuery } from "./hooks/use-poetry-search";
 import { usePoetryStore } from "./store/poetry-store";
-
 interface LibraryPageProps {
-  search: { q?: string; poem?: string };
+  search: {
+    q?: string;
+    poem?: string;
+  };
   onSearchChange: (patch: { q?: string }) => void;
   onOpenPoem: (uid: string) => void;
 }
-
 function DailyCard({
   daily,
   onSelect,
@@ -61,26 +62,26 @@ function DailyCard({
     <button
       type="button"
       onClick={() => onSelect(daily.uid)}
-      className="mx-3 mb-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-left transition-colors hover:bg-primary/10"
+      className="border-primary/30 bg-primary/5 hover:bg-primary/10 mx-3 mb-2 rounded-lg border px-3 py-2.5 text-left transition-colors"
     >
-      <span className="flex items-center gap-1.5 text-[11px] font-medium text-primary">
+      <span className="text-primary flex items-center gap-1.5 text-[11px] font-medium">
         <CalendarDays className="size-3" aria-hidden />
         <Trans>每日一诗</Trans>
       </span>
       <span className="mt-1 flex items-baseline justify-between gap-2">
         <span className="truncate text-sm font-medium">{daily.title}</span>
-        <span className="shrink-0 text-xs text-muted-foreground">
+        <span className="text-muted-foreground shrink-0 text-xs">
           {[daily.author, daily.dynasty].filter(Boolean).join("·")}
         </span>
       </span>
-      <span className="mt-0.5 line-clamp-1 block text-xs text-muted-foreground">
+      <span className="text-muted-foreground mt-0.5 line-clamp-1 block text-xs">
         {daily.body[0]}
       </span>
     </button>
   );
 }
 
-/** Bounded search result list — one page of ≤60 hits, no virtualization. */
+/** 有界搜索结果列表——单页最多约 60 条命中，不做虚拟化。 */
 function SearchResultList({
   items,
   query,
@@ -107,7 +108,6 @@ function SearchResultList({
     </div>
   );
 }
-
 export default function LibraryPage({
   search,
   onSearchChange,
@@ -128,51 +128,53 @@ export default function LibraryPage({
   const setFontSize = usePoetryStore((s) => s.setFontSize);
   const setLineHeight = usePoetryStore((s) => s.setLineHeight);
 
-  // The settled (debounced) query drives IPC; the URL mirrors it. A skip
-  // flag prevents the URL echo of our own navigation from clobbering typing.
+  // 稳定（防抖后）的查询驱动 IPC；URL 与之镜像。skip 标志用于
+  // 防止我们自己的导航回写 URL 把正在输入的内容覆盖掉。
   const skipUrlSync = useRef(false);
   const { input, setInput, query } = useDebouncedQuery(300);
+  // setInput/onSearchChange 是自定义 hook / 属性回调；通过 effect event
+  // 读取，使这些 effect 只依赖真正的触发条件。
+  const syncInputFromUrl = useEffectEvent((value: string) => setInput(value));
+  const pushQueryToUrl = useEffectEvent(() => {
+    const next = query || undefined;
+    if ((search.q ?? undefined) === next) return;
+    skipUrlSync.current = true;
+    onSearchChange({
+      q: next,
+    });
+  });
   useEffect(() => {
     if (skipUrlSync.current) {
       skipUrlSync.current = false;
       return;
     }
-    setInput(search.q ?? "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    syncInputFromUrl(search.q ?? "");
   }, [search.q]);
 
-  // Push the settled query into the URL (replace-style) for back/share.
+  // 把稳定后的查询写入 URL（替换式），便于返回 / 分享。
   useEffect(() => {
-    const next = query || undefined;
-    if ((search.q ?? undefined) === next) return;
-    skipUrlSync.current = true;
-    onSearchChange({ q: next });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    pushQueryToUrl();
   }, [query]);
-
   const effectiveQuery = query;
   const isSearching = effectiveQuery.trim().length > 0;
-
   const [results, setResults] = useState<PoemSummary[] | null>(null);
   const [searching, setSearching] = useState(false);
   const [daily, setDaily] = useState<PoemDetail | null>(null);
   const [detail, setDetail] = useState<PoemDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
-
-  const installedCount = useMemo(
-    () => collections.filter((collection) => collection.installed).length,
-    [collections],
-  );
+  const installedCount = collections.filter(
+    (collection) => collection.installed,
+  ).length;
   const loadedOnce = collections.length > 0;
-
   useEffect(() => {
     void poetryCollections()
       .then(setCollections)
       .catch((error) =>
-        toast.error(t`读取失败`, { description: String(error) }),
+        toast.error(t`读取失败`, {
+          description: String(error),
+        }),
       );
   }, [setCollections, t]);
-
   useEffect(() => {
     if (installedCount === 0) return;
     void poetryDaily()
@@ -180,14 +182,14 @@ export default function LibraryPage({
       .catch(() => setDaily(null));
   }, [installedCount]);
 
-  // Debounced search pipeline.
+  // 防抖后的搜索流程。状态更新被延后，使其在 effect 函数体之外发生。
   useEffect(() => {
     if (!isSearching) {
-      setResults(null);
+      queueMicrotask(() => setResults(null));
       return;
     }
     let cancelled = false;
-    setSearching(true);
+    queueMicrotask(() => setSearching(true));
     void poetrySearch({
       query: effectiveQuery,
       scope,
@@ -202,7 +204,9 @@ export default function LibraryPage({
       .catch((error) => {
         if (!cancelled) {
           setResults([]);
-          toast.error(t`操作失败`, { description: String(error) });
+          toast.error(t`操作失败`, {
+            description: String(error),
+          });
         }
       })
       .finally(() => {
@@ -211,46 +215,41 @@ export default function LibraryPage({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveQuery, scope, activeCollectionIds.join(",")]);
-
-  const loadDetail = useCallback(
-    (uid: string) => {
-      setDetailLoading(true);
-      void poetryPoem(uid)
-        .then(setDetail)
-        .catch((error) =>
-          toast.error(t`操作失败`, { description: String(error) }),
-        )
-        .finally(() => setDetailLoading(false));
-    },
-    [t],
-  );
-
+  }, [effectiveQuery, scope, activeCollectionIds, isSearching, t]);
+  const loadDetail = (uid: string) => {
+    setDetailLoading(true);
+    void poetryPoem(uid)
+      .then(setDetail)
+      .catch((error) =>
+        toast.error(t`操作失败`, {
+          description: String(error),
+        }),
+      )
+      .finally(() => setDetailLoading(false));
+  };
+  const loadDetailIfNeeded = useEffectEvent((uid: string) => {
+    if (detail?.uid !== uid) loadDetail(uid);
+  });
   useEffect(() => {
     const uid = search.poem;
     if (!uid) return;
-    if (detail?.uid !== uid) loadDetail(uid);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // 用微任务延后，使同步加载状态的更新发生在 effect 之外。
+    queueMicrotask(() => loadDetailIfNeeded(uid));
   }, [search.poem]);
-
-  const handleSelect = useCallback(
-    (uid: string) => {
-      onOpenPoem(uid);
-      loadDetail(uid);
-    },
-    [onOpenPoem, loadDetail],
-  );
-
-  const handleRandom = useCallback(async () => {
+  const handleSelect = (uid: string) => {
+    onOpenPoem(uid);
+    loadDetail(uid);
+  };
+  const handleRandom = async () => {
     try {
       const poem = await poetryRandom();
       if (poem) handleSelect(poem.uid);
     } catch (error) {
-      toast.error(t`操作失败`, { description: String(error) });
+      toast.error(t`操作失败`, {
+        description: String(error),
+      });
     }
-  }, [handleSelect, t]);
-
+  };
   const manageLink = (
     <Button variant="ghost" size="xs" asChild>
       <Link to="/library/manage">
@@ -259,10 +258,9 @@ export default function LibraryPage({
       </Link>
     </Button>
   );
-
   if (loadedOnce && installedCount === 0) {
     return (
-      <main className="flex h-full flex-col bg-background text-foreground">
+      <main className="bg-background text-foreground flex h-full flex-col">
         <ToolPageHeader title={<Trans>古诗词</Trans>} trailing={manageLink} />
         <Empty className="flex-1">
           <EmptyHeader>
@@ -280,9 +278,9 @@ export default function LibraryPage({
       </main>
     );
   }
-
+  const activeCollectionIdsLength = activeCollectionIds.length;
   return (
-    <main className="flex h-full flex-col bg-background text-foreground">
+    <main className="bg-background text-foreground flex h-full flex-col">
       <ToolPageHeader
         title={<Trans>文库</Trans>}
         trailing={
@@ -300,7 +298,10 @@ export default function LibraryPage({
           </>
         }
       />
-      <Group orientation="horizontal" className="min-h-0 flex-1 overflow-hidden">
+      <Group
+        orientation="horizontal"
+        className="min-h-0 flex-1 overflow-hidden"
+      >
         <Panel id="library-list" defaultSize="34" minSize="20">
           <div className="flex h-full flex-col">
             <SearchBar
@@ -317,11 +318,14 @@ export default function LibraryPage({
                     >
                       <Filter data-icon="inline-start" />
                       {activeCollectionIds.length > 0
-                        ? t`合集 · ${activeCollectionIds.length}`
+                        ? t`合集 · ${activeCollectionIdsLength}`
                         : t`合集`}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="max-h-72 overflow-y-auto">
+                  <DropdownMenuContent
+                    align="end"
+                    className="max-h-72 overflow-y-auto"
+                  >
                     <DropdownMenuItem
                       disabled={activeCollectionIds.length === 0}
                       onSelect={() => clearCollectionFilter()}
@@ -335,7 +339,9 @@ export default function LibraryPage({
                         <DropdownMenuCheckboxItem
                           key={collection.id}
                           checked={activeCollectionIds.includes(collection.id)}
-                          onCheckedChange={() => toggleCollection(collection.id)}
+                          onCheckedChange={() =>
+                            toggleCollection(collection.id)
+                          }
                           onSelect={(event) => event.preventDefault()}
                         >
                           {collection.name}
@@ -353,7 +359,7 @@ export default function LibraryPage({
               }}
             />
             {isSearching && searching && results === null ? (
-              <div className="flex items-center justify-center gap-2 py-8 text-xs text-muted-foreground">
+              <div className="text-muted-foreground flex items-center justify-center gap-2 py-8 text-xs">
                 <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
                 <Trans>正在检索…</Trans>
               </div>
@@ -368,7 +374,7 @@ export default function LibraryPage({
                       onSelect={handleSelect}
                     />
                   ) : results !== null ? (
-                    <p className="py-10 text-center text-sm text-muted-foreground">
+                    <p className="text-muted-foreground py-10 text-center text-sm">
                       <Trans>没有找到作品</Trans>
                     </p>
                   ) : null}
@@ -392,13 +398,13 @@ export default function LibraryPage({
           </div>
         </Panel>
         <Separator
-            className="group relative w-px shrink-0 bg-border/60 transition-colors hover:bg-primary/50 data-[resize-handle-active]:bg-primary/60"
-            aria-label={t`调整双栏宽度`}
-          />
+          className="group bg-border/60 hover:bg-primary/50 data-[resize-handle-active]:bg-primary/60 relative w-px shrink-0 transition-colors"
+          aria-label={t`调整双栏宽度`}
+        />
         <Panel id="library-detail" defaultSize="66" minSize="40">
           <div
             key={detail?.uid ?? "empty"}
-            className="h-full animate-in fade-in duration-200"
+            className="animate-in fade-in h-full duration-200"
           >
             <PoemDetailPane
               detail={detail}

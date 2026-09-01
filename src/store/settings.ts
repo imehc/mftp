@@ -9,9 +9,9 @@ import {
 
 export type DirectoryTransferMode = "archive" | "direct";
 /**
- * Single source of truth for tool routes. `migrate` re-validates the persisted
- * `lastTool` against this list, so a tool missing here silently loses
- * launch-time restore — keep it in sync when adding a route.
+ * 工具路由的唯一权威来源。`migrate` 会依据此列表重新校验已持久化的
+ * `lastTool`，因此若在此漏掉某个工具，启动时的恢复会静默失效——
+ * 新增路由时务必保持同步。
  */
 export const TOOL_ROUTES = [
   "ssh-sftp",
@@ -38,9 +38,9 @@ interface SettingsState {
   lastTool: ToolRoute | null;
   colorTheme: ColorTheme;
   fontPreset: FontPreset;
-  /** Home page games section is collapsed by default. */
+  /** 首页游戏区默认折叠。 */
   showGames: boolean;
-  /** Master volume for game sound effects, 0..1. */
+  /** 游戏音效主音量，取值范围 0..1。 */
   gamesVolume: number;
   setDirectoryTransferMode: (mode: DirectoryTransferMode) => void;
   setLocale: (locale: AppLocale) => void;
@@ -65,12 +65,10 @@ export const useSettingsStore = create<SettingsState>()(
       fontPreset: "theme",
       showGames: false,
       gamesVolume: 0.7,
-      setDirectoryTransferMode: (mode) =>
-        set({ directoryTransferMode: mode }),
+      setDirectoryTransferMode: (mode) => set({ directoryTransferMode: mode }),
       setLocale: (locale) => set({ locale }),
       setSidebarSize: (size) => set({ sidebarSize: size }),
-      setSidebarCollapsed: (collapsed) =>
-        set({ sidebarCollapsed: collapsed }),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
       setLastTool: (tool) => set({ lastTool: tool }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
       setFontPreset: (font) => set({ fontPreset: font }),
@@ -79,15 +77,15 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      // v5: added the "library" tool route.
+      // v5：新增了 "library" 工具路由。
       version: 5,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
         const legacyTool =
           typeof state.lastTool === "string" ? state.lastTool : null;
-        // The two compress tools merged into one route; everything else is
-        // kept only if it still exists in TOOL_ROUTES.
+        // 两个压缩工具已合并为同一个路由；其余工具只有在
+        // TOOL_ROUTES 中仍然存在时才会保留。
         const lastTool: ToolRoute | null =
           legacyTool === "video-compress" || legacyTool === "image-compress"
             ? "media-compress"

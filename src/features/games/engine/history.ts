@@ -1,7 +1,6 @@
 /**
- * Persisted match history shared by all games. Each game records a
- * self-describing payload on finish and renders its own history list;
- * the store only handles storage, ordering, and capping.
+ * 各游戏共享的持久化对局历史。每个游戏结束时记录一段自描述
+ * 负载，并自行渲染其历史列表；本 store 只负责存储、排序与上限。
  */
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -11,7 +10,7 @@ const MAX_RECORDS = 50;
 export interface GameHistoryRecord<P = unknown> {
   id: string;
   gameId: string;
-  /** Wall-clock finish time (Date.now) — display only, not game state. */
+  /** 结束时的墙上时钟时间（Date.now）——仅用于展示，不是游戏状态。 */
   finishedAt: number;
   payload: P;
 }
