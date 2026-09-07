@@ -28,7 +28,7 @@
   "dependencies": {
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.7",
-    "@codemirror/search": "^6.7.1",
+    "@codemirror/search": "^6.7.2",
     "@codemirror/state": "^6.7.1",
     "@dimforge/rapier2d-compat": "^0.20.0",
     "@dnd-kit/core": "^6.3.1",
