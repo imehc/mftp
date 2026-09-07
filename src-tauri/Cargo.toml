@@ -40,7 +40,7 @@ sha2 = "0.11"
 local-ip-address = "0.6.13"
 whoami = { version = "2", default-features = false }
 fs2 = "0.4.3"
-mdns-sd = "=0.21.0"
+mdns-sd = "=0.21.1"
 tauri-specta = { version = "=2.0.0-rc.24", features = ["typescript"] }
 specta = { version = "=2.0.0-rc.24", features = ["derive"] }
 specta-typescript = "=0.0.11"
