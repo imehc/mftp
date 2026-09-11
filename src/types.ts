@@ -61,6 +61,8 @@ export type {
   SystemNetworkRate,
   SystemProcess,
   SystemStats,
+  TodoItem,
+  TodoItemInput,
   TransferProgress,
   VaultEntry,
   VaultEntryInput,

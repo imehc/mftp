@@ -70,6 +70,10 @@ export const commands = {
 	vaultEntryUpdate: (id: string, input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_update", { id, input })),
 	vaultEntryDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("vault_entry_delete", { id })),
 	vaultEntriesReorder: (orderedIds: string[]) => typedError<VaultEntry[], AppError>(__TAURI_INVOKE("vault_entries_reorder", { orderedIds })),
+	todoItemsList: () => typedError<TodoItem[], AppError>(__TAURI_INVOKE("todo_items_list")),
+	todoItemCreate: (input: TodoItemInput) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_create", { input })),
+	todoItemUpdate: (id: string, input: TodoItemInput) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_update", { id, input })),
+	todoItemDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("todo_item_delete", { id })),
 	/**
 	 *  Serialize the selected sections as a JSON document, optionally encrypted
 	 *  with a password (Argon2id + ChaCha20-Poly1305). The frontend handles the
@@ -733,6 +737,26 @@ export type SystemStats = {
 	network: SystemNetworkRate[],
 	diskIo: SystemDiskIoRate[],
 	topProcesses: SystemProcess[],
+};
+
+export type TodoItem = {
+	id: string,
+	title: string,
+	category?: string | null,
+	notes?: string | null,
+	dueDate?: string | null,
+	completed: boolean,
+	createdAt: number,
+	updatedAt: number,
+};
+
+// Payload for creating/updating a todo item (id/timestamps managed by backend).
+export type TodoItemInput = {
+	title: string,
+	category?: string | null,
+	notes?: string | null,
+	dueDate?: string | null,
+	completed: boolean,
 };
 
 export type TransferProgress = TransferProgress_Serialize | TransferProgress_Deserialize;

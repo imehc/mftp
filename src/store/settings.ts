@@ -20,6 +20,7 @@ export const TOOL_ROUTES = [
   "media-compress",
   "formatter",
   "vault",
+  "todo",
   "library",
   "bt",
 ] as const;

@@ -26,6 +26,7 @@ import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-com
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-compress'
 import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
+import { Route as ToolsTodoRouteImport } from './routes/tools/todo'
 import { Route as ToolsVaultRouteImport } from './routes/tools/vault'
 import { Route as ToolsVideoCompressRouteImport } from './routes/tools/video-compress'
 
@@ -114,6 +115,11 @@ const ToolsSshSftpRoute = ToolsSshSftpRouteImport.update({
   path: '/tools/ssh-sftp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsTodoRoute = ToolsTodoRouteImport.update({
+  id: '/tools/todo',
+  path: '/tools/todo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsVaultRoute = ToolsVaultRouteImport.update({
   id: '/tools/vault',
   path: '/tools/vault',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
+  '/tools/todo': typeof ToolsTodoRoute
   '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
   '/library/': typeof LibraryIndexRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
+  '/tools/todo': typeof ToolsTodoRoute
   '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
   '/library': typeof LibraryIndexRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
+  '/tools/todo': typeof ToolsTodoRoute
   '/tools/vault': typeof ToolsVaultRoute
   '/tools/video-compress': typeof ToolsVideoCompressRoute
   '/library/': typeof LibraryIndexRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/tools/lan-transfer'
     | '/tools/media-compress'
     | '/tools/ssh-sftp'
+    | '/tools/todo'
     | '/tools/vault'
     | '/tools/video-compress'
     | '/library/'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/tools/lan-transfer'
     | '/tools/media-compress'
     | '/tools/ssh-sftp'
+    | '/tools/todo'
     | '/tools/vault'
     | '/tools/video-compress'
     | '/library'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/tools/lan-transfer'
     | '/tools/media-compress'
     | '/tools/ssh-sftp'
+    | '/tools/todo'
     | '/tools/vault'
     | '/tools/video-compress'
     | '/library/'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
   ToolsMediaCompressRoute: typeof ToolsMediaCompressRoute
   ToolsSshSftpRoute: typeof ToolsSshSftpRoute
+  ToolsTodoRoute: typeof ToolsTodoRoute
   ToolsVaultRoute: typeof ToolsVaultRoute
   ToolsVideoCompressRoute: typeof ToolsVideoCompressRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsSshSftpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/todo': {
+      id: '/tools/todo'
+      path: '/tools/todo'
+      fullPath: '/tools/todo'
+      preLoaderRoute: typeof ToolsTodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/vault': {
       id: '/tools/vault'
       path: '/tools/vault'
@@ -432,6 +452,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsLanTransferRoute: ToolsLanTransferRoute,
   ToolsMediaCompressRoute: ToolsMediaCompressRoute,
   ToolsSshSftpRoute: ToolsSshSftpRoute,
+  ToolsTodoRoute: ToolsTodoRoute,
   ToolsVaultRoute: ToolsVaultRoute,
   ToolsVideoCompressRoute: ToolsVideoCompressRoute,
   LibraryIndexRoute: LibraryIndexRoute,

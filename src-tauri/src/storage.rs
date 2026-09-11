@@ -13,6 +13,7 @@ mod export;
 mod helpers;
 mod import;
 mod lan;
+mod todo;
 mod vault;
 
 use helpers::{
@@ -140,6 +141,20 @@ impl Storage {
                 created_at INTEGER NOT NULL,
                 updated_at INTEGER NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS todo_items (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                category TEXT,
+                notes TEXT,
+                due_date TEXT,
+                completed INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_todo_items_list
+            ON todo_items(due_date, completed, updated_at DESC);
 
             CREATE TABLE IF NOT EXISTS bt_tasks (
                 info_hash TEXT PRIMARY KEY,

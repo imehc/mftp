@@ -11,6 +11,7 @@ import type {
   PoetryAuthorsRequest,
   PoetryBrowseRequest,
   PoetrySearchRequest,
+  TodoItemInput,
   VaultEntryInput,
 } from "~/types";
 
@@ -243,6 +244,15 @@ export const vaultEntryDelete = (id: string) =>
   voidCommand(commands.vaultEntryDelete(id));
 export const vaultEntriesReorder = (orderedIds: string[]) =>
   unwrapCommand(commands.vaultEntriesReorder(orderedIds));
+
+// ---- 待办事项 ----
+export const todoItemsList = () => unwrapCommand(commands.todoItemsList());
+export const todoItemCreate = (input: TodoItemInput) =>
+  unwrapCommand(commands.todoItemCreate(input));
+export const todoItemUpdate = (id: string, input: TodoItemInput) =>
+  unwrapCommand(commands.todoItemUpdate(id, input));
+export const todoItemDelete = (id: string) =>
+  voidCommand(commands.todoItemDelete(id));
 
 // ---- 导出 / 导入 ----
 export const dataExport = (

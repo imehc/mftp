@@ -249,7 +249,7 @@ msgid "BT"
 msgstr "BT"
 
 #: src/features/bt/BtTool.tsx:447
-#: src/features/home/entries.tsx:125
+#: src/features/home/entries.tsx:137
 msgid "BT 下载"
 msgstr "BT Downloads"
 
@@ -454,7 +454,7 @@ msgid "两次输入的密码不一致"
 msgstr "Passwords do not match"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:34
-#: src/features/home/entries.tsx:179
+#: src/features/home/entries.tsx:191
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -502,7 +502,7 @@ msgid "互换"
 msgstr "Swap"
 
 #: src/features/games/gomoku/GomokuGame.tsx:35
-#: src/features/home/entries.tsx:159
+#: src/features/home/entries.tsx:171
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -612,6 +612,7 @@ msgstr "In use"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:499
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:335
+#: src/features/todo/TodoItemDialog.tsx:209
 #: src/features/vault/VaultEntryDialog.tsx:192
 msgid "保存"
 msgstr "Save"
@@ -623,6 +624,10 @@ msgstr "Saving..."
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:85
 msgid "保存到"
 msgstr "Save To"
+
+#: src/features/todo/TodoTool.tsx:115
+msgid "保存待办失败"
+msgstr "Failed to save todo"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:335
 msgid "保留音频"
@@ -678,6 +683,7 @@ msgstr "All"
 msgid "全部作为新记录插入"
 msgstr "Insert everything as new records"
 
+#: src/features/todo/TodoTool.tsx:201
 #: src/features/vault/VaultTool.tsx:302
 msgid "全部分类"
 msgstr "All categories"
@@ -796,6 +802,8 @@ msgstr "Preparing"
 msgid "减小 {delta}%"
 msgstr "Reduced {delta}%"
 
+#: src/features/todo/TodoItemDialog.tsx:130
+#: src/features/todo/TodoTool.tsx:195
 #: src/features/vault/VaultEntryDialog.tsx:157
 #: src/features/vault/VaultTool.tsx:296
 msgid "分类"
@@ -836,6 +844,7 @@ msgstr "Created Time"
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:129
 #: src/features/ssh-sftp/components/Sidebar.tsx:371
 #: src/features/ssh-sftp/components/Sidebar.tsx:555
+#: src/features/todo/TodoTool.tsx:300
 #: src/features/vault/VaultTool.tsx:392
 #: src/features/vault/VaultTool.tsx:512
 msgid "删除"
@@ -860,8 +869,22 @@ msgstr "Remove shared folder"
 
 #: src/features/bt/BtTool.tsx:754
 #: src/features/logs/LogPageLayout.tsx:100
+#: src/features/todo/TodoTool.tsx:289
 msgid "删除后无法恢复。"
 msgstr "This cannot be undone."
+
+#: src/features/todo/TodoList.tsx:92
+#: src/features/todo/TodoList.tsx:93
+msgid "删除待办"
+msgstr "Delete todo"
+
+#: src/features/todo/TodoTool.tsx:286
+msgid "删除待办？"
+msgstr "Delete todo?"
+
+#: src/features/todo/TodoTool.tsx:152
+msgid "删除待办失败"
+msgstr "Failed to delete todo"
 
 #: src/features/bt/BtTool.tsx:763
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:30
@@ -928,7 +951,7 @@ msgstr "Encrypted file, enter the password"
 
 #: src/features/crypto/CryptoTool.tsx:78
 #: src/features/crypto/CryptoTool.tsx:95
-#: src/features/home/entries.tsx:75
+#: src/features/home/entries.tsx:76
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -1099,6 +1122,8 @@ msgstr "Discovered Devices"
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:129
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:226
 #: src/features/ssh-sftp/components/Sidebar.tsx:552
+#: src/features/todo/TodoItemDialog.tsx:204
+#: src/features/todo/TodoTool.tsx:294
 #: src/features/transfers/TransferPanel.tsx:496
 #: src/features/vault/VaultEntryDialog.tsx:187
 #: src/features/vault/VaultTool.tsx:509
@@ -1118,7 +1143,7 @@ msgstr "Cancel sync"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/features/home/entries.tsx:139
+#: src/features/home/entries.tsx:151
 #: src/features/poetry/LibraryPage.tsx:264
 #: src/features/poetry/PoemDetailPage.tsx:40
 msgid "古诗词"
@@ -1151,7 +1176,7 @@ msgid "可选"
 msgstr "Optional"
 
 #: src/features/games/billiards/BilliardsGame.tsx:56
-#: src/features/home/entries.tsx:149
+#: src/features/home/entries.tsx:161
 msgid "台球"
 msgstr "Billiards"
 
@@ -1271,7 +1296,7 @@ msgid "困难"
 msgstr "Hard"
 
 #: src/features/games/go/GoGame.tsx:35
-#: src/features/home/entries.tsx:169
+#: src/features/home/entries.tsx:181
 msgid "围棋"
 msgstr "Go"
 
@@ -1374,6 +1399,7 @@ msgstr "Result"
 msgid "处理结果预览"
 msgstr "Result preview"
 
+#: src/features/todo/TodoItemDialog.tsx:186
 #: src/features/vault/VaultEntryDialog.tsx:169
 msgid "备注"
 msgstr "Notes"
@@ -1419,7 +1445,7 @@ msgstr "Size"
 msgid "失败"
 msgstr "Failed"
 
-#: src/features/home/entries.tsx:89
+#: src/features/home/entries.tsx:90
 #: src/features/media-compress/MediaCompressTool.tsx:41
 #: src/features/media-compress/MediaCompressTool.tsx:58
 msgid "媒体处理"
@@ -1478,7 +1504,7 @@ msgid "密码"
 msgstr "Password"
 
 #: src/features/export/sections.tsx:14
-#: src/features/home/entries.tsx:111
+#: src/features/home/entries.tsx:112
 #: src/features/vault/VaultTool.tsx:247
 #: src/features/vault/VaultTool.tsx:264
 msgid "密码本"
@@ -1601,7 +1627,7 @@ msgstr "Write result back to input and switch mode"
 msgid "将返回模式选择，当前对局的进度将会丢失。"
 msgstr "This returns to mode selection and discards the current match progress."
 
-#: src/features/home/entries.tsx:24
+#: src/features/home/entries.tsx:25
 msgid "小游戏"
 msgstr "Games"
 
@@ -1620,7 +1646,7 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:64
+#: src/features/home/entries.tsx:65
 #: src/features/lan-transfer/LanTransferTool.tsx:322
 #: src/features/lan-transfer/LanTransferTool.tsx:340
 msgid "局域网传输"
@@ -1642,7 +1668,7 @@ msgstr "Failed to load LAN transfer auxiliary data: {StringValue2}"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/entries.tsx:22
+#: src/features/home/entries.tsx:23
 msgid "工具"
 msgstr "Tools"
 
@@ -1655,6 +1681,7 @@ msgid "已下载 {formatBytesValue}"
 msgstr "Downloaded {formatBytesValue}"
 
 #: src/features/media-compress/components/CompressResultCard.tsx:40
+#: src/features/todo/TodoTool.tsx:113
 #: src/features/vault/VaultTool.tsx:227
 msgid "已保存"
 msgstr "Saved"
@@ -1677,6 +1704,7 @@ msgstr "Launch at Login disabled"
 
 #: src/features/bt/BtTool.tsx:436
 #: src/features/poetry/LibraryManagePage.tsx:336
+#: src/features/todo/TodoTool.tsx:150
 #: src/features/vault/VaultTool.tsx:237
 msgid "已删除"
 msgstr "Deleted"
@@ -1751,6 +1779,7 @@ msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 
 #: src/features/bt/components/BtStatsBar.tsx:20
+#: src/features/todo/TodoTool.tsx:186
 msgid "已完成"
 msgstr "Completed"
 
@@ -1912,6 +1941,10 @@ msgstr "Audio transcoding is not supported in this WebView"
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
+#: src/features/todo/TodoTool.tsx:243
+msgid "当前分类没有待办"
+msgstr "No todos in this category"
+
 #: src/features/formatter/FormatterTool.tsx:98
 msgid "当前匹配"
 msgstr "Current match"
@@ -1939,6 +1972,11 @@ msgstr "AVIF export is not supported in this environment"
 #: src/features/lan-transfer/LanTransferTool.tsx:406
 msgid "当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured {value} is not in the list of available network interfaces; the access address may become invalid."
+
+#: src/features/home/entries.tsx:123
+#: src/features/todo/TodoTool.tsx:161
+msgid "待办事项"
+msgstr "Todo"
 
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:102
 msgid "待授权请求"
@@ -2188,7 +2226,7 @@ msgstr "File is already in this location"
 msgid "文件管理"
 msgstr "File manager"
 
-#: src/features/home/entries.tsx:23
+#: src/features/home/entries.tsx:24
 #: src/features/poetry/LibraryPage.tsx:285
 msgid "文库"
 msgstr "Library"
@@ -2220,6 +2258,7 @@ msgid "新增"
 msgstr "Add"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:283
+#: src/features/todo/TodoTool.tsx:220
 #: src/features/vault/VaultTool.tsx:279
 msgid "新建"
 msgstr "New"
@@ -2228,6 +2267,10 @@ msgstr "New"
 #: src/features/ssh-sftp/components/Sidebar.tsx:446
 msgid "新建主机"
 msgstr "New Host"
+
+#: src/features/todo/TodoItemDialog.tsx:91
+msgid "新建待办"
+msgstr "New Todo"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:415
 msgid "新建文件夹"
@@ -2266,6 +2309,10 @@ msgstr "Log deleted"
 #: src/features/logs/ActivityLogsPage.tsx:88
 msgid "日志已清空"
 msgstr "Logs cleared"
+
+#: src/features/todo/TodoItemDialog.tsx:147
+msgid "日期"
+msgstr "Date"
 
 #: src/features/logs/ActivityLogsPage.tsx:190
 #: src/features/logs/ActivityLogsPage.tsx:289
@@ -2323,6 +2370,10 @@ msgstr "No keys"
 msgid "暂无密钥，请先在密钥管理中导入。"
 msgstr "No keys yet. Import one in Key Manager first."
 
+#: src/features/todo/TodoTool.tsx:237
+msgid "暂无待办"
+msgstr "No todos"
+
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:124
 msgid "暂无待授权请求"
 msgstr "No pending authorization requests"
@@ -2376,6 +2427,10 @@ msgstr "Update information expired. Check for updates again."
 msgid "更新失败：{formatErrorValue2}"
 msgstr "Update failed: {formatErrorValue2}"
 
+#: src/features/todo/TodoTool.tsx:135
+msgid "更新待办失败"
+msgstr "Failed to update todo"
+
 #: src/features/formatter/FormatterTool.tsx:91
 msgid "替换"
 msgstr "Replace"
@@ -2404,9 +2459,17 @@ msgstr "Service not started"
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "The service is running. Stop it before changing port, receive directory, security mode, or permissions. Auto start can be saved directly."
 
+#: src/features/todo/TodoList.tsx:144
+msgid "未安排"
+msgstr "Unscheduled"
+
 #: src/features/poetry/LibraryManagePage.tsx:514
 msgid "未安装；仅点击时下载，可随时删除"
 msgstr "Not installed; downloaded on demand only, removable anytime"
+
+#: src/features/todo/TodoTool.tsx:182
+msgid "未完成"
+msgstr "Overdue"
 
 #: src/features/bt/BtTool.tsx:562
 msgid "未运行"
@@ -2418,6 +2481,7 @@ msgstr "Not running"
 msgid "未选择"
 msgstr "Not selected"
 
+#: src/features/todo/TodoTool.tsx:164
 #: src/features/vault/VaultTool.tsx:250
 msgid "本地"
 msgstr "Local"
@@ -2470,7 +2534,16 @@ msgstr "View Update"
 msgid "查看节点明细"
 msgstr "View peer details"
 
+#: src/features/todo/TodoList.tsx:39
+msgid "标记为完成"
+msgstr "Mark as completed"
+
+#: src/features/todo/TodoList.tsx:39
+msgid "标记为未完成"
+msgstr "Mark as incomplete"
+
 #: src/features/poetry/components/SearchBar.tsx:28
+#: src/features/todo/TodoItemDialog.tsx:107
 #: src/features/vault/VaultEntryDialog.tsx:147
 msgid "标题"
 msgstr "Title"
@@ -2490,7 +2563,7 @@ msgstr "Validate"
 #: src/features/formatter/FormatterTool.tsx:212
 #: src/features/formatter/FormatterTool.tsx:229
 #: src/features/formatter/FormatterTool.tsx:342
-#: src/features/home/entries.tsx:100
+#: src/features/home/entries.tsx:101
 msgid "格式化"
 msgstr "Formatter"
 
@@ -2637,6 +2710,10 @@ msgstr "Extracting {name}…"
 msgid "正在读取最新信息…"
 msgstr "Reading latest information..."
 
+#: src/features/todo/TodoTool.tsx:229
+msgid "正在读取待办"
+msgstr "Loading todos"
+
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:162
 msgid "正在连接 {sessionTitle}…"
 msgstr "Connecting to {sessionTitle}…"
@@ -2678,6 +2755,14 @@ msgstr "No child folders"
 #: src/features/poetry/LibraryPage.tsx:378
 msgid "没有找到作品"
 msgstr "No poems found"
+
+#: src/features/todo/TodoTool.tsx:245
+msgid "没有进行中的待办"
+msgstr "No todos in progress"
+
+#: src/features/todo/TodoTool.tsx:247
+msgid "没有逾期未完成的待办"
+msgstr "No overdue todos"
 
 #: src/features/poetry/components/PoemDetail.tsx:256
 #: src/features/poetry/components/PoemDetail.tsx:273
@@ -2771,6 +2856,10 @@ msgstr "Clear existing data, then write the file contents"
 msgid "清除 {finishedTransferCount}"
 msgstr "Clear {finishedTransferCount}"
 
+#: src/features/todo/TodoItemDialog.tsx:143
+msgid "清除日期"
+msgstr "Clear date"
+
 #: src/features/games/engine/GameVolumeControl.tsx:15
 msgid "游戏音量"
 msgstr "Game volume"
@@ -2782,6 +2871,10 @@ msgstr "Source video has no audio track"
 #: src/features/vault/VaultTool.tsx:322
 msgid "点击“新建”保存第一条账号密码"
 msgstr "Click “New” to save your first account credential"
+
+#: src/features/todo/TodoTool.tsx:241
+msgid "点击“新建”添加第一条待办"
+msgstr "Click “New” to add your first todo"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:483
 msgid "点击右上角 + 新建主机"
@@ -3178,6 +3271,12 @@ msgstr "Edit"
 msgid "编辑主机"
 msgstr "Edit Host"
 
+#: src/features/todo/TodoItemDialog.tsx:91
+#: src/features/todo/TodoList.tsx:82
+#: src/features/todo/TodoList.tsx:83
+msgid "编辑待办"
+msgstr "Edit Todo"
+
 #: src/features/vault/VaultEntryDialog.tsx:136
 msgid "编辑账号"
 msgstr "Edit account"
@@ -3405,6 +3504,10 @@ msgstr "Enter content"
 msgid "请输入口令"
 msgstr "Enter passphrase"
 
+#: src/features/todo/TodoItemDialog.tsx:62
+msgid "请输入待办标题"
+msgstr "Enter a todo title"
+
 #: src/features/media-compress/resize/ImageResizePanel.tsx:394
 msgid "请输入有效的目标尺寸"
 msgstr "Enter a valid target size"
@@ -3449,6 +3552,10 @@ msgstr "Reading metadata"
 #: src/features/preview/PreviewSurface.tsx:169
 msgid "读取失败"
 msgstr "Failed to load"
+
+#: src/features/todo/TodoTool.tsx:65
+msgid "读取待办失败"
+msgstr "Failed to load todos"
 
 #: src/features/poetry/LibraryPage.tsx:402
 msgid "调整双栏宽度"
@@ -3607,11 +3714,16 @@ msgstr "Restore escaped string content"
 msgid "还没有主机"
 msgstr "No hosts yet"
 
+#: src/features/todo/TodoTool.tsx:249
+msgid "还没有已完成的待办"
+msgstr "No completed todos yet"
+
 #: src/features/ssh-sftp/SshSftpTool.tsx:49
 msgid "还没有打开的连接"
 msgstr "No open connections yet"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:49
+#: src/features/todo/TodoTool.tsx:178
 msgid "进行中"
 msgstr "In Progress"
 

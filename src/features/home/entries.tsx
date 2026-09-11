@@ -10,6 +10,7 @@ import {
   Crown,
   Grid3x3,
   KeyRound,
+  ListTodo,
   LockKeyhole,
   Magnet,
   TerminalSquare,
@@ -109,6 +110,17 @@ export const homeEntries: HomeEntry[] = [
     toolId: "vault",
     icon: KeyRound,
     title: <Trans>密码本</Trans>,
+  },
+  {
+    id: "todo",
+    category: "tools",
+    link: linkOptions({
+      to: "/tools/todo",
+      preload: "intent",
+    }),
+    toolId: "todo",
+    icon: ListTodo,
+    title: <Trans>待办事项</Trans>,
   },
   {
     id: "bt",
