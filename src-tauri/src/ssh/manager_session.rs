@@ -1,4 +1,11 @@
 impl Manager {
+    pub fn is_busy(&self) -> bool {
+        !self.auth.lock().is_empty()
+            || !self.shells.lock().is_empty()
+            || !self.sftp.lock().is_empty()
+            || !self.transfers.lock().is_empty()
+    }
+
     /// Register auth material under a new/again session id (no I/O yet).
     pub fn register(&self, session_id: &str, mat: AuthMaterial) {
         self.auth.lock().insert(session_id.to_string(), mat);

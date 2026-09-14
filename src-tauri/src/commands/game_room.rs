@@ -3,6 +3,7 @@ use crate::models::{GameRoomStatus, GameRoomSummary};
 use crate::AppState;
 use tauri::State;
 
+use super::record_operation;
 use super::run_blocking;
 
 #[tauri::command]
@@ -21,12 +22,22 @@ pub async fn game_room_create(
     player_name: String,
 ) -> AppResult<GameRoomStatus> {
     let manager = state.game_room.clone();
-    run_blocking(move || {
+    let log_game_id = game_id.clone();
+    let result = run_blocking(move || {
         manager
             .create(game_id, room_name, code, player_name)
             .map_err(AppError::from)
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "games",
+        &log_game_id,
+        "create_room",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -40,12 +51,22 @@ pub async fn game_room_join(
     player_name: String,
 ) -> AppResult<GameRoomStatus> {
     let manager = state.game_room.clone();
-    run_blocking(move || {
+    let log_host = host.clone();
+    let result = run_blocking(move || {
         manager
             .join(host, port, game_id, code, player_name)
             .map_err(AppError::from)
     })
-    .await
+    .await;
+    record_operation(
+        &state.storage,
+        "games",
+        &log_host,
+        "join_room",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -68,5 +89,7 @@ pub fn game_room_send(state: State<AppState>, payload: String) -> AppResult<()> 
 #[specta::specta]
 pub fn game_room_leave(state: State<AppState>) -> AppResult<()> {
     state.game_room.leave();
-    Ok(())
+    let result = Ok(());
+    record_operation(&state.storage, "games", "", "leave_room", None, &result);
+    result
 }

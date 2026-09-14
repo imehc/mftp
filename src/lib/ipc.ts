@@ -14,6 +14,7 @@ import type {
   TodoItemInput,
   VaultEntryInput,
 } from "~/types";
+import type { AppDataModule } from "~/bindings";
 
 type CommandResult<T, E> =
   { status: "ok"; data: T } | { status: "error"; error: E };
@@ -94,8 +95,14 @@ export const lanTransferAddTrustedDevice = (input: LanTrustedDeviceInput) =>
   unwrapCommand(commands.lanTransferAddTrustedDevice(input));
 export const lanTransferDeleteTrustedDevice = (id: string) =>
   voidCommand(commands.lanTransferDeleteTrustedDevice(id));
-export const activityLogs = (limit?: number) =>
-  unwrapCommand(commands.activityLogs(limit ?? null));
+export const activityLogs = (
+  limit?: number,
+  source?: string,
+  result?: string,
+) =>
+  unwrapCommand(
+    commands.activityLogs(limit ?? null, source ?? null, result ?? null),
+  );
 export const activityLogsClear = () =>
   voidCommand(commands.activityLogsClear());
 export const activityLogDelete = (id: string) =>
@@ -266,6 +273,10 @@ export const dataImport = (
   password: string | null,
   mode: ImportMode,
 ) => unwrapCommand(commands.dataImport(raw, password, mode));
+export const appDataUsage = () => unwrapCommand(commands.appDataUsage());
+export const appDataClear = (module: AppDataModule) =>
+  unwrapCommand(commands.appDataClear(module));
+export const appDataReset = () => unwrapCommand(commands.appDataReset());
 
 // ---- 诗词库 ----
 export const poetryCollections = () =>

@@ -281,26 +281,62 @@ pub async fn sftp_download_dir(
 #[specta::specta]
 pub fn sftp_cancel_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
     state.manager.cancel_transfer(&transfer_id);
-    Ok(())
+    let result = Ok(());
+    record_operation(
+        &state.storage,
+        "sftp",
+        &transfer_id,
+        "cancel_transfer",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn sftp_pause_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
-    state.manager.pause_transfer(&transfer_id)
+    let result = state.manager.pause_transfer(&transfer_id);
+    record_operation(
+        &state.storage,
+        "sftp",
+        &transfer_id,
+        "pause_transfer",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn sftp_resume_transfer(state: State<AppState>, transfer_id: String) -> AppResult<()> {
-    state.manager.resume_transfer(&transfer_id)
+    let result = state.manager.resume_transfer(&transfer_id);
+    record_operation(
+        &state.storage,
+        "sftp",
+        &transfer_id,
+        "resume_transfer",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn sftp_reset_connection(state: State<AppState>, session_id: String) -> AppResult<()> {
     state.manager.reset_sftp_conn(&session_id);
-    Ok(())
+    let result = Ok(());
+    record_operation(
+        &state.storage,
+        "sftp",
+        &session_id,
+        "reset_connection",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]

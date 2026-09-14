@@ -12,6 +12,7 @@ use crate::poetry::model::{
 use crate::poetry::sync::SYNC_PROGRESS_EVENT;
 use crate::AppState;
 
+use super::record_operation;
 use super::run_blocking;
 
 fn progress_emitter(app: &AppHandle) -> impl Fn(PoetrySyncProgress) + Send + Sync + 'static {
@@ -50,7 +51,10 @@ pub async fn poetry_sync_start(
 ) -> AppResult<()> {
     let library = state.poetry.clone();
     let emit_progress = progress_emitter(&app);
-    run_blocking(move || library.begin_network_sync(emit_progress, collection_ids)).await
+    let result =
+        run_blocking(move || library.begin_network_sync(emit_progress, collection_ids)).await;
+    record_operation(&state.storage, "poetry", "", "sync", None, &result);
+    result
 }
 
 #[tauri::command]
@@ -63,25 +67,40 @@ pub async fn poetry_sync_import_local(
 ) -> AppResult<()> {
     let library = state.poetry.clone();
     let emit_progress = progress_emitter(&app);
-    run_blocking(move || library.begin_local_import(emit_progress, path, collection_ids)).await
+    let result =
+        run_blocking(move || library.begin_local_import(emit_progress, path, collection_ids)).await;
+    record_operation(&state.storage, "poetry", "", "import", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub async fn poetry_sync_cancel(state: State<'_, AppState>) -> AppResult<()> {
     let library = state.poetry.clone();
-    run_blocking(move || {
+    let result = run_blocking(move || {
         library.cancel_sync();
         Ok(())
     })
-    .await
+    .await;
+    record_operation(&state.storage, "poetry", "", "cancel", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub async fn poetry_collection_delete(state: State<'_, AppState>, id: String) -> AppResult<()> {
     let library = state.poetry.clone();
-    run_blocking(move || library.delete_collection(&id)).await
+    let log_id = id.clone();
+    let result = run_blocking(move || library.delete_collection(&id)).await;
+    record_operation(
+        &state.storage,
+        "poetry",
+        &log_id,
+        "delete_collection",
+        None,
+        &result,
+    );
+    result
 }
 
 /// Rebuild or drop the bigram body index; emits `indexing` progress events.
@@ -94,7 +113,7 @@ pub async fn poetry_content_index_build(
 ) -> AppResult<()> {
     let library = state.poetry.clone();
     let emit_progress = progress_emitter(&app);
-    run_blocking(move || {
+    let result = run_blocking(move || {
         library.rebuild_body_index(enable, move |done, total| {
             emit_progress(PoetrySyncProgress {
                 collection_id: "body-index".into(),
@@ -107,7 +126,9 @@ pub async fn poetry_content_index_build(
             });
         })
     })
-    .await
+    .await;
+    record_operation(&state.storage, "poetry", "", "build_index", None, &result);
+    result
 }
 
 #[tauri::command]
@@ -190,7 +211,16 @@ pub async fn poetry_annotations_install(
 ) -> AppResult<()> {
     let library = state.poetry.clone();
     let emit_progress = progress_emitter(&app);
-    run_blocking(move || library.begin_annotations_install(emit_progress)).await
+    let result = run_blocking(move || library.begin_annotations_install(emit_progress)).await;
+    record_operation(
+        &state.storage,
+        "poetry",
+        "annotations",
+        "install",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -213,5 +243,14 @@ pub async fn poetry_annotations_status(
 #[specta::specta]
 pub async fn poetry_annotations_delete(state: State<'_, AppState>) -> AppResult<()> {
     let library = state.poetry.clone();
-    run_blocking(move || library.annotations_delete()).await
+    let result = run_blocking(move || library.annotations_delete()).await;
+    record_operation(
+        &state.storage,
+        "poetry",
+        "annotations",
+        "delete",
+        None,
+        &result,
+    );
+    result
 }

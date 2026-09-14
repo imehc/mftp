@@ -9,6 +9,8 @@ use crate::error::AppResult;
 use crate::AppState;
 use tauri::State;
 
+use super::record_operation;
+
 #[tauri::command]
 #[specta::specta]
 pub async fn bt_probe(state: State<'_, AppState>, source: String) -> AppResult<BtProbeResult> {
@@ -24,10 +26,19 @@ pub async fn bt_add_download(
     file_indices: Vec<usize>,
     dest_dir: String,
 ) -> AppResult<BtTaskInfo> {
-    state
+    let result = state
         .bt
         .add_download(&source, &info_hash, file_indices, dest_dir)
-        .await
+        .await;
+    record_operation(
+        &state.storage,
+        "bt",
+        &info_hash,
+        "add_download",
+        None,
+        &result,
+    );
+    result
 }
 
 /// Ensure a streamable task exists for the target file (cache mode or an
@@ -39,7 +50,16 @@ pub async fn bt_ensure_preview(
     source: String,
     file_index: usize,
 ) -> AppResult<BtTaskInfo> {
-    state.bt.ensure_preview_task(&source, file_index).await
+    let result = state.bt.ensure_preview_task(&source, file_index).await;
+    record_operation(
+        &state.storage,
+        "bt",
+        &source,
+        "ensure_preview",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -66,7 +86,9 @@ pub async fn bt_control(
     action: BtControlAction,
     delete_files: bool,
 ) -> AppResult<()> {
-    state.bt.control(&info_hash, action, delete_files).await
+    let result = state.bt.control(&info_hash, action, delete_files).await;
+    record_operation(&state.storage, "bt", &info_hash, "control", None, &result);
+    result
 }
 
 /// Save the file currently open in the preview page. Unfinished files are
@@ -79,10 +101,19 @@ pub async fn bt_save_to_local(
     dest_dir: String,
     file_index: usize,
 ) -> AppResult<()> {
-    state
+    let result = state
         .bt
         .save_to_local(&info_hash, dest_dir, file_index)
-        .await
+        .await;
+    record_operation(
+        &state.storage,
+        "bt",
+        &info_hash,
+        "save_to_local",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -98,19 +129,32 @@ pub async fn bt_cache_stats(state: State<'_, AppState>) -> AppResult<BtCacheStat
 #[tauri::command]
 #[specta::specta]
 pub async fn bt_set_cache_quota(state: State<'_, AppState>, bytes: u64) -> AppResult<()> {
-    state.bt.set_cache_quota(bytes)
+    let result = state.bt.set_cache_quota(bytes);
+    record_operation(&state.storage, "bt", "", "set_cache_quota", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub async fn bt_clear_cache(state: State<'_, AppState>) -> AppResult<u32> {
-    state.bt.clear_cache().await.map(|n| n as u32)
+    let result = state.bt.clear_cache().await.map(|n| n as u32);
+    record_operation(&state.storage, "bt", "", "clear_cache", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub async fn bt_remove_cache(state: State<'_, AppState>, info_hash: String) -> AppResult<()> {
-    state.bt.remove_cache(&info_hash).await
+    let result = state.bt.remove_cache(&info_hash).await;
+    record_operation(
+        &state.storage,
+        "bt",
+        &info_hash,
+        "remove_cache",
+        None,
+        &result,
+    );
+    result
 }
 
 /// Cache-pool entries for the manageable cache list.

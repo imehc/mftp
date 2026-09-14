@@ -1,11 +1,8 @@
-import { useEffect, useState } from "react";
-import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { useEffect } from "react";
+import { Link } from "@tanstack/react-router";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import {
-  Archive,
-  Download,
-  FileUp,
-  FolderTree,
-  HardDriveDownload,
+  ExternalLink,
   Languages,
   Monitor,
   Moon,
@@ -17,15 +14,12 @@ import {
   Type,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { toast } from "sonner";
 import { useLingui } from "@lingui/react/macro";
 import { useLingui as useLinguiRuntime } from "@lingui/react";
 import { Button } from "~/components/ui/button";
-import { isDesktopPlatform } from "~/lib/platform";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -35,6 +29,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { isDesktopPlatform } from "~/lib/platform";
 import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
 import {
   applyColorTheme,
@@ -46,69 +41,32 @@ import {
   type ColorTheme,
   type FontPreset,
 } from "~/lib/color-theme";
-import {
-  type AppLocale,
-  type DirectoryTransferMode,
-  useSettingsStore,
-} from "~/store/settings";
-import { useTransfersStore } from "~/store/transfers";
-import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 import { localeLabels, localeOptions } from "~/i18n/locales";
+import { type AppLocale, useSettingsStore } from "~/store/settings";
+import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 import { cn } from "~/lib/utils";
-import ExportDialog from "~/features/export/ExportDialog";
-import ImportDialog from "~/features/export/ImportDialog";
-import { exportSections } from "~/features/export/sections";
-const allExportSections = exportSections.map((meta) => meta.id);
+
 const themes = [
-  {
-    value: "system",
-    icon: Monitor,
-  },
-  {
-    value: "light",
-    icon: Sun,
-  },
-  {
-    value: "dark",
-    icon: Moon,
-  },
+  { value: "system", icon: Monitor },
+  { value: "light", icon: Sun },
+  { value: "dark", icon: Moon },
 ] as const;
-const directoryTransferModes = [
-  {
-    value: "archive",
-    icon: Archive,
-  },
-  {
-    value: "direct",
-    icon: FolderTree,
-  },
-] as const;
+
 export default function AppSettingsMenu() {
   const { t } = useLingui();
   const { _ } = useLinguiRuntime();
   const { theme = "system", setTheme } = useTheme();
-  const [autostartEnabled, setAutostartEnabled] = useState(false);
-  const [autostartBusy, setAutostartBusy] = useState(false);
-  const [exportOpen, setExportOpen] = useState(false);
-  const [importOpen, setImportOpen] = useState(false);
   const locale = useSettingsStore((s) => s.locale);
   const setLocale = useSettingsStore((s) => s.setLocale);
   const colorTheme = useSettingsStore((s) => s.colorTheme);
   const setColorTheme = useSettingsStore((s) => s.setColorTheme);
   const fontPreset = useSettingsStore((s) => s.fontPreset);
   const setFontPreset = useSettingsStore((s) => s.setFontPreset);
-  const directoryTransferMode = useSettingsStore(
-    (s) => s.directoryTransferMode,
-  );
-  const setDirectoryTransferMode = useSettingsStore(
-    (s) => s.setDirectoryTransferMode,
-  );
-  const hasRunningTransfer = useTransfersStore((s) =>
-    s.transfers.some((item) => item.status === "running"),
-  );
   const updaterStatus = useUpdaterStore((s) => s.status);
-  const checkingUpdate = updaterStatus === "checking";
+  const checking = updaterStatus === "checking";
   const restarting = updaterStatus === "restarting";
+  const ThemeIcon =
+    themes.find((item) => item.value === theme)?.icon ?? Monitor;
   const updateLabels: Record<UpdaterStatus, string> = {
     idle: t`检查更新`,
     checking: t`正在检查`,
@@ -118,75 +76,19 @@ export default function AppSettingsMenu() {
     restarting: t`重启中`,
     error: t`重新检查`,
   };
-  const themeLabels = {
-    system: t`系统`,
-    light: t`浅色`,
-    dark: t`深色`,
-  } as const;
-  const colorThemeLabels = {
-    default: t`默认`,
-    designbyte: t`DesignByte`,
-    "mx-brutalist": t`MX-Brutalist`,
-    cyberpunk: t`赛博朋克`,
-    tiesen: t`Tiesen`,
-  } as const;
-  const fontPresetLabels = {
-    theme: t`跟随主题`,
-    geist: t`Geist`,
-    outfit: t`Outfit`,
-    jakarta: t`Plus Jakarta`,
-    montserrat: t`Montserrat`,
-  } as const;
-  const ThemeIcon =
-    themes.find((item) => item.value === theme)?.icon ?? Monitor;
-  const directoryTransferModeLabels = {
-    archive: t`压缩包`,
-    direct: t`直接`,
-  } as const;
-  async function refreshAutostart() {
-    try {
-      setAutostartEnabled(await isEnabled());
-    } catch {
-      setAutostartEnabled(false);
-    }
-  }
-  useEffect(() => {
-    if (!isDesktopPlatform()) return;
-    // 用微任务延后，使 setState 发生在 effect 函数体之外。
-    queueMicrotask(() => void refreshAutostart());
-  }, []);
+
   useEffect(() => {
     applyColorTheme(resolveColorTheme(colorTheme));
   }, [colorTheme]);
   useEffect(() => {
     applyFontPreset(resolveFontPreset(fontPreset));
   }, [fontPreset]);
-  function onCheckUpdate() {
-    if (updaterStatus === "ready") {
-      void restartToApplyUpdate();
-      return;
-    }
-    void checkForUpdateManually();
+
+  function checkUpdate() {
+    if (updaterStatus === "ready") void restartToApplyUpdate();
+    else void checkForUpdateManually();
   }
-  async function setAutostartMode(nextEnabled: boolean) {
-    if (nextEnabled === autostartEnabled) return;
-    setAutostartBusy(true);
-    try {
-      if (nextEnabled) {
-        await enable();
-        setAutostartEnabled(true);
-        toast.success(t`已开启开机自启`);
-      } else {
-        await disable();
-        setAutostartEnabled(false);
-        toast.success(t`已关闭开机自启`);
-      }
-    } catch (error) {
-      toast.error(String(error));
-    } finally {
-      setAutostartBusy(false);
-    }
-  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -195,99 +97,49 @@ export default function AppSettingsMenu() {
           {t`设置`}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-44 whitespace-nowrap">
-        {isDesktopPlatform() ? (
-          <>
-            <DropdownMenuGroup>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger disabled={autostartBusy}>
-                  <Monitor />
-                  {t`开机自启`}
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
-                  <DropdownMenuRadioGroup
-                    value={autostartEnabled ? "enabled" : "disabled"}
-                    onValueChange={(value) => {
-                      void setAutostartMode(value === "enabled");
-                    }}
-                  >
-                    <DropdownMenuRadioItem
-                      value="enabled"
-                      disabled={autostartBusy}
-                    >
-                      {t`开启`}
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem
-                      value="disabled"
-                      disabled={autostartBusy}
-                    >
-                      {t({
-                        context: "state",
-                        comment:
-                          "Radio option that disables automatic app startup",
-                        message: "关闭",
-                      })}
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuItem
-                disabled={checkingUpdate || restarting}
-                onSelect={onCheckUpdate}
-              >
-                {updaterStatus === "ready" ? (
-                  <RotateCcw />
-                ) : updaterStatus === "downloading" ? (
-                  <Download />
-                ) : (
-                  <RefreshCw className={cn(checkingUpdate && "animate-spin")} />
-                )}
-                {updateLabels[updaterStatus]}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-          </>
-        ) : null}
+      <DropdownMenuContent align="end" className="min-w-48 whitespace-nowrap">
+        <DropdownMenuItem asChild>
+          <Link to="/settings">
+            <Settings />
+            {t`设置`}
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger disabled={hasRunningTransfer}>
-            <Archive />
-            {t`文件夹传输`}
+          <DropdownMenuSubTrigger>
+            <ExternalLink />
+            {t`更多`}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
-            <DropdownMenuRadioGroup
-              value={directoryTransferMode}
-              onValueChange={(value) => {
-                if (hasRunningTransfer) return;
-                setDirectoryTransferMode(value as DirectoryTransferMode);
-              }}
+          <DropdownMenuSubContent className="min-w-40 whitespace-nowrap">
+            <DropdownMenuItem asChild>
+              <Link to="/about">{t`关于`}</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/logs">{t`日志`}</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => void openUrl("https://github.com/imehc/mftp")}
             >
-              {directoryTransferModes.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <DropdownMenuRadioItem
-                    key={item.value}
-                    value={item.value}
-                    disabled={hasRunningTransfer}
-                  >
-                    <Icon />
-                    {directoryTransferModeLabels[item.value]}
-                  </DropdownMenuRadioItem>
-                );
-              })}
-            </DropdownMenuRadioGroup>
+              <ExternalLink />
+              {t`项目帮助`}
+            </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onSelect={() => setExportOpen(true)}>
-            <HardDriveDownload />
-            {t`导出数据`}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setImportOpen(true)}>
-            <FileUp />
-            {t`导入数据`}
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        {isDesktopPlatform() ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              disabled={checking || restarting}
+              onSelect={checkUpdate}
+            >
+              {updaterStatus === "ready" ? (
+                <RotateCcw />
+              ) : (
+                <RefreshCw className={cn(checking && "animate-spin")} />
+              )}
+              {updateLabels[updaterStatus]}
+            </DropdownMenuItem>
+          </>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
@@ -307,7 +159,6 @@ export default function AppSettingsMenu() {
             </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
-        <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <ThemeIcon />
@@ -317,10 +168,16 @@ export default function AppSettingsMenu() {
             <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
               {themes.map((item) => {
                 const Icon = item.icon;
+                const label =
+                  item.value === "system"
+                    ? t`系统`
+                    : item.value === "light"
+                      ? t`浅色`
+                      : t`深色`;
                 return (
                   <DropdownMenuRadioItem key={item.value} value={item.value}>
                     <Icon />
-                    {themeLabels[item.value]}
+                    {label}
                   </DropdownMenuRadioItem>
                 );
               })}
@@ -345,30 +202,26 @@ export default function AppSettingsMenu() {
                   >
                     <span
                       className="size-3.5"
-                      style={{
-                        backgroundColor: item.swatches.background,
-                      }}
+                      style={{ backgroundColor: item.swatches.background }}
                     />
                     <span
                       className="size-3.5"
-                      style={{
-                        backgroundColor: item.swatches.primary,
-                      }}
+                      style={{ backgroundColor: item.swatches.primary }}
                     />
                     <span
                       className="size-3.5"
-                      style={{
-                        backgroundColor: item.swatches.accent,
-                      }}
+                      style={{ backgroundColor: item.swatches.accent }}
                     />
                     <span
                       className="size-3.5"
-                      style={{
-                        backgroundColor: item.swatches.secondary,
-                      }}
+                      style={{ backgroundColor: item.swatches.secondary }}
                     />
                   </span>
-                  {colorThemeLabels[item.value]}
+                  {item.value === "default"
+                    ? t`默认`
+                    : item.value === "cyberpunk"
+                      ? t`赛博朋克`
+                      : item.value}
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup>
@@ -386,19 +239,17 @@ export default function AppSettingsMenu() {
             >
               {fontPresets.map((item) => (
                 <DropdownMenuRadioItem key={item} value={item}>
-                  {fontPresetLabels[item]}
+                  {item === "theme"
+                    ? t`跟随主题`
+                    : item === "jakarta"
+                      ? "Plus Jakarta"
+                      : item[0].toUpperCase() + item.slice(1)}
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>
-      <ExportDialog
-        open={exportOpen}
-        defaultSections={allExportSections}
-        onOpenChange={setExportOpen}
-      />
-      <ImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </DropdownMenu>
   );
 }

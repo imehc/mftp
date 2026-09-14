@@ -19,4 +19,14 @@ export const exportSections: ExportSectionMeta[] = [
     title: <Trans>主机</Trans>,
     description: <Trans>SSH / SFTP 主机连接配置</Trans>,
   },
+  {
+    id: "todo",
+    title: <Trans>待办</Trans>,
+    description: <Trans>标题、分类、备注、日期和完成状态</Trans>,
+  },
+  {
+    id: "lan",
+    title: <Trans>局域网</Trans>,
+    description: <Trans>传输设置、共享目录和信任设备</Trans>,
+  },
 ];

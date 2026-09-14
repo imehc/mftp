@@ -9,6 +9,8 @@ use crate::AppState;
 use std::net::IpAddr;
 use tauri::State;
 
+use super::record_operation;
+
 #[tauri::command]
 #[specta::specta]
 pub fn lan_transfer_settings(state: State<AppState>) -> AppResult<LanTransferSettings> {
@@ -21,7 +23,9 @@ pub fn lan_transfer_save_settings(
     state: State<AppState>,
     settings: LanTransferSettings,
 ) -> AppResult<LanTransferSettings> {
-    state.storage.save_lan_transfer_settings(settings)
+    let result = state.storage.save_lan_transfer_settings(settings);
+    record_operation(&state.storage, "lan", "", "save_settings", None, &result);
+    result
 }
 
 #[tauri::command]
@@ -67,20 +71,40 @@ pub fn lan_transfer_approve_auth_request(
     id: String,
     permission: String,
 ) -> AppResult<bool> {
-    Ok(state.lan_transfer.approve_auth_request(&id, &permission))
+    let result = Ok(state.lan_transfer.approve_auth_request(&id, &permission));
+    record_operation(
+        &state.storage,
+        "lan",
+        &id,
+        "approve_auth",
+        Some(&permission),
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn lan_transfer_reject_auth_request(state: State<AppState>, id: String) -> AppResult<bool> {
-    Ok(state.lan_transfer.reject_auth_request(&id))
+    let result = Ok(state.lan_transfer.reject_auth_request(&id));
+    record_operation(&state.storage, "lan", &id, "reject_auth", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn lan_transfer_disconnect_device(state: State<AppState>, id: String) -> AppResult<()> {
     state.lan_transfer.disconnect_device(&id);
-    Ok(())
+    let result = Ok(());
+    record_operation(
+        &state.storage,
+        "lan",
+        &id,
+        "disconnect_device",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -93,7 +117,9 @@ pub fn lan_transfer_tasks(state: State<AppState>) -> AppResult<Vec<LanTransferTa
 #[specta::specta]
 pub fn lan_transfer_cancel_task(state: State<AppState>, id: String) -> AppResult<()> {
     state.lan_transfer.cancel_task(&id);
-    Ok(())
+    let result = Ok(());
+    record_operation(&state.storage, "lan", &id, "cancel_task", None, &result);
+    result
 }
 
 #[tauri::command]
@@ -107,19 +133,23 @@ pub fn lan_transfer_start(state: State<AppState>) -> AppResult<LanTransferStatus
         .into_iter()
         .map(|device| device.ip)
         .collect();
-    state.lan_transfer.start(
+    let result = state.lan_transfer.start(
         settings,
         shares,
         trusted_ips,
         state.storage.db_path().to_path_buf(),
-    )
+    );
+    record_operation(&state.storage, "lan", "", "start", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn lan_transfer_stop(state: State<AppState>) -> AppResult<LanTransferStatus> {
     state.lan_transfer.stop();
-    Ok(state.lan_transfer.status())
+    let result = Ok(state.lan_transfer.status());
+    record_operation(&state.storage, "lan", "", "stop", None, &result);
+    result
 }
 
 #[tauri::command]
@@ -134,13 +164,24 @@ pub fn lan_transfer_add_shared_dir(
     state: State<AppState>,
     input: LanSharedDirInput,
 ) -> AppResult<LanSharedDir> {
-    state.storage.add_lan_shared_dir(input)
+    let result = state.storage.add_lan_shared_dir(input);
+    record_operation(&state.storage, "lan", "", "add_shared_dir", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn lan_transfer_delete_shared_dir(state: State<AppState>, id: String) -> AppResult<()> {
-    state.storage.delete_lan_shared_dir(&id)
+    let result = state.storage.delete_lan_shared_dir(&id);
+    record_operation(
+        &state.storage,
+        "lan",
+        &id,
+        "delete_shared_dir",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
@@ -159,25 +200,50 @@ pub fn lan_transfer_add_trusted_device(
         .ip
         .parse::<IpAddr>()
         .map_err(|_| crate::error::AppError(format!("无效的 IP 地址：{}", input.ip)))?;
-    state.storage.add_lan_trusted_device(input)
+    let result = state.storage.add_lan_trusted_device(input);
+    record_operation(
+        &state.storage,
+        "lan",
+        "",
+        "add_trusted_device",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn lan_transfer_delete_trusted_device(state: State<AppState>, id: String) -> AppResult<()> {
-    state.storage.delete_lan_trusted_device(&id)
+    let result = state.storage.delete_lan_trusted_device(&id);
+    record_operation(
+        &state.storage,
+        "lan",
+        &id,
+        "delete_trusted_device",
+        None,
+        &result,
+    );
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn activity_logs(state: State<AppState>, limit: Option<u32>) -> AppResult<Vec<ActivityLog>> {
-    state.storage.list_activity_logs(limit.unwrap_or(500))
+pub fn activity_logs(
+    state: State<AppState>,
+    limit: Option<u32>,
+    source: Option<String>,
+    result: Option<String>,
+) -> AppResult<Vec<ActivityLog>> {
+    state
+        .storage
+        .list_activity_logs(limit.unwrap_or(500), source.as_deref(), result.as_deref())
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn activity_logs_clear(state: State<AppState>) -> AppResult<()> {
-    state.storage.clear_activity_logs()
+    state.storage.clear_activity_logs(None).map(|_| ())
 }
 
 #[tauri::command]

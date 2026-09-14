@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as PreviewRouteImport } from './routes/preview'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
@@ -35,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LogsRoute = LogsRouteImport.update({
   id: '/logs',
   path: '/logs',
@@ -43,6 +50,11 @@ const LogsRoute = LogsRouteImport.update({
 const PreviewRoute = PreviewRouteImport.update({
   id: '/preview',
   path: '/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
@@ -133,8 +145,10 @@ const ToolsVideoCompressRoute = ToolsVideoCompressRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/logs': typeof LogsRoute
   '/preview': typeof PreviewRoute
+  '/settings': typeof SettingsRoute
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
@@ -155,8 +169,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/logs': typeof LogsRoute
   '/preview': typeof PreviewRoute
+  '/settings': typeof SettingsRoute
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
@@ -178,8 +194,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/logs': typeof LogsRoute
   '/preview': typeof PreviewRoute
+  '/settings': typeof SettingsRoute
   '/games/billiards': typeof GamesBilliardsRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
@@ -202,8 +220,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/logs'
     | '/preview'
+    | '/settings'
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
@@ -224,8 +244,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/logs'
     | '/preview'
+    | '/settings'
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
@@ -246,8 +268,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/logs'
     | '/preview'
+    | '/settings'
     | '/games/billiards'
     | '/games/go'
     | '/games/gomoku'
@@ -269,8 +293,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   LogsRoute: typeof LogsRoute
   PreviewRoute: typeof PreviewRoute
+  SettingsRoute: typeof SettingsRoute
   GamesBilliardsRoute: typeof GamesBilliardsRoute
   GamesGoRoute: typeof GamesGoRoute
   GamesGomokuRoute: typeof GamesGomokuRoute
@@ -299,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/logs': {
       id: '/logs'
       path: '/logs'
@@ -311,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/preview'
       fullPath: '/preview'
       preLoaderRoute: typeof PreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/billiards': {
@@ -437,8 +477,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   LogsRoute: LogsRoute,
   PreviewRoute: PreviewRoute,
+  SettingsRoute: SettingsRoute,
   GamesBilliardsRoute: GamesBilliardsRoute,
   GamesGoRoute: GamesGoRoute,
   GamesGomokuRoute: GamesGomokuRoute,

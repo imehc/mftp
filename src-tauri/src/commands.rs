@@ -2,6 +2,7 @@ use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
 mod bt;
+mod data;
 mod export;
 mod game_room;
 mod hosts;
@@ -14,6 +15,7 @@ mod todo;
 mod vault;
 
 pub use bt::*;
+pub use data::*;
 pub use export::*;
 pub use game_room::*;
 pub use hosts::*;
@@ -47,5 +49,5 @@ pub(crate) fn record_operation<T>(
         Ok(_) => ("success", None),
         Err(error) => ("failed", Some(error.0.as_str())),
     };
-    let _ = storage.record_activity_log(source, address, action, status, error_detail.or(detail));
+    let _ = storage.record_result(source, address, action, error_detail.or(detail), status);
 }

@@ -3,6 +3,8 @@ use crate::models::{TodoItem, TodoItemInput};
 use crate::AppState;
 use tauri::State;
 
+use super::record_operation;
+
 #[tauri::command]
 #[specta::specta]
 pub fn todo_items_list(state: State<AppState>) -> AppResult<Vec<TodoItem>> {
@@ -12,7 +14,9 @@ pub fn todo_items_list(state: State<AppState>) -> AppResult<Vec<TodoItem>> {
 #[tauri::command]
 #[specta::specta]
 pub fn todo_item_create(state: State<AppState>, input: TodoItemInput) -> AppResult<TodoItem> {
-    state.storage.create_todo_item(input)
+    let result = state.storage.create_todo_item(input);
+    record_operation(&state.storage, "todo", "", "create", None, &result);
+    result
 }
 
 #[tauri::command]
@@ -22,11 +26,15 @@ pub fn todo_item_update(
     id: String,
     input: TodoItemInput,
 ) -> AppResult<TodoItem> {
-    state.storage.update_todo_item(&id, input)
+    let result = state.storage.update_todo_item(&id, input);
+    record_operation(&state.storage, "todo", &id, "update", None, &result);
+    result
 }
 
 #[tauri::command]
 #[specta::specta]
 pub fn todo_item_delete(state: State<AppState>, id: String) -> AppResult<()> {
-    state.storage.delete_todo_item(&id)
+    let result = state.storage.delete_todo_item(&id);
+    record_operation(&state.storage, "todo", &id, "delete", None, &result);
+    result
 }

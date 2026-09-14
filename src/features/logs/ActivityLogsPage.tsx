@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FileClock, Search } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -38,10 +38,8 @@ import {
 import * as ipc from "~/lib/ipc";
 import { useMediaQuery } from "~/lib/use-media-query";
 import type { ActivityLog } from "~/types";
-function sourceLabel(value: string, t: ReturnType<typeof useLingui>["t"]) {
-  if (value === "ssh") return "SSH";
-  if (value === "sftp") return "SFTP";
-  return t`局域网`;
+function sourceLabel(value: string, labels: Record<string, string>) {
+  return labels[value] ?? labels.lan;
 }
 function OverflowTooltipText({ value }: { value?: string | null }) {
   const text = value || "-";
@@ -68,19 +66,38 @@ export default function ActivityLogsPage() {
   const [loading, setLoading] = useState(false);
   const viewportRef = useRef<HTMLDivElement>(null);
   const desktop = useMediaQuery("(min-width: 768px)");
+  const sourceLabels: Record<string, string> = {
+    lan: t`局域网`,
+    ssh: "SSH",
+    sftp: "SFTP",
+    bt: "BT",
+    todo: t`待办`,
+    vault: t`密码本`,
+    hosts: t`主机`,
+    poetry: t`诗词库`,
+    data: t`数据`,
+    games: t`游戏`,
+  };
   async function load() {
     setLoading(true);
     try {
-      setLogs(await ipc.activityLogs(500));
+      setLogs(
+        await ipc.activityLogs(
+          500,
+          source === "all" ? undefined : source,
+          result === "all" ? undefined : result,
+        ),
+      );
     } catch (error) {
       toast.error(String(error));
     } finally {
       setLoading(false);
     }
   }
+  const loadOnFilterChange = useEffectEvent(load);
   useEffect(() => {
-    void load();
-  }, []);
+    void loadOnFilterChange();
+  }, [source, result]);
   async function clear() {
     try {
       await ipc.activityLogsClear();
@@ -130,7 +147,7 @@ export default function ActivityLogsPage() {
   return (
     <LogPageLayout
       title={t`日志`}
-      description={t`管理 SSH、SFTP 和局域网传输活动`}
+      description={t`查看所有模块的操作记录`}
       actions={
         <LogPageActions
           loading={loading}
@@ -164,6 +181,25 @@ export default function ActivityLogsPage() {
                 </SelectItem>
                 <SelectItem value="ssh">SSH</SelectItem>
                 <SelectItem value="sftp">SFTP</SelectItem>
+                <SelectItem value="vault">
+                  <Trans>密码本</Trans>
+                </SelectItem>
+                <SelectItem value="hosts">
+                  <Trans>主机</Trans>
+                </SelectItem>
+                <SelectItem value="todo">
+                  <Trans>待办</Trans>
+                </SelectItem>
+                <SelectItem value="poetry">
+                  <Trans>诗词库</Trans>
+                </SelectItem>
+                <SelectItem value="bt">BT</SelectItem>
+                <SelectItem value="data">
+                  <Trans>数据</Trans>
+                </SelectItem>
+                <SelectItem value="games">
+                  <Trans>游戏</Trans>
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -247,7 +283,7 @@ export default function ActivityLogsPage() {
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-1.5">
                             <Badge variant="outline">
-                              {sourceLabel(log.source, t)}
+                              {sourceLabel(log.source, sourceLabels)}
                             </Badge>
                             <Badge
                               variant={
@@ -328,7 +364,7 @@ export default function ActivityLogsPage() {
                       </span>
                       <span>
                         <Badge variant="outline">
-                          {sourceLabel(log.source, t)}
+                          {sourceLabel(log.source, sourceLabels)}
                         </Badge>
                       </span>
                       <span className="truncate text-xs tabular-nums">

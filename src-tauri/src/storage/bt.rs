@@ -74,6 +74,16 @@ fn query_all(
 }
 
 impl Storage {
+    pub fn has_active_bt_tasks(&self) -> AppResult<bool> {
+        let conn = self.conn()?;
+        let active: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM bt_tasks WHERE status IN ('active', 'packaging')",
+            [],
+            |row| row.get(0),
+        )?;
+        Ok(active > 0)
+    }
+
     pub fn upsert_bt_task(&self, task: &BtTaskRow) -> AppResult<()> {
         let conn = self.conn()?;
         let total_bytes = task

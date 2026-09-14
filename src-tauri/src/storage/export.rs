@@ -1,5 +1,5 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{ExportSection, ImportPreview};
+use crate::models::{ExportSection, ImportPreview, LanExportData};
 use argon2::{Algorithm, Argon2, Params, Version};
 use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
@@ -113,6 +113,8 @@ pub(super) fn section_key(section: ExportSection) -> &'static str {
     match section {
         ExportSection::Vault => "vault",
         ExportSection::Hosts => "hosts",
+        ExportSection::Todo => "todo",
+        ExportSection::Lan => "lan",
     }
 }
 
@@ -120,6 +122,8 @@ pub(super) fn section_from_key(key: &str) -> Option<ExportSection> {
     match key {
         "vault" => Some(ExportSection::Vault),
         "hosts" => Some(ExportSection::Hosts),
+        "todo" => Some(ExportSection::Todo),
+        "lan" => Some(ExportSection::Lan),
         _ => None,
     }
 }
@@ -156,6 +160,12 @@ impl Storage {
             let value = match section {
                 ExportSection::Vault => json!(self.list_vault_entries()?),
                 ExportSection::Hosts => json!(self.list_hosts()?),
+                ExportSection::Todo => json!(self.list_todo_items()?),
+                ExportSection::Lan => json!(LanExportData {
+                    settings: self.lan_transfer_settings()?,
+                    shared_dirs: self.list_lan_shared_dirs()?,
+                    trusted_devices: self.list_lan_trusted_devices()?,
+                }),
             };
             data.insert(section_key(*section).to_string(), value);
         }

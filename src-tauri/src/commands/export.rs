@@ -3,6 +3,7 @@ use crate::models::{ExportSection, ImportMode, ImportPreview, ImportReport};
 use crate::AppState;
 use tauri::State;
 
+use super::record_operation;
 use super::run_blocking;
 
 /// Serialize the selected sections as a JSON document, optionally encrypted
@@ -17,7 +18,10 @@ pub async fn data_export(
 ) -> AppResult<String> {
     let storage = state.storage.clone();
     // Argon2 key derivation is CPU-heavy; keep it off the async runtime.
-    run_blocking(move || storage.export_document(&sections, password.as_deref())).await
+    let result =
+        run_blocking(move || storage.export_document(&sections, password.as_deref())).await;
+    record_operation(&state.storage, "data", "", "export", None, &result);
+    result
 }
 
 /// Detect whether a file is an mftp export and whether it is encrypted.
@@ -36,5 +40,8 @@ pub async fn data_import(
     mode: ImportMode,
 ) -> AppResult<ImportReport> {
     let storage = state.storage.clone();
-    run_blocking(move || storage.import_document(&raw, password.as_deref(), mode)).await
+    let result =
+        run_blocking(move || storage.import_document(&raw, password.as_deref(), mode)).await;
+    record_operation(&state.storage, "data", "", "import", None, &result);
+    result
 }

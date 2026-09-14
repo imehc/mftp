@@ -7,8 +7,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 const DB_FILE: &str = "mftp.sqlite3";
 
-mod activity;
+pub(crate) mod activity;
 pub(crate) mod bt;
+mod data;
 mod export;
 mod helpers;
 mod import;
@@ -590,5 +591,9 @@ impl Storage {
 
     pub fn db_path(&self) -> &Path {
         &self.db_path
+    }
+
+    pub(crate) fn root_path(&self) -> &Path {
+        &self.root
     }
 }

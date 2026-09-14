@@ -1,5 +1,8 @@
 export type {
   ActivityLog,
+  AppDataClearResult,
+  AppDataModule,
+  AppDataUsage,
   AppError,
   AuthType,
   AuthorBio,

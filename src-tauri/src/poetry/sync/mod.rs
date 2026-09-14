@@ -77,6 +77,27 @@ impl PoetryLibrary {
         }
     }
 
+    pub fn is_active(&self) -> bool {
+        self.active.lock().is_some()
+    }
+
+    pub fn delete_database(&self) -> AppResult<()> {
+        let path = self.root.join("poetry.sqlite3");
+        for suffix in ["", "-wal", "-shm"] {
+            let target = PathBuf::from(format!("{}{}", path.display(), suffix));
+            if target.exists() {
+                fs::remove_file(target)
+                    .map_err(|error| AppError(format!("delete poetry data: {error}")))?;
+            }
+        }
+        let temp_dir = self.tmp_dir();
+        if temp_dir.exists() {
+            fs::remove_dir_all(temp_dir)
+                .map_err(|error| AppError(format!("delete poetry temp data: {error}")))?;
+        }
+        Ok(())
+    }
+
     // ---- status ----
 
     pub fn collections_status(&self) -> AppResult<Vec<PoetryCollectionStatus>> {

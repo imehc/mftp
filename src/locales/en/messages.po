@@ -204,6 +204,10 @@ msgstr "{spaces, plural, one {# space} other {# spaces}}"
 msgid "{taskCount, plural, one {# 任务} other {# 任务}}"
 msgstr "{taskCount, plural, one {# task} other {# tasks}}"
 
+#: src/features/about/AboutPage.tsx:129
+msgid "{title}已清理，释放 {freed}"
+msgstr "{title} cleared, freed {freed}"
+
 #: src/features/transfers/TransferPanel.tsx:180
 msgid "{transferringCount, plural, one {# 个进行中 · {pausedTransferCount} 个已暂停} other {# 个进行中 · {pausedTransferCount} 个已暂停}}"
 msgstr "{transferringCount, plural, one {# transfer in progress · {pausedTransferCount} paused} other {# transfers in progress · {pausedTransferCount} paused}}"
@@ -253,50 +257,35 @@ msgstr "BT"
 msgid "BT 下载"
 msgstr "BT Downloads"
 
+#: src/features/about/AboutPage.tsx:73
+#: src/features/about/AboutPage.tsx:205
+msgid "BT 缓存"
+msgstr "BT cache"
+
+#: src/features/about/AboutPage.tsx:243
+msgid "BT 缓存任务"
+msgstr "BT cache tasks"
+
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:161
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:211
 msgid "CPU"
 msgstr "CPU"
 
-#: src/features/settings/AppSettingsMenu.tsx:128
-msgid "DesignByte"
-msgstr "DesignByte"
-
 #: src/i18n/locales.ts:8
 msgid "English"
 msgstr "English"
-
-#: src/features/settings/AppSettingsMenu.tsx:135
-msgid "Geist"
-msgstr "Geist"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:300
 msgid "IP:端口 直连"
 msgstr "IP:port direct"
 
-#: src/features/settings/AppSettingsMenu.tsx:138
-msgid "Montserrat"
-msgstr "Montserrat"
-
 #: src/features/media-compress/video/VideoCompressPanel.tsx:251
 msgid "MP4 · MOV · M4V，文件不会上传"
 msgstr "MP4 · MOV · M4V — files stay on device"
 
-#: src/features/settings/AppSettingsMenu.tsx:129
-msgid "MX-Brutalist"
-msgstr "MX-Brutalist"
-
-#: src/features/settings/AppSettingsMenu.tsx:136
-msgid "Outfit"
-msgstr "Outfit"
-
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:155
 msgid "PID"
 msgstr "PID"
-
-#: src/features/settings/AppSettingsMenu.tsx:137
-msgid "Plus Jakarta"
-msgstr "Plus Jakarta"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:237
 msgid "PNG · JPG · WebP，保持原格式输出"
@@ -314,9 +303,9 @@ msgstr "PNG is lossless; quality has limited effect"
 msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP host connection profiles"
 
-#: src/features/settings/AppSettingsMenu.tsx:131
-msgid "Tiesen"
-msgstr "Tiesen"
+#: src/features/about/AboutPage.tsx:227
+msgid "SSH/SFTP 连接"
+msgstr "SSH/SFTP sessions"
 
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:147
 msgid "Top 进程"
@@ -404,7 +393,7 @@ msgstr "Download {pendingSaveLabel}"
 
 #: src/features/bt/BtTool.tsx:559
 #: src/features/bt/components/BtStatsBar.tsx:23
-#: src/features/settings/AppSettingsMenu.tsx:116
+#: src/features/settings/AppSettingsMenu.tsx:74
 #: src/store/transfers.ts:9
 msgid "下载中"
 msgstr "Downloading"
@@ -477,7 +466,13 @@ msgstr "Center"
 msgid "中等"
 msgstr "Medium"
 
+#: src/features/about/AboutPage.tsx:197
+msgid "主数据库"
+msgstr "Main database"
+
 #: src/features/export/sections.tsx:19
+#: src/features/logs/ActivityLogsPage.tsx:76
+#: src/features/logs/ActivityLogsPage.tsx:188
 #: src/features/ssh-sftp/components/Sidebar.tsx:401
 #: src/features/ssh-sftp/SshSftpTool.tsx:139
 msgid "主机"
@@ -487,13 +482,17 @@ msgstr "Hosts"
 msgid "主机列表"
 msgstr "Host list"
 
+#: src/features/about/AboutPage.tsx:69
+msgid "主机和密钥"
+msgstr "Hosts and keys"
+
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:126
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:228
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:229
 msgid "主目录"
 msgstr "Home Directory"
 
-#: src/features/settings/AppSettingsMenu.tsx:333
+#: src/features/settings/AppSettingsMenu.tsx:190
 msgid "主题"
 msgstr "Theme"
 
@@ -570,6 +569,14 @@ msgstr "Transfers"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:169
 msgid "传输任务"
 msgstr "Transfer Tasks"
+
+#: src/features/export/sections.tsx:30
+msgid "传输设置、共享目录和信任设备"
+msgstr "Transfer settings, shared folders, and trusted devices"
+
+#: src/features/settings/SettingsPage.tsx:114
+msgid "传输进行中，暂不可修改。"
+msgstr "A transfer is in progress and cannot be changed right now."
 
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:110
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:66
@@ -692,7 +699,7 @@ msgstr "All categories"
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
 
-#: src/features/logs/ActivityLogsPage.tsx:195
+#: src/features/logs/ActivityLogsPage.tsx:231
 msgid "全部时间"
 msgstr "All Time"
 
@@ -700,11 +707,11 @@ msgstr "All Time"
 msgid "全部替换"
 msgstr "Replace all"
 
-#: src/features/logs/ActivityLogsPage.tsx:160
+#: src/features/logs/ActivityLogsPage.tsx:177
 msgid "全部来源"
 msgstr "All Sources"
 
-#: src/features/logs/ActivityLogsPage.tsx:177
+#: src/features/logs/ActivityLogsPage.tsx:213
 msgid "全部结果"
 msgstr "All Results"
 
@@ -713,6 +720,11 @@ msgstr "All Results"
 #: src/features/lan-transfer/LanShareDialog.tsx:92
 msgid "共享目录"
 msgstr "Shared Folders"
+
+#: src/features/about/AboutPage.tsx:155
+#: src/features/settings/AppSettingsMenu.tsx:114
+msgid "关于"
+msgstr "About"
 
 #. Button that closes an SSH session tab
 #. Button that closes the CodeMirror search panel
@@ -725,10 +737,8 @@ msgid "关闭"
 msgstr "Close"
 
 #. Option that turns automatic monitor refresh off
-#. Radio option that disables automatic app startup
 #. Status showing that LAN auto-start is disabled
 #: src/features/lan-transfer/LanTransferSidebar.tsx:295
-#: src/features/settings/AppSettingsMenu.tsx:224
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:139
 msgctxt "state"
 msgid "关闭"
@@ -913,6 +923,7 @@ msgstr "Delete this account?"
 msgid "删除这条日志？"
 msgstr "Delete this log?"
 
+#: src/features/about/AboutPage.tsx:168
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:41
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:118
 #: src/features/lan-transfer/LanTransferTool.tsx:378
@@ -968,7 +979,7 @@ msgstr "Encode / Decode"
 msgid "加载中…"
 msgstr "Loading..."
 
-#: src/features/logs/ActivityLogsPage.tsx:298
+#: src/features/logs/ActivityLogsPage.tsx:334
 msgid "动作"
 msgstr "Action"
 
@@ -1003,7 +1014,7 @@ msgstr "Compress"
 msgid "压缩中"
 msgstr "Compressing"
 
-#: src/features/settings/AppSettingsMenu.tsx:143
+#: src/features/settings/SettingsPage.tsx:107
 msgid "压缩包"
 msgstr "Archive"
 
@@ -1095,6 +1106,8 @@ msgid "发现设备"
 msgstr "Discovered Devices"
 
 #: src/components/ui/prompt-dialog.tsx:101
+#: src/features/about/AboutPage.tsx:315
+#: src/features/about/AboutPage.tsx:329
 #: src/features/bt/BtTool.tsx:644
 #: src/features/bt/BtTool.tsx:645
 #: src/features/bt/BtTool.tsx:767
@@ -1370,7 +1383,7 @@ msgstr "Online preview failed"
 msgid "在线预览缓存"
 msgstr "Online preview cache"
 
-#: src/features/logs/ActivityLogsPage.tsx:295
+#: src/features/logs/ActivityLogsPage.tsx:331
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:119
 msgid "地址"
 msgstr "Address"
@@ -1428,7 +1441,7 @@ msgstr "Copy input"
 msgid "复制输出"
 msgstr "Copy output"
 
-#: src/features/settings/AppSettingsMenu.tsx:314
+#: src/features/settings/AppSettingsMenu.tsx:165
 msgid "外观"
 msgstr "Appearance"
 
@@ -1438,9 +1451,9 @@ msgid "大小"
 msgstr "Size"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:51
-#: src/features/logs/ActivityLogsPage.tsx:183
-#: src/features/logs/ActivityLogsPage.tsx:259
-#: src/features/logs/ActivityLogsPage.tsx:339
+#: src/features/logs/ActivityLogsPage.tsx:219
+#: src/features/logs/ActivityLogsPage.tsx:295
+#: src/features/logs/ActivityLogsPage.tsx:375
 #: src/store/transfers.ts:176
 msgid "失败"
 msgstr "Failed"
@@ -1451,7 +1464,7 @@ msgstr "Failed"
 msgid "媒体处理"
 msgstr "Media Tools"
 
-#: src/features/settings/AppSettingsMenu.tsx:380
+#: src/features/settings/AppSettingsMenu.tsx:233
 msgid "字体"
 msgstr "Font"
 
@@ -1459,6 +1472,10 @@ msgstr "Font"
 #: src/features/poetry/components/PoemDetail.tsx:130
 msgid "字号"
 msgstr "Font size"
+
+#: src/features/about/AboutPage.tsx:193
+msgid "存储占用"
+msgstr "Storage usage"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:242
 msgid "安全模式"
@@ -1503,8 +1520,11 @@ msgstr "If the aspect ratio differs from the original, the image will be stretch
 msgid "密码"
 msgstr "Password"
 
+#: src/features/about/AboutPage.tsx:68
 #: src/features/export/sections.tsx:14
 #: src/features/home/entries.tsx:112
+#: src/features/logs/ActivityLogsPage.tsx:75
+#: src/features/logs/ActivityLogsPage.tsx:185
 #: src/features/vault/VaultTool.tsx:247
 #: src/features/vault/VaultTool.tsx:264
 msgid "密码本"
@@ -1578,7 +1598,7 @@ msgid "导入密钥"
 msgstr "Import Key"
 
 #: src/features/export/ImportDialog.tsx:109
-#: src/features/settings/AppSettingsMenu.tsx:288
+#: src/features/settings/SettingsPage.tsx:70
 msgid "导入数据"
 msgstr "Import data"
 
@@ -1594,8 +1614,12 @@ msgstr "Export"
 msgid "导出为明文 JSON 文件，请妥善保管。"
 msgstr "Exports a plaintext JSON file; keep it safe."
 
+#: src/features/settings/SettingsPage.tsx:61
+msgid "导出密码本、主机、待办和局域网配置。"
+msgstr "Export vault, hosts, todos, and LAN settings."
+
 #: src/features/export/ExportDialog.tsx:95
-#: src/features/settings/AppSettingsMenu.tsx:284
+#: src/features/settings/SettingsPage.tsx:66
 msgid "导出数据"
 msgstr "Export data"
 
@@ -1610,6 +1634,10 @@ msgstr "Check"
 #: src/features/poetry/LibraryManagePage.tsx:549
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "This will delete all local data of \"{pendingDeleteName}\" ({toLocaleStringValue4} entries). This action cannot be undone."
+
+#: src/features/about/AboutPage.tsx:326
+msgid "将删除所有应用内数据、缓存、日志和设置，并恢复首次打开状态。下载目录和共享目录中的文件会保留。"
+msgstr "This deletes all app data, cache, logs, and settings, then restores the first-launch state. Download and shared-folder files are preserved."
 
 #: src/features/games/xiangqi/labels.tsx:51
 msgid "将帅被吃"
@@ -1639,10 +1667,12 @@ msgstr "No poem selected"
 msgid "尺寸模式"
 msgstr "Size mode"
 
+#: src/features/export/sections.tsx:29
 #: src/features/games/go/GoModeMenu.tsx:146
 #: src/features/games/gomoku/GomokuModeMenu.tsx:118
 #: src/features/games/xiangqi/XiangqiModeMenu.tsx:117
-#: src/features/logs/ActivityLogsPage.tsx:163
+#: src/features/logs/ActivityLogsPage.tsx:70
+#: src/features/logs/ActivityLogsPage.tsx:180
 msgid "局域网"
 msgstr "LAN"
 
@@ -1663,6 +1693,10 @@ msgstr "LAN Transfer Settings"
 #: src/features/lan-transfer/LanTransferTool.tsx:106
 msgid "局域网传输辅助数据加载失败：{StringValue2}"
 msgstr "Failed to load LAN transfer auxiliary data: {StringValue2}"
+
+#: src/features/about/AboutPage.tsx:237
+msgid "局域网服务"
+msgstr "LAN service"
 
 #: src/features/ssh-sftp/components/Sidebar.tsx:415
 msgid "展开侧边栏"
@@ -1698,7 +1732,7 @@ msgstr "Stopped"
 msgid "已允许访问"
 msgstr "Access allowed"
 
-#: src/features/settings/AppSettingsMenu.tsx:182
+#: src/features/settings/SettingsPage.tsx:47
 msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
@@ -1796,7 +1830,7 @@ msgstr "Imported key {trimValue}"
 msgid "已导出"
 msgstr "Exported"
 
-#: src/features/settings/AppSettingsMenu.tsx:178
+#: src/features/settings/SettingsPage.tsx:47
 msgid "已开启开机自启"
 msgstr "Launch at Login enabled"
 
@@ -1883,6 +1917,10 @@ msgstr "Draw"
 msgid "并发上限"
 msgstr "Concurrency Limit"
 
+#: src/features/about/AboutPage.tsx:209
+msgid "应用内部数据"
+msgstr "App data"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:475
 msgid "应用启动后自动开启服务"
 msgstr "Start service automatically when the app launches"
@@ -1893,7 +1931,6 @@ msgstr "Download it and play in an external player instead"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:294
 #: src/features/poetry/LibraryManagePage.tsx:502
-#: src/features/settings/AppSettingsMenu.tsx:218
 msgid "开启"
 msgstr "On"
 
@@ -1925,7 +1962,8 @@ msgstr "Open"
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
-#: src/features/settings/AppSettingsMenu.tsx:205
+#: src/features/settings/SettingsPage.tsx:76
+#: src/features/settings/SettingsPage.tsx:81
 msgid "开机自启"
 msgstr "Launch at Login"
 
@@ -1961,6 +1999,10 @@ msgstr "Current match progress will be lost."
 msgid "当前已是最新版本"
 msgstr "Already on the latest version"
 
+#: src/features/about/AboutPage.tsx:223
+msgid "当前状态"
+msgstr "Current status"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:135
 msgid "当前环境不支持 WebCodecs"
 msgstr "WebCodecs is not supported in this environment"
@@ -1973,6 +2015,13 @@ msgstr "AVIF export is not supported in this environment"
 msgid "当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured {value} is not in the list of available network interfaces; the access address may become invalid."
 
+#: src/features/about/AboutPage.tsx:70
+#: src/features/export/sections.tsx:24
+#: src/features/logs/ActivityLogsPage.tsx:74
+#: src/features/logs/ActivityLogsPage.tsx:191
+msgid "待办"
+msgstr "Todos"
+
 #: src/features/home/entries.tsx:123
 #: src/features/todo/TodoTool.tsx:161
 msgid "待办事项"
@@ -1982,15 +2031,23 @@ msgstr "Todo"
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
+#: src/features/about/AboutPage.tsx:213
+msgid "总占用"
+msgstr "Total usage"
+
+#: src/features/about/AboutPage.tsx:298
+msgid "恢复首次打开状态，不删除下载目录和共享目录中的文件。"
+msgstr "Restore the first-launch state without deleting files in download and shared folders."
+
 #: src/features/games/go/GoMatch.tsx:297
 #: src/features/games/gomoku/GomokuMatch.tsx:255
 #: src/features/games/xiangqi/XiangqiMatch.tsx:259
 msgid "悔棋"
 msgstr "Undo"
 
-#: src/features/logs/ActivityLogsPage.tsx:180
-#: src/features/logs/ActivityLogsPage.tsx:259
-#: src/features/logs/ActivityLogsPage.tsx:339
+#: src/features/logs/ActivityLogsPage.tsx:216
+#: src/features/logs/ActivityLogsPage.tsx:295
+#: src/features/logs/ActivityLogsPage.tsx:375
 msgid "成功"
 msgstr "Success"
 
@@ -2146,7 +2203,7 @@ msgstr "Search..."
 msgid "搜索历史"
 msgstr "Search history"
 
-#: src/features/logs/ActivityLogsPage.tsx:150
+#: src/features/logs/ActivityLogsPage.tsx:167
 msgid "搜索地址、动作、详情"
 msgstr "Search address, action, or details"
 
@@ -2185,6 +2242,16 @@ msgstr "Use Automatic Selection"
 msgid "放大"
 msgstr "Larger"
 
+#: src/features/logs/ActivityLogsPage.tsx:78
+#: src/features/logs/ActivityLogsPage.tsx:198
+msgid "数据"
+msgstr "Data"
+
+#: src/features/settings/SettingsPage.tsx:60
+msgid "数据导入导出"
+msgstr "Data import and export"
+
+#: src/features/about/AboutPage.tsx:263
 #: src/features/poetry/LibraryPage.tsx:257
 msgid "数据管理"
 msgstr "Data Management"
@@ -2194,6 +2261,10 @@ msgstr "Data Management"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:295
 msgid "文件"
 msgstr "File"
+
+#: src/features/about/AboutPage.tsx:232
+msgid "文件传输"
+msgstr "File transfer"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:33
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:112
@@ -2205,7 +2276,7 @@ msgstr "File information"
 msgid "文件夹"
 msgstr "Folder"
 
-#: src/features/settings/AppSettingsMenu.tsx:254
+#: src/features/settings/SettingsPage.tsx:86
 msgid "文件夹传输"
 msgstr "Folder Transfer"
 
@@ -2298,15 +2369,16 @@ msgid "无法创建画布上下文"
 msgstr "Cannot create canvas context"
 
 #: src/features/home/HomePage.tsx:127
-#: src/features/logs/ActivityLogsPage.tsx:132
+#: src/features/logs/ActivityLogsPage.tsx:149
+#: src/features/settings/AppSettingsMenu.tsx:117
 msgid "日志"
 msgstr "Logs"
 
-#: src/features/logs/ActivityLogsPage.tsx:97
+#: src/features/logs/ActivityLogsPage.tsx:114
 msgid "日志已删除"
 msgstr "Log deleted"
 
-#: src/features/logs/ActivityLogsPage.tsx:88
+#: src/features/logs/ActivityLogsPage.tsx:105
 msgid "日志已清空"
 msgstr "Logs cleared"
 
@@ -2314,8 +2386,8 @@ msgstr "Logs cleared"
 msgid "日期"
 msgstr "Date"
 
-#: src/features/logs/ActivityLogsPage.tsx:190
-#: src/features/logs/ActivityLogsPage.tsx:289
+#: src/features/logs/ActivityLogsPage.tsx:226
+#: src/features/logs/ActivityLogsPage.tsx:325
 msgid "时间"
 msgstr "Time"
 
@@ -2358,6 +2430,10 @@ msgstr "No shared folders"
 msgid "暂无发现设备"
 msgstr "No discovered devices"
 
+#: src/features/about/AboutPage.tsx:268
+msgid "暂无可清理的数据"
+msgstr "No data to clear"
+
 #: src/features/bt/BtTool.tsx:557
 msgid "暂无可用节点"
 msgstr "No peers yet"
@@ -2383,7 +2459,7 @@ msgstr "No pending authorization requests"
 msgid "暂无数据"
 msgstr "No data"
 
-#: src/features/logs/ActivityLogsPage.tsx:217
+#: src/features/logs/ActivityLogsPage.tsx:253
 msgid "暂无日志"
 msgstr "No logs"
 
@@ -2403,6 +2479,7 @@ msgstr "No accounts"
 msgid "暂无连接的节点"
 msgstr "No connected peers"
 
+#: src/features/settings/AppSettingsMenu.tsx:110
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:99
 msgid "更多"
 msgstr "More"
@@ -2496,6 +2573,10 @@ msgstr "Store credentials locally, click to copy"
 msgid "本地处理"
 msgstr "Local"
 
+#: src/features/about/AboutPage.tsx:177
+msgid "本地文件与数据工具"
+msgstr "Local file and data tools"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:447
 msgid "本地文件夹名称"
 msgstr "Local Folder Name"
@@ -2508,8 +2589,8 @@ msgstr "Local Directory"
 msgid "权限"
 msgstr "Permissions"
 
-#: src/features/logs/ActivityLogsPage.tsx:155
-#: src/features/logs/ActivityLogsPage.tsx:292
+#: src/features/logs/ActivityLogsPage.tsx:172
+#: src/features/logs/ActivityLogsPage.tsx:328
 msgid "来源"
 msgstr "Source"
 
@@ -2525,7 +2606,11 @@ msgstr "Find"
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "View GitHub Releases for update notes"
 
-#: src/features/settings/AppSettingsMenu.tsx:115
+#: src/features/logs/ActivityLogsPage.tsx:150
+msgid "查看所有模块的操作记录"
+msgstr "View activity from all modules"
+
+#: src/features/settings/AppSettingsMenu.tsx:73
 msgid "查看更新"
 msgstr "View Update"
 
@@ -2552,6 +2637,10 @@ msgstr "Title"
 msgid "标题、作者、正文"
 msgstr "Title Author Text"
 
+#: src/features/export/sections.tsx:25
+msgid "标题、分类、备注、日期和完成状态"
+msgstr "Titles, categories, notes, dates, and completion status"
+
 #: src/features/export/sections.tsx:15
 msgid "标题、网址、账号、密码、分类、备注"
 msgstr "Title, URL, username, password, category, notes"
@@ -2575,7 +2664,7 @@ msgstr "Format, minify and validate structured data"
 msgid "格式化内容编辑器"
 msgstr "Formatter content editor"
 
-#: src/features/settings/AppSettingsMenu.tsx:113
+#: src/features/settings/AppSettingsMenu.tsx:71
 msgid "检查更新"
 msgstr "Check for Updates"
 
@@ -2680,7 +2769,7 @@ msgstr "Opening terminal..."
 msgid "正在搜索…未发现房间时可用下方地址直连"
 msgstr "Searching... if no room shows up, connect directly by address below"
 
-#: src/features/settings/AppSettingsMenu.tsx:114
+#: src/features/settings/AppSettingsMenu.tsx:72
 msgid "正在检查"
 msgstr "Checking"
 
@@ -2735,6 +2824,10 @@ msgstr "Full-text index"
 msgid "正文索引已更新"
 msgstr "Full-text index updated"
 
+#: src/features/about/AboutPage.tsx:312
+msgid "此操作无法撤销，其他模块数据不会受到影响。"
+msgstr "This action cannot be undone. Data in other modules will not be affected."
+
 #: src/features/bt/components/PeersDialog.tsx:117
 msgid "每 2 秒刷新 · IP 已脱敏"
 msgstr "Refreshes every 2s · IPs masked"
@@ -2777,7 +2870,12 @@ msgstr "Annotation pack (translations & analysis)"
 msgid "活动中"
 msgstr "Active"
 
-#: src/features/settings/AppSettingsMenu.tsx:123
+#: src/features/about/AboutPage.tsx:72
+#: src/features/about/AboutPage.tsx:253
+msgid "活动日志"
+msgstr "Activity logs"
+
+#: src/features/settings/AppSettingsMenu.tsx:175
 msgid "浅色"
 msgstr "Light"
 
@@ -2785,7 +2883,7 @@ msgstr "Light"
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "Browser access requests, confirmation prompts, and trusted-device fallback requests"
 
-#: src/features/settings/AppSettingsMenu.tsx:124
+#: src/features/settings/AppSettingsMenu.tsx:176
 msgid "深色"
 msgstr "Dark"
 
@@ -2822,6 +2920,14 @@ msgstr "Cleared"
 msgid "清台完成！"
 msgstr "Table cleared!"
 
+#: src/features/about/AboutPage.tsx:288
+msgid "清理"
+msgstr "Clear"
+
+#: src/features/about/AboutPage.tsx:311
+msgid "清理{clearTitle}？"
+msgstr "Clear {clearTitle}?"
+
 #: src/features/bt/BtTool.tsx:357
 msgid "清理预览缓存失败"
 msgstr "Failed to clean up preview cache"
@@ -2839,6 +2945,14 @@ msgstr "Failed to clean up preview cache"
 #: src/features/media-compress/video/VideoCompressPanel.tsx:235
 msgid "清空"
 msgstr "Clear"
+
+#: src/features/about/AboutPage.tsx:296
+msgid "清空所有数据"
+msgstr "Clear all data"
+
+#: src/features/about/AboutPage.tsx:325
+msgid "清空所有数据？"
+msgstr "Clear all data?"
 
 #: src/features/poetry/components/SearchBar.tsx:81
 msgid "清空搜索"
@@ -2859,6 +2973,11 @@ msgstr "Clear {finishedTransferCount}"
 #: src/features/todo/TodoItemDialog.tsx:143
 msgid "清除日期"
 msgstr "Clear date"
+
+#: src/features/logs/ActivityLogsPage.tsx:79
+#: src/features/logs/ActivityLogsPage.tsx:201
+msgid "游戏"
+msgstr "Games"
 
 #: src/features/games/engine/GameVolumeControl.tsx:15
 msgid "游戏音量"
@@ -2883,6 +3002,10 @@ msgstr "Click + in the top right to create a host"
 #: src/lib/updater.ts:287
 msgid "版本 {stateVersion4} 已准备好"
 msgstr "Version {stateVersion4} is ready"
+
+#: src/features/about/AboutPage.tsx:156
+msgid "版本、状态和本地数据管理"
+msgstr "Version, status, and local data management"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:126
 msgid "特殊权限"
@@ -2999,8 +3122,8 @@ msgstr "An Item With This Name Already Exists"
 msgid "目标高度"
 msgstr "Target height"
 
-#: src/features/settings/AppSettingsMenu.tsx:144
-msgid "直接"
+#: src/features/settings/SettingsPage.tsx:107
+msgid "直连"
 msgstr "Direct"
 
 #. Button that joins a game room directly using an IP address and port
@@ -3038,6 +3161,11 @@ msgstr "After confirmation, the operation will continue with the names above."
 msgid "确认密码"
 msgstr "Confirm password"
 
+#: src/features/about/AboutPage.tsx:318
+msgid "确认清理"
+msgstr "Confirm clear"
+
+#: src/features/about/AboutPage.tsx:332
 #: src/features/logs/LogPageLayout.tsx:159
 msgid "确认清空"
 msgstr "Confirm Clear"
@@ -3107,6 +3235,7 @@ msgstr "Later"
 msgid "空目录"
 msgstr "Empty Directory"
 
+#: src/features/about/AboutPage.tsx:75
 #: src/features/home/HomePage.tsx:93
 #: src/features/transfers/TransferPanel.tsx:166
 msgid "空闲"
@@ -3161,9 +3290,9 @@ msgstr "Easy"
 msgid "算法"
 msgstr "Algorithm"
 
-#: src/features/logs/ActivityLogsPage.tsx:133
-msgid "管理 SSH、SFTP 和局域网传输活动"
-msgstr "Manage SSH, SFTP, and LAN transfer activity"
+#: src/features/settings/SettingsPage.tsx:56
+msgid "管理应用数据和运行方式"
+msgstr "Manage app data and startup behavior"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:198
 msgid "类型"
@@ -3177,7 +3306,7 @@ msgstr "Sticky bit"
 msgid "粘贴或输入 {languageLabel3} 内容"
 msgstr "Paste or enter {languageLabel3} content"
 
-#: src/features/settings/AppSettingsMenu.tsx:122
+#: src/features/settings/AppSettingsMenu.tsx:173
 msgid "系统"
 msgstr "System"
 
@@ -3221,8 +3350,8 @@ msgstr "Bind IP"
 msgid "绑定 IP 不可用"
 msgstr "Bind IP Unavailable"
 
-#: src/features/logs/ActivityLogsPage.tsx:172
-#: src/features/logs/ActivityLogsPage.tsx:301
+#: src/features/logs/ActivityLogsPage.tsx:208
+#: src/features/logs/ActivityLogsPage.tsx:337
 msgid "结果"
 msgstr "Result"
 
@@ -3428,7 +3557,9 @@ msgid "设备名"
 msgstr "Device Name"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:374
-#: src/features/settings/AppSettingsMenu.tsx:195
+#: src/features/settings/AppSettingsMenu.tsx:97
+#: src/features/settings/AppSettingsMenu.tsx:104
+#: src/features/settings/SettingsPage.tsx:56
 msgid "设置"
 msgstr "Settings"
 
@@ -3456,6 +3587,20 @@ msgstr "Translation"
 msgid "诗词列表"
 msgstr "Poem list"
 
+#: src/features/about/AboutPage.tsx:71
+#: src/features/logs/ActivityLogsPage.tsx:77
+#: src/features/logs/ActivityLogsPage.tsx:194
+msgid "诗词库"
+msgstr "Poetry library"
+
+#: src/features/about/AboutPage.tsx:248
+msgid "诗词库同步"
+msgstr "Poetry sync"
+
+#: src/features/about/AboutPage.tsx:201
+msgid "诗词数据库"
+msgstr "Poetry database"
+
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:34
 msgid "该文件夹及其全部内容将被永久删除。"
 msgstr "This folder and all of its contents will be permanently deleted."
@@ -3472,12 +3617,12 @@ msgstr "This format cannot be streamed here (mkv support varies by webview)"
 msgid "该私钥有口令保护（连接时输入）"
 msgstr "This private key is passphrase-protected (enter it when connecting)."
 
-#: src/features/logs/ActivityLogsPage.tsx:304
+#: src/features/logs/ActivityLogsPage.tsx:340
 msgid "详情"
 msgstr "Details"
 
 #: src/features/formatter/FormatterTool.tsx:273
-#: src/features/settings/AppSettingsMenu.tsx:295
+#: src/features/settings/AppSettingsMenu.tsx:147
 msgid "语言"
 msgstr "Language"
 
@@ -3569,7 +3714,7 @@ msgstr "Resize image"
 msgid "调整左侧面板宽度"
 msgstr "Resize left panel"
 
-#: src/features/logs/ActivityLogsPage.tsx:220
+#: src/features/logs/ActivityLogsPage.tsx:256
 msgid "调整筛选条件或刷新后再试。"
 msgstr "Adjust the filters or refresh and try again."
 
@@ -3596,11 +3741,11 @@ msgstr "Username"
 msgid "赏析"
 msgstr "Appreciation"
 
-#: src/features/settings/AppSettingsMenu.tsx:130
+#: src/features/settings/AppSettingsMenu.tsx:223
 msgid "赛博朋克"
 msgstr "Cyberpunk"
 
-#: src/features/settings/AppSettingsMenu.tsx:134
+#: src/features/settings/AppSettingsMenu.tsx:243
 msgid "跟随主题"
 msgstr "Match Theme"
 
@@ -3678,11 +3823,12 @@ msgstr "Output format"
 msgid "运行 {formatUptimeValue}"
 msgstr "Uptime {formatUptimeValue}"
 
+#: src/features/about/AboutPage.tsx:75
 #: src/features/lan-transfer/LanTransferTool.tsx:325
 msgid "运行中"
 msgstr "Running"
 
-#: src/features/logs/ActivityLogsPage.tsx:198
+#: src/features/logs/ActivityLogsPage.tsx:234
 msgid "近 7 天"
 msgstr "Last 7 Days"
 
@@ -3696,6 +3842,8 @@ msgstr "Back to Classical Poetry"
 msgid "返回选择"
 msgstr "Back to Menu"
 
+#: src/components/AppPageLayout.tsx:28
+#: src/components/AppPageLayout.tsx:28
 #: src/features/games/engine/GameHeaderControls.tsx:56
 #: src/features/logs/LogPageLayout.tsx:36
 #: src/features/logs/LogPageLayout.tsx:36
@@ -3925,7 +4073,7 @@ msgstr "Quota GB"
 msgid "采集数据…"
 msgstr "Collecting…"
 
-#: src/features/settings/AppSettingsMenu.tsx:118
+#: src/features/settings/AppSettingsMenu.tsx:76
 msgid "重启中"
 msgstr "Restarting"
 
@@ -3941,7 +4089,7 @@ msgstr "Restart and Update"
 msgid "重启应用即可完成更新。"
 msgstr "Restart the app to complete the update."
 
-#: src/features/settings/AppSettingsMenu.tsx:117
+#: src/features/settings/AppSettingsMenu.tsx:75
 msgid "重启更新"
 msgstr "Restart to Update"
 
@@ -3960,7 +4108,7 @@ msgstr "Restart"
 msgid "重新开始对局？"
 msgstr "Restart the match?"
 
-#: src/features/settings/AppSettingsMenu.tsx:119
+#: src/features/settings/AppSettingsMenu.tsx:77
 #: src/lib/updater.ts:235
 msgid "重新检查"
 msgstr "Check Again"
@@ -4020,6 +4168,11 @@ msgstr "Passphrase required"
 msgid "音频"
 msgstr "Audio"
 
+#: src/features/about/AboutPage.tsx:186
+#: src/features/settings/AppSettingsMenu.tsx:123
+msgid "项目帮助"
+msgstr "Project help"
+
 #: src/features/media-compress/components/CompressEstimateBar.tsx:54
 msgid "预估 {estimatedBytesLabel}"
 msgstr "Estimated {estimatedBytesLabel}"
@@ -4070,7 +4223,7 @@ msgid "黑胜"
 msgstr "Black wins"
 
 #: src/features/poetry/LibraryManagePage.tsx:55
-#: src/features/settings/AppSettingsMenu.tsx:127
+#: src/features/settings/AppSettingsMenu.tsx:221
 msgid "默认"
 msgstr "Default"
 

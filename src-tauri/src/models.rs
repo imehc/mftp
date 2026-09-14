@@ -331,6 +331,58 @@ pub struct TodoItemInput {
 pub enum ExportSection {
     Vault,
     Hosts,
+    Todo,
+    Lan,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct LanExportData {
+    pub settings: LanTransferSettings,
+    pub shared_dirs: Vec<LanSharedDir>,
+    pub trusted_devices: Vec<LanTrustedDevice>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AppDataModule {
+    Vault,
+    Hosts,
+    Todo,
+    Poetry,
+    ActivityLogs,
+    BtCache,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppDataUsage {
+    pub vault_bytes: u64,
+    pub hosts_bytes: u64,
+    pub todo_bytes: u64,
+    pub main_database_bytes: u64,
+    pub poetry_database_bytes: u64,
+    pub activity_logs_bytes: u64,
+    pub bt_cache_bytes: u64,
+    pub bt_internal_bytes: u64,
+    pub total_bytes: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppDataClearResult {
+    pub module: AppDataModule,
+    pub records_deleted: u32,
+    pub bytes_freed: u64,
+    pub preserved: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppDataResetResult {
+    pub records_deleted: u32,
+    pub bytes_freed: u64,
+    pub preserved: Vec<String>,
 }
 
 /// How imported records are applied to existing data.

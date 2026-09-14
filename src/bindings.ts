@@ -33,7 +33,7 @@ export const commands = {
 	lanTransferTrustedDevices: () => typedError<LanTrustedDevice[], AppError>(__TAURI_INVOKE("lan_transfer_trusted_devices")),
 	lanTransferAddTrustedDevice: (input: LanTrustedDeviceInput) => typedError<LanTrustedDevice, AppError>(__TAURI_INVOKE("lan_transfer_add_trusted_device", { input })),
 	lanTransferDeleteTrustedDevice: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("lan_transfer_delete_trusted_device", { id })),
-	activityLogs: (limit: number | null) => typedError<ActivityLog[], AppError>(__TAURI_INVOKE("activity_logs", { limit })),
+	activityLogs: (limit: number | null, source: string | null, result: string | null) => typedError<ActivityLog[], AppError>(__TAURI_INVOKE("activity_logs", { limit, source, result })),
 	activityLogsClear: () => typedError<null, AppError>(__TAURI_INVOKE("activity_logs_clear")),
 	activityLogDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("activity_log_delete", { id })),
 	sshConnect: (hostId: string, passphrase: string | null) => typedError<string, AppError>(__TAURI_INVOKE("ssh_connect", { hostId, passphrase })),
@@ -83,6 +83,9 @@ export const commands = {
 	// Detect whether a file is an mftp export and whether it is encrypted.
 	dataInspect: (raw: string) => typedError<ImportPreview, AppError>(__TAURI_INVOKE("data_inspect", { raw })),
 	dataImport: (raw: string, password: string | null, mode: ImportMode) => typedError<ImportReport, AppError>(__TAURI_INVOKE("data_import", { raw, password, mode })),
+	appDataUsage: () => typedError<AppDataUsage, AppError>(__TAURI_INVOKE("app_data_usage")),
+	appDataClear: (module: AppDataModule) => typedError<AppDataClearResult, AppError>(__TAURI_INVOKE("app_data_clear", { module })),
+	appDataReset: () => typedError<AppDataResetResult, AppError>(__TAURI_INVOKE("app_data_reset")),
 	poetryCollections: () => typedError<PoetryCollectionStatus[], AppError>(__TAURI_INVOKE("poetry_collections")),
 	poetrySyncCheck: () => typedError<PoetrySyncPlan, AppError>(__TAURI_INVOKE("poetry_sync_check")),
 	poetrySyncStart: (collectionIds: string[]) => typedError<null, AppError>(__TAURI_INVOKE("poetry_sync_start", { collectionIds })),
@@ -175,6 +178,33 @@ export type ActivityLog = {
 	requestType: string,
 	result: string,
 	detail?: string | null,
+};
+
+export type AppDataClearResult = {
+	module: AppDataModule,
+	recordsDeleted: number,
+	bytesFreed: number,
+	preserved: string[],
+};
+
+export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs" | "btCache";
+
+export type AppDataResetResult = {
+	recordsDeleted: number,
+	bytesFreed: number,
+	preserved: string[],
+};
+
+export type AppDataUsage = {
+	vaultBytes: number,
+	hostsBytes: number,
+	todoBytes: number,
+	mainDatabaseBytes: number,
+	poetryDatabaseBytes: number,
+	activityLogsBytes: number,
+	btCacheBytes: number,
+	btInternalBytes: number,
+	totalBytes: number,
 };
 
 // Unified error type surfaced to the frontend as a plain string.
@@ -314,7 +344,7 @@ export type BtTaskStats = {
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
 // A data section that can be exported; add a variant per exportable module.
-export type ExportSection = "vault" | "hosts";
+export type ExportSection = "vault" | "hosts" | "todo" | "lan";
 
 export type GameRoomStatus = {
 	// "idle" | "hosting" | "joined"

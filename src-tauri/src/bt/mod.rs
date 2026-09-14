@@ -129,6 +129,10 @@ fn parse_info_hash(hex_str: &str) -> AppResult<Id20> {
 }
 
 impl BtManager {
+    pub fn has_active_work(&self) -> AppResult<bool> {
+        self.storage.has_active_bt_tasks()
+    }
+
     pub fn new(app: AppHandle, storage: Storage) -> Self {
         Self {
             app,
