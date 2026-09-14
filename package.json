@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run compile && NODE_ENV=production tsr generate && tsc && vite build",
+    "build": "pnpm run compile && tsr generate && tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "android:dev": "bash scripts/android.sh dev",
