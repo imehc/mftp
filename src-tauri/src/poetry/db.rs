@@ -13,6 +13,8 @@ use super::model::{PoetryScript, PoetryTier};
 use crate::error::{AppError, AppResult};
 use crate::poetry::text;
 
+// Only the desktop annotation-pack import reports under this collection id.
+#[cfg_attr(not(desktop), allow(dead_code))]
 pub const ANNOTATIONS_COLLECTION_ID: &str = "annotations";
 pub const META_BODY_INDEX_ENABLED: &str = "body_fts_enabled";
 

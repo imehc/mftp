@@ -12,21 +12,27 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 use parking_lot::Mutex;
+#[cfg(desktop)]
 use serde_json::Value;
 
 use super::catalog::Catalog;
-use super::db::{PoetryDb, ANNOTATIONS_COLLECTION_ID};
+use super::db::PoetryDb;
+#[cfg(desktop)]
+use super::db::ANNOTATIONS_COLLECTION_ID;
 use super::model::{
     PoetryCollectionStatus, PoetryContentIndexStatus, PoetrySourceStatus, PoetrySyncPlan,
     PoetrySyncProgress,
 };
+#[cfg(desktop)]
 use super::text;
 use crate::error::{AppError, AppResult};
 
 mod ingest;
 mod net;
 
-use net::{download_tarball, fetch_source_sha, run_network_sync};
+#[cfg(desktop)]
+use net::download_tarball;
+use net::{fetch_source_sha, run_network_sync};
 
 use ingest::run_local_import;
 
@@ -403,6 +409,7 @@ fn run_annotations_install(
     }
 }
 
+#[cfg(desktop)]
 fn extract_all(archive_path: &Path, extract_root: &Path, cancelled: &AtomicBool) -> AppResult<()> {
     let file = fs::File::open(archive_path).map_err(|e| AppError(format!("open archive: {e}")))?;
     let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file));
@@ -434,6 +441,7 @@ fn extract_all(archive_path: &Path, extract_root: &Path, cancelled: &AtomicBool)
     Ok(())
 }
 
+#[cfg(desktop)]
 fn import_annotation_jsonl(
     library: &Arc<PoetryLibrary>,
     progress: &ProgressFn<'_>,
@@ -531,6 +539,7 @@ fn import_annotation_jsonl(
     Ok(())
 }
 
+#[cfg(desktop)]
 fn collect_matching_suffix(
     root: &Path,
     dir: &Path,

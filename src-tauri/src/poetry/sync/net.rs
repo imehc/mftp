@@ -5,17 +5,25 @@
 //! reqwest is a desktop-only dependency, so everything touching it lives
 //! behind `#[cfg(desktop)]`.
 
+#[cfg(desktop)]
 use std::fs;
+#[cfg(desktop)]
 use std::io::{Read, Write};
+#[cfg(desktop)]
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::AtomicBool;
+#[cfg(desktop)]
+use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
+#[cfg(desktop)]
 use serde_json::Value;
 
+#[cfg(desktop)]
 use super::ingest::{extract_selected, import_extracted_dir};
 use crate::error::{AppError, AppResult};
 use crate::poetry::catalog::Catalog;
+#[cfg(desktop)]
 use crate::poetry::model::PoetrySyncProgress;
 
 use super::{PoetryLibrary, ProgressFn};
@@ -55,6 +63,7 @@ pub(super) fn fetch_source_sha(_catalog: &Catalog, _source_id: &str) -> AppResul
 
 /// Flatten a reqwest error chain so the UI shows the real cause
 /// (dns / connect / tls) instead of a bare "error sending request".
+#[cfg(desktop)]
 fn error_chain(error: &dyn std::error::Error) -> String {
     let mut message = error.to_string();
     let mut source = error.source();
@@ -65,7 +74,7 @@ fn error_chain(error: &dyn std::error::Error) -> String {
     message
 }
 
-#[cfg(test)]
+#[cfg(all(test, desktop))]
 mod probe {
     use super::*;
 
@@ -93,6 +102,7 @@ mod probe {
     }
 }
 
+#[cfg(desktop)]
 pub(super) fn run_network_sync(
     library: &Arc<PoetryLibrary>,
     progress: &ProgressFn<'_>,
@@ -124,6 +134,17 @@ pub(super) fn run_network_sync(
     result
 }
 
+#[cfg(not(desktop))]
+pub(super) fn run_network_sync(
+    _library: &Arc<PoetryLibrary>,
+    _progress: &ProgressFn<'_>,
+    _ids: &[String],
+    _cancelled: &AtomicBool,
+) -> AppResult<()> {
+    Err(AppError("library downloads require the desktop app".into()))
+}
+
+#[cfg(desktop)]
 fn download_and_import(
     library: &Arc<PoetryLibrary>,
     progress: &ProgressFn<'_>,
@@ -169,6 +190,7 @@ fn download_and_import(
     Ok(())
 }
 
+#[cfg(desktop)]
 pub(super) fn download_tarball(
     progress: &ProgressFn<'_>,
     repo: String,
@@ -230,6 +252,7 @@ pub(super) fn download_tarball(
     Err(last_error.unwrap_or_else(|| AppError("download failed".into())))
 }
 
+#[cfg(desktop)]
 fn stream_to_file(
     response: &mut reqwest::blocking::Response,
     part_path: &Path,

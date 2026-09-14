@@ -12,6 +12,8 @@ use super::model::{PoetryScript, PoetryTier};
 const CATALOG_JSON: &str = include_str!("catalog.json");
 
 #[derive(Debug, Clone, Deserialize)]
+// `repo`/`branch` are only read by the desktop download path (net.rs).
+#[cfg_attr(not(desktop), allow(dead_code))]
 pub struct SourceSpec {
     pub repo: String,
     pub branch: String,
@@ -117,6 +119,7 @@ impl Catalog {
     }
 
     /// Sources needed to sync the given collections.
+    #[cfg_attr(not(desktop), allow(dead_code))]
     pub fn sources_for<'a>(&'a self, ids: &[String]) -> Vec<&'a str> {
         let mut sources: Vec<&str> = self
             .collections
