@@ -122,6 +122,9 @@ jobs:
       - name: Check version consistency
         run: pnpm run version:check
 
+      - name: Check React version consistency
+        run: pnpm run react:check
+
       - name: Build frontend
         run: pnpm run build
 

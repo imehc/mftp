@@ -57,6 +57,9 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check React version consistency
+        run: pnpm run react:check
+
       - name: Build frontend
         run: pnpm run build
 
