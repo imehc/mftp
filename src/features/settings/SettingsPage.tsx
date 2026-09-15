@@ -10,6 +10,7 @@ import AppPageLayout from "~/components/AppPageLayout";
 import ExportDialog from "~/features/export/ExportDialog";
 import ImportDialog from "~/features/export/ImportDialog";
 import { exportSections } from "~/features/export/sections";
+import AiConnectionSettings from "./AiConnectionSettings";
 import { isDesktopPlatform } from "~/lib/platform";
 import { type DirectoryTransferMode, useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
@@ -54,7 +55,8 @@ export default function SettingsPage() {
 
   return (
     <AppPageLayout title={t`设置`} description={t`管理应用数据和运行方式`}>
-      <div className="mx-auto flex w-full max-w-5xl flex-col">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+        {isDesktopPlatform() ? <AiConnectionSettings /> : null}
         <section className="border-border bg-card divide-border divide-y rounded-lg border px-2.5">
           <SettingRow
             title={t`数据导入导出`}

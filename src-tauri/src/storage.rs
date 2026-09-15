@@ -6,8 +6,8 @@ use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const DB_FILE: &str = "mftp.sqlite3";
-
 pub(crate) mod activity;
+pub(crate) mod ai;
 pub(crate) mod bt;
 mod data;
 mod export;
@@ -239,6 +239,7 @@ impl Storage {
             "CREATE INDEX IF NOT EXISTS idx_vault_entries_sort_order ON vault_entries(sort_order)",
             [],
         )?;
+        ai::init_schema(&conn)?;
         Ok(())
     }
 

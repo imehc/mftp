@@ -168,6 +168,7 @@ impl Storage {
             "todo_items",
             "bt_tasks",
             "bt_cache_access",
+            "ai_connection",
             "app_meta",
         ];
         let mut changed = 0usize;
@@ -183,6 +184,7 @@ impl Storage {
                 "todo_items" => tx.execute("DELETE FROM todo_items", [])?,
                 "bt_tasks" => tx.execute("DELETE FROM bt_tasks", [])?,
                 "bt_cache_access" => tx.execute("DELETE FROM bt_cache_access", [])?,
+                "ai_connection" => tx.execute("DELETE FROM ai_connection", [])?,
                 "app_meta" => tx.execute("DELETE FROM app_meta", [])?,
                 _ => 0,
             };

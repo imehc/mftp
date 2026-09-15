@@ -82,6 +82,9 @@ pub async fn app_data_reset(state: State<'_, AppState>) -> AppResult<AppDataRese
     state.bt.shutdown();
     let storage = state.storage.clone();
     run_blocking(move || {
+        if storage.ai_connection()?.is_some() {
+            crate::ai::clear_api_key_for_reset()?;
+        }
         let records_deleted = storage.reset_database()?;
         storage.clear_poetry_database()?;
         storage.remove_bt_internal_data()?;

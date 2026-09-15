@@ -1,6 +1,7 @@
 use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
+mod ai;
 mod bt;
 mod data;
 mod export;
@@ -14,6 +15,7 @@ mod ssh;
 mod todo;
 mod vault;
 
+pub use ai::*;
 pub use bt::*;
 pub use data::*;
 pub use export::*;

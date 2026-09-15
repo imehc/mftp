@@ -1,3 +1,4 @@
+mod ai;
 mod bt;
 mod commands;
 mod error;
@@ -49,6 +50,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
         // explicitly or they will be missing from bindings.ts.
         .typ::<poetry::model::PoetrySyncProgress>()
         .commands(collect_commands![
+            commands::ai_connection_get,
+            commands::ai_connection_save,
+            commands::ai_connection_clear_key,
+            commands::ai_connection_test,
             commands::hosts_list,
             commands::host_get,
             commands::host_create,

@@ -1,4 +1,4 @@
-import { commands } from "~/bindings";
+import { commands, type AiConnectionInput } from "~/bindings";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
   BtControlAction,
@@ -34,6 +34,14 @@ const voidCommand = async <E>(
 ): Promise<void> => {
   await unwrapCommand(promise);
 };
+
+// ---- AI 服务 ----
+export const aiConnectionGet = () => unwrapCommand(commands.aiConnectionGet());
+export const aiConnectionSave = (input: AiConnectionInput) =>
+  unwrapCommand(commands.aiConnectionSave(input));
+export const aiConnectionClearKey = () =>
+  unwrapCommand(commands.aiConnectionClearKey());
+export const aiConnectionTest = () => voidCommand(commands.aiConnectionTest());
 
 // ---- 主机 ----
 export const hostsList = () => unwrapCommand(commands.hostsList());

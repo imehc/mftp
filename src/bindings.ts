@@ -4,6 +4,10 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 
 /** Commands */
 export const commands = {
+	aiConnectionGet: () => typedError<AiConnection, AppError>(__TAURI_INVOKE("ai_connection_get")),
+	aiConnectionSave: (input: AiConnectionInput) => typedError<AiConnection, AppError>(__TAURI_INVOKE("ai_connection_save", { input })),
+	aiConnectionClearKey: () => typedError<AiConnection, AppError>(__TAURI_INVOKE("ai_connection_clear_key")),
+	aiConnectionTest: () => typedError<null, AppError>(__TAURI_INVOKE("ai_connection_test")),
 	hostsList: () => typedError<Host[], AppError>(__TAURI_INVOKE("hosts_list")),
 	hostGet: (id: string) => typedError<Host, AppError>(__TAURI_INVOKE("host_get", { id })),
 	hostCreate: (input: HostInput) => typedError<Host, AppError>(__TAURI_INVOKE("host_create", { input })),
@@ -178,6 +182,19 @@ export type ActivityLog = {
 	requestType: string,
 	result: string,
 	detail?: string | null,
+};
+
+export type AiConnection = {
+	baseUrl: string,
+	model: string,
+	hasKey: boolean,
+};
+
+export type AiConnectionInput = {
+	baseUrl: string,
+	model: string,
+	// None keeps the existing credential; Some replaces it.
+	apiKey?: string | null,
 };
 
 export type AppDataClearResult = {

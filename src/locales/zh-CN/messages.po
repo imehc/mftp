@@ -244,6 +244,27 @@ msgstr "AI 先开"
 msgid "AI 思考中…"
 msgstr "AI 思考中…"
 
+#: src/features/settings/AiConnectionSettings.tsx:110
+msgid "AI 服务"
+msgstr "AI 服务"
+
+#: src/features/settings/AiConnectionSettings.tsx:88
+msgid "AI 服务连接成功"
+msgstr "AI 服务连接成功"
+
+#: src/features/settings/AiConnectionSettings.tsx:76
+msgid "AI 服务配置已保存"
+msgstr "AI 服务配置已保存"
+
+#: src/features/settings/AiConnectionSettings.tsx:145
+#: src/features/settings/AiConnectionSettings.tsx:152
+msgid "API Key"
+msgstr "API Key"
+
+#: src/features/settings/AiConnectionSettings.tsx:100
+msgid "API Key 已清除"
+msgstr "API Key 已清除"
+
 #: src/features/media-compress/image/ImageCompressPanel.tsx:257
 msgid "AVIF（不支持）"
 msgstr "AVIF（不支持）"
@@ -574,7 +595,7 @@ msgstr "传输任务"
 msgid "传输设置、共享目录和信任设备"
 msgstr "传输设置、共享目录和信任设备"
 
-#: src/features/settings/SettingsPage.tsx:114
+#: src/features/settings/SettingsPage.tsx:116
 msgid "传输进行中，暂不可修改。"
 msgstr "传输进行中，暂不可修改。"
 
@@ -618,6 +639,7 @@ msgid "使用中"
 msgstr "使用中"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:499
+#: src/features/settings/AiConnectionSettings.tsx:193
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:335
 #: src/features/todo/TodoItemDialog.tsx:209
 #: src/features/vault/VaultEntryDialog.tsx:192
@@ -1014,7 +1036,7 @@ msgstr "压缩"
 msgid "压缩中"
 msgstr "压缩中"
 
-#: src/features/settings/SettingsPage.tsx:107
+#: src/features/settings/SettingsPage.tsx:109
 msgid "压缩包"
 msgstr "压缩包"
 
@@ -1128,6 +1150,7 @@ msgstr "发现设备"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:301
 #: src/features/media-compress/video/VideoCompressPanel.tsx:369
 #: src/features/poetry/LibraryManagePage.tsx:554
+#: src/features/settings/AiConnectionSettings.tsx:206
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:327
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:85
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:215
@@ -1598,7 +1621,7 @@ msgid "导入密钥"
 msgstr "导入密钥"
 
 #: src/features/export/ImportDialog.tsx:109
-#: src/features/settings/SettingsPage.tsx:70
+#: src/features/settings/SettingsPage.tsx:72
 msgid "导入数据"
 msgstr "导入数据"
 
@@ -1614,12 +1637,12 @@ msgstr "导出"
 msgid "导出为明文 JSON 文件，请妥善保管。"
 msgstr "导出为明文 JSON 文件，请妥善保管。"
 
-#: src/features/settings/SettingsPage.tsx:61
+#: src/features/settings/SettingsPage.tsx:63
 msgid "导出密码本、主机、待办和局域网配置。"
 msgstr "导出密码本、主机、待办和局域网配置。"
 
 #: src/features/export/ExportDialog.tsx:95
-#: src/features/settings/SettingsPage.tsx:66
+#: src/features/settings/SettingsPage.tsx:68
 msgid "导出数据"
 msgstr "导出数据"
 
@@ -1720,6 +1743,10 @@ msgstr "已下载 {formatBytesValue}"
 msgid "已保存"
 msgstr "已保存"
 
+#: src/features/settings/AiConnectionSettings.tsx:117
+msgid "已保存密钥"
+msgstr "已保存密钥"
+
 #: src/features/lan-transfer/LanTransferTool.tsx:181
 msgid "已保存配置"
 msgstr "已保存配置"
@@ -1732,7 +1759,7 @@ msgstr "已停止"
 msgid "已允许访问"
 msgstr "已允许访问"
 
-#: src/features/settings/SettingsPage.tsx:47
+#: src/features/settings/SettingsPage.tsx:48
 msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
@@ -1830,7 +1857,7 @@ msgstr "已导入密钥 {trimValue}"
 msgid "已导出"
 msgstr "已导出"
 
-#: src/features/settings/SettingsPage.tsx:47
+#: src/features/settings/SettingsPage.tsx:48
 msgid "已开启开机自启"
 msgstr "已开启开机自启"
 
@@ -1962,8 +1989,8 @@ msgstr "开放"
 msgid "开放模式会跳过确认码"
 msgstr "开放模式会跳过确认码"
 
-#: src/features/settings/SettingsPage.tsx:76
-#: src/features/settings/SettingsPage.tsx:81
+#: src/features/settings/SettingsPage.tsx:78
+#: src/features/settings/SettingsPage.tsx:83
 msgid "开机自启"
 msgstr "开机自启"
 
@@ -1978,6 +2005,10 @@ msgstr "当前 WebView 不支持音频转码"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:187
 msgid "当前不可用"
 msgstr "当前不可用"
+
+#: src/features/settings/AiConnectionSettings.tsx:112
+msgid "当前仅支持 OpenAI Responses 接口格式"
+msgstr "当前仅支持 OpenAI Responses 接口格式"
 
 #: src/features/todo/TodoTool.tsx:243
 msgid "当前分类没有待办"
@@ -2247,7 +2278,7 @@ msgstr "放大"
 msgid "数据"
 msgstr "数据"
 
-#: src/features/settings/SettingsPage.tsx:60
+#: src/features/settings/SettingsPage.tsx:62
 msgid "数据导入导出"
 msgstr "数据导入导出"
 
@@ -2276,7 +2307,7 @@ msgstr "文件信息"
 msgid "文件夹"
 msgstr "文件夹"
 
-#: src/features/settings/SettingsPage.tsx:86
+#: src/features/settings/SettingsPage.tsx:88
 msgid "文件夹传输"
 msgstr "文件夹传输"
 
@@ -2512,13 +2543,22 @@ msgstr "更新待办失败"
 msgid "替换"
 msgstr "替换"
 
+#: src/features/settings/AiConnectionSettings.tsx:145
+#: src/features/settings/AiConnectionSettings.tsx:152
+msgid "替换 API Key"
+msgstr "替换 API Key"
+
 #: src/features/formatter/FormatterTool.tsx:84
 msgid "替换为"
 msgstr "替换为"
 
-#: src/features/poetry/components/PoemDetail.tsx:224
+#: src/features/poetry/components/PoemDetail.tsx:222
 msgid "有朗诵"
 msgstr "有朗诵"
+
+#: src/features/settings/AiConnectionSettings.tsx:123
+msgid "服务地址"
+msgstr "服务地址"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:168
 msgid "服务已停止"
@@ -2535,6 +2575,10 @@ msgstr "服务未启动"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:483
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
+
+#: src/features/settings/AiConnectionSettings.tsx:117
+msgid "未保存密钥"
+msgstr "未保存密钥"
 
 #: src/features/todo/TodoList.tsx:144
 msgid "未安排"
@@ -2691,6 +2735,10 @@ msgstr "棋盘大小"
 #: src/features/games/xiangqi/XiangqiStage.tsx:532
 msgid "楚 河"
 msgstr "楚 河"
+
+#: src/features/settings/AiConnectionSettings.tsx:134
+msgid "模型"
+msgstr "模型"
 
 #: src/features/crypto/CryptoTool.tsx:154
 msgid "模式"
@@ -2857,8 +2905,8 @@ msgstr "没有进行中的待办"
 msgid "没有逾期未完成的待办"
 msgstr "没有逾期未完成的待办"
 
-#: src/features/poetry/components/PoemDetail.tsx:256
-#: src/features/poetry/components/PoemDetail.tsx:273
+#: src/features/poetry/components/PoemDetail.tsx:254
+#: src/features/poetry/components/PoemDetail.tsx:271
 msgid "注释"
 msgstr "注释"
 
@@ -2878,6 +2926,11 @@ msgstr "活动日志"
 #: src/features/settings/AppSettingsMenu.tsx:175
 msgid "浅色"
 msgstr "浅色"
+
+#: src/features/settings/AiConnectionSettings.tsx:173
+#: src/features/settings/AiConnectionSettings.tsx:181
+msgid "测试连接"
+msgstr "测试连接"
 
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:105
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
@@ -2969,6 +3022,14 @@ msgstr "清空现有数据后写入文件内容"
 #: src/features/transfers/TransferPanel.tsx:404
 msgid "清除 {finishedTransferCount}"
 msgstr "清除 {finishedTransferCount}"
+
+#: src/features/settings/AiConnectionSettings.tsx:200
+msgid "清除 API Key？"
+msgstr "清除 API Key？"
+
+#: src/features/settings/AiConnectionSettings.tsx:166
+msgid "清除密钥"
+msgstr "清除密钥"
 
 #: src/features/todo/TodoItemDialog.tsx:143
 msgid "清除日期"
@@ -3072,6 +3133,10 @@ msgstr "用户组"
 msgid "留空则使用 SSH 配置或本机用户"
 msgstr "留空则使用 SSH 配置或本机用户"
 
+#: src/features/settings/AiConnectionSettings.tsx:151
+msgid "留空则保留现有密钥"
+msgstr "留空则保留现有密钥"
+
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:185
 msgid "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
 msgstr "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
@@ -3122,7 +3187,7 @@ msgstr "目标已存在同名项目"
 msgid "目标高度"
 msgstr "目标高度"
 
-#: src/features/settings/SettingsPage.tsx:107
+#: src/features/settings/SettingsPage.tsx:109
 msgid "直连"
 msgstr "直连"
 
@@ -3169,6 +3234,10 @@ msgstr "确认清理"
 #: src/features/logs/LogPageLayout.tsx:159
 msgid "确认清空"
 msgstr "确认清空"
+
+#: src/features/settings/AiConnectionSettings.tsx:208
+msgid "确认清除"
+msgstr "确认清除"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:263
 #: src/features/lan-transfer/LanTransferSidebar.tsx:35
@@ -3290,7 +3359,7 @@ msgstr "简单"
 msgid "算法"
 msgstr "算法"
 
-#: src/features/settings/SettingsPage.tsx:56
+#: src/features/settings/SettingsPage.tsx:57
 msgid "管理应用数据和运行方式"
 msgstr "管理应用数据和运行方式"
 
@@ -3309,6 +3378,10 @@ msgstr "粘贴或输入 {languageLabel3} 内容"
 #: src/features/settings/AppSettingsMenu.tsx:173
 msgid "系统"
 msgstr "系统"
+
+#: src/features/settings/AiConnectionSettings.tsx:202
+msgid "系统凭据库中的 AI 密钥将被删除，服务地址和模型会保留。"
+msgstr "系统凭据库中的 AI 密钥将被删除，服务地址和模型会保留。"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:66
 msgid "系统监控"
@@ -3559,7 +3632,7 @@ msgstr "设备名"
 #: src/features/lan-transfer/LanTransferTool.tsx:374
 #: src/features/settings/AppSettingsMenu.tsx:97
 #: src/features/settings/AppSettingsMenu.tsx:104
-#: src/features/settings/SettingsPage.tsx:56
+#: src/features/settings/SettingsPage.tsx:57
 msgid "设置"
 msgstr "设置"
 
@@ -3579,7 +3652,7 @@ msgstr "访问"
 msgid "访问时间"
 msgstr "访问时间"
 
-#: src/features/poetry/components/PoemDetail.tsx:260
+#: src/features/poetry/components/PoemDetail.tsx:258
 msgid "译文"
 msgstr "译文"
 
@@ -3626,6 +3699,10 @@ msgstr "详情"
 msgid "语言"
 msgstr "语言"
 
+#: src/features/settings/AiConnectionSettings.tsx:173
+msgid "请先保存当前配置"
+msgstr "请先保存当前配置"
+
 #: src/features/poetry/LibraryManagePage.tsx:255
 #: src/features/poetry/LibraryManagePage.tsx:283
 msgid "请先选择合集"
@@ -3656,6 +3733,14 @@ msgstr "请输入待办标题"
 #: src/features/media-compress/resize/ImageResizePanel.tsx:394
 msgid "请输入有效的目标尺寸"
 msgstr "请输入有效的目标尺寸"
+
+#: src/features/settings/AiConnectionSettings.tsx:129
+msgid "请输入服务地址"
+msgstr "请输入服务地址"
+
+#: src/features/settings/AiConnectionSettings.tsx:139
+msgid "请输入模型名称"
+msgstr "请输入模型名称"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:71
 msgid "请输入路径"
@@ -3737,7 +3822,7 @@ msgstr "负载 {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 msgid "账号"
 msgstr "账号"
 
-#: src/features/poetry/components/PoemDetail.tsx:264
+#: src/features/poetry/components/PoemDetail.tsx:262
 msgid "赏析"
 msgstr "赏析"
 
@@ -3786,6 +3871,10 @@ msgstr "轮到 {sideNameValue}"
 #: src/features/crypto/CryptoTool.tsx:203
 msgid "输入"
 msgstr "输入"
+
+#: src/features/settings/AiConnectionSettings.tsx:151
+msgid "输入 API Key"
+msgstr "输入 API Key"
 
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:49
 msgid "输入密钥口令"
