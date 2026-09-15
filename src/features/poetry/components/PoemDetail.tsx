@@ -118,7 +118,7 @@ export function ReadingSettingsPopover(props: ReadingSettingsProps) {
         <Settings2 />
       </Button>
       {open ? (
-        <div className="border-border bg-popover absolute top-full right-0 z-20 mt-1 w-56 space-y-3 rounded-md border p-3 shadow-md">
+        <div className="border-border bg-popover absolute top-full right-0 z-20 mt-1 w-56 space-y-3 rounded-md border p-3 font-sans shadow-md">
           <label className="text-muted-foreground block space-y-1.5 text-xs">
             <span>{t`字号`}</span>
             <Slider
@@ -188,12 +188,10 @@ export default function PoemDetail({
   }
   const annotation = detail.annotation;
   return (
-    <div className="flex h-full flex-col">
+    <div className="font-poetry flex h-full flex-col">
       <header className="flex items-start justify-between gap-2 px-5 pt-4">
         <div className="min-w-0 space-y-1.5">
-          <h2 className="text-lg font-semibold tracking-wide">
-            {detail.title}
-          </h2>
+          <h2 className="text-lg font-medium tracking-wide">{detail.title}</h2>
           <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             {detail.author ? (
               detail.authorBio && detail.authorBio.desc ? (
