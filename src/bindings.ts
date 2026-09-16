@@ -144,6 +144,10 @@ export const commands = {
 	poetryAnnotationsInstall: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_install")),
 	poetryAnnotationsStatus: () => typedError<PoetryAnnotationsStatus, AppError>(__TAURI_INVOKE("poetry_annotations_status")),
 	poetryAnnotationsDelete: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_delete")),
+	poetryTranslationPackImport: (raw: string) => typedError<number, AppError>(__TAURI_INVOKE("poetry_translation_pack_import", { raw })),
+	poetryTranslationPacks: () => typedError<PoetryTranslationPackSummary[], AppError>(__TAURI_INVOKE("poetry_translation_packs")),
+	poetryTranslationPackDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("poetry_translation_pack_delete", { id })),
+	listPoetryPackTranslations: (uid: string) => typedError<PoetryPackTranslation[], AppError>(__TAURI_INVOKE("list_poetry_pack_translations", { uid })),
 	listPoetryTranslations: (uid: string) => typedError<PoetryTranslation[], AppError>(__TAURI_INVOKE("list_poetry_translations", { uid })),
 	generatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, requestId: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("generate_poetry_translation", { uid, mode, requestId })),
 	updatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, content: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("update_poetry_translation", { uid, mode, content })),
@@ -623,6 +627,17 @@ export type PoetryContentIndexStatus = {
 	indexedPoems: number,
 };
 
+export type PoetryPackTranslation = {
+	packId: string,
+	packName: string,
+	packAuthor: string,
+	packSource: string,
+	packLicense: string,
+	language: string,
+	mode: PoetryTranslationMode,
+	content: string,
+};
+
 // Character script of a collection's source text.
 export type PoetryScript = "simplified" | "traditional";
 
@@ -703,6 +718,15 @@ export type PoetryTranslation = {
 };
 
 export type PoetryTranslationMode = "literal" | "literary";
+
+export type PoetryTranslationPackSummary = {
+	id: string,
+	name: string,
+	author: string,
+	source: string,
+	license: string,
+	entryCount: number,
+};
 
 export type PoetryTranslationSource = "ai" | "user";
 

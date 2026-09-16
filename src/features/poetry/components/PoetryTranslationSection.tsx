@@ -31,12 +31,17 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
+  poetryPackTranslationsList,
   poetryTranslationDelete,
   poetryTranslationGenerate,
   poetryTranslationsList,
   poetryTranslationUpdate,
 } from "~/lib/ipc";
-import type { PoetryTranslation, PoetryTranslationMode } from "~/bindings";
+import type {
+  PoetryPackTranslation,
+  PoetryTranslation,
+  PoetryTranslationMode,
+} from "~/bindings";
 
 interface Props {
   uid: string;
@@ -54,6 +59,9 @@ export default function PoetryTranslationSection({
   const { t } = useLingui();
   const [mode, setMode] = useState<PoetryTranslationMode>("literal");
   const [translations, setTranslations] = useState<PoetryTranslation[]>([]);
+  const [packTranslations, setPackTranslations] = useState<
+    PoetryPackTranslation[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
@@ -65,6 +73,9 @@ export default function PoetryTranslationSection({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [regenerateOpen, setRegenerateOpen] = useState(false);
   const current = translations.find((item) => item.mode === mode) ?? null;
+  const currentPackTranslations = packTranslations.filter(
+    (item) => item.mode === mode,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -74,8 +85,16 @@ export default function PoetryTranslationSection({
         setError(null);
       }
     });
-    void poetryTranslationsList(uid)
-      .then((items) => !cancelled && setTranslations(items))
+    void Promise.all([
+      poetryTranslationsList(uid),
+      poetryPackTranslationsList(uid),
+    ])
+      .then(([items, packItems]) => {
+        if (!cancelled) {
+          setTranslations(items);
+          setPackTranslations(packItems);
+        }
+      })
       .catch((nextError) => !cancelled && setError(String(nextError)))
       .finally(() => !cancelled && setLoading(false));
     return () => {
@@ -303,6 +322,30 @@ export default function PoetryTranslationSection({
           >
             {referenceTranslation}
           </p>
+        </div>
+      ) : null}
+
+      {currentPackTranslations.length > 0 ? (
+        <div className="border-border space-y-3 border-t pt-3">
+          <Badge variant="outline">
+            <Trans>开放译文</Trans>
+          </Badge>
+          {currentPackTranslations.map((item) => (
+            <div
+              key={`${item.packId}-${item.language}-${item.mode}`}
+              className="space-y-1"
+            >
+              <div className="text-muted-foreground text-xs">
+                {item.packName} · {item.packAuthor} · {item.packLicense}
+              </div>
+              <p
+                className="font-poetry whitespace-pre-line"
+                style={{ fontSize, lineHeight }}
+              >
+                {item.content}
+              </p>
+            </div>
+          ))}
         </div>
       ) : null}
 

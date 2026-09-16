@@ -72,7 +72,7 @@ msgstr "{importedKeyCount, plural, one {已导入 # 个密钥} other {已导入 
 msgid "{incomingLabel}名称"
 msgstr "{incomingLabel}名称"
 
-#: src/features/poetry/LibraryManagePage.tsx:458
+#: src/features/poetry/LibraryManagePage.tsx:465
 msgid "{installedLength} 个合集 · {toLocaleStringValue} 篇 · {formatBytesValue}"
 msgstr "{installedLength} 个合集 · {toLocaleStringValue} 篇 · {formatBytesValue}"
 
@@ -256,7 +256,7 @@ msgstr "AI 服务连接成功"
 msgid "AI 服务配置已保存"
 msgstr "AI 服务配置已保存"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:216
+#: src/features/poetry/components/PoetryTranslationSection.tsx:233
 msgid "AI 生成"
 msgstr "AI 生成"
 
@@ -439,7 +439,7 @@ msgstr "下载完成，正在安装更新…"
 msgid "下载完成后才写入该目录"
 msgstr "下载完成后才写入该目录"
 
-#: src/features/poetry/LibraryManagePage.tsx:429
+#: src/features/poetry/LibraryManagePage.tsx:436
 msgid "下载所选"
 msgstr "下载所选"
 
@@ -542,7 +542,7 @@ msgstr "五子棋"
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "交换 {formatBytesValue} / {formatBytesValue2}"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:216
+#: src/features/poetry/components/PoetryTranslationSection.tsx:233
 msgid "人工修订"
 msgstr "人工修订"
 
@@ -565,6 +565,10 @@ msgstr "人机对战"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:428
 msgid "仅上传"
 msgstr "仅上传"
+
+#: src/features/poetry/components/TranslationPackManager.tsx:57
+msgid "仅导入带作者、来源和许可证的本地 JSON"
+msgstr "仅导入带作者、来源和许可证的本地 JSON"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:110
 #: src/features/media-compress/video/VideoCompressPanel.tsx:111
@@ -591,7 +595,7 @@ msgstr "仅限同一局域网内联机"
 msgid "从左侧列表选择一篇，或试试每日一诗。"
 msgstr "从左侧列表选择一篇，或试试每日一诗。"
 
-#: src/features/poetry/LibraryManagePage.tsx:438
+#: src/features/poetry/LibraryManagePage.tsx:445
 msgid "从本地 tar.gz 导入…"
 msgstr "从本地 tar.gz 导入…"
 
@@ -655,7 +659,7 @@ msgid "使用中"
 msgstr "使用中"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:499
-#: src/features/poetry/components/PoetryTranslationSection.tsx:345
+#: src/features/poetry/components/PoetryTranslationSection.tsx:380
 #: src/features/settings/AiConnectionSettings.tsx:218
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:335
 #: src/features/todo/TodoItemDialog.tsx:209
@@ -734,7 +738,7 @@ msgstr "全部作为新记录插入"
 msgid "全部分类"
 msgstr "全部分类"
 
-#: src/features/poetry/LibraryManagePage.tsx:418
+#: src/features/poetry/LibraryManagePage.tsx:425
 msgid "全部合集均已安装。"
 msgstr "全部合集均已安装。"
 
@@ -753,6 +757,10 @@ msgstr "全部来源"
 #: src/features/logs/ActivityLogsPage.tsx:213
 msgid "全部结果"
 msgstr "全部结果"
+
+#: src/features/poetry/components/TranslationPackManager.tsx:33
+msgid "共 {count} 条译文"
+msgstr "共 {count} 条译文"
 
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:24
 #: src/features/lan-transfer/LanShareDialog.tsx:67
@@ -791,7 +799,7 @@ msgstr "关闭中"
 msgid "关闭可进一步减小体积"
 msgstr "关闭可进一步减小体积"
 
-#: src/features/poetry/LibraryManagePage.tsx:491
+#: src/features/poetry/LibraryManagePage.tsx:498
 msgid "关闭时正文搜索走 LIKE 兜底，较慢"
 msgstr "关闭时正文搜索走 LIKE 兜底，较慢"
 
@@ -888,8 +896,8 @@ msgstr "创建时间"
 #: src/features/bt/components/CacheManager.tsx:270
 #: src/features/bt/components/CacheManager.tsx:271
 #: src/features/logs/LogPageLayout.tsx:108
-#: src/features/poetry/components/PoetryTranslationSection.tsx:365
-#: src/features/poetry/LibraryManagePage.tsx:524
+#: src/features/poetry/components/PoetryTranslationSection.tsx:400
+#: src/features/poetry/LibraryManagePage.tsx:531
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:42
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:129
 #: src/features/ssh-sftp/components/Sidebar.tsx:371
@@ -899,6 +907,11 @@ msgstr "创建时间"
 #: src/features/vault/VaultTool.tsx:512
 msgid "删除"
 msgstr "删除"
+
+#. placeholder {0}: pack.name
+#: src/features/poetry/components/TranslationPackManager.tsx:73
+msgid "删除 {0}"
+msgstr "删除 {0}"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:314
 msgid "删除 {name}"
@@ -917,7 +930,7 @@ msgstr "删除主机"
 msgid "删除共享目录"
 msgstr "删除共享目录"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:356
+#: src/features/poetry/components/PoetryTranslationSection.tsx:391
 msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "删除后可重新生成，不影响原文和注释。"
 
@@ -959,8 +972,8 @@ msgstr "删除日志"
 msgid "删除白名单"
 msgstr "删除白名单"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:241
-#: src/features/poetry/components/PoetryTranslationSection.tsx:242
+#: src/features/poetry/components/PoetryTranslationSection.tsx:258
+#: src/features/poetry/components/PoetryTranslationSection.tsx:259
 msgid "删除译文"
 msgstr "删除译文"
 
@@ -1036,15 +1049,15 @@ msgstr "动作"
 msgid "区分大小写"
 msgstr "区分大小写"
 
-#: src/features/poetry/LibraryManagePage.tsx:556
+#: src/features/poetry/LibraryManagePage.tsx:568
 msgid "卸载"
 msgstr "卸载"
 
-#: src/features/poetry/LibraryManagePage.tsx:107
+#: src/features/poetry/LibraryManagePage.tsx:110
 msgid "卸载 {statusName}"
 msgstr "卸载 {statusName}"
 
-#: src/features/poetry/LibraryManagePage.tsx:546
+#: src/features/poetry/LibraryManagePage.tsx:558
 msgid "卸载合集"
 msgstr "卸载合集"
 
@@ -1176,10 +1189,10 @@ msgstr "发现设备"
 #: src/features/logs/LogPageLayout.tsx:156
 #: src/features/media-compress/image/ImageCompressPanel.tsx:301
 #: src/features/media-compress/video/VideoCompressPanel.tsx:369
-#: src/features/poetry/components/PoetryTranslationSection.tsx:332
-#: src/features/poetry/components/PoetryTranslationSection.tsx:360
-#: src/features/poetry/components/PoetryTranslationSection.tsx:380
-#: src/features/poetry/LibraryManagePage.tsx:554
+#: src/features/poetry/components/PoetryTranslationSection.tsx:367
+#: src/features/poetry/components/PoetryTranslationSection.tsx:395
+#: src/features/poetry/components/PoetryTranslationSection.tsx:415
+#: src/features/poetry/LibraryManagePage.tsx:566
 #: src/features/settings/AiConnectionSettings.tsx:231
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:327
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:85
@@ -1201,7 +1214,7 @@ msgstr "取消"
 msgid "取消传输"
 msgstr "取消传输"
 
-#: src/features/poetry/LibraryManagePage.tsx:397
+#: src/features/poetry/LibraryManagePage.tsx:404
 msgid "取消同步"
 msgstr "取消同步"
 
@@ -1215,7 +1228,7 @@ msgstr "口令保护"
 msgid "古诗词"
 msgstr "古诗词"
 
-#: src/features/poetry/LibraryManagePage.tsx:360
+#: src/features/poetry/LibraryManagePage.tsx:367
 msgid "古诗词 · 数据管理"
 msgstr "古诗词 · 数据管理"
 
@@ -1237,7 +1250,7 @@ msgstr "只读"
 msgid "可用 {formatBytesValue}"
 msgstr "可用 {formatBytesValue}"
 
-#: src/features/poetry/LibraryManagePage.tsx:56
+#: src/features/poetry/LibraryManagePage.tsx:59
 msgid "可选"
 msgstr "可选"
 
@@ -1282,11 +1295,11 @@ msgstr "同意后双方交换先后手，立即开始新对局。"
 msgid "同时传输数"
 msgstr "同时传输数"
 
-#: src/features/poetry/LibraryManagePage.tsx:184
+#: src/features/poetry/LibraryManagePage.tsx:191
 msgid "同步失败"
 msgstr "同步失败"
 
-#: src/features/poetry/LibraryManagePage.tsx:177
+#: src/features/poetry/LibraryManagePage.tsx:184
 msgid "同步完成"
 msgstr "同步完成"
 
@@ -1534,7 +1547,7 @@ msgstr "存储占用"
 msgid "安全模式"
 msgstr "安全模式"
 
-#: src/features/poetry/LibraryManagePage.tsx:533
+#: src/features/poetry/LibraryManagePage.tsx:540
 msgid "安装"
 msgstr "安装"
 
@@ -1635,12 +1648,17 @@ msgid "对方请求悔棋"
 msgstr "对方请求悔棋"
 
 #: src/features/export/ImportDialog.tsx:188
+#: src/features/poetry/components/TranslationPackManager.tsx:62
 msgid "导入"
 msgstr "导入"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:169
 msgid "导入中…"
 msgstr "导入中…"
+
+#: src/features/poetry/components/TranslationPackManager.tsx:35
+msgid "导入失败"
+msgstr "导入失败"
 
 #: src/features/export/ImportDialog.tsx:93
 msgid "导入完成：新增 {inserted}，更新 {updated}"
@@ -1684,7 +1702,7 @@ msgstr "将内容转义为字符串字面量"
 msgid "将军"
 msgstr "将军"
 
-#: src/features/poetry/LibraryManagePage.tsx:549
+#: src/features/poetry/LibraryManagePage.tsx:561
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 
@@ -1704,7 +1722,7 @@ msgstr "将死"
 msgid "将结果写回输入并切换模式"
 msgstr "将结果写回输入并切换模式"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:376
+#: src/features/poetry/components/PoetryTranslationSection.tsx:411
 msgid "将覆盖当前人工修订。"
 msgstr "将覆盖当前人工修订。"
 
@@ -1772,7 +1790,7 @@ msgid "已下载 {formatBytesValue}"
 msgstr "已下载 {formatBytesValue}"
 
 #: src/features/media-compress/components/CompressResultCard.tsx:40
-#: src/features/poetry/components/PoetryTranslationSection.tsx:129
+#: src/features/poetry/components/PoetryTranslationSection.tsx:148
 #: src/features/todo/TodoTool.tsx:113
 #: src/features/vault/VaultTool.tsx:227
 msgid "已保存"
@@ -1799,8 +1817,9 @@ msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
 #: src/features/bt/BtTool.tsx:436
-#: src/features/poetry/components/PoetryTranslationSection.tsx:146
-#: src/features/poetry/LibraryManagePage.tsx:336
+#: src/features/poetry/components/PoetryTranslationSection.tsx:165
+#: src/features/poetry/components/TranslationPackManager.tsx:43
+#: src/features/poetry/LibraryManagePage.tsx:343
 #: src/features/todo/TodoTool.tsx:150
 #: src/features/vault/VaultTool.tsx:237
 msgid "已删除"
@@ -1811,7 +1830,7 @@ msgstr "已删除"
 msgid "已删除 {name}"
 msgstr "已删除 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:301
+#: src/features/poetry/LibraryManagePage.tsx:308
 msgid "已删除 {statusName2}"
 msgstr "已删除 {statusName2}"
 
@@ -1867,11 +1886,11 @@ msgstr "已复制输入"
 msgid "已复制输出"
 msgstr "已复制输出"
 
-#: src/features/poetry/LibraryManagePage.tsx:456
+#: src/features/poetry/LibraryManagePage.tsx:463
 msgid "已安装"
 msgstr "已安装"
 
-#: src/features/poetry/LibraryManagePage.tsx:513
+#: src/features/poetry/LibraryManagePage.tsx:520
 msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "已安装 {toLocaleStringValue3} 条，约 14MB"
 
@@ -1880,10 +1899,15 @@ msgstr "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgid "已完成"
 msgstr "已完成"
 
-#: src/features/poetry/LibraryManagePage.tsx:173
-#: src/features/poetry/LibraryManagePage.tsx:346
+#: src/features/poetry/LibraryManagePage.tsx:180
+#: src/features/poetry/LibraryManagePage.tsx:353
 msgid "已导入"
 msgstr "已导入"
+
+#. placeholder {0}: packs.length
+#: src/features/poetry/components/TranslationPackManager.tsx:56
+msgid "已导入 {0} 个译文包"
+msgstr "已导入 {0} 个译文包"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:60
 msgid "已导入密钥 {trimValue}"
@@ -1940,7 +1964,7 @@ msgstr "已添加白名单"
 msgid "已清除 {removed} 个缓存任务"
 msgstr "已清除 {removed} 个缓存任务"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:102
+#: src/features/poetry/components/PoetryTranslationSection.tsx:121
 msgid "已生成"
 msgstr "已生成"
 
@@ -1948,7 +1972,7 @@ msgstr "已生成"
 msgid "已移动 {name}"
 msgstr "已移动 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:490
+#: src/features/poetry/LibraryManagePage.tsx:497
 msgid "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 msgstr "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 
@@ -1997,7 +2021,7 @@ msgid "建议下载后用外部播放器打开"
 msgstr "建议下载后用外部播放器打开"
 
 #: src/features/lan-transfer/LanTransferSidebar.tsx:294
-#: src/features/poetry/LibraryManagePage.tsx:502
+#: src/features/poetry/LibraryManagePage.tsx:509
 msgid "开启"
 msgstr "开启"
 
@@ -2028,6 +2052,14 @@ msgstr "开放"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:385
 msgid "开放模式会跳过确认码"
 msgstr "开放模式会跳过确认码"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:331
+msgid "开放译文"
+msgstr "开放译文"
+
+#: src/features/poetry/components/TranslationPackManager.tsx:53
+msgid "开放译文包"
+msgstr "开放译文包"
 
 #: src/features/settings/SettingsPage.tsx:78
 #: src/features/settings/SettingsPage.tsx:83
@@ -2253,7 +2285,7 @@ msgid "推杆"
 msgstr "推杆"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:198
-#: src/features/poetry/LibraryManagePage.tsx:54
+#: src/features/poetry/LibraryManagePage.tsx:57
 msgid "推荐"
 msgstr "推荐"
 
@@ -2290,12 +2322,13 @@ msgstr "搜索诗词"
 msgid "操作"
 msgstr "操作"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:189
-#: src/features/poetry/LibraryManagePage.tsx:262
-#: src/features/poetry/LibraryManagePage.tsx:289
-#: src/features/poetry/LibraryManagePage.tsx:304
-#: src/features/poetry/LibraryManagePage.tsx:322
-#: src/features/poetry/LibraryManagePage.tsx:338
+#: src/features/poetry/components/PoetryTranslationSection.tsx:208
+#: src/features/poetry/components/TranslationPackManager.tsx:45
+#: src/features/poetry/LibraryManagePage.tsx:269
+#: src/features/poetry/LibraryManagePage.tsx:296
+#: src/features/poetry/LibraryManagePage.tsx:311
+#: src/features/poetry/LibraryManagePage.tsx:329
+#: src/features/poetry/LibraryManagePage.tsx:345
 #: src/features/poetry/LibraryPage.tsx:207
 #: src/features/poetry/LibraryPage.tsx:224
 #: src/features/poetry/LibraryPage.tsx:248
@@ -2369,7 +2402,7 @@ msgstr "文件已在该位置"
 msgid "文件管理"
 msgstr "文件管理"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:182
+#: src/features/poetry/components/PoetryTranslationSection.tsx:201
 msgid "文学意译"
 msgstr "文学意译"
 
@@ -2547,7 +2580,7 @@ msgstr "暂无白名单"
 msgid "暂无设备"
 msgstr "暂无设备"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:279
+#: src/features/poetry/components/PoetryTranslationSection.tsx:296
 msgid "暂无译文"
 msgstr "暂无译文"
 
@@ -2633,7 +2666,7 @@ msgstr "未保存密钥"
 msgid "未安排"
 msgstr "未安排"
 
-#: src/features/poetry/LibraryManagePage.tsx:514
+#: src/features/poetry/LibraryManagePage.tsx:521
 msgid "未安装；仅点击时下载，可随时删除"
 msgstr "未安装；仅点击时下载，可随时删除"
 
@@ -2687,7 +2720,7 @@ msgstr "权限"
 msgid "来源"
 msgstr "来源"
 
-#: src/features/poetry/LibraryManagePage.tsx:384
+#: src/features/poetry/LibraryManagePage.tsx:391
 msgid "来自 chinese-poetry（MIT），下载后离线可用"
 msgstr "来自 chinese-poetry（MIT），下载后离线可用"
 
@@ -2801,7 +2834,7 @@ msgstr "正则"
 msgid "正在下载版本 {stateVersion3}"
 msgstr "正在下载版本 {stateVersion3}"
 
-#: src/features/poetry/LibraryManagePage.tsx:162
+#: src/features/poetry/LibraryManagePage.tsx:169
 msgid "正在下载语料"
 msgstr "正在下载语料"
 
@@ -2838,11 +2871,11 @@ msgstr "正在加载系统监控…"
 msgid "正在取消"
 msgstr "正在取消"
 
-#: src/features/poetry/LibraryManagePage.tsx:171
+#: src/features/poetry/LibraryManagePage.tsx:178
 msgid "正在导入语料"
 msgstr "正在导入语料"
 
-#: src/features/poetry/LibraryManagePage.tsx:312
+#: src/features/poetry/LibraryManagePage.tsx:319
 msgid "正在建立正文索引…"
 msgstr "正在建立正文索引…"
 
@@ -2878,7 +2911,7 @@ msgstr "正在检查更新…"
 msgid "正在检索…"
 msgstr "正在检索…"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:207
+#: src/features/poetry/components/PoetryTranslationSection.tsx:226
 msgid "正在生成"
 msgstr "正在生成"
 
@@ -2916,12 +2949,12 @@ msgstr "正在重启并应用更新…"
 msgid "正文"
 msgstr "正文"
 
-#: src/features/poetry/LibraryManagePage.tsx:486
-#: src/features/poetry/LibraryManagePage.tsx:500
+#: src/features/poetry/LibraryManagePage.tsx:493
+#: src/features/poetry/LibraryManagePage.tsx:507
 msgid "正文全文索引"
 msgstr "正文全文索引"
 
-#: src/features/poetry/LibraryManagePage.tsx:320
+#: src/features/poetry/LibraryManagePage.tsx:327
 msgid "正文索引已更新"
 msgstr "正文索引已更新"
 
@@ -2963,11 +2996,11 @@ msgstr "没有逾期未完成的待办"
 msgid "注释"
 msgstr "注释"
 
-#: src/features/poetry/LibraryManagePage.tsx:509
+#: src/features/poetry/LibraryManagePage.tsx:516
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:300
+#: src/features/poetry/components/PoetryTranslationSection.tsx:317
 msgid "注释包译文"
 msgstr "注释包译文"
 
@@ -3175,7 +3208,7 @@ msgstr "玩家 2"
 msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:292
+#: src/features/poetry/components/PoetryTranslationSection.tsx:309
 msgid "生成"
 msgstr "生成"
 
@@ -3223,7 +3256,7 @@ msgstr "白棋"
 msgid "白棋胜"
 msgstr "白棋胜"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:179
+#: src/features/poetry/components/PoetryTranslationSection.tsx:198
 msgid "白话直译"
 msgstr "白话直译"
 
@@ -3287,7 +3320,7 @@ msgstr "确定删除主机 “{value}”？此操作不可撤销。"
 msgid "确认"
 msgstr "确认"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:354
+#: src/features/poetry/components/PoetryTranslationSection.tsx:389
 msgid "确认删除？"
 msgstr "确认删除？"
 
@@ -3553,9 +3586,9 @@ msgstr "编辑主机"
 msgid "编辑待办"
 msgstr "编辑待办"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:230
-#: src/features/poetry/components/PoetryTranslationSection.tsx:231
-#: src/features/poetry/components/PoetryTranslationSection.tsx:317
+#: src/features/poetry/components/PoetryTranslationSection.tsx:247
+#: src/features/poetry/components/PoetryTranslationSection.tsx:248
+#: src/features/poetry/components/PoetryTranslationSection.tsx:352
 msgid "编辑译文"
 msgstr "编辑译文"
 
@@ -3648,7 +3681,7 @@ msgstr "节点"
 msgid "节点明细"
 msgstr "节点明细"
 
-#: src/features/poetry/LibraryManagePage.tsx:382
+#: src/features/poetry/LibraryManagePage.tsx:389
 msgid "获取语料"
 msgstr "获取语料"
 
@@ -3679,7 +3712,7 @@ msgstr "要移动的文件夹"
 msgid "覆盖"
 msgstr "覆盖"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:374
+#: src/features/poetry/components/PoetryTranslationSection.tsx:409
 msgid "覆盖人工修订？"
 msgstr "覆盖人工修订？"
 
@@ -3736,15 +3769,19 @@ msgstr "访问"
 msgid "访问时间"
 msgstr "访问时间"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:163
+#: src/features/poetry/components/PoetryTranslationSection.tsx:182
 msgid "译文"
 msgstr "译文"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:323
+#: src/features/poetry/components/PoetryTranslationSection.tsx:358
 msgid "译文内容"
 msgstr "译文内容"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:170
+#: src/features/poetry/components/TranslationPackManager.tsx:33
+msgid "译文包已导入"
+msgstr "译文包已导入"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:189
 msgid "译文模式"
 msgstr "译文模式"
 
@@ -3795,8 +3832,8 @@ msgstr "语言"
 msgid "请先保存当前配置"
 msgstr "请先保存当前配置"
 
-#: src/features/poetry/LibraryManagePage.tsx:255
-#: src/features/poetry/LibraryManagePage.tsx:283
+#: src/features/poetry/LibraryManagePage.tsx:262
+#: src/features/poetry/LibraryManagePage.tsx:290
 msgid "请先选择合集"
 msgstr "请先选择合集"
 
@@ -3869,7 +3906,7 @@ msgstr "读取中"
 msgid "读取信息"
 msgstr "读取信息"
 
-#: src/features/poetry/LibraryManagePage.tsx:142
+#: src/features/poetry/LibraryManagePage.tsx:149
 #: src/features/poetry/LibraryPage.tsx:173
 #: src/features/preview/PreviewSurface.tsx:169
 msgid "读取失败"
@@ -4013,7 +4050,7 @@ msgstr "运行中"
 msgid "近 7 天"
 msgstr "近 7 天"
 
-#: src/features/poetry/LibraryManagePage.tsx:371
+#: src/features/poetry/LibraryManagePage.tsx:378
 #: src/features/poetry/PoemDetailPage.tsx:51
 msgid "返回古诗词"
 msgstr "返回古诗词"
@@ -4118,7 +4155,7 @@ msgstr "退出当前对局？"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:122
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:231
-#: src/features/poetry/LibraryManagePage.tsx:89
+#: src/features/poetry/LibraryManagePage.tsx:92
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:142
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:121
 msgid "选择"
@@ -4294,8 +4331,8 @@ msgstr "重新开始对局？"
 msgid "重新检查"
 msgstr "重新检查"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:272
-#: src/features/poetry/components/PoetryTranslationSection.tsx:382
+#: src/features/poetry/components/PoetryTranslationSection.tsx:289
+#: src/features/poetry/components/PoetryTranslationSection.tsx:417
 msgid "重新生成"
 msgstr "重新生成"
 
@@ -4408,7 +4445,7 @@ msgstr "黑棋胜"
 msgid "黑胜"
 msgstr "黑胜"
 
-#: src/features/poetry/LibraryManagePage.tsx:55
+#: src/features/poetry/LibraryManagePage.tsx:58
 #: src/features/settings/AppSettingsMenu.tsx:221
 msgid "默认"
 msgstr "默认"

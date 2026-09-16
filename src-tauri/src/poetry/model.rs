@@ -256,6 +256,58 @@ pub struct PoetryTranslation {
     pub updated_at: i64,
 }
 
+/// Metadata and entries of a user-supplied, redistributable translation pack.
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PoetryTranslationPack {
+    pub format: String,
+    pub version: u32,
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub source: String,
+    pub license: String,
+    pub translations: Vec<PoetryPackTranslationInput>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PoetryPackTranslationInput {
+    pub poem_uid: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub author: String,
+    pub body_fingerprint: String,
+    pub language: String,
+    pub mode: PoetryTranslationMode,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PoetryPackTranslation {
+    pub pack_id: String,
+    pub pack_name: String,
+    pub pack_author: String,
+    pub pack_source: String,
+    pub pack_license: String,
+    pub language: String,
+    pub mode: PoetryTranslationMode,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PoetryTranslationPackSummary {
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub source: String,
+    pub license: String,
+    pub entry_count: i64,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PoetryTranslationStreamEvent {

@@ -36,7 +36,9 @@ import {
   poetrySyncCancel,
   poetrySyncImportLocal,
   poetrySyncStart,
+  poetryTranslationPacks,
 } from "~/lib/ipc";
+import type { PoetryTranslationPackSummary } from "~/bindings";
 import { formatBytes } from "~/lib/format";
 import type {
   PoetryCollectionStatus,
@@ -45,6 +47,7 @@ import type {
 } from "~/types";
 import { usePoetrySyncProgress } from "./hooks/use-poetry-sync";
 import { usePoetryStore } from "./store/poetry-store";
+import TranslationPackManager from "./components/TranslationPackManager";
 const TIER_ORDER: PoetryTier[] = ["recommended", "default", "optIn"];
 const SYNC_TOAST_ID = "poetry-sync";
 const INDEX_TOAST_ID = "poetry-index";
@@ -128,6 +131,9 @@ export default function LibraryManagePage() {
     null,
   );
   const [annotationsCount, setAnnotationsCount] = useState<number | null>(null);
+  const [translationPacks, setTranslationPacks] = useState<
+    PoetryTranslationPackSummary[]
+  >([]);
   const [pendingDelete, setPendingDelete] =
     useState<PoetryCollectionStatus | null>(null);
   const [installedOpen, setInstalledOpen] = useState(false);
@@ -138,6 +144,7 @@ export default function LibraryManagePage() {
       setAnnotationsCount(
         (await poetryAnnotationsStatus().catch(() => null))?.entryCount ?? 0,
       );
+      setTranslationPacks(await poetryTranslationPacks().catch(() => []));
     } catch (error) {
       toast.error(t`读取失败`, {
         description: String(error),
@@ -534,6 +541,11 @@ export default function LibraryManagePage() {
               </Button>
             )}
           </div>
+
+          <TranslationPackManager
+            packs={translationPacks}
+            onChange={setTranslationPacks}
+          />
         </section>
       </div>
 

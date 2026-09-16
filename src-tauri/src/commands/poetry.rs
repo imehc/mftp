@@ -5,14 +5,15 @@ use tauri::{AppHandle, Emitter, State};
 
 use crate::ai::{
     generate_poetry_translation as request_poetry_translation, poetry_translation_stream_event,
-    read_api_key, POETRY_TRANSLATION_PROMPT_VERSION,
+    read_api_key, AiTask, POETRY_TRANSLATION_PROMPT_VERSION,
 };
 use crate::error::{AppError, AppResult};
 use crate::poetry::model::{
     AuthorSummary, PoemDetail, PoemPage, PoetryAnnotationsStatus, PoetryAuthorsRequest,
-    PoetryBrowseRequest, PoetryCollectionStatus, PoetryContentIndexStatus, PoetrySearchRequest,
-    PoetrySearchResult, PoetrySyncPlan, PoetrySyncProgress, PoetryTranslation,
-    PoetryTranslationMode, PoetryTranslationStreamEvent,
+    PoetryBrowseRequest, PoetryCollectionStatus, PoetryContentIndexStatus, PoetryPackTranslation,
+    PoetrySearchRequest, PoetrySearchResult, PoetrySyncPlan, PoetrySyncProgress, PoetryTranslation,
+    PoetryTranslationMode, PoetryTranslationPack, PoetryTranslationPackSummary,
+    PoetryTranslationStreamEvent,
 };
 use crate::poetry::sync::SYNC_PROGRESS_EVENT;
 use crate::poetry::text::body_fingerprint;
@@ -261,6 +262,74 @@ pub async fn poetry_annotations_delete(state: State<'_, AppState>) -> AppResult<
     result
 }
 
+#[tauri::command]
+#[specta::specta]
+pub async fn poetry_translation_pack_import(
+    state: State<'_, AppState>,
+    raw: String,
+) -> AppResult<i64> {
+    if raw.len() > 32 * 1024 * 1024 {
+        return Err(AppError("Translation pack file is too large".into()));
+    }
+    let pack: PoetryTranslationPack = serde_json::from_str(&raw)
+        .map_err(|error| AppError(format!("Invalid translation pack: {error}")))?;
+    let library = state.poetry.clone();
+    let pack_id = pack.id.clone();
+    let result = run_blocking(move || library.db().import_translation_pack(&pack)).await;
+    record_operation(
+        &state.storage,
+        "poetry",
+        &pack_id,
+        "import_translation_pack",
+        None,
+        &result,
+    );
+    result
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn poetry_translation_packs(
+    state: State<'_, AppState>,
+) -> AppResult<Vec<PoetryTranslationPackSummary>> {
+    let db = state.poetry.db();
+    run_blocking(move || db.translation_pack_summaries()).await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn poetry_translation_pack_delete(
+    state: State<'_, AppState>,
+    id: String,
+) -> AppResult<()> {
+    let db = state.poetry.db();
+    let log_id = id.clone();
+    let result = run_blocking(move || db.translation_pack_delete(&id)).await;
+    record_operation(
+        &state.storage,
+        "poetry",
+        &log_id,
+        "delete_translation_pack",
+        None,
+        &result,
+    );
+    result
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn list_poetry_pack_translations(
+    state: State<'_, AppState>,
+    uid: String,
+) -> AppResult<Vec<PoetryPackTranslation>> {
+    let db = state.poetry.db();
+    run_blocking(move || {
+        let poem = db.poem_detail(&uid)?;
+        db.translation_pack_for_poem(&poem.uid, &body_fingerprint(&poem.body))
+    })
+    .await
+}
+
 const POETRY_TRANSLATION_LANGUAGE: &str = "zh-CN";
 
 #[tauri::command]
@@ -308,16 +377,21 @@ pub async fn generate_poetry_translation(
         Ok((poem, fingerprint, config, api_key))
     })
     .await?;
+    let ai_task = AiTask::poetry_translation(mode);
     let task_key = format!(
         "poetry:{}:{}:{}:{mode:?}:{}",
-        poem.uid, fingerprint, POETRY_TRANSLATION_LANGUAGE, POETRY_TRANSLATION_PROMPT_VERSION
+        poem.uid,
+        fingerprint,
+        POETRY_TRANSLATION_LANGUAGE,
+        ai_task.prompt_version()
     );
     let _task = tasks.begin(task_key)?;
     let stream_app = app.clone();
-    let content = request_poetry_translation(&config, &api_key, &poem, mode, move |delta| {
+    let output = request_poetry_translation(&config, &api_key, ai_task, &poem, move |delta| {
         let _ = stream_app.emit(&event_name, PoetryTranslationStreamEvent { delta });
     })
     .await?;
+    let content = output.translation;
     let model = config.model;
     run_blocking(move || {
         storage.upsert_ai_poetry_translation(

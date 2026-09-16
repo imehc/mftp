@@ -4,13 +4,16 @@
 mod client;
 mod credentials;
 mod model;
+mod task;
 mod tasks;
 mod url;
 
-pub use client::{generate_poetry_translation, test_connection, POETRY_TRANSLATION_PROMPT_VERSION};
+pub use client::{generate_poetry_translation, test_connection};
 pub use credentials::{
     clear_api_key, clear_api_key_for_reset, has_api_key, read_api_key, save_api_key,
 };
 pub use model::{AiConnection, AiConnectionConfig, AiConnectionInput};
+pub use task::POETRY_TRANSLATION_PROMPT_VERSION;
+pub(crate) use task::{AiTask, AiTaskRequest, PoetryTranslationResult};
 pub use tasks::{poetry_translation_stream_event, AiTaskManager};
 pub use url::validate_connection;

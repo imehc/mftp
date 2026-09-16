@@ -324,6 +324,14 @@ export const poetryAnnotationsStatus = () =>
   unwrapCommand(commands.poetryAnnotationsStatus());
 export const poetryAnnotationsDelete = () =>
   voidCommand(commands.poetryAnnotationsDelete());
+export const poetryTranslationPackImport = (raw: string) =>
+  unwrapCommand(commands.poetryTranslationPackImport(raw));
+export const poetryTranslationPacks = () =>
+  unwrapCommand(commands.poetryTranslationPacks());
+export const poetryTranslationPackDelete = (id: string) =>
+  voidCommand(commands.poetryTranslationPackDelete(id));
+export const poetryPackTranslationsList = (uid: string) =>
+  unwrapCommand(commands.listPoetryPackTranslations(uid));
 export const poetryTranslationsList = (uid: string) =>
   unwrapCommand(commands.listPoetryTranslations(uid));
 export const poetryTranslationGenerate = (

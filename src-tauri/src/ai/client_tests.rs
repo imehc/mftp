@@ -1,23 +1,5 @@
 use super::*;
 
-fn poem() -> PoemDetail {
-    PoemDetail {
-        uid: "uid".into(),
-        collection_id: "tang".into(),
-        collection_name: "唐诗".into(),
-        title: "静夜思".into(),
-        author: "李白".into(),
-        dynasty: "唐".into(),
-        rhythmic: String::new(),
-        chapter: String::new(),
-        body: vec!["床前明月光".into(), "疑是地上霜".into()],
-        notes: vec!["must not be sent".into()],
-        strains: vec!["must not be sent".into()],
-        author_bio: None,
-        annotation: None,
-    }
-}
-
 #[test]
 fn parses_responses_output_text() {
     let body = br#"{
@@ -39,27 +21,24 @@ fn rejects_incomplete_or_empty_responses() {
 
 #[test]
 fn validates_plain_and_json_translation_output() {
-    assert_eq!(parse_translation_output("Moonlight").unwrap(), "Moonlight");
     assert_eq!(
-        parse_translation_output(r#"{"translation":"月光照在床前。"}"#).unwrap(),
+        parse_translation_output("Moonlight").unwrap().translation,
+        "Moonlight"
+    );
+    assert_eq!(
+        parse_translation_output(r#"{"translation":"月光照在床前。"}"#)
+            .unwrap()
+            .translation,
         "月光照在床前。"
     );
     assert_eq!(
-        parse_translation_output("```json\n{\"translation\":\"Fenced\"}\n```").unwrap(),
+        parse_translation_output("```json\n{\"translation\":\"Fenced\"}\n```")
+            .unwrap()
+            .translation,
         "Fenced"
     );
     assert!(parse_translation_output(r#"{"translation":"  "}"#).is_err());
     assert!(parse_translation_output(r#"{"translation":"text","extra":true}"#).is_err());
-}
-
-#[test]
-fn poetry_input_contains_only_allowed_source_fields() {
-    let input = poetry_input(&poem());
-    let value: Value = serde_json::from_str(&input).unwrap();
-    let object = value.as_object().unwrap();
-    let keys = object.keys().map(String::as_str).collect::<Vec<_>>();
-    assert_eq!(keys, vec!["author", "body", "dynasty", "title"]);
-    assert!(!input.contains("must not be sent"));
 }
 
 #[test]

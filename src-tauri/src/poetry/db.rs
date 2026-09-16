@@ -370,6 +370,28 @@ CREATE TABLE IF NOT EXISTS annotations (
     audio_url TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE IF NOT EXISTS translation_packs (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    author TEXT NOT NULL,
+    source TEXT NOT NULL,
+    license TEXT NOT NULL,
+    installed_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS translation_pack_entries (
+    pack_id TEXT NOT NULL REFERENCES translation_packs(id) ON DELETE CASCADE,
+    poem_uid TEXT NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
+    author TEXT NOT NULL DEFAULT '',
+    body_fingerprint TEXT NOT NULL,
+    language TEXT NOT NULL,
+    mode TEXT NOT NULL,
+    content TEXT NOT NULL,
+    PRIMARY KEY(pack_id, poem_uid, language, mode)
+);
+CREATE INDEX IF NOT EXISTS idx_translation_pack_poem ON translation_pack_entries(poem_uid, body_fingerprint);
+
 -- Title/author search: unigram streams over normalized text. Rowids mirror
 -- poems.rowid so collection deletes stay O(rows-in-collection).
 CREATE VIRTUAL TABLE IF NOT EXISTS poems_fts USING fts5(
