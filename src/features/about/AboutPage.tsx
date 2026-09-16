@@ -95,10 +95,13 @@ export default function AboutPage() {
   async function load() {
     setLoading(true);
     try {
+      const btStats = isDesktopPlatform()
+        ? ipc.btCacheStats()
+        : Promise.resolve(null);
       const [nextUsage, nextLan, nextBt, logs] = await Promise.all([
         ipc.appDataUsage(),
         ipc.lanTransferStatus(),
-        ipc.btCacheStats(),
+        btStats,
         ipc.activityLogs(500),
       ]);
       setUsage(nextUsage);

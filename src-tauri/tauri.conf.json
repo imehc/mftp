@@ -28,6 +28,9 @@
     "iOS": {
       "developmentTeam": "Q4TGGJ5RKN"
     },
+    "android": {
+      "minSdkVersion": 28
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

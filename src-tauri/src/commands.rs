@@ -2,6 +2,7 @@ use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
 mod ai;
+#[cfg(desktop)]
 mod bt;
 mod data;
 mod export;
@@ -16,6 +17,7 @@ mod todo;
 mod vault;
 
 pub use ai::*;
+#[cfg(desktop)]
 pub use bt::*;
 pub use data::*;
 pub use export::*;

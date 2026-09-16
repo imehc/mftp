@@ -27,6 +27,11 @@
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>mftp 需要访问本地网络,以便发现附近设备进行局域网文件传输和小游戏联机对战。</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

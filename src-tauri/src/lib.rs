@@ -1,4 +1,5 @@
 mod ai;
+#[cfg(desktop)]
 mod bt;
 mod commands;
 mod error;
@@ -32,26 +33,13 @@ pub struct AppState {
     pub lan_transfer: Arc<LanTransferManager>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<poetry::sync::PoetryLibrary>,
+    #[cfg(desktop)]
     pub bt: Arc<bt::BtManager>,
 }
 
-fn specta_builder() -> Builder<tauri::Wry> {
-    Builder::<tauri::Wry>::new()
-        .typ::<models::TransferProgress>()
-        .typ::<bt::BtProbeResult>()
-        .typ::<bt::BtTaskInfo>()
-        .typ::<bt::BtTaskStatus>()
-        .typ::<bt::BtPackageMode>()
-        .typ::<bt::BtFileMeta>()
-        .typ::<bt::BtControlAction>()
-        .typ::<bt::BtPeerInfo>()
-        .typ::<bt::BtCacheStats>()
-        .typ::<bt::BtTaskEvent>()
-        // Event payloads never pass through command signatures; register
-        // explicitly or they will be missing from bindings.ts.
-        .typ::<poetry::model::PoetrySyncProgress>()
-        .typ::<poetry::model::PoetryTranslationStreamEvent>()
-        .commands(collect_commands![
+macro_rules! collect_app_commands {
+    ($($($platform_command:ident)::+),* $(,)?) => {
+        collect_commands![
             commands::ai_connection_get,
             commands::ai_connection_save,
             commands::ai_connection_clear_key,
@@ -157,6 +145,15 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::generate_poetry_translation,
             commands::update_poetry_translation,
             commands::delete_poetry_translation,
+            $($($platform_command)::+),*
+        ]
+    };
+}
+
+#[cfg(desktop)]
+macro_rules! all_commands {
+    () => {
+        collect_app_commands![
             commands::bt_probe,
             commands::bt_add_download,
             commands::bt_ensure_preview,
@@ -171,7 +168,38 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::bt_task_peers,
             commands::bt_cache_items,
             commands::bt_task_stats,
-        ])
+        ]
+    };
+}
+
+#[cfg(mobile)]
+macro_rules! all_commands {
+    () => {
+        collect_app_commands![]
+    };
+}
+
+fn specta_builder() -> Builder<tauri::Wry> {
+    let builder = Builder::<tauri::Wry>::new()
+        .typ::<models::TransferProgress>()
+        // Event payloads never pass through command signatures; register
+        // explicitly or they will be missing from bindings.ts.
+        .typ::<poetry::model::PoetrySyncProgress>()
+        .typ::<poetry::model::PoetryTranslationStreamEvent>();
+
+    #[cfg(desktop)]
+    let builder = builder
+        .typ::<bt::BtProbeResult>()
+        .typ::<bt::BtTaskInfo>()
+        .typ::<bt::BtTaskStatus>()
+        .typ::<bt::BtPackageMode>()
+        .typ::<bt::BtFileMeta>()
+        .typ::<bt::BtControlAction>()
+        .typ::<bt::BtPeerInfo>()
+        .typ::<bt::BtCacheStats>()
+        .typ::<bt::BtTaskEvent>();
+
+    builder.commands(all_commands!())
 }
 
 fn cleanup_stale_local_transfer_files() {
@@ -220,6 +248,9 @@ pub fn run() {
             None,
         ))
         .plugin(tauri_plugin_updater::Builder::new().build());
+
+    #[cfg(target_os = "android")]
+    let app = app.plugin(tauri_plugin_keystore::init());
 
     let app = app
         .setup(|app| {
@@ -283,6 +314,7 @@ pub fn run() {
                 lan_transfer,
                 game_room,
                 poetry,
+                #[cfg(desktop)]
                 bt: Arc::new(bt::BtManager::new(app.handle().clone(), storage)),
             });
             Ok(())
@@ -304,6 +336,7 @@ pub fn run() {
             state.manager.shutdown_all();
             state.lan_transfer.stop();
             state.game_room.leave();
+            #[cfg(desktop)]
             state.bt.shutdown();
         }
         cleanup_stale_local_transfer_files();

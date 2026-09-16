@@ -243,11 +243,15 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Android NDK
+      - name: Setup Android SDK and NDK
         shell: bash
         run: |
           NDK_VERSION="27.0.12077973"
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}"
+          BUILD_TOOLS_VERSION="36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+            "platforms;android-36" \
+            "build-tools;${BUILD_TOOLS_VERSION}" \
+            "ndk;${NDK_VERSION}"
           {
             echo "NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}"
             echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}"

@@ -12,11 +12,24 @@ NDK_VERSION="$(ls "$ANDROID_HOME/ndk" | sort -V | tail -1)"
 export NDK_HOME="${NDK_HOME:-$ANDROID_HOME/ndk/$NDK_VERSION}"
 export ANDROID_NDK_HOME="$NDK_HOME"
 
+java_is_gradle_compatible() {
+  local java_home="$1"
+  local major
+  [ -x "$java_home/bin/java" ] || return 1
+  major="$($java_home/bin/java -version 2>&1 | awk -F'[ ".]' 'NR == 1 { print ($2 == "1" ? $3 : $2) }')"
+  [ "$major" -ge 17 ] 2>/dev/null && [ "$major" -le 24 ]
+}
+
 if [ -z "${JAVA_HOME:-}" ]; then
+  GRADLE_JAVA_HOME=""
+  if [ -d "$HOME/.gradle/jdks" ]; then
+    GRADLE_JAVA_HOME="$(find "$HOME/.gradle/jdks" -path '*/Contents/Home/bin/java' -type f -print | sort | head -1 | sed 's|/bin/java$||')"
+  fi
   for candidate in \
     "/Applications/Android Studio.app/Contents/jbr/Contents/Home" \
+    "$GRADLE_JAVA_HOME" \
     "$(/usr/libexec/java_home 2>/dev/null || true)"; do
-    if [ -n "$candidate" ] && [ -d "$candidate" ]; then
+    if [ -n "$candidate" ] && java_is_gradle_compatible "$candidate"; then
       export JAVA_HOME="$candidate"
       break
     fi

@@ -1,32 +1,21 @@
-#[cfg(desktop)]
 use std::io::Read;
-#[cfg(desktop)]
 use std::time::Duration;
 
-#[cfg(desktop)]
 use eventsource_stream::Eventsource;
-#[cfg(desktop)]
 use futures_util::StreamExt;
-#[cfg(desktop)]
 use serde_json::{json, Value};
 
 use crate::error::{AppError, AppResult};
 use crate::poetry::model::PoemDetail;
 
-#[cfg(desktop)]
 use super::url::responses_endpoint;
 use super::{AiConnectionConfig, AiTask, AiTaskRequest, PoetryTranslationResult};
 
-#[cfg(desktop)]
 const REQUEST_LIMIT_BYTES: usize = 128 * 1024;
-#[cfg(desktop)]
 const RESPONSE_LIMIT_BYTES: u64 = 1024 * 1024;
-#[cfg(desktop)]
 const TRANSLATION_LIMIT_BYTES: usize = 64 * 1024;
-#[cfg(desktop)]
 const STREAM_OUTPUT_LIMIT_BYTES: usize = TRANSLATION_LIMIT_BYTES + 1024;
 
-#[cfg(desktop)]
 pub fn test_connection(config: &AiConnectionConfig, api_key: &str) -> AppResult<()> {
     send_text_request(
         config,
@@ -39,12 +28,6 @@ pub fn test_connection(config: &AiConnectionConfig, api_key: &str) -> AppResult<
     .map(|_| ())
 }
 
-#[cfg(not(desktop))]
-pub fn test_connection(_config: &AiConnectionConfig, _api_key: &str) -> AppResult<()> {
-    Err(platform_error())
-}
-
-#[cfg(desktop)]
 pub async fn generate_poetry_translation<F>(
     config: &AiConnectionConfig,
     api_key: &str,
@@ -69,40 +52,62 @@ where
         )
         .await?
     } else {
-        send_text_request(
+        send_text_request_async(
             config,
             api_key,
             request.instructions(),
             request.input(),
             request.max_output_tokens(),
             Duration::from_secs(90),
-        )?
+        )
+        .await?
     };
     match request.task() {
         AiTask::PoetryTranslation { .. } => parse_translation_output(&output),
     }
 }
 
-#[cfg(not(desktop))]
-pub async fn generate_poetry_translation<F>(
-    _config: &AiConnectionConfig,
-    _api_key: &str,
-    _task: AiTask,
-    _poem: &PoemDetail,
-    _on_delta: F,
-) -> AppResult<PoetryTranslationResult>
-where
-    F: FnMut(String) + Send,
-{
-    Err(platform_error())
+async fn send_text_request_async(
+    config: &AiConnectionConfig,
+    api_key: &str,
+    instructions: &str,
+    input: &str,
+    max_output_tokens: u32,
+    timeout: Duration,
+) -> AppResult<String> {
+    let request = json!({
+        "model": config.model,
+        "instructions": instructions,
+        "input": input,
+        "max_output_tokens": max_output_tokens,
+    });
+    let body = serde_json::to_vec(&request)?;
+    if body.len() > REQUEST_LIMIT_BYTES {
+        return Err(AppError("AI request exceeds the size limit".into()));
+    }
+    let client = reqwest::Client::builder()
+        .connect_timeout(Duration::from_secs(10))
+        .timeout(timeout)
+        .redirect(reqwest::redirect::Policy::none())
+        .user_agent("mftp-ai/1")
+        .build()
+        .map_err(|error| AppError(format!("Failed to create AI client: {error}")))?;
+    let response = client
+        .post(responses_endpoint(&config.base_url))
+        .bearer_auth(api_key)
+        .header(reqwest::header::CONTENT_TYPE, "application/json")
+        .body(body)
+        .send()
+        .await
+        .map_err(request_error)?;
+    let status = response.status();
+    let bytes = read_limited_async(response).await?;
+    if !status.is_success() {
+        return Err(provider_error(status.as_u16(), &bytes));
+    }
+    parse_output_text(&bytes)
 }
 
-#[cfg(not(desktop))]
-fn platform_error() -> AppError {
-    AppError("AI provider requests are not available on this platform yet".into())
-}
-
-#[cfg(desktop)]
 fn send_text_request(
     config: &AiConnectionConfig,
     api_key: &str,
@@ -145,7 +150,6 @@ fn send_text_request(
     parse_output_text(&bytes)
 }
 
-#[cfg(desktop)]
 async fn send_streaming_text_request<F>(
     config: &AiConnectionConfig,
     api_key: &str,
@@ -228,7 +232,6 @@ where
     Ok(output)
 }
 
-#[cfg(desktop)]
 fn request_error(error: reqwest::Error) -> AppError {
     let category = if error.is_timeout() {
         "request timed out"
@@ -242,7 +245,6 @@ fn request_error(error: reqwest::Error) -> AppError {
     AppError(format!("AI provider {category}"))
 }
 
-#[cfg(desktop)]
 fn read_limited(response: &mut reqwest::blocking::Response) -> AppResult<Vec<u8>> {
     if response
         .content_length()
@@ -265,7 +267,6 @@ fn read_limited(response: &mut reqwest::blocking::Response) -> AppResult<Vec<u8>
     Ok(bytes)
 }
 
-#[cfg(desktop)]
 async fn read_limited_async(response: reqwest::Response) -> AppResult<Vec<u8>> {
     if response
         .content_length()
@@ -289,7 +290,6 @@ async fn read_limited_async(response: reqwest::Response) -> AppResult<Vec<u8>> {
     Ok(bytes)
 }
 
-#[cfg(desktop)]
 fn provider_error(status: u16, bytes: &[u8]) -> AppError {
     let code = serde_json::from_slice::<Value>(bytes)
         .ok()
@@ -306,7 +306,6 @@ fn provider_error(status: u16, bytes: &[u8]) -> AppError {
     }
 }
 
-#[cfg(desktop)]
 fn parse_output_text(bytes: &[u8]) -> AppResult<String> {
     let value: Value = serde_json::from_slice(bytes)
         .map_err(|_| AppError("AI provider returned invalid JSON".into()))?;
@@ -344,7 +343,6 @@ fn parse_output_text(bytes: &[u8]) -> AppResult<String> {
     Ok(text.to_string())
 }
 
-#[cfg(desktop)]
 fn handle_stream_event<F>(
     event_name: &str,
     data: &str,
@@ -394,7 +392,6 @@ where
     }
 }
 
-#[cfg(desktop)]
 fn append_stream_text<F>(output: &mut String, text: &str, on_delta: &mut F) -> AppResult<()>
 where
     F: FnMut(&str) -> AppResult<()>,
@@ -406,7 +403,6 @@ where
     on_delta(text)
 }
 
-#[cfg(desktop)]
 fn reconcile_stream_text<F>(output: &mut String, text: &str, on_delta: &mut F) -> AppResult<()>
 where
     F: FnMut(&str) -> AppResult<()>,
@@ -420,7 +416,6 @@ where
     }
 }
 
-#[cfg(desktop)]
 fn output_text_from_value(value: &Value) -> String {
     let mut text = String::new();
     if let Some(output) = value.get("output").and_then(Value::as_array) {
@@ -441,7 +436,6 @@ fn output_text_from_value(value: &Value) -> String {
     text
 }
 
-#[cfg(desktop)]
 fn parse_translation_output(output: &str) -> AppResult<PoetryTranslationResult> {
     let output = strip_code_fence(output.trim());
     let translation = match serde_json::from_str::<Value>(output) {
@@ -464,7 +458,6 @@ fn parse_translation_output(output: &str) -> AppResult<PoetryTranslationResult> 
     Ok(PoetryTranslationResult { translation })
 }
 
-#[cfg(desktop)]
 fn strip_code_fence(output: &str) -> &str {
     let Some(after_opening) = output.strip_prefix("```") else {
         return output;
@@ -475,6 +468,6 @@ fn strip_code_fence(output: &str) -> &str {
     body.strip_suffix("```").map(str::trim).unwrap_or(output)
 }
 
-#[cfg(all(test, desktop))]
+#[cfg(test)]
 #[path = "client_tests.rs"]
 mod tests;

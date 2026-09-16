@@ -69,7 +69,10 @@ pub async fn app_data_clear(
 
 #[tauri::command]
 #[specta::specta]
-pub async fn app_data_reset(state: State<'_, AppState>) -> AppResult<AppDataResetResult> {
+pub async fn app_data_reset(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> AppResult<AppDataResetResult> {
     if state.manager.is_busy()
         || state.lan_transfer.status().running
         || state.game_room.status().phase != "idle"
@@ -80,11 +83,11 @@ pub async fn app_data_reset(state: State<'_, AppState>) -> AppResult<AppDataRese
     }
     let before = state.storage.app_data_usage().total_bytes;
     state.bt.shutdown();
+    if state.storage.ai_connection()?.is_some() {
+        crate::ai::clear_api_key_for_reset(&app).await?;
+    }
     let storage = state.storage.clone();
     run_blocking(move || {
-        if storage.ai_connection()?.is_some() {
-            crate::ai::clear_api_key_for_reset()?;
-        }
         let records_deleted = storage.reset_database()?;
         storage.clear_poetry_database()?;
         storage.remove_bt_internal_data()?;

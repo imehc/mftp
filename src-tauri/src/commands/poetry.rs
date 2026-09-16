@@ -366,17 +366,18 @@ pub async fn generate_poetry_translation(
     let load_storage = storage.clone();
     let tasks = state.ai_tasks.clone();
     let event_name = poetry_translation_stream_event(&request_id)?;
-    let (poem, fingerprint, config, api_key) = run_blocking(move || {
+    let (poem, fingerprint, config) = run_blocking(move || {
         let poem = db.poem_detail(&uid)?;
         let fingerprint = body_fingerprint(&poem.body);
         let config = load_storage
             .ai_connection()?
             .ok_or_else(|| AppError("Save the AI service address and model first".into()))?;
-        let api_key = read_api_key()?
-            .ok_or_else(|| AppError("Save an API key before generating a translation".into()))?;
-        Ok((poem, fingerprint, config, api_key))
+        Ok((poem, fingerprint, config))
     })
     .await?;
+    let api_key = read_api_key(&app)
+        .await?
+        .ok_or_else(|| AppError("Save an API key before generating a translation".into()))?;
     let ai_task = AiTask::poetry_translation(mode);
     let task_key = format!(
         "poetry:{}:{}:{}:{mode:?}:{}",
