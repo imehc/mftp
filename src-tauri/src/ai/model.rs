@@ -5,6 +5,7 @@ use specta::Type;
 pub struct AiConnectionConfig {
     pub base_url: String,
     pub model: String,
+    pub streaming_enabled: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Type)]
@@ -12,6 +13,7 @@ pub struct AiConnectionConfig {
 pub struct AiConnection {
     pub base_url: String,
     pub model: String,
+    pub streaming_enabled: bool,
     pub has_key: bool,
 }
 
@@ -20,7 +22,13 @@ pub struct AiConnection {
 pub struct AiConnectionInput {
     pub base_url: String,
     pub model: String,
+    #[serde(default = "default_streaming_enabled")]
+    pub streaming_enabled: bool,
     /// None keeps the existing credential; Some replaces it.
     #[serde(default)]
     pub api_key: Option<String>,
+}
+
+fn default_streaming_enabled() -> bool {
+    true
 }

@@ -244,24 +244,36 @@ msgstr "AI 先开"
 msgid "AI 思考中…"
 msgstr "AI 思考中…"
 
-#: src/features/settings/AiConnectionSettings.tsx:110
+#: src/features/settings/AiConnectionSettings.tsx:125
 msgid "AI 服务"
 msgstr "AI 服务"
 
-#: src/features/settings/AiConnectionSettings.tsx:88
+#: src/features/settings/AiConnectionSettings.tsx:103
 msgid "AI 服务连接成功"
 msgstr "AI 服务连接成功"
 
-#: src/features/settings/AiConnectionSettings.tsx:76
+#: src/features/settings/AiConnectionSettings.tsx:91
 msgid "AI 服务配置已保存"
 msgstr "AI 服务配置已保存"
 
-#: src/features/settings/AiConnectionSettings.tsx:145
-#: src/features/settings/AiConnectionSettings.tsx:152
+#: src/features/poetry/components/PoetryTranslationSection.tsx:216
+msgid "AI 生成"
+msgstr "AI 生成"
+
+#: src/features/export/sections.tsx:35
+msgid "AI 生成及人工修订的诗词译文，不包含 API Key"
+msgstr "AI 生成及人工修订的诗词译文，不包含 API Key"
+
+#: src/features/export/sections.tsx:34
+msgid "AI 译文"
+msgstr "AI 译文"
+
+#: src/features/settings/AiConnectionSettings.tsx:160
+#: src/features/settings/AiConnectionSettings.tsx:167
 msgid "API Key"
 msgstr "API Key"
 
-#: src/features/settings/AiConnectionSettings.tsx:100
+#: src/features/settings/AiConnectionSettings.tsx:115
 msgid "API Key 已清除"
 msgstr "API Key 已清除"
 
@@ -530,6 +542,10 @@ msgstr "五子棋"
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "交换 {formatBytesValue} / {formatBytesValue2}"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:216
+msgid "人工修订"
+msgstr "人工修订"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:19
 #: src/features/games/go/labels.tsx:92
 #: src/features/games/gomoku/labels.tsx:80
@@ -571,7 +587,7 @@ msgstr "仅显示开头部分"
 msgid "仅限同一局域网内联机"
 msgstr "仅限同一局域网内联机"
 
-#: src/features/poetry/components/PoemDetail.tsx:183
+#: src/features/poetry/components/PoemDetail.tsx:184
 msgid "从左侧列表选择一篇，或试试每日一诗。"
 msgstr "从左侧列表选择一篇，或试试每日一诗。"
 
@@ -639,7 +655,8 @@ msgid "使用中"
 msgstr "使用中"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:499
-#: src/features/settings/AiConnectionSettings.tsx:193
+#: src/features/poetry/components/PoetryTranslationSection.tsx:345
+#: src/features/settings/AiConnectionSettings.tsx:218
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:335
 #: src/features/todo/TodoItemDialog.tsx:209
 #: src/features/vault/VaultEntryDialog.tsx:192
@@ -871,6 +888,7 @@ msgstr "创建时间"
 #: src/features/bt/components/CacheManager.tsx:270
 #: src/features/bt/components/CacheManager.tsx:271
 #: src/features/logs/LogPageLayout.tsx:108
+#: src/features/poetry/components/PoetryTranslationSection.tsx:365
 #: src/features/poetry/LibraryManagePage.tsx:524
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:42
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:129
@@ -898,6 +916,10 @@ msgstr "删除主机"
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:75
 msgid "删除共享目录"
 msgstr "删除共享目录"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:356
+msgid "删除后可重新生成，不影响原文和注释。"
+msgstr "删除后可重新生成，不影响原文和注释。"
 
 #: src/features/bt/BtTool.tsx:754
 #: src/features/logs/LogPageLayout.tsx:100
@@ -936,6 +958,11 @@ msgstr "删除日志"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:362
 msgid "删除白名单"
 msgstr "删除白名单"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:241
+#: src/features/poetry/components/PoetryTranslationSection.tsx:242
+msgid "删除译文"
+msgstr "删除译文"
 
 #: src/features/vault/VaultTool.tsx:501
 msgid "删除该账号？"
@@ -1149,8 +1176,11 @@ msgstr "发现设备"
 #: src/features/logs/LogPageLayout.tsx:156
 #: src/features/media-compress/image/ImageCompressPanel.tsx:301
 #: src/features/media-compress/video/VideoCompressPanel.tsx:369
+#: src/features/poetry/components/PoetryTranslationSection.tsx:332
+#: src/features/poetry/components/PoetryTranslationSection.tsx:360
+#: src/features/poetry/components/PoetryTranslationSection.tsx:380
 #: src/features/poetry/LibraryManagePage.tsx:554
-#: src/features/settings/AiConnectionSettings.tsx:206
+#: src/features/settings/AiConnectionSettings.tsx:231
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:327
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:85
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:215
@@ -1491,8 +1521,8 @@ msgstr "媒体处理"
 msgid "字体"
 msgstr "字体"
 
-#: src/features/poetry/components/PoemDetail.tsx:123
-#: src/features/poetry/components/PoemDetail.tsx:130
+#: src/features/poetry/components/PoemDetail.tsx:124
+#: src/features/poetry/components/PoemDetail.tsx:131
 msgid "字号"
 msgstr "字号"
 
@@ -1674,6 +1704,10 @@ msgstr "将死"
 msgid "将结果写回输入并切换模式"
 msgstr "将结果写回输入并切换模式"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:376
+msgid "将覆盖当前人工修订。"
+msgstr "将覆盖当前人工修订。"
+
 #: src/features/games/engine/GameHeaderControls.tsx:135
 msgid "将返回模式选择，当前对局的进度将会丢失。"
 msgstr "将返回模式选择，当前对局的进度将会丢失。"
@@ -1682,7 +1716,7 @@ msgstr "将返回模式选择，当前对局的进度将会丢失。"
 msgid "小游戏"
 msgstr "小游戏"
 
-#: src/features/poetry/components/PoemDetail.tsx:180
+#: src/features/poetry/components/PoemDetail.tsx:181
 msgid "尚未选择作品"
 msgstr "尚未选择作品"
 
@@ -1738,12 +1772,13 @@ msgid "已下载 {formatBytesValue}"
 msgstr "已下载 {formatBytesValue}"
 
 #: src/features/media-compress/components/CompressResultCard.tsx:40
+#: src/features/poetry/components/PoetryTranslationSection.tsx:129
 #: src/features/todo/TodoTool.tsx:113
 #: src/features/vault/VaultTool.tsx:227
 msgid "已保存"
 msgstr "已保存"
 
-#: src/features/settings/AiConnectionSettings.tsx:117
+#: src/features/settings/AiConnectionSettings.tsx:132
 msgid "已保存密钥"
 msgstr "已保存密钥"
 
@@ -1764,6 +1799,7 @@ msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
 #: src/features/bt/BtTool.tsx:436
+#: src/features/poetry/components/PoetryTranslationSection.tsx:146
 #: src/features/poetry/LibraryManagePage.tsx:336
 #: src/features/todo/TodoTool.tsx:150
 #: src/features/vault/VaultTool.tsx:237
@@ -1904,6 +1940,10 @@ msgstr "已添加白名单"
 msgid "已清除 {removed} 个缓存任务"
 msgstr "已清除 {removed} 个缓存任务"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:102
+msgid "已生成"
+msgstr "已生成"
+
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:270
 msgid "已移动 {name}"
 msgstr "已移动 {name}"
@@ -1929,7 +1969,7 @@ msgstr "已连接 · {hostAddressValue2}"
 msgid "已选 {selectedSize} / {filesLength}"
 msgstr "已选 {selectedSize} / {filesLength}"
 
-#: src/features/poetry/components/PoemDetail.tsx:67
+#: src/features/poetry/components/PoemDetail.tsx:68
 msgid "平仄"
 msgstr "平仄"
 
@@ -2006,7 +2046,7 @@ msgstr "当前 WebView 不支持音频转码"
 msgid "当前不可用"
 msgstr "当前不可用"
 
-#: src/features/settings/AiConnectionSettings.tsx:112
+#: src/features/settings/AiConnectionSettings.tsx:127
 msgid "当前仅支持 OpenAI Responses 接口格式"
 msgstr "当前仅支持 OpenAI Responses 接口格式"
 
@@ -2250,6 +2290,7 @@ msgstr "搜索诗词"
 msgid "操作"
 msgstr "操作"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:189
 #: src/features/poetry/LibraryManagePage.tsx:262
 #: src/features/poetry/LibraryManagePage.tsx:289
 #: src/features/poetry/LibraryManagePage.tsx:304
@@ -2327,6 +2368,10 @@ msgstr "文件已在该位置"
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:61
 msgid "文件管理"
 msgstr "文件管理"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:182
+msgid "文学意译"
+msgstr "文学意译"
 
 #: src/features/home/entries.tsx:24
 #: src/features/poetry/LibraryPage.tsx:285
@@ -2449,7 +2494,7 @@ msgstr "暂无下载任务"
 msgid "暂无任务"
 msgstr "暂无任务"
 
-#: src/features/poetry/components/PoemDetail.tsx:94
+#: src/features/poetry/components/PoemDetail.tsx:95
 msgid "暂无作者小传。"
 msgstr "暂无作者小传。"
 
@@ -2502,6 +2547,10 @@ msgstr "暂无白名单"
 msgid "暂无设备"
 msgstr "暂无设备"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:279
+msgid "暂无译文"
+msgstr "暂无译文"
+
 #: src/features/vault/VaultTool.tsx:318
 msgid "暂无账号"
 msgstr "暂无账号"
@@ -2543,8 +2592,8 @@ msgstr "更新待办失败"
 msgid "替换"
 msgstr "替换"
 
-#: src/features/settings/AiConnectionSettings.tsx:145
-#: src/features/settings/AiConnectionSettings.tsx:152
+#: src/features/settings/AiConnectionSettings.tsx:160
+#: src/features/settings/AiConnectionSettings.tsx:167
 msgid "替换 API Key"
 msgstr "替换 API Key"
 
@@ -2552,11 +2601,11 @@ msgstr "替换 API Key"
 msgid "替换为"
 msgstr "替换为"
 
-#: src/features/poetry/components/PoemDetail.tsx:222
+#: src/features/poetry/components/PoemDetail.tsx:223
 msgid "有朗诵"
 msgstr "有朗诵"
 
-#: src/features/settings/AiConnectionSettings.tsx:123
+#: src/features/settings/AiConnectionSettings.tsx:138
 msgid "服务地址"
 msgstr "服务地址"
 
@@ -2576,7 +2625,7 @@ msgstr "服务未启动"
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 
-#: src/features/settings/AiConnectionSettings.tsx:117
+#: src/features/settings/AiConnectionSettings.tsx:132
 msgid "未保存密钥"
 msgstr "未保存密钥"
 
@@ -2736,7 +2785,7 @@ msgstr "棋盘大小"
 msgid "楚 河"
 msgstr "楚 河"
 
-#: src/features/settings/AiConnectionSettings.tsx:134
+#: src/features/settings/AiConnectionSettings.tsx:149
 msgid "模型"
 msgstr "模型"
 
@@ -2829,6 +2878,10 @@ msgstr "正在检查更新…"
 msgid "正在检索…"
 msgstr "正在检索…"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:207
+msgid "正在生成"
+msgstr "正在生成"
+
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:266
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:267
 msgid "正在移动 {name}…"
@@ -2905,14 +2958,18 @@ msgstr "没有进行中的待办"
 msgid "没有逾期未完成的待办"
 msgstr "没有逾期未完成的待办"
 
-#: src/features/poetry/components/PoemDetail.tsx:254
-#: src/features/poetry/components/PoemDetail.tsx:271
+#: src/features/poetry/components/PoemDetail.tsx:263
+#: src/features/poetry/components/PoemDetail.tsx:276
 msgid "注释"
 msgstr "注释"
 
 #: src/features/poetry/LibraryManagePage.tsx:509
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:300
+msgid "注释包译文"
+msgstr "注释包译文"
 
 #: src/features/home/HomePage.tsx:93
 msgid "活动中"
@@ -2923,12 +2980,17 @@ msgstr "活动中"
 msgid "活动日志"
 msgstr "活动日志"
 
+#: src/features/settings/AiConnectionSettings.tsx:171
+#: src/features/settings/AiConnectionSettings.tsx:176
+msgid "流式输出"
+msgstr "流式输出"
+
 #: src/features/settings/AppSettingsMenu.tsx:175
 msgid "浅色"
 msgstr "浅色"
 
-#: src/features/settings/AiConnectionSettings.tsx:173
-#: src/features/settings/AiConnectionSettings.tsx:181
+#: src/features/settings/AiConnectionSettings.tsx:198
+#: src/features/settings/AiConnectionSettings.tsx:206
 msgid "测试连接"
 msgstr "测试连接"
 
@@ -3023,11 +3085,11 @@ msgstr "清空现有数据后写入文件内容"
 msgid "清除 {finishedTransferCount}"
 msgstr "清除 {finishedTransferCount}"
 
-#: src/features/settings/AiConnectionSettings.tsx:200
+#: src/features/settings/AiConnectionSettings.tsx:225
 msgid "清除 API Key？"
 msgstr "清除 API Key？"
 
-#: src/features/settings/AiConnectionSettings.tsx:166
+#: src/features/settings/AiConnectionSettings.tsx:191
 msgid "清除密钥"
 msgstr "清除密钥"
 
@@ -3113,6 +3175,10 @@ msgstr "玩家 2"
 msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:292
+msgid "生成"
+msgstr "生成"
+
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:158
 msgid "用户"
 msgstr "用户"
@@ -3133,7 +3199,7 @@ msgstr "用户组"
 msgid "留空则使用 SSH 配置或本机用户"
 msgstr "留空则使用 SSH 配置或本机用户"
 
-#: src/features/settings/AiConnectionSettings.tsx:151
+#: src/features/settings/AiConnectionSettings.tsx:166
 msgid "留空则保留现有密钥"
 msgstr "留空则保留现有密钥"
 
@@ -3156,6 +3222,10 @@ msgstr "白棋"
 #: src/features/games/gomoku/labels.tsx:111
 msgid "白棋胜"
 msgstr "白棋胜"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:179
+msgid "白话直译"
+msgstr "白话直译"
 
 #: src/features/ssh-sftp/components/monitor/useSystemMonitor.ts:60
 msgid "监控采集超时"
@@ -3217,6 +3287,10 @@ msgstr "确定删除主机 “{value}”？此操作不可撤销。"
 msgid "确认"
 msgstr "确认"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:354
+msgid "确认删除？"
+msgstr "确认删除？"
+
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:199
 msgid "确认后会按上面的名称继续。"
 msgstr "确认后会按上面的名称继续。"
@@ -3235,7 +3309,7 @@ msgstr "确认清理"
 msgid "确认清空"
 msgstr "确认清空"
 
-#: src/features/settings/AiConnectionSettings.tsx:208
+#: src/features/settings/AiConnectionSettings.tsx:233
 msgid "确认清除"
 msgstr "确认清除"
 
@@ -3379,7 +3453,7 @@ msgstr "粘贴或输入 {languageLabel3} 内容"
 msgid "系统"
 msgstr "系统"
 
-#: src/features/settings/AiConnectionSettings.tsx:202
+#: src/features/settings/AiConnectionSettings.tsx:227
 msgid "系统凭据库中的 AI 密钥将被删除，服务地址和模型会保留。"
 msgstr "系统凭据库中的 AI 密钥将被删除，服务地址和模型会保留。"
 
@@ -3478,6 +3552,12 @@ msgstr "编辑主机"
 #: src/features/todo/TodoList.tsx:83
 msgid "编辑待办"
 msgstr "编辑待办"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:230
+#: src/features/poetry/components/PoetryTranslationSection.tsx:231
+#: src/features/poetry/components/PoetryTranslationSection.tsx:317
+msgid "编辑译文"
+msgstr "编辑译文"
 
 #: src/features/vault/VaultEntryDialog.tsx:136
 msgid "编辑账号"
@@ -3582,8 +3662,8 @@ msgstr "获取资源信息…"
 msgid "获取资源信息失败"
 msgstr "获取资源信息失败"
 
-#: src/features/poetry/components/PoemDetail.tsx:134
-#: src/features/poetry/components/PoemDetail.tsx:141
+#: src/features/poetry/components/PoemDetail.tsx:135
+#: src/features/poetry/components/PoemDetail.tsx:142
 msgid "行距"
 msgstr "行距"
 
@@ -3598,6 +3678,10 @@ msgstr "要移动的文件夹"
 #: src/features/export/ImportDialog.tsx:160
 msgid "覆盖"
 msgstr "覆盖"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:374
+msgid "覆盖人工修订？"
+msgstr "覆盖人工修订？"
 
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:69
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:132
@@ -3652,9 +3736,17 @@ msgstr "访问"
 msgid "访问时间"
 msgstr "访问时间"
 
-#: src/features/poetry/components/PoemDetail.tsx:258
+#: src/features/poetry/components/PoetryTranslationSection.tsx:163
 msgid "译文"
 msgstr "译文"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:323
+msgid "译文内容"
+msgstr "译文内容"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:170
+msgid "译文模式"
+msgstr "译文模式"
 
 #: src/features/poetry/components/PoemList.tsx:98
 msgid "诗词列表"
@@ -3699,7 +3791,7 @@ msgstr "详情"
 msgid "语言"
 msgstr "语言"
 
-#: src/features/settings/AiConnectionSettings.tsx:173
+#: src/features/settings/AiConnectionSettings.tsx:198
 msgid "请先保存当前配置"
 msgstr "请先保存当前配置"
 
@@ -3734,11 +3826,11 @@ msgstr "请输入待办标题"
 msgid "请输入有效的目标尺寸"
 msgstr "请输入有效的目标尺寸"
 
-#: src/features/settings/AiConnectionSettings.tsx:129
+#: src/features/settings/AiConnectionSettings.tsx:144
 msgid "请输入服务地址"
 msgstr "请输入服务地址"
 
-#: src/features/settings/AiConnectionSettings.tsx:139
+#: src/features/settings/AiConnectionSettings.tsx:154
 msgid "请输入模型名称"
 msgstr "请输入模型名称"
 
@@ -3822,7 +3914,7 @@ msgstr "负载 {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 msgid "账号"
 msgstr "账号"
 
-#: src/features/poetry/components/PoemDetail.tsx:262
+#: src/features/poetry/components/PoemDetail.tsx:267
 msgid "赏析"
 msgstr "赏析"
 
@@ -3872,7 +3964,7 @@ msgstr "轮到 {sideNameValue}"
 msgid "输入"
 msgstr "输入"
 
-#: src/features/settings/AiConnectionSettings.tsx:151
+#: src/features/settings/AiConnectionSettings.tsx:166
 msgid "输入 API Key"
 msgstr "输入 API Key"
 
@@ -4202,6 +4294,11 @@ msgstr "重新开始对局？"
 msgid "重新检查"
 msgstr "重新检查"
 
+#: src/features/poetry/components/PoetryTranslationSection.tsx:272
+#: src/features/poetry/components/PoetryTranslationSection.tsx:382
+msgid "重新生成"
+msgstr "重新生成"
+
 #: src/features/bt/BtTool.tsx:631
 #: src/features/bt/BtTool.tsx:632
 #: src/features/preview/PreviewSurface.tsx:173
@@ -4230,8 +4327,8 @@ msgstr "键升序"
 msgid "键降序"
 msgstr "键降序"
 
-#: src/features/poetry/components/PoemDetail.tsx:114
 #: src/features/poetry/components/PoemDetail.tsx:115
+#: src/features/poetry/components/PoemDetail.tsx:116
 msgid "阅读设置"
 msgstr "阅读设置"
 

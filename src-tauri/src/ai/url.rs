@@ -49,6 +49,7 @@ pub fn validate_connection(base_url: &str, model: &str) -> AppResult<AiConnectio
     Ok(AiConnectionConfig {
         base_url: base_url.to_string(),
         model: model.to_string(),
+        streaming_enabled: true,
     })
 }
 

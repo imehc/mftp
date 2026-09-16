@@ -27,6 +27,7 @@ use tauri_specta::{collect_commands, Builder};
 /// Shared application state available to all commands.
 pub struct AppState {
     pub storage: Storage,
+    pub ai_tasks: Arc<ai::AiTaskManager>,
     pub manager: Arc<Manager>,
     pub lan_transfer: Arc<LanTransferManager>,
     pub game_room: Arc<GameRoomManager>,
@@ -49,6 +50,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
         // Event payloads never pass through command signatures; register
         // explicitly or they will be missing from bindings.ts.
         .typ::<poetry::model::PoetrySyncProgress>()
+        .typ::<poetry::model::PoetryTranslationStreamEvent>()
         .commands(collect_commands![
             commands::ai_connection_get,
             commands::ai_connection_save,
@@ -147,6 +149,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::poetry_annotations_install,
             commands::poetry_annotations_status,
             commands::poetry_annotations_delete,
+            commands::list_poetry_translations,
+            commands::generate_poetry_translation,
+            commands::update_poetry_translation,
+            commands::delete_poetry_translation,
             commands::bt_probe,
             commands::bt_add_download,
             commands::bt_ensure_preview,
@@ -268,6 +274,7 @@ pub fn run() {
             }
             app.manage(AppState {
                 storage: storage.clone(),
+                ai_tasks: Arc::new(ai::AiTaskManager::default()),
                 manager: Arc::new(manager),
                 lan_transfer,
                 game_room,

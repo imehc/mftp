@@ -1,4 +1,11 @@
-import { commands, type AiConnectionInput } from "~/bindings";
+import { listen } from "@tauri-apps/api/event";
+import {
+  commands,
+  type AiConnectionInput,
+  type PoetryTranslationMode,
+  type PoetryTranslationStreamEvent,
+} from "~/bindings";
+import { poetryTranslationStreamEvent } from "~/lib/events";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
   BtControlAction,
@@ -317,6 +324,36 @@ export const poetryAnnotationsStatus = () =>
   unwrapCommand(commands.poetryAnnotationsStatus());
 export const poetryAnnotationsDelete = () =>
   voidCommand(commands.poetryAnnotationsDelete());
+export const poetryTranslationsList = (uid: string) =>
+  unwrapCommand(commands.listPoetryTranslations(uid));
+export const poetryTranslationGenerate = (
+  uid: string,
+  mode: PoetryTranslationMode,
+  onDelta: (delta: string) => void,
+) => {
+  const requestId = crypto.randomUUID();
+  return listen<PoetryTranslationStreamEvent>(
+    poetryTranslationStreamEvent(requestId),
+    (event) => onDelta(event.payload.delta),
+  ).then(async (unlisten) => {
+    try {
+      return await unwrapCommand(
+        commands.generatePoetryTranslation(uid, mode, requestId),
+      );
+    } finally {
+      unlisten();
+    }
+  });
+};
+export const poetryTranslationUpdate = (
+  uid: string,
+  mode: PoetryTranslationMode,
+  content: string,
+) => unwrapCommand(commands.updatePoetryTranslation(uid, mode, content));
+export const poetryTranslationDelete = (
+  uid: string,
+  mode: PoetryTranslationMode,
+) => voidCommand(commands.deletePoetryTranslation(uid, mode));
 
 // ---- BT ----
 export const btProbe = (source: string) =>

@@ -2,10 +2,12 @@ use crate::error::{AppError, AppResult};
 use crate::models::{
     Host, ImportMode, ImportReport, ImportSectionReport, LanExportData, TodoItem, VaultEntry,
 };
+use crate::poetry::model::PoetryTranslation;
 use rusqlite::{params, Connection};
 use serde_json::Value;
 use std::collections::HashSet;
 
+use super::ai::{translation_mode_to_db, translation_source_to_db, validate_translation};
 use super::export::{decrypt_envelope, parse_document, section_from_key};
 use super::{now_ms, Storage};
 
@@ -269,6 +271,98 @@ fn import_lan(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<C
     Ok(counts)
 }
 
+fn import_ai_translations(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<Counts> {
+    let mut translations: Vec<PoetryTranslation> = serde_json::from_value(value.clone())
+        .map_err(|error| AppError(format!("invalid AI translation data: {error}")))?;
+    for translation in &translations {
+        validate_translation(translation)?;
+    }
+    if mode == ImportMode::Overwrite {
+        conn.execute("DELETE FROM ai_poetry_translations", [])?;
+    }
+    let mut counts = Counts {
+        inserted: 0,
+        updated: 0,
+    };
+    for translation in &mut translations {
+        if mode == ImportMode::Append {
+            translation.id = uuid::Uuid::new_v4().to_string();
+            counts.inserted += conn.execute(
+                r#"
+                INSERT OR IGNORE INTO ai_poetry_translations(
+                    id, poem_uid, body_fingerprint, language, mode, prompt_version,
+                    content, source, model, created_at, updated_at
+                ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
+                "#,
+                params![
+                    translation.id,
+                    translation.poem_uid,
+                    translation.body_fingerprint,
+                    translation.language,
+                    translation_mode_to_db(translation.mode),
+                    translation.prompt_version,
+                    translation.content,
+                    translation_source_to_db(translation.source),
+                    translation.model,
+                    translation.created_at,
+                    translation.updated_at,
+                ],
+            )? as u32;
+            continue;
+        }
+        if mode == ImportMode::Merge {
+            let updated = conn.execute(
+                r#"
+                UPDATE ai_poetry_translations
+                SET content = ?6, source = ?7, model = ?8,
+                    created_at = ?9, updated_at = ?10
+                WHERE poem_uid = ?1 AND body_fingerprint = ?2
+                  AND language = ?3 AND mode = ?4 AND prompt_version = ?5
+                "#,
+                params![
+                    translation.poem_uid,
+                    translation.body_fingerprint,
+                    translation.language,
+                    translation_mode_to_db(translation.mode),
+                    translation.prompt_version,
+                    translation.content,
+                    translation_source_to_db(translation.source),
+                    translation.model,
+                    translation.created_at,
+                    translation.updated_at,
+                ],
+            )?;
+            if updated > 0 {
+                counts.updated += 1;
+                continue;
+            }
+        }
+        conn.execute(
+            r#"
+            INSERT INTO ai_poetry_translations(
+                id, poem_uid, body_fingerprint, language, mode, prompt_version,
+                content, source, model, created_at, updated_at
+            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
+            "#,
+            params![
+                translation.id,
+                translation.poem_uid,
+                translation.body_fingerprint,
+                translation.language,
+                translation_mode_to_db(translation.mode),
+                translation.prompt_version,
+                translation.content,
+                translation_source_to_db(translation.source),
+                translation.model,
+                translation.created_at,
+                translation.updated_at,
+            ],
+        )?;
+        counts.inserted += 1;
+    }
+    Ok(counts)
+}
+
 impl Storage {
     /// Apply an export file to the local database. Detects encryption from the
     /// envelope; `password` is required for encrypted files.
@@ -306,6 +400,9 @@ impl Storage {
                 crate::models::ExportSection::Hosts => import_hosts(&tx, value, mode)?,
                 crate::models::ExportSection::Todo => import_todo(&tx, value, mode)?,
                 crate::models::ExportSection::Lan => import_lan(&tx, value, mode)?,
+                crate::models::ExportSection::AiTranslations => {
+                    import_ai_translations(&tx, value, mode)?
+                }
             };
             report.sections.push(ImportSectionReport {
                 section,

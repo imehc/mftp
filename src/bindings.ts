@@ -144,6 +144,10 @@ export const commands = {
 	poetryAnnotationsInstall: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_install")),
 	poetryAnnotationsStatus: () => typedError<PoetryAnnotationsStatus, AppError>(__TAURI_INVOKE("poetry_annotations_status")),
 	poetryAnnotationsDelete: () => typedError<null, AppError>(__TAURI_INVOKE("poetry_annotations_delete")),
+	listPoetryTranslations: (uid: string) => typedError<PoetryTranslation[], AppError>(__TAURI_INVOKE("list_poetry_translations", { uid })),
+	generatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, requestId: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("generate_poetry_translation", { uid, mode, requestId })),
+	updatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, content: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("update_poetry_translation", { uid, mode, content })),
+	deletePoetryTranslation: (uid: string, mode: PoetryTranslationMode) => typedError<null, AppError>(__TAURI_INVOKE("delete_poetry_translation", { uid, mode })),
 	btProbe: (source: string) => typedError<BtProbeResult, AppError>(__TAURI_INVOKE("bt_probe", { source })),
 	btAddDownload: (source: string, infoHash: string, fileIndices: number[], destDir: string) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_add_download", { source, infoHash, fileIndices, destDir })),
 	/**
@@ -187,12 +191,14 @@ export type ActivityLog = {
 export type AiConnection = {
 	baseUrl: string,
 	model: string,
+	streamingEnabled: boolean,
 	hasKey: boolean,
 };
 
 export type AiConnectionInput = {
 	baseUrl: string,
 	model: string,
+	streamingEnabled?: boolean,
 	// None keeps the existing credential; Some replaces it.
 	apiKey?: string | null,
 };
@@ -361,7 +367,7 @@ export type BtTaskStats = {
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
 // A data section that can be exported; add a variant per exportable module.
-export type ExportSection = "vault" | "hosts" | "todo" | "lan";
+export type ExportSection = "vault" | "hosts" | "todo" | "lan" | "aiTranslations";
 
 export type GameRoomStatus = {
 	// "idle" | "hosting" | "joined"
@@ -681,6 +687,28 @@ export type PoetryTier =
 "default" | 
 // Large collections that are never checked automatically.
 "optIn";
+
+export type PoetryTranslation = {
+	id: string,
+	poemUid: string,
+	bodyFingerprint: string,
+	language: string,
+	mode: PoetryTranslationMode,
+	promptVersion: number,
+	content: string,
+	source: PoetryTranslationSource,
+	model: string,
+	createdAt: number,
+	updatedAt: number,
+};
+
+export type PoetryTranslationMode = "literal" | "literary";
+
+export type PoetryTranslationSource = "ai" | "user";
+
+export type PoetryTranslationStreamEvent = {
+	delta: string,
+};
 
 // A remote directory entry returned by SFTP listing.
 export type SftpEntry = {

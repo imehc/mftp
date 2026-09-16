@@ -34,5 +34,9 @@ export const sshClosedEvent = (sessionId: string) =>
 /** 诗词库的同步 / 导入 / 索引进度。载荷类型：`PoetrySyncProgress`。 */
 export const LIBRARY_SYNC_PROGRESS = "library://sync-progress";
 
+/** 单次诗词译文生成的流式增量。载荷类型：`PoetryTranslationStreamEvent`。 */
+export const poetryTranslationStreamEvent = (requestId: string) =>
+  `ai://poetry-translation/${requestId}`;
+
 /** BT 任务级事件（存到本地完成 / 失败）。载荷类型：`BtTaskEvent`。 */
 export const BT_TASK_EVENT = "bt://task-event";

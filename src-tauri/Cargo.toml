@@ -72,4 +72,6 @@ tauri-plugin-autostart = "2.5.1"
 keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native", "sync-secret-service", "crypto-rust"] }
 # Library sync downloads upstream tar.gz archives; already compiled into the
 # desktop binary via the updater's dependency tree, so this adds no weight.
-reqwest = { version = "0.13", default-features = false, features = ["blocking", "gzip", "rustls"] }
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "gzip", "rustls", "stream"] }
+eventsource-stream = "0.2.3"
+futures-util = "0.3"

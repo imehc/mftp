@@ -124,6 +124,17 @@ pub fn poem_uid(collection_id: &str, title: &str, author: &str, body: &str) -> S
     hex(&digest[..16])
 }
 
+/// Exact source-body fingerprint for user-owned derived data. Length prefixes
+/// keep paragraph boundaries unambiguous without depending on JSON encoding.
+pub fn body_fingerprint(body: &[String]) -> String {
+    let mut hasher = Sha256::new();
+    for paragraph in body {
+        hasher.update((paragraph.len() as u64).to_be_bytes());
+        hasher.update(paragraph.as_bytes());
+    }
+    hex(&hasher.finalize())
+}
+
 /// Match key shared with the annotation pack: hash of normalized
 /// (title, author) only — the external data cannot know our collection ids.
 pub fn annotation_key(title: &str, author: &str) -> String {
@@ -219,6 +230,20 @@ mod tests {
         assert_eq!(a, b);
         assert_ne!(a, poem_uid("shijing", "关雎", "", "参差荇菜"));
         assert_eq!(a.len(), 32);
+    }
+
+    #[test]
+    fn body_fingerprint_preserves_content_and_paragraph_boundaries() {
+        let source = vec!["春眠不觉晓".to_string(), "处处闻啼鸟".to_string()];
+        assert_eq!(body_fingerprint(&source), body_fingerprint(&source));
+        assert_ne!(
+            body_fingerprint(&source),
+            body_fingerprint(&["春眠不觉晓处处闻啼鸟".to_string()])
+        );
+        assert_ne!(
+            body_fingerprint(&source),
+            body_fingerprint(&["春眠不觉晓".to_string(), "处处闻啼鸟。".to_string()])
+        );
     }
 
     #[test]

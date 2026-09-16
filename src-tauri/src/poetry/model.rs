@@ -225,3 +225,39 @@ pub struct PoetryAnnotationsStatus {
     pub installed: bool,
     pub entry_count: i64,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PoetryTranslationMode {
+    Literal,
+    Literary,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PoetryTranslationSource {
+    Ai,
+    User,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PoetryTranslation {
+    pub id: String,
+    pub poem_uid: String,
+    pub body_fingerprint: String,
+    pub language: String,
+    pub mode: PoetryTranslationMode,
+    pub prompt_version: u32,
+    pub content: String,
+    pub source: PoetryTranslationSource,
+    pub model: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PoetryTranslationStreamEvent {
+    pub delta: String,
+}

@@ -20,7 +20,11 @@ pub async fn ai_connection_get(state: State<'_, AppState>) -> AppResult<AiConnec
                 .as_ref()
                 .map(|value| value.base_url.clone())
                 .unwrap_or_default(),
-            model: config.map(|value| value.model).unwrap_or_default(),
+            model: config
+                .as_ref()
+                .map(|value| value.model.clone())
+                .unwrap_or_default(),
+            streaming_enabled: config.map(|value| value.streaming_enabled).unwrap_or(true),
             has_key: has_api_key()?,
         })
     })
@@ -35,7 +39,8 @@ pub async fn ai_connection_save(
 ) -> AppResult<AiConnection> {
     let storage = state.storage.clone();
     run_blocking(move || {
-        let config = validate_connection(&input.base_url, &input.model)?;
+        let mut config = validate_connection(&input.base_url, &input.model)?;
+        config.streaming_enabled = input.streaming_enabled;
         let replacement = input.api_key.as_deref();
         let previous_api_key = if replacement.is_some() {
             read_api_key()?
@@ -62,6 +67,7 @@ pub async fn ai_connection_save(
         Ok(AiConnection {
             base_url: config.base_url,
             model: config.model,
+            streaming_enabled: config.streaming_enabled,
             has_key: replacement.is_some() || previous_api_key.is_some() || has_api_key()?,
         })
     })
@@ -80,7 +86,11 @@ pub async fn ai_connection_clear_key(state: State<'_, AppState>) -> AppResult<Ai
                 .as_ref()
                 .map(|value| value.base_url.clone())
                 .unwrap_or_default(),
-            model: config.map(|value| value.model).unwrap_or_default(),
+            model: config
+                .as_ref()
+                .map(|value| value.model.clone())
+                .unwrap_or_default(),
+            streaming_enabled: config.map(|value| value.streaming_enabled).unwrap_or(true),
             has_key: false,
         })
     })

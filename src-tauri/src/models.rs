@@ -333,6 +333,7 @@ pub enum ExportSection {
     Hosts,
     Todo,
     Lan,
+    AiTranslations,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]

@@ -29,4 +29,9 @@ export const exportSections: ExportSectionMeta[] = [
     title: <Trans>局域网</Trans>,
     description: <Trans>传输设置、共享目录和信任设备</Trans>,
   },
+  {
+    id: "aiTranslations",
+    title: <Trans>AI 译文</Trans>,
+    description: <Trans>AI 生成及人工修订的诗词译文，不包含 API Key</Trans>,
+  },
 ];

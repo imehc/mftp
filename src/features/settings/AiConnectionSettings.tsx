@@ -23,6 +23,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { PasswordInput } from "~/components/ui/password-input";
+import { Switch } from "~/components/ui/switch";
 import {
   aiConnectionClearKey,
   aiConnectionGet,
@@ -37,12 +38,17 @@ export default function AiConnectionSettings() {
   const [model, setModel] = useState("");
   const [savedBaseUrl, setSavedBaseUrl] = useState("");
   const [savedModel, setSavedModel] = useState("");
+  const [streamingEnabled, setStreamingEnabled] = useState(true);
+  const [savedStreamingEnabled, setSavedStreamingEnabled] = useState(true);
   const [hasKey, setHasKey] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [clearOpen, setClearOpen] = useState(false);
-  const dirty = baseUrl.trim() !== savedBaseUrl || model.trim() !== savedModel;
+  const dirty =
+    baseUrl.trim() !== savedBaseUrl ||
+    model.trim() !== savedModel ||
+    streamingEnabled !== savedStreamingEnabled;
 
   useEffect(() => {
     let cancelled = false;
@@ -53,6 +59,8 @@ export default function AiConnectionSettings() {
         setModel(connection.model);
         setSavedBaseUrl(connection.baseUrl);
         setSavedModel(connection.model);
+        setStreamingEnabled(connection.streamingEnabled);
+        setSavedStreamingEnabled(connection.streamingEnabled);
         setHasKey(connection.hasKey);
       })
       .catch((error) => !cancelled && toast.error(String(error)))
@@ -66,11 +74,18 @@ export default function AiConnectionSettings() {
     setSaving(true);
     try {
       const apiKey = keyInputRef.current?.value.trim() || null;
-      const connection = await aiConnectionSave({ baseUrl, model, apiKey });
+      const connection = await aiConnectionSave({
+        baseUrl,
+        model,
+        streamingEnabled,
+        apiKey,
+      });
       setBaseUrl(connection.baseUrl);
       setModel(connection.model);
       setSavedBaseUrl(connection.baseUrl);
       setSavedModel(connection.model);
+      setStreamingEnabled(connection.streamingEnabled);
+      setSavedStreamingEnabled(connection.streamingEnabled);
       setHasKey(connection.hasKey);
       if (keyInputRef.current) keyInputRef.current.value = "";
       toast.success(t`AI 服务配置已保存`);
@@ -150,6 +165,16 @@ export default function AiConnectionSettings() {
             disabled={loading || saving}
             placeholder={hasKey ? t`留空则保留现有密钥` : t`输入 API Key`}
             aria-label={hasKey ? t`替换 API Key` : t`API Key`}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-4 sm:col-span-2">
+          <Label htmlFor="ai-streaming">{t`流式输出`}</Label>
+          <Switch
+            id="ai-streaming"
+            checked={streamingEnabled}
+            disabled={loading || saving}
+            aria-label={t`流式输出`}
+            onCheckedChange={setStreamingEnabled}
           />
         </div>
       </div>

@@ -26,6 +26,7 @@ import {
 } from "~/components/ui/sheet";
 import { cn } from "~/lib/utils";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
+import PoetryTranslationSection from "./PoetryTranslationSection";
 interface PoemDetailViewProps {
   detail: PoemDetailModel | null;
   loading: boolean;
@@ -248,15 +249,19 @@ export default function PoemDetail({
           </div>
           <CollapsibleStrains strains={detail.strains} />
 
-          {annotation ? (
+          <PoetryTranslationSection
+            uid={detail.uid}
+            fontSize={fontSize}
+            lineHeight={lineHeight}
+            referenceTranslation={annotation?.translation}
+          />
+
+          {annotation &&
+          (annotation.remark.trim() || annotation.appreciation.trim()) ? (
             <div className="border-border space-y-4 border-t pt-4">
               <AnnotationSection
                 title={<Trans>注释</Trans>}
                 body={annotation.remark}
-              />
-              <AnnotationSection
-                title={<Trans>译文</Trans>}
-                body={annotation.translation}
               />
               <AnnotationSection
                 title={<Trans>赏析</Trans>}
