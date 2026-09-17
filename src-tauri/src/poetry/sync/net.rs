@@ -1,9 +1,9 @@
-//! Desktop network channel: resolve upstream commit shas, stream codeload
-//! tarballs to temp files with progress + cancellation, and hand the
-//! extracted trees over to the ingest pipeline.
+//! Desktop sync orchestration: pick the file-level or tarball channel per
+//! source, stream codeload tarballs to temp files with progress and
+//! cancellation, and hand the extracted trees over to the ingest pipeline.
 //!
-//! reqwest is a desktop-only dependency, so everything touching it lives
-//! behind `#[cfg(desktop)]`.
+//! GitHub API access lives in `github`; reqwest is a desktop-only dependency,
+//! so everything touching it lives behind `#[cfg(desktop)]`.
 
 #[cfg(desktop)]
 use std::fs;
@@ -17,62 +17,13 @@ use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
 #[cfg(desktop)]
-use serde_json::Value;
-
+use super::github::{download_progress, error_chain, fetch_needed_blobs, resolve_source_sha};
 #[cfg(desktop)]
 use super::ingest::{extract_selected, import_extracted_dir};
 use crate::error::{AppError, AppResult};
 use crate::poetry::catalog::Catalog;
-#[cfg(desktop)]
-use crate::poetry::model::PoetrySyncProgress;
 
 use super::{PoetryLibrary, ProgressFn};
-
-/// Resolve the current commit sha of every source referenced by `ids`.
-#[cfg(desktop)]
-pub(super) fn fetch_source_sha(catalog: &Catalog, source_id: &str) -> AppResult<String> {
-    let Some(spec) = catalog.sources.get(source_id) else {
-        return Err(AppError(format!("unknown source: {source_id}")));
-    };
-    let url = format!(
-        "https://api.github.com/repos/{}/commits/{}",
-        spec.repo, spec.branch
-    );
-    let client = reqwest::blocking::Client::builder()
-        .connect_timeout(std::time::Duration::from_secs(15))
-        .user_agent("mftp-library-sync")
-        .build()
-        .map_err(|e| AppError(format!("http client: {e}")))?;
-    let value: Value = client
-        .get(url)
-        .send()
-        .map_err(|e| AppError(format!("获取上游版本失败：{}", error_chain(&e))))?
-        .json()
-        .map_err(|e| AppError(format!("decode commit info: {e}")))?;
-    value
-        .get("sha")
-        .and_then(Value::as_str)
-        .map(str::to_string)
-        .ok_or_else(|| AppError("commit response missing sha".into()))
-}
-
-#[cfg(not(desktop))]
-pub(super) fn fetch_source_sha(_catalog: &Catalog, _source_id: &str) -> AppResult<String> {
-    Err(AppError("library downloads require the desktop app".into()))
-}
-
-/// Flatten a reqwest error chain so the UI shows the real cause
-/// (dns / connect / tls) instead of a bare "error sending request".
-#[cfg(desktop)]
-fn error_chain(error: &dyn std::error::Error) -> String {
-    let mut message = error.to_string();
-    let mut source = error.source();
-    while let Some(cause) = source {
-        message.push_str(&format!(": {cause}"));
-        source = cause.source();
-    }
-    message
-}
 
 #[cfg(all(test, desktop))]
 mod probe {
@@ -111,25 +62,15 @@ pub(super) fn run_network_sync(
 ) -> AppResult<()> {
     let catalog = Catalog::load().map_err(AppError)?;
 
-    // Resolve upstream shas first; fall back to timestamps so a flaky API
-    // never blocks importing data that will be downloaded anyway.
-    let mut shas = std::collections::HashMap::<String, String>::new();
-    for source_id in catalog.sources_for(ids) {
-        let sha = fetch_source_sha(&catalog, source_id).unwrap_or_else(|_| {
-            format!(
-                "snapshot-{}",
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map(|duration| duration.as_secs())
-                    .unwrap_or(0)
-            )
-        });
-        shas.insert(source_id.to_string(), sha);
-    }
+    // Announce the job before any network work: resolving upstream shas and
+    // the connect/TLS handshake both take seconds on a slow route, and the UI
+    // keys its toast and busy state off progress events. Without this the
+    // page looks frozen until the first 256 KiB have been streamed.
+    progress(download_progress(0, None));
 
     let tmp = library.tmp_dir();
     fs::create_dir_all(&tmp).map_err(AppError::from)?;
-    let result = download_and_import(library, progress, &catalog, ids, &shas, &tmp, cancelled);
+    let result = download_and_import(library, progress, &catalog, ids, &tmp, cancelled);
     let _ = fs::remove_dir_all(&tmp);
     result
 }
@@ -150,7 +91,6 @@ fn download_and_import(
     progress: &ProgressFn<'_>,
     catalog: &Catalog,
     ids: &[String],
-    shas: &std::collections::HashMap<String, String>,
     tmp: &Path,
     cancelled: &AtomicBool,
 ) -> AppResult<()> {
@@ -161,21 +101,41 @@ fn download_and_import(
         let Some(spec) = catalog.sources.get(source_id) else {
             continue;
         };
-        let archive_path = tmp.join(format!("{source_id}.tar.gz"));
-        download_tarball(
-            progress,
-            spec.repo.clone(),
-            spec.branch.clone(),
-            &archive_path,
-            cancelled,
-        )?;
-
         let extract_dir = tmp.join(format!("extract-{source_id}"));
         let _ = fs::remove_dir_all(&extract_dir);
         fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
-        extract_selected(&archive_path, &extract_dir, catalog, ids, cancelled)?;
 
-        let sha = shas.get(source_id).cloned().unwrap_or_default();
+        // Pull only the blobs the selected collections need. Any failure or a
+        // request budget too small for the file set falls back to the whole
+        // tarball, so behaviour never degrades below the previous release.
+        let blobs = fetch_needed_blobs(progress, spec, catalog, ids, &extract_dir, cancelled);
+        if !matches!(blobs, Ok(true)) {
+            if cancelled.load(Ordering::SeqCst) {
+                return Err(AppError("cancelled".into()));
+            }
+            if let Err(error) = &blobs {
+                eprintln!("poetry blob fetch fell back to tarball: {}", error.0);
+            }
+            // A partial blob run may have left files behind; the tarball
+            // extractor expects an empty root.
+            let _ = fs::remove_dir_all(&extract_dir);
+            fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
+            let archive_path = tmp.join(format!("{source_id}.tar.gz"));
+            download_tarball(
+                progress,
+                spec.repo.clone(),
+                spec.branch.clone(),
+                &archive_path,
+                cancelled,
+            )?;
+            extract_selected(&archive_path, &extract_dir, catalog, ids, cancelled)?;
+            let _ = fs::remove_file(&archive_path);
+        }
+
+        // Resolved after the download so a slow GitHub API never delays the
+        // transfer the user is waiting on. Only used to stamp the installed
+        // collections below.
+        let sha = resolve_source_sha(catalog, source_id);
         import_extracted_dir(
             library,
             progress,
@@ -185,7 +145,6 @@ fn download_and_import(
             cancelled,
         )?;
         let _ = fs::remove_dir_all(&extract_dir);
-        let _ = fs::remove_file(&archive_path);
     }
     Ok(())
 }
@@ -217,15 +176,7 @@ pub(super) fn download_tarball(
         }
         if attempt > 0 {
             std::thread::sleep(std::time::Duration::from_secs(2));
-            progress(PoetrySyncProgress {
-                collection_id: "download".into(),
-                phase: "downloading".into(),
-                bytes_done: 0,
-                bytes_total: None,
-                imported: 0,
-                total: None,
-                error: None,
-            });
+            progress(download_progress(0, None));
         }
         let response = client
             .get(url.clone())
@@ -235,6 +186,9 @@ pub(super) fn download_tarball(
         match response {
             Ok(mut response) => {
                 let part_path = dest.with_extension("part");
+                // Headers are in, so the total is known: report it now rather
+                // than waiting the 256 KiB the streaming loop batches by.
+                progress(download_progress(0, response.content_length()));
                 return match stream_to_file(&mut response, &part_path, progress, cancelled) {
                     Ok(()) => {
                         // Only completed downloads get promoted.
@@ -276,15 +230,7 @@ fn stream_to_file(
                 done += n as u64;
                 if done - last_report >= 256 * 1024 {
                     last_report = done;
-                    progress(PoetrySyncProgress {
-                        collection_id: "download".into(),
-                        phase: "downloading".into(),
-                        bytes_done: done,
-                        bytes_total: response.content_length(),
-                        imported: 0,
-                        total: None,
-                        error: None,
-                    });
+                    progress(download_progress(done, response.content_length()));
                 }
             }
             Err(error) if error.kind() == std::io::ErrorKind::Interrupted => continue,

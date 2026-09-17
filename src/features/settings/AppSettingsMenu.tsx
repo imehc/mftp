@@ -97,7 +97,7 @@ export default function AppSettingsMenu() {
           {t`设置`}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-48 whitespace-nowrap">
+      <DropdownMenuContent align="end" className="min-w-48">
         <DropdownMenuItem asChild>
           <Link to="/settings">
             <Settings />

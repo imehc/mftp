@@ -14,6 +14,8 @@ interface SearchBarProps {
   onInputChange: (value: string) => void;
   onScopeChange: (scope: PoetrySearchScope) => void;
   onSubmit?: (query: string) => void;
+  onRemoveHistory?: (query: string) => void;
+  onClearHistory?: () => void;
 }
 const SCOPES: Array<{
   value: PoetrySearchScope;
@@ -44,6 +46,8 @@ export default function SearchBar({
   onInputChange,
   onScopeChange,
   onSubmit,
+  onRemoveHistory,
+  onClearHistory,
 }: SearchBarProps) {
   const { t } = useLingui();
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -88,34 +92,56 @@ export default function SearchBar({
               <X />
             </Button>
           ) : null}
-          {historyOpen ? (
+          {historyOpen && history.length > 0 ? (
             <div className="border-border bg-popover absolute inset-x-0 top-full z-20 mt-1 rounded-md border p-1 shadow-md">
               <div className="text-muted-foreground flex items-center justify-between px-2 py-1 text-[11px]">
                 <span className="flex items-center gap-1">
                   <History className="size-3" aria-hidden />
                   <Trans>搜索历史</Trans>
                 </span>
-                <button
-                  type="button"
-                  className="hover:text-foreground"
-                  onClick={() => setHistoryOpen(false)}
-                >
-                  <Trans context="action">关闭</Trans>
-                </button>
+                <span className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="hover:text-foreground"
+                    onClick={() => {
+                      onClearHistory?.();
+                      setHistoryOpen(false);
+                    }}
+                  >
+                    <Trans>清空</Trans>
+                  </button>
+                  <button
+                    type="button"
+                    className="hover:text-foreground"
+                    onClick={() => setHistoryOpen(false)}
+                  >
+                    <Trans context="action">关闭</Trans>
+                  </button>
+                </span>
               </div>
-              {history.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className="hover:bg-accent block w-full truncate rounded-sm px-2 py-1.5 text-left text-sm"
-                  onClick={() => {
-                    onInputChange(item);
-                    onSubmit?.(item);
-                    setHistoryOpen(false);
-                  }}
-                >
-                  {item}
-                </button>
+              {history.map((name) => (
+                <div key={name} className="flex items-center gap-0.5">
+                  <button
+                    type="button"
+                    className="hover:bg-accent min-w-0 flex-1 truncate rounded-sm px-2 py-1.5 text-left text-sm"
+                    onClick={() => {
+                      onInputChange(name);
+                      onSubmit?.(name);
+                      setHistoryOpen(false);
+                    }}
+                  >
+                    {name}
+                  </button>
+                  <button
+                    type="button"
+                    // 变量名用 name，以复用目录里已有的 `删除 {name}` 而非新增近似条目。
+                    aria-label={t`删除 ${name}`}
+                    className="text-muted-foreground hover:text-foreground shrink-0 rounded-sm p-1"
+                    onClick={() => onRemoveHistory?.(name)}
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
               ))}
             </div>
           ) : null}

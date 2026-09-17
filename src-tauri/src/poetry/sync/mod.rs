@@ -27,12 +27,14 @@ use super::model::{
 use super::text;
 use crate::error::{AppError, AppResult};
 
+mod github;
 mod ingest;
 mod net;
 
+use github::fetch_source_sha;
 #[cfg(desktop)]
 use net::download_tarball;
-use net::{fetch_source_sha, run_network_sync};
+use net::run_network_sync;
 
 use ingest::run_local_import;
 
@@ -109,11 +111,15 @@ impl PoetryLibrary {
     pub fn collections_status(&self) -> AppResult<Vec<PoetryCollectionStatus>> {
         let catalog = Catalog::load().map_err(AppError)?;
         let conn = self.db().open()?;
+        // `LENGTH()` counts characters on TEXT, so the poem text is measured
+        // through a BLOB cast: UTF-8 Chinese is 3 bytes per character and the
+        // character count under-reports the stored size by ~3x.
         let mut stmt = conn.prepare(
             "SELECT collection_id, COUNT(*),
-                    COALESCE(SUM(LENGTH(body) + LENGTH(notes) + LENGTH(strains)
-                                  + LENGTH(title) + LENGTH(author) + LENGTH(chapter)
-                                  + LENGTH(rhythmic)), 0)
+                    COALESCE(SUM(LENGTH(CAST(body AS BLOB)) + LENGTH(CAST(notes AS BLOB))
+                               + LENGTH(CAST(strains AS BLOB)) + LENGTH(CAST(title AS BLOB))
+                               + LENGTH(CAST(author AS BLOB)) + LENGTH(CAST(chapter AS BLOB))
+                               + LENGTH(CAST(rhythmic AS BLOB))), 0)
              FROM poems GROUP BY collection_id",
         )?;
         let stats: std::collections::HashMap<String, (i64, i64)> = stmt

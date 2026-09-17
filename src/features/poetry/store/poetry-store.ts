@@ -17,6 +17,7 @@ interface PoetryState {
   setSearchScope: (scope: PoetrySearchScope) => void;
   searchHistory: string[];
   pushSearchHistory: (query: string) => void;
+  removeSearchHistory: (query: string) => void;
   clearSearchHistory: () => void;
 
   /** 详情面板的阅读偏好。 */
@@ -57,6 +58,10 @@ export const usePoetryStore = create<PoetryState>()(
             ].slice(0, MAX_HISTORY),
           };
         }),
+      removeSearchHistory: (query) =>
+        set((state) => ({
+          searchHistory: state.searchHistory.filter((item) => item !== query),
+        })),
       clearSearchHistory: () => set({ searchHistory: [] }),
 
       fontSize: 17,

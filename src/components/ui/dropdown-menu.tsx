@@ -42,7 +42,9 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         align={align}
         className={cn(
-          "bg-popover text-popover-foreground ring-foreground/10 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg p-1 shadow-md ring-1 data-closed:duration-120 data-closed:ease-in data-open:duration-200 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:overflow-hidden motion-reduce:animate-none",
+          // 按最宽标签定宽，而不是锁死触发器宽度：触发器常常只是个很窄的图标按钮，
+          // 锁死后标签会从词中间断开。上限取 Radix 量出的可用宽度。
+          "bg-popover text-popover-foreground ring-foreground/10 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) w-max max-w-(--radix-dropdown-menu-content-available-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg p-1 shadow-md ring-1 data-closed:duration-120 data-closed:ease-in data-open:duration-200 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:overflow-hidden motion-reduce:animate-none",
           className,
         )}
         {...props}

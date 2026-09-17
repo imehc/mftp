@@ -123,6 +123,8 @@ export default function LibraryPage({
   const setScope = usePoetryStore((s) => s.setSearchScope);
   const history = usePoetryStore((s) => s.searchHistory);
   const pushHistory = usePoetryStore((s) => s.pushSearchHistory);
+  const removeHistory = usePoetryStore((s) => s.removeSearchHistory);
+  const clearHistory = usePoetryStore((s) => s.clearSearchHistory);
   const fontSize = usePoetryStore((s) => s.fontSize);
   const lineHeight = usePoetryStore((s) => s.lineHeight);
   const setFontSize = usePoetryStore((s) => s.setFontSize);
@@ -323,7 +325,9 @@ export default function LibraryPage({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    align="end"
+                    // 触发器贴在面板最左边，右对齐会把更宽的菜单推出视口，
+                    // 再被碰撞检测推回来，结果和按钮完全脱钩。
+                    align="start"
                     className="max-h-72 overflow-y-auto"
                   >
                     <DropdownMenuItem
@@ -357,6 +361,8 @@ export default function LibraryPage({
                 skipUrlSync.current = false;
                 setInput(value);
               }}
+              onRemoveHistory={removeHistory}
+              onClearHistory={clearHistory}
             />
             {isSearching && searching && results === null ? (
               <div className="text-muted-foreground flex items-center justify-center gap-2 py-8 text-xs">
