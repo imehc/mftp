@@ -42,3 +42,35 @@ fn task_request_rejects_empty_source_text() {
         .request(&source)
         .is_err());
 }
+
+#[test]
+fn modes_differ_and_both_forbid_echoing_the_classical_wording() {
+    let literal = AiTask::poetry_translation(PoetryTranslationMode::Literal)
+        .request(&poem())
+        .unwrap();
+    let literary = AiTask::poetry_translation(PoetryTranslationMode::Literary)
+        .request(&poem())
+        .unwrap();
+    assert_ne!(literal.instructions(), literary.instructions());
+    for request in [&literal, &literary] {
+        assert!(request.instructions().contains("is not a translation"));
+    }
+    assert!(literal.instructions().contains("one line per source line"));
+}
+
+#[test]
+fn output_budget_scales_with_the_source_length() {
+    let mut long = poem();
+    long.body = vec!["床前明月光".repeat(80)];
+    let short_tokens = AiTask::poetry_translation(PoetryTranslationMode::Literal)
+        .request(&poem())
+        .unwrap()
+        .max_output_tokens();
+    let long_tokens = AiTask::poetry_translation(PoetryTranslationMode::Literal)
+        .request(&long)
+        .unwrap()
+        .max_output_tokens();
+    assert!(short_tokens >= MIN_OUTPUT_TOKENS);
+    assert!(long_tokens > short_tokens);
+    assert!(long_tokens <= MAX_OUTPUT_TOKENS);
+}
