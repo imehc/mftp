@@ -95,6 +95,12 @@ i18n：
 
 ### 后端
 
+测试组织：
+
+- Rust 单元测试必须放在独立文件中，不在生产源码内内联测试实现，参考 `src-tauri/src/ai/client.rs`。
+- 普通模块 `foo.rs` 的测试放在同目录 `foo_tests.rs`，并在模块末尾使用 `#[cfg(test)] #[path = "foo_tests.rs"] mod tests;` 引入。
+- 目录模块 `mod.rs` 的测试放在同目录 `tests.rs`，并使用 `#[cfg(test)] mod tests;` 引入；需要特殊条件编译或模块名时保留原 `cfg` 和模块名，并通过 `#[path = "..."]` 指向独立测试文件。
+
 错误处理：
 
 - 生产路径禁止 `.unwrap()`、`.expect()`、`panic!`，用 `Result` + `?` 经统一错误类型跨 IPC 返回。
@@ -168,6 +174,7 @@ UI 与样式：
 结构与 Git：
 
 - Never 让源文件超过 600 行不拆分（生成物除外：shadcn `components/ui`、`bindings.ts`、`routeTree.gen.ts`）。
+- Never 在 Rust 生产源码中内联 `mod tests { ... }` 或其他测试模块实现；测试代码必须按后端测试组织规范放入独立文件。
 - Never revert/reset/checkout 不是你写的未提交改动；遇到时先读懂并在其基础上继续。
 
 ## 约定与协作

@@ -344,13 +344,5 @@ pub fn run() {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn export_typescript_bindings() {
-        specta_builder()
-            .export(Typescript::default(), "../src/bindings.ts")
-            .expect("failed to export TypeScript bindings");
-    }
-}
+#[path = "lib_tests.rs"]
+mod tests;
