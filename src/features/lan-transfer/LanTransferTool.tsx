@@ -2,7 +2,6 @@ import { startTransition, useEffect, useEffectEvent, useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { open } from "@tauri-apps/plugin-dialog";
 import {
-  Copy,
   LoaderCircle,
   Power,
   RefreshCw,
@@ -11,6 +10,7 @@ import {
   Wifi,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CopyButton } from "~/components/CopyButton";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -297,11 +297,6 @@ export default function LanTransferTool() {
       toast.error(String(error));
     }
   }
-  async function copyUrl() {
-    if (!status?.url) return;
-    await navigator.clipboard.writeText(status.url);
-    toast.success(t`已复制地址`);
-  }
   async function chooseDownloadDir() {
     if (running) return null;
     const selected = await open({
@@ -360,15 +355,16 @@ export default function LanTransferTool() {
               </div>
             </div>
             <div className="flex max-w-full items-center gap-1.5 overflow-x-auto">
-              <Button
+              <CopyButton
                 variant="outline"
                 size="sm"
-                onClick={copyUrl}
+                value={status?.url ?? ""}
                 disabled={!status?.url}
-              >
-                <Copy data-icon="inline-start" />
-                <Trans>复制</Trans>
-              </Button>
+                showLabel
+                label={t`复制`}
+                copiedLabel={t`已复制地址`}
+                onError={(error) => toast.error(String(error))}
+              />
               <Button variant="outline" size="sm" onClick={openSettings}>
                 <Settings data-icon="inline-start" />
                 <Trans>设置</Trans>

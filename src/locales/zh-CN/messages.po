@@ -17,9 +17,9 @@ msgstr ""
 msgid "{activeSessionCount, plural, one {# 连接} other {# 连接}}"
 msgstr "{activeSessionCount, plural, one {# 连接} other {# 连接}}"
 
-#: src/features/crypto/CryptoTool.tsx:207
-#: src/features/crypto/CryptoTool.tsx:252
-#: src/features/formatter/FormatterTool.tsx:424
+#: src/features/crypto/CryptoTool.tsx:199
+#: src/features/crypto/CryptoTool.tsx:243
+#: src/features/formatter/FormatterTool.tsx:415
 msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 
@@ -84,7 +84,7 @@ msgstr "{itemsLength} 个任务"
 msgid "{languageLabel2} 格式有效"
 msgstr "{languageLabel2} 格式有效"
 
-#: src/features/formatter/FormatterTool.tsx:415
+#: src/features/formatter/FormatterTool.tsx:406
 msgid "{lineCount, plural, one {# 行} other {# 行}}"
 msgstr "{lineCount, plural, one {# 行} other {# 行}}"
 
@@ -127,7 +127,7 @@ msgstr "{moveNumber, plural, one {第 # 手} other {第 # 手}}"
 msgid "{name} 的房间"
 msgstr "{name} 的房间"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:348
+#: src/features/lan-transfer/LanTransferTool.tsx:343
 msgid "{onlineConnectionCount, plural, one {# 个在线连接} other {# 个在线连接}}"
 msgstr "{onlineConnectionCount, plural, one {# 个在线连接} other {# 个在线连接}}"
 
@@ -195,8 +195,8 @@ msgstr "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgid "{sideNameValue} 获胜"
 msgstr "{sideNameValue} 获胜"
 
+#: src/features/formatter/FormatterTool.tsx:304
 #: src/features/formatter/FormatterTool.tsx:313
-#: src/features/formatter/FormatterTool.tsx:322
 msgid "{spaces, plural, one {# 空格} other {# 空格}}"
 msgstr "{spaces, plural, one {# 空格} other {# 空格}}"
 
@@ -285,7 +285,7 @@ msgstr "AVIF（不支持）"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:425
+#: src/features/bt/BtTool.tsx:421
 #: src/features/home/entries.tsx:137
 msgid "BT 下载"
 msgstr "BT 下载"
@@ -344,7 +344,7 @@ msgstr "SSH/SFTP 连接"
 msgid "Top 进程"
 msgstr "Top 进程"
 
-#: src/features/crypto/CryptoTool.tsx:185
+#: src/features/crypto/CryptoTool.tsx:177
 msgid "URL Safe"
 msgstr "URL Safe"
 
@@ -401,7 +401,7 @@ msgstr "下一个"
 #: src/features/bt/components/CacheManager.tsx:253
 #: src/features/bt/components/CacheManager.tsx:254
 #: src/features/bt/components/CacheManager.tsx:299
-#: src/features/bt/components/TaskDialogs.tsx:128
+#: src/features/bt/components/TaskDialogs.tsx:129
 #: src/features/bt/components/TaskRow.tsx:155
 #: src/features/bt/components/TaskRow.tsx:156
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
@@ -420,7 +420,7 @@ msgid "下载 {entryName2}"
 msgstr "下载 {entryName2}"
 
 #: src/features/bt/components/CacheManager.tsx:290
-#: src/features/bt/components/TaskDialogs.tsx:119
+#: src/features/bt/components/TaskDialogs.tsx:120
 msgid "下载 {pendingSaveLabel}"
 msgstr "下载 {pendingSaveLabel}"
 
@@ -529,7 +529,7 @@ msgstr "主目录"
 msgid "主题"
 msgstr "主题"
 
-#: src/features/crypto/CryptoTool.tsx:111
+#: src/features/crypto/CryptoTool.tsx:103
 msgid "互换"
 msgstr "互换"
 
@@ -650,7 +650,7 @@ msgstr "你赢了"
 msgid "你输了"
 msgstr "你输了"
 
-#: src/features/crypto/CryptoTool.tsx:188
+#: src/features/crypto/CryptoTool.tsx:180
 msgid "使用 -_ 替换 +/，并省略填充"
 msgstr "使用 -_ 替换 +/，并省略填充"
 
@@ -702,7 +702,7 @@ msgstr "做种中"
 msgid "停一手"
 msgstr "停一手"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:393
+#: src/features/lan-transfer/LanTransferTool.tsx:389
 msgid "停止"
 msgstr "停止"
 
@@ -812,7 +812,7 @@ msgstr "其他用户"
 msgid "内存"
 msgstr "内存"
 
-#: src/features/formatter/FormatterTool.tsx:411
+#: src/features/formatter/FormatterTool.tsx:402
 msgid "内容"
 msgstr "内容"
 
@@ -824,7 +824,7 @@ msgstr "内容不是有效的 {languageLabel}"
 msgid "内容不是有效的转义字符串"
 msgstr "内容不是有效的转义字符串"
 
-#: src/features/crypto/CryptoTool.tsx:53
+#: src/features/crypto/CryptoTool.tsx:54
 msgid "内容无效，无法解码"
 msgstr "内容无效，无法解码"
 
@@ -892,7 +892,7 @@ msgstr "创建时间"
 
 #: src/features/bt/components/CacheManager.tsx:270
 #: src/features/bt/components/CacheManager.tsx:271
-#: src/features/bt/components/TaskDialogs.tsx:106
+#: src/features/bt/components/TaskDialogs.tsx:107
 #: src/features/bt/components/TaskRow.tsx:208
 #: src/features/bt/components/TaskRow.tsx:209
 #: src/features/logs/LogPageLayout.tsx:108
@@ -917,7 +917,7 @@ msgstr "删除 {name}"
 msgid "删除 {packName}"
 msgstr "删除 {packName}"
 
-#: src/features/bt/components/TaskDialogs.tsx:88
+#: src/features/bt/components/TaskDialogs.tsx:89
 msgid "删除 {pendingDeleteLabel}"
 msgstr "删除 {pendingDeleteLabel}"
 
@@ -934,7 +934,7 @@ msgstr "删除共享目录"
 msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "删除后可重新生成，不影响原文和注释。"
 
-#: src/features/bt/components/TaskDialogs.tsx:91
+#: src/features/bt/components/TaskDialogs.tsx:92
 #: src/features/logs/LogPageLayout.tsx:100
 #: src/features/todo/TodoTool.tsx:289
 msgid "删除后无法恢复。"
@@ -953,7 +953,7 @@ msgstr "删除待办？"
 msgid "删除待办失败"
 msgstr "删除待办失败"
 
-#: src/features/bt/components/TaskDialogs.tsx:100
+#: src/features/bt/components/TaskDialogs.tsx:101
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:30
 msgid "删除文件"
 msgstr "删除文件"
@@ -988,7 +988,7 @@ msgstr "删除这条日志？"
 #: src/features/about/AboutPage.tsx:171
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:41
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:118
-#: src/features/lan-transfer/LanTransferTool.tsx:378
+#: src/features/lan-transfer/LanTransferTool.tsx:374
 #: src/features/logs/LogPageLayout.tsx:138
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:116
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:144
@@ -1022,8 +1022,8 @@ msgstr "加密导出"
 msgid "加密文件，请输入密码"
 msgstr "加密文件，请输入密码"
 
-#: src/features/crypto/CryptoTool.tsx:78
-#: src/features/crypto/CryptoTool.tsx:95
+#: src/features/crypto/CryptoTool.tsx:70
+#: src/features/crypto/CryptoTool.tsx:87
 #: src/features/home/entries.tsx:76
 msgid "加解密"
 msgstr "加解密"
@@ -1068,7 +1068,7 @@ msgstr "卸载合集"
 msgid "历史记录"
 msgstr "历史记录"
 
-#: src/features/formatter/FormatterTool.tsx:351
+#: src/features/formatter/FormatterTool.tsx:342
 msgid "压缩"
 msgstr "压缩"
 
@@ -1172,8 +1172,8 @@ msgstr "发现设备"
 #: src/features/about/AboutPage.tsx:332
 #: src/features/bt/components/AddTorrentDialog.tsx:315
 #: src/features/bt/components/CacheManager.tsx:297
-#: src/features/bt/components/TaskDialogs.tsx:104
-#: src/features/bt/components/TaskDialogs.tsx:126
+#: src/features/bt/components/TaskDialogs.tsx:105
+#: src/features/bt/components/TaskDialogs.tsx:127
 #: src/features/bt/components/TaskRow.tsx:189
 #: src/features/bt/components/TaskRow.tsx:190
 #: src/features/export/ExportDialog.tsx:162
@@ -1342,11 +1342,11 @@ msgstr "后手（执白）"
 msgid "后手（执黑）"
 msgstr "后手（执黑）"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:393
+#: src/features/lan-transfer/LanTransferTool.tsx:389
 msgid "启动"
 msgstr "启动"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:358
+#: src/features/lan-transfer/LanTransferTool.tsx:353
 msgid "启动服务后显示浏览器访问地址"
 msgstr "启动服务后显示浏览器访问地址"
 
@@ -1416,7 +1416,7 @@ msgstr "图片压缩"
 msgid "图片文件"
 msgstr "图片文件"
 
-#: src/features/formatter/FormatterTool.tsx:242
+#: src/features/formatter/FormatterTool.tsx:232
 msgid "在内容中搜索（Ctrl+F）"
 msgstr "在内容中搜索（Ctrl+F）"
 
@@ -1483,10 +1483,10 @@ msgstr "处理结果预览"
 msgid "备注"
 msgstr "备注"
 
-#: src/components/CopyButton.tsx:48
-#: src/features/bt/components/TaskDialogs.tsx:75
-#: src/features/formatter/FormatterTool.tsx:254
-#: src/features/lan-transfer/LanTransferTool.tsx:370
+#: src/components/CopyButton.tsx:50
+#: src/features/bt/components/TaskDialogs.tsx:74
+#: src/features/formatter/FormatterTool.tsx:243
+#: src/features/lan-transfer/LanTransferTool.tsx:364
 msgid "复制"
 msgstr "复制"
 
@@ -1498,13 +1498,11 @@ msgstr "复制密码"
 msgid "复制账号"
 msgstr "复制账号"
 
-#: src/features/crypto/CryptoTool.tsx:220
-#: src/features/crypto/CryptoTool.tsx:221
+#: src/features/crypto/CryptoTool.tsx:212
 msgid "复制输入"
 msgstr "复制输入"
 
-#: src/features/crypto/CryptoTool.tsx:266
-#: src/features/crypto/CryptoTool.tsx:267
+#: src/features/crypto/CryptoTool.tsx:257
 msgid "复制输出"
 msgstr "复制输出"
 
@@ -1695,7 +1693,7 @@ msgstr "导出密码本、主机、待办和局域网配置。"
 msgid "导出数据"
 msgstr "导出数据"
 
-#: src/features/formatter/FormatterTool.tsx:389
+#: src/features/formatter/FormatterTool.tsx:380
 msgid "将内容转义为字符串字面量"
 msgstr "将内容转义为字符串字面量"
 
@@ -1719,7 +1717,7 @@ msgstr "将帅被吃"
 msgid "将死"
 msgstr "将死"
 
-#: src/features/crypto/CryptoTool.tsx:108
+#: src/features/crypto/CryptoTool.tsx:100
 msgid "将结果写回输入并切换模式"
 msgstr "将结果写回输入并切换模式"
 
@@ -1753,8 +1751,8 @@ msgid "局域网"
 msgstr "局域网"
 
 #: src/features/home/entries.tsx:65
-#: src/features/lan-transfer/LanTransferTool.tsx:322
-#: src/features/lan-transfer/LanTransferTool.tsx:340
+#: src/features/lan-transfer/LanTransferTool.tsx:317
+#: src/features/lan-transfer/LanTransferTool.tsx:335
 msgid "局域网传输"
 msgstr "局域网传输"
 
@@ -1805,7 +1803,7 @@ msgstr "已保存密钥"
 msgid "已保存配置"
 msgstr "已保存配置"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:325
+#: src/features/lan-transfer/LanTransferTool.tsx:320
 msgid "已停止"
 msgstr "已停止"
 
@@ -1862,13 +1860,13 @@ msgstr "已取消任务"
 msgid "已取消压缩"
 msgstr "已取消压缩"
 
-#: src/components/CopyButton.tsx:49
-#: src/features/bt/BtTool.tsx:420
-#: src/features/formatter/FormatterTool.tsx:203
+#: src/components/CopyButton.tsx:51
+#: src/features/bt/components/TaskDialogs.tsx:75
+#: src/features/formatter/FormatterTool.tsx:244
 msgid "已复制"
 msgstr "已复制"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:303
+#: src/features/lan-transfer/LanTransferTool.tsx:365
 msgid "已复制地址"
 msgstr "已复制地址"
 
@@ -1880,11 +1878,11 @@ msgstr "已复制密码"
 msgid "已复制账号"
 msgstr "已复制账号"
 
-#: src/features/crypto/CryptoTool.tsx:218
+#: src/features/crypto/CryptoTool.tsx:213
 msgid "已复制输入"
 msgstr "已复制输入"
 
-#: src/features/crypto/CryptoTool.tsx:264
+#: src/features/crypto/CryptoTool.tsx:258
 msgid "已复制输出"
 msgstr "已复制输出"
 
@@ -2115,7 +2113,7 @@ msgstr "当前环境不支持 WebCodecs"
 msgid "当前环境不支持导出 AVIF"
 msgstr "当前环境不支持导出 AVIF"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:406
+#: src/features/lan-transfer/LanTransferTool.tsx:402
 msgid "当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。"
 
@@ -2294,7 +2292,7 @@ msgstr "推荐"
 msgid "提子 {value}:{value2}"
 msgstr "提子 {value}:{value2}"
 
-#: src/features/formatter/FormatterTool.tsx:245
+#: src/features/formatter/FormatterTool.tsx:235
 #: src/features/vault/VaultTool.tsx:281
 msgid "搜索"
 msgstr "搜索"
@@ -2340,7 +2338,7 @@ msgstr "操作失败"
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "支持磁力链接与本地 .torrent 文件"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:417
+#: src/features/lan-transfer/LanTransferTool.tsx:413
 msgid "改为自动选择"
 msgstr "改为自动选择"
 
@@ -2510,7 +2508,7 @@ msgstr "昵称"
 msgid "显示密码"
 msgstr "显示密码"
 
-#: src/features/crypto/CryptoTool.tsx:56
+#: src/features/crypto/CryptoTool.tsx:57
 msgid "暂不支持该算法"
 msgstr "暂不支持该算法"
 
@@ -2520,7 +2518,7 @@ msgstr "暂不支持该算法"
 msgid "暂停"
 msgstr "暂停"
 
-#: src/features/bt/BtTool.tsx:448
+#: src/features/bt/BtTool.tsx:444
 msgid "暂无下载任务"
 msgstr "暂无下载任务"
 
@@ -2694,8 +2692,8 @@ msgstr "本地"
 msgid "本地保存账号密码，点击即可复制"
 msgstr "本地保存账号密码，点击即可复制"
 
-#: src/features/crypto/CryptoTool.tsx:81
-#: src/features/formatter/FormatterTool.tsx:215
+#: src/features/crypto/CryptoTool.tsx:73
+#: src/features/formatter/FormatterTool.tsx:205
 #: src/features/media-compress/MediaCompressTool.tsx:44
 msgid "本地处理"
 msgstr "本地处理"
@@ -2776,22 +2774,22 @@ msgstr "标题、分类、备注、日期和完成状态"
 msgid "标题、网址、账号、密码、分类、备注"
 msgstr "标题、网址、账号、密码、分类、备注"
 
-#: src/features/formatter/FormatterTool.tsx:360
+#: src/features/formatter/FormatterTool.tsx:351
 msgid "校验"
 msgstr "校验"
 
-#: src/features/formatter/FormatterTool.tsx:212
-#: src/features/formatter/FormatterTool.tsx:229
-#: src/features/formatter/FormatterTool.tsx:342
+#: src/features/formatter/FormatterTool.tsx:202
+#: src/features/formatter/FormatterTool.tsx:219
+#: src/features/formatter/FormatterTool.tsx:333
 #: src/features/home/entries.tsx:101
 msgid "格式化"
 msgstr "格式化"
 
-#: src/features/formatter/FormatterTool.tsx:232
+#: src/features/formatter/FormatterTool.tsx:222
 msgid "格式化、压缩与校验结构化数据"
 msgstr "格式化、压缩与校验结构化数据"
 
-#: src/features/formatter/FormatterTool.tsx:446
+#: src/features/formatter/FormatterTool.tsx:437
 msgid "格式化内容编辑器"
 msgstr "格式化内容编辑器"
 
@@ -2827,7 +2825,7 @@ msgstr "楚 河"
 msgid "模型"
 msgstr "模型"
 
-#: src/features/crypto/CryptoTool.tsx:154
+#: src/features/crypto/CryptoTool.tsx:146
 msgid "模式"
 msgstr "模式"
 
@@ -3040,8 +3038,8 @@ msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
 msgid "深色"
 msgstr "深色"
 
-#: src/features/bt/BtTool.tsx:429
-#: src/features/bt/BtTool.tsx:453
+#: src/features/bt/BtTool.tsx:425
+#: src/features/bt/BtTool.tsx:449
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:48
 #: src/features/lan-transfer/LanShareDialog.tsx:141
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:334
@@ -3060,7 +3058,7 @@ msgstr "添加下载任务失败"
 msgid "添加共享目录"
 msgstr "添加共享目录"
 
-#: src/features/formatter/FormatterTool.tsx:392
+#: src/features/formatter/FormatterTool.tsx:383
 msgid "添加转义"
 msgstr "添加转义"
 
@@ -3086,8 +3084,8 @@ msgid "清理预览缓存失败"
 msgstr "清理预览缓存失败"
 
 #: src/features/bt/components/CacheManager.tsx:202
-#: src/features/crypto/CryptoTool.tsx:120
-#: src/features/formatter/FormatterTool.tsx:263
+#: src/features/crypto/CryptoTool.tsx:112
+#: src/features/formatter/FormatterTool.tsx:254
 #: src/features/games/billiards/BilliardsModeMenu.tsx:166
 #: src/features/games/go/GoModeMenu.tsx:160
 #: src/features/games/gomoku/GomokuModeMenu.tsx:132
@@ -3357,12 +3355,12 @@ msgstr "确认清除"
 msgid "确认码"
 msgstr "确认码"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:344
+#: src/features/lan-transfer/LanTransferTool.tsx:339
 msgid "确认码 {statusConfirmationCode}"
 msgstr "确认码 {statusConfirmationCode}"
 
 #: src/features/bt/components/AddTorrentDialog.tsx:234
-#: src/features/bt/components/TaskDialogs.tsx:66
+#: src/features/bt/components/TaskDialogs.tsx:65
 #: src/features/bt/components/TaskRow.tsx:199
 #: src/features/bt/components/TaskRow.tsx:200
 msgid "磁力链接"
@@ -3404,7 +3402,7 @@ msgstr "种类"
 msgid "移动"
 msgstr "移动"
 
-#: src/features/formatter/FormatterTool.tsx:402
+#: src/features/formatter/FormatterTool.tsx:393
 msgid "移除转义"
 msgstr "移除转义"
 
@@ -3468,7 +3466,7 @@ msgstr "简体中文"
 msgid "简单"
 msgstr "简单"
 
-#: src/features/crypto/CryptoTool.tsx:130
+#: src/features/crypto/CryptoTool.tsx:122
 msgid "算法"
 msgstr "算法"
 
@@ -3484,7 +3482,7 @@ msgstr "类型"
 msgid "粘滞位"
 msgstr "粘滞位"
 
-#: src/features/formatter/FormatterTool.tsx:445
+#: src/features/formatter/FormatterTool.tsx:436
 msgid "粘贴或输入 {languageLabel3} 内容"
 msgstr "粘贴或输入 {languageLabel3} 内容"
 
@@ -3532,7 +3530,7 @@ msgstr "绑定"
 msgid "绑定 IP"
 msgstr "绑定 IP"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:403
+#: src/features/lan-transfer/LanTransferTool.tsx:399
 msgid "绑定 IP 不可用"
 msgstr "绑定 IP 不可用"
 
@@ -3541,7 +3539,7 @@ msgstr "绑定 IP 不可用"
 msgid "结果"
 msgstr "结果"
 
-#: src/features/crypto/CryptoTool.tsx:277
+#: src/features/crypto/CryptoTool.tsx:267
 msgid "结果会实时显示在这里"
 msgstr "结果会实时显示在这里"
 
@@ -3565,7 +3563,7 @@ msgstr "缓冲中…"
 msgid "缓存已清理"
 msgstr "缓存已清理"
 
-#: src/features/crypto/CryptoTool.tsx:168
+#: src/features/crypto/CryptoTool.tsx:160
 msgid "编码"
 msgstr "编码"
 
@@ -3573,7 +3571,7 @@ msgstr "编码"
 msgid "编码中"
 msgstr "编码中"
 
-#: src/features/crypto/CryptoTool.tsx:55
+#: src/features/crypto/CryptoTool.tsx:56
 msgid "编码失败"
 msgstr "编码失败"
 
@@ -3614,7 +3612,7 @@ msgstr "缩放方式"
 msgid "缩放比例"
 msgstr "缩放比例"
 
-#: src/features/formatter/FormatterTool.tsx:298
+#: src/features/formatter/FormatterTool.tsx:289
 msgid "缩进"
 msgstr "缩进"
 
@@ -3740,7 +3738,7 @@ msgstr "解析"
 msgid "解析中"
 msgstr "解析中"
 
-#: src/features/crypto/CryptoTool.tsx:171
+#: src/features/crypto/CryptoTool.tsx:163
 msgid "解码"
 msgstr "解码"
 
@@ -3752,7 +3750,7 @@ msgstr "认证方式"
 msgid "设备名"
 msgstr "设备名"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:374
+#: src/features/lan-transfer/LanTransferTool.tsx:370
 #: src/features/settings/AppSettingsMenu.tsx:97
 #: src/features/settings/AppSettingsMenu.tsx:104
 #: src/features/settings/SettingsPage.tsx:57
@@ -3829,7 +3827,7 @@ msgstr "该私钥有口令保护（连接时输入）"
 msgid "详情"
 msgstr "详情"
 
-#: src/features/formatter/FormatterTool.tsx:273
+#: src/features/formatter/FormatterTool.tsx:264
 #: src/features/settings/AppSettingsMenu.tsx:147
 msgid "语言"
 msgstr "语言"
@@ -3990,7 +3988,7 @@ msgid "转存失败"
 msgstr "转存失败"
 
 #: src/features/bt/components/CacheManager.tsx:293
-#: src/features/bt/components/TaskDialogs.tsx:122
+#: src/features/bt/components/TaskDialogs.tsx:123
 msgid "转存完成后会从缓存中移除。"
 msgstr "转存完成后会从缓存中移除。"
 
@@ -4003,7 +4001,7 @@ msgstr "轮到 {seatNameValue}"
 msgid "轮到 {sideNameValue}"
 msgstr "轮到 {sideNameValue}"
 
-#: src/features/crypto/CryptoTool.tsx:203
+#: src/features/crypto/CryptoTool.tsx:195
 msgid "输入"
 msgstr "输入"
 
@@ -4019,15 +4017,15 @@ msgstr "输入密钥口令"
 msgid "输入房间码"
 msgstr "输入房间码"
 
-#: src/features/crypto/CryptoTool.tsx:232
+#: src/features/crypto/CryptoTool.tsx:223
 msgid "输入要编码的文本"
 msgstr "输入要编码的文本"
 
-#: src/features/crypto/CryptoTool.tsx:232
+#: src/features/crypto/CryptoTool.tsx:223
 msgid "输入要解码的内容"
 msgstr "输入要解码的内容"
 
-#: src/features/crypto/CryptoTool.tsx:245
+#: src/features/crypto/CryptoTool.tsx:236
 msgid "输出"
 msgstr "输出"
 
@@ -4048,7 +4046,7 @@ msgid "运行 {formatUptimeValue}"
 msgstr "运行 {formatUptimeValue}"
 
 #: src/features/about/AboutPage.tsx:75
-#: src/features/lan-transfer/LanTransferTool.tsx:325
+#: src/features/lan-transfer/LanTransferTool.tsx:320
 msgid "运行中"
 msgstr "运行中"
 
@@ -4078,7 +4076,7 @@ msgstr "返回首页"
 msgid "返回首页？"
 msgstr "返回首页？"
 
-#: src/features/formatter/FormatterTool.tsx:399
+#: src/features/formatter/FormatterTool.tsx:390
 msgid "还原被转义的字符串内容"
 msgstr "还原被转义的字符串内容"
 
@@ -4218,7 +4216,7 @@ msgstr "选择尺寸模式"
 msgid "选择当前文件夹"
 msgstr "选择当前文件夹"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:310
+#: src/features/lan-transfer/LanTransferTool.tsx:305
 msgid "选择接收目录"
 msgstr "选择接收目录"
 
@@ -4253,11 +4251,11 @@ msgstr "选择种子文件"
 msgid "选择移动位置"
 msgstr "选择移动位置"
 
-#: src/features/crypto/CryptoTool.tsx:138
+#: src/features/crypto/CryptoTool.tsx:130
 msgid "选择算法"
 msgstr "选择算法"
 
-#: src/features/crypto/CryptoTool.tsx:98
+#: src/features/crypto/CryptoTool.tsx:90
 msgid "选择算法对文本进行编码或解码"
 msgstr "选择算法对文本进行编码或解码"
 
@@ -4265,7 +4263,7 @@ msgstr "选择算法对文本进行编码或解码"
 msgid "选择缩放比例"
 msgstr "选择缩放比例"
 
-#: src/features/formatter/FormatterTool.tsx:308
+#: src/features/formatter/FormatterTool.tsx:299
 msgid "选择缩进"
 msgstr "选择缩进"
 
@@ -4273,7 +4271,7 @@ msgstr "选择缩进"
 msgid "选择解压位置"
 msgstr "选择解压位置"
 
-#: src/features/formatter/FormatterTool.tsx:283
+#: src/features/formatter/FormatterTool.tsx:274
 msgid "选择语言"
 msgstr "选择语言"
 
@@ -4285,11 +4283,11 @@ msgstr "选择输出分辨率"
 msgid "选择输出格式"
 msgstr "选择输出格式"
 
-#: src/features/formatter/FormatterTool.tsx:369
+#: src/features/formatter/FormatterTool.tsx:360
 msgid "递归按字母升序排序对象键"
 msgstr "递归按字母升序排序对象键"
 
-#: src/features/formatter/FormatterTool.tsx:370
+#: src/features/formatter/FormatterTool.tsx:361
 msgid "递归按字母降序排序对象键"
 msgstr "递归按字母降序排序对象键"
 
@@ -4366,11 +4364,11 @@ msgstr "链接"
 msgid "错误"
 msgstr "错误"
 
-#: src/features/formatter/FormatterTool.tsx:379
+#: src/features/formatter/FormatterTool.tsx:370
 msgid "键升序"
 msgstr "键升序"
 
-#: src/features/formatter/FormatterTool.tsx:381
+#: src/features/formatter/FormatterTool.tsx:372
 msgid "键降序"
 msgstr "键降序"
 

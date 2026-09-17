@@ -8,7 +8,6 @@ import {
   ArrowUpZA,
   Braces,
   CheckCheck,
-  Copy,
   Eraser,
   Minimize2,
   Quote,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
+import { CopyButton } from "~/components/CopyButton";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
@@ -195,16 +195,6 @@ export default function FormatterTool() {
       view.focus();
     }
   }
-  async function handleCopy() {
-    const doc = currentDoc();
-    if (!doc) return;
-    try {
-      await navigator.clipboard.writeText(doc);
-      toast.success(t`已复制`);
-    } catch (error) {
-      toast.error(String(error));
-    }
-  }
   const languageLabel3 = language.label;
   return (
     <main className="bg-background text-foreground flex h-full flex-col">
@@ -244,15 +234,16 @@ export default function FormatterTool() {
                 <Search data-icon="inline-start" />
                 <Trans>搜索</Trans>
               </Button>
-              <Button
+              <CopyButton
                 variant="outline"
                 size="sm"
-                onClick={() => void handleCopy()}
+                value={value}
                 disabled={!value}
-              >
-                <Copy data-icon="inline-start" />
-                <Trans>复制</Trans>
-              </Button>
+                showLabel
+                label={t`复制`}
+                copiedLabel={t`已复制`}
+                onError={(error) => toast.error(String(error))}
+              />
               <Button
                 variant="outline"
                 size="sm"

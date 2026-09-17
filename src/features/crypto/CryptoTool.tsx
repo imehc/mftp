@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { ArrowDownUp, Binary, Copy, Eraser, LockKeyhole } from "lucide-react";
+import { ArrowDownUp, Binary, Eraser, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
+import { CopyButton } from "~/components/CopyButton";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
@@ -55,15 +56,6 @@ export default function CryptoTool() {
         ? t`编码失败`
         : t`暂不支持该算法`
     : null;
-  async function copyText(value: string, successMessage: string) {
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success(successMessage);
-    } catch (error) {
-      toast.error(String(error));
-    }
-  }
   function clearAll() {
     setInput("");
   }
@@ -212,16 +204,15 @@ export default function CryptoTool() {
                     other="# 个字符"
                   />
                 </Badge>
-                <Button
+                <CopyButton
                   variant="ghost"
                   size="icon-xs"
-                  onClick={() => void copyText(input, t`已复制输入`)}
+                  value={input}
                   disabled={!input}
-                  aria-label={t`复制输入`}
-                  title={t`复制输入`}
-                >
-                  <Copy />
-                </Button>
+                  label={t`复制输入`}
+                  copiedLabel={t`已复制输入`}
+                  onError={(error) => toast.error(String(error))}
+                />
               </div>
             </div>
             <Textarea
@@ -258,16 +249,15 @@ export default function CryptoTool() {
                     />
                   </Badge>
                 )}
-                <Button
+                <CopyButton
                   variant="ghost"
                   size="icon-xs"
-                  onClick={() => void copyText(output, t`已复制输出`)}
+                  value={output}
                   disabled={!output}
-                  aria-label={t`复制输出`}
-                  title={t`复制输出`}
-                >
-                  <Copy />
-                </Button>
+                  label={t`复制输出`}
+                  copiedLabel={t`已复制输出`}
+                  onError={(error) => toast.error(String(error))}
+                />
               </div>
             </div>
             <Textarea

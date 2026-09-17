@@ -17,9 +17,9 @@ msgstr ""
 msgid "{activeSessionCount, plural, one {# 连接} other {# 连接}}"
 msgstr "{activeSessionCount, plural, one {# connection} other {# connections}}"
 
-#: src/features/crypto/CryptoTool.tsx:207
-#: src/features/crypto/CryptoTool.tsx:252
-#: src/features/formatter/FormatterTool.tsx:424
+#: src/features/crypto/CryptoTool.tsx:199
+#: src/features/crypto/CryptoTool.tsx:243
+#: src/features/formatter/FormatterTool.tsx:415
 msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# character} other {# characters}}"
 
@@ -84,7 +84,7 @@ msgstr "{itemsLength} tasks"
 msgid "{languageLabel2} 格式有效"
 msgstr "{languageLabel2} format valid"
 
-#: src/features/formatter/FormatterTool.tsx:415
+#: src/features/formatter/FormatterTool.tsx:406
 msgid "{lineCount, plural, one {# 行} other {# 行}}"
 msgstr "{lineCount, plural, one {# line} other {# lines}}"
 
@@ -127,7 +127,7 @@ msgstr "Move #"
 msgid "{name} 的房间"
 msgstr "{name}'s room"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:348
+#: src/features/lan-transfer/LanTransferTool.tsx:343
 msgid "{onlineConnectionCount, plural, one {# 个在线连接} other {# 个在线连接}}"
 msgstr "{onlineConnectionCount, plural, one {# online connection} other {# online connections}}"
 
@@ -195,8 +195,8 @@ msgstr "Shot #"
 msgid "{sideNameValue} 获胜"
 msgstr "{sideNameValue} wins"
 
+#: src/features/formatter/FormatterTool.tsx:304
 #: src/features/formatter/FormatterTool.tsx:313
-#: src/features/formatter/FormatterTool.tsx:322
 msgid "{spaces, plural, one {# 空格} other {# 空格}}"
 msgstr "{spaces, plural, one {# space} other {# spaces}}"
 
@@ -285,7 +285,7 @@ msgstr "AVIF (unsupported)"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:425
+#: src/features/bt/BtTool.tsx:421
 #: src/features/home/entries.tsx:137
 msgid "BT 下载"
 msgstr "BT Downloads"
@@ -344,7 +344,7 @@ msgstr "SSH/SFTP sessions"
 msgid "Top 进程"
 msgstr "Top Processes"
 
-#: src/features/crypto/CryptoTool.tsx:185
+#: src/features/crypto/CryptoTool.tsx:177
 msgid "URL Safe"
 msgstr "URL Safe"
 
@@ -401,7 +401,7 @@ msgstr "Next"
 #: src/features/bt/components/CacheManager.tsx:253
 #: src/features/bt/components/CacheManager.tsx:254
 #: src/features/bt/components/CacheManager.tsx:299
-#: src/features/bt/components/TaskDialogs.tsx:128
+#: src/features/bt/components/TaskDialogs.tsx:129
 #: src/features/bt/components/TaskRow.tsx:155
 #: src/features/bt/components/TaskRow.tsx:156
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
@@ -420,7 +420,7 @@ msgid "下载 {entryName2}"
 msgstr "Download {entryName2}"
 
 #: src/features/bt/components/CacheManager.tsx:290
-#: src/features/bt/components/TaskDialogs.tsx:119
+#: src/features/bt/components/TaskDialogs.tsx:120
 msgid "下载 {pendingSaveLabel}"
 msgstr "Download {pendingSaveLabel}"
 
@@ -529,7 +529,7 @@ msgstr "Home Directory"
 msgid "主题"
 msgstr "Theme"
 
-#: src/features/crypto/CryptoTool.tsx:111
+#: src/features/crypto/CryptoTool.tsx:103
 msgid "互换"
 msgstr "Swap"
 
@@ -650,7 +650,7 @@ msgstr "You win"
 msgid "你输了"
 msgstr "You lose"
 
-#: src/features/crypto/CryptoTool.tsx:188
+#: src/features/crypto/CryptoTool.tsx:180
 msgid "使用 -_ 替换 +/，并省略填充"
 msgstr "Replace +/ with -_ and omit padding"
 
@@ -702,7 +702,7 @@ msgstr "Seeding"
 msgid "停一手"
 msgstr "Pass"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:393
+#: src/features/lan-transfer/LanTransferTool.tsx:389
 msgid "停止"
 msgstr "Stop"
 
@@ -812,7 +812,7 @@ msgstr "Others"
 msgid "内存"
 msgstr "Memory"
 
-#: src/features/formatter/FormatterTool.tsx:411
+#: src/features/formatter/FormatterTool.tsx:402
 msgid "内容"
 msgstr "Content"
 
@@ -824,7 +824,7 @@ msgstr "Content is not a valid {languageLabel}"
 msgid "内容不是有效的转义字符串"
 msgstr "Content is not a valid escaped string"
 
-#: src/features/crypto/CryptoTool.tsx:53
+#: src/features/crypto/CryptoTool.tsx:54
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
@@ -892,7 +892,7 @@ msgstr "Created Time"
 
 #: src/features/bt/components/CacheManager.tsx:270
 #: src/features/bt/components/CacheManager.tsx:271
-#: src/features/bt/components/TaskDialogs.tsx:106
+#: src/features/bt/components/TaskDialogs.tsx:107
 #: src/features/bt/components/TaskRow.tsx:208
 #: src/features/bt/components/TaskRow.tsx:209
 #: src/features/logs/LogPageLayout.tsx:108
@@ -917,7 +917,7 @@ msgstr "Delete {name}"
 msgid "删除 {packName}"
 msgstr "Delete {packName}"
 
-#: src/features/bt/components/TaskDialogs.tsx:88
+#: src/features/bt/components/TaskDialogs.tsx:89
 msgid "删除 {pendingDeleteLabel}"
 msgstr "Delete {pendingDeleteLabel}"
 
@@ -934,7 +934,7 @@ msgstr "Remove shared folder"
 msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "You can generate it again later. The original text and annotations are unaffected."
 
-#: src/features/bt/components/TaskDialogs.tsx:91
+#: src/features/bt/components/TaskDialogs.tsx:92
 #: src/features/logs/LogPageLayout.tsx:100
 #: src/features/todo/TodoTool.tsx:289
 msgid "删除后无法恢复。"
@@ -953,7 +953,7 @@ msgstr "Delete todo?"
 msgid "删除待办失败"
 msgstr "Failed to delete todo"
 
-#: src/features/bt/components/TaskDialogs.tsx:100
+#: src/features/bt/components/TaskDialogs.tsx:101
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:30
 msgid "删除文件"
 msgstr "Delete File"
@@ -988,7 +988,7 @@ msgstr "Delete this log?"
 #: src/features/about/AboutPage.tsx:171
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:41
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:118
-#: src/features/lan-transfer/LanTransferTool.tsx:378
+#: src/features/lan-transfer/LanTransferTool.tsx:374
 #: src/features/logs/LogPageLayout.tsx:138
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:116
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:144
@@ -1022,8 +1022,8 @@ msgstr "Encrypt export"
 msgid "加密文件，请输入密码"
 msgstr "Encrypted file, enter the password"
 
-#: src/features/crypto/CryptoTool.tsx:78
-#: src/features/crypto/CryptoTool.tsx:95
+#: src/features/crypto/CryptoTool.tsx:70
+#: src/features/crypto/CryptoTool.tsx:87
 #: src/features/home/entries.tsx:76
 msgid "加解密"
 msgstr "Encode / Decode"
@@ -1068,7 +1068,7 @@ msgstr "Uninstall collection"
 msgid "历史记录"
 msgstr "History"
 
-#: src/features/formatter/FormatterTool.tsx:351
+#: src/features/formatter/FormatterTool.tsx:342
 msgid "压缩"
 msgstr "Compress"
 
@@ -1172,8 +1172,8 @@ msgstr "Discovered Devices"
 #: src/features/about/AboutPage.tsx:332
 #: src/features/bt/components/AddTorrentDialog.tsx:315
 #: src/features/bt/components/CacheManager.tsx:297
-#: src/features/bt/components/TaskDialogs.tsx:104
-#: src/features/bt/components/TaskDialogs.tsx:126
+#: src/features/bt/components/TaskDialogs.tsx:105
+#: src/features/bt/components/TaskDialogs.tsx:127
 #: src/features/bt/components/TaskRow.tsx:189
 #: src/features/bt/components/TaskRow.tsx:190
 #: src/features/export/ExportDialog.tsx:162
@@ -1342,11 +1342,11 @@ msgstr "Second (White)"
 msgid "后手（执黑）"
 msgstr "Play second (Black)"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:393
+#: src/features/lan-transfer/LanTransferTool.tsx:389
 msgid "启动"
 msgstr "Start"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:358
+#: src/features/lan-transfer/LanTransferTool.tsx:353
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
@@ -1416,7 +1416,7 @@ msgstr "Image Compress"
 msgid "图片文件"
 msgstr "Image files"
 
-#: src/features/formatter/FormatterTool.tsx:242
+#: src/features/formatter/FormatterTool.tsx:232
 msgid "在内容中搜索（Ctrl+F）"
 msgstr "Search in content (Ctrl+F)"
 
@@ -1483,10 +1483,10 @@ msgstr "Result preview"
 msgid "备注"
 msgstr "Notes"
 
-#: src/components/CopyButton.tsx:48
-#: src/features/bt/components/TaskDialogs.tsx:75
-#: src/features/formatter/FormatterTool.tsx:254
-#: src/features/lan-transfer/LanTransferTool.tsx:370
+#: src/components/CopyButton.tsx:50
+#: src/features/bt/components/TaskDialogs.tsx:74
+#: src/features/formatter/FormatterTool.tsx:243
+#: src/features/lan-transfer/LanTransferTool.tsx:364
 msgid "复制"
 msgstr "Copy"
 
@@ -1498,13 +1498,11 @@ msgstr "Copy password"
 msgid "复制账号"
 msgstr "Copy username"
 
-#: src/features/crypto/CryptoTool.tsx:220
-#: src/features/crypto/CryptoTool.tsx:221
+#: src/features/crypto/CryptoTool.tsx:212
 msgid "复制输入"
 msgstr "Copy input"
 
-#: src/features/crypto/CryptoTool.tsx:266
-#: src/features/crypto/CryptoTool.tsx:267
+#: src/features/crypto/CryptoTool.tsx:257
 msgid "复制输出"
 msgstr "Copy output"
 
@@ -1695,7 +1693,7 @@ msgstr "Export vault, hosts, todos, and LAN settings."
 msgid "导出数据"
 msgstr "Export data"
 
-#: src/features/formatter/FormatterTool.tsx:389
+#: src/features/formatter/FormatterTool.tsx:380
 msgid "将内容转义为字符串字面量"
 msgstr "Escape content as a string literal"
 
@@ -1719,7 +1717,7 @@ msgstr "General captured"
 msgid "将死"
 msgstr "Checkmate"
 
-#: src/features/crypto/CryptoTool.tsx:108
+#: src/features/crypto/CryptoTool.tsx:100
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
@@ -1753,8 +1751,8 @@ msgid "局域网"
 msgstr "LAN"
 
 #: src/features/home/entries.tsx:65
-#: src/features/lan-transfer/LanTransferTool.tsx:322
-#: src/features/lan-transfer/LanTransferTool.tsx:340
+#: src/features/lan-transfer/LanTransferTool.tsx:317
+#: src/features/lan-transfer/LanTransferTool.tsx:335
 msgid "局域网传输"
 msgstr "LAN Transfer"
 
@@ -1805,7 +1803,7 @@ msgstr "Key saved"
 msgid "已保存配置"
 msgstr "Settings saved"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:325
+#: src/features/lan-transfer/LanTransferTool.tsx:320
 msgid "已停止"
 msgstr "Stopped"
 
@@ -1862,13 +1860,13 @@ msgstr "Task cancelled"
 msgid "已取消压缩"
 msgstr "Compression cancelled"
 
-#: src/components/CopyButton.tsx:49
-#: src/features/bt/BtTool.tsx:420
-#: src/features/formatter/FormatterTool.tsx:203
+#: src/components/CopyButton.tsx:51
+#: src/features/bt/components/TaskDialogs.tsx:75
+#: src/features/formatter/FormatterTool.tsx:244
 msgid "已复制"
 msgstr "Copied"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:303
+#: src/features/lan-transfer/LanTransferTool.tsx:365
 msgid "已复制地址"
 msgstr "Address copied"
 
@@ -1880,11 +1878,11 @@ msgstr "Password copied"
 msgid "已复制账号"
 msgstr "Username copied"
 
-#: src/features/crypto/CryptoTool.tsx:218
+#: src/features/crypto/CryptoTool.tsx:213
 msgid "已复制输入"
 msgstr "Input copied"
 
-#: src/features/crypto/CryptoTool.tsx:264
+#: src/features/crypto/CryptoTool.tsx:258
 msgid "已复制输出"
 msgstr "Output copied"
 
@@ -2115,7 +2113,7 @@ msgstr "WebCodecs is not supported in this environment"
 msgid "当前环境不支持导出 AVIF"
 msgstr "AVIF export is not supported in this environment"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:406
+#: src/features/lan-transfer/LanTransferTool.tsx:402
 msgid "当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured {value} is not in the list of available network interfaces; the access address may become invalid."
 
@@ -2294,7 +2292,7 @@ msgstr "Recommended"
 msgid "提子 {value}:{value2}"
 msgstr "Captures {value}:{value2}"
 
-#: src/features/formatter/FormatterTool.tsx:245
+#: src/features/formatter/FormatterTool.tsx:235
 #: src/features/vault/VaultTool.tsx:281
 msgid "搜索"
 msgstr "Search"
@@ -2340,7 +2338,7 @@ msgstr "Operation failed"
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "Supports magnet links and local .torrent files"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:417
+#: src/features/lan-transfer/LanTransferTool.tsx:413
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
@@ -2510,7 +2508,7 @@ msgstr "Nickname"
 msgid "显示密码"
 msgstr "Show password"
 
-#: src/features/crypto/CryptoTool.tsx:56
+#: src/features/crypto/CryptoTool.tsx:57
 msgid "暂不支持该算法"
 msgstr "Algorithm not supported yet"
 
@@ -2520,7 +2518,7 @@ msgstr "Algorithm not supported yet"
 msgid "暂停"
 msgstr "Pause"
 
-#: src/features/bt/BtTool.tsx:448
+#: src/features/bt/BtTool.tsx:444
 msgid "暂无下载任务"
 msgstr "No download tasks yet"
 
@@ -2694,8 +2692,8 @@ msgstr "Local"
 msgid "本地保存账号密码，点击即可复制"
 msgstr "Store credentials locally, click to copy"
 
-#: src/features/crypto/CryptoTool.tsx:81
-#: src/features/formatter/FormatterTool.tsx:215
+#: src/features/crypto/CryptoTool.tsx:73
+#: src/features/formatter/FormatterTool.tsx:205
 #: src/features/media-compress/MediaCompressTool.tsx:44
 msgid "本地处理"
 msgstr "Local"
@@ -2776,22 +2774,22 @@ msgstr "Titles, categories, notes, dates, and completion status"
 msgid "标题、网址、账号、密码、分类、备注"
 msgstr "Title, URL, username, password, category, notes"
 
-#: src/features/formatter/FormatterTool.tsx:360
+#: src/features/formatter/FormatterTool.tsx:351
 msgid "校验"
 msgstr "Validate"
 
-#: src/features/formatter/FormatterTool.tsx:212
-#: src/features/formatter/FormatterTool.tsx:229
-#: src/features/formatter/FormatterTool.tsx:342
+#: src/features/formatter/FormatterTool.tsx:202
+#: src/features/formatter/FormatterTool.tsx:219
+#: src/features/formatter/FormatterTool.tsx:333
 #: src/features/home/entries.tsx:101
 msgid "格式化"
 msgstr "Formatter"
 
-#: src/features/formatter/FormatterTool.tsx:232
+#: src/features/formatter/FormatterTool.tsx:222
 msgid "格式化、压缩与校验结构化数据"
 msgstr "Format, minify and validate structured data"
 
-#: src/features/formatter/FormatterTool.tsx:446
+#: src/features/formatter/FormatterTool.tsx:437
 msgid "格式化内容编辑器"
 msgstr "Formatter content editor"
 
@@ -2827,7 +2825,7 @@ msgstr "楚 河"
 msgid "模型"
 msgstr "Model"
 
-#: src/features/crypto/CryptoTool.tsx:154
+#: src/features/crypto/CryptoTool.tsx:146
 msgid "模式"
 msgstr "Mode"
 
@@ -3040,8 +3038,8 @@ msgstr "Browser access requests, confirmation prompts, and trusted-device fallba
 msgid "深色"
 msgstr "Dark"
 
-#: src/features/bt/BtTool.tsx:429
-#: src/features/bt/BtTool.tsx:453
+#: src/features/bt/BtTool.tsx:425
+#: src/features/bt/BtTool.tsx:449
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:48
 #: src/features/lan-transfer/LanShareDialog.tsx:141
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:334
@@ -3060,7 +3058,7 @@ msgstr "Failed to add download task"
 msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
-#: src/features/formatter/FormatterTool.tsx:392
+#: src/features/formatter/FormatterTool.tsx:383
 msgid "添加转义"
 msgstr "Escape"
 
@@ -3086,8 +3084,8 @@ msgid "清理预览缓存失败"
 msgstr "Failed to clean up preview cache"
 
 #: src/features/bt/components/CacheManager.tsx:202
-#: src/features/crypto/CryptoTool.tsx:120
-#: src/features/formatter/FormatterTool.tsx:263
+#: src/features/crypto/CryptoTool.tsx:112
+#: src/features/formatter/FormatterTool.tsx:254
 #: src/features/games/billiards/BilliardsModeMenu.tsx:166
 #: src/features/games/go/GoModeMenu.tsx:160
 #: src/features/games/gomoku/GomokuModeMenu.tsx:132
@@ -3357,12 +3355,12 @@ msgstr "Clear key"
 msgid "确认码"
 msgstr "Confirmation Code"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:344
+#: src/features/lan-transfer/LanTransferTool.tsx:339
 msgid "确认码 {statusConfirmationCode}"
 msgstr "Confirmation code {statusConfirmationCode}"
 
 #: src/features/bt/components/AddTorrentDialog.tsx:234
-#: src/features/bt/components/TaskDialogs.tsx:66
+#: src/features/bt/components/TaskDialogs.tsx:65
 #: src/features/bt/components/TaskRow.tsx:199
 #: src/features/bt/components/TaskRow.tsx:200
 msgid "磁力链接"
@@ -3404,7 +3402,7 @@ msgstr "Kind"
 msgid "移动"
 msgstr "Move"
 
-#: src/features/formatter/FormatterTool.tsx:402
+#: src/features/formatter/FormatterTool.tsx:393
 msgid "移除转义"
 msgstr "Unescape"
 
@@ -3468,7 +3466,7 @@ msgstr "Simplified Chinese"
 msgid "简单"
 msgstr "Easy"
 
-#: src/features/crypto/CryptoTool.tsx:130
+#: src/features/crypto/CryptoTool.tsx:122
 msgid "算法"
 msgstr "Algorithm"
 
@@ -3484,7 +3482,7 @@ msgstr "Type"
 msgid "粘滞位"
 msgstr "Sticky bit"
 
-#: src/features/formatter/FormatterTool.tsx:445
+#: src/features/formatter/FormatterTool.tsx:436
 msgid "粘贴或输入 {languageLabel3} 内容"
 msgstr "Paste or enter {languageLabel3} content"
 
@@ -3532,7 +3530,7 @@ msgstr "Bind"
 msgid "绑定 IP"
 msgstr "Bind IP"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:403
+#: src/features/lan-transfer/LanTransferTool.tsx:399
 msgid "绑定 IP 不可用"
 msgstr "Bind IP Unavailable"
 
@@ -3541,7 +3539,7 @@ msgstr "Bind IP Unavailable"
 msgid "结果"
 msgstr "Result"
 
-#: src/features/crypto/CryptoTool.tsx:277
+#: src/features/crypto/CryptoTool.tsx:267
 msgid "结果会实时显示在这里"
 msgstr "Result appears here in real time"
 
@@ -3565,7 +3563,7 @@ msgstr "Buffering…"
 msgid "缓存已清理"
 msgstr "Cache cleared"
 
-#: src/features/crypto/CryptoTool.tsx:168
+#: src/features/crypto/CryptoTool.tsx:160
 msgid "编码"
 msgstr "Encode"
 
@@ -3573,7 +3571,7 @@ msgstr "Encode"
 msgid "编码中"
 msgstr "Encoding"
 
-#: src/features/crypto/CryptoTool.tsx:55
+#: src/features/crypto/CryptoTool.tsx:56
 msgid "编码失败"
 msgstr "Encoding failed"
 
@@ -3614,7 +3612,7 @@ msgstr "Resize method"
 msgid "缩放比例"
 msgstr "Scale"
 
-#: src/features/formatter/FormatterTool.tsx:298
+#: src/features/formatter/FormatterTool.tsx:289
 msgid "缩进"
 msgstr "Indent"
 
@@ -3740,7 +3738,7 @@ msgstr "Parse"
 msgid "解析中"
 msgstr "Demuxing"
 
-#: src/features/crypto/CryptoTool.tsx:171
+#: src/features/crypto/CryptoTool.tsx:163
 msgid "解码"
 msgstr "Decode"
 
@@ -3752,7 +3750,7 @@ msgstr "Authentication"
 msgid "设备名"
 msgstr "Device Name"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:374
+#: src/features/lan-transfer/LanTransferTool.tsx:370
 #: src/features/settings/AppSettingsMenu.tsx:97
 #: src/features/settings/AppSettingsMenu.tsx:104
 #: src/features/settings/SettingsPage.tsx:57
@@ -3829,7 +3827,7 @@ msgstr "This private key is passphrase-protected (enter it when connecting)."
 msgid "详情"
 msgstr "Details"
 
-#: src/features/formatter/FormatterTool.tsx:273
+#: src/features/formatter/FormatterTool.tsx:264
 #: src/features/settings/AppSettingsMenu.tsx:147
 msgid "语言"
 msgstr "Language"
@@ -3990,7 +3988,7 @@ msgid "转存失败"
 msgstr "Failed to save"
 
 #: src/features/bt/components/CacheManager.tsx:293
-#: src/features/bt/components/TaskDialogs.tsx:122
+#: src/features/bt/components/TaskDialogs.tsx:123
 msgid "转存完成后会从缓存中移除。"
 msgstr "Removed from cache once saved."
 
@@ -4003,7 +4001,7 @@ msgstr "{seatNameValue}'s turn"
 msgid "轮到 {sideNameValue}"
 msgstr "{sideNameValue}'s turn"
 
-#: src/features/crypto/CryptoTool.tsx:203
+#: src/features/crypto/CryptoTool.tsx:195
 msgid "输入"
 msgstr "Input"
 
@@ -4019,15 +4017,15 @@ msgstr "Enter Key Passphrase"
 msgid "输入房间码"
 msgstr "Enter Room Code"
 
-#: src/features/crypto/CryptoTool.tsx:232
+#: src/features/crypto/CryptoTool.tsx:223
 msgid "输入要编码的文本"
 msgstr "Enter text to encode"
 
-#: src/features/crypto/CryptoTool.tsx:232
+#: src/features/crypto/CryptoTool.tsx:223
 msgid "输入要解码的内容"
 msgstr "Enter content to decode"
 
-#: src/features/crypto/CryptoTool.tsx:245
+#: src/features/crypto/CryptoTool.tsx:236
 msgid "输出"
 msgstr "Output"
 
@@ -4048,7 +4046,7 @@ msgid "运行 {formatUptimeValue}"
 msgstr "Uptime {formatUptimeValue}"
 
 #: src/features/about/AboutPage.tsx:75
-#: src/features/lan-transfer/LanTransferTool.tsx:325
+#: src/features/lan-transfer/LanTransferTool.tsx:320
 msgid "运行中"
 msgstr "Running"
 
@@ -4078,7 +4076,7 @@ msgstr "Back to Home"
 msgid "返回首页？"
 msgstr "Return home?"
 
-#: src/features/formatter/FormatterTool.tsx:399
+#: src/features/formatter/FormatterTool.tsx:390
 msgid "还原被转义的字符串内容"
 msgstr "Restore escaped string content"
 
@@ -4218,7 +4216,7 @@ msgstr "Select size mode"
 msgid "选择当前文件夹"
 msgstr "Select Current Folder"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:310
+#: src/features/lan-transfer/LanTransferTool.tsx:305
 msgid "选择接收目录"
 msgstr "Select Receive Directory"
 
@@ -4253,11 +4251,11 @@ msgstr "Select torrent file"
 msgid "选择移动位置"
 msgstr "Select Move Location"
 
-#: src/features/crypto/CryptoTool.tsx:138
+#: src/features/crypto/CryptoTool.tsx:130
 msgid "选择算法"
 msgstr "Select algorithm"
 
-#: src/features/crypto/CryptoTool.tsx:98
+#: src/features/crypto/CryptoTool.tsx:90
 msgid "选择算法对文本进行编码或解码"
 msgstr "Choose an algorithm to encode or decode text"
 
@@ -4265,7 +4263,7 @@ msgstr "Choose an algorithm to encode or decode text"
 msgid "选择缩放比例"
 msgstr "Select scale"
 
-#: src/features/formatter/FormatterTool.tsx:308
+#: src/features/formatter/FormatterTool.tsx:299
 msgid "选择缩进"
 msgstr "Select indent"
 
@@ -4273,7 +4271,7 @@ msgstr "Select indent"
 msgid "选择解压位置"
 msgstr "Select Extract Location"
 
-#: src/features/formatter/FormatterTool.tsx:283
+#: src/features/formatter/FormatterTool.tsx:274
 msgid "选择语言"
 msgstr "Select language"
 
@@ -4285,11 +4283,11 @@ msgstr "Select output resolution"
 msgid "选择输出格式"
 msgstr "Select output format"
 
-#: src/features/formatter/FormatterTool.tsx:369
+#: src/features/formatter/FormatterTool.tsx:360
 msgid "递归按字母升序排序对象键"
 msgstr "Recursively sort object keys A→Z"
 
-#: src/features/formatter/FormatterTool.tsx:370
+#: src/features/formatter/FormatterTool.tsx:361
 msgid "递归按字母降序排序对象键"
 msgstr "Recursively sort object keys Z→A"
 
@@ -4366,11 +4364,11 @@ msgstr "Link"
 msgid "错误"
 msgstr "Error"
 
-#: src/features/formatter/FormatterTool.tsx:379
+#: src/features/formatter/FormatterTool.tsx:370
 msgid "键升序"
 msgstr "Keys A→Z"
 
-#: src/features/formatter/FormatterTool.tsx:381
+#: src/features/formatter/FormatterTool.tsx:372
 msgid "键降序"
 msgstr "Keys Z→A"
 

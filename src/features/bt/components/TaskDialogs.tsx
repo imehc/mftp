@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
+import { CopyButton } from "~/components/CopyButton";
 import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -23,7 +24,6 @@ interface TaskDialogsProps {
   /** 磁力链接弹窗的内容；null 表示不显示。 */
   magnetText: string | null;
   onCloseMagnet: () => void;
-  onCopyMagnet: (text: string) => void;
   /** 待确认删除的标题；null 表示不显示。 */
   pendingDeleteLabel: string | null;
   /** 预览任务没有可删的本地文件，不显示该勾选项。 */
@@ -42,7 +42,6 @@ interface TaskDialogsProps {
 export default function TaskDialogs({
   magnetText,
   onCloseMagnet,
-  onCopyMagnet,
   pendingDeleteLabel,
   showDeleteFiles,
   deleteFiles,
@@ -68,12 +67,14 @@ export default function TaskDialogs({
           </DialogHeader>
           <div className="flex gap-2">
             <Input readOnly value={magnetText ?? ""} />
-            <Button
+            <CopyButton
               variant="outline"
-              onClick={() => onCopyMagnet(magnetText ?? "")}
-            >
-              <Trans>复制</Trans>
-            </Button>
+              value={magnetText ?? ""}
+              showLabel
+              label={t`复制`}
+              copiedLabel={t`已复制`}
+              onError={(error) => toast.error(String(error))}
+            />
           </div>
         </DialogContent>
       </Dialog>

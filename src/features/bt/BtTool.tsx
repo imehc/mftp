@@ -415,10 +415,6 @@ export default function BtTool() {
   };
   const pendingDeleteLabel = pendingDelete?.label;
   const pendingSaveLabel = pendingSave?.label;
-  const copyMagnet = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    toast.success(t`已复制`);
-  };
   return (
     <div className="flex h-full min-h-0 flex-col">
       <ToolPageHeader
@@ -512,7 +508,6 @@ export default function BtTool() {
       <TaskDialogs
         magnetText={magnetTask ? magnetOf(magnetTask) : null}
         onCloseMagnet={() => setMagnetTask(null)}
-        onCopyMagnet={(text) => void copyMagnet(text)}
         pendingDeleteLabel={pendingDeleteLabel ?? null}
         showDeleteFiles={pendingDelete?.mode !== "preview"}
         deleteFiles={deleteFiles}

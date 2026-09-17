@@ -18,7 +18,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
-  Copy,
   Eye,
   EyeOff,
   Globe,
@@ -32,6 +31,7 @@ import {
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { toast } from "sonner";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
+import { CopyButton } from "~/components/CopyButton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -192,15 +192,6 @@ export default function VaultTool() {
       setEntries(previous);
       const error = formatError(cause);
       toast.error(t`排序保存失败：${error}`);
-    }
-  }
-  async function copyText(value: string, successMessage: string) {
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success(successMessage);
-    } catch (error) {
-      toast.error(formatError(error));
     }
   }
   function toggleVisible(id: string) {
@@ -406,19 +397,16 @@ export default function VaultTool() {
                                 <span className="min-w-0 truncate font-mono text-xs">
                                   {entry.username}
                                 </span>
-                                <Button
+                                <CopyButton
                                   variant="ghost"
                                   size="icon-sm"
-                                  title={t`复制账号`}
-                                  onClick={() =>
-                                    void copyText(
-                                      entry.username!,
-                                      t`已复制账号`,
-                                    )
+                                  value={entry.username}
+                                  label={t`复制账号`}
+                                  copiedLabel={t`已复制账号`}
+                                  onError={(error) =>
+                                    toast.error(formatError(error))
                                   }
-                                >
-                                  <Copy />
-                                </Button>
+                                />
                               </div>
                             ) : null}
                             {entry.password ? (
@@ -437,19 +425,16 @@ export default function VaultTool() {
                                 >
                                   {visible ? <EyeOff /> : <Eye />}
                                 </Button>
-                                <Button
+                                <CopyButton
                                   variant="ghost"
                                   size="icon-sm"
-                                  title={t`复制密码`}
-                                  onClick={() =>
-                                    void copyText(
-                                      entry.password!,
-                                      t`已复制密码`,
-                                    )
+                                  value={entry.password}
+                                  label={t`复制密码`}
+                                  copiedLabel={t`已复制密码`}
+                                  onError={(error) =>
+                                    toast.error(formatError(error))
                                   }
-                                >
-                                  <Copy />
-                                </Button>
+                                />
                               </div>
                             ) : null}
                           </div>
