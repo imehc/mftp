@@ -10,6 +10,10 @@ export function localDateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+export function todoDateFromKey(value: string): Date {
+  return new Date(`${value}T00:00:00`);
+}
+
 export function todoView(item: TodoItem, today: string): TodoView {
   if (item.completed) return "completed";
   if (item.dueDate && item.dueDate < today) return "overdue";
@@ -60,7 +64,7 @@ export function buildTodoListRows(items: TodoItem[]): TodoListRow[] {
 }
 
 export function formatTodoDate(value: string, locale: string): string {
-  const date = new Date(`${value}T00:00:00`);
+  const date = todoDateFromKey(value);
   return new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "long",

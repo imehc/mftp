@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { X } from "lucide-react";
+import { enUS, zhCN } from "date-fns/locale";
+import { CalendarIcon, X } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
+import { Calendar } from "~/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +15,16 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 import { Textarea } from "~/components/ui/textarea";
 import { firstFormError } from "~/lib/form-errors";
+import { cn } from "~/lib/utils";
 import type { TodoItem, TodoItemInput } from "~/types";
+import { localDateKey, todoDateFromKey } from "./todo-utils";
 
 interface TodoItemDialogProps {
   open: boolean;
@@ -34,7 +43,7 @@ const emptyValues = {
 };
 
 function toFormValues(item: TodoItem | null) {
-  if (!item) return emptyValues;
+  if (!item) return { ...emptyValues };
   return {
     title: item.title,
     category: item.category ?? "",
@@ -42,6 +51,73 @@ function toFormValues(item: TodoItem | null) {
     dueDate: item.dueDate ?? "",
     completed: item.completed,
   };
+}
+
+function TodoDatePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const { i18n, t } = useLingui();
+  const [open, setOpen] = useState(false);
+  const selectedDate = value ? todoDateFromKey(value) : undefined;
+  const locale = i18n.locale.startsWith("zh") ? zhCN : enUS;
+  const clearLabel = t`清除日期`;
+
+  return (
+    <div className="flex min-w-0 items-center gap-1.5">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id="todo-due-date"
+            type="button"
+            variant="outline"
+            className="min-w-0 flex-1 justify-start font-normal"
+          >
+            <CalendarIcon data-icon="inline-start" />
+            <span
+              className={cn(
+                "truncate",
+                !selectedDate && "text-muted-foreground",
+              )}
+            >
+              {selectedDate
+                ? new Intl.DateTimeFormat(i18n.locale, {
+                    dateStyle: "medium",
+                  }).format(selectedDate)
+                : t`选择日期`}
+            </span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            locale={locale}
+            selected={selectedDate}
+            defaultMonth={selectedDate}
+            onSelect={(date) => {
+              onChange(date ? localDateKey(date) : "");
+              setOpen(false);
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+      {value ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => onChange("")}
+          aria-label={clearLabel}
+          title={clearLabel}
+        >
+          <X />
+        </Button>
+      ) : null}
+    </div>
+  );
 }
 
 export default function TodoItemDialog({
@@ -85,7 +161,7 @@ export default function TodoItemDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {item ? <Trans>编辑待办</Trans> : <Trans>新建待办</Trans>}
@@ -139,38 +215,17 @@ export default function TodoItemDialog({
               )}
             </form.Field>
             <form.Field name="dueDate">
-              {(field) => {
-                const clearLabel = t`清除日期`;
-                return (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="todo-due-date">
-                      <Trans>日期</Trans>
-                    </Label>
-                    <div className="flex items-center gap-1.5">
-                      <Input
-                        id="todo-due-date"
-                        type="date"
-                        value={field.state.value}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                      />
-                      {field.state.value ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => field.handleChange("")}
-                          aria-label={clearLabel}
-                          title={clearLabel}
-                        >
-                          <X />
-                        </Button>
-                      ) : null}
-                    </div>
-                  </div>
-                );
-              }}
+              {(field) => (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="todo-due-date">
+                    <Trans>日期</Trans>
+                  </Label>
+                  <TodoDatePicker
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                  />
+                </div>
+              )}
             </form.Field>
           </div>
           <datalist id="todo-category-options">

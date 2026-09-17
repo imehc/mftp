@@ -1,10 +1,17 @@
-import { useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { CalendarDays, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { cn } from "~/lib/utils";
 import type { TodoItem } from "~/types";
 import {
@@ -27,12 +34,14 @@ function TodoRow({
   onToggle,
   onEdit,
   onDelete,
+  onViewNotes,
 }: {
   row: Extract<TodoListRow, { kind: "item" }>;
   pending: boolean;
   onToggle: (item: TodoItem) => void;
   onEdit: (item: TodoItem) => void;
   onDelete: (item: TodoItem) => void;
+  onViewNotes: (item: TodoItem) => void;
 }) {
   const { t } = useLingui();
   const { item } = row;
@@ -63,14 +72,18 @@ function TodoRow({
             ) : null}
           </div>
           {item.notes ? (
-            <p
+            <button
+              type="button"
+              title={item.notes}
+              aria-label={t`查看完整备注`}
+              onClick={() => onViewNotes(item)}
               className={cn(
-                "text-muted-foreground mt-1 text-xs break-words whitespace-pre-wrap",
+                "text-muted-foreground focus-visible:ring-ring mt-1 line-clamp-2 max-h-8 w-full cursor-pointer appearance-none overflow-hidden border-0 bg-transparent p-0 text-left text-xs leading-4 break-words whitespace-pre-wrap focus-visible:ring-2 focus-visible:outline-none",
                 item.completed && "opacity-70",
               )}
             >
               {item.notes}
-            </p>
+            </button>
           ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-0.5">
@@ -109,56 +122,81 @@ export default function TodoList({
 }: TodoListProps) {
   const { i18n } = useLingui();
   const parentRef = useRef<HTMLDivElement>(null);
+  const [notesItem, setNotesItem] = useState<TodoItem | null>(null);
   const rows = buildTodoListRows(items);
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => parentRef.current,
+    getItemKey: (index) => rows[index]?.key ?? index,
     estimateSize: (index) => (rows[index]?.kind === "header" ? 40 : 70),
     overscan: 8,
   });
 
+  useLayoutEffect(() => {
+    virtualizer.measure();
+  }, [items, virtualizer]);
+
   return (
-    <div ref={parentRef} className="min-h-0 flex-1 overflow-auto">
-      <div
-        className="relative w-full"
-        style={{ height: virtualizer.getTotalSize() }}
-      >
-        {virtualizer.getVirtualItems().map((virtualRow) => {
-          const row = rows[virtualRow.index];
-          if (!row) return null;
-          return (
-            <div
-              key={row.key}
-              ref={virtualizer.measureElement}
-              data-index={virtualRow.index}
-              className="absolute top-0 left-0 w-full"
-              style={{ transform: `translateY(${virtualRow.start}px)` }}
-            >
-              {row.kind === "header" ? (
-                <div className="text-muted-foreground flex h-10 items-center gap-2 px-1.5 text-xs font-medium">
-                  <CalendarDays className="size-3.5" />
-                  <span>
-                    {row.dueDate ? (
-                      formatTodoDate(row.dueDate, i18n.locale)
-                    ) : (
-                      <Trans>未安排</Trans>
-                    )}
-                  </span>
-                  <Badge variant="secondary">{row.count}</Badge>
-                </div>
-              ) : (
-                <TodoRow
-                  row={row}
-                  pending={pendingIds.has(row.item.id)}
-                  onToggle={onToggle}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                />
-              )}
-            </div>
-          );
-        })}
+    <>
+      <div ref={parentRef} className="min-h-0 flex-1 overflow-auto">
+        <div
+          className="relative w-full"
+          style={{ height: virtualizer.getTotalSize() }}
+        >
+          {virtualizer.getVirtualItems().map((virtualRow) => {
+            const row = rows[virtualRow.index];
+            if (!row) return null;
+            return (
+              <div
+                key={row.key}
+                ref={virtualizer.measureElement}
+                data-index={virtualRow.index}
+                className="absolute top-0 left-0 w-full"
+                style={{ transform: `translateY(${virtualRow.start}px)` }}
+              >
+                {row.kind === "header" ? (
+                  <div className="text-muted-foreground flex h-10 items-center gap-2 px-1.5 text-xs font-medium">
+                    <CalendarDays className="size-3.5" />
+                    <span>
+                      {row.dueDate ? (
+                        formatTodoDate(row.dueDate, i18n.locale)
+                      ) : (
+                        <Trans>未安排</Trans>
+                      )}
+                    </span>
+                    <Badge variant="secondary">{row.count}</Badge>
+                  </div>
+                ) : (
+                  <TodoRow
+                    row={row}
+                    pending={pendingIds.has(row.item.id)}
+                    onToggle={onToggle}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    onViewNotes={setNotesItem}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      <Dialog
+        open={notesItem !== null}
+        onOpenChange={(open) => !open && setNotesItem(null)}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="pr-8 break-words">
+              {notesItem?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-foreground break-words whitespace-pre-wrap">
+            {notesItem?.notes}
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

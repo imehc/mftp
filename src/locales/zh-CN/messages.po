@@ -2732,6 +2732,10 @@ msgstr "查找"
 msgid "查看 GitHub Release 获取更新内容"
 msgstr "查看 GitHub Release 获取更新内容"
 
+#: src/features/todo/TodoList.tsx:78
+msgid "查看完整备注"
+msgstr "查看完整备注"
+
 #: src/features/logs/ActivityLogsPage.tsx:150
 msgid "查看所有模块的操作记录"
 msgstr "查看所有模块的操作记录"
@@ -4220,6 +4224,10 @@ msgstr "选择接收目录"
 #: src/features/media-compress/components/CompressDropzone.tsx:102
 msgid "选择文件"
 msgstr "选择文件"
+
+#: src/features/todo/TodoItemDialog.tsx:90
+msgid "选择日期"
+msgstr "选择日期"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:243
 #: src/features/media-compress/video/VideoCompressPanel.tsx:252
