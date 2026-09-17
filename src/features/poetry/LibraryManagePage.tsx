@@ -233,19 +233,6 @@ export default function LibraryManagePage() {
       installedStats: stats,
     };
   })();
-  useEffect(() => {
-    if (pending.length === 0) return;
-    // 用微任务延后，使 setState 发生在 effect 函数体之外；在此重新计算
-    // 默认值，这样依赖数组只需稳定的 `pending` 状态。
-    const defaults = new Set(
-      pending
-        .filter((collection) => collection.tier !== "optIn")
-        .map((collection) => collection.id),
-    );
-    queueMicrotask(() =>
-      setSelected((prev) => (prev.size === 0 ? defaults : prev)),
-    );
-  }, [pending]);
   const toggle = (id: string) =>
     setSelected((prev) => {
       const next = new Set(prev);
@@ -253,18 +240,19 @@ export default function LibraryManagePage() {
       else next.add(id);
       return next;
     });
+  // 勾选状态可能残留已安装的合集 id，取交集后再用于下载与按钮禁用。
+  const selectedPendingIds = [...selected].filter((id) =>
+    pending.some((collection) => collection.id === id),
+  );
   const syncBusy = progress.active;
   const startSync = async () => {
-    const ids = [...selected].filter((id) =>
-      pending.some((collection) => collection.id === id),
-    );
-    if (ids.length === 0) {
+    if (selectedPendingIds.length === 0) {
       toast.info(t`请先选择合集`);
       return;
     }
     setStarting(true);
     try {
-      await poetrySyncStart(ids);
+      await poetrySyncStart(selectedPendingIds);
     } catch (error) {
       toast.error(t`操作失败`, {
         description: String(error),
@@ -274,6 +262,10 @@ export default function LibraryManagePage() {
     }
   };
   const importLocal = async () => {
+    if (selectedPendingIds.length === 0) {
+      toast.info(t`请先选择合集`);
+      return;
+    }
     const picked = await open({
       multiple: false,
       directory: false,
@@ -285,13 +277,8 @@ export default function LibraryManagePage() {
       ],
     });
     if (typeof picked !== "string") return;
-    const ids = selected.size > 0 ? [...selected] : [];
-    if (ids.length === 0) {
-      toast.info(t`请先选择合集`);
-      return;
-    }
     try {
-      await poetrySyncImportLocal(picked, ids);
+      await poetrySyncImportLocal(picked, selectedPendingIds);
     } catch (error) {
       toast.error(t`操作失败`, {
         description: String(error),
@@ -429,7 +416,7 @@ export default function LibraryManagePage() {
           <div className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
-              disabled={syncBusy || starting || pending.length === 0}
+              disabled={syncBusy || starting || selectedPendingIds.length === 0}
               onClick={() => void startSync()}
             >
               <ArrowDownToLine data-icon="inline-start" />
@@ -438,7 +425,7 @@ export default function LibraryManagePage() {
             <Button
               size="sm"
               variant="outline"
-              disabled={syncBusy}
+              disabled={syncBusy || starting || selectedPendingIds.length === 0}
               onClick={() => void importLocal()}
             >
               <FolderInput data-icon="inline-start" />
