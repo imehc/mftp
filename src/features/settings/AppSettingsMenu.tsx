@@ -44,7 +44,7 @@ import {
 import { localeLabels, localeOptions } from "~/i18n/locales";
 import { type AppLocale, useSettingsStore } from "~/store/settings";
 import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 
 const themes = [
   { value: "system", icon: Monitor },

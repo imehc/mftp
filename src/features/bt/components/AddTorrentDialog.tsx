@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { BtFileMeta, BtProbeResult, BtTaskInfo } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { formatBytes } from "~/lib/format";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import {
   Dialog,
   DialogContent,

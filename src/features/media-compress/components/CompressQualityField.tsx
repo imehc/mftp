@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
 import { Field, FieldLabel } from "~/components/ui/field";
 import { Slider } from "~/components/ui/slider";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 interface CompressQualityFieldProps {
   value: number;
   min: number;

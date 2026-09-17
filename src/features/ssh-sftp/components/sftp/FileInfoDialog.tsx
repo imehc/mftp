@@ -16,7 +16,7 @@ import {
   parentPath,
   parseFileMode,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 interface FileInfoDialogProps {
   info: InfoState;
   onOpenChange: (open: boolean) => void;

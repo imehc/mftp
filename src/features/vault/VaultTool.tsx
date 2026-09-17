@@ -59,7 +59,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import VaultEntryDialog from "~/features/vault/VaultEntryDialog";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import {
   vaultEntriesList,
   vaultEntriesReorder,

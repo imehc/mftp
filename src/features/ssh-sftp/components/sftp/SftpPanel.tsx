@@ -67,7 +67,7 @@ import {
   type SortKey,
   type SortState,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import { useMediaQuery } from "~/lib/use-media-query";
 interface Props {
   session: Session;

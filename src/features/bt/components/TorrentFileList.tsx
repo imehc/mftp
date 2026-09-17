@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { BtFileMeta } from "~/types";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import { formatBytes } from "~/lib/format";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";

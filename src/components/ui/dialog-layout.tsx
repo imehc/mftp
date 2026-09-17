@@ -4,7 +4,7 @@ import {
   DialogFooter,
   DialogHeader,
 } from "~/components/ui/dialog";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 
 /**
  * 通用对话框框架：标题栏和操作栏保持不动，仅主体区域滚动。

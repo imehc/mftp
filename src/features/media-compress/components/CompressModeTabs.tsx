@@ -3,7 +3,7 @@ import { Clapperboard, ImageIcon, ImageUpscale } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { COMPRESS_MODES } from "~/features/media-compress/modes";
 import type { CompressModeId } from "~/features/media-compress/types";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 interface CompressModeTabsProps {
   value: CompressModeId;
   onChange: (mode: CompressModeId) => void;

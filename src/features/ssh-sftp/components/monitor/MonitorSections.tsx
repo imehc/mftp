@@ -3,7 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { HardDrive, LayoutList } from "lucide-react";
 import type { SystemStats } from "~/types";
 import { formatBytes } from "~/lib/format";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 function Section({
   title,
   icon,

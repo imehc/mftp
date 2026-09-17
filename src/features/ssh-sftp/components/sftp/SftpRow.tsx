@@ -28,7 +28,7 @@ import {
   formatSize,
   isArchive,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 interface RowProps {
   entry: SftpEntry;
   loading: boolean;

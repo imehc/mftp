@@ -36,7 +36,7 @@ import type { Host } from "~/types";
 import { useHostsStore } from "~/store/hosts";
 import { useSessionsStore } from "~/store/sessions";
 import { prefersReducedMotion } from "~/lib/motion";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {

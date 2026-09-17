@@ -14,7 +14,7 @@ import {
   type DimensionMode,
   type ResizeMethod,
 } from "~/features/media-compress/resize/resize";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 export const DIMENSION_MODES: readonly DimensionMode[] = [
   "exact",
   "width",

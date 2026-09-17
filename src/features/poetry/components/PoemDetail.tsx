@@ -24,7 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "~/components/ui/sheet";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
 import PoetryTranslationSection from "./PoetryTranslationSection";
 interface PoemDetailViewProps {

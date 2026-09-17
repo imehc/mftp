@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { TransferProgress } from "~/types";
 import * as ipc from "~/lib/ipc";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import { formatBytes } from "~/lib/format";
 import { prefersReducedMotion } from "~/lib/motion";
 import { TRANSFER_PROGRESS } from "~/lib/events";

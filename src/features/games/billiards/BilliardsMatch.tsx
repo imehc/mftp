@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Badge } from "~/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 import { AiController, LocalController } from "../engine/controllers";
 import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";

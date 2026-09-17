@@ -36,7 +36,7 @@ import {
   normalizeRemotePath,
   parentPath,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 interface RemoteDirectoryPickerProps {
   open: boolean;
   title: string;

@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 const statusColor: Record<string, string> = {
   connecting: "bg-yellow-500",
   connected: "bg-green-500",

@@ -8,7 +8,7 @@ import {
   pickFileNative,
   type NativeFilePickOptions,
 } from "~/features/media-compress/format";
-import { cn } from "~/lib/utils";
+import { cn } from "cn";
 interface CompressDropzoneProps {
   inputRef: RefObject<HTMLInputElement | null>;
   accept: string;
