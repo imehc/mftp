@@ -45,7 +45,7 @@ impl BtManager {
             // straight into the user's folder keeps what it wrote.
             let remove_engine_files = row.mode == "preview"
                 || row.package_mode == "archive"
-                || super::download::stages_into_part_dir(&row);
+                || super::staging::stages_into_part_dir(&row);
             session
                 .delete(hash.into(), remove_engine_files)
                 .await

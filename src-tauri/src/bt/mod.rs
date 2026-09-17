@@ -13,9 +13,12 @@
 mod cache;
 mod cancel;
 mod download;
+mod engine;
 mod export;
+mod finalize;
 mod models;
 mod probe;
+mod staging;
 mod stats;
 mod stream_server;
 
@@ -24,16 +27,12 @@ use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 use std::time::Duration;
 
-use anyhow::Context as _;
-use librqbit::{
-    AddTorrent, AddTorrentOptions, AddTorrentResponse, ListenerOptions, ManagedTorrent, Session,
-    SessionOptions, SessionPersistenceConfig,
-};
+use librqbit::{AddTorrent, AddTorrentOptions, ManagedTorrent, Session};
 use librqbit_core::hash_id::Id20;
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::sync::Mutex as StdMutex;
-use tauri::{AppHandle, Manager as _};
+use tauri::AppHandle;
 use tokio::sync::Mutex;
 
 use crate::error::{AppError, AppResult};
@@ -43,8 +42,7 @@ pub use models::{
     BtCacheItem, BtCacheStats, BtControlAction, BtFileMeta, BtPackageMode, BtPeerInfo,
     BtProbeResult, BtTaskEvent, BtTaskInfo, BtTaskStats, BtTaskStatus,
 };
-use probe::{handle_to_probe, probe_from_info, source_info_hash, torrent_bytes_to_probe};
-use stats::{spawn_progress_pump, task_state};
+use stats::task_state;
 use stream_server::StreamServer;
 
 /// Magnet cold start (DHT peer discovery + metadata) can be slow; on timeout
@@ -129,10 +127,6 @@ fn parse_info_hash(hex_str: &str) -> AppResult<Id20> {
 }
 
 impl BtManager {
-    pub fn has_active_work(&self) -> AppResult<bool> {
-        self.storage.has_active_bt_tasks()
-    }
-
     pub fn new(app: AppHandle, storage: Storage) -> Self {
         Self {
             app,
@@ -142,155 +136,6 @@ impl BtManager {
             pending_saves: Arc::new(StdMutex::new(HashSet::new())),
             finalize_jobs: Arc::new(StdMutex::new(HashMap::new())),
             finalize_gate: Arc::new(Mutex::new(())),
-        }
-    }
-
-    fn base_dir(&self) -> AppResult<PathBuf> {
-        let dir = self
-            .app
-            .path()
-            .app_data_dir()
-            .map_err(|e| AppError(format!("无法定位应用数据目录: {e}")))?;
-        Ok(dir.join("bt"))
-    }
-
-    /// Start the engine lazily. Json persistence restores the previous
-    /// session's torrents automatically on startup, so replaying rows from
-    /// the storage table here is unnecessary.
-    async fn ensure_engine(&self) -> AppResult<Arc<Session>> {
-        let mut guard = self.engine.lock().await;
-        if let Some(engine) = guard.as_ref() {
-            return Ok(engine.session.clone());
-        }
-        let base = self.base_dir()?;
-        let session_dir = base.join("session");
-        let data_dir = base.join("data");
-        std::fs::create_dir_all(&session_dir)?;
-        std::fs::create_dir_all(&data_dir)?;
-
-        let session = Session::new_with_opts(
-            data_dir,
-            SessionOptions {
-                persistence: Some(SessionPersistenceConfig::Json {
-                    folder: Some(session_dir),
-                }),
-                // Without a listener the engine can only dial out, so peers
-                // that are themselves behind NAT are unreachable — half the
-                // swarm on a low-seed torrent. UPnP asks the router for a
-                // port so they can dial back; it degrades silently to
-                // outgoing-only when the router refuses.
-                listen: Some(ListenerOptions {
-                    enable_upnp_port_forwarding: true,
-                    ..Default::default()
-                }),
-                // Trust the persisted bitfield (spot-checked, full re-hash on
-                // mismatch) instead of re-reading every existing file at each
-                // start, which showed up as a long "Initializing" at 0.
-                fastresume: true,
-                // Sizes the session's blocking-IO semaphore (default 8). Every
-                // open playback stream holds one permit for its whole life, and
-                // piece writeback takes permits from the same pool — with the
-                // default a couple of streams noticeably starve downloads.
-                runtime_worker_threads: Some(16),
-                trackers: fallback_trackers(),
-                ..Default::default()
-            },
-        )
-        .await
-        .context("failed to start BT engine")
-        .map_err(|e| AppError(format!("{e:#}")))?;
-
-        let pump_handle =
-            spawn_progress_pump(self.app.clone(), session.clone(), self.storage.clone());
-        let server = StreamServer::spawn(session.clone(), self.active_streams.clone())
-            .await
-            .ok_or_else(|| AppError("播放服务创建失败".into()))?;
-        *guard = Some(Engine {
-            session: session.clone(),
-            pump_handle,
-            server,
-        });
-        self.pause_restored_torrents(&session).await;
-        self.resume_finalize_jobs(&session).await;
-        self.cleanup_orphan_owned_dirs(&session);
-        Ok(session)
-    }
-
-    /// librqbit's persistence restores `is_paused` verbatim, so torrents that
-    /// were running at shutdown resume the moment the engine starts — history
-    /// silently burning bandwidth the user never asked for. Park everything
-    /// instead and let explicit actions (resume, preview, re-download) start
-    /// traffic. Archive tasks are exempt: `resume_finalize_jobs` needs them
-    /// downloading to finish packaging.
-    async fn pause_restored_torrents(&self, session: &Arc<Session>) {
-        let archive_pending: HashSet<String> = self
-            .storage
-            .list_bt_archive_tasks()
-            .unwrap_or_default()
-            .into_iter()
-            .filter(|row| row.status == "active" || row.status == "packaging")
-            .map(|row| row.info_hash)
-            .collect();
-        let handles = RefCell::new(Vec::new());
-        session.with_torrents(|torrents| {
-            for (_, handle) in torrents {
-                if !archive_pending.contains(&info_hash_hex(handle)) {
-                    handles.borrow_mut().push(handle.clone());
-                }
-            }
-        });
-        for handle in handles.into_inner() {
-            let _ = session.pause(&handle).await;
-        }
-    }
-
-    /// Undo `pause_restored_torrents` for one task. Every explicit user entry
-    /// point (resume, preview, streaming, re-download) goes through this, or
-    /// the action would look like it did nothing.
-    pub(super) async fn unpause_task(&self, session: &Arc<Session>, info_hash: &str) {
-        let Ok(hash) = parse_info_hash(info_hash) else {
-            return;
-        };
-        let Ok(Some(handle)) = find_handle(session, &hash) else {
-            return;
-        };
-        if matches!(handle.stats().state, librqbit::TorrentStatsState::Paused) {
-            let _ = session.unpause(&handle).await;
-        }
-    }
-
-    /// Resolve magnet/torrent metadata (list-only, zero disk writes).
-    pub async fn probe(&self, source: &str) -> AppResult<BtProbeResult> {
-        let local = PathBuf::from(source);
-        if local.is_file() {
-            let bytes =
-                std::fs::read(&local).map_err(|e| AppError(format!("读取种子文件失败: {e}")))?;
-            return torrent_bytes_to_probe(&bytes);
-        }
-        if !source.starts_with("magnet:") && !source.starts_with("http") {
-            return Err(AppError("仅支持磁力链接或 .torrent 文件路径".into()));
-        }
-        let session = self.ensure_engine().await?;
-        let resp = tokio::time::timeout(
-            PROBE_TIMEOUT,
-            session.add_torrent(
-                AddTorrent::from_url(source),
-                Some(AddTorrentOptions {
-                    list_only: true,
-                    ..Default::default()
-                }),
-            ),
-        )
-        .await
-        .map_err(|_| AppError("获取资源信息超时，请检查网络或稍后重试".into()))?
-        .map_err(|e| AppError(format!("获取资源信息失败: {e:#}")))?;
-
-        match resp {
-            AddTorrentResponse::ListOnly(listed) => {
-                probe_from_info(&listed.info, listed.info_hash.as_string())
-            }
-            AddTorrentResponse::AlreadyManaged(_, handle) => handle_to_probe(&handle),
-            AddTorrentResponse::Added(..) => Err(AppError("内部状态异常：probe 不应落盘".into())),
         }
     }
 
@@ -361,13 +206,6 @@ impl BtManager {
         Ok(peers)
     }
 
-    fn engine_running(&self) -> Option<Arc<Session>> {
-        self.engine
-            .try_lock()
-            .ok()
-            .and_then(|g| g.as_ref().map(|e| e.session.clone()))
-    }
-
     /// Total bytes of a task's selected files. None while the engine is down
     /// or metadata has not arrived, so callers can fall back to showing the
     /// cached amount alone.
@@ -385,120 +223,6 @@ impl BtManager {
             .list_cache_lru()
             .map(|rows| rows.len())
             .unwrap_or(0)
-    }
-
-    /// Called on app exit: abort the progress pump and stream server, then
-    /// drop the Session (the cancellation token's drop guard winds the engine
-    /// down; fastresume is written incrementally, nothing to flush).
-    pub fn shutdown(&self) {
-        if let Ok(jobs) = self.finalize_jobs.lock() {
-            for cancelled in jobs.values() {
-                cancelled.store(true, std::sync::atomic::Ordering::SeqCst);
-            }
-        }
-        if let Ok(mut guard) = self.engine.try_lock() {
-            if let Some(engine) = guard.take() {
-                engine.pump_handle.abort();
-                engine.server.accept_task.abort();
-            }
-        }
-    }
-
-    /// Online preview entry: make sure a streamable task exists for the
-    /// target file (cache mode) and return its info.
-    ///
-    /// Resolution order (docs/bt.md §3.3): reuse an existing task; local
-    /// .torrent yields the infohash offline; magnets must be v1 40-hex.
-    pub async fn ensure_preview_task(
-        &self,
-        source: &str,
-        file_index: usize,
-    ) -> AppResult<BtTaskInfo> {
-        let hash_hex = source_info_hash(source)?;
-        if let Some(mut row) = self.storage.get_bt_task(&hash_hex)? {
-            let completed_archive = is_completed_archive(&row.status, &row.package_mode);
-            // Reuse the existing task; lazy start restores handles via
-            // persistence when the engine was down.
-            let session = self.ensure_engine().await?;
-            let hash = parse_info_hash(&hash_hex)?;
-            match find_handle(&session, &hash)? {
-                // Previewing another file of the same torrent: the engine only
-                // downloads what is selected, so add this file to the
-                // selection instead of waiting forever on a stalled stream.
-                Some(handle) => {
-                    let mut wanted: HashSet<usize> = handle
-                        .only_files()
-                        .unwrap_or_default()
-                        .into_iter()
-                        .collect();
-                    if !wanted.is_empty() && wanted.insert(file_index) {
-                        session
-                            .update_only_files(&handle, &wanted)
-                            .await
-                            .map_err(|e| AppError(format!("更新文件选择失败: {e:#}")))?;
-                    }
-                    self.unpause_task(&session, &hash_hex).await;
-                }
-                None => {
-                    // A completed archive no longer has an engine handle. Its
-                    // preview must stay ephemeral so the persisted archive
-                    // state never returns to active/packaging.
-                    let output_folder = if completed_archive {
-                        self.cache_root()?
-                            .join(&hash_hex)
-                            .to_string_lossy()
-                            .into_owned()
-                    } else {
-                        row.dest_dir.clone()
-                    };
-                    self.add_torrent_to_session(&session, source, vec![file_index], output_folder)
-                        .await?;
-                    if !completed_archive {
-                        row.file_indices = vec![file_index];
-                        row.status = "active".into();
-                        row.total_bytes = None;
-                        row.last_error = None;
-                        row.pinned = false;
-                        self.storage.upsert_bt_task(&row)?;
-                    }
-                }
-            }
-            if !completed_archive {
-                let _ = self.storage.touch_bt_access(&hash_hex);
-            }
-            return Ok(self.task_info_with_live(row));
-        }
-        let session = self.ensure_engine().await?;
-        let dest_dir = self
-            .cache_root()?
-            .join(&hash_hex)
-            .to_string_lossy()
-            .into_owned();
-        let handle = self
-            .add_torrent_to_session(&session, source, vec![file_index], dest_dir.clone())
-            .await?;
-        let label = handle.name().unwrap_or_else(|| hash_hex.clone());
-        let row = BtTaskRow {
-            info_hash: hash_hex.clone(),
-            label,
-            dest_dir: dest_dir.clone(),
-            mode: "preview".into(),
-            pinned: false,
-            created_at: crate::storage::now_ms(),
-            work_dir: dest_dir.clone(),
-            file_indices: vec![file_index],
-            package_mode: "direct".into(),
-            status: "active".into(),
-            output_path: None,
-            total_bytes: None,
-            last_error: None,
-        };
-        self.storage.upsert_bt_task(&row)?;
-        let _ = self.storage.touch_bt_access(&hash_hex);
-        // Run one quota reclaim pass after the new task lands; failures
-        // never block this preview.
-        let _ = self.evict_if_needed(&hash_hex).await;
-        Ok(self.task_info_with_live(row))
     }
 
     /// Mint a streaming URL. Starts the engine when needed so the preview
@@ -563,7 +287,7 @@ impl BtManager {
         // A staged download is not done when the last piece lands — the file
         // still has to move into the user's folder, and only the finalize job
         // knows when that happened.
-        let staged = download::stages_into_part_dir(&row);
+        let staged = staging::stages_into_part_dir(&row);
         let cache_available =
             row.mode != "preview" || self.storage.has_bt_access(&row.info_hash).unwrap_or(false);
         let mut info = BtTaskInfo {

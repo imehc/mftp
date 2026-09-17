@@ -3,45 +3,17 @@ import { listen } from "@tauri-apps/api/event";
 import { useNavigate } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { msg } from "@lingui/core/macro";
-import {
-  HardDriveDownload,
-  Magnet,
-  Pause,
-  Play,
-  Plus,
-  RotateCcw,
-  Trash2,
-  XCircle,
-} from "lucide-react";
+import { Magnet, Plus } from "lucide-react";
 import { toast } from "sonner";
 import * as ipc from "~/lib/ipc";
 import { translate } from "~/i18n/translate";
 import type { BtFileMeta, BtProbeResult, BtTaskInfo } from "~/types";
 import { useTransfersStore } from "~/store/transfers";
 import TransferPanel from "~/features/transfers/TransferPanel";
-import { formatBytes } from "~/lib/format";
 import { BT_TASK_EVENT } from "~/lib/events";
-import { isPreviewable, previewKind } from "~/lib/preview-kind";
+import { previewKind } from "~/lib/preview-kind";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import { Checkbox } from "~/components/ui/checkbox";
 import {
   Empty,
   EmptyHeader,
@@ -51,6 +23,8 @@ import {
 import AddTorrentDialog from "./components/AddTorrentDialog";
 import CacheManager from "./components/CacheManager";
 import PeersDialog from "./components/PeersDialog";
+import TaskDialogs from "./components/TaskDialogs";
+import TaskRow from "./components/TaskRow";
 import { previewSearch, saveFileToLocal } from "./file-actions";
 import {
   clearPreviewLaunch,
@@ -441,6 +415,10 @@ export default function BtTool() {
   };
   const pendingDeleteLabel = pendingDelete?.label;
   const pendingSaveLabel = pendingSave?.label;
+  const copyMagnet = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    toast.success(t`已复制`);
+  };
   return (
     <div className="flex h-full min-h-0 flex-col">
       <ToolPageHeader
@@ -477,213 +455,29 @@ export default function BtTool() {
           </Empty>
         ) : (
           <div className="border-border flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto rounded-lg border p-1">
-            {tasks.map((task) => {
-              const total = task.total ?? 0;
-              const progress = task.progress ?? 0;
-              const terminal = task.finished || task.status === "Cancelled";
-              const percent =
-                total > 0
-                  ? Math.min(100, Math.round((progress / total) * 100))
-                  : 0;
-              // 引擎里确实有这个任务；state 为空说明引擎还没起来或句柄
-              // 尚未恢复，此时不该摆出 0 B / 0 B 冒充下载中。
-              const live = !terminal && task.state != null;
-              const running =
-                task.state === "Downloading" ||
-                task.state === "Initializing" ||
-                task.state === "Seeding";
-              const controllable =
-                !terminal &&
-                task.status !== "Cancelled" &&
-                task.status !== "Error" &&
-                task.status !== "Packaging";
-              // 预览任务才带选中文件；缓存还在时才有打开 / 下载的意义。
-              const cached = task.mode === "preview" && task.cacheAvailable;
-              const openable = cached
-                ? task.files.find((file) =>
-                    isPreviewable(previewKind(file.path)),
-                  )
-                : undefined;
-              const savable = cached ? task.files[0] : undefined;
-              // 在下载但连不上节点：徽标换成提示，免得只剩 0% 让人猜。
-              const stalled = noPeers.has(task.infoHash);
-              return (
-                <div
-                  key={task.infoHash}
-                  className="hover:bg-sidebar-accent flex flex-col gap-1 rounded-md px-2 py-1.5 text-xs"
-                >
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="min-w-0 flex-1 truncate text-left font-medium hover:underline"
-                      title={task.label}
-                      onClick={() => openPrefilled(magnetOf(task))}
-                    >
-                      {task.label}
-                    </button>
-                    {task.mode === "preview" ? (
-                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-                        <Trans>在线预览</Trans>
-                      </span>
-                    ) : null}
-                    {task.mode === "preview" && !task.cacheAvailable ? (
-                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-                        <Trans>缓存已清理</Trans>
-                      </span>
-                    ) : null}
-                    {task.status === "Cancelled" ? (
-                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-                        <Trans>已取消</Trans>
-                      </span>
-                    ) : null}
-                    {task.status === "Error" ? (
-                      <span
-                        className="bg-muted text-destructive shrink-0 rounded-sm px-1 py-px text-[10px]"
-                        title={task.error ?? undefined}
-                      >
-                        <Trans>错误</Trans>
-                      </span>
-                    ) : null}
-                    {terminal || task.status === "Error" ? null : (
-                      <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-                        {task.state === "Initializing" ? (
-                          <Trans>获取资源信息…</Trans>
-                        ) : task.state === "Paused" ? (
-                          <Trans>已暂停</Trans>
-                        ) : task.state === "Seeding" ? (
-                          <Trans>做种中</Trans>
-                        ) : task.state === "Downloading" ? (
-                          stalled ? (
-                            <Trans>暂无可用节点</Trans>
-                          ) : (
-                            <Trans>下载中</Trans>
-                          )
-                        ) : (
-                          <Trans>未运行</Trans>
-                        )}
-                      </span>
-                    )}
-                    {terminal ? (
-                      <span className="text-muted-foreground shrink-0 tabular-nums">
-                        {formatBytes(total)}
-                      </span>
-                    ) : live && total > 0 ? (
-                      <>
-                        <button
-                          type="button"
-                          className="text-muted-foreground hover:text-foreground shrink-0 tabular-nums hover:underline"
-                          title={t`查看节点明细`}
-                          onClick={() => setPeersTask(task)}
-                        >
-                          {t`节点`} {task.peersLive}
-                        </button>
-                        <span className="shrink-0 font-medium tabular-nums">
-                          {formatBytes(progress)} / {formatBytes(total)}
-                        </span>
-                      </>
-                    ) : null}
-                    {openable ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t`打开`}
-                        aria-label={t`打开`}
-                        onClick={() => void openFile(task, openable)}
-                      >
-                        <Play />
-                      </Button>
-                    ) : null}
-                    {savable ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t`下载`}
-                        aria-label={t`下载`}
-                        disabled={task.pinned}
-                        onClick={() =>
-                          setPendingSave({
-                            infoHash: task.infoHash,
-                            label: task.label,
-                            index: savable.index,
-                          })
-                        }
-                      >
-                        <HardDriveDownload />
-                      </Button>
-                    ) : null}
-                    {controllable ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={running ? t`暂停` : t`继续`}
-                        aria-label={running ? t`暂停` : t`继续`}
-                        onClick={() =>
-                          void control(task, running ? "Pause" : "Resume")
-                        }
-                      >
-                        {running ? <Pause /> : <Play />}
-                      </Button>
-                    ) : null}
-                    {task.status === "Error" ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t`重试`}
-                        aria-label={t`重试`}
-                        onClick={() => openPrefilled(magnetOf(task))}
-                      >
-                        <RotateCcw />
-                      </Button>
-                    ) : null}
-                    {!terminal &&
-                    task.mode !== "preview" &&
-                    task.status !== "Cancelled" ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t`取消`}
-                        aria-label={t`取消`}
-                        onClick={() => void control(task, "Cancel")}
-                      >
-                        <XCircle />
-                      </Button>
-                    ) : null}
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      title={t`磁力链接`}
-                      aria-label={t`磁力链接`}
-                      onClick={() => setMagnetTask(task)}
-                    >
-                      <Magnet />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      title={t`删除`}
-                      aria-label={t`删除`}
-                      disabled={task.pinned}
-                      onClick={() => {
-                        setDeleteFiles(task.mode === "preview");
-                        setPendingDelete(task);
-                      }}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </div>
-                  {terminal ? null : (
-                    <div className="bg-muted h-0.5 overflow-hidden rounded-full">
-                      <div
-                        className="bg-primary h-full rounded-full transition-[width]"
-                        style={{
-                          width: `${percent}%`,
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {tasks.map((task) => (
+              <TaskRow
+                key={task.infoHash}
+                task={task}
+                stalled={noPeers.has(task.infoHash)}
+                onPrefill={(task) => openPrefilled(magnetOf(task))}
+                onOpenFile={(task, file) => void openFile(task, file)}
+                onPeers={setPeersTask}
+                onSave={(task, index) =>
+                  setPendingSave({
+                    infoHash: task.infoHash,
+                    label: task.label,
+                    index,
+                  })
+                }
+                onControl={(task, action) => void control(task, action)}
+                onMagnet={setMagnetTask}
+                onDelete={(task) => {
+                  setDeleteFiles(task.mode === "preview");
+                  setPendingDelete(task);
+                }}
+              />
+            ))}
           </div>
         )}
 
@@ -715,84 +509,20 @@ export default function BtTool() {
         onClose={() => setPeersTask(null)}
       />
 
-      <Dialog
-        open={magnetTask !== null}
-        onOpenChange={(open) => !open && setMagnetTask(null)}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
-              <Trans>磁力链接</Trans>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex gap-2">
-            <Input readOnly value={magnetTask ? magnetOf(magnetTask) : ""} />
-            <Button
-              variant="outline"
-              onClick={async () => {
-                if (!magnetTask) return;
-                await navigator.clipboard.writeText(magnetOf(magnetTask));
-                toast.success(t`已复制`);
-              }}
-            >
-              <Trans>复制</Trans>
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog
-        open={pendingDelete !== null}
-        onOpenChange={(open) => !open && setPendingDelete(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {pendingDelete ? t`删除 ${pendingDeleteLabel}` : ""}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              <Trans>删除后无法恢复。</Trans>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          {pendingDelete?.mode === "preview" ? null : (
-            <label className="flex items-center gap-2 text-xs">
-              <Checkbox
-                checked={deleteFiles}
-                onCheckedChange={(value) => setDeleteFiles(value === true)}
-              />
-              <Trans>删除文件</Trans>
-            </label>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void confirmDelete()}>
-              {t`删除`}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={pendingSave !== null}
-        onOpenChange={(open) => !open && setPendingSave(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {pendingSave ? t`下载 ${pendingSaveLabel}` : ""}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              <Trans>转存完成后会从缓存中移除。</Trans>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void confirmSave()}>
-              {t`下载`}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <TaskDialogs
+        magnetText={magnetTask ? magnetOf(magnetTask) : null}
+        onCloseMagnet={() => setMagnetTask(null)}
+        onCopyMagnet={(text) => void copyMagnet(text)}
+        pendingDeleteLabel={pendingDeleteLabel ?? null}
+        showDeleteFiles={pendingDelete?.mode !== "preview"}
+        deleteFiles={deleteFiles}
+        onDeleteFilesChange={setDeleteFiles}
+        onCloseDelete={() => setPendingDelete(null)}
+        onConfirmDelete={() => void confirmDelete()}
+        pendingSaveLabel={pendingSaveLabel ?? null}
+        onCloseSave={() => setPendingSave(null)}
+        onConfirmSave={() => void confirmSave()}
+      />
     </div>
   );
 }

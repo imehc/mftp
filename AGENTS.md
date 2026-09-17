@@ -52,7 +52,10 @@ src-tauri/src/
 ### 文件行数
 
 - `src-tauri/**/*.rs` 和 `src/**/*.{ts,tsx}` 不得超过 600 行。
-- 例外：`src/components/ui/**` 下的 shadcn 组件。
+- 例外（生成物，拆分无意义且会被覆盖）：
+  - `src/components/ui/**` 下的 shadcn 组件。
+  - `src/bindings.ts` —— Tauri Specta 导出，`src-tauri/src/lib.rs` 每次启动都会重写，文件头也标注了「Do not edit manually」。
+  - `src/routeTree.gen.ts` —— TanStack Router 自动生成。
 
 ### 注释
 
@@ -164,7 +167,7 @@ UI 与样式：
 
 结构与 Git：
 
-- Never 让源文件超过 600 行不拆分（shadcn `components/ui` 除外）。
+- Never 让源文件超过 600 行不拆分（生成物除外：shadcn `components/ui`、`bindings.ts`、`routeTree.gen.ts`）。
 - Never revert/reset/checkout 不是你写的未提交改动；遇到时先读懂并在其基础上继续。
 
 ## 约定与协作

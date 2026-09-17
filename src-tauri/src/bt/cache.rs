@@ -10,12 +10,12 @@ use librqbit::{Session, TorrentStatsState};
 use tauri::Emitter as _;
 use walkdir::WalkDir;
 
-use super::download::remove_owned_hash_dir;
 use super::export::{
     export_files, export_files_are_complete, file_is_complete, partial_archive_path,
     remove_file_if_exists, selected_export_files, ExportFile,
 };
 use super::probe::handle_to_probe;
+use super::staging::remove_owned_hash_dir;
 use super::{
     find_handle, is_completed_archive, parse_info_hash, same_dir, BtManager, TorrentHandle,
 };
@@ -236,7 +236,7 @@ impl BtManager {
                     || row.as_ref().is_some_and(|task| {
                         task.mode == "preview"
                             || task.package_mode == "archive"
-                            || super::download::stages_into_part_dir(task)
+                            || super::staging::stages_into_part_dir(task)
                     });
                 session
                     .delete(hash.into(), remove_engine_files)

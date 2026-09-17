@@ -285,7 +285,7 @@ msgstr "AVIF (unsupported)"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:447
+#: src/features/bt/BtTool.tsx:425
 #: src/features/home/entries.tsx:137
 msgid "BT 下载"
 msgstr "BT Downloads"
@@ -396,14 +396,14 @@ msgid "下一个"
 msgstr "Next"
 
 #: src/features/bt/BtPreviewScreen.tsx:157
-#: src/features/bt/BtTool.tsx:600
-#: src/features/bt/BtTool.tsx:601
-#: src/features/bt/BtTool.tsx:791
 #: src/features/bt/components/AddTorrentDialog.tsx:327
 #: src/features/bt/components/BtStatsBar.tsx:68
 #: src/features/bt/components/CacheManager.tsx:253
 #: src/features/bt/components/CacheManager.tsx:254
 #: src/features/bt/components/CacheManager.tsx:299
+#: src/features/bt/components/TaskDialogs.tsx:128
+#: src/features/bt/components/TaskRow.tsx:155
+#: src/features/bt/components/TaskRow.tsx:156
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
 #: src/features/media-compress/components/CompressResultCard.tsx:70
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:266
@@ -419,13 +419,13 @@ msgstr "Download {entryName}"
 msgid "下载 {entryName2}"
 msgstr "Download {entryName2}"
 
-#: src/features/bt/BtTool.tsx:782
 #: src/features/bt/components/CacheManager.tsx:290
+#: src/features/bt/components/TaskDialogs.tsx:119
 msgid "下载 {pendingSaveLabel}"
 msgstr "Download {pendingSaveLabel}"
 
-#: src/features/bt/BtTool.tsx:559
 #: src/features/bt/components/BtStatsBar.tsx:23
+#: src/features/bt/components/TaskRow.tsx:114
 #: src/features/settings/AppSettingsMenu.tsx:74
 #: src/store/transfers.ts:9
 msgid "下载中"
@@ -691,8 +691,8 @@ msgstr "Modified Date"
 msgid "修改时间"
 msgstr "Modified Time"
 
-#: src/features/bt/BtTool.tsx:554
 #: src/features/bt/components/BtStatsBar.tsx:20
+#: src/features/bt/components/TaskRow.tsx:109
 #: src/store/transfers.ts:10
 msgid "做种中"
 msgstr "Seeding"
@@ -725,7 +725,7 @@ msgstr "By word"
 
 #: src/features/formatter/FormatterTool.tsx:87
 #: src/features/poetry/components/SearchBar.tsx:26
-#: src/features/poetry/LibraryPage.tsx:338
+#: src/features/poetry/LibraryPage.tsx:337
 msgid "全部"
 msgstr "All"
 
@@ -890,11 +890,11 @@ msgstr "Create Room"
 msgid "创建时间"
 msgstr "Created Time"
 
-#: src/features/bt/BtTool.tsx:663
-#: src/features/bt/BtTool.tsx:664
-#: src/features/bt/BtTool.tsx:769
 #: src/features/bt/components/CacheManager.tsx:270
 #: src/features/bt/components/CacheManager.tsx:271
+#: src/features/bt/components/TaskDialogs.tsx:106
+#: src/features/bt/components/TaskRow.tsx:208
+#: src/features/bt/components/TaskRow.tsx:209
 #: src/features/logs/LogPageLayout.tsx:108
 #: src/features/poetry/components/PoetryTranslationSection.tsx:406
 #: src/features/poetry/LibraryManagePage.tsx:518
@@ -908,7 +908,7 @@ msgstr "Created Time"
 msgid "删除"
 msgstr "Delete"
 
-#: src/features/poetry/components/SearchBar.tsx:139
+#: src/features/poetry/components/SearchBar.tsx:138
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:314
 msgid "删除 {name}"
 msgstr "Delete {name}"
@@ -917,7 +917,7 @@ msgstr "Delete {name}"
 msgid "删除 {packName}"
 msgstr "Delete {packName}"
 
-#: src/features/bt/BtTool.tsx:751
+#: src/features/bt/components/TaskDialogs.tsx:88
 msgid "删除 {pendingDeleteLabel}"
 msgstr "Delete {pendingDeleteLabel}"
 
@@ -934,7 +934,7 @@ msgstr "Remove shared folder"
 msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "You can generate it again later. The original text and annotations are unaffected."
 
-#: src/features/bt/BtTool.tsx:754
+#: src/features/bt/components/TaskDialogs.tsx:91
 #: src/features/logs/LogPageLayout.tsx:100
 #: src/features/todo/TodoTool.tsx:289
 msgid "删除后无法恢复。"
@@ -953,7 +953,7 @@ msgstr "Delete todo?"
 msgid "删除待办失败"
 msgstr "Failed to delete todo"
 
-#: src/features/bt/BtTool.tsx:763
+#: src/features/bt/components/TaskDialogs.tsx:100
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:30
 msgid "删除文件"
 msgstr "Delete File"
@@ -1170,12 +1170,12 @@ msgstr "Discovered Devices"
 #: src/components/ui/prompt-dialog.tsx:101
 #: src/features/about/AboutPage.tsx:318
 #: src/features/about/AboutPage.tsx:332
-#: src/features/bt/BtTool.tsx:644
-#: src/features/bt/BtTool.tsx:645
-#: src/features/bt/BtTool.tsx:767
-#: src/features/bt/BtTool.tsx:789
 #: src/features/bt/components/AddTorrentDialog.tsx:315
 #: src/features/bt/components/CacheManager.tsx:297
+#: src/features/bt/components/TaskDialogs.tsx:104
+#: src/features/bt/components/TaskDialogs.tsx:126
+#: src/features/bt/components/TaskRow.tsx:189
+#: src/features/bt/components/TaskRow.tsx:190
 #: src/features/export/ExportDialog.tsx:162
 #: src/features/export/ImportDialog.tsx:181
 #: src/features/games/engine/GameHeaderControls.tsx:52
@@ -1432,15 +1432,15 @@ msgstr "Select collections in Data Management and download them to browse offlin
 msgid "在线"
 msgstr "Online"
 
-#: src/features/bt/BtTool.tsx:526
+#: src/features/bt/components/TaskRow.tsx:81
 #: src/features/bt/components/TorrentFileList.tsx:143
 #: src/features/bt/components/TorrentFileList.tsx:144
 #: src/features/transfers/TransferPanel.tsx:473
 msgid "在线预览"
 msgstr "Online Preview"
 
-#: src/features/bt/BtTool.tsx:327
-#: src/features/bt/BtTool.tsx:400
+#: src/features/bt/BtTool.tsx:301
+#: src/features/bt/BtTool.tsx:374
 #: src/features/bt/components/CacheManager.tsx:134
 msgid "在线预览失败"
 msgstr "Online preview failed"
@@ -1483,8 +1483,8 @@ msgstr "Result preview"
 msgid "备注"
 msgstr "Notes"
 
-#: src/components/CopyButton.tsx:46
-#: src/features/bt/BtTool.tsx:738
+#: src/components/CopyButton.tsx:48
+#: src/features/bt/components/TaskDialogs.tsx:75
 #: src/features/formatter/FormatterTool.tsx:254
 #: src/features/lan-transfer/LanTransferTool.tsx:370
 msgid "复制"
@@ -1817,7 +1817,7 @@ msgstr "Access allowed"
 msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
-#: src/features/bt/BtTool.tsx:436
+#: src/features/bt/BtTool.tsx:410
 #: src/features/poetry/components/PoetryTranslationSection.tsx:165
 #: src/features/poetry/components/TranslationPackManager.tsx:46
 #: src/features/poetry/LibraryManagePage.tsx:330
@@ -1847,7 +1847,7 @@ msgstr "Shared folder removed"
 msgid "已删除白名单"
 msgstr "Trusted device removed"
 
-#: src/features/bt/BtTool.tsx:536
+#: src/features/bt/components/TaskRow.tsx:91
 #: src/features/lan-transfer/LanTransferSidebar.tsx:52
 #: src/store/transfers.ts:175
 msgid "已取消"
@@ -1862,8 +1862,8 @@ msgstr "Task cancelled"
 msgid "已取消压缩"
 msgstr "Compression cancelled"
 
-#: src/components/CopyButton.tsx:47
-#: src/features/bt/BtTool.tsx:735
+#: src/components/CopyButton.tsx:49
+#: src/features/bt/BtTool.tsx:420
 #: src/features/formatter/FormatterTool.tsx:203
 msgid "已复制"
 msgstr "Copied"
@@ -1946,8 +1946,8 @@ msgstr "Disconnected from {hostLabel}"
 msgid "已断开设备"
 msgstr "Device disconnected"
 
-#: src/features/bt/BtTool.tsx:552
 #: src/features/bt/components/BtStatsBar.tsx:21
+#: src/features/bt/components/TaskRow.tsx:107
 #: src/store/transfers.ts:11
 #: src/store/transfers.ts:241
 msgid "已暂停"
@@ -1982,7 +1982,7 @@ msgid "已解压到 {outName}"
 msgstr "Extracted to {outName}"
 
 #: src/features/bt/BtPreviewScreen.tsx:105
-#: src/features/bt/BtTool.tsx:266
+#: src/features/bt/BtTool.tsx:240
 msgid "已转存到本地"
 msgstr "Saved to local storage"
 
@@ -2186,10 +2186,10 @@ msgstr "Owner"
 msgid "打包中"
 msgstr "Packaging"
 
-#: src/features/bt/BtTool.tsx:589
-#: src/features/bt/BtTool.tsx:590
 #: src/features/bt/components/CacheManager.tsx:242
 #: src/features/bt/components/CacheManager.tsx:243
+#: src/features/bt/components/TaskRow.tsx:144
+#: src/features/bt/components/TaskRow.tsx:145
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:182
 msgid "打开"
 msgstr "Open"
@@ -2514,13 +2514,13 @@ msgstr "Show password"
 msgid "暂不支持该算法"
 msgstr "Algorithm not supported yet"
 
-#: src/features/bt/BtTool.tsx:618
-#: src/features/bt/BtTool.tsx:619
+#: src/features/bt/components/TaskRow.tsx:167
+#: src/features/bt/components/TaskRow.tsx:168
 #: src/features/transfers/TransferPanel.tsx:481
 msgid "暂停"
 msgstr "Pause"
 
-#: src/features/bt/BtTool.tsx:470
+#: src/features/bt/BtTool.tsx:448
 msgid "暂无下载任务"
 msgstr "No download tasks yet"
 
@@ -2544,7 +2544,7 @@ msgstr "No discovered devices"
 msgid "暂无可清理的数据"
 msgstr "No data to clear"
 
-#: src/features/bt/BtTool.tsx:557
+#: src/features/bt/components/TaskRow.tsx:112
 msgid "暂无可用节点"
 msgstr "No peers yet"
 
@@ -2675,7 +2675,7 @@ msgstr "Not installed; downloaded on demand only, removable anytime"
 msgid "未完成"
 msgstr "Overdue"
 
-#: src/features/bt/BtTool.tsx:562
+#: src/features/bt/components/TaskRow.tsx:117
 msgid "未运行"
 msgstr "Not running"
 
@@ -2745,8 +2745,8 @@ msgstr "View activity from all modules"
 msgid "查看更新"
 msgstr "View Update"
 
-#: src/features/bt/BtTool.tsx:575
 #: src/features/bt/components/BtStatsBar.tsx:87
+#: src/features/bt/components/TaskRow.tsx:130
 msgid "查看节点明细"
 msgstr "View peer details"
 
@@ -2912,7 +2912,7 @@ msgstr "Checking"
 msgid "正在检查更新…"
 msgstr "Checking for updates..."
 
-#: src/features/poetry/LibraryPage.tsx:371
+#: src/features/poetry/LibraryPage.tsx:370
 msgid "正在检索…"
 msgstr "Searching…"
 
@@ -2984,7 +2984,7 @@ msgid "没有子文件夹"
 msgstr "No child folders"
 
 #: src/features/poetry/components/PoemList.tsx:151
-#: src/features/poetry/LibraryPage.tsx:385
+#: src/features/poetry/LibraryPage.tsx:384
 msgid "没有找到作品"
 msgstr "No poems found"
 
@@ -3040,8 +3040,8 @@ msgstr "Browser access requests, confirmation prompts, and trusted-device fallba
 msgid "深色"
 msgstr "Dark"
 
-#: src/features/bt/BtTool.tsx:451
-#: src/features/bt/BtTool.tsx:475
+#: src/features/bt/BtTool.tsx:429
+#: src/features/bt/BtTool.tsx:453
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:48
 #: src/features/lan-transfer/LanShareDialog.tsx:141
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:334
@@ -3081,7 +3081,7 @@ msgstr "Clear"
 msgid "清理{clearTitle}？"
 msgstr "Clear {clearTitle}?"
 
-#: src/features/bt/BtTool.tsx:357
+#: src/features/bt/BtTool.tsx:331
 msgid "清理预览缓存失败"
 msgstr "Failed to clean up preview cache"
 
@@ -3361,10 +3361,10 @@ msgstr "Confirmation Code"
 msgid "确认码 {statusConfirmationCode}"
 msgstr "Confirmation code {statusConfirmationCode}"
 
-#: src/features/bt/BtTool.tsx:654
-#: src/features/bt/BtTool.tsx:655
-#: src/features/bt/BtTool.tsx:725
 #: src/features/bt/components/AddTorrentDialog.tsx:234
+#: src/features/bt/components/TaskDialogs.tsx:66
+#: src/features/bt/components/TaskRow.tsx:199
+#: src/features/bt/components/TaskRow.tsx:200
 msgid "磁力链接"
 msgstr "Magnet link"
 
@@ -3545,8 +3545,8 @@ msgstr "Result"
 msgid "结果会实时显示在这里"
 msgstr "Result appears here in real time"
 
-#: src/features/bt/BtTool.tsx:618
-#: src/features/bt/BtTool.tsx:619
+#: src/features/bt/components/TaskRow.tsx:167
+#: src/features/bt/components/TaskRow.tsx:168
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:436
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:448
 #: src/features/transfers/TransferPanel.tsx:481
@@ -3561,7 +3561,7 @@ msgstr "Resuming Transfer"
 msgid "缓冲中…"
 msgstr "Buffering…"
 
-#: src/features/bt/BtTool.tsx:531
+#: src/features/bt/components/TaskRow.tsx:86
 msgid "缓存已清理"
 msgstr "Cache cleared"
 
@@ -3678,8 +3678,8 @@ msgstr "Ball in hand: drag the cue ball to place it"
 msgid "至少修改其中一个名称。"
 msgstr "Change at least one name."
 
-#: src/features/bt/BtTool.tsx:578
 #: src/features/bt/components/BtStatsBar.tsx:90
+#: src/features/bt/components/TaskRow.tsx:133
 msgid "节点"
 msgstr "Peers"
 
@@ -3691,8 +3691,8 @@ msgstr "Peer details"
 msgid "获取语料"
 msgstr "Get corpus"
 
-#: src/features/bt/BtTool.tsx:550
 #: src/features/bt/components/BtStatsBar.tsx:16
+#: src/features/bt/components/TaskRow.tsx:105
 #: src/store/transfers.ts:8
 msgid "获取资源信息…"
 msgstr "Fetching metadata…"
@@ -3922,7 +3922,7 @@ msgstr "Failed to load"
 msgid "读取待办失败"
 msgstr "Failed to load todos"
 
-#: src/features/poetry/LibraryPage.tsx:409
+#: src/features/poetry/LibraryPage.tsx:408
 msgid "调整双栏宽度"
 msgstr "Resize columns"
 
@@ -3983,14 +3983,14 @@ msgstr "Go to line"
 
 #: src/features/bt/BtPreviewScreen.tsx:108
 #: src/features/bt/BtPreviewScreen.tsx:128
-#: src/features/bt/BtTool.tsx:270
-#: src/features/bt/BtTool.tsx:414
+#: src/features/bt/BtTool.tsx:244
+#: src/features/bt/BtTool.tsx:388
 #: src/features/bt/components/CacheManager.tsx:149
 msgid "转存失败"
 msgstr "Failed to save"
 
-#: src/features/bt/BtTool.tsx:785
 #: src/features/bt/components/CacheManager.tsx:293
+#: src/features/bt/components/TaskDialogs.tsx:122
 msgid "转存完成后会从缓存中移除。"
 msgstr "Removed from cache once saved."
 
@@ -4346,8 +4346,8 @@ msgstr "Check Again"
 msgid "重新生成"
 msgstr "Regenerate"
 
-#: src/features/bt/BtTool.tsx:631
-#: src/features/bt/BtTool.tsx:632
+#: src/features/bt/components/TaskRow.tsx:178
+#: src/features/bt/components/TaskRow.tsx:179
 #: src/features/preview/PreviewSurface.tsx:173
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:165
 #: src/features/transfers/TransferPanel.tsx:512
@@ -4360,8 +4360,8 @@ msgstr "Retry"
 msgid "链接"
 msgstr "Link"
 
-#: src/features/bt/BtTool.tsx:544
 #: src/features/bt/components/BtStatsBar.tsx:22
+#: src/features/bt/components/TaskRow.tsx:99
 #: src/store/transfers.ts:12
 msgid "错误"
 msgstr "Error"

@@ -139,7 +139,7 @@ pub(super) fn spawn_progress_pump(
             let task_states = rows
                 .into_iter()
                 .map(|row| {
-                    let staged = super::download::stages_into_part_dir(&row);
+                    let staged = super::staging::stages_into_part_dir(&row);
                     (row.info_hash, (row.package_mode, row.status, staged))
                 })
                 .collect::<std::collections::HashMap<_, _>>();
