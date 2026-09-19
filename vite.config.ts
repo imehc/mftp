@@ -7,6 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "node:path";
 
 const host = process.env.TAURI_DEV_HOST;
+const devHost = host || "127.0.0.1";
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
@@ -31,7 +32,8 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
+    // 避免 macOS 将 localhost 优先解析到 ::1，导致受限环境无法监听。
+    host: devHost,
     hmr: host
       ? {
           protocol: "ws",

@@ -57,8 +57,8 @@ futures-util = "0.3"
 tauri-plugin-updater = "2"
 tauri-plugin-autostart = "2.5.1"
 keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native", "sync-secret-service", "crypto-rust"] }
-# Library sync downloads upstream tar.gz archives; already compiled into the
-# desktop binary via the updater's dependency tree, so this adds no weight.
+# Library sync uses the GitHub tree/blob API on desktop and mobile. The desktop
+# tar.gz path remains a fallback, so reqwest is a shared direct dependency.
 
 # BT is exposed only on desktop. librqbit's socket layer uses APIs that are
 # unavailable on iOS, so keeping the engine out of mobile targets is also

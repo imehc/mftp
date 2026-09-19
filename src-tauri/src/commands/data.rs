@@ -13,6 +13,7 @@ fn ensure_idle(state: &AppState, module: AppDataModule) -> AppResult<()> {
     if matches!(module, AppDataModule::Poetry) && state.poetry.is_active() {
         return Err(AppError("请先停止诗词库同步".into()));
     }
+    #[cfg(desktop)]
     if matches!(module, AppDataModule::BtCache) && state.bt.has_active_work()? {
         return Err(AppError("请先停止 BT 任务".into()));
     }
@@ -55,13 +56,21 @@ pub async fn app_data_clear(
             .await?
         }
         AppDataModule::BtCache => {
-            let count = state.bt.clear_cache().await? as u32;
-            state.storage.data_clear_result(
-                AppDataModule::BtCache,
-                count,
-                before,
-                vec!["BT 任务记录和用户下载文件".into()],
-            )
+            #[cfg(desktop)]
+            {
+                let count = state.bt.clear_cache().await? as u32;
+                state.storage.data_clear_result(
+                    AppDataModule::BtCache,
+                    count,
+                    before,
+                    vec!["BT 任务记录和用户下载文件".into()],
+                )
+            }
+            #[cfg(not(desktop))]
+            {
+                let _ = (state, before);
+                return Err(AppError("BT cache is only available on desktop".into()));
+            }
         }
     };
     Ok(result)
@@ -77,11 +86,15 @@ pub async fn app_data_reset(
         || state.lan_transfer.status().running
         || state.game_room.status().phase != "idle"
         || state.poetry.is_active()
-        || state.bt.has_active_work()?
     {
         return Err(AppError("请先停止所有连接、传输和同步任务".into()));
     }
+    #[cfg(desktop)]
+    if state.bt.has_active_work()? {
+        return Err(AppError("请先停止所有连接、传输和同步任务".into()));
+    }
     let before = state.storage.app_data_usage().total_bytes;
+    #[cfg(desktop)]
     state.bt.shutdown();
     if state.storage.ai_connection()?.is_some() {
         crate::ai::clear_api_key_for_reset(&app).await?;

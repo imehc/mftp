@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import LibraryMobilePage from "~/features/poetry/LibraryMobilePage";
 import LibraryPage from "~/features/poetry/LibraryPage";
-import { desktopOnlyGuard } from "~/lib/platform";
+import { isMobilePlatform } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 
 interface LibrarySearch {
@@ -19,15 +20,31 @@ function LibraryRoute() {
     setLastTool("library");
   }, [setLastTool]);
 
+  const search = Route.useSearch();
+  const onSearchChange = (patch: { q?: string }) =>
+    void navigate({
+      to: "/library",
+      search: (prev) => ({ ...prev, ...patch }),
+    });
+  if (isMobilePlatform()) {
+    return (
+      <LibraryMobilePage
+        search={search}
+        onSearchChange={onSearchChange}
+        onOpenPoem={(uid) =>
+          void navigate({
+            to: "/library/$id",
+            params: { id: uid },
+            search: { q: search.q },
+          })
+        }
+      />
+    );
+  }
   return (
     <LibraryPage
-      search={Route.useSearch()}
-      onSearchChange={(patch) =>
-        void navigate({
-          to: "/library",
-          search: (prev) => ({ ...prev, ...patch }),
-        })
-      }
+      search={search}
+      onSearchChange={onSearchChange}
       onOpenPoem={(uid) =>
         void navigate({
           to: "/library",
@@ -43,6 +60,5 @@ export const Route = createFileRoute("/library/")({
     q: typeof search.q === "string" ? search.q : undefined,
     poem: typeof search.poem === "string" ? search.poem : undefined,
   }),
-  beforeLoad: desktopOnlyGuard,
   component: LibraryRoute,
 });

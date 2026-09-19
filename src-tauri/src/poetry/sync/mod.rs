@@ -50,6 +50,12 @@ pub struct PoetryLibrary {
 
 impl PoetryLibrary {
     pub fn new(app_data_root: PathBuf) -> Self {
+        let temp_dir = app_data_root.join("poetry-tmp");
+        if let Err(error) = fs::remove_dir_all(&temp_dir) {
+            if error.kind() != std::io::ErrorKind::NotFound {
+                eprintln!("failed to clean stale poetry temp data: {error}");
+            }
+        }
         Self {
             root: app_data_root,
             active: Mutex::new(None),
@@ -565,3 +571,7 @@ fn collect_matching_suffix(
     }
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "sync_tests.rs"]
+mod tests;

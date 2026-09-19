@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   LoaderCircle,
@@ -32,6 +33,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   poetryPackTranslationsList,
+  aiConnectionGet,
   poetryTranslationDelete,
   poetryTranslationGenerate,
   poetryTranslationsList,
@@ -48,6 +50,8 @@ interface Props {
   fontSize: number;
   lineHeight: number;
   referenceTranslation?: string;
+  initialMode?: PoetryTranslationMode;
+  onModeChange?: (mode: PoetryTranslationMode) => void;
 }
 
 export default function PoetryTranslationSection({
@@ -55,9 +59,11 @@ export default function PoetryTranslationSection({
   fontSize,
   lineHeight,
   referenceTranslation,
+  initialMode = "literal",
+  onModeChange,
 }: Props) {
   const { t } = useLingui();
-  const [mode, setMode] = useState<PoetryTranslationMode>("literal");
+  const [mode, setMode] = useState<PoetryTranslationMode>(initialMode);
   const [translations, setTranslations] = useState<PoetryTranslation[]>([]);
   const [packTranslations, setPackTranslations] = useState<
     PoetryPackTranslation[]
@@ -72,10 +78,22 @@ export default function PoetryTranslationSection({
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [regenerateOpen, setRegenerateOpen] = useState(false);
+  const [configurationMissing, setConfigurationMissing] = useState(false);
+  const mountedRef = useRef(true);
+  const cancelGenerationRef = useRef<(() => void) | null>(null);
   const current = translations.find((item) => item.mode === mode) ?? null;
   const currentPackTranslations = packTranslations.filter(
     (item) => item.mode === mode,
   );
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cancelGenerationRef.current?.();
+      cancelGenerationRef.current = null;
+    };
+  }, [uid]);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,17 +131,36 @@ export default function PoetryTranslationSection({
     setGenerating(true);
     setStreamingContent("");
     setError(null);
+    setConfigurationMissing(false);
     try {
-      const translation = await poetryTranslationGenerate(uid, mode, (delta) =>
+      const connection = await aiConnectionGet();
+      if (!mountedRef.current) return;
+      if (
+        !connection.hasKey ||
+        !connection.baseUrl.trim() ||
+        !connection.model.trim()
+      ) {
+        setConfigurationMissing(true);
+        return;
+      }
+      const generation = poetryTranslationGenerate(uid, mode, (delta) =>
         setStreamingContent((content) => content + delta),
       );
+      cancelGenerationRef.current = generation.cancel;
+      const translation = await generation.promise;
+      if (!mountedRef.current) return;
       replaceTranslation(translation);
       toast.success(t`已生成`);
     } catch (nextError) {
-      setError(String(nextError));
+      if (mountedRef.current && String(nextError) !== "Error: cancelled") {
+        setError(String(nextError));
+      }
     } finally {
-      setStreamingContent("");
-      setGenerating(false);
+      if (mountedRef.current) {
+        setStreamingContent("");
+        setGenerating(false);
+      }
+      cancelGenerationRef.current = null;
     }
   }
 
@@ -189,8 +226,11 @@ export default function PoetryTranslationSection({
           aria-label={t`译文模式`}
           onValueChange={(value) => {
             if (value) {
-              setMode(value as PoetryTranslationMode);
+              const nextMode = value as PoetryTranslationMode;
+              setMode(nextMode);
+              onModeChange?.(nextMode);
               setError(null);
+              setConfigurationMissing(false);
             }
           }}
         >
@@ -207,6 +247,23 @@ export default function PoetryTranslationSection({
         <Alert variant="destructive">
           <AlertTitle>{t`操作失败`}</AlertTitle>
           <AlertDescription className="break-words">{error}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {configurationMissing ? (
+        <Alert>
+          <AlertTitle>{t`尚未配置 AI 服务`}</AlertTitle>
+          <AlertDescription className="flex flex-wrap items-center gap-2">
+            <Trans>请先配置服务地址、模型和 API Key，再生成译文。</Trans>
+            <Button variant="outline" size="sm" asChild>
+              <Link
+                to="/settings"
+                search={{ returnUid: uid, returnMode: mode }}
+              >
+                <Trans>去设置</Trans>
+              </Link>
+            </Button>
+          </AlertDescription>
         </Alert>
       ) : null}
 

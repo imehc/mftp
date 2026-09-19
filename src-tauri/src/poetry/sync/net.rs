@@ -1,23 +1,21 @@
-//! Desktop sync orchestration: pick the file-level or tarball channel per
-//! source, stream codeload tarballs to temp files with progress and
-//! cancellation, and hand the extracted trees over to the ingest pipeline.
-//!
-//! GitHub API access lives in `github`; reqwest is a desktop-only dependency,
-//! so everything touching it lives behind `#[cfg(desktop)]`.
+//! Poetry sync orchestration: pull only the catalog files needed by each
+//! collection through the GitHub tree/blob API, with a desktop-only tarball
+//! fallback when the API budget is insufficient.
 
-#[cfg(desktop)]
 use std::fs;
 #[cfg(desktop)]
 use std::io::{Read, Write};
-#[cfg(desktop)]
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
-#[cfg(desktop)]
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
 #[cfg(desktop)]
 use super::github::{download_progress, error_chain, fetch_needed_blobs, resolve_source_sha};
+#[cfg(not(desktop))]
+use super::github::{download_progress, fetch_needed_blobs, resolve_source_sha};
+#[cfg(not(desktop))]
+use super::ingest::import_extracted_dir;
 #[cfg(desktop)]
 use super::ingest::{extract_selected, import_extracted_dir};
 use crate::error::{AppError, AppResult};
@@ -53,12 +51,59 @@ pub(super) fn run_network_sync(
 
 #[cfg(not(desktop))]
 pub(super) fn run_network_sync(
-    _library: &Arc<PoetryLibrary>,
-    _progress: &ProgressFn<'_>,
-    _ids: &[String],
-    _cancelled: &AtomicBool,
+    library: &Arc<PoetryLibrary>,
+    progress: &ProgressFn<'_>,
+    ids: &[String],
+    cancelled: &AtomicBool,
 ) -> AppResult<()> {
-    Err(AppError("library downloads require the desktop app".into()))
+    let catalog = Catalog::load().map_err(AppError)?;
+    progress(download_progress(0, None));
+    let tmp = library.tmp_dir();
+    fs::create_dir_all(&tmp).map_err(AppError::from)?;
+    let result = download_and_import_blobs(library, progress, &catalog, ids, &tmp, cancelled);
+    let _ = fs::remove_dir_all(&tmp);
+    result
+}
+
+#[cfg(not(desktop))]
+fn download_and_import_blobs(
+    library: &Arc<PoetryLibrary>,
+    progress: &ProgressFn<'_>,
+    catalog: &Catalog,
+    ids: &[String],
+    tmp: &Path,
+    cancelled: &AtomicBool,
+) -> AppResult<()> {
+    for source_id in catalog.sources_for(ids) {
+        if cancelled.load(Ordering::SeqCst) {
+            return Err(AppError("cancelled".into()));
+        }
+        let Some(spec) = catalog.sources.get(source_id) else {
+            continue;
+        };
+        let extract_dir = tmp.join(format!("extract-{source_id}"));
+        let _ = fs::remove_dir_all(&extract_dir);
+        fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
+        match fetch_needed_blobs(progress, spec, catalog, ids, &extract_dir, cancelled)? {
+            true => {}
+            false => {
+                return Err(AppError(
+                    "GitHub API request budget is too small for this mobile download".into(),
+                ));
+            }
+        }
+        let sha = resolve_source_sha(catalog, source_id);
+        import_extracted_dir(
+            library,
+            progress,
+            &extract_dir,
+            ids,
+            &|_| sha.clone(),
+            cancelled,
+        )?;
+        let _ = fs::remove_dir_all(&extract_dir);
+    }
+    Ok(())
 }
 
 #[cfg(desktop)]

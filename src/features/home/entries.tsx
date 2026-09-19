@@ -144,9 +144,6 @@ export const homeEntries: HomeEntry[] = [
       preload: "intent",
     }),
     toolId: "library",
-    // 目前仅桌面端：主从布局尚无对应的
-    // 移动端版本（D8）。
-    platforms: ["desktop"],
     icon: BookMarked,
     title: <Trans>古诗词</Trans>,
   },

@@ -4,7 +4,7 @@
 //! the database writer.
 
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -238,7 +238,16 @@ pub(super) fn extract_selected(
             .map_err(|e| AppError(e.to_string()))?
             .into_owned();
         // Strip the leading `repo-branch/` component GitHub tarballs add.
-        let rel: PathBuf = path.components().skip(1).collect();
+        let mut rel = PathBuf::new();
+        for component in path.components().skip(1) {
+            match component {
+                Component::Normal(value) => rel.push(value),
+                Component::CurDir => {}
+                Component::Prefix(_) | Component::RootDir | Component::ParentDir => {
+                    return Err(AppError("unsafe archive path".into()));
+                }
+            }
+        }
         let rel_str = rel.to_string_lossy().replace('\\', "/");
         let matched = needed
             .iter()

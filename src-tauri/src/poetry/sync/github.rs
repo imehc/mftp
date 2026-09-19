@@ -3,36 +3,25 @@
 //! let a collection be pulled without its whole source tarball, and the
 //! `downloading` progress event both channels report with.
 //!
-//! reqwest is a desktop-only dependency, so everything touching it lives
-//! behind `#[cfg(desktop)]`.
+//! The same file-level GitHub channel is used by desktop and mobile builds.
 
-#[cfg(desktop)]
 use std::fs;
-#[cfg(desktop)]
 use std::path::Path;
-#[cfg(desktop)]
 use std::sync::atomic::AtomicBool;
-#[cfg(desktop)]
 use std::sync::atomic::Ordering;
 
-#[cfg(desktop)]
 use serde_json::Value;
 
-#[cfg(desktop)]
 use super::ingest::glob_match;
 use crate::error::{AppError, AppResult};
 use crate::poetry::catalog::Catalog;
-#[cfg(desktop)]
 use crate::poetry::catalog::SourceSpec;
-#[cfg(desktop)]
 use crate::poetry::model::PoetrySyncProgress;
 
-#[cfg(desktop)]
 use super::ProgressFn;
 
 /// Every `downloading` event carries the same shape; only the byte counters
 /// vary. Shared by the tarball and blob channels so the UI sees one format.
-#[cfg(desktop)]
 pub(super) fn download_progress(bytes_done: u64, bytes_total: Option<u64>) -> PoetrySyncProgress {
     PoetrySyncProgress {
         collection_id: "download".into(),
@@ -47,7 +36,6 @@ pub(super) fn download_progress(bytes_done: u64, bytes_total: Option<u64>) -> Po
 
 /// Flatten a reqwest error chain so the UI shows the real cause
 /// (dns / connect / tls) instead of a bare "error sending request".
-#[cfg(desktop)]
 pub(super) fn error_chain(error: &dyn std::error::Error) -> String {
     let mut message = error.to_string();
     let mut source = error.source();
@@ -59,7 +47,6 @@ pub(super) fn error_chain(error: &dyn std::error::Error) -> String {
 }
 
 /// Resolve the current commit sha of every source referenced by `ids`.
-#[cfg(desktop)]
 pub(super) fn fetch_source_sha(catalog: &Catalog, source_id: &str) -> AppResult<String> {
     let Some(spec) = catalog.sources.get(source_id) else {
         return Err(AppError(format!("unknown source: {source_id}")));
@@ -81,14 +68,8 @@ pub(super) fn fetch_source_sha(catalog: &Catalog, source_id: &str) -> AppResult<
         .ok_or_else(|| AppError("commit response missing sha".into()))
 }
 
-#[cfg(not(desktop))]
-pub(super) fn fetch_source_sha(_catalog: &Catalog, _source_id: &str) -> AppResult<String> {
-    Err(AppError("library downloads require the desktop app".into()))
-}
-
 /// Best-effort upstream commit sha; a flaky API must never block importing
 /// data that has already been downloaded.
-#[cfg(desktop)]
 pub(super) fn resolve_source_sha(catalog: &Catalog, source_id: &str) -> String {
     fetch_source_sha(catalog, source_id).unwrap_or_else(|_| {
         format!(
@@ -101,7 +82,6 @@ pub(super) fn resolve_source_sha(catalog: &Catalog, source_id: &str) -> String {
     })
 }
 
-#[cfg(desktop)]
 fn api_client() -> AppResult<reqwest::blocking::Client> {
     reqwest::blocking::Client::builder()
         .connect_timeout(std::time::Duration::from_secs(15))
@@ -112,7 +92,6 @@ fn api_client() -> AppResult<reqwest::blocking::Client> {
 }
 
 /// A file entry from the git tree API. `size` is absent for directories.
-#[cfg(desktop)]
 #[derive(serde::Deserialize)]
 struct TreeEntry {
     path: String,
@@ -123,7 +102,6 @@ struct TreeEntry {
     size: u64,
 }
 
-#[cfg(desktop)]
 #[derive(serde::Deserialize)]
 struct TreeResponse {
     #[serde(default)]
@@ -134,7 +112,6 @@ struct TreeResponse {
 
 /// One request returns every path in the repository, which is what lets us
 /// pull only the blobs a collection needs instead of the whole tarball.
-#[cfg(desktop)]
 fn fetch_source_tree(repo: &str, branch: &str) -> AppResult<Vec<TreeEntry>> {
     let url = format!("https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1");
     let response: TreeResponse = api_client()?
@@ -143,8 +120,7 @@ fn fetch_source_tree(repo: &str, branch: &str) -> AppResult<Vec<TreeEntry>> {
         .map_err(|e| AppError(format!("获取上游文件清单失败：{}", error_chain(&e))))?
         .json()
         .map_err(|e| AppError(format!("decode tree info: {e}")))?;
-    // A truncated listing means we cannot know the full file set; the caller
-    // falls back to the tarball rather than importing an incomplete collection.
+    // A truncated listing means we cannot know the full file set safely.
     if response.truncated {
         return Err(AppError("upstream tree listing is truncated".into()));
     }
@@ -152,8 +128,7 @@ fn fetch_source_tree(repo: &str, branch: &str) -> AppResult<Vec<TreeEntry>> {
 }
 
 /// Unauthenticated API calls are capped at 60/hour. Returns `None` when the
-/// budget cannot be read, which also means we take the tarball.
-#[cfg(desktop)]
+/// budget cannot be read, so callers can choose whether to fall back.
 fn core_requests_remaining(client: &reqwest::blocking::Client) -> Option<u64> {
     let value: Value = client
         .get("https://api.github.com/rate_limit")
@@ -170,11 +145,9 @@ fn core_requests_remaining(client: &reqwest::blocking::Client) -> Option<u64> {
 
 /// Requests kept aside for the commit sha lookup, the sync check and a retry,
 /// so a blob run never strands the quota at zero.
-#[cfg(desktop)]
 const RATE_HEADROOM: u64 = 10;
 
 /// Blobs a collection needs, in a stable order so progress is monotonic.
-#[cfg(desktop)]
 fn needed_blobs<'a>(
     tree: &'a [TreeEntry],
     catalog: &Catalog,
@@ -203,7 +176,6 @@ fn needed_blobs<'a>(
     matched
 }
 
-#[cfg(desktop)]
 fn write_blob(extract_dir: &Path, entry: &TreeEntry, bytes: &[u8]) -> AppResult<()> {
     let rel = Path::new(&entry.path);
     // Upstream listings are data, not instructions: never let one escape the
@@ -224,7 +196,6 @@ fn write_blob(extract_dir: &Path, entry: &TreeEntry, bytes: &[u8]) -> AppResult<
 
 /// Fetch one blob with a single retry, mirroring the tarball's tolerance for
 /// transient blips.
-#[cfg(desktop)]
 fn fetch_blob(
     client: &reqwest::blocking::Client,
     repo: &str,
@@ -264,9 +235,7 @@ fn fetch_blob(
 
 /// Fetch every blob the requested collections need into `extract_dir`.
 ///
-/// Returns `Ok(false)` when the request budget is too small for the file set,
-/// telling the caller to download the source tarball instead.
-#[cfg(desktop)]
+/// Returns `Ok(false)` when the request budget is too small for the file set.
 pub(super) fn fetch_needed_blobs(
     progress: &ProgressFn<'_>,
     spec: &SourceSpec,
@@ -302,6 +271,6 @@ pub(super) fn fetch_needed_blobs(
     Ok(true)
 }
 
-#[cfg(all(test, desktop))]
+#[cfg(test)]
 #[path = "github_tests.rs"]
 mod tests;

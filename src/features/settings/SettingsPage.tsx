@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { Archive, FolderTree, HardDriveDownload } from "lucide-react";
 import { useLingui } from "@lingui/react/macro";
@@ -14,13 +15,22 @@ import AiConnectionSettings from "./AiConnectionSettings";
 import { isDesktopPlatform } from "~/lib/platform";
 import { type DirectoryTransferMode, useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
+import type { PoetryTranslationMode } from "~/bindings";
 
 const transferModes = [
   { value: "archive", icon: Archive },
   { value: "direct", icon: FolderTree },
 ] as const;
 
-export default function SettingsPage() {
+export default function SettingsPage({
+  returnContext,
+}: {
+  returnContext?: {
+    returnUid?: string;
+    returnQ?: string;
+    returnMode?: PoetryTranslationMode;
+  };
+}) {
   const { t } = useLingui();
   const mode = useSettingsStore((state) => state.directoryTransferMode);
   const setMode = useSettingsStore((state) => state.setDirectoryTransferMode);
@@ -54,9 +64,28 @@ export default function SettingsPage() {
   }
 
   return (
-    <AppPageLayout title={t`设置`} description={t`管理应用数据和运行方式`}>
+    <AppPageLayout
+      title={t`设置`}
+      description={t`管理应用数据和运行方式`}
+      actions={
+        returnContext?.returnUid ? (
+          <Button variant="outline" size="sm" asChild>
+            <Link
+              to="/library/$id"
+              params={{ id: returnContext.returnUid }}
+              search={{
+                q: returnContext.returnQ,
+                mode: returnContext.returnMode,
+              }}
+            >
+              {t`返回诗词`}
+            </Link>
+          </Button>
+        ) : undefined
+      }
+    >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-        {isDesktopPlatform() ? <AiConnectionSettings /> : null}
+        <AiConnectionSettings />
         <section className="border-border bg-card divide-border divide-y rounded-lg border px-2.5">
           <SettingRow
             title={t`数据导入导出`}

@@ -16,14 +16,18 @@ java_is_gradle_compatible() {
   local java_home="$1"
   local major
   [ -x "$java_home/bin/java" ] || return 1
-  major="$($java_home/bin/java -version 2>&1 | awk -F'[ ".]' 'NR == 1 { print ($2 == "1" ? $3 : $2) }')"
+  major="$($java_home/bin/java -version 2>&1 | sed -n 's/.*version "\([^".]*\).*/\1/p' | head -1)"
   [ "$major" -ge 17 ] 2>/dev/null && [ "$major" -le 24 ]
 }
+
+if [ -n "${JAVA_HOME:-}" ] && ! java_is_gradle_compatible "$JAVA_HOME"; then
+  unset JAVA_HOME
+fi
 
 if [ -z "${JAVA_HOME:-}" ]; then
   GRADLE_JAVA_HOME=""
   if [ -d "$HOME/.gradle/jdks" ]; then
-    GRADLE_JAVA_HOME="$(find "$HOME/.gradle/jdks" -path '*/Contents/Home/bin/java' -type f -print | sort | head -1 | sed 's|/bin/java$||')"
+    GRADLE_JAVA_HOME="$(find "$HOME/.gradle/jdks" -path '*/bin/java' -type f -print | sort | head -1 | sed 's|/bin/java$||')"
   fi
   for candidate in \
     "/Applications/Android Studio.app/Contents/jbr/Contents/Home" \
@@ -34,6 +38,11 @@ if [ -z "${JAVA_HOME:-}" ]; then
       break
     fi
   done
+fi
+
+if [ -z "${JAVA_HOME:-}" ]; then
+  echo "Android builds require a Gradle-compatible JDK (17-24). Install one or set JAVA_HOME to it." >&2
+  exit 1
 fi
 
 TOOLCHAIN_BIN="$NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64/bin"

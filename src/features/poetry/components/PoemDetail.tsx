@@ -26,6 +26,7 @@ import {
 } from "~/components/ui/sheet";
 import { cn } from "cn";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
+import type { PoetryTranslationMode } from "~/bindings";
 import PoetryTranslationSection from "./PoetryTranslationSection";
 interface PoemDetailViewProps {
   detail: PoemDetailModel | null;
@@ -34,6 +35,8 @@ interface PoemDetailViewProps {
   lineHeight: number;
   onFontSizeChange: (size: number) => void;
   onLineHeightChange: (height: number) => void;
+  initialTranslationMode?: PoetryTranslationMode;
+  onTranslationModeChange?: (mode: PoetryTranslationMode) => void;
 }
 function AnnotationSection({
   title,
@@ -86,12 +89,15 @@ export function AuthorBioSheet({
 }) {
   return (
     <Sheet open={bio !== null} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent side="right" className="w-[360px] sm:max-w-[85vw]">
+      <SheetContent
+        side="right"
+        className="max-sm:inset-x-0 max-sm:top-auto max-sm:right-auto max-sm:bottom-0 max-sm:h-auto max-sm:max-h-[75dvh] max-sm:w-full max-sm:max-w-none max-sm:border-t max-sm:border-l-0 sm:w-[360px] sm:max-w-[85vw]"
+      >
         <SheetHeader>
           <SheetTitle>{bio?.name}</SheetTitle>
           <SheetDescription>{bio?.dynasty}</SheetDescription>
         </SheetHeader>
-        <p className="px-4 pb-6 text-sm leading-loose whitespace-pre-line">
+        <p className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 text-sm leading-loose whitespace-pre-line">
           {bio?.desc || <Trans>暂无作者小传。</Trans>}
         </p>
       </SheetContent>
@@ -154,6 +160,8 @@ export default function PoemDetail({
   lineHeight,
   onFontSizeChange,
   onLineHeightChange,
+  initialTranslationMode,
+  onTranslationModeChange,
 }: PoemDetailViewProps) {
   const [bio, setBio] = useState<AuthorBio | null>(null);
   // 当诗词切换时在渲染期间重置作者简介（React 的“在 prop 变化时
@@ -254,6 +262,8 @@ export default function PoemDetail({
             fontSize={fontSize}
             lineHeight={lineHeight}
             referenceTranslation={annotation?.translation}
+            initialMode={initialTranslationMode}
+            onModeChange={onTranslationModeChange}
           />
 
           {annotation &&

@@ -6,6 +6,7 @@ import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import { poetryPoem } from "~/lib/ipc";
 import type { PoemDetail as PoemDetailModel } from "~/types";
+import type { PoetryTranslationMode } from "~/bindings";
 import PoemDetail from "./components/PoemDetail";
 import { usePoetryStore } from "./store/poetry-store";
 
@@ -13,7 +14,17 @@ import { usePoetryStore } from "./store/poetry-store";
  * 直接访问 `/library/$id` 时的整页详情。桌面端的常规
  * 流程是在 `/library` 内部展示详情面板。
  */
-export default function PoemDetailPage({ uid }: { uid: string }) {
+export default function PoemDetailPage({
+  uid,
+  backQuery,
+  initialTranslationMode,
+  onTranslationModeChange,
+}: {
+  uid: string;
+  backQuery?: string;
+  initialTranslationMode?: PoetryTranslationMode;
+  onTranslationModeChange?: (mode: PoetryTranslationMode) => void;
+}) {
   const fontSize = usePoetryStore((s) => s.fontSize);
   const lineHeight = usePoetryStore((s) => s.lineHeight);
   const setFontSize = usePoetryStore((s) => s.setFontSize);
@@ -43,7 +54,7 @@ export default function PoemDetailPage({ uid }: { uid: string }) {
             <Link
               to="/library"
               search={{
-                q: undefined,
+                q: backQuery,
                 poem: undefined,
               }}
             >
@@ -65,6 +76,8 @@ export default function PoemDetailPage({ uid }: { uid: string }) {
           lineHeight={lineHeight}
           onFontSizeChange={setFontSize}
           onLineHeightChange={setLineHeight}
+          initialTranslationMode={initialTranslationMode}
+          onTranslationModeChange={onTranslationModeChange}
         />
       )}
     </main>

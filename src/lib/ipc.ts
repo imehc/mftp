@@ -2,6 +2,7 @@ import { listen } from "@tauri-apps/api/event";
 import {
   commands,
   type AiConnectionInput,
+  type PoetryTranslation,
   type PoetryTranslationMode,
   type PoetryTranslationStreamEvent,
 } from "~/bindings";
@@ -340,18 +341,38 @@ export const poetryTranslationGenerate = (
   onDelta: (delta: string) => void,
 ) => {
   const requestId = crypto.randomUUID();
-  return listen<PoetryTranslationStreamEvent>(
+  let cancelled = false;
+  let unlisten: (() => void) | null = null;
+  const cleanup = () => {
+    const listener = unlisten;
+    unlisten = null;
+    listener?.();
+  };
+  const promise = listen<PoetryTranslationStreamEvent>(
     poetryTranslationStreamEvent(requestId),
     (event) => onDelta(event.payload.delta),
-  ).then(async (unlisten) => {
+  ).then(async (listener) => {
+    unlisten = listener;
+    if (cancelled) {
+      cleanup();
+      throw new Error("cancelled");
+    }
     try {
       return await unwrapCommand(
         commands.generatePoetryTranslation(uid, mode, requestId),
       );
     } finally {
-      unlisten();
+      cleanup();
     }
   });
+  return {
+    promise: promise as Promise<PoetryTranslation>,
+    // 页面离开时只解除事件监听；后端请求继续运行并自行释放任务锁。
+    cancel: () => {
+      cancelled = true;
+      cleanup();
+    },
+  };
 };
 export const poetryTranslationUpdate = (
   uid: string,

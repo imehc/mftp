@@ -8,12 +8,13 @@ use crate::ai::{
     read_api_key, AiTask, POETRY_TRANSLATION_PROMPT_VERSION,
 };
 use crate::error::{AppError, AppResult};
+#[cfg(desktop)]
+use crate::poetry::model::PoetryTranslationPack;
 use crate::poetry::model::{
     AuthorSummary, PoemDetail, PoemPage, PoetryAnnotationsStatus, PoetryAuthorsRequest,
     PoetryBrowseRequest, PoetryCollectionStatus, PoetryContentIndexStatus, PoetryPackTranslation,
     PoetrySearchRequest, PoetrySearchResult, PoetrySyncPlan, PoetrySyncProgress, PoetryTranslation,
-    PoetryTranslationMode, PoetryTranslationPack, PoetryTranslationPackSummary,
-    PoetryTranslationStreamEvent,
+    PoetryTranslationMode, PoetryTranslationPackSummary, PoetryTranslationStreamEvent,
 };
 use crate::poetry::sync::SYNC_PROGRESS_EVENT;
 use crate::poetry::text::body_fingerprint;
@@ -72,12 +73,25 @@ pub async fn poetry_sync_import_local(
     path: String,
     collection_ids: Vec<String>,
 ) -> AppResult<()> {
-    let library = state.poetry.clone();
-    let emit_progress = progress_emitter(&app);
-    let result =
-        run_blocking(move || library.begin_local_import(emit_progress, path, collection_ids)).await;
-    record_operation(&state.storage, "poetry", "", "import", None, &result);
-    result
+    #[cfg(mobile)]
+    {
+        // Mobile data installation is intentionally download-only; reject old
+        // clients or direct IPC calls instead of accepting local archives.
+        let _ = (app, state, path, collection_ids);
+        return Err(AppError(
+            "Local poetry import is not available on mobile".into(),
+        ));
+    }
+    #[cfg(desktop)]
+    {
+        let library = state.poetry.clone();
+        let emit_progress = progress_emitter(&app);
+        let result =
+            run_blocking(move || library.begin_local_import(emit_progress, path, collection_ids))
+                .await;
+        record_operation(&state.storage, "poetry", "", "import", None, &result);
+        result
+    }
 }
 
 #[tauri::command]
@@ -268,23 +282,35 @@ pub async fn poetry_translation_pack_import(
     state: State<'_, AppState>,
     raw: String,
 ) -> AppResult<i64> {
-    if raw.len() > 32 * 1024 * 1024 {
-        return Err(AppError("Translation pack file is too large".into()));
+    #[cfg(mobile)]
+    {
+        // Translation packs are also a local import surface and remain
+        // desktop-only until a controlled online pack channel is available.
+        let _ = (state, raw);
+        return Err(AppError(
+            "Local translation pack import is not available on mobile".into(),
+        ));
     }
-    let pack: PoetryTranslationPack = serde_json::from_str(&raw)
-        .map_err(|error| AppError(format!("Invalid translation pack: {error}")))?;
-    let library = state.poetry.clone();
-    let pack_id = pack.id.clone();
-    let result = run_blocking(move || library.db().import_translation_pack(&pack)).await;
-    record_operation(
-        &state.storage,
-        "poetry",
-        &pack_id,
-        "import_translation_pack",
-        None,
-        &result,
-    );
-    result
+    #[cfg(desktop)]
+    {
+        if raw.len() > 32 * 1024 * 1024 {
+            return Err(AppError("Translation pack file is too large".into()));
+        }
+        let pack: PoetryTranslationPack = serde_json::from_str(&raw)
+            .map_err(|error| AppError(format!("Invalid translation pack: {error}")))?;
+        let library = state.poetry.clone();
+        let pack_id = pack.id.clone();
+        let result = run_blocking(move || library.db().import_translation_pack(&pack)).await;
+        record_operation(
+            &state.storage,
+            "poetry",
+            &pack_id,
+            "import_translation_pack",
+            None,
+            &result,
+        );
+        result
+    }
 }
 
 #[tauri::command]

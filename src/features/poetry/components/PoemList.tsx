@@ -13,6 +13,8 @@ interface PoemListProps {
   selectedUid?: string;
   onSelect: (uid: string) => void;
   onCountChange?: (count: number | null) => void;
+  /** 移动端详情返回时恢复列表滚动锚点。 */
+  scrollStorageKey?: string;
 }
 interface BrowseState {
   items: PoemSummary[];
@@ -31,6 +33,7 @@ export default function PoemList({
   selectedUid,
   onSelect,
   onCountChange,
+  scrollStorageKey,
 }: PoemListProps) {
   const { t } = useLingui();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -41,6 +44,7 @@ export default function PoemList({
   });
   const [loading, setLoading] = useState(false);
   const loadSeq = useRef(0);
+  const restoredScroll = useRef(false);
   // onCountChange 是属性回调；通过 effect event 读取最新值，
   // 使重置 effect 只依赖重置 key。
   const notifyCountReset = useEffectEvent(() => onCountChange?.(null));
@@ -53,8 +57,25 @@ export default function PoemList({
     scrollRef.current?.scrollTo({
       top: 0,
     });
+    restoredScroll.current = false;
     notifyCountReset();
   }, [resetKey]);
+
+  useEffect(() => {
+    if (!scrollStorageKey || state.items.length === 0 || restoredScroll.current)
+      return;
+    try {
+      const saved = Number(sessionStorage.getItem(scrollStorageKey));
+      if (Number.isFinite(saved) && saved > 0) {
+        requestAnimationFrame(() =>
+          scrollRef.current?.scrollTo({ top: saved }),
+        );
+      }
+    } catch {
+      // 存储不可用时仍保持列表可读。
+    }
+    restoredScroll.current = true;
+  }, [scrollStorageKey, state.items.length]);
   const loadMore = async () => {
     const seq = ++loadSeq.current;
     setLoading(true);
@@ -99,6 +120,13 @@ export default function PoemList({
       className="h-full overflow-y-auto px-2 pb-4"
       onScroll={(event) => {
         const el = event.currentTarget;
+        if (scrollStorageKey) {
+          try {
+            sessionStorage.setItem(scrollStorageKey, String(el.scrollTop));
+          } catch {
+            // 存储不可用时忽略滚动位置持久化。
+          }
+        }
         const nearBottom =
           el.scrollTop + el.clientHeight >= el.scrollHeight - 240;
         if (nearBottom && !loading && !state.exhausted) {

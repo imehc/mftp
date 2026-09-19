@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import LibraryMobileManagePage from "~/features/poetry/LibraryMobileManagePage";
 import LibraryManagePage from "~/features/poetry/LibraryManagePage";
-import { desktopOnlyGuard } from "~/lib/platform";
+import { isMobilePlatform } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 
 function LibraryManageRoute() {
@@ -11,10 +12,13 @@ function LibraryManageRoute() {
     setLastTool("library");
   }, [setLastTool]);
 
-  return <LibraryManagePage />;
+  return isMobilePlatform() ? (
+    <LibraryMobileManagePage />
+  ) : (
+    <LibraryManagePage />
+  );
 }
 
 export const Route = createFileRoute("/library/manage")({
-  beforeLoad: desktopOnlyGuard,
   component: LibraryManageRoute,
 });

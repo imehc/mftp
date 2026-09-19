@@ -126,6 +126,9 @@ export default function AiConnectionSettings() {
           <p className="text-muted-foreground mt-0.5 text-xs">
             {t`当前仅支持 OpenAI Responses 接口格式`}
           </p>
+          <p className="text-muted-foreground mt-1 max-w-prose text-xs leading-relaxed">
+            {t`生成请求会发送到你配置的第三方服务，可能产生服务费用。`}
+          </p>
         </div>
         <Badge variant={hasKey ? "secondary" : "outline"}>
           {hasKey ? <CircleCheck /> : <KeyRound />}

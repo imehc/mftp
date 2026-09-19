@@ -11,7 +11,7 @@
   rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
   ```
 
-所有 Android 命令都通过 `scripts/android.sh` 走，它会自动设置 `ANDROID_HOME` / `NDK_HOME` / `JAVA_HOME`，并为 vendored OpenSSL 生成 NDK r23+ 缺失的 `<triple>-ranlib` / `<triple>-ar` 工具 shim（这是 ssh2 依赖交叉编译所必需的）。
+所有 Android 命令都通过 `scripts/android.sh` 走，它会自动设置 `ANDROID_HOME` / `NDK_HOME` / `JAVA_HOME`，并为 vendored OpenSSL 生成 NDK r23+ 缺失的 `<triple>-ranlib` / `<triple>-ar` 工具 shim（这是 ssh2 依赖交叉编译所必需的）。Gradle 8.14.3 要求 Java 17–24；脚本会忽略不兼容的 `JAVA_HOME`（例如 Android Studio 自带的 Java 25），优先使用 Gradle 管理的兼容 JDK。
 
 ## 常用命令
 
