@@ -36,3 +36,8 @@ src/locales/**/messages.ts
 
 # Agent skills installed by `npx skills`; restore with `pnpm skills:sync`
 .agents/skills/*
+
+# docs 只提交 android.md / ios.md，其余文档仅保留在本地
+docs/*
+!docs/android.md
+!docs/ios.md
