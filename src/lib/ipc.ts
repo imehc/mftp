@@ -391,32 +391,20 @@ export const btAddDownload = (
   source: string,
   infoHash: string,
   fileIndices: number[],
-  destDir: string,
-) =>
-  unwrapCommand(commands.btAddDownload(source, infoHash, fileIndices, destDir));
+) => unwrapCommand(commands.btAddDownload(source, infoHash, fileIndices));
+export const btExport = (infoHash: string, destDir: string) =>
+  unwrapCommand(commands.btExport(infoHash, destDir));
 export const btList = () => unwrapCommand(commands.btList());
 export const btControl = (
   infoHash: string,
   action: BtControlAction,
   deleteFiles: boolean,
 ) => voidCommand(commands.btControl(infoHash, action, deleteFiles));
-export const btEnsurePreview = (source: string, fileIndex: number) =>
-  unwrapCommand(commands.btEnsurePreview(source, fileIndex));
-export const btStreamUrl = (infoHash: string, fileIndex: number) =>
-  unwrapCommand(commands.btStreamUrl(infoHash, fileIndex));
-export const btSaveToLocal = (
-  infoHash: string,
-  destDir: string,
-  fileIndex: number,
-) => voidCommand(commands.btSaveToLocal(infoHash, destDir, fileIndex));
-export const btCacheStats = () => unwrapCommand(commands.btCacheStats());
-export const btSetCacheQuota = (bytes: number) =>
-  voidCommand(commands.btSetCacheQuota(bytes));
-export const btClearCache = () => unwrapCommand(commands.btClearCache());
-export const btRemoveCache = (infoHash: string) =>
-  voidCommand(commands.btRemoveCache(infoHash));
-export const btCacheItems = () => unwrapCommand(commands.btCacheItems());
 export const btTaskPeers = (infoHash: string) =>
   unwrapCommand(commands.btTaskPeers(infoHash));
-export const btTaskStats = (infoHash: string, fileIndex: number | null) =>
-  unwrapCommand(commands.btTaskStats(infoHash, fileIndex));
+export const btDhtStatus = () => unwrapCommand(commands.btDhtStatus());
+export const btPlayability = (
+  infoHash: string,
+  fileIndex: number,
+  prepare: boolean,
+) => unwrapCommand(commands.btPlayability(infoHash, fileIndex, prepare));

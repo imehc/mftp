@@ -352,7 +352,6 @@ pub enum AppDataModule {
     Todo,
     Poetry,
     ActivityLogs,
-    BtCache,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -364,7 +363,6 @@ pub struct AppDataUsage {
     pub main_database_bytes: u64,
     pub poetry_database_bytes: u64,
     pub activity_logs_bytes: u64,
-    pub bt_cache_bytes: u64,
     pub bt_internal_bytes: u64,
     pub total_bytes: u64,
 }

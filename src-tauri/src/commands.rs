@@ -2,7 +2,7 @@ use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
 mod ai;
-#[cfg(desktop)]
+#[cfg(any(desktop, target_os = "android"))]
 mod bt;
 mod data;
 mod export;
@@ -17,7 +17,7 @@ mod todo;
 mod vault;
 
 pub use ai::*;
-#[cfg(desktop)]
+#[cfg(any(desktop, target_os = "android"))]
 pub use bt::*;
 pub use data::*;
 pub use export::*;

@@ -10,9 +10,7 @@ use librqbit::{Session, TorrentStatsState};
 
 use super::export::archive_target;
 use super::finalize::{run_finalize_job, FinalizeContext};
-use super::staging::{
-    part_dir_for, part_root, remove_owned_hash_dir, remove_part_dir, stages_into_part_dir,
-};
+use super::staging::remove_owned_hash_dir;
 use super::{
     find_handle, info_hash_hex, parse_info_hash, same_dir, BtManager, BtTaskInfo, TorrentHandle,
 };
@@ -24,44 +22,43 @@ impl BtManager {
         source: &str,
         expected_info_hash: &str,
         file_indices: Vec<usize>,
-        dest_dir: String,
     ) -> AppResult<BtTaskInfo> {
-        if dest_dir.trim().is_empty() {
-            return Err(AppError("下载目录不能为空".into()));
-        }
         if file_indices.is_empty() {
             return Err(AppError("至少选择一个文件".into()));
         }
         parse_info_hash(expected_info_hash)?;
         let expected_info_hash = expected_info_hash.to_ascii_lowercase();
-        std::fs::create_dir_all(&dest_dir)
-            .map_err(|error| AppError(format!("创建下载目录失败: {error}")))?;
+        let add_gate = {
+            let mut gates = self.add_gates.lock().await;
+            gates
+                .entry(expected_info_hash.clone())
+                .or_insert_with(|| Arc::new(tokio::sync::Mutex::new(())))
+                .clone()
+        };
+        let _add_guard = add_gate.lock().await;
 
         let package_mode = if file_indices.len() > 1 {
             "archive"
         } else {
             "direct"
         };
+        let existing = self.storage.get_bt_task(&expected_info_hash)?;
         // Both modes download out of sight and only publish the finished
         // result: archives need a scratch tree to pack from, plain downloads
         // must not leave a half-written placeholder in the user's folder.
-        let work_dir = if package_mode == "archive" {
-            self.staging_dir_for(&expected_info_hash)?
-        } else {
-            part_dir_for(Path::new(&dest_dir), &expected_info_hash)
-        };
+        let work_dir = self.private_download_dir(&expected_info_hash)?;
         std::fs::create_dir_all(&work_dir)
             .map_err(|error| AppError(format!("创建下载暂存目录失败: {error}")))?;
 
-        let session = self.ensure_engine().await?;
-        let existing = self.storage.get_bt_task(&expected_info_hash)?;
         let reuse = existing.as_ref().is_some_and(|row| {
-            row.status != "completed"
-                && row.dest_dir == dest_dir
+            matches!(row.status.as_str(), "active" | "error" | "cancelled")
                 && row.package_mode == package_mode
                 && row.file_indices == file_indices
                 && same_dir(Path::new(&row.work_dir), &work_dir)
         });
+        ensure_existing_task_can_be_added(existing.as_ref(), reuse)?;
+
+        let session = self.ensure_engine().await?;
         if !reuse {
             self.replace_existing_task(&session, &expected_info_hash)
                 .await?;
@@ -113,14 +110,14 @@ impl BtManager {
                 .and_then(|row| row.output_path)
                 .map(PathBuf::from)
                 .filter(|path| path.extension().is_some_and(|extension| extension == "tar"))
-                .unwrap_or_else(|| archive_target(Path::new(&dest_dir), &label))
+                .unwrap_or_else(|| archive_target(&work_dir, &label))
         } else {
             PathBuf::new()
         };
         let row = BtTaskRow {
             info_hash: actual_hash,
             label,
-            dest_dir,
+            dest_dir: String::new(),
             mode: "download".into(),
             pinned: false,
             created_at: crate::storage::now_ms(),
@@ -130,26 +127,27 @@ impl BtManager {
             status: "active".into(),
             output_path: (package_mode == "archive")
                 .then(|| output_path.to_string_lossy().into_owned()),
+            export_path: None,
             total_bytes: Some(total),
             last_error: None,
         };
         self.storage.upsert_bt_task(&row)?;
-        // Both modes need a watcher: the archive job packs on completion, the
-        // plain download moves its finished file into the user's folder.
-        self.start_finalize_job(&session, row.clone(), handle);
+        // Both modes need a watcher: archives are packed, while direct files
+        // are marked complete once their private path is fully written.
+        self.start_finalize_job(row.clone(), handle);
         Ok(self.task_info_with_live(row))
     }
 
-    fn staging_root(&self) -> AppResult<PathBuf> {
-        let root = self.base_dir()?.join("staging");
+    pub(super) fn private_download_root(&self) -> AppResult<PathBuf> {
+        let root = self.base_dir()?.join("downloads");
         std::fs::create_dir_all(&root)
-            .map_err(|error| AppError(format!("创建 BT 暂存目录失败: {error}")))?;
+            .map_err(|error| AppError(format!("创建 BT 私有下载目录失败: {error}")))?;
         Ok(root)
     }
 
-    pub(super) fn staging_dir_for(&self, info_hash: &str) -> AppResult<PathBuf> {
+    pub(super) fn private_download_dir(&self, info_hash: &str) -> AppResult<PathBuf> {
         parse_info_hash(info_hash)?;
-        Ok(self.staging_root()?.join(info_hash))
+        Ok(self.private_download_root()?.join(info_hash))
     }
 
     async fn align_existing_handle(
@@ -187,9 +185,7 @@ impl BtManager {
         let row = self.storage.get_bt_task(info_hash)?;
         let hash = parse_info_hash(info_hash)?;
         if find_handle(session, &hash)?.is_some() {
-            let delete_files = row
-                .as_ref()
-                .is_some_and(|item| item.mode == "preview" || item.package_mode == "archive");
+            let delete_files = row.is_some();
             session
                 .delete(hash.into(), delete_files)
                 .await
@@ -205,12 +201,7 @@ impl BtManager {
 
     /// Arm the watcher that turns a finished download into its published
     /// result. One job per task; a second call while one runs is a no-op.
-    pub(super) fn start_finalize_job(
-        &self,
-        session: &Arc<Session>,
-        row: BtTaskRow,
-        handle: TorrentHandle,
-    ) {
+    pub(super) fn start_finalize_job(&self, row: BtTaskRow, handle: TorrentHandle) {
         let cancelled = Arc::new(AtomicBool::new(false));
         let inserted = self
             .finalize_jobs
@@ -230,7 +221,6 @@ impl BtManager {
         let context = FinalizeContext {
             app: self.app.clone(),
             storage: self.storage.clone(),
-            session: session.clone(),
             jobs: self.finalize_jobs.clone(),
             gate: self.finalize_gate.clone(),
             cancelled,
@@ -284,7 +274,7 @@ impl BtManager {
                 continue;
             };
             if let Ok(Some(handle)) = find_handle(session, &hash) {
-                self.start_finalize_job(session, row, handle);
+                self.start_finalize_job(row, handle);
             }
         }
     }
@@ -304,27 +294,25 @@ impl BtManager {
                 .is_some_and(Path::is_file);
             if row.status == "completed" {
                 if find_handle(session, &hash).ok().flatten().is_some() {
-                    let _ = session.delete(hash.into(), true).await;
+                    let _ = session.delete(hash.into(), false).await;
                 }
-                let _ = self.remove_owned_task_dir(&row);
                 continue;
             }
             if output_exists && row.status == "packaging" {
                 if find_handle(session, &hash).ok().flatten().is_some() {
-                    let _ = session.delete(hash.into(), true).await;
+                    let _ = session.delete(hash.into(), false).await;
                 }
-                let _ = self.remove_owned_task_dir(&row);
                 let _ = self.storage.update_bt_task_state(
                     &row.info_hash,
                     "completed",
                     row.output_path.as_deref(),
                     None,
                 );
-                super::cache::emit_event(&self.app, &row.info_hash, "package-completed");
+                super::finalize::emit_event(&self.app, &row.info_hash, "package-completed");
                 continue;
             }
             if let Ok(Some(handle)) = find_handle(session, &hash) {
-                self.start_finalize_job(session, row, handle);
+                self.start_finalize_job(row, handle);
             } else {
                 let _ = self.storage.update_bt_task_state(
                     &row.info_hash,
@@ -337,47 +325,23 @@ impl BtManager {
     }
 
     pub(super) fn remove_owned_task_dir(&self, row: &BtTaskRow) -> AppResult<()> {
-        if row.mode == "preview" {
-            let root = self.cache_root()?;
-            return remove_owned_hash_dir(&root, &root.join(&row.info_hash), &row.info_hash);
-        }
-        if row.package_mode == "archive" {
-            return remove_owned_hash_dir(
-                &self.staging_root()?,
-                Path::new(&row.work_dir),
-                &row.info_hash,
-            );
-        }
-        if stages_into_part_dir(row) {
-            return remove_part_dir(row);
-        }
-        Ok(())
+        remove_owned_hash_dir(
+            &self.private_download_root()?,
+            Path::new(&row.work_dir),
+            &row.info_hash,
+        )
     }
 
     pub(super) fn cleanup_orphan_owned_dirs(&self, session: &Session) {
         let mut referenced = HashSet::new();
-        let mut roots: HashSet<PathBuf> = [self.cache_root(), self.staging_root()]
+        let roots: HashSet<PathBuf> = [self.private_download_root()]
             .into_iter()
             .flatten()
             .collect();
-        let mut part_roots = HashSet::new();
         if let Ok(rows) = self.storage.list_bt_tasks() {
             for row in rows {
-                if row.mode == "preview" {
-                    if let Ok(root) = self.cache_root() {
-                        referenced.insert(root.join(row.info_hash));
-                    }
-                } else if row.package_mode == "archive" {
+                if row.dest_dir.is_empty() {
                     referenced.insert(PathBuf::from(row.work_dir));
-                } else if stages_into_part_dir(&row) {
-                    // Part dirs sit in the user's own folder, so the only way
-                    // to learn their root is from the rows that use it.
-                    part_roots.insert(part_root(Path::new(&row.dest_dir)));
-                    // A finished or cancelled row has already handed its file
-                    // over; anything still on disk there is leftover bulk.
-                    if !matches!(row.status.as_str(), "completed" | "cancelled") {
-                        referenced.insert(PathBuf::from(row.work_dir));
-                    }
                 }
             }
         }
@@ -390,7 +354,6 @@ impl BtManager {
             }
         });
         referenced.extend(session_dirs.into_inner());
-        roots.extend(part_roots.iter().cloned());
         for root in &roots {
             let Ok(entries) = std::fs::read_dir(root) else {
                 continue;
@@ -410,11 +373,27 @@ impl BtManager {
                 }
             }
         }
-        for root in part_roots {
-            let _ = std::fs::remove_dir(root);
-        }
     }
 }
+
+fn ensure_existing_task_can_be_added(existing: Option<&BtTaskRow>, reuse: bool) -> AppResult<()> {
+    let Some(row) = existing else {
+        return Ok(());
+    };
+    match row.status.as_str() {
+        "active" if reuse => Ok(()),
+        "error" | "cancelled" => Ok(()),
+        "completed" => Err(AppError(
+            "该资源已下载完成；如需重新下载，请先删除现有任务".into(),
+        )),
+        "packaging" => Err(AppError("该资源正在处理，不能重复添加".into())),
+        "active" => Err(AppError(
+            "该资源已有下载任务，不能用新的文件选择覆盖".into(),
+        )),
+        _ => Err(AppError("该资源已有任务，不能重复添加".into())),
+    }
+}
+
 fn validate_selection(handle: &TorrentHandle, file_indices: &[usize]) -> AppResult<u64> {
     let selected: HashSet<usize> = file_indices.iter().copied().collect();
     if selected.len() != file_indices.len() {
@@ -438,3 +417,7 @@ fn validate_selection(handle: &TorrentHandle, file_indices: &[usize]) -> AppResu
     }
     Ok(total)
 }
+
+#[cfg(test)]
+#[path = "download_tests.rs"]
+mod tests;

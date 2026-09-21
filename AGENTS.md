@@ -52,7 +52,7 @@ src-tauri/src/
 1. 读相关代码，确认职责边界、数据流、现有模式和可复用组件。
 2. 判断是否会让文件超过 600 行，必要时先拆分。
 3. 说明简短方案：改哪些文件、如何验证、是否引入依赖。
-4. 实现后运行相关验证（见「构建与验证命令」）。
+4. 实现后运行相关验证（见「构建与验证命令」，只跑改动涉及的测试及关联测试，不跑全量）。
 
 简单 typo、单行配置、小文案调整可省略正式计划，但仍要遵守文件行数、i18n 和验证要求。
 
@@ -148,7 +148,9 @@ i18n：
 - 格式：`pnpm format`（Prettier + Tailwind 类名排序，pre-commit 已接入 lint-staged）
 - i18n 文案改动：`pnpm run extract && pnpm run compile && pnpm build`
 - 后端改动：`cargo check --manifest-path src-tauri/Cargo.toml`
-- 后端核心逻辑：`cargo test --manifest-path src-tauri/Cargo.toml --locked`
+- 后端核心逻辑：`cargo test --manifest-path src-tauri/Cargo.toml --locked <测试名过滤>`，只跑改动涉及的测试及其关联测试（如 `cargo test ... ssh::` 只跑 ssh 模块），不用每次全量。
+
+验证范围：日常只跑调整功能涉及的测试以及与之关联的测试（调用方、被调用方、同领域模块），不跑全量测试套件；全量 `cargo test --locked` 只在提交前跑一次兜底。
 
 提交前尽量完整验证：`pnpm build` + `cargo test --manifest-path src-tauri/Cargo.toml --locked`。
 

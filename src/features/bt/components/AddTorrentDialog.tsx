@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { FolderOpen, LoaderCircle, Magnet } from "lucide-react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
-import type { BtFileMeta, BtProbeResult, BtTaskInfo } from "~/types";
+import type { BtProbeResult, BtTaskInfo } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { formatBytes } from "~/lib/format";
 import { cn } from "cn";
@@ -17,42 +17,48 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { systemDownloadDir } from "../file-actions";
 import TorrentFileList from "./TorrentFileList";
 export interface AddTorrentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** 在媒体文件上点击预览；携带对话框当前的来源。 */
-  onPreview: (source: string, file: BtFileMeta, probe: BtProbeResult) => void;
-  onAdded: (task: BtTaskInfo) => void;
-  /** 预填的来源（任务行的磁力链接）：对话框一打开就探测，
-   *  之后的流程与手动添加一致。 */
+  onAdded: (
+    task: BtTaskInfo,
+    source: string,
+    probe: BtProbeResult,
+    fileIndices: number[],
+  ) => void;
+  /** 预填的来源和首次解析结果，用于从任务列表直接打开文件选择。 */
   initialSource?: string | null;
   initialProbe?: BtProbeResult | null;
+  initialSelected?: number[] | null;
+  readOnly?: boolean;
+  existingInfoHashes: ReadonlySet<string>;
+  allowExistingTask?: boolean;
 }
 
 /**
  * 添加流程：磁力链接 / .torrent 输入 → bt_probe 文件树 → 选择 →
- * 目标目录 → bt_add_download。任务进入底部传输面板（id 前缀 bt:）。
+ * 文件选择 → bt_add_download。任务进入下载列表和底部传输面板。
  *
- * 用已有任务的磁力链接打开时复用同一流程：探测通过引擎已管理的
- * 种子解析（不会写入磁盘），而 bt_tasks 以 infohash 为键，
- * 因此不会出现重复记录。
+ * 已添加任务从 BT 页面标题打开时直接复用首次解析结果，不再次调用
+ * bt_probe；只有错误任务的显式“重试”动作才重新探测磁力链接。
  */
 export default function AddTorrentDialog({
   open,
   onOpenChange,
-  onPreview,
   onAdded,
   initialSource,
   initialProbe,
+  initialSelected,
+  readOnly = false,
+  existingInfoHashes,
+  allowExistingTask = false,
 }: AddTorrentDialogProps) {
   const { t } = useLingui();
   const [source, setSource] = useState("");
   const [probing, setProbing] = useState(false);
   const [probe, setProbe] = useState<BtProbeResult | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [destDir, setDestDir] = useState("");
   const [starting, setStarting] = useState(false);
   // 仅在带 initialSource 时有意义：失败时回到输入步骤，
   // 这样磁力链接可被重新解析，而不是一直转圈。
@@ -62,7 +68,6 @@ export default function AddTorrentDialog({
     setProbing(false);
     setProbe(null);
     setSelected(new Set());
-    setDestDir("");
     setStarting(false);
     setProbeFailed(false);
   };
@@ -110,8 +115,8 @@ export default function AddTorrentDialog({
     }
   };
 
-  // 从任务行打开：完全跳过输入步骤 —— 显示加载状态并在后台
-  // 探测。该值是普通字符串，在 BT 页轮询重渲染时保持稳定。
+  // 从任务行打开：完全跳过输入步骤，直接注入首次解析结果。
+  // source 是普通字符串，在 BT 页轮询重渲染时保持稳定。
   const doProbeOnOpen = useEffectEvent(doProbe);
   useEffect(() => {
     if (!open || !initialSource) return;
@@ -121,25 +126,17 @@ export default function AddTorrentDialog({
       setSource(initialSource);
       if (initialProbe) {
         setProbe(initialProbe);
-        setSelected(new Set(initialProbe.files.map((file) => file.index)));
+        setSelected(
+          new Set(
+            initialSelected ?? initialProbe.files.map((file) => file.index),
+          ),
+        );
         return;
       }
-      // 用最新闭包探测，且不在 doProbe 身份变化时重跑。
+      // 没有首次解析结果时才允许走普通探测路径。
       void doProbeOnOpen(initialSource);
     });
-  }, [initialProbe, initialSource, open]);
-  // 保存位置默认跟随系统下载文件夹。用 setState 回调判空，这样在解析
-  // 返回之前就自己选了目录的情况下不会被覆盖。
-  useEffect(() => {
-    if (!open) return;
-    let cancelled = false;
-    void systemDownloadDir().then((dir) => {
-      if (!cancelled && dir) setDestDir((prev) => prev || dir);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [open]);
+  }, [initialProbe, initialSelected, initialSource, open]);
   const toggleFile = (index: number) => {
     if (index < 0 || !probe) {
       // -1 = 来自表头行的“全选”信号：依据当前是否已全选来整体翻转。
@@ -156,31 +153,28 @@ export default function AddTorrentDialog({
       return next;
     });
   };
-  const pickDestDir = async () => {
-    const picked = await openDialog({
-      multiple: false,
-      directory: true,
-      defaultPath: destDir || undefined,
-    });
-    if (typeof picked === "string") setDestDir(picked);
-  };
   const selectedBytes = (() => {
     if (!probe) return 0;
     return probe.files
       .filter((f) => selected.has(f.index))
       .reduce((sum, f) => sum + f.len, 0);
   })();
+  const duplicateTask =
+    !!probe &&
+    !readOnly &&
+    !allowExistingTask &&
+    existingInfoHashes.has(probe.infoHash);
   const startDownload = async () => {
-    if (!probe || !destDir.trim() || selected.size === 0) return;
+    if (!probe || selected.size === 0 || duplicateTask) return;
     setStarting(true);
     try {
+      const fileIndices = [...selected].sort((a, b) => a - b);
       const task = await ipc.btAddDownload(
         source.trim(),
         probe.infoHash,
-        [...selected].sort((a, b) => a - b),
-        destDir,
+        fileIndices,
       );
-      onAdded(task);
+      onAdded(task, source.trim(), probe, fileIndices);
       toast.success(t`任务已添加，可在传输面板查看进度`);
       close();
     } catch (error) {
@@ -285,47 +279,44 @@ export default function AddTorrentDialog({
                 files={probe.files}
                 selected={selected}
                 onToggle={toggleFile}
-                onPreview={(file) => onPreview(source.trim(), file, probe)}
+                readOnly={readOnly}
               />
             </div>
-            <div className="flex shrink-0 gap-2">
-              <Input
-                value={destDir}
-                onChange={(e) => setDestDir(e.target.value)}
-                placeholder={t`选择保存位置`}
-                readOnly
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={pickDestDir}
-                title={t`选择保存位置`}
-                aria-label={t`选择保存位置`}
-              >
-                <FolderOpen />
-              </Button>
-            </div>
-            {/* 下载中的文件在隐藏暂存目录里，下完才迁入这里；不说明的话
-                用户会以为没在下载。 */}
-            <p className="text-muted-foreground shrink-0 text-xs">
-              <Trans>下载完成后才写入该目录</Trans>
-            </p>
+            {readOnly ? null : (
+              // 下载先进入应用私有目录，完成后再由任务操作复制到用户目录。
+              <p className="text-muted-foreground shrink-0 text-xs">
+                <Trans>下载完成后可复制到系统下载目录或其他位置</Trans>
+              </p>
+            )}
+            {duplicateTask ? (
+              <p className="text-destructive shrink-0 text-xs">
+                <Trans>该资源已在下载列表中，不能重复添加</Trans>
+              </p>
+            ) : null}
             <DialogFooter className="shrink-0">
-              <Button variant="ghost" onClick={close}>
-                <Trans>取消</Trans>
-              </Button>
-              <Button
-                disabled={selected.size === 0 || !destDir.trim() || starting}
-                onClick={() => void startDownload()}
-              >
-                {starting ? (
-                  <LoaderCircle
-                    data-icon="inline-start"
-                    className="animate-spin"
-                  />
-                ) : null}
-                <Trans>下载</Trans>
-              </Button>
+              {readOnly ? (
+                <Button onClick={close}>
+                  <Trans>关闭</Trans>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" onClick={close}>
+                    <Trans>取消</Trans>
+                  </Button>
+                  <Button
+                    disabled={selected.size === 0 || starting || duplicateTask}
+                    onClick={() => void startDownload()}
+                  >
+                    {starting ? (
+                      <LoaderCircle
+                        data-icon="inline-start"
+                        className="animate-spin"
+                      />
+                    ) : null}
+                    <Trans>下载</Trans>
+                  </Button>
+                </>
+              )}
             </DialogFooter>
           </div>
         )}

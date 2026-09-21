@@ -1,23 +1,31 @@
-//! The post-download stage: wait for the pieces to land, then either rename a
-//! single file into the user's folder or pack the selected files into one
-//! archive.
+//! The post-download stage: wait for the pieces to land, then publish the
+//! selected file or archive inside the application's private BT directory.
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use librqbit::{Session, TorrentStatsState};
+use librqbit::TorrentStatsState;
+use tauri::Emitter as _;
 
 use super::export::{
-    archive_target, move_export_file, pack_tar, partial_archive_path, remove_file_if_exists,
-    selected_export_files,
+    archive_target, pack_tar, partial_archive_path, remove_file_if_exists, selected_export_files,
 };
-use super::staging::{remove_part_dir, stages_into_part_dir};
-use super::{find_handle, parse_info_hash, TorrentHandle};
+use super::TorrentHandle;
 use crate::error::{AppError, AppResult};
 use crate::storage::bt::BtTaskRow;
 use crate::transfer::emit_transfer_progress_with_finish;
+
+pub(super) fn emit_event(app: &tauri::AppHandle, info_hash: &str, kind: &str) {
+    let _ = app.emit(
+        crate::transfer::BT_TASK_EVENT,
+        super::BtTaskEvent {
+            info_hash: info_hash.to_string(),
+            kind: kind.to_string(),
+        },
+    );
+}
 
 const ARCHIVE_PHASE: &str = "bt:packaging";
 const DOWNLOAD_PHASE: &str = "bt:downloading";
@@ -26,7 +34,6 @@ const DOWNLOAD_PHASE: &str = "bt:downloading";
 pub(super) struct FinalizeContext {
     pub(super) app: tauri::AppHandle,
     pub(super) storage: crate::storage::Storage,
-    pub(super) session: Arc<Session>,
     pub(super) jobs: Arc<Mutex<std::collections::HashMap<String, Arc<AtomicBool>>>>,
     pub(super) gate: Arc<tokio::sync::Mutex<()>>,
     pub(super) cancelled: Arc<AtomicBool>,
@@ -59,7 +66,7 @@ pub(super) async fn run_finalize_job(context: FinalizeContext) {
         // the download; a plain download reports through its row status, which
         // the task list is already polling.
         if archive {
-            super::cache::emit_event(
+            emit_event(
                 &context.app,
                 &context.row.info_hash,
                 &format!("package-failed:{message}"),
@@ -88,9 +95,8 @@ async fn wait_until_finished(handle: &TorrentHandle, cancelled: &AtomicBool) -> 
     }
 }
 
-/// Hand a finished single-file download over to the user's folder. Everything
-/// before this point happened inside the hidden part dir, so this rename is the
-/// moment the file becomes visible — and it is whole when it appears.
+/// Record the finished file in the private download directory. Exporting it to
+/// a user-selected folder is a separate explicit operation.
 async fn finalize_direct(context: &FinalizeContext) -> AppResult<()> {
     wait_until_finished(&context.handle, &context.cancelled).await?;
     let id = format!("bt:{}", context.row.info_hash);
@@ -110,16 +116,6 @@ async fn finalize_direct(context: &FinalizeContext) -> AppResult<()> {
         );
         Ok(())
     };
-    if !stages_into_part_dir(&context.row) {
-        // Row from before staging existed: the engine wrote straight into the
-        // user's folder, so there is nothing left to hand over.
-        return finish(context.storage.mark_bt_task_completed(
-            &context.row.info_hash,
-            (total > 0).then_some(total),
-            None,
-        ));
-    }
-
     let _guard = context.gate.lock().await;
     if context.cancelled.load(Ordering::SeqCst)
         || context
@@ -132,29 +128,9 @@ async fn finalize_direct(context: &FinalizeContext) -> AppResult<()> {
     // Metadata is only readable while the torrent is in the session, so resolve
     // the paths before dropping it.
     let files = selected_export_files(&context.handle, &context.row.file_indices)?;
-    let hash = parse_info_hash(&context.row.info_hash)?;
-    if find_handle(&context.session, &hash)?.is_some() {
-        // Stop seeding before moving: the engine has the file open, and there
-        // is nothing left to serve from a path we are about to empty.
-        context
-            .session
-            .delete(hash.into(), false)
-            .await
-            .map_err(|error| AppError(format!("结束下载失败: {error:#}")))?;
-    }
-    let dest_dir = PathBuf::from(&context.row.dest_dir);
-    let moved = tokio::task::spawn_blocking(move || {
-        files
-            .iter()
-            .map(|file| move_export_file(file, &dest_dir))
-            .collect::<AppResult<Vec<_>>>()
-    })
-    .await
-    .map_err(|error| AppError(format!("转存任务异常终止: {error}")))??;
-    let output = moved
+    let output = files
         .first()
-        .map(|path| path.to_string_lossy().into_owned());
-    let _ = remove_part_dir(&context.row);
+        .map(|file| file.absolute.to_string_lossy().into_owned());
     finish(context.storage.mark_bt_task_completed(
         &context.row.info_hash,
         (total > 0).then_some(total),
@@ -165,21 +141,12 @@ async fn finalize_direct(context: &FinalizeContext) -> AppResult<()> {
 async fn finalize_archive(context: &FinalizeContext) -> AppResult<()> {
     wait_until_finished(&context.handle, &context.cancelled).await?;
 
-    let reserved_target = context
+    let target = context
         .row
         .output_path
         .as_ref()
         .map(PathBuf::from)
-        .ok_or_else(|| AppError("压缩包目标路径缺失".into()))?;
-    let target = if reserved_target.exists()
-        || reserved_target
-            .extension()
-            .is_none_or(|extension| extension != "tar")
-    {
-        archive_target(Path::new(&context.row.dest_dir), &context.row.label)
-    } else {
-        reserved_target
-    };
+        .unwrap_or_else(|| archive_target(Path::new(&context.row.work_dir), &context.row.label));
     context.storage.update_bt_task_state(
         &context.row.info_hash,
         "packaging",
@@ -241,10 +208,6 @@ async fn finalize_archive(context: &FinalizeContext) -> AppResult<()> {
         Some(&target.to_string_lossy()),
         None,
     )?;
-    let hash = parse_info_hash(&context.row.info_hash)?;
-    if find_handle(&context.session, &hash)?.is_some() {
-        let _ = context.session.delete(hash.into(), true).await;
-    }
     emit_transfer_progress_with_finish(
         &context.app,
         &format!("bt:{}", context.row.info_hash),
@@ -253,6 +216,6 @@ async fn finalize_archive(context: &FinalizeContext) -> AppResult<()> {
         Some(total),
         true,
     );
-    super::cache::emit_event(&context.app, &context.row.info_hash, "package-completed");
+    emit_event(&context.app, &context.row.info_hash, "package-completed");
     Ok(())
 }

@@ -20,22 +20,12 @@ pub struct BtTaskRow {
     pub package_mode: String,
     pub status: String,
     pub output_path: Option<String>,
+    pub export_path: Option<String>,
     pub total_bytes: Option<u64>,
     pub last_error: Option<String>,
 }
 
 fn row_from(r: &rusqlite::Row<'_>) -> rusqlite::Result<BtTaskRow> {
-    let total_bytes = r
-        .get::<_, Option<i64>>(11)?
-        .map(u64::try_from)
-        .transpose()
-        .map_err(|error| {
-            rusqlite::Error::FromSqlConversionFailure(
-                11,
-                rusqlite::types::Type::Integer,
-                Box::new(error),
-            )
-        })?;
     Ok(BtTaskRow {
         info_hash: r.get(0)?,
         label: r.get(1)?,
@@ -54,12 +44,23 @@ fn row_from(r: &rusqlite::Row<'_>) -> rusqlite::Result<BtTaskRow> {
         package_mode: r.get(8)?,
         status: r.get(9)?,
         output_path: r.get(10)?,
-        total_bytes,
-        last_error: r.get(12)?,
+        export_path: r.get(11)?,
+        total_bytes: r
+            .get::<_, Option<i64>>(12)?
+            .map(u64::try_from)
+            .transpose()
+            .map_err(|error| {
+                rusqlite::Error::FromSqlConversionFailure(
+                    12,
+                    rusqlite::types::Type::Integer,
+                    Box::new(error),
+                )
+            })?,
+        last_error: r.get(13)?,
     })
 }
 
-const COLS: &str = "info_hash, label, dest_dir, mode, pinned, created_at, work_dir, file_indices, package_mode, status, output_path, total_bytes, last_error";
+const COLS: &str = "info_hash, label, dest_dir, mode, pinned, created_at, work_dir, file_indices, package_mode, status, output_path, export_path, total_bytes, last_error";
 
 fn query_all(
     conn: &Connection,
@@ -74,6 +75,37 @@ fn query_all(
 }
 
 impl Storage {
+    pub fn finish_bt_download_only_migration(&self) -> AppResult<()> {
+        const MIGRATION_KEY: &str = "bt_download_only_migrated_v1";
+        let mut conn = self.conn()?;
+        let done: Option<String> = conn
+            .query_row(
+                "SELECT value FROM app_meta WHERE key = ?1",
+                params![MIGRATION_KEY],
+                |row| row.get(0),
+            )
+            .optional()?;
+        if done.as_deref() == Some("1") {
+            return Ok(());
+        }
+        let transaction = conn.transaction()?;
+        transaction.execute("DELETE FROM bt_tasks WHERE mode = 'preview'", [])?;
+        transaction.execute("DELETE FROM bt_cache_access", [])?;
+        transaction.execute("DELETE FROM app_meta WHERE key = 'bt_cache_quota'", [])?;
+        transaction.execute(
+            "INSERT INTO app_meta(key, value) VALUES(?1, '1')
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            params![MIGRATION_KEY],
+        )?;
+        transaction.commit()?;
+
+        let cache_dir = self.root_path().join("bt").join("cache");
+        if cache_dir.exists() {
+            std::fs::remove_dir_all(cache_dir)?;
+        }
+        Ok(())
+    }
+
     pub fn has_active_bt_tasks(&self) -> AppResult<bool> {
         let conn = self.conn()?;
         let active: i64 = conn.query_row(
@@ -94,8 +126,9 @@ impl Storage {
         conn.execute(
             "INSERT INTO bt_tasks (
                 info_hash, label, dest_dir, mode, pinned, created_at, work_dir,
-                file_indices, package_mode, status, output_path, total_bytes, last_error
-             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
+                file_indices, package_mode, status, output_path, export_path,
+                total_bytes, last_error
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)
              ON CONFLICT(info_hash) DO UPDATE SET
                label = excluded.label,
                dest_dir = excluded.dest_dir,
@@ -106,6 +139,7 @@ impl Storage {
                package_mode = excluded.package_mode,
                status = excluded.status,
                output_path = excluded.output_path,
+               export_path = excluded.export_path,
                total_bytes = excluded.total_bytes,
                last_error = excluded.last_error",
             params![
@@ -120,6 +154,7 @@ impl Storage {
                 task.package_mode,
                 task.status,
                 task.output_path,
+                task.export_path,
                 total_bytes,
                 task.last_error,
             ],
@@ -252,6 +287,15 @@ impl Storage {
         Ok(())
     }
 
+    pub fn set_bt_task_export_path(&self, info_hash: &str, export_path: &str) -> AppResult<()> {
+        let conn = self.conn()?;
+        conn.execute(
+            "UPDATE bt_tasks SET export_path = ?2 WHERE info_hash = ?1",
+            params![info_hash, export_path],
+        )?;
+        Ok(())
+    }
+
     pub fn mark_bt_task_cancelled(&self, info_hash: &str) -> AppResult<()> {
         let mut conn = self.conn()?;
         let transaction = conn.transaction()?;
@@ -261,7 +305,8 @@ impl Storage {
         )?;
         transaction.execute(
             "UPDATE bt_tasks
-             SET pinned = 0, status = 'cancelled', output_path = NULL, last_error = NULL
+             SET pinned = 0, status = 'cancelled', output_path = NULL,
+                 export_path = NULL, last_error = NULL
              WHERE info_hash = ?1",
             params![info_hash],
         )?;
@@ -276,8 +321,8 @@ impl Storage {
     /// (`mark_bt_cache_cleared`), and archive rows are finalized by the
     /// packaging job.
     ///
-    /// `output_path` records where the finished file was moved to; None keeps
-    /// whatever the row already had.
+    /// `output_path` records the completed file in the private directory; None
+    /// keeps whatever the row already had.
     pub fn mark_bt_task_completed(
         &self,
         info_hash: &str,

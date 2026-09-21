@@ -76,10 +76,6 @@ msgstr "{incomingLabel} Name"
 msgid "{installedLength} 个合集 · {toLocaleStringValue} 篇 · {formatBytesValue}"
 msgstr "{installedLength} collections · {toLocaleStringValue} entries · {formatBytesValue}"
 
-#: src/features/bt/components/CacheManager.tsx:169
-msgid "{itemsLength} 个任务"
-msgstr "{itemsLength} tasks"
-
 #: src/features/formatter/FormatterTool.tsx:154
 msgid "{languageLabel2} 格式有效"
 msgstr "{languageLabel2} format valid"
@@ -204,7 +200,7 @@ msgstr "{spaces, plural, one {# space} other {# spaces}}"
 msgid "{taskCount, plural, one {# 任务} other {# 任务}}"
 msgstr "{taskCount, plural, one {# task} other {# tasks}}"
 
-#: src/features/about/AboutPage.tsx:132
+#: src/features/about/AboutPage.tsx:118
 msgid "{title}已清理，释放 {freed}"
 msgstr "{title} cleared, freed {freed}"
 
@@ -256,7 +252,7 @@ msgstr "AI service connection succeeded"
 msgid "AI 服务配置已保存"
 msgstr "AI service settings saved"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:274
+#: src/features/poetry/components/PoetryTranslationSection.tsx:290
 msgid "AI 生成"
 msgstr "AI generated"
 
@@ -281,23 +277,14 @@ msgstr "API Key cleared"
 msgid "AVIF（不支持）"
 msgstr "AVIF (unsupported)"
 
-#: src/features/transfers/TransferPanel.tsx:468
+#: src/features/transfers/TransferPanel.tsx:462
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:421
-#: src/features/home/entries.tsx:137
+#: src/features/bt/BtTool.tsx:374
+#: src/features/home/entries.tsx:140
 msgid "BT 下载"
 msgstr "BT Downloads"
-
-#: src/features/about/AboutPage.tsx:73
-#: src/features/about/AboutPage.tsx:208
-msgid "BT 缓存"
-msgstr "BT cache"
-
-#: src/features/about/AboutPage.tsx:246
-msgid "BT 缓存任务"
-msgstr "BT cache tasks"
 
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:161
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:211
@@ -336,7 +323,7 @@ msgstr "PNG is lossless; quality has limited effect"
 msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP host connection profiles"
 
-#: src/features/about/AboutPage.tsx:230
+#: src/features/about/AboutPage.tsx:212
 msgid "SSH/SFTP 连接"
 msgstr "SSH/SFTP sessions"
 
@@ -360,7 +347,6 @@ msgstr "Previous"
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "The last move was a pass: pass again to end the game, or play to reset the count"
 
-#: src/features/bt/components/BtStatsBar.tsx:77
 #: src/features/lan-transfer/LanTransferSidebar.tsx:56
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:272
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:288
@@ -395,15 +381,7 @@ msgstr "Parent Directory"
 msgid "下一个"
 msgstr "Next"
 
-#: src/features/bt/BtPreviewScreen.tsx:157
-#: src/features/bt/components/AddTorrentDialog.tsx:327
-#: src/features/bt/components/BtStatsBar.tsx:68
-#: src/features/bt/components/CacheManager.tsx:253
-#: src/features/bt/components/CacheManager.tsx:254
-#: src/features/bt/components/CacheManager.tsx:299
-#: src/features/bt/components/TaskDialogs.tsx:129
-#: src/features/bt/components/TaskRow.tsx:155
-#: src/features/bt/components/TaskRow.tsx:156
+#: src/features/bt/components/AddTorrentDialog.tsx:316
 #: src/features/lan-transfer/LanTransferSidebar.tsx:57
 #: src/features/media-compress/components/CompressResultCard.tsx:70
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:266
@@ -419,24 +397,19 @@ msgstr "Download {entryName}"
 msgid "下载 {entryName2}"
 msgstr "Download {entryName2}"
 
-#: src/features/bt/components/CacheManager.tsx:290
-#: src/features/bt/components/TaskDialogs.tsx:120
-msgid "下载 {pendingSaveLabel}"
-msgstr "Download {pendingSaveLabel}"
-
-#: src/features/bt/components/BtStatsBar.tsx:23
-#: src/features/bt/components/TaskRow.tsx:114
+#: src/features/bt/BtTool.tsx:408
+#: src/features/bt/components/TaskRow.tsx:126
 #: src/features/settings/AppSettingsMenu.tsx:74
 #: src/store/transfers.ts:9
 msgid "下载中"
 msgstr "Downloading"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:71
-#: src/features/poetry/LibraryMobileManagePage.tsx:106
+#: src/features/poetry/LibraryMobileManagePage.tsx:68
+#: src/features/poetry/LibraryMobileManagePage.tsx:103
 msgid "下载失败"
 msgstr "Download failed"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:68
+#: src/features/poetry/LibraryMobileManagePage.tsx:65
 msgid "下载完成"
 msgstr "Download complete"
 
@@ -444,15 +417,15 @@ msgstr "Download complete"
 msgid "下载完成，正在安装更新…"
 msgstr "Download complete, installing update..."
 
-#: src/features/bt/components/AddTorrentDialog.tsx:311
-msgid "下载完成后才写入该目录"
-msgstr "Written here only once complete"
+#: src/features/bt/components/AddTorrentDialog.tsx:288
+msgid "下载完成后可复制到系统下载目录或其他位置"
+msgstr ""
 
 #: src/features/poetry/LibraryManagePage.tsx:423
 msgid "下载所选"
 msgstr "Download selected"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:202
+#: src/features/poetry/LibraryMobileManagePage.tsx:199
 msgid "下载所选合集"
 msgstr "Download selected collections"
 
@@ -493,7 +466,7 @@ msgid "两次输入的密码不一致"
 msgstr "Passwords do not match"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:34
-#: src/features/home/entries.tsx:188
+#: src/features/home/entries.tsx:191
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -516,7 +489,7 @@ msgstr "Center"
 msgid "中等"
 msgstr "Medium"
 
-#: src/features/about/AboutPage.tsx:200
+#: src/features/about/AboutPage.tsx:186
 msgid "主数据库"
 msgstr "Main database"
 
@@ -532,7 +505,7 @@ msgstr "Hosts"
 msgid "主机列表"
 msgstr "Host list"
 
-#: src/features/about/AboutPage.tsx:69
+#: src/features/about/AboutPage.tsx:62
 msgid "主机和密钥"
 msgstr "Hosts and keys"
 
@@ -551,7 +524,7 @@ msgid "互换"
 msgstr "Swap"
 
 #: src/features/games/gomoku/GomokuGame.tsx:35
-#: src/features/home/entries.tsx:168
+#: src/features/home/entries.tsx:171
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -559,7 +532,7 @@ msgstr "Gomoku"
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "Swapped {formatBytesValue} / {formatBytesValue2}"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:274
+#: src/features/poetry/components/PoetryTranslationSection.tsx:290
 msgid "人工修订"
 msgstr "Manually revised"
 
@@ -608,7 +581,7 @@ msgstr "Showing the beginning only"
 msgid "仅限同一局域网内联机"
 msgstr "Online play works within the same LAN only"
 
-#: src/features/poetry/components/PoemDetail.tsx:189
+#: src/features/poetry/components/PoemDetail.tsx:192
 msgid "从左侧列表选择一篇，或试试每日一诗。"
 msgstr "Pick a poem from the list, or try the daily poem."
 
@@ -616,11 +589,15 @@ msgstr "Pick a poem from the list, or try the daily poem."
 msgid "从本地 tar.gz 导入…"
 msgstr "Import from local tar.gz…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:184
+#: src/features/bt/components/TaskDialogs.tsx:77
+msgid "任务及应用内下载文件将被删除，操作无法恢复。"
+msgstr ""
+
+#: src/features/bt/components/AddTorrentDialog.tsx:178
 msgid "任务已添加，可在传输面板查看进度"
 msgstr "Task added. Check progress in the transfer panel"
 
-#: src/features/transfers/TransferPanel.tsx:378
+#: src/features/transfers/TransferPanel.tsx:372
 msgid "传输"
 msgstr "Transfers"
 
@@ -671,12 +648,8 @@ msgstr "You lose"
 msgid "使用 -_ 替换 +/，并省略填充"
 msgstr "Replace +/ with -_ and omit padding"
 
-#: src/features/bt/components/CacheManager.tsx:230
-msgid "使用中"
-msgstr "In use"
-
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:499
-#: src/features/poetry/components/PoetryTranslationSection.tsx:427
+#: src/features/poetry/components/PoetryTranslationSection.tsx:443
 #: src/features/settings/AiConnectionSettings.tsx:221
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:335
 #: src/features/todo/TodoItemDialog.tsx:264
@@ -708,8 +681,7 @@ msgstr "Modified Date"
 msgid "修改时间"
 msgstr "Modified Time"
 
-#: src/features/bt/components/BtStatsBar.tsx:20
-#: src/features/bt/components/TaskRow.tsx:109
+#: src/features/bt/components/TaskRow.tsx:121
 #: src/store/transfers.ts:10
 msgid "做种中"
 msgstr "Seeding"
@@ -786,14 +758,17 @@ msgstr "{count} translations"
 msgid "共享目录"
 msgstr "Shared Folders"
 
-#: src/features/about/AboutPage.tsx:158
+#: src/features/about/AboutPage.tsx:144
 #: src/features/settings/AppSettingsMenu.tsx:114
 msgid "关于"
 msgstr "About"
 
+#: src/features/bt/components/AddTorrentDialog.tsx:299
+msgid "关闭"
+msgstr "Close"
+
 #. Button that closes an SSH session tab
 #. Button that closes the CodeMirror search panel
-#: src/features/bt/BtPreviewScreen.tsx:162
 #: src/features/formatter/FormatterTool.tsx:93
 #: src/features/poetry/components/SearchBar.tsx:118
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:136
@@ -869,7 +844,7 @@ msgstr "Write and execute"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:295
 #: src/features/media-compress/video/VideoCompressPanel.tsx:218
-#: src/store/transfers.ts:316
+#: src/store/transfers.ts:313
 msgid "准备中"
 msgstr "Preparing"
 
@@ -908,13 +883,11 @@ msgstr "Create Room"
 msgid "创建时间"
 msgstr "Created Time"
 
-#: src/features/bt/components/CacheManager.tsx:270
-#: src/features/bt/components/CacheManager.tsx:271
-#: src/features/bt/components/TaskDialogs.tsx:107
-#: src/features/bt/components/TaskRow.tsx:208
-#: src/features/bt/components/TaskRow.tsx:209
+#: src/features/bt/components/TaskDialogs.tsx:83
+#: src/features/bt/components/TaskRow.tsx:237
+#: src/features/bt/components/TaskRow.tsx:238
 #: src/features/logs/LogPageLayout.tsx:108
-#: src/features/poetry/components/PoetryTranslationSection.tsx:447
+#: src/features/poetry/components/PoetryTranslationSection.tsx:463
 #: src/features/poetry/LibraryManagePage.tsx:518
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:42
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:129
@@ -926,8 +899,8 @@ msgstr "Created Time"
 msgid "删除"
 msgstr "Delete"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:246
-#: src/features/poetry/LibraryMobileManagePage.tsx:247
+#: src/features/poetry/LibraryMobileManagePage.tsx:243
+#: src/features/poetry/LibraryMobileManagePage.tsx:244
 msgid "删除 {itemName}"
 msgstr "Delete {itemName}"
 
@@ -940,7 +913,7 @@ msgstr "Delete {name}"
 msgid "删除 {packName}"
 msgstr "Delete {packName}"
 
-#: src/features/bt/components/TaskDialogs.tsx:89
+#: src/features/bt/components/TaskDialogs.tsx:74
 msgid "删除 {pendingDeleteLabel}"
 msgstr "Delete {pendingDeleteLabel}"
 
@@ -953,17 +926,16 @@ msgstr "Delete Host"
 msgid "删除共享目录"
 msgstr "Remove shared folder"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:438
+#: src/features/poetry/components/PoetryTranslationSection.tsx:454
 msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "You can generate it again later. The original text and annotations are unaffected."
 
-#: src/features/bt/components/TaskDialogs.tsx:92
 #: src/features/logs/LogPageLayout.tsx:100
 #: src/features/todo/TodoTool.tsx:289
 msgid "删除后无法恢复。"
 msgstr "This cannot be undone."
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:272
+#: src/features/poetry/LibraryMobileManagePage.tsx:269
 msgid "删除后需要重新下载，不会影响已保存的 AI 译文。"
 msgstr "You can download it again later. Saved AI translations are not affected."
 
@@ -980,7 +952,6 @@ msgstr "Delete todo?"
 msgid "删除待办失败"
 msgstr "Failed to delete todo"
 
-#: src/features/bt/components/TaskDialogs.tsx:101
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:30
 msgid "删除文件"
 msgstr "Delete File"
@@ -999,12 +970,12 @@ msgstr "Delete Log"
 msgid "删除白名单"
 msgstr "Remove from allowlist"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:299
-#: src/features/poetry/components/PoetryTranslationSection.tsx:300
+#: src/features/poetry/components/PoetryTranslationSection.tsx:315
+#: src/features/poetry/components/PoetryTranslationSection.tsx:316
 msgid "删除译文"
 msgstr "Delete translation"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:270
+#: src/features/poetry/LibraryMobileManagePage.tsx:267
 msgid "删除诗词合集？"
 msgstr "Delete poetry collection?"
 
@@ -1016,7 +987,7 @@ msgstr "Delete this account?"
 msgid "删除这条日志？"
 msgstr "Delete this log?"
 
-#: src/features/about/AboutPage.tsx:171
+#: src/features/about/AboutPage.tsx:157
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:41
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:118
 #: src/features/lan-transfer/LanTransferTool.tsx:374
@@ -1032,7 +1003,7 @@ msgstr "Refresh"
 msgid "刷新间隔"
 msgstr "Refresh interval"
 
-#: src/features/transfers/TransferPanel.tsx:532
+#: src/features/transfers/TransferPanel.tsx:521
 msgid "剩余 {metricsEta}"
 msgstr "Remaining {metricsEta}"
 
@@ -1055,12 +1026,12 @@ msgstr "Encrypted file, enter the password"
 
 #: src/features/crypto/CryptoTool.tsx:70
 #: src/features/crypto/CryptoTool.tsx:87
-#: src/features/home/entries.tsx:76
+#: src/features/home/entries.tsx:80
 msgid "加解密"
 msgstr "Encode / Decode"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:212
-#: src/features/bt/components/AddTorrentDialog.tsx:226
+#: src/features/bt/components/AddTorrentDialog.tsx:206
+#: src/features/bt/components/AddTorrentDialog.tsx:220
 #: src/features/bt/components/PeersDialog.tsx:66
 #: src/features/poetry/components/PoemList.tsx:170
 #: src/features/preview/PreviewScreen.tsx:49
@@ -1158,7 +1129,7 @@ msgstr "Original resolution"
 msgid "原视频"
 msgstr "Original video"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:247
+#: src/features/poetry/components/PoetryTranslationSection.tsx:263
 msgid "去设置"
 msgstr "Open settings"
 
@@ -1203,14 +1174,12 @@ msgid "发现设备"
 msgstr "Discovered Devices"
 
 #: src/components/ui/prompt-dialog.tsx:101
-#: src/features/about/AboutPage.tsx:318
-#: src/features/about/AboutPage.tsx:332
-#: src/features/bt/components/AddTorrentDialog.tsx:315
-#: src/features/bt/components/CacheManager.tsx:297
-#: src/features/bt/components/TaskDialogs.tsx:105
-#: src/features/bt/components/TaskDialogs.tsx:127
-#: src/features/bt/components/TaskRow.tsx:189
-#: src/features/bt/components/TaskRow.tsx:190
+#: src/features/about/AboutPage.tsx:295
+#: src/features/about/AboutPage.tsx:309
+#: src/features/bt/components/AddTorrentDialog.tsx:304
+#: src/features/bt/components/TaskDialogs.tsx:81
+#: src/features/bt/components/TaskRow.tsx:183
+#: src/features/bt/components/TaskRow.tsx:184
 #: src/features/export/ExportDialog.tsx:162
 #: src/features/export/ImportDialog.tsx:181
 #: src/features/games/engine/GameHeaderControls.tsx:52
@@ -1224,12 +1193,12 @@ msgstr "Discovered Devices"
 #: src/features/logs/LogPageLayout.tsx:156
 #: src/features/media-compress/image/ImageCompressPanel.tsx:301
 #: src/features/media-compress/video/VideoCompressPanel.tsx:369
-#: src/features/poetry/components/PoetryTranslationSection.tsx:414
-#: src/features/poetry/components/PoetryTranslationSection.tsx:442
-#: src/features/poetry/components/PoetryTranslationSection.tsx:462
+#: src/features/poetry/components/PoetryTranslationSection.tsx:430
+#: src/features/poetry/components/PoetryTranslationSection.tsx:458
+#: src/features/poetry/components/PoetryTranslationSection.tsx:478
 #: src/features/poetry/LibraryManagePage.tsx:553
-#: src/features/poetry/LibraryMobileManagePage.tsx:215
-#: src/features/poetry/LibraryMobileManagePage.tsx:276
+#: src/features/poetry/LibraryMobileManagePage.tsx:212
+#: src/features/poetry/LibraryMobileManagePage.tsx:273
 #: src/features/settings/AiConnectionSettings.tsx:234
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:327
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:85
@@ -1240,7 +1209,7 @@ msgstr "Discovered Devices"
 #: src/features/ssh-sftp/components/Sidebar.tsx:552
 #: src/features/todo/TodoItemDialog.tsx:259
 #: src/features/todo/TodoTool.tsx:294
-#: src/features/transfers/TransferPanel.tsx:496
+#: src/features/transfers/TransferPanel.tsx:485
 #: src/features/vault/VaultEntryDialog.tsx:187
 #: src/features/vault/VaultTool.tsx:494
 msgid "取消"
@@ -1259,7 +1228,7 @@ msgstr "Cancel sync"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/features/home/entries.tsx:148
+#: src/features/home/entries.tsx:151
 #: src/features/poetry/LibraryMobilePage.tsx:158
 #: src/features/poetry/LibraryMobilePage.tsx:185
 #: src/features/poetry/LibraryPage.tsx:266
@@ -1286,7 +1255,7 @@ msgstr "Updates can only be checked in the desktop app"
 msgid "只读"
 msgstr "Read Only"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:163
+#: src/features/poetry/LibraryMobileManagePage.tsx:160
 msgid "可下载合集"
 msgstr "Available collections"
 
@@ -1295,12 +1264,16 @@ msgid "可用 {formatBytesValue}"
 msgstr "Available {formatBytesValue}"
 
 #: src/features/poetry/LibraryManagePage.tsx:59
-#: src/features/poetry/LibraryMobileManagePage.tsx:183
+#: src/features/poetry/LibraryMobileManagePage.tsx:180
 msgid "可选"
 msgstr "Optional"
 
+#: src/features/bt/components/TaskRow.tsx:135
+msgid "可预览"
+msgstr "Preview ready"
+
 #: src/features/games/billiards/BilliardsGame.tsx:56
-#: src/features/home/entries.tsx:158
+#: src/features/home/entries.tsx:161
 msgid "台球"
 msgstr "Billiards"
 
@@ -1420,7 +1393,7 @@ msgid "困难"
 msgstr "Hard"
 
 #: src/features/games/go/GoGame.tsx:35
-#: src/features/home/entries.tsx:178
+#: src/features/home/entries.tsx:181
 msgid "围棋"
 msgstr "Go"
 
@@ -1444,7 +1417,7 @@ msgstr "Exact size"
 msgid "固定高度"
 msgstr "Fixed height"
 
-#: src/features/bt/components/TorrentFileList.tsx:58
+#: src/features/bt/components/TorrentFileList.tsx:44
 msgid "图片"
 msgstr "Image"
 
@@ -1476,23 +1449,6 @@ msgstr "Select collections in Data Management and download them to browse offlin
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:66
 msgid "在线"
 msgstr "Online"
-
-#: src/features/bt/components/TaskRow.tsx:81
-#: src/features/bt/components/TorrentFileList.tsx:143
-#: src/features/bt/components/TorrentFileList.tsx:144
-#: src/features/transfers/TransferPanel.tsx:473
-msgid "在线预览"
-msgstr "Online Preview"
-
-#: src/features/bt/BtTool.tsx:301
-#: src/features/bt/BtTool.tsx:374
-#: src/features/bt/components/CacheManager.tsx:134
-msgid "在线预览失败"
-msgstr "Online preview failed"
-
-#: src/features/bt/components/CacheManager.tsx:166
-msgid "在线预览缓存"
-msgstr "Online preview cache"
 
 #: src/features/logs/ActivityLogsPage.tsx:331
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:119
@@ -1529,11 +1485,16 @@ msgid "备注"
 msgstr "Notes"
 
 #: src/components/CopyButton.tsx:50
-#: src/features/bt/components/TaskDialogs.tsx:74
+#: src/features/bt/components/TaskDialogs.tsx:59
 #: src/features/formatter/FormatterTool.tsx:243
 #: src/features/lan-transfer/LanTransferTool.tsx:364
 msgid "复制"
 msgstr "Copy"
+
+#: src/features/bt/components/TaskRow.tsx:205
+#: src/features/bt/components/TaskRow.tsx:206
+msgid "复制到用户目录"
+msgstr ""
 
 #: src/features/vault/VaultTool.tsx:432
 msgid "复制密码"
@@ -1564,11 +1525,11 @@ msgstr "Size"
 #: src/features/logs/ActivityLogsPage.tsx:219
 #: src/features/logs/ActivityLogsPage.tsx:295
 #: src/features/logs/ActivityLogsPage.tsx:375
-#: src/store/transfers.ts:176
+#: src/store/transfers.ts:173
 msgid "失败"
 msgstr "Failed"
 
-#: src/features/home/entries.tsx:90
+#: src/features/home/entries.tsx:94
 #: src/features/media-compress/MediaCompressTool.tsx:41
 #: src/features/media-compress/MediaCompressTool.tsx:58
 msgid "媒体处理"
@@ -1578,12 +1539,12 @@ msgstr "Media Tools"
 msgid "字体"
 msgstr "Font"
 
-#: src/features/poetry/components/PoemDetail.tsx:127
-#: src/features/poetry/components/PoemDetail.tsx:134
+#: src/features/poetry/components/PoemDetail.tsx:130
+#: src/features/poetry/components/PoemDetail.tsx:137
 msgid "字号"
 msgstr "Font size"
 
-#: src/features/about/AboutPage.tsx:196
+#: src/features/about/AboutPage.tsx:182
 msgid "存储占用"
 msgstr "Storage usage"
 
@@ -1598,8 +1559,8 @@ msgstr "Install"
 #: src/features/lan-transfer/LanTransferSidebar.tsx:50
 #: src/features/media-compress/image/ImageCompressPanel.tsx:293
 #: src/features/media-compress/video/VideoCompressPanel.tsx:213
-#: src/store/transfers.ts:125
-#: src/store/transfers.ts:173
+#: src/store/transfers.ts:122
+#: src/store/transfers.ts:170
 msgid "完成"
 msgstr "Completed"
 
@@ -1630,9 +1591,9 @@ msgstr "If the aspect ratio differs from the original, the image will be stretch
 msgid "密码"
 msgstr "Password"
 
-#: src/features/about/AboutPage.tsx:68
+#: src/features/about/AboutPage.tsx:61
 #: src/features/export/sections.tsx:14
-#: src/features/home/entries.tsx:112
+#: src/features/home/entries.tsx:116
 #: src/features/logs/ActivityLogsPage.tsx:75
 #: src/features/logs/ActivityLogsPage.tsx:185
 #: src/features/vault/VaultTool.tsx:238
@@ -1750,7 +1711,7 @@ msgstr "Check"
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "This will delete all local data of \"{pendingDeleteName}\" ({toLocaleStringValue4} entries). This action cannot be undone."
 
-#: src/features/about/AboutPage.tsx:329
+#: src/features/about/AboutPage.tsx:306
 msgid "将删除所有应用内数据、缓存、日志和设置，并恢复首次打开状态。下载目录和共享目录中的文件会保留。"
 msgstr "This deletes all app data, cache, logs, and settings, then restores the first-launch state. Download and shared-folder files are preserved."
 
@@ -1766,7 +1727,7 @@ msgstr "Checkmate"
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:458
+#: src/features/poetry/components/PoetryTranslationSection.tsx:474
 msgid "将覆盖当前人工修订。"
 msgstr "This will overwrite the current manual revision."
 
@@ -1774,19 +1735,19 @@ msgstr "This will overwrite the current manual revision."
 msgid "将返回模式选择，当前对局的进度将会丢失。"
 msgstr "This returns to mode selection and discards the current match progress."
 
-#: src/features/home/entries.tsx:25
+#: src/features/home/entries.tsx:29
 msgid "小游戏"
 msgstr "Games"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:257
+#: src/features/poetry/LibraryMobileManagePage.tsx:254
 msgid "尚未安装合集"
 msgstr "No collections installed"
 
-#: src/features/poetry/components/PoemDetail.tsx:186
+#: src/features/poetry/components/PoemDetail.tsx:189
 msgid "尚未选择作品"
 msgstr "No poem selected"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:239
+#: src/features/poetry/components/PoetryTranslationSection.tsx:255
 msgid "尚未配置 AI 服务"
 msgstr "AI service is not configured"
 
@@ -1803,7 +1764,7 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:65
+#: src/features/home/entries.tsx:69
 #: src/features/lan-transfer/LanTransferTool.tsx:317
 #: src/features/lan-transfer/LanTransferTool.tsx:335
 msgid "局域网传输"
@@ -1821,7 +1782,7 @@ msgstr "LAN Transfer Settings"
 msgid "局域网传输辅助数据加载失败：{StringValue2}"
 msgstr "Failed to load LAN transfer auxiliary data: {StringValue2}"
 
-#: src/features/about/AboutPage.tsx:240
+#: src/features/about/AboutPage.tsx:222
 msgid "局域网服务"
 msgstr "LAN service"
 
@@ -1829,7 +1790,7 @@ msgstr "LAN service"
 msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
-#: src/features/home/entries.tsx:23
+#: src/features/home/entries.tsx:27
 msgid "工具"
 msgstr "Tools"
 
@@ -1842,7 +1803,7 @@ msgid "已下载 {formatBytesValue}"
 msgstr "Downloaded {formatBytesValue}"
 
 #: src/features/media-compress/components/CompressResultCard.tsx:40
-#: src/features/poetry/components/PoetryTranslationSection.tsx:169
+#: src/features/poetry/components/PoetryTranslationSection.tsx:185
 #: src/features/todo/TodoTool.tsx:113
 #: src/features/vault/VaultTool.tsx:218
 msgid "已保存"
@@ -1868,8 +1829,8 @@ msgstr "Access allowed"
 msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
-#: src/features/bt/BtTool.tsx:410
-#: src/features/poetry/components/PoetryTranslationSection.tsx:186
+#: src/features/bt/BtTool.tsx:365
+#: src/features/poetry/components/PoetryTranslationSection.tsx:202
 #: src/features/poetry/components/TranslationPackManager.tsx:46
 #: src/features/poetry/LibraryManagePage.tsx:330
 #: src/features/todo/TodoTool.tsx:150
@@ -1877,7 +1838,7 @@ msgstr "Launch at Login disabled"
 msgid "已删除"
 msgstr "Deleted"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:125
+#: src/features/poetry/LibraryMobileManagePage.tsx:122
 msgid "已删除 {itemName}"
 msgstr "Deleted {itemName}"
 
@@ -1902,9 +1863,9 @@ msgstr "Shared folder removed"
 msgid "已删除白名单"
 msgstr "Trusted device removed"
 
-#: src/features/bt/components/TaskRow.tsx:91
+#: src/features/bt/components/TaskRow.tsx:103
 #: src/features/lan-transfer/LanTransferSidebar.tsx:52
-#: src/store/transfers.ts:175
+#: src/store/transfers.ts:172
 msgid "已取消"
 msgstr "Cancelled"
 
@@ -1918,10 +1879,18 @@ msgid "已取消压缩"
 msgstr "Compression cancelled"
 
 #: src/components/CopyButton.tsx:51
-#: src/features/bt/components/TaskDialogs.tsx:75
+#: src/features/bt/components/TaskDialogs.tsx:60
 #: src/features/formatter/FormatterTool.tsx:244
 msgid "已复制"
 msgstr "Copied"
+
+#: src/features/bt/BtTool.tsx:291
+msgid "已复制到用户目录"
+msgstr ""
+
+#: src/features/bt/BtTool.tsx:275
+msgid "已复制到系统下载目录"
+msgstr ""
 
 #: src/features/lan-transfer/LanTransferTool.tsx:365
 msgid "已复制地址"
@@ -1951,11 +1920,11 @@ msgstr "Installed"
 msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:223
+#: src/features/poetry/LibraryMobileManagePage.tsx:220
 msgid "已安装合集"
 msgstr "Installed collections"
 
-#: src/features/bt/components/BtStatsBar.tsx:20
+#: src/features/bt/BtTool.tsx:440
 #: src/features/todo/TodoTool.tsx:186
 msgid "已完成"
 msgstr "Completed"
@@ -2005,10 +1974,9 @@ msgstr "Disconnected from {hostLabel}"
 msgid "已断开设备"
 msgstr "Device disconnected"
 
-#: src/features/bt/components/BtStatsBar.tsx:21
-#: src/features/bt/components/TaskRow.tsx:107
+#: src/features/bt/components/TaskRow.tsx:119
 #: src/store/transfers.ts:11
-#: src/store/transfers.ts:241
+#: src/store/transfers.ts:238
 msgid "已暂停"
 msgstr "Paused"
 
@@ -2020,11 +1988,7 @@ msgstr "Shared folder added"
 msgid "已添加白名单"
 msgstr "Trusted device added"
 
-#: src/features/bt/components/CacheManager.tsx:194
-msgid "已清除 {removed} 个缓存任务"
-msgstr "Removed {removed} cached tasks"
-
-#: src/features/poetry/components/PoetryTranslationSection.tsx:142
+#: src/features/poetry/components/PoetryTranslationSection.tsx:153
 msgid "已生成"
 msgstr "Generated"
 
@@ -2040,16 +2004,11 @@ msgstr "Indexed {toLocaleStringValue2} entries, sub-millisecond search"
 msgid "已解压到 {outName}"
 msgstr "Extracted to {outName}"
 
-#: src/features/bt/BtPreviewScreen.tsx:105
-#: src/features/bt/BtTool.tsx:240
-msgid "已转存到本地"
-msgstr "Saved to local storage"
-
 #: src/features/ssh-sftp/components/Sidebar.tsx:331
 msgid "已连接 · {hostAddressValue2}"
 msgstr "Connected · {hostAddressValue2}"
 
-#: src/features/bt/components/TorrentFileList.tsx:83
+#: src/features/bt/components/TorrentFileList.tsx:70
 msgid "已选 {selectedSize} / {filesLength}"
 msgstr "Selected {selectedSize} / {filesLength}"
 
@@ -2068,7 +2027,7 @@ msgstr "Draw"
 msgid "并发上限"
 msgstr "Concurrency Limit"
 
-#: src/features/about/AboutPage.tsx:212
+#: src/features/about/AboutPage.tsx:194
 msgid "应用内部数据"
 msgstr "App data"
 
@@ -2113,7 +2072,7 @@ msgstr "Open"
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:372
+#: src/features/poetry/components/PoetryTranslationSection.tsx:388
 msgid "开放译文"
 msgstr "Open translation"
 
@@ -2162,7 +2121,7 @@ msgstr "Current match progress will be lost."
 msgid "当前已是最新版本"
 msgstr "Already on the latest version"
 
-#: src/features/about/AboutPage.tsx:226
+#: src/features/about/AboutPage.tsx:208
 msgid "当前状态"
 msgstr "Current status"
 
@@ -2178,14 +2137,14 @@ msgstr "AVIF export is not supported in this environment"
 msgid "当前配置的 {value} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured {value} is not in the list of available network interfaces; the access address may become invalid."
 
-#: src/features/about/AboutPage.tsx:70
+#: src/features/about/AboutPage.tsx:63
 #: src/features/export/sections.tsx:24
 #: src/features/logs/ActivityLogsPage.tsx:74
 #: src/features/logs/ActivityLogsPage.tsx:191
 msgid "待办"
 msgstr "Todos"
 
-#: src/features/home/entries.tsx:123
+#: src/features/home/entries.tsx:127
 #: src/features/todo/TodoTool.tsx:161
 msgid "待办事项"
 msgstr "Todo"
@@ -2194,11 +2153,11 @@ msgstr "Todo"
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
-#: src/features/about/AboutPage.tsx:216
+#: src/features/about/AboutPage.tsx:198
 msgid "总占用"
 msgstr "Total usage"
 
-#: src/features/about/AboutPage.tsx:301
+#: src/features/about/AboutPage.tsx:278
 msgid "恢复首次打开状态，不删除下载目录和共享目录中的文件。"
 msgstr "Restore the first-launch state without deleting files in download and shared folders."
 
@@ -2245,10 +2204,6 @@ msgstr "Owner"
 msgid "打包中"
 msgstr "Packaging"
 
-#: src/features/bt/components/CacheManager.tsx:242
-#: src/features/bt/components/CacheManager.tsx:243
-#: src/features/bt/components/TaskRow.tsx:144
-#: src/features/bt/components/TaskRow.tsx:145
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:182
 msgid "打开"
 msgstr "Open"
@@ -2256,6 +2211,11 @@ msgstr "Open"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:308
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "Open this directory when starting SFTP. If it does not exist, fall back to the home directory, then the root directory."
+
+#: src/features/bt/components/TaskRow.tsx:215
+#: src/features/bt/components/TaskRow.tsx:216
+msgid "打开下载位置"
+msgstr ""
 
 #: src/features/ssh-sftp/SshSftpTool.tsx:136
 msgid "打开主机列表"
@@ -2348,7 +2308,7 @@ msgstr "Follow"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:198
 #: src/features/poetry/LibraryManagePage.tsx:57
-#: src/features/poetry/LibraryMobileManagePage.tsx:183
+#: src/features/poetry/LibraryMobileManagePage.tsx:180
 msgid "推荐"
 msgstr "Recommended"
 
@@ -2381,19 +2341,23 @@ msgstr "Search title, username, URL"
 msgid "搜索诗词"
 msgstr "Search poems"
 
+#: src/features/bt/BtTool.tsx:333
+msgid "播放窗口尚未就绪"
+msgstr ""
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:200
 msgid "操作"
 msgstr "Actions"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:232
+#: src/features/poetry/components/PoetryTranslationSection.tsx:248
 #: src/features/poetry/components/TranslationPackManager.tsx:48
 #: src/features/poetry/LibraryManagePage.tsx:257
 #: src/features/poetry/LibraryManagePage.tsx:283
 #: src/features/poetry/LibraryManagePage.tsx:298
 #: src/features/poetry/LibraryManagePage.tsx:316
 #: src/features/poetry/LibraryManagePage.tsx:332
-#: src/features/poetry/LibraryMobileManagePage.tsx:114
-#: src/features/poetry/LibraryMobileManagePage.tsx:128
+#: src/features/poetry/LibraryMobileManagePage.tsx:111
+#: src/features/poetry/LibraryMobileManagePage.tsx:125
 #: src/features/poetry/LibraryMobilePage.tsx:134
 #: src/features/poetry/LibraryMobilePage.tsx:150
 #: src/features/poetry/LibraryPage.tsx:209
@@ -2402,7 +2366,7 @@ msgstr "Actions"
 msgid "操作失败"
 msgstr "Operation failed"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:218
+#: src/features/bt/components/AddTorrentDialog.tsx:212
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "Supports magnet links and local .torrent files"
 
@@ -2423,22 +2387,22 @@ msgstr "Data"
 msgid "数据导入导出"
 msgstr "Data import and export"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:150
+#: src/features/poetry/LibraryMobileManagePage.tsx:147
 msgid "数据直接下载到本设备，安装后可离线阅读。下载期间请保持应用开启。"
 msgstr "Data is downloaded directly to this device for offline reading. Keep the app open during download."
 
-#: src/features/about/AboutPage.tsx:266
+#: src/features/about/AboutPage.tsx:243
 #: src/features/poetry/LibraryPage.tsx:259
 msgid "数据管理"
 msgstr "Data Management"
 
-#: src/features/bt/components/TorrentFileList.tsx:60
+#: src/features/bt/components/TorrentFileList.tsx:46
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:64
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:295
 msgid "文件"
 msgstr "File"
 
-#: src/features/about/AboutPage.tsx:235
+#: src/features/about/AboutPage.tsx:217
 msgid "文件传输"
 msgstr "File transfer"
 
@@ -2473,16 +2437,16 @@ msgstr "File is already in this location"
 msgid "文件管理"
 msgstr "File manager"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:225
+#: src/features/poetry/components/PoetryTranslationSection.tsx:241
 msgid "文学意译"
 msgstr "Literary"
 
-#: src/features/home/entries.tsx:24
+#: src/features/home/entries.tsx:28
 #: src/features/poetry/LibraryPage.tsx:287
 msgid "文库"
 msgstr "Library"
 
-#: src/features/bt/components/TorrentFileList.tsx:59
+#: src/features/bt/components/TorrentFileList.tsx:45
 msgid "文本"
 msgstr "Text"
 
@@ -2548,6 +2512,14 @@ msgstr "No access"
 msgid "无法创建画布上下文"
 msgstr "Cannot create canvas context"
 
+#: src/features/bt/BtTool.tsx:341
+msgid "无法开始预览"
+msgstr ""
+
+#: src/features/bt/BtTool.tsx:307
+msgid "无法打开下载位置"
+msgstr ""
+
 #: src/features/home/HomePage.tsx:127
 #: src/features/logs/ActivityLogsPage.tsx:149
 #: src/features/settings/AppSettingsMenu.tsx:117
@@ -2584,13 +2556,17 @@ msgstr "Show password"
 msgid "暂不支持该算法"
 msgstr "Algorithm not supported yet"
 
-#: src/features/bt/components/TaskRow.tsx:167
-#: src/features/bt/components/TaskRow.tsx:168
-#: src/features/transfers/TransferPanel.tsx:481
+#: src/features/bt/components/TaskRow.tsx:161
+#: src/features/bt/components/TaskRow.tsx:162
+#: src/features/transfers/TransferPanel.tsx:470
 msgid "暂停"
 msgstr "Pause"
 
-#: src/features/bt/BtTool.tsx:444
+#: src/features/bt/BtTool.tsx:434
+msgid "暂无下载中的任务"
+msgstr ""
+
+#: src/features/bt/BtTool.tsx:396
 msgid "暂无下载任务"
 msgstr "No download tasks yet"
 
@@ -2598,7 +2574,7 @@ msgstr "No download tasks yet"
 msgid "暂无任务"
 msgstr "No tasks"
 
-#: src/features/poetry/components/PoemDetail.tsx:98
+#: src/features/poetry/components/PoemDetail.tsx:101
 msgid "暂无作者小传。"
 msgstr "No author biography yet."
 
@@ -2610,11 +2586,11 @@ msgstr "No shared folders"
 msgid "暂无发现设备"
 msgstr "No discovered devices"
 
-#: src/features/about/AboutPage.tsx:271
+#: src/features/about/AboutPage.tsx:248
 msgid "暂无可清理的数据"
 msgstr "No data to clear"
 
-#: src/features/bt/components/TaskRow.tsx:112
+#: src/features/bt/components/TaskRow.tsx:124
 msgid "暂无可用节点"
 msgstr "No peers yet"
 
@@ -2625,6 +2601,10 @@ msgstr "No keys"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:281
 msgid "暂无密钥，请先在密钥管理中导入。"
 msgstr "No keys yet. Import one in Key Manager first."
+
+#: src/features/bt/BtTool.tsx:468
+msgid "暂无已完成任务"
+msgstr ""
 
 #: src/features/todo/TodoTool.tsx:237
 msgid "暂无待办"
@@ -2651,7 +2631,7 @@ msgstr "No trusted devices"
 msgid "暂无设备"
 msgstr "No devices"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:337
+#: src/features/poetry/components/PoetryTranslationSection.tsx:353
 msgid "暂无译文"
 msgstr "No translation"
 
@@ -2705,7 +2685,7 @@ msgstr "Replace API Key"
 msgid "替换为"
 msgstr "Replace with"
 
-#: src/features/poetry/components/PoemDetail.tsx:228
+#: src/features/poetry/components/PoemDetail.tsx:231
 msgid "有朗诵"
 msgstr "Audio available"
 
@@ -2745,7 +2725,7 @@ msgstr "Not installed; downloaded on demand only, removable anytime"
 msgid "未完成"
 msgstr "Overdue"
 
-#: src/features/bt/components/TaskRow.tsx:117
+#: src/features/bt/components/TaskRow.tsx:129
 msgid "未运行"
 msgstr "Not running"
 
@@ -2770,7 +2750,7 @@ msgstr "Store credentials locally, click to copy"
 msgid "本地处理"
 msgstr "Local"
 
-#: src/features/about/AboutPage.tsx:180
+#: src/features/about/AboutPage.tsx:166
 msgid "本地文件与数据工具"
 msgstr "Local file and data tools"
 
@@ -2815,8 +2795,7 @@ msgstr "View activity from all modules"
 msgid "查看更新"
 msgstr "View Update"
 
-#: src/features/bt/components/BtStatsBar.tsx:87
-#: src/features/bt/components/TaskRow.tsx:130
+#: src/features/bt/components/TaskRow.tsx:147
 msgid "查看节点明细"
 msgstr "View peer details"
 
@@ -2853,7 +2832,7 @@ msgstr "Validate"
 #: src/features/formatter/FormatterTool.tsx:202
 #: src/features/formatter/FormatterTool.tsx:219
 #: src/features/formatter/FormatterTool.tsx:333
-#: src/features/home/entries.tsx:101
+#: src/features/home/entries.tsx:105
 msgid "格式化"
 msgstr "Formatter"
 
@@ -2905,7 +2884,7 @@ msgstr "Mode"
 msgid "正则"
 msgstr "Regexp"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:89
+#: src/features/poetry/LibraryMobileManagePage.tsx:86
 msgid "正在下载"
 msgstr "Downloading"
 
@@ -2916,10 +2895,6 @@ msgstr "Downloading version {stateVersion3}"
 #: src/features/poetry/LibraryManagePage.tsx:169
 msgid "正在下载语料"
 msgstr "Downloading corpus"
-
-#: src/features/bt/BtPreviewScreen.tsx:140
-msgid "正在准备在线预览…"
-msgstr "Preparing online preview…"
 
 #: src/lib/updater.ts:270
 msgid "正在准备版本 {stateVersion2}"
@@ -2946,11 +2921,11 @@ msgstr "Loading physics engine..."
 msgid "正在加载系统监控…"
 msgstr "Loading system monitor…"
 
-#: src/store/transfers.ts:203
+#: src/store/transfers.ts:200
 msgid "正在取消"
 msgstr "Cancelling"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:88
+#: src/features/poetry/LibraryMobileManagePage.tsx:85
 msgid "正在导入"
 msgstr "Importing"
 
@@ -2982,7 +2957,7 @@ msgstr "Opening terminal..."
 msgid "正在搜索…未发现房间时可用下方地址直连"
 msgstr "Searching... if no room shows up, connect directly by address below"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:86
+#: src/features/poetry/LibraryMobileManagePage.tsx:83
 msgid "正在校验"
 msgstr "Verifying"
 
@@ -2999,7 +2974,7 @@ msgstr "Checking for updates..."
 msgid "正在检索…"
 msgstr "Searching…"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:267
+#: src/features/poetry/components/PoetryTranslationSection.tsx:283
 msgid "正在生成"
 msgstr "Generating"
 
@@ -3008,7 +2983,7 @@ msgstr "Generating"
 msgid "正在移动 {name}…"
 msgstr "Moving {name}…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:262
+#: src/features/bt/components/AddTorrentDialog.tsx:256
 msgid "正在获取资源信息…"
 msgstr "Fetching resource info…"
 
@@ -3046,7 +3021,7 @@ msgstr "Full-text index"
 msgid "正文索引已更新"
 msgstr "Full-text index updated"
 
-#: src/features/about/AboutPage.tsx:315
+#: src/features/about/AboutPage.tsx:292
 msgid "此操作无法撤销，其他模块数据不会受到影响。"
 msgstr "This action cannot be undone. Data in other modules will not be affected."
 
@@ -3081,8 +3056,8 @@ msgstr "No todos in progress"
 msgid "没有逾期未完成的待办"
 msgstr "No overdue todos"
 
-#: src/features/poetry/components/PoemDetail.tsx:270
-#: src/features/poetry/components/PoemDetail.tsx:283
+#: src/features/poetry/components/PoemDetail.tsx:273
+#: src/features/poetry/components/PoemDetail.tsx:286
 msgid "注释"
 msgstr "Notes"
 
@@ -3090,7 +3065,7 @@ msgstr "Notes"
 msgid "注释包（译文 / 赏析）"
 msgstr "Annotation pack (translations & analysis)"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:358
+#: src/features/poetry/components/PoetryTranslationSection.tsx:374
 msgid "注释包译文"
 msgstr "Annotation Pack Translation"
 
@@ -3098,8 +3073,8 @@ msgstr "Annotation Pack Translation"
 msgid "活动中"
 msgstr "Active"
 
-#: src/features/about/AboutPage.tsx:72
-#: src/features/about/AboutPage.tsx:256
+#: src/features/about/AboutPage.tsx:65
+#: src/features/about/AboutPage.tsx:233
 msgid "活动日志"
 msgstr "Activity logs"
 
@@ -3125,19 +3100,19 @@ msgstr "Browser access requests, confirmation prompts, and trusted-device fallba
 msgid "深色"
 msgstr "Dark"
 
-#: src/features/bt/BtTool.tsx:425
-#: src/features/bt/BtTool.tsx:449
+#: src/features/bt/BtTool.tsx:378
+#: src/features/bt/BtTool.tsx:401
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:48
 #: src/features/lan-transfer/LanShareDialog.tsx:141
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:334
 msgid "添加"
 msgstr "Add"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:214
+#: src/features/bt/components/AddTorrentDialog.tsx:208
 msgid "添加 BT 任务"
 msgstr "Add BT Task"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:187
+#: src/features/bt/components/AddTorrentDialog.tsx:181
 msgid "添加下载任务失败"
 msgstr "Failed to add download task"
 
@@ -3158,19 +3133,14 @@ msgstr "Cleared"
 msgid "清台完成！"
 msgstr "Table cleared!"
 
-#: src/features/about/AboutPage.tsx:291
+#: src/features/about/AboutPage.tsx:268
 msgid "清理"
 msgstr "Clear"
 
-#: src/features/about/AboutPage.tsx:314
+#: src/features/about/AboutPage.tsx:291
 msgid "清理{clearTitle}？"
 msgstr "Clear {clearTitle}?"
 
-#: src/features/bt/BtTool.tsx:331
-msgid "清理预览缓存失败"
-msgstr "Failed to clean up preview cache"
-
-#: src/features/bt/components/CacheManager.tsx:202
 #: src/features/crypto/CryptoTool.tsx:112
 #: src/features/formatter/FormatterTool.tsx:254
 #: src/features/games/billiards/BilliardsModeMenu.tsx:166
@@ -3185,11 +3155,11 @@ msgstr "Failed to clean up preview cache"
 msgid "清空"
 msgstr "Clear"
 
-#: src/features/about/AboutPage.tsx:299
+#: src/features/about/AboutPage.tsx:276
 msgid "清空所有数据"
 msgstr "Clear all data"
 
-#: src/features/about/AboutPage.tsx:328
+#: src/features/about/AboutPage.tsx:305
 msgid "清空所有数据？"
 msgstr "Clear all data?"
 
@@ -3205,7 +3175,7 @@ msgstr "Clear Logs"
 msgid "清空现有数据后写入文件内容"
 msgstr "Clear existing data, then write the file contents"
 
-#: src/features/transfers/TransferPanel.tsx:404
+#: src/features/transfers/TransferPanel.tsx:398
 msgid "清除 {finishedTransferCount}"
 msgstr "Clear {finishedTransferCount}"
 
@@ -3250,7 +3220,7 @@ msgstr "Click + in the top right to create a host"
 msgid "版本 {stateVersion4} 已准备好"
 msgstr "Version {stateVersion4} is ready"
 
-#: src/features/about/AboutPage.tsx:159
+#: src/features/about/AboutPage.tsx:145
 msgid "版本、状态和本地数据管理"
 msgstr "Version, status, and local data management"
 
@@ -3299,7 +3269,7 @@ msgstr "Player 2"
 msgid "玩家 2 胜"
 msgstr "Player 2 wins"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:350
+#: src/features/poetry/components/PoetryTranslationSection.tsx:366
 msgid "生成"
 msgstr "Generate"
 
@@ -3351,7 +3321,7 @@ msgstr "White"
 msgid "白棋胜"
 msgstr "White wins"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:222
+#: src/features/poetry/components/PoetryTranslationSection.tsx:238
 msgid "白话直译"
 msgstr "Literal"
 
@@ -3415,11 +3385,11 @@ msgstr "Delete host \"{value}\"? This action cannot be undone."
 msgid "确认"
 msgstr "Confirm"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:278
+#: src/features/poetry/LibraryMobileManagePage.tsx:275
 msgid "确认删除"
 msgstr "Delete"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:436
+#: src/features/poetry/components/PoetryTranslationSection.tsx:452
 msgid "确认删除？"
 msgstr "Delete?"
 
@@ -3432,11 +3402,11 @@ msgstr "After confirmation, the operation will continue with the names above."
 msgid "确认密码"
 msgstr "Confirm password"
 
-#: src/features/about/AboutPage.tsx:321
+#: src/features/about/AboutPage.tsx:298
 msgid "确认清理"
 msgstr "Confirm clear"
 
-#: src/features/about/AboutPage.tsx:335
+#: src/features/about/AboutPage.tsx:312
 #: src/features/logs/LogPageLayout.tsx:159
 msgid "确认清空"
 msgstr "Confirm Clear"
@@ -3454,10 +3424,10 @@ msgstr "Confirmation Code"
 msgid "确认码 {statusConfirmationCode}"
 msgstr "Confirmation code {statusConfirmationCode}"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:234
-#: src/features/bt/components/TaskDialogs.tsx:65
-#: src/features/bt/components/TaskRow.tsx:199
-#: src/features/bt/components/TaskRow.tsx:200
+#: src/features/bt/components/AddTorrentDialog.tsx:228
+#: src/features/bt/components/TaskDialogs.tsx:50
+#: src/features/bt/components/TaskRow.tsx:193
+#: src/features/bt/components/TaskRow.tsx:194
 msgid "磁力链接"
 msgstr "Magnet link"
 
@@ -3469,7 +3439,7 @@ msgstr "Disks"
 msgid "磁盘 I/O"
 msgstr "Disk I/O"
 
-#: src/features/bt/components/TorrentFileList.tsx:56
+#: src/features/bt/components/TorrentFileList.tsx:42
 msgid "视频"
 msgstr "Video"
 
@@ -3510,7 +3480,7 @@ msgstr "Later"
 msgid "空目录"
 msgstr "Empty Directory"
 
-#: src/features/about/AboutPage.tsx:75
+#: src/features/about/AboutPage.tsx:67
 #: src/features/home/HomePage.tsx:93
 #: src/features/transfers/TransferPanel.tsx:166
 msgid "空闲"
@@ -3638,25 +3608,21 @@ msgstr "Result"
 msgid "结果会实时显示在这里"
 msgstr "Result appears here in real time"
 
-#: src/features/bt/components/TaskRow.tsx:167
-#: src/features/bt/components/TaskRow.tsx:168
+#: src/features/bt/components/TaskRow.tsx:161
+#: src/features/bt/components/TaskRow.tsx:162
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:436
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:448
-#: src/features/transfers/TransferPanel.tsx:481
+#: src/features/transfers/TransferPanel.tsx:470
 msgid "继续"
 msgstr "Continue"
 
-#: src/store/transfers.ts:250
+#: src/store/transfers.ts:247
 msgid "继续传输中"
 msgstr "Resuming Transfer"
 
 #: src/features/preview/PreviewSurface.tsx:148
 msgid "缓冲中…"
 msgstr "Buffering…"
-
-#: src/features/bt/components/TaskRow.tsx:86
-msgid "缓存已清理"
-msgstr "Cache cleared"
 
 #: src/features/crypto/CryptoTool.tsx:160
 msgid "编码"
@@ -3685,9 +3651,9 @@ msgstr "Edit Host"
 msgid "编辑待办"
 msgstr "Edit Todo"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:288
-#: src/features/poetry/components/PoetryTranslationSection.tsx:289
-#: src/features/poetry/components/PoetryTranslationSection.tsx:399
+#: src/features/poetry/components/PoetryTranslationSection.tsx:304
+#: src/features/poetry/components/PoetryTranslationSection.tsx:305
+#: src/features/poetry/components/PoetryTranslationSection.tsx:415
 msgid "编辑译文"
 msgstr "Edit translation"
 
@@ -3771,8 +3737,7 @@ msgstr "Ball in hand: drag the cue ball to place it"
 msgid "至少修改其中一个名称。"
 msgstr "Change at least one name."
 
-#: src/features/bt/components/BtStatsBar.tsx:90
-#: src/features/bt/components/TaskRow.tsx:133
+#: src/features/bt/components/TaskRow.tsx:150
 msgid "节点"
 msgstr "Peers"
 
@@ -3780,7 +3745,7 @@ msgstr "Peers"
 msgid "节点明细"
 msgstr "Peer details"
 
-#: src/features/poetry/LibraryMobileManagePage.tsx:135
+#: src/features/poetry/LibraryMobileManagePage.tsx:132
 #: src/features/poetry/LibraryMobilePage.tsx:173
 msgid "获取诗词数据"
 msgstr "Get poetry data"
@@ -3789,18 +3754,17 @@ msgstr "Get poetry data"
 msgid "获取语料"
 msgstr "Get corpus"
 
-#: src/features/bt/components/BtStatsBar.tsx:16
-#: src/features/bt/components/TaskRow.tsx:105
+#: src/features/bt/components/TaskRow.tsx:117
 #: src/store/transfers.ts:8
 msgid "获取资源信息…"
 msgstr "Fetching metadata…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:89
+#: src/features/bt/components/AddTorrentDialog.tsx:94
 msgid "获取资源信息失败"
 msgstr "Failed to fetch resource info"
 
-#: src/features/poetry/components/PoemDetail.tsx:138
-#: src/features/poetry/components/PoemDetail.tsx:145
+#: src/features/poetry/components/PoemDetail.tsx:141
+#: src/features/poetry/components/PoemDetail.tsx:148
 msgid "行距"
 msgstr "Line height"
 
@@ -3816,7 +3780,7 @@ msgstr "Folder to Move"
 msgid "覆盖"
 msgstr "Overwrite"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:456
+#: src/features/poetry/components/PoetryTranslationSection.tsx:472
 msgid "覆盖人工修订？"
 msgstr "Overwrite manual revisions?"
 
@@ -3830,7 +3794,7 @@ msgstr "Extract"
 msgid "解压出的文件夹"
 msgstr "Extracted Folder"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:262
+#: src/features/bt/components/AddTorrentDialog.tsx:256
 msgid "解析"
 msgstr "Parse"
 
@@ -3873,11 +3837,11 @@ msgstr "Access"
 msgid "访问时间"
 msgstr "Accessed Time"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:203
+#: src/features/poetry/components/PoetryTranslationSection.tsx:219
 msgid "译文"
 msgstr "Translation"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:405
+#: src/features/poetry/components/PoetryTranslationSection.tsx:421
 msgid "译文内容"
 msgstr "Translation content"
 
@@ -3885,7 +3849,7 @@ msgstr "Translation content"
 msgid "译文包已导入"
 msgstr "Translation pack imported"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:210
+#: src/features/poetry/components/PoetryTranslationSection.tsx:226
 msgid "译文模式"
 msgstr "Translation mode"
 
@@ -3893,23 +3857,27 @@ msgstr "Translation mode"
 msgid "诗词列表"
 msgstr "Poem list"
 
-#: src/features/about/AboutPage.tsx:71
+#: src/features/about/AboutPage.tsx:64
 #: src/features/logs/ActivityLogsPage.tsx:77
 #: src/features/logs/ActivityLogsPage.tsx:194
 msgid "诗词库"
 msgstr "Poetry library"
 
-#: src/features/about/AboutPage.tsx:251
+#: src/features/about/AboutPage.tsx:228
 msgid "诗词库同步"
 msgstr "Poetry sync"
 
-#: src/features/about/AboutPage.tsx:204
+#: src/features/about/AboutPage.tsx:190
 msgid "诗词数据库"
 msgstr "Poetry database"
 
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:34
 msgid "该文件夹及其全部内容将被永久删除。"
 msgstr "This folder and all of its contents will be permanently deleted."
+
+#: src/features/bt/BtTool.tsx:327
+msgid "该文件格式不支持渐进预览"
+msgstr ""
 
 #: src/features/preview/PreviewSurface.tsx:139
 msgid "该格式不支持预览"
@@ -3922,6 +3890,10 @@ msgstr "This format cannot be streamed here (mkv support varies by webview)"
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:163
 msgid "该私钥有口令保护（连接时输入）"
 msgstr "This private key is passphrase-protected (enter it when connecting)."
+
+#: src/features/bt/components/AddTorrentDialog.tsx:293
+msgid "该资源已在下载列表中，不能重复添加"
+msgstr "This torrent is already in the download list and cannot be added again"
 
 #: src/features/logs/ActivityLogsPage.tsx:340
 msgid "详情"
@@ -3938,7 +3910,7 @@ msgstr "Save the current settings first"
 
 #: src/features/poetry/LibraryManagePage.tsx:250
 #: src/features/poetry/LibraryManagePage.tsx:266
-#: src/features/poetry/LibraryMobileManagePage.tsx:100
+#: src/features/poetry/LibraryMobileManagePage.tsx:97
 msgid "请先选择合集"
 msgstr "Select collections first"
 
@@ -3951,9 +3923,13 @@ msgstr "Choose an image first"
 msgid "请先选择视频文件"
 msgstr "Choose a video first"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:241
+#: src/features/poetry/components/PoetryTranslationSection.tsx:257
 msgid "请先配置服务地址、模型和 API Key，再生成译文。"
 msgstr "Configure the service URL, model, and API key before generating a translation."
+
+#: src/features/bt/BtTool.tsx:334
+msgid "请稍后重试"
+msgstr ""
 
 #: src/components/ui/prompt-dialog.tsx:46
 #: src/features/vault/VaultEntryDialog.tsx:62
@@ -4016,7 +3992,7 @@ msgid "读取信息"
 msgstr "Reading metadata"
 
 #: src/features/poetry/LibraryManagePage.tsx:149
-#: src/features/poetry/LibraryMobileManagePage.tsx:54
+#: src/features/poetry/LibraryMobileManagePage.tsx:51
 #: src/features/poetry/LibraryMobilePage.tsx:99
 #: src/features/poetry/LibraryPage.tsx:175
 #: src/features/preview/PreviewSurface.tsx:169
@@ -4062,7 +4038,7 @@ msgstr "Load {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 msgid "账号"
 msgstr "Username"
 
-#: src/features/poetry/components/PoemDetail.tsx:274
+#: src/features/poetry/components/PoemDetail.tsx:277
 msgid "赏析"
 msgstr "Appreciation"
 
@@ -4086,18 +4062,10 @@ msgstr "Go"
 msgid "跳转到行"
 msgstr "Go to line"
 
-#: src/features/bt/BtPreviewScreen.tsx:108
-#: src/features/bt/BtPreviewScreen.tsx:128
-#: src/features/bt/BtTool.tsx:244
-#: src/features/bt/BtTool.tsx:388
-#: src/features/bt/components/CacheManager.tsx:149
+#: src/features/bt/BtTool.tsx:278
+#: src/features/bt/BtTool.tsx:294
 msgid "转存失败"
 msgstr "Failed to save"
-
-#: src/features/bt/components/CacheManager.tsx:293
-#: src/features/bt/components/TaskDialogs.tsx:123
-msgid "转存完成后会从缓存中移除。"
-msgstr "Removed from cache once saved."
 
 #: src/features/games/go/GoMatch.tsx:235
 #: src/features/games/gomoku/GomokuMatch.tsx:216
@@ -4152,7 +4120,7 @@ msgstr "Output format"
 msgid "运行 {formatUptimeValue}"
 msgstr "Uptime {formatUptimeValue}"
 
-#: src/features/about/AboutPage.tsx:75
+#: src/features/about/AboutPage.tsx:67
 #: src/features/lan-transfer/LanTransferTool.tsx:320
 msgid "运行中"
 msgstr "Running"
@@ -4162,8 +4130,8 @@ msgid "近 7 天"
 msgstr "Last 7 Days"
 
 #: src/features/poetry/LibraryManagePage.tsx:365
-#: src/features/poetry/LibraryMobileManagePage.tsx:140
-#: src/features/poetry/LibraryMobileManagePage.tsx:141
+#: src/features/poetry/LibraryMobileManagePage.tsx:137
+#: src/features/poetry/LibraryMobileManagePage.tsx:138
 #: src/features/poetry/PoemDetailPage.tsx:62
 msgid "返回古诗词"
 msgstr "Back to Classical Poetry"
@@ -4286,9 +4254,6 @@ msgstr "Select File to Upload"
 msgid "选择上传文件夹"
 msgstr "Select Folder to Upload"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:295
-#: src/features/bt/components/AddTorrentDialog.tsx:302
-#: src/features/bt/components/AddTorrentDialog.tsx:303
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:129
 msgid "选择保存位置"
 msgstr "Select Save Location"
@@ -4355,8 +4320,8 @@ msgstr "Estimated size appears after choosing a video"
 msgid "选择私钥文件"
 msgstr "Select Private Key File"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:244
-#: src/features/bt/components/AddTorrentDialog.tsx:245
+#: src/features/bt/components/AddTorrentDialog.tsx:238
+#: src/features/bt/components/AddTorrentDialog.tsx:239
 msgid "选择种子文件"
 msgstr "Select torrent file"
 
@@ -4404,10 +4369,6 @@ msgstr "Recursively sort object keys A→Z"
 msgid "递归按字母降序排序对象键"
 msgstr "Recursively sort object keys Z→A"
 
-#: src/features/bt/components/CacheManager.tsx:173
-msgid "配额 GB"
-msgstr "Quota GB"
-
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:123
 msgid "采集数据…"
 msgstr "Collecting…"
@@ -4452,17 +4413,17 @@ msgstr "Restart the match?"
 msgid "重新检查"
 msgstr "Check Again"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:330
-#: src/features/poetry/components/PoetryTranslationSection.tsx:464
+#: src/features/poetry/components/PoetryTranslationSection.tsx:346
+#: src/features/poetry/components/PoetryTranslationSection.tsx:480
 msgid "重新生成"
 msgstr "Regenerate"
 
-#: src/features/bt/components/TaskRow.tsx:178
-#: src/features/bt/components/TaskRow.tsx:179
+#: src/features/bt/components/TaskRow.tsx:172
+#: src/features/bt/components/TaskRow.tsx:173
 #: src/features/preview/PreviewSurface.tsx:173
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:165
-#: src/features/transfers/TransferPanel.tsx:512
-#: src/features/transfers/TransferPanel.tsx:521
+#: src/features/transfers/TransferPanel.tsx:501
+#: src/features/transfers/TransferPanel.tsx:510
 #: src/lib/updater.ts:125
 msgid "重试"
 msgstr "Retry"
@@ -4471,8 +4432,7 @@ msgstr "Retry"
 msgid "链接"
 msgstr "Link"
 
-#: src/features/bt/components/BtStatsBar.tsx:22
-#: src/features/bt/components/TaskRow.tsx:99
+#: src/features/bt/components/TaskRow.tsx:111
 #: src/store/transfers.ts:12
 msgid "错误"
 msgstr "Error"
@@ -4485,8 +4445,8 @@ msgstr "Keys A→Z"
 msgid "键降序"
 msgstr "Keys Z→A"
 
-#: src/features/poetry/components/PoemDetail.tsx:118
-#: src/features/poetry/components/PoemDetail.tsx:119
+#: src/features/poetry/components/PoemDetail.tsx:121
+#: src/features/poetry/components/PoemDetail.tsx:122
 msgid "阅读设置"
 msgstr "Reading settings"
 
@@ -4510,11 +4470,11 @@ msgstr "Random"
 msgid "需口令"
 msgstr "Passphrase required"
 
-#: src/features/bt/components/TorrentFileList.tsx:57
+#: src/features/bt/components/TorrentFileList.tsx:43
 msgid "音频"
 msgstr "Audio"
 
-#: src/features/about/AboutPage.tsx:189
+#: src/features/about/AboutPage.tsx:175
 #: src/features/settings/AppSettingsMenu.tsx:123
 msgid "项目帮助"
 msgstr "Project help"
@@ -4526,6 +4486,11 @@ msgstr "Estimated {estimatedBytesLabel}"
 #: src/features/media-compress/components/CompressEstimateBar.tsx:48
 msgid "预估 {estimatedMinLabel} ~ {estimatedMaxLabel}"
 msgstr "Estimated {estimatedMinLabel} ~ {estimatedMaxLabel}"
+
+#: src/features/bt/components/TaskRow.tsx:227
+#: src/features/bt/components/TaskRow.tsx:228
+msgid "预览"
+msgstr ""
 
 #: src/components/ToolPageHeader.tsx:22
 #: src/features/games/engine/GameHeaderControls.tsx:28

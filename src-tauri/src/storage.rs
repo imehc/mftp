@@ -169,6 +169,7 @@ impl Storage {
                 package_mode TEXT NOT NULL DEFAULT 'direct',
                 status TEXT NOT NULL DEFAULT 'active',
                 output_path TEXT,
+                export_path TEXT,
                 total_bytes INTEGER,
                 last_error TEXT
             );
@@ -229,6 +230,7 @@ impl Storage {
             "TEXT NOT NULL DEFAULT 'active'",
         )?;
         add_column_if_missing(&conn, "bt_tasks", "output_path", "TEXT")?;
+        add_column_if_missing(&conn, "bt_tasks", "export_path", "TEXT")?;
         add_column_if_missing(&conn, "bt_tasks", "total_bytes", "INTEGER")?;
         add_column_if_missing(&conn, "bt_tasks", "last_error", "TEXT")?;
         conn.execute(

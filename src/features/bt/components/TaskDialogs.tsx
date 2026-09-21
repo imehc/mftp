@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
 import { CopyButton } from "~/components/CopyButton";
 import { Input } from "~/components/ui/input";
-import { Checkbox } from "~/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,31 +25,17 @@ interface TaskDialogsProps {
   onCloseMagnet: () => void;
   /** 待确认删除的标题；null 表示不显示。 */
   pendingDeleteLabel: string | null;
-  /** 预览任务没有可删的本地文件，不显示该勾选项。 */
-  showDeleteFiles: boolean;
-  deleteFiles: boolean;
-  onDeleteFilesChange: (value: boolean) => void;
   onCloseDelete: () => void;
   onConfirmDelete: () => void;
-  /** 待确认转存的标题；null 表示不显示。 */
-  pendingSaveLabel: string | null;
-  onCloseSave: () => void;
-  onConfirmSave: () => void;
 }
 
-/** 任务列表用到的三个独立弹窗：磁力链接、删除确认、转存确认。 */
+/** 任务列表用到的磁力链接与删除确认弹窗。 */
 export default function TaskDialogs({
   magnetText,
   onCloseMagnet,
   pendingDeleteLabel,
-  showDeleteFiles,
-  deleteFiles,
-  onDeleteFilesChange,
   onCloseDelete,
   onConfirmDelete,
-  pendingSaveLabel,
-  onCloseSave,
-  onConfirmSave,
 }: TaskDialogsProps) {
   const { t } = useLingui();
   return (
@@ -89,44 +74,13 @@ export default function TaskDialogs({
               {pendingDeleteLabel ? t`删除 ${pendingDeleteLabel}` : ""}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              <Trans>删除后无法恢复。</Trans>
+              <Trans>任务及应用内下载文件将被删除，操作无法恢复。</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {showDeleteFiles ? (
-            <label className="flex items-center gap-2 text-xs">
-              <Checkbox
-                checked={deleteFiles}
-                onCheckedChange={(value) => onDeleteFilesChange(value === true)}
-              />
-              <Trans>删除文件</Trans>
-            </label>
-          ) : null}
           <AlertDialogFooter>
             <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
             <AlertDialogAction onClick={onConfirmDelete}>
               {t`删除`}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={pendingSaveLabel !== null}
-        onOpenChange={(open) => !open && onCloseSave()}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {pendingSaveLabel ? t`下载 ${pendingSaveLabel}` : ""}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              <Trans>转存完成后会从缓存中移除。</Trans>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirmSave}>
-              {t`下载`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

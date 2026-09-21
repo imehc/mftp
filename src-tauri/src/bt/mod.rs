@@ -6,11 +6,10 @@
 //!   only adds app-side metadata (storage/bt.rs).
 //! - Progress flows to the frontend through the shared event channel in
 //!   crate::transfer, with task ids prefixed by "bt:".
-//! - Platform note: the engine is pure Rust and compiles everywhere. Entry
-//!   points are desktop-only in the UI; as long as mobile never triggers
-//!   ensure_engine there is no network or disk activity.
+//! - Platform note: desktop and Android expose the engine independently.
+//!   iOS deliberately excludes this module until its socket-layer target
+//!   support is available; it never falls back to a desktop process.
 
-mod cache;
 mod cancel;
 mod download;
 mod engine;
@@ -21,26 +20,26 @@ mod probe;
 mod staging;
 mod stats;
 mod stream_server;
+mod trackers;
 
-use std::path::{Path, PathBuf};
-use std::sync::atomic::AtomicBool;
+use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 
 use librqbit::{AddTorrent, AddTorrentOptions, ManagedTorrent, Session};
 use librqbit_core::hash_id::Id20;
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
-use std::sync::Mutex as StdMutex;
+use std::collections::HashMap;
 use tauri::AppHandle;
+use tokio::io::AsyncReadExt;
 use tokio::sync::Mutex;
+use tokio::time::timeout;
 
 use crate::error::{AppError, AppResult};
 use crate::storage::{bt::BtTaskRow, Storage};
-pub use cache::ActiveStreams;
 pub use models::{
-    BtCacheItem, BtCacheStats, BtControlAction, BtFileMeta, BtPackageMode, BtPeerInfo,
-    BtProbeResult, BtTaskEvent, BtTaskInfo, BtTaskStats, BtTaskStatus,
+    BtControlAction, BtDhtState, BtDhtStatus, BtFileMeta, BtPackageMode, BtPeerInfo, BtPlayability,
+    BtProbeResult, BtTaskEvent, BtTaskInfo, BtTaskStatus,
 };
 use stats::task_state;
 use stream_server::StreamServer;
@@ -49,51 +48,41 @@ use stream_server::StreamServer;
 /// the user cancels and retries rather than hanging forever.
 const PROBE_TIMEOUT: Duration = Duration::from_secs(90);
 const PUMP_INTERVAL: Duration = Duration::from_secs(1);
-
-/// Trackers announced for every non-private torrent on top of whatever the
-/// source carries. Bare magnets (`magnet:?xt=…` with no `tr=`) are common —
-/// including the ones this app hands out — and without trackers DHT is the
-/// only way to find peers, which is why such a task can sit at 0 forever.
-/// librqbit keeps private torrents on their own tracker (session.rs:1557).
-const FALLBACK_TRACKERS: [&str; 6] = [
-    "udp://tracker.opentrackr.org:1337/announce",
-    "udp://open.demonii.com:1337/announce",
-    "udp://tracker.openbittorrent.com:6969/announce",
-    "udp://exodus.desync.com:6969/announce",
-    "udp://tracker.torrent.eu.org:451/announce",
-    "udp://open.stealth.si:80/announce",
-];
-
-fn fallback_trackers() -> HashSet<url::Url> {
-    FALLBACK_TRACKERS
-        .iter()
-        .filter_map(|tracker| tracker.parse().ok())
-        .collect()
-}
+const READ_PROBE_BYTES: u64 = 512 * 1024;
+const READ_PROBE_TIMEOUT: Duration = Duration::from_millis(500);
+const PLAYABILITY_READY_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// The alias is not re-exported at the crate root; use Arc<ManagedTorrent>.
 type TorrentHandle = Arc<ManagedTorrent>;
+
+fn dht_state_for_counts(ipv4_nodes: usize, ipv6_nodes: usize, outstanding: usize) -> BtDhtState {
+    if ipv4_nodes + ipv6_nodes > 0 {
+        BtDhtState::Ready
+    } else if outstanding > 0 {
+        BtDhtState::Bootstrapping
+    } else {
+        BtDhtState::NotEstablished
+    }
+}
 
 pub struct BtManager {
     app: AppHandle,
     storage: Storage,
     engine: Mutex<Option<Engine>>,
-    /// Playback connection count (infohash -> connections); basis for the
-    /// active-stream exemption from LRU eviction.
-    active_streams: ActiveStreams,
-    /// In-flight save-to-local tasks, guarding against duplicate queues.
-    pending_saves: Arc<StdMutex<HashSet<String>>>,
     /// Cooperative cancellation flags for the jobs that publish a finished
     /// download: moving a plain file out, packing an archive.
-    finalize_jobs: Arc<StdMutex<HashMap<String, Arc<AtomicBool>>>>,
+    finalize_jobs: Arc<std::sync::Mutex<HashMap<String, Arc<std::sync::atomic::AtomicBool>>>>,
     /// Serializes publication with task deletion.
     finalize_gate: Arc<Mutex<()>>,
+    /// Serialize add/replace decisions per info hash so concurrent duplicate
+    /// requests cannot both pass the storage check and delete each other's data.
+    add_gates: Mutex<HashMap<String, Arc<Mutex<()>>>>,
 }
 
 struct Engine {
     session: Arc<Session>,
     pump_handle: tokio::task::JoinHandle<()>,
-    server: StreamServer,
+    stream_server: Option<StreamServer>,
 }
 
 fn info_hash_hex(handle: &TorrentHandle) -> String {
@@ -132,10 +121,9 @@ impl BtManager {
             app,
             storage,
             engine: Mutex::new(None),
-            active_streams: Arc::new(StdMutex::new(HashMap::new())),
-            pending_saves: Arc::new(StdMutex::new(HashSet::new())),
-            finalize_jobs: Arc::new(StdMutex::new(HashMap::new())),
+            finalize_jobs: Arc::new(std::sync::Mutex::new(HashMap::new())),
             finalize_gate: Arc::new(Mutex::new(())),
+            add_gates: Mutex::new(HashMap::new()),
         }
     }
 
@@ -206,43 +194,164 @@ impl BtManager {
         Ok(peers)
     }
 
-    /// Total bytes of a task's selected files. None while the engine is down
-    /// or metadata has not arrived, so callers can fall back to showing the
-    /// cached amount alone.
-    pub(super) fn task_total_bytes(&self, info_hash: &str) -> Option<u64> {
-        let session = self.engine_running()?;
-        let hash = parse_info_hash(info_hash).ok()?;
-        let handle = find_handle(&session, &hash).ok().flatten()?;
-        let total = handle.stats().total_bytes;
-        (total > 0).then_some(total)
-    }
-
-    /// Task count inside the cache pool (for settings display).
-    pub fn preview_task_count(&self) -> usize {
-        self.storage
-            .list_cache_lru()
-            .map(|rows| rows.len())
-            .unwrap_or(0)
-    }
-
-    /// Mint a streaming URL. Starts the engine when needed so the preview
-    /// page stays reloadable/deep-linkable (persistence restores the task).
-    pub async fn stream_url(&self, info_hash: &str, file_index: usize) -> AppResult<String> {
+    /// Return platform-local DHT routing and request diagnostics on demand.
+    pub async fn dht_status(&self) -> AppResult<BtDhtStatus> {
         let session = self.ensure_engine().await?;
-        // Restored tasks come back paused; playing one is an explicit request
-        // for traffic, otherwise the stream would stall forever.
-        self.unpause_task(&session, info_hash).await;
-        let guard = self.engine.lock().await;
-        let engine = guard
-            .as_ref()
-            .ok_or_else(|| AppError("播放服务未就绪".into()))?;
-        Ok(engine.server.url_for(info_hash, file_index))
+        let Some(dht) = session.get_dht() else {
+            return Ok(BtDhtStatus {
+                enabled: false,
+                ipv4_nodes: 0,
+                ipv6_nodes: 0,
+                outstanding_requests: 0,
+                state: BtDhtState::Disabled,
+            });
+        };
+        let stats = dht.stats();
+        Ok(BtDhtStatus {
+            enabled: true,
+            ipv4_nodes: stats.routing_table_size,
+            ipv6_nodes: stats.routing_table_size_v6,
+            outstanding_requests: stats.outstanding_requests,
+            state: dht_state_for_counts(
+                stats.routing_table_size,
+                stats.routing_table_size_v6,
+                stats.outstanding_requests,
+            ),
+        })
     }
 
-    pub(super) fn cache_root(&self) -> AppResult<PathBuf> {
-        let dir = self.base_dir()?.join("cache");
-        std::fs::create_dir_all(&dir).map_err(|e| AppError(format!("创建缓存目录失败: {e}")))?;
-        Ok(dir)
+    /// Inspect a selected file's contiguous readable prefix and, when the
+    /// minimum playback window is ready, return the task-bound Range URL.
+    pub async fn playability(
+        &self,
+        info_hash: &str,
+        file_index: usize,
+        prepare: bool,
+    ) -> AppResult<BtPlayability> {
+        let hash = parse_info_hash(info_hash)?;
+        let task = self
+            .storage
+            .get_bt_task(info_hash)?
+            .ok_or_else(|| AppError("任务不存在".into()))?;
+        if task.package_mode != "direct" || !task.file_indices.contains(&file_index) {
+            return Err(AppError("文件不属于当前下载任务".into()));
+        }
+        let session = self.ensure_engine().await?;
+        let handle = find_handle(&session, &hash)?
+            .ok_or_else(|| AppError("任务不存在或尚未初始化".into()))?;
+        let (total_bytes, file_name) = handle
+            .with_metadata(|metadata| {
+                metadata.file_infos.get(file_index).map(|file| {
+                    (
+                        file.len,
+                        file.relative_filename.to_string_lossy().into_owned(),
+                    )
+                })
+            })
+            .map_err(|error| AppError(format!("资源信息未就绪: {error:#}")))?
+            .ok_or_else(|| AppError("文件不存在".into()))?;
+        let content_type = mime_guess::from_path(&file_name)
+            .first_or_octet_stream()
+            .to_string();
+        let supported = content_type.starts_with("video/")
+            || content_type.starts_with("audio/")
+            || content_type.starts_with("image/")
+            || content_type.starts_with("text/");
+        let minimum_bytes = total_bytes.min(READ_PROBE_BYTES);
+        if !supported || total_bytes == 0 {
+            return Ok(BtPlayability {
+                info_hash: info_hash.to_string(),
+                file_index,
+                file_name,
+                supported,
+                total_bytes,
+                contiguous_bytes: 0,
+                minimum_bytes,
+                ready: false,
+                loading: false,
+                reason: Some(if total_bytes == 0 {
+                    "空文件无法预览".into()
+                } else {
+                    "该文件格式不支持渐进预览".into()
+                }),
+                url: None,
+            });
+        }
+        if !matches!(
+            timeout(PLAYABILITY_READY_TIMEOUT, handle.wait_until_initialized()).await,
+            Ok(Ok(()))
+        ) {
+            return Ok(BtPlayability {
+                info_hash: info_hash.to_string(),
+                file_index,
+                file_name,
+                supported,
+                total_bytes,
+                contiguous_bytes: 0,
+                minimum_bytes,
+                ready: false,
+                loading: true,
+                reason: Some("正在初始化下载任务".into()),
+                url: None,
+            });
+        }
+        if handle.is_paused() {
+            if prepare {
+                session
+                    .unpause(&handle)
+                    .await
+                    .map_err(|error| AppError(format!("恢复下载任务失败: {error:#}")))?;
+            } else {
+                return Ok(BtPlayability {
+                    info_hash: info_hash.to_string(),
+                    file_index,
+                    file_name,
+                    supported,
+                    total_bytes,
+                    contiguous_bytes: 0,
+                    minimum_bytes,
+                    ready: false,
+                    loading: false,
+                    reason: Some("任务已暂停".into()),
+                    url: None,
+                });
+            }
+        }
+        let probe_len = minimum_bytes;
+        let mut contiguous_bytes = 0;
+        if let Ok(mut stream) = handle.clone().stream(file_index).await {
+            let mut buffer = vec![0u8; probe_len as usize];
+            if matches!(
+                timeout(READ_PROBE_TIMEOUT, stream.read_exact(&mut buffer)).await,
+                Ok(Ok(_))
+            ) {
+                contiguous_bytes = probe_len;
+            }
+        }
+        let ready = contiguous_bytes >= minimum_bytes;
+        let url = if ready {
+            self.engine
+                .lock()
+                .await
+                .as_ref()
+                .and_then(|engine| engine.stream_server.as_ref())
+                .map(|server| server.url_for(info_hash, file_index))
+        } else {
+            None
+        };
+        Ok(BtPlayability {
+            info_hash: info_hash.to_string(),
+            file_index,
+            file_name,
+            supported,
+            total_bytes,
+            contiguous_bytes,
+            minimum_bytes,
+            ready,
+            loading: !ready,
+            reason: (!ready).then(|| "播放窗口尚未连续可读".into()),
+            url,
+        })
     }
 
     pub(super) async fn add_torrent_to_session(
@@ -252,16 +361,48 @@ impl BtManager {
         only_files: Vec<usize>,
         output_folder: String,
     ) -> AppResult<TorrentHandle> {
+        let (source_info, add_source) = if std::path::Path::new(source).is_file() {
+            let bytes = std::fs::read(source)
+                .map_err(|error| AppError(format!("读取种子文件失败: {error}")))?;
+            (
+                Some(trackers::inspect_torrent_bytes(&bytes)?),
+                AddTorrent::from_bytes(bytes),
+            )
+        } else if source.starts_with("http://") || source.starts_with("https://") {
+            let response = reqwest::get(source)
+                .await
+                .map_err(|error| AppError(format!("下载种子文件失败: {error}")))?
+                .error_for_status()
+                .map_err(|error| AppError(format!("下载种子文件失败: {error}")))?;
+            let bytes = response
+                .bytes()
+                .await
+                .map_err(|error| AppError(format!("读取种子文件失败: {error}")))?;
+            (
+                Some(trackers::inspect_torrent_bytes(&bytes)?),
+                AddTorrent::from_bytes(bytes),
+            )
+        } else {
+            (
+                trackers::inspect_source(source)?,
+                AddTorrent::from_url(source),
+            )
+        };
+        let public_trackers = trackers::load_public_trackers(&self.base_dir()?);
+        let fallback = trackers::fallback_for_source(source_info.as_ref(), &public_trackers);
         let opts = AddTorrentOptions {
             output_folder: Some(output_folder),
             only_files: (!only_files.is_empty()).then_some(only_files),
+            trackers: fallback,
+            // Keep newly added tasks aligned with the session-wide swarm cap.
+            peer_limit: Some(engine::BT_PEER_LIMIT),
             // overwrite=true is the precondition for resume semantics;
             // idempotency is guaranteed by the bt_tasks table.
             overwrite: true,
             ..Default::default()
         };
         session
-            .add_torrent(AddTorrent::from_url(source), Some(opts))
+            .add_torrent(add_source, Some(opts))
             .await
             .map_err(|e| AppError(format!("添加下载任务失败: {e:#}")))?
             .into_handle()
@@ -284,28 +425,29 @@ impl BtManager {
         };
         let persisted_total = row.total_bytes;
         let persisted_finished = matches!(persisted_status, BtTaskStatus::Completed);
-        // A staged download is not done when the last piece lands — the file
-        // still has to move into the user's folder, and only the finalize job
-        // knows when that happened.
-        let staged = staging::stages_into_part_dir(&row);
-        let cache_available =
-            row.mode != "preview" || self.storage.has_bt_access(&row.info_hash).unwrap_or(false);
+        let exported = row
+            .export_path
+            .as_deref()
+            .is_some_and(|output| Path::new(output).is_file());
         let mut info = BtTaskInfo {
             info_hash: row.info_hash.clone(),
             label: row.label,
-            dest_dir: row.dest_dir,
-            mode: row.mode,
-            pinned: row.pinned,
+            download_dir: row.work_dir.clone(),
+            output_path: row.output_path.clone(),
+            export_path: row.export_path.clone(),
+            exported,
             status: persisted_status,
             package_mode,
-            cache_available,
+            file_index: (package_mode == BtPackageMode::Direct)
+                .then(|| row.file_indices.first().copied())
+                .flatten(),
+            file_name: None,
             error: row.last_error,
             total: persisted_total,
             progress: persisted_finished.then_some(persisted_total.unwrap_or(0)),
             finished: persisted_finished,
             peers_live: 0,
             state: None,
-            files: Vec::new(),
         };
         if !matches!(persisted_status, BtTaskStatus::Cancelled) {
             let Some(session) = self.engine_running() else {
@@ -331,39 +473,38 @@ impl BtManager {
                                 .unwrap_or(0),
                             error,
                             task_state(&stats.state, finished),
+                            handle
+                                .with_metadata(|metadata| {
+                                    info.file_index.and_then(|index| {
+                                        metadata.file_infos.get(index).map(|file| {
+                                            file.relative_filename.to_string_lossy().into_owned()
+                                        })
+                                    })
+                                })
+                                .ok()
+                                .flatten(),
                         ));
                         break;
                     }
                 }
             });
-            if let Some((total, progress, finished, peers, error, state)) = snapshot.into_inner() {
+            if let Some((total, progress, finished, peers, error, state, file_name)) =
+                snapshot.into_inner()
+            {
                 info.total = Some(total);
                 info.progress = Some(progress);
                 info.finished = finished || persisted_finished;
                 info.state = Some(state);
-                if finished
-                    && !staged
-                    && matches!(info.package_mode, BtPackageMode::Direct)
-                    && !matches!(info.status, BtTaskStatus::Error)
-                {
-                    info.status = BtTaskStatus::Completed;
-                }
-                if (staged || matches!(info.package_mode, BtPackageMode::Archive))
-                    && !matches!(info.status, BtTaskStatus::Completed)
-                {
+                if !matches!(info.status, BtTaskStatus::Completed) {
                     info.finished = false;
                 }
                 info.peers_live = peers;
+                info.file_name = file_name;
                 if let Some(error) = error {
                     info.status = BtTaskStatus::Error;
                     info.error = Some(error);
                     info.finished = false;
                 }
-            }
-            // Only preview rows need file identity (open / save-as act on one
-            // file); plain downloads already sit in the user's folder.
-            if info.mode == "preview" {
-                info.files = self.selected_file_meta(&session, &info.info_hash, &row.file_indices);
             }
         }
         info
@@ -380,10 +521,6 @@ fn same_dir(a: &Path, b: &Path) -> bool {
     }
 }
 
-fn is_completed_archive(status: &str, package_mode: &str) -> bool {
-    status == "completed" && package_mode == "archive"
-}
-
 fn find_handle(session: &Session, hash: &Id20) -> AppResult<Option<TorrentHandle>> {
     let found = RefCell::new(None);
     session.with_torrents(|torrents| {
@@ -398,5 +535,5 @@ fn find_handle(session: &Session, hash: &Id20) -> AppResult<Option<TorrentHandle
 }
 
 #[cfg(test)]
-#[path = "tests.rs"]
+#[path = "dht_tests.rs"]
 mod tests;

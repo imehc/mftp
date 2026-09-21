@@ -1,16 +1,18 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  HardDriveDownload,
+  Eye,
+  FolderOpen,
   Magnet,
   Pause,
   Play,
   RotateCcw,
+  Send,
   Trash2,
   XCircle,
 } from "lucide-react";
-import type { BtFileMeta, BtTaskInfo } from "~/types";
+import type { BtTaskInfo } from "~/types";
 import { formatBytes } from "~/lib/format";
-import { isPreviewable, previewKind } from "~/lib/preview-kind";
+import { canPlayInline, isPreviewable, previewKind } from "~/lib/preview-kind";
 import { Button } from "~/components/ui/button";
 
 /** 控制动作，与 `ipc.btControl` 的取值一致。 */
@@ -20,12 +22,16 @@ interface TaskRowProps {
   task: BtTaskInfo;
   /** 引擎在下载但连不上节点，徽标改为提示。 */
   stalled: boolean;
-  onPrefill: (task: BtTaskInfo) => void;
-  onOpenFile: (task: BtTaskInfo, file: BtFileMeta) => void;
+  previewReady: boolean;
+  hasParsedProbe: boolean;
+  onOpenParsed: (task: BtTaskInfo) => void;
+  onRetry: (task: BtTaskInfo) => void;
   onPeers: (task: BtTaskInfo) => void;
-  onSave: (task: BtTaskInfo, fileIndex: number) => void;
   onControl: (task: BtTaskInfo, action: BtControlAction) => void;
   onMagnet: (task: BtTaskInfo) => void;
+  onExport: (task: BtTaskInfo) => void;
+  onOpenLocation: (task: BtTaskInfo) => void;
+  onPreview: (task: BtTaskInfo) => void | Promise<void>;
   onDelete: (task: BtTaskInfo) => void;
 }
 
@@ -33,12 +39,16 @@ interface TaskRowProps {
 export default function TaskRow({
   task,
   stalled,
-  onPrefill,
-  onOpenFile,
+  previewReady,
+  hasParsedProbe,
+  onOpenParsed,
+  onRetry,
   onPeers,
-  onSave,
   onControl,
   onMagnet,
+  onExport,
+  onOpenLocation,
+  onPreview,
   onDelete,
 }: TaskRowProps) {
   const { t } = useLingui();
@@ -59,33 +69,35 @@ export default function TaskRow({
     task.status !== "Cancelled" &&
     task.status !== "Error" &&
     task.status !== "Packaging";
-  // 预览任务才带选中文件；缓存还在时才有打开 / 下载的意义。
-  const cached = task.mode === "preview" && task.cacheAvailable;
-  const openable = cached
-    ? task.files.find((file) => isPreviewable(previewKind(file.path)))
-    : undefined;
-  const savable = cached ? task.files[0] : undefined;
+  const previewable =
+    task.packageMode === "Direct" &&
+    task.fileIndex != null &&
+    (terminal
+      ? task.status === "Completed" &&
+        !!task.outputPath &&
+        isPreviewable(previewKind(task.outputPath))
+      : task.status === "Active" &&
+        previewReady &&
+        !!task.fileName &&
+        isPreviewable(previewKind(task.fileName)) &&
+        canPlayInline(task.fileName, previewKind(task.fileName)));
   return (
     <div className="hover:bg-sidebar-accent flex flex-col gap-1 rounded-md px-2 py-1.5 text-xs">
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          className="min-w-0 flex-1 truncate text-left font-medium hover:underline"
-          title={task.label}
-          onClick={() => onPrefill(task)}
-        >
-          {task.label}
-        </button>
-        {task.mode === "preview" ? (
-          <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-            <Trans>在线预览</Trans>
+        {hasParsedProbe ? (
+          <button
+            type="button"
+            className="min-w-0 flex-1 truncate text-left font-medium hover:underline"
+            title={task.label}
+            onClick={() => onOpenParsed(task)}
+          >
+            {task.label}
+          </button>
+        ) : (
+          <span className="min-w-0 flex-1 truncate text-left font-medium">
+            {task.label}
           </span>
-        ) : null}
-        {task.mode === "preview" && !task.cacheAvailable ? (
-          <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-            <Trans>缓存已清理</Trans>
-          </span>
-        ) : null}
+        )}
         {task.status === "Cancelled" ? (
           <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
             <Trans>已取消</Trans>
@@ -118,6 +130,11 @@ export default function TaskRow({
             )}
           </span>
         )}
+        {previewReady ? (
+          <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
+            <Trans>可预览</Trans>
+          </span>
+        ) : null}
         {terminal ? (
           <span className="text-muted-foreground shrink-0 tabular-nums">
             {formatBytes(total)}
@@ -137,29 +154,6 @@ export default function TaskRow({
             </span>
           </>
         ) : null}
-        {openable ? (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title={t`打开`}
-            aria-label={t`打开`}
-            onClick={() => onOpenFile(task, openable)}
-          >
-            <Play />
-          </Button>
-        ) : null}
-        {savable ? (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title={t`下载`}
-            aria-label={t`下载`}
-            disabled={task.pinned}
-            onClick={() => onSave(task, savable.index)}
-          >
-            <HardDriveDownload />
-          </Button>
-        ) : null}
         {controllable ? (
           <Button
             variant="ghost"
@@ -177,12 +171,12 @@ export default function TaskRow({
             size="icon-xs"
             title={t`重试`}
             aria-label={t`重试`}
-            onClick={() => onPrefill(task)}
+            onClick={() => onRetry(task)}
           >
             <RotateCcw />
           </Button>
         ) : null}
-        {!terminal && task.mode !== "preview" && task.status !== "Cancelled" ? (
+        {!terminal && task.status !== "Cancelled" ? (
           <Button
             variant="ghost"
             size="icon-xs"
@@ -202,12 +196,46 @@ export default function TaskRow({
         >
           <Magnet />
         </Button>
+        {terminal && task.status === "Completed" ? (
+          <>
+            {!task.exported ? (
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                title={t`复制到用户目录`}
+                aria-label={t`复制到用户目录`}
+                onClick={() => onExport(task)}
+              >
+                <Send />
+              </Button>
+            ) : null}
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              title={t`打开下载位置`}
+              aria-label={t`打开下载位置`}
+              onClick={() => onOpenLocation(task)}
+            >
+              <FolderOpen />
+            </Button>
+          </>
+        ) : null}
+        {previewable ? (
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            title={t`预览`}
+            aria-label={t`预览`}
+            onClick={() => void onPreview(task)}
+          >
+            <Eye />
+          </Button>
+        ) : null}
         <Button
           variant="ghost"
           size="icon-xs"
           title={t`删除`}
           aria-label={t`删除`}
-          disabled={task.pinned}
           onClick={() => onDelete(task)}
         >
           <Trash2 />

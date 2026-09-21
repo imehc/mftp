@@ -6,19 +6,13 @@ import {
   Film,
   Image as ImageIcon,
   Music,
-  Play,
 } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { BtFileMeta } from "~/types";
 import { cn } from "cn";
 import { formatBytes } from "~/lib/format";
-import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import {
-  isPreviewable,
-  previewKind,
-  type PreviewKind,
-} from "~/lib/preview-kind";
+import { previewKind, type PreviewKind } from "~/lib/preview-kind";
 const KIND_ICONS = {
   video: Film,
   audio: Music,
@@ -28,19 +22,11 @@ const KIND_ICONS = {
 } as const;
 
 /** 预览入口：时序媒体直接播放，其余用查看器。 */
-const PREVIEW_ICONS = {
-  video: Play,
-  audio: Play,
-  image: ImageIcon,
-  text: FileText,
-  other: FileIcon,
-} as const;
 export interface TorrentFileListProps {
   files: BtFileMeta[];
   selected: Set<number>;
   onToggle: (index: number) => void;
-  /** 在可预览文件上点击预览按钮。 */
-  onPreview: (file: BtFileMeta) => void;
+  readOnly?: boolean;
 }
 
 /** 种子文件列表：虚拟化的行，带选择复选框与可预览
@@ -49,7 +35,7 @@ const TorrentFileList = function TorrentFileList({
   files,
   selected,
   onToggle,
-  onPreview,
+  readOnly = false,
 }: TorrentFileListProps) {
   const { t } = useLingui();
   const kindLabel = (kind: PreviewKind) => {
@@ -74,6 +60,7 @@ const TorrentFileList = function TorrentFileList({
       <label className="text-muted-foreground flex items-center gap-2 px-1 text-xs">
         <Checkbox
           checked={allSelected}
+          disabled={readOnly}
           onCheckedChange={() => {
             // 父组件依据当前状态整体重置；-1 作为触发信号。
             onToggle(-1);
@@ -97,8 +84,6 @@ const TorrentFileList = function TorrentFileList({
             const kind = previewKind(file.path);
             const Icon = KIND_ICONS[kind];
             const checked = selected.has(file.index);
-            const canPreview = isPreviewable(kind);
-            const PreviewIcon = PREVIEW_ICONS[kind];
             return (
               <div
                 key={file.index}
@@ -118,10 +103,12 @@ const TorrentFileList = function TorrentFileList({
                 <button
                   type="button"
                   className="flex min-w-0 flex-1 items-center gap-2 py-2 pl-2"
+                  disabled={readOnly}
                   onClick={() => onToggle(file.index)}
                 >
                   <Checkbox
                     checked={checked}
+                    disabled={readOnly}
                     tabIndex={-1}
                     className="pointer-events-none"
                   />
@@ -136,17 +123,6 @@ const TorrentFileList = function TorrentFileList({
                     {formatBytes(file.len)}
                   </span>
                 </button>
-                {canPreview ? (
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    title={t`在线预览`}
-                    aria-label={t`在线预览`}
-                    onClick={() => onPreview(file)}
-                  >
-                    <PreviewIcon />
-                  </Button>
-                ) : null}
               </div>
             );
           })}

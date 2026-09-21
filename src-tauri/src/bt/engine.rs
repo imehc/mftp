@@ -5,16 +5,33 @@
 use anyhow::Context as _;
 use std::cell::RefCell;
 use std::collections::HashSet;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::time::Duration;
 
-use librqbit::{ListenerOptions, Session, SessionOptions, SessionPersistenceConfig};
+use librqbit::{
+    dht::DhtPersistenceConfig, DhtSessionConfig, ListenerOptions, Session, SessionOptions,
+    SessionPersistenceConfig,
+};
 use tauri::Manager as _;
 
 use super::stats::spawn_progress_pump;
-use super::stream_server::StreamServer;
-use super::{fallback_trackers, find_handle, info_hash_hex, parse_info_hash, BtManager, Engine};
+use super::{find_handle, info_hash_hex, parse_info_hash, BtManager, Engine};
 use crate::error::{AppError, AppResult};
+
+pub(super) const BT_INIT_CONCURRENCY: usize = 2;
+pub(super) const BT_PEER_LIMIT: usize = 64;
+pub(super) const BT_DHT_DUMP_INTERVAL: Duration = Duration::from_secs(60);
+
+fn dht_config(base: &Path) -> DhtSessionConfig {
+    DhtSessionConfig {
+        persistence: Some(DhtPersistenceConfig {
+            dump_interval: Some(BT_DHT_DUMP_INTERVAL),
+            config_filename: Some(base.join("dht.json")),
+        }),
+        ..Default::default()
+    }
+}
 
 impl BtManager {
     pub fn has_active_work(&self) -> AppResult<bool> {
@@ -47,6 +64,10 @@ impl BtManager {
         let session = Session::new_with_opts(
             data_dir,
             SessionOptions {
+                // Keep the routing table in the same platform-local BT data
+                // directory as the session, so restarts do not rebuild DHT
+                // state and desktop/mobile instances remain independent.
+                dht: Some(dht_config(&base)),
                 persistence: Some(SessionPersistenceConfig::Json {
                     folder: Some(session_dir),
                 }),
@@ -68,7 +89,10 @@ impl BtManager {
                 // piece writeback takes permits from the same pool — with the
                 // default a couple of streams noticeably starve downloads.
                 runtime_worker_threads: Some(16),
-                trackers: fallback_trackers(),
+                // Bound startup work and swarm fan-out so a large restored
+                // library cannot monopolize the local device.
+                concurrent_init_limit: Some(BT_INIT_CONCURRENCY),
+                peer_limit: Some(BT_PEER_LIMIT),
                 ..Default::default()
             },
         )
@@ -78,18 +102,35 @@ impl BtManager {
 
         let pump_handle =
             spawn_progress_pump(self.app.clone(), session.clone(), self.storage.clone());
-        let server = StreamServer::spawn(session.clone(), self.active_streams.clone())
-            .await
-            .ok_or_else(|| AppError("播放服务创建失败".into()))?;
+        let stream_server =
+            super::stream_server::StreamServer::spawn(session.clone(), self.storage.clone()).await;
         *guard = Some(Engine {
             session: session.clone(),
             pump_handle,
-            server,
+            stream_server,
         });
+        self.cleanup_legacy_bt_tasks(&session).await;
         self.pause_restored_torrents(&session).await;
         self.resume_finalize_jobs(&session).await;
         self.cleanup_orphan_owned_dirs(&session);
         Ok(session)
+    }
+
+    /// Remove rows created before every task moved into the app-private
+    /// download directory. Their user-directory files are left untouched.
+    async fn cleanup_legacy_bt_tasks(&self, session: &Arc<Session>) {
+        let rows = self.storage.list_bt_tasks().unwrap_or_default();
+        for row in rows
+            .into_iter()
+            .filter(|row| row.mode == "preview" || !row.dest_dir.is_empty())
+        {
+            if let Ok(hash) = parse_info_hash(&row.info_hash) {
+                let _ = session.delete(hash.into(), false).await;
+            }
+            let _ = self.storage.delete_bt_access(&row.info_hash);
+            let _ = self.storage.delete_bt_task(&row.info_hash);
+        }
+        let _ = self.storage.finish_bt_download_only_migration();
     }
 
     /// librqbit's persistence restores `is_paused` verbatim, so torrents that
@@ -154,8 +195,14 @@ impl BtManager {
         if let Ok(mut guard) = self.engine.try_lock() {
             if let Some(engine) = guard.take() {
                 engine.pump_handle.abort();
-                engine.server.accept_task.abort();
+                if let Some(server) = engine.stream_server {
+                    server.accept_task.abort();
+                }
             }
         }
     }
 }
+
+#[cfg(test)]
+#[path = "engine_tests.rs"]
+mod tests;

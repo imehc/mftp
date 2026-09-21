@@ -26,13 +26,18 @@ pub struct BtProbeResult {
 pub struct BtTaskInfo {
     pub info_hash: String,
     pub label: String,
-    pub dest_dir: String,
-    /// 'download'; 'preview' (cache mode) added in P2.
-    pub mode: String,
-    pub pinned: bool,
+    /// Application-private directory that owns the downloaded pieces.
+    pub download_dir: String,
+    /// Completed file/archive path inside the application-private directory.
+    pub output_path: Option<String>,
+    /// Optional user-directory copy created by an explicit export action.
+    pub export_path: Option<String>,
+    pub exported: bool,
     pub status: BtTaskStatus,
     pub package_mode: BtPackageMode,
-    pub cache_available: bool,
+    /// Selected source file used by the progressive preview endpoint.
+    pub file_index: Option<usize>,
+    pub file_name: Option<String>,
     pub error: Option<String>,
     pub total: Option<u64>,
     pub progress: Option<u64>,
@@ -42,9 +47,22 @@ pub struct BtTaskInfo {
     /// been restored yet. The transfer panel only adopts a task once this says
     /// it is actually downloading, so history stays out of it.
     pub state: Option<BtTaskState>,
-    /// Selected files of a preview task, so its row can offer open / save-as.
-    /// Empty for plain downloads and while the engine has no handle.
-    pub files: Vec<BtFileMeta>,
+}
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct BtPlayability {
+    pub info_hash: String,
+    pub file_index: usize,
+    pub file_name: String,
+    pub supported: bool,
+    pub total_bytes: u64,
+    pub contiguous_bytes: u64,
+    pub minimum_bytes: u64,
+    pub ready: bool,
+    pub loading: bool,
+    pub reason: Option<String>,
+    pub url: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Type)]
@@ -81,35 +99,23 @@ pub struct BtPeerInfo {
     pub state: String,
 }
 
+/// Shared DHT diagnostics for the current platform-local BT session.
 #[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct BtCacheStats {
-    pub used_bytes: u64,
-    pub quota_bytes: u64,
-    /// Task count inside the cache pool (mode='preview').
-    pub items: usize,
+pub struct BtDhtStatus {
+    pub enabled: bool,
+    pub ipv4_nodes: usize,
+    pub ipv6_nodes: usize,
+    pub outstanding_requests: usize,
+    pub state: BtDhtState,
 }
 
-/// One cache-pool entry, for the manageable cache list.
-#[derive(Debug, Clone, Serialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct BtCacheItem {
-    pub info_hash: String,
-    pub label: String,
-    /// On-disk size of this entry's cache directory, i.e. how much of the file
-    /// is cached so far.
-    pub size_bytes: u64,
-    /// Total size of the task's selected files; None while the engine is down
-    /// or metadata has not arrived.
-    pub total_bytes: Option<u64>,
-    pub last_access: i64,
-    /// Pinned (save-to-local in flight) or currently streaming: exempt from
-    /// eviction, and deleting would break the operation in progress.
-    pub pinned: bool,
-    pub streaming: bool,
-    /// The task's selected files, so the cache list can offer open/save-as.
-    /// Empty while the engine has no handle for this task.
-    pub files: Vec<BtFileMeta>,
+#[derive(Debug, Clone, Copy, Serialize, Type)]
+pub enum BtDhtState {
+    Disabled,
+    NotEstablished,
+    Bootstrapping,
+    Ready,
 }
 
 /// Engine-side task state. Kept as an enum rather than a display string so
@@ -121,20 +127,6 @@ pub enum BtTaskState {
     Seeding,
     Paused,
     Error,
-}
-
-/// Live stats for one task; polled by the preview page footer.
-#[derive(Debug, Clone, Serialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct BtTaskStats {
-    pub info_hash: String,
-    pub state: BtTaskState,
-    pub progress: u64,
-    pub total: u64,
-    pub down_bps: u64,
-    pub up_bps: u64,
-    pub peers_live: u32,
-    pub peers_queued: u32,
 }
 
 /// Payload of bt://task-event. The kind covers save, package, and removal

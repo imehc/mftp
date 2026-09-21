@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
@@ -60,9 +60,9 @@ keyring = { version = "3", default-features = false, features = ["apple-native",
 # Library sync uses the GitHub tree/blob API on desktop and mobile. The desktop
 # tar.gz path remains a fallback, so reqwest is a shared direct dependency.
 
-# BT is exposed only on desktop. librqbit's socket layer uses APIs that are
-# unavailable on iOS, so keeping the engine out of mobile targets is also
-# required for cross-compilation.
+# BT is exposed on desktop and Android. librqbit's socket layer uses APIs
+# unavailable on iOS, so the engine dependencies stay out of iOS builds.
+[target.'cfg(not(target_os = "ios"))'.dependencies]
 librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"] }
 librqbit-core = { version = "9.0.1", default-features = false, features = ["sha1-ring"] }
 tokio = { version = "1", features = ["sync", "time", "net", "io-util"] }

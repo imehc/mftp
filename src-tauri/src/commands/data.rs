@@ -13,10 +13,6 @@ fn ensure_idle(state: &AppState, module: AppDataModule) -> AppResult<()> {
     if matches!(module, AppDataModule::Poetry) && state.poetry.is_active() {
         return Err(AppError("请先停止诗词库同步".into()));
     }
-    #[cfg(desktop)]
-    if matches!(module, AppDataModule::BtCache) && state.bt.has_active_work()? {
-        return Err(AppError("请先停止 BT 任务".into()));
-    }
     Ok(())
 }
 
@@ -54,23 +50,6 @@ pub async fn app_data_clear(
                 Ok(storage.data_clear_result(AppDataModule::Poetry, 0, before, Vec::new()))
             })
             .await?
-        }
-        AppDataModule::BtCache => {
-            #[cfg(desktop)]
-            {
-                let count = state.bt.clear_cache().await? as u32;
-                state.storage.data_clear_result(
-                    AppDataModule::BtCache,
-                    count,
-                    before,
-                    vec!["BT 任务记录和用户下载文件".into()],
-                )
-            }
-            #[cfg(not(desktop))]
-            {
-                let _ = (state, before);
-                return Err(AppError("BT cache is only available on desktop".into()));
-            }
         }
     };
     Ok(result)

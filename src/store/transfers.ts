@@ -37,8 +37,6 @@ export interface TransferState {
   retrying?: boolean;
   /** 面板徽标展示的任务来源；默认为 sftp（历史行为）。 */
   source?: "sftp" | "bt";
-  /** BT 任务模式；preview = 缓存下载，支撑在线播放。 */
-  mode?: "download" | "preview";
 }
 interface TransfersState {
   transfers: TransferState[];
@@ -50,7 +48,6 @@ interface TransfersState {
       cancellable?: boolean;
       retry?: () => void | Promise<void>;
       source?: "sftp" | "bt";
-      mode?: "download" | "preview";
     },
   ) => void;
   restore: TransfersState["start"];
@@ -325,7 +322,6 @@ function createTransfer(
     controlError: undefined,
     retry: options?.retry,
     source: options?.source,
-    mode: options?.mode,
     retrying: false,
   };
 }

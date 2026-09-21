@@ -20,6 +20,7 @@ fn sample_row(hash: &str) -> BtTaskRow {
         package_mode: "archive".into(),
         status: "packaging".into(),
         output_path: Some("/downloads/archive.tar.gz".into()),
+        export_path: Some("/Users/test/archive.tar.gz".into()),
         total_bytes: Some(456),
         last_error: Some("retryable".into()),
     }
@@ -36,6 +37,7 @@ fn upsert_round_trips_archive_state() {
     assert_eq!(loaded.package_mode, "archive");
     assert_eq!(loaded.status, "packaging");
     assert_eq!(loaded.output_path, row.output_path);
+    assert_eq!(loaded.export_path, row.export_path);
     assert_eq!(loaded.total_bytes, Some(456));
     assert_eq!(loaded.last_error.as_deref(), Some("retryable"));
     std::fs::remove_dir_all(root).unwrap();
@@ -174,6 +176,7 @@ fn cancelling_task_keeps_history_and_clears_runtime_state() {
     let history = storage.get_bt_task(&hash).unwrap().unwrap();
     assert_eq!(history.status, "cancelled");
     assert_eq!(history.output_path, None);
+    assert_eq!(history.export_path, None);
     assert_eq!(history.last_error, None);
     assert!(!history.pinned);
     assert!(!storage.has_bt_access(&hash).unwrap());

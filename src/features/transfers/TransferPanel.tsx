@@ -303,13 +303,7 @@ export default function TransferPanel({
     markCancelling(id);
     try {
       if (id.startsWith("bt:")) {
-        // 移除预览任务会清除其缓存文件；下载任务在取消时
-        // 保留历史记录与用户目录下的文件。
-        await ipc.btControl(
-          id.slice(3),
-          transfer.mode === "preview" ? "Remove" : "Cancel",
-          transfer.mode === "preview",
-        );
+        await ipc.btControl(id.slice(3), "Cancel", false);
         finishTransfer(id, "cancelled");
       } else {
         await ipc.sftpCancelTransfer(id);
@@ -466,11 +460,6 @@ const TransferItem = function TransferItem({
         {transfer.source === "bt" ? (
           <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px] font-medium">
             <Trans>BT</Trans>
-          </span>
-        ) : null}
-        {transfer.source === "bt" && transfer.mode === "preview" ? (
-          <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-            <Trans>在线预览</Trans>
           </span>
         ) : null}
         {transfer.status === "running" && transfer.cancellable !== false ? (

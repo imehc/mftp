@@ -5,13 +5,13 @@ use std::io::{BufReader, BufWriter, Read, Result as IoResult, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use super::TorrentHandle;
+use super::{BtManager, BtTaskInfo, TorrentHandle};
 use crate::error::{AppError, AppResult};
 use anyhow::Context as _;
+use tauri::Manager as _;
 
 #[derive(Clone)]
 pub(super) struct ExportFile {
-    pub index: usize,
     pub absolute: PathBuf,
     pub relative: PathBuf,
     pub len: u64,
@@ -40,8 +40,7 @@ pub(super) fn selected_export_files(
                             .map(|items| items.contains(index))
                             .unwrap_or(true)
                 })
-                .map(|(index, info)| ExportFile {
-                    index,
+                .map(|(_, info)| ExportFile {
                     absolute: output.join(&info.relative_filename),
                     relative: info.relative_filename.clone(),
                     len: info.len,
@@ -55,56 +54,14 @@ pub(super) fn selected_export_files(
     Ok(files)
 }
 
-pub(super) fn file_is_complete(handle: &TorrentHandle, file_index: usize) -> AppResult<bool> {
-    let len = handle
-        .with_metadata(|meta| meta.file_infos.get(file_index).map(|file| file.len))
-        .map_err(|error| AppError(format!("资源信息未就绪: {error:#}")))?
-        .ok_or_else(|| AppError("文件不存在".into()))?;
-    Ok(progress_reaches_len(
-        &handle.stats().file_progress,
-        file_index,
-        len,
-    ))
-}
-
-pub(super) fn export_files_are_complete(handle: &TorrentHandle, files: &[ExportFile]) -> bool {
-    let progress = handle.stats().file_progress;
-    files
-        .iter()
-        .all(|file| progress_reaches_len(&progress, file.index, file.len))
-}
-
-fn progress_reaches_len(progress: &[u64], file_index: usize, len: u64) -> bool {
-    progress.get(file_index).copied().unwrap_or(0) >= len
-}
-
-pub(super) fn copy_export_file(file: &ExportFile, dest_dir: &Path) -> AppResult<PathBuf> {
-    let target = unique_path(dest_dir, &export_file_name(file));
-    copy_without_overwrite(&file.absolute, &target)?;
+pub(super) fn copy_path_to_dir(
+    source: &Path,
+    dest_dir: &Path,
+    fallback_name: &str,
+) -> AppResult<PathBuf> {
+    let target = unique_path(dest_dir, fallback_name);
+    copy_without_overwrite(source, &target)?;
     Ok(target)
-}
-
-/// Hand a finished file over to the user's folder. The staging directory lives
-/// inside that folder, so this is a same-filesystem rename: instant, no second
-/// copy of the data. The copy fallback covers the rare case where it is not
-/// (a mount point below the download folder).
-pub(super) fn move_export_file(file: &ExportFile, dest_dir: &Path) -> AppResult<PathBuf> {
-    let target = unique_path(dest_dir, &export_file_name(file));
-    if std::fs::rename(&file.absolute, &target).is_ok() {
-        return Ok(target);
-    }
-    copy_without_overwrite(&file.absolute, &target)?;
-    let _ = std::fs::remove_file(&file.absolute);
-    Ok(target)
-}
-
-/// Exports are flat: a single file keeps its own name, never the folder
-/// structure the torrent happened to wrap it in.
-fn export_file_name(file: &ExportFile) -> String {
-    file.relative
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "bt-download".into())
 }
 
 fn copy_without_overwrite(source: &Path, target: &Path) -> AppResult<()> {
@@ -127,36 +84,6 @@ fn copy_without_overwrite(source: &Path, target: &Path) -> AppResult<()> {
         return Err(AppError(format!("{error:#}")));
     }
     Ok(())
-}
-
-pub(super) fn export_files(
-    files: &[ExportFile],
-    dest_dir: &Path,
-    label: &str,
-    info_hash: &str,
-    cancelled: &AtomicBool,
-) -> AppResult<PathBuf> {
-    if let [file] = files {
-        return copy_export_file(file, dest_dir);
-    }
-    let target = archive_target(dest_dir, label);
-    let partial = partial_archive_path(&target, info_hash)?;
-    remove_file_if_exists(&partial)?;
-    if let Err(error) = pack_tar(files, &partial, cancelled) {
-        let _ = remove_file_if_exists(&partial);
-        return Err(error);
-    }
-    if cancelled.load(Ordering::SeqCst) {
-        let _ = remove_file_if_exists(&partial);
-        return Err(AppError("任务已取消".into()));
-    }
-    if target.exists() {
-        let _ = remove_file_if_exists(&partial);
-        return Err(AppError("目标文件已存在，请重试".into()));
-    }
-    std::fs::rename(&partial, &target)
-        .map_err(|error| AppError(format!("保存压缩包失败: {error}")))?;
-    Ok(target)
 }
 
 pub(super) fn archive_target(dest_dir: &Path, label: &str) -> PathBuf {
@@ -236,6 +163,69 @@ fn sanitize_name(label: &str) -> String {
         "bt-download".into()
     } else {
         trimmed.to_string()
+    }
+}
+
+impl BtManager {
+    pub async fn export_task(
+        &self,
+        info_hash: &str,
+        requested_dir: String,
+    ) -> AppResult<BtTaskInfo> {
+        let hash = super::parse_info_hash(info_hash)?;
+        let session = self.ensure_engine().await?;
+        let _guard = self.finalize_gate.lock().await;
+        let row = self
+            .storage
+            .get_bt_task(info_hash)?
+            .ok_or_else(|| AppError("任务不存在".into()))?;
+        if row.status != "completed" {
+            return Err(AppError("任务尚未完成，无法转存".into()));
+        }
+        if row
+            .export_path
+            .as_deref()
+            .is_some_and(|path| Path::new(path).is_file())
+        {
+            return Err(AppError("任务已经转存".into()));
+        }
+        let source = row
+            .output_path
+            .as_deref()
+            .map(PathBuf::from)
+            .filter(|path| path.is_file())
+            .ok_or_else(|| AppError("下载文件不存在，请重新下载".into()))?;
+        let target_dir = if requested_dir.trim().is_empty() {
+            self.app
+                .path()
+                .download_dir()
+                .map_err(|error| AppError(format!("无法定位系统下载目录: {error}")))?
+        } else {
+            PathBuf::from(requested_dir.trim())
+        };
+        std::fs::create_dir_all(&target_dir)
+            .map_err(|error| AppError(format!("创建转存目录失败: {error}")))?;
+
+        if super::find_handle(&session, &hash)?.is_some() {
+            session
+                .delete(hash.into(), false)
+                .await
+                .map_err(|error| AppError(format!("停止 BT 任务失败: {error:#}")))?;
+        }
+        let filename = source
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("bt-download");
+        let target = copy_path_to_dir(&source, &target_dir, filename)?;
+        let target_string = target.to_string_lossy().into_owned();
+        self.storage
+            .set_bt_task_export_path(info_hash, &target_string)?;
+        super::finalize::emit_event(&self.app, info_hash, "export-completed");
+        let updated = self
+            .storage
+            .get_bt_task(info_hash)?
+            .ok_or_else(|| AppError("转存后任务不存在".into()))?;
+        Ok(self.task_info_with_live(updated))
     }
 }
 

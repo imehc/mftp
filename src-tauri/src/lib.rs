@@ -1,5 +1,5 @@
 mod ai;
-#[cfg(desktop)]
+#[cfg(any(desktop, target_os = "android"))]
 mod bt;
 mod commands;
 mod error;
@@ -33,7 +33,7 @@ pub struct AppState {
     pub lan_transfer: Arc<LanTransferManager>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<poetry::sync::PoetryLibrary>,
-    #[cfg(desktop)]
+    #[cfg(any(desktop, target_os = "android"))]
     pub bt: Arc<bt::BtManager>,
 }
 
@@ -150,29 +150,23 @@ macro_rules! collect_app_commands {
     };
 }
 
-#[cfg(desktop)]
+#[cfg(any(desktop, target_os = "android"))]
 macro_rules! all_commands {
     () => {
         collect_app_commands![
             commands::bt_probe,
             commands::bt_add_download,
-            commands::bt_ensure_preview,
-            commands::bt_stream_url,
+            commands::bt_export,
             commands::bt_list,
             commands::bt_control,
-            commands::bt_save_to_local,
-            commands::bt_cache_stats,
-            commands::bt_set_cache_quota,
-            commands::bt_clear_cache,
-            commands::bt_remove_cache,
             commands::bt_task_peers,
-            commands::bt_cache_items,
-            commands::bt_task_stats,
+            commands::bt_dht_status,
+            commands::bt_playability,
         ]
     };
 }
 
-#[cfg(mobile)]
+#[cfg(all(mobile, not(target_os = "android")))]
 macro_rules! all_commands {
     () => {
         collect_app_commands![]
@@ -187,7 +181,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
         .typ::<poetry::model::PoetrySyncProgress>()
         .typ::<poetry::model::PoetryTranslationStreamEvent>();
 
-    #[cfg(desktop)]
+    #[cfg(any(desktop, target_os = "android"))]
     let builder = builder
         .typ::<bt::BtProbeResult>()
         .typ::<bt::BtTaskInfo>()
@@ -196,7 +190,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
         .typ::<bt::BtFileMeta>()
         .typ::<bt::BtControlAction>()
         .typ::<bt::BtPeerInfo>()
-        .typ::<bt::BtCacheStats>()
+        .typ::<bt::BtDhtStatus>()
+        .typ::<bt::BtDhtState>()
+        .typ::<bt::BtPlayability>()
         .typ::<bt::BtTaskEvent>();
 
     builder.commands(all_commands!())
@@ -314,7 +310,7 @@ pub fn run() {
                 lan_transfer,
                 game_room,
                 poetry,
-                #[cfg(desktop)]
+                #[cfg(any(desktop, target_os = "android"))]
                 bt: Arc::new(bt::BtManager::new(app.handle().clone(), storage)),
             });
             Ok(())
@@ -336,7 +332,7 @@ pub fn run() {
             state.manager.shutdown_all();
             state.lan_transfer.stop();
             state.game_room.leave();
-            #[cfg(desktop)]
+            #[cfg(any(desktop, target_os = "android"))]
             state.bt.shutdown();
         }
         cleanup_stale_local_transfer_files();

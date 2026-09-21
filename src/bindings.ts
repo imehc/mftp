@@ -153,32 +153,13 @@ export const commands = {
 	updatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, content: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("update_poetry_translation", { uid, mode, content })),
 	deletePoetryTranslation: (uid: string, mode: PoetryTranslationMode) => typedError<null, AppError>(__TAURI_INVOKE("delete_poetry_translation", { uid, mode })),
 	btProbe: (source: string) => typedError<BtProbeResult, AppError>(__TAURI_INVOKE("bt_probe", { source })),
-	btAddDownload: (source: string, infoHash: string, fileIndices: number[], destDir: string) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_add_download", { source, infoHash, fileIndices, destDir })),
-	/**
-	 *  Ensure a streamable task exists for the target file (cache mode or an
-	 *  existing task); returns the task info.
-	 */
-	btEnsurePreview: (source: string, fileIndex: number) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_ensure_preview", { source, fileIndex })),
-	btStreamUrl: (infoHash: string, fileIndex: number) => typedError<string, AppError>(__TAURI_INVOKE("bt_stream_url", { infoHash, fileIndex })),
+	btAddDownload: (source: string, infoHash: string, fileIndices: number[]) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_add_download", { source, infoHash, fileIndices })),
+	btExport: (infoHash: string, destDir: string) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_export", { infoHash, destDir })),
 	btList: () => typedError<BtTaskInfo[], AppError>(__TAURI_INVOKE("bt_list")),
 	btControl: (infoHash: string, action: BtControlAction, deleteFiles: boolean) => typedError<null, AppError>(__TAURI_INVOKE("bt_control", { infoHash, action, deleteFiles })),
-	/**
-	 *  Save the file currently open in the preview page. Unfinished files are
-	 *  exported automatically after their download completes.
-	 */
-	btSaveToLocal: (infoHash: string, destDir: string, fileIndex: number) => typedError<null, AppError>(__TAURI_INVOKE("bt_save_to_local", { infoHash, destDir, fileIndex })),
-	btCacheStats: () => typedError<BtCacheStats, AppError>(__TAURI_INVOKE("bt_cache_stats")),
-	btSetCacheQuota: (bytes: number) => typedError<null, AppError>(__TAURI_INVOKE("bt_set_cache_quota", { bytes })),
-	btClearCache: () => typedError<number, AppError>(__TAURI_INVOKE("bt_clear_cache")),
-	btRemoveCache: (infoHash: string) => typedError<null, AppError>(__TAURI_INVOKE("bt_remove_cache", { infoHash })),
 	btTaskPeers: (infoHash: string) => typedError<BtPeerInfo[], AppError>(__TAURI_INVOKE("bt_task_peers", { infoHash })),
-	// Cache-pool entries for the manageable cache list.
-	btCacheItems: () => typedError<BtCacheItem[], AppError>(__TAURI_INVOKE("bt_cache_items")),
-	/**
-	 *  Live stats of one task (preview page footer polls this). `file_index`
-	 *  narrows the byte counters to the previewed file.
-	 */
-	btTaskStats: (infoHash: string, fileIndex: number | null) => typedError<BtTaskStats, AppError>(__TAURI_INVOKE("bt_task_stats", { infoHash, fileIndex })),
+	btDhtStatus: () => typedError<BtDhtStatus, AppError>(__TAURI_INVOKE("bt_dht_status")),
+	btPlayability: (infoHash: string, fileIndex: number, prepare: boolean) => typedError<BtPlayability, AppError>(__TAURI_INVOKE("bt_playability", { infoHash, fileIndex, prepare })),
 };
 
 /* Types */
@@ -214,7 +195,7 @@ export type AppDataClearResult = {
 	preserved: string[],
 };
 
-export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs" | "btCache";
+export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs";
 
 export type AppDataResetResult = {
 	recordsDeleted: number,
@@ -229,7 +210,6 @@ export type AppDataUsage = {
 	mainDatabaseBytes: number,
 	poetryDatabaseBytes: number,
 	activityLogsBytes: number,
-	btCacheBytes: number,
 	btInternalBytes: number,
 	totalBytes: number,
 };
@@ -252,42 +232,18 @@ export type AuthorSummary = {
 	poemCount: number,
 };
 
-// One cache-pool entry, for the manageable cache list.
-export type BtCacheItem = {
-	infoHash: string,
-	label: string,
-	/**
-	 *  On-disk size of this entry's cache directory, i.e. how much of the file
-	 *  is cached so far.
-	 */
-	sizeBytes: number,
-	/**
-	 *  Total size of the task's selected files; None while the engine is down
-	 *  or metadata has not arrived.
-	 */
-	totalBytes: number | null,
-	lastAccess: number,
-	/**
-	 *  Pinned (save-to-local in flight) or currently streaming: exempt from
-	 *  eviction, and deleting would break the operation in progress.
-	 */
-	pinned: boolean,
-	streaming: boolean,
-	/**
-	 *  The task's selected files, so the cache list can offer open/save-as.
-	 *  Empty while the engine has no handle for this task.
-	 */
-	files: BtFileMeta[],
-};
-
-export type BtCacheStats = {
-	usedBytes: number,
-	quotaBytes: number,
-	// Task count inside the cache pool (mode='preview').
-	items: number,
-};
-
 export type BtControlAction = "Pause" | "Resume" | "Cancel" | "Remove";
+
+export type BtDhtState = "Disabled" | "NotEstablished" | "Bootstrapping" | "Ready";
+
+// Shared DHT diagnostics for the current platform-local BT session.
+export type BtDhtStatus = {
+	enabled: boolean,
+	ipv4Nodes: number,
+	ipv6Nodes: number,
+	outstandingRequests: number,
+	state: BtDhtState,
+};
 
 export type BtFileMeta = {
 	index: number,
@@ -304,6 +260,20 @@ export type BtPeerInfo = {
 	fetchedBytes: number,
 	uploadedBytes: number,
 	state: string,
+};
+
+export type BtPlayability = {
+	infoHash: string,
+	fileIndex: number,
+	fileName: string,
+	supported: boolean,
+	totalBytes: number,
+	contiguousBytes: number,
+	minimumBytes: number,
+	ready: boolean,
+	loading: boolean,
+	reason: string | null,
+	url: string | null,
 };
 
 export type BtProbeResult = {
@@ -325,13 +295,18 @@ export type BtTaskEvent = {
 export type BtTaskInfo = {
 	infoHash: string,
 	label: string,
-	destDir: string,
-	// 'download'; 'preview' (cache mode) added in P2.
-	mode: string,
-	pinned: boolean,
+	// Application-private directory that owns the downloaded pieces.
+	downloadDir: string,
+	// Completed file/archive path inside the application-private directory.
+	outputPath: string | null,
+	// Optional user-directory copy created by an explicit export action.
+	exportPath: string | null,
+	exported: boolean,
 	status: BtTaskStatus,
 	packageMode: BtPackageMode,
-	cacheAvailable: boolean,
+	// Selected source file used by the progressive preview endpoint.
+	fileIndex: number | null,
+	fileName: string | null,
 	error: string | null,
 	total: number | null,
 	progress: number | null,
@@ -343,11 +318,6 @@ export type BtTaskInfo = {
 	 *  it is actually downloading, so history stays out of it.
 	 */
 	state: BtTaskState | null,
-	/**
-	 *  Selected files of a preview task, so its row can offer open / save-as.
-	 *  Empty for plain downloads and while the engine has no handle.
-	 */
-	files: BtFileMeta[],
 };
 
 /**
@@ -355,18 +325,6 @@ export type BtTaskInfo = {
  *  the frontend owns the wording (i18n).
  */
 export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" | "Error";
-
-// Live stats for one task; polled by the preview page footer.
-export type BtTaskStats = {
-	infoHash: string,
-	state: BtTaskState,
-	progress: number,
-	total: number,
-	downBps: number,
-	upBps: number,
-	peersLive: number,
-	peersQueued: number,
-};
 
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 

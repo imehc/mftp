@@ -16,7 +16,11 @@ import {
   TerminalSquare,
   Wifi,
 } from "lucide-react";
-import { isMobilePlatform } from "~/lib/platform";
+import {
+  isAndroidPlatform,
+  isIosPlatform,
+  isMobilePlatform,
+} from "~/lib/platform";
 import type { ToolRoute } from "~/store/settings";
 export type HomeCategory = "tools" | "library" | "games";
 export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
@@ -24,7 +28,7 @@ export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
   library: <Trans>文库</Trans>,
   games: <Trans>小游戏</Trans>,
 };
-export type HomePlatform = "desktop" | "mobile";
+export type HomePlatform = "desktop" | "android" | "ios" | "mobile";
 export interface HomeEntry {
   id: string;
   category: HomeCategory;
@@ -130,9 +134,8 @@ export const homeEntries: HomeEntry[] = [
       preload: "intent",
     }),
     toolId: "bt",
-    // BT 引擎在各平台都能编译，但下载页尚无
-    // 移动端布局。
-    platforms: ["desktop"],
+    // iOS 暂不注册 BT 引擎；桌面端和 Android 使用独立本地 Session。
+    platforms: ["desktop", "android"],
     icon: Magnet,
     title: <Trans>BT 下载</Trans>,
   },
@@ -188,7 +191,13 @@ export const homeEntries: HomeEntry[] = [
     title: <Trans>中国象棋</Trans>,
   },
 ];
-const currentPlatform: HomePlatform = isMobilePlatform() ? "mobile" : "desktop";
+const currentPlatform: HomePlatform = isAndroidPlatform()
+  ? "android"
+  : isIosPlatform()
+    ? "ios"
+    : isMobilePlatform()
+      ? "mobile"
+      : "desktop";
 
 /** 当前平台可用的首页入口。 */
 export const availableHomeEntries: HomeEntry[] = homeEntries.filter(

@@ -40,10 +40,8 @@ impl Storage {
     pub fn app_data_usage(&self) -> AppDataUsage {
         let poetry = self.root.join("poetry.sqlite3");
         let bt_root = self.root.join("bt");
-        let bt_cache = bt_root.join("cache");
         let main_database_bytes = file_family_size(&self.db_path);
         let poetry_database_bytes = file_family_size(&poetry);
-        let bt_cache_bytes = dir_size(&bt_cache);
         let bt_internal_bytes = dir_size(&bt_root);
         let (vault_bytes, hosts_bytes, todo_bytes, activity_logs_bytes) = self
             .conn()
@@ -115,7 +113,6 @@ impl Storage {
             main_database_bytes,
             poetry_database_bytes,
             activity_logs_bytes,
-            bt_cache_bytes,
             bt_internal_bytes,
             total_bytes: main_database_bytes + poetry_database_bytes + bt_internal_bytes,
         }
@@ -131,7 +128,7 @@ impl Storage {
             }
             AppDataModule::Todo => tx.execute("DELETE FROM todo_items", [])?,
             AppDataModule::ActivityLogs => tx.execute("DELETE FROM lan_access_logs", [])?,
-            AppDataModule::Poetry | AppDataModule::BtCache => {
+            AppDataModule::Poetry => {
                 return Err(AppError("module is not stored in the main database".into()));
             }
         };

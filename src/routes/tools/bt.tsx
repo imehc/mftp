@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import BtTool from "~/features/bt/BtTool";
-import { desktopOnlyGuard } from "~/lib/platform";
+import { btAvailableGuard } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 
 function BtRoute() {
@@ -15,6 +15,6 @@ function BtRoute() {
 }
 
 export const Route = createFileRoute("/tools/bt")({
-  beforeLoad: desktopOnlyGuard,
+  beforeLoad: btAvailableGuard,
   component: BtRoute,
 });

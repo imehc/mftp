@@ -31,12 +31,7 @@ import { formatBytes } from "~/lib/format";
 import { isDesktopPlatform } from "~/lib/platform";
 import { useSessionsStore } from "~/store/sessions";
 import { useTransfersStore } from "~/store/transfers";
-import type {
-  AppDataModule,
-  AppDataUsage,
-  BtCacheStats,
-  LanTransferStatus,
-} from "~/types";
+import type { AppDataModule, AppDataUsage, LanTransferStatus } from "~/types";
 
 const modules: AppDataModule[] = [
   "vault",
@@ -44,7 +39,6 @@ const modules: AppDataModule[] = [
   "todo",
   "poetry",
   "activityLogs",
-  "btCache",
 ];
 
 function statusLabel(value: boolean, labels: { active: string; idle: string }) {
@@ -58,7 +52,6 @@ export default function AboutPage() {
   const sync = usePoetrySyncProgress();
   const [usage, setUsage] = useState<AppDataUsage | null>(null);
   const [lan, setLan] = useState<LanTransferStatus | null>(null);
-  const [bt, setBt] = useState<BtCacheStats | null>(null);
   const [logCount, setLogCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [version, setVersion] = useState("-");
@@ -70,7 +63,6 @@ export default function AboutPage() {
     todo: t`待办`,
     poetry: t`诗词库`,
     activityLogs: t`活动日志`,
-    btCache: t`BT 缓存`,
   };
   const statusLabels = { active: t`运行中`, idle: t`空闲` };
   const moduleBytes: Record<AppDataModule, number> = {
@@ -79,7 +71,6 @@ export default function AboutPage() {
     todo: usage?.todoBytes ?? 0,
     poetry: usage?.poetryDatabaseBytes ?? 0,
     activityLogs: usage?.activityLogsBytes ?? 0,
-    btCache: usage?.btCacheBytes ?? 0,
   };
   const visibleModules = usage
     ? modules.filter((module) => moduleBytes[module] > 0)
@@ -95,18 +86,13 @@ export default function AboutPage() {
   async function load() {
     setLoading(true);
     try {
-      const btStats = isDesktopPlatform()
-        ? ipc.btCacheStats()
-        : Promise.resolve(null);
-      const [nextUsage, nextLan, nextBt, logs] = await Promise.all([
+      const [nextUsage, nextLan, logs] = await Promise.all([
         ipc.appDataUsage(),
         ipc.lanTransferStatus(),
-        btStats,
         ipc.activityLogs(500),
       ]);
       setUsage(nextUsage);
       setLan(nextLan);
-      setBt(nextBt);
       setLogCount(logs.length);
     } catch (error) {
       toast.error(String(error));
@@ -205,10 +191,6 @@ export default function AboutPage() {
               value={usage ? formatBytes(usage.poetryDatabaseBytes) : "-"}
             />
             <UsageRow
-              label={t`BT 缓存`}
-              value={usage ? formatBytes(usage.btCacheBytes) : "-"}
-            />
-            <UsageRow
               label={t`应用内部数据`}
               value={usage ? formatBytes(usage.btInternalBytes) : "-"}
             />
@@ -241,11 +223,6 @@ export default function AboutPage() {
               value={statusLabel(lan?.running ?? false, statusLabels)}
               active={lan?.running ?? false}
               icon={<Wifi className="size-3.5" />}
-            />
-            <StatusRow
-              label={t`BT 缓存任务`}
-              value={`${bt?.items ?? 0}`}
-              active={(bt?.items ?? 0) > 0}
             />
             <StatusRow
               label={t`诗词库同步`}

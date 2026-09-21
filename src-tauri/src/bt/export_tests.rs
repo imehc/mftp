@@ -17,13 +17,11 @@ fn packs_selected_files_with_relative_paths() {
     let target = root.join("result.tar");
     let files = vec![
         ExportFile {
-            index: 0,
             absolute: first,
             relative: "folder/first.txt".into(),
             len: 5,
         },
         ExportFile {
-            index: 1,
             absolute: nested,
             relative: "folder/nested/second.txt".into(),
             len: 6,
@@ -47,6 +45,23 @@ fn packs_selected_files_with_relative_paths() {
 }
 
 #[test]
+fn copying_private_output_uses_unique_name_without_overwrite() {
+    let source_root = temp_dir("move-source");
+    let destination = temp_dir("move-destination");
+    let source = source_root.join("source.bin");
+    std::fs::write(&source, b"payload").unwrap();
+    std::fs::write(destination.join("source.bin"), b"old").unwrap();
+
+    let target = copy_path_to_dir(&source, &destination, "source.bin").unwrap();
+
+    assert_eq!(target, destination.join("source (2).bin"));
+    assert_eq!(std::fs::read(target).unwrap(), b"payload");
+    assert_eq!(std::fs::read(&source).unwrap(), b"payload");
+    std::fs::remove_dir_all(source_root).unwrap();
+    std::fs::remove_dir_all(destination).unwrap();
+}
+
+#[test]
 fn tar_suffix_is_preserved_when_choosing_unique_name() {
     let root = temp_dir("unique");
     File::create(root.join("sample.tar")).unwrap();
@@ -55,100 +70,4 @@ fn tar_suffix_is_preserved_when_choosing_unique_name() {
         root.join("sample (2).tar")
     );
     std::fs::remove_dir_all(root).unwrap();
-}
-
-#[test]
-fn single_file_export_keeps_name_and_never_overwrites() {
-    let source_root = temp_dir("single-source");
-    let destination = temp_dir("single-destination");
-    let source = source_root.join("source.bin");
-    File::create(&source)
-        .unwrap()
-        .write_all(b"payload")
-        .unwrap();
-    File::create(destination.join("source.bin")).unwrap();
-    let file = ExportFile {
-        index: 0,
-        absolute: source,
-        relative: "folder/source.bin".into(),
-        len: 7,
-    };
-    let target = copy_export_file(&file, &destination).unwrap();
-    assert_eq!(target, destination.join("source (2).bin"));
-    assert_eq!(std::fs::read(target).unwrap(), b"payload");
-    std::fs::remove_dir_all(source_root).unwrap();
-    std::fs::remove_dir_all(destination).unwrap();
-}
-
-#[test]
-fn cancelled_archive_export_removes_partial_file() {
-    let source_root = temp_dir("cancelled-source");
-    let destination = temp_dir("cancelled-destination");
-    let source = source_root.join("source.bin");
-    File::create(&source)
-        .unwrap()
-        .write_all(b"payload")
-        .unwrap();
-    let files = vec![
-        ExportFile {
-            index: 0,
-            absolute: source.clone(),
-            relative: "source.bin".into(),
-            len: 7,
-        },
-        ExportFile {
-            index: 1,
-            absolute: source,
-            relative: "copy.bin".into(),
-            len: 7,
-        },
-    ];
-    let hash = "a".repeat(40);
-    let result = export_files(
-        &files,
-        &destination,
-        "cancelled",
-        &hash,
-        &AtomicBool::new(true),
-    );
-    assert!(result.is_err());
-    assert!(!destination.join("cancelled.tar").exists());
-    assert!(!destination
-        .join(format!(".cancelled.tar.{hash}.mftp-part"))
-        .exists());
-    std::fs::remove_dir_all(source_root).unwrap();
-    std::fs::remove_dir_all(destination).unwrap();
-}
-
-#[test]
-fn staged_file_moves_out_without_clobbering_the_folder() {
-    let staging = temp_dir("move-staging");
-    let destination = temp_dir("move-destination");
-    let source = staging.join("source.bin");
-    File::create(&source)
-        .unwrap()
-        .write_all(b"payload")
-        .unwrap();
-    File::create(destination.join("source.bin")).unwrap();
-    let file = ExportFile {
-        index: 0,
-        absolute: source.clone(),
-        relative: "folder/source.bin".into(),
-        len: 7,
-    };
-    let target = move_export_file(&file, &destination).unwrap();
-    assert_eq!(target, destination.join("source (2).bin"));
-    assert_eq!(std::fs::read(target).unwrap(), b"payload");
-    assert!(!source.exists());
-    std::fs::remove_dir_all(staging).unwrap();
-    std::fs::remove_dir_all(destination).unwrap();
-}
-
-#[test]
-fn file_completion_uses_the_target_file_progress() {
-    let progress = vec![10, 2, 30];
-    assert!(progress_reaches_len(&progress, 0, 10));
-    assert!(!progress_reaches_len(&progress, 1, 20));
-    assert!(progress_reaches_len(&progress, 2, 30));
-    assert!(!progress_reaches_len(&progress, 4, 1));
 }

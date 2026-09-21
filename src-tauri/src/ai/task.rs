@@ -124,10 +124,15 @@ fn poetry_translation_request(
         PoetryTranslationMode::Literal => LITERAL_STYLE,
         PoetryTranslationMode::Literary => LITERARY_STYLE,
     };
-    let source_chars = poem.body.iter().map(|line| line.chars().count()).sum::<usize>();
+    let source_chars = poem
+        .body
+        .iter()
+        .map(|line| line.chars().count())
+        .sum::<usize>();
     let max_output_tokens = source_chars
         .saturating_mul(OUTPUT_TOKENS_PER_SOURCE_CHAR)
-        .clamp(MIN_OUTPUT_TOKENS as usize, MAX_OUTPUT_TOKENS as usize) as u32;
+        .clamp(MIN_OUTPUT_TOKENS as usize, MAX_OUTPUT_TOKENS as usize)
+        as u32;
     Ok(AiTaskRequest {
         task: AiTask::PoetryTranslation { mode },
         instructions: format!("{TRANSLATION_RULES}\n{style}"),

@@ -11,7 +11,7 @@ use crate::models::TransferProgress;
 pub const TRANSFER_PROGRESS_EVENT: &str = "sftp-transfer-progress";
 
 /// BT task-level events (save-to-local done/failed). Payload: `bt::BtTaskEvent`.
-#[cfg(desktop)]
+#[cfg(any(desktop, target_os = "android"))]
 pub const BT_TASK_EVENT: &str = "bt://task-event";
 
 pub(crate) fn emit_transfer_progress(
@@ -39,7 +39,7 @@ pub(crate) fn emit_transfer_progress(
 /// Used by engine-managed tasks (BT): carries the finished flag on
 /// completion so the frontend can flip the task to success (for SFTP the
 /// completion state is driven by the command return value).
-#[cfg(desktop)]
+#[cfg(any(desktop, target_os = "android"))]
 pub(crate) fn emit_transfer_progress_with_finish(
     app: &AppHandle,
     transfer_id: &str,

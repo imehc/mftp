@@ -9,6 +9,14 @@ export function isMobilePlatform(): boolean {
   return /android|iphone|ipad/i.test(navigator.userAgent);
 }
 
+export function isAndroidPlatform(): boolean {
+  return /android/i.test(navigator.userAgent);
+}
+
+export function isIosPlatform(): boolean {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
 export function isDesktopPlatform(): boolean {
   return !isMobilePlatform();
 }
@@ -19,6 +27,13 @@ export function isDesktopPlatform(): boolean {
  */
 export function desktopOnlyGuard(): void {
   if (isMobilePlatform()) {
+    throw redirect({ to: "/" });
+  }
+}
+
+/** BT 当前在桌面端和 Android 提供本地引擎，iOS 保持明确不可用。 */
+export function btAvailableGuard(): void {
+  if (isIosPlatform()) {
     throw redirect({ to: "/" });
   }
 }
