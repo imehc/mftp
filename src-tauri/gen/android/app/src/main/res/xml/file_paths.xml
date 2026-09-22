@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Tauri app_data_dir is dataDir, one level above Android filesDir. -->
+  <files-path name="bt_downloads" path="../bt/downloads/" />
   <external-path name="my_images" path="." />
   <cache-path name="my_cache_images" path="." />
 </paths>

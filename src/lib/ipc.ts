@@ -408,3 +408,10 @@ export const btPlayability = (
   fileIndex: number,
   prepare: boolean,
 ) => unwrapCommand(commands.btPlayability(infoHash, fileIndex, prepare));
+
+export const btBrowseFiles = (infoHash: string, path: string | null = null) =>
+  unwrapCommand(commands.btBrowseFiles(infoHash, path));
+export const btPreviewFile = (infoHash: string, path: string) =>
+  unwrapCommand(commands.btPreviewFile(infoHash, path));
+export const btOpenFile = (infoHash: string, path: string) =>
+  voidCommand(commands.btOpenFile(infoHash, path));

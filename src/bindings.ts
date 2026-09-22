@@ -160,6 +160,9 @@ export const commands = {
 	btTaskPeers: (infoHash: string) => typedError<BtPeerInfo[], AppError>(__TAURI_INVOKE("bt_task_peers", { infoHash })),
 	btDhtStatus: () => typedError<BtDhtStatus, AppError>(__TAURI_INVOKE("bt_dht_status")),
 	btPlayability: (infoHash: string, fileIndex: number, prepare: boolean) => typedError<BtPlayability, AppError>(__TAURI_INVOKE("bt_playability", { infoHash, fileIndex, prepare })),
+	btBrowseFiles: (infoHash: string, path: string | null) => typedError<BtFileListing, AppError>(__TAURI_INVOKE("bt_browse_files", { infoHash, path })),
+	btPreviewFile: (infoHash: string, path: string) => typedError<BtFilePreview, AppError>(__TAURI_INVOKE("bt_preview_file", { infoHash, path })),
+	btOpenFile: (infoHash: string, path: string) => typedError<null, AppError>(__TAURI_INVOKE("bt_open_file", { infoHash, path })),
 };
 
 /* Types */
@@ -245,10 +248,28 @@ export type BtDhtStatus = {
 	state: BtDhtState,
 };
 
+export type BtFileEntry = {
+	// Relative to the task's download directory, never an arbitrary device path.
+	path: string,
+	name: string,
+	isDir: boolean,
+	size: number,
+};
+
+export type BtFileListing = {
+	current: BtFileEntry,
+	entries: BtFileEntry[],
+};
+
 export type BtFileMeta = {
 	index: number,
 	path: string,
 	len: number,
+};
+
+export type BtFilePreview = {
+	url: string,
+	partial: boolean,
 };
 
 export type BtPackageMode = "Direct" | "Archive";

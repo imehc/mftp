@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  Eye,
+  ListTree,
   FolderOpen,
   Magnet,
   Pause,
@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import type { BtTaskInfo } from "~/types";
 import { formatBytes } from "~/lib/format";
-import { canPlayInline, isPreviewable, previewKind } from "~/lib/preview-kind";
 import { Button } from "~/components/ui/button";
 
 /** 控制动作，与 `ipc.btControl` 的取值一致。 */
@@ -22,7 +21,6 @@ interface TaskRowProps {
   task: BtTaskInfo;
   /** 引擎在下载但连不上节点，徽标改为提示。 */
   stalled: boolean;
-  previewReady: boolean;
   hasParsedProbe: boolean;
   onOpenParsed: (task: BtTaskInfo) => void;
   onRetry: (task: BtTaskInfo) => void;
@@ -30,8 +28,7 @@ interface TaskRowProps {
   onControl: (task: BtTaskInfo, action: BtControlAction) => void;
   onMagnet: (task: BtTaskInfo) => void;
   onExport: (task: BtTaskInfo) => void;
-  onOpenLocation: (task: BtTaskInfo) => void;
-  onPreview: (task: BtTaskInfo) => void | Promise<void>;
+  onOpenFiles: (task: BtTaskInfo) => void;
   onDelete: (task: BtTaskInfo) => void;
 }
 
@@ -39,7 +36,6 @@ interface TaskRowProps {
 export default function TaskRow({
   task,
   stalled,
-  previewReady,
   hasParsedProbe,
   onOpenParsed,
   onRetry,
@@ -47,8 +43,7 @@ export default function TaskRow({
   onControl,
   onMagnet,
   onExport,
-  onOpenLocation,
-  onPreview,
+  onOpenFiles,
   onDelete,
 }: TaskRowProps) {
   const { t } = useLingui();
@@ -69,35 +64,17 @@ export default function TaskRow({
     task.status !== "Cancelled" &&
     task.status !== "Error" &&
     task.status !== "Packaging";
-  const previewable =
-    task.packageMode === "Direct" &&
-    task.fileIndex != null &&
-    (terminal
-      ? task.status === "Completed" &&
-        !!task.outputPath &&
-        isPreviewable(previewKind(task.outputPath))
-      : task.status === "Active" &&
-        previewReady &&
-        !!task.fileName &&
-        isPreviewable(previewKind(task.fileName)) &&
-        canPlayInline(task.fileName, previewKind(task.fileName)));
   return (
     <div className="hover:bg-sidebar-accent flex flex-col gap-1 rounded-md px-2 py-1.5 text-xs">
-      <div className="flex items-center gap-2">
-        {hasParsedProbe ? (
-          <button
-            type="button"
-            className="min-w-0 flex-1 truncate text-left font-medium hover:underline"
-            title={task.label}
-            onClick={() => onOpenParsed(task)}
-          >
-            {task.label}
-          </button>
-        ) : (
-          <span className="min-w-0 flex-1 truncate text-left font-medium">
-            {task.label}
-          </span>
-        )}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          className="min-w-0 flex-1 basis-1/2 truncate text-left font-medium hover:underline sm:basis-auto"
+          title={task.label}
+          onClick={() => onOpenFiles(task)}
+        >
+          {task.label}
+        </button>
         {task.status === "Cancelled" ? (
           <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
             <Trans>已取消</Trans>
@@ -130,11 +107,6 @@ export default function TaskRow({
             )}
           </span>
         )}
-        {previewReady ? (
-          <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px]">
-            <Trans>可预览</Trans>
-          </span>
-        ) : null}
         {terminal ? (
           <span className="text-muted-foreground shrink-0 tabular-nums">
             {formatBytes(total)}
@@ -209,26 +181,26 @@ export default function TaskRow({
                 <Send />
               </Button>
             ) : null}
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              title={t`打开下载位置`}
-              aria-label={t`打开下载位置`}
-              onClick={() => onOpenLocation(task)}
-            >
-              <FolderOpen />
-            </Button>
           </>
         ) : null}
-        {previewable ? (
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          title={t`打开文件或目录`}
+          aria-label={t`打开文件或目录`}
+          onClick={() => onOpenFiles(task)}
+        >
+          <FolderOpen />
+        </Button>
+        {hasParsedProbe ? (
           <Button
             variant="ghost"
             size="icon-xs"
-            title={t`预览`}
-            aria-label={t`预览`}
-            onClick={() => void onPreview(task)}
+            title={t`查看资源信息`}
+            aria-label={t`查看资源信息`}
+            onClick={() => onOpenParsed(task)}
           >
-            <Eye />
+            <ListTree />
           </Button>
         ) : null}
         <Button

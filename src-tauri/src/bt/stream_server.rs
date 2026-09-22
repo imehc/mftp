@@ -1,19 +1,24 @@
-//! Local Range server backed directly by librqbit's task stream.
+//! Local Range server reading original files or verified torrent pieces, never a cache.
 
+use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 
 use librqbit::Session;
-use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncSeek, AsyncSeekExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::timeout;
 
+use crate::error::{AppError, AppResult};
 use crate::storage::Storage;
 
 const MAX_HEADER_BYTES: usize = 8 * 1024;
 const READ_BUFFER: usize = 64 * 1024;
-const READY_TIMEOUT: Duration = Duration::from_secs(30);
-const READ_STALL_TIMEOUT: Duration = Duration::from_secs(90);
+const READY_TIMEOUT: Duration = Duration::from_secs(10);
+const READ_STALL_TIMEOUT: Duration = Duration::from_secs(15);
+// A paused task cannot fill missing pieces until the user explicitly resumes it.
+const PAUSED_READ_TIMEOUT: Duration = Duration::from_secs(2);
+const RESPONSE_HEADERS: &str = "Cache-Control: no-store, no-cache, must-revalidate\r\nPragma: no-cache\r\nAccept-Ranges: bytes\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Expose-Headers: Content-Range, Content-Length\r\nConnection: close\r\n";
 
 pub(super) struct StreamServer {
     port: u16,
@@ -40,6 +45,16 @@ impl StreamServer {
             self.port, self.token, info_hash, file_index
         )
     }
+
+    pub(super) fn file_url(&self, info_hash: &str, path: &str) -> String {
+        let query = url::form_urlencoded::Serializer::new(String::new())
+            .append_pair("path", path)
+            .finish();
+        format!(
+            "http://127.0.0.1:{}/{}/file/{}?{}",
+            self.port, self.token, info_hash, query
+        )
+    }
 }
 
 async fn accept_loop(
@@ -48,22 +63,108 @@ async fn accept_loop(
     storage: Storage,
     token: String,
 ) {
+    // Dropping this set on shutdown also closes clients and releases stream permits.
+    let mut clients = tokio::task::JoinSet::new();
     loop {
-        let Ok((stream, _)) = listener.accept().await else {
-            continue;
-        };
-        tokio::spawn(handle_connection(
-            stream,
-            session.clone(),
-            storage.clone(),
-            token.clone(),
-        ));
+        tokio::select! {
+            Some(_) = clients.join_next(), if !clients.is_empty() => {},
+            accepted = listener.accept(), if clients.len() < 32 => {
+                let Ok((stream, _)) = accepted else { break };
+                clients.spawn(handle_connection(stream, session.clone(), storage.clone(), token.clone()));
+            }
+        }
     }
 }
 
 struct Request {
     path: String,
     range: Option<(u64, Option<u64>)>,
+    invalid_range: bool,
+    method: String,
+}
+
+trait ReadSeek: AsyncRead + AsyncSeek + Unpin + Send {}
+impl<T: AsyncRead + AsyncSeek + Unpin + Send> ReadSeek for T {}
+
+struct Source {
+    reader: Box<dyn ReadSeek>,
+    total: u64,
+    name: String,
+    stalled_after: Duration,
+}
+
+async fn file_source(
+    session: &Arc<Session>,
+    storage: &Storage,
+    hash: &str,
+    relative: String,
+) -> AppResult<Source> {
+    let hash_id = super::parse_info_hash(hash)?;
+    let row = storage
+        .get_bt_task(hash)?
+        .ok_or_else(|| AppError::from("Download task not found"))?;
+    let row_for_path = row.clone();
+    let path = crate::commands::run_blocking(move || {
+        let path = super::files::resolve_path(Path::new(&row_for_path.work_dir), &relative)?;
+        if !path.is_file() {
+            return Err(AppError::from("Download file not found"));
+        }
+        Ok(path)
+    })
+    .await?;
+    if row.status == "completed" {
+        let file = tokio::fs::File::open(&path).await?;
+        let total = file.metadata().await?.len();
+        return Ok(Source {
+            reader: Box::new(file),
+            total,
+            name: path.to_string_lossy().into_owned(),
+            stalled_after: READ_STALL_TIMEOUT,
+        });
+    }
+    let handle = super::find_handle(session, &hash_id)?
+        .ok_or_else(|| AppError::from("Download task is not initialized"))?;
+    let index_handle = handle.clone();
+    let index = crate::commands::run_blocking(move || {
+        super::files::selected_index(&index_handle, &row, &path)
+    })
+    .await?;
+    torrent_source(handle, index).await
+}
+
+async fn torrent_source(handle: super::TorrentHandle, index: usize) -> AppResult<Source> {
+    let unavailable = || AppError::from("Torrent metadata is not ready");
+    timeout(READY_TIMEOUT, handle.wait_until_initialized())
+        .await
+        .map_err(|_| unavailable())?
+        .map_err(|_| unavailable())?;
+    let (total, name) = handle
+        .with_metadata(|metadata| {
+            metadata.file_infos.get(index).map(|file| {
+                (
+                    file.len,
+                    file.relative_filename.to_string_lossy().into_owned(),
+                )
+            })
+        })
+        .ok()
+        .flatten()
+        .ok_or_else(unavailable)?;
+    let stalled_after = if handle.is_paused() {
+        PAUSED_READ_TIMEOUT
+    } else {
+        READ_STALL_TIMEOUT
+    };
+    let reader = timeout(READY_TIMEOUT, handle.stream(index))
+        .await
+        .map_err(|_| unavailable())?
+        .map_err(|_| unavailable())?;
+    Ok(Source {
+        reader: Box::new(reader),
+        total,
+        name,
+        stalled_after,
+    })
 }
 
 async fn handle_connection(
@@ -72,43 +173,53 @@ async fn handle_connection(
     storage: Storage,
     token: String,
 ) {
-    let Ok(Some(request)) = read_request(&mut stream).await else {
+    let Ok(Ok(Some(request))) = timeout(READY_TIMEOUT, read_request(&mut stream)).await else {
         return;
     };
-    let prefix = format!("/{token}/stream/");
+    let prefix = format!("/{token}/");
     let Some(route) = request.path.strip_prefix(&prefix) else {
         let _ = write_simple(&mut stream, 404, "Not Found").await;
         return;
     };
-    let Some((hash_text, file_index)) = split_route(route) else {
-        let _ = write_simple(&mut stream, 404, "Not Found").await;
-        return;
-    };
-    let selected = storage
-        .get_bt_task(&hash_text)
-        .ok()
-        .flatten()
-        .is_some_and(|task| task.file_indices.contains(&file_index));
-    if !selected {
-        let _ = write_simple(&mut stream, 404, "Not Found").await;
+    if request.method == "OPTIONS" {
+        let _ = stream.write_all(format!("HTTP/1.1 204 No Content\r\n{RESPONSE_HEADERS}Access-Control-Allow-Methods: GET, HEAD, OPTIONS\r\nAccess-Control-Allow-Headers: Range\r\nContent-Length: 0\r\n\r\n").as_bytes()).await;
         return;
     }
-    let Ok(hash) = super::parse_info_hash(&hash_text) else {
-        let _ = write_simple(&mut stream, 404, "Not Found").await;
-        return;
-    };
-    let Ok(Some(handle)) = super::find_handle(&session, &hash) else {
-        let _ = write_simple(&mut stream, 404, "Not Found").await;
-        return;
-    };
-    if !matches!(
-        timeout(READY_TIMEOUT, handle.wait_until_initialized()).await,
-        Ok(Ok(()))
-    ) {
-        let _ = write_simple(&mut stream, 503, "Torrent Not Ready").await;
+    if !matches!(request.method.as_str(), "GET" | "HEAD") {
+        let _ = write_simple(&mut stream, 405, "Method Not Allowed").await;
         return;
     }
-    respond_with_range(&mut stream, handle, file_index, request.range).await;
+    let source = if let Some(route) = route.strip_prefix("file/") {
+        let Some((hash, query)) = route.split_once('?') else {
+            return;
+        };
+        let Some((_, path)) =
+            url::form_urlencoded::parse(query.as_bytes()).find(|(key, _)| key == "path")
+        else {
+            return;
+        };
+        file_source(&session, &storage, hash, path.into_owned()).await
+    } else if let Some((hash, index)) = route.strip_prefix("stream/").and_then(split_route) {
+        let selected = storage
+            .get_bt_task(&hash)
+            .ok()
+            .flatten()
+            .is_some_and(|task| task.file_indices.is_empty() || task.file_indices.contains(&index));
+        let handle = super::parse_info_hash(&hash)
+            .ok()
+            .and_then(|hash| super::find_handle(&session, &hash).ok().flatten());
+        match handle.filter(|_| selected) {
+            Some(handle) => torrent_source(handle, index).await,
+            None => Err(AppError::from("Download file not found")),
+        }
+    } else {
+        Err(AppError::from("Download file not found"))
+    };
+    let Ok(source) = source else {
+        let _ = write_simple(&mut stream, 404, "Not Found").await;
+        return;
+    };
+    respond_with_range(&mut stream, source, request).await;
 }
 
 async fn read_request(stream: &mut TcpStream) -> std::io::Result<Option<Request>> {
@@ -132,18 +243,38 @@ async fn read_request(stream: &mut TcpStream) -> std::io::Result<Option<Request>
 fn parse_request(raw: &[u8]) -> Option<Request> {
     let text = std::str::from_utf8(raw).ok()?;
     let mut lines = text.lines();
-    let path = lines.next()?.split_whitespace().nth(1)?.to_string();
-    let range = lines.find_map(|line| line.strip_prefix("Range:").and_then(parse_range));
-    Some(Request { path, range })
+    let mut first = lines.next()?.split_whitespace();
+    let method = first.next()?.to_string();
+    let path = first.next()?.to_string();
+    let header = lines
+        .filter_map(|line| line.split_once(':'))
+        .find(|(name, _)| name.eq_ignore_ascii_case("range"));
+    let range = header.and_then(|(_, value)| parse_range(value));
+    Some(Request {
+        path,
+        range,
+        invalid_range: header.is_some() && range.is_none(),
+        method,
+    })
 }
 
 fn parse_range(header: &str) -> Option<(u64, Option<u64>)> {
-    let value = header.trim().strip_prefix("bytes=")?.split(',').next()?;
-    let (start, end) = value.split_once('-')?;
-    if start.trim().is_empty() {
-        return Some((u64::MAX, Some(end.trim().parse().ok()?)));
+    let value = header.trim().strip_prefix("bytes=")?;
+    if value.contains(',') {
+        return None;
     }
-    Some((start.trim().parse().ok()?, end.trim().parse().ok()))
+    let (start, end) = value.split_once('-')?;
+    if start.is_empty() {
+        return Some((u64::MAX, Some(end.parse().ok()?)));
+    }
+    Some((
+        start.parse().ok()?,
+        if end.is_empty() {
+            None
+        } else {
+            Some(end.parse().ok()?)
+        },
+    ))
 }
 
 fn split_route(route: &str) -> Option<(String, usize)> {
@@ -157,72 +288,86 @@ fn split_route(route: &str) -> Option<(String, usize)> {
 async fn write_simple(stream: &mut TcpStream, status: u16, reason: &str) -> std::io::Result<()> {
     stream
         .write_all(
-            format!("HTTP/1.1 {status} {reason}\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n")
+            format!("HTTP/1.1 {status} {reason}\r\n{RESPONSE_HEADERS}Content-Length: 0\r\n\r\n")
                 .as_bytes(),
         )
         .await?;
     stream.shutdown().await
 }
 
-async fn respond_with_range(
-    stream: &mut TcpStream,
-    handle: super::TorrentHandle,
-    file_index: usize,
-    range: Option<(u64, Option<u64>)>,
-) {
-    let metadata = handle.with_metadata(|metadata| {
-        metadata.file_infos.get(file_index).map(|file| {
-            (
-                file.len,
-                file.relative_filename.to_string_lossy().into_owned(),
-            )
-        })
-    });
-    let Ok(Some((total, filename))) = metadata else {
-        let _ = write_simple(stream, 404, "Not Found").await;
-        return;
-    };
-    let Some((start, end, status)) = resolve_range(total, range) else {
-        let _ = write_simple(stream, 416, "Range Not Satisfiable").await;
-        return;
-    };
-    let length = end.saturating_sub(start).saturating_add(1);
-    let content_type = mime_guess::from_path(&filename)
-        .first_or_octet_stream()
-        .to_string();
-    let header = if status == 206 {
-        format!(
-            "HTTP/1.1 206 Partial Content\r\nContent-Type: {content_type}\r\nContent-Length: {length}\r\nContent-Range: bytes {start}-{end}/{total}\r\nAccept-Ranges: bytes\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n"
-        )
-    } else {
-        format!(
-            "HTTP/1.1 200 OK\r\nContent-Type: {content_type}\r\nContent-Length: {length}\r\nAccept-Ranges: bytes\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n"
-        )
-    };
-    if stream.write_all(header.as_bytes()).await.is_err() {
+async fn respond_with_range(stream: &mut TcpStream, mut source: Source, request: Request) {
+    let total = source.total;
+    if total == 0 && request.range.is_none() && !request.invalid_range {
+        let _ = write_simple(stream, 200, "OK").await;
         return;
     }
-    let Ok(mut source) = handle.stream(file_index).await else {
+    let resolved = (!request.invalid_range)
+        .then(|| resolve_range(total, request.range))
+        .flatten();
+    let Some((start, end, status)) = resolved else {
+        let _ = stream.write_all(format!("HTTP/1.1 416 Range Not Satisfiable\r\n{RESPONSE_HEADERS}Content-Range: bytes */{total}\r\nContent-Length: 0\r\n\r\n").as_bytes()).await;
         return;
     };
-    if source.seek(std::io::SeekFrom::Start(start)).await.is_err() {
+    let length = end - start + 1;
+    let content_type = mime_guess::from_path(&source.name)
+        .first_or_octet_stream()
+        .to_string();
+    let content_range = if status == 206 {
+        format!("Content-Range: bytes {start}-{end}/{total}\r\n")
+    } else {
+        String::new()
+    };
+    let reason = if status == 206 {
+        "Partial Content"
+    } else {
+        "OK"
+    };
+    let header = format!("HTTP/1.1 {status} {reason}\r\n{RESPONSE_HEADERS}Content-Type: {content_type}\r\nContent-Length: {length}\r\n{content_range}\r\n");
+    if request.method == "HEAD" {
+        let _ = stream.write_all(header.as_bytes()).await;
+        return;
+    }
+    if source
+        .reader
+        .seek(std::io::SeekFrom::Start(start))
+        .await
+        .is_err()
+    {
         return;
     }
     let mut remaining = length;
-    let mut buffer = vec![0u8; READ_BUFFER.min(length as usize).max(1)];
+    let mut buffer = vec![0u8; READ_BUFFER];
+    let mut sent_header = false;
     while remaining > 0 {
-        let want = buffer.len().min(remaining as usize);
-        let read = timeout(READ_STALL_TIMEOUT, source.read(&mut buffer[..want])).await;
-        match read {
-            Ok(Ok(0)) | Err(_) => break,
-            Ok(Ok(count)) => {
-                if stream.write_all(&buffer[..count]).await.is_err() {
-                    return;
+        let want = remaining.min(buffer.len() as u64) as usize;
+        let mut disconnected = [0u8; 1];
+        // A closed preview must not retain an engine read permit while waiting for a piece.
+        let read = tokio::select! {
+            read = timeout(source.stalled_after, source.reader.read(&mut buffer[..want])) => read,
+            _ = stream.peek(&mut disconnected) => return,
+        };
+        let count = match read {
+            Ok(Ok(count)) if count > 0 => count,
+            _ => {
+                if !sent_header {
+                    let _ = write_simple(stream, 503, "Piece Not Available").await;
                 }
-                remaining = remaining.saturating_sub(count as u64);
+                return;
             }
-            Ok(Err(_)) => return,
+        };
+        if !sent_header {
+            if stream.write_all(header.as_bytes()).await.is_err() {
+                return;
+            }
+            sent_header = true;
         }
+        if !matches!(
+            timeout(READ_STALL_TIMEOUT, stream.write_all(&buffer[..count])).await,
+            Ok(Ok(()))
+        ) {
+            return;
+        }
+        remaining -= count as u64;
     }
     let _ = stream.shutdown().await;
 }

@@ -14,6 +14,30 @@ pub struct BtFileMeta {
 
 #[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
+pub struct BtFileEntry {
+    /// Relative to the task's download directory, never an arbitrary device path.
+    pub path: String,
+    pub name: String,
+    pub is_dir: bool,
+    pub size: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct BtFileListing {
+    pub current: BtFileEntry,
+    pub entries: Vec<BtFileEntry>,
+}
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct BtFilePreview {
+    pub url: String,
+    pub partial: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct BtProbeResult {
     pub info_hash: String,
     pub name: String,

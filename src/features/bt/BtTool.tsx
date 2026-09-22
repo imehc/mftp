@@ -1,10 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
-import { convertFileSrc } from "@tauri-apps/api/core";
-import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 import { listen } from "@tauri-apps/api/event";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useNavigate } from "@tanstack/react-router";
 import { Magnet, Plus } from "lucide-react";
 import { toast } from "sonner";
 import * as ipc from "~/lib/ipc";
@@ -12,7 +9,6 @@ import type { BtProbeResult, BtTaskInfo } from "~/types";
 import { useTransfersStore } from "~/store/transfers";
 import TransferPanel from "~/features/transfers/TransferPanel";
 import { BT_TASK_EVENT } from "~/lib/events";
-import { canPlayInline, isPreviewable, previewKind } from "~/lib/preview-kind";
 import { isMobilePlatform } from "~/lib/platform";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
@@ -26,6 +22,7 @@ import AddTorrentDialog from "./components/AddTorrentDialog";
 import PeersDialog from "./components/PeersDialog";
 import TaskDialogs from "./components/TaskDialogs";
 import TaskRow from "./components/TaskRow";
+import FileBrowserDialog from "./components/FileBrowserDialog";
 import { systemDownloadDir } from "./file-actions";
 
 const SHARE_TRACKERS = [
@@ -44,10 +41,9 @@ function magnetOf(task: BtTaskInfo) {
 
 export default function BtTool() {
   const { t } = useLingui();
-  const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [tasks, setTasks] = useState<BtTaskInfo[]>([]);
-  const [previewReady, setPreviewReady] = useState<Set<string>>(new Set());
+  const [filesTask, setFilesTask] = useState<BtTaskInfo | null>(null);
   const [parsedHashes, setParsedHashes] = useState<Set<string>>(new Set());
   const parsedProbes = useRef(
     new Map<
@@ -128,46 +124,13 @@ export default function BtTool() {
         : stalled,
     );
   };
-  const refreshPreviewReadiness = async (list: BtTaskInfo[]) => {
-    const candidates = list.filter((task) => {
-      if (task.status !== "Active" || task.fileIndex == null || !task.fileName)
-        return false;
-      const kind = previewKind(task.fileName);
-      return isPreviewable(kind) && canPlayInline(task.fileName, kind);
-    });
-    const probeTasks = candidates.filter((task) => task.state !== "Paused");
-    const results = await Promise.allSettled(
-      probeTasks.map((task) =>
-        ipc.btPlayability(task.infoHash, task.fileIndex!, false),
-      ),
-    );
-    setPreviewReady((current) => {
-      const next = new Set<string>();
-      for (const task of candidates) {
-        if (task.state === "Paused" && current.has(task.infoHash))
-          next.add(task.infoHash);
-      }
-      results.forEach((result, index) => {
-        if (result.status === "fulfilled" && result.value.ready)
-          next.add(probeTasks[index].infoHash);
-        else if (
-          result.status === "rejected" &&
-          current.has(probeTasks[index].infoHash)
-        )
-          next.add(probeTasks[index].infoHash);
-      });
-      return next;
-    });
-  };
   const refresh = async () => {
     try {
       const list = await ipc.btList();
       setTasks(list);
       trackStalledPeers(list);
-      void refreshPreviewReadiness(list);
     } catch {
       setTasks([]);
-      setPreviewReady(new Set());
     }
   };
   const refreshInEffect = useEffectEvent(refresh);
@@ -294,64 +257,6 @@ export default function BtTool() {
       toast.error(t`转存失败`, { description: String(error) });
     }
   };
-  const openLocation = async (task: BtTaskInfo) => {
-    const location =
-      (task.exported && task.exportPath) || task.outputPath || task.downloadDir;
-    if (!location) return;
-    try {
-      await revealItemInDir(location);
-    } catch {
-      try {
-        await openPath(location);
-      } catch (error) {
-        toast.error(t`无法打开下载位置`, { description: String(error) });
-      }
-    }
-  };
-  const previewTask = async (task: BtTaskInfo) => {
-    let url: string | null = null;
-    let name = task.label;
-    if (task.status === "Completed") {
-      const path = (task.exported && task.exportPath) || task.outputPath;
-      if (!path || !isPreviewable(previewKind(path))) return;
-      url = convertFileSrc(path);
-      name = path.split(/[\\/]/).pop() || task.label;
-    } else if (task.fileIndex != null) {
-      try {
-        const state = await ipc.btPlayability(
-          task.infoHash,
-          task.fileIndex,
-          true,
-        );
-        if (!state.supported) {
-          toast.info(t`该文件格式不支持渐进预览`, {
-            description: state.fileName,
-          });
-          return;
-        }
-        if (!state.ready || !state.url) {
-          toast.info(t`播放窗口尚未就绪`, {
-            description: state.reason ?? t`请稍后重试`,
-          });
-          return;
-        }
-        url = state.url;
-        name = state.fileName;
-      } catch (error) {
-        toast.error(t`无法开始预览`, { description: String(error) });
-        return;
-      }
-    }
-    if (!url || !isPreviewable(previewKind(name))) return;
-    void navigate({
-      to: "/preview",
-      search: {
-        name,
-        kind: previewKind(name),
-        url,
-      },
-    });
-  };
   const activeTasks = tasks.filter((task) => task.status !== "Completed");
   const completedTasks = tasks.filter((task) => task.status === "Completed");
   const confirmDelete = async () => {
@@ -414,7 +319,6 @@ export default function BtTool() {
                     key={task.infoHash}
                     task={task}
                     stalled={noPeers.has(task.infoHash)}
-                    previewReady={previewReady.has(task.infoHash)}
                     hasParsedProbe={parsedHashes.has(task.infoHash)}
                     onOpenParsed={openParsed}
                     onRetry={(item) => openPrefilled(magnetOf(item))}
@@ -422,8 +326,7 @@ export default function BtTool() {
                     onControl={(item, action) => void control(item, action)}
                     onMagnet={setMagnetTask}
                     onExport={(item) => void exportTask(item)}
-                    onOpenLocation={(item) => void openLocation(item)}
-                    onPreview={previewTask}
+                    onOpenFiles={setFilesTask}
                     onDelete={(item) => {
                       setPendingDelete(item);
                     }}
@@ -448,7 +351,6 @@ export default function BtTool() {
                     key={task.infoHash}
                     task={task}
                     stalled={false}
-                    previewReady={false}
                     hasParsedProbe={parsedHashes.has(task.infoHash)}
                     onOpenParsed={openParsed}
                     onRetry={(item) => openPrefilled(magnetOf(item))}
@@ -456,8 +358,7 @@ export default function BtTool() {
                     onControl={(item, action) => void control(item, action)}
                     onMagnet={setMagnetTask}
                     onExport={(item) => void exportTask(item)}
-                    onOpenLocation={(item) => void openLocation(item)}
-                    onPreview={previewTask}
+                    onOpenFiles={setFilesTask}
                     onDelete={(item) => {
                       setPendingDelete(item);
                     }}
@@ -472,6 +373,16 @@ export default function BtTool() {
           </div>
         )}
       </div>
+      {filesTask ? (
+        <FileBrowserDialog
+          key={filesTask.infoHash}
+          task={
+            tasks.find((task) => task.infoHash === filesTask.infoHash) ??
+            filesTask
+          }
+          onClose={() => setFilesTask(null)}
+        />
+      ) : null}
       <TransferPanel animateOnMount={false} />
       <AddTorrentDialog
         open={dialogOpen}

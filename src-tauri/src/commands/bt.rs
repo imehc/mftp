@@ -13,6 +13,36 @@ use super::record_operation;
 
 #[tauri::command]
 #[specta::specta]
+pub async fn bt_browse_files(
+    state: State<'_, AppState>,
+    info_hash: String,
+    path: Option<String>,
+) -> AppResult<crate::bt::BtFileListing> {
+    state.bt.browse_files(&info_hash, path).await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn bt_preview_file(
+    state: State<'_, AppState>,
+    info_hash: String,
+    path: String,
+) -> AppResult<crate::bt::BtFilePreview> {
+    state.bt.preview_file(&info_hash, path).await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn bt_open_file(
+    state: State<'_, AppState>,
+    info_hash: String,
+    path: String,
+) -> AppResult<()> {
+    state.bt.open_file(&info_hash, path).await
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn bt_probe(state: State<'_, AppState>, source: String) -> AppResult<BtProbeResult> {
     state.bt.probe(&source).await
 }

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircle, RotateCcw } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { canPlayInline, type PreviewKind } from "~/lib/preview-kind";
+import { type PreviewKind } from "~/lib/preview-kind";
+import MediaPlayer from "./MediaPlayer";
 export interface PreviewSurfaceProps {
   /** WebView 能加载的任意 URL：回环流、blob:、asset:。 */
   url: string;
@@ -32,34 +33,58 @@ export default function PreviewSurface({
   const [text, setText] = useState<{
     body: string;
     truncated: boolean;
+    interrupted: boolean;
   } | null>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  // 容器格式 WebView 放不了时不必尝试：转圈之后必然失败。
-  const playable = canPlayInline(name, kind);
 
   // 文本自身没有 load 事件：直接拉取开头部分并渲染。
   useEffect(() => {
     if (kind !== "text" || !url) return;
     const controller = new AbortController();
     void (async () => {
+      let body = "";
+      let received = 0;
       try {
         const response = await fetch(url, {
           signal: controller.signal,
+          cache: "no-store",
           headers: {
             Range: `bytes=0-${TEXT_HEAD_BYTES - 1}`,
           },
         });
         if (!response.ok && response.status !== 206)
           throw new Error("read failed");
-        const body = await response.text();
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error("empty response");
+        const decoder = new TextDecoder();
+        // 边读边显示已到达的文本；缺失后续分片时保留可读内容，且始终限制内存用量。
+        while (received < TEXT_HEAD_BYTES) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const chunk = value.subarray(0, TEXT_HEAD_BYTES - received);
+          received += chunk.byteLength;
+          body += decoder.decode(chunk, { stream: true });
+          if (controller.signal.aborted) return;
+          setText({ body, truncated: false, interrupted: false });
+          setLoading(false);
+        }
+        body += decoder.decode();
+        await reader.cancel();
+        if (controller.signal.aborted) return;
+        const total = Number(
+          response.headers.get("Content-Range")?.split("/")[1] ??
+            response.headers.get("Content-Length"),
+        );
         setText({
           body,
-          truncated: body.length >= TEXT_HEAD_BYTES,
+          truncated: total > received || received >= TEXT_HEAD_BYTES,
+          interrupted: false,
         });
         setLoading(false);
       } catch {
         if (controller.signal.aborted) return;
-        setFailed(true);
+        if (received > 0) setText({ body, truncated: true, interrupted: true });
+        else setFailed(true);
         setLoading(false);
       }
     })();
@@ -84,30 +109,14 @@ export default function PreviewSurface({
   }, [kind]);
   return (
     <div className="border-border bg-muted/40 relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg border">
-      {kind === "video" && playable ? (
-        <video
+      {kind === "video" || kind === "audio" ? (
+        <MediaPlayer
           key={attempt}
-          className="h-full max-h-full w-full bg-black"
-          src={url}
-          controls
-          autoPlay
-          playsInline
-          onPlaying={ready}
-          onCanPlay={ready}
-          onWaiting={() => setLoading(true)}
-          onError={fail}
-        />
-      ) : null}
-      {kind === "audio" && playable ? (
-        <audio
-          key={attempt}
-          className="w-full max-w-md px-4"
-          src={url}
-          controls
-          autoPlay
-          onPlaying={ready}
-          onCanPlay={ready}
-          onWaiting={() => setLoading(true)}
+          url={url}
+          name={name}
+          video={kind === "video"}
+          onReady={ready}
+          onLoading={() => setLoading(true)}
           onError={fail}
         />
       ) : null}
@@ -132,6 +141,17 @@ export default function PreviewSurface({
               <Trans>仅显示开头部分</Trans>
             </p>
           ) : null}
+          {text?.interrupted ? (
+            <Button
+              className="mt-2"
+              variant="outline"
+              size="xs"
+              onClick={retry}
+            >
+              <RotateCcw />
+              <Trans>重新读取</Trans>
+            </Button>
+          ) : null}
         </div>
       ) : null}
       {kind === "other" ? (
@@ -140,7 +160,7 @@ export default function PreviewSurface({
         </p>
       ) : null}
 
-      {loading && !failed && playable && kind !== "other" ? (
+      {loading && !failed && kind !== "other" ? (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="bg-background/80 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs shadow-sm">
             <LoaderCircle className="size-3.5 animate-spin" />
@@ -152,21 +172,10 @@ export default function PreviewSurface({
           </div>
         </div>
       ) : null}
-      {/* 容器格式不支持是确定的结论，没有重试的意义；其余失败可能只是
-          分片还没到（种子刚加入、暂时没节点），因此给一个重试入口。 */}
-      {!playable ? (
-        <div className="bg-background/95 text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-1 p-4 text-center text-xs">
-          <span>
-            <Trans>该格式无法在线播放（mkv 等格式支持度有限）</Trans>
-          </span>
-          <span>
-            <Trans>建议下载后用外部播放器打开</Trans>
-          </span>
-        </div>
-      ) : failed ? (
+      {failed ? (
         <div className="bg-background/95 text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-xs">
           <span>
-            <Trans>读取失败</Trans>
+            <Trans>暂时无法预览，文件可能尚未下载完整或编码不受支持</Trans>
           </span>
           <Button variant="outline" size="xs" onClick={retry}>
             <RotateCcw data-icon="inline-start" />

@@ -3,6 +3,7 @@ mod ai;
 mod bt;
 mod commands;
 mod error;
+mod file_opener;
 mod game_room;
 mod lan_transfer;
 mod models;
@@ -162,6 +163,9 @@ macro_rules! all_commands {
             commands::bt_task_peers,
             commands::bt_dht_status,
             commands::bt_playability,
+            commands::bt_browse_files,
+            commands::bt_preview_file,
+            commands::bt_open_file,
         ]
     };
 }
@@ -233,6 +237,7 @@ pub fn run() {
 
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(file_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init());
