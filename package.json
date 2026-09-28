@@ -47,7 +47,7 @@
     "@lingui/core": "^6.8.0",
     "@lingui/react": "^6.8.0",
     "@tanstack/react-form": "^1.33.5",
-    "@tanstack/react-router": "^1.170.38",
+    "@tanstack/react-router": "^1.170.39",
     "@tanstack/react-table": "^9.2.4",
     "@tanstack/react-virtual": "^3.14.13",
     "@tauri-apps/api": "^2",
