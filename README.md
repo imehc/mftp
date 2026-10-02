@@ -20,6 +20,8 @@ pnpm build         # 前端构建（会先编译多语言词典）
 pnpm tauri build   # 打包（同样会先编译多语言词典）
 ```
 
+首次克隆后的 Plumb 和 TalkToFigma 配置见 [MCP 首次配置](docs/mcp-setup.md)。
+
 ## 技术栈
 
 - 前端：React 19、TypeScript、Vite、Tailwind v4、shadcn/ui、zustand、Lingui、@xterm/xterm

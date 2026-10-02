@@ -4,10 +4,19 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 
 /** Commands */
 export const commands = {
-	aiConnectionGet: () => typedError<AiConnection, AppError>(__TAURI_INVOKE("ai_connection_get")),
-	aiConnectionSave: (input: AiConnectionInput) => typedError<AiConnection, AppError>(__TAURI_INVOKE("ai_connection_save", { input })),
-	aiConnectionClearKey: () => typedError<AiConnection, AppError>(__TAURI_INVOKE("ai_connection_clear_key")),
-	aiConnectionTest: () => typedError<null, AppError>(__TAURI_INVOKE("ai_connection_test")),
+	aiConfigurationGet: () => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_configuration_get")),
+	aiProviderCreate: (input: AiProviderCreateInput_Deserialize) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_provider_create", { input })),
+	aiProviderUpdate: (input: AiProviderUpdateInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_provider_update", { input })),
+	aiProviderDelete: (input: AiProviderDeleteInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_provider_delete", { input })),
+	aiKeySave: (input: AiKeySaveInput_Deserialize) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_key_save", { input })),
+	aiKeyDelete: (input: AiKeyDeleteInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_key_delete", { input })),
+	aiModelSave: (input: AiModelSaveInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_model_save", { input })),
+	aiModelDelete: (input: AiModelDeleteInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_model_delete", { input })),
+	aiProviderActivate: (input: AiProviderTargetInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_provider_activate", { input })),
+	aiProviderSelect: (input: AiProviderSelectionInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_provider_select", { input })),
+	aiModelSwitch: (input: AiModelSwitchInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_model_switch", { input })),
+	aiStreamingUpdate: (input: AiStreamingUpdateInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_streaming_update", { input })),
+	aiProviderTest: (input: AiProviderTargetInput) => typedError<null, AppError>(__TAURI_INVOKE("ai_provider_test", { input })),
 	hostsList: () => typedError<Host[], AppError>(__TAURI_INVOKE("hosts_list")),
 	hostGet: (id: string) => typedError<Host, AppError>(__TAURI_INVOKE("host_get", { id })),
 	hostCreate: (input: HostInput) => typedError<Host, AppError>(__TAURI_INVOKE("host_create", { input })),
@@ -67,8 +76,8 @@ export const commands = {
 	gameRoomCreate: (gameId: string, roomName: string, code: string | null, playerName: string) => typedError<GameRoomStatus, AppError>(__TAURI_INVOKE("game_room_create", { gameId, roomName, code, playerName })),
 	gameRoomJoin: (host: string, port: number, gameId: string, code: string | null, playerName: string) => typedError<GameRoomStatus, AppError>(__TAURI_INVOKE("game_room_join", { host, port, gameId, code, playerName })),
 	gameRoomDiscover: (gameId: string) => typedError<GameRoomSummary[], AppError>(__TAURI_INVOKE("game_room_discover", { gameId })),
-	gameRoomSend: (payload: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_send", { payload })),
-	gameRoomLeave: () => typedError<null, AppError>(__TAURI_INVOKE("game_room_leave")),
+	gameRoomSend: (instanceId: string, payload: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_send", { instanceId, payload })),
+	gameRoomLeave: (instanceId: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_leave", { instanceId })),
 	vaultEntriesList: () => typedError<VaultEntry[], AppError>(__TAURI_INVOKE("vault_entries_list")),
 	vaultEntryCreate: (input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_create", { input })),
 	vaultEntryUpdate: (id: string, input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_update", { id, input })),
@@ -174,21 +183,146 @@ export type ActivityLog = {
 	requestType: string,
 	result: string,
 	detail?: string | null,
+	/**
+	 *  Full structured error for failed/canceled rows: versioned payload on
+	 *  new writes, compatibility-wrapped text on pre-column rows. Localized
+	 *  by the frontend through kind/code; `detail` keeps business metadata.
+	 */
+	error?: AppError | null,
 };
 
-export type AiConnection = {
-	baseUrl: string,
-	model: string,
+export type AiConfigurationView = {
+	revision: number,
+	activeProviderId: string | null,
 	streamingEnabled: boolean,
-	hasKey: boolean,
+	providers: AiProviderView[],
+	labelCandidates: string[],
+	modelCandidates: string[],
 };
 
-export type AiConnectionInput = {
+export type AiKeyDeleteInput = {
+	expectedRevision: number,
+	providerId: string,
+	keyId: string,
+	replacementKeyId: string | null,
+};
+
+export type AiKeySaveInput = AiKeySaveInput_Serialize | AiKeySaveInput_Deserialize;
+
+export type AiKeySaveInput_Deserialize = {
+	expectedRevision: number,
+	providerId: string,
+	keyId: string | null,
+	label: string,
+	replacementSecret?: string | null,
+};
+
+export type AiKeySaveInput_Serialize = {
+	expectedRevision: number,
+	providerId: string,
+	keyId: string | null,
+	label: string,
+	replacementSecret: string | null,
+};
+
+export type AiKeyState = "savedUnverified" | "missing";
+
+export type AiKeyView = {
+	id: string,
+	label: string,
+	state: AiKeyState,
+};
+
+export type AiModelDeleteInput = {
+	expectedRevision: number,
+	providerId: string,
+	id: string,
+	replacementModelId: string | null,
+};
+
+export type AiModelSaveInput = {
+	expectedRevision: number,
+	providerId: string,
+	// Row identity differs from the remote API model identifier.
+	id: string | null,
+	modelId: string,
+	displayName: string | null,
+};
+
+export type AiModelSwitchInput = {
+	expectedRevision: number,
+	expectedActiveProviderId: string,
+	// Local model row identity, not the remote API model name.
+	modelId: string,
+};
+
+export type AiModelView = {
+	id: string,
+	modelId: string,
+	displayName: string | null,
+};
+
+export type AiProviderCreateInput = AiProviderCreateInput_Serialize | AiProviderCreateInput_Deserialize;
+
+export type AiProviderCreateInput_Deserialize = {
+	expectedRevision: number,
+	name: string,
 	baseUrl: string,
-	model: string,
-	streamingEnabled?: boolean,
-	// None keeps the existing credential; Some replaces it.
-	apiKey?: string | null,
+	keyLabel: string,
+	apiKey: string,
+	modelId: string,
+	displayName: string | null,
+};
+
+export type AiProviderCreateInput_Serialize = {
+	expectedRevision: number,
+	name: string,
+	baseUrl: string,
+	keyLabel: string,
+	apiKey: string,
+	modelId: string,
+	displayName: string | null,
+};
+
+export type AiProviderDeleteInput = {
+	expectedRevision: number,
+	providerId: string,
+};
+
+export type AiProviderSelectionInput = {
+	expectedRevision: number,
+	providerId: string,
+	currentKeyId: string,
+	currentModelId: string,
+};
+
+export type AiProviderTargetInput = {
+	expectedRevision: number,
+	providerId: string,
+};
+
+export type AiProviderUpdateInput = {
+	expectedRevision: number,
+	providerId: string,
+	name: string,
+	baseUrl: string,
+};
+
+export type AiProviderView = {
+	id: string,
+	name: string,
+	baseUrl: string,
+	requiresAddressRepair: boolean,
+	currentKeyId: string | null,
+	currentModelId: string | null,
+	revision: number,
+	keys: AiKeyView[],
+	models: AiModelView[],
+};
+
+export type AiStreamingUpdateInput = {
+	expectedRevision: number,
+	streamingEnabled: boolean,
 };
 
 export type AppDataClearResult = {
@@ -217,8 +351,15 @@ export type AppDataUsage = {
 	totalBytes: number,
 };
 
-// Unified error type surfaced to the frontend as a plain string.
-export type AppError = string;
+// Both kinds use the same wire shape, including an empty args object.
+export type AppError = {
+	kind: AppErrorKind,
+	code: string,
+	message: string,
+	args: { [key in string]: string },
+};
+
+export type AppErrorKind = "custom" | "external";
 
 export type AuthType = "password" | "key";
 
@@ -308,10 +449,7 @@ export type BtProbeResult = {
  *  Payload of bt://task-event. The kind covers save, package, and removal
  *  lifecycle notifications; detailed progress stays on TransferProgress.
  */
-export type BtTaskEvent = {
-	infoHash: string,
-	kind: string,
-};
+export type BtTaskEvent = { kind: "package-completed"; infoHash: string } | { kind: "package-failed"; infoHash: string; error: AppError } | { kind: "export-completed"; infoHash: string } | { kind: "cancelled"; infoHash: string } | { kind: "removed"; infoHash: string };
 
 export type BtTaskInfo = {
 	infoHash: string,
@@ -328,7 +466,7 @@ export type BtTaskInfo = {
 	// Selected source file used by the progressive preview endpoint.
 	fileIndex: number | null,
 	fileName: string | null,
-	error: string | null,
+	error: AppError | null,
 	total: number | null,
 	progress: number | null,
 	finished: boolean,
@@ -349,10 +487,33 @@ export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" 
 
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
+export type CustomErrorCode = "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts" | "todo" | "lan" | "aiTranslations";
 
+export type GameRoomClosedEvent = {
+	instanceId: string,
+	reason: GameRoomClosedReason,
+};
+
+// Existing close notifications are lifecycle reasons, not error payloads.
+export type GameRoomClosedReason = "closed" | "connection-lost" | "peer-left";
+
+export type GameRoomMessageEvent = {
+	instanceId: string,
+	payload: string,
+};
+
+export type GameRoomPeerEvent = {
+	instanceId: string,
+	connected: boolean,
+	name: string | null,
+};
+
 export type GameRoomStatus = {
+	// Local runtime identity; rejoining the same remote room gets a new value.
+	instanceId: string | null,
 	// "idle" | "hosting" | "joined"
 	phase: string,
 	roomId: string | null,
@@ -372,8 +533,13 @@ export type GameRoomStatus = {
 export type GameRoomSummary = {
 	roomId: string,
 	gameId: string,
-	roomName: string,
-	hostName: string,
+	/**
+	 *  Display names are passthrough discovery metadata: absent or empty
+	 *  fields stay None and the frontend renders localized placeholders.
+	 *  The backend must not invent display copy (i18n boundary).
+	 */
+	roomName: string | null,
+	hostName: string | null,
 	ip: string,
 	port: number,
 	hasCode: boolean,
@@ -508,6 +674,7 @@ export type LanTransferTask = {
 	total: number,
 	startedAt: number,
 	updatedAt: number,
+	error?: AppError | null,
 };
 
 export type LanTrustedDevice = {
@@ -669,8 +836,11 @@ export type PoetrySyncProgress = {
 	bytesTotal: number | null,
 	imported: number,
 	total: number | null,
-	// Populated only on the terminal `error` phase.
-	error?: string | null,
+	/**
+	 *  Populated only on the terminal `error` phase; carries the full
+	 *  protocol so the UI can localize by code at render time.
+	 */
+	error?: AppError | null,
 };
 
 // Install tier from the catalog config; drives default checkboxes in the UI.
@@ -823,7 +993,9 @@ export type TodoItem = {
 	category?: string | null,
 	notes?: string | null,
 	dueDate?: string | null,
+	dueAt?: number | null,
 	completed: boolean,
+	completedAt?: number | null,
 	createdAt: number,
 	updatedAt: number,
 };
@@ -834,6 +1006,7 @@ export type TodoItemInput = {
 	category?: string | null,
 	notes?: string | null,
 	dueDate?: string | null,
+	dueAt?: number | null,
 	completed: boolean,
 };
 

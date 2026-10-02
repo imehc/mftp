@@ -1,20 +1,52 @@
 import { useEffect } from "react";
-import { Outlet, createRootRoute, useNavigate } from "@tanstack/react-router";
+import {
+  Outlet,
+  createRootRoute,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 import { getToolEntry } from "~/features/home/entries";
 import { isMobilePlatform } from "~/lib/platform";
-import { useHostsStore } from "~/store/hosts";
 import { useSettingsStore } from "~/store/settings";
+import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
 
 const START_ROUTE_RESOLVED_KEY = "mftp-start-route-resolved";
 
 function RootLayout() {
   const navigate = useNavigate();
-  const loadAll = useHostsStore((s) => s.loadAll);
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const selectedPoem = useRouterState({
+    select: (state) => state.location.search.poem,
+  });
+  const settingsDetail = useRouterState({
+    select: (state) =>
+      state.location.search.panel === "ai" ||
+      state.location.search.panel === "data" ||
+      !!state.location.search.returnUid,
+  });
+  // 按模块迁移：已完成的模块接入新骨架，其他页面在各自阶段接入。
+  const home = pathname === "/";
+  const homeCategory = useRouterState({
+    select: (state) => state.location.search.category,
+  });
+  const showGames = useSettingsStore((state) => state.showGames);
+  const settings = pathname === "/settings";
+  const logs = pathname === "/logs";
+  const about = pathname === "/about";
+  const preview = pathname === "/preview";
+  const library = pathname === "/library" || pathname.startsWith("/library/");
+  const games = pathname.startsWith("/games/");
+  const bt = pathname === "/tools/bt";
+  const vault = pathname === "/tools/vault";
+  const formatter = pathname === "/tools/formatter";
+  const media = pathname === "/tools/media-compress";
+  const crypto = pathname === "/tools/crypto";
+  const lan = pathname === "/tools/lan-transfer";
+  const ssh = pathname === "/tools/ssh-sftp";
+  const todo = pathname === "/tools/todo";
   const lastTool = useSettingsStore((s) => s.lastTool);
-
-  useEffect(() => {
-    void loadAll();
-  }, [loadAll]);
 
   useEffect(() => {
     if (sessionStorage.getItem(START_ROUTE_RESOLVED_KEY)) return;
@@ -30,7 +62,48 @@ function RootLayout() {
 
   return (
     <div className="app-shell">
-      <Outlet />
+      {library ||
+      bt ||
+      games ||
+      settings ||
+      todo ||
+      home ||
+      ssh ||
+      lan ||
+      crypto ||
+      media ||
+      formatter ||
+      vault ||
+      logs ||
+      about ||
+      preview ? (
+        <ModuleNavigationFrame
+          active={
+            home && homeCategory === "games" && showGames
+              ? "games"
+              : home && homeCategory === "library"
+                ? "library"
+                : library
+                  ? "library"
+                  : games
+                    ? "games"
+                    : settings || logs || about
+                      ? "settings"
+                      : "tools"
+          }
+          primary={
+            home ||
+            (library &&
+              (pathname === "/library" || pathname === "/library/") &&
+              !selectedPoem) ||
+            (settings && !settingsDetail)
+          }
+        >
+          <Outlet />
+        </ModuleNavigationFrame>
+      ) : (
+        <Outlet />
+      )}
     </div>
   );
 }

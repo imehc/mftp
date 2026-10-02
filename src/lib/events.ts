@@ -18,14 +18,14 @@
  */
 export const TRANSFER_PROGRESS = "sftp-transfer-progress";
 
-/** 由 `src-tauri/src/lib.rs` 发出，对应游戏房间的生命周期。 */
+/** 由 `src-tauri/src/adapters/room_events.rs` 发出，对应游戏房间的生命周期。 */
 export const GAME_ROOM_PEER = "game-room://peer";
 export const GAME_ROOM_MESSAGE = "game-room://message";
 export const GAME_ROOM_CLOSED = "game-room://closed";
 
 /**
  * SSH 终端事件按会话区分，因此事件名中带有会话 id。
- * 由 `src-tauri/src/ssh/shell_worker.rs` 以相同结构生成。
+ * 由 `src-tauri/src/adapters/ssh.rs` 以相同结构生成。
  */
 export const sshDataEvent = (sessionId: string) => `ssh://data/${sessionId}`;
 export const sshClosedEvent = (sessionId: string) =>

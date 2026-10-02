@@ -7,7 +7,12 @@ export default defineConfig({
     {
       path: "<rootDir>/src/locales/{locale}/messages",
       include: ["src"],
-      exclude: ["**/node_modules/**", "src/locales/**"],
+      exclude: [
+        "**/node_modules/**",
+        "src/locales/**",
+        "**/*.test.ts",
+        "**/__fixtures__/**",
+      ],
     },
   ],
 });

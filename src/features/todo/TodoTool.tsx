@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Plus } from "lucide-react";
-import { toast } from "sonner";
-import { ToolPageHeader } from "~/components/ToolPageHeader";
+import { Plus, Search } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import AppPageLayout from "~/components/AppPageLayout";
+import { Alert, AlertTitle, AlertDescription } from "~/components/ui/alert";
+import { useTodo } from "./hooks/use-todo";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,179 +25,126 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import {
-  todoItemCreate,
-  todoItemDelete,
-  todoItemUpdate,
-  todoItemsList,
-} from "~/lib/ipc";
-import type { TodoItem, TodoItemInput } from "~/types";
 import TodoItemDialog from "./TodoItemDialog";
 import TodoList from "./TodoList";
-import {
-  ALL_TODO_CATEGORIES,
-  localDateKey,
-  sortTodoItems,
-  todoView,
-  type TodoView,
-} from "./todo-utils";
+import { ALL_TODO_CATEGORIES, type TodoView } from "./todo-utils";
+import { describeError } from "~/lib/errors";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 export default function TodoTool() {
   const { t } = useLingui();
-  const [items, setItems] = useState<TodoItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState(ALL_TODO_CATEGORIES);
-  const [view, setView] = useState<TodoView>("active");
-  const [today, setToday] = useState(() => localDateKey(new Date()));
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<TodoItem | null>(null);
-  const [deleting, setDeleting] = useState<TodoItem | null>(null);
-  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    todoItemsList()
-      .then((nextItems) => setItems(sortTodoItems(nextItems)))
-      .catch((error) =>
-        toast.error(t`读取待办失败`, { description: String(error) }),
-      )
-      .finally(() => setLoading(false));
-  }, [t]);
-
-  useEffect(() => {
-    const now = new Date();
-    const nextMidnight = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + 1,
-    );
-    // 跨过午夜后重新计算逾期状态，避免应用长时间打开时列表不更新。
-    const timer = window.setTimeout(
-      () => setToday(localDateKey(new Date())),
-      nextMidnight.getTime() - now.getTime() + 1_000,
-    );
-    return () => window.clearTimeout(timer);
-  }, [today]);
-
-  const categories = [
-    ...new Set(items.flatMap((item) => (item.category ? [item.category] : []))),
-  ].sort((left, right) => left.localeCompare(right));
-  const itemsByView = {
-    active: items.filter((item) => todoView(item, today) === "active"),
-    overdue: items.filter((item) => todoView(item, today) === "overdue"),
-    completed: items.filter((item) => todoView(item, today) === "completed"),
-  } satisfies Record<TodoView, TodoItem[]>;
-  const filteredItems =
-    category === ALL_TODO_CATEGORIES
-      ? itemsByView[view]
-      : itemsByView[view].filter((item) => item.category === category);
-
-  async function handleSubmit(input: TodoItemInput) {
-    try {
-      if (editing) {
-        const updated = await todoItemUpdate(editing.id, input);
-        setItems((current) =>
-          sortTodoItems(
-            current.map((item) => (item.id === updated.id ? updated : item)),
-          ),
-        );
-      } else {
-        const created = await todoItemCreate(input);
-        setItems((current) => sortTodoItems([...current, created]));
-      }
-      setDialogOpen(false);
-      setEditing(null);
-      toast.success(t`已保存`);
-    } catch (error) {
-      toast.error(t`保存待办失败`, { description: String(error) });
-    }
-  }
-
-  async function handleToggle(item: TodoItem) {
-    setPendingIds((current) => new Set(current).add(item.id));
-    try {
-      const updated = await todoItemUpdate(item.id, {
-        title: item.title,
-        category: item.category,
-        notes: item.notes,
-        dueDate: item.dueDate,
-        completed: !item.completed,
-      });
-      setItems((current) =>
-        sortTodoItems(
-          current.map((entry) => (entry.id === updated.id ? updated : entry)),
-        ),
-      );
-    } catch (error) {
-      toast.error(t`更新待办失败`, { description: String(error) });
-    } finally {
-      setPendingIds((current) => {
-        const next = new Set(current);
-        next.delete(item.id);
-        return next;
-      });
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleting) return;
-    try {
-      await todoItemDelete(deleting.id);
-      setItems((current) => current.filter((item) => item.id !== deleting.id));
-      toast.success(t`已删除`);
-    } catch (error) {
-      toast.error(t`删除待办失败`, { description: String(error) });
-    } finally {
-      setDeleting(null);
-    }
-  }
+  const desktopActions = useDesktopLayout();
+  const {
+    items,
+    loading,
+    loadError,
+    retry,
+    query,
+    setQuery,
+    category,
+    setCategory,
+    view,
+    setView,
+    categories,
+    itemsByView,
+    filteredItems,
+    dialogOpen,
+    setDialogOpen,
+    editing,
+    setEditing,
+    deleting,
+    setDeleting,
+    pendingIds,
+    handleSubmit,
+    handleToggle,
+    handleDelete,
+  } = useTodo();
 
   return (
-    <main className="bg-background text-foreground flex h-full flex-col">
-      <ToolPageHeader
-        title={<Trans>待办事项</Trans>}
-        trailing={
-          <Badge variant="outline">
-            <Trans>本地</Trans>
-          </Badge>
-        }
-      />
-
-      <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-2 p-2.5 sm:p-3">
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <Tabs
-            value={view}
-            onValueChange={(value) => setView(value as TodoView)}
-            className="gap-0"
+    <AppPageLayout
+      title={<Trans>待办事项</Trans>}
+      adaptiveDensity
+      scroll="content"
+      bottomInset={
+        !loading && !loadError && filteredItems.length > 0 ? "scroll" : "page"
+      }
+      contentClassName="gap-1 pt-1 md:gap-3 md:pt-4"
+      actions={
+        <Button
+          variant={desktopActions ? "default" : "ghost"}
+          size={desktopActions ? "default" : "icon"}
+          aria-label={t`新建待办`}
+          title={t`新建待办`}
+          disabled={loading}
+          onClick={() => {
+            setEditing(null);
+            setDialogOpen(true);
+          }}
+        >
+          <Plus data-icon={desktopActions ? "inline-start" : undefined} />
+          {desktopActions ? <Trans>新建</Trans> : null}
+        </Button>
+      }
+    >
+      <div className="relative shrink-0">
+        <Search
+          aria-hidden
+          className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+        />
+        <Input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t`搜索待办`}
+          aria-label={t`搜索待办`}
+          className="pl-9"
+        />
+      </div>
+      <div className="flex shrink-0 flex-col md:flex-row md:items-center md:gap-2">
+        <Tabs
+          value={view}
+          onValueChange={(value) => setView(value as TodoView)}
+          className="gap-0"
+        >
+          <TabsList
+            density="adaptive"
+            aria-label={t({
+              message: "待办状态",
+              comment: "切换进行中、逾期和已完成待办的标签栏",
+            })}
+            className="w-full md:w-auto"
           >
-            <TabsList className="w-full sm:w-auto">
-              <TabsTrigger value="active">
-                <Trans>进行中</Trans>
-                <Badge variant="outline">{itemsByView.active.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="overdue">
-                <Trans>未完成</Trans>
-                <Badge variant="outline">{itemsByView.overdue.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="completed">
-                <Trans>已完成</Trans>
-                <Badge variant="outline">{itemsByView.completed.length}</Badge>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <div className="flex min-w-0 items-center gap-2 sm:ml-auto">
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger
-                className="min-w-0 flex-1 sm:w-40 sm:flex-none"
-                aria-label={t`分类`}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
+            <TabsTrigger value="active">
+              <Trans>进行中</Trans>
+              <Badge variant="outline">{itemsByView.active.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="overdue">
+              <Trans>未完成</Trans>
+              <Badge variant="outline">{itemsByView.overdue.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="completed">
+              <Trans>已完成</Trans>
+              <Badge variant="outline">{itemsByView.completed.length}</Badge>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div className="flex min-w-0 items-center gap-2 md:ml-auto">
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger
+              density="adaptive"
+              className="min-w-0 flex-1 md:w-40 md:flex-none"
+              aria-label={t`分类`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="ui-density-adaptive">
+              <SelectGroup>
                 <SelectItem value={ALL_TODO_CATEGORIES}>
                   <Trans>全部分类</Trans>
                 </SelectItem>
@@ -205,65 +153,75 @@ export default function TodoTool() {
                     {item}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-            <Badge variant="secondary">{filteredItems.length}</Badge>
-            <Button
-              className="ml-auto"
-              size="sm"
-              onClick={() => {
-                setEditing(null);
-                setDialogOpen(true);
-              }}
-            >
-              <Plus data-icon="inline-start" />
-              <Trans>新建</Trans>
-            </Button>
-          </div>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Badge variant="secondary">{filteredItems.length}</Badge>
         </div>
-
-        {loading ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyTitle>
-                <Trans>正在读取待办</Trans>
-              </EmptyTitle>
-            </EmptyHeader>
-          </Empty>
-        ) : filteredItems.length === 0 ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyTitle>
-                <Trans>暂无待办</Trans>
-              </EmptyTitle>
-              <EmptyDescription>
-                {items.length === 0 ? (
-                  <Trans>点击“新建”添加第一条待办</Trans>
-                ) : category !== ALL_TODO_CATEGORIES ? (
-                  <Trans>当前分类没有待办</Trans>
-                ) : view === "active" ? (
-                  <Trans>没有进行中的待办</Trans>
-                ) : view === "overdue" ? (
-                  <Trans>没有逾期未完成的待办</Trans>
-                ) : (
-                  <Trans>还没有已完成的待办</Trans>
-                )}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <TodoList
-            items={filteredItems}
-            pendingIds={pendingIds}
-            onToggle={(item) => void handleToggle(item)}
-            onEdit={(item) => {
-              setEditing(item);
-              setDialogOpen(true);
-            }}
-            onDelete={setDeleting}
-          />
-        )}
       </div>
+
+      {loadError ? (
+        <Alert variant="destructive">
+          <AlertTitle>
+            <Trans>读取待办失败</Trans>
+          </AlertTitle>
+          <AlertDescription>{describeError(loadError)}</AlertDescription>
+          <Button
+            fullWidth
+            variant="outline"
+            onClick={retry}
+            className="mt-2 justify-self-start"
+          >
+            <Trans comment="待办列表读取失败后重新加载">重试</Trans>
+          </Button>
+        </Alert>
+      ) : loading ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>
+              <Trans>正在读取待办</Trans>
+            </EmptyTitle>
+          </EmptyHeader>
+        </Empty>
+      ) : filteredItems.length === 0 ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>
+              {query.trim() ? (
+                <Trans>没有找到相关待办</Trans>
+              ) : (
+                <Trans>暂无待办</Trans>
+              )}
+            </EmptyTitle>
+            <EmptyDescription>
+              {query.trim() ? (
+                <Trans>试试其他关键词或清除筛选</Trans>
+              ) : items.length === 0 ? (
+                <Trans>点击“新建”添加第一条待办</Trans>
+              ) : category !== ALL_TODO_CATEGORIES ? (
+                <Trans>当前分类没有待办</Trans>
+              ) : view === "active" ? (
+                <Trans>没有进行中的待办</Trans>
+              ) : view === "overdue" ? (
+                <Trans>没有逾期未完成的待办</Trans>
+              ) : (
+                <Trans>还没有已完成的待办</Trans>
+              )}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <TodoList
+          items={filteredItems}
+          pendingIds={pendingIds}
+          onToggle={(item) => void handleToggle(item)}
+          onEdit={(item) => {
+            setEditing(item);
+            setDialogOpen(true);
+          }}
+          onDelete={setDeleting}
+        />
+      )}
 
       <TodoItemDialog
         open={dialogOpen}
@@ -280,7 +238,7 @@ export default function TodoTool() {
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="ui-density-adaptive">
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>删除待办？</Trans>
@@ -302,6 +260,6 @@ export default function TodoTool() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </main>
+    </AppPageLayout>
   );
 }

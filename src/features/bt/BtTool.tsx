@@ -1,17 +1,27 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
-import { listen } from "@tauri-apps/api/event";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Magnet, Plus } from "lucide-react";
+import { ArrowLeft, Magnet, Plus } from "lucide-react";
 import { toast } from "sonner";
 import * as ipc from "~/lib/ipc";
 import type { BtProbeResult, BtTaskInfo } from "~/types";
 import { useTransfersStore } from "~/store/transfers";
-import TransferPanel from "~/features/transfers/TransferPanel";
-import { BT_TASK_EVENT } from "~/lib/events";
+import ActivityMenu from "~/features/transfers/ActivityMenu";
+import { describeError } from "~/lib/errors";
+import { acquireBtPage, retryBtSubscription } from "./runtime/btRuntime";
+import { magnetOf } from "./magnet";
+import { forgetBtTask, syncBtTask } from "./task-sync";
+import { refreshBtTasks, useBtTasksStore } from "./tasks-store";
 import { isMobilePlatform } from "~/lib/platform";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
+import {
+  Alert,
+  AlertAction,
+  AlertDescription,
+  AlertTitle,
+} from "~/components/ui/alert";
 import {
   Empty,
   EmptyHeader,
@@ -19,30 +29,14 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import AddTorrentDialog from "./components/AddTorrentDialog";
-import PeersDialog from "./components/PeersDialog";
 import TaskDialogs from "./components/TaskDialogs";
-import TaskRow from "./components/TaskRow";
-import FileBrowserDialog from "./components/FileBrowserDialog";
+import TaskList from "./components/TaskList";
+import TaskFilesPage from "./components/TaskFilesPage";
 import { systemDownloadDir } from "./file-actions";
-
-const SHARE_TRACKERS = [
-  "udp://tracker.opentrackr.org:1337/announce",
-  "udp://open.demonii.com:1337/announce",
-  "udp://tracker.openbittorrent.com:6969/announce",
-];
-const NO_PEER_HINT_DELAY = 15000;
-
-function magnetOf(task: BtTaskInfo) {
-  const trackers = SHARE_TRACKERS.map(
-    (tracker) => `&tr=${encodeURIComponent(tracker)}`,
-  ).join("");
-  return `magnet:?xt=urn:btih:${task.infoHash}&dn=${encodeURIComponent(task.label)}${trackers}`;
-}
 
 export default function BtTool() {
   const { t } = useLingui();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [tasks, setTasks] = useState<BtTaskInfo[]>([]);
   const [filesTask, setFilesTask] = useState<BtTaskInfo | null>(null);
   const [parsedHashes, setParsedHashes] = useState<Set<string>>(new Set());
   const parsedProbes = useRef(
@@ -51,20 +45,39 @@ export default function BtTool() {
       { source: string; probe: BtProbeResult; fileIndices: number[] }
     >(),
   );
-  const [peersTask, setPeersTask] = useState<BtTaskInfo | null>(null);
-  const [noPeers, setNoPeers] = useState<Set<string>>(new Set());
-  const zeroPeersSince = useRef(new Map<string, number>());
+  const [filesTab, setFilesTab] = useState("files");
+  const [busyTasks, setBusyTasks] = useState<Set<string>>(new Set());
+  const pendingActions = useRef(new Set<string>());
+  const openFiles = (task: BtTaskInfo, tab = "files") => {
+    setFilesTab(tab);
+    setFilesTask(task);
+  };
+  const runAction = async (hash: string, action: () => Promise<void>) => {
+    if (pendingActions.current.has(hash)) return;
+    pendingActions.current.add(hash);
+    setBusyTasks(new Set(pendingActions.current));
+    try {
+      await action();
+    } finally {
+      pendingActions.current.delete(hash);
+      setBusyTasks(new Set(pendingActions.current));
+    }
+  };
   const [prefill, setPrefill] = useState<string | null>(null);
   const [prefillProbe, setPrefillProbe] = useState<BtProbeResult | null>(null);
   const [prefillSelected, setPrefillSelected] = useState<number[] | null>(null);
   const [dialogReadOnly, setDialogReadOnly] = useState(false);
   const [magnetTask, setMagnetTask] = useState<BtTaskInfo | null>(null);
   const [pendingDelete, setPendingDelete] = useState<BtTaskInfo | null>(null);
-  const startTransfer = useTransfersStore((s) => s.start);
-  const restoreTransfer = useTransfersStore((s) => s.restore);
   const finishTransfer = useTransfersStore((s) => s.finish);
-  const updateProgressBatch = useTransfersStore((s) => s.updateProgressBatch);
-  const registered = useRef(new Map<string, string>());
+  const tasks = useBtTasksStore((s) => s.tasks);
+  const setTasks = useBtTasksStore((s) => s.setTasks);
+  const loading = useBtTasksStore((s) => s.loading);
+  const loadError = useBtTasksStore((s) => s.error);
+  const subscriptionError = useBtTasksStore((s) => s.subscriptionError);
+  const pendingAddSource = useBtTasksStore((s) => s.pendingAddSource);
+  const consumeAddSource = useBtTasksStore((s) => s.consumeAddSource);
+  const noPeers = useBtTasksStore((s) => s.noPeers);
 
   const openPrefilled = (magnet: string) => {
     setPrefill(magnet);
@@ -73,113 +86,9 @@ export default function BtTool() {
     setDialogReadOnly(false);
     setDialogOpen(true);
   };
-  const registerTask = (task: BtTaskInfo, explicit = false) => {
-    const id = `bt:${task.infoHash}`;
-    const signature = task.packageMode;
-    const current = useTransfersStore
-      .getState()
-      .transfers.find((item) => item.id === id);
-    const changed = registered.current.get(task.infoHash) !== signature;
-    const shouldStart = explicit
-      ? changed || !current || current.status !== "running"
-      : (task.state === "Downloading" || task.status === "Packaging") &&
-        (changed || !current);
-    if (shouldStart) {
-      registered.current.set(task.infoHash, signature);
-      (explicit ? startTransfer : restoreTransfer)(id, task.label, {
-        cancellable: true,
-        source: "bt",
-        retry: () => openPrefilled(magnetOf(task)),
-      });
-    }
-    if (task.status === "Packaging") {
-      updateProgressBatch([
-        {
-          id,
-          phase: "bt:packaging",
-          transferred: task.progress ?? 0,
-          total: task.total ?? null,
-          finished: false,
-        },
-      ]);
-    } else if (task.status === "Error")
-      finishTransfer(id, "error", task.error ?? undefined);
-  };
-  const registerTaskInEffect = useEffectEvent(registerTask);
-  const trackStalledPeers = (list: BtTaskInfo[]) => {
-    const now = Date.now();
-    const stalled = new Set<string>();
-    for (const task of list) {
-      if (task.state !== "Downloading" || task.peersLive > 0) {
-        zeroPeersSince.current.delete(task.infoHash);
-        continue;
-      }
-      const since = zeroPeersSince.current.get(task.infoHash) ?? now;
-      zeroPeersSince.current.set(task.infoHash, since);
-      if (now - since >= NO_PEER_HINT_DELAY) stalled.add(task.infoHash);
-    }
-    setNoPeers((prev) =>
-      prev.size === stalled.size && [...stalled].every((hash) => prev.has(hash))
-        ? prev
-        : stalled,
-    );
-  };
-  const refresh = async () => {
-    try {
-      const list = await ipc.btList();
-      setTasks(list);
-      trackStalledPeers(list);
-    } catch {
-      setTasks([]);
-    }
-  };
-  const refreshInEffect = useEffectEvent(refresh);
-  useEffect(() => {
-    queueMicrotask(() => void refreshInEffect());
-    const timer = setInterval(() => void refreshInEffect(), 2000);
-    return () => clearInterval(timer);
-  }, []);
-  useEffect(() => {
-    for (const task of tasks) {
-      const id = `bt:${task.infoHash}`;
-      if (task.status === "Completed" || task.status === "Cancelled") {
-        if (
-          useTransfersStore.getState().transfers.find((item) => item.id === id)
-            ?.status === "running"
-        )
-          finishTransfer(
-            id,
-            task.status === "Completed" ? "success" : "cancelled",
-          );
-        registered.current.delete(task.infoHash);
-      } else registerTaskInEffect(task);
-    }
-  }, [finishTransfer, tasks]);
-  useEffect(() => {
-    let cancelled = false;
-    let dispose: (() => void) | null = null;
-    void listen<{ infoHash: string; kind: string }>(BT_TASK_EVENT, (event) => {
-      if (event.payload.kind === "package-completed")
-        finishTransfer(`bt:${event.payload.infoHash}`, "success");
-      else if (event.payload.kind.startsWith("package-failed:"))
-        finishTransfer(
-          `bt:${event.payload.infoHash}`,
-          "error",
-          event.payload.kind.slice("package-failed:".length),
-        );
-      else if (event.payload.kind === "cancelled")
-        finishTransfer(`bt:${event.payload.infoHash}`, "cancelled");
-      registered.current.delete(event.payload.infoHash);
-      void refreshInEffect();
-    }).then((unlisten) => {
-      if (cancelled) unlisten();
-      else dispose = unlisten;
-    });
-    return () => {
-      cancelled = true;
-      dispose?.();
-    };
-  }, [finishTransfer]);
+  // 页面挂载期间申请 2s 级轮询；任务同步、无对等节点提示都由模块运行期负责。
+  useEffect(() => acquireBtPage(), []);
+  const refresh = refreshBtTasks;
 
   const openAdd = () => {
     setPrefill(null);
@@ -200,11 +109,15 @@ export default function BtTool() {
       next.add(task.infoHash);
       return next;
     });
-    setTasks((current) => [
+    setTasks([
       task,
-      ...current.filter((item) => item.infoHash !== task.infoHash),
+      ...useBtTasksStore
+        .getState()
+        .tasks.filter((item) => item.infoHash !== task.infoHash),
     ]);
-    registerTask(task, true);
+    // 新加入的任务立刻进入传输面板，不等下一次轮询。
+    syncBtTask(task, true);
+    void refresh();
   };
   const openParsed = (task: BtTaskInfo) => {
     const parsed = parsedProbes.current.get(task.infoHash);
@@ -223,12 +136,12 @@ export default function BtTool() {
       await ipc.btControl(task.infoHash, action, false);
       const id = `bt:${task.infoHash}`;
       if (action === "Cancel") {
-        registered.current.delete(task.infoHash);
+        forgetBtTask(task.infoHash);
         finishTransfer(id, "cancelled");
       } else useTransfersStore.getState().setPaused(id, action === "Pause");
       await refresh();
     } catch (error) {
-      toast.error(String(error));
+      toast.error(describeError(error));
     }
   };
   const exportTask = async (task: BtTaskInfo) => {
@@ -238,177 +151,195 @@ export default function BtTool() {
         toast.success(t`已复制到系统下载目录`);
         await refresh();
       } catch (error) {
-        toast.error(t`转存失败`, { description: String(error) });
+        toast.error(t`转存失败`, { description: describeError(error) });
       }
       return;
     }
-    const defaultPath = await systemDownloadDir();
-    const picked = await openDialog({
-      multiple: false,
-      directory: true,
-      defaultPath: defaultPath || undefined,
-    });
-    if (typeof picked !== "string") return;
     try {
+      const defaultPath = await systemDownloadDir();
+      const picked = await openDialog({
+        multiple: false,
+        directory: true,
+        defaultPath: defaultPath || undefined,
+      });
+      if (typeof picked !== "string") return;
       await ipc.btExport(task.infoHash, picked);
       toast.success(t`已复制到用户目录`);
       await refresh();
     } catch (error) {
-      toast.error(t`转存失败`, { description: String(error) });
+      toast.error(t`转存失败`, { description: describeError(error) });
     }
   };
-  const activeTasks = tasks.filter((task) => task.status !== "Completed");
-  const completedTasks = tasks.filter((task) => task.status === "Completed");
   const confirmDelete = async () => {
     if (!pendingDelete) return;
     const target = pendingDelete;
     setPendingDelete(null);
     try {
       await ipc.btControl(target.infoHash, "Remove", true);
-      registered.current.delete(target.infoHash);
+      forgetBtTask(target.infoHash);
       finishTransfer(`bt:${target.infoHash}`, "cancelled");
       toast.success(t`已删除`);
       await refresh();
     } catch (error) {
-      toast.error(String(error));
+      toast.error(describeError(error));
     }
   };
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <ToolPageHeader
-        title={<Trans>BT 下载</Trans>}
-        trailing={
-          <Button size="xs" onClick={openAdd}>
-            <Plus data-icon="inline-start" />
-            <Trans>添加</Trans>
-          </Button>
-        }
-      >
-        {tasks.length > 0 ? (
-          <span className="text-muted-foreground text-xs tabular-nums">
-            {tasks.length}
-          </span>
-        ) : null}
-      </ToolPageHeader>
-      <div className="flex min-h-0 flex-1 flex-col gap-2 p-2.5 sm:p-3">
-        {tasks.length === 0 ? (
-          <Empty className="border border-dashed">
-            <EmptyHeader>
-              <EmptyMedia>
-                <Magnet />
-              </EmptyMedia>
-              <EmptyTitle>
-                <Trans>暂无下载任务</Trans>
-              </EmptyTitle>
-            </EmptyHeader>
-            <Button variant="outline" size="sm" onClick={openAdd}>
-              <Plus data-icon="inline-start" />
-              <Trans>添加</Trans>
+    <div
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive flex h-full min-h-0 flex-col"
+    >
+      <div className={filesTask ? "hidden" : "flex min-h-0 flex-1 flex-col"}>
+        <ToolPageHeader
+          showHome={false}
+          status={<ActivityMenu />}
+          leading={
+            <Button variant="ghost" size="icon-sm" asChild>
+              <Link
+                to="/"
+                search={{ category: "tools" }}
+                aria-label={t`返回首页`}
+              >
+                <ArrowLeft />
+              </Link>
             </Button>
-          </Empty>
-        ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-            <section className="border-border shrink-0 rounded-lg border p-1">
-              <h2 className="text-muted-foreground px-2 py-1 text-xs font-medium">
-                <Trans>下载中</Trans>
-                <span className="ml-1 tabular-nums">{activeTasks.length}</span>
-              </h2>
-              {activeTasks.length > 0 ? (
-                activeTasks.map((task) => (
-                  <TaskRow
-                    key={task.infoHash}
-                    task={task}
-                    stalled={noPeers.has(task.infoHash)}
-                    hasParsedProbe={parsedHashes.has(task.infoHash)}
-                    onOpenParsed={openParsed}
-                    onRetry={(item) => openPrefilled(magnetOf(item))}
-                    onPeers={setPeersTask}
-                    onControl={(item, action) => void control(item, action)}
-                    onMagnet={setMagnetTask}
-                    onExport={(item) => void exportTask(item)}
-                    onOpenFiles={setFilesTask}
-                    onDelete={(item) => {
-                      setPendingDelete(item);
-                    }}
-                  />
-                ))
-              ) : (
-                <p className="text-muted-foreground px-2 py-3 text-xs">
-                  <Trans>暂无下载中的任务</Trans>
-                </p>
-              )}
-            </section>
-            <section className="border-border shrink-0 rounded-lg border p-1">
-              <h2 className="text-muted-foreground px-2 py-1 text-xs font-medium">
-                <Trans>已完成</Trans>
-                <span className="ml-1 tabular-nums">
-                  {completedTasks.length}
+          }
+          title={<Trans>BT 下载</Trans>}
+          trailing={
+            <Button
+              variant="ghost"
+              density="adaptive"
+              size="icon-sm"
+              aria-label={t`添加`}
+              onClick={openAdd}
+            >
+              <Plus data-icon="inline-start" />
+            </Button>
+          }
+        />
+        <div className="flex min-h-0 flex-1 flex-col gap-2 px-2.5 pt-2.5 md:px-3 md:pt-3">
+          {loadError || subscriptionError ? (
+            <Alert variant="destructive">
+              <AlertTitle>
+                {loadError ? (
+                  <Trans>无法读取下载任务</Trans>
+                ) : (
+                  <Trans>任务状态通知暂不可用</Trans>
+                )}
+              </AlertTitle>
+              <AlertDescription>
+                {describeError(loadError ?? subscriptionError)}
+              </AlertDescription>
+              <AlertAction>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => {
+                    // 重新建立事件监听；读取本来就会在期间自愈。
+                    if (subscriptionError) retryBtSubscription();
+                    void refresh();
+                  }}
+                >
+                  <Trans comment="重新读取 BT 下载任务；通知监听失败时也会重新连接监听">
+                    重试
+                  </Trans>
+                </Button>
+              </AlertAction>
+            </Alert>
+          ) : null}
+          {loading ? (
+            <p role="status" className="text-muted-foreground text-sm">
+              <Trans>加载中…</Trans>
+            </p>
+          ) : null}
+          {tasks.length === 0 && !loading && !loadError ? (
+            <Empty className="border border-dashed">
+              <EmptyHeader>
+                <EmptyMedia>
+                  <Magnet />
+                </EmptyMedia>
+                <EmptyTitle>
+                  <Trans>暂无下载任务</Trans>
+                </EmptyTitle>
+              </EmptyHeader>
+              <Button variant="outline" size="sm" onClick={openAdd}>
+                <Plus data-icon="inline-start" />
+                <Trans>添加</Trans>
+              </Button>
+            </Empty>
+          ) : tasks.length > 0 ? (
+            <>
+              <div className="flex items-center justify-between gap-3 py-1 text-xs">
+                <h2 className="font-semibold">
+                  <Trans>全部任务</Trans>
+                </h2>
+                <span className="text-muted-foreground tabular-nums">
+                  {tasks.length}
                 </span>
-              </h2>
-              {completedTasks.length > 0 ? (
-                completedTasks.map((task) => (
-                  <TaskRow
-                    key={task.infoHash}
-                    task={task}
-                    stalled={false}
-                    hasParsedProbe={parsedHashes.has(task.infoHash)}
-                    onOpenParsed={openParsed}
-                    onRetry={(item) => openPrefilled(magnetOf(item))}
-                    onPeers={setPeersTask}
-                    onControl={(item, action) => void control(item, action)}
-                    onMagnet={setMagnetTask}
-                    onExport={(item) => void exportTask(item)}
-                    onOpenFiles={setFilesTask}
-                    onDelete={(item) => {
-                      setPendingDelete(item);
-                    }}
-                  />
-                ))
-              ) : (
-                <p className="text-muted-foreground px-2 py-3 text-xs">
-                  <Trans>暂无已完成任务</Trans>
-                </p>
-              )}
-            </section>
-          </div>
-        )}
+              </div>
+              <TaskList
+                tasks={tasks}
+                rowProps={(task) => ({
+                  busy: busyTasks.has(task.infoHash),
+                  stalled: noPeers.has(task.infoHash),
+                  hasParsedProbe: parsedHashes.has(task.infoHash),
+                  onOpenParsed: openParsed,
+                  onRetry: (item) => openPrefilled(magnetOf(item)),
+                  onPeers: (item) => openFiles(item, "peers"),
+                  onControl: (item, action) =>
+                    void runAction(item.infoHash, () => control(item, action)),
+                  onMagnet: setMagnetTask,
+                  onExport: (item) =>
+                    void runAction(item.infoHash, () => exportTask(item)),
+                  onOpenFiles: (item) => openFiles(item),
+                  onDelete: setPendingDelete,
+                })}
+              />
+            </>
+          ) : null}
+        </div>
       </div>
       {filesTask ? (
-        <FileBrowserDialog
+        <TaskFilesPage
           key={filesTask.infoHash}
           task={
             tasks.find((task) => task.infoHash === filesTask.infoHash) ??
             filesTask
           }
+          initialTab={filesTab}
           onClose={() => setFilesTask(null)}
+          onExport={() =>
+            void runAction(filesTask.infoHash, () => exportTask(filesTask))
+          }
+          busy={busyTasks.has(filesTask.infoHash)}
         />
       ) : null}
-      <TransferPanel animateOnMount={false} />
       <AddTorrentDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        initialSource={prefill}
+        open={dialogOpen || pendingAddSource !== null}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          // 关闭即消费：跨页面重试意图只打开一次对话框。
+          if (!open) consumeAddSource();
+        }}
+        initialSource={prefill ?? pendingAddSource}
         initialProbe={prefillProbe}
         initialSelected={prefillSelected}
         readOnly={dialogReadOnly}
         existingInfoHashes={new Set(tasks.map((task) => task.infoHash))}
-        allowExistingTask={prefill != null && prefillProbe == null}
-        onAdded={handleAdded}
-      />
-      <PeersDialog
-        task={
-          peersTask
-            ? { infoHash: peersTask.infoHash, label: peersTask.label }
-            : null
+        allowExistingTask={
+          (prefill ?? pendingAddSource) != null && prefillProbe == null
         }
-        onClose={() => setPeersTask(null)}
+        onAdded={handleAdded}
       />
       <TaskDialogs
         magnetText={magnetTask ? magnetOf(magnetTask) : null}
         onCloseMagnet={() => setMagnetTask(null)}
         pendingDeleteLabel={pendingDelete?.label ?? null}
         onCloseDelete={() => setPendingDelete(null)}
-        onConfirmDelete={() => void confirmDelete()}
+        onConfirmDelete={() => {
+          if (pendingDelete)
+            void runAction(pendingDelete.infoHash, confirmDelete);
+        }}
       />
     </div>
   );

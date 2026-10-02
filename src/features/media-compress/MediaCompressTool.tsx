@@ -1,9 +1,9 @@
 import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
-import { Archive, LoaderCircle } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
-import { ToolPageHeader } from "~/components/ToolPageHeader";
+import { LoaderCircle } from "lucide-react";
+import AppPageLayout from "~/components/AppPageLayout";
+import { MediaProcessingGuard } from "./MediaProcessingGuard";
 import { CompressModeTabs } from "~/features/media-compress/components/CompressModeTabs";
 import type { CompressModeId } from "~/features/media-compress/types";
 const ImageCompressPanel = lazy(
@@ -36,46 +36,25 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
     });
   }
   return (
-    <main className="bg-background text-foreground flex h-full flex-col">
-      <ToolPageHeader
+    <MediaProcessingGuard>
+      <AppPageLayout
         title={<Trans>媒体处理</Trans>}
-        trailing={
-          <Badge variant="outline">
-            <Trans>本地处理</Trans>
-          </Badge>
-        }
-      />
-
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-2">
-              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
-                <Archive className="size-4" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="truncate text-sm font-semibold">
-                  <Trans>媒体处理</Trans>
-                </h1>
-                <p className="text-muted-foreground truncate text-xs">
-                  <Trans>图片 / 视频本地压缩与调整图片尺寸</Trans>
-                </p>
-              </div>
-            </div>
-            <CompressModeTabs
-              value={mode}
-              onChange={(next) => {
-                void navigate({
-                  to: "/tools/media-compress",
-                  search: {
-                    mode: next,
-                  },
-                  replace: true,
-                });
-              }}
-            />
-          </div>
-        </section>
+        adaptiveDensity
+        bottomInset="scroll"
+        contentClassName="flex flex-col gap-3"
+      >
+        <CompressModeTabs
+          value={mode}
+          onChange={(next) => {
+            void navigate({
+              to: "/tools/media-compress",
+              search: {
+                mode: next,
+              },
+              replace: true,
+            });
+          }}
+        />
 
         <Suspense
           fallback={
@@ -86,22 +65,40 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
           }
         >
           {visitedModes.has("image") ? (
-            <div hidden={mode !== "image"}>
+            <div
+              role="tabpanel"
+              id="media-panel-image"
+              aria-labelledby="media-tab-image"
+              tabIndex={0}
+              hidden={mode !== "image"}
+            >
               <ImageCompressPanel />
             </div>
           ) : null}
           {visitedModes.has("video") ? (
-            <div hidden={mode !== "video"}>
+            <div
+              role="tabpanel"
+              id="media-panel-video"
+              aria-labelledby="media-tab-video"
+              tabIndex={0}
+              hidden={mode !== "video"}
+            >
               <VideoCompressPanel />
             </div>
           ) : null}
           {visitedModes.has("resize") ? (
-            <div hidden={mode !== "resize"}>
+            <div
+              role="tabpanel"
+              id="media-panel-resize"
+              aria-labelledby="media-tab-resize"
+              tabIndex={0}
+              hidden={mode !== "resize"}
+            >
               <ImageResizePanel />
             </div>
           ) : null}
         </Suspense>
-      </div>
-    </main>
+      </AppPageLayout>
+    </MediaProcessingGuard>
   );
 }

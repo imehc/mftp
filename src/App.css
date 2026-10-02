@@ -23,6 +23,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* 保留 Tailwind 默认断点；移动 / PC 布局统一由 md（48rem）切换。 */
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans-token);
   --font-mono: var(--font-mono-token);
@@ -45,6 +46,8 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-chess-red: var(--chess-red);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -69,6 +72,9 @@
 }
 
 :root {
+  --ui-icon-size: 1rem;
+  --ui-icon-size-sm: 0.875rem;
+  --ui-icon-size-xs: 0.75rem;
   --font-sans-token: "Geist Variable", Geist, sans-serif;
   --font-mono-token:
     "Geist Mono Variable", "Geist Mono", ui-monospace, monospace;
@@ -88,6 +94,9 @@
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.52 0.16 155);
+  --warning: oklch(0.62 0.15 75);
+  /* 象棋红方：由主题管理的阵营色，深色下需要提亮。 */
+  --chess-red: oklch(0.52 0.14 28);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -124,6 +133,8 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.72 0.16 155);
+  --warning: oklch(0.79 0.15 78);
+  --chess-red: oklch(0.7 0.15 28);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -142,6 +153,14 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@media (width < theme(--breakpoint-md)), (pointer: coarse) {
+  :root {
+    --ui-icon-size: 1.25rem;
+    --ui-icon-size-sm: 1.125rem;
+    --ui-icon-size-xs: 1rem;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -151,6 +170,8 @@
   }
   html {
     @apply font-sans;
+    /* 默认不覆盖系统/WebView 字号；手动比例统一驱动 rem，安全区的 px 不缩放。 */
+    font-size: calc(100% * clamp(0.875, var(--ui-scale, 1), 1.25));
   }
 
   /* 安全区域留白：env() 在 iOS（WKWebView + viewport-fit=cover）上生效，
@@ -165,16 +186,190 @@
 
   /* 应用外壳：填满视口，并在移动端让内容避开状态栏 / 手势栏。 */
   .app-shell {
-    height: 100dvh;
+    height: min(100dvh, var(--native-viewport-height, 100dvh));
     padding-top: var(--safe-top, env(safe-area-inset-top, 0px));
     padding-bottom: var(--safe-bottom, env(safe-area-inset-bottom, 0px));
     padding-left: var(--safe-left, env(safe-area-inset-left, 0px));
     padding-right: var(--safe-right, env(safe-area-inset-right, 0px));
     overflow: hidden;
   }
+
+  /* 页面显式把底部避让交给滚动末尾；只匹配直属页面，Portal 不改变外壳。 */
+  .app-shell:has(> [data-bottom-inset="scroll"]) {
+    padding-bottom: 0;
+  }
 }
 
 @layer components {
+  /* 列表可经过手势区域，滚到底时才由内容内的留白保护末项。 */
+  .app-scroll-safe-end {
+    padding-bottom: max(0.75rem, var(--safe-bottom, 0px));
+    scroll-padding-bottom: max(0.75rem, var(--safe-bottom, 0px));
+  }
+
+  /* Android 的键盘可覆盖 WebView 而不改变 dvh；原生入口提供实际可用高度。 */
+  .app-viewport {
+    height: min(100dvh, var(--native-viewport-height, 100dvh));
+  }
+  /* 只在已迁移页面和 Portal 内显式启用，沉浸式工具保持自己的密度。 */
+  @media (width < theme(--breakpoint-md)), (pointer: coarse) {
+    .ui-density-adaptive
+      :is(
+        [data-ui-control="button"],
+        [data-slot="input"],
+        [data-ui-control="input-group"],
+        [data-slot="select-trigger"],
+        [data-slot="select-item"],
+        [data-slot="dropdown-menu-item"],
+        [data-slot="toggle-group-item"],
+        [data-slot="touch-label"]
+      ):not([data-day]) {
+      min-height: max(44px, 2.75rem);
+    }
+    .ui-density-adaptive
+      :is([data-ui-control="button"], [data-slot="touch-label"]):not(
+        [data-day]
+      ) {
+      min-width: max(44px, 2.75rem);
+    }
+    /* 日历按七列可用宽度设置单元格，不能由普通按钮最小宽度撑破网格。 */
+    .ui-density-adaptive [data-slot="input-group-addon"] {
+      padding-block: 0;
+    }
+    .ui-density-adaptive [data-slot="input-group-control"] {
+      min-height: 0;
+      height: 100%;
+    }
+  }
+
+  /* 点击区域属于按钮自身且不重叠；伪元素仅绘制居中的紧凑外观。 */
+  :is(
+    [data-slot="tabs-list"],
+    [data-slot="select-trigger"]
+  )[data-density="adaptive"] {
+    --control-surface-height: 2rem;
+  }
+  [data-slot="select-trigger"][data-density="adaptive"]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    height: var(--control-surface-height);
+    transform: translateY(-50%);
+    border: 1px solid var(--input);
+    border-radius: inherit;
+    background: var(--background);
+    pointer-events: none;
+  }
+  [data-slot="tabs-list"][data-density="adaptive"] {
+    --tab-surface-height: var(--control-surface-height);
+    position: relative;
+    isolation: isolate;
+    height: var(--tab-surface-height);
+    padding-block: 0;
+    background: transparent;
+  }
+  [data-slot="tabs-list"][data-density="adaptive"]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    height: var(--tab-surface-height);
+    transform: translateY(-50%);
+    border-radius: inherit;
+    background: var(--muted);
+    pointer-events: none;
+  }
+  [data-slot="tabs-list"][data-density="adaptive"]
+    > [data-slot="tabs-trigger"] {
+    position: relative;
+    isolation: isolate;
+    min-width: max(44px, 2.75rem);
+    background: transparent;
+    box-shadow: none;
+  }
+  [data-slot="tabs-list"][data-density="adaptive"]
+    > [data-slot="tabs-trigger"]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    height: calc(var(--tab-surface-height) - 0.375rem);
+    transform: translateY(-50%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  [data-slot="tabs-list"][data-density="adaptive"]
+    > [data-state="active"]::before {
+    background: var(--background);
+    box-shadow: var(--shadow-sm);
+  }
+  @media (width < theme(--breakpoint-md)), (pointer: coarse) {
+    [data-slot="tabs-list"][data-density="adaptive"] {
+      height: max(44px, 2.75rem);
+    }
+  }
+
+  /* 工具栏按钮与 Tabs 共用可见高度，按钮自身仍承接完整触控区。 */
+  [data-ui-control="button"][data-density="adaptive"] {
+    --control-surface-height: 2rem;
+    --button-surface: var(--primary);
+    --button-surface-border: transparent;
+    position: relative;
+    isolation: isolate;
+    height: var(--control-surface-height);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  [data-ui-control="button"][data-density="adaptive"]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    height: var(--control-surface-height);
+    transform: translateY(-50%);
+    border-radius: inherit;
+    border: 1px solid var(--button-surface-border);
+    background: var(--button-surface);
+    pointer-events: none;
+  }
+  [data-ui-control="button"][data-density="adaptive"][data-variant="outline"] {
+    --button-surface: var(--background);
+    --button-surface-border: var(--border);
+  }
+  [data-ui-control="button"][data-density="adaptive"][data-variant="ghost"],
+  [data-ui-control="button"][data-density="adaptive"][data-variant="link"] {
+    --button-surface: transparent;
+  }
+  [data-ui-control="button"][data-density="adaptive"][data-variant="secondary"] {
+    --button-surface: var(--secondary);
+  }
+  [data-ui-control="button"][data-density="adaptive"][data-variant="destructive"] {
+    --button-surface: color-mix(in oklch, var(--destructive) 10%, transparent);
+  }
+  [data-ui-control="button"][data-density="adaptive"]:is(
+      :hover,
+      [aria-expanded="true"]
+    ):not(:disabled) {
+    --button-surface: var(--muted);
+  }
+  [data-ui-control="button"][data-density="adaptive"][data-variant="default"]:hover:not(
+      :disabled
+    ) {
+    --button-surface: color-mix(in oklch, var(--primary) 80%, transparent);
+  }
+  @media (width < theme(--breakpoint-md)), (pointer: coarse) {
+    [data-ui-control="button"][data-density="adaptive"] {
+      min-height: max(44px, 2.75rem);
+      min-width: max(44px, 2.75rem);
+    }
+  }
+
   .cn-toast [data-content] {
     min-width: 0;
     flex: 1;
@@ -216,4 +411,10 @@
   .sftp-list-content {
     animation: none;
   }
+}
+
+/* 固定底部导航已经避让系统区，正文末尾只保留普通间距；Portal 不受影响。 */
+[data-bottom-navigation="visible"] .app-scroll-safe-end {
+  padding-bottom: 0.75rem;
+  scroll-padding-bottom: 0.75rem;
 }

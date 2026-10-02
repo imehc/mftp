@@ -8,7 +8,10 @@
 import type { SeatIndex } from "./types";
 
 export interface RemoteMove<M> {
-  /** 对局内单调递增的走法计数；用于检测丢失 / 重复。 */
+  /** 重赛递增 round，悔棋递增 revision，防止旧消息在手数复用后生效。 */
+  round: number;
+  revision: number;
+  /** 当前修订内的落子索引，与应用前的 moveCount 相等。 */
   seq: number;
   seat: SeatIndex;
   move: M;

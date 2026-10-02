@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { msg } from "@lingui/core/macro";
 import { translate } from "~/i18n/translate";
-import type { TransferProgress } from "~/types";
+import type { AppError, TransferProgress } from "~/types";
+import type { TransferRetryIntent } from "~/features/transfers/retry";
+import { toIpcError } from "~/lib/errors";
 
 /** 后端 BT phase 是机器 key，文案归前端；未收录的 key 原样透出。 */
 const BT_PHASE_LABELS: Record<string, () => string> = {
@@ -25,15 +27,16 @@ export interface TransferState {
   speed?: number | null;
   updatedAt: number;
   status: "running" | "success" | "error" | "cancelled";
-  error?: string;
+  error?: AppError;
   cancelling?: boolean;
   cancellingPhase?: string;
   cancellable?: boolean;
   paused?: boolean;
   pausedPhase?: string;
   controlPending?: boolean;
-  controlError?: string;
-  retry?: () => void | Promise<void>;
+  controlError?: AppError;
+  /** 重试动作的类型化描述；不能保存页面的 setState 闭包。 */
+  retry?: TransferRetryIntent;
   retrying?: boolean;
   /** 面板徽标展示的任务来源；默认为 sftp（历史行为）。 */
   source?: "sftp" | "bt";
@@ -41,12 +44,14 @@ export interface TransferState {
 interface TransfersState {
   transfers: TransferState[];
   dismissed: Set<string>;
+  /** 进度事件监听不可用；面板据此提示，不把失败当成“没有任务”。 */
+  runtimeError?: AppError;
   start: (
     id: string,
     label: string,
     options?: {
       cancellable?: boolean;
-      retry?: () => void | Promise<void>;
+      retry?: TransferRetryIntent;
       source?: "sftp" | "bt";
     },
   ) => void;
@@ -56,19 +61,21 @@ interface TransfersState {
   finish: (
     id: string,
     status: "success" | "error" | "cancelled",
-    error?: string,
+    error?: unknown,
   ) => void;
   markCancelling: (id: string) => void;
   cancelFailed: (id: string) => void;
   setPaused: (id: string, paused: boolean) => void;
   setControlPending: (id: string, pending: boolean) => void;
-  setControlError: (id: string, error?: string) => void;
+  setControlError: (id: string, error?: unknown) => void;
   setRetrying: (id: string, retrying: boolean) => void;
+  setRuntimeError: (error?: unknown) => void;
   clearFinished: () => void;
 }
 export const useTransfersStore = create<TransfersState>((set) => ({
   transfers: [],
   dismissed: new Set(),
+  runtimeError: undefined,
   start(id, label, options) {
     set((state) => {
       const dismissed = new Set(state.dismissed);
@@ -159,6 +166,11 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     }));
   },
   finish(id, status, error) {
+    // 旧调用方的字符串在公共边界兼容，任务状态只保存完整协议。
+    const payload =
+      status === "error" && error != null
+        ? toIpcError(error).payload
+        : undefined;
     set((state) => ({
       transfers: state.transfers.map((item) =>
         item.id === id
@@ -175,7 +187,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
                 status === "success" && item.total != null
                   ? item.total
                   : item.transferred,
-              error,
+              error: payload,
               speed: null,
               cancelling: false,
               cancellingPhase: undefined,
@@ -266,12 +278,13 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     }));
   },
   setControlError(id, error) {
+    const payload = error == null ? undefined : toIpcError(error).payload;
     set((state) => ({
       transfers: state.transfers.map((item) =>
         item.id === id
           ? {
               ...item,
-              controlError: error,
+              controlError: payload,
             }
           : item,
       ),
@@ -288,6 +301,11 @@ export const useTransfersStore = create<TransfersState>((set) => ({
           : item,
       ),
     }));
+  },
+  setRuntimeError(error) {
+    set({
+      runtimeError: error == null ? undefined : toIpcError(error).payload,
+    });
   },
   clearFinished() {
     set((state) => {

@@ -10,12 +10,12 @@ import {
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { FieldDescription } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import { firstFormError } from "~/lib/form-errors";
 import type { ExtractState } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 interface ExtractDialogProps {
@@ -63,15 +63,18 @@ export default function ExtractDialog({
         !open && !directoryPickerOpen && setExtractTarget(null)
       }
     >
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent
+        showCloseButton={false}
+        className="ui-density-adaptive md:max-w-lg"
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>解压</Trans>
           </DialogTitle>
           <DialogDescription className="truncate">
             {extractTarget?.entry.name ?? ""}
           </DialogDescription>
-        </DialogHeader>
+        </DialogLayoutHeader>
         {extractTarget ? (
           <FieldGroup className="gap-3">
             <form.Field name="outName">
@@ -79,10 +82,11 @@ export default function ExtractDialog({
                 const error = firstFormError(field.state.meta.errors);
                 return (
                   <Field data-invalid={!!error}>
-                    <FieldLabel>
+                    <FieldLabel htmlFor="extract-folder-name">
                       <Trans>文件夹名称</Trans>
                     </FieldLabel>
                     <Input
+                      id="extract-folder-name"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(event) => {

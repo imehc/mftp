@@ -43,7 +43,15 @@ export const formatterLanguages: FormatterLanguage[] = [
   {
     id: "json",
     label: "JSON",
-    extensions: () => [json(), linter(jsonParseLinter())],
+    extensions: () => {
+      const lintJson = jsonParseLinter();
+      return [
+        json(),
+        linter((view) =>
+          view.state.doc.toString().trim() ? lintJson(view) : [],
+        ),
+      ];
+    },
     format: formatJson,
     minify: minifyJson,
     validate: validateJson,

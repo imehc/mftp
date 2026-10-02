@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { baseName, pickFilePathNative } from "~/lib/files";
 import { KeyRound, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useHostsStore } from "~/store/hosts";
@@ -14,12 +14,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
   Empty,
   EmptyDescription,
@@ -27,12 +22,17 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { Separator } from "~/components/ui/separator";
+import {
+  DialogLayoutContent,
+  DialogLayoutHeader,
+  DialogLayoutBody,
+} from "~/components/ui/dialog-layout";
 import { firstFormError } from "~/lib/form-errors";
 import {
   emptyKeyImportFormValues,
   createKeyImportSchema,
 } from "~/features/ssh-sftp/components/keys/KeyManager.schema";
+import { describeError } from "~/lib/errors";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -60,24 +60,27 @@ export default function KeyManager({ open, onOpenChange }: Props) {
         toast.success(t`已导入密钥 ${trimValue}`);
         form.reset(emptyKeyImportFormValues);
       } catch (e) {
-        toast.error(String(e));
+        toast.error(describeError(e));
       } finally {
         setBusy(false);
       }
     },
   });
   async function pickFile() {
-    const selected = await openDialog({
-      multiple: false,
-      directory: false,
-      title: t`选择私钥文件`,
-    });
-    if (typeof selected === "string") {
-      form.setFieldValue("sourcePath", selected);
-      if (!form.getFieldValue("label")) {
-        const name = selected.split(/[\\/]/).pop() ?? "key";
-        form.setFieldValue("label", name);
+    try {
+      const selected = await pickFilePathNative({
+        title: t`选择私钥文件`,
+        filterName: t`私钥文件`,
+        extensions: ["*"],
+        allowMobile: true,
+      });
+      if (typeof selected === "string") {
+        form.setFieldValue("sourcePath", selected);
+        if (!form.getFieldValue("label"))
+          form.setFieldValue("label", baseName(selected));
       }
+    } catch (error) {
+      toast.error(describeError(error));
     }
   }
   async function remove(id: string, name: string) {
@@ -85,145 +88,156 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       await deleteKey(id);
       toast.success(t`已删除 ${name}`);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
     }
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
+      <DialogLayoutContent
+        placement="responsive-page"
+        className="ui-density-adaptive md:max-w-lg"
+        showCloseButton={false}
+        aria-describedby={undefined}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>密钥管理</Trans>
           </DialogTitle>
-        </DialogHeader>
-
-        <div className="border-border rounded-lg border p-3">
-          <FieldGroup>
-            <form.Field name="label">
-              {(field) => {
-                const error = firstFormError(field.state.meta.errors);
-                return (
-                  <UiField data-invalid={!!error}>
-                    <FieldLabel htmlFor="key-label">
-                      <Trans>名称</Trans>
-                    </FieldLabel>
-                    <Input
-                      id="key-label"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="id_ed25519"
-                      aria-invalid={!!error}
-                    />
-                    {error ? (
-                      <FieldDescription>{error}</FieldDescription>
-                    ) : null}
-                  </UiField>
-                );
-              }}
-            </form.Field>
-            <form.Field name="sourcePath">
-              {(field) => {
-                const error = firstFormError(field.state.meta.errors);
-                return (
-                  <UiField data-invalid={!!error}>
-                    <FieldLabel>
-                      <Trans>私钥文件</Trans>
-                    </FieldLabel>
-                    <div className="flex gap-2">
+        </DialogLayoutHeader>
+        <DialogLayoutBody className="flex flex-col gap-4">
+          <div className="border-border rounded-lg border p-3">
+            <FieldGroup density="compact">
+              <form.Field name="label">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <UiField data-invalid={!!error}>
+                      <FieldLabel htmlFor="key-label">
+                        <Trans>名称</Trans>
+                      </FieldLabel>
                       <Input
-                        readOnly
+                        id="key-label"
                         value={field.state.value}
-                        placeholder={t`未选择`}
-                        className="flex-1"
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="id_ed25519"
                         aria-invalid={!!error}
                       />
-                      <Button variant="outline" onClick={pickFile}>
-                        <Upload data-icon="inline-start" /> <Trans>选择</Trans>
-                      </Button>
-                    </div>
-                    {error ? (
-                      <FieldDescription>{error}</FieldDescription>
-                    ) : null}
+                      {error ? (
+                        <FieldDescription>{error}</FieldDescription>
+                      ) : null}
+                    </UiField>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="sourcePath">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <UiField data-invalid={!!error}>
+                      <FieldLabel>
+                        <Trans>私钥文件</Trans>
+                      </FieldLabel>
+                      <div className="flex gap-2">
+                        <Input
+                          readOnly
+                          aria-label={t`私钥文件`}
+                          value={field.state.value}
+                          placeholder={t`未选择`}
+                          className="flex-1"
+                          aria-invalid={!!error}
+                        />
+                        <Button variant="outline" onClick={pickFile}>
+                          <Upload data-icon="inline-start" />{" "}
+                          <Trans>选择</Trans>
+                        </Button>
+                      </div>
+                      {error ? (
+                        <FieldDescription>{error}</FieldDescription>
+                      ) : null}
+                    </UiField>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="hasPassphrase">
+                {(field) => (
+                  <UiField orientation="horizontal">
+                    <Checkbox
+                      id="key-has-passphrase"
+                      checked={field.state.value}
+                      onCheckedChange={(checked) =>
+                        field.handleChange(checked === true)
+                      }
+                    />
+                    <FieldLabel htmlFor="key-has-passphrase">
+                      <Trans>该私钥有口令保护（连接时输入）</Trans>
+                    </FieldLabel>
                   </UiField>
-                );
-              }}
-            </form.Field>
-            <form.Field name="hasPassphrase">
-              {(field) => (
-                <UiField orientation="horizontal">
-                  <Checkbox
-                    id="key-has-passphrase"
-                    checked={field.state.value}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                  <FieldLabel htmlFor="key-has-passphrase">
-                    <Trans>该私钥有口令保护（连接时输入）</Trans>
-                  </FieldLabel>
-                </UiField>
-              )}
-            </form.Field>
-            <Button onClick={() => void form.handleSubmit()} disabled={busy}>
-              {busy ? t`导入中…` : t`导入密钥`}
-            </Button>
-          </FieldGroup>
-        </div>
+                )}
+              </form.Field>
+              <Button
+                fullWidth
+                onClick={() => void form.handleSubmit()}
+                disabled={busy}
+              >
+                {busy ? t`导入中…` : t`导入密钥`}
+              </Button>
+            </FieldGroup>
+          </div>
 
-        <Separator />
-
-        <div className="flex flex-col gap-1">
-          <p className="text-muted-foreground text-xs font-medium">
-            <Plural
-              value={{
-                importedKeyCount: keys.length,
-              }}
-              one="已导入 # 个密钥"
-              other="已导入 # 个密钥"
-            />
-          </p>
-          {keys.length === 0 ? (
-            <Empty className="py-6">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <KeyRound />
-                </EmptyMedia>
-                <EmptyTitle>
-                  <Trans>暂无密钥</Trans>
-                </EmptyTitle>
-                <EmptyDescription>
-                  <Trans>导入私钥后可在主机中选用。</Trans>
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {keys.map((k) => (
-                <li
-                  key={k.id}
-                  className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-1.5"
-                >
-                  <KeyRound className="text-muted-foreground size-4" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm">{k.label}</p>
-                    <p className="text-muted-foreground truncate text-xs">
-                      {k.hasPassphrase ? t`口令保护` : t`无口令`}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => remove(k.id, k.label)}
+          <div className="order-first flex flex-col gap-1 rounded-lg border p-3">
+            <p className="text-muted-foreground text-xs font-medium">
+              <Plural
+                value={{
+                  importedKeyCount: keys.length,
+                }}
+                one="已导入 # 个密钥"
+                other="已导入 # 个密钥"
+              />
+            </p>
+            {keys.length === 0 ? (
+              <Empty className="py-6">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <KeyRound />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    <Trans>暂无密钥</Trans>
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    <Trans>导入私钥后可在主机中选用。</Trans>
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <ul className="flex flex-col gap-1">
+                {keys.map((k) => (
+                  <li
+                    key={k.id}
+                    className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-1.5"
                   >
-                    <Trash2 className="text-destructive" />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </DialogContent>
+                    <KeyRound className="text-muted-foreground size-4" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm">{k.label}</p>
+                      <p className="text-muted-foreground truncate text-xs">
+                        {k.hasPassphrase ? t`口令保护` : t`无口令`}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={t`删除`}
+                      onClick={() => remove(k.id, k.label)}
+                    >
+                      <Trash2 className="text-destructive" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </DialogLayoutBody>
+      </DialogLayoutContent>
     </Dialog>
   );
 }

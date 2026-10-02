@@ -1,375 +1,380 @@
-/**
- * Generic LAN lobby shared by all mini-games: create a room (optional
- * room code), browse nearby rooms via mDNS, or join a typed IP:port as
- * the fallback for networks that filter multicast. Hands a live
- * OnlineMatchSession to the caller once both seats are filled.
- */
-import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { KeyRound, RefreshCw, Radio, Users } from "lucide-react";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
-import { Badge } from "~/components/ui/badge";
+  ArrowLeft,
+  KeyRound,
+  Link2,
+  Plus,
+  RefreshCw,
+  Users,
+} from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
+import { Label } from "~/components/ui/label";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
-  gameRoomCreate,
-  gameRoomDiscover,
-  gameRoomJoin,
-  gameRoomLeave,
-  gameRoomStatus,
-  lanTransferSettings,
-} from "~/lib/ipc";
-import type { GameRoomStatus, GameRoomSummary } from "~/types";
-import { OnlineMatchSession } from "./session";
-export interface OnlineLobbyReady<M> {
-  session: OnlineMatchSession<M>;
-  status: GameRoomStatus;
-}
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutFooter,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
+import { CopyButton } from "~/components/CopyButton";
+import { describeError } from "~/lib/errors";
+import type { RoomOwner } from "./roomOwner";
+import type { MoveParser } from "./protocol";
+import { useOnlineLobby } from "./use-online-lobby";
+
 export function OnlineLobby<M>({
   gameId,
-  onReady,
+  parseMove,
+  owner,
+  onExit,
 }: {
   gameId: string;
-  onReady(ready: OnlineLobbyReady<M>): void;
+  parseMove: MoveParser<M>;
+  owner: RoomOwner<M>;
+  onExit: () => void;
 }) {
   const { t } = useLingui();
-  const [nickname, setNickname] = useState("");
-  const [roomName, setRoomName] = useState("");
-  const [roomCode, setRoomCode] = useState("");
-  const [rooms, setRooms] = useState<GameRoomSummary[]>([]);
-  const [scanning, setScanning] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hosting, setHosting] = useState<GameRoomStatus | null>(null);
-  const [joinTarget, setJoinTarget] = useState<GameRoomSummary | null>(null);
-  const [joinCode, setJoinCode] = useState("");
-  const [manualAddr, setManualAddr] = useState("");
-  const [manualCode, setManualCode] = useState("");
-  const sessionRef = useRef<OnlineMatchSession<M> | null>(null);
-  const handedOffRef = useRef(false);
-
-  // 把昵称默认设为 LAN 传输所用的设备名。
-  useEffect(() => {
-    let cancelled = false;
-    void lanTransferSettings()
-      .then((settings) => {
-        if (!cancelled && settings.deviceName) {
-          setNickname((current) => current || settings.deviceName);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // 浏览时轮询发现；每次扫描本身在 Rust 中阻塞约 1.2s。
-  useEffect(() => {
-    if (hosting) return;
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const scan = async () => {
-      setScanning(true);
-      try {
-        const found = await gameRoomDiscover(gameId);
-        if (!cancelled) setRooms(found);
-      } catch {
-        // 没有 Tauri 桥接（普通浏览器）—— 列表留空。
-      }
-      if (!cancelled) {
-        setScanning(false);
-        timer = setTimeout(scan, 4000);
-      }
-    };
-    void scan();
-    return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
-    };
-  }, [gameId, hosting]);
-
-  // 除非会话已交给对局界面，否则拆除房间。
-  useEffect(
-    () => () => {
-      if (handedOffRef.current) return;
-      sessionRef.current?.close();
-      void gameRoomLeave().catch(() => {});
-    },
-    [],
-  );
-  const playerName = () => nickname.trim() || t`玩家`;
-  const handOff = (session: OnlineMatchSession<M>, status: GameRoomStatus) => {
-    if (handedOffRef.current) return;
-    handedOffRef.current = true;
-    onReady({
-      session,
-      status,
-    });
+  const c = useOnlineLobby(gameId, parseMove, owner);
+  const report = (error: unknown) => toast.error(describeError(error));
+  const back = async () => {
+    await c.cancel();
+    onExit();
   };
-  const create = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const name = playerName();
-      const status = await gameRoomCreate(
-        gameId,
-        roomName.trim() || t`${name} 的房间`,
-        roomCode.trim() || null,
-        name,
-      );
-      const session = await OnlineMatchSession.create<M>(status);
-      sessionRef.current = session;
-      session.onPeerPresence((connected) => {
-        if (!connected) return;
-        void gameRoomStatus()
-          .then((fresh) => handOff(session, fresh))
-          .catch(() => handOff(session, status));
-      });
-      setHosting(status);
-    } catch (e) {
-      setError(String(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const join = async (host: string, port: number, code: string | null) => {
-    setBusy(true);
-    setError(null);
-    try {
-      const status = await gameRoomJoin(host, port, gameId, code, playerName());
-      const session = await OnlineMatchSession.create<M>(status);
-      sessionRef.current = session;
-      handOff(session, status);
-    } catch (e) {
-      setError(String(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const joinManual = () => {
-    const [host, portRaw] = manualAddr.trim().split(":");
-    const port = Number(portRaw);
-    if (!host || !Number.isInteger(port) || port <= 0 || port > 65535) {
-      setError(t`地址格式应为 IP:端口`);
-      return;
-    }
-    void join(host, port, manualCode.trim() || null);
-  };
-  const cancelHosting = () => {
-    sessionRef.current?.close();
-    sessionRef.current = null;
-    setHosting(null);
-    void gameRoomLeave().catch(() => {});
-  };
-  if (hosting) {
-    return (
-      <div className="flex flex-1 justify-center overflow-auto p-3">
-        <div className="border-border flex w-full max-w-sm flex-col gap-3 self-center rounded-md border p-4">
-          <div className="text-center text-sm font-medium">
-            {hosting.roomName}
-          </div>
-          <div className="text-muted-foreground text-center text-xs">
-            {hosting.host}:{hosting.port}
-          </div>
-          {hosting.code ? (
-            <div className="text-center">
-              <div className="text-muted-foreground text-xs">
-                <Trans>房间码</Trans>
-              </div>
-              <div className="font-mono text-2xl font-semibold tracking-widest">
-                {hosting.code}
-              </div>
-            </div>
-          ) : null}
-          <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
-            <span className="size-2 animate-pulse rounded-full bg-emerald-500" />
-            <Trans>等待对手加入…</Trans>
-          </div>
-          <Button variant="outline" size="sm" onClick={cancelHosting}>
-            <Trans>取消</Trans>
-          </Button>
-        </div>
-      </div>
-    );
-  }
   return (
-    <div className="flex flex-1 justify-center overflow-auto p-3">
-      <div className="flex w-full max-w-sm flex-col gap-2 self-center">
-        <label className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground shrink-0">
-            <Trans>昵称</Trans>
-          </span>
-          <Input
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            placeholder={t`玩家`}
-            className="h-7 text-xs"
-          />
-        </label>
-
-        <div className="border-border flex flex-col gap-2 rounded-md border p-2.5">
-          <span className="flex items-center gap-2 text-sm font-medium">
-            <Users className="size-4" />
-            <Trans>创建房间</Trans>
-          </span>
-          <div className="flex gap-2">
-            <Input
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              placeholder={t`房间名（可选）`}
-              className="h-7 flex-1 text-xs"
-            />
-            <Input
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value)}
-              placeholder={t`房间码（可选）`}
-              className="h-7 w-28 text-xs"
-            />
-          </div>
-          <Button size="sm" disabled={busy} onClick={() => void create()}>
-            <Trans>创建并等待对手</Trans>
+    <>
+      <ToolPageHeader
+        showHome={false}
+        title={c.hosting?.roomName || <Trans>联机对局</Trans>}
+        leading={
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t`返回模式选择`}
+            disabled={c.cancelling}
+            onClick={() => void back()}
+          >
+            <ArrowLeft />
           </Button>
-        </div>
-
-        <div className="border-border flex flex-col gap-1.5 rounded-md border p-2.5">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-sm font-medium">
-              <Radio className="size-4" />
-              <Trans>附近的房间</Trans>
-            </span>
-            <RefreshCw
-              className={`text-muted-foreground size-3.5 ${scanning ? "animate-spin" : ""}`}
-            />
-          </div>
-          {rooms.length === 0 ? (
-            <div className="text-muted-foreground py-1 text-center text-xs">
-              <Trans>正在搜索…未发现房间时可用下方地址直连</Trans>
-            </div>
+        }
+        trailing={
+          c.hosting ? (
+            <Button
+              variant="ghost"
+              density="adaptive"
+              size="sm"
+              disabled={c.busy}
+              onClick={() => void c.cancel()}
+            >
+              <Trans>取消等待</Trans>
+            </Button>
           ) : (
-            <ul className="flex max-h-40 flex-col gap-1 overflow-auto">
-              {rooms.map((room) => (
-                <li
-                  key={room.roomId}
-                  className="border-border/60 flex items-center justify-between gap-2 rounded border px-2 py-1"
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t`刷新房间`}
+              disabled={c.discovery.scanning || c.busy}
+              onClick={c.discovery.refresh}
+            >
+              <RefreshCw
+                className={
+                  c.discovery.scanning ? "motion-safe:animate-spin" : undefined
+                }
+              />
+            </Button>
+          )
+        }
+      />
+      <div className="app-scroll-safe-end min-h-0 flex-1 overflow-auto px-3 pt-3 md:px-4 md:pt-4">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-3">
+          {c.hosting ? (
+            <>
+              <div className="flex flex-col items-center gap-3 py-12 text-center">
+                <Users className="bg-muted size-12 rounded-xl p-3" />
+                <h2 className="text-sm font-semibold">
+                  <Trans>等待对手加入…</Trans>
+                </h2>
+                <div className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
+                  <span className="break-all">
+                    {c.hosting.host}:{c.hosting.port}
+                  </span>
+                  <CopyButton
+                    value={`${c.hosting.host}:${c.hosting.port}`}
+                    variant="ghost"
+                    size="icon-sm"
+                    label={t`复制地址`}
+                    onError={report}
+                  />
+                </div>
+              </div>
+              {c.hosting.code ? (
+                <div className="flex items-center justify-between gap-3 rounded-xl border p-4">
+                  <div>
+                    <Label>
+                      <Trans>房间码</Trans>
+                    </Label>
+                    <p className="mt-1 font-mono text-sm">{c.hosting.code}</p>
+                  </div>
+                  <CopyButton
+                    value={c.hosting.code}
+                    variant="outline"
+                    size="sm"
+                    density="adaptive"
+                    label={t`复制房间码`}
+                    onError={report}
+                  />
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <section className="min-w-0 rounded-xl border p-4">
+                <h2 className="text-sm font-semibold">
+                  <Trans>附近的房间</Trans>
+                </h2>
+                {c.discovery.error ? (
+                  <p role="alert" className="text-destructive my-3 text-sm">
+                    {describeError(c.discovery.error)}
+                  </p>
+                ) : c.discovery.rooms.length === 0 ? (
+                  <p
+                    role="status"
+                    className="text-muted-foreground my-3 text-sm"
+                  >
+                    {c.discovery.scanning ? (
+                      <Trans>正在搜索…</Trans>
+                    ) : (
+                      <Trans>未发现房间，可输入地址加入</Trans>
+                    )}
+                  </p>
+                ) : null}
+                <ul className="my-2 divide-y">
+                  {c.discovery.rooms.map((room) => (
+                    <li
+                      key={room.roomId}
+                      className="flex min-w-0 items-center gap-3 py-3"
+                    >
+                      <Users className="text-muted-foreground size-5 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 text-sm font-medium">
+                          <span className="truncate">
+                            {room.roomName ?? t`房间`}
+                          </span>
+                          {room.hasCode ? (
+                            <KeyRound
+                              className="size-3.5 shrink-0"
+                              aria-label={t`需要房间码`}
+                            />
+                          ) : null}
+                        </div>
+                        <p className="text-muted-foreground truncate text-xs">
+                          {room.hostName ?? t`玩家`} · {room.ip}:{room.port}
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        density="adaptive"
+                        disabled={c.busy}
+                        onClick={() => c.openJoin(room)}
+                      >
+                        <Trans>加入</Trans>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  fullWidth
+                  variant="outline"
+                  className="md:w-fit"
+                  disabled={c.busy}
+                  onClick={() => c.openJoin()}
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 truncate text-xs font-medium">
-                      {room.roomName}
-                      {room.hasCode ? (
-                        <KeyRound className="text-muted-foreground size-3 shrink-0" />
-                      ) : null}
-                    </div>
-                    <div className="text-muted-foreground truncate text-[10px]">
-                      {room.hostName} · {room.ip}:{room.port}
-                    </div>
+                  <Link2 />
+                  <Trans>输入地址</Trans>
+                </Button>
+              </section>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void c.create();
+                }}
+                className="rounded-xl border p-4"
+              >
+                <fieldset
+                  disabled={c.busy}
+                  className="flex min-w-0 flex-col gap-3"
+                >
+                  <h2 className="text-sm font-semibold">
+                    <Trans>创建房间</Trans>
+                  </h2>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="room-nickname">
+                      <Trans>昵称</Trans>
+                    </Label>
+                    <Input
+                      id="room-nickname"
+                      value={c.nickname}
+                      onChange={(e) => c.setNickname(e.target.value)}
+                      placeholder={t`玩家`}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="room-name">
+                      <Trans>房间名称</Trans>
+                    </Label>
+                    <Input
+                      id="room-name"
+                      value={c.roomName}
+                      onChange={(e) => c.setRoomName(e.target.value)}
+                      placeholder={t`房间名（可选）`}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="room-code">
+                      <Trans>房间码（可选）</Trans>
+                    </Label>
+                    <PasswordInput
+                      id="room-code"
+                      value={c.roomCode}
+                      onChange={(e) => c.setRoomCode(e.target.value)}
+                    />
                   </div>
                   <Button
-                    size="xs"
-                    variant="outline"
-                    disabled={busy}
-                    onClick={() => {
-                      if (room.hasCode) {
-                        setJoinCode("");
-                        setJoinTarget(room);
-                      } else {
-                        void join(room.ip, room.port, null);
-                      }
-                    }}
+                    type="submit"
+                    fullWidth
+                    className="md:w-fit md:self-start"
                   >
-                    <Trans>加入</Trans>
+                    <Plus />
+                    <Trans>创建房间</Trans>
                   </Button>
-                </li>
-              ))}
-            </ul>
+                </fieldset>
+              </form>
+            </>
           )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Input
-            value={manualAddr}
-            onChange={(e) => setManualAddr(e.target.value)}
-            placeholder={t`IP:端口 直连`}
-            className="h-7 flex-1 text-xs"
-          />
-          <Input
-            value={manualCode}
-            onChange={(e) => setManualCode(e.target.value)}
-            placeholder={t`房间码`}
-            className="h-7 w-24 text-xs"
-          />
-          <Button
-            size="xs"
-            variant="outline"
-            disabled={busy}
-            onClick={joinManual}
-          >
-            <Trans
-              context="game connection action"
-              comment="Button that joins a game room directly using an IP address and port"
+          {c.error && !c.joinOpen ? (
+            <p role="alert" className="text-destructive text-sm">
+              {describeError(c.error)}
+            </p>
+          ) : null}
+          {c.busy && !c.hosting && !c.joinOpen ? (
+            <Button
+              fullWidth
+              variant="outline"
+              disabled={c.cancelling}
+              onClick={() => void c.cancel()}
             >
-              直连
-            </Trans>
-          </Button>
+              <Trans>取消连接</Trans>
+            </Button>
+          ) : null}
+          <p className="text-muted-foreground text-center text-xs">
+            <Trans>仅限同一局域网内联机</Trans>
+          </p>
         </div>
-
-        {error ? (
-          <div className="text-destructive text-center text-xs">{error}</div>
-        ) : null}
-        <Badge
-          variant="outline"
-          className="self-center text-[10px] font-normal"
-        >
-          <Trans>仅限同一局域网内联机</Trans>
-        </Badge>
       </div>
-
-      <AlertDialog
-        open={joinTarget !== null}
+      <Dialog
+        open={c.joinOpen}
         onOpenChange={(open) => {
-          if (!open) setJoinTarget(null);
+          if (!open && !c.cancelling) void c.closeJoin();
         }}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              <Trans>输入房间码</Trans>
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {joinTarget?.roomName} · {joinTarget?.ip}:{joinTarget?.port}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <Input
-            autoFocus
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value)}
-            placeholder={t`房间码`}
-          />
-          <AlertDialogFooter>
-            <AlertDialogCancel>
-              <Trans>取消</Trans>
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={joinCode.trim().length === 0}
-              onClick={() => {
-                const target = joinTarget;
-                setJoinTarget(null);
-                if (target) void join(target.ip, target.port, joinCode.trim());
+        <DialogLayoutContent
+          placement="responsive-page"
+          className="ui-density-adaptive md:max-w-md"
+          showCloseButton={false}
+          aria-describedby={undefined}
+        >
+          <DialogLayoutHeader showCloseButton>
+            <DialogTitle>
+              <Trans>加入房间</Trans>
+            </DialogTitle>
+          </DialogLayoutHeader>
+          <DialogLayoutBody>
+            <form
+              id="join-room"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void c.join();
               }}
             >
-              <Trans>加入</Trans>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+              <fieldset
+                disabled={c.busy}
+                className="flex min-w-0 flex-col gap-3 p-1"
+              >
+                <div className="space-y-1.5">
+                  <Label htmlFor="join-address">
+                    <Trans>地址</Trans>
+                  </Label>
+                  <Input
+                    id="join-address"
+                    value={c.manualAddr}
+                    onChange={(e) => c.setManualAddr(e.target.value)}
+                    placeholder={t`IP:端口 直连`}
+                    aria-invalid={c.addressInvalid}
+                    aria-describedby={
+                      c.addressInvalid ? "join-address-error" : undefined
+                    }
+                  />
+                  {c.addressInvalid ? (
+                    <p
+                      id="join-address-error"
+                      className="text-destructive text-xs"
+                    >
+                      <Trans>地址格式应为 IP:端口</Trans>
+                    </p>
+                  ) : null}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="join-nickname">
+                    <Trans>昵称</Trans>
+                  </Label>
+                  <Input
+                    id="join-nickname"
+                    value={c.nickname}
+                    onChange={(e) => c.setNickname(e.target.value)}
+                    placeholder={t`玩家`}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="join-code">
+                    <Trans>房间码</Trans>
+                  </Label>
+                  <PasswordInput
+                    id="join-code"
+                    value={c.joinCode}
+                    onChange={(e) => c.setJoinCode(e.target.value)}
+                    required={c.codeRequired}
+                  />
+                </div>
+              </fieldset>
+            </form>
+            {c.error ? (
+              <p role="alert" className="text-destructive mt-3 text-sm">
+                {describeError(c.error)}
+              </p>
+            ) : null}
+          </DialogLayoutBody>
+          <DialogLayoutFooter>
+            <Button
+              variant="outline"
+              disabled={c.cancelling}
+              onClick={() => void c.closeJoin()}
+            >
+              {c.busy ? <Trans>取消连接</Trans> : <Trans>取消</Trans>}
+            </Button>
+            <Button
+              type="submit"
+              form="join-room"
+              disabled={c.busy || (c.codeRequired && !c.joinCode.trim())}
+            >
+              {c.busy ? <Trans>连接中…</Trans> : <Trans>加入</Trans>}
+            </Button>
+          </DialogLayoutFooter>
+        </DialogLayoutContent>
+      </Dialog>
+    </>
   );
 }

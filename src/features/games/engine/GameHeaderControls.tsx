@@ -63,7 +63,12 @@ export function GameHomeButton({
 }
 function RestartButton({ onClick }: { onClick?: () => void }) {
   return (
-    <Button variant="ghost" size="xs" onClick={onClick}>
+    <Button
+      variant="ghost"
+      density="adaptive"
+      className="w-full justify-start"
+      onClick={onClick}
+    >
       <RotateCcw data-icon="inline-start" />
       <Trans>重开</Trans>
     </Button>
@@ -71,7 +76,12 @@ function RestartButton({ onClick }: { onClick?: () => void }) {
 }
 function ExitButton({ onClick }: { onClick?: () => void }) {
   return (
-    <Button variant="ghost" size="xs" onClick={onClick}>
+    <Button
+      variant="ghost"
+      density="adaptive"
+      className="w-full justify-start"
+      onClick={onClick}
+    >
       <LogOut data-icon="inline-start" />
       <Trans>退出对局</Trans>
     </Button>

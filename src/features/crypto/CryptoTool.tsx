@@ -1,276 +1,143 @@
-import { useState } from "react";
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { ArrowDownUp, Binary, Eraser, LockKeyhole } from "lucide-react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ArrowDownUp, Eraser, Info } from "lucide-react";
 import { toast } from "sonner";
+import AppPageLayout from "~/components/AppPageLayout";
 import { CopyButton } from "~/components/CopyButton";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Textarea } from "~/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import {
-  type Base64Variant,
-  decodeBase64,
-  encodeBase64,
-} from "~/features/crypto/base64";
-type CryptoAlgorithm = "base64";
-type CryptoMode = "encode" | "decode";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { describeError } from "~/lib/errors";
+import CryptoTextPanel from "./CryptoTextPanel";
+import { useCrypto } from "./use-crypto";
+
 export default function CryptoTool() {
   const { t } = useLingui();
-  const [algorithm, setAlgorithm] = useState<CryptoAlgorithm>("base64");
-  const [mode, setMode] = useState<CryptoMode>("encode");
-  const [urlSafe, setUrlSafe] = useState(false);
-  const [input, setInput] = useState("");
-  const variant: Base64Variant = urlSafe ? "url-safe" : "standard";
-  const outcome = (() => {
-    if (!input) {
-      return {
-        ok: true as const,
-        value: "",
-      };
-    }
-    if (algorithm !== "base64") {
-      return {
-        ok: false as const,
-        error: "unsupported" as const,
-      };
-    }
-    return mode === "encode"
-      ? encodeBase64(input, variant)
-      : decodeBase64(input, variant);
-  })();
-  const output = outcome.ok ? outcome.value : "";
-  const errorMessage = !outcome.ok
-    ? outcome.error === "invalid-base64"
-      ? t`内容无效，无法解码`
-      : outcome.error === "encode-failed"
-        ? t`编码失败`
-        : t`暂不支持该算法`
-    : null;
-  function clearAll() {
-    setInput("");
-  }
-  function swapInputOutput() {
-    if (!outcome.ok || !output) return;
-    setInput(output);
-    setMode((current) => (current === "encode" ? "decode" : "encode"));
-  }
+  const crypto = useCrypto();
   return (
-    <main className="bg-background text-foreground flex h-full flex-col">
-      <ToolPageHeader
-        title={<Trans>加解密</Trans>}
-        trailing={
-          <Badge variant="outline">
-            <Trans>本地处理</Trans>
-          </Badge>
-        }
-      />
-
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-2">
-              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
-                <LockKeyhole className="size-4" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="truncate text-sm font-semibold">
-                  <Trans>加解密</Trans>
-                </h1>
-                <p className="text-muted-foreground truncate text-xs">
-                  <Trans>选择算法对文本进行编码或解码</Trans>
-                </p>
-              </div>
-            </div>
-            <div className="flex max-w-full items-center gap-1.5 overflow-x-auto">
+    <AppPageLayout
+      adaptiveDensity
+      bottomInset="scroll"
+      title={<Trans>加解密</Trans>}
+      contentClassName="flex flex-col gap-3"
+    >
+      <div className="flex flex-wrap items-center gap-3">
+        <Field orientation="horizontal" className="w-auto">
+          <FieldLabel htmlFor="crypto-algorithm">
+            <Trans>算法</Trans>
+          </FieldLabel>
+          <Select value="base64">
+            <SelectTrigger
+              id="crypto-algorithm"
+              density="adaptive"
+              aria-label={t`选择算法`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="base64">Base64</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Tabs
+          value={crypto.mode}
+          onValueChange={(value) => {
+            if (value === "encode" || value === "decode") crypto.setMode(value);
+          }}
+        >
+          <TabsList density="adaptive" aria-label={t`模式`}>
+            <TabsTrigger value="encode">
+              <Trans>编码</Trans>
+            </TabsTrigger>
+            <TabsTrigger value="decode">
+              <Trans>解码</Trans>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        <CryptoTextPanel
+          id="crypto-input"
+          label={<Trans>输入</Trans>}
+          value={crypto.input}
+          onChange={crypto.setInput}
+          placeholder={
+            crypto.mode === "encode" ? t`输入要编码的文本` : t`输入要解码的内容`
+          }
+          error={crypto.error}
+          actions={
+            <Button
+              density="adaptive"
+              variant="outline"
+              size="sm"
+              disabled={!crypto.input}
+              onClick={() => crypto.setInput("")}
+            >
+              <Eraser />
+              <Trans>清空</Trans>
+            </Button>
+          }
+        />
+        <CryptoTextPanel
+          id="crypto-output"
+          label={<Trans>结果</Trans>}
+          value={crypto.output}
+          placeholder={t`结果会实时显示在这里`}
+          actions={
+            <>
               <Button
+                density="adaptive"
                 variant="outline"
                 size="sm"
-                onClick={swapInputOutput}
-                disabled={!outcome.ok || !output}
+                disabled={!crypto.output || !!crypto.error}
+                onClick={crypto.swap}
                 title={t`将结果写回输入并切换模式`}
               >
-                <ArrowDownUp data-icon="inline-start" />
+                <ArrowDownUp />
                 <Trans>互换</Trans>
               </Button>
-              <Button
+              <CopyButton
                 variant="outline"
                 size="sm"
-                onClick={clearAll}
-                disabled={!input}
-              >
-                <Eraser data-icon="inline-start" />
-                <Trans>清空</Trans>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] lg:items-end">
-            <Field>
-              <FieldLabel>
-                <Trans>算法</Trans>
-              </FieldLabel>
-              <Select
-                value={algorithm}
-                onValueChange={(value) => {
-                  if (value === "base64") setAlgorithm(value);
-                }}
-              >
-                <SelectTrigger className="w-full" aria-label={t`选择算法`}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="base64">
-                    <span className="flex items-center gap-1.5">
-                      <Binary className="size-3.5" />
-                      Base64
-                    </span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field>
-              <FieldLabel>
-                <Trans>模式</Trans>
-              </FieldLabel>
-              <ToggleGroup
-                type="single"
-                value={mode}
-                onValueChange={(value) => {
-                  if (value === "encode" || value === "decode") {
-                    setMode(value);
-                  }
-                }}
-                variant="outline"
-                className="w-full"
-              >
-                <ToggleGroupItem value="encode" className="flex-1">
-                  <Trans>编码</Trans>
-                </ToggleGroupItem>
-                <ToggleGroupItem value="decode" className="flex-1">
-                  <Trans>解码</Trans>
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </Field>
-
-            {algorithm === "base64" ? (
-              <Field orientation="horizontal" className="lg:pb-1">
-                <Checkbox
-                  id="crypto-url-safe"
-                  checked={urlSafe}
-                  onCheckedChange={(checked) => setUrlSafe(checked === true)}
-                />
-                <div className="min-w-0">
-                  <FieldLabel htmlFor="crypto-url-safe">
-                    <Trans>URL Safe</Trans>
-                  </FieldLabel>
-                  <FieldDescription>
-                    <Trans>使用 -_ 替换 +/，并省略填充</Trans>
-                  </FieldDescription>
-                </div>
-              </Field>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="grid min-h-0 flex-1 gap-2 md:grid-cols-2">
-          <div className="border-border bg-card flex min-h-56 flex-col gap-1.5 rounded-lg border p-2.5">
-            <div className="flex items-center justify-between gap-2">
-              <label
-                htmlFor="crypto-input"
-                className="text-muted-foreground text-xs font-medium"
-              >
-                <Trans>输入</Trans>
-              </label>
-              <div className="flex items-center gap-1">
-                <Badge variant="outline">
-                  <Plural
-                    value={{
-                      characterCount: input.length,
-                    }}
-                    one="# 个字符"
-                    other="# 个字符"
-                  />
-                </Badge>
-                <CopyButton
-                  variant="ghost"
-                  size="icon-xs"
-                  value={input}
-                  disabled={!input}
-                  label={t`复制输入`}
-                  copiedLabel={t`已复制输入`}
-                  onError={(error) => toast.error(String(error))}
-                />
-              </div>
-            </div>
-            <Textarea
-              id="crypto-input"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder={
-                mode === "encode" ? t`输入要编码的文本` : t`输入要解码的内容`
-              }
-              className="min-h-0 flex-1 resize-none font-mono text-sm"
-              aria-invalid={!!errorMessage}
-            />
-          </div>
-
-          <div className="border-border bg-card flex min-h-56 flex-col gap-1.5 rounded-lg border p-2.5">
-            <div className="flex items-center justify-between gap-2">
-              <label
-                htmlFor="crypto-output"
-                className="text-muted-foreground text-xs font-medium"
-              >
-                <Trans>输出</Trans>
-              </label>
-              <div className="flex items-center gap-1">
-                {errorMessage ? (
-                  <Badge variant="destructive">{errorMessage}</Badge>
-                ) : (
-                  <Badge variant="outline">
-                    <Plural
-                      value={{
-                        characterCount: output.length,
-                      }}
-                      one="# 个字符"
-                      other="# 个字符"
-                    />
-                  </Badge>
-                )}
-                <CopyButton
-                  variant="ghost"
-                  size="icon-xs"
-                  value={output}
-                  disabled={!output}
-                  label={t`复制输出`}
-                  copiedLabel={t`已复制输出`}
-                  onError={(error) => toast.error(String(error))}
-                />
-              </div>
-            </div>
-            <Textarea
-              id="crypto-output"
-              value={output}
-              readOnly
-              placeholder={t`结果会实时显示在这里`}
-              className="min-h-0 flex-1 resize-none font-mono text-sm"
-              aria-invalid={!!errorMessage}
-            />
-          </div>
-        </section>
+                value={crypto.output}
+                disabled={!crypto.output}
+                showLabel
+                label={t`复制结果`}
+                onError={(error) => toast.error(describeError(error))}
+              />
+            </>
+          }
+        />
       </div>
-    </main>
+      <Field orientation="horizontal">
+        <Checkbox
+          id="crypto-url-safe"
+          checked={crypto.urlSafe}
+          onCheckedChange={(value) => crypto.setUrlSafe(value === true)}
+        />
+        <div>
+          <FieldLabel htmlFor="crypto-url-safe">
+            <Trans>使用 URL 安全字符</Trans>
+          </FieldLabel>
+          <FieldDescription>
+            <Trans>使用 -_ 替换 +/，并省略填充</Trans>
+          </FieldDescription>
+        </div>
+      </Field>
+      <p className="text-muted-foreground flex items-center gap-2 pb-3 text-xs">
+        <Info className="size-4 shrink-0" />
+        <Trans>内容在本机实时处理。</Trans>
+      </p>
+    </AppPageLayout>
   );
 }

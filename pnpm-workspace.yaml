@@ -1,3 +1,8 @@
 allowBuilds:
   esbuild: true
   simple-git-hooks: true
+
+# @codemirror/state 被间接依赖锁在 6.7.1，而直接依赖是 ^6.7.4;
+# 两份实例会让 instanceof 校验失败,必须收敛到同一版本。
+overrides:
+  "@codemirror/state": "$@codemirror/state"

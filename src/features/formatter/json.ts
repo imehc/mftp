@@ -80,7 +80,8 @@ function sortValueKeys(value: unknown, direction: SortDirection): unknown {
     const record = value as Record<string, unknown>;
     const keys = Object.keys(record).sort();
     if (direction === "desc") keys.reverse();
-    const sorted: Record<string, unknown> = {};
+    // JSON 允许 __proto__ 等键；无原型对象避免赋值时把合法字段当作原型设置器。
+    const sorted: Record<string, unknown> = Object.create(null);
     for (const key of keys) {
       sorted[key] = sortValueKeys(record[key], direction);
     }

@@ -31,34 +31,24 @@ function PoemCard({ poem, query, active, onSelect }: PoemCardProps) {
       type="button"
       onClick={() => onSelect(poem.uid)}
       aria-label={poem.title}
+      aria-current={active ? "true" : undefined}
       className={cn(
-        "flex h-full w-full flex-col gap-1 rounded-lg border px-3 py-2.5 text-left transition-[translate,box-shadow] duration-100 hover:-translate-y-px hover:shadow-md",
-        active ? "border-primary/60 bg-accent" : "border-border bg-card",
+        "hover:bg-accent focus-visible:outline-ring flex w-full min-w-0 flex-col gap-1.5 rounded-lg px-3 py-3 text-left transition-colors",
+        active && "bg-accent",
       )}
     >
-      <div className="flex min-w-0 items-baseline justify-between gap-2">
-        <span className="truncate text-sm font-medium">
-          <Highlight text={poem.title} query={query} />
-        </span>
-        {poem.dynasty ? (
-          <span className="text-muted-foreground shrink-0 text-xs">
-            {poem.author ? `${poem.author}·` : ""}
-            {poem.dynasty}
-          </span>
-        ) : (
-          poem.author && (
-            <span className="text-muted-foreground shrink-0 text-xs">
-              {poem.author}
-            </span>
-          )
-        )}
-      </div>
-      <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
+      <span className="line-clamp-2 text-sm font-semibold break-words">
+        <Highlight text={poem.title} query={query} />
+      </span>
+      <span
+        className="text-muted-foreground block max-w-full truncate text-xs"
+        title={poem.collectionName}
+      >
+        {[poem.author, poem.dynasty].filter(Boolean).join(" · ")}
+      </span>
+      <p className="text-muted-foreground line-clamp-1 text-xs leading-relaxed">
         <Highlight text={poem.excerpt} query={query} />
       </p>
-      <span className="text-muted-foreground/70 mt-auto truncate pt-1 text-[11px]">
-        {poem.collectionName}
-      </span>
     </button>
   );
 }

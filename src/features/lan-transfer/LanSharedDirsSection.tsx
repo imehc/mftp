@@ -73,7 +73,7 @@ export default function LanSharedDirsSection({
                   size="icon-xs"
                   title={t`删除共享目录`}
                   aria-label={t`删除共享目录`}
-                  className="max-sm:min-h-11 max-sm:min-w-11"
+                  className="max-md:min-h-11 max-md:min-w-11"
                   onClick={() => void deleteShare(share.id)}
                 >
                   <Trash2 className="text-destructive" />

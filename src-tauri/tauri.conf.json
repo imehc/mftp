@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "mftp",
-        "width": 800,
-        "height": 600
+        "width": 880,
+        "height": 640
       }
     ],
     "security": {

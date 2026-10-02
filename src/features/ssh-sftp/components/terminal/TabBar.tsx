@@ -1,160 +1,111 @@
-import { useState } from "react";
-import { useLingui } from "@lingui/react/macro";
-import {
-  ChevronDown,
-  FolderOpen,
-  Gauge,
-  LoaderCircle,
-  TerminalSquare,
-  X,
-} from "lucide-react";
+import { useState, type Ref } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { useSessionsStore } from "~/store/sessions";
 import type { Session } from "~/types";
+import { Button } from "~/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { cn } from "cn";
-const statusColor: Record<string, string> = {
-  connecting: "bg-yellow-500",
-  connected: "bg-green-500",
-  closed: "bg-muted-foreground",
-  error: "bg-destructive",
-};
-interface ViewOption {
-  view: Session["view"];
-  icon: typeof TerminalSquare;
-  label: string;
-}
-export default function TabBar() {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { describeError } from "~/lib/errors";
+
+export default function TabBar({
+  onHosts,
+  actionRef,
+}: {
+  onHosts: () => void;
+  actionRef: Ref<HTMLDivElement>;
+}) {
   const { t } = useLingui();
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
   const setActive = useSessionsStore((s) => s.setActive);
   const setView = useSessionsStore((s) => s.setView);
   const closeSession = useSessionsStore((s) => s.closeSession);
-  const [closingIds, setClosingIds] = useState<Set<string>>(() => new Set());
-  async function closeTab(id: string) {
-    setClosingIds((current) => new Set(current).add(id));
-    try {
-      await closeSession(id);
-    } finally {
-      setClosingIds((current) => {
-        const next = new Set(current);
-        next.delete(id);
-        return next;
-      });
-    }
-  }
-  if (sessions.length === 0) return null;
-  const viewOptions: ViewOption[] = [
-    {
-      view: "terminal",
-      icon: TerminalSquare,
-      label: t`终端`,
-    },
-    {
-      view: "sftp",
-      icon: FolderOpen,
-      label: t`文件管理`,
-    },
-    {
-      view: "monitor",
-      icon: Gauge,
-      label: t`系统监控`,
-    },
-  ];
+  const [closing, setClosing] = useState(false);
+  const active = sessions.find((session) => session.id === activeId);
+  if (!active) return null;
+  const statuses = {
+    connecting: t`连接中`,
+    connected: t`已连接`,
+    closed: t`已断开`,
+    error: t`失败`,
+  };
   return (
-    <div className="border-border bg-sidebar flex h-9 items-stretch gap-1 border-b px-1.5">
-      <div className="flex flex-1 items-stretch gap-1 overflow-x-auto py-1">
-        {sessions.map((s) => {
-          const isClosing = closingIds.has(s.id);
-          const { icon: ViewIcon, label: viewLabel } =
-            viewOptions.find((option) => option.view === s.view) ??
-            viewOptions[0];
-          return (
-            <div
-              key={s.id}
-              onClick={() => setActive(s.id)}
-              className={cn(
-                "group flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 text-xs",
-                s.id === activeId
-                  ? "border-border bg-background"
-                  : "text-muted-foreground hover:bg-sidebar-accent border-transparent",
-              )}
+    <div className="shrink-0 border-b">
+      <div className="flex min-h-11 items-center gap-2 border-b px-3">
+        <Select value={active.id} onValueChange={setActive}>
+          <SelectTrigger
+            density="adaptive"
+            className="max-w-64 min-w-0 flex-1"
+            aria-label={t`选择连接`}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="ui-density-adaptive">
+            {sessions.map((session) => (
+              <SelectItem key={session.id} value={session.id}>
+                {session.title} · {statuses[session.status]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={t`打开主机列表`}
+          onClick={onHosts}
+        >
+          <Plus />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="ml-auto"
+          aria-label={t`关闭连接`}
+          disabled={closing}
+          onClick={async () => {
+            setClosing(true);
+            try {
+              await closeSession(active.id);
+            } catch (error) {
+              toast.error(describeError(error));
+            } finally {
+              setClosing(false);
+            }
+          }}
+        >
+          <X />
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 px-3 py-1">
+        <Tabs
+          value={active.view}
+          onValueChange={(view) => setView(active.id, view as Session["view"])}
+          className="min-w-0"
+        >
+          <TabsList density="adaptive" aria-label={t`连接视图`}>
+            <TabsTrigger value="terminal">
+              <Trans>终端</Trans>
+            </TabsTrigger>
+            <TabsTrigger value="sftp" disabled={active.status !== "connected"}>
+              <Trans>文件</Trans>
+            </TabsTrigger>
+            <TabsTrigger
+              value="monitor"
+              disabled={active.status !== "connected"}
             >
-              {isClosing ? (
-                <LoaderCircle className="text-muted-foreground size-3 shrink-0 animate-spin" />
-              ) : (
-                <span
-                  className={cn(
-                    "size-1.5 shrink-0 rounded-full",
-                    statusColor[s.status] ?? "bg-muted-foreground",
-                  )}
-                />
-              )}
-              <span className="max-w-32 truncate">{s.title}</span>
-
-              {s.status === "connected" && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      title={viewLabel}
-                      aria-label={t`切换视图：${viewLabel}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="hover:bg-muted flex items-center gap-0.5 rounded p-0.5 opacity-60 hover:opacity-100"
-                      disabled={isClosing}
-                    >
-                      <ViewIcon className="size-3.5" />
-                      <ChevronDown className="size-2.5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-36">
-                    {viewOptions.map(({ view, icon: Icon, label }) => (
-                      <DropdownMenuItem
-                        key={view}
-                        onSelect={() => setView(s.id, view)}
-                        className={cn(
-                          view === s.view && "bg-accent text-accent-foreground",
-                        )}
-                      >
-                        <Icon className="size-3.5" />
-                        {label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-
-              <button
-                title={
-                  isClosing
-                    ? t`关闭中`
-                    : t({
-                        context: "action",
-                        comment: "Button that closes an SSH session tab",
-                        message: "关闭",
-                      })
-                }
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void closeTab(s.id);
-                }}
-                className="hover:bg-muted rounded p-0.5 opacity-50 hover:opacity-100 disabled:opacity-50"
-                disabled={isClosing}
-              >
-                {isClosing ? (
-                  <LoaderCircle className="size-3.5 animate-spin" />
-                ) : (
-                  <X className="size-3.5" />
-                )}
-              </button>
-            </div>
-          );
-        })}
+              <Trans>监控</Trans>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div ref={actionRef} className="flex items-center gap-2" />
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
 import { GameResultBar } from "../engine/GameResultBar";
+import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { gomokuAiStrategy } from "./ai";
 import { playFinishSound, playStoneSound } from "./audio";
 import { GomokuStage } from "./GomokuStage";
@@ -205,69 +206,81 @@ export function GomokuMatchView({
   const seatNameValue = seatName(mode, state.turnSeat, online);
   return (
     <>
-      <div className="border-border border-b px-2 py-1 text-xs">
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {state.finished ? (
-            <Badge variant="secondary">
-              {matchResultLabel(mode, snapshot.winnerSeat, online)}
-            </Badge>
-          ) : (
-            <Badge variant="secondary">
+      {!showResult ? (
+        <BoardMatchLayout
+          title={
+            state.finished ? (
+              matchResultLabel(mode, snapshot.winnerSeat, online)
+            ) : (
               <Trans>轮到 {seatNameValue}</Trans>
-            </Badge>
-          )}
-          <Badge variant="outline">
-            <Plural
-              value={{
-                moveNumber: state.moveCount + (state.finished ? 0 : 1),
-              }}
-              one="第 # 手"
-              other="第 # 手"
-            />
-          </Badge>
-          {aiThinking ? (
-            <Badge variant="outline">
-              <Trans>AI 思考中…</Trans>
-            </Badge>
-          ) : null}
-          {online &&
-          !state.finished &&
-          snapshot.phase === "awaiting-move" &&
-          snapshot.activeSeat !== online.localSeat ? (
-            <Badge variant="outline">
-              <Trans>等待对方落子…</Trans>
-            </Badge>
-          ) : null}
-          {online?.undoWaiting ? (
-            <Badge variant="outline">
-              <Trans>等待对方同意悔棋…</Trans>
-            </Badge>
-          ) : null}
-          <Button
-            variant="outline"
-            size="xs"
-            disabled={!canUndo}
-            onClick={() =>
-              online ? online.onRequestUndo(undoPlies) : runner.undo(undoPlies)
-            }
-          >
-            <Undo2 data-icon="inline-start" />
-            <Trans>悔棋</Trans>
-          </Button>
-        </div>
-      </div>
-      <div className="relative z-0 min-h-0 flex-1 overflow-hidden p-1.5">
-        <GomokuStage
-          board={state.board}
-          lastMove={state.lastMove}
-          winningLine={state.winningLine}
-          ghostSeat={state.turnSeat}
-          interactive={activeIsLocal && !state.finished}
-          onPlay={(move) => local.submit(move)}
-        />
-      </div>
+            )
+          }
+          mode={mode}
+          localSeat={localSeat}
+          finished={state.finished && showResult}
+          status={
+            <>
+              <Badge variant="outline">
+                <Plural
+                  value={{
+                    moveNumber: state.moveCount + (state.finished ? 0 : 1),
+                  }}
+                  one="第 # 手"
+                  other="第 # 手"
+                />
+              </Badge>
+              {aiThinking ? (
+                <Badge variant="outline">
+                  <Trans>AI 思考中…</Trans>
+                </Badge>
+              ) : null}
+              {online &&
+              !state.finished &&
+              snapshot.phase === "awaiting-move" &&
+              snapshot.activeSeat !== online.localSeat ? (
+                <Badge variant="outline">
+                  <Trans>等待对方落子…</Trans>
+                </Badge>
+              ) : null}
+              {online?.undoWaiting ? (
+                <Badge variant="outline">
+                  <Trans>等待对方同意悔棋…</Trans>
+                </Badge>
+              ) : null}
+            </>
+          }
+          controls={
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                density="adaptive"
+                disabled={!canUndo}
+                onClick={() =>
+                  online
+                    ? online.onRequestUndo(undoPlies)
+                    : runner.undo(undoPlies)
+                }
+              >
+                <Undo2 data-icon="inline-start" />
+                <Trans>悔棋</Trans>
+              </Button>
+            </>
+          }
+        >
+          <GomokuStage
+            board={state.board}
+            lastMove={state.lastMove}
+            winningLine={state.winningLine}
+            ghostSeat={state.turnSeat}
+            interactive={activeIsLocal && !state.finished}
+            onPlay={(move) => local.submit(move)}
+          />
+        </BoardMatchLayout>
+      ) : null}
       {state.finished && showResult ? (
         <GameResultBar
+          presentation="page"
           title={matchResultLabel(mode, snapshot.winnerSeat, online)}
           details={
             <Plural

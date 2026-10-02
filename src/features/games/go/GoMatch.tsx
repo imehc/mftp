@@ -13,6 +13,7 @@ import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
 import { GameResultBar } from "../engine/GameResultBar";
+import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { goAiStrategy } from "./ai";
 import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
 import { GoStage } from "./GoStage";
@@ -224,104 +225,117 @@ export function GoMatchView({
   const value2 = state.captures[1];
   return (
     <>
-      <div className="border-border border-b px-2 py-1 text-xs">
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {state.finished ? (
-            <Badge variant="secondary">
-              {matchResultLabel(mode, snapshot.winnerSeat, online)}
-            </Badge>
-          ) : (
-            <Badge variant="secondary">
+      {!showResult ? (
+        <BoardMatchLayout
+          title={
+            state.finished ? (
+              matchResultLabel(mode, snapshot.winnerSeat, online)
+            ) : (
               <Trans>轮到 {seatNameValue}</Trans>
-            </Badge>
-          )}
-          <Badge variant="outline">
-            <Plural
-              value={{
-                moveNumber: state.moveCount + (state.finished ? 0 : 1),
-              }}
-              one="第 # 手"
-              other="第 # 手"
-            />
-          </Badge>
-          <Badge variant="outline">
-            <Trans>
-              提子 {value}:{value2}
-            </Trans>
-          </Badge>
-          {state.finished && state.finalScore ? (
-            <Badge variant="outline">{scoreLine(state)}</Badge>
-          ) : null}
-          {aiThinking ? (
-            <Badge variant="outline">
-              <Trans>AI 思考中…</Trans>
-            </Badge>
-          ) : null}
-          {online &&
-          !state.finished &&
-          snapshot.phase === "awaiting-move" &&
-          snapshot.activeSeat !== online.localSeat ? (
-            <Badge variant="outline">
-              <Trans>等待对方落子…</Trans>
-            </Badge>
-          ) : null}
-          {online?.undoWaiting ? (
-            <Badge variant="outline">
-              <Trans>等待对方同意悔棋…</Trans>
-            </Badge>
-          ) : null}
-          {state.consecutivePasses === 1 && !state.finished ? (
-            <Badge variant="outline">
-              <Trans>上一手已停手：再停一手即终局，落子则重新计数</Trans>
-            </Badge>
-          ) : null}
-          <Button
-            variant="outline"
-            size="xs"
-            disabled={!activeIsLocal || state.finished}
-            title={t`停一手`}
-            onClick={submitPass}
-          >
-            <Flag data-icon="inline-start" />
-            <Trans>停一手</Trans>
-          </Button>
-          <Button
-            variant="outline"
-            size="xs"
-            disabled={!canUndo}
-            onClick={() =>
-              online ? online.onRequestUndo(undoPlies) : runner.undo(undoPlies)
-            }
-          >
-            <Undo2 data-icon="inline-start" />
-            <Trans>悔棋</Trans>
-          </Button>
-        </div>
-      </div>
-      <div className="relative z-0 min-h-0 flex-1 overflow-hidden p-1.5">
-        <GoStage
-          boardSize={state.boardSize}
-          board={state.board}
-          lastMove={state.lastMove}
-          ghostSeat={state.turnSeat}
-          interactive={activeIsLocal && !state.finished}
-          legalPoints={legalPoints}
-          onPlay={(move) => {
-            if (move.kind !== "play") return;
-            const index = cellIndex(state.boardSize, move.row, move.col);
-            if (legalPoints[index]) local.submit(move);
-          }}
-        />
-      </div>
+            )
+          }
+          mode={mode}
+          localSeat={localSeat}
+          finished={state.finished && showResult}
+          status={
+            <>
+              <Badge variant="outline">
+                <Plural
+                  value={{
+                    moveNumber: state.moveCount + (state.finished ? 0 : 1),
+                  }}
+                  one="第 # 手"
+                  other="第 # 手"
+                />
+              </Badge>
+              <Badge variant="outline">
+                <Trans>
+                  提子 {value}:{value2}
+                </Trans>
+              </Badge>
+              {state.finished && state.finalScore ? (
+                <Badge variant="outline">{scoreLine(state)}</Badge>
+              ) : null}
+              {aiThinking ? (
+                <Badge variant="outline">
+                  <Trans>AI 思考中…</Trans>
+                </Badge>
+              ) : null}
+              {online &&
+              !state.finished &&
+              snapshot.phase === "awaiting-move" &&
+              snapshot.activeSeat !== online.localSeat ? (
+                <Badge variant="outline">
+                  <Trans>等待对方落子…</Trans>
+                </Badge>
+              ) : null}
+              {online?.undoWaiting ? (
+                <Badge variant="outline">
+                  <Trans>等待对方同意悔棋…</Trans>
+                </Badge>
+              ) : null}
+              {state.consecutivePasses === 1 && !state.finished ? (
+                <Badge variant="outline">
+                  <Trans>上一手已停手：再停一手即终局，落子则重新计数</Trans>
+                </Badge>
+              ) : null}
+            </>
+          }
+          controls={
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                density="adaptive"
+                disabled={!activeIsLocal || state.finished}
+                title={t`停一手`}
+                onClick={submitPass}
+              >
+                <Flag data-icon="inline-start" />
+                <Trans>停一手</Trans>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                density="adaptive"
+                disabled={!canUndo}
+                onClick={() =>
+                  online
+                    ? online.onRequestUndo(undoPlies)
+                    : runner.undo(undoPlies)
+                }
+              >
+                <Undo2 data-icon="inline-start" />
+                <Trans>悔棋</Trans>
+              </Button>
+            </>
+          }
+        >
+          <GoStage
+            boardSize={state.boardSize}
+            board={state.board}
+            lastMove={state.lastMove}
+            ghostSeat={state.turnSeat}
+            interactive={activeIsLocal && !state.finished}
+            legalPoints={legalPoints}
+            onPlay={(move) => {
+              if (move.kind !== "play") return;
+              const index = cellIndex(state.boardSize, move.row, move.col);
+              if (legalPoints[index]) local.submit(move);
+            }}
+          />
+        </BoardMatchLayout>
+      ) : null}
       {state.finished && showResult ? (
         <GameResultBar
+          presentation="page"
           title={matchResultLabel(mode, snapshot.winnerSeat, online)}
           celebrate={
             snapshot.winnerSeat !== null &&
             (mode.kind === "hotseat" || snapshot.winnerSeat === localSeat)
           }
           details={
-            <span className="flex flex-wrap justify-center gap-x-2 sm:justify-start">
+            <span className="flex flex-wrap justify-center gap-x-2 md:justify-start">
               {state.finalScore ? <span>{scoreLine(state)}</span> : null}
               <Plural
                 value={{

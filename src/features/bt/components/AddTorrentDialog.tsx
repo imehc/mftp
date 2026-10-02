@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FolderOpen, LoaderCircle, Magnet } from "lucide-react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
@@ -6,18 +6,19 @@ import { toast } from "sonner";
 import type { BtProbeResult, BtTaskInfo } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { formatBytes } from "~/lib/format";
-import { cn } from "cn";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { Label } from "~/components/ui/label";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import TorrentFileList from "./TorrentFileList";
+import { describeError } from "~/lib/errors";
 export interface AddTorrentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,6 +56,13 @@ export default function AddTorrentDialog({
   allowExistingTask = false,
 }: AddTorrentDialogProps) {
   const { t } = useLingui();
+  const requests = useRef({ generation: 0, probing: false, starting: false });
+  useEffect(() => {
+    const state = requests.current;
+    return () => {
+      state.generation++;
+    };
+  }, []);
   const [source, setSource] = useState("");
   const [probing, setProbing] = useState(false);
   const [probe, setProbe] = useState<BtProbeResult | null>(null);
@@ -72,13 +80,17 @@ export default function AddTorrentDialog({
     setProbeFailed(false);
   };
   const close = () => {
+    if (requests.current.starting) return;
+    requests.current.generation++;
+    requests.current.probing = false;
     onOpenChange(false);
-    // 延后重置，避免关闭动画期间内容闪成空白。
-    setTimeout(reset, 200);
   };
   const doProbe = async (raw: string) => {
     const trimmed = raw.trim();
-    if (!trimmed) return;
+    if (!trimmed || requests.current.probing || requests.current.starting)
+      return;
+    requests.current.probing = true;
+    const generation = ++requests.current.generation;
     const apply = (result: BtProbeResult) => {
       setProbe(result);
       // 默认全选所有文件。
@@ -88,30 +100,41 @@ export default function AddTorrentDialog({
     setProbing(true);
     try {
       const result = await ipc.btProbe(trimmed);
-      apply(result);
+      if (generation === requests.current.generation) apply(result);
     } catch (error) {
+      if (generation !== requests.current.generation) return;
       setProbeFailed(true);
       toast.error(t`获取资源信息失败`, {
-        description: String(error),
+        description: describeError(error),
       });
     } finally {
-      setProbing(false);
+      if (generation === requests.current.generation) {
+        requests.current.probing = false;
+        setProbing(false);
+      }
     }
   };
   const pickTorrent = async () => {
-    const picked = await openDialog({
-      multiple: false,
-      directory: false,
-      filters: [
-        {
-          name: "Torrent",
-          extensions: ["torrent"],
-        },
-      ],
-    });
-    if (typeof picked === "string") {
-      setSource(picked);
-      await doProbe(picked);
+    const generation = requests.current.generation;
+    try {
+      const picked = await openDialog({
+        multiple: false,
+        directory: false,
+        filters: [
+          {
+            name: "Torrent",
+            extensions: ["torrent"],
+          },
+        ],
+      });
+      if (generation !== requests.current.generation) return;
+      if (typeof picked === "string") {
+        setSource(picked);
+        await doProbe(picked);
+      }
+    } catch (error) {
+      if (generation === requests.current.generation)
+        toast.error(t`获取资源信息失败`, { description: describeError(error) });
     }
   };
 
@@ -119,9 +142,14 @@ export default function AddTorrentDialog({
   // source 是普通字符串，在 BT 页轮询重渲染时保持稳定。
   const doProbeOnOpen = useEffectEvent(doProbe);
   useEffect(() => {
-    if (!open || !initialSource) return;
+    if (!open) return;
+    let disposed = false;
     // 用微任务延后，使重置发生在 effect 函数体之外。
     queueMicrotask(() => {
+      if (disposed) return;
+      reset();
+      requests.current.probing = false;
+      if (!initialSource) return;
       setProbe(null);
       setSource(initialSource);
       if (initialProbe) {
@@ -136,6 +164,11 @@ export default function AddTorrentDialog({
       // 没有首次解析结果时才允许走普通探测路径。
       void doProbeOnOpen(initialSource);
     });
+    const state = requests.current;
+    return () => {
+      disposed = true;
+      state.generation++;
+    };
   }, [initialProbe, initialSelected, initialSource, open]);
   const toggleFile = (index: number) => {
     if (index < 0 || !probe) {
@@ -165,7 +198,15 @@ export default function AddTorrentDialog({
     !allowExistingTask &&
     existingInfoHashes.has(probe.infoHash);
   const startDownload = async () => {
-    if (!probe || selected.size === 0 || duplicateTask) return;
+    if (
+      !probe ||
+      selected.size === 0 ||
+      duplicateTask ||
+      requests.current.starting
+    )
+      return;
+    requests.current.starting = true;
+    const generation = requests.current.generation;
     setStarting(true);
     try {
       const fileIndices = [...selected].sort((a, b) => a - b);
@@ -174,14 +215,17 @@ export default function AddTorrentDialog({
         probe.infoHash,
         fileIndices,
       );
+      if (generation !== requests.current.generation) return;
       onAdded(task, source.trim(), probe, fileIndices);
       toast.success(t`任务已添加，可在传输面板查看进度`);
+      requests.current.starting = false;
       close();
     } catch (error) {
       toast.error(t`添加下载任务失败`, {
-        description: String(error),
+        description: describeError(error),
       });
     } finally {
+      requests.current.starting = false;
       setStarting(false);
     }
   };
@@ -193,133 +237,135 @@ export default function AddTorrentDialog({
       }}
     >
       <DialogContent
-        className={cn(
-          "flex max-h-[85dvh] min-h-0 flex-col overflow-hidden sm:max-w-lg",
-          probe && "h-[min(85dvh,40rem)]",
-        )}
+        placement="responsive-page"
+        showCloseButton={false}
+        className="ui-density-adaptive flex max-h-full min-h-0 flex-col overflow-hidden md:max-w-[30rem]"
       >
-        {/* 从任务行打开时无需标题介绍：标题仅为辅助技术保留，
-            种子名就显示在下方。 */}
-        <DialogHeader className={initialSource ? "sr-only" : undefined}>
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
-            {initialSource ? (
-              (probe?.name ?? <Trans>加载中…</Trans>)
-            ) : (
-              <Trans>添加 BT 任务</Trans>
-            )}
+            {readOnly ? <Trans>查看资源信息</Trans> : <Trans>添加下载</Trans>}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="sr-only">
             <Trans>支持磁力链接与本地 .torrent 文件</Trans>
           </DialogDescription>
-        </DialogHeader>
-
-        {!probe ? (
-          initialSource && !probeFailed ? (
-            <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-xs">
-              <LoaderCircle className="size-3.5 animate-spin" />
-              <Trans>加载中…</Trans>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <div className="flex gap-2">
-                <Input
-                  value={source}
-                  onChange={(e) => setSource(e.target.value)}
-                  placeholder={t`磁力链接`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && source.trim())
-                      void doProbe(source);
-                  }}
-                />
+        </DialogLayoutHeader>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+          {!readOnly ? (
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="bt-source">
+                <Trans>磁力链接</Trans>
+              </Label>
+              <Textarea
+                id="bt-source"
+                rows={3}
+                value={source}
+                disabled={probing || starting}
+                onChange={(event) => {
+                  setSource(event.target.value);
+                  setProbe(null);
+                }}
+                placeholder={t`磁力链接`}
+              />
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
-                  size="icon"
-                  onClick={pickTorrent}
-                  title={t`选择种子文件`}
-                  aria-label={t`选择种子文件`}
+                  fullWidth
+                  disabled={probing || starting}
+                  onClick={() => void pickTorrent()}
                 >
-                  <FolderOpen />
+                  <FolderOpen data-icon="inline-start" />
+                  <Trans>选择种子文件</Trans>
                 </Button>
-              </div>
-              <Button
-                disabled={!source.trim() || probing}
-                onClick={() => void doProbe(source)}
-              >
-                {probing ? (
-                  <LoaderCircle
-                    data-icon="inline-start"
-                    className="animate-spin"
-                  />
-                ) : (
-                  <Magnet data-icon="inline-start" />
-                )}
-                {probing ? t`正在获取资源信息…` : t`解析`}
-              </Button>
-            </div>
-          )
-        ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-4">
-            <div
-              className={cn(
-                "flex shrink-0 items-baseline justify-between gap-2 px-1",
-                // 这里上方没有标题，因此留出空间给对话框
-                // 浮动的关闭按钮。
-                initialSource && "pr-8",
-              )}
-            >
-              <span className="min-w-0 truncate text-sm font-medium">
-                {probe.name}
-              </span>
-              <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
-                {formatBytes(selectedBytes)} / {formatBytes(probe.totalLen)}
-              </span>
-            </div>
-            <div className="min-h-0 flex-1 overflow-hidden">
-              <TorrentFileList
-                files={probe.files}
-                selected={selected}
-                onToggle={toggleFile}
-                readOnly={readOnly}
-              />
-            </div>
-            {readOnly ? null : (
-              // 下载先进入应用私有目录，完成后再由任务操作复制到用户目录。
-              <p className="text-muted-foreground shrink-0 text-xs">
-                <Trans>下载完成后可复制到系统下载目录或其他位置</Trans>
-              </p>
-            )}
-            {duplicateTask ? (
-              <p className="text-destructive shrink-0 text-xs">
-                <Trans>该资源已在下载列表中，不能重复添加</Trans>
-              </p>
-            ) : null}
-            <DialogFooter className="shrink-0">
-              {readOnly ? (
-                <Button onClick={close}>
-                  <Trans>关闭</Trans>
-                </Button>
-              ) : (
-                <>
-                  <Button variant="ghost" onClick={close}>
-                    <Trans>取消</Trans>
-                  </Button>
+                {!probe ? (
                   <Button
-                    disabled={selected.size === 0 || starting || duplicateTask}
-                    onClick={() => void startDownload()}
+                    fullWidth
+                    disabled={!source.trim() || probing || starting}
+                    onClick={() => void doProbe(source)}
                   >
-                    {starting ? (
+                    {probing ? (
                       <LoaderCircle
                         data-icon="inline-start"
                         className="animate-spin"
                       />
-                    ) : null}
-                    <Trans>下载</Trans>
+                    ) : (
+                      <Magnet data-icon="inline-start" />
+                    )}
+                    <Trans>解析</Trans>
                   </Button>
-                </>
-              )}
-            </DialogFooter>
-          </div>
-        )}
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+          {probing ? (
+            <p role="status" className="text-muted-foreground text-sm">
+              <Trans>正在获取资源信息…</Trans>
+            </p>
+          ) : null}
+          {probeFailed ? (
+            <p role="alert" className="text-destructive text-sm">
+              <Trans>获取资源信息失败</Trans>
+            </p>
+          ) : null}
+          {probe ? (
+            <section className="flex min-h-48 shrink-0 flex-col gap-3 rounded-xl border p-3">
+              <h2 className="text-sm font-semibold">
+                <Trans>解析结果</Trans>
+              </h2>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="min-w-0 text-sm font-medium break-words">
+                  {probe.name}
+                </span>
+                <span className="text-muted-foreground text-xs tabular-nums">
+                  {formatBytes(selectedBytes)} / {formatBytes(probe.totalLen)}
+                </span>
+              </div>
+              <div
+                className="min-h-0"
+                style={{
+                  height: `${Math.min(probe.files.length, 6) * 2.75 + 2.5}rem`,
+                }}
+              >
+                <TorrentFileList
+                  files={probe.files}
+                  selected={selected}
+                  onToggle={toggleFile}
+                  readOnly={readOnly || starting}
+                />
+              </div>
+            </section>
+          ) : null}
+          {probe && !readOnly ? (
+            <p className="text-muted-foreground text-xs">
+              <Trans>下载完成后可复制到系统下载目录或其他位置</Trans>
+            </p>
+          ) : null}
+          {duplicateTask ? (
+            <p role="alert" className="text-destructive text-xs">
+              <Trans>该资源已在下载列表中，不能重复添加</Trans>
+            </p>
+          ) : null}
+        </div>
+        <DialogFooter className="shrink-0">
+          <Button variant="outline" disabled={starting} onClick={close}>
+            {readOnly ? <Trans>关闭</Trans> : <Trans>取消</Trans>}
+          </Button>
+          {!readOnly ? (
+            <Button
+              disabled={
+                !probe || selected.size === 0 || starting || duplicateTask
+              }
+              onClick={() => void startDownload()}
+            >
+              {starting ? (
+                <LoaderCircle
+                  data-icon="inline-start"
+                  className="animate-spin"
+                />
+              ) : null}
+              <Trans>开始下载</Trans>
+            </Button>
+          ) : null}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

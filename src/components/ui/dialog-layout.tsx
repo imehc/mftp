@@ -1,5 +1,9 @@
 import * as React from "react";
+import { Trans } from "@lingui/react/macro";
+import { XIcon } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import {
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -27,13 +31,40 @@ function DialogLayoutContent({
 
 function DialogLayoutHeader({
   className,
+  children,
+  showCloseButton = false,
   ...props
-}: React.ComponentProps<typeof DialogHeader>) {
+}: React.ComponentProps<typeof DialogHeader> & { showCloseButton?: boolean }) {
   return (
     <DialogHeader
-      className={cn("border-border border-b pb-3", className)}
+      className={cn(
+        "border-border border-b pr-10 pb-3",
+        showCloseButton && "flex-row items-center justify-between gap-2 pr-0",
+        className,
+      )}
       {...props}
-    />
+    >
+      {showCloseButton ? (
+        <>
+          <div className="min-w-0 flex-1">{children}</div>
+          {/* 同排关闭入口随标题与缩放居中；Content 应关闭默认的绝对定位入口。 */}
+          <DialogClose asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="-my-2 -mr-2 shrink-0"
+            >
+              <XIcon />
+              <span className="sr-only">
+                <Trans>关闭</Trans>
+              </span>
+            </Button>
+          </DialogClose>
+        </>
+      ) : (
+        children
+      )}
+    </DialogHeader>
   );
 }
 

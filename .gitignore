@@ -30,6 +30,7 @@ src-tauri/target
 *.sln
 *.sw?
 .claude/
+.codex/
 .tanstack/
 
 src/locales/**/messages.ts
@@ -41,3 +42,6 @@ src/locales/**/messages.ts
 docs/*
 !docs/android.md
 !docs/ios.md
+!docs/mcp-setup.md
+
+.vitest/

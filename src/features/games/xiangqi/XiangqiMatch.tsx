@@ -9,6 +9,7 @@ import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
 import { GameResultBar } from "../engine/GameResultBar";
+import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { xiangqiAiStrategy } from "./ai";
 import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
 import { matchResultLabel, resultReasonLabel, sideName } from "./labels";
@@ -204,80 +205,93 @@ export function XiangqiMatchView({
   const sideNameValue = sideName(mode, state.turnSeat, online);
   return (
     <>
-      <div className="border-border border-b px-2 py-1 text-xs">
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {state.finished ? (
-            <Badge variant="secondary">
-              {matchResultLabel(mode, snapshot.winnerSeat, online)}
-            </Badge>
-          ) : (
-            <Badge variant="secondary">
+      {!showResult ? (
+        <BoardMatchLayout
+          title={
+            state.finished ? (
+              matchResultLabel(mode, snapshot.winnerSeat, online)
+            ) : (
               <Trans>轮到 {sideNameValue}</Trans>
-            </Badge>
-          )}
-          <Badge variant="outline">
-            <Plural
-              value={{
-                moveNumber: state.moveCount + (state.finished ? 0 : 1),
-              }}
-              one="第 # 手"
-              other="第 # 手"
-            />
-          </Badge>
-          {state.inCheck ? (
-            <Badge className="bg-[#b63a32] text-white">
-              <Trans>将军</Trans>
-            </Badge>
-          ) : null}
-          {aiThinking ? (
-            <Badge variant="outline">
-              <Trans>AI 思考中…</Trans>
-            </Badge>
-          ) : null}
-          {online &&
-          !state.finished &&
-          snapshot.phase === "awaiting-move" &&
-          snapshot.activeSeat !== online.localSeat ? (
-            <Badge variant="outline">
-              <Trans>等待对方落子…</Trans>
-            </Badge>
-          ) : null}
-          {online?.undoWaiting ? (
-            <Badge variant="outline">
-              <Trans>等待对方同意悔棋…</Trans>
-            </Badge>
-          ) : null}
-          <Button
-            variant="outline"
-            size="xs"
-            disabled={!canUndo}
-            onClick={() =>
-              online ? online.onRequestUndo(undoPlies) : runner.undo(undoPlies)
-            }
-          >
-            <Undo2 data-icon="inline-start" />
-            <Trans>悔棋</Trans>
-          </Button>
-        </div>
-      </div>
-      <div className="relative z-0 min-h-0 flex-1 overflow-hidden p-1.5">
-        <XiangqiStage
-          board={state.board}
-          turnSeat={state.turnSeat}
-          legalMoves={currentLegalMoves}
-          lastMove={state.lastMove}
-          inCheck={state.inCheck}
-          interactive={activeIsLocal && !state.finished}
-          flipped={
-            mode.kind === "online"
-              ? online?.localSeat === 1
-              : mode.kind === "ai" && mode.localSeat === 1
+            )
           }
-          onPlay={(move) => local.submit(move)}
-        />
-      </div>
+          mode={mode}
+          localSeat={localSeat}
+          red
+          finished={state.finished && showResult}
+          status={
+            <>
+              <Badge variant="outline">
+                <Plural
+                  value={{
+                    moveNumber: state.moveCount + (state.finished ? 0 : 1),
+                  }}
+                  one="第 # 手"
+                  other="第 # 手"
+                />
+              </Badge>
+              {state.inCheck ? (
+                <Badge className="bg-chess-red text-white">
+                  <Trans>将军</Trans>
+                </Badge>
+              ) : null}
+              {aiThinking ? (
+                <Badge variant="outline">
+                  <Trans>AI 思考中…</Trans>
+                </Badge>
+              ) : null}
+              {online &&
+              !state.finished &&
+              snapshot.phase === "awaiting-move" &&
+              snapshot.activeSeat !== online.localSeat ? (
+                <Badge variant="outline">
+                  <Trans>等待对方落子…</Trans>
+                </Badge>
+              ) : null}
+              {online?.undoWaiting ? (
+                <Badge variant="outline">
+                  <Trans>等待对方同意悔棋…</Trans>
+                </Badge>
+              ) : null}
+            </>
+          }
+          controls={
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                density="adaptive"
+                disabled={!canUndo}
+                onClick={() =>
+                  online
+                    ? online.onRequestUndo(undoPlies)
+                    : runner.undo(undoPlies)
+                }
+              >
+                <Undo2 data-icon="inline-start" />
+                <Trans>悔棋</Trans>
+              </Button>
+            </>
+          }
+        >
+          <XiangqiStage
+            board={state.board}
+            turnSeat={state.turnSeat}
+            legalMoves={currentLegalMoves}
+            lastMove={state.lastMove}
+            inCheck={state.inCheck}
+            interactive={activeIsLocal && !state.finished}
+            flipped={
+              mode.kind === "online"
+                ? online?.localSeat === 1
+                : mode.kind === "ai" && mode.localSeat === 1
+            }
+            onPlay={(move) => local.submit(move)}
+          />
+        </BoardMatchLayout>
+      ) : null}
       {state.finished && showResult ? (
         <GameResultBar
+          presentation="page"
           title={matchResultLabel(mode, snapshot.winnerSeat, online)}
           celebrate={
             snapshot.winnerSeat !== null &&

@@ -1,14 +1,7 @@
-import { useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  BookOpen,
-  ChevronDown,
-  LoaderCircle,
-  Music,
-  Settings2,
-} from "lucide-react";
+import { useId, useState } from "react";
+import { Trans } from "@lingui/react/macro";
+import { BookOpen, LoaderCircle, Music } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import {
   Empty,
   EmptyDescription,
@@ -16,19 +9,21 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { Slider } from "~/components/ui/slider";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "~/components/ui/sheet";
-import { cn } from "cn";
+import { Tabs, TabsContent } from "~/components/ui/tabs";
+import { Separator } from "~/components/ui/separator";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
 import type { PoetryTranslationMode } from "~/bindings";
 import PoetryTranslationSection from "./PoetryTranslationSection";
+import {
+  AnnotationSection,
+  AuthorBioSheet,
+  CollapsibleStrains,
+} from "./PoemAnnotations";
+import ReadingControlsDesktop from "./ReadingControls.desktop";
+import ReadingControlsMobile from "./ReadingControls.mobile";
 interface PoemDetailViewProps {
+  settingsInHeader?: boolean;
   detail: PoemDetailModel | null;
   loading: boolean;
   fontSize: number;
@@ -38,124 +33,11 @@ interface PoemDetailViewProps {
   initialTranslationMode?: PoetryTranslationMode;
   onTranslationModeChange?: (mode: PoetryTranslationMode) => void;
 }
-function AnnotationSection({
-  title,
-  body,
-}: {
-  title: React.ReactNode;
-  body: string;
-}) {
-  if (!body.trim()) return null;
-  return (
-    <section className="space-y-1">
-      <h3 className="text-muted-foreground text-sm font-medium">{title}</h3>
-      <p className="text-sm leading-relaxed whitespace-pre-line">{body}</p>
-    </section>
-  );
-}
-function CollapsibleStrains({ strains }: { strains: string[] }) {
-  const [open, setOpen] = useState(false);
-  if (strains.length === 0) return null;
-  return (
-    <section>
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        aria-expanded={open}
-        className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm"
-      >
-        <ChevronDown
-          className={cn("size-3.5 transition-transform", open && "rotate-180")}
-          aria-hidden
-        />
-        <Trans>平仄</Trans>
-      </button>
-      {open ? (
-        <div className="text-muted-foreground mt-1 font-mono text-xs leading-relaxed">
-          {strains.map((line, index) => (
-            <p key={index}>{line}</p>
-          ))}
-        </div>
-      ) : null}
-    </section>
-  );
-}
-export function AuthorBioSheet({
-  bio,
-  onClose,
-}: {
-  bio: AuthorBio | null;
-  onClose: () => void;
-}) {
-  return (
-    <Sheet open={bio !== null} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent
-        side="right"
-        className="max-sm:inset-x-0 max-sm:top-auto max-sm:right-auto max-sm:bottom-0 max-sm:h-auto max-sm:max-h-[75dvh] max-sm:w-full max-sm:max-w-none max-sm:border-t max-sm:border-l-0 sm:w-[360px] sm:max-w-[85vw]"
-      >
-        <SheetHeader>
-          <SheetTitle>{bio?.name}</SheetTitle>
-          <SheetDescription>{bio?.dynasty}</SheetDescription>
-        </SheetHeader>
-        <p className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 text-sm leading-loose whitespace-pre-line">
-          {bio?.desc || <Trans>暂无作者小传。</Trans>}
-        </p>
-      </SheetContent>
-    </Sheet>
-  );
-}
-interface ReadingSettingsProps {
-  fontSize: number;
-  lineHeight: number;
-  onFontSizeChange: (size: number) => void;
-  onLineHeightChange: (height: number) => void;
-}
-export function ReadingSettingsPopover(props: ReadingSettingsProps) {
-  const [open, setOpen] = useState(false);
-  const { t } = useLingui();
-  return (
-    <div className="relative">
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        aria-label={t`阅读设置`}
-        title={t`阅读设置`}
-        onClick={() => setOpen((value) => !value)}
-      >
-        <Settings2 />
-      </Button>
-      {open ? (
-        <div className="border-border bg-popover absolute top-full right-0 z-20 mt-1 w-56 space-y-3 rounded-md border p-3 font-sans shadow-md">
-          <label className="text-muted-foreground block space-y-1.5 text-xs">
-            <span>{t`字号`}</span>
-            <Slider
-              value={[props.fontSize]}
-              min={14}
-              max={26}
-              step={1}
-              onValueChange={([size]) => props.onFontSizeChange(size)}
-              aria-label={t`字号`}
-            />
-          </label>
-          <label className="text-muted-foreground block space-y-1.5 text-xs">
-            <span>{t`行距`}</span>
-            <Slider
-              value={[props.lineHeight]}
-              min={1.5}
-              max={2.6}
-              step={0.1}
-              onValueChange={([height]) => props.onLineHeightChange(height)}
-              aria-label={t`行距`}
-            />
-          </label>
-        </div>
-      ) : null}
-    </div>
-  );
-}
+
 export default function PoemDetail({
   detail,
   loading,
+  settingsInHeader = false,
   fontSize,
   lineHeight,
   onFontSizeChange,
@@ -163,22 +45,26 @@ export default function PoemDetail({
   initialTranslationMode,
   onTranslationModeChange,
 }: PoemDetailViewProps) {
+  const narrow = !useDesktopLayout();
+  const originalLabelId = useId();
+  const translationLabelId = useId();
+  const [view, setView] = useState(
+    initialTranslationMode ? "translation" : "original",
+  );
   const [bio, setBio] = useState<AuthorBio | null>(null);
-  // 当诗词切换时在渲染期间重置作者简介（React 的“在 prop 变化时
-  // 调整 state”模式），而不是用 effect。
   const [prevUid, setPrevUid] = useState(detail?.uid);
   if (prevUid !== detail?.uid) {
     setPrevUid(detail?.uid);
     setBio(null);
+    setView(initialTranslationMode ? "translation" : "original");
   }
-  if (loading) {
+  if (loading)
     return (
       <div className="text-muted-foreground flex h-full items-center justify-center">
         <LoaderCircle className="size-5 animate-spin" aria-hidden />
       </div>
     );
-  }
-  if (!detail) {
+  if (!detail)
     return (
       <Empty className="h-full">
         <EmptyHeader>
@@ -194,107 +80,153 @@ export default function PoemDetail({
         </EmptyHeader>
       </Empty>
     );
-  }
+  const settings = {
+    fontSize,
+    lineHeight,
+    onFontSizeChange,
+    onLineHeightChange,
+  };
   const annotation = detail.annotation;
   return (
-    <div className="font-poetry flex h-full flex-col">
-      <header className="flex items-start justify-between gap-2 px-5 pt-4">
-        <div className="min-w-0 space-y-1.5">
-          <h2 className="text-lg font-medium tracking-wide">{detail.title}</h2>
-          <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-            {detail.author ? (
-              detail.authorBio && detail.authorBio.desc ? (
+    <Tabs
+      value={view}
+      onValueChange={setView}
+      className="ui-density-adaptive flex h-full min-h-0 flex-col gap-0"
+    >
+      {narrow ? (
+        <ReadingControlsMobile
+          settings={settings}
+          settingsInHeader={settingsInHeader}
+        />
+      ) : null}
+      <div className="app-scroll-safe-end min-h-0 flex-1 overflow-y-auto px-4 md:px-6">
+        <article className="mx-auto flex w-full max-w-prose flex-col gap-6 py-8 md:py-10">
+          <header className="font-poetry flex flex-col items-center gap-3 text-center">
+            <span
+              id={originalLabelId}
+              className="text-muted-foreground text-xs"
+            >
+              {!narrow || view === "original" ? (
+                <Trans>原文</Trans>
+              ) : (
+                <Trans>译文</Trans>
+              )}
+            </span>
+            <h2 className="text-2xl font-semibold tracking-wide break-words">
+              {detail.title}
+            </h2>
+            <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
+              {detail.authorBio?.desc ? (
                 <button
                   type="button"
-                  className="underline-offset-2 hover:underline"
+                  className="hover:underline"
                   onClick={() => setBio(detail.authorBio ?? null)}
                 >
                   {detail.author}
                 </button>
               ) : (
                 <span>{detail.author}</span>
-              )
-            ) : null}
-            {detail.dynasty ? <span>{detail.dynasty}</span> : null}
-            {detail.rhythmic ? (
-              <Badge variant="outline">
-                <Music
-                  data-icon="inline-start"
-                  className="size-3"
-                  aria-hidden
-                />
-                {detail.rhythmic}
-              </Badge>
-            ) : null}
-            {annotation?.hasAudio ? (
-              <Badge variant="outline">
-                <Trans>有朗诵</Trans>
-              </Badge>
-            ) : null}
-          </div>
-        </div>
-        <ReadingSettingsPopover
-          fontSize={fontSize}
-          lineHeight={lineHeight}
-          onFontSizeChange={onFontSizeChange}
-          onLineHeightChange={onLineHeightChange}
-        />
-      </header>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-8">
-        <div
-          key={detail.uid}
-          className="fade-in animate-in mx-auto max-w-prose space-y-4 pt-4 duration-200"
-          style={{
-            fontSize,
-            lineHeight,
-          }}
-        >
-          <div>
-            {detail.body.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
-          <CollapsibleStrains strains={detail.strains} />
-
-          <PoetryTranslationSection
-            uid={detail.uid}
-            fontSize={fontSize}
-            lineHeight={lineHeight}
-            referenceTranslation={annotation?.translation}
-            initialMode={initialTranslationMode}
-            onModeChange={onTranslationModeChange}
-          />
-
-          {annotation &&
-          (annotation.remark.trim() || annotation.appreciation.trim()) ? (
-            <div className="border-border space-y-4 border-t pt-4">
-              <AnnotationSection
-                title={<Trans>注释</Trans>}
-                body={annotation.remark}
-              />
-              <AnnotationSection
-                title={<Trans>赏析</Trans>}
-                body={annotation.appreciation}
-              />
+              )}
+              {detail.dynasty ? <span>· {detail.dynasty}</span> : null}
+              {detail.rhythmic ? (
+                <Badge variant="outline">
+                  <Music aria-hidden />
+                  {detail.rhythmic}
+                </Badge>
+              ) : null}
+              {annotation?.hasAudio ? (
+                <Badge variant="outline">
+                  <Trans>有朗诵</Trans>
+                </Badge>
+              ) : null}
             </div>
-          ) : null}
-
-          {detail.notes.length > 0 ? (
-            <div className="border-border border-t pt-4">
-              <h3 className="text-muted-foreground mb-1 text-sm font-medium">
-                <Trans>注释</Trans>
-              </h3>
-              <ul className="text-muted-foreground list-disc space-y-1 pl-4 text-sm leading-relaxed">
-                {detail.notes.map((note, index) => (
-                  <li key={index}>{note}</li>
-                ))}
-              </ul>
+          </header>
+          <TabsContent
+            value="original"
+            forceMount
+            hidden={narrow && view !== "original"}
+            {...(!narrow && {
+              role: "region",
+              "aria-labelledby": originalLabelId,
+              tabIndex: undefined,
+            })}
+          >
+            <div
+              className="font-poetry flex flex-col gap-3 text-center break-words"
+              style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
+            >
+              {detail.body.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
+            <div className="mt-6 flex flex-col gap-4">
+              <CollapsibleStrains strains={detail.strains} />
+              {annotation ? (
+                <>
+                  <AnnotationSection
+                    title={<Trans>注释</Trans>}
+                    body={annotation.remark}
+                  />
+                  <AnnotationSection
+                    title={<Trans>赏析</Trans>}
+                    body={annotation.appreciation}
+                  />
+                </>
+              ) : null}
+              {detail.notes.length ? (
+                <section className="flex flex-col gap-1">
+                  <h3 className="text-muted-foreground text-sm font-medium">
+                    <Trans>注释</Trans>
+                  </h3>
+                  <ul className="text-muted-foreground flex list-disc flex-col gap-1 pl-4 text-sm leading-relaxed">
+                    {detail.notes.map((note, index) => (
+                      <li key={index}>{note}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </div>
+          </TabsContent>
+          {/* 桌面连续显示原文和译文；跨断点只切换可见性与语义，保留翻译任务订阅和编辑草稿。 */}
+          <TabsContent
+            value="translation"
+            forceMount
+            hidden={narrow && view !== "translation"}
+            {...(!narrow && {
+              role: "region",
+              "aria-labelledby": translationLabelId,
+              tabIndex: undefined,
+            })}
+          >
+            {!narrow ? (
+              <div className="mb-4 flex flex-col gap-4">
+                <Separator />
+                <h3
+                  id={translationLabelId}
+                  className="text-muted-foreground text-sm font-medium"
+                >
+                  <Trans>译文</Trans>
+                </h3>
+              </div>
+            ) : null}
+            <PoetryTranslationSection
+              key={detail.uid}
+              uid={detail.uid}
+              {...settings}
+              referenceTranslation={annotation?.translation}
+              initialMode={initialTranslationMode}
+              onModeChange={onTranslationModeChange}
+            />
+          </TabsContent>
+          {!narrow ? (
+            <ReadingControlsDesktop
+              settings={settings}
+              settingsInHeader={settingsInHeader}
+            />
           ) : null}
-        </div>
+        </article>
       </div>
       <AuthorBioSheet bio={bio} onClose={() => setBio(null)} />
-    </div>
+    </Tabs>
   );
 }

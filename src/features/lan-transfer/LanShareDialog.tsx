@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { open } from "@tauri-apps/plugin-dialog";
+import { baseName, pickDirectoryNative } from "~/lib/files";
+import { toast } from "sonner";
+import { describeError } from "~/lib/errors";
 import { FolderOpen } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
 import {
@@ -18,6 +19,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import { firstFormError } from "~/lib/form-errors";
 import {
   createLanSharedDirSchema,
@@ -55,27 +57,29 @@ export default function LanShareDialog({
     if (dialogOpen) form.reset(emptyShareFormValues);
   }, [dialogOpen, form]);
   async function chooseShareDir() {
-    const selected = await open({
-      multiple: false,
-      directory: true,
-      title: t`选择共享目录`,
-    });
-    if (typeof selected !== "string") return;
-    form.setFieldValue("path", selected);
-    if (!form.getFieldValue("name").trim()) {
-      const parts = selected.split(/[\\/]/).filter(Boolean);
-      form.setFieldValue("name", parts[parts.length - 1] ?? t`共享目录`);
+    try {
+      const selected = await pickDirectoryNative(t`选择共享目录`);
+      if (!selected) return;
+      form.setFieldValue("path", selected);
+      if (!form.getFieldValue("name").trim())
+        form.setFieldValue("name", baseName(selected));
+    } catch (error) {
+      toast.error(describeError(error));
     }
   }
+
   return (
     <Dialog open={dialogOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
+      <DialogContent
+        className="ui-density-adaptive max-w-lg"
+        showCloseButton={false}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>添加共享目录</Trans>
           </DialogTitle>
-        </DialogHeader>
-        <FieldGroup>
+        </DialogLayoutHeader>
+        <FieldGroup density="compact">
           <form.Field name="name">
             {(field) => {
               const error = firstFormError(field.state.meta.errors);
@@ -102,11 +106,12 @@ export default function LanShareDialog({
               const error = firstFormError(field.state.meta.errors);
               return (
                 <UiField data-invalid={!!error}>
-                  <FieldLabel>
+                  <FieldLabel htmlFor="lan-share-path">
                     <Trans>本地目录</Trans>
                   </FieldLabel>
                   <div className="flex gap-2">
                     <Input
+                      id="lan-share-path"
                       readOnly
                       value={field.state.value}
                       placeholder={t`未选择`}

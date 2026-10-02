@@ -2,15 +2,18 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ExternalLink, MonitorSmartphone, RefreshCw } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import type { LanDiscoveredDevice } from "~/types";
+import type { AppError, LanDiscoveredDevice } from "~/types";
 import { formatRelativeTime } from "~/lib/relative-time";
+import { describeError } from "~/lib/errors";
 interface Props {
+  error: AppError | null;
   devices: LanDiscoveredDevice[];
   discovering: boolean;
   refresh: () => void;
   openDevice: (device: LanDiscoveredDevice) => void;
 }
 export default function LanDiscoveredDevicesPanel({
+  error,
   devices,
   discovering,
   refresh,
@@ -22,7 +25,7 @@ export default function LanDiscoveredDevicesPanel({
       <div className="border-border flex shrink-0 items-center justify-between gap-2 border-b px-2.5 py-2">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold">
-            <Trans>发现设备</Trans>
+            <Trans>附近设备</Trans>
           </h2>
           <p className="text-muted-foreground truncate text-xs">
             <Trans>同网段 MFTP 客户端，点击可直接打开访问地址</Trans>
@@ -42,12 +45,20 @@ export default function LanDiscoveredDevicesPanel({
         </Button>
       </div>
       <div className="p-2">
-        {devices.length === 0 ? (
-          <div className="border-border text-muted-foreground flex min-h-24 items-center justify-center rounded-md border border-dashed text-xs">
+        {error ? (
+          <p
+            role="status"
+            className="text-destructive px-2 py-3 text-xs wrap-anywhere"
+          >
+            {describeError(error)}
+          </p>
+        ) : null}
+        {devices.length === 0 && !error ? (
+          <div className="border-border text-muted-foreground flex min-h-16 items-center justify-center rounded-md border border-dashed text-xs">
             <Trans>暂无发现设备</Trans>
           </div>
         ) : (
-          <div className="grid gap-1.5 sm:grid-cols-2">
+          <div className="grid gap-1.5">
             {devices.map((device) => (
               <button
                 key={device.id}

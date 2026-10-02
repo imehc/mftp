@@ -1,6 +1,9 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { Button } from "~/components/ui/button";
+import { describeError, toIpcError } from "~/lib/errors";
+import type { AppError } from "~/bindings";
 import { poetryBrowse } from "~/lib/ipc";
 import type { PoemSummary } from "~/types";
 import PoemCard from "./PoemCard";
@@ -43,12 +46,16 @@ export default function PoemList({
     exhausted: false,
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<AppError | null>(null);
   const loadSeq = useRef(0);
   const restoredScroll = useRef(false);
   // onCountChange 是属性回调；通过 effect event 读取最新值，
   // 使重置 effect 只依赖重置 key。
   const notifyCountReset = useEffectEvent(() => onCountChange?.(null));
   useEffect(() => {
+    loadSeq.current++;
+    setError(null);
+    setLoading(false);
     setState({
       items: [],
       cursor: null,
@@ -59,6 +66,10 @@ export default function PoemList({
     });
     restoredScroll.current = false;
     notifyCountReset();
+    const generation = loadSeq;
+    return () => {
+      generation.current++;
+    };
   }, [resetKey]);
 
   useEffect(() => {
@@ -79,6 +90,7 @@ export default function PoemList({
   const loadMore = async () => {
     const seq = ++loadSeq.current;
     setLoading(true);
+    setError(null);
     try {
       const page = await poetryBrowse({
         collectionIds: collectionIds.length > 0 ? collectionIds : null,
@@ -93,6 +105,8 @@ export default function PoemList({
         cursor: page.nextCursor ?? null,
         exhausted: !page.nextCursor,
       }));
+    } catch (nextError) {
+      if (seq === loadSeq.current) setError(toIpcError(nextError).payload);
     } finally {
       if (seq === loadSeq.current) setLoading(false);
     }
@@ -102,12 +116,12 @@ export default function PoemList({
   // 读取，而不是每次渲染都重新订阅。
   const loadMoreInEffect = useEffectEvent(loadMore);
   useEffect(() => {
-    if (!state.exhausted && state.items.length === 0 && !loading) {
+    if (!state.exhausted && state.items.length === 0 && !loading && !error) {
       void loadMoreInEffect();
     }
-  }, [state.exhausted, state.items.length, loading]);
+  }, [state.exhausted, state.items.length, loading, error]);
   const virtualizer = useVirtualizer({
-    count: state.items.length + (state.exhausted ? 0 : 1),
+    count: state.items.length + (state.exhausted || error ? 0 : 1),
     getScrollElement: () => scrollRef.current,
     estimateSize: () => 92,
     overscan: 8,
@@ -117,7 +131,7 @@ export default function PoemList({
       ref={scrollRef}
       role="list"
       aria-label={t`诗词列表`}
-      className="h-full overflow-y-auto px-2 pb-4"
+      className="app-scroll-safe-end h-full min-h-0 flex-1 overflow-y-auto px-2 pt-2"
       onScroll={(event) => {
         const el = event.currentTarget;
         if (scrollStorageKey) {
@@ -129,7 +143,7 @@ export default function PoemList({
         }
         const nearBottom =
           el.scrollTop + el.clientHeight >= el.scrollHeight - 240;
-        if (nearBottom && !loading && !state.exhausted) {
+        if (nearBottom && !loading && !state.exhausted && !error) {
           void loadMore();
         }
       }}
@@ -157,7 +171,7 @@ export default function PoemList({
               }}
             >
               {poem ? (
-                <div className="pb-2">
+                <div>
                   <PoemCard
                     poem={poem}
                     query={query}
@@ -166,7 +180,7 @@ export default function PoemList({
                   />
                 </div>
               ) : (
-                <div className="text-muted-foreground flex h-[84px] items-center justify-center text-xs">
+                <div className="text-muted-foreground flex h-21 items-center justify-center text-xs">
                   <Trans>加载中…</Trans>
                 </div>
               )}
@@ -174,6 +188,14 @@ export default function PoemList({
           );
         })}
       </div>
+      {error ? (
+        <div role="alert" className="flex flex-col gap-2 p-3 text-sm">
+          <p>{describeError(error)}</p>
+          <Button variant="outline" onClick={() => void loadMore()}>
+            <Trans>重试</Trans>
+          </Button>
+        </div>
+      ) : null}
       {state.exhausted && state.items.length === 0 ? (
         <p className="text-muted-foreground py-10 text-center text-sm">
           {t`没有找到作品`}

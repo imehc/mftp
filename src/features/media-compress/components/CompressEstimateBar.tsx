@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
 import { Badge } from "~/components/ui/badge";
-import { formatBytes } from "~/features/media-compress/format";
+import { formatBytes } from "~/lib/format";
 interface CompressEstimateBarProps {
   estimatedBytes?: number | null;
   estimatedMin?: number | null;
@@ -63,13 +63,13 @@ export function CompressEstimateBar({
             <span>{emptyHint}</span>
           )}
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center justify-end gap-2 max-md:w-full max-md:[&>button]:flex-1">
           {secondaryAction}
           {primaryAction}
         </div>
       </div>
       {showProgress ? (
-        <div className="mt-2 space-y-1">
+        <div className="mt-2 flex flex-col gap-1">
           <div className="text-muted-foreground flex items-center justify-between text-xs">
             <span>{progressLabel}</span>
             <span className="tabular-nums">{Math.round(progress)}%</span>

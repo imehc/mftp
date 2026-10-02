@@ -37,7 +37,11 @@ let initPromise: Promise<unknown> | null = null;
 
 /** 任何模拟运行前必须先 resolve（用于加载 WASM 模块）。 */
 export function ensurePhysicsReady(): Promise<unknown> {
-  initPromise ??= RAPIER.init();
+  // 初始化失败后允许显式重试，不能永久复用已拒绝的 Promise。
+  initPromise ??= RAPIER.init().catch((error: unknown) => {
+    initPromise = null;
+    throw error;
+  });
   return initPromise;
 }
 

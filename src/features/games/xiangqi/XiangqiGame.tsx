@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
-import { Crown } from "lucide-react";
-import { GameHomeButton, GameMatchActions } from "../engine/GameHeaderControls";
-import { GameVolumeControl } from "../engine/GameVolumeControl";
+import { BoardGameHeader } from "../engine/BoardGameHeader";
 import { unlockXiangqiAudio } from "./audio";
 import { XiangqiMatch } from "./XiangqiMatch";
 import { XiangqiModeMenu } from "./XiangqiModeMenu";
@@ -11,8 +9,10 @@ import type { XiangqiMode } from "./types";
 export default function XiangqiGame() {
   const [mode, setMode] = useState<XiangqiMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
+  const [onlinePlaying, setOnlinePlaying] = useState(false);
   const [matchFinished, setMatchFinished] = useState(false);
   const exitMatch = () => {
+    setOnlinePlaying(false);
     setMatchFinished(false);
     setMode(null);
   };
@@ -21,31 +21,20 @@ export default function XiangqiGame() {
     setMatchKey((key) => key + 1);
   };
   return (
-    <main className="bg-background text-foreground flex h-full flex-col overflow-hidden">
-      <header className="border-border flex items-center justify-between gap-2 border-b px-2 py-1.5">
-        <div className="flex items-center gap-1">
-          <GameHomeButton
-            matchActive={mode !== null}
-            matchFinished={matchFinished}
-          />
-          <div className="bg-border h-4 w-px" />
-          <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
-            <Crown className="size-3.5" />
-            <Trans>中国象棋</Trans>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <GameVolumeControl />
-          {mode ? (
-            <GameMatchActions
-              matchFinished={matchFinished}
-              canRestart={mode.kind !== "online"}
-              onRestart={restartMatch}
-              onExit={exitMatch}
-            />
-          ) : null}
-        </div>
-      </header>
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
+    >
+      {mode?.kind !== "online" || onlinePlaying ? (
+        <BoardGameHeader
+          title={<Trans>中国象棋</Trans>}
+          active={mode !== null}
+          finished={matchFinished}
+          canRestart={mode?.kind !== "online"}
+          onRestart={restartMatch}
+          onExit={exitMatch}
+        />
+      ) : null}
       {mode === null ? (
         <XiangqiModeMenu
           onStart={(nextMode) => {
@@ -56,6 +45,7 @@ export default function XiangqiGame() {
         />
       ) : mode.kind === "online" ? (
         <XiangqiOnlineFlow
+          onPlayingChange={setOnlinePlaying}
           onExit={exitMatch}
           onFinishedChange={setMatchFinished}
         />

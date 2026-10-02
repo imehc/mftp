@@ -1,182 +1,77 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
-import { Archive, FolderTree, HardDriveDownload } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useLingui } from "@lingui/react/macro";
-import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import { Switch } from "~/components/ui/switch";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import AppPageLayout from "~/components/AppPageLayout";
-import ExportDialog from "~/features/export/ExportDialog";
-import ImportDialog from "~/features/export/ImportDialog";
-import { exportSections } from "~/features/export/sections";
-import AiConnectionSettings from "./AiConnectionSettings";
-import { isDesktopPlatform } from "~/lib/platform";
-import { type DirectoryTransferMode, useSettingsStore } from "~/store/settings";
-import { useTransfersStore } from "~/store/transfers";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
+import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
+import AiConfigurationSettings from "~/features/ai-configuration/AiConfigurationSettings";
+import SettingsOverview from "./SettingsOverview";
+import BackupPage from "~/features/export/BackupPage";
 import type { PoetryTranslationMode } from "~/bindings";
-
-const transferModes = [
-  { value: "archive", icon: Archive },
-  { value: "direct", icon: FolderTree },
-] as const;
 
 export default function SettingsPage({
   returnContext,
 }: {
   returnContext?: {
+    panel?: "ai" | "data";
     returnUid?: string;
     returnQ?: string;
     returnMode?: PoetryTranslationMode;
   };
 }) {
   const { t } = useLingui();
-  const mode = useSettingsStore((state) => state.directoryTransferMode);
-  const setMode = useSettingsStore((state) => state.setDirectoryTransferMode);
-  const running = useTransfersStore((state) =>
-    state.transfers.some((item) => item.status === "running"),
-  );
-  const [autostart, setAutostart] = useState(false);
-  const [autostartBusy, setAutostartBusy] = useState(false);
-  const [exportOpen, setExportOpen] = useState(false);
-  const [importOpen, setImportOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isDesktopPlatform()) return;
-    void isEnabled()
-      .then(setAutostart)
-      .catch(() => setAutostart(false));
-  }, []);
-
-  async function setAutostartMode(value: boolean) {
-    setAutostartBusy(true);
-    try {
-      if (value) await enable();
-      else await disable();
-      setAutostart(value);
-      toast.success(value ? t`已开启开机自启` : t`已关闭开机自启`);
-    } catch (error) {
-      toast.error(String(error));
-    } finally {
-      setAutostartBusy(false);
-    }
-  }
-
+  const navigate = useNavigate();
+  const ai = returnContext?.panel === "ai" || !!returnContext?.returnUid;
+  if (returnContext?.panel === "data") return <BackupPage />;
   return (
-    <AppPageLayout
-      title={t`设置`}
-      description={t`管理应用数据和运行方式`}
-      actions={
-        returnContext?.returnUid ? (
-          <Button variant="outline" size="sm" asChild>
-            <Link
-              to="/library/$id"
-              params={{ id: returnContext.returnUid }}
-              search={{
-                q: returnContext.returnQ,
-                mode: returnContext.returnMode,
-              }}
-            >
-              {t`返回诗词`}
-            </Link>
-          </Button>
-        ) : undefined
-      }
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col"
     >
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-        <AiConnectionSettings />
-        <section className="border-border bg-card divide-border divide-y rounded-lg border px-2.5">
-          <SettingRow
-            title={t`数据导入导出`}
-            description={t`导出密码本、主机、待办和局域网配置。`}
-          >
-            <div className="flex shrink-0 gap-2">
-              <Button variant="outline" onClick={() => setExportOpen(true)}>
-                <HardDriveDownload data-icon="inline-start" />
-                {t`导出数据`}
+      <ToolPageHeader
+        showHome={false}
+        title={ai ? t`AI 服务` : t`设置`}
+        leading={
+          ai ? (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t`返回设置`}
+              onClick={() => void navigate({ to: "/settings", search: {} })}
+            >
+              <ArrowLeft />
+            </Button>
+          ) : undefined
+        }
+        trailing={
+          <div className="flex items-center gap-1">
+            {ai ? <AiWorkspaceMenu /> : null}
+            {returnContext?.returnUid ? (
+              <Button variant="outline" density="adaptive" asChild>
+                <Link
+                  to="/library/$id"
+                  params={{ id: returnContext.returnUid }}
+                  search={{
+                    q: returnContext.returnQ,
+                    mode: returnContext.returnMode,
+                  }}
+                >{t`返回诗词`}</Link>
               </Button>
-              <Button variant="outline" onClick={() => setImportOpen(true)}>
-                <FolderTree data-icon="inline-start" />
-                {t`导入数据`}
-              </Button>
-            </div>
-          </SettingRow>
-
-          {isDesktopPlatform() ? (
-            <SettingRow title={t`开机自启`}>
-              <Switch
-                checked={autostart}
-                disabled={autostartBusy}
-                onCheckedChange={(value) => void setAutostartMode(value)}
-                aria-label={t`开机自启`}
-              />
-            </SettingRow>
-          ) : null}
-
-          <SettingRow title={t`文件夹传输`}>
-            <div className="flex shrink-0 flex-col items-end gap-1.5">
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                value={mode}
-                onValueChange={(value) => {
-                  if (!running) setMode(value as DirectoryTransferMode);
-                }}
-                className="gap-2"
-              >
-                {transferModes.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <ToggleGroupItem
-                      key={item.value}
-                      value={item.value}
-                      disabled={running}
-                      className="flex items-center gap-2"
-                    >
-                      <Icon className="size-4" />
-                      {item.value === "archive" ? t`压缩包` : t`直连`}
-                    </ToggleGroupItem>
-                  );
-                })}
-              </ToggleGroup>
-              {running ? (
-                <p className="text-muted-foreground text-right text-xs">
-                  {t`传输进行中，暂不可修改。`}
-                </p>
-              ) : null}
-            </div>
-          </SettingRow>
-        </section>
-      </div>
-      <ExportDialog
-        open={exportOpen}
-        defaultSections={exportSections.map((item) => item.id)}
-        onOpenChange={setExportOpen}
+            ) : null}
+          </div>
+        }
       />
-      <ImportDialog open={importOpen} onOpenChange={setImportOpen} />
-    </AppPageLayout>
-  );
-}
-
-function SettingRow({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex min-h-12 flex-col justify-between gap-2 py-2 sm:flex-row sm:items-center">
-      <div className="min-w-0">
-        <h2 className="text-sm font-medium">{title}</h2>
-        {description ? (
-          <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>
-        ) : null}
+      <div className="app-scroll-safe-end mx-auto min-h-0 w-full max-w-5xl flex-1 overflow-auto px-3 pt-3">
+        {ai ? (
+          <AiConfigurationSettings />
+        ) : (
+          <SettingsOverview
+            onAi={() =>
+              void navigate({ to: "/settings", search: { panel: "ai" } })
+            }
+          />
+        )}
       </div>
-      {children}
-    </div>
+    </main>
   );
 }

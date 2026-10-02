@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Dialog as DialogPrimitive } from "radix-ui";
+import { Trans } from "@lingui/react/macro";
 
 import { cn } from "cn";
 import { Button } from "~/components/ui/button";
@@ -37,7 +38,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 data-closed:duration-150 data-closed:ease-in data-open:duration-200 data-open:ease-out supports-backdrop-filter:backdrop-blur-xs motion-reduce:animate-none",
+        "motion-safe:data-open:animate-in data-open:fade-in-0 motion-safe:data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 data-closed:duration-150 data-closed:ease-in data-open:duration-200 data-open:ease-out supports-backdrop-filter:backdrop-blur-xs motion-reduce:animate-none",
         className,
       )}
       {...props}
@@ -49,35 +50,56 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  placement = "center",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
+  placement?: "center" | "responsive-sheet" | "responsive-page";
 }) {
   return (
     <DialogPortal>
       <DialogOverlay />
-      <DialogPrimitive.Content
-        data-slot="dialog-content"
+      {/*
+        Portal 挂在 body 下，拿不到 .app-shell 的安全区 padding，必须自己
+        处理有效视口：外层只负责居中与安全区留白（pointer-events-none 让
+        空白处的点击继续落到遮罩上关闭弹窗），内容自身滚动。
+      */}
+      <div
         className={cn(
-          "bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-open:slide-in-from-bottom-2 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-closed:slide-out-to-bottom-2 fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl p-4 text-sm ring-1 outline-none data-closed:duration-150 data-closed:ease-in data-open:duration-250 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none sm:max-w-sm",
-          className,
+          "app-viewport pointer-events-none fixed inset-0 z-50 grid place-items-center p-4 pt-[calc(1rem+var(--safe-top,0px))] pr-[calc(1rem+var(--safe-right,0px))] pb-[calc(1rem+var(--safe-bottom,0px))] pl-[calc(1rem+var(--safe-left,0px))]",
+          placement === "responsive-sheet" &&
+            "max-md:items-end max-md:px-0 max-md:pb-0",
+          placement === "responsive-page" && "max-md:pl-[var(--safe-left,0px)] max-md:pr-[var(--safe-right,0px)] max-md:pt-[var(--safe-top,0px)] max-md:pb-[var(--safe-bottom,0px)]",
         )}
-        {...props}
       >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button
-              variant="ghost"
-              className="absolute top-2 right-2"
-              size="icon-sm"
-            >
-              <XIcon />
-              <span className="sr-only">Close</span>
-            </Button>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
+        <DialogPrimitive.Content
+          data-slot="dialog-content"
+          className={cn(
+            "bg-popover text-popover-foreground ring-foreground/10 motion-safe:data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-open:slide-in-from-bottom-2 motion-safe:data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-closed:slide-out-to-bottom-2 pointer-events-auto relative grid max-h-full w-full gap-4 overflow-y-auto overscroll-contain rounded-xl p-4 text-sm ring-1 outline-none data-closed:duration-150 data-closed:ease-in data-open:duration-250 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none md:max-w-sm",
+            placement === "responsive-sheet" &&
+              "max-md:rounded-b-none max-md:pb-[calc(1rem+var(--safe-bottom,0px))]",
+            placement === "responsive-page" && "max-md:h-full max-md:rounded-none",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close data-slot="dialog-close" asChild>
+              <Button
+                variant="ghost"
+                className="absolute top-2 right-2"
+                size="icon-sm"
+              >
+                <XIcon />
+                <span className="sr-only">
+                  <Trans>关闭</Trans>
+                </span>
+              </Button>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </div>
     </DialogPortal>
   );
 }
@@ -104,7 +126,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end",
+        "bg-muted/50 -mx-4 -mb-4 flex flex-row gap-2 rounded-b-xl border-t p-4 md:justify-end max-md:[&>button]:min-w-0 max-md:[&>button]:flex-1",
         className,
       )}
       {...props}
@@ -112,7 +134,9 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">
+            <Trans>关闭</Trans>
+          </Button>
         </DialogPrimitive.Close>
       )}
     </div>

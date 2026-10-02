@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-import { Trans } from "@lingui/react/macro";
-import { Percent, Ruler } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   InputGroup,
@@ -14,7 +13,6 @@ import {
   type DimensionMode,
   type ResizeMethod,
 } from "~/features/media-compress/resize/resize";
-import { cn } from "cn";
 export const DIMENSION_MODES: readonly DimensionMode[] = [
   "exact",
   "width",
@@ -55,47 +53,25 @@ export function ResizeMethodTabs({
   onChange,
   disabled,
 }: ResizeMethodTabsProps) {
-  const methods: readonly {
-    id: ResizeMethod;
-    icon: ReactNode;
-    label: ReactNode;
-  }[] = [
-    {
-      id: "ratio",
-      icon: <Percent className="size-3.5" />,
-      label: <Trans>按比例</Trans>,
-    },
-    {
-      id: "dimension",
-      icon: <Ruler className="size-3.5" />,
-      label: <Trans>按尺寸</Trans>,
-    },
-  ];
+  const { t } = useLingui();
   return (
-    <div
-      role="tablist"
-      className="border-border bg-muted/40 inline-flex self-start rounded-md border p-0.5"
+    <ToggleGroup
+      type="single"
+      value={value}
+      onValueChange={(next) => {
+        if (next === "ratio" || next === "dimension") onChange(next);
+      }}
+      disabled={disabled}
+      variant="outline"
+      aria-label={t`缩放方式`}
     >
-      {methods.map((method) => {
-        const active = method.id === value;
-        return (
-          <Button
-            key={method.id}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            size="xs"
-            variant={active ? "secondary" : "ghost"}
-            disabled={disabled}
-            className={cn("gap-1 px-2.5", active && "shadow-sm")}
-            onClick={() => onChange(method.id)}
-          >
-            {method.icon}
-            {method.label}
-          </Button>
-        );
-      })}
-    </div>
+      <ToggleGroupItem value="ratio">
+        <Trans>按比例</Trans>
+      </ToggleGroupItem>
+      <ToggleGroupItem value="dimension">
+        <Trans>按尺寸</Trans>
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 }
 interface DimensionInputProps {

@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { describeError } from "~/lib/errors";
 
 interface TaskDialogsProps {
   /** 磁力链接弹窗的内容；null 表示不显示。 */
@@ -44,7 +45,7 @@ export default function TaskDialogs({
         open={magnetText !== null}
         onOpenChange={(open) => !open && onCloseMagnet()}
       >
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="md:max-w-lg">
           <DialogHeader>
             <DialogTitle>
               <Trans>磁力链接</Trans>
@@ -58,7 +59,7 @@ export default function TaskDialogs({
               showLabel
               label={t`复制`}
               copiedLabel={t`已复制`}
-              onError={(error) => toast.error(String(error))}
+              onError={(error) => toast.error(describeError(error))}
             />
           </div>
         </DialogContent>

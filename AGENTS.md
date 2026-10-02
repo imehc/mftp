@@ -1,213 +1,72 @@
 # AGENTS.md
 
-本文件是写给 AI 编程助手看的项目规范。所有自动化编码代理在修改本项目时都应遵守这里的约定。
-
 ## 技术栈
 
-- 本项目是 Tauri v2 跨平台桌面应用（桌面 + 移动端），前后端同仓库。
-- 前端：`src/`，React 19 + TypeScript + Vite + TanStack Router + Zustand + shadcn/ui + Tailwind v4。
-- 后端：`src-tauri/src/`，Rust + Tauri v2 + ssh2/libssh2。
-- 包管理器：pnpm，不要用 npm/yarn。
-- i18n 用 Lingui，动画用 gsap，长列表用 `@tanstack/react-virtual`。
+- Tauri v2，支持桌面、Android、iOS；各端独立运行，不依赖另一端提供能力。
+- 前端：React 19 + TypeScript + Vite + TanStack Router + Zustand。
+- UI：shadcn/ui + Tailwind v4；动画用 gsap，长列表用 `@tanstack/react-virtual`。
+- 后端：Rust + ssh2/libssh2 + SQLite；IPC 类型由 Specta 生成。
+- 包管理器：pnpm；国际化：Lingui；前端测试：Vitest。
 
 ## 目录结构
 
-```
+```text
 src/
-├── bindings.ts        # specta 自动生成的 IPC 类型，禁止手改
-├── types.ts           # bindings.ts 的再导出门面，新增类型改 Rust，不改这里
-├── routeTree.gen.ts   # TanStack Router 自动生成，禁止手改
-├── routes/            # 路由薄壳：路由定义、平台守卫、参数转交，不写业务逻辑
-├── features/<name>/   # 功能模块：页面骨架、hooks、store、子组件都放这里
-├── components/
-│   ├── ui/            # shadcn/ui 基础组件，优先复用，不受 600 行限制
-│   └── *.tsx          # 跨 feature 通用组件
-├── lib/               # 跨 feature 纯工具：ipc.ts、events.ts、format.ts、platform.ts
-├── store/             # 全局 Zustand store
-├── i18n/              # Lingui Provider 与工具
-├── locales/{zh-CN,en}/  # messages.po 是翻译源（需提交）；messages.ts 是编译产物（勿提交）
-└── themes/            # 主题定义
+├── routes/          # 路由、守卫、参数转交，不写业务逻辑
+├── features/        # 按功能组织页面、组件、hooks、store
+├── components/      # 跨功能组件；ui/ 为 shadcn 基础组件
+├── lib/             # 公共 IPC、事件、错误、平台、文件等工具
+├── store/           # 全局状态与偏好
+├── locales/         # 翻译源 messages.po
+├── themes/          # 主题
+├── bindings.ts      # Rust/Specta 生成的 IPC 类型
+├── types.ts         # 类型再导出门面
+└── routeTree.gen.ts # 自动生成的路由树
 
 src-tauri/src/
-├── lib.rs             # specta_builder() 与 collect_commands![]，IPC 注册入口
-├── commands/          # IPC 命令实现
-├── error.rs           # 统一错误类型
-├── models.rs          # 数据模型
-└── ssh/  lan_transfer/  storage/  game_room/  poetry/   # 领域模块
+├── app/             # 命令注册、依赖装配、生命周期协调
+├── modules/         # 按功能组织命令、模型、仓储和领域逻辑
+├── core/            # 共用执行与资源管理
+├── adapters/        # 平台与事件适配
+├── error/           # 统一错误协议
+└── storage/         # 数据库与迁移
 ```
 
 ## 编码规范
 
-### 平台边界
+- 新功能、重构等非简单任务，先分析项目架构、职责边界与影响范围，输出独立计划文档（方案、实施阶段、验证标准），经用户确认后分阶段实施；每阶段更新进度、验证结果与剩余事项。
+- 上述任务涉及 UI 调整时，先更新 Figma 设计图，完成并经用户确认后再实施对应 UI；无法连接 Figma 时明确向用户说明，不跳过设计确认。
+- 简单修正可直接调整，无需计划文档或分阶段；具体任务计划、进度与实现细节不写入 AGENTS.md。
+- 优先复用现有组件、工具和依赖，按职责拆分，避免重复抽象。
+- TS/TSX/Rust 文件最多 600 行；shadcn `components/ui/`、`bindings.ts`、`routeTree.gen.ts` 除外。
+- 前端注释用中文，Rust 注释用英文；解释非直观逻辑、协议、并发和生命周期的原因。
+- 业务归所属 feature/module，公共层只放共用能力；临时状态留页面，跨页资源按自身生命周期管理。
+- IPC 统一走 `src/lib/ipc.ts`，事件统一走 `src/lib/events.ts`；契约在 Rust 定义，由 Specta 自动生成前端类型。
+- 新功能沿用统一注册入口：前端接入路由、模块元数据和平台守卫；后端在 `app/registry` 登记命令与事件类型，同步 `command_baseline.txt`，由 `app/services` 装配。
+- 错误统一为 `AppError { kind, code, message, args }`，全链路保留；按 kind/code 判断，前端用 `describeError` 展示。业务错误用英文诊断，展示文案走 Lingui。
+- 用户可见文案全部走 Lingui；提交 `messages.po`。文案改动后执行 `pnpm run extract && pnpm run compile && pnpm build`。
+- UI 按已确认的设计逐模块实现，完成后同平台、尺寸、状态对照；保留已有功能、数据和偏好。
+- 布局统一以 Tailwind 默认 `md`（48rem，默认字号下 768px）分界：`>= md` 为 PC 布局，`< md` 为移动布局；复用 `useDesktopLayout` 与 `md:`/`max-md:`，不覆盖默认断点；平台能力用 `platform.ts` / `cfg(mobile)` 判断，切布局不丢状态。
+- UI 复用共享组件、语义 token 和尺寸变体；工具栏用 `density="adaptive"`，主要触控目标至少约 44×44 CSS px，控件有可访问标签。
+- 弹窗成对底部按钮在窄屏同行等宽、桌面靠右，复用共享 Footer；返回先关顶层浮层，再回上级，保留查询与滚动位置。
+- 整体缩放默认跟随系统；新增或修改页面的文字、图标、控件和间距统一使用根级 rem/尺寸 token，支持后续全局“显示大小”设置，不另设页面倍率或用固定 px 绕过缩放。
+- 缩放变化同步虚拟列表测量，主要触控目标保留下限；不重复叠加系统倍率，系统安全区与键盘 inset 不随应用倍率缩放。Canvas、终端等专用内容单独明确尺寸边界。
+- Android/iOS 滚动内容延伸至底部安全区，仅末尾留白，不固定遮挡或重复避让；复用 `bottomInset="scroll"` / `app-scroll-safe-end`。固定操作栏与 Portal 独立处理安全区。
+- 阻塞工作放后端 blocking 管道；异步处理竞态、取消和清理，任务完成以实际 worker 退出为准。
+- 数据迁移须版本化、幂等并保留用户数据；reset 与任务互斥，保留有效迁移标志；SQL 参数化。
+- 修改后运行相关构建、lint 和定向测试；前端测试与源码同目录，Rust 测试放独立文件。UI 另查窄/宽屏、主题、长文案和缩放，保证键盘下操作可达。
+- 后续新增或发现需要长期遵守的规范、禁止行为，及时更新本文件，合并去重，保持简洁。
 
-- 桌面端与移动端是两个独立的个体：同一仓库、各自自闭环，任何一端的功能都不以「另一端配合运行」为前提。
-- 移动端模块的全部逻辑（界面、IPC、Rust 后端能力）必须在移动端客户端内自己完成，不依赖桌面端在线，不做「桌面主导、移动端只做展示/代理」之类的联动设计；桌面端同理。
-- 跨端共享的只有天然可共用的部分（纯工具、类型、UI 组件、领域模块代码），不为「复用另一端已有实现」引入跨进程/跨设备的状态依赖。
-- 平台差异通过 `cfg(mobile)` 与 `src/lib/platform.ts` 表达；设计功能时分别考虑每个平台独立完整可用。
+## 禁止行为
 
-### 工作流程
-
-非频繁改动必须先分析、再计划、后写码：
-
-1. 读相关代码，确认职责边界、数据流、现有模式和可复用组件。
-2. 判断是否会让文件超过 600 行，必要时先拆分。
-3. 说明简短方案：改哪些文件、如何验证、是否引入依赖。
-4. 实现后运行相关验证（见「构建与验证命令」，只跑改动涉及的测试及关联测试，不跑全量）。
-
-简单 typo、单行配置、小文案调整可省略正式计划，但仍要遵守文件行数、i18n 和验证要求。
-
-### 文件行数
-
-- `src-tauri/**/*.rs` 和 `src/**/*.{ts,tsx}` 不得超过 600 行。
-- 例外（生成物，拆分无意义且会被覆盖）：
-  - `src/components/ui/**` 下的 shadcn 组件。
-  - `src/bindings.ts` —— Tauri Specta 导出，`src-tauri/src/lib.rs` 每次启动都会重写，文件头也标注了「Do not edit manually」。
-  - `src/routeTree.gen.ts` —— TanStack Router 自动生成。
-
-### 注释
-
-只在重要或不直观处写注释，解释「为什么」，不解释自明代码。必须注释的场景：
-
-- 协议、状态机、并发、锁、生命周期管理。
-- `cfg(mobile)`、IPC 序列化边界、Tauri 权限等容易踩坑的分支。
-- 看似多余但实际必要的兼容或防御逻辑。
-- 复杂正则、位运算、魔法数字。
-
-注释语言：后端 Rust（`src-tauri/**`）统一用英文注释；前端（`src/**/*.{ts,tsx,css}`）统一用中文注释。同一文件内不要中英混用。完成一个多文件功能后，用脚本对全部新增/改动文件做一次横切扫描（注释语言、硬编码文案、行数上限），不要凭记忆抽查——前后端两侧都漏过。
-
-### 前端
-
-组件与架构：
-
-- React Compiler 已在 `vite.config.ts` 启用（`babel-plugin-react-compiler`），组件自动记忆化。Never 手写 `useMemo`/`useCallback`/`memo` 做性能优化，除非 memoize 的开销远超渲染本身（如超大列表行级比较），并需注释说明原因。
-- 先复用，再新建。优先级：`src/components/ui` → 已装第三方库 → 已有 feature 组件/hooks/store/lib → 新建。
-- 第三次出现相似实现时，抽公共组件或 hook。
-- 影响面广的问题在全局收口层处理：i18n provider、`lib/ipc.ts`、错误处理、路由配置、store。
-- 同一工具实现出现第二处就抽到 `src/lib/**`。
-- 平台判断用 `src/lib/platform.ts` 的现成函数，不要在组件里自行判断。
-
-UI 与响应式：
-
-- 页面必须兼容移动端和桌面端，移动优先，用 `sm:`/`md:`/`lg:` 向上增强。
-- 保持布局紧凑、入口清晰、状态完整。
-- 长列表用 `@tanstack/react-virtual` 虚拟化。
-- 用户可见按钮、图标、菜单、表单控件要有可访问标签或 title。
-
-i18n：
-
-- 面向用户的前端文案必须走 Lingui。JSX 用 `<Trans>`，属性/toast/dialog 标题用 ``t`...` ``，非 React 渲染路径用 `translate(msg...)`。
-- 表单 schema 错误文案做成接收 `t` 的 schema factory，不写成模块级固定字符串。
-- `.po` 是源文件需提交；`messages.ts` 是生成物已 gitignore；`pnpm build` 会先执行 compile。
-- 新增/改动文案后：`pnpm run extract && pnpm run compile && pnpm build`。
-
-### 后端
-
-测试组织：
-
-- Rust 单元测试必须放在独立文件中，不在生产源码内内联测试实现，参考 `src-tauri/src/ai/client.rs`。
-- 普通模块 `foo.rs` 的测试放在同目录 `foo_tests.rs`，并在模块末尾使用 `#[cfg(test)] #[path = "foo_tests.rs"] mod tests;` 引入。
-- 目录模块 `mod.rs` 的测试放在同目录 `tests.rs`，并使用 `#[cfg(test)] mod tests;` 引入；需要特殊条件编译或模块名时保留原 `cfg` 和模块名，并通过 `#[path = "..."]` 指向独立测试文件。
-
-错误处理：
-
-- 生产路径禁止 `.unwrap()`、`.expect()`、`panic!`，用 `Result` + `?` 经统一错误类型跨 IPC 返回。
-- 错误信息要可诊断，但不得泄露密钥、口令、token。
-
-性能与边界：
-
-- 文件系统、网络、加密、密钥、路径安全等敏感或重逻辑放后端。
-- 不阻塞 async runtime，重活用 blocking 线程或独立任务。
-- LAN 传输、SSH/SFTP 会话、事件监听、临时资源必须有清理路径。
-
-数据与迁移：
-
-- schema 变更必须版本化、幂等、向前迁移，不破坏已有用户数据。
-
-### IPC 与类型
-
-类型由 `specta + tauri-specta` 从 Rust 自动生成，本项目重度依赖此约定：
-
-- 绑定产物 `src/bindings.ts` 由 `lib.rs` 的 `specta_builder()` 导出；`src/types.ts` 只是再导出门面。
-- 新增命令两步走：加 `#[tauri::command] #[specta::specta]`，并加进 `collect_commands![]`，漏第二步前端看不到。
-- 事件 payload 类型必须在 `specta_builder()` 里显式 `.typ::<T>()` 注册，否则不出现在 `bindings.ts`。
-- `cargo test` 时会重新导出绑定（`tests::export_typescript_bindings`），后端改完跑测试即可发现不同步。
-- 命令命名 `动词_名词`，如 `list_hosts`、`start_transfer`。
-
-### 依赖策略
-
-复杂能力优先复用成熟库。已装应优先复用：`@tanstack/react-virtual`、`@tanstack/react-table`、`@dnd-kit`、`gsap`、`qrcode.react`、`next-themes`、Lingui。
-
-新增依赖前考虑：已有库能否覆盖、维护活跃度与稳定性、体积影响、是否涉及安全逻辑（安全相关优先成熟库）。
-
-## 构建与验证命令
-
-按改动范围选择验证：
-
-- 前端改动：`pnpm build`
-- 前端改动（提交前）：`pnpm lint`（0 error 才可提交，warning 逐步清零）
-- 格式：`pnpm format`（Prettier + Tailwind 类名排序，pre-commit 已接入 lint-staged）
-- i18n 文案改动：`pnpm run extract && pnpm run compile && pnpm build`
-- 后端改动：`cargo check --manifest-path src-tauri/Cargo.toml`
-- 后端核心逻辑：`cargo test --manifest-path src-tauri/Cargo.toml --locked <测试名过滤>`，只跑改动涉及的测试及其关联测试（如 `cargo test ... ssh::` 只跑 ssh 模块），不用每次全量。
-
-验证范围：日常只跑调整功能涉及的测试以及与之关联的测试（调用方、被调用方、同领域模块），不跑全量测试套件；全量 `cargo test --locked` 只在提交前跑一次兜底。
-
-提交前尽量完整验证：`pnpm build` + `cargo test --manifest-path src-tauri/Cargo.toml --locked`。
-
-## Never 规则
-
-每条背后都是真实踩坑。违反任何一条都可能导致构建失败或破坏用户数据。
-
-生成物：
-
-- Never 手改 `src/bindings.ts`、`src/types.ts`、`src/routeTree.gen.ts`——自动生成，源头在 Rust/路由配置。
-- Never 手动提交 `src/locales/**/messages.ts`——编译产物，已 gitignore。
-
-IPC 边界：
-
-- Never 在组件里直接 invoke，IPC 调用集中在 `src/lib/ipc.ts`。
-- Never 手写或手改前端 IPC 类型，新增类型一律改 Rust。
-- Never 内联事件名字符串，统一从 `src/lib/events.ts` 引用；动态事件（如 `ssh://data/{id}`）用导出的函数生成，不在调用处拼接。
-- Never 在 `collect_commands![]` 条目上写 `#[cfg]`，平台专属命令用局部 macro 按 `cfg` 选列表（见 `lib.rs` 的 `all_commands!`）。
-
-平台边界：
-
-- Never 把某端功能设计成依赖另一端配合（如桌面端主导、移动端调用桌面端能力），每端必须能独立完整运行自己的模块，见「平台边界」。
-
-文案与代码：
-
-- Never 新增硬编码用户可见文案，必须走 Lingui。
-- Never 生产路径使用 `.unwrap()`/`.expect()`/`panic!`。
-- Never 拼接 SQL，必须参数化。
-
-UI 与样式：
-
-- Never 硬编码颜色/阴影/圆角（`#fff`、任意 `oklch(...)` 字面量等），必须用语义 token：Tailwind 类如 `bg-primary`、`text-muted-foreground`，或 `App.css`/`themes/presets.css` 里已定义的 CSS 变量——本项目支持多主题切换，硬编码会破坏切主题。
-
-结构与 Git：
-
-- Never 让源文件超过 600 行不拆分（生成物除外：shadcn `components/ui`、`bindings.ts`、`routeTree.gen.ts`）。
-- Never 在 Rust 生产源码中内联 `mod tests { ... }` 或其他测试模块实现；测试代码必须按后端测试组织规范放入独立文件。
-- Never revert/reset/checkout 不是你写的未提交改动；遇到时先读懂并在其基础上继续。
-
-## 约定与协作
-
-### Commit 规范
-
-- 格式：`type(scope): 中文描述`，类型：feat / fix / docs / refactor / test / chore / chore(deps)。
-- 只在被明确要求时才 commit，且只 stage 自己改动且符合意图的文件。
-
-### Code Review 标准
-
-先列问题，按严重程度排序，给出文件和行号。重点关注：
-
-- 行为回归和真实 bug。
-- IPC 类型不一致、错误处理缺失、未处理的异步失败。
-- i18n 硬编码用户文案、文件超过 600 行。
-- 迁移破坏旧数据、测试或验证缺口。
-
-如果没有发现问题，明确说明未发现阻断问题，并列出剩余风险或未跑的验证。
-
-### 规则演进
-
-每次 AI 犯了本文件没覆盖的错误，就在对应章节补一条规则或在 Never 规则里加一条，让这份文件随踩坑持续演进。
+- 禁止用 npm/yarn，禁止手改生成物或在前端另写 IPC 契约；不手改 `src/types.ts`，不提交 `src/locales/**/messages.ts`。
+- React Compiler 已启用，禁止常规手写 `useMemo` / `useCallback` / `memo`；特殊优化须说明依据。
+- 禁止 Rust 生产路径使用 `.unwrap()`、`.expect()`、`panic!`，禁止日志或错误泄露密钥、口令、token。
+- 禁止按错误文案判断类别、将结构化错误转成字符串传递，或把查询失败当作数据不存在。
+- 禁止失败回滚误删已有资源、擅自删除用户文件，或以破坏性操作掩盖清理失败；破坏性测试使用隔离数据。
+- 禁止把设计示例数据、假系统栏或设备外框写入生产页面；不能因设计图或宽屏布局开放平台不支持的能力。
+- 移动操作不能仅依赖 hover、双击、右键或外部拖入，必须有可见的等价入口。
+- 禁止自动重放认证或写操作；AI 服务密钥只能覆盖、不回显，不进入公开快照，关闭或切页清理密钥输入。
+- 禁止覆盖或回退他人的未提交改动；未经明确要求不 commit，仅 stage 本次改动。
+- 真机测试须先列计划并获用户确认；确认前禁止自行安装、启动或操作设备验收。
+- 禁止把构建通过、设计预览或浏览器模拟当作原生/真实后端验收；未测不得标记通过。

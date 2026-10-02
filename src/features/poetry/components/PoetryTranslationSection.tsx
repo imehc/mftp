@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import PoetryReadError from "./PoetryReadError";
+import {
+  DialogLayoutContent,
+  DialogLayoutHeader,
+  DialogLayoutBody,
+} from "~/components/ui/dialog-layout";
+import { usePoetryTranslations } from "../hooks/use-poetry-translations";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -8,7 +14,6 @@ import {
   Sparkles,
   Trash2,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -22,28 +27,11 @@ import {
 } from "~/components/ui/alert-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { Textarea } from "~/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import {
-  poetryPackTranslationsList,
-  aiConnectionGet,
-  poetryTranslationDelete,
-  poetryTranslationGenerate,
-  poetryTranslationsList,
-  poetryTranslationUpdate,
-} from "~/lib/ipc";
-import type {
-  PoetryPackTranslation,
-  PoetryTranslation,
-  PoetryTranslationMode,
-} from "~/bindings";
+import { describeError } from "~/lib/errors";
+import type { PoetryTranslationMode } from "~/bindings";
 
 interface Props {
   uid: string;
@@ -63,190 +51,47 @@ export default function PoetryTranslationSection({
   onModeChange,
 }: Props) {
   const { t } = useLingui();
-  const [mode, setMode] = useState<PoetryTranslationMode>(initialMode);
-  const [translations, setTranslations] = useState<PoetryTranslation[]>([]);
-  const [packTranslations, setPackTranslations] = useState<
-    PoetryPackTranslation[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [streamingContent, setStreamingContent] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState<PoetryTranslation | null>(null);
-  const [editContent, setEditContent] = useState("");
-  const [savingEdit, setSavingEdit] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [regenerateOpen, setRegenerateOpen] = useState(false);
-  const [configurationMissing, setConfigurationMissing] = useState(false);
-  const mountedRef = useRef(true);
-  const cancelGenerationRef = useRef<(() => void) | null>(null);
-  const current = translations.find((item) => item.mode === mode) ?? null;
-  const currentPackTranslations = packTranslations.filter(
-    (item) => item.mode === mode,
-  );
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      cancelGenerationRef.current?.();
-      cancelGenerationRef.current = null;
-    };
-  }, [uid]);
-
-  useEffect(() => {
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled) {
-        setLoading(true);
-        setError(null);
-      }
-    });
-    void Promise.all([
-      poetryTranslationsList(uid),
-      poetryPackTranslationsList(uid),
-    ])
-      .then(([items, packItems]) => {
-        if (!cancelled) {
-          setTranslations(items);
-          setPackTranslations(packItems);
-        }
-      })
-      .catch((nextError) => !cancelled && setError(String(nextError)))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [uid]);
-
-  function replaceTranslation(next: PoetryTranslation) {
-    setTranslations((items) => [
-      ...items.filter((item) => item.mode !== next.mode),
-      next,
-    ]);
-  }
-
-  async function generate() {
-    setGenerating(true);
-    setStreamingContent("");
-    setError(null);
-    setConfigurationMissing(false);
-    try {
-      const connection = await aiConnectionGet();
-      if (!mountedRef.current) return;
-      if (
-        !connection.hasKey ||
-        !connection.baseUrl.trim() ||
-        !connection.model.trim()
-      ) {
-        setConfigurationMissing(true);
-        return;
-      }
-      const generation = poetryTranslationGenerate(uid, mode, (delta) =>
-        setStreamingContent((content) => content + delta),
-      );
-      cancelGenerationRef.current = generation.cancel;
-      const translation = await generation.promise;
-      if (!mountedRef.current) return;
-      replaceTranslation(translation);
-      toast.success(t`已生成`);
-    } catch (nextError) {
-      if (mountedRef.current && String(nextError) !== "Error: cancelled") {
-        setError(String(nextError));
-      }
-    } finally {
-      if (mountedRef.current) {
-        setStreamingContent("");
-        setGenerating(false);
-      }
-      cancelGenerationRef.current = null;
-    }
-  }
-
-  function startEdit() {
-    if (!current) return;
-    setEditing(current);
-    setEditContent(current.content);
-  }
-
-  async function saveEdit() {
-    if (!editing || !editContent.trim()) return;
-    setSavingEdit(true);
-    setError(null);
-    try {
-      const translation = await poetryTranslationUpdate(
-        uid,
-        editing.mode,
-        editContent,
-      );
-      replaceTranslation(translation);
-      setEditing(null);
-      toast.success(t`已保存`);
-    } catch (nextError) {
-      setError(String(nextError));
-    } finally {
-      setSavingEdit(false);
-    }
-  }
-
-  async function remove() {
-    if (!current) return;
-    setDeleting(true);
-    setError(null);
-    try {
-      await poetryTranslationDelete(uid, current.mode);
-      setTranslations((items) =>
-        items.filter((item) => item.mode !== current.mode),
-      );
-      toast.success(t`已删除`);
-    } catch (nextError) {
-      setError(String(nextError));
-    } finally {
-      setDeleting(false);
-    }
-  }
-
-  function requestGeneration() {
-    if (current?.source === "user") setRegenerateOpen(true);
-    else void generate();
-  }
-
+  const {
+    mode,
+    setMode,
+    current,
+    currentPackTranslations,
+    loading,
+    readError,
+    retryRead,
+    generating,
+    streamingContent,
+    deleting,
+    error,
+    setError,
+    editing,
+    setEditing,
+    editContent,
+    setEditContent,
+    savingEdit,
+    deleteOpen,
+    setDeleteOpen,
+    regenerateOpen,
+    setRegenerateOpen,
+    configurationMissing,
+    setConfigurationMissing,
+    generate,
+    startEdit,
+    saveEdit,
+    remove,
+    requestGeneration,
+  } = usePoetryTranslations(uid, initialMode);
   return (
-    <section className="border-border space-y-3 border-t pt-4 font-sans text-sm">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-muted-foreground font-medium">
-          <Trans>译文</Trans>
-        </h3>
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          value={mode}
-          disabled={generating || savingEdit || deleting}
-          aria-label={t`译文模式`}
-          onValueChange={(value) => {
-            if (value) {
-              const nextMode = value as PoetryTranslationMode;
-              setMode(nextMode);
-              onModeChange?.(nextMode);
-              setError(null);
-              setConfigurationMissing(false);
-            }
-          }}
-        >
-          <ToggleGroupItem value="literal">
-            <Trans>白话直译</Trans>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="literary">
-            <Trans>文学意译</Trans>
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
+    <section className="flex flex-col gap-4 font-sans text-sm">
+      {readError ? (
+        <PoetryReadError error={readError} onRetry={retryRead} />
+      ) : null}
       {error ? (
         <Alert variant="destructive">
           <AlertTitle>{t`操作失败`}</AlertTitle>
-          <AlertDescription className="break-words">{error}</AlertDescription>
+          <AlertDescription className="break-words">
+            {describeError(error)}
+          </AlertDescription>
         </Alert>
       ) : null}
 
@@ -267,12 +112,26 @@ export default function PoetryTranslationSection({
         </Alert>
       ) : null}
 
+      {referenceTranslation?.trim() && !current && !generating ? (
+        <div className="flex flex-col gap-2">
+          <Badge variant="outline">
+            <Trans>注释包译文</Trans>
+          </Badge>
+          <p
+            className="font-poetry whitespace-pre-line"
+            style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
+          >
+            {referenceTranslation}
+          </p>
+        </div>
+      ) : null}
+
       {loading ? (
         <div className="text-muted-foreground flex min-h-20 items-center justify-center">
           <LoaderCircle className="size-4 animate-spin" aria-hidden />
         </div>
       ) : current || generating ? (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             {generating ? (
               <Badge variant="outline">
@@ -329,75 +188,40 @@ export default function PoetryTranslationSection({
           ) : (
             <p
               className="font-poetry whitespace-pre-line"
-              style={{ fontSize, lineHeight }}
+              style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
             >
               {generating ? streamingContent : current?.content}
             </p>
           )}
-          {!generating && current ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={deleting}
-              onClick={requestGeneration}
-            >
-              <RefreshCw data-icon="inline-start" />
-              <Trans>重新生成</Trans>
-            </Button>
-          ) : null}
         </div>
       ) : (
-        <div className="flex min-h-20 flex-col items-start justify-center gap-2">
-          <p className="text-muted-foreground text-xs">
-            <Trans>暂无译文</Trans>
-          </p>
-          <Button
-            type="button"
-            size="sm"
-            disabled={generating}
-            onClick={requestGeneration}
-          >
-            {generating ? (
-              <LoaderCircle data-icon="inline-start" className="animate-spin" />
-            ) : (
-              <Sparkles data-icon="inline-start" />
-            )}
-            <Trans>生成</Trans>
-          </Button>
+        <div className="flex flex-col items-start gap-2">
+          {!readError &&
+          !referenceTranslation?.trim() &&
+          currentPackTranslations.length === 0 ? (
+            <p className="text-muted-foreground text-xs">
+              <Trans>暂无译文</Trans>
+            </p>
+          ) : null}
         </div>
       )}
 
-      {referenceTranslation?.trim() ? (
-        <div className="border-border space-y-2 border-t pt-3">
-          <Badge variant="outline">
-            <Trans>注释包译文</Trans>
-          </Badge>
-          <p
-            className="font-poetry whitespace-pre-line"
-            style={{ fontSize, lineHeight }}
-          >
-            {referenceTranslation}
-          </p>
-        </div>
-      ) : null}
-
       {currentPackTranslations.length > 0 ? (
-        <div className="border-border space-y-3 border-t pt-3">
+        <div className="border-border flex flex-col gap-3 border-t pt-3">
           <Badge variant="outline">
             <Trans>开放译文</Trans>
           </Badge>
           {currentPackTranslations.map((item) => (
             <div
               key={`${item.packId}-${item.language}-${item.mode}`}
-              className="space-y-1"
+              className="flex flex-col gap-1"
             >
               <div className="text-muted-foreground text-xs">
                 {item.packName} · {item.packAuthor} · {item.packLicense}
               </div>
               <p
                 className="font-poetry whitespace-pre-line"
-                style={{ fontSize, lineHeight }}
+                style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
               >
                 {item.content}
               </p>
@@ -406,25 +230,94 @@ export default function PoetryTranslationSection({
         </div>
       ) : null}
 
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          value={mode}
+          disabled={generating || savingEdit || deleting}
+          aria-label={t`译文模式`}
+          onValueChange={(value) => {
+            if (value) {
+              const nextMode = value as PoetryTranslationMode;
+              setMode(nextMode);
+              onModeChange?.(nextMode);
+              setError(null);
+              setConfigurationMissing(false);
+            }
+          }}
+        >
+          <ToggleGroupItem value="literal">
+            <Trans>白话直译</Trans>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="literary">
+            <Trans>文学意译</Trans>
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={
+            generating || deleting || savingEdit || loading || !!readError
+          }
+          onClick={requestGeneration}
+        >
+          {generating ? (
+            <LoaderCircle data-icon="inline-start" className="animate-spin" />
+          ) : current ? (
+            <RefreshCw data-icon="inline-start" />
+          ) : (
+            <Sparkles data-icon="inline-start" />
+          )}
+          {current ? <Trans>重新生成</Trans> : <Trans>生成</Trans>}
+        </Button>
+      </div>
+
+      {referenceTranslation?.trim() && (current || generating) ? (
+        <div className="flex flex-col gap-2">
+          <Badge variant="outline">
+            <Trans>注释包译文</Trans>
+          </Badge>
+          <p
+            className="font-poetry whitespace-pre-line"
+            style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
+          >
+            {referenceTranslation}
+          </p>
+        </div>
+      ) : null}
+
       <Dialog
         open={editing !== null}
-        onOpenChange={(open) => !open && setEditing(null)}
+        onOpenChange={(open) => !open && !savingEdit && setEditing(null)}
       >
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogLayoutContent
+          className="ui-density-adaptive md:max-w-lg"
+          showCloseButton={false}
+        >
+          <DialogLayoutHeader showCloseButton>
             <DialogTitle>{t`编辑译文`}</DialogTitle>
-          </DialogHeader>
-          <Textarea
-            value={editContent}
-            disabled={savingEdit}
-            className="min-h-52 resize-y"
-            aria-label={t`译文内容`}
-            onChange={(event) => setEditContent(event.target.value)}
-          />
+          </DialogLayoutHeader>
+          <DialogLayoutBody>
+            {error ? (
+              <p role="alert" className="text-destructive mb-3 text-sm">
+                {describeError(error)}
+              </p>
+            ) : null}
+            <Textarea
+              value={editContent}
+              disabled={savingEdit}
+              className="min-h-52 resize-y"
+              aria-label={t`译文内容`}
+              onChange={(event) => setEditContent(event.target.value)}
+            />
+          </DialogLayoutBody>
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
+              disabled={savingEdit}
               onClick={() => setEditing(null)}
             >
               <Trans>取消</Trans>
@@ -443,7 +336,7 @@ export default function PoetryTranslationSection({
               <Trans>保存</Trans>
             </Button>
           </DialogFooter>
-        </DialogContent>
+        </DialogLayoutContent>
       </Dialog>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>

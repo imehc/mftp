@@ -1,9 +1,11 @@
+import { cn } from "cn";
 import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trophy } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { VictoryConfetti } from "./VictoryConfetti";
 export function GameResultBar({
+  presentation = "bar",
   title,
   details,
   rematchWaiting = false,
@@ -11,6 +13,7 @@ export function GameResultBar({
   onRematch,
   onExit,
 }: {
+  presentation?: "bar" | "page";
   title: ReactNode;
   details?: ReactNode;
   rematchWaiting?: boolean;
@@ -23,13 +26,33 @@ export function GameResultBar({
       {celebrate ? <VictoryConfetti /> : null}
       <section
         aria-live="polite"
-        className="animate-in border-border bg-background slide-in-from-bottom-2 pointer-events-auto relative z-30 shrink-0 border-t px-3 py-2 duration-300"
+        className={cn(
+          "border-border bg-background pointer-events-auto relative z-30 px-3 py-2",
+          presentation === "page"
+            ? "app-scroll-safe-end flex min-h-0 flex-1 overflow-auto"
+            : "animate-in slide-in-from-bottom-2 shrink-0 border-t duration-300",
+        )}
         style={{
           paddingBottom: "calc(var(--safe-bottom, 0px) + 0.5rem)",
         }}
       >
-        <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-2 sm:flex-row sm:justify-between">
-          <div className="min-w-0 text-center sm:text-left">
+        <div
+          className={cn(
+            "mx-auto flex w-full max-w-4xl flex-col items-center gap-3",
+            presentation === "page"
+              ? "my-auto py-8"
+              : "gap-2 md:flex-row md:justify-between",
+          )}
+        >
+          {presentation === "page" ? (
+            <Trophy className="bg-muted size-12 rounded-xl p-3" />
+          ) : null}
+          <div
+            className={cn(
+              "min-w-0 text-center",
+              presentation === "bar" && "md:text-left",
+            )}
+          >
             <div className="text-sm font-semibold">{title}</div>
             {details ? (
               <div className="text-muted-foreground mt-0.5 text-xs">
@@ -37,10 +60,15 @@ export function GameResultBar({
               </div>
             ) : null}
           </div>
-          <div className="flex w-full shrink-0 gap-2 sm:w-auto">
+          <div
+            className={cn(
+              "flex w-full shrink-0 gap-2 md:w-auto",
+              presentation === "page" && "max-w-sm",
+            )}
+          >
             <Button
               size="sm"
-              className="flex-1 sm:min-w-28"
+              className="flex-1 md:min-w-28"
               disabled={rematchWaiting}
               onClick={onRematch}
             >
@@ -54,7 +82,7 @@ export function GameResultBar({
             <Button
               size="sm"
               variant="outline"
-              className="flex-1 sm:min-w-28"
+              className="flex-1 md:min-w-28"
               onClick={onExit}
             >
               <ArrowLeft data-icon="inline-start" />

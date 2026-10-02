@@ -61,6 +61,15 @@ export default defineConfig(async () => ({
           if (id.includes("/@dimforge/")) return "vendor-physics";
           if (id.includes("/mediabunny/")) return "vendor-media";
           if (id.includes("/@xterm/")) return "vendor-xterm";
+          // CodeMirror（含 @lezer 解析器与 @uiw 包装）只被懒加载的格式化工具
+          // 使用；放进通用 vendor chunk 会让它跟着首屏一起预加载。
+          if (
+            id.includes("/@codemirror/") ||
+            id.includes("/@lezer/") ||
+            id.includes("/@uiw/")
+          ) {
+            return "vendor-codemirror";
+          }
           if (id.includes("/@tauri-apps/")) return "vendor-tauri";
           if (id.includes("/@lingui/")) return "vendor-i18n";
           if (id.includes("/@tanstack/")) return "vendor-tanstack";

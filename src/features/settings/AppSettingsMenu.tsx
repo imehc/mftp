@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import {
@@ -32,8 +31,6 @@ import {
 import { isDesktopPlatform } from "~/lib/platform";
 import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
 import {
-  applyColorTheme,
-  applyFontPreset,
   colorThemes,
   fontPresets,
   resolveColorTheme,
@@ -45,6 +42,7 @@ import { localeLabels, localeOptions } from "~/i18n/locales";
 import { type AppLocale, useSettingsStore } from "~/store/settings";
 import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 import { cn } from "cn";
+import AiModelMenu from "~/features/ai-configuration/AiModelMenu";
 
 const themes = [
   { value: "system", icon: Monitor },
@@ -77,13 +75,6 @@ export default function AppSettingsMenu() {
     error: t`重新检查`,
   };
 
-  useEffect(() => {
-    applyColorTheme(resolveColorTheme(colorTheme));
-  }, [colorTheme]);
-  useEffect(() => {
-    applyFontPreset(resolveFontPreset(fontPreset));
-  }, [fontPreset]);
-
   function checkUpdate() {
     if (updaterStatus === "ready") void restartToApplyUpdate();
     else void checkForUpdateManually();
@@ -97,7 +88,12 @@ export default function AppSettingsMenu() {
           {t`设置`}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-48">
+      <DropdownMenuContent
+        align="end"
+        collisionPadding={8}
+        sticky="always"
+        className="min-w-48"
+      >
         <DropdownMenuItem asChild>
           <Link to="/settings">
             <Settings />
@@ -141,6 +137,7 @@ export default function AppSettingsMenu() {
           </>
         ) : null}
         <DropdownMenuSeparator />
+        <AiModelMenu />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Languages />

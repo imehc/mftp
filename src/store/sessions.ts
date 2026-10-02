@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Host, Session } from "~/types";
 import * as ipc from "~/lib/ipc";
+import { toIpcError } from "~/lib/errors";
 
 let counter = 0;
 const nextTabId = () => `tab-${++counter}`;
@@ -69,7 +70,7 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
       if (get().activeId === tabId) set({ activeId: sessionId });
       return sessionId;
     } catch (e) {
-      get().patch(tabId, { status: "error", error: String(e) });
+      get().patch(tabId, { status: "error", error: toIpcError(e).payload });
       throw e;
     }
   },

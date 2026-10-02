@@ -1,6 +1,7 @@
+import { useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FolderInput, Trash2 } from "lucide-react";
-import { open } from "@tauri-apps/plugin-dialog";
+import { pickFilePathNative } from "~/lib/files";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -9,25 +10,32 @@ import {
   poetryTranslationPacks,
 } from "~/lib/ipc";
 import type { PoetryTranslationPackSummary } from "~/bindings";
+import { describeError } from "~/lib/errors";
 
 export default function TranslationPackManager({
   packs,
   onChange,
+  disabled = false,
 }: {
   packs: PoetryTranslationPackSummary[];
+  disabled?: boolean;
   onChange: (packs: PoetryTranslationPackSummary[]) => void;
 }) {
   const { t } = useLingui();
   const packCount = packs.length;
+  const [busy, setBusy] = useState(false);
+  const pending = useRef(false);
 
   const importPack = async () => {
-    const picked = await open({
-      multiple: false,
-      directory: false,
-      filters: [{ name: "JSON", extensions: ["json"] }],
-    });
-    if (typeof picked !== "string") return;
+    if (pending.current || disabled) return;
+    pending.current = true;
+    setBusy(true);
     try {
+      const picked = await pickFilePathNative({
+        filterName: "JSON",
+        extensions: ["json"],
+      });
+      if (typeof picked !== "string") return;
       const { readTextFile } = await import("@tauri-apps/plugin-fs");
       const count = await poetryTranslationPackImport(
         await readTextFile(picked),
@@ -35,17 +43,26 @@ export default function TranslationPackManager({
       onChange(await poetryTranslationPacks());
       toast.success(t`译文包已导入`, { description: t`共 ${count} 条译文` });
     } catch (error) {
-      toast.error(t`导入失败`, { description: String(error) });
+      toast.error(t`导入失败`, { description: describeError(error) });
+    } finally {
+      pending.current = false;
+      setBusy(false);
     }
   };
 
   const deletePack = async (id: string) => {
+    if (pending.current || disabled) return;
+    pending.current = true;
+    setBusy(true);
     try {
       await poetryTranslationPackDelete(id);
       onChange(packs.filter((item) => item.id !== id));
       toast.success(t`已删除`);
     } catch (error) {
-      toast.error(t`操作失败`, { description: String(error) });
+      toast.error(t`操作失败`, { description: describeError(error) });
+    } finally {
+      pending.current = false;
+      setBusy(false);
     }
   };
 
@@ -62,7 +79,12 @@ export default function TranslationPackManager({
               : t`仅导入带作者、来源和许可证的本地 JSON`}
           </p>
         </div>
-        <Button variant="outline" size="xs" onClick={() => void importPack()}>
+        <Button
+          variant="outline"
+          density="adaptive"
+          disabled={busy || disabled}
+          onClick={() => void importPack()}
+        >
           <FolderInput data-icon="inline-start" />
           <Trans>导入</Trans>
         </Button>
@@ -79,7 +101,9 @@ export default function TranslationPackManager({
             </span>
             <Button
               variant="ghost"
-              size="icon-xs"
+              size="icon-sm"
+              density="adaptive"
+              disabled={busy || disabled}
               aria-label={t`删除 ${packName}`}
               onClick={() => void deletePack(pack.id)}
             >

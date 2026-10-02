@@ -1,9 +1,16 @@
 /** 模式选择菜单：练习、人机设置、同屏对战，以及历史记录。 */
 import { useState } from "react";
-import { Plural, Trans } from "@lingui/react/macro";
-import { Bot, Target, Users } from "lucide-react";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { ChevronRight, Play, Target, Users } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Label } from "~/components/ui/label";
 import type { Difficulty } from "../engine/ai";
 import { useGameHistory, useGamesHistoryStore } from "../engine/history";
 import {
@@ -52,108 +59,113 @@ export function BilliardsModeMenu({
 }: {
   onStart: (mode: BilliardsMode) => void;
 }) {
+  const { t } = useLingui();
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [playerBreaks, setPlayerBreaks] = useState(true);
   const records = useGameHistory<BilliardsHistoryPayload>(BILLIARDS_GAME_ID);
   const clearGame = useGamesHistoryStore((s) => s.clearGame);
   return (
-    <div className="flex flex-1 justify-center overflow-auto p-3">
-      <div className="flex w-full max-w-xs flex-col gap-2 self-center">
-        <Button
-          variant="outline"
-          size="sm"
-          className="justify-between"
-          onClick={() =>
-            onStart({
-              kind: "practice",
-            })
-          }
-        >
-          <span className="flex items-center gap-2">
-            <Target className="size-4" />
-            <Trans>练习模式</Trans>
-          </span>
-          <span className="text-muted-foreground text-xs font-normal">
-            <Trans>自由清台</Trans>
-          </span>
-        </Button>
-        <div className="border-border flex flex-col gap-2 rounded-md border p-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="flex items-center gap-2 text-sm font-medium">
-              <Bot className="size-4" />
+    <div className="app-scroll-safe-end min-h-0 flex-1 overflow-auto px-3 pt-3">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-3">
+        <div className="grid gap-3 md:grid-cols-2">
+          <section className="flex flex-col gap-3 rounded-xl border p-4">
+            <h2 className="text-sm font-semibold">
               <Trans>人机对战</Trans>
-            </span>
+            </h2>
+            <div className="space-y-1.5">
+              <Label htmlFor="billiards-difficulty">
+                <Trans>难度</Trans>
+              </Label>
+              <Select
+                value={difficulty}
+                onValueChange={(value) => setDifficulty(value as Difficulty)}
+              >
+                <SelectTrigger id="billiards-difficulty" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">
+                    <Trans>简单</Trans>
+                  </SelectItem>
+                  <SelectItem value="medium">
+                    <Trans>中等</Trans>
+                  </SelectItem>
+                  <SelectItem value="hard">
+                    <Trans>困难</Trans>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="billiards-break">
+                <Trans>先后手</Trans>
+              </Label>
+              <Select
+                value={playerBreaks ? "me" : "ai"}
+                onValueChange={(value) => setPlayerBreaks(value === "me")}
+              >
+                <SelectTrigger id="billiards-break" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="me">
+                    <Trans>我先开球</Trans>
+                  </SelectItem>
+                  <SelectItem value="ai">
+                    <Trans>AI 先开球</Trans>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
-              size="xs"
-              onClick={() =>
-                onStart({
-                  kind: "ai",
-                  difficulty,
-                  playerBreaks,
-                })
-              }
+              fullWidth
+              className="md:w-fit md:self-start"
+              onClick={() => onStart({ kind: "ai", difficulty, playerBreaks })}
             >
-              <Trans>开始</Trans>
+              <Play />
+              <Trans>开始对局</Trans>
             </Button>
-          </div>
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            value={difficulty}
-            onValueChange={(value) => {
-              if (value) setDifficulty(value as Difficulty);
-            }}
-            className="w-full"
-          >
-            <ToggleGroupItem value="easy" className="flex-1">
-              <Trans>简单</Trans>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="medium" className="flex-1">
-              <Trans>中等</Trans>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="hard" className="flex-1">
-              <Trans>困难</Trans>
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            value={playerBreaks ? "me" : "ai"}
-            onValueChange={(value) => {
-              if (value) setPlayerBreaks(value === "me");
-            }}
-            className="w-full"
-          >
-            <ToggleGroupItem value="me" className="flex-1">
-              <Trans>我先开</Trans>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="ai" className="flex-1">
-              <Trans>AI 先开</Trans>
-            </ToggleGroupItem>
-          </ToggleGroup>
+          </section>
+          <section className="rounded-xl border p-4">
+            <h2 className="mb-2 text-sm font-semibold">
+              <Trans>其他方式</Trans>
+            </h2>
+            {[
+              {
+                kind: "hotseat" as const,
+                icon: Users,
+                title: t`双人对战`,
+                description: t`同屏轮流`,
+              },
+              {
+                kind: "practice" as const,
+                icon: Target,
+                title: t`练习模式`,
+                description: t`自由清台`,
+              },
+            ].map((item) => (
+              <button
+                key={item.kind}
+                type="button"
+                onClick={() => onStart({ kind: item.kind })}
+                className="hover:bg-accent focus-visible:ring-ring flex min-h-[max(44px,4rem)] w-full items-center gap-3 border-b text-left last:border-0 focus-visible:ring-2"
+              >
+                <item.icon className="text-muted-foreground size-5 shrink-0" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium">
+                    {item.title}
+                  </span>
+                  <span className="text-muted-foreground block text-xs">
+                    {item.description}
+                  </span>
+                </span>
+                <ChevronRight className="text-muted-foreground size-4" />
+              </button>
+            ))}
+          </section>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="justify-between"
-          onClick={() =>
-            onStart({
-              kind: "hotseat",
-            })
-          }
-        >
-          <span className="flex items-center gap-2">
-            <Users className="size-4" />
-            <Trans>双人对战</Trans>
-          </span>
-          <span className="text-muted-foreground text-xs font-normal">
-            <Trans>同屏轮流</Trans>
-          </span>
-        </Button>
         {records.length > 0 ? (
-          <div className="border-border flex flex-col gap-1 rounded-md border p-2.5">
+          <div className="border-border flex flex-col gap-2 rounded-xl border p-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground text-xs font-medium">
                 <Trans>历史记录</Trans>

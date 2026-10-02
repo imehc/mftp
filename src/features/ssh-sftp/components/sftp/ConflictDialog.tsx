@@ -14,10 +14,10 @@ import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
   DialogDescription,
 } from "~/components/ui/dialog";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import { firstFormError } from "~/lib/form-errors";
 export interface ConflictResolution {
   incomingName: string;
@@ -112,8 +112,11 @@ export default function ConflictDialog({
   }, [form, open, name, initialIncomingName, initialExistingName]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent
+        showCloseButton={false}
+        className="ui-density-adaptive max-w-md"
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>目标已存在同名项目</Trans>
           </DialogTitle>
@@ -123,7 +126,7 @@ export default function ConflictDialog({
               ”。修改要继续操作的名称，或先重命名远端已有项目。
             </Trans>
           </DialogDescription>
-        </DialogHeader>
+        </DialogLayoutHeader>
 
         <form
           autoComplete="off"

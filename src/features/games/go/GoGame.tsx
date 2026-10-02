@@ -1,9 +1,7 @@
 /** 围棋界面外壳：顶部操作与模式切换。 */
 import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
-import { Grid3x3 } from "lucide-react";
-import { GameHomeButton, GameMatchActions } from "../engine/GameHeaderControls";
-import { GameVolumeControl } from "../engine/GameVolumeControl";
+import { BoardGameHeader } from "../engine/BoardGameHeader";
 import { unlockGoAudio } from "./audio";
 import { GoMatch } from "./GoMatch";
 import { GoModeMenu } from "./GoModeMenu";
@@ -12,8 +10,10 @@ import type { GoMode } from "./types";
 export default function GoGame() {
   const [mode, setMode] = useState<GoMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
+  const [onlinePlaying, setOnlinePlaying] = useState(false);
   const [matchFinished, setMatchFinished] = useState(false);
   const exitMatch = () => {
+    setOnlinePlaying(false);
     setMatchFinished(false);
     setMode(null);
   };
@@ -22,31 +22,20 @@ export default function GoGame() {
     setMatchKey((key) => key + 1);
   };
   return (
-    <main className="bg-background text-foreground flex h-full flex-col overflow-hidden">
-      <header className="border-border flex items-center justify-between gap-2 border-b px-2 py-1.5">
-        <div className="flex items-center gap-1">
-          <GameHomeButton
-            matchActive={mode !== null}
-            matchFinished={matchFinished}
-          />
-          <div className="bg-border h-4 w-px" />
-          <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
-            <Grid3x3 className="size-3.5" />
-            <Trans>围棋</Trans>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <GameVolumeControl />
-          {mode ? (
-            <GameMatchActions
-              matchFinished={matchFinished}
-              canRestart={mode.kind !== "online"}
-              onRestart={restartMatch}
-              onExit={exitMatch}
-            />
-          ) : null}
-        </div>
-      </header>
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
+    >
+      {mode?.kind !== "online" || onlinePlaying ? (
+        <BoardGameHeader
+          title={<Trans>围棋</Trans>}
+          active={mode !== null}
+          finished={matchFinished}
+          canRestart={mode?.kind !== "online"}
+          onRestart={restartMatch}
+          onExit={exitMatch}
+        />
+      ) : null}
       {mode === null ? (
         <GoModeMenu
           onStart={(nextMode) => {
@@ -57,6 +46,7 @@ export default function GoGame() {
         />
       ) : mode.kind === "online" ? (
         <GoOnlineFlow
+          onPlayingChange={setOnlinePlaying}
           boardSize={mode.boardSize}
           onExit={exitMatch}
           onFinishedChange={setMatchFinished}

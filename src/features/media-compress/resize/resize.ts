@@ -5,8 +5,8 @@ import {
   extensionForFormat,
   isSupportedImageFile,
   mimeForFormat,
-  stripExtension,
 } from "~/features/media-compress/image/compress";
+import { stripExtension } from "~/lib/files";
 import { translate } from "~/i18n/translate";
 export type ResizeMethod = "ratio" | "dimension";
 export type DimensionMode =

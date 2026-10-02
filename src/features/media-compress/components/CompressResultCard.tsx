@@ -4,11 +4,10 @@ import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import {
-  downloadBlob,
-  formatBytes,
-  sizeDeltaPercent,
-} from "~/features/media-compress/format";
+import { downloadBlob } from "~/lib/files";
+import { formatBytes } from "~/lib/format";
+import { sizeDeltaPercent } from "~/features/media-compress/format";
+import { describeError } from "~/lib/errors";
 interface CompressResultCardProps {
   fileName: string;
   size: number;
@@ -41,16 +40,16 @@ export function CompressResultCard({
         if (saved !== size) onSizeChange?.(saved);
       }
     } catch (error) {
-      toast.error(String(error));
+      toast.error(describeError(error));
     }
   }
   return (
-    <section className="border-border bg-card flex flex-col rounded-lg border p-2.5">
-      <div className="flex items-center justify-between gap-2">
+    <section className="border-border bg-card flex flex-col gap-3 rounded-lg border p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-muted-foreground min-w-0 text-xs font-medium">
           <h2 className="truncate">{title ?? <Trans>压缩结果</Trans>}</h2>
         </div>
-        <div className="flex min-w-0 shrink-0 items-center gap-1.5 overflow-x-auto whitespace-nowrap">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
           {extraBadges}
           <Badge variant="outline" className="shrink-0">
             {formatBytes(size)}
@@ -60,18 +59,23 @@ export function CompressResultCard({
               {t`减小 ${delta}%`}
             </Badge>
           ) : null}
-          <Button
-            size="sm"
-            title={fileName}
-            className="shrink-0"
-            onClick={() => void onDownload()}
-          >
-            <Download data-icon="inline-start" />
-            <Trans>下载</Trans>
-          </Button>
         </div>
       </div>
-      {preview ? <div className="mt-auto">{preview}</div> : null}
+      <p className="text-muted-foreground text-xs break-all">{fileName}</p>
+      {preview ? <div>{preview}</div> : null}
+      <div className="flex justify-end">
+        {" "}
+        <Button
+          size="sm"
+          title={fileName}
+          density="adaptive"
+          className="max-md:w-full"
+          onClick={() => void onDownload()}
+        >
+          <Download data-icon="inline-start" />
+          <Trans>下载</Trans>
+        </Button>
+      </div>
     </section>
   );
 }

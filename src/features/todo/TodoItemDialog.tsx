@@ -1,30 +1,25 @@
-import { useEffect, useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useForm } from "@tanstack/react-form";
-import { enUS, zhCN } from "date-fns/locale";
-import { CalendarIcon, X } from "lucide-react";
-import { z } from "zod";
+import { Trans } from "@lingui/react/macro";
 import { Button } from "~/components/ui/button";
-import { Calendar } from "~/components/ui/calendar";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
+import CandidateInput from "~/components/CandidateInput";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+} from "~/components/ui/field";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutFooter,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
+import { useTodoEditor } from "./hooks/use-todo-editor";
 import { Textarea } from "~/components/ui/textarea";
 import { firstFormError } from "~/lib/form-errors";
-import { cn } from "cn";
 import type { TodoItem, TodoItemInput } from "~/types";
-import { localDateKey, todoDateFromKey } from "./todo-utils";
+import TodoSchedulePicker from "./TodoSchedulePicker";
 
 interface TodoItemDialogProps {
   open: boolean;
@@ -34,92 +29,6 @@ interface TodoItemDialogProps {
   onSubmit: (input: TodoItemInput) => Promise<void>;
 }
 
-const emptyValues = {
-  title: "",
-  category: "",
-  notes: "",
-  dueDate: "",
-  completed: false,
-};
-
-function toFormValues(item: TodoItem | null) {
-  if (!item) return { ...emptyValues };
-  return {
-    title: item.title,
-    category: item.category ?? "",
-    notes: item.notes ?? "",
-    dueDate: item.dueDate ?? "",
-    completed: item.completed,
-  };
-}
-
-function TodoDatePicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  const { i18n, t } = useLingui();
-  const [open, setOpen] = useState(false);
-  const selectedDate = value ? todoDateFromKey(value) : undefined;
-  const locale = i18n.locale.startsWith("zh") ? zhCN : enUS;
-  const clearLabel = t`清除日期`;
-
-  return (
-    <div className="flex min-w-0 items-center gap-1.5">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id="todo-due-date"
-            type="button"
-            variant="outline"
-            className="min-w-0 flex-1 justify-start font-normal"
-          >
-            <CalendarIcon data-icon="inline-start" />
-            <span
-              className={cn(
-                "truncate",
-                !selectedDate && "text-muted-foreground",
-              )}
-            >
-              {selectedDate
-                ? new Intl.DateTimeFormat(i18n.locale, {
-                    dateStyle: "medium",
-                  }).format(selectedDate)
-                : t`选择日期`}
-            </span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            locale={locale}
-            selected={selectedDate}
-            defaultMonth={selectedDate}
-            onSelect={(date) => {
-              onChange(date ? localDateKey(date) : "");
-              setOpen(false);
-            }}
-          />
-        </PopoverContent>
-      </Popover>
-      {value ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => onChange("")}
-          aria-label={clearLabel}
-          title={clearLabel}
-        >
-          <X />
-        </Button>
-      ) : null}
-    </div>
-  );
-}
-
 export default function TodoItemDialog({
   open,
   item,
@@ -127,147 +36,155 @@ export default function TodoItemDialog({
   onOpenChange,
   onSubmit,
 }: TodoItemDialogProps) {
-  const { t } = useLingui();
-  const form = useForm({
-    defaultValues: toFormValues(item),
-    validators: {
-      onSubmit: z.object({
-        title: z
-          .string()
-          .trim()
-          .min(1, t`请输入待办标题`),
-        category: z.string(),
-        notes: z.string(),
-        dueDate: z.string(),
-        completed: z.boolean(),
-      }),
-    },
-    onSubmit: async ({ value }) => {
-      const category = value.category.trim();
-      const notes = value.notes.trim();
-      await onSubmit({
-        title: value.title.trim(),
-        category: category || null,
-        notes: notes || null,
-        dueDate: value.dueDate || null,
-        completed: value.completed,
-      });
-    },
-  });
-
-  useEffect(() => {
-    if (open) form.reset(toFormValues(item));
-  }, [form, item, open]);
+  const form = useTodoEditor({ open, item, onSubmit });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogLayoutContent
+        placement="responsive-page"
+        className="ui-density-adaptive md:max-w-lg"
+        aria-describedby={undefined}
+        showCloseButton={false}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             {item ? <Trans>编辑待办</Trans> : <Trans>新建待办</Trans>}
           </DialogTitle>
-        </DialogHeader>
-        <form
-          className="flex flex-col gap-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void form.handleSubmit();
-          }}
-        >
-          <form.Field name="title">
-            {(field) => {
-              const error = firstFormError(field.state.meta.errors);
-              return (
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="todo-title">
-                    <Trans>标题</Trans>
-                  </Label>
-                  <Input
-                    id="todo-title"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    aria-invalid={!!error}
-                    autoFocus
-                  />
-                  {error ? (
-                    <p className="text-destructive text-xs">{error}</p>
-                  ) : null}
-                </div>
-              );
+        </DialogLayoutHeader>
+        <DialogLayoutBody>
+          <form
+            id="todo-item-form"
+            className="p-1"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void form.handleSubmit();
             }}
-          </form.Field>
+          >
+            <FieldGroup density="compact">
+              <form.Field name="title">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <Field data-invalid={!!error}>
+                      <FieldLabel htmlFor="todo-title">
+                        <Trans>标题</Trans>
+                      </FieldLabel>
+                      <Input
+                        id="todo-title"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        aria-invalid={!!error}
+                        aria-describedby={
+                          error ? "todo-title-error" : undefined
+                        }
+                        autoFocus
+                      />
+                      {error ? (
+                        <FieldError id="todo-title-error">{error}</FieldError>
+                      ) : null}
+                    </Field>
+                  );
+                }}
+              </form.Field>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <form.Field name="category">
-              {(field) => (
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="todo-category">
-                    <Trans>分类</Trans>
-                  </Label>
-                  <Input
-                    id="todo-category"
-                    list="todo-category-options"
-                    value={field.state.value}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                  />
-                </div>
-              )}
-            </form.Field>
-            <form.Field name="dueDate">
-              {(field) => (
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="todo-due-date">
-                    <Trans>日期</Trans>
-                  </Label>
-                  <TodoDatePicker
-                    value={field.state.value}
-                    onChange={field.handleChange}
-                  />
-                </div>
-              )}
-            </form.Field>
-          </div>
-          <datalist id="todo-category-options">
-            {categories.map((category) => (
-              <option key={category} value={category} />
-            ))}
-          </datalist>
+              <FieldGroup density="compact" className="md:grid md:grid-cols-2">
+                <form.Field name="category">
+                  {(field) => (
+                    <Field className="md:col-span-2">
+                      <FieldLabel htmlFor="todo-category">
+                        <Trans>分类</Trans>
+                      </FieldLabel>
+                      <CandidateInput
+                        id="todo-category"
+                        candidates={categories}
+                        required={false}
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
+                <form.Field name="dueDate">
+                  {(dateField) => (
+                    <form.Field name="dueTime">
+                      {(timeField) => {
+                        const error = firstFormError(
+                          timeField.state.meta.errors,
+                        );
+                        return (
+                          <Field
+                            className="md:col-span-2"
+                            data-invalid={!!error}
+                          >
+                            <FieldLabel htmlFor="todo-schedule">
+                              <Trans>计划时间</Trans>
+                            </FieldLabel>
+                            <TodoSchedulePicker
+                              date={dateField.state.value}
+                              time={timeField.state.value}
+                              error={!!error}
+                              onChange={(date, time) => {
+                                dateField.handleChange(date);
+                                timeField.handleChange(time);
+                              }}
+                            />
+                            {error ? (
+                              <FieldError id="todo-time-error">
+                                {error}
+                              </FieldError>
+                            ) : null}
+                          </Field>
+                        );
+                      }}
+                    </form.Field>
+                  )}
+                </form.Field>
+              </FieldGroup>
 
-          <form.Field name="notes">
-            {(field) => (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="todo-notes">
-                  <Trans>备注</Trans>
-                </Label>
-                <Textarea
-                  id="todo-notes"
-                  rows={4}
-                  value={field.state.value}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                />
-              </div>
+              <form.Field name="notes">
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="todo-notes">
+                      <Trans>备注</Trans>
+                    </FieldLabel>
+                    <Textarea
+                      id="todo-notes"
+                      rows={4}
+                      value={field.state.value}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                    />
+                  </Field>
+                )}
+              </form.Field>
+            </FieldGroup>
+          </form>
+        </DialogLayoutBody>
+        <DialogLayoutFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            <Trans>取消</Trans>
+          </Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button
+                type="submit"
+                form="todo-item-form"
+                disabled={isSubmitting}
+              >
+                <Trans>保存</Trans>
+              </Button>
             )}
-          </form.Field>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              <Trans>取消</Trans>
-            </Button>
-            <form.Subscribe selector={(state) => state.isSubmitting}>
-              {(isSubmitting) => (
-                <Button type="submit" disabled={isSubmitting}>
-                  <Trans>保存</Trans>
-                </Button>
-              )}
-            </form.Subscribe>
-          </DialogFooter>
-        </form>
-      </DialogContent>
+          </form.Subscribe>
+        </DialogLayoutFooter>
+      </DialogLayoutContent>
     </Dialog>
   );
 }

@@ -19,7 +19,7 @@ export function sideName(
       <span
         className={
           side === 0
-            ? "inline-flex items-center gap-1 text-[#b63a32]"
+            ? "text-chess-red inline-flex items-center gap-1"
             : "inline-flex items-center gap-1"
         }
       >
@@ -36,7 +36,7 @@ export function sideName(
     return side === mode.localSeat ? <Trans>你</Trans> : "AI";
   }
   return side === 0 ? (
-    <span className="inline-flex items-center gap-1 text-[#b63a32]">
+    <span className="text-chess-red inline-flex items-center gap-1">
       <Circle className="size-3 fill-current" />
       <Trans>红方</Trans>
     </span>

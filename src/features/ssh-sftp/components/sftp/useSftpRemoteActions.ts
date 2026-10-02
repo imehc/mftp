@@ -18,6 +18,7 @@ import {
   type LoadingAction,
   type PromptState,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { describeError } from "~/lib/errors";
 interface UseSftpRemoteActionsOptions {
   sessionId: string;
   cwd: string | null;
@@ -96,7 +97,7 @@ export function useSftpRemoteActions({
         return;
       }
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
       return;
     }
     await runExtract(entry, remoteParent, outName);
@@ -163,7 +164,7 @@ export function useSftpRemoteActions({
       });
       if (cwd) await load(cwd);
     } catch (e) {
-      toast.error(String(e), {
+      toast.error(describeError(e), {
         id: tid,
       });
     } finally {
@@ -207,7 +208,7 @@ export function useSftpRemoteActions({
         return;
       }
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
       return;
     }
     await runMoveEntry(entry, target);
@@ -272,7 +273,7 @@ export function useSftpRemoteActions({
       });
       await load(cwd);
     } catch (e) {
-      toast.error(String(e), {
+      toast.error(describeError(e), {
         id: tid,
       });
     } finally {
@@ -286,7 +287,7 @@ export function useSftpRemoteActions({
       await ipc.sftpMkdir(sessionId, joinPath(cwd, name));
       await load(cwd);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
     }
   }
   async function doRename(entry: SftpEntry, name: string) {
@@ -299,7 +300,7 @@ export function useSftpRemoteActions({
       await ipc.sftpRename(sessionId, entry.path, joinPath(cwd, name));
       await load(cwd);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
     }
   }
   async function confirmDelete() {
@@ -323,7 +324,7 @@ export function useSftpRemoteActions({
       });
       await load(cwd);
     } catch (e) {
-      const message = String(e);
+      const message = describeError(e);
       if (transferId) finishTransfer(transferId, "error", message);
       toast.error(message, {
         id: tid,

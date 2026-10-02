@@ -1,3 +1,5 @@
+import type { AppError } from "~/bindings";
+
 export type {
   ActivityLog,
   AppDataClearResult,
@@ -74,6 +76,7 @@ export interface Session {
   hostId: string;
   title: string;
   status: "connecting" | "connected" | "closed" | "error";
-  error?: string;
+  /** 统一的四字段错误；渲染时再本地化，不保存字符串文案。 */
+  error?: AppError;
   view: "terminal" | "sftp" | "monitor";
 }

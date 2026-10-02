@@ -1,4 +1,4 @@
-use crate::error::{AppError, AppResult};
+use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::models::{AppDataClearResult, AppDataModule, AppDataUsage};
 use rusqlite::Connection;
 use std::fs;
@@ -6,6 +6,20 @@ use std::path::Path;
 use walkdir::WalkDir;
 
 use super::Storage;
+
+// A reset detaches the live BT directory into this prefix before deleting;
+// leftovers from a failed pass are swept by the next `Storage::new`.
+const BT_TOMBSTONE_PREFIX: &str = "bt.pending-delete-";
+
+fn detach_bt_directory(path: &Path, tombstone: &Path) -> AppResult<bool> {
+    // An inaccessible path is not an absent one. Never delete in place if
+    // rename fails: the next engine must not reuse a tree with live writers.
+    if !path.try_exists()? {
+        return Ok(false);
+    }
+    fs::rename(path, tombstone)?;
+    Ok(true)
+}
 
 fn file_family_size(path: &Path) -> u64 {
     ["", "-wal", "-shm"]
@@ -39,10 +53,9 @@ fn query_bytes(conn: &Connection, query: &str) -> u64 {
 impl Storage {
     pub fn app_data_usage(&self) -> AppDataUsage {
         let poetry = self.root.join("poetry.sqlite3");
-        let bt_root = self.root.join("bt");
         let main_database_bytes = file_family_size(&self.db_path);
         let poetry_database_bytes = file_family_size(&poetry);
-        let bt_internal_bytes = dir_size(&bt_root);
+        let bt_internal_bytes = self.bt_internal_bytes();
         let (vault_bytes, hosts_bytes, todo_bytes, activity_logs_bytes) = self
             .conn()
             .ok()
@@ -100,8 +113,9 @@ impl Storage {
                             LENGTH(CAST(COALESCE(ip, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(request_type, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(result, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(detail, '') AS BLOB))
-                        ), 0) FROM lan_access_logs",
+                            LENGTH(CAST(COALESCE(detail, '') AS BLOB)) +
+                            LENGTH(CAST(COALESCE(error_payload, '') AS BLOB))
+                        ), 0) FROM activity_logs",
                     ),
                 )
             })
@@ -127,9 +141,13 @@ impl Storage {
                 tx.execute("DELETE FROM hosts", [])? + tx.execute("DELETE FROM ssh_keys", [])?
             }
             AppDataModule::Todo => tx.execute("DELETE FROM todo_items", [])?,
-            AppDataModule::ActivityLogs => tx.execute("DELETE FROM lan_access_logs", [])?,
+            AppDataModule::ActivityLogs => tx.execute("DELETE FROM activity_logs", [])?,
             AppDataModule::Poetry => {
-                return Err(AppError("module is not stored in the main database".into()));
+                // The entry layer routes poetry clears to its own database;
+                // reaching here means a caller bypassed that routing.
+                return Err(AppError::custom(
+                    CustomErrorCode::AppDataModuleSeparateStore,
+                ));
             }
         };
         tx.commit()?;
@@ -157,34 +175,31 @@ impl Storage {
         let tables = [
             "hosts",
             "ssh_keys",
-            "lan_transfer_settings",
-            "lan_shared_dirs",
-            "lan_trusted_devices",
-            "lan_access_logs",
+            "activity_logs",
             "vault_entries",
             "todo_items",
-            "bt_tasks",
-            "bt_cache_access",
-            "ai_connection",
-            "ai_poetry_translations",
             "app_meta",
         ];
-        let mut changed = 0usize;
+        let mut changed = crate::modules::bt::schema::reset(&tx)?;
+        changed += crate::modules::lan_transfer::schema::reset(&tx)?;
+        changed += crate::modules::ai::schema::reset(&tx)?;
         for table in tables {
             changed += match table {
                 "hosts" => tx.execute("DELETE FROM hosts", [])?,
                 "ssh_keys" => tx.execute("DELETE FROM ssh_keys", [])?,
-                "lan_transfer_settings" => tx.execute("DELETE FROM lan_transfer_settings", [])?,
-                "lan_shared_dirs" => tx.execute("DELETE FROM lan_shared_dirs", [])?,
-                "lan_trusted_devices" => tx.execute("DELETE FROM lan_trusted_devices", [])?,
-                "lan_access_logs" => tx.execute("DELETE FROM lan_access_logs", [])?,
+                "activity_logs" => tx.execute("DELETE FROM activity_logs", [])?,
                 "vault_entries" => tx.execute("DELETE FROM vault_entries", [])?,
                 "todo_items" => tx.execute("DELETE FROM todo_items", [])?,
-                "bt_tasks" => tx.execute("DELETE FROM bt_tasks", [])?,
-                "bt_cache_access" => tx.execute("DELETE FROM bt_cache_access", [])?,
-                "ai_connection" => tx.execute("DELETE FROM ai_connection", [])?,
-                "ai_poetry_translations" => tx.execute("DELETE FROM ai_poetry_translations", [])?,
-                "app_meta" => tx.execute("DELETE FROM app_meta", [])?,
+                // Schema versions and retired-source markers describe the
+                // retained database, not user preferences. Clearing them can
+                // replay ALTER TABLE or reimport deleted legacy credentials.
+                "app_meta" => tx.execute(
+                    "DELETE FROM app_meta WHERE key NOT IN (
+                        'legacy_json_migrated', 'ai_schema_version', 'todo_schema_version',
+                        'bt_error_payload_schema_version', 'bt_download_only_migrated_v1'
+                    )",
+                    [],
+                )?,
                 _ => 0,
             };
         }
@@ -194,10 +209,62 @@ impl Storage {
 
     pub fn remove_bt_internal_data(&self) -> AppResult<()> {
         let path = self.root.join("bt");
-        if path.exists() {
-            fs::remove_dir_all(path)?;
+        // librqbit 9.0.1 `Session::stop()` only pauses torrents, signals
+        // cancellation and sleeps ~1s (their own source admits it is not a
+        // quiescence barrier), so third-party writers may still be alive when
+        // reset deletes engine data. Renaming the live directory to a
+        // same-volume tombstone first detaches the name the next engine will
+        // recreate: fd-holding writers can only append to the already-orphaned
+        // tree, never to fresh state.
+        let tombstone = self
+            .root
+            .join(format!("{BT_TOMBSTONE_PREFIX}{}", uuid::Uuid::new_v4()));
+        if detach_bt_directory(&path, &tombstone)? {
+            self.delete_bt_tombstone(&tombstone);
         }
         Ok(())
+    }
+
+    fn delete_bt_tombstone(&self, tombstone: &Path) {
+        // Surviving writers may recreate files while this delete runs. A
+        // residual tombstone must not fail the reset; usage accounting keeps
+        // counting it and the next storage startup retries the sweep.
+        if let Err(error) = fs::remove_dir_all(tombstone) {
+            eprintln!("deferred bt internal data cleanup, will retry at next startup: {error}");
+        }
+    }
+
+    pub(super) fn sweep_bt_tombstones(&self) {
+        // Run before this process can start a fresh engine.
+        let Ok(entries) = fs::read_dir(&self.root) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            if entry
+                .file_name()
+                .to_string_lossy()
+                .starts_with(BT_TOMBSTONE_PREFIX)
+            {
+                self.delete_bt_tombstone(&entry.path());
+            }
+        }
+    }
+
+    fn bt_internal_bytes(&self) -> u64 {
+        let mut bytes = dir_size(&self.root.join("bt"));
+        let Ok(entries) = fs::read_dir(&self.root) else {
+            return bytes;
+        };
+        for entry in entries.flatten() {
+            if entry
+                .file_name()
+                .to_string_lossy()
+                .starts_with(BT_TOMBSTONE_PREFIX)
+            {
+                bytes += dir_size(&entry.path());
+            }
+        }
+        bytes
     }
 
     pub fn data_clear_result(

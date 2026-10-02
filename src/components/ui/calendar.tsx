@@ -8,6 +8,7 @@ import {
 } from "react-day-picker"
 
 import { Button, buttonVariants } from "~/components/ui/button"
+import { TOUCH_TARGET_CLASS } from "~/lib/touch"
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react"
 
 function Calendar({
@@ -54,16 +55,18 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
+          TOUCH_TARGET_CLASS,
           "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
+          TOUCH_TARGET_CLASS,
           "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
           defaultClassNames.button_next
         ),
         month_caption: cn(
-          "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)",
+          "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size) max-md:min-h-[max(44px,2.75rem)] pointer-coarse:min-h-[max(44px,2.75rem)]",
           defaultClassNames.month_caption
         ),
         dropdowns: cn(

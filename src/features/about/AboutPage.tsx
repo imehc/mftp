@@ -1,361 +1,205 @@
-import { useEffect, useEffectEvent, useState, type ReactNode } from "react";
-import { getVersion } from "@tauri-apps/api/app";
-import { openUrl } from "@tauri-apps/plugin-opener";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import {
-  Activity,
+  ArrowLeft,
   Database,
-  HardDrive,
+  ExternalLink,
   RefreshCw,
-  RotateCcw,
   Trash2,
-  Wifi,
 } from "lucide-react";
-import { useLingui } from "@lingui/react/macro";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
-import { Badge } from "~/components/ui/badge";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import AppPageLayout from "~/components/AppPageLayout";
-import { usePoetrySyncProgress } from "~/features/poetry/hooks/use-poetry-sync";
-import * as ipc from "~/lib/ipc";
-import { formatBytes } from "~/lib/format";
-import { isDesktopPlatform } from "~/lib/platform";
+import { Badge } from "~/components/ui/badge";
+import {
+  SettingsEntry,
+  SettingsGroup,
+} from "~/features/settings/SettingsEntry";
+import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import { useSessionsStore } from "~/store/sessions";
 import { useTransfersStore } from "~/store/transfers";
-import type { AppDataModule, AppDataUsage, LanTransferStatus } from "~/types";
+import { isDesktopPlatform } from "~/lib/platform";
+import { formatBytes } from "~/lib/format";
+import { describeError } from "~/lib/errors";
+import { useAbout } from "./use-about";
+import DataManagementDialogs from "./DataManagementDialogs";
 
-const modules: AppDataModule[] = [
-  "vault",
-  "hosts",
-  "todo",
-  "poetry",
-  "activityLogs",
-];
-
-function statusLabel(value: boolean, labels: { active: string; idle: string }) {
-  return value ? labels.active : labels.idle;
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex min-h-10 items-center justify-between gap-3 border-b py-2 last:border-0">
+      <span className="min-w-0 text-sm">{label}</span>
+      <Badge variant="secondary">{value}</Badge>
+    </div>
+  );
 }
-
 export default function AboutPage() {
   const { t } = useLingui();
-  const sessions = useSessionsStore((state) => state.sessions);
-  const transfers = useTransfersStore((state) => state.transfers);
+  const c = useAbout();
+  const sessions = useSessionsStore((s) => s.sessions);
+  const transfers = useTransfersStore((s) => s.transfers);
   const sync = usePoetrySyncProgress();
-  const [usage, setUsage] = useState<AppDataUsage | null>(null);
-  const [lan, setLan] = useState<LanTransferStatus | null>(null);
-  const [logCount, setLogCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [version, setVersion] = useState("-");
-  const [clearModule, setClearModule] = useState<AppDataModule | null>(null);
-  const [resetOpen, setResetOpen] = useState(false);
-  const moduleTitles: Record<AppDataModule, string> = {
-    vault: t`密码本`,
-    hosts: t`主机和密钥`,
-    todo: t`待办`,
-    poetry: t`诗词库`,
-    activityLogs: t`活动日志`,
-  };
-  const statusLabels = { active: t`运行中`, idle: t`空闲` };
-  const moduleBytes: Record<AppDataModule, number> = {
-    vault: usage?.vaultBytes ?? 0,
-    hosts: usage?.hostsBytes ?? 0,
-    todo: usage?.todoBytes ?? 0,
-    poetry: usage?.poetryDatabaseBytes ?? 0,
-    activityLogs: usage?.activityLogsBytes ?? 0,
-  };
-  const visibleModules = usage
-    ? modules.filter((module) => moduleBytes[module] > 0)
-    : modules;
   const activeSessions = sessions.filter(
-    (item) => item.status === "connecting" || item.status === "connected",
+    (s) => s.status === "connecting" || s.status === "connected",
   ).length;
   const activeTransfers = transfers.filter(
-    (item) => item.status === "running",
+    (s) => s.status === "running",
   ).length;
-  const clearTitle = clearModule ? moduleTitles[clearModule] : "";
-
-  async function load() {
-    setLoading(true);
-    try {
-      const [nextUsage, nextLan, logs] = await Promise.all([
-        ipc.appDataUsage(),
-        ipc.lanTransferStatus(),
-        ipc.activityLogs(500),
-      ]);
-      setUsage(nextUsage);
-      setLan(nextLan);
-      setLogCount(logs.length);
-    } catch (error) {
-      toast.error(String(error));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const loadOnMount = useEffectEvent(load);
-  useEffect(() => {
-    queueMicrotask(() => void loadOnMount());
-    void getVersion()
-      .then(setVersion)
-      .catch(() => setVersion("dev"));
-  }, []);
-
-  async function confirmClear() {
-    if (!clearModule) return;
-    try {
-      const result = await ipc.appDataClear(clearModule);
-      const title = moduleTitles[clearModule];
-      const freed = formatBytes(result.bytesFreed);
-      toast.success(t`${title}已清理，释放 ${freed}`);
-      setClearModule(null);
-      void load();
-    } catch (error) {
-      toast.error(String(error));
-    }
-  }
-
-  async function resetAll() {
-    try {
-      if (isDesktopPlatform()) {
-        const { disable } = await import("@tauri-apps/plugin-autostart");
-        await disable().catch(() => undefined);
-      }
-      await ipc.appDataReset();
-      localStorage.removeItem("mftp-settings");
-      localStorage.removeItem("mftp-games-history");
-      localStorage.removeItem("mftp-poetry");
-      window.location.href = "/";
-    } catch (error) {
-      toast.error(String(error));
-    }
-  }
-
   return (
-    <AppPageLayout
-      title={t`关于`}
-      description={t`版本、状态和本地数据管理`}
-      actions={
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={loading}
-          onClick={() => void load()}
-        >
-          <RefreshCw
-            className={loading ? "animate-spin" : undefined}
-            data-icon="inline-start"
-          />
-          {t`刷新`}
-        </Button>
-      }
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
     >
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-semibold">MFTP</h2>
-              <p className="text-muted-foreground mt-1 text-xs">{t`本地文件与数据工具`}</p>
-            </div>
-            <Badge variant="outline">v{version}</Badge>
-          </div>
-          <Button
-            variant="link"
-            className="mt-2 h-auto px-0"
-            onClick={() => void openUrl("https://github.com/imehc/mftp")}
-          >
-            {t`项目帮助`}
+      <ToolPageHeader
+        showHome={false}
+        title={<Trans>关于</Trans>}
+        leading={
+          <Button variant="ghost" size="icon-sm" density="adaptive" asChild>
+            <Link to="/settings" aria-label={t`返回设置`}>
+              <ArrowLeft />
+            </Link>
           </Button>
-        </section>
-
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="mb-2 flex items-center gap-2">
-            <Database className="size-4" />
-            <h2 className="text-sm font-semibold">{t`存储占用`}</h2>
+        }
+        trailing={
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            density="adaptive"
+            aria-label={t`刷新状态`}
+            disabled={c.loading || c.busy}
+            onClick={() => void c.reload()}
+          >
+            <RefreshCw className={c.loading ? "animate-spin" : undefined} />
+          </Button>
+        }
+      />
+      <div className="app-scroll-safe-end mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-3 overflow-auto px-3 pt-3 md:px-4 md:pt-4">
+        <div className="flex shrink-0 flex-col items-center gap-2 py-6">
+          <div
+            className="bg-foreground text-background flex size-10 items-center justify-center rounded-xl text-xl font-semibold"
+            aria-hidden="true"
+          >
+            M
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <UsageRow
-              label={t`主数据库`}
-              value={usage ? formatBytes(usage.mainDatabaseBytes) : "-"}
-            />
-            <UsageRow
-              label={t`诗词数据库`}
-              value={usage ? formatBytes(usage.poetryDatabaseBytes) : "-"}
-            />
-            <UsageRow
-              label={t`应用内部数据`}
-              value={usage ? formatBytes(usage.btInternalBytes) : "-"}
-            />
-            <UsageRow
-              label={t`总占用`}
-              value={usage ? formatBytes(usage.totalBytes) : "-"}
-              strong
-            />
-          </div>
-        </section>
-
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="mb-2 flex items-center gap-2">
-            <Activity className="size-4" />
-            <h2 className="text-sm font-semibold">{t`当前状态`}</h2>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <StatusRow
-              label={t`SSH/SFTP 连接`}
-              value={`${activeSessions}`}
-              active={activeSessions > 0}
-            />
-            <StatusRow
-              label={t`文件传输`}
-              value={`${activeTransfers}`}
-              active={activeTransfers > 0}
-            />
-            <StatusRow
-              label={t`局域网服务`}
-              value={statusLabel(lan?.running ?? false, statusLabels)}
-              active={lan?.running ?? false}
-              icon={<Wifi className="size-3.5" />}
-            />
-            <StatusRow
-              label={t`诗词库同步`}
-              value={statusLabel(sync.active, statusLabels)}
-              active={sync.active}
-            />
-            <StatusRow
-              label={t`活动日志`}
-              value={`${logCount}`}
-              active={false}
-            />
-          </div>
-        </section>
-
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="mb-2 flex items-center gap-2">
-            <HardDrive className="size-4" />
-            <h2 className="text-sm font-semibold">{t`数据管理`}</h2>
-          </div>
-          <div className="divide-border divide-y">
-            {visibleModules.length === 0 ? (
-              <p className="text-muted-foreground py-1 text-xs">
-                {t`暂无可清理的数据`}
-              </p>
-            ) : null}
-            {visibleModules.map((module) => (
-              <div
-                key={module}
-                className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0"
-              >
-                <div className="min-w-0">
-                  <span className="text-sm">{moduleTitles[module]}</span>
-                  <span className="text-muted-foreground ml-2 text-xs tabular-nums">
-                    {usage ? formatBytes(moduleBytes[module]) : "-"}
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setClearModule(module)}
-                >
-                  <Trash2 data-icon="inline-start" />
-                  {t`清理`}
-                </Button>
-              </div>
-            ))}
-          </div>
-          <div className="border-border mt-3 border-t pt-2.5">
-            <Button variant="destructive" onClick={() => setResetOpen(true)}>
-              <RotateCcw data-icon="inline-start" />
-              {t`清空所有数据`}
+          <h1 className="text-lg font-semibold">MFTP</h1>
+          <p className="text-muted-foreground text-xs tabular-nums">
+            {c.version}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            <Trans>本地文件与数据工具</Trans>
+          </p>
+        </div>
+        {c.error || c.versionError ? (
+          <div
+            role="status"
+            className="text-destructive flex shrink-0 items-center justify-between gap-3 text-sm"
+          >
+            <span>{describeError(c.error ?? c.versionError)}</span>
+            <Button
+              variant="outline"
+              density="adaptive"
+              disabled={c.loading || c.busy}
+              onClick={() => void c.reload()}
+            >
+              <Trans>重试</Trans>
             </Button>
-            <p className="text-muted-foreground mt-2 text-xs">{t`恢复首次打开状态，不删除下载目录和共享目录中的文件。`}</p>
           </div>
-        </section>
+        ) : null}
+        <div className="grid shrink-0 gap-3 md:grid-cols-2">
+          <SettingsGroup title={<Trans>存储占用</Trans>}>
+            <InfoRow
+              label={t`主数据库`}
+              value={c.usage ? formatBytes(c.usage.mainDatabaseBytes) : "—"}
+            />
+            <InfoRow
+              label={t`诗词数据库`}
+              value={c.usage ? formatBytes(c.usage.poetryDatabaseBytes) : "—"}
+            />
+            <InfoRow
+              label={t`应用内部数据`}
+              value={c.usage ? formatBytes(c.usage.btInternalBytes) : "—"}
+            />
+            <InfoRow
+              label={t`总占用`}
+              value={c.usage ? formatBytes(c.usage.totalBytes) : "—"}
+            />
+          </SettingsGroup>
+          <SettingsGroup title={<Trans>运行状态</Trans>}>
+            <InfoRow
+              label="SSH / SFTP"
+              value={activeSessions ? String(activeSessions) : t`空闲`}
+            />
+            <InfoRow
+              label={t`文件传输`}
+              value={activeTransfers ? String(activeTransfers) : t`空闲`}
+            />
+            {isDesktopPlatform() ? (
+              <>
+                <InfoRow
+                  label={t`局域网服务`}
+                  value={
+                    c.lanError
+                      ? t`状态读取失败`
+                      : c.lan
+                        ? c.lan.running
+                          ? t`运行中`
+                          : t`未启动`
+                        : "—"
+                  }
+                />
+                {c.lanError ? (
+                  <p
+                    role="status"
+                    className="text-destructive text-xs break-words"
+                  >
+                    {describeError(c.lanError)}
+                  </p>
+                ) : null}
+              </>
+            ) : null}
+            <InfoRow
+              label={t`诗词同步`}
+              value={
+                sync.stale ? t`等待确认` : sync.active ? t`运行中` : t`空闲`
+              }
+            />
+          </SettingsGroup>
+        </div>
+        <div className="shrink-0">
+          <SettingsGroup title={<Trans>本地数据</Trans>}>
+            <SettingsEntry
+              icon={Database}
+              title={<Trans>按模块清理</Trans>}
+              description={<Trans>选择需要清理的数据范围</Trans>}
+              disabled={c.busy}
+              onClick={() => c.setModulesOpen(true)}
+            />
+            <SettingsEntry
+              icon={Trash2}
+              title={<Trans>清空所有数据</Trans>}
+              description={<Trans>恢复首次打开状态</Trans>}
+              disabled={c.busy}
+              onClick={() => c.selectTarget("all")}
+            />
+          </SettingsGroup>
+        </div>
+        <div className="shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            density="adaptive"
+            onClick={() =>
+              void openUrl("https://github.com/imehc/mftp").catch((error) =>
+                toast.error(describeError(error)),
+              )
+            }
+          >
+            <ExternalLink data-icon="inline-start" />
+            <Trans>项目帮助</Trans>
+          </Button>
+        </div>
       </div>
-
-      <AlertDialog
-        open={clearModule !== null}
-        onOpenChange={(open) => {
-          if (!open) setClearModule(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t`清理${clearTitle}？`}</AlertDialogTitle>
-            <AlertDialogDescription>{t`此操作无法撤销，其他模块数据不会受到影响。`}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => void confirmClear()}
-            >{t`确认清理`}</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t`清空所有数据？`}</AlertDialogTitle>
-            <AlertDialogDescription>{t`将删除所有应用内数据、缓存、日志和设置，并恢复首次打开状态。下载目录和共享目录中的文件会保留。`}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => void resetAll()}
-            >{t`确认清空`}</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </AppPageLayout>
-  );
-}
-
-function UsageRow({
-  label,
-  value,
-  strong = false,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-}) {
-  return (
-    <div className="bg-muted/40 flex items-center justify-between gap-2 rounded-md px-2.5 py-2">
-      <span className="text-muted-foreground text-xs">{label}</span>
-      <span
-        className={strong ? "text-sm font-semibold" : "text-sm tabular-nums"}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function StatusRow({
-  label,
-  value,
-  active,
-  icon,
-}: {
-  label: string;
-  value: string;
-  active: boolean;
-  icon?: ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-2 py-1.5">
-      <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-        {icon}
-        {label}
-      </span>
-      <Badge variant={active ? "secondary" : "outline"}>{value}</Badge>
-    </div>
+      <DataManagementDialogs controller={c} />
+    </main>
   );
 }

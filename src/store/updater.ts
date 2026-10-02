@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { AppError } from "~/types";
 
 export type UpdaterStatus =
   | "idle"
@@ -16,7 +17,8 @@ export interface UpdaterState {
   downloaded: number;
   total?: number;
   phase: "downloading" | "installing";
-  error: string | null;
+  /** 更新插件的完整错误（external），到渲染时再本地化。 */
+  error: AppError | null;
 }
 
 export const initialUpdaterState: UpdaterState = {

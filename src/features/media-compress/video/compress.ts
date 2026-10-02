@@ -1,3 +1,5 @@
+import { msg } from "@lingui/core/macro";
+import { translate } from "~/i18n/translate";
 import {
   ALL_FORMATS,
   BlobSource,
@@ -55,7 +57,7 @@ const QUALITY_RATIO_LOW = 0.15;
 const PROBE_CACHE_LIMIT = 8;
 
 function abortError(): DOMException {
-  return new DOMException("压缩已取消", "AbortError");
+  return new DOMException(translate(msg`压缩已取消`), "AbortError");
 }
 
 function throwIfAborted(signal?: AbortSignal): void {
@@ -257,7 +259,7 @@ export async function probeVideoFile(
         });
         video.addEventListener(
           "error",
-          () => reject(new Error("无法读取视频信息")),
+          () => reject(new Error(translate(msg`无法读取视频信息`))),
           { once: true },
         );
       }),
@@ -330,10 +332,10 @@ export async function compressVideoFile(
   metadata?: VideoMeta,
 ): Promise<VideoCompressResult> {
   if (!webCodecsSupported()) {
-    throw new Error("当前环境不支持 WebCodecs，无法压缩视频");
+    throw new Error(translate(msg`当前环境不支持 WebCodecs，无法压缩视频`));
   }
   if (!isSupportedVideoFile(file)) {
-    throw new Error("仅支持 MP4、MOV、M4V 格式");
+    throw new Error(translate(msg`仅支持 MP4、MOV、M4V 格式`));
   }
   throwIfAborted(signal);
 
@@ -421,8 +423,8 @@ export async function compressVideoFile(
         .join("; ");
       throw new Error(
         detail
-          ? `无法转换该视频（${detail}）`
-          : "无法转换该视频，可能是不支持的编码",
+          ? translate(msg`无法转换该视频（${detail}）`)
+          : translate(msg`无法转换该视频，可能是不支持的编码`),
       );
     }
 
@@ -436,7 +438,7 @@ export async function compressVideoFile(
 
     const buffer = target.buffer;
     if (!buffer) {
-      throw new Error("压缩未生成输出数据");
+      throw new Error(translate(msg`压缩未生成输出数据`));
     }
 
     onProgress?.(100, "done");

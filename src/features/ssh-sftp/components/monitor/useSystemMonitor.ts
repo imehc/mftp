@@ -1,7 +1,8 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { msg } from "@lingui/core/macro";
-import type { Session, SystemStats } from "~/types";
+import type { AppError, Session, SystemStats } from "~/types";
 import * as ipc from "~/lib/ipc";
+import { toIpcError } from "~/lib/errors";
 import { translate } from "~/i18n/translate";
 import { useSessionsStore } from "~/store/sessions";
 export type RefreshIntervalMs = 0 | 2000 | 5000 | 10000;
@@ -52,16 +53,21 @@ function toPoint(stats: SystemStats): MonitorPoint {
     write: stats.diskIo.reduce((sum, d) => sum + d.writeBytesPerSec, 0),
   };
 }
-function fetchSystemStats(sessionId: string): Promise<SystemStats> {
-  return Promise.race([
-    ipc.sshSystemStats(sessionId),
-    new Promise<never>((_, reject) => {
-      setTimeout(
-        () => reject(new Error(translate(msg`监控采集超时`))),
-        REFRESH_TIMEOUT_MS,
-      );
-    }),
-  ]);
+async function fetchSystemStats(sessionId: string): Promise<SystemStats> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      ipc.sshSystemStats(sessionId),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(translate(msg`监控采集超时`))),
+          REFRESH_TIMEOUT_MS,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 export function useSystemMonitor(session: Session) {
   const sessionId = session.id;
@@ -70,7 +76,7 @@ export function useSystemMonitor(session: Session) {
     () => historyMap.get(sessionId) ?? [],
   );
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
   const [paused, setPaused] = useState(false);
   const [intervalMs, setIntervalMs] = useState<RefreshIntervalMs>(5000);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
@@ -101,7 +107,7 @@ export function useSystemMonitor(session: Session) {
     } catch (e) {
       if (seqRef.current !== seq) return;
       failuresRef.current += 1;
-      setError(String(e));
+      setError(toIpcError(e).payload);
       if (failuresRef.current >= MAX_CONSECUTIVE_FAILURES) setPaused(true);
     } finally {
       inFlightRef.current = false;
@@ -119,11 +125,17 @@ export function useSystemMonitor(session: Session) {
   // 定时器不会在每次渲染时都被拆除。
   const refreshInEffect = useEffectEvent(refresh);
   useEffect(() => {
-    // 用微任务延后，使 setState 发生在 effect 函数体之外。
+    let cancelled = false;
+    // 卸载使当前代次失效，晚到的采样不能继续写入页面或历史。
     queueMicrotask(() => {
+      if (cancelled) return;
       setHistory(historyMap.get(sessionId) ?? []);
       void refreshInEffect();
     });
+    return () => {
+      cancelled = true;
+      seqRef.current += 1;
+    };
   }, [sessionId]);
   useEffect(() => {
     if (intervalMs === 0 || paused) return;

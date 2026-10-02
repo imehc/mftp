@@ -17,6 +17,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
+[dev-dependencies]
+tauri = { version = "2", features = ["test"] }
+zeroize = "1.9"
+tokio = { version = "1", features = ["test-util"] }
+
 [dependencies]
 tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-opener = "2"
@@ -51,6 +56,9 @@ url = { version = "2", default-features = false }
 reqwest = { version = "0.13", default-features = false, features = ["blocking", "gzip", "rustls", "stream"] }
 eventsource-stream = "0.2.3"
 futures-util = "0.3"
+# Shared maintenance uses notifications/deadlines on Tauri's existing runtime;
+# BT-specific networking and file IO features remain platform-scoped below.
+tokio = { version = "1", features = ["sync", "time"] }
 
 # Desktop-only plugins: updater and autostart have no mobile support.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
@@ -65,7 +73,7 @@ keyring = { version = "3", default-features = false, features = ["apple-native",
 [target.'cfg(not(target_os = "ios"))'.dependencies]
 librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"] }
 librqbit-core = { version = "9.0.1", default-features = false, features = ["sha1-ring"] }
-tokio = { version = "1", features = ["sync", "time", "net", "io-util"] }
+tokio = { version = "1", features = ["net", "io-util"] }
 anyhow = "1"
 mime_guess = "2"
 
@@ -74,3 +82,5 @@ keyring = { version = "3", default-features = false, features = ["apple-native"]
 
 [target.'cfg(target_os = "android")'.dependencies]
 tauri-plugin-keystore = "=2.1.0-alpha.2"
+zeroize = "1.9"
+jni = "0.21"

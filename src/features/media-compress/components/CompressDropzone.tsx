@@ -4,11 +4,9 @@ import { Trans } from "@lingui/react/macro";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import {
-  pickFileNative,
-  type NativeFilePickOptions,
-} from "~/features/media-compress/format";
+import { pickFileNative, type NativeFilePickOptions } from "~/lib/files";
 import { cn } from "cn";
+import { describeError } from "~/lib/errors";
 interface CompressDropzoneProps {
   inputRef: RefObject<HTMLInputElement | null>;
   accept: string;
@@ -18,6 +16,8 @@ interface CompressDropzoneProps {
   title: ReactNode;
   description: ReactNode;
   footer?: ReactNode;
+  preview?: ReactNode;
+  onClear?: () => void;
   pickLabel?: ReactNode;
   /**
    * 桌面端 Tauri 原生对话框的后缀过滤，因为 WebView 不强制
@@ -34,6 +34,8 @@ export function CompressDropzone({
   title,
   description,
   footer,
+  preview,
+  onClear,
   pickLabel,
   nativeFilter,
 }: CompressDropzoneProps) {
@@ -48,7 +50,7 @@ export function CompressDropzone({
           return;
         }
       } catch (error) {
-        toast.error(String(error));
+        toast.error(describeError(error));
         return;
       }
     }
@@ -57,9 +59,9 @@ export function CompressDropzone({
   return (
     <section
       className={cn(
-        "rounded-lg border border-dashed p-3 transition-colors",
+        "border-border bg-card rounded-lg border p-3 transition-colors",
+        !preview && "md:col-span-2 md:border-dashed",
         dragOver ? "border-primary bg-accent/40" : "border-border bg-card",
-        disabled && "pointer-events-none opacity-60",
       )}
       onDragOver={(event) => {
         event.preventDefault();
@@ -69,6 +71,7 @@ export function CompressDropzone({
       onDrop={(event) => {
         event.preventDefault();
         setDragOver(false);
+        if (disabled) return;
         const dropped = event.dataTransfer.files?.[0];
         if (dropped) onFile(dropped);
       }}
@@ -84,25 +87,58 @@ export function CompressDropzone({
           if (next) onFile(next);
         }}
       />
-      <div className="flex flex-col items-center justify-center gap-2 py-4 text-center sm:py-6">
-        <div className="border-border bg-background flex size-10 items-center justify-center rounded-md border">
-          {icon}
+      {preview ? (
+        <div className="flex min-w-0 flex-col gap-3">
+          <h2 className="text-sm font-semibold">
+            <Trans>源文件</Trans>
+          </h2>
+          <div className="bg-muted flex h-60 items-center justify-center overflow-hidden rounded-md">
+            {preview}
+          </div>
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">{footer}</div>
+            <div className="flex items-center gap-2">
+              <Button
+                density="adaptive"
+                variant="outline"
+                size="sm"
+                disabled={disabled}
+                onClick={() => void onPick()}
+              >
+                <Trans>更换</Trans>
+              </Button>
+              <Button
+                density="adaptive"
+                variant="ghost"
+                size="sm"
+                disabled={disabled}
+                onClick={onClear}
+              >
+                <Trans>清空</Trans>
+              </Button>
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-medium">{title}</p>
-          <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>
+      ) : (
+        <div className="flex min-h-64 flex-col items-center justify-center gap-4 py-6 text-center">
+          <div className="bg-muted flex size-12 items-center justify-center rounded-lg">
+            {icon}
+          </div>
+          <div>
+            <p className="text-sm font-medium">{title}</p>
+            <p className="text-muted-foreground mt-1 text-xs">{description}</p>
+          </div>
+          <Button
+            density="adaptive"
+            className="max-md:w-full"
+            onClick={() => void onPick()}
+            disabled={disabled}
+          >
+            <Upload />
+            {pickLabel ?? <Trans>选择文件</Trans>}
+          </Button>
         </div>
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => void onPick()}
-          disabled={disabled}
-        >
-          <Upload data-icon="inline-start" />
-          {pickLabel ?? <Trans>选择文件</Trans>}
-        </Button>
-        {footer}
-      </div>
+      )}
     </section>
   );
 }

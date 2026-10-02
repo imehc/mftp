@@ -8,10 +8,10 @@ import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { FieldDescription } from "~/components/ui/field";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
+import { Field, FieldDescription } from "~/components/ui/field";
 import { firstFormError } from "~/lib/form-errors";
 interface Props {
   open: boolean;
@@ -58,10 +58,10 @@ export default function PromptDialog({
   }, [form, open, initialValue]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
+      <DialogContent className="ui-density-adaptive max-w-sm" showCloseButton={false}>
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
+        </DialogLayoutHeader>
         <form
           autoComplete="off"
           onSubmit={(e) => {
@@ -74,9 +74,10 @@ export default function PromptDialog({
             {(field) => {
               const error = firstFormError(field.state.meta.errors);
               return (
-                <div className="flex flex-col gap-1.5">
+                <Field data-invalid={!!error}>
                   <Input
                     autoFocus
+                    aria-label={placeholder ?? title}
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     placeholder={placeholder}
@@ -88,7 +89,7 @@ export default function PromptDialog({
                       {error}
                     </FieldDescription>
                   ) : null}
-                </div>
+                </Field>
               );
             }}
           </form.Field>

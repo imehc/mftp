@@ -1,504 +1,219 @@
-import { useEffect, useState, type ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  type DragEndEvent,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  Eye,
-  EyeOff,
-  Globe,
-  GripVertical,
-  KeyRound,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-} from "lucide-react";
-import { openUrl } from "@tauri-apps/plugin-opener";
-import { toast } from "sonner";
-import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { CopyButton } from "~/components/CopyButton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
-import { Badge } from "~/components/ui/badge";
+import { ListFilter, Plus, Search } from "lucide-react";
+import AppPageLayout from "~/components/AppPageLayout";
 import { Button } from "~/components/ui/button";
 import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupAddon,
+} from "~/components/ui/input-group";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "~/components/ui/dropdown-menu";
+import {
   Empty,
-  EmptyDescription,
   EmptyHeader,
   EmptyTitle,
+  EmptyDescription,
 } from "~/components/ui/empty";
-import { Input } from "~/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-import VaultEntryDialog from "~/features/vault/VaultEntryDialog";
-import { cn } from "cn";
-import {
-  vaultEntriesList,
-  vaultEntriesReorder,
-  vaultEntryCreate,
-  vaultEntryDelete,
-  vaultEntryUpdate,
-} from "~/lib/ipc";
-import type { VaultEntry, VaultEntryInput } from "~/types";
-const ALL_CATEGORIES = "__all__";
-function formatError(error: unknown): string {
-  if (error && typeof error === "object" && "message" in error) {
-    return String(
-      (
-        error as {
-          message: unknown;
-        }
-      ).message,
-    );
-  }
-  return String(error);
-}
-function SortableEntryCard({
-  id,
-  sortable,
-  children,
-}: {
-  id: string;
-  sortable: boolean;
-  children: ReactNode;
-}) {
-  const { t } = useLingui();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id,
-    disabled: !sortable,
-  });
-  const style = {
-    // 只做位移：若用 Transform 还会套用策略的缩放，
-    // 把高度不同的卡片压扁。
-    transform: CSS.Translate.toString(transform),
-    transition,
-  };
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn("relative", isDragging && "z-10 opacity-80")}
-    >
-      {sortable ? (
-        <button
-          type="button"
-          className="text-muted-foreground hover:bg-accent absolute top-1/2 left-1 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md"
-          aria-label={t`拖动排序`}
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="size-3.5" />
-        </button>
-      ) : null}
-      {children}
-    </div>
-  );
-}
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "~/components/ui/alert-dialog";
+import { describeError } from "~/lib/errors";
+import { useVault } from "./use-vault";
+import { ALL_CATEGORIES } from "./vault-utils";
+import VaultEntryDialog from "./VaultEntryDialog";
+import VaultEntryList from "./VaultEntryList";
+
 export default function VaultTool() {
   const { t } = useLingui();
-  const [entries, setEntries] = useState<VaultEntry[]>([]);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState(ALL_CATEGORIES);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<VaultEntry | null>(null);
-  const [deleting, setDeleting] = useState<VaultEntry | null>(null);
-  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 6,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-  useEffect(() => {
-    vaultEntriesList()
-      .then(setEntries)
-      .catch((error) => toast.error(formatError(error)));
-  }, []);
-  const categories = (() => {
-    const set = new Set<string>();
-    for (const entry of entries) {
-      if (entry.category) set.add(entry.category);
-    }
-    return [...set].sort((a, b) => a.localeCompare(b));
-  })();
-  const filtered = (() => {
-    const keyword = search.trim().toLowerCase();
-    return entries.filter((entry) => {
-      if (category !== ALL_CATEGORIES && entry.category !== category) {
-        return false;
-      }
-      if (!keyword) return true;
-      return [entry.title, entry.username, entry.url, entry.notes]
-        .filter(Boolean)
-        .some((text) => String(text).toLowerCase().includes(keyword));
-    });
-  })();
-  const canSort =
-    !search.trim() && category === ALL_CATEGORIES && entries.length > 1;
-  const sortableIds = entries.map((e) => e.id);
-  async function onDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = sortableIds.indexOf(String(active.id));
-    const newIndex = sortableIds.indexOf(String(over.id));
-    if (oldIndex < 0 || newIndex < 0) return;
-    const previous = entries;
-    setEntries(arrayMove(entries, oldIndex, newIndex));
-    try {
-      const next = await vaultEntriesReorder(
-        arrayMove(sortableIds, oldIndex, newIndex),
-      );
-      setEntries(next);
-    } catch (cause) {
-      setEntries(previous);
-      const error = formatError(cause);
-      toast.error(t`排序保存失败：${error}`);
-    }
-  }
-  function toggleVisible(id: string) {
-    setVisibleIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-  async function handleSubmit(input: VaultEntryInput) {
-    try {
-      if (editing) {
-        const updated = await vaultEntryUpdate(editing.id, input);
-        setEntries((prev) =>
-          prev.map((e) => (e.id === updated.id ? updated : e)),
-        );
-      } else {
-        const created = await vaultEntryCreate(input);
-        setEntries((prev) => [created, ...prev]);
-      }
-      setDialogOpen(false);
-      setEditing(null);
-      toast.success(t`已保存`);
-    } catch (error) {
-      toast.error(formatError(error));
-    }
-  }
-  async function handleDelete() {
-    if (!deleting) return;
-    try {
-      await vaultEntryDelete(deleting.id);
-      setEntries((prev) => prev.filter((e) => e.id !== deleting.id));
-      toast.success(t`已删除`);
-    } catch (error) {
-      toast.error(formatError(error));
-    } finally {
-      setDeleting(null);
-    }
-  }
+  const c = useVault();
   return (
-    <main className="bg-background text-foreground flex h-full flex-col">
-      <ToolPageHeader
-        title={<Trans>密码本</Trans>}
-        trailing={
-          <Badge variant="outline">
-            <Trans>本地</Trans>
-          </Badge>
-        }
-      />
-
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2 overflow-auto p-2.5 sm:p-3">
-        <section className="border-border bg-card rounded-lg border p-2.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-2">
-              <div className="border-border bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
-                <KeyRound className="size-4" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="truncate text-sm font-semibold">
-                  <Trans>密码本</Trans>
-                </h1>
-                <p className="text-muted-foreground truncate text-xs">
-                  <Trans>本地保存账号密码，点击即可复制</Trans>
-                </p>
-              </div>
-            </div>
+    <AppPageLayout
+      title={<Trans>密码本</Trans>}
+      adaptiveDensity
+      scroll="content"
+      bottomInset="scroll"
+      contentClassName="gap-3"
+      actions={
+        c.sorting ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            density="adaptive"
+            disabled={c.busy}
+            onClick={() => c.setSorting(false)}
+          >
+            <Trans>完成</Trans>
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            density="adaptive"
+            aria-label={t`新建账号`}
+            disabled={c.busy || c.loading || !!c.error}
+            onClick={() => c.edit(null)}
+          >
+            <Plus />
+          </Button>
+        )
+      }
+    >
+      <div className="flex shrink-0 items-center gap-2">
+        <InputGroup>
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupInput
+            value={c.search}
+            onChange={(e) => {
+              c.setSearch(e.target.value);
+              c.setSorting(false);
+            }}
+            placeholder={t`搜索标题、账号、网址`}
+            aria-label={t`搜索`}
+          />
+        </InputGroup>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
-              size="sm"
-              onClick={() => {
-                setEditing(null);
-                setDialogOpen(true);
+              variant={c.category === ALL_CATEGORIES ? "ghost" : "secondary"}
+              size="icon-sm"
+              density="adaptive"
+              aria-label={t`筛选和排序`}
+            >
+              <ListFilter />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="ui-density-adaptive">
+            <DropdownMenuRadioGroup
+              value={c.category}
+              onValueChange={(v) => {
+                c.setCategory(v);
+                c.setSorting(false);
               }}
             >
-              <Plus data-icon="inline-start" />
-              <Trans>新建</Trans>
-            </Button>
-          </div>
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-            <div className="relative flex-1">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t`搜索标题、账号、网址`}
-                className="h-8 pl-7"
-                aria-label={t`搜索`}
-              />
-            </div>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger
-                className="h-8 w-full sm:w-40"
-                aria-label={t`分类`}
+              <DropdownMenuRadioItem value={ALL_CATEGORIES}>
+                <Trans>全部分类</Trans>
+              </DropdownMenuRadioItem>
+              {c.categories.map((x) => (
+                <DropdownMenuRadioItem key={x} value={x}>
+                  {x}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                disabled={c.busy || c.loading || c.entries.length < 2}
+                onSelect={() => {
+                  c.setSearch("");
+                  c.setCategory(ALL_CATEGORIES);
+                  c.setSorting(true);
+                }}
               >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_CATEGORIES}>
-                  <Trans>全部分类</Trans>
-                </SelectItem>
-                {categories.map((item) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
-
-        {filtered.length === 0 ? (
-          <Empty className="flex-1">
-            <EmptyHeader>
-              <EmptyTitle>
-                <Trans>暂无账号</Trans>
-              </EmptyTitle>
-              <EmptyDescription>
-                {entries.length === 0 ? (
-                  <Trans>点击“新建”保存第一条账号密码</Trans>
-                ) : (
-                  <Trans>无匹配结果</Trans>
-                )}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={onDragEnd}
-          >
-            <SortableContext
-              items={sortableIds}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="flex flex-col gap-2">
-                {filtered.map((entry) => {
-                  const visible = visibleIds.has(entry.id);
-                  return (
-                    <SortableEntryCard
-                      key={entry.id}
-                      id={entry.id}
-                      sortable={canSort}
-                    >
-                      <section
-                        className={cn(
-                          "border-border bg-card rounded-lg border p-2.5",
-                          canSort && "pl-6",
-                        )}
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <h2 className="truncate text-sm font-semibold">
-                              {entry.title}
-                            </h2>
-                            {entry.category ? (
-                              <Badge variant="outline">{entry.category}</Badge>
-                            ) : null}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {entry.url ? (
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                title={t`打开网址`}
-                                onClick={() => {
-                                  void openUrl(entry.url!).catch((error) =>
-                                    toast.error(formatError(error)),
-                                  );
-                                }}
-                              >
-                                <Globe />
-                              </Button>
-                            ) : null}
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              title={t`编辑`}
-                              onClick={() => {
-                                setEditing(entry);
-                                setDialogOpen(true);
-                              }}
-                            >
-                              <Pencil />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              title={t`删除`}
-                              onClick={() => setDeleting(entry)}
-                            >
-                              <Trash2 />
-                            </Button>
-                          </div>
-                        </div>
-                        {entry.username || entry.password ? (
-                          <div className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
-                            {entry.username ? (
-                              <div className="flex min-w-0 items-center gap-1.5">
-                                <span className="text-muted-foreground shrink-0 text-xs">
-                                  <Trans>账号</Trans>
-                                </span>
-                                <span className="min-w-0 truncate font-mono text-xs">
-                                  {entry.username}
-                                </span>
-                                <CopyButton
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  value={entry.username}
-                                  label={t`复制账号`}
-                                  copiedLabel={t`已复制账号`}
-                                  onError={(error) =>
-                                    toast.error(formatError(error))
-                                  }
-                                />
-                              </div>
-                            ) : null}
-                            {entry.password ? (
-                              <div className="flex min-w-0 items-center gap-1.5">
-                                <span className="text-muted-foreground shrink-0 text-xs">
-                                  <Trans>密码</Trans>
-                                </span>
-                                <span className="min-w-0 truncate font-mono text-xs">
-                                  {visible ? entry.password : "••••••••"}
-                                </span>
-                                <Button
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  title={visible ? t`隐藏密码` : t`显示密码`}
-                                  onClick={() => toggleVisible(entry.id)}
-                                >
-                                  {visible ? <EyeOff /> : <Eye />}
-                                </Button>
-                                <CopyButton
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  value={entry.password}
-                                  label={t`复制密码`}
-                                  copiedLabel={t`已复制密码`}
-                                  onError={(error) =>
-                                    toast.error(formatError(error))
-                                  }
-                                />
-                              </div>
-                            ) : null}
-                          </div>
-                        ) : null}
-                        {entry.url || entry.notes ? (
-                          <div className="mt-1 flex flex-col gap-0.5">
-                            {entry.url ? (
-                              <p className="text-muted-foreground truncate text-xs">
-                                {entry.url}
-                              </p>
-                            ) : null}
-                            {entry.notes ? (
-                              <p className="text-muted-foreground line-clamp-2 text-xs whitespace-pre-wrap">
-                                {entry.notes}
-                              </p>
-                            ) : null}
-                          </div>
-                        ) : null}
-                      </section>
-                    </SortableEntryCard>
-                  );
-                })}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
+                <Trans>调整顺序</Trans>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-
+      {c.error ? (
+        <div
+          role="status"
+          className="border-destructive/30 text-destructive flex items-center justify-between gap-3 rounded-lg border p-3 text-sm"
+        >
+          <span>{describeError(c.error)}</span>
+          <Button
+            variant="outline"
+            density="adaptive"
+            onClick={() => void c.reload()}
+            disabled={c.loading}
+          >
+            <Trans>重试</Trans>
+          </Button>
+        </div>
+      ) : null}
+      {c.loading && c.entries.length === 0 ? (
+        <p role="status" className="text-muted-foreground p-3 text-sm">
+          <Trans>正在加载账号…</Trans>
+        </p>
+      ) : c.error && c.entries.length === 0 ? null : c.filtered.length ? (
+        <VaultEntryList controller={c} />
+      ) : (
+        <Empty className="app-scroll-safe-end flex-1">
+          <EmptyHeader>
+            <EmptyTitle>
+              {c.entries.length ? (
+                <Trans>无匹配结果</Trans>
+              ) : (
+                <Trans>暂无账号</Trans>
+              )}
+            </EmptyTitle>
+            <EmptyDescription>
+              {c.entries.length ? (
+                <Trans>调整搜索内容或分类后重试</Trans>
+              ) : (
+                <Trans>点击“新建”保存第一条账号密码</Trans>
+              )}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      )}
       <VaultEntryDialog
-        open={dialogOpen}
-        entry={editing}
-        categories={categories}
+        open={c.dialogOpen}
+        entry={c.editing}
+        categories={c.categories}
+        busy={c.busy}
         onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) setEditing(null);
+          if (!c.busy) c.setDialogOpen(open);
         }}
-        onSubmit={handleSubmit}
+        onSubmit={c.submit}
       />
-
       <AlertDialog
-        open={deleting !== null}
+        open={!!c.deleting}
         onOpenChange={(open) => {
-          if (!open) setDeleting(null);
+          if (!open && !c.busy) c.setDeleting(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="ui-density-adaptive">
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>删除该账号？</Trans>
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {deleting?.title ?? ""}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{c.deleting?.title}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
+            <AlertDialogCancel disabled={c.busy}>
               <Trans>取消</Trans>
             </AlertDialogCancel>
-            <AlertDialogAction onClick={() => void handleDelete()}>
+            <AlertDialogAction
+              disabled={c.busy}
+              onClick={(event) => {
+                event.preventDefault();
+                void c.remove();
+              }}
+            >
               <Trans>删除</Trans>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </main>
+    </AppPageLayout>
   );
 }

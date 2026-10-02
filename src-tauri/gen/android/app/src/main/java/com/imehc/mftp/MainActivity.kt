@@ -5,12 +5,10 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.activity.enableEdgeToEdge
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : TauriActivity() {
-  private var webView: WebView? = null
-  private var safeAreaJs: String? = null
+  private var webViewInsets: WebViewInsets? = null
+  private var webViewBackNavigation: WebViewBackNavigation? = null
   // Android filters multicast packets unless a MulticastLock is held;
   // without it mDNS discovery (game rooms / LAN devices) sees nothing.
   private var multicastLock: WifiManager.MulticastLock? = null
@@ -32,6 +30,8 @@ class MainActivity : TauriActivity() {
   }
 
   override fun onDestroy() {
+    webViewBackNavigation?.dispose()
+    webViewInsets?.dispose()
     try {
       multicastLock?.release()
     } catch (_: Exception) {}
@@ -39,34 +39,29 @@ class MainActivity : TauriActivity() {
   }
 
   override fun onWebViewCreate(webView: WebView) {
-    this.webView = webView
-    ViewCompat.setOnApplyWindowInsetsListener(webView) { _, insets ->
-      val bars = insets.getInsets(
-        WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
-      )
-      val density = resources.displayMetrics.density
-      fun toDp(px: Int) = px / density
-      safeAreaJs =
-        "document.documentElement.style.setProperty('--safe-top','${toDp(bars.top)}px');" +
-        "document.documentElement.style.setProperty('--safe-bottom','${toDp(bars.bottom)}px');" +
-        "document.documentElement.style.setProperty('--safe-left','${toDp(bars.left)}px');" +
-        "document.documentElement.style.setProperty('--safe-right','${toDp(bars.right)}px');"
-      applySafeArea()
-      // The page may not have loaded when the first inset pass runs; re-apply
-      // shortly after so the SPA document picks the values up.
-      webView.postDelayed({ applySafeArea() }, 500)
-      webView.postDelayed({ applySafeArea() }, 2000)
-      insets
-    }
+    webViewBackNavigation?.dispose()
+    webViewInsets?.dispose()
+    val backNavigation = WebViewBackNavigation(this, webView)
+    webViewBackNavigation = backNavigation
+    webViewInsets = WebViewInsets(this, webView, backNavigation::onImeVisibilityChanged)
   }
 
   override fun onResume() {
     super.onResume()
-    applySafeArea()
+    AiCredentialLifecycle.onResume(this)
+    webViewInsets?.apply()
   }
 
-  private fun applySafeArea() {
-    val js = safeAreaJs ?: return
-    webView?.evaluateJavascript(js, null)
+  override fun onPause() {
+    // Invalidate synchronously before Android finishes leaving the Activity.
+    AiCredentialLifecycle.onPause()
+    super.onPause()
   }
+
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+    // Losing focus to a biometric dialog must not cancel its authentication.
+    if (hasFocus) AiCredentialLifecycle.onFocusGained(this)
+  }
+
 }

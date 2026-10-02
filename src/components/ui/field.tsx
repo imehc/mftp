@@ -33,12 +33,20 @@ function FieldLegend({
     />
   );
 }
-function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
+function FieldGroup({
+  className,
+  density = "default",
+  ...props
+}: React.ComponentProps<"div"> & { density?: "default" | "compact" }) {
   return (
     <div
       data-slot="field-group"
+      data-density={density}
       className={cn(
-        "group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3 *:data-[slot=field-group]:gap-4",
+        "group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3",
+        density === "default" && "*:data-[slot=field-group]:gap-4",
+        density === "compact" &&
+          "gap-3 [&_[data-slot=field-description]]:text-xs [&_[data-slot=field]]:gap-1.5",
         className,
       )}
       {...props}

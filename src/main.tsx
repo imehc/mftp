@@ -8,6 +8,7 @@ import { TooltipProvider } from "~/components/ui/tooltip";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
 import { checkForUpdateOnLaunch } from "~/lib/updater";
 import { applyStoredColorTheme } from "~/lib/color-theme";
+import { AppRuntime } from "~/app/AppRuntime";
 import "./App.css";
 
 applyStoredColorTheme();
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AppI18nProvider>
         <TooltipProvider>
+          <AppRuntime />
           <RouterProvider router={router} />
         </TooltipProvider>
         <Toaster position="bottom-right" />

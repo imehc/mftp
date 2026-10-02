@@ -1,0 +1,68 @@
+/* 横屏只重排同一批节点，球桌、控制器与击球回放不重新挂载。 */
+.billiards-game[data-landscape="true"] {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr) 4.5rem;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding-bottom: var(--safe-bottom, 0px);
+}
+.billiards-game[data-landscape="true"] .billiards-landscape-nav {
+  grid-column: 1;
+  grid-row: 1;
+  flex-wrap: wrap;
+}
+.billiards-game[data-landscape="true"] .billiards-score {
+  grid-column: 1;
+  grid-row: 2;
+  max-width: 7rem;
+  align-self: center;
+  padding: 0.5rem;
+}
+.billiards-game[data-landscape="true"] .billiards-score > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.billiards-game[data-landscape="true"] .billiards-score > div > div {
+  align-items: center;
+}
+.billiards-game[data-landscape="true"] .billiards-stage {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  height: 100%;
+}
+.billiards-game[data-landscape="true"] .billiards-controls {
+  grid-column: 3;
+  grid-row: 1 / -1;
+  padding: 0.5rem 0.25rem;
+}
+.billiards-game[data-landscape="true"] .billiards-power {
+  height: 100%;
+  flex-direction: column;
+}
+.billiards-game[data-landscape="true"] .billiards-power [role="meter"] {
+  width: 0.25rem;
+  min-height: 2rem;
+  display: flex;
+  align-items: flex-end;
+}
+.billiards-game[data-landscape="true"] .billiards-power [role="meter"] > div {
+  width: 100% !important;
+  height: var(--billiards-power, 0%);
+}
+.billiards-game:fullscreen {
+  padding-top: var(--safe-top, 0px);
+  padding-left: var(--safe-left, 0px);
+  padding-right: var(--safe-right, 0px);
+}
+
+.billiards-game[data-landscape="true"]:has(.billiards-result) {
+  padding-bottom: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.billiards-game[data-landscape="true"]:has(.billiards-result) .billiards-stage {
+  grid-row: 1 / 3;
+}
+.billiards-game[data-landscape="true"] .billiards-result {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}

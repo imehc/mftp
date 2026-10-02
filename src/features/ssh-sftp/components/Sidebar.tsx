@@ -23,13 +23,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LoaderCircle,
-  Pencil,
   Plus,
   Server,
   KeyRound,
-  Trash2,
-  Unplug,
-  Zap,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Host } from "~/types";
@@ -61,11 +58,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import HostRow from "./hosts/HostRow";
 import HostForm from "~/features/ssh-sftp/components/hosts/HostForm";
 import KeyManager from "~/features/ssh-sftp/components/keys/KeyManager";
 import PassphrasePrompt from "~/features/ssh-sftp/components/hosts/PassphrasePrompt";
+import { describeError } from "~/lib/errors";
 interface SidebarProps {
   collapsed: boolean;
+  overlay?: boolean;
   onToggleCollapsed: () => void;
 }
 function SortableHostRow({
@@ -98,24 +98,28 @@ function SortableHostRow({
     >
       <button
         type="button"
-        className="text-muted-foreground hover:bg-sidebar-accent absolute top-1/2 left-0 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md"
+        className="text-muted-foreground hover:bg-sidebar-accent absolute top-1/2 left-0 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md pointer-coarse:min-h-[max(44px,2.75rem)] pointer-coarse:w-11"
         aria-label={t`拖动排序`}
         {...attributes}
         {...listeners}
       >
         <GripVertical className="size-3.5" />
       </button>
-      <div className="pl-5">{children}</div>
+      <div className="pl-5 pointer-coarse:pl-11">{children}</div>
     </li>
   );
 }
 export default function Sidebar({
   collapsed,
+  overlay = false,
   onToggleCollapsed,
 }: SidebarProps) {
   const { t } = useLingui();
   const sidebarRef = useRef<HTMLElement>(null);
   const hosts = useHostsStore((s) => s.hosts);
+  const loadError = useHostsStore((s) => s.loadError);
+  const loading = useHostsStore((s) => s.loading);
+  const retryLoad = useHostsStore((s) => s.ensureLoaded);
   const keys = useHostsStore((s) => s.keys);
   const deleteHost = useHostsStore((s) => s.deleteHost);
   const reorderHosts = useHostsStore((s) => s.reorderHosts);
@@ -174,7 +178,7 @@ export default function Sidebar({
     try {
       await reorderHosts(orderedIds);
     } catch (error) {
-      toast.error(t`排序保存失败：${error}`);
+      toast.error(describeError(error));
     }
   }
   async function connect(host: Host) {
@@ -194,7 +198,7 @@ export default function Sidebar({
     try {
       await openSession(host);
     } catch (e) {
-      toast.error(t`连接失败：${e}`);
+      toast.error(describeError(e));
     }
   }
   async function disconnect(host: Host) {
@@ -206,7 +210,7 @@ export default function Sidebar({
       const hostLabel = host.label;
       toast.success(t`已断开 ${hostLabel}`);
     } catch (e) {
-      toast.error(t`断开失败：${e}`);
+      toast.error(describeError(e));
     } finally {
       setDisconnecting((current) => {
         const next = new Set(current);
@@ -222,7 +226,7 @@ export default function Sidebar({
       await deleteHost(deleteTarget.id);
       toast.success(t`已删除主机 ${name}`);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
     } finally {
       setDeleteTarget(null);
     }
@@ -271,14 +275,12 @@ export default function Sidebar({
           <TooltipTrigger asChild>
             <button
               type="button"
+              aria-label={host.label}
               className={cn(
                 "hover:bg-sidebar-accent relative flex h-9 w-full items-center justify-center rounded-lg",
                 isActive && "bg-sidebar-accent",
               )}
-              onDoubleClick={() => connect(host)}
-              onClick={() => {
-                if (session) setActive(session.id);
-              }}
+              onClick={() => void connect(host)}
             >
               {isConnecting || isDisconnecting ? (
                 <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
@@ -286,7 +288,7 @@ export default function Sidebar({
                 <Server className="size-4" />
               )}
               {isConnected && !isDisconnecting ? (
-                <span className="absolute top-2 right-2 size-1.5 rounded-full bg-green-500" />
+                <span className="bg-success absolute top-2 right-2 size-1.5 rounded-full" />
               ) : null}
             </button>
           </TooltipTrigger>
@@ -301,88 +303,29 @@ export default function Sidebar({
         </Tooltip>
       );
     }
-    const hostAddressValue = hostAddress(host);
-    const hostAddressValue2 = hostAddress(host);
-    const hostAddressValue3 = hostAddress(host);
     return (
-      <div
-        className={cn(
-          "hover:bg-sidebar-accent relative flex items-center rounded-lg px-2 py-1.5",
-          isActive && "bg-sidebar-accent",
-        )}
-      >
-        <button
-          className="min-w-0 flex-1 text-left"
-          onDoubleClick={() => connect(host)}
-          title={session ? t`双击切换到连接` : t`双击连接`}
-        >
-          <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
-            <span className="truncate">{host.label}</span>
-            {isConnecting || isDisconnecting ? (
-              <LoaderCircle className="text-muted-foreground size-3 shrink-0 animate-spin" />
-            ) : isConnected ? (
-              <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
-            ) : null}
-          </p>
-          <p className="text-muted-foreground truncate text-xs">
-            {isConnected
-              ? isDisconnecting
-                ? t`断开中 · ${hostAddressValue}`
-                : t`已连接 · ${hostAddressValue2}`
-              : isConnecting
-                ? t`连接中 · ${hostAddressValue3}`
-                : hostAddress(host)}
-          </p>
-        </button>
-        <div className="bg-sidebar-accent/95 pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 gap-0.5 rounded-md group-hover:pointer-events-auto group-hover:flex">
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title={
-              isDisconnecting ? t`断开中` : isConnected ? t`断开连接` : t`连接`
-            }
-            disabled={isConnecting || isDisconnecting}
-            onClick={() =>
-              isConnected ? void disconnect(host) : void connect(host)
-            }
-          >
-            {isConnecting || isDisconnecting ? (
-              <LoaderCircle className="animate-spin" />
-            ) : isConnected ? (
-              <Unplug />
-            ) : (
-              <Zap />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title={t`编辑`}
-            onClick={() => {
-              setEditing(host);
-              setFormOpen(true);
-            }}
-          >
-            <Pencil />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            title={t`删除`}
-            onClick={() => setDeleteTarget(host)}
-          >
-            <Trash2 className="text-destructive" />
-          </Button>
-        </div>
-      </div>
+      <HostRow
+        host={host}
+        active={isActive}
+        connected={isConnected}
+        busy={isConnecting || isDisconnecting}
+        onConnect={() => void connect(host)}
+        onDisconnect={() => void disconnect(host)}
+        onEdit={() => {
+          setEditing(host);
+          setFormOpen(true);
+        }}
+        onDelete={() => setDeleteTarget(host)}
+      />
     );
   }
+
   const value = deleteTarget?.label;
   return (
     <aside
       ref={sidebarRef}
       className={cn(
-        "bg-sidebar flex h-full min-h-0 min-w-0 flex-col overflow-hidden",
+        "ui-density-adaptive bg-background flex h-full min-h-0 min-w-0 flex-col overflow-hidden",
         collapsed ? "items-stretch" : "",
       )}
     >
@@ -406,13 +349,22 @@ export default function Sidebar({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                aria-label={
+                  overlay ? t`关闭` : collapsed ? t`展开侧边栏` : t`折叠侧边栏`
+                }
                 onClick={onToggleCollapsed}
               >
-                {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+                {overlay ? (
+                  <X />
+                ) : collapsed ? (
+                  <PanelLeftOpen />
+                ) : (
+                  <PanelLeftClose />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              {collapsed ? t`展开侧边栏` : t`折叠侧边栏`}
+              {overlay ? t`关闭` : collapsed ? t`展开侧边栏` : t`折叠侧边栏`}
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -420,6 +372,7 @@ export default function Sidebar({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                aria-label={t`密钥管理`}
                 onClick={() => setKeysOpen(true)}
               >
                 <KeyRound />
@@ -434,6 +387,7 @@ export default function Sidebar({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                aria-label={t`新建主机`}
                 onClick={() => {
                   setEditing(null);
                   setFormOpen(true);
@@ -454,17 +408,32 @@ export default function Sidebar({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t`搜索…`}
-          className="h-7"
+          aria-label={t`搜索主机`}
         />
       </div>
 
       <div
         className={cn(
-          "flex-1 overflow-y-auto pb-2",
+          "app-scroll-safe-end min-h-0 flex-1 overflow-y-auto",
           collapsed ? "px-1.5" : "px-2",
         )}
       >
-        {filtered.length === 0 ? (
+        {loadError ? (
+          <div role="alert" className="space-y-2 p-2 text-sm">
+            <p>{describeError(loadError)}</p>
+            <Button
+              variant="outline"
+              fullWidth
+              onClick={() => void retryLoad().catch(() => undefined)}
+            >
+              <Trans>重试</Trans>
+            </Button>
+          </div>
+        ) : loading ? (
+          <p role="status" className="p-3 text-sm">
+            <Trans>正在加载</Trans>
+          </p>
+        ) : filtered.length === 0 ? (
           collapsed ? (
             <div className="text-muted-foreground flex justify-center py-4">
               <Server className="size-4" />
@@ -528,7 +497,7 @@ export default function Sidebar({
             try {
               await openSession(host, passphrase);
             } catch (e) {
-              toast.error(t`连接失败：${e}`);
+              toast.error(describeError(e));
             }
           }
         }}

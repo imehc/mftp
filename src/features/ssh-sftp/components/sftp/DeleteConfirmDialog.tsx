@@ -24,13 +24,16 @@ export default function DeleteConfirmDialog({
   const value = target?.name;
   return (
     <AlertDialog open={!!target} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="ui-density-adaptive">
         <AlertDialogHeader>
           <AlertDialogTitle>
             {target?.isDir ? t`删除文件夹` : t`删除文件`}
           </AlertDialogTitle>
           <AlertDialogDescription>
             <Trans>确定删除 “{value}”？</Trans>
+            <span className="mt-2 block font-mono text-xs break-all">
+              {target?.path}
+            </span>
             {target?.isDir ? t`该文件夹及其全部内容将被永久删除。` : ""}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -38,7 +41,7 @@ export default function DeleteConfirmDialog({
           <AlertDialogCancel>
             <Trans>取消</Trans>
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
+          <AlertDialogAction variant="destructive" onClick={onConfirm}>
             <Trans>删除</Trans>
           </AlertDialogAction>
         </AlertDialogFooter>

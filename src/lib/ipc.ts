@@ -1,12 +1,12 @@
 import { listen } from "@tauri-apps/api/event";
 import {
   commands,
-  type AiConnectionInput,
   type PoetryTranslation,
   type PoetryTranslationMode,
   type PoetryTranslationStreamEvent,
 } from "~/bindings";
 import { poetryTranslationStreamEvent } from "~/lib/events";
+import { toIpcError } from "~/lib/errors";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
   BtControlAction,
@@ -30,11 +30,16 @@ type CommandResult<T, E> =
 const unwrapCommand = async <T, E>(
   promise: Promise<CommandResult<T, E>>,
 ): Promise<T> => {
-  const result = await promise;
-  if (result.status === "ok") {
-    return result.data;
+  try {
+    const result = await promise;
+    if (result.status === "ok") {
+      return result.data;
+    }
+    throw toIpcError(result.error);
+  } catch (error) {
+    // 同时收口命令返回的错误和原生 IPC 拒绝，重复转换保持原对象。
+    throw toIpcError(error);
   }
-  throw result.error;
 };
 
 const voidCommand = async <E>(
@@ -43,13 +48,44 @@ const voidCommand = async <E>(
   await unwrapCommand(promise);
 };
 
-// ---- AI 服务 ----
-export const aiConnectionGet = () => unwrapCommand(commands.aiConnectionGet());
-export const aiConnectionSave = (input: AiConnectionInput) =>
-  unwrapCommand(commands.aiConnectionSave(input));
-export const aiConnectionClearKey = () =>
-  unwrapCommand(commands.aiConnectionClearKey());
-export const aiConnectionTest = () => voidCommand(commands.aiConnectionTest());
+// ---- AI 多地址公开配置 ----
+export const aiConfigurationGet = () =>
+  unwrapCommand(commands.aiConfigurationGet());
+export const aiProviderCreate = (
+  input: Parameters<typeof commands.aiProviderCreate>[0],
+) => unwrapCommand(commands.aiProviderCreate(input));
+export const aiProviderUpdate = (
+  input: Parameters<typeof commands.aiProviderUpdate>[0],
+) => unwrapCommand(commands.aiProviderUpdate(input));
+export const aiProviderDelete = (
+  input: Parameters<typeof commands.aiProviderDelete>[0],
+) => unwrapCommand(commands.aiProviderDelete(input));
+export const aiKeySave = (input: Parameters<typeof commands.aiKeySave>[0]) =>
+  unwrapCommand(commands.aiKeySave(input));
+export const aiKeyDelete = (
+  input: Parameters<typeof commands.aiKeyDelete>[0],
+) => unwrapCommand(commands.aiKeyDelete(input));
+export const aiModelSave = (
+  input: Parameters<typeof commands.aiModelSave>[0],
+) => unwrapCommand(commands.aiModelSave(input));
+export const aiModelDelete = (
+  input: Parameters<typeof commands.aiModelDelete>[0],
+) => unwrapCommand(commands.aiModelDelete(input));
+export const aiProviderActivate = (
+  input: Parameters<typeof commands.aiProviderActivate>[0],
+) => unwrapCommand(commands.aiProviderActivate(input));
+export const aiProviderSelect = (
+  input: Parameters<typeof commands.aiProviderSelect>[0],
+) => unwrapCommand(commands.aiProviderSelect(input));
+export const aiModelSwitch = (
+  input: Parameters<typeof commands.aiModelSwitch>[0],
+) => unwrapCommand(commands.aiModelSwitch(input));
+export const aiStreamingUpdate = (
+  input: Parameters<typeof commands.aiStreamingUpdate>[0],
+) => unwrapCommand(commands.aiStreamingUpdate(input));
+export const aiProviderTest = (
+  input: Parameters<typeof commands.aiProviderTest>[0],
+) => voidCommand(commands.aiProviderTest(input));
 
 // ---- 主机 ----
 export const hostsList = () => unwrapCommand(commands.hostsList());
@@ -141,9 +177,10 @@ export const gameRoomJoin = (
 ) => unwrapCommand(commands.gameRoomJoin(host, port, gameId, code, playerName));
 export const gameRoomDiscover = (gameId: string) =>
   unwrapCommand(commands.gameRoomDiscover(gameId));
-export const gameRoomSend = (payload: string) =>
-  voidCommand(commands.gameRoomSend(payload));
-export const gameRoomLeave = () => voidCommand(commands.gameRoomLeave());
+export const gameRoomSend = (instanceId: string, payload: string) =>
+  voidCommand(commands.gameRoomSend(instanceId, payload));
+export const gameRoomLeave = (instanceId: string) =>
+  voidCommand(commands.gameRoomLeave(instanceId));
 
 // ---- SSH 命令 ----
 export const sshConnect = (hostId: string, passphrase?: string) =>
@@ -335,13 +372,28 @@ export const poetryPackTranslationsList = (uid: string) =>
   unwrapCommand(commands.listPoetryPackTranslations(uid));
 export const poetryTranslationsList = (uid: string) =>
   unwrapCommand(commands.listPoetryTranslations(uid));
+export interface PoetryGenerationHandle {
+  /**
+   * 生成完成时返回译文；调用方在 `detach()` 之后不应再使用结果。
+   * 离开时若请求尚未开始，返回 null（不会为离开的订阅者新起请求）。
+   */
+  promise: Promise<PoetryTranslation | null>;
+  /**
+   * 停止接收流式增量。
+   *
+   * 这不是「取消后端任务」：请求一旦开始，后端会继续执行并自行释放任务锁。
+   * 真正的取消需要后端提供契约，前端不得用按钮文案假装已经取消。
+   */
+  detach: () => void;
+}
+
 export const poetryTranslationGenerate = (
   uid: string,
   mode: PoetryTranslationMode,
   onDelta: (delta: string) => void,
-) => {
+): PoetryGenerationHandle => {
   const requestId = crypto.randomUUID();
-  let cancelled = false;
+  let detached = false;
   let unlisten: (() => void) | null = null;
   const cleanup = () => {
     const listener = unlisten;
@@ -353,9 +405,9 @@ export const poetryTranslationGenerate = (
     (event) => onDelta(event.payload.delta),
   ).then(async (listener) => {
     unlisten = listener;
-    if (cancelled) {
+    if (detached) {
       cleanup();
-      throw new Error("cancelled");
+      return null;
     }
     try {
       return await unwrapCommand(
@@ -366,10 +418,9 @@ export const poetryTranslationGenerate = (
     }
   });
   return {
-    promise: promise as Promise<PoetryTranslation>,
-    // 页面离开时只解除事件监听；后端请求继续运行并自行释放任务锁。
-    cancel: () => {
-      cancelled = true;
+    promise,
+    detach: () => {
+      detached = true;
       cleanup();
     },
   };

@@ -37,6 +37,7 @@ import {
   parentPath,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "cn";
+import { describeError } from "~/lib/errors";
 interface RemoteDirectoryPickerProps {
   open: boolean;
   title: string;
@@ -90,7 +91,7 @@ export default function RemoteDirectoryPicker({
         path: normalized,
       });
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
     } finally {
       setLoading(false);
     }
@@ -107,14 +108,19 @@ export default function RemoteDirectoryPicker({
       const home = await ipc.sftpHome(sessionId);
       await loadPath(home);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
       setLoading(false);
     }
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent className="sm:max-w-xl">
-        <DialogLayoutHeader>
+      <DialogLayoutContent
+        placement="responsive-page"
+        className="ui-density-adaptive md:max-w-xl"
+        showCloseButton={false}
+        aria-describedby={undefined}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>{title}</DialogTitle>
         </DialogLayoutHeader>
 

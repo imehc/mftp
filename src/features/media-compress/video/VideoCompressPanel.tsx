@@ -1,6 +1,8 @@
+import MediaProgress from "../components/MediaProgress";
 import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FileVideo, LoaderCircle } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { FileVideo, VideoOff } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -9,6 +11,7 @@ import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -17,7 +20,8 @@ import { CompressDropzone } from "~/features/media-compress/components/CompressD
 import { CompressEstimateBar } from "~/features/media-compress/components/CompressEstimateBar";
 import { CompressQualityField } from "~/features/media-compress/components/CompressQualityField";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
-import { formatBytes, formatDuration } from "~/features/media-compress/format";
+import { formatDuration } from "~/features/media-compress/format";
+import { formatBytes } from "~/lib/format";
 import type { CompressPhase } from "~/features/media-compress/types";
 import {
   audioCodecsSupported,
@@ -33,7 +37,9 @@ import {
   VIDEO_QUALITY_STEP,
   webCodecsSupported,
 } from "~/features/media-compress/video/compress";
+import { useMediaProcessing } from "../MediaProcessingGuard";
 import { useCompressResult } from "~/features/media-compress/useCompressResult";
+import { describeError } from "~/lib/errors";
 export default function VideoCompressPanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,6 +51,7 @@ export default function VideoCompressPanel() {
   const [quality, setQuality] = useState(DEFAULT_VIDEO_QUALITY);
   const [keepAudio, setKeepAudio] = useState(true);
   const [phase, setPhase] = useState<CompressPhase>("idle");
+  useMediaProcessing("video", phase === "compressing");
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -121,9 +128,9 @@ export default function VideoCompressPanel() {
       setPhase("idle");
     } catch (err) {
       if (probeRunRef.current !== runId) return;
-      setError(String(err));
+      setError(describeError(err));
       setPhase("error");
-      toast.error(String(err));
+      toast.error(describeError(err));
     }
   }
   async function onCompress() {
@@ -186,7 +193,7 @@ export default function VideoCompressPanel() {
         toast.message(t`已取消压缩`);
         return;
       }
-      const message = String(err);
+      const message = describeError(err);
       if (abortRef.current !== controller) return;
       setError(message);
       setPhase("error");
@@ -196,9 +203,6 @@ export default function VideoCompressPanel() {
         abortRef.current = null;
       }
     }
-  }
-  function onCancel() {
-    abortRef.current?.abort();
   }
   function onClear() {
     void applyFile(null);
@@ -216,27 +220,48 @@ export default function VideoCompressPanel() {
             : phase === "probing"
               ? t`读取信息`
               : t`准备中`;
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {!codecOk ? (
-          <p className="text-destructive text-xs">
-            <Trans>当前 WebView 不支持 WebCodecs，无法压缩视频。</Trans>
-          </p>
-        ) : (
-          <span />
-        )}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onClear}
-          disabled={!file && !result.blob}
-        >
-          <Trans>清空</Trans>
+  const processingView = phase === "compressing";
+  if (!codecOk) {
+    return (
+      <section
+        role="status"
+        className="border-border bg-card flex flex-col items-center gap-3 rounded-lg border p-6 text-center"
+      >
+        <VideoOff className="text-muted-foreground size-6" />
+        <h2 className="text-sm font-semibold">
+          <Trans>当前设备不支持视频压缩</Trans>
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          <Trans>当前环境缺少所需的视频编码能力，可以继续使用图片压缩。</Trans>
+        </p>
+        <Button asChild density="adaptive" className="max-md:w-full">
+          <Link to="/tools/media-compress" search={{ mode: "image" }} replace>
+            <Trans>图片压缩</Trans>
+          </Link>
         </Button>
-      </div>
-
+      </section>
+    );
+  }
+  return processingView ? (
+    <MediaProgress
+      fileName={file?.name ?? ""}
+      progress={progress}
+      label={stageLabel}
+      onCancel={() => abortRef.current?.abort()}
+    />
+  ) : (
+    <div className="grid min-w-0 grid-cols-1 items-start gap-3 md:grid-cols-2">
       <CompressDropzone
+        preview={
+          previewUrl ? (
+            <video
+              src={previewUrl}
+              controls
+              className="size-full object-contain"
+            />
+          ) : undefined
+        }
+        onClear={onClear}
         inputRef={inputRef}
         accept=".mp4,.mov,.m4v,video/mp4,video/quicktime"
         nativeFilter={{
@@ -244,16 +269,30 @@ export default function VideoCompressPanel() {
           filterName: t`视频文件`,
           extensions: ["mp4", "mov", "m4v"],
         }}
-        disabled={phase === "compressing" || !codecOk}
+        disabled={!codecOk}
         onFile={(next) => void applyFile(next)}
         icon={<FileVideo className="text-muted-foreground size-5" />}
-        title={<Trans>拖放视频到此处，或选择文件</Trans>}
+        title={
+          <>
+            <span className="md:hidden">
+              <Trans>选择一个视频</Trans>
+            </span>
+            <span className="hidden md:inline">
+              <Trans>拖放视频到此处，或选择文件</Trans>
+            </span>
+          </>
+        }
         description={<Trans>MP4 · MOV · M4V，文件不会上传</Trans>}
         pickLabel={<Trans>选择视频</Trans>}
         footer={
           file ? (
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5">
-              <Badge variant="secondary">{file.name}</Badge>
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <span
+                className="w-full truncate text-left text-sm"
+                title={file.name}
+              >
+                {file.name}
+              </span>
               <Badge variant="outline">{formatBytes(file.size)}</Badge>
               {meta ? (
                 <>
@@ -270,164 +309,142 @@ export default function VideoCompressPanel() {
         }
       />
 
-      <section className="border-border bg-card rounded-lg border p-2.5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.35fr)_auto] lg:items-end">
-          <Field className="min-w-0">
-            <FieldLabel>
-              <Trans>输出分辨率</Trans>
-            </FieldLabel>
-            <Select
-              value={resolution}
-              onValueChange={(value) => {
-                if (
-                  value === "original" ||
-                  value === "1080p" ||
-                  value === "720p" ||
-                  value === "480p" ||
-                  value === "360p"
-                ) {
-                  setResolution(value);
-                }
-              }}
-              disabled={phase === "compressing"}
-            >
-              <SelectTrigger className="w-full" aria-label={t`选择输出分辨率`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="original">
-                  <Trans>原始分辨率</Trans>
-                </SelectItem>
-                <SelectItem value="1080p">1080p</SelectItem>
-                <SelectItem value="720p">720p</SelectItem>
-                <SelectItem value="480p">480p</SelectItem>
-                <SelectItem value="360p">360p</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+      {file ? (
+        <section className="border-border bg-card min-w-0 rounded-lg border p-3">
+          <h2 className="mb-3 text-sm font-semibold">
+            <Trans>输出设置</Trans>
+          </h2>
+          <div className="grid gap-3">
+            <Field className="min-w-0">
+              <FieldLabel>
+                <Trans>输出分辨率</Trans>
+              </FieldLabel>
+              <Select
+                value={resolution}
+                onValueChange={(value) => {
+                  if (
+                    value === "original" ||
+                    value === "1080p" ||
+                    value === "720p" ||
+                    value === "480p" ||
+                    value === "360p"
+                  ) {
+                    setResolution(value);
+                  }
+                }}
+                disabled={phase === "probing"}
+              >
+                <SelectTrigger
+                  className="w-full"
+                  aria-label={t`选择输出分辨率`}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="original">
+                      <Trans>原始分辨率</Trans>
+                    </SelectItem>
+                    <SelectItem value="1080p">1080p</SelectItem>
+                    <SelectItem value="720p">720p</SelectItem>
+                    <SelectItem value="480p">480p</SelectItem>
+                    <SelectItem value="360p">360p</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
 
-          <CompressQualityField
-            value={quality}
-            min={VIDEO_QUALITY_MIN}
-            max={VIDEO_QUALITY_MAX}
-            step={VIDEO_QUALITY_STEP}
-            disabled={phase === "compressing"}
-            ariaLabel={t`选择压缩程度`}
-            onChange={setQuality}
+            <CompressQualityField
+              value={quality}
+              min={VIDEO_QUALITY_MIN}
+              max={VIDEO_QUALITY_MAX}
+              step={VIDEO_QUALITY_STEP}
+              disabled={phase === "probing"}
+              ariaLabel={t`选择压缩程度`}
+              onChange={setQuality}
+            />
+
+            <Field orientation="horizontal" className="items-center">
+              <Checkbox
+                id="video-keep-audio"
+                checked={keepAudio}
+                onCheckedChange={(checked) => setKeepAudio(checked === true)}
+                disabled={meta?.hasAudio === false || !audioCodecOk}
+              />
+              <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                <FieldLabel htmlFor="video-keep-audio" className="leading-none">
+                  <Trans>保留音频</Trans>
+                </FieldLabel>
+                <FieldDescription className="!mt-0">
+                  {meta && !meta.hasAudio ? (
+                    <Trans>源视频没有音轨</Trans>
+                  ) : !audioCodecOk ? (
+                    <Trans>当前 WebView 不支持音频转码</Trans>
+                  ) : (
+                    <Trans>关闭可进一步减小体积</Trans>
+                  )}
+                </FieldDescription>
+              </div>
+            </Field>
+          </div>
+
+          <CompressEstimateBar
+            estimatedBytes={estimate?.estimatedBytes}
+            estimatedMin={estimate?.estimatedMin}
+            estimatedMax={estimate?.estimatedMax}
+            ratio={estimate?.ratio}
+            emptyHint={<Trans>选择视频后显示预估体积</Trans>}
+            extraBadges={
+              estimate ? (
+                <Badge variant="outline">
+                  {estimate.outputWidth}×{estimate.outputHeight}
+                </Badge>
+              ) : null
+            }
+            showProgress={progress > 0}
+            progress={progress}
+            progressLabel={stageLabel}
+            primaryAction={
+              <Button
+                onClick={() => void onCompress()}
+                disabled={!file || !codecOk}
+              >
+                <Trans>开始压缩</Trans>
+              </Button>
+            }
           />
 
-          <Field
-            orientation="horizontal"
-            className="items-center self-end sm:col-span-2 lg:col-span-1 lg:min-w-[12rem] lg:pb-5"
-          >
-            <Checkbox
-              id="video-keep-audio"
-              checked={keepAudio}
-              onCheckedChange={(checked) => setKeepAudio(checked === true)}
-              disabled={
-                phase === "compressing" ||
-                meta?.hasAudio === false ||
-                !audioCodecOk
-              }
-            />
-            <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-              <FieldLabel htmlFor="video-keep-audio" className="leading-none">
-                <Trans>保留音频</Trans>
-              </FieldLabel>
-              <FieldDescription className="!mt-0">
-                {meta && !meta.hasAudio ? (
-                  <Trans>源视频没有音轨</Trans>
-                ) : !audioCodecOk ? (
-                  <Trans>当前 WebView 不支持音频转码</Trans>
-                ) : (
-                  <Trans>关闭可进一步减小体积</Trans>
-                )}
-              </FieldDescription>
-            </div>
-          </Field>
-        </div>
+          {error ? (
+            <p className="text-destructive mt-2 text-xs">{error}</p>
+          ) : null}
+        </section>
+      ) : null}
 
-        <CompressEstimateBar
-          estimatedBytes={estimate?.estimatedBytes}
-          estimatedMin={estimate?.estimatedMin}
-          estimatedMax={estimate?.estimatedMax}
-          ratio={estimate?.ratio}
-          emptyHint={<Trans>选择视频后显示预估体积</Trans>}
-          extraBadges={
-            estimate ? (
-              <Badge variant="outline">
-                {estimate.outputWidth}×{estimate.outputHeight}
-              </Badge>
-            ) : null
-          }
-          showProgress={phase === "compressing" || progress > 0}
-          progress={progress}
-          progressLabel={stageLabel}
-          secondaryAction={
-            phase === "compressing" ? (
-              <Button variant="outline" size="sm" onClick={onCancel}>
-                <Trans>取消</Trans>
-              </Button>
-            ) : null
-          }
-          primaryAction={
-            <Button
-              size="sm"
-              onClick={() => void onCompress()}
-              disabled={!file || !codecOk || phase === "compressing"}
-            >
-              {phase === "compressing" ? (
-                <LoaderCircle
-                  data-icon="inline-start"
-                  className="animate-spin"
-                />
-              ) : null}
-              <Trans>开始压缩</Trans>
-            </Button>
-          }
-        />
-
-        {error ? (
-          <p className="text-destructive mt-2 text-xs">{error}</p>
-        ) : null}
-      </section>
-
-      {(previewUrl || result.url) && (
-        <section className="grid gap-2 md:grid-cols-2">
-          {previewUrl ? (
-            <div className="border-border bg-card flex flex-col rounded-lg border p-2.5">
-              <div className="text-muted-foreground mb-1.5 text-xs font-medium">
-                <Trans>原视频</Trans>
-              </div>
-              <div className="mt-auto h-64 w-full overflow-hidden rounded-md bg-black">
+      <div className="md:col-span-2">
+        {result.url && result.blob ? (
+          <CompressResultCard
+            fileName={result.fileName}
+            size={result.size}
+            originalSize={meta?.size ?? file?.size ?? 0}
+            blob={result.blob}
+            onSizeChange={setResultSize}
+            preview={
+              <div className="bg-muted h-64 w-full overflow-hidden rounded-md">
                 <video
-                  src={previewUrl}
+                  src={result.url}
                   controls
                   className="h-full w-full rounded-md object-contain"
                 />
               </div>
-            </div>
-          ) : null}
-          {result.url && result.blob ? (
-            <CompressResultCard
-              fileName={result.fileName}
-              size={result.size}
-              originalSize={meta?.size ?? file?.size ?? 0}
-              blob={result.blob}
-              onSizeChange={setResultSize}
-              preview={
-                <div className="h-64 w-full overflow-hidden rounded-md bg-black">
-                  <video
-                    src={result.url}
-                    controls
-                    className="h-full w-full rounded-md object-contain"
-                  />
-                </div>
-              }
-            />
-          ) : null}
-        </section>
-      )}
+            }
+          />
+        ) : null}
+      </div>
+      {error && !file ? (
+        <p role="status" className="text-destructive text-sm md:col-span-2">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

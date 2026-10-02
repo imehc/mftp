@@ -32,6 +32,7 @@ function LanAuthRequestPermissionForm({
   request: LanAuthRequest;
   approve: (id: string, permission: string) => void;
 }) {
+  const { t } = useLingui();
   const form = useForm({
     defaultValues: {
       permission: "readWrite",
@@ -44,7 +45,7 @@ function LanAuthRequestPermissionForm({
     },
   });
   return (
-    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+    <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
       <form.Field name="permission">
         {(field) => (
           <Select
@@ -59,7 +60,11 @@ function LanAuthRequestPermissionForm({
               }
             }}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger
+              density="adaptive"
+              aria-label={t`访问权限`}
+              className="w-full"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -151,7 +156,7 @@ export default function LanPendingAuthRequestsPanel({
                       size="icon-xs"
                       title={t`拒绝访问`}
                       aria-label={t`拒绝访问`}
-                      className="max-sm:min-h-11 max-sm:min-w-11"
+                      className="max-md:min-h-11 max-md:min-w-11"
                       onClick={() => void reject(request.id)}
                     >
                       <ShieldOff className="text-destructive" />

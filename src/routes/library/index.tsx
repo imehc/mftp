@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import LibraryMobilePage from "~/features/poetry/LibraryMobilePage";
 import LibraryPage from "~/features/poetry/LibraryPage";
-import { isMobilePlatform } from "~/lib/platform";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useSettingsStore } from "~/store/settings";
 
 interface LibrarySearch {
@@ -13,6 +12,7 @@ interface LibrarySearch {
 }
 
 function LibraryRoute() {
+  const desktop = useDesktopLayout();
   const setLastTool = useSettingsStore((s) => s.setLastTool);
   const navigate = useNavigate();
 
@@ -24,33 +24,28 @@ function LibraryRoute() {
   const onSearchChange = (patch: { q?: string }) =>
     void navigate({
       to: "/library",
+      replace: true,
       search: (prev) => ({ ...prev, ...patch }),
     });
-  if (isMobilePlatform()) {
-    return (
-      <LibraryMobilePage
-        search={search}
-        onSearchChange={onSearchChange}
-        onOpenPoem={(uid) =>
-          void navigate({
-            to: "/library/$id",
-            params: { id: uid },
-            search: { q: search.q },
-          })
-        }
-      />
-    );
-  }
   return (
     <LibraryPage
       search={search}
       onSearchChange={onSearchChange}
-      onOpenPoem={(uid) =>
+      onOpenPoem={(uid) => {
+        if (!desktop && uid) {
+          void navigate({
+            to: "/library/$id",
+            params: { id: uid },
+            search: { q: search.q },
+          });
+          return;
+        }
         void navigate({
           to: "/library",
-          search: (prev) => ({ ...prev, poem: uid }),
-        })
-      }
+          // 空 uid 表示关掉详情（窄桌面单栏用返回按钮触发），要真正去掉参数。
+          search: (prev) => ({ ...prev, poem: uid || undefined }),
+        });
+      }}
     />
   );
 }

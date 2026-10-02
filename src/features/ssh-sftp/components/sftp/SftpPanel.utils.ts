@@ -11,6 +11,13 @@ import type { SftpEntry, SftpFileInfo } from "~/types";
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
 import { formatBytes } from "~/lib/format";
 
+/**
+ * 虚拟列表行高。触控密度下「更多」按钮撑到 44px，行高随之变高；
+ * 估算值只影响首帧和滚动条，实际高度由 `measureElement` 测量后覆盖。
+ */
+export const SFTP_ROW_HEIGHT = 32;
+export const SFTP_ROW_HEIGHT_TOUCH = 56;
+
 // 起别名，使既有调用方（SftpRow）的 import 名保持不变。
 export const formatSize = formatBytes;
 export function nextTransferId(): string {
@@ -82,9 +89,6 @@ export function parentPath(p: string): string {
   const trimmed = p.replace(/\/+$/, "");
   const idx = trimmed.lastIndexOf("/");
   return idx <= 0 ? "/" : trimmed.slice(0, idx);
-}
-export function baseName(p: string): string {
-  return p.split(/[\\/]/).filter(Boolean).pop() ?? p;
 }
 const ARCHIVE_RE = /\.(zip|tar|tar\.gz|tgz|tar\.bz2|tbz2)$/i;
 export function isArchive(name: string): boolean {

@@ -3376,6 +3376,7 @@ dependencies = [
  "flate2",
  "fs2",
  "futures-util",
+ "jni 0.21.1",
  "keyring",
  "librqbit",
  "librqbit-core",
@@ -3407,6 +3408,7 @@ dependencies = [
  "uuid",
  "walkdir",
  "whoami",
+ "zeroize",
 ]
 
 [[package]]

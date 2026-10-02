@@ -1,12 +1,23 @@
 import { create } from "zustand";
-import type { Host, HostInput, SshKey } from "~/types";
+import { toIpcError } from "~/lib/errors";
+import type { AppError, Host, HostInput, SshKey } from "~/types";
 import * as ipc from "~/lib/ipc";
+
+/** 并发的 ensureLoaded 共享同一次读取，避免重复请求。 */
+let pendingLoad: Promise<void> | null = null;
+let loadGeneration = 0;
 
 interface HostsState {
   hosts: Host[];
   keys: SshKey[];
   loading: boolean;
+  loadError: AppError | null;
+  /** 是否已经成功读取过一次；`ensureLoaded` 据此跳过重复读取。 */
+  loaded: boolean;
   loadAll: () => Promise<void>;
+  invalidate: () => void;
+  /** 按需加载一次；并发调用共享同一次读取。 */
+  ensureLoaded: () => Promise<void>;
   createHost: (input: HostInput) => Promise<Host>;
   updateHost: (id: string, input: HostInput) => Promise<Host>;
   deleteHost: (id: string) => Promise<void>;
@@ -23,18 +34,50 @@ export const useHostsStore = create<HostsState>((set, get) => ({
   hosts: [],
   keys: [],
   loading: false,
+  loadError: null,
+  loaded: false,
+
+  invalidate() {
+    // 清理后拒绝晚到的旧快照，防止已删除的主机或密钥重新出现在缓存。
+    loadGeneration++;
+    pendingLoad = null;
+    set({
+      hosts: [],
+      keys: [],
+      loaded: false,
+      loading: false,
+      loadError: null,
+    });
+  },
 
   async loadAll() {
-    set({ loading: true });
+    const generation = ++loadGeneration;
+    set({ loading: true, loadError: null });
     try {
       const [hosts, keys] = await Promise.all([
         ipc.hostsList(),
         ipc.keysList(),
       ]);
-      set({ hosts, keys });
+      if (generation === loadGeneration) set({ hosts, keys, loaded: true });
+    } catch (error) {
+      if (generation !== loadGeneration) return;
+      set({ loadError: toIpcError(error).payload });
+      throw error;
     } finally {
-      set({ loading: false });
+      if (generation === loadGeneration) set({ loading: false });
     }
+  },
+
+  async ensureLoaded() {
+    if (get().loaded) return;
+    if (pendingLoad) return pendingLoad;
+    const pending = get()
+      .loadAll()
+      .finally(() => {
+        if (pendingLoad === pending) pendingLoad = null;
+      });
+    pendingLoad = pending;
+    return pending;
   },
 
   async createHost(input) {

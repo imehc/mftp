@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import PreviewScreen from "~/features/preview/PreviewScreen";
-import { btAvailableGuard } from "~/lib/platform";
+import FilePreviewPage from "~/features/preview/FilePreviewPage";
 import {
   previewKind,
   toPreviewKind,
@@ -21,9 +20,9 @@ interface PreviewSearch {
  */
 function PreviewRoute() {
   const { name, kind, url } = Route.useSearch();
-  const resolved = kind ?? previewKind(name);
-
-  return <PreviewScreen name={name} kind={resolved} url={url ?? null} />;
+  return (
+    <FilePreviewPage name={name} kind={kind ?? previewKind(name)} url={url} />
+  );
 }
 
 export const Route = createFileRoute("/preview")({
@@ -32,6 +31,5 @@ export const Route = createFileRoute("/preview")({
     kind: toPreviewKind(search.kind),
     url: typeof search.url === "string" ? search.url : undefined,
   }),
-  beforeLoad: btAvailableGuard,
   component: PreviewRoute,
 });

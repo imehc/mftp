@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import {
   Download,
   File as FileIcon,
@@ -29,6 +29,10 @@ import {
   isArchive,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "cn";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import SftpActionsMobile from "./SftpActions.mobile";
+import type { SftpAction } from "./sftp-actions";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 interface RowProps {
   entry: SftpEntry;
   loading: boolean;
@@ -54,19 +58,35 @@ const SftpRow = function SftpRow({
   onDelete,
 }: RowProps) {
   const { t } = useLingui();
+  const compact = !useDesktopLayout();
   const canExtract = !entry.isDir && isArchive(entry.name);
   const [menuOpen, setMenuOpen] = useState(false);
+  const actions: SftpAction[] = [
+    { label: t`下载`, icon: Download, run: () => onDownload(entry) },
+    { label: t`文件信息`, icon: Info, run: () => onInfo(entry) },
+    ...(canExtract
+      ? [{ label: t`解压`, icon: FolderOpen, run: () => onExtract(entry) }]
+      : []),
+    { label: t`移动`, icon: FolderInput, run: () => onMove(entry) },
+    { label: t`重命名`, icon: Pencil, run: () => onRename(entry) },
+    {
+      label: t`删除`,
+      icon: Trash2,
+      run: () => onDelete(entry),
+      destructive: true,
+    },
+  ];
   return (
     <div
       className={cn(
-        "group border-border/40 hover:bg-muted/50 grid grid-cols-[var(--sftp-list-columns)] items-center border-b px-3 py-1.5 text-sm",
+        "group border-border/40 hover:bg-muted/50 grid grid-cols-[var(--sftp-list-columns)] items-center border-b px-3 py-1.5 text-sm max-md:min-h-16 max-md:grid-cols-[minmax(0,1fr)_auto]",
         menuOpen && "bg-muted/50",
       )}
     >
       <button
         className="flex min-w-0 items-center gap-2 px-2 text-left"
-        onClick={() => entry.isDir && onEnter(entry.path)}
-        disabled={!entry.isDir || disabled}
+        onClick={() => (entry.isDir ? onEnter(entry.path) : onInfo(entry))}
+        disabled={disabled}
       >
         {loading ? (
           <LoaderCircle className="text-muted-foreground size-4 shrink-0 animate-spin" />
@@ -77,60 +97,62 @@ const SftpRow = function SftpRow({
         ) : (
           <FileIcon className="text-muted-foreground size-4 shrink-0" />
         )}
-        <span className={cn("truncate", entry.isDir && "cursor-pointer")}>
-          {entry.name}
+        <span className="min-w-0">
+          <span className="block truncate">{entry.name}</span>
+          <span className="text-muted-foreground mt-1 block truncate text-xs md:hidden">
+            {entry.isDir ? t`文件夹` : formatSize(entry.size)} ·{" "}
+            {formatMtime(entry.mtime)}
+          </span>
         </span>
       </button>
-      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs sm:block">
+      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs md:block">
         {formatMtime(entry.mtime)}
       </span>
-      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs sm:block">
+      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs md:block">
         {entryType(entry)}
       </span>
-      <span className="text-muted-foreground truncate px-2 text-left text-xs">
+      <span className="text-muted-foreground hidden truncate px-2 text-left text-xs md:block">
         {entry.isDir ? "—" : formatSize(entry.size)}
       </span>
       <div className="flex min-w-0 justify-end px-1">
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              title={t`更多`}
-              aria-label={t`更多文件操作`}
-              className="max-sm:min-h-11 max-sm:min-w-11"
-            >
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={() => onDownload(entry)}>
-                <Download /> <Trans>下载</Trans>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onInfo(entry)}>
-                <Info /> <Trans>文件信息</Trans>
-              </DropdownMenuItem>
-              {canExtract ? (
-                <DropdownMenuItem onSelect={() => onExtract(entry)}>
-                  <FolderOpen /> <Trans>解压</Trans>
-                </DropdownMenuItem>
-              ) : null}
-              <DropdownMenuItem onSelect={() => onMove(entry)}>
-                <FolderInput /> <Trans>移动</Trans>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onRename(entry)}>
-                <Pencil /> <Trans>重命名</Trans>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onSelect={() => onDelete(entry)}
-              >
-                <Trash2 /> <Trans>删除</Trans>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          {compact ? (
+            <SftpActionsMobile
+              name={entry.name}
+              open={menuOpen}
+              onOpenChange={setMenuOpen}
+              actions={actions}
+            />
+          ) : (
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  title={t`更多`}
+                  aria-label={t`更多文件操作`}
+                  className={TOUCH_TARGET_CLASS}
+                >
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="ui-density-adaptive">
+                <DropdownMenuGroup>
+                  {actions.map(({ label, icon: Icon, run, destructive }) => (
+                    <DropdownMenuItem
+                      key={label}
+                      onSelect={run}
+                      variant={destructive ? "destructive" : "default"}
+                    >
+                      <Icon />
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </>
       </div>
     </div>
   );

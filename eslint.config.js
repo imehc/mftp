@@ -10,6 +10,8 @@ export default tseslint.config(
     ignores: [
       "dist/**",
       "dist-ssr/**",
+      // 设计册包含拼接执行的浏览器/Figma 片段与生成包，由其独立 check 脚本验证。
+      "docs/design/navigation-a/**",
       // Rust 管理的资源（如 lan_transfer 浏览器端）不属于前端代码
       "src-tauri/**",
       // 自动生成：真实来源是 Rust（specta）/ 路由配置 / .po 文件
@@ -45,7 +47,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["*.config.{ts,js}", "scripts/**"],
+    files: ["*.config.{ts,js}", "scripts/**/*.mjs"],
     languageOptions: {
       globals: { ...globals.node },
     },

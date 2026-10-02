@@ -5,15 +5,21 @@
 import { useEffect, useRef, useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Badge } from "~/components/ui/badge";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { cn } from "cn";
+import { BilliardsControls } from "./BilliardsControls";
+import {
+  ALL_TRAY,
+  BallTray,
+  SeatCell,
+  seatName,
+  seatTray,
+} from "./BilliardsScore";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { AiController, LocalController } from "../engine/controllers";
 import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController } from "../engine/types";
 import { GameResultBar } from "../engine/GameResultBar";
 import { billiardsAiStrategy } from "./ai";
-import { BALL_HEX } from "./colors";
 import { createBilliardsGame, createInitialState } from "./rules";
 import {
   BilliardsStage,
@@ -114,102 +120,6 @@ export function BilliardsMatch({
     />
   );
 }
-function seatName(mode: BilliardsMode, seat: number) {
-  if (mode.kind === "ai") return seat === 0 ? <Trans>你</Trans> : "AI";
-  return seat === 0 ? <Trans>玩家 1</Trans> : <Trans>玩家 2</Trans>;
-}
-function BallIcon({ id, potted }: { id: number; potted: boolean }) {
-  const striped = id >= 9 && id <= 15;
-  const color = BALL_HEX[id];
-  return (
-    <span
-      className={cn(
-        "relative inline-flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full",
-        potted && "opacity-25 saturate-0",
-      )}
-      style={{
-        backgroundColor: striped ? "#f6f1e7" : color,
-      }}
-    >
-      {striped ? (
-        <span
-          className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2"
-          style={{
-            backgroundColor: color,
-          }}
-        />
-      ) : null}
-      <span className="relative inline-flex size-2.5 items-center justify-center rounded-full bg-[#f6f1e7] text-[7px] leading-none font-bold text-neutral-900">
-        {id}
-      </span>
-    </span>
-  );
-}
-
-/** 剩余目标球条：已落袋的球仍显示但变暗。 */
-function BallTray({
-  state,
-  ids,
-}: {
-  state: BilliardsState;
-  ids: readonly number[];
-}) {
-  return (
-    <span className="inline-flex items-center gap-0.5">
-      {ids.map((id) => (
-        <BallIcon
-          key={id}
-          id={id}
-          potted={state.balls.find((ball) => ball.id === id)?.potted ?? false}
-        />
-      ))}
-    </span>
-  );
-}
-const SOLID_TRAY = [1, 2, 3, 4, 5, 6, 7, 8] as const;
-const STRIPE_TRAY = [9, 10, 11, 12, 13, 14, 15, 8] as const;
-const ALL_TRAY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
-function seatTray(
-  state: BilliardsState,
-  seat: number,
-): readonly number[] | null {
-  const group = state.groups[seat];
-  if (group === "solids") return SOLID_TRAY;
-  if (group === "stripes") return STRIPE_TRAY;
-  return null;
-}
-
-/** 对战 HUD 的一侧：玩家徽章 + 剩余球托盘。 */
-function SeatCell({
-  mode,
-  state,
-  seat,
-  active,
-  align,
-}: {
-  mode: BilliardsMode;
-  state: BilliardsState;
-  seat: number;
-  active: boolean;
-  align: "start" | "end";
-}) {
-  const tray = seatTray(state, seat);
-  return (
-    <div
-      className={cn(
-        "flex min-w-0 flex-wrap items-center gap-1",
-        align === "end"
-          ? "flex-row-reverse justify-self-end"
-          : "justify-self-start",
-      )}
-    >
-      <Badge variant={active ? "secondary" : "outline"}>
-        {seatName(mode, seat)}
-      </Badge>
-      {tray ? <BallTray state={state} ids={tray} /> : null}
-    </div>
-  );
-}
 function MatchView({
   mode,
   session,
@@ -227,6 +137,7 @@ function MatchView({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
+  const desktop = useDesktopLayout();
   const { runner, local } = session;
   const snapshot = useMatchSnapshot(runner);
   const state = snapshot.state;
@@ -283,7 +194,7 @@ function MatchView({
     snapshot.winnerSeat !== null ? seatName(mode, snapshot.winnerSeat) : "";
   return (
     <>
-      <div className="border-border min-h-8 border-b px-2 py-1 text-xs">
+      <div className="billiards-score min-h-8 shrink-0 px-3 py-2 text-xs">
         {state.finished ? (
           <div className="flex flex-wrap items-center justify-center gap-1.5">
             <Badge variant="secondary">
@@ -325,7 +236,7 @@ function MatchView({
                 other="剩余 # 球"
               />
             </Badge>
-            <BallTray state={state} ids={ALL_TRAY} />
+            {desktop ? <BallTray state={state} ids={ALL_TRAY} /> : null}
             {outcome?.foul ? (
               <Badge variant="destructive">{foulLabel(outcome.foul)}</Badge>
             ) : null}
@@ -379,7 +290,7 @@ function MatchView({
         )}
       </div>
 
-      <div className="relative z-0 min-h-0 flex-1 overflow-hidden">
+      <div className="billiards-stage relative z-0 min-h-0 min-w-0 flex-1 overflow-hidden">
         <BilliardsStage
           ref={stageRef}
           balls={state.balls}
@@ -406,109 +317,66 @@ function MatchView({
         />
       </div>
       {state.finished ? (
-        <GameResultBar
-          title={
-            state.variant === "practice" ? (
-              <Trans>清台完成！</Trans>
-            ) : snapshot.winnerSeat !== null ? (
-              <Trans>{winnerSeatLabel} 获胜</Trans>
-            ) : (
-              <Trans>对局结束</Trans>
-            )
-          }
-          celebrate={
-            state.variant === "practice" ||
-            (snapshot.winnerSeat !== null &&
-              (mode.kind === "hotseat" ||
-                (mode.kind === "ai" && snapshot.winnerSeat === 0)))
-          }
-          details={
-            <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start">
-              <Plural
-                value={{
-                  shotCount: state.shotCount,
-                }}
-                one="总杆数 #"
-                other="总杆数 #"
-              />
-              {mode.kind !== "practice"
-                ? [0, 1].map((seat) => {
-                    const tray = seatTray(state, seat);
-                    return (
-                      <span
-                        key={seat}
-                        className="inline-flex items-center gap-1.5"
-                      >
-                        {seatName(mode, seat)}
-                        {tray ? <BallTray state={state} ids={tray} /> : null}
-                        <Plural
-                          value={{
-                            foulCount: state.foulCounts[seat] ?? 0,
-                          }}
-                          one="犯规 # 次"
-                          other="犯规 # 次"
-                        />
-                      </span>
-                    );
-                  })
-                : null}
-            </span>
-          }
-          onRematch={onRematch}
-          onExit={onExit}
-        />
-      ) : (
-        <div
-          className="border-border flex items-center gap-3 border-t px-3 py-2"
-          style={{
-            paddingBottom: "calc(var(--safe-bottom, 0px) + 0.5rem)",
-          }}
-        >
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            value={String(followDraw)}
-            onValueChange={(value) => {
-              if (value) setFollowDraw(Number(value));
-            }}
-          >
-            <ToggleGroupItem value="-0.7">
-              <Trans comment="Billiards cue action that applies draw/backspin to the cue ball">
-                拉杆
-              </Trans>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="0">
-              <Trans>中杆</Trans>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="0.7">
-              <Trans>推杆</Trans>
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            {powerPercent > 0 ? (
-              <>
-                <div className="bg-muted h-1.5 min-w-0 flex-1 overflow-hidden rounded-full">
-                  <div
-                    className="bg-primary h-full rounded-full"
-                    style={{
-                      width: `${powerPercent}%`,
-                    }}
-                  />
-                </div>
-                <span className="text-muted-foreground w-9 shrink-0 text-right text-xs tabular-nums">
-                  {powerPercent}%
-                </span>
-              </>
-            ) : (
-              <span className="text-muted-foreground truncate text-xs">
-                {activeIsLocal && !ballInHand ? (
-                  <Trans>按住桌面向母球后方拖动蓄力，松手击球</Trans>
-                ) : null}
+        <div className="billiards-result shrink-0">
+          <GameResultBar
+            title={
+              state.variant === "practice" ? (
+                <Trans>清台完成！</Trans>
+              ) : snapshot.winnerSeat !== null ? (
+                <Trans>{winnerSeatLabel} 获胜</Trans>
+              ) : (
+                <Trans>对局结束</Trans>
+              )
+            }
+            celebrate={
+              state.variant === "practice" ||
+              (snapshot.winnerSeat !== null &&
+                (mode.kind === "hotseat" ||
+                  (mode.kind === "ai" && snapshot.winnerSeat === 0)))
+            }
+            details={
+              <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 md:justify-start">
+                <Plural
+                  value={{
+                    shotCount: state.shotCount,
+                  }}
+                  one="总杆数 #"
+                  other="总杆数 #"
+                />
+                {mode.kind !== "practice"
+                  ? [0, 1].map((seat) => {
+                      const tray = seatTray(state, seat);
+                      return (
+                        <span
+                          key={seat}
+                          className="inline-flex items-center gap-1.5"
+                        >
+                          {seatName(mode, seat)}
+                          {tray ? <BallTray state={state} ids={tray} /> : null}
+                          <Plural
+                            value={{
+                              foulCount: state.foulCounts[seat] ?? 0,
+                            }}
+                            one="犯规 # 次"
+                            other="犯规 # 次"
+                          />
+                        </span>
+                      );
+                    })
+                  : null}
               </span>
-            )}
-          </div>
+            }
+            onRematch={onRematch}
+            onExit={onExit}
+          />
         </div>
+      ) : (
+        <BilliardsControls
+          followDraw={followDraw}
+          onFollowDraw={setFollowDraw}
+          power={powerPercent}
+          interactive={activeIsLocal && !ballInHand}
+        />
       )}
     </>
   );

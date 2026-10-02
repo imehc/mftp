@@ -1,12 +1,11 @@
 import { LoaderCircle } from "lucide-react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Dialog, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import type { InfoState } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import {
   entryType,
@@ -27,23 +26,29 @@ export default function FileInfoDialog({
 }: FileInfoDialogProps) {
   return (
     <Dialog open={!!info} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogLayoutContent
+        placement="responsive-sheet"
+        className="ui-density-adaptive md:max-w-lg"
+        showCloseButton={false}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>文件信息</Trans>
           </DialogTitle>
           <DialogDescription className="truncate">
             {info?.details?.name ?? info?.entry.name ?? ""}
           </DialogDescription>
-        </DialogHeader>
-        {info ? (
-          <FileInfoDetails
-            entry={info.entry}
-            details={info.details}
-            loading={info.loading}
-          />
-        ) : null}
-      </DialogContent>
+        </DialogLayoutHeader>
+        <DialogLayoutBody>
+          {info ? (
+            <FileInfoDetails
+              entry={info.entry}
+              details={info.details}
+              loading={info.loading}
+            />
+          ) : null}
+        </DialogLayoutBody>
+      </DialogLayoutContent>
     </Dialog>
   );
 }

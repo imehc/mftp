@@ -5,16 +5,25 @@
  */
 import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react/macro";
-import { CircleDot } from "lucide-react";
+import { useBilliardsOrientation } from "./use-billiards-orientation";
+import type { AppError } from "~/types";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import { useMediaQuery } from "~/lib/use-media-query";
+import { describeError, toIpcError } from "~/lib/errors";
+import { Button } from "~/components/ui/button";
+import { BilliardsHeader } from "./BilliardsHeader";
+import "./billiards.css";
 import { useSettingsStore } from "~/store/settings";
-import { GameHomeButton, GameMatchActions } from "../engine/GameHeaderControls";
-import { GameVolumeControl } from "../engine/GameVolumeControl";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
 import { ensurePhysicsReady } from "./physics";
 import { setGameAudioVolume, unlockAudio } from "./render/audio";
 import type { BilliardsMode } from "./types";
 export default function BilliardsGame() {
+  const mobile = !useDesktopLayout();
+  const landscape = useMediaQuery("(orientation: landscape)") && mobile;
+  const [physicsError, setPhysicsError] = useState<AppError | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const [physicsReady, setPhysicsReady] = useState(false);
   const [mode, setMode] = useState<BilliardsMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
@@ -35,42 +44,49 @@ export default function BilliardsGame() {
   }, [gamesVolume]);
   useEffect(() => {
     let cancelled = false;
-    void ensurePhysicsReady().then(() => {
-      if (!cancelled) setPhysicsReady(true);
-    });
+    void ensurePhysicsReady()
+      .then(() => {
+        if (!cancelled) setPhysicsReady(true);
+      })
+      .catch((error) => {
+        if (!cancelled) setPhysicsError(toIpcError(error).payload);
+      });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [attempt]);
+  const rotate = useBilliardsOrientation(mode !== null, landscape);
   return (
-    <main className="bg-background text-foreground flex h-full flex-col overflow-hidden">
-      <header className="border-border flex items-center justify-between gap-2 border-b px-2 py-1.5">
-        <div className="flex items-center gap-1">
-          <GameHomeButton
-            matchActive={mode !== null}
-            matchFinished={matchFinished}
-          />
-          <div className="bg-border h-4 w-px" />
-          <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
-            <CircleDot className="size-3.5" />
-            <Trans>台球</Trans>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <GameVolumeControl />
-          {mode ? (
-            <GameMatchActions
-              matchFinished={matchFinished}
-              canRestart
-              onRestart={restartMatch}
-              onExit={exitMatch}
-            />
-          ) : null}
-        </div>
-      </header>
+    <main
+      data-landscape={landscape && mode !== null}
+      className="billiards-game ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
+    >
+      <BilliardsHeader
+        active={mode !== null}
+        finished={matchFinished}
+        landscape={landscape}
+        mobile={mobile}
+        onRotate={() => void rotate()}
+        onRestart={restartMatch}
+        onExit={exitMatch}
+      />
       {!physicsReady ? (
         <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-          <Trans>正在加载物理引擎…</Trans>
+          {physicsError ? (
+            <div className="flex flex-col items-center gap-3">
+              <p role="alert">{describeError(physicsError)}</p>
+              <Button
+                onClick={() => {
+                  setPhysicsError(null);
+                  setAttempt((value) => value + 1);
+                }}
+              >
+                <Trans>重试</Trans>
+              </Button>
+            </div>
+          ) : (
+            <Trans>正在加载物理引擎…</Trans>
+          )}
         </div>
       ) : mode === null ? (
         <BilliardsModeMenu

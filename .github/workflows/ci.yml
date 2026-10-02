@@ -63,5 +63,8 @@ jobs:
       - name: Build frontend
         run: pnpm run build
 
+      - name: Run frontend tests
+        run: pnpm test
+
       - name: Run Rust tests
         run: cargo test --manifest-path src-tauri/Cargo.toml --locked

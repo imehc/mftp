@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Trans } from "@lingui/react/macro";
+import ReadingSettingsPopover from "./components/ReadingSettingsPopover";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft } from "lucide-react";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import { poetryPoem } from "~/lib/ipc";
-import type { PoemDetail as PoemDetailModel } from "~/types";
 import type { PoetryTranslationMode } from "~/bindings";
 import PoemDetail from "./components/PoemDetail";
 import { usePoetryStore } from "./store/poetry-store";
+import { usePoemRead } from "./hooks/use-poem-read";
+import PoetryReadError from "./components/PoetryReadError";
 
 /**
  * 直接访问 `/library/$id` 时的整页详情。桌面端的常规
@@ -25,33 +25,33 @@ export default function PoemDetailPage({
   initialTranslationMode?: PoetryTranslationMode;
   onTranslationModeChange?: (mode: PoetryTranslationMode) => void;
 }) {
+  const { t } = useLingui();
   const fontSize = usePoetryStore((s) => s.fontSize);
   const lineHeight = usePoetryStore((s) => s.lineHeight);
   const setFontSize = usePoetryStore((s) => s.setFontSize);
   const setLineHeight = usePoetryStore((s) => s.setLineHeight);
-  const [detail, setDetail] = useState<PoemDetailModel | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    // 用微任务延后，使重置发生在 effect 函数体之外。
-    queueMicrotask(() => {
-      setDetail(null);
-      setError(null);
-    });
-    void poetryPoem(uid)
-      .then((poem) => !cancelled && setDetail(poem))
-      .catch((err) => !cancelled && setError(String(err)));
-    return () => {
-      cancelled = true;
-    };
-  }, [uid]);
+  const { detail, error, loading, retry } = usePoemRead(uid);
   return (
-    <main className="bg-background text-foreground flex h-full flex-col">
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col"
+    >
       <ToolPageHeader
+        showHome={false}
         title={detail?.title ?? <Trans>古诗词</Trans>}
         trailing={
-          <Button variant="ghost" size="xs" asChild>
+          <ReadingSettingsPopover
+            fontSize={fontSize}
+            lineHeight={lineHeight}
+            onFontSizeChange={setFontSize}
+            onLineHeightChange={setLineHeight}
+          />
+        }
+        leading={
+          <Button variant="ghost" size="icon-sm" asChild>
             <Link
+              aria-label={t`返回古诗词`}
+              title={t`返回古诗词`}
               to="/library"
               search={{
                 q: backQuery,
@@ -59,19 +59,21 @@ export default function PoemDetailPage({
               }}
             >
               <ArrowLeft data-icon="inline-start" />
-              <Trans>返回古诗词</Trans>
             </Link>
           </Button>
         }
       />
       {error ? (
-        <p className="text-muted-foreground flex-1 pt-10 text-center text-sm">
-          {error}
+        <PoetryReadError error={error} onRetry={retry} />
+      ) : !loading && !detail ? (
+        <p className="text-muted-foreground p-4 text-center text-sm">
+          <Trans>没有找到作品</Trans>
         </p>
       ) : (
         <PoemDetail
+          settingsInHeader
           detail={detail}
-          loading={detail === null}
+          loading={loading}
           fontSize={fontSize}
           lineHeight={lineHeight}
           onFontSizeChange={setFontSize}

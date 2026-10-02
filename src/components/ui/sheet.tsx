@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Dialog as SheetPrimitive } from "radix-ui";
+import { Trans } from "@lingui/react/macro";
 
 import { cn } from "cn";
 import { Button } from "~/components/ui/button";
@@ -59,7 +60,9 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "bg-background text-foreground ring-foreground/10 data-open:animate-in data-closed:animate-out fixed z-50 flex flex-col gap-4 text-sm shadow-lg ring-1 transition outline-none data-closed:duration-200 data-closed:ease-in data-open:duration-300 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none",
+          // Portal 挂在 body 下，拿不到 .app-shell 的安全区 padding，这里自己
+          // 留白并允许正文滚动；否则刘海/手势条会盖住标题或底部操作。
+          "bg-background text-foreground ring-foreground/10 data-open:animate-in data-closed:animate-out fixed z-50 flex flex-col gap-4 overflow-y-auto overscroll-contain pt-[var(--safe-top,0px)] pr-[var(--safe-right,0px)] pb-[var(--safe-bottom,0px)] pl-[var(--safe-left,0px)] text-sm shadow-lg ring-1 transition outline-none data-closed:duration-200 data-closed:ease-in data-open:duration-300 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none",
           side === "left" &&
             "data-open:slide-in-from-left data-closed:slide-out-to-left inset-y-0 left-0 h-full w-3/4 max-w-sm border-r",
           side === "right" &&
@@ -81,7 +84,9 @@ function SheetContent({
               size="icon-sm"
             >
               <XIcon />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">
+                <Trans>关闭</Trans>
+              </span>
             </Button>
           </SheetPrimitive.Close>
         )}

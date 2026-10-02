@@ -8,8 +8,10 @@ import {
 } from "@tauri-apps/plugin-updater";
 import { toast } from "sonner";
 import { translate } from "~/i18n/translate";
+import { describeError, toIpcError } from "~/lib/errors";
 import { isDesktopPlatform } from "~/lib/platform";
 import { formatBytes } from "~/lib/format";
+import type { AppError } from "~/types";
 import {
   resetUpdaterState,
   setUpdaterState,
@@ -88,12 +90,12 @@ export async function checkForUpdateManually() {
     registerAvailableUpdate(update);
   } catch (error) {
     console.warn("manual update check failed", error);
-    const message = updateErrorTitle(error);
+    const payload = toIpcError(error).payload;
     setUpdaterState({
       status: "error",
-      error: message,
+      error: payload,
     });
-    toast.error(message, {
+    toast.error(updateErrorTitle(payload), {
       id: UPDATE_TOAST_ID,
       closeButton: true,
     });
@@ -111,13 +113,13 @@ export async function restartToApplyUpdate() {
     await relaunch();
   } catch (error) {
     console.warn("update relaunch failed", error);
-    const formatErrorValue = formatError(error);
-    const message = translate(msg`重启失败：${formatErrorValue}`);
     setUpdaterState({
       status: "ready",
-      error: message,
+      error: toIpcError(error).payload,
     });
-    toast.error(message, {
+    // 变量名同时是 Lingui 的占位符名；改名会让既有翻译失效。
+    const formatErrorValue = describeError(error);
+    toast.error(translate(msg`重启失败：${formatErrorValue}`), {
       id: UPDATE_TOAST_ID,
       duration: Number.POSITIVE_INFINITY,
       closeButton: true,
@@ -222,13 +224,13 @@ async function downloadAndInstall(update: Update) {
     showReadyToRestartToast();
   } catch (error) {
     console.warn("update install failed", error);
-    const formatErrorValue2 = formatError(error);
-    const message = translate(msg`更新失败：${formatErrorValue2}`);
     setUpdaterState({
       status: "error",
-      error: message,
+      error: toIpcError(error).payload,
     });
-    toast.error(message, {
+    // 同上：占位符名保持不变，避免丢弃既有译文。
+    const formatErrorValue2 = describeError(error);
+    toast.error(translate(msg`更新失败：${formatErrorValue2}`), {
       id: UPDATE_TOAST_ID,
       closeButton: true,
       action: {
@@ -401,12 +403,12 @@ export function formatReleaseNotes(body?: string) {
   }
   return notes;
 }
-function formatError(error: unknown) {
-  if (error instanceof Error) return error.message;
-  return String(error);
-}
-function updateErrorTitle(error: unknown) {
-  const message = formatError(error);
+/**
+ * 更新插件只抛出英文 Error，没有 kind/code；这里按文案归类仅用于选择标题，
+ * 不参与任何领域分支，也不是 AppError 的分类依据。
+ */
+function updateErrorTitle(payload: AppError) {
+  const message = payload.message;
   if (message.includes("None of the fallback platforms")) {
     return translate(msg`检查更新失败：当前平台没有可用更新包`);
   }

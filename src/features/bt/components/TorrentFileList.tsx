@@ -87,30 +87,25 @@ const TorrentFileList = function TorrentFileList({
             return (
               <div
                 key={file.index}
+                data-index={row.index}
+                ref={virtualizer.measureElement}
                 className={cn(
-                  "hover:bg-sidebar-accent flex w-full items-center gap-2 rounded-md pr-1 text-left text-xs",
+                  "hover:bg-sidebar-accent flex min-h-[max(44px,2.75rem)] w-full items-center gap-2 rounded-md pr-1 text-left text-xs",
                   checked && "bg-sidebar-accent/60",
                 )}
                 style={{
                   position: "absolute",
                   top: 0,
                   left: 0,
-                  height: row.size,
                   width: "100%",
                   transform: `translateY(${row.start}px)`,
                 }}
               >
-                <button
-                  type="button"
-                  className="flex min-w-0 flex-1 items-center gap-2 py-2 pl-2"
-                  disabled={readOnly}
-                  onClick={() => onToggle(file.index)}
-                >
+                <label className="flex min-h-[max(44px,2.75rem)] min-w-0 flex-1 items-center gap-2 py-2 pl-2">
                   <Checkbox
                     checked={checked}
                     disabled={readOnly}
-                    tabIndex={-1}
-                    className="pointer-events-none"
+                    onCheckedChange={() => onToggle(file.index)}
                   />
                   <Icon className="text-muted-foreground size-3.5 shrink-0" />
                   <span
@@ -122,7 +117,7 @@ const TorrentFileList = function TorrentFileList({
                   <span className="text-muted-foreground shrink-0 tabular-nums">
                     {formatBytes(file.len)}
                   </span>
-                </button>
+                </label>
               </div>
             );
           })}

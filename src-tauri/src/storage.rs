@@ -1,5 +1,6 @@
 use crate::error::{AppError, AppResult};
-use crate::models::{Host, HostInput, SshKey};
+use crate::modules::hosts::model::{auth_type_to_db, Host};
+use crate::modules::keys::model::SshKey;
 use rusqlite::{params, Connection, OptionalExtension};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -7,20 +8,14 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 const DB_FILE: &str = "mftp.sqlite3";
 pub(crate) mod activity;
-pub(crate) mod ai;
-pub(crate) mod bt;
 mod data;
 mod export;
 mod helpers;
 mod import;
-mod lan;
-mod todo;
-mod vault;
 
-use helpers::{
-    add_column_if_missing, auth_type_to_db, bool_to_int, host_from_row, restrict_file_permissions,
-    ssh_key_from_row,
-};
+pub(crate) use helpers::{add_column_if_missing, bool_to_int};
+
+use helpers::restrict_file_permissions;
 
 #[derive(Clone)]
 pub struct Storage {
@@ -42,6 +37,7 @@ impl Storage {
             db_path: root.join(DB_FILE),
             root,
         };
+        storage.sweep_bt_tombstones();
         storage.init_db()?;
         restrict_file_permissions(&storage.db_path);
         storage.migrate_legacy_json()?;
@@ -55,7 +51,10 @@ impl Storage {
     }
 
     fn init_db(&self) -> AppResult<()> {
-        let conn = self.conn()?;
+        let mut conn = self.conn()?;
+        // Must run before the shared schema below creates `activity_logs`,
+        // otherwise the rename guard can no longer tell old from new.
+        activity::migrate_table_name(&conn)?;
         conn.execute_batch(
             r#"
             PRAGMA journal_mode = WAL;
@@ -66,182 +65,35 @@ impl Storage {
                 value TEXT NOT NULL
             );
 
-            CREATE TABLE IF NOT EXISTS hosts (
-                id TEXT PRIMARY KEY,
-                label TEXT NOT NULL,
-                host TEXT NOT NULL,
-                port INTEGER NOT NULL,
-                username TEXT NOT NULL,
-                auth_type TEXT NOT NULL,
-                password TEXT,
-                key_id TEXT,
-                default_path TEXT,
-                sort_order INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL,
-                updated_at INTEGER NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS ssh_keys (
-                id TEXT PRIMARY KEY,
-                label TEXT NOT NULL,
-                filename TEXT NOT NULL,
-                private_key TEXT NOT NULL,
-                has_passphrase INTEGER NOT NULL,
-                created_at INTEGER NOT NULL
-            );
-
-            CREATE INDEX IF NOT EXISTS idx_hosts_sort_order ON hosts(sort_order);
-
-            CREATE TABLE IF NOT EXISTS lan_transfer_settings (
-                id INTEGER PRIMARY KEY CHECK(id = 1),
-                device_name TEXT NOT NULL,
-                port INTEGER NOT NULL,
-                bind_host TEXT NOT NULL DEFAULT '',
-                download_dir TEXT NOT NULL,
-                auto_start INTEGER NOT NULL,
-                security_mode TEXT NOT NULL,
-                default_permission TEXT NOT NULL,
-                max_concurrent_transfers INTEGER NOT NULL DEFAULT 3
-            );
-
-            CREATE TABLE IF NOT EXISTS lan_shared_dirs (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                path TEXT NOT NULL,
-                created_at INTEGER NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS lan_trusted_devices (
-                id TEXT PRIMARY KEY,
-                label TEXT NOT NULL,
-                ip TEXT NOT NULL,
-                created_at INTEGER NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS lan_access_logs (
+            CREATE TABLE IF NOT EXISTS activity_logs (
                 id TEXT PRIMARY KEY,
                 created_at INTEGER NOT NULL,
                 ip TEXT NOT NULL,
                 request_type TEXT NOT NULL,
                 result TEXT NOT NULL,
-                detail TEXT
+                detail TEXT,
+                error_payload TEXT
             );
 
-            CREATE INDEX IF NOT EXISTS idx_lan_access_logs_created_at
-            ON lan_access_logs(created_at DESC);
-
-            CREATE TABLE IF NOT EXISTS vault_entries (
-                id TEXT PRIMARY KEY,
-                title TEXT NOT NULL,
-                url TEXT,
-                username TEXT,
-                password TEXT,
-                category TEXT,
-                notes TEXT,
-                sort_order INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL,
-                updated_at INTEGER NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS todo_items (
-                id TEXT PRIMARY KEY,
-                title TEXT NOT NULL,
-                category TEXT,
-                notes TEXT,
-                due_date TEXT,
-                completed INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL,
-                updated_at INTEGER NOT NULL
-            );
-
-            CREATE INDEX IF NOT EXISTS idx_todo_items_list
-            ON todo_items(due_date, completed, updated_at DESC);
-
-            CREATE TABLE IF NOT EXISTS bt_tasks (
-                info_hash TEXT PRIMARY KEY,
-                label TEXT NOT NULL,
-                dest_dir TEXT NOT NULL,
-                mode TEXT NOT NULL DEFAULT 'download',
-                pinned INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL,
-                work_dir TEXT NOT NULL DEFAULT '',
-                file_indices TEXT NOT NULL DEFAULT '[]',
-                package_mode TEXT NOT NULL DEFAULT 'direct',
-                status TEXT NOT NULL DEFAULT 'active',
-                output_path TEXT,
-                export_path TEXT,
-                total_bytes INTEGER,
-                last_error TEXT
-            );
-
-            CREATE TABLE IF NOT EXISTS bt_cache_access (
-                info_hash TEXT PRIMARY KEY,
-                last_access INTEGER NOT NULL
-            );
-
-            DROP TABLE IF EXISTS lan_transfer_history;
+            CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at
+            ON activity_logs(created_at DESC);
 
             "#,
         )?;
         add_column_if_missing(
             &conn,
-            "lan_transfer_settings",
-            "bind_host",
-            "TEXT NOT NULL DEFAULT ''",
-        )?;
-        add_column_if_missing(
-            &conn,
-            "lan_transfer_settings",
-            "max_concurrent_transfers",
-            "INTEGER NOT NULL DEFAULT 3",
-        )?;
-        add_column_if_missing(
-            &conn,
-            "lan_access_logs",
+            "activity_logs",
             "source",
             "TEXT NOT NULL DEFAULT 'lan'",
         )?;
-        vault::relax_vault_not_null_columns(&conn)?;
-        // sort_order arrived after release builds existed; the relax rebuild
-        // above copies columns positionally, so this must run after it.
-        add_column_if_missing(
-            &conn,
-            "vault_entries",
-            "sort_order",
-            "INTEGER NOT NULL DEFAULT 0",
-        )?;
-        add_column_if_missing(&conn, "bt_tasks", "work_dir", "TEXT NOT NULL DEFAULT ''")?;
-        add_column_if_missing(
-            &conn,
-            "bt_tasks",
-            "file_indices",
-            "TEXT NOT NULL DEFAULT '[]'",
-        )?;
-        add_column_if_missing(
-            &conn,
-            "bt_tasks",
-            "package_mode",
-            "TEXT NOT NULL DEFAULT 'direct'",
-        )?;
-        add_column_if_missing(
-            &conn,
-            "bt_tasks",
-            "status",
-            "TEXT NOT NULL DEFAULT 'active'",
-        )?;
-        add_column_if_missing(&conn, "bt_tasks", "output_path", "TEXT")?;
-        add_column_if_missing(&conn, "bt_tasks", "export_path", "TEXT")?;
-        add_column_if_missing(&conn, "bt_tasks", "total_bytes", "INTEGER")?;
-        add_column_if_missing(&conn, "bt_tasks", "last_error", "TEXT")?;
-        conn.execute(
-            "UPDATE bt_tasks SET work_dir = dest_dir WHERE work_dir = ''",
-            [],
-        )?;
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_vault_entries_sort_order ON vault_entries(sort_order)",
-            [],
-        )?;
-        ai::init_schema(&conn)?;
+        activity::ensure_error_payload_column(&conn)?;
+        crate::modules::hosts::schema::init(&conn)?;
+        crate::modules::keys::schema::init(&conn)?;
+        crate::modules::lan_transfer::schema::init(&mut conn)?;
+        crate::modules::vault::schema::init(&conn)?;
+        crate::modules::bt::schema::init(&mut conn)?;
+        crate::modules::todo::schema::init(&mut conn)?;
+        crate::modules::ai::schema::init(&mut conn)?;
         Ok(())
     }
 
@@ -335,11 +187,12 @@ impl Storage {
 
         for key in keys {
             let key_path = self.legacy_keys_dir().join(&key.filename);
+            // The IO error keeps its own external code; the context and the
+            // key file name (never the absolute path) aid diagnosis.
             let private_key = fs::read_to_string(&key_path).map_err(|error| {
-                AppError(format!(
-                    "迁移密钥失败：无法读取 {}: {error}",
-                    key_path.display()
-                ))
+                AppError::from_io(&error)
+                    .context("failed to migrate legacy SSH key")
+                    .with_arg("filename", &key.filename)
             })?;
             tx.execute(
                 r#"
@@ -367,235 +220,12 @@ impl Storage {
         Ok(())
     }
 
-    pub fn list_hosts(&self) -> AppResult<Vec<Host>> {
-        let conn = self.conn()?;
-        let mut stmt = conn.prepare(
-            r#"
-            SELECT id, label, host, port, username, auth_type, password, key_id,
-                   default_path, created_at, updated_at
-            FROM hosts
-            ORDER BY sort_order ASC, created_at ASC
-            "#,
-        )?;
-        let hosts = stmt
-            .query_map([], host_from_row)?
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(hosts)
-    }
-
-    pub fn get_host(&self, id: &str) -> AppResult<Host> {
-        let conn = self.conn()?;
-        conn.query_row(
-            r#"
-            SELECT id, label, host, port, username, auth_type, password, key_id,
-                   default_path, created_at, updated_at
-            FROM hosts
-            WHERE id = ?1
-            "#,
-            params![id],
-            host_from_row,
-        )
-        .optional()?
-        .ok_or_else(|| AppError(format!("host not found: {id}")))
-    }
-
-    pub fn create_host(&self, input: HostInput) -> AppResult<Host> {
-        let conn = self.conn()?;
-        let ts = now_ms();
-        let id = uuid::Uuid::new_v4().to_string();
-        let sort_order: i64 = conn.query_row(
-            "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM hosts",
-            [],
-            |row| row.get(0),
-        )?;
-        let host = Host {
-            id,
-            label: input.label,
-            host: input.host,
-            port: input.port,
-            username: input.username,
-            auth_type: input.auth_type,
-            password: input.password,
-            key_id: input.key_id,
-            default_path: input.default_path,
-            created_at: ts,
-            updated_at: ts,
-        };
-        conn.execute(
-            r#"
-            INSERT INTO hosts(
-                id, label, host, port, username, auth_type, password, key_id,
-                default_path, sort_order, created_at, updated_at
-            )
-            VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
-            "#,
-            params![
-                host.id,
-                host.label,
-                host.host,
-                host.port,
-                host.username,
-                auth_type_to_db(host.auth_type.clone()),
-                host.password,
-                host.key_id,
-                host.default_path,
-                sort_order,
-                host.created_at,
-                host.updated_at,
-            ],
-        )?;
-        Ok(host)
-    }
-
-    pub fn update_host(&self, id: &str, input: HostInput) -> AppResult<Host> {
-        let conn = self.conn()?;
-        let ts = now_ms();
-        let changed = conn.execute(
-            r#"
-            UPDATE hosts
-            SET label = ?2,
-                host = ?3,
-                port = ?4,
-                username = ?5,
-                auth_type = ?6,
-                password = ?7,
-                key_id = ?8,
-                default_path = ?9,
-                updated_at = ?10
-            WHERE id = ?1
-            "#,
-            params![
-                id,
-                input.label,
-                input.host,
-                input.port,
-                input.username,
-                auth_type_to_db(input.auth_type),
-                input.password,
-                input.key_id,
-                input.default_path,
-                ts,
-            ],
-        )?;
-        if changed == 0 {
-            return Err(AppError(format!("host not found: {id}")));
-        }
-        self.get_host(id)
-    }
-
-    pub fn delete_host(&self, id: &str) -> AppResult<()> {
-        let conn = self.conn()?;
-        conn.execute("DELETE FROM hosts WHERE id = ?1", params![id])?;
-        Ok(())
-    }
-
-    pub fn reorder_hosts(&self, ordered_ids: Vec<String>) -> AppResult<Vec<Host>> {
-        let mut conn = self.conn()?;
-        let tx = conn.transaction()?;
-        for (index, id) in ordered_ids.iter().enumerate() {
-            let changed = tx.execute(
-                "UPDATE hosts SET sort_order = ?2 WHERE id = ?1",
-                params![id, index as i64],
-            )?;
-            if changed == 0 {
-                return Err(AppError(format!("host not found: {id}")));
-            }
-        }
-        tx.commit()?;
-        self.list_hosts()
-    }
-
-    pub fn list_keys(&self) -> AppResult<Vec<SshKey>> {
-        let conn = self.conn()?;
-        let mut stmt = conn.prepare(
-            r#"
-            SELECT id, label, filename, has_passphrase, created_at
-            FROM ssh_keys
-            ORDER BY created_at ASC
-            "#,
-        )?;
-        let keys = stmt
-            .query_map([], ssh_key_from_row)?
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(keys)
-    }
-
-    pub fn get_key(&self, id: &str) -> AppResult<SshKey> {
-        let conn = self.conn()?;
-        conn.query_row(
-            r#"
-            SELECT id, label, filename, has_passphrase, created_at
-            FROM ssh_keys
-            WHERE id = ?1
-            "#,
-            params![id],
-            ssh_key_from_row,
-        )
-        .optional()?
-        .ok_or_else(|| AppError(format!("key not found: {id}")))
-    }
-
-    pub fn key_private_key(&self, id: &str) -> AppResult<String> {
-        let conn = self.conn()?;
-        conn.query_row(
-            "SELECT private_key FROM ssh_keys WHERE id = ?1",
-            params![id],
-            |row| row.get(0),
-        )
-        .optional()?
-        .ok_or_else(|| AppError(format!("key not found: {id}")))
-    }
-
-    pub fn import_key(
-        &self,
-        label: String,
-        source_path: &str,
-        has_passphrase: bool,
-    ) -> AppResult<SshKey> {
-        let private_key = fs::read_to_string(source_path)?;
-        let id = uuid::Uuid::new_v4().to_string();
-        let filename = Path::new(source_path)
-            .file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("id_key")
-            .to_string();
-        let key = SshKey {
-            id,
-            label,
-            filename,
-            has_passphrase,
-            created_at: now_ms(),
-        };
-        let conn = self.conn()?;
-        conn.execute(
-            r#"
-            INSERT INTO ssh_keys(
-                id, label, filename, private_key, has_passphrase, created_at
-            )
-            VALUES(?1, ?2, ?3, ?4, ?5, ?6)
-            "#,
-            params![
-                key.id,
-                key.label,
-                key.filename,
-                private_key,
-                bool_to_int(key.has_passphrase),
-                key.created_at,
-            ],
-        )?;
-        Ok(key)
-    }
-
-    pub fn delete_key(&self, id: &str) -> AppResult<()> {
-        let conn = self.conn()?;
-        conn.execute("DELETE FROM ssh_keys WHERE id = ?1", params![id])?;
-        Ok(())
-    }
-
     pub fn db_path(&self) -> &Path {
         &self.db_path
     }
 
+    // Only BT adapters/repositories and storage-backed tests need this path.
+    #[cfg(any(desktop, target_os = "android", test))]
     pub(crate) fn root_path(&self) -> &Path {
         &self.root
     }

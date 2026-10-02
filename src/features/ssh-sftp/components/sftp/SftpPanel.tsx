@@ -10,29 +10,16 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useTable, type ColumnSizingState } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
-  ArrowUp,
   ChevronDown,
   ChevronUp,
-  File as FileIcon,
   FolderOpen,
-  FolderPlus,
-  FolderUp,
-  Home,
   LoaderCircle,
   RefreshCw,
-  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Session, SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
 import { Button } from "~/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import {
   Empty,
   EmptyHeader,
@@ -45,6 +32,7 @@ import DeleteConfirmDialog from "~/features/ssh-sftp/components/sftp/DeleteConfi
 import ExtractDialog from "~/features/ssh-sftp/components/sftp/ExtractDialog";
 import FileInfoDialog from "~/features/ssh-sftp/components/sftp/FileInfoDialog";
 import RemoteDirectoryPicker from "~/features/ssh-sftp/components/sftp/RemoteDirectoryPicker";
+import SftpToolbar from "./SftpToolbar";
 import SftpRow from "~/features/ssh-sftp/components/sftp/SftpRow";
 import { useSftpNavigation } from "~/features/ssh-sftp/components/sftp/useSftpNavigation";
 import { useSftpRemoteActions } from "~/features/ssh-sftp/components/sftp/useSftpRemoteActions";
@@ -60,6 +48,8 @@ import {
   sftpColumns,
   sftpFeatures,
   sftpHeaderHeight,
+  SFTP_ROW_HEIGHT,
+  SFTP_ROW_HEIGHT_TOUCH,
   type ConflictState,
   type DirectoryPickerState,
   type InfoState,
@@ -69,16 +59,22 @@ import {
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { cn } from "cn";
 import { useMediaQuery } from "~/lib/use-media-query";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import { describeError } from "~/lib/errors";
 interface Props {
   session: Session;
+  toolbarTarget?: HTMLElement | null;
 }
-export default function SftpPanel({ session }: Props) {
+export default function SftpPanel({ session, toolbarTarget }: Props) {
   const { t } = useLingui();
   const sessionId = session.id;
-  const compact = useMediaQuery("(max-width: 640px)");
+  const compact = !useDesktopLayout();
+  // 宽屏平板同样是触摸输入：行高按输入方式而不是屏宽决定。
+  const coarsePointer = useMediaQuery("(pointer: coarse)");
+  const touchDensity = compact || coarsePointer;
   const listScrollRef = useRef<HTMLDivElement | null>(null);
   const userResizedColumnsRef = useRef(false);
-  const { cwd, entries, loading, loadingAction, load, goHome } =
+  const { cwd, entries, loading, loadingAction, loadError, load, goHome } =
     useSftpNavigation(session);
   const [busy, setBusy] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({
@@ -141,9 +137,10 @@ export default function SftpPanel({ session }: Props) {
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => listScrollRef.current,
-    estimateSize: () => 36,
+    estimateSize: () =>
+      touchDensity ? SFTP_ROW_HEIGHT_TOUCH : SFTP_ROW_HEIGHT,
     overscan: 12,
-    scrollMargin: sftpHeaderHeight,
+    scrollMargin: compact ? 0 : sftpHeaderHeight,
   });
   const headerGroup = table.getHeaderGroups()[0];
   const listColumnStyle = {
@@ -208,7 +205,7 @@ export default function SftpPanel({ session }: Props) {
         };
       });
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
       setInfo((current) => {
         if (!current || current.entry.path !== entry.path) return current;
         return {
@@ -220,86 +217,18 @@ export default function SftpPanel({ session }: Props) {
   }
   return (
     <div className="bg-background flex h-full flex-col">
-      {/* 工具栏 */}
-      <div className="border-border flex items-center gap-1 border-b px-2 py-1.5">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          title={t`主目录`}
-          aria-label={t`主目录`}
-          className="max-sm:min-h-11 max-sm:min-w-11"
-          onClick={goHome}
-          disabled={loading}
-        >
-          {loadingAction === "home" ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <Home />
-          )}
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          title={t`上级目录`}
-          aria-label={t`上级目录`}
-          className="max-sm:min-h-11 max-sm:min-w-11"
-          onClick={() => cwd && load(parentPath(cwd), "parent")}
-          disabled={loading || !cwd || cwd === "/"}
-        >
-          {loadingAction === "parent" ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <ArrowUp />
-          )}
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          title={t`刷新`}
-          aria-label={t`刷新`}
-          className="max-sm:min-h-11 max-sm:min-w-11"
-          onClick={() => cwd && load(cwd, "refresh")}
-          disabled={loading || !cwd}
-        >
-          {loadingAction === "refresh" ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <RefreshCw />
-          )}
-        </Button>
-        <div className="bg-muted mx-1 flex-1 truncate rounded-md px-2 py-1 font-mono text-xs">
-          {cwd ?? "…"}
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            setPrompt({
-              kind: "mkdir",
-            })
-          }
-          disabled={!cwd || !!busy}
-        >
-          <FolderPlus data-icon="inline-start" /> <Trans>新建</Trans>
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" disabled={!cwd || !!busy}>
-              <Upload data-icon="inline-start" /> <Trans>上传</Trans>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={onUpload}>
-                <FileIcon /> <Trans>上传文件</Trans>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={onUploadDir}>
-                <FolderUp /> <Trans>上传文件夹</Trans>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <SftpToolbar
+        target={toolbarTarget}
+        cwd={cwd}
+        loading={loading}
+        busy={!!busy}
+        onHome={() => void goHome()}
+        onParent={() => cwd && void load(parentPath(cwd), "parent")}
+        onRefresh={() => cwd && void load(cwd, "refresh")}
+        onCreate={() => setPrompt({ kind: "mkdir" })}
+        onUpload={onUpload}
+        onUploadDir={onUploadDir}
+      />
 
       {busy ? (
         <div className="border-border bg-muted/50 text-muted-foreground flex items-center gap-2 border-b px-3 py-1.5 text-xs">
@@ -308,14 +237,32 @@ export default function SftpPanel({ session }: Props) {
         </div>
       ) : null}
 
+      {loadError ? (
+        <div
+          role="alert"
+          className="flex shrink-0 items-center gap-2 border-b p-3 text-sm"
+        >
+          <span className="min-w-0 flex-1">{describeError(loadError)}</span>
+          <Button
+            variant="outline"
+            density="adaptive"
+            onClick={() => (cwd ? void load(cwd, "refresh") : void goHome())}
+          >
+            <Trans>重试</Trans>
+          </Button>
+        </div>
+      ) : null}
       {/* 文件列表 */}
-      <div ref={listScrollRef} className="relative flex-1 overflow-y-auto">
+      <div
+        ref={listScrollRef}
+        className="app-scroll-safe-end relative min-h-0 flex-1 overflow-y-auto"
+      >
         {loading && entries.length === 0 ? (
           <div className="text-muted-foreground flex h-full items-center justify-center gap-2 text-sm">
             <LoaderCircle className="size-4 animate-spin" />
             <Trans>加载中…</Trans>
           </div>
-        ) : !loading && entries.length === 0 ? (
+        ) : !loading && !loadError && entries.length === 0 ? (
           <Empty className="h-full">
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -335,7 +282,7 @@ export default function SftpPanel({ session }: Props) {
             )}
             style={listColumnStyle}
           >
-            <div className="border-border bg-background text-muted-foreground sticky top-0 z-10 grid grid-cols-[var(--sftp-list-columns)] border-b px-3 text-xs font-medium">
+            <div className="border-border bg-background text-muted-foreground sticky top-0 z-10 hidden grid-cols-[var(--sftp-list-columns)] border-b px-3 text-xs font-medium md:grid">
               {headerGroup.headers.map((header) => {
                 const id = header.column.id;
                 const sortable = id !== "actions";
@@ -372,9 +319,11 @@ export default function SftpPanel({ session }: Props) {
                 return (
                   <div
                     key={row.id}
+                    data-index={virtualRow.index}
+                    ref={rowVirtualizer.measureElement}
                     className="absolute top-0 left-0 w-full"
                     style={{
-                      transform: `translateY(${virtualRow.start - sftpHeaderHeight}px)`,
+                      transform: `translateY(${virtualRow.start - (compact ? 0 : sftpHeaderHeight)}px)`,
                     }}
                   >
                     <SftpRow
@@ -481,7 +430,8 @@ export default function SftpPanel({ session }: Props) {
         onResolve={(resolution) => {
           const c = conflict;
           setConflict(null);
-          if (c) void c.run(resolution).catch((e) => toast.error(String(e)));
+          if (c)
+            void c.run(resolution).catch((e) => toast.error(describeError(e)));
         }}
       />
 

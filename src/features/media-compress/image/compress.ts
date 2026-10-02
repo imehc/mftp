@@ -1,9 +1,6 @@
-import {
-  baseName,
-  downloadBlob,
-  formatBytes,
-  stripExtension,
-} from "~/features/media-compress/format";
+import { msg } from "@lingui/core/macro";
+import { translate } from "~/i18n/translate";
+import { stripExtension } from "~/lib/files";
 
 export type ImageInputFormat = "png" | "jpg" | "jpeg" | "webp";
 export type ImageOutputFormat = "jpg" | "png" | "webp" | "avif";
@@ -79,8 +76,6 @@ function estimateFactor(format: ImageOutputFormat, quality: number): number {
   return low + (high - low) * t;
 }
 
-export { baseName, downloadBlob, formatBytes, stripExtension };
-
 export function isSupportedImageFile(file: File | { name: string }): boolean {
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
   return INPUT_EXT.has(ext);
@@ -137,7 +132,7 @@ export function estimateImageOutput(
 
 export async function probeImageFile(file: File): Promise<ImageMeta> {
   if (!isSupportedImageFile(file)) {
-    throw new Error("仅支持 PNG、JPG、WebP 格式");
+    throw new Error(translate(msg`仅支持 PNG、JPG、WebP 格式`));
   }
   const bitmap = await createImageBitmap(file);
   try {
@@ -162,7 +157,7 @@ export function canvasToBlob(
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error(`浏览器无法导出 ${mimeType}`));
+          reject(new Error(translate(msg`浏览器无法导出 ${mimeType}`)));
           return;
         }
         resolve(blob);
@@ -180,23 +175,23 @@ export async function compressImageFile(
   signal?: AbortSignal,
 ): Promise<ImageCompressResult> {
   if (!isSupportedImageFile(file)) {
-    throw new Error("仅支持 PNG、JPG、WebP 格式");
+    throw new Error(translate(msg`仅支持 PNG、JPG、WebP 格式`));
   }
   if (signal?.aborted) {
-    throw new DOMException("压缩已取消", "AbortError");
+    throw new DOMException(translate(msg`压缩已取消`), "AbortError");
   }
 
   onProgress?.(10);
   const bitmap = await createImageBitmap(file);
   if (signal?.aborted) {
     bitmap.close();
-    throw new DOMException("压缩已取消", "AbortError");
+    throw new DOMException(translate(msg`压缩已取消`), "AbortError");
   }
   onProgress?.(35);
 
   try {
     if (signal?.aborted) {
-      throw new DOMException("压缩已取消", "AbortError");
+      throw new DOMException(translate(msg`压缩已取消`), "AbortError");
     }
 
     const canvas = document.createElement("canvas");
@@ -204,7 +199,7 @@ export async function compressImageFile(
     canvas.height = bitmap.height;
     const context = canvas.getContext("2d");
     if (!context) {
-      throw new Error("无法创建画布上下文");
+      throw new Error(translate(msg`无法创建画布上下文`));
     }
 
     // JPEG 不支持透明通道；填充白色，避免透明 PNG 出现黑色底。
@@ -216,7 +211,7 @@ export async function compressImageFile(
     onProgress?.(70);
 
     if (signal?.aborted) {
-      throw new DOMException("压缩已取消", "AbortError");
+      throw new DOMException(translate(msg`压缩已取消`), "AbortError");
     }
 
     const mimeType = mimeForFormat(options.outputFormat);
@@ -230,15 +225,18 @@ export async function compressImageFile(
       blob = await canvasToBlob(canvas, mimeType, quality);
     } catch (error) {
       if (options.outputFormat === "avif") {
-        throw new Error("当前环境不支持导出 AVIF，请改用 WebP 或 JPG", {
-          cause: error,
-        });
+        throw new Error(
+          translate(msg`当前环境不支持导出 AVIF，请改用 WebP 或 JPG`),
+          {
+            cause: error,
+          },
+        );
       }
       throw error;
     }
 
     if (signal?.aborted) {
-      throw new DOMException("压缩已取消", "AbortError");
+      throw new DOMException(translate(msg`压缩已取消`), "AbortError");
     }
 
     onProgress?.(100);

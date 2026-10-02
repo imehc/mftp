@@ -35,6 +35,7 @@ import {
   hostFormValuesToInput,
   hostToFormValues,
 } from "~/features/ssh-sftp/components/hosts/HostForm.schema";
+import { describeError } from "~/lib/errors";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -60,7 +61,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
         else await createHost(payload);
         onOpenChange(false);
       } catch (e) {
-        setSubmitError(String(e));
+        setSubmitError(describeError(e));
       }
     },
   });
@@ -74,13 +75,18 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
   }, [form, host, open]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent className="sm:max-w-md">
-        <DialogLayoutHeader>
+      <DialogLayoutContent
+        placement="responsive-page"
+        className="ui-density-adaptive md:max-w-md"
+        showCloseButton={false}
+        aria-describedby={undefined}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>{host ? t`编辑主机` : t`新建主机`}</DialogTitle>
         </DialogLayoutHeader>
 
         <DialogLayoutBody className="pr-1">
-          <FieldGroup>
+          <FieldGroup density="compact">
             <form.Field name="label">
               {(field) => {
                 const error = firstFormError(field.state.meta.errors);
@@ -94,7 +100,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="My Server"
+                      placeholder={t`我的服务器`}
                       autoCapitalize="off"
                       autoCorrect="off"
                       autoComplete="off"
@@ -109,7 +115,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
               }}
             </form.Field>
 
-            <div className="grid grid-cols-[1fr_100px] gap-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_6.25rem]">
               <form.Field name="host">
                 {(field) => {
                   const error = firstFormError(field.state.meta.errors);

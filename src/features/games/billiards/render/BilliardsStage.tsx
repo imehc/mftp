@@ -457,6 +457,7 @@ export const BilliardsStage = forwardRef<
     if (!host) return;
     let disposed = false;
     let app: Application | null = null;
+    let observer: ResizeObserver | null = null;
 
     void (async () => {
       const nextApp = new Application();
@@ -472,6 +473,9 @@ export const BilliardsStage = forwardRef<
         return;
       }
       app = nextApp;
+      // 容器会因 HUD、界面字号与横屏工具栏变化而改变，不能只监听窗口。
+      observer = new ResizeObserver(() => nextApp.resize());
+      observer.observe(host);
       host.appendChild(nextApp.canvas);
       const scene = createScene(nextApp, {
         onPowerPreview: (power) => propsRef.current.onPowerPreview(power),
@@ -489,6 +493,7 @@ export const BilliardsStage = forwardRef<
 
     return () => {
       disposed = true;
+      observer?.disconnect();
       sceneRef.current?.destroy();
       sceneRef.current = null;
       app?.destroy(true, { children: true, texture: true });

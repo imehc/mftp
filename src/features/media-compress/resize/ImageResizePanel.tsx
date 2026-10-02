@@ -1,6 +1,7 @@
+import MediaProgress from "../components/MediaProgress";
 import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ImageIcon, LoaderCircle } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -8,6 +9,7 @@ import { Field, FieldLabel } from "~/components/ui/field";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -15,7 +17,7 @@ import {
 import { Slider } from "~/components/ui/slider";
 import { CompressDropzone } from "~/features/media-compress/components/CompressDropzone";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
-import { formatBytes } from "~/features/media-compress/format";
+import { formatBytes } from "~/lib/format";
 import {
   isSupportedImageFile,
   probeImageFile,
@@ -42,7 +44,9 @@ import {
   type ResizeSize,
 } from "~/features/media-compress/resize/resize";
 import type { CompressPhase } from "~/features/media-compress/types";
+import { useMediaProcessing } from "../MediaProcessingGuard";
 import { useCompressResult } from "~/features/media-compress/useCompressResult";
+import { describeError } from "~/lib/errors";
 export default function ImageResizePanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +57,7 @@ export default function ImageResizePanel() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [meta, setMeta] = useState<ImageMeta | null>(null);
   const [phase, setPhase] = useState<CompressPhase>("idle");
+  useMediaProcessing("resize", phase === "compressing");
   const [error, setError] = useState<string | null>(null);
   const [method, setMethod] = useState<ResizeMethod>("ratio");
   const [ratio, setRatio] = useState(DEFAULT_RATIO);
@@ -144,9 +149,9 @@ export default function ImageResizePanel() {
       setPhase("idle");
     } catch (err) {
       if (probeRunRef.current !== runId) return;
-      setError(String(err));
+      setError(describeError(err));
       setPhase("error");
-      toast.error(String(err));
+      toast.error(describeError(err));
     }
   }
   function onDimensionModeChange(next: DimensionMode) {
@@ -190,7 +195,7 @@ export default function ImageResizePanel() {
         return;
       }
       if (abortRef.current !== controller) return;
-      const message = String(err);
+      const message = describeError(err);
       setError(message);
       setPhase("error");
       toast.error(message);
@@ -209,20 +214,25 @@ export default function ImageResizePanel() {
   const targetHeight = target?.height;
   const metaWidth = meta?.width;
   const metaHeight = meta?.height;
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onClear}
-          disabled={!file && !result.blob}
-        >
-          <Trans>清空</Trans>
-        </Button>
-      </div>
-
+  const processingView = phase === "compressing";
+  return processingView ? (
+    <MediaProgress
+      fileName={file?.name ?? ""}
+      onCancel={() => abortRef.current?.abort()}
+    />
+  ) : (
+    <div className="grid min-w-0 grid-cols-1 items-start gap-3 md:grid-cols-2">
       <CompressDropzone
+        preview={
+          previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={t`原图预览`}
+              className="size-full object-contain"
+            />
+          ) : undefined
+        }
+        onClear={onClear}
         inputRef={inputRef}
         accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
         nativeFilter={{
@@ -233,13 +243,27 @@ export default function ImageResizePanel() {
         disabled={processing}
         onFile={(next) => void applyFile(next)}
         icon={<ImageIcon className="text-muted-foreground size-5" />}
-        title={<Trans>拖放图片到此处，或选择文件</Trans>}
+        title={
+          <>
+            <span className="md:hidden">
+              <Trans>选择一张图片</Trans>
+            </span>
+            <span className="hidden md:inline">
+              <Trans>拖放图片到此处，或选择文件</Trans>
+            </span>
+          </>
+        }
         description={<Trans>PNG · JPG · WebP，保持原格式输出</Trans>}
         pickLabel={<Trans>选择图片</Trans>}
         footer={
           file ? (
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5">
-              <Badge variant="secondary">{file.name}</Badge>
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <span
+                className="w-full truncate text-left text-sm"
+                title={file.name}
+              >
+                {file.name}
+              </span>
               <Badge variant="outline">{formatBytes(file.size)}</Badge>
               {meta ? (
                 <Badge variant="outline">
@@ -251,236 +275,216 @@ export default function ImageResizePanel() {
         }
       />
 
-      <section className="border-border bg-card rounded-lg border p-2.5">
-        <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
-          <Field>
-            <FieldLabel>
-              <Trans>缩放方式</Trans>
-            </FieldLabel>
-            <ResizeMethodTabs
-              value={method}
-              onChange={setMethod}
-              disabled={processing}
-            />
-          </Field>
-
-          {method === "ratio" ? (
-            <Field className="min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <FieldLabel>
-                  <Trans>缩放比例</Trans>
-                </FieldLabel>
-                <span className="text-muted-foreground text-xs tabular-nums">
-                  {ratio}%
-                </span>
-              </div>
-              <Slider
-                min={RATIO_MIN}
-                max={RATIO_MAX}
-                step={RATIO_STEP}
-                value={[ratio]}
-                onValueChange={(values) => {
-                  const next = values[0];
-                  if (typeof next === "number") setRatio(next);
-                }}
-                disabled={processing}
-                aria-label={t`选择缩放比例`}
-                className="mt-1"
-              />
-              <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
-                <span>
-                  <Trans>缩小</Trans>
-                </span>
-                <span>
-                  <Trans>放大</Trans>
-                </span>
-              </div>
-            </Field>
-          ) : (
+      {file ? (
+        <section className="border-border bg-card min-w-0 rounded-lg border p-3">
+          <h2 className="mb-3 text-sm font-semibold">
+            <Trans>输出设置</Trans>
+          </h2>
+          <div className="grid gap-3">
             <Field>
               <FieldLabel>
-                <Trans>尺寸模式</Trans>
+                <Trans>缩放方式</Trans>
               </FieldLabel>
-              <Select
-                value={dimensionMode}
-                onValueChange={(value) => {
-                  if (isDimensionMode(value)) onDimensionModeChange(value);
-                }}
+              <ResizeMethodTabs
+                value={method}
+                onChange={setMethod}
                 disabled={processing}
-              >
-                <SelectTrigger className="w-full" aria-label={t`选择尺寸模式`}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {DIMENSION_MODES.map((mode) => (
-                    <SelectItem key={mode} value={mode}>
-                      {dimensionModeLabel(mode)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </Field>
-          )}
-        </div>
 
-        {method === "dimension" ? (
-          <div className="mt-3">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {(dimensionMode === "exact" || dimensionMode === "width") && (
-                <DimensionInput
-                  label={<Trans>宽度</Trans>}
-                  value={widthInput}
-                  disabled={processing}
-                  ariaLabel={t`目标宽度`}
-                  onChange={setWidthInput}
-                />
-              )}
-              {(dimensionMode === "exact" || dimensionMode === "height") && (
-                <DimensionInput
-                  label={<Trans>高度</Trans>}
-                  value={heightInput}
-                  disabled={processing}
-                  ariaLabel={t`目标高度`}
-                  onChange={setHeightInput}
-                />
-              )}
-              {dimensionMode === "longest" && (
-                <DimensionInput
-                  label={<Trans>最大边长</Trans>}
-                  value={edgeInput}
-                  disabled={processing}
-                  ariaLabel={t`目标最大边长`}
-                  onChange={setEdgeInput}
-                />
-              )}
-              {dimensionMode === "shortest" && (
-                <DimensionInput
-                  label={<Trans>最小边长</Trans>}
-                  value={edgeInput}
-                  disabled={processing}
-                  ariaLabel={t`目标最小边长`}
-                  onChange={setEdgeInput}
-                />
-              )}
-            </div>
-            {dimensionMode === "exact" ? (
-              <p className="text-muted-foreground mt-2 text-xs">
-                <Trans>宽高与原图比例不同时，图片会被拉伸变形</Trans>
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        <div className="border-border mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3">
-          <div className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-xs">
-            {target ? (
-              <>
-                <Badge variant="outline">
-                  <Trans>
-                    输出 {targetWidth} × {targetHeight} px
-                  </Trans>
-                </Badge>
-                {meta ? (
-                  <span>
-                    <Trans>
-                      原图 {metaWidth} × {metaHeight} px
-                    </Trans>
+            {method === "ratio" ? (
+              <Field className="min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <FieldLabel>
+                    <Trans>缩放比例</Trans>
+                  </FieldLabel>
+                  <span className="text-muted-foreground text-xs tabular-nums">
+                    {ratio}%
                   </span>
-                ) : null}
-              </>
+                </div>
+                <Slider
+                  min={RATIO_MIN}
+                  max={RATIO_MAX}
+                  step={RATIO_STEP}
+                  value={[ratio]}
+                  onValueChange={(values) => {
+                    const next = values[0];
+                    if (typeof next === "number") setRatio(next);
+                  }}
+                  disabled={processing}
+                  aria-label={t`选择缩放比例`}
+                  className="mt-1"
+                />
+                <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
+                  <span>
+                    <Trans>缩小</Trans>
+                  </span>
+                  <span>
+                    <Trans>放大</Trans>
+                  </span>
+                </div>
+              </Field>
             ) : (
-              <span>
-                {meta ? (
-                  <Trans>请输入有效的目标尺寸</Trans>
-                ) : (
-                  <Trans>选择图片后显示输出尺寸</Trans>
-                )}
-              </span>
+              <Field>
+                <FieldLabel>
+                  <Trans>尺寸模式</Trans>
+                </FieldLabel>
+                <Select
+                  value={dimensionMode}
+                  onValueChange={(value) => {
+                    if (isDimensionMode(value)) onDimensionModeChange(value);
+                  }}
+                  disabled={processing}
+                >
+                  <SelectTrigger
+                    className="w-full"
+                    aria-label={t`选择尺寸模式`}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {DIMENSION_MODES.map((mode) => (
+                        <SelectItem key={mode} value={mode}>
+                          {dimensionModeLabel(mode)}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </Field>
             )}
           </div>
-          <Button
-            size="sm"
-            onClick={() => void onProcess()}
-            disabled={!file || !targetAllowed || processing}
-          >
-            {processing ? (
-              <LoaderCircle data-icon="inline-start" className="animate-spin" />
-            ) : null}
-            <Trans>开始处理</Trans>
-          </Button>
-        </div>
 
-        {target && !targetAllowed ? (
-          <p className="text-destructive mt-2 text-xs">
-            <Trans>目标尺寸需在 1–10000 像素之间</Trans>
-          </p>
-        ) : null}
-        {error ? (
-          <p className="text-destructive mt-2 text-xs">{error}</p>
-        ) : null}
-      </section>
-
-      {(previewUrl || result.url) && (
-        <section className="grid gap-2 md:grid-cols-2">
-          {previewUrl ? (
-            <div className="border-border bg-card flex flex-col rounded-lg border p-2.5">
-              <div className="mb-1.5 flex items-center justify-between gap-2">
-                <span className="text-muted-foreground text-xs font-medium">
-                  <Trans>原图</Trans>
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {meta ? (
-                    <Badge variant="outline">
-                      {meta.width}×{meta.height}
-                    </Badge>
-                  ) : null}
-                  {file ? (
-                    <Badge variant="outline">{formatBytes(file.size)}</Badge>
-                  ) : null}
-                </div>
+          {method === "dimension" ? (
+            <div className="mt-3">
+              <div className="grid gap-3 md:grid-cols-2">
+                {(dimensionMode === "exact" || dimensionMode === "width") && (
+                  <DimensionInput
+                    label={<Trans>宽度</Trans>}
+                    value={widthInput}
+                    disabled={processing}
+                    ariaLabel={t`目标宽度`}
+                    onChange={setWidthInput}
+                  />
+                )}
+                {(dimensionMode === "exact" || dimensionMode === "height") && (
+                  <DimensionInput
+                    label={<Trans>高度</Trans>}
+                    value={heightInput}
+                    disabled={processing}
+                    ariaLabel={t`目标高度`}
+                    onChange={setHeightInput}
+                  />
+                )}
+                {dimensionMode === "longest" && (
+                  <DimensionInput
+                    label={<Trans>最大边长</Trans>}
+                    value={edgeInput}
+                    disabled={processing}
+                    ariaLabel={t`目标最大边长`}
+                    onChange={setEdgeInput}
+                  />
+                )}
+                {dimensionMode === "shortest" && (
+                  <DimensionInput
+                    label={<Trans>最小边长</Trans>}
+                    value={edgeInput}
+                    disabled={processing}
+                    ariaLabel={t`目标最小边长`}
+                    onChange={setEdgeInput}
+                  />
+                )}
               </div>
-              <div className="bg-muted/30 mt-auto h-64 w-full overflow-hidden rounded-md">
-                <img
-                  src={previewUrl}
-                  alt={t`原图预览`}
-                  className="h-full w-full rounded-md object-contain"
-                />
-              </div>
+              {dimensionMode === "exact" ? (
+                <p className="text-muted-foreground mt-2 text-xs">
+                  <Trans>宽高与原图比例不同时，图片会被拉伸变形</Trans>
+                </p>
+              ) : null}
             </div>
           ) : null}
 
-          {result.blob && result.url ? (
-            <CompressResultCard
-              title={<Trans>处理结果</Trans>}
-              fileName={result.fileName}
-              size={result.size}
-              originalSize={meta?.size ?? file?.size ?? 0}
-              blob={result.blob}
-              onSizeChange={setResultSize}
-              extraBadges={
-                resultDims ? (
-                  <Badge variant="outline" className="shrink-0">
-                    {resultDims.width}×{resultDims.height}
+          <div className="border-border mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-xs">
+              {target ? (
+                <>
+                  <Badge variant="outline">
+                    <Trans>
+                      输出 {targetWidth} × {targetHeight} px
+                    </Trans>
                   </Badge>
-                ) : null
-              }
-              preview={
-                <div className="bg-muted/30 h-64 w-full overflow-hidden rounded-md">
-                  <img
-                    src={result.url}
-                    alt={t`处理结果预览`}
-                    className="h-full w-full rounded-md object-contain"
-                  />
-                </div>
-              }
-            />
-          ) : (
-            <div className="border-border bg-card text-muted-foreground flex min-h-40 items-center justify-center rounded-lg border border-dashed p-2.5 text-xs">
-              <Trans>处理完成后在此预览输出</Trans>
+                  {meta ? (
+                    <span>
+                      <Trans>
+                        原图 {metaWidth} × {metaHeight} px
+                      </Trans>
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                <span>
+                  {meta ? (
+                    <Trans>请输入有效的目标尺寸</Trans>
+                  ) : (
+                    <Trans>选择图片后显示输出尺寸</Trans>
+                  )}
+                </span>
+              )}
             </div>
-          )}
+            <div className="flex gap-2 max-md:w-full max-md:[&>button]:flex-1">
+              <Button
+                onClick={() => void onProcess()}
+                disabled={!file || !targetAllowed || processing}
+              >
+                <Trans>开始处理</Trans>
+              </Button>
+            </div>
+          </div>
+
+          {target && !targetAllowed ? (
+            <p className="text-destructive mt-2 text-xs">
+              <Trans>目标尺寸需在 1–10000 像素之间</Trans>
+            </p>
+          ) : null}
+          {error ? (
+            <p className="text-destructive mt-2 text-xs">{error}</p>
+          ) : null}
         </section>
-      )}
+      ) : null}
+
+      <div className="md:col-span-2">
+        {result.blob && result.url ? (
+          <CompressResultCard
+            title={<Trans>处理结果</Trans>}
+            fileName={result.fileName}
+            size={result.size}
+            originalSize={meta?.size ?? file?.size ?? 0}
+            blob={result.blob}
+            onSizeChange={setResultSize}
+            extraBadges={
+              resultDims ? (
+                <Badge variant="outline" className="shrink-0">
+                  {resultDims.width}×{resultDims.height}
+                </Badge>
+              ) : null
+            }
+            preview={
+              <div className="bg-muted/30 h-64 w-full overflow-hidden rounded-md">
+                <img
+                  src={result.url}
+                  alt={t`处理结果预览`}
+                  className="h-full w-full rounded-md object-contain"
+                />
+              </div>
+            }
+          />
+        ) : null}
+      </div>
+      {error && !file ? (
+        <p role="status" className="text-destructive text-sm md:col-span-2">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

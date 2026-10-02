@@ -43,7 +43,7 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
   }, [form, host]);
   return (
     <Dialog open={!!host} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="ui-density-adaptive max-w-sm">
         <DialogHeader>
           <DialogTitle>
             <Trans>输入密钥口令</Trans>
@@ -72,7 +72,7 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="passphrase"
+                    placeholder={t`请输入口令`}
                     aria-invalid={!!error}
                   />
                   {error ? <FieldDescription>{error}</FieldDescription> : null}

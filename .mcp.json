@@ -3,6 +3,14 @@
     "shadcn": {
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]
+    },
+    "plumb": {
+      "command": "npx",
+      "args": ["-y", "plumb-mcp"]
+    },
+    "TalkToFigma": {
+      "command": "bunx",
+      "args": ["cursor-talk-to-figma-mcp@latest"]
     }
   }
 }

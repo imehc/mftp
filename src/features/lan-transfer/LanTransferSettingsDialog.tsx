@@ -103,14 +103,17 @@ export default function LanTransferSettingsDialog({
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent className="max-w-lg">
-        <DialogLayoutHeader>
+      <DialogLayoutContent
+        className="ui-density-adaptive max-w-lg"
+        showCloseButton={false}
+      >
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>局域网传输设置</Trans>
           </DialogTitle>
         </DialogLayoutHeader>
         <DialogLayoutBody>
-          <FieldGroup>
+          <FieldGroup density="compact">
             <form.Field name="deviceName">
               {(field) => (
                 <UiField>
@@ -137,12 +140,15 @@ export default function LanTransferSettingsDialog({
                     </FieldLabel>
                     <Input
                       id="lan-port"
+                      type="number"
+                      min={1}
+                      max={65535}
                       value={field.state.value}
                       inputMode="numeric"
                       disabled={running}
                       onBlur={field.handleBlur}
                       onChange={(event) =>
-                        field.handleChange(Number(event.target.value) || 3000)
+                        field.handleChange(Number(event.target.value))
                       }
                       aria-invalid={!!error}
                     />
@@ -174,7 +180,7 @@ export default function LanTransferSettingsDialog({
                       }
                       disabled={running}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger aria-label={t`绑定 IP`}>
                         <SelectValue placeholder={t`自动选择`} />
                       </SelectTrigger>
                       <SelectContent>
@@ -216,6 +222,7 @@ export default function LanTransferSettingsDialog({
                   </FieldLabel>
                   <div className="flex gap-2">
                     <Input
+                      aria-label={t`接收目录`}
                       readOnly
                       value={field.state.value}
                       placeholder={t`未选择`}
@@ -242,6 +249,7 @@ export default function LanTransferSettingsDialog({
                     <Trans>安全模式</Trans>
                   </FieldLabel>
                   <ToggleGroup
+                    aria-label={t`安全模式`}
                     type="single"
                     value={field.state.value}
                     onValueChange={(value) => {
@@ -255,7 +263,6 @@ export default function LanTransferSettingsDialog({
                       }
                     }}
                     variant="outline"
-                    size="sm"
                     disabled={running}
                     className="justify-start"
                   >
@@ -285,7 +292,7 @@ export default function LanTransferSettingsDialog({
                     <div className="mb-2 text-sm font-medium">
                       <Trans>白名单</Trans>
                     </div>
-                    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_150px_auto]">
+                    <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_9.375rem_auto]">
                       <trustedForm.Field name="label">
                         {(field) => (
                           <Input
@@ -294,6 +301,7 @@ export default function LanTransferSettingsDialog({
                             onChange={(event) =>
                               field.handleChange(event.target.value)
                             }
+                            aria-label={t`名称`}
                             placeholder={t`名称`}
                           />
                         )}
@@ -309,6 +317,7 @@ export default function LanTransferSettingsDialog({
                                 onChange={(event) =>
                                   field.handleChange(event.target.value)
                                 }
+                                aria-label={t`IP 地址`}
                                 placeholder="192.168.1.10"
                                 aria-invalid={!!error}
                               />
@@ -360,7 +369,7 @@ export default function LanTransferSettingsDialog({
                               size="icon-xs"
                               title={t`删除白名单`}
                               aria-label={t`删除白名单`}
-                              className="max-sm:min-h-11 max-sm:min-w-11"
+                              className="max-md:min-h-11 max-md:min-w-11"
                               onClick={() =>
                                 void deleteTrustedDevice(device.id)
                               }
@@ -401,6 +410,7 @@ export default function LanTransferSettingsDialog({
                     <Trans>默认权限</Trans>
                   </FieldLabel>
                   <ToggleGroup
+                    aria-label={t`默认权限`}
                     type="single"
                     value={field.state.value}
                     onValueChange={(value) => {
@@ -414,7 +424,6 @@ export default function LanTransferSettingsDialog({
                       }
                     }}
                     variant="outline"
-                    size="sm"
                     disabled={running}
                     className="justify-start"
                   >
@@ -441,6 +450,7 @@ export default function LanTransferSettingsDialog({
                       <Trans>同时传输数</Trans>
                     </FieldLabel>
                     <Input
+                      aria-label={t`同时传输数`}
                       type="number"
                       min={1}
                       max={16}

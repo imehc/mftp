@@ -21,23 +21,28 @@ import {
   isIosPlatform,
   isMobilePlatform,
 } from "~/lib/platform";
-import type { ToolRoute } from "~/store/settings";
+import {
+  moduleAvailableOn,
+  moduleForTool,
+  moduleMetadata,
+  type ModuleId,
+  type ModulePlatform,
+  type ToolRoute,
+} from "~/lib/module-metadata";
 export type HomeCategory = "tools" | "library" | "games";
 export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
   tools: <Trans>工具</Trans>,
   library: <Trans>文库</Trans>,
   games: <Trans>小游戏</Trans>,
 };
-export type HomePlatform = "desktop" | "android" | "ios" | "mobile";
+/** 首页按平台筛选；平台/能力的事实来源是模块元数据。 */
+export type HomePlatform = ModulePlatform;
 export interface HomeEntry {
-  id: string;
+  /** 稳定模块 id；平台能力与 lastTool 恢复从模块元数据读取。 */
+  id: ModuleId;
   category: HomeCategory;
   /** 该入口路由的带类型 link 配置。 */
   link: LinkOptions;
-  /** 进入该路由时若需记住为上次使用的工具，则设置。 */
-  toolId?: ToolRoute;
-  /** 该入口可用的平台；省略表示全平台可用。 */
-  platforms?: readonly HomePlatform[];
   icon: ComponentType<{
     className?: string;
   }>;
@@ -50,7 +55,6 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({
       to: "/tools/ssh-sftp",
     }),
-    toolId: "ssh-sftp",
     icon: TerminalSquare,
     title: "SSH / SFTP",
   },
@@ -61,10 +65,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/tools/lan-transfer",
       preload: "intent",
     }),
-    toolId: "lan-transfer",
-    // 移动端隐藏：局域网服务 / mDNS 会触发网络权限弹窗
-    //（iOS 本地网络、国内无线数据），而该功能在移动端本就无法完整使用。
-    platforms: ["desktop"],
     icon: Wifi,
     title: <Trans>局域网传输</Trans>,
   },
@@ -75,7 +75,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/tools/crypto",
       preload: "intent",
     }),
-    toolId: "crypto",
     icon: LockKeyhole,
     title: <Trans>加解密</Trans>,
   },
@@ -89,7 +88,6 @@ export const homeEntries: HomeEntry[] = [
       },
       preload: "intent",
     }),
-    toolId: "media-compress",
     icon: Archive,
     title: <Trans>媒体处理</Trans>,
   },
@@ -100,7 +98,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/tools/formatter",
       preload: "intent",
     }),
-    toolId: "formatter",
     icon: Braces,
     title: <Trans>格式化</Trans>,
   },
@@ -111,7 +108,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/tools/vault",
       preload: "intent",
     }),
-    toolId: "vault",
     icon: KeyRound,
     title: <Trans>密码本</Trans>,
   },
@@ -122,7 +118,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/tools/todo",
       preload: "intent",
     }),
-    toolId: "todo",
     icon: ListTodo,
     title: <Trans>待办事项</Trans>,
   },
@@ -133,9 +128,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/tools/bt",
       preload: "intent",
     }),
-    toolId: "bt",
-    // iOS 暂不注册 BT 引擎；桌面端和 Android 使用独立本地 Session。
-    platforms: ["desktop", "android"],
     icon: Magnet,
     title: <Trans>BT 下载</Trans>,
   },
@@ -146,7 +138,6 @@ export const homeEntries: HomeEntry[] = [
       to: "/library",
       preload: "intent",
     }),
-    toolId: "library",
     icon: BookMarked,
     title: <Trans>古诗词</Trans>,
   },
@@ -199,10 +190,15 @@ const currentPlatform: HomePlatform = isAndroidPlatform()
       ? "mobile"
       : "desktop";
 
-/** 当前平台可用的首页入口。 */
-export const availableHomeEntries: HomeEntry[] = homeEntries.filter(
-  (entry) => !entry.platforms || entry.platforms.includes(currentPlatform),
-);
+/** 当前平台可用的首页入口；平台能力来自模块元数据。 */
+export const availableHomeEntries: HomeEntry[] = homeEntries.filter((entry) => {
+  const module = moduleMetadata(entry.id);
+  return !module || moduleAvailableOn(module, currentPlatform);
+});
+
+/** 由「上次使用的工具」找到对应入口；未在当前平台提供时返回 undefined。 */
 export function getToolEntry(tool: ToolRoute): HomeEntry | undefined {
-  return availableHomeEntries.find((entry) => entry.toolId === tool);
+  const module = moduleForTool(tool);
+  if (!module) return undefined;
+  return availableHomeEntries.find((entry) => entry.id === module.id);
 }

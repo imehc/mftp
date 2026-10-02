@@ -1,6 +1,7 @@
+import MediaProgress from "../components/MediaProgress";
 import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ImageIcon, LoaderCircle } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -8,6 +9,7 @@ import { Field, FieldLabel } from "~/components/ui/field";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -30,9 +32,11 @@ import {
   type ImageMeta,
   type ImageOutputFormat,
 } from "~/features/media-compress/image/compress";
-import { formatBytes } from "~/features/media-compress/format";
+import { formatBytes } from "~/lib/format";
 import type { CompressPhase } from "~/features/media-compress/types";
+import { useMediaProcessing } from "../MediaProcessingGuard";
 import { useCompressResult } from "~/features/media-compress/useCompressResult";
+import { describeError } from "~/lib/errors";
 export default function ImageCompressPanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,6 +47,7 @@ export default function ImageCompressPanel() {
   const [outputFormat, setOutputFormat] = useState<ImageOutputFormat>("jpg");
   const [quality, setQuality] = useState(DEFAULT_IMAGE_QUALITY);
   const [phase, setPhase] = useState<CompressPhase>("idle");
+  useMediaProcessing("image", phase === "compressing");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [avifOk, setAvifOk] = useState(true);
@@ -112,9 +117,9 @@ export default function ImageCompressPanel() {
       setPhase("idle");
     } catch (err) {
       if (probeRunRef.current !== runId) return;
-      setError(String(err));
+      setError(describeError(err));
       setPhase("error");
-      toast.error(String(err));
+      toast.error(describeError(err));
     }
   }
   async function onCompress() {
@@ -167,7 +172,7 @@ export default function ImageCompressPanel() {
         return;
       }
       if (abortRef.current !== controller) return;
-      const message = String(err);
+      const message = describeError(err);
       setError(message);
       setPhase("error");
       toast.error(message);
@@ -177,27 +182,30 @@ export default function ImageCompressPanel() {
       }
     }
   }
-  function onCancel() {
-    abortRef.current?.abort();
-  }
   function onClear() {
     void applyFile(null);
     if (inputRef.current) inputRef.current.value = "";
   }
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onClear}
-          disabled={!file && !result.blob}
-        >
-          <Trans>清空</Trans>
-        </Button>
-      </div>
-
+  const processingView = phase === "compressing";
+  return processingView ? (
+    <MediaProgress
+      fileName={file?.name ?? ""}
+      progress={progress}
+      onCancel={() => abortRef.current?.abort()}
+    />
+  ) : (
+    <div className="grid min-w-0 grid-cols-1 items-start gap-3 md:grid-cols-2">
       <CompressDropzone
+        preview={
+          previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={t`原图预览`}
+              className="size-full object-contain"
+            />
+          ) : undefined
+        }
+        onClear={onClear}
         inputRef={inputRef}
         accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
         nativeFilter={{
@@ -205,16 +213,30 @@ export default function ImageCompressPanel() {
           filterName: t`图片文件`,
           extensions: ["png", "jpg", "jpeg", "webp"],
         }}
-        disabled={phase === "compressing"}
+        disabled={phase === "probing"}
         onFile={(next) => void applyFile(next)}
         icon={<ImageIcon className="text-muted-foreground size-5" />}
-        title={<Trans>拖放图片到此处，或选择文件</Trans>}
+        title={
+          <>
+            <span className="md:hidden">
+              <Trans>选择一张图片</Trans>
+            </span>
+            <span className="hidden md:inline">
+              <Trans>拖放图片到此处，或选择文件</Trans>
+            </span>
+          </>
+        }
         description={<Trans>PNG · JPG · WebP，默认保持原格式输出</Trans>}
         pickLabel={<Trans>选择图片</Trans>}
         footer={
           file ? (
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5">
-              <Badge variant="secondary">{file.name}</Badge>
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <span
+                className="w-full truncate text-left text-sm"
+                title={file.name}
+              >
+                {file.name}
+              </span>
               <Badge variant="outline">{formatBytes(file.size)}</Badge>
               {meta ? (
                 <Badge variant="outline">
@@ -226,150 +248,113 @@ export default function ImageCompressPanel() {
         }
       />
 
-      <section className="border-border bg-card rounded-lg border p-2.5">
-        <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
-          <Field>
-            <FieldLabel>
-              <Trans>输出格式</Trans>
-            </FieldLabel>
-            <Select
-              value={outputFormat}
-              onValueChange={(value) => {
-                if (
-                  value === "jpg" ||
-                  value === "png" ||
-                  value === "webp" ||
-                  value === "avif"
-                ) {
-                  setOutputFormat(value);
-                }
-              }}
-              disabled={phase === "compressing"}
-            >
-              <SelectTrigger className="w-full" aria-label={t`选择输出格式`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="jpg">JPG</SelectItem>
-                <SelectItem value="png">PNG</SelectItem>
-                <SelectItem value="webp">WebP</SelectItem>
-                <SelectItem value="avif" disabled={!avifOk}>
-                  {avifOk ? "AVIF" : t`AVIF（不支持）`}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+      {file ? (
+        <section className="border-border bg-card min-w-0 rounded-lg border p-3">
+          <h2 className="mb-3 text-sm font-semibold">
+            <Trans>输出设置</Trans>
+          </h2>
+          <div className="grid gap-3">
+            <Field>
+              <FieldLabel>
+                <Trans>输出格式</Trans>
+              </FieldLabel>
+              <Select
+                value={outputFormat}
+                onValueChange={(value) => {
+                  if (
+                    value === "jpg" ||
+                    value === "png" ||
+                    value === "webp" ||
+                    value === "avif"
+                  ) {
+                    setOutputFormat(value);
+                  }
+                }}
+                disabled={phase === "probing"}
+              >
+                <SelectTrigger className="w-full" aria-label={t`选择输出格式`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="jpg">JPG</SelectItem>
+                    <SelectItem value="png">PNG</SelectItem>
+                    <SelectItem value="webp">WebP</SelectItem>
+                    <SelectItem value="avif" disabled={!avifOk}>
+                      {avifOk ? "AVIF" : t`AVIF（不支持）`}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
 
-          <CompressQualityField
-            value={quality}
-            min={IMAGE_QUALITY_MIN}
-            max={IMAGE_QUALITY_MAX}
-            step={IMAGE_QUALITY_STEP}
-            disabled={phase === "compressing" || outputFormat === "png"}
-            ariaLabel={t`选择压缩程度`}
-            onChange={setQuality}
-            rightHint={
-              outputFormat === "png" ? (
-                <span className="min-w-0 truncate text-right">
-                  <Trans>PNG 为无损格式，压缩程度影响有限</Trans>
-                </span>
-              ) : undefined
+            <CompressQualityField
+              value={quality}
+              min={IMAGE_QUALITY_MIN}
+              max={IMAGE_QUALITY_MAX}
+              step={IMAGE_QUALITY_STEP}
+              disabled={outputFormat === "png"}
+              ariaLabel={t`选择压缩程度`}
+              onChange={setQuality}
+              rightHint={
+                outputFormat === "png" ? (
+                  <span className="min-w-0 truncate text-right">
+                    <Trans>PNG 为无损格式，压缩程度影响有限</Trans>
+                  </span>
+                ) : undefined
+              }
+            />
+          </div>
+
+          <CompressEstimateBar
+            estimatedBytes={estimate?.estimatedBytes}
+            estimatedMin={estimate?.estimatedMin}
+            estimatedMax={estimate?.estimatedMax}
+            ratio={estimate?.ratio}
+            emptyHint={<Trans>选择图片后显示预估体积</Trans>}
+            showProgress={progress > 0}
+            progress={progress}
+            progressLabel={
+              phase === "done" ? <Trans>完成</Trans> : <Trans>准备中</Trans>
+            }
+            primaryAction={
+              <Button onClick={() => void onCompress()} disabled={!file}>
+                <Trans>开始压缩</Trans>
+              </Button>
             }
           />
-        </div>
 
-        <CompressEstimateBar
-          estimatedBytes={estimate?.estimatedBytes}
-          estimatedMin={estimate?.estimatedMin}
-          estimatedMax={estimate?.estimatedMax}
-          ratio={estimate?.ratio}
-          emptyHint={<Trans>选择图片后显示预估体积</Trans>}
-          showProgress={phase === "compressing" || progress > 0}
-          progress={progress}
-          progressLabel={
-            phase === "compressing" ? (
-              <Trans>压缩中</Trans>
-            ) : phase === "done" ? (
-              <Trans>完成</Trans>
-            ) : (
-              <Trans>准备中</Trans>
-            )
-          }
-          secondaryAction={
-            phase === "compressing" ? (
-              <Button variant="outline" size="sm" onClick={onCancel}>
-                <Trans>取消</Trans>
-              </Button>
-            ) : null
-          }
-          primaryAction={
-            <Button
-              size="sm"
-              onClick={() => void onCompress()}
-              disabled={!file || phase === "compressing"}
-            >
-              {phase === "compressing" ? (
-                <LoaderCircle
-                  data-icon="inline-start"
-                  className="animate-spin"
-                />
-              ) : null}
-              <Trans>开始压缩</Trans>
-            </Button>
-          }
-        />
+          {error ? (
+            <p className="text-destructive mt-2 text-xs">{error}</p>
+          ) : null}
+        </section>
+      ) : null}
 
-        {error ? (
-          <p className="text-destructive mt-2 text-xs">{error}</p>
-        ) : null}
-      </section>
-
-      {(previewUrl || result.url) && (
-        <section className="grid gap-2 md:grid-cols-2">
-          {previewUrl ? (
-            <div className="border-border bg-card flex flex-col rounded-lg border p-2.5">
-              <div className="mb-1.5 flex items-center justify-between gap-2">
-                <span className="text-muted-foreground text-xs font-medium">
-                  <Trans>原图</Trans>
-                </span>
-                {file ? (
-                  <Badge variant="outline">{formatBytes(file.size)}</Badge>
-                ) : null}
-              </div>
-              <div className="bg-muted/30 mt-auto h-64 w-full overflow-hidden rounded-md">
+      <div className="md:col-span-2">
+        {result.blob && result.url ? (
+          <CompressResultCard
+            fileName={result.fileName}
+            size={result.size}
+            originalSize={meta?.size ?? file?.size ?? 0}
+            blob={result.blob}
+            onSizeChange={setResultSize}
+            preview={
+              <div className="bg-muted/30 h-64 w-full overflow-hidden rounded-md">
                 <img
-                  src={previewUrl}
-                  alt={t`原图预览`}
+                  src={result.url}
+                  alt={t`压缩结果预览`}
                   className="h-full w-full rounded-md object-contain"
                 />
               </div>
-            </div>
-          ) : null}
-
-          {result.blob && result.url ? (
-            <CompressResultCard
-              fileName={result.fileName}
-              size={result.size}
-              originalSize={meta?.size ?? file?.size ?? 0}
-              blob={result.blob}
-              onSizeChange={setResultSize}
-              preview={
-                <div className="bg-muted/30 h-64 w-full overflow-hidden rounded-md">
-                  <img
-                    src={result.url}
-                    alt={t`压缩结果预览`}
-                    className="h-full w-full rounded-md object-contain"
-                  />
-                </div>
-              }
-            />
-          ) : (
-            <div className="border-border bg-card text-muted-foreground flex min-h-40 items-center justify-center rounded-lg border border-dashed p-2.5 text-xs">
-              <Trans>压缩完成后在此预览输出</Trans>
-            </div>
-          )}
-        </section>
-      )}
+            }
+          />
+        ) : null}
+      </div>
+      {error && !file ? (
+        <p role="status" className="text-destructive text-sm md:col-span-2">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

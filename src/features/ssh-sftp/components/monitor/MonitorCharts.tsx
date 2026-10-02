@@ -150,7 +150,7 @@ export function TimeSeriesCard({
       {subline ? (
         <p className="text-muted-foreground text-xs">{subline}</p>
       ) : null}
-      <div className="h-32 sm:h-36">
+      <div className="h-32 md:h-36">
         {points.length < 2 ? (
           <div className="text-muted-foreground flex h-full items-center justify-center text-xs">
             <Trans>暂无数据</Trans>

@@ -1,9 +1,17 @@
-import { startTransition, useEffect, useEffectEvent, useState } from "react";
+import {
+  startTransition,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { toast } from "sonner";
 import { scheduleIdleTask } from "~/features/lan-transfer/lanTransferData";
 import * as ipc from "~/lib/ipc";
-import type { LanDiscoveredDevice } from "~/types";
+import { createPoller } from "~/lib/polling";
+import type { AppError, LanDiscoveredDevice } from "~/types";
+import { describeError, toIpcError } from "~/lib/errors";
 const OFFLINE_AFTER_MS = 30_000;
 const REMOVE_AFTER_MS = 5 * 60_000;
 function mergeDevices(
@@ -33,18 +41,27 @@ function mergeDevices(
 }
 export function useLanDiscovery(active: boolean) {
   const [devices, setDevices] = useState<LanDiscoveredDevice[]>([]);
+  const request = useRef({ generation: 0, pending: false });
+  const [discoveryError, setDiscoveryError] = useState<AppError | null>(null);
   const [discovering, setDiscovering] = useState(false);
   const refreshDiscovery = async () => {
+    if (request.current.pending || !active) return;
+    request.current.pending = true;
+    const generation = request.current.generation;
     setDiscovering(true);
     try {
       const next = await ipc.lanTransferDiscoverDevices();
+      if (generation !== request.current.generation) return;
+      setDiscoveryError(null);
       startTransition(() => {
         setDevices((current) => mergeDevices(current, next));
       });
     } catch (error) {
-      toast.error(String(error));
+      if (generation === request.current.generation)
+        setDiscoveryError(toIpcError(error).payload);
     } finally {
-      setDiscovering(false);
+      request.current.pending = false;
+      if (generation === request.current.generation) setDiscovering(false);
     }
   };
   // 用最新的 refreshDiscovery 闭包轮询，且不在每次渲染时重置定时器；
@@ -56,25 +73,32 @@ export function useLanDiscovery(active: boolean) {
       queueMicrotask(() => setDevices((current) => mergeDevices(current, [])));
       return;
     }
+    const requestState = request.current;
     const cancelInitial = scheduleIdleTask(() => {
       void refreshDiscoveryInEffect();
     });
-    const timer = window.setInterval(() => {
-      void refreshDiscoveryInEffect();
-    }, 15_000);
+    // 串行轮询：广播发现不堆叠请求，页面不可见时暂停。
+    const poller = createPoller(refreshDiscoveryInEffect, {
+      intervalMs: 15_000,
+      runImmediately: false,
+      pauseWhenHidden: true,
+    });
     return () => {
+      // 关闭后晚到的广播结果不再写回页面，解除轮询不等于取消原生请求。
+      requestState.generation++;
       cancelInitial();
-      window.clearInterval(timer);
+      poller.stop();
     };
   }, [active]);
   const openDiscoveredDevice = async (device: LanDiscoveredDevice) => {
     try {
       await openUrl(device.url);
     } catch (error) {
-      toast.error(String(error));
+      toast.error(describeError(error));
     }
   };
   return {
+    discoveryError,
     discoveredDevices: devices,
     discovering,
     refreshDiscovery,

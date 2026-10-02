@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { formatBytes } from "~/lib/format";
+import { describeError } from "~/lib/errors";
 import { TimeSeriesCard } from "~/features/ssh-sftp/components/monitor/MonitorCharts";
 import {
   DisksSection,
@@ -108,8 +109,8 @@ export default function SystemMonitorPanel({ session }: Props) {
   const formatBytesValue = formatBytes(stats.memory.swapUsed);
   const formatBytesValue2 = formatBytes(stats.memory.swapTotal);
   return (
-    <div className="bg-background flex h-full flex-col [--viz-1:#2a78d6] [--viz-2:#eb6834] [--viz-3:#1baf7a] dark:[--viz-1:#3987e5] dark:[--viz-2:#d95926] dark:[--viz-3:#199e70]">
-      <div className="border-border flex items-center gap-1 border-b px-2 py-1.5">
+    <div className="bg-background flex h-full flex-col [--viz-1:var(--chart-1)] [--viz-2:var(--chart-2)] [--viz-3:var(--chart-3)]">
+      <div className="border-border flex flex-wrap items-center gap-1 border-b px-3 py-1">
         <Button
           variant="ghost"
           size="icon-sm"
@@ -131,10 +132,14 @@ export default function SystemMonitorPanel({ session }: Props) {
               setIntervalMs(Number(value) as RefreshIntervalMs)
             }
           >
-            <SelectTrigger className="h-7 w-24">
+            <SelectTrigger
+              density="adaptive"
+              className="w-24"
+              aria-label={t`刷新间隔`}
+            >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="ui-density-adaptive">
               <SelectItem value="0">
                 {t({
                   context: "state",
@@ -153,7 +158,14 @@ export default function SystemMonitorPanel({ session }: Props) {
       {error ? (
         <div className="border-border bg-destructive/10 text-destructive flex items-center gap-2 border-b px-3 py-1.5 text-xs">
           <TriangleAlert className="size-3.5 shrink-0" />
-          <span className="min-w-0 flex-1 truncate">{error}</span>
+          <span className="min-w-0 flex-1 truncate">
+            {describeError(error)}
+            {ready ? (
+              <span className="ml-2">
+                <Trans>当前显示上次采样</Trans>
+              </span>
+            ) : null}
+          </span>
           {paused ? (
             <span className="shrink-0">
               <Trans>连续失败，已暂停刷新</Trans>
@@ -171,7 +183,7 @@ export default function SystemMonitorPanel({ session }: Props) {
         </div>
       ) : null}
 
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="app-scroll-safe-end min-h-0 flex-1 overflow-y-auto px-3 pt-3">
         <div className="mx-auto flex max-w-6xl flex-col gap-3">
           {ready ? (
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 px-0.5 text-xs">
@@ -206,7 +218,7 @@ export default function SystemMonitorPanel({ session }: Props) {
             </div>
           ) : null}
 
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <TimeSeriesCard
               title={<Trans>CPU</Trans>}
               icon={<Cpu className="text-muted-foreground size-4" />}
@@ -298,8 +310,16 @@ export default function SystemMonitorPanel({ session }: Props) {
             />
           </div>
 
-          <DisksSection disks={stats.disks} />
-          <ProcessesSection processes={stats.topProcesses} />
+          {ready ? (
+            <>
+              <DisksSection disks={stats.disks} />
+              <ProcessesSection processes={stats.topProcesses} />
+            </>
+          ) : (
+            <p role="status" className="text-muted-foreground text-sm">
+              <Trans>等待监控数据</Trans>
+            </p>
+          )}
         </div>
       </div>
     </div>

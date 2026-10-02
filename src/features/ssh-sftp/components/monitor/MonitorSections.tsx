@@ -48,7 +48,7 @@ function UsageBar({ percent }: { percent: number }) {
           clamped >= 90
             ? "bg-destructive"
             : clamped >= 75
-              ? "bg-amber-500"
+              ? "bg-warning"
               : "bg-primary",
         )}
         style={{
@@ -76,7 +76,7 @@ export function DisksSection({ disks }: { disks: SystemStats["disks"] }) {
                 key={`${disk.filesystem}-${disk.mount}`}
                 className="flex items-center gap-3 text-xs"
               >
-                <div className="flex w-32 shrink-0 flex-col leading-tight sm:w-44">
+                <div className="flex w-32 shrink-0 flex-col leading-tight md:w-44">
                   <span className="text-foreground truncate font-mono">
                     {disk.mount}
                   </span>
@@ -90,7 +90,7 @@ export function DisksSection({ disks }: { disks: SystemStats["disks"] }) {
                 <span className="w-10 shrink-0 text-right font-medium tabular-nums">
                   {percent.toFixed(0)}%
                 </span>
-                <span className="text-muted-foreground hidden w-32 shrink-0 text-right tabular-nums sm:inline">
+                <span className="text-muted-foreground hidden w-32 shrink-0 text-right tabular-nums md:inline">
                   {formatBytes(disk.used)} / {formatBytes(disk.total)}
                 </span>
                 <span className="text-muted-foreground hidden w-24 shrink-0 text-right tabular-nums md:inline">
@@ -111,7 +111,7 @@ function ProcessRow({ proc }: { proc: SystemStats["topProcesses"][number] }) {
       <span className="truncate">{proc.user}</span>
       <span className="flex items-center gap-1.5 tabular-nums">
         <span className="w-9 text-right">{proc.cpu.toFixed(1)}%</span>
-        <span className="bg-muted hidden h-1 flex-1 overflow-hidden rounded-full sm:block">
+        <span className="bg-muted hidden h-1 flex-1 overflow-hidden rounded-full md:block">
           <span
             className="block h-full bg-[var(--viz-1)]"
             style={{
@@ -122,7 +122,7 @@ function ProcessRow({ proc }: { proc: SystemStats["topProcesses"][number] }) {
       </span>
       <span className="flex items-center gap-1.5 tabular-nums">
         <span className="w-9 text-right">{proc.memory.toFixed(1)}%</span>
-        <span className="bg-muted hidden h-1 flex-1 overflow-hidden rounded-full sm:block">
+        <span className="bg-muted hidden h-1 flex-1 overflow-hidden rounded-full md:block">
           <span
             className="block h-full bg-[var(--viz-3)]"
             style={{
@@ -150,7 +150,7 @@ export function ProcessesSection({
       {processes.length === 0 ? (
         <EmptyHint />
       ) : (
-        <div className="grid grid-cols-[3rem_5rem_4.5rem_4.5rem_minmax(0,1fr)] gap-x-2 gap-y-1 text-xs sm:grid-cols-[3rem_5rem_6rem_6rem_minmax(0,1fr)]">
+        <div className="grid grid-cols-[3rem_5rem_4.5rem_4.5rem_minmax(0,1fr)] gap-x-2 gap-y-1 text-xs md:grid-cols-[3rem_5rem_6rem_6rem_minmax(0,1fr)]">
           <span className="text-muted-foreground">
             <Trans>PID</Trans>
           </span>

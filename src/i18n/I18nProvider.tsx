@@ -19,6 +19,10 @@ export function AppI18nProvider({ children }: PropsWithChildren) {
     return resolveLocale(locale);
   })();
   useEffect(() => {
+    // 语言切换同步文档语义，屏幕阅读器才能使用当前界面的发音规则。
+    document.documentElement.lang = activeLocale;
+  }, [activeLocale]);
+  useEffect(() => {
     if (locale !== "system") return;
     const onLanguageChange = () => setSystemLocaleVersion((value) => value + 1);
     window.addEventListener("languagechange", onLanguageChange);

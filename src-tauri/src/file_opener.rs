@@ -23,16 +23,16 @@ pub fn open(app: &tauri::AppHandle, path: &std::path::Path) -> crate::error::App
         use tauri_plugin_opener::OpenerExt;
         app.opener()
             .open_path(path.to_string_lossy(), None::<&str>)
-            .map_err(|error| error.to_string())
+            .map_err(AppError::from)
     };
     #[cfg(target_os = "android")]
     let result = app
         .state::<tauri::plugin::PluginHandle<tauri::Wry>>()
         .run_mobile_plugin::<()>("openFile", serde_json::json!({ "path": path }))
-        .map_err(|error| error.to_string());
+        .map_err(|error| AppError::external("opener:open", error.to_string()));
     result.map_err(|error| {
-        AppError(format!(
-            "Failed to open {} with a system application: {error}",
+        error.context(format!(
+            "Failed to open {} with a system application",
             path.display()
         ))
     })

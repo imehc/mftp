@@ -1,16 +1,15 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import ActivityMenu from "~/features/transfers/ActivityMenu";
 import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Panel, Separator } from "react-resizable-panels";
 import {
+  ArrowLeft,
   BookMarked,
-  CalendarDays,
   Filter,
   LoaderCircle,
   Shuffle,
   SlidersHorizontal,
 } from "lucide-react";
-import { toast } from "sonner";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import {
@@ -28,20 +27,18 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import {
-  poetryCollections,
-  poetryDaily,
-  poetryPoem,
-  poetryRandom,
-  poetrySearch,
-} from "~/lib/ipc";
-import type { PoemDetail, PoemSummary } from "~/types";
+import PoetryReadError from "./components/PoetryReadError";
+import DailyPoemLink from "./components/DailyPoemLink";
+import type { PoemSummary } from "~/types";
 import PoemCard from "./components/PoemCard";
 import PoemDetailPane from "./components/PoemDetail";
 import PoemList from "./components/PoemList";
 import SearchBar from "./components/SearchBar";
-import { useDebouncedQuery } from "./hooks/use-poetry-search";
+import { usePoetryLibrary } from "./hooks/use-poetry-library";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import { usePoetryStore } from "./store/poetry-store";
+
 interface LibraryPageProps {
   search: {
     q?: string;
@@ -50,37 +47,6 @@ interface LibraryPageProps {
   onSearchChange: (patch: { q?: string }) => void;
   onOpenPoem: (uid: string) => void;
 }
-function DailyCard({
-  daily,
-  onSelect,
-}: {
-  daily: PoemDetail | null;
-  onSelect: (uid: string) => void;
-}) {
-  if (!daily) return null;
-  return (
-    <button
-      type="button"
-      onClick={() => onSelect(daily.uid)}
-      className="border-primary/30 bg-primary/5 hover:bg-primary/10 mx-3 mb-2 rounded-lg border px-3 py-2.5 text-left transition-colors"
-    >
-      <span className="text-primary flex items-center gap-1.5 text-[11px] font-medium">
-        <CalendarDays className="size-3" aria-hidden />
-        <Trans>每日一诗</Trans>
-      </span>
-      <span className="mt-1 flex items-baseline justify-between gap-2">
-        <span className="truncate text-sm font-medium">{daily.title}</span>
-        <span className="text-muted-foreground shrink-0 text-xs">
-          {[daily.author, daily.dynasty].filter(Boolean).join("·")}
-        </span>
-      </span>
-      <span className="text-muted-foreground mt-0.5 line-clamp-1 block text-xs">
-        {daily.body[0]}
-      </span>
-    </button>
-  );
-}
-
 /** 有界搜索结果列表——单页最多约 60 条命中，不做虚拟化。 */
 function SearchResultList({
   items,
@@ -94,9 +60,12 @@ function SearchResultList({
   onSelect: (uid: string) => void;
 }) {
   return (
-    <div className="h-full overflow-y-auto px-2 pb-4" role="list">
+    <div
+      className="app-scroll-safe-end h-full overflow-y-auto px-2"
+      role="list"
+    >
       {items.map((poem) => (
-        <div key={poem.uid} role="listitem" className="pb-2">
+        <div key={poem.uid} role="listitem">
           <PoemCard
             poem={poem}
             query={query}
@@ -114,156 +83,66 @@ export default function LibraryPage({
   onOpenPoem,
 }: LibraryPageProps) {
   const { t } = useLingui();
-  const collections = usePoetryStore((s) => s.collections);
-  const setCollections = usePoetryStore((s) => s.setCollections);
-  const activeCollectionIds = usePoetryStore((s) => s.activeCollectionIds);
+  // 同一个 controller 和列表槽位跨断点存活，保留搜索草稿和滚动状态。
+  const narrow = !useDesktopLayout();
   const toggleCollection = usePoetryStore((s) => s.toggleCollection);
   const clearCollectionFilter = usePoetryStore((s) => s.clearCollectionFilter);
-  const scope = usePoetryStore((s) => s.searchScope);
   const setScope = usePoetryStore((s) => s.setSearchScope);
   const history = usePoetryStore((s) => s.searchHistory);
-  const pushHistory = usePoetryStore((s) => s.pushSearchHistory);
   const removeHistory = usePoetryStore((s) => s.removeSearchHistory);
   const clearHistory = usePoetryStore((s) => s.clearSearchHistory);
   const fontSize = usePoetryStore((s) => s.fontSize);
   const lineHeight = usePoetryStore((s) => s.lineHeight);
   const setFontSize = usePoetryStore((s) => s.setFontSize);
   const setLineHeight = usePoetryStore((s) => s.setLineHeight);
-
-  // 稳定（防抖后）的查询驱动 IPC；URL 与之镜像。skip 标志用于
-  // 防止我们自己的导航回写 URL 把正在输入的内容覆盖掉。
-  const skipUrlSync = useRef(false);
-  const { input, setInput, query } = useDebouncedQuery(300);
-  // setInput/onSearchChange 是自定义 hook / 属性回调；通过 effect event
-  // 读取，使这些 effect 只依赖真正的触发条件。
-  const syncInputFromUrl = useEffectEvent((value: string) => setInput(value));
-  const pushQueryToUrl = useEffectEvent(() => {
-    const next = query || undefined;
-    if ((search.q ?? undefined) === next) return;
-    skipUrlSync.current = true;
-    onSearchChange({
-      q: next,
-    });
-  });
-  useEffect(() => {
-    if (skipUrlSync.current) {
-      skipUrlSync.current = false;
-      return;
-    }
-    syncInputFromUrl(search.q ?? "");
-  }, [search.q]);
-
-  // 把稳定后的查询写入 URL（替换式），便于返回 / 分享。
-  useEffect(() => {
-    pushQueryToUrl();
-  }, [query]);
-  const effectiveQuery = query;
-  const isSearching = effectiveQuery.trim().length > 0;
-  const [results, setResults] = useState<PoemSummary[] | null>(null);
-  const [searching, setSearching] = useState(false);
-  const [daily, setDaily] = useState<PoemDetail | null>(null);
-  const [detail, setDetail] = useState<PoemDetail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const installedCount = collections.filter(
-    (collection) => collection.installed,
-  ).length;
-  const loadedOnce = collections.length > 0;
-  useEffect(() => {
-    void poetryCollections()
-      .then(setCollections)
-      .catch((error) =>
-        toast.error(t`读取失败`, {
-          description: String(error),
-        }),
-      );
-  }, [setCollections, t]);
-  useEffect(() => {
-    if (installedCount === 0) return;
-    void poetryDaily()
-      .then(setDaily)
-      .catch(() => setDaily(null));
-  }, [installedCount]);
-
-  // 防抖后的搜索流程。状态更新被延后，使其在 effect 函数体之外发生。
-  useEffect(() => {
-    if (!isSearching) {
-      queueMicrotask(() => setResults(null));
-      return;
-    }
-    let cancelled = false;
-    queueMicrotask(() => setSearching(true));
-    void poetrySearch({
-      query: effectiveQuery,
-      scope,
-      collectionIds:
-        activeCollectionIds.length > 0 ? activeCollectionIds : null,
-      limit: 60,
-      offset: 0,
-    })
-      .then((result) => {
-        if (!cancelled) setResults(result.items);
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          setResults([]);
-          toast.error(t`操作失败`, {
-            description: String(error),
-          });
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setSearching(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [effectiveQuery, scope, activeCollectionIds, isSearching, t]);
-  const loadDetail = (uid: string) => {
-    setDetailLoading(true);
-    void poetryPoem(uid)
-      .then(setDetail)
-      .catch((error) =>
-        toast.error(t`操作失败`, {
-          description: String(error),
-        }),
-      )
-      .finally(() => setDetailLoading(false));
-  };
-  const loadDetailIfNeeded = useEffectEvent((uid: string) => {
-    if (detail?.uid !== uid) loadDetail(uid);
-  });
-  useEffect(() => {
-    const uid = search.poem;
-    if (!uid) return;
-    // 用微任务延后，使同步加载状态的更新发生在 effect 之外。
-    queueMicrotask(() => loadDetailIfNeeded(uid));
-  }, [search.poem]);
-  const handleSelect = (uid: string) => {
-    onOpenPoem(uid);
-    loadDetail(uid);
-  };
-  const handleRandom = async () => {
-    try {
-      const poem = await poetryRandom();
-      if (poem) handleSelect(poem.uid);
-    } catch (error) {
-      toast.error(t`操作失败`, {
-        description: String(error),
-      });
-    }
-  };
+  // 搜索 / 详情 / 合集行为与移动页共用一个 controller，避免两端漂移。
+  const {
+    collections,
+    activeCollectionIds,
+    scope,
+    input,
+    setInput,
+    query,
+    isSearching,
+    results,
+    searching,
+    daily,
+    detail,
+    detailLoading,
+    detailError,
+    retryDetail,
+    installedCount,
+    loadedOnce,
+    collectionsError,
+    collectionsLoading,
+    retryCollections,
+    searchError,
+    retrySearch,
+    handleSelect,
+    handleSubmit,
+    handleRandom,
+  } = usePoetryLibrary({ search, onSearchChange, onOpenPoem });
   const manageLink = (
-    <Button variant="ghost" size="xs" asChild>
-      <Link to="/library/manage">
+    <Button variant="ghost" size="icon-sm" asChild>
+      <Link
+        aria-label={t`数据管理`}
+        title={t`数据管理`}
+        to="/library/manage"
+        search={{ q: search.q, poem: search.poem }}
+      >
         <SlidersHorizontal data-icon="inline-start" />
-        <Trans>数据管理</Trans>
       </Link>
     </Button>
   );
   if (loadedOnce && installedCount === 0) {
     return (
       <main className="bg-background text-foreground flex h-full flex-col">
-        <ToolPageHeader title={<Trans>古诗词</Trans>} trailing={manageLink} />
+        <ToolPageHeader
+          status={<ActivityMenu />}
+          showHome={false}
+          title={<Trans>古诗词</Trans>}
+          trailing={manageLink}
+        />
         <Empty className="flex-1">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -280,146 +159,185 @@ export default function LibraryPage({
       </main>
     );
   }
-  const activeCollectionIdsLength = activeCollectionIds.length;
+  const searchToolbar = (
+    <SearchBar
+      input={input}
+      scope={scope}
+      history={history}
+      filterSlot={
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t`按合集筛选`}
+              title={t`按合集筛选`}
+            >
+              <Filter />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            // 触发器贴在面板最左边，右对齐会把更宽的菜单推出视口，
+            // 再被碰撞检测推回来，结果和按钮完全脱钩。
+            align="start"
+            className="max-h-72 overflow-y-auto"
+          >
+            <DropdownMenuItem
+              disabled={activeCollectionIds.length === 0}
+              onSelect={() => clearCollectionFilter()}
+            >
+              <Trans>全部</Trans>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {collections
+              .filter((collection) => collection.installed)
+              .map((collection) => (
+                <DropdownMenuCheckboxItem
+                  key={collection.id}
+                  checked={activeCollectionIds.includes(collection.id)}
+                  onCheckedChange={() => toggleCollection(collection.id)}
+                  onSelect={(event) => event.preventDefault()}
+                >
+                  {collection.name}
+                </DropdownMenuCheckboxItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      }
+      onInputChange={setInput}
+      onScopeChange={setScope}
+      onSubmit={handleSubmit}
+      onRemoveHistory={removeHistory}
+      onClearHistory={clearHistory}
+    />
+  );
+  const listPane = (
+    <div className="flex h-full flex-col">
+      {collectionsError ? (
+        <PoetryReadError error={collectionsError} onRetry={retryCollections} />
+      ) : searchError && isSearching ? (
+        <PoetryReadError error={searchError} onRetry={retrySearch} />
+      ) : collectionsLoading ||
+        (isSearching && searching && results === null) ? (
+        <div className="text-muted-foreground flex items-center justify-center gap-2 py-8 text-xs">
+          <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
+          <Trans>正在检索…</Trans>
+        </div>
+      ) : isSearching ? (
+        <>
+          <div className="min-h-0 flex-1">
+            {results !== null && results.length > 0 ? (
+              <SearchResultList
+                items={results}
+                query={query}
+                selectedUid={search.poem}
+                onSelect={handleSelect}
+              />
+            ) : results !== null ? (
+              <p className="text-muted-foreground py-10 text-center text-sm">
+                <Trans>没有找到作品</Trans>
+              </p>
+            ) : null}
+          </div>
+        </>
+      ) : (
+        <>
+          {!activeCollectionIds.length && daily ? (
+            <DailyPoemLink poem={daily} onSelect={handleSelect} />
+          ) : null}
+          <div className="min-h-0 flex-1">
+            <PoemList
+              resetKey={`browse:${activeCollectionIds.join(",")}`}
+              collectionIds={activeCollectionIds}
+              selectedUid={search.poem}
+              onSelect={handleSelect}
+              scrollStorageKey="mftp-poetry-mobile-scroll"
+            />
+          </div>
+        </>
+      )}
+    </div>
+  );
+  const detailPane = (
+    <div
+      key={detail?.uid ?? "empty"}
+      className="animate-in fade-in h-full duration-200"
+    >
+      {detailError ? (
+        <PoetryReadError error={detailError} onRetry={retryDetail} />
+      ) : (
+        <PoemDetailPane
+          detail={detail}
+          loading={detailLoading}
+          fontSize={fontSize}
+          lineHeight={lineHeight}
+          onFontSizeChange={setFontSize}
+          onLineHeightChange={setLineHeight}
+        />
+      )}
+    </div>
+  );
   return (
-    <main className="bg-background text-foreground flex h-full flex-col">
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col"
+    >
       <ToolPageHeader
-        title={<Trans>文库</Trans>}
+        status={<ActivityMenu />}
+        showHome={false}
+        title={<Trans>古诗词</Trans>}
         trailing={
           <>
             <Button
               variant="ghost"
-              size="xs"
-              onClick={() => void handleRandom()}
+              size="icon-sm"
+              onClick={() => void handleRandom(handleSelect)}
               aria-label={t`随机`}
             >
               <Shuffle data-icon="inline-start" />
-              <Trans>随机</Trans>
             </Button>
             {manageLink}
           </>
         }
       />
+      {searchToolbar}
       <Group
-        orientation="horizontal"
+        orientation={narrow ? "vertical" : "horizontal"}
         className="min-h-0 flex-1 overflow-hidden"
       >
-        <Panel id="library-list" defaultSize="34" minSize="20">
-          <div className="flex h-full flex-col">
-            <SearchBar
-              input={input}
-              scope={scope}
-              history={history}
-              filterSlot={
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      aria-label={t`按合集筛选`}
-                      className="text-xs"
-                    >
-                      <Filter data-icon="inline-start" />
-                      {activeCollectionIds.length > 0
-                        ? t`合集 · ${activeCollectionIdsLength}`
-                        : t`合集`}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    // 触发器贴在面板最左边，右对齐会把更宽的菜单推出视口，
-                    // 再被碰撞检测推回来，结果和按钮完全脱钩。
-                    align="start"
-                    className="max-h-72 overflow-y-auto"
-                  >
-                    <DropdownMenuItem
-                      disabled={activeCollectionIds.length === 0}
-                      onSelect={() => clearCollectionFilter()}
-                    >
-                      <Trans>全部</Trans>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    {collections
-                      .filter((collection) => collection.installed)
-                      .map((collection) => (
-                        <DropdownMenuCheckboxItem
-                          key={collection.id}
-                          checked={activeCollectionIds.includes(collection.id)}
-                          onCheckedChange={() =>
-                            toggleCollection(collection.id)
-                          }
-                          onSelect={(event) => event.preventDefault()}
-                        >
-                          {collection.name}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
-              onInputChange={setInput}
-              onScopeChange={setScope}
-              onSubmit={(value) => {
-                pushHistory(value);
-                skipUrlSync.current = false;
-                setInput(value);
-              }}
-              onRemoveHistory={removeHistory}
-              onClearHistory={clearHistory}
-            />
-            {isSearching && searching && results === null ? (
-              <div className="text-muted-foreground flex items-center justify-center gap-2 py-8 text-xs">
-                <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
-                <Trans>正在检索…</Trans>
-              </div>
-            ) : isSearching ? (
-              <>
-                <div className="min-h-0 flex-1">
-                  {results !== null && results.length > 0 ? (
-                    <SearchResultList
-                      items={results}
-                      query={effectiveQuery}
-                      selectedUid={search.poem}
-                      onSelect={handleSelect}
-                    />
-                  ) : results !== null ? (
-                    <p className="text-muted-foreground py-10 text-center text-sm">
-                      <Trans>没有找到作品</Trans>
-                    </p>
-                  ) : null}
-                </div>
-              </>
-            ) : (
-              <>
-                {!activeCollectionIds.length ? (
-                  <DailyCard daily={daily} onSelect={handleSelect} />
-                ) : null}
-                <div className="min-h-0 flex-1">
-                  <PoemList
-                    resetKey={`browse:${activeCollectionIds.join(",")}`}
-                    collectionIds={activeCollectionIds}
-                    selectedUid={search.poem}
-                    onSelect={handleSelect}
-                  />
-                </div>
-              </>
-            )}
-          </div>
+        <Panel
+          id="library-list"
+          defaultSize="30"
+          minSize="20"
+          className={narrow && search.poem ? "hidden" : ""}
+        >
+          {listPane}
         </Panel>
         <Separator
-          className="group bg-border/60 hover:bg-primary/50 data-[resize-handle-active]:bg-primary/60 relative w-px shrink-0 transition-colors"
+          className={narrow ? "hidden" : "bg-border w-px shrink-0"}
           aria-label={t`调整双栏宽度`}
         />
-        <Panel id="library-detail" defaultSize="66" minSize="40">
-          <div
-            key={detail?.uid ?? "empty"}
-            className="animate-in fade-in h-full duration-200"
-          >
-            <PoemDetailPane
-              detail={detail}
-              loading={detailLoading}
-              fontSize={fontSize}
-              lineHeight={lineHeight}
-              onFontSizeChange={setFontSize}
-              onLineHeightChange={setLineHeight}
-            />
+        <Panel
+          id="library-detail"
+          defaultSize="70"
+          minSize="40"
+          className={narrow && !search.poem ? "hidden" : ""}
+        >
+          <div className="flex h-full min-h-0 flex-col">
+            {narrow ? (
+              <div className="flex shrink-0 items-center border-b px-2 py-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={TOUCH_TARGET_CLASS}
+                  onClick={() => onOpenPoem("")}
+                >
+                  <ArrowLeft data-icon="inline-start" />
+                  <Trans>返回列表</Trans>
+                </Button>
+              </div>
+            ) : null}
+            <div className="min-h-0 flex-1">{detailPane}</div>
           </div>
         </Panel>
       </Group>

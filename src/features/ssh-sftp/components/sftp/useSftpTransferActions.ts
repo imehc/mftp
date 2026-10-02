@@ -6,11 +6,12 @@ import { useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
 import type { SftpEntry } from "~/types";
 import * as ipc from "~/lib/ipc";
+import { describeError, hasCustomCode } from "~/lib/errors";
 import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
+import { baseName } from "~/lib/files";
 import {
-  baseName,
   joinLocalPath,
   joinPath,
   nextTransferId,
@@ -61,19 +62,21 @@ export function useSftpTransferActions({
         await ipc.sftpResetConnection(sessionId);
       }
       startTransfer(transferId, label, {
-        retry: () => run(true),
+        retry: { kind: "sftp-action", run: () => run(true) },
       });
       try {
         await ipc.sftpUpload(sessionId, selected, remote, transferId);
         finishTransfer(transferId, "success");
         await load(refreshPath);
-      } catch (e) {
-        const message = String(e);
-        if (message === "传输已取消") {
-          finishTransfer(transferId, "cancelled");
-        } else {
-          finishTransfer(transferId, "error", message);
-        }
+      } catch (error) {
+        // 取消是业务状态而非失败：只按稳定 code 判断，不比较文案。
+        finishTransfer(
+          transferId,
+          hasCustomCode(error, "sftp:transfer_cancelled")
+            ? "cancelled"
+            : "error",
+          error,
+        );
       }
     };
     await run();
@@ -93,18 +96,20 @@ export function useSftpTransferActions({
         await ipc.sftpResetConnection(sessionId);
       }
       startTransfer(transferId, label, {
-        retry: () => run(true),
+        retry: { kind: "sftp-action", run: () => run(true) },
       });
       try {
         await ipc.sftpDownload(sessionId, entry.path, dest, transferId);
         finishTransfer(transferId, "success");
-      } catch (e) {
-        const message = String(e);
-        if (message === "传输已取消") {
-          finishTransfer(transferId, "cancelled");
-        } else {
-          finishTransfer(transferId, "error", message);
-        }
+      } catch (error) {
+        // 取消是业务状态而非失败：只按稳定 code 判断，不比较文案。
+        finishTransfer(
+          transferId,
+          hasCustomCode(error, "sftp:transfer_cancelled")
+            ? "cancelled"
+            : "error",
+          error,
+        );
       }
     };
     await run();
@@ -139,7 +144,7 @@ export function useSftpTransferActions({
         await ipc.sftpResetConnection(sessionId);
       }
       startTransfer(transferId, label, {
-        retry: () => run(true),
+        retry: { kind: "sftp-action", run: () => run(true) },
       });
       try {
         await ipc.sftpDownloadDir(
@@ -150,13 +155,15 @@ export function useSftpTransferActions({
           transferId,
         );
         finishTransfer(transferId, "success");
-      } catch (e) {
-        const message = String(e);
-        if (message === "传输已取消") {
-          finishTransfer(transferId, "cancelled");
-        } else {
-          finishTransfer(transferId, "error", message);
-        }
+      } catch (error) {
+        // 取消是业务状态而非失败：只按稳定 code 判断，不比较文案。
+        finishTransfer(
+          transferId,
+          hasCustomCode(error, "sftp:transfer_cancelled")
+            ? "cancelled"
+            : "error",
+          error,
+        );
       }
     };
     await run();
@@ -189,7 +196,7 @@ export function useSftpTransferActions({
         initialName: defaultName,
       });
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
     }
   }
   async function uploadDirWithPromptName(localDir: string, remoteName: string) {
@@ -284,7 +291,7 @@ export function useSftpTransferActions({
         return;
       }
     } catch (e) {
-      toast.error(String(e));
+      toast.error(describeError(e));
       return;
     }
     await runUploadDir(localDir, remoteName, options);
@@ -305,7 +312,7 @@ export function useSftpTransferActions({
         await ipc.sftpResetConnection(sessionId);
       }
       startTransfer(transferId, label, {
-        retry: () => run(true),
+        retry: { kind: "sftp-action", run: () => run(true) },
       });
       try {
         await ipc.sftpUploadDir(
@@ -321,13 +328,15 @@ export function useSftpTransferActions({
         }
         finishTransfer(transferId, "success");
         await load(remoteParent);
-      } catch (e) {
-        const message = String(e);
-        if (message === "传输已取消") {
-          finishTransfer(transferId, "cancelled");
-        } else {
-          finishTransfer(transferId, "error", message);
-        }
+      } catch (error) {
+        // 取消是业务状态而非失败：只按稳定 code 判断，不比较文案。
+        finishTransfer(
+          transferId,
+          hasCustomCode(error, "sftp:transfer_cancelled")
+            ? "cancelled"
+            : "error",
+          error,
+        );
       }
     };
     await run();
