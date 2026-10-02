@@ -553,7 +553,7 @@ msgstr "下载任务不存在"
 msgid "下载会话无法恢复，请重新添加任务"
 msgstr "下载会话无法恢复，请重新添加任务"
 
-#: src/features/poetry/LibraryManagePage.tsx:120
+#: src/features/poetry/LibraryManagePage.tsx:102
 msgid "下载后即可离线搜索和阅读。"
 msgstr "下载后即可离线搜索和阅读。"
 
@@ -780,7 +780,7 @@ msgstr "今天"
 msgid "从左侧列表选择一篇，或试试每日一诗。"
 msgstr "从左侧列表选择一篇，或试试每日一诗。"
 
-#: src/features/poetry/LibraryManagePage.tsx:140
+#: src/features/poetry/LibraryManagePage.tsx:122
 msgid "从本地 tar.gz 导入…"
 msgstr "从本地 tar.gz 导入…"
 
@@ -1114,7 +1114,7 @@ msgstr "关闭可进一步减小体积"
 msgid "关闭后，本次修改不会保存。"
 msgstr "关闭后，本次修改不会保存。"
 
-#: src/features/poetry/LibraryManagePage.tsx:177
+#: src/features/poetry/LibraryManagePage.tsx:159
 msgid "关闭时正文搜索走 LIKE 兜底，较慢"
 msgstr "关闭时正文搜索走 LIKE 兜底，较慢"
 
@@ -1248,7 +1248,7 @@ msgstr "创建时间"
 #: src/features/bt/components/TaskDialogs.tsx:84
 #: src/features/bt/components/TaskRow.tsx:226
 #: src/features/poetry/components/PoetryTranslationSection.tsx:356
-#: src/features/poetry/LibraryManagePage.tsx:212
+#: src/features/poetry/LibraryManagePage.tsx:194
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:90
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:229
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:45
@@ -1441,7 +1441,7 @@ msgstr "加载中"
 #: src/features/bt/components/PeersPanel.tsx:58
 #: src/features/poetry/components/CollectionManagement.tsx:123
 #: src/features/poetry/components/PoemList.tsx:184
-#: src/features/poetry/LibraryManagePage.tsx:161
+#: src/features/poetry/LibraryManagePage.tsx:143
 #: src/features/preview/PreviewScreen.tsx:76
 #: src/features/preview/PreviewSurface.tsx:129
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:196
@@ -1455,7 +1455,7 @@ msgstr "加载中…"
 msgid "区分大小写"
 msgstr "区分大小写"
 
-#: src/features/poetry/LibraryManagePage.tsx:255
+#: src/features/poetry/LibraryManagePage.tsx:237
 msgid "卸载"
 msgstr "卸载"
 
@@ -1463,7 +1463,7 @@ msgstr "卸载"
 msgid "卸载 {name}"
 msgstr "卸载 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:245
+#: src/features/poetry/LibraryManagePage.tsx:227
 msgid "卸载合集"
 msgstr "卸载合集"
 
@@ -1614,7 +1614,7 @@ msgstr "发生未知错误，请重试"
 #: src/features/poetry/components/PoetryTranslationSection.tsx:323
 #: src/features/poetry/components/PoetryTranslationSection.tsx:351
 #: src/features/poetry/components/PoetryTranslationSection.tsx:371
-#: src/features/poetry/LibraryManagePage.tsx:253
+#: src/features/poetry/LibraryManagePage.tsx:235
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:333
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:85
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:218
@@ -1675,10 +1675,6 @@ msgstr "口令保护"
 #: src/features/poetry/PoemDetailPage.tsx:41
 msgid "古诗词"
 msgstr "古诗词"
-
-#: src/features/poetry/LibraryManagePage.tsx:86
-msgid "古诗词 · 数据管理"
-msgstr "古诗词 · 数据管理"
 
 #: src/features/poetry/LibraryPage.tsx:152
 msgid "古诗词语料还没有下载"
@@ -2067,7 +2063,7 @@ msgstr "存储占用"
 msgid "安全模式"
 msgstr "安全模式"
 
-#: src/features/poetry/LibraryManagePage.tsx:221
+#: src/features/poetry/LibraryManagePage.tsx:203
 msgid "安装"
 msgstr "安装"
 
@@ -2244,7 +2240,7 @@ msgstr "导出所选数据"
 msgid "将军"
 msgstr "将军"
 
-#: src/features/poetry/LibraryManagePage.tsx:248
+#: src/features/poetry/LibraryManagePage.tsx:230
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 
@@ -2485,7 +2481,7 @@ msgstr "已复制到系统下载目录"
 msgid "已安装"
 msgstr "已安装"
 
-#: src/features/poetry/LibraryManagePage.tsx:200
+#: src/features/poetry/LibraryManagePage.tsx:182
 msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "已安装 {toLocaleStringValue3} 条，约 14MB"
 
@@ -2584,7 +2580,7 @@ msgstr "已生成"
 msgid "已移动 {name}"
 msgstr "已移动 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:176
+#: src/features/poetry/LibraryManagePage.tsx:158
 msgid "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 msgstr "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 
@@ -2649,7 +2645,7 @@ msgstr "应用正在清理数据，请稍后重试"
 msgid "应用正在退出，无法执行此操作"
 msgstr "应用正在退出，无法执行此操作"
 
-#: src/features/poetry/LibraryManagePage.tsx:189
+#: src/features/poetry/LibraryManagePage.tsx:171
 msgid "开启"
 msgstr "开启"
 
@@ -3598,7 +3594,7 @@ msgstr "未启用服务地址"
 msgid "未安排"
 msgstr "未安排"
 
-#: src/features/poetry/LibraryManagePage.tsx:201
+#: src/features/poetry/LibraryManagePage.tsx:183
 msgid "未安装；仅点击时下载，可随时删除"
 msgstr "未安装；仅点击时下载，可随时删除"
 
@@ -4054,8 +4050,8 @@ msgstr "正在重启并应用更新…"
 msgid "正文"
 msgstr "正文"
 
-#: src/features/poetry/LibraryManagePage.tsx:172
-#: src/features/poetry/LibraryManagePage.tsx:187
+#: src/features/poetry/LibraryManagePage.tsx:154
+#: src/features/poetry/LibraryManagePage.tsx:169
 msgid "正文全文索引"
 msgstr "正文全文索引"
 
@@ -4138,7 +4134,7 @@ msgstr "没有逾期未完成的待办"
 msgid "注释"
 msgstr "注释"
 
-#: src/features/poetry/LibraryManagePage.tsx:196
+#: src/features/poetry/LibraryManagePage.tsx:178
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
 
@@ -5139,7 +5135,7 @@ msgstr "访问权限"
 msgid "译文"
 msgstr "译文"
 
-#: src/features/poetry/LibraryManagePage.tsx:124
+#: src/features/poetry/LibraryManagePage.tsx:106
 msgid "译文与本地语料"
 msgstr "译文与本地语料"
 
@@ -5192,7 +5188,7 @@ msgstr "诗词库同步已取消"
 msgid "诗词数据库"
 msgstr "诗词数据库"
 
-#: src/features/poetry/LibraryManagePage.tsx:88
+#: src/features/poetry/LibraryManagePage.tsx:81
 msgid "诗词数据管理"
 msgstr "诗词数据管理"
 
@@ -5612,8 +5608,8 @@ msgstr "返回上级目录"
 msgid "返回列表"
 msgstr "返回列表"
 
-#: src/features/poetry/LibraryManagePage.tsx:99
-#: src/features/poetry/LibraryManagePage.tsx:111
+#: src/features/poetry/LibraryManagePage.tsx:85
+#: src/features/poetry/LibraryManagePage.tsx:86
 #: src/features/poetry/PoemDetailPage.tsx:53
 #: src/features/poetry/PoemDetailPage.tsx:54
 msgid "返回古诗词"
@@ -6030,7 +6026,7 @@ msgstr "重新读取"
 #: src/features/poetry/components/CollectionManagement.tsx:113
 #: src/features/poetry/components/PoemList.tsx:195
 #: src/features/poetry/components/PoetryReadError.tsx:25
-#: src/features/poetry/LibraryManagePage.tsx:156
+#: src/features/poetry/LibraryManagePage.tsx:138
 #: src/features/preview/PreviewSurface.tsx:146
 #: src/features/settings/AutostartSetting.desktop.tsx:42
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:177

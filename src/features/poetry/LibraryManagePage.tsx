@@ -3,7 +3,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowDownToLine,
   ArrowLeft,
-  BookMarked,
   FolderInput,
   ScrollText,
   Trash2,
@@ -23,7 +22,6 @@ import {
 } from "~/components/ui/alert-dialog";
 import { describeError } from "~/lib/errors";
 import { isDesktopPlatform } from "~/lib/platform";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { usePoetryLocalData } from "./hooks/use-poetry-local-data";
 import { usePoetryCollectionsManage } from "./hooks/use-poetry-collections-manage";
 import {
@@ -39,7 +37,6 @@ export default function LibraryManagePage({
   search: { q?: string; poem?: string };
 }) {
   const { t } = useLingui();
-  const desktop = useDesktopLayout();
   const localDataAvailable = isDesktopPlatform();
   const controller = usePoetryCollectionsManage();
   const {
@@ -81,34 +78,19 @@ export default function LibraryManagePage({
     >
       <ToolPageHeader
         showHome={false}
-        title={
-          desktop ? (
-            <Trans>古诗词 · 数据管理</Trans>
-          ) : (
-            <Trans>诗词数据管理</Trans>
-          )
-        }
+        title={<Trans>诗词数据管理</Trans>}
         leading={
-          <Button
-            variant="ghost"
-            density="adaptive"
-            size={desktop ? "default" : "icon-sm"}
-            asChild
-          >
+          <Button variant="ghost" density="adaptive" size="icon-sm" asChild>
             <Link
               aria-label={t`返回古诗词`}
+              title={t`返回古诗词`}
               to="/library"
               search={{
                 q: search.q,
                 poem: search.poem,
               }}
             >
-              {desktop ? (
-                <BookMarked data-icon="inline-start" />
-              ) : (
-                <ArrowLeft />
-              )}
-              {desktop ? <Trans>返回古诗词</Trans> : null}
+              <ArrowLeft data-icon="inline-start" />
             </Link>
           </Button>
         }
