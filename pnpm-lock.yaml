@@ -24,8 +24,8 @@ importers:
         specifier: ^6.7.6
         version: 6.7.6
       '@dimforge/rapier2d-compat':
-        specifier: ^0.20.0
-        version: 0.20.0
+        specifier: ^0.21.0
+        version: 0.21.0
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -508,8 +508,8 @@ packages:
   '@date-fns/tz@1.5.0':
     resolution: {integrity: sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==}
 
-  '@dimforge/rapier2d-compat@0.20.0':
-    resolution: {integrity: sha512-FFYwGrfJov7d5kn4fxblG/ip5C+sYQL+Jl/hqLvDvu4BcMD/Mhrz7cTvnZTtuIRDXY8CLuraObqB/prip4wdWQ==}
+  '@dimforge/rapier2d-compat@0.21.0':
+    resolution: {integrity: sha512-cMStLQZbY5D/ajAPjOwTwoYuAJAungTYB45MNFEa5B+LGaMiZfxLwjHsfpxH5B0sDa+gkmcQFJJKiHNKnlpMnA==}
 
   '@dnd-kit/accessibility@3.1.1':
     resolution: {integrity: sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==}
@@ -4930,7 +4930,7 @@ snapshots:
 
   '@date-fns/tz@1.5.0': {}
 
-  '@dimforge/rapier2d-compat@0.20.0': {}
+  '@dimforge/rapier2d-compat@0.21.0': {}
 
   '@dnd-kit/accessibility@3.1.1(react@19.3.0)':
     dependencies:
