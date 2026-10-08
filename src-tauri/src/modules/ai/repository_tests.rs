@@ -13,6 +13,7 @@ fn test_storage() -> (Storage, std::path::PathBuf) {
 fn connection_schema_is_idempotent_and_upserts() {
     let (storage, root) = test_storage();
     let config = AiConnectionConfig {
+        protocol: Default::default(),
         base_url: "https://api.example.com".into(),
         model: "model-a".into(),
         streaming_enabled: true,
@@ -26,6 +27,7 @@ fn connection_schema_is_idempotent_and_upserts() {
     );
     AiRepository::new(storage.clone())
         .save_connection(&AiConnectionConfig {
+            protocol: Default::default(),
             base_url: config.base_url,
             model: "model-b".into(),
             streaming_enabled: false,

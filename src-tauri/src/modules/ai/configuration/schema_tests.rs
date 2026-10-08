@@ -196,3 +196,28 @@ fn reset_preserves_cleanup_journal_and_version_across_reopen() {
     tx.commit().unwrap();
     assert_eq!(snapshot(&mut reopened).unwrap().revision, 2);
 }
+
+#[test]
+fn v3_migration_preserves_configuration_and_defaults_protocol() {
+    let mut conn = database();
+    legacy_schema::init(&mut conn).unwrap();
+    conn.execute_batch(include_str!("schema.sql")).unwrap();
+    conn.execute(
+        "UPDATE app_meta SET value = '3' WHERE key = 'ai_schema_version'",
+        [],
+    )
+    .unwrap();
+    add_provider(&mut conn, "a", "key", "model");
+    init(&mut conn).unwrap();
+    let view = snapshot(&mut conn).unwrap();
+    assert_eq!(
+        view.providers[0].protocol,
+        crate::modules::ai::AiProtocol::Responses
+    );
+    assert_eq!(view.providers[0].models[0].model_id, "model");
+    init(&mut conn).unwrap();
+    assert_eq!(snapshot(&mut conn).unwrap(), view);
+    assert!(conn
+        .execute("UPDATE ai_providers SET protocol = 'unknown'", [])
+        .is_err());
+}

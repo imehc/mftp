@@ -1,7 +1,7 @@
 use super::{
     input::{AiProviderDeleteInput, AiProviderUpdateInput},
     model::AiConfigurationView,
-    schema::normalized_endpoint,
+    schema::normalized_protocol_endpoint,
     transaction as tx,
     validation::{NewProvider, PROVIDER_LIMIT},
 };
@@ -12,8 +12,13 @@ use crate::{
 };
 use rusqlite::{params, Connection};
 
-fn unique_endpoint(conn: &Connection, base: &str, except: Option<&str>) -> AppResult<String> {
-    let endpoint = normalized_endpoint(base)?;
+fn unique_endpoint(
+    conn: &Connection,
+    base: &str,
+    protocol: crate::modules::ai::AiProtocol,
+    except: Option<&str>,
+) -> AppResult<String> {
+    let endpoint = normalized_protocol_endpoint(base, protocol)?;
     let duplicate: bool = conn.query_row("SELECT EXISTS(SELECT 1 FROM ai_providers WHERE endpoint_key = ?1 AND (?2 IS NULL OR id <> ?2))", params![endpoint, except], |r| r.get(0))?;
     if duplicate {
         return Err(AppError::custom(Code::AiProviderDuplicate));
@@ -26,7 +31,7 @@ fn check_create(conn: &Connection, input: &NewProvider) -> AppResult<String> {
     if count >= PROVIDER_LIMIT {
         return Err(AppError::custom(Code::AiProviderLimit));
     }
-    unique_endpoint(conn, &input.base_url, None)
+    unique_endpoint(conn, &input.base_url, input.protocol, None)
 }
 impl AiRepository {
     pub(in crate::modules::ai) fn prepare_provider(&self, input: &NewProvider) -> AppResult<()> {
@@ -43,8 +48,8 @@ impl AiRepository {
             let key = uuid::Uuid::new_v4().to_string();
             let model = uuid::Uuid::new_v4().to_string();
             let first: bool = t.query_row("SELECT NOT EXISTS(SELECT 1 FROM ai_providers)", [], |r| r.get(0))?;
-            t.execute("INSERT INTO ai_providers(id, name, base_url, endpoint_key, current_key_id, current_model_id, created_at, updated_at) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?7)",
-                params![provider, input.name, input.base_url, endpoint, key, model, now_ms()])?;
+            t.execute("INSERT INTO ai_providers(id, name, base_url, endpoint_key, current_key_id, current_model_id, created_at, updated_at, protocol) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?7, ?8)",
+                params![provider, input.name, input.base_url, endpoint, key, model, now_ms(), input.protocol.as_str()])?;
             t.execute("INSERT INTO ai_provider_keys VALUES(?1, ?2, ?3, ?4, ?5, ?5)", params![key, provider, input.label, reference, now_ms()])?;
             t.execute("INSERT INTO ai_provider_models VALUES(?1, ?2, ?3, ?3, ?4, 0, ?5, ?5)", params![model, provider, input.model, input.display, now_ms()])?;
             tx::publish(t, reference)?;
@@ -61,10 +66,10 @@ impl AiRepository {
     ) -> AppResult<AiConfigurationView> {
         self.change(input.expected_revision, |t| {
             tx::provider(t, &input.provider_id)?;
-            let endpoint = unique_endpoint(t, &input.base_url, Some(&input.provider_id))?;
+            let endpoint = unique_endpoint(t, &input.base_url, input.protocol, Some(&input.provider_id))?;
             t.execute(
-                "UPDATE ai_providers SET name = ?2, base_url = ?3, endpoint_key = ?4 WHERE id = ?1",
-                params![input.provider_id, input.name, input.base_url, endpoint],
+                "UPDATE ai_providers SET name = ?2, base_url = ?3, endpoint_key = ?4, protocol = ?5 WHERE id = ?1",
+                params![input.provider_id, input.name, input.base_url, endpoint, input.protocol.as_str()],
             )?;
             tx::touch(t, &input.provider_id)
         })

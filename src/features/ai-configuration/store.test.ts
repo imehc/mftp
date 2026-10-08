@@ -113,6 +113,7 @@ describe("AI 配置同步", () => {
     const a = {
       id: "A",
       name: "A",
+      protocol: "responses" as const,
       baseUrl: "https://a.invalid",
       requiresAddressRepair: false,
       revision: 1,

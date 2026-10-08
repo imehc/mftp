@@ -19,6 +19,7 @@ pnpm qa:browser model-environment model-recording
 | model-recording   | 实际浏览器 MP4 编码和导出数据                          | 不含原生保存/分享             |
 | model-attachments | 附件交互、恶意 Markdown 纯文本展示                     | IPC/存储为隔离 mock           |
 | model-system      | WebGL 上下文丢失/恢复、方向与渲染预算                  | 方向和温度为模拟输入          |
+| ai-protocol       | 默认格式、添加/编辑三协议、草稿放弃、375/900px 布局    | 仅模拟 IPC，不含真实上游请求  |
 | display-size      | 英文 320/767/768px、125% 显示大小、日历/虚拟列表/xterm | 不含系统字号、真实 SSH resize |
 
 脚本创建本机回环 Vite 服务，依次启动独立无头 Chrome，保留默认沙箱与 GPU；每次使用新临时浏览器 profile。Vite 预扫描所有夹具依赖，避免首个用例因依赖优化而刷新。每组超时 180 秒，任何组失败都会返回非零退出码。仅关闭本次创建的进程。临时 profile 保留在系统临时目录，不复用日常浏览器数据。

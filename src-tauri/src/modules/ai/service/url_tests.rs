@@ -31,3 +31,26 @@ fn builds_responses_endpoint_without_duplicate_v1() {
         "https://example.com/v1/responses"
     );
 }
+
+#[test]
+fn protocol_endpoints_replace_known_suffix_and_preserve_prefix() {
+    use crate::modules::ai::AiProtocol;
+    for base in [
+        "https://example.com/custom",
+        "https://example.com/custom/v1",
+        "https://example.com/custom/v1/responses",
+        "https://example.com/custom/v1/chat/completions/",
+        "https://example.com/custom/v1/messages",
+    ] {
+        for (protocol, suffix) in [
+            (AiProtocol::Responses, "responses"),
+            (AiProtocol::ChatCompletions, "chat/completions"),
+            (AiProtocol::AnthropicMessages, "messages"),
+        ] {
+            assert_eq!(
+                protocol_endpoint(base, protocol),
+                format!("https://example.com/custom/v1/{suffix}")
+            );
+        }
+    }
+}

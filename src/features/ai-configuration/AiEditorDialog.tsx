@@ -31,6 +31,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { describeError } from "~/lib/errors";
 
+import { AiProtocolField } from "./AiProtocolField";
 import { useAiEditor } from "./hooks/use-ai-editor";
 import { useAiConfiguration } from "./store";
 import type { AiEditorTarget } from "./types";
@@ -117,6 +118,11 @@ export default function AiEditorDialog({
                           autoFocus
                         />
                       </Field>
+                      <AiProtocolField
+                        value={form.protocol}
+                        onChange={form.setProtocol}
+                        disabled={busy}
+                      />
                       <Field>
                         <FieldLabel htmlFor="ai-url">
                           <Trans>服务地址</Trans>
@@ -133,9 +139,6 @@ export default function AiEditorDialog({
                           autoCapitalize="none"
                           spellCheck={false}
                         />
-                        <FieldDescription>
-                          <Trans>当前仅支持 OpenAI Responses 接口格式</Trans>
-                        </FieldDescription>
                       </Field>
                       {form.addressChanged ? (
                         <Field orientation="horizontal">

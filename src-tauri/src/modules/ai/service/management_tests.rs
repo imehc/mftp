@@ -3,6 +3,7 @@ use crate::modules::ai::configuration::{input::*, model::*};
 
 pub(super) fn create(revision: i64, name: &str) -> AiProviderCreateInput {
     AiProviderCreateInput {
+        protocol: Default::default(),
         expected_revision: revision,
         name: name.into(),
         base_url: format!("https://{name}.example.com/v1"),
@@ -113,6 +114,7 @@ async fn noncurrent_edits_and_null_secret_keep_identity_and_do_not_activate() {
     let v = f
         .service
         .update_provider(AiProviderUpdateInput {
+            protocol: Default::default(),
             expected_revision: v.revision,
             provider_id: p.id.clone(),
             name: " Updated ".into(),
@@ -317,3 +319,63 @@ fn malformed_secret_inputs_never_echo_the_value() {
 
 #[path = "management_constraints_tests.rs"]
 mod constraints;
+
+#[tokio::test]
+async fn protocols_round_trip_and_snapshot_keeps_its_original_protocol() {
+    use crate::modules::ai::AiProtocol;
+    let f = Fixture::new();
+    let original = f.service.create_provider(create(0, "a")).await.unwrap();
+    let before = f.service.request_snapshot().await.unwrap();
+    let id = original.providers[0].id.clone();
+    let mut view = original;
+    for protocol in [
+        AiProtocol::ChatCompletions,
+        AiProtocol::AnthropicMessages,
+        AiProtocol::Responses,
+    ] {
+        view = f
+            .service
+            .update_provider(AiProviderUpdateInput {
+                expected_revision: view.revision,
+                provider_id: id.clone(),
+                name: "a".into(),
+                base_url: "https://a.example.com/v1".into(),
+                protocol,
+            })
+            .await
+            .unwrap();
+        assert_eq!(view.providers[0].protocol, protocol);
+        assert_eq!(
+            f.service.request_snapshot().await.unwrap().config.protocol,
+            protocol
+        );
+        assert_eq!(before.config.protocol, AiProtocol::Responses);
+        assert_eq!(
+            AiRepository::new(Storage::new(f.root.clone()).unwrap())
+                .configuration()
+                .unwrap(),
+            view
+        );
+    }
+    let mut draft = create(view.revision, "a");
+    draft.protocol = AiProtocol::ChatCompletions;
+    let view = f.service.create_provider(draft).await.unwrap();
+    assert_eq!(view.providers.len(), 2);
+    let mut duplicate = create(view.revision, "a");
+    duplicate.protocol = AiProtocol::ChatCompletions;
+    assert!(f.service.create_provider(duplicate).await.is_err());
+}
+
+#[test]
+fn protocol_input_defaults_only_on_create_and_rejects_unknown_values() {
+    let mut value = serde_json::json!({"expectedRevision":0,"name":"a","baseUrl":"https://a.example","keyLabel":"a","apiKey":"fake","modelId":"a"});
+    assert_eq!(
+        serde_json::from_value::<AiProviderCreateInput>(value.clone())
+            .unwrap()
+            .protocol,
+        crate::modules::ai::AiProtocol::Responses
+    );
+    value["protocol"] = serde_json::json!("unknown");
+    assert!(serde_json::from_value::<AiProviderCreateInput>(value).is_err());
+    assert!(serde_json::from_value::<AiProviderUpdateInput>(serde_json::json!({"expectedRevision":0,"name":"a","providerId":"a","baseUrl":"https://a.example"})).is_err());
+}

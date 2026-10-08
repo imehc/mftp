@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
+import { protocolLabels } from "./protocol-labels";
 import RowActionsDesktop from "./RowActions.desktop";
 import RowActionsMobile from "./RowActions.mobile";
 import { AI_LIMITS, type AiDeleteTarget, type AiEditorTarget } from "./types";
@@ -52,6 +53,9 @@ export default function ProviderDetails({
       <div className="flex min-h-[max(44px,2.75rem)] items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-medium">{provider.name}</h3>
+          <p className="text-muted-foreground mt-1 text-xs">
+            {t(protocolLabels[provider.protocol])}
+          </p>
           <p
             className="text-muted-foreground mt-1 truncate text-xs"
             title={provider.baseUrl}

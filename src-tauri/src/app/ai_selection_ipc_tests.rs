@@ -6,6 +6,7 @@ fn selection_handlers_restore_saved_rows_and_keep_test_read_only() {
     let repo = AiRepository::new(f.storage.clone());
     for name in ["a", "b"] {
         repo.save_connection(&AiConnectionConfig {
+            protocol: Default::default(),
             base_url: format!("https://{name}.example.com"),
             model: format!("model-{name}"),
             streaming_enabled: true,

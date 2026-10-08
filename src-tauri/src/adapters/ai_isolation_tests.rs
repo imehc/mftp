@@ -173,6 +173,7 @@ async fn reset_journal_recovery_after_reopen_only_clears_qa_credentials() {
     let service = fixture.service(qa.clone());
     let view = service
         .create_provider(AiProviderCreateInput {
+            protocol: Default::default(),
             expected_revision: 0,
             name: "QA".into(),
             base_url: "https://qa.example.com/v1".into(),

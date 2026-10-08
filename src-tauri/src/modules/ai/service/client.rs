@@ -3,12 +3,18 @@ use std::time::Duration;
 
 use eventsource_stream::Eventsource;
 use futures_util::StreamExt;
-use serde_json::{json, Value};
+use serde_json::Value;
 
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::modules::ai::AiConnectionConfig;
 
-use super::url::responses_endpoint;
+use super::url::protocol_endpoint;
+#[path = "protocol.rs"]
+mod protocol;
+#[path = "responses.rs"]
+mod responses;
+#[cfg(test)]
+use responses::{handle_stream_event, parse_output_text};
 
 const REQUEST_LIMIT_BYTES: usize = 128 * 1024;
 const RESPONSE_LIMIT_BYTES: u64 = 1024 * 1024;
@@ -47,7 +53,7 @@ pub async fn generate_text<F>(
 where
     F: FnMut(String) + Send,
 {
-    if config.streaming_enabled {
+    let output = if config.streaming_enabled {
         send_streaming_text_request(config, api_key, request, Duration::from_secs(90), |delta| {
             on_delta(delta.to_string());
             Ok(())
@@ -55,7 +61,11 @@ where
         .await
     } else {
         send_text_request_async(config, api_key, request, Duration::from_secs(90)).await
+    }?;
+    if output.len() > request.output_limit_bytes {
+        return Err(AppError::custom(CustomErrorCode::AiOutputTooLarge));
     }
+    Ok(output)
 }
 
 async fn send_text_request_async(
@@ -64,20 +74,21 @@ async fn send_text_request_async(
     request: &AiTextRequest,
     timeout: Duration,
 ) -> AppResult<String> {
-    let body = json!({
-        "model": config.model,
-        "instructions": request.instructions,
-        "input": request.input,
-        "max_output_tokens": request.max_output_tokens,
-    });
+    let body = protocol::request_body(
+        config,
+        &request.instructions,
+        &request.input,
+        request.max_output_tokens,
+        false,
+    );
     let body = serde_json::to_vec(&body)?;
     if body.len() > REQUEST_LIMIT_BYTES {
         return Err(AppError::custom(CustomErrorCode::AiRequestTooLarge));
     }
     let client = build_client(timeout)?;
     let response = client
-        .post(responses_endpoint(&config.base_url))
-        .bearer_auth(api_key)
+        .post(protocol_endpoint(&config.base_url, config.protocol))
+        .headers(protocol::headers(config.protocol, api_key)?)
         .header(reqwest::header::CONTENT_TYPE, "application/json")
         .body(body)
         .send()
@@ -87,7 +98,7 @@ async fn send_text_request_async(
     if !status.is_success() {
         return Err(provider_error(status.as_u16(), &bytes));
     }
-    parse_output_text(&bytes)
+    protocol::parse_output(config.protocol, &bytes)
 }
 
 fn send_text_request(
@@ -98,12 +109,7 @@ fn send_text_request(
     max_output_tokens: u32,
     timeout: Duration,
 ) -> AppResult<String> {
-    let request = json!({
-        "model": config.model,
-        "instructions": instructions,
-        "input": input,
-        "max_output_tokens": max_output_tokens,
-    });
+    let request = protocol::request_body(config, instructions, input, max_output_tokens, false);
     let body = serde_json::to_vec(&request)?;
     if body.len() > REQUEST_LIMIT_BYTES {
         return Err(AppError::custom(CustomErrorCode::AiRequestTooLarge));
@@ -111,8 +117,8 @@ fn send_text_request(
 
     let client = build_blocking_client(timeout)?;
     let mut response = client
-        .post(responses_endpoint(&config.base_url))
-        .bearer_auth(api_key)
+        .post(protocol_endpoint(&config.base_url, config.protocol))
+        .headers(protocol::headers(config.protocol, api_key)?)
         .header(reqwest::header::CONTENT_TYPE, "application/json")
         .body(body)
         .send()?;
@@ -121,7 +127,7 @@ fn send_text_request(
     if !status.is_success() {
         return Err(provider_error(status.as_u16(), &bytes));
     }
-    parse_output_text(&bytes)
+    protocol::parse_output(config.protocol, &bytes)
 }
 
 fn build_client(timeout: Duration) -> AppResult<reqwest::Client> {
@@ -156,13 +162,13 @@ async fn send_streaming_text_request<F>(
 where
     F: FnMut(&str) -> AppResult<()> + Send,
 {
-    let body = json!({
-        "model": config.model,
-        "instructions": request.instructions,
-        "input": request.input,
-        "max_output_tokens": request.max_output_tokens,
-        "stream": true,
-    });
+    let body = protocol::request_body(
+        config,
+        &request.instructions,
+        &request.input,
+        request.max_output_tokens,
+        true,
+    );
     let body = serde_json::to_vec(&body)?;
     if body.len() > REQUEST_LIMIT_BYTES {
         return Err(AppError::custom(CustomErrorCode::AiRequestTooLarge));
@@ -170,8 +176,8 @@ where
 
     let client = build_client(timeout)?;
     let response = client
-        .post(responses_endpoint(&config.base_url))
-        .bearer_auth(api_key)
+        .post(protocol_endpoint(&config.base_url, config.protocol))
+        .headers(protocol::headers(config.protocol, api_key)?)
         .header(reqwest::header::CONTENT_TYPE, "application/json")
         .body(body)
         .send()
@@ -202,11 +208,13 @@ where
     let mut events = byte_stream.eventsource();
     let mut output = String::new();
     let mut completed = false;
+    let mut state = protocol::StreamState::default();
     while let Some(event) = events.next().await {
         let event = event.map_err(|_| {
             AppError::external("ai:provider_protocol", "AI provider stream is invalid")
         })?;
-        if handle_stream_event(
+        if state.handle(
+            config.protocol,
             &event.event,
             &event.data,
             output_limit,
@@ -223,7 +231,7 @@ where
             "AI provider returned an incomplete response",
         ));
     }
-    Ok(output)
+    protocol::nonempty(output)
 }
 
 fn read_limited(response: &mut reqwest::blocking::Response) -> AppResult<Vec<u8>> {
@@ -284,141 +292,10 @@ fn provider_error(status: u16, bytes: &[u8]) -> AppError {
     AppError::external("ai:provider_status", message)
 }
 
-fn parse_output_text(bytes: &[u8]) -> AppResult<String> {
-    let value: Value = serde_json::from_slice(bytes)
-        .map_err(|error| AppError::from(error).context("AI provider returned invalid JSON"))?;
-    if value
-        .get("status")
-        .and_then(Value::as_str)
-        .is_some_and(|status| status != "completed")
-    {
-        return Err(AppError::external(
-            "ai:provider_failed",
-            "AI provider returned an incomplete response",
-        ));
-    }
-    let text = output_text_from_value(&value);
-    let text = text.trim();
-    if text.is_empty() {
-        return Err(AppError::external(
-            "ai:provider_protocol",
-            "AI provider response did not contain output text",
-        ));
-    }
-    Ok(text.to_string())
-}
-
-fn handle_stream_event<F>(
-    event_name: &str,
-    data: &str,
-    output_limit_bytes: usize,
-    output: &mut String,
-    on_delta: &mut F,
-) -> AppResult<bool>
-where
-    F: FnMut(&str) -> AppResult<()>,
-{
-    if data.trim() == "[DONE]" {
-        return Ok(true);
-    }
-    let value: Value = serde_json::from_str(data).map_err(|error| {
-        AppError::from(error).context("AI provider stream event is invalid JSON")
-    })?;
-    let event_type = value
-        .get("type")
-        .and_then(Value::as_str)
-        .unwrap_or(event_name);
-    match event_type {
-        "response.output_text.delta" => {
-            let delta = value.get("delta").and_then(Value::as_str).ok_or_else(|| {
-                AppError::external(
-                    "ai:provider_protocol",
-                    "AI provider stream delta is invalid",
-                )
-            })?;
-            append_stream_text(output, delta, output_limit_bytes, on_delta)?;
-            Ok(false)
-        }
-        "response.output_text.done" => {
-            if let Some(text) = value.get("text").and_then(Value::as_str) {
-                reconcile_stream_text(output, text, output_limit_bytes, on_delta)?;
-            }
-            Ok(false)
-        }
-        "response.completed" => {
-            if let Some(response) = value.get("response") {
-                let text = output_text_from_value(response);
-                if !text.is_empty() {
-                    reconcile_stream_text(output, &text, output_limit_bytes, on_delta)?;
-                }
-            }
-            Ok(true)
-        }
-        "response.failed" | "response.incomplete" | "error" => Err(AppError::external(
-            "ai:provider_failed",
-            "AI provider returned a failed stream event",
-        )),
-        _ => Ok(false),
-    }
-}
-
-fn append_stream_text<F>(
-    output: &mut String,
-    text: &str,
-    output_limit_bytes: usize,
-    on_delta: &mut F,
-) -> AppResult<()>
-where
-    F: FnMut(&str) -> AppResult<()>,
-{
-    if output.len() + text.len() > output_limit_bytes {
-        return Err(AppError::custom(CustomErrorCode::AiOutputTooLarge));
-    }
-    output.push_str(text);
-    on_delta(text)
-}
-
-fn reconcile_stream_text<F>(
-    output: &mut String,
-    text: &str,
-    output_limit_bytes: usize,
-    on_delta: &mut F,
-) -> AppResult<()>
-where
-    F: FnMut(&str) -> AppResult<()>,
-{
-    if output.is_empty() {
-        append_stream_text(output, text, output_limit_bytes, on_delta)
-    } else if output == text {
-        Ok(())
-    } else {
-        Err(AppError::external(
-            "ai:provider_protocol",
-            "AI provider stream output is inconsistent",
-        ))
-    }
-}
-
-fn output_text_from_value(value: &Value) -> String {
-    let mut text = String::new();
-    if let Some(output) = value.get("output").and_then(Value::as_array) {
-        for item in output {
-            let Some(content) = item.get("content").and_then(Value::as_array) else {
-                continue;
-            };
-            for part in content {
-                if part.get("type").and_then(Value::as_str) != Some("output_text") {
-                    continue;
-                }
-                if let Some(part_text) = part.get("text").and_then(Value::as_str) {
-                    text.push_str(part_text);
-                }
-            }
-        }
-    }
-    text
-}
-
 #[cfg(test)]
 #[path = "client_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "protocol_tests.rs"]
+mod protocol_tests;

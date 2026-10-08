@@ -18,6 +18,7 @@ pub struct AiConfigurationView {
 pub struct AiProviderView {
     pub id: String,
     pub name: String,
+    pub protocol: crate::modules::ai::AiProtocol,
     pub base_url: String,
     pub requires_address_repair: bool,
     pub current_key_id: Option<String>,

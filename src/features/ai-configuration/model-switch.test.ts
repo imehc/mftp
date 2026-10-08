@@ -8,6 +8,7 @@ function snapshot(): AiConfigurationView {
   const provider = (id: string): AiProviderView => ({
     id,
     name: id,
+    protocol: "responses",
     baseUrl: `https://${id}.example.invalid/v1`,
     revision: 1,
     requiresAddressRepair: false,

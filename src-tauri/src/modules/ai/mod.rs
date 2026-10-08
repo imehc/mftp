@@ -13,7 +13,7 @@ mod repository;
 pub(crate) mod schema;
 mod service;
 
-pub use model::AiConnectionConfig;
+pub use model::{AiConnectionConfig, AiProtocol};
 pub(crate) use ports::AiCredentials;
 pub(crate) use repository::AiRepository;
 pub(crate) use service::{

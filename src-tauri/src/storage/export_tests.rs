@@ -25,6 +25,7 @@ fn ai_translation_export_round_trips_without_connection_config() {
     let source = Storage::new(source_root.clone()).unwrap();
     AiRepository::new(source.clone())
         .save_connection(&AiConnectionConfig {
+            protocol: Default::default(),
             base_url: "https://private-provider.example".into(),
             model: "translation-model".into(),
             streaming_enabled: true,

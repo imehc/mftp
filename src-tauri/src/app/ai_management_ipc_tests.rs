@@ -43,6 +43,7 @@ fn management_handlers_preserve_arguments_public_metadata_and_errors() {
     // Populate a missing credential slot without touching a native keychain.
     AiRepository::new(f.storage.clone())
         .save_connection(&AiConnectionConfig {
+            protocol: Default::default(),
             base_url: "https://a.example.com".into(),
             model: "model-a".into(),
             streaming_enabled: true,
@@ -52,7 +53,8 @@ fn management_handlers_preserve_arguments_public_metadata_and_errors() {
     let id = view["providers"][0]["id"].clone();
     let key = view["providers"][0]["keys"][0]["id"].clone();
     let model = view["providers"][0]["models"][0]["id"].clone();
-    let view = invoke(&webview, "ai_provider_update", json!({"input": {"expectedRevision": view["revision"], "providerId": id, "name": "Renamed", "baseUrl": "https://a.example.com/v1"}})).unwrap();
+    let view = invoke(&webview, "ai_provider_update", json!({"input": {"expectedRevision": view["revision"], "providerId": id, "name": "Renamed", "protocol": "chatCompletions", "baseUrl": "https://a.example.com/v1"}})).unwrap();
+    assert_eq!(view["providers"][0]["protocol"], "chatCompletions");
     let view = invoke(&webview, "ai_key_save", json!({"input": {"expectedRevision": view["revision"], "providerId": id, "keyId": key, "label": "personal", "replacementSecret": null}})).unwrap();
     assert_eq!(view["providers"][0]["keys"][0]["state"], "missing");
     let view = invoke(&webview, "ai_model_save", json!({"input": {"expectedRevision": view["revision"], "providerId": id, "id": null, "modelId": "model-b", "displayName": "Second"}})).unwrap();
@@ -94,7 +96,7 @@ fn management_handlers_reject_maintenance_before_credentials_and_redact_bad_inpu
         ),
         (
             "ai_provider_update",
-            json!({"input": {"expectedRevision": 0, "providerId": "a", "name": "a", "baseUrl": "https://a.example.com"}}),
+            json!({"input": {"expectedRevision": 0, "providerId": "a", "name": "a", "protocol": "responses", "baseUrl": "https://a.example.com"}}),
         ),
         (
             "ai_provider_delete",

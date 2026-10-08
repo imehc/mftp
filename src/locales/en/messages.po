@@ -354,6 +354,11 @@ msgstr "The AI returned an invalid translation format"
 msgid "AI 配置已更新，请重新加载后重试"
 msgstr "AI configuration has changed. Reload and try again."
 
+#. AI 上游接口格式名称，保留英文名称
+#: src/features/ai-configuration/protocol-labels.ts:15
+msgid "Anthropic Messages"
+msgstr "Anthropic Messages"
+
 #: src/lib/errors/messages.ts:191
 msgid "API Key 为空或过长"
 msgstr "The API key is empty or too long"
@@ -392,6 +397,11 @@ msgstr "BT internal data"
 #: src/lib/errors/messages.ts:106
 msgid "BT 预览服务尚未就绪"
 msgstr "The torrent preview service is not ready"
+
+#. AI 上游接口格式名称，保留英文名称
+#: src/features/ai-configuration/protocol-labels.ts:11
+msgid "Chat Completions"
+msgstr "Chat Completions"
 
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:167
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:227
@@ -484,6 +494,11 @@ msgstr "PNG · Transparent background · No tool panels"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:310
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG is lossless; quality has limited effect"
+
+#. AI 上游接口格式名称，保留英文名称
+#: src/features/ai-configuration/protocol-labels.ts:7
+msgid "Responses"
+msgstr "Responses"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:105
@@ -1153,7 +1168,7 @@ msgstr "Replace +/ with -_ and omit padding"
 msgid "使用 URL 安全字符"
 msgstr "Use URL-safe characters"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:276
+#: src/features/ai-configuration/AiEditorDialog.tsx:279
 msgid "使用最新版本继续编辑"
 msgstr "Continue with the latest version"
 
@@ -1170,7 +1185,7 @@ msgstr "Open with system app"
 msgid "使用系统应用打开 {entryName}"
 msgstr "Open {entryName} with system app"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:293
+#: src/features/ai-configuration/AiEditorDialog.tsx:296
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:515
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:120
 #: src/features/poetry/components/PoetryTranslationSection.tsx:338
@@ -1776,7 +1791,7 @@ msgstr "Delete Folder"
 msgid "删除日志"
 msgstr "Delete Log"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:117
+#: src/features/ai-configuration/ProviderDetails.tsx:121
 msgid "删除服务地址"
 msgstr "Delete service address"
 
@@ -2134,7 +2149,7 @@ msgstr "An unknown error occurred. Please try again."
 #: src/components/ui/prompt-dialog.tsx:107
 #: src/features/about/DataManagementDialogs.tsx:158
 #: src/features/ai-configuration/AiDeleteDialog.tsx:120
-#: src/features/ai-configuration/AiEditorDialog.tsx:286
+#: src/features/ai-configuration/AiEditorDialog.tsx:289
 #: src/features/bt/components/AddTorrentDialog.tsx:363
 #: src/features/bt/components/TaskDialogs.tsx:83
 #: src/features/bt/components/TaskRow.tsx:219
@@ -2360,7 +2375,7 @@ msgstr "Sync progress"
 msgid "同网段 MFTP 客户端，点击可直接打开访问地址"
 msgstr "MFTP clients on the same subnet. Click to open the access URL."
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:109
+#: src/features/ai-configuration/AiEditorDialog.tsx:110
 #: src/features/lan-transfer/LanShareDialog.tsx:94
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:310
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:311
@@ -2798,14 +2813,14 @@ msgstr "Passwords"
 msgid "密码条目"
 msgstr "Password entry"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:150
-#: src/features/ai-configuration/ProviderDetails.tsx:165
+#: src/features/ai-configuration/ProviderDetails.tsx:154
+#: src/features/ai-configuration/ProviderDetails.tsx:169
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:223
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:257
 msgid "密钥"
 msgstr "Key"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:177
+#: src/features/ai-configuration/AiEditorDialog.tsx:180
 msgid "密钥值"
 msgstr "Key value"
 
@@ -3146,7 +3161,7 @@ msgstr "Downloaded {downloadedSize}"
 msgid "已保存"
 msgstr "Saved"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:260
+#: src/features/ai-configuration/ProviderDetails.tsx:264
 msgid "已保存 · 未验证"
 msgstr "Saved · Unverified"
 
@@ -3159,7 +3174,7 @@ msgstr "Saved models"
 msgid "已保存的 AI 翻译记录无效"
 msgstr "The saved AI translation record is invalid"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:197
+#: src/features/ai-configuration/AiEditorDialog.tsx:200
 msgid "已保存的密钥不会回显，只能输入新值覆盖。"
 msgstr "Saved keys are never shown. Enter a new value to replace one."
 
@@ -3551,8 +3566,8 @@ msgstr "Open edges"
 msgid "开机自启"
 msgstr "Launch at Login"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:213
-#: src/features/ai-configuration/ProviderDetails.tsx:254
+#: src/features/ai-configuration/ProviderDetails.tsx:217
+#: src/features/ai-configuration/ProviderDetails.tsx:258
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:57
 #: src/features/ai-configuration/ProviderNavigation.mobile.tsx:42
 msgid "当前"
@@ -3574,10 +3589,6 @@ msgstr "Currently unavailable"
 msgid "当前不在游戏房间中"
 msgstr "You are not in a game room"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:137
-msgid "当前仅支持 OpenAI Responses 接口格式"
-msgstr "Only the OpenAI Responses API format is currently supported"
-
 #: src/lib/errors/messages.ts:142
 msgid "当前传输阶段无法暂停"
 msgstr "The transfer cannot be paused at this stage"
@@ -3596,11 +3607,11 @@ msgstr "Current match"
 
 #: src/features/ai-configuration/AiModelMenu.desktop.tsx:82
 #: src/features/ai-configuration/AiModelMenu.mobile.tsx:79
-#: src/features/ai-configuration/ProviderDetails.tsx:64
+#: src/features/ai-configuration/ProviderDetails.tsx:68
 msgid "当前地址"
 msgstr "Active address"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:127
+#: src/features/ai-configuration/ProviderDetails.tsx:131
 msgid "当前密钥"
 msgstr "Current key"
 
@@ -3638,7 +3649,7 @@ msgid "当前显示上次采样"
 msgstr "Showing the previous sample"
 
 #. 选中模型包含共享引用的已知分配估算。
-#: src/features/ai-configuration/ProviderDetails.tsx:135
+#: src/features/ai-configuration/ProviderDetails.tsx:139
 #: src/features/model-viewer/components/MemoryPanel.tsx:88
 msgid "当前模型"
 msgstr "Current model"
@@ -3827,7 +3838,7 @@ msgstr "I break"
 msgid "我的服务器"
 msgstr "My server"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:150
+#: src/features/ai-configuration/AiEditorDialog.tsx:153
 msgid "我确认将密钥和生成请求发送到新的服务地址。"
 msgstr "I confirm that keys and generation requests will be sent to the new service address."
 
@@ -3922,7 +3933,7 @@ msgid "打开主机列表，选择已有主机或新建主机"
 msgstr "Open the host list to choose or create a host"
 
 #. 打开当前 AI 服务地址中已存在的密钥或模型编辑表单，不启用该项
-#: src/features/ai-configuration/AiEditorDialog.tsx:250
+#: src/features/ai-configuration/AiEditorDialog.tsx:253
 msgid "打开已有项"
 msgstr "Open existing item"
 
@@ -4053,6 +4064,11 @@ msgstr "Try a different keyword"
 msgid "排序操作结束"
 msgstr "Reordering ended"
 
+#. 添加或编辑 AI 服务商时选择上游 API 协议
+#: src/features/ai-configuration/AiProtocolField.tsx:26
+msgid "接口格式"
+msgstr "API format"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:227
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:231
 msgid "接收目录"
@@ -4143,7 +4159,7 @@ msgstr "Playback position"
 msgid "播放速度"
 msgstr "Speed"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:194
+#: src/features/ai-configuration/ProviderDetails.tsx:198
 #: src/features/logs/LogDialogs.tsx:69
 #: src/features/logs/LogRow.desktop.tsx:26
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:232
@@ -4206,12 +4222,12 @@ msgstr "Use Automatic Selection"
 msgid "放大"
 msgstr "Larger"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:320
+#: src/features/ai-configuration/AiEditorDialog.tsx:323
 #: src/features/vault/VaultEntryDialog.tsx:278
 msgid "放弃修改"
 msgstr "Discard changes"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:302
+#: src/features/ai-configuration/AiEditorDialog.tsx:305
 #: src/features/vault/VaultEntryDialog.tsx:262
 msgid "放弃未保存的修改？"
 msgstr "Discard unsaved changes?"
@@ -4514,7 +4530,7 @@ msgstr "Nickname"
 msgid "显示单位"
 msgstr "Display units"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:222
+#: src/features/ai-configuration/AiEditorDialog.tsx:225
 msgid "显示名称（可选）"
 msgstr "Display name (optional)"
 
@@ -4763,7 +4779,7 @@ msgstr "Replace with"
 msgid "有朗诵"
 msgstr "Audio available"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:122
+#: src/features/ai-configuration/AiEditorDialog.tsx:128
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:22
 msgid "服务地址"
 msgstr "Service URL"
@@ -4780,7 +4796,7 @@ msgstr "Service started"
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "The service is running. Stop it before changing port, receive directory, security mode, or permissions. Auto start can be saved directly."
 
-#: src/features/ai-configuration/ProviderDetails.tsx:262
+#: src/features/ai-configuration/ProviderDetails.tsx:266
 msgid "未保存密钥"
 msgstr "No key saved"
 
@@ -4888,8 +4904,8 @@ msgstr "Not recorded"
 msgid "未运行"
 msgstr "Not running"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:130
-#: src/features/ai-configuration/ProviderDetails.tsx:138
+#: src/features/ai-configuration/ProviderDetails.tsx:134
+#: src/features/ai-configuration/ProviderDetails.tsx:142
 #: src/features/lan-transfer/LanShareDialog.tsx:122
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:234
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:152
@@ -4940,7 +4956,7 @@ msgstr "This import exceeds 512 MiB. Choose a smaller model."
 msgid "本次更新"
 msgstr "What's new"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:305
+#: src/features/ai-configuration/AiEditorDialog.tsx:308
 msgid "本次输入的内容将被清除。"
 msgstr "The content entered in this form will be cleared."
 
@@ -5086,8 +5102,8 @@ msgid "标准画质 · 像素比例上限 2"
 msgstr "Standard quality \\u00b7 Pixel ratio up to 2"
 
 #. AI 密钥的可复用名称，不是密钥值
-#: src/features/ai-configuration/AiEditorDialog.tsx:162
-#: src/features/ai-configuration/ProviderDetails.tsx:190
+#: src/features/ai-configuration/AiEditorDialog.tsx:165
+#: src/features/ai-configuration/ProviderDetails.tsx:194
 msgid "标签"
 msgstr "Label"
 
@@ -5165,9 +5181,9 @@ msgid "楚河汉界，布局对弈"
 msgstr "Plan your moves across the river"
 
 #. 三维查看器的多模型列表标签。
-#: src/features/ai-configuration/AiEditorDialog.tsx:207
-#: src/features/ai-configuration/ProviderDetails.tsx:146
-#: src/features/ai-configuration/ProviderDetails.tsx:165
+#: src/features/ai-configuration/AiEditorDialog.tsx:210
+#: src/features/ai-configuration/ProviderDetails.tsx:150
+#: src/features/ai-configuration/ProviderDetails.tsx:169
 #: src/features/model-viewer/components/WorkspaceInspector.tsx:54
 msgid "模型"
 msgstr "Model"
@@ -5206,7 +5222,7 @@ msgstr "Model animation"
 msgid "模型包含网络地址或不安全路径，已阻止读取"
 msgstr "The model contains a network address or an unsafe path. Reading was blocked."
 
-#: src/features/ai-configuration/ProviderDetails.tsx:188
+#: src/features/ai-configuration/ProviderDetails.tsx:192
 msgid "模型名称 / ID"
 msgstr "Model name / ID"
 
@@ -5340,7 +5356,7 @@ msgstr "Downloading"
 msgid "正在下载更新"
 msgstr "Downloading update"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:293
+#: src/features/ai-configuration/AiEditorDialog.tsx:296
 msgid "正在保存"
 msgstr "Saving"
 
@@ -5621,7 +5637,7 @@ msgstr "A key with this label already exists under this AI service address."
 msgid "此 AI 服务地址下已存在相同的模型 ID"
 msgstr "This model ID already exists under this AI service address."
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:235
+#: src/features/ai-configuration/AiEditorDialog.tsx:238
 msgid "此地址下已存在相同的标签或模型，可以打开已有项进行编辑。"
 msgstr "This address already has this label or model. Open the existing item to edit it."
 
@@ -5633,7 +5649,7 @@ msgstr "This scene has no materials."
 msgid "此场景没有纹理"
 msgstr "This scene has no textures."
 
-#: src/features/ai-configuration/ProviderDetails.tsx:81
+#: src/features/ai-configuration/ProviderDetails.tsx:85
 msgid "此服务地址需要修复，请先编辑地址。"
 msgstr "This service address needs repair. Edit the address first."
 
@@ -5784,7 +5800,7 @@ msgstr "Streaming output"
 msgid "浅色"
 msgstr "Light"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:109
+#: src/features/ai-configuration/ProviderDetails.tsx:113
 msgid "测试连接"
 msgstr "Test connection"
 
@@ -5858,18 +5874,18 @@ msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
 #: src/features/ai-configuration/AiConfigurationSettings.tsx:139
-#: src/features/ai-configuration/AiEditorDialog.tsx:59
+#: src/features/ai-configuration/AiEditorDialog.tsx:60
 #: src/features/ai-configuration/ProviderNavigation.mobile.tsx:54
 msgid "添加地址"
 msgstr "Add address"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:64
-#: src/features/ai-configuration/ProviderDetails.tsx:181
+#: src/features/ai-configuration/AiEditorDialog.tsx:65
+#: src/features/ai-configuration/ProviderDetails.tsx:185
 msgid "添加密钥"
 msgstr "Add key"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:67
-#: src/features/ai-configuration/ProviderDetails.tsx:181
+#: src/features/ai-configuration/AiEditorDialog.tsx:68
+#: src/features/ai-configuration/ProviderDetails.tsx:185
 msgid "添加模型"
 msgstr "Add model"
 
@@ -6166,7 +6182,7 @@ msgstr "Interface scale"
 msgid "留空则使用 SSH 配置或本机用户"
 msgstr "Leave empty to use SSH config or local user"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:192
+#: src/features/ai-configuration/AiEditorDialog.tsx:195
 msgid "留空则保留现有密钥"
 msgstr "Leave blank to keep the current key"
 
@@ -6744,7 +6760,7 @@ msgstr "Continue processing"
 msgid "继续完成重置"
 msgstr "Continue reset"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:310
+#: src/features/ai-configuration/AiEditorDialog.tsx:313
 #: src/features/vault/VaultEntryDialog.tsx:270
 msgid "继续编辑"
 msgstr "Keep editing"
@@ -6789,12 +6805,12 @@ msgstr "Edit"
 msgid "编辑主机"
 msgstr "Edit Host"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:60
-#: src/features/ai-configuration/ProviderDetails.tsx:94
+#: src/features/ai-configuration/AiEditorDialog.tsx:61
+#: src/features/ai-configuration/ProviderDetails.tsx:98
 msgid "编辑地址"
 msgstr "Edit address"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:63
+#: src/features/ai-configuration/AiEditorDialog.tsx:64
 msgid "编辑密钥"
 msgstr "Edit key"
 
@@ -6807,7 +6823,7 @@ msgstr "Edit Todo"
 
 #. 编辑本地模型库的名称、分组和收藏状态。
 #. 编辑本地模型库的名称、分组和收藏状态。
-#: src/features/ai-configuration/AiEditorDialog.tsx:66
+#: src/features/ai-configuration/AiEditorDialog.tsx:67
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:53
 #: src/features/model-viewer/components/LibraryList.tsx:211
 msgid "编辑模型"
@@ -7084,7 +7100,7 @@ msgstr "Authentication"
 msgid "记录任务与清单"
 msgstr "Keep track of tasks and lists"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:74
+#: src/features/ai-configuration/ProviderDetails.tsx:78
 msgid "设为当前"
 msgstr "Set as active"
 
@@ -7347,7 +7363,7 @@ msgstr "Configure the service URL, model, and API key before generating a transl
 msgid "请填写 AI 模型名称，或名称过长"
 msgstr "The AI model name is empty or too long"
 
-#: src/features/ai-configuration/hooks/use-ai-editor.ts:100
+#: src/features/ai-configuration/hooks/use-ai-editor.ts:107
 msgid "请填写必填字段"
 msgstr "Complete the required fields"
 
@@ -7373,7 +7389,7 @@ msgstr "Rotate your device to landscape. Your match will be preserved."
 msgid "请求路径无效或超出共享目录：{path}"
 msgstr "The requested path is invalid or outside the shared folder: {path}"
 
-#: src/features/ai-configuration/hooks/use-ai-editor.ts:113
+#: src/features/ai-configuration/hooks/use-ai-editor.ts:120
 msgid "请确认新的服务地址"
 msgstr "Confirm the new service address"
 
@@ -7399,7 +7415,7 @@ msgstr "Enter content"
 msgid "请输入口令"
 msgstr "Enter passphrase"
 
-#: src/features/ai-configuration/hooks/use-ai-editor.ts:109
+#: src/features/ai-configuration/hooks/use-ai-editor.ts:116
 msgid "请输入密钥值"
 msgstr "Enter a key value"
 
@@ -7626,7 +7642,7 @@ msgstr "{sideNameValue}'s turn"
 msgid "输入"
 msgstr "Input"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:193
+#: src/features/ai-configuration/AiEditorDialog.tsx:196
 msgid "输入 API Key"
 msgstr "Enter API Key"
 
@@ -8090,7 +8106,7 @@ msgstr "Per-model values include shared references; totals are deduplicated. Hid
 msgid "部分纹理、变形目标或动画分配无法估算，当前合计不完整。"
 msgstr "Some texture, morph target, or animation allocations cannot be estimated. The total is incomplete."
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:266
+#: src/features/ai-configuration/AiEditorDialog.tsx:269
 msgid "配置已更新，草稿已保留。请核对最新配置后再保存。"
 msgstr "The configuration has changed. Your draft is preserved. Review the latest configuration before saving."
 

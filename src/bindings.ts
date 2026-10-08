@@ -307,11 +307,14 @@ export type AiModelView = {
 	displayName: string | null,
 };
 
+export type AiProtocol = "responses" | "chatCompletions" | "anthropicMessages";
+
 export type AiProviderCreateInput = AiProviderCreateInput_Serialize | AiProviderCreateInput_Deserialize;
 
 export type AiProviderCreateInput_Deserialize = {
 	expectedRevision: number,
 	name: string,
+	protocol?: AiProtocol,
 	baseUrl: string,
 	keyLabel: string,
 	apiKey: string,
@@ -322,6 +325,7 @@ export type AiProviderCreateInput_Deserialize = {
 export type AiProviderCreateInput_Serialize = {
 	expectedRevision: number,
 	name: string,
+	protocol: AiProtocol,
 	baseUrl: string,
 	keyLabel: string,
 	apiKey: string,
@@ -350,12 +354,14 @@ export type AiProviderUpdateInput = {
 	expectedRevision: number,
 	providerId: string,
 	name: string,
+	protocol: AiProtocol,
 	baseUrl: string,
 };
 
 export type AiProviderView = {
 	id: string,
 	name: string,
+	protocol: AiProtocol,
 	baseUrl: string,
 	requiresAddressRepair: boolean,
 	currentKeyId: string | null,

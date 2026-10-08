@@ -46,20 +46,16 @@ pub fn validate_connection(base_url: &str, model: &str) -> AppResult<AiConnectio
     }
 
     Ok(AiConnectionConfig {
+        protocol: Default::default(),
         base_url: base_url.to_string(),
         model: model.to_string(),
         streaming_enabled: true,
     })
 }
 
+#[cfg(test)]
 pub(in crate::modules::ai) fn responses_endpoint(base_url: &str) -> String {
-    if base_url.ends_with("/v1/responses") {
-        base_url.to_string()
-    } else if base_url.ends_with("/v1") {
-        format!("{base_url}/responses")
-    } else {
-        format!("{base_url}/v1/responses")
-    }
+    protocol_endpoint(base_url, crate::modules::ai::AiProtocol::Responses)
 }
 
 fn is_loopback(host: Host<&str>) -> bool {
@@ -73,3 +69,27 @@ fn is_loopback(host: Host<&str>) -> bool {
 #[cfg(test)]
 #[path = "url_tests.rs"]
 mod tests;
+
+pub(in crate::modules::ai) fn protocol_endpoint(
+    base_url: &str,
+    protocol: crate::modules::ai::AiProtocol,
+) -> String {
+    use crate::modules::ai::AiProtocol;
+    let base = base_url.trim_end_matches('/');
+    let suffix = match protocol {
+        AiProtocol::Responses => "responses",
+        AiProtocol::ChatCompletions => "chat/completions",
+        AiProtocol::AnthropicMessages => "messages",
+    };
+    // A full endpoint may be retained in the editor while its protocol changes.
+    for old in ["/chat/completions", "/responses", "/messages"] {
+        if let Some(prefix) = base.strip_suffix(old) {
+            return format!("{prefix}/{suffix}");
+        }
+    }
+    if base.ends_with("/v1") {
+        format!("{base}/{suffix}")
+    } else {
+        format!("{base}/v1/{suffix}")
+    }
+}

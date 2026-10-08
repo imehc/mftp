@@ -8,6 +8,7 @@ function provider(id: string): AiProviderView {
   return {
     id,
     name: id,
+    protocol: "responses",
     baseUrl: `https://${id}.example.invalid/v1`,
     requiresAddressRepair: false,
     revision: 1,

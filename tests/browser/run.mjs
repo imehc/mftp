@@ -14,6 +14,7 @@ const names = [
   "model-attachments",
   "model-system",
   "display-size",
+  "ai-protocol",
 ];
 const selected = process.argv.slice(2);
 if (selected.some((name) => !names.includes(name)))

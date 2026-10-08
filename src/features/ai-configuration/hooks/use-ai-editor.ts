@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
-import type { AppError } from "~/bindings";
+import type { AiProtocol, AppError } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import {
   aiKeySave,
@@ -21,6 +21,11 @@ export function useAiEditor(target: AiEditorTarget, onSaved: () => void) {
   const [revision, setRevision] = useState(view.revision);
   const [name, setName] = useState(
     target.kind === "provider" ? (target.provider?.name ?? "") : "",
+  );
+  const [protocol, setProtocol] = useState<AiProtocol>(
+    target.kind === "provider"
+      ? (target.provider?.protocol ?? "responses")
+      : "responses",
   );
   const [baseUrl, setBaseUrl] = useState(
     target.kind === "provider" ? (target.provider?.baseUrl ?? "") : "",
@@ -72,6 +77,8 @@ export function useAiEditor(target: AiEditorTarget, onSaved: () => void) {
           ];
   const dirty =
     keyDirty ||
+    (target.kind === "provider" &&
+      protocol !== (target.provider?.protocol ?? "responses")) ||
     [name, baseUrl, label, model, displayName].some(
       (value, index) => value !== initial[index],
     );
@@ -123,11 +130,13 @@ export function useAiEditor(target: AiEditorTarget, onSaved: () => void) {
                 providerId: target.provider.id,
                 name,
                 baseUrl,
+                protocol,
               })
             : await aiProviderCreate({
                 expectedRevision,
                 name,
                 baseUrl,
+                protocol,
                 keyLabel: label,
                 apiKey: secret,
                 modelId: model,
@@ -165,6 +174,8 @@ export function useAiEditor(target: AiEditorTarget, onSaved: () => void) {
     setName,
     baseUrl,
     setBaseUrl,
+    protocol,
+    setProtocol,
     label,
     setLabel,
     model,

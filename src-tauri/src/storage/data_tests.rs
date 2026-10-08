@@ -141,7 +141,7 @@ fn reset_preserves_migration_versions_and_clears_settings_atomically() {
     assert!(read_meta(&storage, "activity_log_error_legacy_before_ms").is_none());
     assert!(storage.migration_done(&conn).unwrap());
     for (key, value) in [
-        ("ai_schema_version", "3"),
+        ("ai_schema_version", "4"),
         ("bt_error_payload_schema_version", "99"),
         ("bt_download_only_migrated_v1", "1"),
     ] {

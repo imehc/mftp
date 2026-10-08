@@ -41,6 +41,7 @@ pub(super) fn model_id(model: &str) -> AppResult<String> {
 pub(in crate::modules::ai) struct NewProvider {
     pub expected_revision: i64,
     pub name: String,
+    pub protocol: crate::modules::ai::AiProtocol,
     pub base_url: String,
     pub label: String,
     pub model: String,
@@ -56,6 +57,7 @@ impl NewProvider {
             Self {
                 expected_revision: input.expected_revision,
                 name: text(&input.name, Code::AiProviderNameInvalid)?,
+                protocol: input.protocol,
                 base_url: config.base_url,
                 label: text(&input.key_label, Code::AiKeyLabelInvalid)?,
                 model,

@@ -30,10 +30,11 @@ pub(super) fn snapshot_in(tx: &Transaction<'_>) -> AppResult<AiConfigurationView
     let mut providers = tx
         .prepare(
             "SELECT id, name, base_url, endpoint_key IS NULL, current_key_id, current_model_id,
-             revision FROM ai_providers ORDER BY created_at, id",
+             revision, protocol FROM ai_providers ORDER BY created_at, id",
         )?
         .query_map([], |r| {
             Ok(AiProviderView {
+                protocol: r.get(7)?,
                 id: r.get(0)?,
                 name: r.get(1)?,
                 base_url: r.get(2)?,

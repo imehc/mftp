@@ -117,6 +117,7 @@ fn shared_reset_rolls_back_ai_rows_and_reopen_does_not_restore_deleted_config() 
     let storage = Storage::new(root.clone()).unwrap();
     let repo = AiRepository::new(storage.clone());
     let config = AiConnectionConfig {
+        protocol: Default::default(),
         base_url: "https://example.com".into(),
         model: "saved-model".into(),
         streaming_enabled: false,

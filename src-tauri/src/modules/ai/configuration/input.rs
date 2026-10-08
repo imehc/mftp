@@ -16,6 +16,8 @@ fn optional_secret<'de, D: Deserializer<'de>>(d: D) -> Result<Option<String>, D:
 pub struct AiProviderCreateInput {
     pub expected_revision: i64,
     pub name: String,
+    #[serde(default)]
+    pub protocol: crate::modules::ai::AiProtocol,
     pub base_url: String,
     pub key_label: String,
     #[serde(deserialize_with = "secret")]
@@ -31,6 +33,7 @@ pub struct AiProviderUpdateInput {
     pub expected_revision: i64,
     pub provider_id: String,
     pub name: String,
+    pub protocol: crate::modules::ai::AiProtocol,
     pub base_url: String,
 }
 

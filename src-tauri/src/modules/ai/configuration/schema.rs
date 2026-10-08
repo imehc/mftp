@@ -3,16 +3,23 @@ use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBe
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::modules::ai::{legacy_schema, service::url};
 
-pub(in crate::modules::ai) const VERSION: i64 = 3;
+pub(in crate::modules::ai) const VERSION: i64 = 4;
 pub(in crate::modules::ai) const LEGACY_PROVIDER: &str = "1e227548-da9b-52f8-8e79-18175d9a0df7";
 pub(in crate::modules::ai) const LEGACY_KEY: &str = "73f7eabc-03ce-5cb1-9452-4db4eb464d1b";
 pub(in crate::modules::ai) const LEGACY_MODEL: &str = "f9e51a88-54bc-51d8-8a5e-5b0d58d389bc";
 
 pub(in crate::modules::ai) fn normalized_endpoint(base_url: &str) -> AppResult<String> {
+    normalized_protocol_endpoint(base_url, crate::modules::ai::AiProtocol::Responses)
+}
+
+pub(in crate::modules::ai) fn normalized_protocol_endpoint(
+    base_url: &str,
+    protocol: crate::modules::ai::AiProtocol,
+) -> AppResult<String> {
     let config = url::validate_connection(base_url, "migration-validation")?;
     // Use the same endpoint builder as actual AI requests. Url canonicalizes
     // host casing/default ports while preserving case-sensitive service paths.
-    let parsed = ::url::Url::parse(&url::responses_endpoint(&config.base_url))
+    let parsed = ::url::Url::parse(&url::protocol_endpoint(&config.base_url, protocol))
         .map_err(|_| AppError::custom(CustomErrorCode::AiAddressInvalid))?;
     Ok(parsed.to_string())
 }
@@ -24,6 +31,11 @@ pub(in crate::modules::ai) fn init(conn: &mut Connection) -> AppResult<()> {
         return Err(AppError::custom(CustomErrorCode::AiSchemaTooNew));
     }
     if version == VERSION {
+        tx.commit()?;
+        return Ok(());
+    }
+    if version == 3 {
+        migrate_protocol(&tx)?;
         tx.commit()?;
         return Ok(());
     }
@@ -44,6 +56,7 @@ pub(in crate::modules::ai) fn init(conn: &mut Connection) -> AppResult<()> {
     tx.execute_batch(include_str!("schema.sql"))?;
     migrate_connection(&tx)?;
     tx.execute("DROP TABLE ai_connection", [])?;
+    migrate_protocol(&tx)?;
     tx.execute(
         "INSERT INTO app_meta(key, value) VALUES('ai_schema_version', ?1)
          ON CONFLICT(key) DO UPDATE SET value = excluded.value",
@@ -136,3 +149,12 @@ mod tests;
 #[cfg(test)]
 #[path = "constraints_tests.rs"]
 mod constraints_tests;
+
+fn migrate_protocol(tx: &Transaction<'_>) -> AppResult<()> {
+    tx.execute_batch(
+        "ALTER TABLE ai_providers ADD COLUMN protocol TEXT NOT NULL DEFAULT 'responses'
+        CHECK(protocol IN ('responses', 'chatCompletions', 'anthropicMessages'));
+        UPDATE app_meta SET value = '4' WHERE key = 'ai_schema_version';",
+    )?;
+    Ok(())
+}

@@ -160,15 +160,16 @@ pub(super) fn connection_in(
     provider_id: Option<&str>,
 ) -> AppResult<StoredConnection> {
     conn.query_row(
-            "SELECT p.id, p.base_url, m.model_id, k.credential_ref, s.streaming_enabled
+            "SELECT p.id, p.base_url, m.model_id, k.credential_ref, s.streaming_enabled, p.protocol
              FROM ai_settings s LEFT JOIN ai_providers p ON p.id = COALESCE(?1, s.active_provider_id)
              LEFT JOIN ai_provider_models m ON m.id = p.current_model_id AND m.provider_id = p.id
              LEFT JOIN ai_provider_keys k ON k.id = p.current_key_id AND k.provider_id = p.id WHERE s.id = 1",
             [provider_id], |r| Ok((r.get::<_, Option<String>>(0)?, r.get::<_, Option<String>>(1)?,
-                r.get::<_, Option<String>>(2)?, r.get::<_, Option<String>>(3)?, r.get::<_, i64>(4)? != 0)),
-        ).map_err(AppError::from).and_then(|(id, base, model, reference, streaming_enabled)| {
+                r.get::<_, Option<String>>(2)?, r.get::<_, Option<String>>(3)?, r.get::<_, i64>(4)? != 0, r.get::<_, Option<super::AiProtocol>>(5)?)),
+        ).map_err(AppError::from).and_then(|(id, base, model, reference, streaming_enabled, protocol)| {
             let config = if id.is_some() {
                 Some(AiConnectionConfig {
+                    protocol: protocol.ok_or_else(|| AppError::external("db:operation", "Missing AI protocol"))?,
                     base_url: base.ok_or_else(|| AppError::custom(CustomErrorCode::AiAddressInvalid))?,
                     model: model.ok_or_else(|| AppError::custom(CustomErrorCode::AiModelInvalid))?,
                     streaming_enabled,
@@ -186,6 +187,7 @@ impl StoredConnection {
         let mut validated =
             super::service::url::validate_connection(&config.base_url, &config.model)?;
         validated.streaming_enabled = config.streaming_enabled;
+        validated.protocol = config.protocol;
         let reference = self
             .reference
             .ok_or_else(|| AppError::custom(CustomErrorCode::AiApiKeyMissing))?;
