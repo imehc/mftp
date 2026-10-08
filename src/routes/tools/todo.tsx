@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import TodoTool from "~/features/todo/TodoTool";
 import { useSettingsStore } from "~/store/settings";
 

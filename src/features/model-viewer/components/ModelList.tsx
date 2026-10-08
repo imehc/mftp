@@ -1,7 +1,7 @@
-import { useEffect, useId, useRef } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { cn } from "cn";
 import {
   Check,
   Eye,
@@ -11,9 +11,9 @@ import {
   RotateCcw,
   Trash2,
 } from "lucide-react";
-import { cn } from "cn";
+import { useEffect, useId, useRef } from "react";
+
 import { Button } from "~/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   Field,
   FieldDescription,
@@ -21,10 +21,12 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
-import type { ViewerSession, ViewerState } from "../runtime/session";
+
 import type { ModelLayout } from "../runtime/collection";
+import type { ViewerSession, ViewerState } from "../runtime/session";
 
 const statuses = {
   queued: msg({ message: "等待导入", comment: "批量模型导入的排队状态。" }),

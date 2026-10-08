@@ -1,21 +1,23 @@
-import { useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { cn } from "cn";
 import { CalendarDays } from "lucide-react";
+import { useRef, useState } from "react";
+
 import { Badge } from "~/components/ui/badge";
 import { Checkbox } from "~/components/ui/checkbox";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import TodoRowActionsDesktop from "./TodoRowActions.desktop";
-import TodoRowActionsMobile from "./TodoRowActions.mobile";
-import TodoDetailsDialog from "./TodoDetailsDialog";
-import TodoTimestamps from "./TodoTimestamps";
-import { cn } from "cn";
 import type { TodoItem } from "~/types";
+
 import {
   buildTodoListRows,
   formatTodoDate,
   type TodoListRow,
 } from "./todo-utils";
+import TodoDetailsDialog from "./TodoDetailsDialog";
+import TodoRowActionsDesktop from "./TodoRowActions.desktop";
+import TodoRowActionsMobile from "./TodoRowActions.mobile";
+import TodoTimestamps from "./TodoTimestamps";
 
 interface TodoListProps {
   items: TodoItem[];

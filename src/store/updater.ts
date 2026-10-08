@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { AppError } from "~/types";
 
 export type UpdaterStatus =

@@ -1,6 +1,8 @@
-import { expect, it } from "vitest";
 import { i18n } from "@lingui/core";
+import { expect, it } from "vitest";
+
 import { decodeDataUri } from "./data-uri";
+
 i18n.loadAndActivate({ locale: "zh-CN", messages: {} });
 
 it("解码两种数据 URI 形式中的任意二进制字节", () => {
@@ -11,6 +13,7 @@ it("解码两种数据 URI 形式中的任意二进制字节", () => {
     new Uint8Array([1, 2, 3]),
   );
 });
+
 it("拒绝格式错误的编码和超出预算的分配", () => {
   expect(() => decodeDataUri("data:,abc%zz", 10)).toThrow();
   expect(() => decodeDataUri("data:,abcd", 3)).toThrow();

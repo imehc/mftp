@@ -1,8 +1,10 @@
-import { beforeEach, expect, test, vi } from "vitest";
 import { i18n } from "@lingui/core";
-import { useTransfersStore } from "~/store/transfers";
-import { createTransferActions } from "./transfer-actions";
+import { beforeEach, expect, test, vi } from "vitest";
+
 import * as ipc from "~/lib/ipc";
+import { useTransfersStore } from "~/store/transfers";
+
+import { createTransferActions } from "./transfer-actions";
 
 vi.mock("~/lib/ipc", () => ({
   btControl: vi.fn(),
@@ -11,6 +13,7 @@ vi.mock("~/lib/ipc", () => ({
   sftpResumeTransfer: vi.fn(),
 }));
 vi.mock("./retry", () => ({ runTransferRetry: vi.fn() }));
+
 beforeEach(() => {
   vi.resetAllMocks();
   i18n.loadAndActivate({ locale: "zh-CN", messages: {} });
@@ -20,6 +23,7 @@ beforeEach(() => {
     runtimeError: undefined,
   });
 });
+
 test("BT 取消仍通过原命令并标记结束", async () => {
   useTransfersStore.getState().start("bt:hash", "test");
   await createTransferActions().cancelTransfer(
@@ -28,6 +32,7 @@ test("BT 取消仍通过原命令并标记结束", async () => {
   expect(ipc.btControl).toHaveBeenCalledWith("hash", "Cancel", false);
   expect(useTransfersStore.getState().transfers[0].status).toBe("cancelled");
 });
+
 test("SFTP 取消等待实际结束事件，不提前宣告完成", async () => {
   useTransfersStore.getState().start("sftp", "test");
   await createTransferActions().cancelTransfer(
@@ -37,6 +42,7 @@ test("SFTP 取消等待实际结束事件，不提前宣告完成", async () => 
   expect(useTransfersStore.getState().transfers[0].status).toBe("running");
   expect(useTransfersStore.getState().transfers[0].cancelling).toBe(true);
 });
+
 test("操作失败恢复待处理状态并保留完整错误", async () => {
   const error = {
     kind: "external" as const,
@@ -52,6 +58,7 @@ test("操作失败恢复待处理状态并保留完整错误", async () => {
   expect(useTransfersStore.getState().transfers[0].cancelling).toBe(false);
   expect(useTransfersStore.getState().transfers[0].controlError).toEqual(error);
 });
+
 test("两个面板用旧快照重复暂停只发起一次请求", async () => {
   let finish!: () => void;
   vi.mocked(ipc.sftpPauseTransfer).mockImplementation(

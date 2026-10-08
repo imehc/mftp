@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import ModelViewerPage from "~/features/model-viewer/ModelViewerPage";
 import { useSettingsStore } from "~/store/settings";
 

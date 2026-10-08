@@ -1,4 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
+
 import { RoomOwner } from "./roomOwner";
 
 export function useOnlineRoom<M>(gameId: string) {

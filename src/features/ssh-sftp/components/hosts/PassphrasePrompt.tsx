@@ -1,11 +1,9 @@
-import { useEffect } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
 import { z } from "zod";
-import type { Host } from "~/types";
+
 import { Button } from "~/components/ui/button";
-import { PasswordInput } from "~/components/ui/password-input";
-import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
   Dialog,
   DialogContent,
@@ -13,13 +11,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
+import { PasswordInput } from "~/components/ui/password-input";
 import { firstFormError } from "~/lib/form-errors";
+import type { Host } from "~/types";
+
 interface Props {
   /** 等待口令的主机；隐藏时为 null。 */
   host: Host | null;
   onClose: () => void;
   onSubmit: (passphrase: string) => void;
 }
+
 export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
   const { t } = useLingui();
   const form = useForm({

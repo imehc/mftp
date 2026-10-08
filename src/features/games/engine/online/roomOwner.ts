@@ -1,6 +1,7 @@
 import type { AppError, GameRoomStatus } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import { gameRoomLeave } from "~/lib/ipc";
+
 import type { MoveParser } from "./protocol";
 import { OnlineMatchSession, registrationAborted } from "./session";
 
@@ -31,11 +32,13 @@ interface Attempt<M> {
 let lifecycleTail = Promise.resolve();
 let cancelActive: (() => void) | undefined;
 const pendingCleanup = new Set<string>();
+
 function serialize(work: () => Promise<void>): Promise<void> {
   const result = lifecycleTail.then(work);
   lifecycleTail = result.catch(() => {});
   return result;
 }
+
 async function release(instanceId: string): Promise<void> {
   pendingCleanup.add(instanceId);
   await gameRoomLeave(instanceId);
@@ -134,6 +137,7 @@ export class RoomOwner<M> {
         attempt.offClosed = session.onClosed(() => {
           if (this.current(attempt)) void this.cancel(registrationAborted());
         });
+
         const handOff = () => {
           if (!this.current(attempt) || session.isClosed || this.snapshot.ready)
             return;
@@ -144,6 +148,7 @@ export class RoomOwner<M> {
           attempt.offPresence?.();
           attempt.offClosed?.();
         };
+
         if (attempt.status.phase === "hosting") {
           this.publish({ hosting: session.status });
           attempt.offPresence = session.onPeerPresence((connected) => {

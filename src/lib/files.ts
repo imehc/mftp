@@ -92,8 +92,15 @@ export interface NativeFilePickOptions {
   allowMobile?: boolean;
   /** 原生对话框中显示的文件类型标签。 */
   filterName: string;
-  /** 允许的后缀（不含点），如 ["png", "jpg"]。 */
+  /** 允许的后缀（不含点），如 ["png", "jpg"]；["*"] 表示所有文件。 */
   extensions: string[];
+}
+
+function nativeFileFilters(options: NativeFilePickOptions) {
+  // macOS 会把星号当作实际后缀；选择所有文件时必须省略原生类型过滤。
+  return options.extensions.includes("*")
+    ? undefined
+    : [{ name: options.filterName, extensions: options.extensions }];
 }
 
 /**
@@ -114,7 +121,7 @@ export async function pickFilePathNative(
     multiple: false,
     directory: false,
     title: options.title,
-    filters: [{ name: options.filterName, extensions: options.extensions }],
+    filters: nativeFileFilters(options),
   });
   if (typeof selected !== "string" || !selected) return false;
 
@@ -132,7 +139,7 @@ export async function pickFilePathsNative(
     multiple: true,
     directory: false,
     title: options.title,
-    filters: [{ name: options.filterName, extensions: options.extensions }],
+    filters: nativeFileFilters(options),
   });
   return Array.isArray(selected)
     ? selected

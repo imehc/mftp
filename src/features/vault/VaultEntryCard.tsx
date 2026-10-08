@@ -1,19 +1,20 @@
-import { useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Ellipsis, Eye, EyeOff, GripVertical, Pencil } from "lucide-react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { Ellipsis, Eye, EyeOff, GripVertical, Pencil } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+
 import { CopyButton } from "~/components/CopyButton";
-import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { describeError } from "~/lib/errors";
 import type { VaultEntry } from "~/types";

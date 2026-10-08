@@ -1,13 +1,16 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Plus, Trash2 } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import type { LanSharedDir } from "~/types";
+
 interface Props {
   shares: LanSharedDir[];
   running: boolean;
   openShare: () => void;
   deleteShare: (id: string) => void;
 }
+
 export default function LanSharedDirsSection({
   shares,
   running,

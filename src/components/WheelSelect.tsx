@@ -1,6 +1,8 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
-import { WheelPicker, WheelPickerWrapper } from "@ncdai/react-wheel-picker";
 import "@ncdai/react-wheel-picker/style.css";
+
+import { WheelPicker, WheelPickerWrapper } from "@ncdai/react-wheel-picker";
+import { useEffect, useLayoutEffect, useRef } from "react";
+
 import { useMediaQuery } from "~/lib/use-media-query";
 
 /** 第三方滚轮的主题、无障碍和减少动态效果适配，不持有业务状态。 */

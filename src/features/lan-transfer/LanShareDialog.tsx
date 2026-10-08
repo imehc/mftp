@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { baseName, pickDirectoryNative } from "~/lib/files";
-import { toast } from "sonner";
-import { describeError } from "~/lib/errors";
+import { useForm } from "@tanstack/react-form";
 import { FolderOpen } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
+
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -12,6 +11,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import {
   Field as UiField,
   FieldDescription,
@@ -19,24 +19,28 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
-import { firstFormError } from "~/lib/form-errors";
 import {
   createLanSharedDirSchema,
-  lanSharedDirFormValuesToInput,
   type LanSharedDirFormValues,
+  lanSharedDirFormValuesToInput,
 } from "~/features/lan-transfer/lanTransferForms.schema";
+import { describeError } from "~/lib/errors";
+import { baseName, pickDirectoryNative } from "~/lib/files";
+import { firstFormError } from "~/lib/form-errors";
 import type { LanSharedDirInput } from "~/types";
+
 interface LanShareDialogProps {
   open: boolean;
   busy: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (input: LanSharedDirInput) => Promise<void>;
 }
+
 const emptyShareFormValues: LanSharedDirFormValues = {
   name: "",
   path: "",
 };
+
 export default function LanShareDialog({
   open: dialogOpen,
   busy,
@@ -56,6 +60,7 @@ export default function LanShareDialog({
   useEffect(() => {
     if (dialogOpen) form.reset(emptyShareFormValues);
   }, [dialogOpen, form]);
+
   async function chooseShareDir() {
     try {
       const selected = await pickDirectoryNative(t`选择共享目录`);

@@ -11,6 +11,7 @@
  * 坐标都与物理常量一致。
  */
 import { Container, Sprite, Texture } from "pixi.js";
+
 import {
   CUSHION_THICKNESS,
   FOOT_SPOT_X,
@@ -137,6 +138,7 @@ function paintTable(): HTMLCanvasElement {
   // 顶面一直延伸到与台面相接的库边尖端。
   for (const segment of cushionSegments()) {
     const [ix0, iy0, ix1, iy1, ox1, oy1, ox0, oy0] = segment.points;
+
     const path = (): void => {
       ctx.beginPath();
       ctx.moveTo(px(ix0), px(iy0));
@@ -167,6 +169,7 @@ function paintTable(): HTMLCanvasElement {
     ctx.save();
     path();
     ctx.clip();
+
     const jaw = (
       ex: number,
       ey: number,
@@ -199,6 +202,7 @@ function paintTable(): HTMLCanvasElement {
       ctx.fillStyle = g;
       ctx.fill();
     };
+
     jaw(px(ix0), px(iy0), px(ox0), px(oy0), px(ix1), px(iy1));
     jaw(px(ix1), px(iy1), px(ox1), px(oy1), px(ix0), px(iy0));
     ctx.restore();
@@ -223,6 +227,7 @@ function paintTable(): HTMLCanvasElement {
   ctx.beginPath();
   ctx.rect(bedX, bedY, bedW, bedH);
   ctx.clip();
+
   const edgeShadow = (
     x0: number,
     y0: number,
@@ -236,6 +241,7 @@ function paintTable(): HTMLCanvasElement {
     ctx.fillStyle = g;
     ctx.fillRect(bedX, bedY, bedW, bedH);
   };
+
   edgeShadow(bedX, bedY, bedX, bedY + reach, 0.34);
   edgeShadow(bedX, bedY, bedX + reach, bedY, 0.3);
   edgeShadow(bedX, bedY + bedH, bedX, bedY + bedH - reach, 0.2);
@@ -258,8 +264,10 @@ function paintTable(): HTMLCanvasElement {
   // 库边瞄准点：嵌入木框的珍珠母镶饰。
   const sightY = px(TABLE_H / 2 + CUSHION_THICKNESS + FRAME / 2);
   const sightX = px(TABLE_W / 2 + CUSHION_THICKNESS + FRAME / 2);
+
   const drawSight = (x: number, y: number): void => {
     const s = px(0.011);
+
     const diamond = (scale: number): void => {
       ctx.beginPath();
       ctx.moveTo(x, y - s * scale);
@@ -268,6 +276,7 @@ function paintTable(): HTMLCanvasElement {
       ctx.lineTo(x - s * scale, y);
       ctx.closePath();
     };
+
     // 先画凹陷阴影，再画镶饰，最后在受光面点一抹高光。
     diamond(1.12);
     ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
@@ -283,6 +292,7 @@ function paintTable(): HTMLCanvasElement {
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.fill();
   };
+
   for (const k of [-3, -2, -1, 1, 2, 3]) {
     const x = px((k * TABLE_W) / 8);
     drawSight(x, -sightY);

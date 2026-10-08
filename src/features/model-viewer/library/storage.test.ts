@@ -1,7 +1,9 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { Group } from "three";
+import { beforeEach, expect, it, vi } from "vitest";
+
 import type { ModelViewState } from "~/bindings";
 import * as ipc from "~/lib/ipc";
+
 import type { ModelHandle } from "../domain/types";
 import { librarySource, originalResources, saveModel } from "./storage";
 

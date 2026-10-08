@@ -1,17 +1,17 @@
 import {
-  createRng,
-  yieldToUi,
   type AiStrategy,
+  createRng,
   type Difficulty,
+  yieldToUi,
 } from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
+import { cellIndex, findWinningLine, inBounds, legalMoves } from "./rules";
 import {
   BOARD_SIZE,
-  WIN_LENGTH,
   type GomokuMove,
   type GomokuState,
+  WIN_LENGTH,
 } from "./types";
-import { cellIndex, findWinningLine, inBounds, legalMoves } from "./rules";
 
 const DIRECTIONS: Array<[number, number]> = [
   [1, 0],

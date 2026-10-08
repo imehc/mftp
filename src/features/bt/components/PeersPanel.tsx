@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
-import { createPoller } from "~/lib/polling";
-import { describeError, toIpcError } from "~/lib/errors";
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircle } from "lucide-react";
-import type { AppError, BtPeerInfo } from "~/types";
-import * as ipc from "~/lib/ipc";
+import { useEffect, useState } from "react";
+
+import { describeError, toIpcError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import * as ipc from "~/lib/ipc";
+import { createPoller } from "~/lib/polling";
+import type { AppError, BtPeerInfo } from "~/types";
+
 const POLL_INTERVAL_MS = 2000;
 
 /**
@@ -18,6 +20,7 @@ export default function PeersPanel({ infoHash }: { infoHash: string }) {
   useEffect(() => {
     const hash = infoHash;
     let cancelled = false;
+
     const poll = async () => {
       try {
         const result = await ipc.btTaskPeers(hash);
@@ -29,6 +32,7 @@ export default function PeersPanel({ infoHash }: { infoHash: string }) {
         if (!cancelled) setError(toIpcError(cause).payload);
       }
     };
+
     // 用微任务延后，使重置发生在 effect 函数体之外。
     queueMicrotask(() => {
       if (cancelled) return;

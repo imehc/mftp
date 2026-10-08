@@ -1,15 +1,15 @@
+import { Trans } from "@lingui/react/macro";
+import { useBlocker } from "@tanstack/react-router";
 import {
   createContext,
-  useContext,
-  useEffect,
-  useState,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
-import { useBlocker } from "@tanstack/react-router";
-import { Trans } from "@lingui/react/macro";
-import { Button } from "~/components/ui/button";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,10 +21,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
 
 const ProcessingContext = createContext<Dispatch<
   SetStateAction<Set<string>>
 > | null>(null);
+
 export function useMediaProcessing(id: string, processing: boolean) {
   const register = useContext(ProcessingContext);
   useEffect(() => {
@@ -38,6 +40,7 @@ export function useMediaProcessing(id: string, processing: boolean) {
       });
   }, [id, processing, register]);
 }
+
 export function MediaProcessingGuard({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<Set<string>>(() => new Set());
   // 已访问模式保持挂载；只有离开媒体工作区才会终止本页持有的处理任务。
@@ -78,6 +81,7 @@ export function MediaProcessingGuard({ children }: { children: ReactNode }) {
     </ProcessingContext>
   );
 }
+
 export function MediaCancelButton({ onConfirm }: { onConfirm: () => void }) {
   return (
     <AlertDialog>

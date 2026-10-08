@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import { Bot, Check } from "lucide-react";
-import { DropdownMenuItem } from "~/components/ui/dropdown-menu";
+import { useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
@@ -10,7 +10,9 @@ import {
   DialogLayoutContent,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
+import { DropdownMenuItem } from "~/components/ui/dropdown-menu";
 import { describeError } from "~/lib/errors";
+
 import { useAiConfiguration } from "./store";
 
 /** 窄屏用独立面板，避免嵌套菜单碰撞后只剩很窄的可用宽度。 */

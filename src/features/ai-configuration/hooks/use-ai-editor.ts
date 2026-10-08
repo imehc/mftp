@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useRef, useState } from "react";
+
+import type { AppError } from "~/bindings";
+import { toIpcError } from "~/lib/errors";
 import {
   aiKeySave,
   aiModelSave,
   aiProviderCreate,
   aiProviderUpdate,
 } from "~/lib/ipc";
-import { toIpcError } from "~/lib/errors";
-import type { AppError } from "~/bindings";
+
+import { findExistingItem } from "../find-existing-item";
 import { useAiConfiguration } from "../store";
 import type { AiEditorTarget } from "../types";
-import { findExistingItem } from "../find-existing-item";
 
 /** 草稿跨断点保留，密钥仅留在非受控输入中，不进入状态和公开快照。 */
 export function useAiEditor(target: AiEditorTarget, onSaved: () => void) {
@@ -157,6 +159,7 @@ export function useAiEditor(target: AiEditorTarget, onSaved: () => void) {
       onSaved();
     }
   }
+
   return {
     name,
     setName,

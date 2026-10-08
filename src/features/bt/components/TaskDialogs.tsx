@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
+
 import { CopyButton } from "~/components/CopyButton";
-import { Input } from "~/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
 import { describeError } from "~/lib/errors";
 
 interface TaskDialogsProps {

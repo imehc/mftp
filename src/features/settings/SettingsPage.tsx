@@ -1,13 +1,15 @@
+import { useLingui } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { useLingui } from "@lingui/react/macro";
-import { Button } from "~/components/ui/button";
-import { ToolPageHeader } from "~/components/ToolPageHeader";
-import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
-import AiConfigurationSettings from "~/features/ai-configuration/AiConfigurationSettings";
-import SettingsOverview from "./SettingsOverview";
-import BackupPage from "~/features/export/BackupPage";
+
 import type { PoetryTranslationMode } from "~/bindings";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
+import { Button } from "~/components/ui/button";
+import AiConfigurationSettings from "~/features/ai-configuration/AiConfigurationSettings";
+import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
+import BackupPage from "~/features/export/BackupPage";
+
+import SettingsOverview from "./SettingsOverview";
 
 export default function SettingsPage({
   returnContext,

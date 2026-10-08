@@ -1,8 +1,11 @@
 import { msg, plural } from "@lingui/core/macro";
+
 import { translate } from "~/i18n/translate";
+
 interface RelativeTimeOptions {
   justNowThresholdMs?: number;
 }
+
 export function formatRelativeTime(
   timestamp: number,
   { justNowThresholdMs = 0 }: RelativeTimeOptions = {},

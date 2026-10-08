@@ -1,4 +1,3 @@
-import { expect, it, vi } from "vitest";
 import {
   BoxGeometry,
   BufferGeometry,
@@ -10,6 +9,8 @@ import {
   MeshStandardMaterial,
   Vector3,
 } from "three";
+import { expect, it, vi } from "vitest";
+
 import { ModelCollection } from "../runtime/collection";
 import { sampleGeometry, sourcePoint } from "./geometry";
 import { analyzeTopology } from "./topology";
@@ -28,6 +29,7 @@ export function entryFor(mesh: Mesh) {
     dispose() {},
   });
 }
+
 it("在节点变换后测量源文件米制尺寸，并忽略显示位置和归一化", async () => {
   const mesh = new Mesh(new BoxGeometry(2, 4, 6));
   mesh.position.set(20, 30, 40);
@@ -49,6 +51,7 @@ it("在节点变换后测量源文件米制尺寸，并忽略显示位置和归�
     .applyMatrix4(entry.handle.scene.parent!.matrixWorld);
   expect(sourcePoint(entry, world).distanceTo(source)).toBeLessThan(1e-10);
 });
+
 it("采样每个实例的变换，并在反射下保留渲染方向", async () => {
   const mesh = new InstancedMesh(
     new BoxGeometry(2, 2, 2),
@@ -70,6 +73,7 @@ it("采样每个实例的变换，并在反射下保留渲染方向", async () =
       opposedNormals: 0,
     });
 });
+
 it("采样当前变形位置，不比较未变形法线", async () => {
   const geometry = new BufferGeometry();
   geometry.setAttribute(
@@ -93,6 +97,7 @@ it("采样当前变形位置，不比较未变形法线", async () => {
   expect(samples[0].positions[2]).toBe(1);
   expect(samples[0].normals).toBeNull();
 });
+
 it("拒绝过度的实例展开并遵循取消操作", async () => {
   const signal = new AbortController();
   signal.abort();

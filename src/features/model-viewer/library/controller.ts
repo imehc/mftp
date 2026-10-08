@@ -1,5 +1,5 @@
 import type { ModelLibraryCatalog, ModelLibraryEdit } from "~/bindings";
-import { toIpcError, type IpcError } from "~/lib/errors";
+import { type IpcError, toIpcError } from "~/lib/errors";
 import {
   modelLibraryCache,
   modelLibraryCatalog,
@@ -9,6 +9,7 @@ import {
   modelLibrarySaveView,
   modelLibraryThumbnail,
 } from "~/lib/ipc";
+
 import type { ViewerSession } from "../runtime/session";
 import { librarySource, saveModel } from "./storage";
 

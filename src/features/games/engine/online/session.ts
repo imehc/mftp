@@ -6,15 +6,16 @@
  * 的锁步 `move` 帧，以及对局控制帧（悔棋 / 重赛协商）—— 因此任何
  * 回合制游戏都能两者兼得，而无需改动 Rust。
  */
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { msg } from "@lingui/core/macro";
-import { translate } from "~/i18n/translate";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+
 import type {
   GameRoomClosedEvent,
-  GameRoomMessageEvent,
   GameRoomClosedReason,
+  GameRoomMessageEvent,
   GameRoomPeerEvent,
 } from "~/bindings";
+import { translate } from "~/i18n/translate";
 import {
   GAME_ROOM_CLOSED,
   GAME_ROOM_MESSAGE,
@@ -22,20 +23,22 @@ import {
 } from "~/lib/events";
 import { gameRoomSend } from "~/lib/ipc";
 import type { GameRoomStatus } from "~/types";
+
 import type { MatchTransport, RemoteMove } from "../transport";
 import type { SeatIndex } from "../types";
-
 import {
-  ONLINE_PROTOCOL_VERSION,
-  parseFrame,
   type AppFrame,
   type MatchControlMessage,
   type MoveParser,
+  ONLINE_PROTOCOL_VERSION,
+  parseFrame,
 } from "./protocol";
+
 export type { MatchControlMessage } from "./protocol";
 
 // 仅缓冲监听已接入、但对局消费者尚未挂载的短暂窗口。
 const MAX_PENDING_FRAMES = 128;
+
 type SessionEvent =
   | { kind: "message"; event: GameRoomMessageEvent }
   | { kind: "peer"; event: GameRoomPeerEvent }
@@ -107,19 +110,23 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
     const session = new OnlineMatchSession(parseMove);
     const stop = () => session.close();
     signal?.addEventListener("abort", stop, { once: true });
+
     let rejectStopped = () => {};
+
     const aborted = new Promise<never>((_, reject) => {
       rejectStopped = () => reject(registrationAborted());
       session.stopped.signal.addEventListener("abort", rejectStopped, {
         once: true,
       });
     });
+
     // 每个注册独立接收解除函数：Promise.all 先失败后，晚到的成功
     // 也必须立即清理，不能等一个已被丢弃的结果数组。
     const retain = (unlisten: UnlistenFn) => {
       if (session.isClosed) disposeListener(unlisten);
       else session.unlisteners.push(unlisten);
     };
+
     const registrations = Promise.all([
       Promise.resolve()
         .then(() =>

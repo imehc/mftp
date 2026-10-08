@@ -1,19 +1,21 @@
-import { Terminal as XTerm } from "@xterm/xterm";
-import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
-import { listen } from "@tauri-apps/api/event";
+
 import { msg } from "@lingui/core/macro";
+import { listen } from "@tauri-apps/api/event";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal as XTerm } from "@xterm/xterm";
 import { toast } from "sonner";
+
 import { translate } from "~/i18n/translate";
-import { useSessionsStore } from "~/store/sessions";
-import * as ipc from "~/lib/ipc";
-import { sshClosedEvent, sshDataEvent } from "~/lib/events";
 import { describeError, frontendError, toIpcError } from "~/lib/errors";
 import {
   createSubscription,
   disposeSubscriptions,
   type Subscription,
 } from "~/lib/event-subscription";
+import { sshClosedEvent, sshDataEvent } from "~/lib/events";
+import * as ipc from "~/lib/ipc";
+import { useSessionsStore } from "~/store/sessions";
 
 /**
  * SSH 终端运行期。
@@ -47,11 +49,13 @@ interface TerminalEntry {
 
 // 编解码辅助函数，用于 shell 通道的 base64 传输。
 const enc = new TextEncoder();
+
 function bytesToBase64(bytes: Uint8Array): string {
   let bin = "";
   for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
   return btoa(bin);
 }
+
 function base64ToBytes(b64: string): Uint8Array {
   const bin = atob(b64);
   const out = new Uint8Array(bin.length);
@@ -125,6 +129,7 @@ function handleResize(entry: TerminalEntry, sessionId: string): void {
 function openShell(sessionId: string, entry: TerminalEntry): void {
   let shellOpenConfirmed = false;
   let subscriptionError: unknown = null;
+
   const onSubscriptionError = (cause: unknown) => {
     subscriptionError ??= cause;
   };

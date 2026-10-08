@@ -1,12 +1,13 @@
 import { listen } from "@tauri-apps/api/event";
-import type { TransferProgress } from "~/types";
+
+import { toIpcError } from "~/lib/errors";
 import {
   createSubscription,
   type Subscription,
 } from "~/lib/event-subscription";
-import { toIpcError } from "~/lib/errors";
 import { TRANSFER_PROGRESS } from "~/lib/events";
 import { useTransfersStore } from "~/store/transfers";
+import type { TransferProgress } from "~/types";
 
 const FLUSH_MS = 100;
 const RECONNECT_BASE_MS = 1000;

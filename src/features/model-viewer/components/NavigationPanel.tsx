@@ -1,15 +1,17 @@
-import { useState, useSyncExternalStore } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useState, useSyncExternalStore } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+
+import type { InteractionMode } from "../inspection/tools";
 import type { ModelViewerRuntime } from "../runtime/viewer";
 import {
   InspectionChoice,
   InspectionRange,
   InspectionToggle,
 } from "./InspectionFields";
-import type { InteractionMode } from "../inspection/tools";
 
 export function NavigationPanel({
   runtime,

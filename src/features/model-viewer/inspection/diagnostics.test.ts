@@ -1,7 +1,8 @@
-import { afterEach, expect, it, vi } from "vitest";
 import { BoxGeometry, Group, Mesh } from "three";
-import { ModelDiagnostics } from "./diagnostics";
+import { afterEach, expect, it, vi } from "vitest";
+
 import { ModelCollection } from "../runtime/collection";
+import { ModelDiagnostics } from "./diagnostics";
 
 class TestWorker {
   static instances: TestWorker[] = [];
@@ -13,10 +14,12 @@ class TestWorker {
     TestWorker.instances.push(this);
   }
 }
+
 afterEach(() => {
   vi.unstubAllGlobals();
   TestWorker.instances = [];
 });
+
 function entry() {
   const scene = new Group();
   scene.add(new Mesh(new BoxGeometry(2, 3, 4)));
@@ -31,6 +34,7 @@ function entry() {
     dispose() {},
   });
 }
+
 it("终止已取消的工作线程，并忽略另一请求之后的过期报告", async () => {
   vi.stubGlobal("Worker", TestWorker);
   const diagnostics = new ModelDiagnostics();
@@ -48,6 +52,7 @@ it("终止已取消的工作线程，并忽略另一请求之后的过期报告"
   expect(second.terminate).toHaveBeenCalledOnce();
   diagnostics.dispose();
 });
+
 it("在工作线程启动前取消几何采样，并丢弃依赖姿态的报告", async () => {
   vi.stubGlobal("Worker", TestWorker);
   const diagnostics = new ModelDiagnostics();

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { useLingui } from "@lingui/react/macro";
+import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { describeError, toIpcError } from "~/lib/errors";
+
 import type { AppError } from "~/bindings";
+import { describeError, toIpcError } from "~/lib/errors";
 
 /** 只由桌面入口挂载，读取失败不能伪装成开关已关闭。 */
 export function useAutostart() {
@@ -43,6 +44,7 @@ export function useAutostart() {
       setBusy(false);
     }
   }
+
   return {
     enabled,
     busy,

@@ -1,6 +1,8 @@
-import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useLingui } from "@lingui/react/macro";
+import { useCanGoBack, useRouter } from "@tanstack/react-router";
+
 import type { PreviewKind } from "~/lib/preview-kind";
+
 import PreviewScreen from "./PreviewScreen";
 
 export default function FilePreviewPage({

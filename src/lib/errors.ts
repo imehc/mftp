@@ -1,12 +1,13 @@
 import type { AppError, CustomErrorCode } from "~/bindings";
 import { translate } from "~/i18n/translate";
+
 import {
   appDataSectionNames,
   customErrorMessages,
   dataBusyParticipantNames,
+  type FrontendErrorCode,
   frontendErrorMessages,
   unknownErrorMessage,
-  type FrontendErrorCode,
 } from "./errors/messages";
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -1,5 +1,8 @@
+import { useLingui as useLinguiRuntime } from "@lingui/react";
+import { useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { cn } from "cn";
 import {
   ExternalLink,
   Languages,
@@ -13,8 +16,7 @@ import {
   Type,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useLingui } from "@lingui/react/macro";
-import { useLingui as useLinguiRuntime } from "@lingui/react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -28,21 +30,20 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { isDesktopPlatform } from "~/lib/platform";
-import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
+import AiModelMenu from "~/features/ai-configuration/AiModelMenu";
+import { localeLabels, localeOptions } from "~/i18n/locales";
 import {
+  type ColorTheme,
   colorThemes,
+  type FontPreset,
   fontPresets,
   resolveColorTheme,
   resolveFontPreset,
-  type ColorTheme,
-  type FontPreset,
 } from "~/lib/color-theme";
-import { localeLabels, localeOptions } from "~/i18n/locales";
+import { isDesktopPlatform } from "~/lib/platform";
+import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
 import { type AppLocale, useSettingsStore } from "~/store/settings";
 import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
-import { cn } from "cn";
-import AiModelMenu from "~/features/ai-configuration/AiModelMenu";
 
 const themes = [
   { value: "system", icon: Monitor },

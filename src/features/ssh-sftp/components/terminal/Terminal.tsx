@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircle, TriangleAlert } from "lucide-react";
-import type { Session } from "~/types";
-import { describeError } from "~/lib/errors";
-import { acquireTerminal } from "~/features/ssh-sftp/runtime/terminalRuntime";
+import { useEffect, useRef, useState } from "react";
+
 import {
   Empty,
   EmptyDescription,
@@ -11,6 +9,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
+import { acquireTerminal } from "~/features/ssh-sftp/runtime/terminalRuntime";
+import { describeError } from "~/lib/errors";
+import type { Session } from "~/types";
 
 interface Props {
   session: Session;

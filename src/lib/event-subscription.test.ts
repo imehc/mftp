@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+
 import {
   createSubscription,
   disposeSubscriptions,
@@ -78,11 +79,13 @@ test("释放函数同步抛错或返回被拒绝的 Promise 都不冒泡", async
   });
   await subscription.ready;
   subscription.dispose();
+
   // Tauri 的解除函数声明为返回 void，运行时却可能返回 Promise（见
   // event-subscription 的说明），这里显式模拟这种被拒绝的异步解除。
   const rejectingDisposer = async () => {
     throw new Error("async release failed");
   };
+
   const asyncFailing = createSubscription(
     async () => rejectingDisposer as unknown as () => void,
   );

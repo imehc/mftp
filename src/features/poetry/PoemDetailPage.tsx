@@ -1,14 +1,16 @@
-import { Link } from "@tanstack/react-router";
-import ReadingSettingsPopover from "./components/ReadingSettingsPopover";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+
+import type { PoetryTranslationMode } from "~/bindings";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import type { PoetryTranslationMode } from "~/bindings";
+
 import PoemDetail from "./components/PoemDetail";
-import { usePoetryStore } from "./store/poetry-store";
-import { usePoemRead } from "./hooks/use-poem-read";
 import PoetryReadError from "./components/PoetryReadError";
+import ReadingSettingsPopover from "./components/ReadingSettingsPopover";
+import { usePoemRead } from "./hooks/use-poem-read";
+import { usePoetryStore } from "./store/poetry-store";
 
 /**
  * 直接访问 `/library/$id` 时的整页详情。桌面端的常规

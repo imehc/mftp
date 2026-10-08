@@ -1,24 +1,26 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+
 import {
   AlertDialog,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
-import { Field, FieldLabel, FieldError } from "~/components/ui/field";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "~/components/ui/select";
 import { describeError } from "~/lib/errors";
+
 import { useAiDelete } from "./hooks/use-ai-delete";
 import type { AiDeleteTarget } from "./types";
 

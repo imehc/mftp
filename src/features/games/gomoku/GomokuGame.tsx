@@ -1,26 +1,31 @@
 /** 五子棋界面外壳：顶部操作与模式切换。 */
-import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
+import { useState } from "react";
+
 import { BoardGameHeader } from "../engine/BoardGameHeader";
 import { unlockGomokuAudio } from "./audio";
 import { GomokuMatch } from "./GomokuMatch";
 import { GomokuModeMenu } from "./GomokuModeMenu";
 import { GomokuOnlineFlow } from "./GomokuOnline";
 import type { GomokuMode } from "./types";
+
 export default function GomokuGame() {
   const [mode, setMode] = useState<GomokuMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
   const [onlinePlaying, setOnlinePlaying] = useState(false);
   const [matchFinished, setMatchFinished] = useState(false);
+
   const exitMatch = () => {
     setOnlinePlaying(false);
     setMatchFinished(false);
     setMode(null);
   };
+
   const restartMatch = () => {
     setMatchFinished(false);
     setMatchKey((key) => key + 1);
   };
+
   return (
     <main
       data-bottom-inset="scroll"

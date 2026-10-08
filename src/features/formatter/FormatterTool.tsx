@@ -1,12 +1,13 @@
+import { search } from "@codemirror/search";
+import { Prec } from "@codemirror/state";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import CodeMirror, {
   EditorView,
   type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
 import { useRef } from "react";
-import { search } from "@codemirror/search";
-import { Prec } from "@codemirror/state";
 import { toast } from "sonner";
+
 import AppPageLayout from "~/components/AppPageLayout";
 import { CopyButton } from "~/components/CopyButton";
 import {
@@ -18,8 +19,9 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { describeError } from "~/lib/errors";
-import { formatterLanguages } from "./languages";
+
 import { FormatterActions } from "./FormatterActions";
+import { formatterLanguages } from "./languages";
 import { useFormatter } from "./use-formatter";
 
 // 编辑器文字随根级显示比例变化；内容保留自身滚动与光标定位，不做 transform 缩放。

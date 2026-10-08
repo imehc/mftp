@@ -1,6 +1,7 @@
-import { useId } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Settings2 } from "lucide-react";
+import { useId } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import {

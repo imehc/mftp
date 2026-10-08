@@ -1,10 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { Activity, ChevronRight } from "lucide-react";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { useTransfersStore } from "~/store/transfers";
 import { describeError } from "~/lib/errors";
+import { useTransfersStore } from "~/store/transfers";
 
 /** 首页只读运行期摘要，任务动作和完整记录由活动面板/日志承接。 */
 export default function HomeRecentActivity() {

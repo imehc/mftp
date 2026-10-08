@@ -1,16 +1,17 @@
-import { useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FolderInput, Trash2 } from "lucide-react";
-import { pickFilePathNative } from "~/lib/files";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+
+import type { PoetryTranslationPackSummary } from "~/bindings";
 import { Button } from "~/components/ui/button";
+import { describeError } from "~/lib/errors";
+import { pickFilePathNative } from "~/lib/files";
 import {
   poetryTranslationPackDelete,
   poetryTranslationPackImport,
   poetryTranslationPacks,
 } from "~/lib/ipc";
-import type { PoetryTranslationPackSummary } from "~/bindings";
-import { describeError } from "~/lib/errors";
 
 export default function TranslationPackManager({
   packs,

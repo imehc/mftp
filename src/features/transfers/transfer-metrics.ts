@@ -1,10 +1,13 @@
 import { msg, plural } from "@lingui/core/macro";
+
 import { translate } from "~/i18n/translate";
 import { formatBytes } from "~/lib/format";
 import type { TransferState } from "~/store/transfers";
+
 function formatSpeed(bytesPerSecond: number): string {
   return `${formatBytes(bytesPerSecond)}/s`;
 }
+
 function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "--";
   const rounded = Math.ceil(seconds);
@@ -86,6 +89,7 @@ function formatDuration(seconds: number): string {
     }),
   );
 }
+
 export function transferMetrics(progress: TransferState) {
   const total = progress.total ?? 0;
   const percent =

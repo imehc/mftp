@@ -1,3 +1,4 @@
+import { openUrl } from "@tauri-apps/plugin-opener";
 import {
   startTransition,
   useEffect,
@@ -5,15 +6,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import { toast } from "sonner";
+
 import { scheduleIdleTask } from "~/features/lan-transfer/lanTransferData";
+import { describeError, toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { createPoller } from "~/lib/polling";
 import type { AppError, LanDiscoveredDevice } from "~/types";
-import { describeError, toIpcError } from "~/lib/errors";
+
 const OFFLINE_AFTER_MS = 30_000;
 const REMOVE_AFTER_MS = 5 * 60_000;
+
 function mergeDevices(
   current: LanDiscoveredDevice[],
   next: LanDiscoveredDevice[],
@@ -39,11 +42,13 @@ function mergeDevices(
       );
     });
 }
+
 export function useLanDiscovery(active: boolean) {
   const [devices, setDevices] = useState<LanDiscoveredDevice[]>([]);
   const request = useRef({ generation: 0, pending: false });
   const [discoveryError, setDiscoveryError] = useState<AppError | null>(null);
   const [discovering, setDiscovering] = useState(false);
+
   const refreshDiscovery = async () => {
     if (request.current.pending || !active) return;
     request.current.pending = true;
@@ -64,6 +69,7 @@ export function useLanDiscovery(active: boolean) {
       if (generation === request.current.generation) setDiscovering(false);
     }
   };
+
   // 用最新的 refreshDiscovery 闭包轮询，且不在每次渲染时重置定时器；
   // refreshDiscovery 也作为手动刷新返回。
   const refreshDiscoveryInEffect = useEffectEvent(refreshDiscovery);
@@ -90,6 +96,7 @@ export function useLanDiscovery(active: boolean) {
       poller.stop();
     };
   }, [active]);
+
   const openDiscoveredDevice = async (device: LanDiscoveredDevice) => {
     try {
       await openUrl(device.url);
@@ -97,6 +104,7 @@ export function useLanDiscovery(active: boolean) {
       toast.error(describeError(error));
     }
   };
+
   return {
     discoveryError,
     discoveredDevices: devices,

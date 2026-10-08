@@ -1,10 +1,12 @@
-import { useEffect, useId, useRef } from "react";
-import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
-import { Check, ChevronDown, ChevronRight } from "lucide-react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import { cn } from "cn";
+import { Check, ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect, useId, useRef } from "react";
+
 import { Button } from "~/components/ui/button";
-import { visibleSceneNodes, type ModelInspection } from "../domain/inspection";
+
+import { type ModelInspection, visibleSceneNodes } from "../domain/inspection";
 
 export function SceneTree({
   inspection,
@@ -59,11 +61,13 @@ export function SceneTree({
     onExpanded(next);
     onSelected(id);
   }
+
   function focus(index: number) {
     const target = Math.max(0, Math.min(rows.length - 1, index));
     onSelected(rows[target].node.id);
     virtualizer.scrollToIndex(target, { align: "auto" });
   }
+
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <p id={`${treeId}-help`} className="text-muted-foreground text-xs">

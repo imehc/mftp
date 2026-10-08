@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Monitor, QrCode } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { useState } from "react";
 import { toast } from "sonner";
+
 import { CopyButton } from "~/components/CopyButton";
-import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import { describeError } from "~/lib/errors";

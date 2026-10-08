@@ -1,13 +1,14 @@
 import {
+  type BufferAttribute,
   BufferGeometry,
+  type InterleavedBufferAttribute,
   Material,
+  type Object3D,
+  type Skeleton,
   Texture,
   TextureUtils,
-  type Object3D,
-  type BufferAttribute,
-  type InterleavedBufferAttribute,
-  type Skeleton,
 } from "three";
+
 import type { ModelHandle } from "../domain/types";
 
 export type Allocation = {
@@ -15,6 +16,7 @@ export type Allocation = {
   bytes: number;
   category: "geometry" | "texture" | "animation" | "skeleton" | "shared";
 };
+
 export type MemoryInventory = {
   sources: Map<Blob, number>;
   cpu: Map<object, Allocation>;
@@ -32,6 +34,7 @@ export type MemoryInventory = {
   animations: number;
   unknown: number;
 };
+
 export type MemoryTotals = {
   source: number;
   cpu: number;
@@ -95,6 +98,7 @@ export function memoryInventory(model: ModelHandle): MemoryInventory {
   const textures = new Set<Texture>(),
     skeletons = new Set<Skeleton>();
   let unknown = 0;
+
   const array = (value: unknown, category: Allocation["category"]) => {
     if (ArrayBuffer.isView(value))
       cpu.set(value.buffer, {
@@ -106,6 +110,7 @@ export function memoryInventory(model: ModelHandle): MemoryInventory {
             : category,
       });
   };
+
   const attribute = (
     attr: BufferAttribute | InterleavedBufferAttribute,
     upload = true,
@@ -119,6 +124,7 @@ export function memoryInventory(model: ModelHandle): MemoryInventory {
         category: "geometry",
       });
   };
+
   for (const root of model.resourceScenes ?? [model.scene])
     root.traverse((node: Object3D) => {
       const mesh = node as Object3D & {

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useLingui } from "@lingui/react/macro";
-import type { ModelViewerRuntime } from "../runtime/viewer";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+
 import type { ViewAxis } from "../runtime/orientation";
+import type { ModelViewerRuntime } from "../runtime/viewer";
 
 export function ViewGizmo({ runtime }: { runtime: ModelViewerRuntime }) {
   const { t } = useLingui();

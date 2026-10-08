@@ -1,11 +1,13 @@
 import { Trans } from "@lingui/react/macro";
 import { Circle } from "lucide-react";
+
 import type { SeatIndex } from "../engine/types";
 import type {
   XiangqiHistoryPayload,
   XiangqiMode,
   XiangqiResultReason,
 } from "./types";
+
 export function sideName(
   mode: XiangqiMode,
   side: SeatIndex,
@@ -47,6 +49,7 @@ export function sideName(
     </span>
   );
 }
+
 export function resultReasonLabel(reason: XiangqiResultReason) {
   if (reason === "general-captured") return <Trans>将帅被吃</Trans>;
   if (reason === "checkmate") return <Trans>将死</Trans>;
@@ -55,6 +58,7 @@ export function resultReasonLabel(reason: XiangqiResultReason) {
   if (reason === "no-capture") return <Trans>连续六十回合未吃子</Trans>;
   return null;
 }
+
 export function matchResultLabel(
   mode: XiangqiMode,
   winnerSeat: SeatIndex | null,
@@ -80,6 +84,7 @@ export function matchResultLabel(
   const sideNameValue = sideName(mode, winnerSeat, online);
   return <Trans>{sideNameValue} 获胜</Trans>;
 }
+
 export function historyModeLabel(payload: XiangqiHistoryPayload) {
   if (payload.mode === "hotseat") return <Trans>双人</Trans>;
   if (payload.mode === "online") return <Trans>联机</Trans>;
@@ -97,6 +102,7 @@ export function historyModeLabel(payload: XiangqiHistoryPayload) {
     </span>
   );
 }
+
 export function historyResult(payload: XiangqiHistoryPayload) {
   if (payload.winnerSeat === null) {
     return <Trans>和棋</Trans>;
@@ -117,6 +123,7 @@ export function historyResult(payload: XiangqiHistoryPayload) {
   }
   return payload.winnerSeat === 0 ? <Trans>红胜</Trans> : <Trans>黑胜</Trans>;
 }
+
 export function formatHistoryTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
     month: "2-digit",

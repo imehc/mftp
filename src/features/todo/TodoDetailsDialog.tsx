@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogClose, DialogTitle } from "~/components/ui/dialog";
@@ -9,6 +10,7 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 import type { TodoItem } from "~/types";
+
 import TodoTimestamps from "./TodoTimestamps";
 
 export default function TodoDetailsDialog({

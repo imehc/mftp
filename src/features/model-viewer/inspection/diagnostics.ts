@@ -1,7 +1,8 @@
 import type { IpcError } from "~/lib/errors";
 import { toIpcError } from "~/lib/errors";
-import type { ModelEntry } from "../runtime/collection";
+
 import { modelError } from "../domain/errors";
+import type { ModelEntry } from "../runtime/collection";
 import { sampleGeometry } from "./geometry";
 import type {
   AnalysisRequest,
@@ -16,6 +17,7 @@ type DiagnosticState = {
   dimensions: number[] | null;
   error: IpcError | null;
 };
+
 export class ModelDiagnostics {
   private state: DiagnosticState = {
     busy: null,

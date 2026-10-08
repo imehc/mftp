@@ -1,3 +1,4 @@
+import { hasCustomCode } from "~/lib/errors";
 import {
   modelViewerAttach,
   modelViewerClose,
@@ -5,8 +6,8 @@ import {
   modelViewerRead,
   modelViewerSize,
 } from "~/lib/ipc";
-import { hasCustomCode } from "~/lib/errors";
-import { modelError, MissingResources } from "../domain/errors";
+
+import { MissingResources, modelError } from "../domain/errors";
 import type { ModelSource } from "../domain/types";
 import { MAX_IMPORT_BYTES } from "./browser";
 
@@ -31,6 +32,7 @@ export async function nativeSource(
     await modelViewerClose(session.id);
     throw error;
   }
+
   const sizeOf = async (key: string) => {
     try {
       return await modelViewerSize(session.id, key);
@@ -39,6 +41,7 @@ export async function nativeSource(
       throw error;
     }
   };
+
   return {
     name: session.name,
     size: session.size,

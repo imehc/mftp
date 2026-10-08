@@ -1,9 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Plus, Search } from "lucide-react";
-import { Input } from "~/components/ui/input";
+
 import AppPageLayout from "~/components/AppPageLayout";
-import { Alert, AlertTitle, AlertDescription } from "~/components/ui/alert";
-import { useTodo } from "./hooks/use-todo";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +21,7 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "~/components/ui/empty";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -31,11 +31,13 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import TodoItemDialog from "./TodoItemDialog";
-import TodoList from "./TodoList";
-import { ALL_TODO_CATEGORIES, type TodoView } from "./todo-utils";
 import { describeError } from "~/lib/errors";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
+import { useTodo } from "./hooks/use-todo";
+import { ALL_TODO_CATEGORIES, type TodoView } from "./todo-utils";
+import TodoItemDialog from "./TodoItemDialog";
+import TodoList from "./TodoList";
 
 export default function TodoTool() {
   const { t } = useLingui();

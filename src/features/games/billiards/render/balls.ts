@@ -15,6 +15,7 @@ import {
   Sprite,
   Texture,
 } from "pixi.js";
+
 import { BALL_HEX } from "../colors";
 import { BALL_RADIUS } from "../constants";
 import type { BallState } from "../types";

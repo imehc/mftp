@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
 import { useDebouncedQuery } from "./use-poetry-search";
 
 function initialMarkup(initialInput?: string) {
@@ -11,6 +12,7 @@ function initialMarkup(initialInput?: string) {
       "data-query": query,
     });
   }
+
   // 服务端渲染不执行 effect，直接验证首帧，不能依赖防抖或 URL 镜像补救。
   return renderToStaticMarkup(createElement(Probe));
 }

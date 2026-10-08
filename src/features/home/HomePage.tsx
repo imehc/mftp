@@ -1,17 +1,19 @@
-import { useEffect, useEffectEvent, useRef } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
+import { useEffect, useEffectEvent, useRef } from "react";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
+import ActivityMenu from "~/features/transfers/ActivityMenu";
+import { toolRouteOf } from "~/lib/module-metadata";
+import { useSettingsStore } from "~/store/settings";
+
 import {
   availableHomeEntries,
-  homeCategoryLabels,
   type HomeCategory,
+  homeCategoryLabels,
 } from "./entries";
 import { homeDescriptions } from "./home-descriptions";
-import { toolRouteOf } from "~/lib/module-metadata";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
-import { useSettingsStore } from "~/store/settings";
 import HomeRecentActivity from "./HomeRecentActivity";
 
 export default function HomePage({ category }: { category?: HomeCategory }) {
@@ -39,6 +41,7 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
         toggleGames();
       }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);

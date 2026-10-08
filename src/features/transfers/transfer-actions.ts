@@ -1,5 +1,6 @@
 import * as ipc from "~/lib/ipc";
 import { type TransferState, useTransfersStore } from "~/store/transfers";
+
 import { runTransferRetry } from "./retry";
 
 /** 两种面板共享任务动作；订阅与资源生命周期仍由应用运行期持有。 */
@@ -13,6 +14,7 @@ export function createTransferActions() {
     setControlError,
     setRetrying,
   } = useTransfersStore.getState();
+
   const cancelTransfer = async (transfer: TransferState) => {
     const current = useTransfersStore
       .getState()
@@ -40,6 +42,7 @@ export function createTransferActions() {
       setControlError(id, error);
     }
   };
+
   const togglePause = async (transfer: TransferState) => {
     const current = useTransfersStore
       .getState()
@@ -74,6 +77,7 @@ export function createTransferActions() {
       setControlPending(id, false);
     }
   };
+
   const retryTransfer = async (transfer: TransferState) => {
     const current = useTransfersStore
       .getState()
@@ -90,5 +94,6 @@ export function createTransferActions() {
       setRetrying(transfer.id, false);
     }
   };
+
   return { cancelTransfer, togglePause, retryTransfer };
 }

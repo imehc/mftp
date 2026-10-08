@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
-import { toast } from "sonner";
-import { format } from "date-fns";
 import { readTextFile } from "@tauri-apps/plugin-fs";
-import { dataExport, dataImport, dataInspect } from "~/lib/ipc";
-import { baseName, downloadBlob, pickFilePathNative } from "~/lib/files";
-import { isDesktopPlatform } from "~/lib/platform";
+import { format } from "date-fns";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+
 import { toIpcError } from "~/lib/errors";
+import { baseName, downloadBlob, pickFilePathNative } from "~/lib/files";
+import { dataExport, dataImport, dataInspect } from "~/lib/ipc";
+import { isDesktopPlatform } from "~/lib/platform";
 import { useHostsStore } from "~/store/hosts";
 import type {
   AppError,
@@ -15,6 +16,7 @@ import type {
   ImportPreview,
   ImportReport,
 } from "~/types";
+
 import { exportSections } from "./sections";
 
 interface PickedBackup {
@@ -22,6 +24,7 @@ interface PickedBackup {
   raw: string;
   preview: ImportPreview;
 }
+
 export function useBackup() {
   const { t } = useLingui();
   const available = exportSections.filter(
@@ -51,6 +54,7 @@ export function useBackup() {
       mounted.current = false;
     };
   }, []);
+
   function changeTab(next: string) {
     if (working.current || next === tab) return;
     // 标签切换保留数据选择，只清除无需跨表单保留的明文密码。
@@ -62,6 +66,7 @@ export function useBackup() {
     setImportPassword("");
     setError(null);
   }
+
   function toggle(id: ExportSection) {
     setSelected((previous) => {
       const next = new Set(previous);
@@ -70,8 +75,10 @@ export function useBackup() {
       return next;
     });
   }
+
   const passwordInvalid =
     encrypted && (!password || password !== confirmPassword);
+
   async function exportBackup() {
     if (working.current || !selected.size || passwordInvalid) return;
     working.current = true;
@@ -99,6 +106,7 @@ export function useBackup() {
       if (mounted.current) setBusy(false);
     }
   }
+
   async function pick() {
     if (working.current) return;
     const generation = ++pickGeneration.current;
@@ -128,6 +136,7 @@ export function useBackup() {
       if (alive()) setPicking(false);
     }
   }
+
   async function importBackup() {
     if (
       working.current ||
@@ -159,10 +168,12 @@ export function useBackup() {
       if (mounted.current) setBusy(false);
     }
   }
+
   function submitImport() {
     if (mode === "overwrite") setConfirmOverwrite(true);
     else void importBackup();
   }
+
   return {
     available,
     tab,
@@ -193,4 +204,5 @@ export function useBackup() {
     submitImport,
   };
 }
+
 export type BackupController = ReturnType<typeof useBackup>;

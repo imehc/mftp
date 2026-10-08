@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import BtTool from "~/features/bt/BtTool";
 import { btAvailableGuard } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";

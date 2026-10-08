@@ -1,5 +1,6 @@
-import { useId, useState } from "react";
 import { Trans } from "@lingui/react/macro";
+import { useId, useState } from "react";
+
 import type { ModelLibraryEntry } from "~/bindings";
 import { Button } from "~/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Switch } from "~/components/ui/switch";
+
 import type { ModelLibraryController } from "../library/controller";
 
 export function LibraryEntryEditor({

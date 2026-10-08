@@ -3,22 +3,26 @@
  * 以及模式切换。击球是桌面上的弹弓手势（在母球后方拖动以瞄准并蓄力，
  * 松手击出）——底栏只放旋转切换与实时力度读数。
  */
-import { useEffect, useState } from "react";
+import "./billiards.css";
+
 import { Trans } from "@lingui/react/macro";
-import { useBilliardsOrientation } from "./use-billiards-orientation";
-import type { AppError } from "~/types";
+import { useEffect, useState } from "react";
+
+import { Button } from "~/components/ui/button";
+import { describeError, toIpcError } from "~/lib/errors";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useMediaQuery } from "~/lib/use-media-query";
-import { describeError, toIpcError } from "~/lib/errors";
-import { Button } from "~/components/ui/button";
-import { BilliardsHeader } from "./BilliardsHeader";
-import "./billiards.css";
 import { useSettingsStore } from "~/store/settings";
+import type { AppError } from "~/types";
+
+import { BilliardsHeader } from "./BilliardsHeader";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
 import { ensurePhysicsReady } from "./physics";
 import { setGameAudioVolume, unlockAudio } from "./render/audio";
 import type { BilliardsMode } from "./types";
+import { useBilliardsOrientation } from "./use-billiards-orientation";
+
 export default function BilliardsGame() {
   const mobile = !useDesktopLayout();
   const landscape = useMediaQuery("(orientation: landscape)") && mobile;
@@ -29,10 +33,12 @@ export default function BilliardsGame() {
   const [matchKey, setMatchKey] = useState(0);
   const [matchFinished, setMatchFinished] = useState(false);
   const gamesVolume = useSettingsStore((s) => s.gamesVolume);
+
   const exitMatch = () => {
     setMatchFinished(false);
     setMode(null);
   };
+
   const restartMatch = () => {
     setMatchFinished(false);
     setMatchKey((key) => key + 1);

@@ -6,6 +6,7 @@
  * 观察它，从而把逐帧渲染（Pixi）隔离在 React 更新周期之外。
  */
 import { useSyncExternalStore } from "react";
+
 import type {
   GameDefinition,
   MatchPhase,

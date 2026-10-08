@@ -1,9 +1,11 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
-import type { AppError, Session, SftpEntry } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { useHostsStore } from "~/store/hosts";
+
 import type { LoadingAction } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { toIpcError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import { useHostsStore } from "~/store/hosts";
+import type { AppError, Session, SftpEntry } from "~/types";
+
 export function useSftpNavigation(session: Session) {
   const sessionId = session.id;
   const [cwd, setCwd] = useState<string | null>(null);
@@ -15,6 +17,7 @@ export function useSftpNavigation(session: Session) {
   );
   // 目录读取的代数：慢请求晚到时不能覆盖用户刚刚选择的新目录。
   const generation = useRef(0);
+
   const load = async (path: string, action: LoadingAction = "list") => {
     const current = ++generation.current;
     setLoadError(null);
@@ -34,6 +37,7 @@ export function useSftpNavigation(session: Session) {
       }
     }
   };
+
   useEffect(
     () => () => {
       // 卸载后晚到的读取结果不再写回页面状态。
@@ -68,6 +72,7 @@ export function useSftpNavigation(session: Session) {
       cancelled = true;
     };
   }, [sessionId, session.hostId]);
+
   async function goHome() {
     // 主目录解析也属于导航请求，不能覆盖后发目录或卸载后的状态。
     const current = ++generation.current;
@@ -85,6 +90,7 @@ export function useSftpNavigation(session: Session) {
       setLoadingAction(null);
     }
   }
+
   return {
     cwd,
     entries,

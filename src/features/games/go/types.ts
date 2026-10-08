@@ -6,7 +6,9 @@ import type { SeatIndex } from "../engine/types";
 export const GO_GAME_ID = "go";
 
 export const BOARD_SIZES = [9, 13, 19] as const;
+
 export type BoardSize = (typeof BOARD_SIZES)[number];
+
 export const DEFAULT_BOARD_SIZE: BoardSize = 19;
 
 /** 中国规则的贴目。直接比较目数时，白方总共多得 7.5 目。 */

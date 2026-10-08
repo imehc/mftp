@@ -1,5 +1,6 @@
-import { expect, it, vi } from "vitest";
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Texture } from "three";
+import { expect, it, vi } from "vitest";
+
 import { ModelResources } from "./resources";
 
 it("只释放一次共享几何体、材质和纹理，包括延迟结果", () => {
@@ -50,6 +51,7 @@ it("共享 ImageBitmap 的不同纹理对象仅在最后一个持有者结束后
   class Bitmap {
     close = vi.fn();
   }
+
   vi.stubGlobal("ImageBitmap", Bitmap);
   try {
     const bitmap = new Bitmap();

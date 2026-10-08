@@ -1,11 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { LogResult } from "./LogResult";
+
 import type { ActivityLog } from "~/types";
-import type { ActivityLogsController } from "./use-activity-logs";
+
 import { logDetail } from "./log-utils";
+import { LogResult } from "./LogResult";
+import type { ActivityLogsController } from "./use-activity-logs";
 
 export const LOG_COLUMNS =
   "grid-cols-[9rem_5rem_minmax(5rem,1fr)_minmax(6rem,1.2fr)_4.5rem_minmax(6rem,1.5fr)]";
+
 export function LogTableHead() {
   return (
     <div
@@ -33,6 +36,7 @@ export function LogTableHead() {
     </div>
   );
 }
+
 export default function LogRowDesktop({
   log,
   controller: c,

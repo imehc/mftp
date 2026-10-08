@@ -1,16 +1,18 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MoreHorizontal, RefreshCw } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { useAiConfiguration } from "./store";
+
 import AiModelMenu from "./AiModelMenu";
+import { useAiConfiguration } from "./store";
 
 /** 工作区次要操作与全局模型菜单共用公开快照，不读取密钥。 */
 export default function AiWorkspaceMenu() {

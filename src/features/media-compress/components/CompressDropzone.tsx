@@ -1,12 +1,14 @@
+import { Trans } from "@lingui/react/macro";
+import { cn } from "cn";
+import { Upload } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 import { useState } from "react";
-import { Trans } from "@lingui/react/macro";
-import { Upload } from "lucide-react";
 import { toast } from "sonner";
+
 import { Button } from "~/components/ui/button";
-import { pickFileNative, type NativeFilePickOptions } from "~/lib/files";
-import { cn } from "cn";
 import { describeError } from "~/lib/errors";
+import { type NativeFilePickOptions, pickFileNative } from "~/lib/files";
+
 interface CompressDropzoneProps {
   inputRef: RefObject<HTMLInputElement | null>;
   accept: string;
@@ -25,6 +27,7 @@ interface CompressDropzoneProps {
    */
   nativeFilter?: NativeFilePickOptions;
 }
+
 export function CompressDropzone({
   inputRef,
   accept,
@@ -40,6 +43,7 @@ export function CompressDropzone({
   nativeFilter,
 }: CompressDropzoneProps) {
   const [dragOver, setDragOver] = useState(false);
+
   async function onPick() {
     if (nativeFilter) {
       try {
@@ -56,6 +60,7 @@ export function CompressDropzone({
     }
     inputRef.current?.click();
   }
+
   return (
     <section
       className={cn(

@@ -1,11 +1,10 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FolderOpen, LoaderCircle, Magnet } from "lucide-react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { FolderOpen, LoaderCircle, Magnet } from "lucide-react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { BtProbeResult, BtTaskInfo } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { formatBytes } from "~/lib/format";
+
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,12 +12,16 @@ import {
   DialogFooter,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
-import { Textarea } from "~/components/ui/textarea";
-import { Label } from "~/components/ui/label";
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
-import TorrentFileList from "./TorrentFileList";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
 import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
+import * as ipc from "~/lib/ipc";
+import type { BtProbeResult, BtTaskInfo } from "~/types";
+
+import TorrentFileList from "./TorrentFileList";
+
 export interface AddTorrentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -71,6 +74,7 @@ export default function AddTorrentDialog({
   // 仅在带 initialSource 时有意义：失败时回到输入步骤，
   // 这样磁力链接可被重新解析，而不是一直转圈。
   const [probeFailed, setProbeFailed] = useState(false);
+
   const reset = () => {
     setSource("");
     setProbing(false);
@@ -79,23 +83,27 @@ export default function AddTorrentDialog({
     setStarting(false);
     setProbeFailed(false);
   };
+
   const close = () => {
     if (requests.current.starting) return;
     requests.current.generation++;
     requests.current.probing = false;
     onOpenChange(false);
   };
+
   const doProbe = async (raw: string) => {
     const trimmed = raw.trim();
     if (!trimmed || requests.current.probing || requests.current.starting)
       return;
     requests.current.probing = true;
     const generation = ++requests.current.generation;
+
     const apply = (result: BtProbeResult) => {
       setProbe(result);
       // 默认全选所有文件。
       setSelected(new Set(result.files.map((f) => f.index)));
     };
+
     setProbeFailed(false);
     setProbing(true);
     try {
@@ -114,6 +122,7 @@ export default function AddTorrentDialog({
       }
     }
   };
+
   const pickTorrent = async () => {
     const generation = requests.current.generation;
     try {
@@ -170,6 +179,7 @@ export default function AddTorrentDialog({
       state.generation++;
     };
   }, [initialProbe, initialSelected, initialSource, open]);
+
   const toggleFile = (index: number) => {
     if (index < 0 || !probe) {
       // -1 = 来自表头行的“全选”信号：依据当前是否已全选来整体翻转。
@@ -186,6 +196,7 @@ export default function AddTorrentDialog({
       return next;
     });
   };
+
   const selectedBytes = (() => {
     if (!probe) return 0;
     return probe.files
@@ -197,6 +208,7 @@ export default function AddTorrentDialog({
     !readOnly &&
     !allowExistingTask &&
     existingInfoHashes.has(probe.infoHash);
+
   const startDownload = async () => {
     if (
       !probe ||
@@ -229,6 +241,7 @@ export default function AddTorrentDialog({
       setStarting(false);
     }
   };
+
   return (
     <Dialog
       open={open}

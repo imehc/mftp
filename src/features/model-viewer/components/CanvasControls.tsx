@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowDown, ArrowUp, Move } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
 import { isMobilePlatform } from "~/lib/platform";
-import type { ModelViewerRuntime } from "../runtime/viewer";
+
 import { unitFactor } from "../inspection/tools";
+import type { ModelViewerRuntime } from "../runtime/viewer";
 
 function FlightPad({ runtime }: { runtime: ModelViewerRuntime }) {
   const { t } = useLingui();
@@ -18,6 +20,7 @@ function FlightPad({ runtime }: { runtime: ModelViewerRuntime }) {
       runtime.flight.input(0, 0);
       setStick([0, 0]);
     };
+
     window.addEventListener("blur", clear);
     document.addEventListener("visibilitychange", clear);
     return () => {

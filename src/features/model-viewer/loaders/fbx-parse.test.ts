@@ -1,8 +1,9 @@
-import { expect, it, vi } from "vitest";
 import { Box3, Mesh, Vector3 } from "three";
+import { expect, it, vi } from "vitest";
+
+import { fbxFixture } from "./fbx-fixture.test-utils";
 import { parseFbx } from "./fbx-parse";
 import { unpackFbx } from "./fbx-transfer";
-import { fbxFixture } from "./fbx-fixture.test-utils";
 
 it("在没有 DOM 的环境解析 ASCII，并保留可转移的几何与米制尺寸", async () => {
   const { value, buffers } = parseFbx(fbxFixture());

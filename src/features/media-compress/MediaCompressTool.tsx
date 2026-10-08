@@ -1,11 +1,14 @@
-import { lazy, Suspense, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
+import { useNavigate } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
+import { lazy, Suspense, useState } from "react";
+
 import AppPageLayout from "~/components/AppPageLayout";
-import { MediaProcessingGuard } from "./MediaProcessingGuard";
 import { CompressModeTabs } from "~/features/media-compress/components/CompressModeTabs";
 import type { CompressModeId } from "~/features/media-compress/types";
+
+import { MediaProcessingGuard } from "./MediaProcessingGuard";
+
 const ImageCompressPanel = lazy(
   () => import("~/features/media-compress/image/ImageCompressPanel"),
 );
@@ -15,9 +18,11 @@ const ImageResizePanel = lazy(
 const VideoCompressPanel = lazy(
   () => import("~/features/media-compress/video/VideoCompressPanel"),
 );
+
 interface MediaCompressToolProps {
   mode: CompressModeId;
 }
+
 export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
   const navigate = useNavigate();
   const [visitedModes, setVisitedModes] = useState<Set<CompressModeId>>(

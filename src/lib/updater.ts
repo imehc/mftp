@@ -1,4 +1,3 @@
-import { createElement, type ReactNode } from "react";
 import { msg } from "@lingui/core/macro";
 import { relaunch } from "@tauri-apps/plugin-process";
 import {
@@ -6,23 +5,27 @@ import {
   type DownloadEvent,
   type Update,
 } from "@tauri-apps/plugin-updater";
+import { createElement, type ReactNode } from "react";
 import { toast } from "sonner";
+
 import { translate } from "~/i18n/translate";
 import { describeError, toIpcError } from "~/lib/errors";
-import { isDesktopPlatform } from "~/lib/platform";
 import { formatBytes } from "~/lib/format";
-import type { AppError } from "~/types";
+import { isDesktopPlatform } from "~/lib/platform";
 import {
   resetUpdaterState,
   setUpdaterState,
   useUpdaterStore,
 } from "~/store/updater";
+import type { AppError } from "~/types";
+
 let checkedOnLaunch = false;
 let activeUpdate: Update | null = null;
 let downloadTask: Promise<void> | null = null;
 const UPDATE_CHECK_TIMEOUT_MS = 15_000;
 const UPDATE_TOAST_ID = "app-update";
 const MAX_RELEASE_NOTES = 8;
+
 export async function checkForUpdateOnLaunch() {
   if (
     checkedOnLaunch ||
@@ -42,6 +45,7 @@ export async function checkForUpdateOnLaunch() {
     console.warn("update check failed", error);
   }
 }
+
 export async function checkForUpdateManually() {
   if (!isTauriRuntime() || !isDesktopPlatform()) {
     toast.error(translate(msg`只能在桌面应用中检查更新`));
@@ -101,6 +105,7 @@ export async function checkForUpdateManually() {
     });
   }
 }
+
 export async function restartToApplyUpdate() {
   const state = useUpdaterStore.getState();
   if (state.status !== "ready" && state.status !== "restarting") return;
@@ -130,6 +135,7 @@ export async function restartToApplyUpdate() {
     });
   }
 }
+
 function registerAvailableUpdate(update: Update) {
   if (activeUpdate && activeUpdate !== update) {
     void activeUpdate.close().catch(() => undefined);
@@ -146,12 +152,14 @@ function registerAvailableUpdate(update: Update) {
   });
   showAvailableUpdateToast();
 }
+
 function showCheckingToast() {
   toast.loading(translate(msg`正在检查更新…`), {
     id: UPDATE_TOAST_ID,
     duration: Number.POSITIVE_INFINITY,
   });
 }
+
 function showAvailableUpdateToast() {
   const state = useUpdaterStore.getState();
   if (state.status !== "available" || !state.version) return;
@@ -176,6 +184,7 @@ function showAvailableUpdateToast() {
     },
   });
 }
+
 function discardAvailableUpdate() {
   const update = activeUpdate;
   activeUpdate = null;
@@ -183,6 +192,7 @@ function discardAvailableUpdate() {
   toast.dismiss(UPDATE_TOAST_ID);
   if (update) void update.close().catch(() => undefined);
 }
+
 async function startUpdateDownload() {
   if (downloadTask) {
     showDownloadProgressToast();
@@ -211,6 +221,7 @@ async function startUpdateDownload() {
     downloadTask = null;
   }
 }
+
 async function downloadAndInstall(update: Update) {
   try {
     await update.downloadAndInstall(handleDownloadEvent);
@@ -243,6 +254,7 @@ async function downloadAndInstall(update: Update) {
     await update.close().catch(() => undefined);
   }
 }
+
 function handleDownloadEvent(event: DownloadEvent) {
   const state = useUpdaterStore.getState();
   if (event.event === "Started") {
@@ -262,6 +274,7 @@ function handleDownloadEvent(event: DownloadEvent) {
   }
   showDownloadProgressToast();
 }
+
 function showDownloadProgressToast() {
   const state = useUpdaterStore.getState();
   if (state.status !== "downloading" || !state.version) return;
@@ -282,6 +295,7 @@ function showDownloadProgressToast() {
     },
   );
 }
+
 function showReadyToRestartToast() {
   const state = useUpdaterStore.getState();
   if (state.status !== "ready" || !state.version) return;
@@ -302,6 +316,7 @@ function showReadyToRestartToast() {
     },
   });
 }
+
 function showRestartingToast() {
   toast.loading(translate(msg`正在重启并应用更新…`), {
     id: UPDATE_TOAST_ID,
@@ -312,13 +327,16 @@ function showRestartingToast() {
     cancel: null,
   });
 }
+
 async function resetAfterFailedUpdate() {
   resetUpdaterState();
   await checkForUpdateManually();
 }
+
 function isTauriRuntime() {
   return "__TAURI_INTERNALS__" in window;
 }
+
 function checkWithTimeout() {
   return withTimeout(
     check({
@@ -328,6 +346,7 @@ function checkWithTimeout() {
     translate(msg`检查更新超时，请确认 GitHub Release 更新源是否可访问`),
   );
 }
+
 function withTimeout<T>(promise: Promise<T>, ms: number, message: string) {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
@@ -337,6 +356,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, message: string) {
     if (timeoutId) clearTimeout(timeoutId);
   });
 }
+
 function releaseNotesContent(notes: string[]): ReactNode {
   if (notes.length === 0)
     return translate(msg`查看 GitHub Release 获取更新内容`);
@@ -356,6 +376,7 @@ function releaseNotesContent(notes: string[]): ReactNode {
     ),
   );
 }
+
 function downloadProgressContent(
   state: ReturnType<typeof useUpdaterStore.getState>,
 ) {
@@ -375,6 +396,7 @@ function downloadProgressContent(
     msg`${percent}%（${formatBytesValue2} / ${formatBytesValue3}）`,
   );
 }
+
 export function formatReleaseNotes(body?: string) {
   if (!body?.trim()) return [];
   const notes: string[] = [];
@@ -403,6 +425,7 @@ export function formatReleaseNotes(body?: string) {
   }
   return notes;
 }
+
 /**
  * 更新插件只抛出英文 Error，没有 kind/code；这里按文案归类仅用于选择标题，
  * 不参与任何领域分支，也不是 AppError 的分类依据。

@@ -1,9 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+
 import { Button } from "~/components/ui/button";
 import type { ActivityLog } from "~/types";
-import type { ActivityLogsController } from "./use-activity-logs";
-import { LogResult } from "./LogResult";
+
 import { logDetail } from "./log-utils";
+import { LogResult } from "./LogResult";
+import type { ActivityLogsController } from "./use-activity-logs";
 
 export default function LogRowMobile({
   log,

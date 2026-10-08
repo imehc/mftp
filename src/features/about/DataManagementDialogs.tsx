@@ -1,25 +1,27 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
+  DialogLayoutBody,
   DialogLayoutContent,
   DialogLayoutHeader,
-  DialogLayoutBody,
 } from "~/components/ui/dialog-layout";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "~/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { formatBytes } from "~/lib/format";
 import { describeError } from "~/lib/errors";
-import { DATA_MODULES, type AboutController } from "./use-about";
+import { formatBytes } from "~/lib/format";
+
+import { type AboutController, DATA_MODULES } from "./use-about";
 
 export default function DataManagementDialogs({
   controller: c,

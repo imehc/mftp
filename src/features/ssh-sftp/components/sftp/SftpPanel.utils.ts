@@ -1,15 +1,16 @@
+import { msg } from "@lingui/core/macro";
 import {
+  type ColumnDef,
   columnResizingFeature,
   columnSizingFeature,
-  tableFeatures,
-  type ColumnDef,
   type ColumnSizingState,
+  tableFeatures,
 } from "@tanstack/react-table";
-import { msg } from "@lingui/core/macro";
-import { translate } from "~/i18n/translate";
-import type { SftpEntry, SftpFileInfo } from "~/types";
+
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
+import { translate } from "~/i18n/translate";
 import { formatBytes } from "~/lib/format";
+import type { SftpEntry, SftpFileInfo } from "~/types";
 
 /**
  * 虚拟列表行高。触控密度下「更多」按钮撑到 44px，行高随之变高；
@@ -20,22 +21,27 @@ export const SFTP_ROW_HEIGHT_TOUCH = 56;
 
 // 起别名，使既有调用方（SftpRow）的 import 名保持不变。
 export const formatSize = formatBytes;
+
 export function nextTransferId(): string {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
 }
+
 export function formatMtime(seconds: number): string {
   if (!seconds) return "—";
   return new Date(seconds * 1000).toLocaleString();
 }
+
 export function formatInfoTime(seconds: number | null | undefined): string {
   if (!seconds) return translate(msg`不可用`);
   return new Date(seconds * 1000).toLocaleString();
 }
+
 export function formatInfoSize(
   entry: Pick<SftpEntry, "isDir" | "size">,
 ): string {
   return entry.isDir ? translate(msg`不可用`) : formatSize(entry.size);
 }
+
 export interface FileModePermissions {
   raw: string;
   owner: number;
@@ -45,6 +51,7 @@ export interface FileModePermissions {
   setGroupId: boolean;
   sticky: boolean;
 }
+
 export function parseFileMode(mode: number): FileModePermissions | null {
   if (!mode) return null;
   const permissionBits = mode & 0o7777;
@@ -58,12 +65,14 @@ export function parseFileMode(mode: number): FileModePermissions | null {
     sticky: (permissionBits & 0o1000) !== 0,
   };
 }
+
 export function formatOwner(info: Pick<SftpFileInfo, "uid" | "gid">): string {
   if (info.uid == null && info.gid == null) return "—";
   if (info.uid == null) return `gid ${info.gid}`;
   if (info.gid == null) return `uid ${info.uid}`;
   return `${info.uid}:${info.gid}`;
 }
+
 export function entryType(entry: SftpEntry): string {
   if (entry.isDir) return translate(msg`文件夹`);
   if (entry.isSymlink) return translate(msg`链接`);
@@ -71,42 +80,52 @@ export function entryType(entry: SftpEntry): string {
   if (dot <= 0 || dot === entry.name.length - 1) return translate(msg`文件`);
   return entry.name.slice(dot + 1).toLowerCase();
 }
+
 export function joinPath(dir: string, name: string): string {
   return dir.endsWith("/") ? `${dir}${name}` : `${dir}/${name}`;
 }
+
 export function normalizeRemotePath(path: string): string {
   if (!path) return "/";
   const normalized = path.replace(/\/+/g, "/").replace(/\/+$/, "");
   return normalized || "/";
 }
+
 export function isSameOrChildPath(path: string, parent: string): boolean {
   const p = normalizeRemotePath(path);
   const base = normalizeRemotePath(parent);
   return p === base || (base !== "/" && p.startsWith(`${base}/`));
 }
+
 export function parentPath(p: string): string {
   if (p === "/" || p === "") return "/";
   const trimmed = p.replace(/\/+$/, "");
   const idx = trimmed.lastIndexOf("/");
   return idx <= 0 ? "/" : trimmed.slice(0, idx);
 }
+
 const ARCHIVE_RE = /\.(zip|tar|tar\.gz|tgz|tar\.bz2|tbz2)$/i;
+
 export function isArchive(name: string): boolean {
   return ARCHIVE_RE.test(name);
 }
+
 /** 压缩包解压后预期产生的目录名。 */
 export function archiveStem(name: string): string {
   return name.replace(ARCHIVE_RE, "");
 }
+
 export function validPlainName(name: string): boolean {
   return name.trim() !== "" && !/[\\/]/.test(name.trim());
 }
+
 export function joinLocalPath(parent: string, name: string): string {
   const separator = parent.includes("\\") && !parent.includes("/") ? "\\" : "/";
   return parent.endsWith("/") || parent.endsWith("\\")
     ? `${parent}${name}`
     : `${parent}${separator}${name}`;
 }
+
 export type PromptState =
   | {
       kind: "mkdir";
@@ -126,16 +145,19 @@ export type PromptState =
       initialName: string;
     }
   | null;
+
 export type InfoState = {
   entry: SftpEntry;
   details: SftpFileInfo | null;
   loading: boolean;
 } | null;
+
 export type ExtractState = {
   entry: SftpEntry;
   outName: string;
   remoteParent: string;
 } | null;
+
 export type DirectoryPickerState = {
   title: string;
   initialPath: string;
@@ -151,14 +173,19 @@ export type ConflictState = {
   initialExistingName?: string;
   run: (resolution: ConflictResolution) => Promise<void>;
 } | null;
+
 export type LoadingAction =
   "home" | "parent" | "refresh" | "list" | `enter:${string}`;
+
 export type SortKey = "name" | "mtime" | "type" | "size";
+
 export type SortDirection = "asc" | "desc";
+
 export interface SortState {
   key: SortKey;
   direction: SortDirection;
 }
+
 export const sftpFeatures = tableFeatures({
   columnSizingFeature,
   columnResizingFeature,
@@ -196,6 +223,7 @@ export const sftpColumns: ColumnDef<typeof sftpFeatures, SftpEntry>[] = [
     enableResizing: false,
   },
 ];
+
 export function sftpColumnLabel(id: string): string {
   if (id === "name") return translate(msg`名称`);
   if (id === "mtime") return translate(msg`修改日期`);
@@ -204,6 +232,7 @@ export function sftpColumnLabel(id: string): string {
   if (id === "actions") return translate(msg`操作`);
   return id;
 }
+
 export const sftpHeaderHeight = 32;
 const sftpRowPaddingX = 24;
 const sftpDefaultColumnSizing: Record<string, number> = {
@@ -213,6 +242,7 @@ const sftpDefaultColumnSizing: Record<string, number> = {
   size: 80,
   actions: 64,
 };
+
 export function computeInitialSftpColumnSizing(
   width: number,
 ): ColumnSizingState {
@@ -267,6 +297,7 @@ export function computeInitialSftpColumnSizing(
   }
   return scaled;
 }
+
 export function sameColumnSizing(
   current: ColumnSizingState,
   next: ColumnSizingState,
@@ -277,10 +308,12 @@ export function sameColumnSizing(
     keys.every((key) => current[key] === next[key])
   );
 }
+
 export const nameCollator = new Intl.Collator(undefined, {
   numeric: true,
   sensitivity: "base",
 });
+
 export function loadingLabel(action: LoadingAction | null): string {
   if (!action) return translate(msg`加载中…`);
   if (action === "home") return translate(msg`正在打开主目录…`);
@@ -289,15 +322,18 @@ export function loadingLabel(action: LoadingAction | null): string {
   if (action.startsWith("enter:")) return translate(msg`正在打开文件夹…`);
   return translate(msg`加载中…`);
 }
+
 export function defaultSortDirection(key: SortKey): SortDirection {
   return key === "mtime" || key === "size" ? "desc" : "asc";
 }
+
 export function entrySortType(entry: SftpEntry): string {
   if (entry.isDir) return "0:folder";
   if (entry.isSymlink) return "1:symlink";
   const type = entryType(entry);
   return type === translate(msg`文件`) ? "2:file" : `3:${type}`;
 }
+
 export function compareEntries(
   a: SftpEntry,
   b: SftpEntry,

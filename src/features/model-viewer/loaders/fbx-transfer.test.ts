@@ -1,4 +1,3 @@
-import { expect, it, vi } from "vitest";
 import {
   AnimationClip,
   AnimationMixer,
@@ -14,8 +13,10 @@ import {
   Vector3,
   VectorKeyframeTrack,
 } from "three";
-import { packFbx, unpackFbx } from "./fbx-transfer";
+import { expect, it, vi } from "vitest";
+
 import { FBX_NODE_LIMIT } from "./fbx-policy";
+import { packFbx, unpackFbx } from "./fbx-transfer";
 
 it("场景移交保留骨骼绑定、动画轨道和初始变形权重", async () => {
   const scene = new Group(),

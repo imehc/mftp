@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+
 import { createPoller } from "~/lib/polling";
 
 // 轮询原语的行为验收：慢读取不堆叠、触发合并、可见性暂停。

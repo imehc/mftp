@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
+
 import type { ModuleId } from "~/lib/module-metadata";
 
 /** 展示说明留在首页，不让领域元数据依赖 React 或文案。 */
@@ -8,7 +9,11 @@ export const homeDescriptions: Record<ModuleId, ReactNode> = {
   "lan-transfer": <Trans>在局域网共享文件</Trans>,
   crypto: <Trans>本地编码与解码</Trans>,
   "media-compress": <Trans>压缩图片、视频与调整尺寸</Trans>,
-  "model-viewer": <Trans>在本地查看 GLB 与 glTF 三维模型</Trans>,
+  "model-viewer": (
+    <Trans comment="首页 3D 模型工具说明，列出支持的文件格式。">
+      在本地查看 GLB、glTF 与 FBX 三维模型
+    </Trans>
+  ),
   formatter: <Trans>整理与校验文本数据</Trans>,
   vault: <Trans>管理账号与密码</Trans>,
   todo: <Trans>记录任务与清单</Trans>,

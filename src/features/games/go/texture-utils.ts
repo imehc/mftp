@@ -3,6 +3,7 @@
  * 两种棋子精灵。与棋盘尺寸无关——网格/星位在 GoStage 中作为 Graphics 绘制。
  */
 import { CanvasSource, Texture } from "pixi.js";
+
 import type { SeatIndex } from "../engine/types";
 
 // 确定性的栅格哈希 → 值噪声 → fbm；带种子，使木纹在每次启动都一致，

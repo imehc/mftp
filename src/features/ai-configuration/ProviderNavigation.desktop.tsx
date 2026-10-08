@@ -1,8 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Plus } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
 import { cn } from "cn";
+import { Plus } from "lucide-react";
+
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+
 import { AI_LIMITS, type ProviderNavigationProps } from "./types";
 
 export default function ProviderNavigationDesktop({

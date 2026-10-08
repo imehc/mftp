@@ -1,4 +1,5 @@
-import { useId, type ReactNode } from "react";
+import { type ReactNode, useId } from "react";
+
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   Select,
@@ -43,6 +44,7 @@ export function InspectionChoice({
     </Field>
   );
 }
+
 export function InspectionRange({
   label,
   value,
@@ -78,6 +80,7 @@ export function InspectionRange({
     </Field>
   );
 }
+
 export function InspectionToggle({
   label,
   checked,

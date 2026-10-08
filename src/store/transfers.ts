@@ -1,9 +1,10 @@
-import { create } from "zustand";
 import { msg } from "@lingui/core/macro";
-import { translate } from "~/i18n/translate";
-import type { AppError, TransferProgress } from "~/types";
+import { create } from "zustand";
+
 import type { TransferRetryIntent } from "~/features/transfers/retry";
+import { translate } from "~/i18n/translate";
 import { toIpcError } from "~/lib/errors";
+import type { AppError, TransferProgress } from "~/types";
 
 /** 后端 BT phase 是机器 key，文案归前端；未收录的 key 原样透出。 */
 const BT_PHASE_LABELS: Record<string, () => string> = {
@@ -18,6 +19,7 @@ const BT_PHASE_LABELS: Record<string, () => string> = {
 function btPhaseLabel(phase: string): string {
   return BT_PHASE_LABELS[phase]?.() ?? phase;
 }
+
 export interface TransferState {
   id: string;
   label: string;
@@ -41,6 +43,7 @@ export interface TransferState {
   /** 面板徽标展示的任务来源；默认为 sftp（历史行为）。 */
   source?: "sftp" | "bt";
 }
+
 interface TransfersState {
   transfers: TransferState[];
   dismissed: Set<string>;
@@ -72,6 +75,7 @@ interface TransfersState {
   setRuntimeError: (error?: unknown) => void;
   clearFinished: () => void;
 }
+
 export const useTransfersStore = create<TransfersState>((set) => ({
   transfers: [],
   dismissed: new Set(),
@@ -320,6 +324,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
     });
   },
 }));
+
 function createTransfer(
   id: string,
   label: string,

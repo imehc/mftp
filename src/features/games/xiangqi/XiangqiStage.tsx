@@ -1,17 +1,18 @@
 /** Pixi 渲染的中国象棋棋盘、棋子、标记与指针交互。 */
-import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
+import gsap from "gsap";
 import {
   Application,
   Container,
+  type FederatedPointerEvent,
   Graphics,
   Sprite,
   Text,
   TextStyle,
-  type FederatedPointerEvent,
 } from "pixi.js";
-import gsap from "gsap";
+import { useEffect, useRef, useState } from "react";
+
 import { boardCoordinate } from "./rules";
 import {
   BOARD_SURFACE_HEIGHT,
@@ -25,6 +26,7 @@ import {
   PIECE_TEXTURE_SIZE,
 } from "./texture-utils";
 import type { XiangqiMove, XiangqiPiece } from "./types";
+
 const CELL = 72;
 const GRID_WIDTH = CELL * 8;
 const GRID_HEIGHT = CELL * 9;
@@ -54,6 +56,7 @@ const PIECE_SYMBOL: Record<number, Record<XiangqiPiece["kind"], string>> = {
     soldier: "卒",
   },
 };
+
 export interface XiangqiStageProps {
   board: readonly (XiangqiPiece | null)[];
   turnSeat: number;
@@ -64,17 +67,21 @@ export interface XiangqiStageProps {
   flipped: boolean;
   onPlay(move: XiangqiMove): void;
 }
+
 interface SceneState extends Omit<XiangqiStageProps, "onPlay"> {
   accentColor: number;
 }
+
 interface PieceView {
   container: Container;
   identity: string;
 }
+
 interface Scene {
   setState(state: SceneState): void;
   destroy(): void;
 }
+
 function displayCoordinate(
   index: number,
   flipped: boolean,
@@ -90,6 +97,7 @@ function displayCoordinate(
     y: displayRow * CELL - GRID_HEIGHT / 2,
   };
 }
+
 function resolvePrimaryColor(): number {
   if (typeof document === "undefined") return FALLBACK_ACCENT;
   const value = getComputedStyle(document.documentElement)
@@ -108,11 +116,13 @@ function resolvePrimaryColor(): number {
   const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
   return (red << 16) | (green << 8) | blue;
 }
+
 function drawGrid(): Graphics {
   const highlight = new Graphics();
   const dark = new Graphics();
   const halfWidth = GRID_WIDTH / 2;
   const halfHeight = GRID_HEIGHT / 2;
+
   const drawLines = (graphics: Graphics, offset: number): void => {
     for (let row = 0; row < 10; row++) {
       const y = row * CELL - halfHeight + offset;
@@ -137,18 +147,11 @@ function drawGrid(): Graphics {
       .moveTo(CELL + offset, halfHeight - CELL * 2 + offset)
       .lineTo(-CELL + offset, halfHeight + offset);
   };
+
   drawLines(highlight, 1.5);
-  highlight.stroke({
-    width: 2.2,
-    color: 0xf5ce87,
-    alpha: 0.28,
-  });
+  highlight.stroke({ width: 2.2, color: 0xf5ce87, alpha: 0.28 });
   drawLines(dark, 0);
-  dark.stroke({
-    width: 2.15,
-    color: 0x3d1e0b,
-    alpha: 0.9,
-  });
+  dark.stroke({ width: 2.15, color: 0x3d1e0b, alpha: 0.9 });
   const marks = new Graphics();
   const markPoints: Array<[number, number]> = [
     [2, 1],
@@ -184,15 +187,12 @@ function drawGrid(): Graphics {
         .lineTo(outerX, y + gap);
     }
   }
-  marks.stroke({
-    width: 2.1,
-    color: 0x3d1e0b,
-    alpha: 0.88,
-  });
+  marks.stroke({ width: 2.1, color: 0x3d1e0b, alpha: 0.88 });
   const group = new Graphics();
   group.addChild(highlight, dark, marks);
   return group;
 }
+
 function createRiverLabel(text: string, x: number): Text {
   const label = new Text({
     text,
@@ -213,6 +213,7 @@ function createRiverLabel(text: string, x: number): Text {
   label.alpha = 0.88;
   return label;
 }
+
 function createScene(
   app: Application,
   labels: {
@@ -262,12 +263,14 @@ function createScene(
     flipped: false,
     accentColor: FALLBACK_ACCENT,
   };
+
   function moveForTarget(index: number): XiangqiMove | undefined {
     if (selected === null) return undefined;
     return state.legalMoves.find(
       (move) => move.from === selected && move.to === index,
     );
   }
+
   function createPiece(
     piece: XiangqiPiece,
     index: number,
@@ -318,6 +321,7 @@ function createScene(
       identity: `${piece.side}:${piece.kind}`,
     };
   }
+
   function redrawMarkers(): void {
     lastMoveLayer.clear();
     targetLayer.clear();
@@ -389,18 +393,21 @@ function createScene(
       }
     }
   }
+
   function relayout(): void {
     root.position.set(app.screen.width / 2, app.screen.height / 2);
     root.scale.set(
       Math.min(app.screen.width / FIT_WIDTH, app.screen.height / FIT_HEIGHT),
     );
   }
+
   relayout();
   app.renderer.on("resize", relayout);
   app.stage.eventMode = "static";
   app.stage.hitArea = {
     contains: () => true,
   };
+
   const toIntersection = (event: FederatedPointerEvent): number | null => {
     const point = root.toLocal(event.global);
     let col = Math.round((point.x + GRID_WIDTH / 2) / CELL);
@@ -416,6 +423,7 @@ function createScene(
     }
     return row * 9 + col;
   };
+
   app.stage.on("pointermove", (event: FederatedPointerEvent) => {
     const index = toIntersection(event);
     const piece = index === null ? null : state.board[index];
@@ -482,6 +490,7 @@ function createScene(
     },
   };
 }
+
 export function XiangqiStage(props: XiangqiStageProps) {
   const { i18n } = useLingui();
   const containerRef = useRef<HTMLDivElement | null>(null);

@@ -1,20 +1,22 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Group,
   Panel,
-  Separator,
   type PanelImperativeHandle,
+  Separator,
 } from "react-resizable-panels";
-import { useSettingsStore } from "~/store/settings";
-import { useSessionsStore } from "~/store/sessions";
-import { useHostsStore } from "~/store/hosts";
+
+import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
 import Sidebar from "~/features/ssh-sftp/components/Sidebar";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
 import TabBar from "~/features/ssh-sftp/components/terminal/TabBar";
 import Terminal from "~/features/ssh-sftp/components/terminal/Terminal";
-import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
+import ActivityMenu from "~/features/transfers/ActivityMenu";
+import { useHostsStore } from "~/store/hosts";
+import { useSessionsStore } from "~/store/sessions";
+import { useSettingsStore } from "~/store/settings";
+
 // 懒加载：监控面板会引入图表库，而应用的其它部分并不需要它；
 // 仅在真正打开监控视图时才付出这个代价。
 const SystemMonitorPanel = lazy(
@@ -26,10 +28,9 @@ import {
   PanelLeft,
   TerminalSquare,
 } from "lucide-react";
-import { Button } from "~/components/ui/button";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Sheet, SheetContent, SheetTitle } from "~/components/ui/sheet";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import { Button } from "~/components/ui/button";
 import {
   Empty,
   EmptyDescription,
@@ -37,7 +38,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
+import { Sheet, SheetContent, SheetTitle } from "~/components/ui/sheet";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 const SIDEBAR_COLLAPSED_REM = 3.25;
+
 function Workspace({ onHosts }: { onHosts: () => void }) {
   const [toolbarTarget, setToolbarTarget] = useState<HTMLDivElement | null>(
     null,

@@ -1,4 +1,5 @@
 import type { AiConfigurationView } from "~/bindings";
+
 import type { AiEditorTarget } from "./types";
 
 /** 仅定位当前地址的其他条目；跨地址候选只复用文字，不改变当前选择。 */

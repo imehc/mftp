@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { useLingui } from "@lingui/react/macro";
-import { Check, Copy } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { cn } from "cn";
+import { Check, Copy } from "lucide-react";
+import { type ComponentProps, useEffect, useRef, useState } from "react";
+
+import { Button } from "~/components/ui/button";
 
 type CopyButtonProps = Omit<
   ComponentProps<typeof Button>,

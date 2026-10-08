@@ -1,24 +1,26 @@
 import { useEffect } from "react";
+
 /**
  * 联机（局域网）流程：大厅交接 + 共享对局控制器的网络对局视图接线。
  * 棋盘规格通过游戏 id（go-9 / go-13 / go-19）协商，使双方总能构建
  * 完全一致的初始局面；走法时序与悔棋/重赛协商由 OnlineMatchController 收口。
  */
 import { useSettingsStore } from "~/store/settings";
+
+import type { OnlineGame } from "../engine/online/matchTypes";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
 import { OnlineMatchDialogs } from "../engine/online/OnlineMatchDialogs";
-import type { OnlineGame } from "../engine/online/matchTypes";
-import { OnlineMatchSession, hashString } from "../engine/online/session";
-import { useOnlineRoom } from "../engine/online/useOnlineRoom";
+import { hashString, OnlineMatchSession } from "../engine/online/session";
 import { useOnlineMatch } from "../engine/online/useOnlineMatch";
+import { useOnlineRoom } from "../engine/online/useOnlineRoom";
 import type { MoveResolution } from "../engine/types";
 import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
 import { GoMatchView } from "./GoMatch";
 import { goMoveParser } from "./onlineProtocol";
 import { createInitialGoState, goGame } from "./rules";
 import {
-  GO_GAME_ID,
   type BoardSize,
+  GO_GAME_ID,
   type GoMode,
   type GoMove,
   type GoPresentation,
@@ -104,11 +106,13 @@ function OnlineMatch({
   onFinishedChange: (finished: boolean) => void;
 }) {
   const volume = useSettingsStore((s) => s.gamesVolume);
+
   const present = (resolution: MoveResolution<GoState, GoPresentation>) => {
     if (resolution.presentation.captured.length > 0) playCaptureSound(volume);
     else playStoneSound(volume);
     if (resolution.state.finished) playFinishSound(volume);
   };
+
   const {
     controller,
     snapshot,

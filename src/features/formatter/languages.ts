@@ -1,16 +1,17 @@
 import { json, jsonParseLinter } from "@codemirror/lang-json";
-import type { Extension } from "@codemirror/state";
 import { linter } from "@codemirror/lint";
+import type { Extension } from "@codemirror/state";
+
 import {
   escapeJsonString,
   formatJson,
+  type FormatOptions,
+  type FormatResult,
   minifyJson,
+  type SortDirection,
   sortJsonKeys,
   unescapeJsonString,
   validateJson,
-  type FormatOptions,
-  type FormatResult,
-  type SortDirection,
 } from "~/features/formatter/json";
 
 export type FormatterLanguageId = "json";

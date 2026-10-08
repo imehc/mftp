@@ -1,6 +1,8 @@
-import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
+import type { ReactNode } from "react";
+
 import type { ExportSection } from "~/bindings";
+
 export interface ExportSectionMeta {
   id: ExportSection;
   title: ReactNode;

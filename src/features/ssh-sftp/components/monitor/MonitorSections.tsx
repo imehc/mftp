@@ -1,9 +1,11 @@
-import { type ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
-import { HardDrive, LayoutList } from "lucide-react";
-import type { SystemStats } from "~/types";
-import { formatBytes } from "~/lib/format";
 import { cn } from "cn";
+import { HardDrive, LayoutList } from "lucide-react";
+import { type ReactNode } from "react";
+
+import { formatBytes } from "~/lib/format";
+import type { SystemStats } from "~/types";
+
 function Section({
   title,
   icon,
@@ -23,6 +25,7 @@ function Section({
     </section>
   );
 }
+
 function EmptyHint() {
   return (
     <p className="text-muted-foreground py-2 text-center text-xs">
@@ -58,6 +61,7 @@ function UsageBar({ percent }: { percent: number }) {
     </div>
   );
 }
+
 export function DisksSection({ disks }: { disks: SystemStats["disks"] }) {
   return (
     <Section
@@ -104,6 +108,7 @@ export function DisksSection({ disks }: { disks: SystemStats["disks"] }) {
     </Section>
   );
 }
+
 function ProcessRow({ proc }: { proc: SystemStats["topProcesses"][number] }) {
   return (
     <>
@@ -137,6 +142,7 @@ function ProcessRow({ proc }: { proc: SystemStats["topProcesses"][number] }) {
     </>
   );
 }
+
 export function ProcessesSection({
   processes,
 }: {
@@ -174,4 +180,5 @@ export function ProcessesSection({
     </Section>
   );
 }
+
 export { Section as MonitorSection };

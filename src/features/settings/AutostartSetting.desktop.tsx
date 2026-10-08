@@ -1,14 +1,16 @@
-import { Power } from "lucide-react";
 import { Trans } from "@lingui/react/macro";
+import { Power } from "lucide-react";
+
+import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldContent,
-  FieldLabel,
   FieldDescription,
+  FieldLabel,
 } from "~/components/ui/field";
 import { Switch } from "~/components/ui/switch";
-import { Button } from "~/components/ui/button";
 import { describeError } from "~/lib/errors";
+
 import { useAutostart } from "./hooks/use-autostart";
 
 /** 平台专属入口；移动端不挂载，也不调用自启插件。 */

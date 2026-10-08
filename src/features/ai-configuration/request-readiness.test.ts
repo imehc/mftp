@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+
 import type { AiConfigurationView } from "~/bindings";
+
 import { hasAiRequestSelection } from "./request-readiness";
 
 function configuration(): AiConfigurationView {

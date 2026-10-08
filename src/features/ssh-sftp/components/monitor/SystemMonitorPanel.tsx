@@ -10,7 +10,7 @@ import {
   Server,
   TriangleAlert,
 } from "lucide-react";
-import type { Session, SystemStats } from "~/types";
+
 import { Button } from "~/components/ui/button";
 import {
   Select,
@@ -19,20 +19,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { formatBytes } from "~/lib/format";
-import { describeError } from "~/lib/errors";
 import { TimeSeriesCard } from "~/features/ssh-sftp/components/monitor/MonitorCharts";
 import {
   DisksSection,
   ProcessesSection,
 } from "~/features/ssh-sftp/components/monitor/MonitorSections";
 import {
-  useSystemMonitor,
   type RefreshIntervalMs,
+  useSystemMonitor,
 } from "~/features/ssh-sftp/components/monitor/useSystemMonitor";
+import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
+import type { Session, SystemStats } from "~/types";
+
 interface Props {
   session: Session;
 }
+
 const pct = (value: number) => `${value.toFixed(1)}%`;
 
 /// 用于乐观首屏的清零快照，使布局在首个采样往返（约 1.2s）期间立即可见。
@@ -63,6 +66,7 @@ const PLACEHOLDER: SystemStats = {
   diskIo: [],
   topProcesses: [],
 };
+
 export default function SystemMonitorPanel({ session }: Props) {
   const { t } = useLingui();
   const formatSeconds = (seconds: number) =>
@@ -325,6 +329,7 @@ export default function SystemMonitorPanel({ session }: Props) {
     </div>
   );
 }
+
 function formatUptime(t: ReturnType<typeof useLingui>["t"], seconds: number) {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);

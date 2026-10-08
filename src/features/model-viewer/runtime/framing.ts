@@ -1,11 +1,12 @@
 import {
   Box3,
   Group,
+  type Object3D,
   PerspectiveCamera,
   Sphere,
   Vector3,
-  type Object3D,
 } from "three";
+
 import { modelError } from "../domain/errors";
 
 export function frameModel(root: Object3D) {

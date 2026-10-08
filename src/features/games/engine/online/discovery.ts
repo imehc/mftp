@@ -3,6 +3,7 @@ import { gameRoomDiscover } from "~/lib/ipc";
 
 let flight: { gameId: string; result: Promise<GameRoomSummary[]> } | null =
   null;
+
 export async function discoverRooms(
   gameId: string,
 ): Promise<GameRoomSummary[]> {

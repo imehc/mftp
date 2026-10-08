@@ -1,10 +1,11 @@
 import {
+  type PerspectiveCamera,
   Plane,
   Raycaster,
   Vector2,
   Vector3,
-  type PerspectiveCamera,
 } from "three";
+
 import type { ModelCollection, ModelEntry } from "./collection";
 
 /** 显式摆放模式独占指针；平面沿视线，数值输入提供所有轴的等价操作。 */

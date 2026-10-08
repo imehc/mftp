@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import VaultTool from "~/features/vault/VaultTool";
 import { useSettingsStore } from "~/store/settings";
 

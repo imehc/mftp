@@ -1,14 +1,15 @@
 import { useEffect } from "react";
-import { useSettingsStore } from "~/store/settings";
+
+import { installBtRuntime } from "~/features/bt/runtime/btRuntime";
+import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
+import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
 import {
   applyColorTheme,
   applyFontPreset,
   resolveColorTheme,
   resolveFontPreset,
 } from "~/lib/color-theme";
-import { installBtRuntime } from "~/features/bt/runtime/btRuntime";
-import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
-import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
+import { useSettingsStore } from "~/store/settings";
 
 /**
  * 应用运行期：装配需要跨页面存活的后台同步（传输进度、BT 任务快照）。

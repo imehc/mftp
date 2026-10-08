@@ -1,7 +1,8 @@
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
 import { CheckCircle2, RefreshCw, Shield, ShieldOff } from "lucide-react";
+import { z } from "zod";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -12,9 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import type { LanAuthRequest } from "~/types";
-import { formatRelativeTime } from "~/lib/relative-time";
 import { lanPermissionLabel } from "~/features/lan-transfer/labels";
+import { formatRelativeTime } from "~/lib/relative-time";
+import type { LanAuthRequest } from "~/types";
+
 interface Props {
   requests: LanAuthRequest[];
   refreshing: boolean;
@@ -22,9 +24,11 @@ interface Props {
   approve: (id: string, permission: string) => void;
   reject: (id: string) => void;
 }
+
 const permissionFormSchema = z.object({
   permission: z.enum(["readOnly", "readWrite", "uploadOnly"]),
 });
+
 function LanAuthRequestPermissionForm({
   request,
   approve,
@@ -90,6 +94,7 @@ function LanAuthRequestPermissionForm({
     </div>
   );
 }
+
 export default function LanPendingAuthRequestsPanel({
   requests,
   refreshing,

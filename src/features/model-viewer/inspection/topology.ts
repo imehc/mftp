@@ -1,4 +1,5 @@
 import { Vector3 } from "three";
+
 import type { MeshSample, TopologyReport } from "./types";
 
 /** 在相邻空间桶内按实际距离焊接，桶边界两侧的近点也能合并。 */

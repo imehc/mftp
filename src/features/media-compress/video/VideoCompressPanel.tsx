@@ -1,9 +1,9 @@
-import MediaProgress from "../components/MediaProgress";
-import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { FileVideo, VideoOff } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -21,8 +21,8 @@ import { CompressEstimateBar } from "~/features/media-compress/components/Compre
 import { CompressQualityField } from "~/features/media-compress/components/CompressQualityField";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
 import { formatDuration } from "~/features/media-compress/format";
-import { formatBytes } from "~/lib/format";
 import type { CompressPhase } from "~/features/media-compress/types";
+import { useCompressResult } from "~/features/media-compress/useCompressResult";
 import {
   audioCodecsSupported,
   compressVideoFile,
@@ -30,16 +30,19 @@ import {
   estimateVideoOutput,
   isSupportedVideoFile,
   probeVideoFile,
-  type VideoMeta,
-  type VideoResolution,
   VIDEO_QUALITY_MAX,
   VIDEO_QUALITY_MIN,
   VIDEO_QUALITY_STEP,
+  type VideoMeta,
+  type VideoResolution,
   webCodecsSupported,
 } from "~/features/media-compress/video/compress";
-import { useMediaProcessing } from "../MediaProcessingGuard";
-import { useCompressResult } from "~/features/media-compress/useCompressResult";
 import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
+
+import MediaProgress from "../components/MediaProgress";
+import { useMediaProcessing } from "../MediaProcessingGuard";
+
 export default function VideoCompressPanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -77,12 +80,14 @@ export default function VideoCompressPanel() {
     setPrevCodecOk(audioCodecOk);
     if (!audioCodecOk) setKeepAudio(false);
   }
+
   function resetResultState() {
     clearResult();
     setError(null);
     setProgress(0);
     setStage("");
   }
+
   useEffect(() => {
     if (phase !== "done" || lastParamsRef.current === paramsKey) return;
     setPhase("idle");
@@ -100,6 +105,7 @@ export default function VideoCompressPanel() {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
   async function applyFile(next: File | null) {
     abortRef.current?.abort();
     abortRef.current = null;
@@ -133,6 +139,7 @@ export default function VideoCompressPanel() {
       toast.error(describeError(err));
     }
   }
+
   async function onCompress() {
     if (!file) {
       toast.error(t`请先选择视频文件`);
@@ -204,10 +211,12 @@ export default function VideoCompressPanel() {
       }
     }
   }
+
   function onClear() {
     void applyFile(null);
     if (inputRef.current) inputRef.current.value = "";
   }
+
   const stageLabel =
     stage === "demuxing"
       ? t`解析中`

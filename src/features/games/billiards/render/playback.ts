@@ -1,6 +1,7 @@
 /** 击球回放：在应用 ticker 上重放记录的物理帧。 */
 import gsap from "gsap";
 import type { Application, Container, Ticker } from "pixi.js";
+
 import { FIXED_DT, POCKETS } from "../constants";
 import type { BilliardsPresentation } from "../types";
 import { playImpactEvent } from "./audio";
@@ -104,6 +105,7 @@ export function runPresentation(
         hooks.moveBall(id, x, y, true);
       }
     };
+
     app.ticker.add(tick);
   });
 }

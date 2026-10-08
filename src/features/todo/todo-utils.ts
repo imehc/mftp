@@ -1,8 +1,10 @@
 import { format, isThisYear } from "date-fns";
+
 import { dateLocale } from "~/lib/date-locale";
 import type { TodoItem } from "~/types";
 
 export const ALL_TODO_CATEGORIES = "__all__";
+
 export type TodoView = "active" | "overdue" | "completed";
 
 export function localDateKey(date: Date): string {

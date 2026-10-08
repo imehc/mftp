@@ -1,14 +1,15 @@
-import { useEffect } from "react";
 import {
-  Outlet,
   createRootRoute,
+  Outlet,
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import { getToolEntry } from "~/features/home/entries";
+import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
 import { isMobilePlatform } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
-import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
 
 const START_ROUTE_RESOLVED_KEY = "mftp-start-route-resolved";
 

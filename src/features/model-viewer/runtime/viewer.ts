@@ -3,28 +3,30 @@ import {
   HemisphereLight,
   PerspectiveCamera,
   Scene,
+  Sphere,
   Spherical,
   Vector3,
   WebGLRenderer,
-  Sphere,
 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { ModelHandle } from "../domain/types";
+
+import type { ModelViewState } from "~/bindings";
+
 import { modelError } from "../domain/errors";
-import { fitCamera } from "./framing";
-import { ModelCollection, type ModelLayout } from "./collection";
-import { ModelPlacement } from "./placement";
-import { MemoryHistory } from "./memory";
-import { texturePreview } from "./texture-preview";
-import { OrientationGizmo } from "./gizmo";
-import { orientCamera, type ViewAxis } from "./orientation";
-import { FlightControls } from "./flight";
-import { InspectionTools, type InteractionMode } from "../inspection/tools";
+import type { ModelHandle } from "../domain/types";
 import { ViewerEnvironment } from "../inspection/environment";
 import { ViewerShadows } from "../inspection/shadows";
-import type { ModelViewState } from "~/bindings";
-import { captureModelView } from "../library/view";
 import type { Unit } from "../inspection/tools";
+import { InspectionTools, type InteractionMode } from "../inspection/tools";
+import { captureModelView } from "../library/view";
+import { ModelCollection, type ModelLayout } from "./collection";
+import { FlightControls } from "./flight";
+import { fitCamera } from "./framing";
+import { OrientationGizmo } from "./gizmo";
+import { MemoryHistory } from "./memory";
+import { orientCamera, type ViewAxis } from "./orientation";
+import { ModelPlacement } from "./placement";
+import { texturePreview } from "./texture-preview";
 
 function litScene() {
   const scene = new Scene();
@@ -43,16 +45,19 @@ async function waitUntilVisible(signal: AbortSignal) {
       document.removeEventListener("visibilitychange", visible);
       signal.removeEventListener("abort", abort);
     };
+
     const visible = () => {
       if (!document.hidden) {
         cleanup();
         resolve();
       }
     };
+
     const abort = () => {
       cleanup();
       reject(signal.reason);
     };
+
     document.addEventListener("visibilitychange", visible);
     signal.addEventListener("abort", abort, { once: true });
   });

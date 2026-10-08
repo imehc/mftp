@@ -1,9 +1,8 @@
-import { useState, type Ref } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Plus, X } from "lucide-react";
+import { type Ref, useState } from "react";
 import { toast } from "sonner";
-import { useSessionsStore } from "~/store/sessions";
-import type { Session } from "~/types";
+
 import { Button } from "~/components/ui/button";
 import {
   Select,
@@ -14,6 +13,8 @@ import {
 } from "~/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { describeError } from "~/lib/errors";
+import { useSessionsStore } from "~/store/sessions";
+import type { Session } from "~/types";
 
 export default function TabBar({
   onHosts,

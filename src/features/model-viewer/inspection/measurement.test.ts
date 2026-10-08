@@ -1,5 +1,6 @@
-import { expect, it, vi } from "vitest";
 import { BoxGeometry, Group, Mesh, PerspectiveCamera, Vector3 } from "three";
+import { expect, it, vi } from "vitest";
+
 import { ModelCollection } from "../runtime/collection";
 import { ModelMeasurement } from "./measurement";
 

@@ -1,6 +1,8 @@
 import type { ComponentProps } from "react";
-import ReadingSettingsPopover from "./ReadingSettingsPopover";
+
 import ReadingModeTabs from "./ReadingModeTabs";
+import ReadingSettingsPopover from "./ReadingSettingsPopover";
+
 export default function ReadingControlsMobile({
   settings,
   settingsInHeader,

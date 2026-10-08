@@ -1,8 +1,9 @@
 import type { WebGLRenderer } from "three";
+
 import { modelError } from "../domain/errors";
+import { type ModelExtension, modelExtension } from "../domain/formats";
 import type { ImportProgress, ModelSource } from "../domain/types";
 import { loadGltf } from "./gltf";
-import { modelExtension, type ModelExtension } from "../domain/formats";
 
 const loaders: Record<ModelExtension, typeof loadGltf> = {
   glb: loadGltf,

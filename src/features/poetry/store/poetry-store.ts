@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
 import type { PoetryCollectionStatus, PoetrySearchScope } from "~/types";
 
 interface PoetryState {

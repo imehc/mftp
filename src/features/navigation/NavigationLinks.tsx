@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
+
 import { Button } from "~/components/ui/button";
+
 import type { NavigationItem } from "./NavigationItems";
 
 export default function NavigationLinks({

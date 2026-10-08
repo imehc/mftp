@@ -1,8 +1,10 @@
-import { expect, test } from "vitest";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
+import { expect, test } from "vitest";
+
 import type { AppError, LanTransferTask } from "~/bindings";
+import { applyBtTaskEvent } from "~/features/bt/task-events";
 import { describeError, IpcError, toIpcError } from "~/lib/errors";
 import {
   customErrorMessages,
@@ -16,7 +18,6 @@ import {
   sftpDownload,
 } from "~/lib/ipc";
 import { useTransfersStore } from "~/store/transfers";
-import { applyBtTaskEvent } from "~/features/bt/task-events";
 
 const custom: AppError = {
   kind: "custom",

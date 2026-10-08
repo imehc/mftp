@@ -1,18 +1,23 @@
 import { Mesh, type PerspectiveCamera, type Vector3 } from "three";
+
 import type { ModelEntry } from "../runtime/collection";
-import { MaterialPreview, type MaterialView } from "./preview";
 import { ModelDiagnostics } from "./diagnostics";
 import { ModelMeasurement } from "./measurement";
+import { MaterialPreview, type MaterialView } from "./preview";
 
 export type InteractionMode = "orbit" | "place" | "fly" | "measure";
+
 export type Unit = "m" | "cm" | "mm" | "ft";
+
 export const unitFactor: Record<Unit, number> = {
   m: 1,
   cm: 100,
   mm: 1000,
   ft: 1 / 0.3048,
 };
+
 export type MorphView = { id: string; name: string; value: number };
+
 export type SavedView = {
   id: string;
   name: string;
@@ -21,6 +26,7 @@ export type SavedView = {
   near: number;
   far: number;
 };
+
 type ToolState = {
   mode: InteractionMode;
   unit: Unit;
@@ -34,6 +40,7 @@ type ToolState = {
   morphs: MorphView[];
   views: SavedView[];
 };
+
 export class InspectionTools {
   private state: ToolState = {
     mode: "orbit",

@@ -1,8 +1,9 @@
-import { expect, it, vi } from "vitest";
 import { BoxGeometry, Group, Mesh, MeshBasicMaterial } from "three";
-import { ModelCollection, layoutPositions } from "./collection";
-import { ModelResources } from "./resources";
+import { expect, it, vi } from "vitest";
+
+import { layoutPositions, ModelCollection } from "./collection";
 import { memoryInventory, memoryTotals } from "./memory";
+import { ModelResources } from "./resources";
 
 function model() {
   const scene = new Group();
@@ -19,6 +20,7 @@ function model() {
     dispose: () => resources.dispose(),
   };
 }
+
 it("布局具有确定性、居中且保持间距", () => {
   for (const layout of ["row", "grid", "ring"] as const) {
     const positions = layoutPositions(7, layout);
@@ -31,6 +33,7 @@ it("布局具有确定性、居中且保持间距", () => {
   }
   expect(layoutPositions(1, "ring")[0].toArray()).toEqual([0, 0, 0]);
 });
+
 it("追加操作保留位置，重置操作恢复上次布局基线", () => {
   const collection = new ModelCollection(vi.fn());
   collection.add(collection.prepare("a", model()));
@@ -51,6 +54,7 @@ it("追加操作保留位置，重置操作恢复上次布局基线", () => {
   expect(collection.entries.has("b")).toBe(true);
   collection.dispose();
 });
+
 it("经过 20 轮加载和删除后模型对象及跟踪分配回到基线", () => {
   const collection = new ModelCollection(vi.fn());
   const peaks: number[] = [];

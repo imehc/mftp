@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
 import {
   aiProviderActivate,
   aiProviderSelect,
   aiProviderTest,
   aiStreamingUpdate,
 } from "~/lib/ipc";
+
 import { useAiConfiguration } from "../store";
 import type { AiDeleteTarget, AiEditorTarget } from "../types";
 
@@ -28,14 +30,17 @@ export function useAiConfigurationPanel() {
   const active = view?.providers.find(
     (item) => item.id === view.activeProviderId,
   );
+
   function edit(target: AiEditorTarget) {
     clearError();
     setEditor(target);
   }
+
   function remove(target: AiDeleteTarget) {
     clearError();
     setDeleting(target);
   }
+
   async function test() {
     if (!view || !provider) return;
     if (
@@ -48,6 +53,7 @@ export function useAiConfigurationPanel() {
     )
       toast.success(t`AI 服务连接成功`);
   }
+
   function saved() {
     const latest = useAiConfiguration.getState().view;
     if (editor?.kind === "provider" && !editor.provider) {
@@ -58,6 +64,7 @@ export function useAiConfigurationPanel() {
     }
     setEditor(null);
   }
+
   function activate() {
     if (view && provider)
       void execute(() =>
@@ -67,6 +74,7 @@ export function useAiConfigurationPanel() {
         }),
       );
   }
+
   function select(currentKeyId: string, currentModelId: string) {
     if (view && provider)
       void execute(() =>
@@ -78,6 +86,7 @@ export function useAiConfigurationPanel() {
         }),
       );
   }
+
   function streaming(streamingEnabled: boolean) {
     if (view)
       void execute(() =>
@@ -87,6 +96,7 @@ export function useAiConfigurationPanel() {
         }),
       );
   }
+
   return {
     view,
     loading,

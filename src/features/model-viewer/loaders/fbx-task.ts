@@ -1,5 +1,6 @@
-import { IpcError } from "~/lib/errors";
 import type { AppError } from "~/bindings";
+import { IpcError } from "~/lib/errors";
+
 import { FBX_PARSE_TIMEOUT, fbxError } from "./fbx-policy";
 import type { FbxTransfer } from "./fbx-transfer";
 

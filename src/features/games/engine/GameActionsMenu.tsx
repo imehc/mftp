@@ -1,12 +1,14 @@
-import type { ComponentProps } from "react";
 import { useLingui } from "@lingui/react/macro";
 import { MoreHorizontal } from "lucide-react";
+import type { ComponentProps } from "react";
+
 import { Button } from "~/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+
 import { GameMatchActions } from "./GameHeaderControls";
 import { GameVolumeControl } from "./GameVolumeControl";
 

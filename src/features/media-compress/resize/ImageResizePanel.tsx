@@ -1,8 +1,8 @@
-import MediaProgress from "../components/MediaProgress";
-import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ImageIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Field, FieldLabel } from "~/components/ui/field";
@@ -17,36 +17,39 @@ import {
 import { Slider } from "~/components/ui/slider";
 import { CompressDropzone } from "~/features/media-compress/components/CompressDropzone";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
-import { formatBytes } from "~/lib/format";
 import {
+  type ImageMeta,
   isSupportedImageFile,
   probeImageFile,
-  type ImageMeta,
 } from "~/features/media-compress/image/compress";
-import {
-  DimensionInput,
-  DIMENSION_MODES,
-  dimensionModeLabel,
-  isDimensionMode,
-  parseDimensionInput,
-  ResizeMethodTabs,
-} from "~/features/media-compress/resize/ResizeControls";
 import {
   computeTargetSize,
   DEFAULT_RATIO,
+  type DimensionMode,
   isTargetSizeAllowed,
   RATIO_MAX,
   RATIO_MIN,
   RATIO_STEP,
   resizeImageFile,
-  type DimensionMode,
   type ResizeMethod,
   type ResizeSize,
 } from "~/features/media-compress/resize/resize";
+import {
+  DIMENSION_MODES,
+  DimensionInput,
+  dimensionModeLabel,
+  isDimensionMode,
+  parseDimensionInput,
+  ResizeMethodTabs,
+} from "~/features/media-compress/resize/ResizeControls";
 import type { CompressPhase } from "~/features/media-compress/types";
-import { useMediaProcessing } from "../MediaProcessingGuard";
 import { useCompressResult } from "~/features/media-compress/useCompressResult";
 import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
+
+import MediaProgress from "../components/MediaProgress";
+import { useMediaProcessing } from "../MediaProcessingGuard";
+
 export default function ImageResizePanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +94,7 @@ export default function ImageResizePanel() {
       ),
     );
   }
+
   const target = (() => {
     if (!meta) return null;
     return computeTargetSize(
@@ -115,11 +119,13 @@ export default function ImageResizePanel() {
     if (phase !== "done" || lastParamsRef.current === paramsKey) return;
     setPhase("idle");
   }, [paramsKey, phase]);
+
   function resetResultState() {
     clearResult();
     setResultDims(null);
     setError(null);
   }
+
   async function applyFile(next: File | null) {
     abortRef.current?.abort();
     abortRef.current = null;
@@ -154,11 +160,13 @@ export default function ImageResizePanel() {
       toast.error(describeError(err));
     }
   }
+
   function onDimensionModeChange(next: DimensionMode) {
     setDimensionMode(next);
     // 重新预填，使切换模式时总是先预览原样尺寸。
     if (meta) seedInputs(meta, next);
   }
+
   async function onProcess() {
     if (!file || !meta) {
       toast.error(t`请先选择图片文件`);
@@ -205,10 +213,12 @@ export default function ImageResizePanel() {
       }
     }
   }
+
   function onClear() {
     void applyFile(null);
     if (inputRef.current) inputRef.current.value = "";
   }
+
   const processing = phase === "compressing";
   const targetWidth = target?.width;
   const targetHeight = target?.height;

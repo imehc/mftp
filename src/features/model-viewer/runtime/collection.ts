@@ -1,11 +1,13 @@
 import { Box3, Group, Vector3 } from "three";
+
+import type { InspectionViewState } from "../domain/inspection";
 import type { ModelHandle } from "../domain/types";
 import { ModelAnimation } from "./animation";
 import { frameModel } from "./framing";
 import { inspectModel } from "./inspection";
-import type { InspectionViewState } from "../domain/inspection";
 
 export type ModelLayout = "row" | "grid" | "ring";
+
 export type ModelEntry = {
   id: string;
   handle: ModelHandle;

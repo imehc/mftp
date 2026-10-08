@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import FilePreviewPage from "~/features/preview/FilePreviewPage";
 import {
+  type PreviewKind,
   previewKind,
   toPreviewKind,
-  type PreviewKind,
 } from "~/lib/preview-kind";
 
 interface PreviewSearch {

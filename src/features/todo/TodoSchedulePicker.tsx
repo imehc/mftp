@@ -1,23 +1,25 @@
-import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { dateLocale } from "~/lib/date-locale";
-import TodoSchedulePopoverDesktop from "./TodoSchedulePopover.desktop";
-import TodoScheduleDialogMobile from "./TodoScheduleDialog.mobile";
-import TodoTimeSelectDesktop from "./TodoTimeSelect.desktop";
-import TodoTimeWheelMobile from "./TodoTimeWheel.mobile";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 import {
   localDateKey,
   localTimeKey,
   plannedTimestamp,
   todoDateFromKey,
 } from "./todo-utils";
+import TodoScheduleDialogMobile from "./TodoScheduleDialog.mobile";
+import TodoSchedulePopoverDesktop from "./TodoSchedulePopover.desktop";
+import TodoTimeSelectDesktop from "./TodoTimeSelect.desktop";
+import TodoTimeWheelMobile from "./TodoTimeWheel.mobile";
 
 /** 只持有弹层草稿；确认后才写回共用表单，关闭弹层不改变原计划。 */
 export default function TodoSchedulePicker({

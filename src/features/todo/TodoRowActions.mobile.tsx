@@ -1,13 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+
 import type { TodoRowActionsProps } from "./todo-row-actions";
 
 /** 卡片右上角的次级操作不参与正文行高，仍保留独立的 24px 点击区。 */

@@ -1,16 +1,19 @@
+import { i18n } from "@lingui/core";
+import { I18nProvider as LinguiProvider } from "@lingui/react";
 import type { PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
-import { I18nProvider as LinguiProvider } from "@lingui/react";
-import { i18n } from "@lingui/core";
-import { messages as zhCnMessages } from "~/locales/zh-CN/messages";
-import { messages as enMessages } from "~/locales/en/messages";
+
 import { defaultLocale, resolveLocale } from "~/i18n/locales";
+import { messages as enMessages } from "~/locales/en/messages";
+import { messages as zhCnMessages } from "~/locales/zh-CN/messages";
 import { useSettingsStore } from "~/store/settings";
+
 i18n.load({
   "zh-CN": zhCnMessages,
   en: enMessages,
 });
 i18n.activate(defaultLocale);
+
 export function AppI18nProvider({ children }: PropsWithChildren) {
   const locale = useSettingsStore((s) => s.locale);
   const [systemLocaleVersion, setSystemLocaleVersion] = useState(0);

@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Info, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogClose,
+  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -13,13 +14,14 @@ import {
 } from "~/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 import type {
   InspectionViewState,
   ModelInspection,
 } from "../domain/inspection";
 import type { ModelViewerRuntime } from "../runtime/viewer";
-import { SceneTree } from "./SceneTree";
 import { ResourceDetails } from "./ResourceDetails";
+import { SceneTree } from "./SceneTree";
 
 function ModelInformation({ inspection }: { inspection: ModelInspection }) {
   const { t, i18n } = useLingui();

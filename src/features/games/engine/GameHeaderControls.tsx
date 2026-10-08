@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import { Home, LogOut, RotateCcw } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+
 export function GameHomeButton({
   matchActive,
   matchFinished,
@@ -61,6 +63,7 @@ export function GameHomeButton({
     </AlertDialog>
   );
 }
+
 function RestartButton({ onClick }: { onClick?: () => void }) {
   return (
     <Button
@@ -74,6 +77,7 @@ function RestartButton({ onClick }: { onClick?: () => void }) {
     </Button>
   );
 }
+
 function ExitButton({ onClick }: { onClick?: () => void }) {
   return (
     <Button
@@ -87,6 +91,7 @@ function ExitButton({ onClick }: { onClick?: () => void }) {
     </Button>
   );
 }
+
 export function GameMatchActions({
   matchFinished,
   canRestart,

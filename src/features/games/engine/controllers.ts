@@ -25,6 +25,7 @@ export class LocalController<S, M> implements PlayerController<S, M> {
         this.pending = null;
         reject(ctx.signal.reason ?? new DOMException("Aborted", "AbortError"));
       };
+
       ctx.signal.addEventListener("abort", onAbort, { once: true });
       this.pending = {
         resolve,
@@ -115,6 +116,7 @@ export class RemoteController<S, M> implements PlayerController<S, M> {
         this.waiter = null;
         reject(ctx.signal.reason ?? new DOMException("Aborted", "AbortError"));
       };
+
       ctx.signal.addEventListener("abort", onAbort, { once: true });
       this.waiter = {
         resolve,

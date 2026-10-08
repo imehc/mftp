@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
-import babel from "@rolldown/plugin-babel";
+
 import { linguiTransformerBabelPreset } from "@lingui/vite-plugin";
+import babel from "@rolldown/plugin-babel";
 import { defineConfig } from "vitest/config";
 
 // 前端测试统一走 vitest：只装 Lingui 宏与 `~` 别名，

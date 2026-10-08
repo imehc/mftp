@@ -1,25 +1,27 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Plus, Sparkles } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Switch } from "~/components/ui/switch";
-import { Field, FieldLabel } from "~/components/ui/field";
+
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
 import {
   Empty,
+  EmptyContent,
+  EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-  EmptyDescription,
-  EmptyContent,
 } from "~/components/ui/empty";
+import { Field, FieldLabel } from "~/components/ui/field";
 import { Separator } from "~/components/ui/separator";
+import { Switch } from "~/components/ui/switch";
 import { describeError } from "~/lib/errors";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
+import AiDeleteDialog from "./AiDeleteDialog";
+import AiEditorDialog from "./AiEditorDialog";
 import { useAiConfigurationPanel } from "./hooks/use-ai-configuration-panel";
+import ProviderDetails from "./ProviderDetails";
 import ProviderNavigationDesktop from "./ProviderNavigation.desktop";
 import ProviderNavigationMobile from "./ProviderNavigation.mobile";
-import ProviderDetails from "./ProviderDetails";
-import AiEditorDialog from "./AiEditorDialog";
-import AiDeleteDialog from "./AiDeleteDialog";
 
 export default function AiConfigurationSettings() {
   const { t } = useLingui();

@@ -6,15 +6,16 @@
  * 属性（9/13/19），因此所有几何都在 createScene 内按场景计算。被提的
  * 棋子先缩小再移除。
  */
-import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import {
   Application,
   Container,
+  type FederatedPointerEvent,
   Graphics,
   Sprite,
-  type FederatedPointerEvent,
 } from "pixi.js";
-import gsap from "gsap";
+import { useEffect, useRef } from "react";
+
 import type { SeatIndex } from "../engine/types";
 import {
   getBoardTexture,
@@ -229,6 +230,7 @@ function createScene(
     root.position.set(w / 2, h / 2);
     root.scale.set(Math.min(w, h) / FIT_EXTENT);
   }
+
   relayout();
   app.renderer.on("resize", relayout);
 
@@ -254,10 +256,12 @@ function createScene(
     hoverIndex = toIntersection(e);
     redrawGhost();
   });
+
   const clearHover = (): void => {
     hoverIndex = null;
     redrawGhost();
   };
+
   app.stage.on("pointerleave", clearHover);
   app.stage.on("pointercancel", clearHover);
   app.stage.on("pointertap", (e: FederatedPointerEvent) => {

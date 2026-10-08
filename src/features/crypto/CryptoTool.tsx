@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowDownUp, Eraser, Info } from "lucide-react";
 import { toast } from "sonner";
+
 import AppPageLayout from "~/components/AppPageLayout";
 import { CopyButton } from "~/components/CopyButton";
 import { Button } from "~/components/ui/button";
@@ -16,6 +17,7 @@ import {
 } from "~/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { describeError } from "~/lib/errors";
+
 import CryptoTextPanel from "./CryptoTextPanel";
 import { useCrypto } from "./use-crypto";
 

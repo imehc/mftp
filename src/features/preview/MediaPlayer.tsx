@@ -1,16 +1,17 @@
-import { useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
 import {
-  Maximize,
   AudioLines,
+  Maximize,
   Pause,
   Play,
   Volume2,
   VolumeX,
 } from "lucide-react";
+import { useRef, useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Slider } from "~/components/ui/slider";
-import { cn } from "cn";
 import { describeError } from "~/lib/errors";
 
 function timestamp(value: number) {
@@ -48,6 +49,7 @@ export default function MediaPlayer({
   const [playError, setPlayError] = useState(false);
   const [fullscreenError, setFullscreenError] = useState<string | null>(null);
   const [scrubbing, setScrubbing] = useState<number | null>(null);
+
   const synchronize = () => {
     if (!media.current) return;
     setPosition(media.current.currentTime);
@@ -55,6 +57,7 @@ export default function MediaPlayer({
       Number.isFinite(media.current.duration) ? media.current.duration : 0,
     );
   };
+
   const togglePlay = async () => {
     const element = media.current;
     if (!element) return;
@@ -68,6 +71,7 @@ export default function MediaPlayer({
       }
     }
   };
+
   const events = {
     src: url,
     preload: "metadata",

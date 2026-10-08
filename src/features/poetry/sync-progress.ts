@@ -1,11 +1,12 @@
-import { create } from "zustand";
 import { listen } from "@tauri-apps/api/event";
-import type { AppError, PoetrySyncProgress } from "~/types";
+import { create } from "zustand";
+
 import {
   createSubscription,
   type Subscription,
 } from "~/lib/event-subscription";
 import { LIBRARY_SYNC_PROGRESS } from "~/lib/events";
+import type { AppError, PoetrySyncProgress } from "~/types";
 
 /**
  * 诗词库同步进度的共享快照。

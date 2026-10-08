@@ -5,6 +5,7 @@ import {
   type GomokuHistoryPayload,
   type GomokuMode,
 } from "./types";
+
 export function GomokuModeMenu({
   onStart,
 }: {

@@ -1,25 +1,27 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   open as openDialog,
   save as saveDialog,
 } from "@tauri-apps/plugin-dialog";
-import { useLingui } from "@lingui/react/macro";
 import { toast } from "sonner";
-import type { SftpEntry } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { describeError, hasCustomCode } from "~/lib/errors";
-import { useSettingsStore } from "~/store/settings";
-import { useTransfersStore } from "~/store/transfers";
+
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
-import { baseName } from "~/lib/files";
 import {
+  type ConflictState,
   joinLocalPath,
   joinPath,
-  nextTransferId,
-  validPlainName,
-  type ConflictState,
   type LoadingAction,
+  nextTransferId,
   type PromptState,
+  validPlainName,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { describeError, hasCustomCode } from "~/lib/errors";
+import { baseName } from "~/lib/files";
+import * as ipc from "~/lib/ipc";
+import { useSettingsStore } from "~/store/settings";
+import { useTransfersStore } from "~/store/transfers";
+import type { SftpEntry } from "~/types";
+
 interface UseSftpTransferActionsOptions {
   sessionId: string;
   cwd: string | null;
@@ -27,10 +29,12 @@ interface UseSftpTransferActionsOptions {
   setPrompt: (value: PromptState) => void;
   setConflict: (value: ConflictState) => void;
 }
+
 interface UploadDirOptions {
   displayName?: string;
   afterUpload?: () => Promise<void>;
 }
+
 export function useSftpTransferActions({
   sessionId,
   cwd,
@@ -44,6 +48,7 @@ export function useSftpTransferActions({
   const directoryTransferMode = useSettingsStore(
     (state) => state.directoryTransferMode,
   );
+
   async function onUpload() {
     if (!cwd) return;
     const selected = await openDialog({
@@ -57,6 +62,7 @@ export function useSftpTransferActions({
     const refreshPath = cwd;
     const transferId = nextTransferId();
     const label = t`上传 ${name}`;
+
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -79,8 +85,10 @@ export function useSftpTransferActions({
         );
       }
     };
+
     await run();
   }
+
   async function onDownload(entry: SftpEntry) {
     if (entry.isDir) return onDownloadDir(entry);
     const dest = await saveDialog({
@@ -91,6 +99,7 @@ export function useSftpTransferActions({
     const transferId = nextTransferId();
     const entryName = entry.name;
     const label = t`下载 ${entryName}`;
+
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -112,8 +121,10 @@ export function useSftpTransferActions({
         );
       }
     };
+
     await run();
   }
+
   async function onDownloadDir(entry: SftpEntry) {
     setPrompt({
       kind: "downloadDir",
@@ -121,6 +132,7 @@ export function useSftpTransferActions({
       initialName: entry.name,
     });
   }
+
   async function downloadDirWithName(entry: SftpEntry, folderName: string) {
     const trimmedName = folderName.trim();
     if (!validPlainName(trimmedName)) {
@@ -139,6 +151,7 @@ export function useSftpTransferActions({
     const transferId = nextTransferId();
     const entryName2 = entry.name;
     const label = t`下载 ${entryName2}`;
+
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -166,8 +179,10 @@ export function useSftpTransferActions({
         );
       }
     };
+
     await run();
   }
+
   async function onUploadDir() {
     if (!cwd) return;
     const selected = await openDialog({
@@ -179,6 +194,7 @@ export function useSftpTransferActions({
     const name = baseName(selected);
     await prepareUploadDir(selected, name);
   }
+
   async function prepareUploadDir(localDir: string, defaultName: string) {
     if (!cwd) return;
     try {
@@ -199,6 +215,7 @@ export function useSftpTransferActions({
       toast.error(describeError(e));
     }
   }
+
   async function uploadDirWithPromptName(localDir: string, remoteName: string) {
     if (!validPlainName(remoteName)) {
       toast.error(t`名称不能为空，且不能包含斜杠`);
@@ -207,6 +224,7 @@ export function useSftpTransferActions({
     setPrompt(null);
     await uploadDirWithName(localDir, remoteName.trim());
   }
+
   function showUploadConflict(
     localDir: string,
     remoteName: string,
@@ -223,6 +241,7 @@ export function useSftpTransferActions({
       },
     });
   }
+
   async function resolveUploadConflict(
     localDir: string,
     remoteName: string,
@@ -274,10 +293,12 @@ export function useSftpTransferActions({
       },
     });
   }
+
   function pickStagingName(remoteName: string): string {
     const suffix = nextTransferId().slice(0, 8);
     return `.${remoteName}.mftp-uploading-${suffix}`;
   }
+
   async function uploadDirWithName(
     localDir: string,
     remoteName: string,
@@ -296,6 +317,7 @@ export function useSftpTransferActions({
     }
     await runUploadDir(localDir, remoteName, options);
   }
+
   async function runUploadDir(
     localDir: string,
     remoteName: string,
@@ -307,6 +329,7 @@ export function useSftpTransferActions({
     const remoteParent = cwd;
     const name = options?.displayName ?? remoteName;
     const label = t`上传 ${name}`;
+
     const run = async (resetConnection = false): Promise<void> => {
       if (resetConnection) {
         await ipc.sftpResetConnection(sessionId);
@@ -339,8 +362,10 @@ export function useSftpTransferActions({
         );
       }
     };
+
     await run();
   }
+
   return {
     onUpload,
     onDownload,

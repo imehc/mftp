@@ -1,5 +1,5 @@
-import type { Dispatch, SetStateAction } from "react";
 import { useLingui } from "@lingui/react/macro";
+import type { Dispatch, SetStateAction } from "react";
 
 export interface TodoTimeControlProps {
   value: string;

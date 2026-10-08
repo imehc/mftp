@@ -1,10 +1,11 @@
-import { toIpcError, type IpcError } from "~/lib/errors";
+import { type IpcError, toIpcError } from "~/lib/errors";
+
 import { MissingResources } from "../domain/errors";
+import { modelFormat } from "../domain/formats";
+import type { ModelInspection } from "../domain/inspection";
 import type { ImportProgress, ModelHandle, ModelSource } from "../domain/types";
 import { loadModel } from "../loaders/registry";
-import { modelFormat } from "../domain/formats";
 import { ModelViewerRuntime } from "./viewer";
-import type { ModelInspection } from "../domain/inspection";
 
 export type ImportRequest = {
   name: string;

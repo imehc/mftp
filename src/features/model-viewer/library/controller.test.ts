@@ -1,15 +1,17 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 import type {
   ModelLibraryCatalog,
   ModelLibraryDocument,
   ModelViewState,
 } from "~/bindings";
 import * as ipc from "~/lib/ipc";
-import type { ModelViewerRuntime } from "../runtime/viewer";
+
+import type { ModelEntry } from "../runtime/collection";
 import { ViewerSession } from "../runtime/session";
+import type { ModelViewerRuntime } from "../runtime/viewer";
 import { ModelLibraryController } from "./controller";
 import { saveModel } from "./storage";
-import type { ModelEntry } from "../runtime/collection";
 
 vi.mock("~/lib/ipc", () => ({
   modelLibraryCatalog: vi.fn(),
@@ -189,7 +191,9 @@ it("预览模型不入库、不生成缩略图、不标记保存失败，归档�
   const archived = {
     handle: { format: "GLB", archive: new Map([["", new Blob(["glTF"])]]) },
   } as ModelEntry;
+
   f.session.runtime!.models.entries.set("preview", preview);
+
   f.session.runtime!.models.entries.set("saved", archived);
 
   let subscriber = () => {};

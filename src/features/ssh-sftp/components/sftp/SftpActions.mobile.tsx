@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { MoreHorizontal } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import {
@@ -7,6 +8,7 @@ import {
   DialogLayoutContent,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
+
 import type { SftpAction } from "./sftp-actions";
 
 export default function SftpActionsMobile({

@@ -1,11 +1,13 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { AppError, PoetryCollectionStatus } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { usePoetrySyncProgress } from "../sync-progress";
-import { usePoetryStore } from "../store/poetry-store";
+
 import { describeError, toIpcError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import type { AppError, PoetryCollectionStatus } from "~/types";
+
+import { usePoetryStore } from "../store/poetry-store";
+import { usePoetrySyncProgress } from "../sync-progress";
 
 /**
  * 桌面与移动的数据管理页共用的合集管理行为：刷新、勾选、开始 / 取消同步、

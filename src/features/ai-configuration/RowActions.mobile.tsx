@@ -1,13 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+
 import type { RowActionsProps } from "./types";
 
 export default function RowActionsMobile(props: RowActionsProps) {

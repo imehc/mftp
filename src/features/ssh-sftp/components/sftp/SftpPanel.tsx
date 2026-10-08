@@ -1,14 +1,7 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type MouseEventHandler,
-  type TouchEventHandler,
-} from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useTable, type ColumnSizingState } from "@tanstack/react-table";
+import { type ColumnSizingState, useTable } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { cn } from "cn";
 import {
   ChevronDown,
   ChevronUp,
@@ -16,9 +9,16 @@ import {
   LoaderCircle,
   RefreshCw,
 } from "lucide-react";
+import {
+  type CSSProperties,
+  type MouseEventHandler,
+  type TouchEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "sonner";
-import type { Session, SftpEntry } from "~/types";
-import * as ipc from "~/lib/ipc";
+
 import { Button } from "~/components/ui/button";
 import {
   Empty,
@@ -32,39 +32,43 @@ import DeleteConfirmDialog from "~/features/ssh-sftp/components/sftp/DeleteConfi
 import ExtractDialog from "~/features/ssh-sftp/components/sftp/ExtractDialog";
 import FileInfoDialog from "~/features/ssh-sftp/components/sftp/FileInfoDialog";
 import RemoteDirectoryPicker from "~/features/ssh-sftp/components/sftp/RemoteDirectoryPicker";
-import SftpToolbar from "./SftpToolbar";
-import SftpRow from "~/features/ssh-sftp/components/sftp/SftpRow";
-import { useSftpNavigation } from "~/features/ssh-sftp/components/sftp/useSftpNavigation";
-import { useSftpRemoteActions } from "~/features/ssh-sftp/components/sftp/useSftpRemoteActions";
-import { useSftpTransferActions } from "~/features/ssh-sftp/components/sftp/useSftpTransferActions";
 import {
   compareEntries,
   computeInitialSftpColumnSizing,
+  type ConflictState,
   defaultSortDirection,
+  type DirectoryPickerState,
+  type InfoState,
   loadingLabel,
   parentPath,
+  type PromptState,
   sameColumnSizing,
+  SFTP_ROW_HEIGHT,
+  SFTP_ROW_HEIGHT_TOUCH,
   sftpColumnLabel,
   sftpColumns,
   sftpFeatures,
   sftpHeaderHeight,
-  SFTP_ROW_HEIGHT,
-  SFTP_ROW_HEIGHT_TOUCH,
-  type ConflictState,
-  type DirectoryPickerState,
-  type InfoState,
-  type PromptState,
   type SortKey,
   type SortState,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "cn";
-import { useMediaQuery } from "~/lib/use-media-query";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import SftpRow from "~/features/ssh-sftp/components/sftp/SftpRow";
+import { useSftpNavigation } from "~/features/ssh-sftp/components/sftp/useSftpNavigation";
+import { useSftpRemoteActions } from "~/features/ssh-sftp/components/sftp/useSftpRemoteActions";
+import { useSftpTransferActions } from "~/features/ssh-sftp/components/sftp/useSftpTransferActions";
 import { describeError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import { useMediaQuery } from "~/lib/use-media-query";
+import type { Session, SftpEntry } from "~/types";
+
+import SftpToolbar from "./SftpToolbar";
+
 interface Props {
   session: Session;
   toolbarTarget?: HTMLElement | null;
 }
+
 export default function SftpPanel({ session, toolbarTarget }: Props) {
   const { t } = useLingui();
   const sessionId = session.id;
@@ -158,6 +162,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
     const element = listScrollRef.current;
     if (!element) return;
     userResizedColumnsRef.current = false;
+
     const fitColumns = (width: number) => {
       if (userResizedColumnsRef.current) return;
       const next = computeInitialSftpColumnSizing(width);
@@ -165,6 +170,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         sameColumnSizing(current, next) ? current : next,
       );
     };
+
     fitColumns(element.clientWidth);
     const observer = new ResizeObserver(([entry]) => {
       const width = entry?.contentRect.width ?? element.clientWidth;
@@ -175,6 +181,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
       observer.disconnect();
     };
   }, [sessionId]);
+
   const toggleSort = (key: SortKey) => {
     setSort((current) =>
       current.key === key
@@ -188,6 +195,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
           },
     );
   };
+
   async function showInfo(entry: SftpEntry) {
     setInfo({
       entry,
@@ -215,6 +223,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
       });
     }
   }
+
   return (
     <div className="bg-background flex h-full flex-col">
       <SftpToolbar
@@ -445,6 +454,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
     </div>
   );
 }
+
 function ResizableHeader({
   hidden,
   label,

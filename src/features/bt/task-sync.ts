@@ -1,5 +1,6 @@
-import type { BtTaskInfo } from "~/types";
 import { useTransfersStore } from "~/store/transfers";
+import type { BtTaskInfo } from "~/types";
+
 import { magnetOf } from "./magnet";
 
 /**

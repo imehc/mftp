@@ -1,6 +1,8 @@
-import type { ReactNode } from "react";
-import { Badge } from "~/components/ui/badge";
 import { Trans } from "@lingui/react/macro";
+import type { ReactNode } from "react";
+
+import { Badge } from "~/components/ui/badge";
+
 import type { Difficulty } from "./ai";
 import type { SeatIndex } from "./types";
 

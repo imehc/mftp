@@ -2197,7 +2197,7 @@ msgstr "困毙"
 msgid "困难"
 msgstr "困难"
 
-#: src/features/home/home-descriptions.tsx:19
+#: src/features/home/home-descriptions.tsx:23
 msgid "围地对弈，探索棋局"
 msgstr "围地对弈，探索棋局"
 
@@ -2256,9 +2256,10 @@ msgstr "在局域网共享文件"
 msgid "在数据管理页勾选合集并下载，即可离线浏览。"
 msgstr "在数据管理页勾选合集并下载，即可离线浏览。"
 
-#: src/features/home/home-descriptions.tsx:11
-msgid "在本地查看 GLB 与 glTF 三维模型"
-msgstr "在本地查看 GLB 与 glTF 三维模型"
+#. 首页 3D 模型工具说明，列出支持的文件格式。
+#: src/features/home/home-descriptions.tsx:12
+msgid "在本地查看 GLB、glTF 与 FBX 三维模型"
+msgstr "在本地查看 GLB、glTF 与 FBX 三维模型"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:77
 msgid "在线"
@@ -3752,7 +3753,7 @@ msgstr "数据导入与导出"
 msgid "数据管理"
 msgstr "数据管理"
 
-#: src/features/home/home-descriptions.tsx:12
+#: src/features/home/home-descriptions.tsx:16
 msgid "整理与校验文本数据"
 msgstr "整理与校验文本数据"
 
@@ -4544,7 +4545,7 @@ msgstr "棋盘大小"
 msgid "楚 河"
 msgstr "楚 河"
 
-#: src/features/home/home-descriptions.tsx:20
+#: src/features/home/home-descriptions.tsx:24
 msgid "楚河汉界，布局对弈"
 msgstr "楚河汉界，布局对弈"
 
@@ -5576,7 +5577,7 @@ msgstr "确认覆盖"
 msgid "磁力链接"
 msgstr "磁力链接"
 
-#: src/features/home/home-descriptions.tsx:15
+#: src/features/home/home-descriptions.tsx:19
 msgid "磁力链接与种子下载"
 msgstr "磁力链接与种子下载"
 
@@ -5801,7 +5802,7 @@ msgstr "管理 AI 配置"
 msgid "管理模型、调整位置并检查资源。"
 msgstr "管理模型、调整位置并检查资源。"
 
-#: src/features/home/home-descriptions.tsx:13
+#: src/features/home/home-descriptions.tsx:17
 msgid "管理账号与密码"
 msgstr "管理账号与密码"
 
@@ -5880,7 +5881,7 @@ msgstr "线框"
 msgid "练习"
 msgstr "练习"
 
-#: src/features/home/home-descriptions.tsx:17
+#: src/features/home/home-descriptions.tsx:21
 msgid "练习击球或开始对局"
 msgstr "练习击球或开始对局"
 
@@ -6193,7 +6194,7 @@ msgstr "获取资源信息失败"
 msgid "获取资源信息超时，请检查网络或稍后重试"
 msgstr "获取资源信息超时，请检查网络或稍后重试"
 
-#: src/features/home/home-descriptions.tsx:18
+#: src/features/home/home-descriptions.tsx:22
 msgid "落子连五，切磋棋艺"
 msgstr "落子连五，切磋棋艺"
 
@@ -6279,7 +6280,7 @@ msgstr "计算包围盒尺寸"
 msgid "认证方式"
 msgstr "认证方式"
 
-#: src/features/home/home-descriptions.tsx:14
+#: src/features/home/home-descriptions.tsx:18
 msgid "记录任务与清单"
 msgstr "记录任务与清单"
 
@@ -7362,7 +7363,7 @@ msgstr "键升序"
 msgid "键降序"
 msgstr "键降序"
 
-#: src/features/home/home-descriptions.tsx:16
+#: src/features/home/home-descriptions.tsx:20
 msgid "阅读、收藏与翻译古诗词"
 msgstr "阅读、收藏与翻译古诗词"
 

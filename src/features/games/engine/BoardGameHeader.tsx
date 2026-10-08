@@ -1,9 +1,9 @@
-import { useState, type ReactNode } from "react";
-import { Link, useBlocker } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link, useBlocker } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { type ReactNode, useState } from "react";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Button } from "~/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
+
 import { GameActionsMenu } from "./GameActionsMenu";
 import { GameVolumeControl } from "./GameVolumeControl";
 

@@ -1,6 +1,8 @@
-import { useId, useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import { BookOpen, LoaderCircle, Music } from "lucide-react";
+import { useId, useState } from "react";
+
+import type { PoetryTranslationMode } from "~/bindings";
 import { Badge } from "~/components/ui/badge";
 import {
   Empty,
@@ -9,19 +11,20 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { Separator } from "~/components/ui/separator";
+import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
-import type { PoetryTranslationMode } from "~/bindings";
-import PoetryTranslationSection from "./PoetryTranslationSection";
+
 import {
   AnnotationSection,
   AuthorBioSheet,
   CollapsibleStrains,
 } from "./PoemAnnotations";
+import PoetryTranslationSection from "./PoetryTranslationSection";
 import ReadingControlsDesktop from "./ReadingControls.desktop";
 import ReadingControlsMobile from "./ReadingControls.mobile";
+
 interface PoemDetailViewProps {
   settingsInHeader?: boolean;
   detail: PoemDetailModel | null;

@@ -1,17 +1,19 @@
 import {
   DataTexture,
   EquirectangularReflectionMapping,
+  HalfFloatType,
   LinearFilter,
   LinearSRGBColorSpace,
   PMREMGenerator,
+  RGBAFormat,
   type Scene,
   type WebGLRenderer,
   type WebGLRenderTarget,
-  HalfFloatType,
-  RGBAFormat,
 } from "three";
+
+import { type IpcError, toIpcError } from "~/lib/errors";
+
 import { modelError } from "../domain/errors";
-import { toIpcError, type IpcError } from "~/lib/errors";
 
 export class ViewerEnvironment {
   private state: {

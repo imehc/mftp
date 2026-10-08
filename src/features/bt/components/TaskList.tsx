@@ -1,6 +1,8 @@
-import { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useRef } from "react";
+
 import type { BtTaskInfo } from "~/types";
+
 import TaskRow, { type TaskRowProps } from "./TaskRow";
 
 export default function TaskList({

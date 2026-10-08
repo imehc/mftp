@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
 import { Trans } from "@lingui/react/macro";
+import { useRef, useState } from "react";
+
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   Select,
@@ -11,8 +12,8 @@ import {
 } from "~/components/ui/select";
 
 import {
-  useTodoTimeFields,
   type TodoTimeControlProps,
+  useTodoTimeFields,
 } from "./hooks/use-todo-time-fields";
 
 export default function TodoTimeSelectDesktop(props: TodoTimeControlProps) {

@@ -1,7 +1,19 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useForm } from "@tanstack/react-form";
+import { type ReactNode, useEffect, useState } from "react";
 import { z } from "zod";
+
+import CandidateInput from "~/components/CandidateInput";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
@@ -10,23 +22,13 @@ import {
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "~/components/ui/alert-dialog";
-import CandidateInput from "~/components/CandidateInput";
 import { Input } from "~/components/ui/input";
-import { PasswordInput } from "~/components/ui/password-input";
 import { Label } from "~/components/ui/label";
+import { PasswordInput } from "~/components/ui/password-input";
 import { Textarea } from "~/components/ui/textarea";
 import { firstFormError } from "~/lib/form-errors";
 import type { VaultEntry, VaultEntryInput } from "~/types";
+
 interface Props {
   open: boolean;
   busy: boolean;
@@ -37,6 +39,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onSubmit: (input: VaultEntryInput) => Promise<void>;
 }
+
 const emptyValues = {
   title: "",
   url: "",
@@ -45,6 +48,7 @@ const emptyValues = {
   category: "",
   notes: "",
 };
+
 function toFormValues(entry: VaultEntry | null) {
   if (!entry) return emptyValues;
   return {
@@ -56,6 +60,7 @@ function toFormValues(entry: VaultEntry | null) {
     notes: entry.notes ?? "",
   };
 }
+
 export default function VaultEntryDialog({
   open,
   busy,
@@ -160,11 +165,13 @@ export default function VaultEntryDialog({
       }}
     </form.Field>
   );
+
   function close() {
     if (busy) return;
     if (form.state.isDirty) setDiscard(true);
     else onOpenChange(false);
   }
+
   return (
     <>
       <Dialog

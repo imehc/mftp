@@ -1,16 +1,18 @@
 import { listen } from "@tauri-apps/api/event";
-import type { BtTaskEvent } from "~/types";
-import { createPoller, type Poller } from "~/lib/polling";
+
+import { toIpcError } from "~/lib/errors";
 import {
   createSubscription,
   type Subscription,
 } from "~/lib/event-subscription";
-import { toIpcError } from "~/lib/errors";
-import { isIosPlatform } from "~/lib/platform";
 import { BT_TASK_EVENT } from "~/lib/events";
+import { isIosPlatform } from "~/lib/platform";
+import { createPoller, type Poller } from "~/lib/polling";
 import { useTransfersStore } from "~/store/transfers";
-import { applyBtTaskEvent } from "../task-events";
+import type { BtTaskEvent } from "~/types";
+
 import { updatePeerWatch } from "../peer-watch";
+import { applyBtTaskEvent } from "../task-events";
 import { syncBtTasks } from "../task-sync";
 import { refreshBtTasks, useBtTasksStore } from "../tasks-store";
 

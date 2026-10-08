@@ -1,10 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ExternalLink, MonitorSmartphone, RefreshCw } from "lucide-react";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import type { AppError, LanDiscoveredDevice } from "~/types";
-import { formatRelativeTime } from "~/lib/relative-time";
 import { describeError } from "~/lib/errors";
+import { formatRelativeTime } from "~/lib/relative-time";
+import type { AppError, LanDiscoveredDevice } from "~/types";
+
 interface Props {
   error: AppError | null;
   devices: LanDiscoveredDevice[];
@@ -12,6 +14,7 @@ interface Props {
   refresh: () => void;
   openDevice: (device: LanDiscoveredDevice) => void;
 }
+
 export default function LanDiscoveredDevicesPanel({
   error,
   devices,

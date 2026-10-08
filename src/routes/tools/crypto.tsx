@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import CryptoTool from "~/features/crypto/CryptoTool";
 import { useSettingsStore } from "~/store/settings";
 

@@ -1,8 +1,10 @@
 import { z } from "zod";
+
 type TranslateTag = (
   literals: TemplateStringsArray,
   ...placeholders: unknown[]
 ) => string;
+
 export function createKeyImportSchema(t: TranslateTag) {
   return z.object({
     label: z
@@ -16,6 +18,7 @@ export function createKeyImportSchema(t: TranslateTag) {
     hasPassphrase: z.boolean(),
   });
 }
+
 export const keyImportSchema = createKeyImportSchema(((
   literals,
   ...placeholders
@@ -26,7 +29,9 @@ export const keyImportSchema = createKeyImportSchema(((
     },
     ...placeholders,
   )) as TranslateTag);
+
 export type KeyImportFormValues = z.infer<typeof keyImportSchema>;
+
 export const emptyKeyImportFormValues: KeyImportFormValues = {
   label: "",
   sourcePath: "",

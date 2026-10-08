@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Box, FolderOpen, Library } from "lucide-react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
+import { Box, FolderOpen, Library } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
 import AppPageLayout from "~/components/AppPageLayout";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
@@ -12,32 +15,31 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { Badge } from "~/components/ui/badge";
+import { listenNativeFileDrop } from "~/lib/events";
 import {
   isTauriRuntime,
   pickFilePathNative,
   pickFilePathsNative,
 } from "~/lib/files";
-import { isMobilePlatform } from "~/lib/platform";
-import { listenNativeFileDrop } from "~/lib/events";
 import { formatBytes } from "~/lib/format";
+import { isMobilePlatform } from "~/lib/platform";
+
+import { AnimationBar } from "./components/AnimationBar";
+import { CanvasControls } from "./components/CanvasControls";
 import { ImportStatus } from "./components/ImportStatus";
-import { ViewGizmo } from "./components/ViewGizmo";
+import { LibraryPanel, LibraryStatus } from "./components/LibraryPanel";
+import { MemoryWarning } from "./components/MemoryPanel";
 import { ViewerHelp } from "./components/ViewerHelp";
+import { ViewGizmo } from "./components/ViewGizmo";
+import { WorkspaceInspector } from "./components/WorkspaceInspector";
 import { modelError } from "./domain/errors";
-import { modelExtensions } from "./loaders/registry";
 import { modelFileAccept } from "./domain/formats";
+import { ModelLibraryController } from "./library/controller";
+import { modelExtensions } from "./loaders/registry";
+import { ViewerSession } from "./runtime/session";
 import { browserSource } from "./sources/browser";
 import { nativeSource } from "./sources/native";
 import { isModelName } from "./sources/paths";
-import { ViewerSession } from "./runtime/session";
-import { AnimationBar } from "./components/AnimationBar";
-import { WorkspaceInspector } from "./components/WorkspaceInspector";
-import { MemoryWarning } from "./components/MemoryPanel";
-import { CanvasControls } from "./components/CanvasControls";
-import { ModelLibraryController } from "./library/controller";
-import { LibraryPanel, LibraryStatus } from "./components/LibraryPanel";
 
 export default function ModelViewerPage() {
   const { t } = useLingui();

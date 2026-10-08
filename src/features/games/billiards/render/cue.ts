@@ -1,4 +1,5 @@
 import { Container, Graphics } from "pixi.js";
+
 import { px } from "./table";
 
 export function createCueView() {
@@ -10,6 +11,7 @@ export function createCueView() {
   const buttHalfWidth = 6.8;
   const halfWidthAt = (x: number) =>
     tipHalfWidth + (buttHalfWidth - tipHalfWidth) * (x / stickLength);
+
   const band = (
     graphic: Graphics,
     start: number,
@@ -30,6 +32,7 @@ export function createCueView() {
       ])
       .fill({ color, alpha });
   };
+
   const strip = (top: number, bottom: number, color: number, alpha: number) => {
     stick
       .poly([

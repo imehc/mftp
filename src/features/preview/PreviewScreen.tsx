@@ -1,10 +1,13 @@
-import type { ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft, LoaderCircle } from "lucide-react";
+import type { ReactNode } from "react";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import type { PreviewKind } from "~/lib/preview-kind";
+
 import PreviewSurface from "./PreviewSurface";
+
 export interface PreviewScreenProps {
   /** 文件名，显示在标题栏，并用作图片的 alt 文本。 */
   name: string;

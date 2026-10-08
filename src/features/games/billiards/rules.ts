@@ -20,13 +20,13 @@ import {
 import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
 import {
   ballGroup,
-  remainingGroupBalls,
   type BallState,
   type BilliardsMove,
   type BilliardsPresentation,
   type BilliardsState,
   type BilliardsVariant,
   type FoulReason,
+  remainingGroupBalls,
   type ShotOutcome,
 } from "./types";
 

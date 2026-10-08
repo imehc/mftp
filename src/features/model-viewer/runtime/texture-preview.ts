@@ -5,9 +5,9 @@ import {
   PlaneGeometry,
   Scene,
   SRGBColorSpace,
-  WebGLRenderTarget,
   type Texture,
   type WebGLRenderer,
+  WebGLRenderTarget,
 } from "three";
 
 /** 按需生成小尺寸预览，兼容解码后的压缩纹理；临时 GPU 资源立即释放。 */

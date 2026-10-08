@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircle } from "lucide-react";
+import type { ReactNode } from "react";
+
 import { MediaCancelButton } from "../MediaProcessingGuard";
 
 export default function MediaProgress({

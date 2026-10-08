@@ -1,20 +1,22 @@
-import { useEffect, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import { describeError, toIpcError } from "~/lib/errors";
 import {
   todoItemCreate,
   todoItemDelete,
-  todoItemUpdate,
   todoItemsList,
+  todoItemUpdate,
 } from "~/lib/ipc";
-import { describeError, toIpcError } from "~/lib/errors";
 import type { AppError, TodoItem, TodoItemInput } from "~/types";
+
 import {
   ALL_TODO_CATEGORIES,
-  sortTodoItems,
   matchesTodoQuery,
-  todoView,
+  sortTodoItems,
   type TodoView,
+  todoView,
 } from "../todo-utils";
 
 /** 两端共用的待办状态与动作；布局不拥有 IPC 或异步资源。 */

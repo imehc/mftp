@@ -1,8 +1,10 @@
-import type { PoetryTranslationPackSummary } from "~/bindings";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
-import { pickFilePathNative } from "~/lib/files";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
+
+import type { PoetryTranslationPackSummary } from "~/bindings";
+import { describeError, toIpcError } from "~/lib/errors";
+import { pickFilePathNative } from "~/lib/files";
 import {
   poetryAnnotationsDelete,
   poetryAnnotationsInstall,
@@ -13,8 +15,9 @@ import {
   poetryTranslationPacks,
 } from "~/lib/ipc";
 import type { AppError, PoetryContentIndexStatus } from "~/types";
-import { describeError, toIpcError } from "~/lib/errors";
+
 import type { PoetrySyncProgressState } from "../sync-progress";
+
 const INDEX_TOAST_ID = "poetry-index";
 
 /** 桌面本地语料能力独立于页面布局，读取和动作共享忙碌与卸载边界。 */
@@ -37,6 +40,7 @@ export function usePoetryLocalData(
   const [extrasError, setExtrasError] = useState<AppError | null>(null);
   const [extrasLoading, setExtrasLoading] = useState(true);
   const extraReads = useRef({ generation: 0, mounted: false });
+
   // 独立读取并行执行；失败保持错误状态，不把未知状态显示成未安装。
   const refreshExtras = async () => {
     if (!extraReads.current.mounted) return;
@@ -60,6 +64,7 @@ export function usePoetryLocalData(
       if (generation === extraReads.current.generation) setExtrasLoading(false);
     }
   };
+
   const refreshInEffect = useEffectEvent(refreshExtras);
   useEffect(() => {
     if (!enabled) return;
@@ -80,6 +85,7 @@ export function usePoetryLocalData(
     if (progress.phase !== "done" && progress.phase !== "error") return;
     queueMicrotask(() => void refreshInEffect());
   }, [progress.phase, progress.updatedAt]);
+
   const importLocal = async () => {
     if (selectedPendingIds.length === 0) {
       toast.info(t`请先选择合集`);
@@ -98,6 +104,7 @@ export function usePoetryLocalData(
       });
     }
   };
+
   const toggleBodyIndex = async (enable: boolean) => {
     try {
       if (enable) {
@@ -117,6 +124,7 @@ export function usePoetryLocalData(
       });
     }
   };
+
   const installAnnotations = async () => {
     try {
       await poetryAnnotationsInstall();
@@ -124,6 +132,7 @@ export function usePoetryLocalData(
       toast.error(t`操作失败`, { description: describeError(error) });
     }
   };
+
   const deleteAnnotations = async () => {
     try {
       await poetryAnnotationsDelete();
@@ -147,6 +156,7 @@ export function usePoetryLocalData(
       if (extraReads.current.mounted) setBusy(false);
     }
   }
+
   return {
     bodyIndex,
     annotationsCount,

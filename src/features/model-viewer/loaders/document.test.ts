@@ -1,6 +1,8 @@
-import { expect, it } from "vitest";
 import { i18n } from "@lingui/core";
+import { expect, it } from "vitest";
+
 import { parseDocument } from "./document";
+
 i18n.loadAndActivate({ locale: "zh-CN", messages: {} });
 
 function glb(json: object, binary?: Uint8Array) {

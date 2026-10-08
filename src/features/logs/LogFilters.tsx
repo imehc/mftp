@@ -1,7 +1,15 @@
-import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ListFilter, Search } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "~/components/ui/button";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
@@ -9,20 +17,14 @@ import {
 } from "~/components/ui/input-group";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "~/components/ui/select";
-import { Dialog, DialogTitle } from "~/components/ui/dialog";
-import {
-  DialogLayoutContent,
-  DialogLayoutHeader,
-  DialogLayoutBody,
-} from "~/components/ui/dialog-layout";
-import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 import type { ActivityLogsController } from "./use-activity-logs";
 
 function FilterSelect({
@@ -59,6 +61,7 @@ function FilterSelect({
     </Select>
   );
 }
+
 export default function LogFilters({
   controller: c,
 }: {

@@ -1,5 +1,5 @@
-import { router } from "~/router";
 import { useBtTasksStore } from "~/features/bt/tasks-store";
+import { router } from "~/router";
 
 /**
  * 传输任务的重试意图。

@@ -1,38 +1,40 @@
-import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { ArrowLeft, Magnet, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import * as ipc from "~/lib/ipc";
-import type { BtProbeResult, BtTaskInfo } from "~/types";
-import { useTransfersStore } from "~/store/transfers";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
-import { describeError } from "~/lib/errors";
-import { acquireBtPage, retryBtSubscription } from "./runtime/btRuntime";
-import { magnetOf } from "./magnet";
-import { forgetBtTask, syncBtTask } from "./task-sync";
-import { refreshBtTasks, useBtTasksStore } from "./tasks-store";
-import { isMobilePlatform } from "~/lib/platform";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Button } from "~/components/ui/button";
 import {
   Alert,
   AlertAction,
   AlertDescription,
   AlertTitle,
 } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
+import ActivityMenu from "~/features/transfers/ActivityMenu";
+import { describeError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import { isMobilePlatform } from "~/lib/platform";
+import { useTransfersStore } from "~/store/transfers";
+import type { BtProbeResult, BtTaskInfo } from "~/types";
+
 import AddTorrentDialog from "./components/AddTorrentDialog";
 import TaskDialogs from "./components/TaskDialogs";
-import TaskList from "./components/TaskList";
 import TaskFilesPage from "./components/TaskFilesPage";
+import TaskList from "./components/TaskList";
 import { systemDownloadDir } from "./file-actions";
+import { magnetOf } from "./magnet";
+import { acquireBtPage, retryBtSubscription } from "./runtime/btRuntime";
+import { forgetBtTask, syncBtTask } from "./task-sync";
+import { refreshBtTasks, useBtTasksStore } from "./tasks-store";
 
 export default function BtTool() {
   const { t } = useLingui();
@@ -48,10 +50,12 @@ export default function BtTool() {
   const [filesTab, setFilesTab] = useState("files");
   const [busyTasks, setBusyTasks] = useState<Set<string>>(new Set());
   const pendingActions = useRef(new Set<string>());
+
   const openFiles = (task: BtTaskInfo, tab = "files") => {
     setFilesTab(tab);
     setFilesTask(task);
   };
+
   const runAction = async (hash: string, action: () => Promise<void>) => {
     if (pendingActions.current.has(hash)) return;
     pendingActions.current.add(hash);
@@ -63,6 +67,7 @@ export default function BtTool() {
       setBusyTasks(new Set(pendingActions.current));
     }
   };
+
   const [prefill, setPrefill] = useState<string | null>(null);
   const [prefillProbe, setPrefillProbe] = useState<BtProbeResult | null>(null);
   const [prefillSelected, setPrefillSelected] = useState<number[] | null>(null);
@@ -86,6 +91,7 @@ export default function BtTool() {
     setDialogReadOnly(false);
     setDialogOpen(true);
   };
+
   // 页面挂载期间申请 2s 级轮询；任务同步、无对等节点提示都由模块运行期负责。
   useEffect(() => acquireBtPage(), []);
   const refresh = refreshBtTasks;
@@ -97,6 +103,7 @@ export default function BtTool() {
     setDialogReadOnly(false);
     setDialogOpen(true);
   };
+
   const handleAdded = (
     task: BtTaskInfo,
     source: string,
@@ -119,6 +126,7 @@ export default function BtTool() {
     syncBtTask(task, true);
     void refresh();
   };
+
   const openParsed = (task: BtTaskInfo) => {
     const parsed = parsedProbes.current.get(task.infoHash);
     if (!parsed) return;
@@ -128,6 +136,7 @@ export default function BtTool() {
     setDialogReadOnly(true);
     setDialogOpen(true);
   };
+
   const control = async (
     task: BtTaskInfo,
     action: "Pause" | "Resume" | "Cancel",
@@ -144,6 +153,7 @@ export default function BtTool() {
       toast.error(describeError(error));
     }
   };
+
   const exportTask = async (task: BtTaskInfo) => {
     if (isMobilePlatform()) {
       try {
@@ -170,6 +180,7 @@ export default function BtTool() {
       toast.error(t`转存失败`, { description: describeError(error) });
     }
   };
+
   const confirmDelete = async () => {
     if (!pendingDelete) return;
     const target = pendingDelete;
@@ -184,6 +195,7 @@ export default function BtTool() {
       toast.error(describeError(error));
     }
   };
+
   return (
     <div
       data-bottom-inset="scroll"

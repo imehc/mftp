@@ -1,11 +1,12 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { Group } from "three";
-import type { ModelHandle, ModelSource } from "../domain/types";
+import { beforeEach, expect, it, vi } from "vitest";
+
 import { MissingResources } from "../domain/errors";
+import type { ModelHandle, ModelSource } from "../domain/types";
 import { loadModel } from "../loaders/registry";
-import type { ModelViewerRuntime } from "./viewer";
 import { ModelCollection } from "./collection";
 import { ViewerSession } from "./session";
+import type { ModelViewerRuntime } from "./viewer";
 
 vi.mock("../loaders/registry", () => ({ loadModel: vi.fn() }));
 

@@ -1,4 +1,5 @@
 export const TEXT_HEAD_BYTES = 128 * 1024;
+
 export interface TextPreview {
   body: string;
   truncated: boolean;

@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Volume2, VolumeX } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -8,6 +9,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Slider } from "~/components/ui/slider";
 import { useSettingsStore } from "~/store/settings";
+
 export function GameVolumeControl({
   presentation = "icon",
 }: {

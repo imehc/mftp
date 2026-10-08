@@ -1,6 +1,7 @@
 import { expect, it } from "vitest";
-import { modelExtension, modelFileAccept, modelFormat } from "./formats";
+
 import { browserSource } from "../sources/browser";
+import { modelExtension, modelFileAccept, modelFormat } from "./formats";
 
 it("文件选择、拖放与格式标识使用同一份扩展名定义", () => {
   for (const [name, format] of [

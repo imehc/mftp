@@ -1,24 +1,26 @@
 import { Trans } from "@lingui/react/macro";
+
+import CandidateInput from "~/components/CandidateInput";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
-import CandidateInput from "~/components/CandidateInput";
-import { Input } from "~/components/ui/input";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldError,
-} from "~/components/ui/field";
 import {
   DialogLayoutBody,
   DialogLayoutContent,
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
-import { useTodoEditor } from "./hooks/use-todo-editor";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { firstFormError } from "~/lib/form-errors";
 import type { TodoItem, TodoItemInput } from "~/types";
+
+import { useTodoEditor } from "./hooks/use-todo-editor";
 import TodoSchedulePicker from "./TodoSchedulePicker";
 
 interface TodoItemDialogProps {

@@ -1,26 +1,28 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Ellipsis, RefreshCw, Trash2 } from "lucide-react";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import {
-  Empty,
-  EmptyHeader,
-  EmptyTitle,
-  EmptyDescription,
-} from "~/components/ui/empty";
-import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "~/components/ui/empty";
 import { describeError } from "~/lib/errors";
-import { useActivityLogs } from "./use-activity-logs";
+
+import LogDialogs from "./LogDialogs";
 import LogFilters from "./LogFilters";
 import LogList from "./LogList";
-import LogDialogs from "./LogDialogs";
+import { useActivityLogs } from "./use-activity-logs";
 
 export default function ActivityLogsPage() {
   const { t } = useLingui();

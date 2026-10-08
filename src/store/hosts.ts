@@ -1,7 +1,8 @@
 import { create } from "zustand";
+
 import { toIpcError } from "~/lib/errors";
-import type { AppError, Host, HostInput, SshKey } from "~/types";
 import * as ipc from "~/lib/ipc";
+import type { AppError, Host, HostInput, SshKey } from "~/types";
 
 /** 并发的 ensureLoaded 共享同一次读取，避免重复请求。 */
 let pendingLoad: Promise<void> | null = null;

@@ -37,10 +37,12 @@ export function abortableDelay(ms: number, signal: AbortSignal): Promise<void> {
       signal.removeEventListener("abort", onAbort);
       resolve();
     }, ms);
+
     const onAbort = () => {
       clearTimeout(timer);
       reject(signal.reason ?? new DOMException("Aborted", "AbortError"));
     };
+
     signal.addEventListener("abort", onAbort, { once: true });
   });
 }

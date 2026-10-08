@@ -6,19 +6,21 @@ import {
   Settings,
   ShieldAlert,
 } from "lucide-react";
+
 import AppPageLayout from "~/components/AppPageLayout";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { describeError } from "~/lib/errors";
+
+import LanConnectedDevices from "./LanConnectedDevices";
 import LanDiscoveredDevicesPanel from "./LanDiscoveredDevicesPanel";
 import LanPendingAuthRequestsPanel from "./LanPendingAuthRequestsPanel";
-import LanShareDialog from "./LanShareDialog";
-import LanSharedDirsSection from "./LanSharedDirsSection";
-import LanTransferSettingsDialog from "./LanTransferSettingsDialog";
 import LanServiceCard from "./LanServiceCard";
-import LanConnectedDevices from "./LanConnectedDevices";
+import LanSharedDirsSection from "./LanSharedDirsSection";
+import LanShareDialog from "./LanShareDialog";
 import LanTransferActivity from "./LanTransferActivity";
-import { describeError } from "~/lib/errors";
+import LanTransferSettingsDialog from "./LanTransferSettingsDialog";
 import { useLanTransfer } from "./use-lan-transfer";
 
 export default function LanTransferTool() {

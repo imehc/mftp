@@ -1,10 +1,11 @@
-import { defineConfig } from "vite";
+import { resolve } from "node:path";
+
+import { lingui, linguiTransformerBabelPreset } from "@lingui/vite-plugin";
+import babel from "@rolldown/plugin-babel";
+import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import babel from "@rolldown/plugin-babel";
-import { lingui, linguiTransformerBabelPreset } from "@lingui/vite-plugin";
-import tailwindcss from "@tailwindcss/vite";
-import { resolve } from "node:path";
+import { defineConfig } from "vite";
 
 const host = process.env.TAURI_DEV_HOST;
 const devHost = host || "127.0.0.1";

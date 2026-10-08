@@ -1,7 +1,9 @@
 import { afterEach, expect, it, vi } from "vitest";
+
 import { IpcError } from "~/lib/errors";
-import { browserSource } from "../sources/browser";
+
 import { ModelResources } from "../runtime/resources";
+import { browserSource } from "../sources/browser";
 import { readFbxImages } from "./fbx-images";
 
 afterEach(() => vi.unstubAllGlobals());

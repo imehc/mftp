@@ -8,10 +8,10 @@ import {
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
+
+import { CopyButton } from "~/components/CopyButton";
+import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { PasswordInput } from "~/components/ui/password-input";
-import { Label } from "~/components/ui/label";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
@@ -19,11 +19,13 @@ import {
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
-import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { CopyButton } from "~/components/CopyButton";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { PasswordInput } from "~/components/ui/password-input";
 import { describeError } from "~/lib/errors";
-import type { RoomOwner } from "./roomOwner";
+
 import type { MoveParser } from "./protocol";
+import type { RoomOwner } from "./roomOwner";
 import { useOnlineLobby } from "./use-online-lobby";
 
 export function OnlineLobby<M>({
@@ -40,10 +42,12 @@ export function OnlineLobby<M>({
   const { t } = useLingui();
   const c = useOnlineLobby(gameId, parseMove, owner);
   const report = (error: unknown) => toast.error(describeError(error));
+
   const back = async () => {
     await c.cancel();
     onExit();
   };
+
   return (
     <>
       <ToolPageHeader

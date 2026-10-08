@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import type { MessageDescriptor } from "@lingui/core";
+import { describe, expect, it, vi } from "vitest";
+
 import {
   createLanSettingsSchema,
   createLanSharedDirSchema,
@@ -28,6 +29,7 @@ describe("LAN 表单本地化校验", () => {
     ).toBe(true);
     expect(schema.safeParse({ ...values, port: 8080 }).success).toBe(true);
   });
+
   it("共享目录未选择时保留本地化错误", () => {
     const result = createLanSharedDirSchema(() => "请选择目录").safeParse({
       name: "QA",

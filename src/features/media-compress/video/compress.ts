@@ -1,5 +1,4 @@
 import { msg } from "@lingui/core/macro";
-import { translate } from "~/i18n/translate";
 import {
   ALL_FORMATS,
   BlobSource,
@@ -10,6 +9,8 @@ import {
   Mp4OutputFormat,
   Output,
 } from "mediabunny";
+
+import { translate } from "~/i18n/translate";
 
 export type VideoResolution = "original" | "1080p" | "720p" | "480p" | "360p";
 
@@ -80,12 +81,14 @@ function raceAbort<T>(
   return new Promise<T>((resolve, reject) => {
     let settled = false;
     const cleanup = () => signal.removeEventListener("abort", abort);
+
     const finish = (callback: () => void) => {
       if (settled) return;
       settled = true;
       cleanup();
       callback();
     };
+
     const abort = () => {
       finish(() => {
         onAbort?.();

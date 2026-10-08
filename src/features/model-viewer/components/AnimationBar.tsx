@@ -1,6 +1,7 @@
-import { useId, useState, useSyncExternalStore } from "react";
-import { ChevronDown, ChevronUp, Pause, Play, Square } from "lucide-react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { ChevronDown, ChevronUp, Pause, Play, Square } from "lucide-react";
+import { useId, useState, useSyncExternalStore } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Slider } from "~/components/ui/slider";
+
 import type { LoopMode, ModelAnimation } from "../runtime/animation";
 
 export function AnimationBar({
@@ -32,6 +34,7 @@ export function AnimationBar({
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+
   const clipLabel = (name: string, index: number) => {
     const number = index + 1;
     if (!name)
@@ -43,6 +46,7 @@ export function AnimationBar({
       ? `${name} (${number})`
       : name;
   };
+
   const loops: { value: LoopMode; label: string }[] = [
     {
       value: "once",

@@ -1,12 +1,13 @@
-import { useEffect, useId, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
-import { ChevronDown, Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+
+import { Button } from "~/components/ui/button";
 import {
   InputGroup,
-  InputGroupInput,
   InputGroupAddon,
+  InputGroupInput,
 } from "~/components/ui/input-group";
-import { Button } from "~/components/ui/button";
 import {
   Popover,
   PopoverAnchor,
@@ -45,12 +46,14 @@ export default function CandidateInput({
         .getElementById(`${listId}-${active}`)
         ?.scrollIntoView({ block: "nearest" });
   }, [open, active, listId]);
+
   function choose(candidate: string) {
     onChange(candidate);
     setOpen(false);
     setActive(-1);
     input.current?.focus();
   }
+
   return (
     <Popover
       open={open && !disabled && options.length > 0}

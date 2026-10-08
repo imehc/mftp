@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import type { BoardSize, GoMove } from "./types";
 
 export function goMoveParser(boardSize: BoardSize) {

@@ -1,7 +1,8 @@
-import { useEffect } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useForm } from "@tanstack/react-form";
 import { FolderOpen, ShieldAlert, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -29,19 +30,20 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { firstFormError } from "~/lib/form-errors";
 import {
   createLanSettingsSchema,
   createLanTrustedDeviceSchema,
-  lanTrustedDeviceFormValuesToInput,
   type LanTrustedDeviceFormValues,
+  lanTrustedDeviceFormValuesToInput,
 } from "~/features/lan-transfer/lanTransferForms.schema";
+import { firstFormError } from "~/lib/form-errors";
 import type {
   LanNetworkAddress,
   LanTransferSettings,
   LanTrustedDevice,
   LanTrustedDeviceInput,
 } from "~/types";
+
 interface LanTransferSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,10 +57,12 @@ interface LanTransferSettingsDialogProps {
   deleteTrustedDevice: (id: string) => void;
   saveSettings: (values: LanTransferSettings) => Promise<void>;
 }
+
 const emptyTrustedDeviceFormValues: LanTrustedDeviceFormValues = {
   label: "",
   ip: "",
 };
+
 export default function LanTransferSettingsDialog({
   open,
   onOpenChange,
@@ -97,10 +101,12 @@ export default function LanTransferSettingsDialog({
     form.reset(settings);
     trustedForm.reset(emptyTrustedDeviceFormValues);
   }, [form, open, settings, trustedForm]);
+
   async function pickDownloadDir() {
     const selected = await chooseDownloadDir();
     if (selected) form.setFieldValue("downloadDir", selected);
   }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent

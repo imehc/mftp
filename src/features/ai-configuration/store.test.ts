@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+
 import type { AiConfigurationView } from "~/bindings";
+
 import { createAiConfigurationStore } from "./store";
 
 function view(
@@ -15,6 +17,7 @@ function view(
     modelCandidates: [],
   };
 }
+
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error: unknown) => void;
@@ -24,6 +27,7 @@ function deferred<T>() {
   });
   return { promise, resolve, reject };
 }
+
 const failure = {
   kind: "custom" as const,
   code: "ai:revision_conflict",
@@ -44,6 +48,7 @@ describe("AI 配置同步", () => {
     expect(read).toHaveBeenCalledTimes(1);
     expect(store.getState().loading).toBe(false);
   });
+
   it("不让延迟读取覆盖变更快照", async () => {
     const result = deferred<AiConfigurationView>();
     const store = createAiConfigurationStore(() => result.promise);
@@ -54,6 +59,7 @@ describe("AI 配置同步", () => {
     expect(store.getState().view?.activeProviderId).toBe("B");
     expect(store.getState().view?.revision).toBe(2);
   });
+
   it("拒绝同一时刻的重复提交且不保留输入", async () => {
     const result = deferred<AiConfigurationView>();
     const store = createAiConfigurationStore();
@@ -65,6 +71,7 @@ describe("AI 配置同步", () => {
     expect(await first).toBe(true);
     expect(store.getState().busy).toBe(false);
   });
+
   it("刷新冲突但绝不重放写入或认证", async () => {
     const store = createAiConfigurationStore(async () => view(8));
     const mutation = vi.fn(async () => {
@@ -75,6 +82,7 @@ describe("AI 配置同步", () => {
     expect(store.getState().view?.revision).toBe(8);
     expect(store.getState().error).toEqual(failure);
   });
+
   it("读取出错时保留现有数据，不显示空配置", async () => {
     const store = createAiConfigurationStore(async () => {
       throw failure;
@@ -84,6 +92,7 @@ describe("AI 配置同步", () => {
     expect(store.getState().view?.activeProviderId).toBe("A");
     expect(store.getState().error).toEqual(failure);
   });
+
   it("重新加载部分删除结果，同时保留原始错误", async () => {
     const store = createAiConfigurationStore(async () => view(6));
     await store.getState().execute(async () => view(5, "A"));
@@ -98,6 +107,7 @@ describe("AI 配置同步", () => {
     expect(store.getState().view?.activeProviderId).toBeNull();
     expect(store.getState().error).toEqual(cleanup);
   });
+
   it("使用后端响应原子替换地址和两个选择", async () => {
     const store = createAiConfigurationStore();
     const a = {

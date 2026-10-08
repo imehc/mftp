@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { useLingui } from "@lingui/react/macro";
-import { toast } from "sonner";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useLingui } from "@lingui/react/macro";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+
+import { describeError, toIpcError } from "~/lib/errors";
 import {
   vaultEntriesList,
   vaultEntriesReorder,
@@ -9,8 +11,8 @@ import {
   vaultEntryDelete,
   vaultEntryUpdate,
 } from "~/lib/ipc";
-import { describeError, toIpcError } from "~/lib/errors";
-import type { VaultEntry, VaultEntryInput, AppError } from "~/types";
+import type { AppError, VaultEntry, VaultEntryInput } from "~/types";
+
 import { ALL_CATEGORIES, filterVaultEntries } from "./vault-utils";
 
 export function useVault() {
@@ -28,6 +30,7 @@ export function useVault() {
   const mounted = useRef(false);
   const generation = useRef(0);
   const writing = useRef(false);
+
   async function read(run: number) {
     try {
       const next = await vaultEntriesList();
@@ -39,12 +42,14 @@ export function useVault() {
       if (mounted.current && generation.current === run) setLoading(false);
     }
   }
+
   function reload() {
     if (writing.current) return;
     setLoading(true);
     setError(null);
     return read(++generation.current);
   }
+
   useEffect(() => {
     mounted.current = true;
     void read(++generation.current);
@@ -58,6 +63,7 @@ export function useVault() {
   const filtered = filterVaultEntries(entries, search, category);
   const canSort =
     sorting && !search.trim() && category === ALL_CATEGORIES && !busy;
+
   // 写操作串行准入，避免重复提交或排序回滚覆盖刚刚完成的编辑。
   async function mutate(action: () => Promise<void>) {
     if (writing.current) return;
@@ -73,6 +79,7 @@ export function useVault() {
       if (mounted.current) setBusy(false);
     }
   }
+
   async function submit(input: VaultEntryInput) {
     await mutate(async () => {
       const entry = editing
@@ -89,6 +96,7 @@ export function useVault() {
       toast.success(t`已保存`);
     });
   }
+
   async function remove() {
     if (!deleting) return;
     const id = deleting.id;
@@ -100,6 +108,7 @@ export function useVault() {
       toast.success(t`已删除`);
     });
   }
+
   async function reorder(active: string, over: string) {
     if (!canSort) return;
     const from = entries.findIndex((e) => e.id === active),
@@ -118,12 +127,14 @@ export function useVault() {
       }
     });
   }
+
   function edit(entry: VaultEntry | null) {
     if (!busy) {
       setEditing(entry);
       setDialogOpen(true);
     }
   }
+
   return {
     entries,
     filtered,
@@ -150,4 +161,5 @@ export function useVault() {
     reorder,
   };
 }
+
 export type VaultController = ReturnType<typeof useVault>;

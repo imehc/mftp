@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import type { ReactNode } from "react";
+
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   InputGroup,
@@ -8,11 +8,13 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "~/components/ui/input-group";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   DIMENSION_MAX,
   type DimensionMode,
   type ResizeMethod,
 } from "~/features/media-compress/resize/resize";
+
 export const DIMENSION_MODES: readonly DimensionMode[] = [
   "exact",
   "width",
@@ -20,9 +22,11 @@ export const DIMENSION_MODES: readonly DimensionMode[] = [
   "longest",
   "shortest",
 ];
+
 export function isDimensionMode(value: string): value is DimensionMode {
   return (DIMENSION_MODES as readonly string[]).includes(value);
 }
+
 export function dimensionModeLabel(mode: DimensionMode): ReactNode {
   switch (mode) {
     case "exact":
@@ -37,17 +41,20 @@ export function dimensionModeLabel(mode: DimensionMode): ReactNode {
       return <Trans>固定最小边</Trans>;
   }
 }
+
 export function parseDimensionInput(value: string): number | null {
   if (!value.trim()) return null;
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 1) return null;
   return Math.round(parsed);
 }
+
 interface ResizeMethodTabsProps {
   value: ResizeMethod;
   onChange: (method: ResizeMethod) => void;
   disabled?: boolean;
 }
+
 export function ResizeMethodTabs({
   value,
   onChange,
@@ -74,6 +81,7 @@ export function ResizeMethodTabs({
     </ToggleGroup>
   );
 }
+
 interface DimensionInputProps {
   label: ReactNode;
   value: string;
@@ -81,6 +89,7 @@ interface DimensionInputProps {
   ariaLabel: string;
   onChange: (value: string) => void;
 }
+
 export function DimensionInput({
   label,
   value,

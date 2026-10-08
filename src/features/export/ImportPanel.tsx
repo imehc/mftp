@@ -1,17 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FileInput } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { PasswordInput } from "~/components/ui/password-input";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "~/components/ui/select";
-import { PasswordInput } from "~/components/ui/password-input";
 import { SettingsGroup } from "~/features/settings/SettingsEntry";
+
 import { exportSections } from "./sections";
 import type { BackupController } from "./use-backup";
 

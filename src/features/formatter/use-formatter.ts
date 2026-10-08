@@ -1,18 +1,22 @@
-import { useState, type RefObject } from "react";
-import { useLingui } from "@lingui/react/macro";
-import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { openSearchPanel } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
+import { useLingui } from "@lingui/react/macro";
+import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { useTheme } from "next-themes";
+import { type RefObject, useState } from "react";
 import { toast } from "sonner";
-import { getFormatterLanguage, type FormatterLanguageId } from "./languages";
+
 import type { FormatResult, SortDirection } from "./json";
+import { type FormatterLanguageId, getFormatterLanguage } from "./languages";
+
 type IndentId = "2" | "4" | "tab";
+
 const indentValues: Record<IndentId, string> = {
   "2": "  ",
   "4": "    ",
   tab: "\t",
 };
+
 export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
   const { t } = useLingui();
   const { resolvedTheme } = useTheme();
@@ -24,6 +28,7 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
   const validation =
     value.trim() && language.validate ? language.validate(value) : null;
   const isDocValid = validation?.ok !== false;
+
   function describeFormatError(
     result: Extract<
       FormatResult,
@@ -41,6 +46,7 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
       ? t`第 ${resultLine} 行第 ${resultColumn} 列附近有语法错误`
       : t`内容不是有效的 ${languageLabel}`;
   }
+
   const extensions = [
     ...language.extensions(),
     // CodeMirror 面板（搜索等）的 UI 文案：键是 CodeMirror 原来的
@@ -86,6 +92,7 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
   function currentDoc(): string {
     return editorRef.current?.view?.state.doc.toString() ?? value;
   }
+
   function replaceDoc(next: string) {
     const view = editorRef.current?.view;
     if (view) {
@@ -99,6 +106,7 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
     }
     setValue(next);
   }
+
   function applyResult(result: FormatResult) {
     if (result.ok) {
       replaceDoc(result.value);
@@ -106,6 +114,7 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
     }
     toast.error(describeFormatError(result));
   }
+
   function handleFormat() {
     const doc = currentDoc();
     if (!doc.trim()) return;
@@ -115,11 +124,13 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
       }),
     );
   }
+
   function handleMinify() {
     const doc = currentDoc();
     if (!doc.trim() || !language.minify) return;
     applyResult(language.minify(doc));
   }
+
   function handleValidate() {
     const doc = currentDoc();
     if (!doc.trim() || !language.validate) return;
@@ -131,6 +142,7 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
       toast.error(describeFormatError(result));
     }
   }
+
   function handleSortKeys(sortDirection: SortDirection) {
     const doc = currentDoc();
     if (!doc.trim() || !language.sortKeys) return;
@@ -143,11 +155,13 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
     );
     applyResult(result);
   }
+
   function handleEscape() {
     const doc = currentDoc();
     if (!doc || !language.escape) return;
     applyResult(language.escape(doc));
   }
+
   function handleUnescape() {
     const doc = currentDoc();
     if (!doc || !language.unescape) return;
@@ -158,12 +172,14 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
     }
     applyResult(result);
   }
+
   function handleSearch() {
     const view = editorRef.current?.view;
     if (view) {
       openSearchPanel(view);
     }
   }
+
   const statusLanguage = language.label;
   const status = !validation
     ? null
@@ -193,4 +209,5 @@ export function useFormatter(editorRef: RefObject<ReactCodeMirrorRef | null>) {
     handleSearch,
   };
 }
+
 export type FormatterController = ReturnType<typeof useFormatter>;

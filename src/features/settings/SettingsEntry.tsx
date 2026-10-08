@@ -1,6 +1,6 @@
-import type { ReactNode, ComponentProps } from "react";
-import { ChevronRight, type LucideIcon } from "lucide-react";
 import { cn } from "cn";
+import { ChevronRight, type LucideIcon } from "lucide-react";
+import type { ComponentProps, ReactNode } from "react";
 
 /** 设置入口的图标、两行文案、分隔与触控尺寸统一在此处。 */
 export function SettingsEntry({
@@ -38,6 +38,7 @@ export function SettingsEntry({
     </button>
   );
 }
+
 export function SettingsGroup({
   title,
   children,

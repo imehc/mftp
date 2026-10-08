@@ -1,13 +1,14 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { AppError, PoemDetail, PoemSummary } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { useDebouncedQuery } from "./use-poetry-search";
-import { usePoetryStore } from "../store/poetry-store";
-import { describeError, toIpcError } from "~/lib/errors";
 
+import { describeError, toIpcError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import type { AppError, PoemDetail, PoemSummary } from "~/types";
+
+import { usePoetryStore } from "../store/poetry-store";
 import { usePoemRead } from "./use-poem-read";
+import { useDebouncedQuery } from "./use-poetry-search";
 
 interface UsePoetryLibraryOptions {
   /** 路由上的查询参数（唯一来源），页面间共享同一套链接语义。 */

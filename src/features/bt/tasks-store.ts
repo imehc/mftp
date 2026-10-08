@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import type { AppError, BtTaskInfo } from "~/types";
+
 import { toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
+import type { AppError, BtTaskInfo } from "~/types";
 
 /**
  * BT 任务快照的全局投影。读取与监听由模块运行期（`runtime/btRuntime`）

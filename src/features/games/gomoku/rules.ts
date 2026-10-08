@@ -5,11 +5,11 @@ import type {
 } from "../engine/types";
 import {
   BOARD_SIZE,
-  WIN_LENGTH,
   type GomokuMove,
   type GomokuPresentation,
   type GomokuState,
   type Stone,
+  WIN_LENGTH,
 } from "./types";
 
 const DIRECTIONS: Array<[number, number]> = [

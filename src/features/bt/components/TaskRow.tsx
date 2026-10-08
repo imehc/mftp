@@ -12,9 +12,7 @@ import {
   Users,
   XCircle,
 } from "lucide-react";
-import type { BtTaskInfo } from "~/types";
-import { formatBytes } from "~/lib/format";
-import { describeError } from "~/lib/errors";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -23,9 +21,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
 import { useTransfersStore } from "~/store/transfers";
+import type { BtTaskInfo } from "~/types";
 
 export type BtControlAction = "Pause" | "Resume" | "Cancel";
+
 export interface TaskRowProps {
   task: BtTaskInfo;
   stalled: boolean;

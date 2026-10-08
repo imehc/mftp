@@ -7,6 +7,7 @@
  * 在各平台上表现一致。
  */
 import RAPIER from "@dimforge/rapier2d-compat";
+
 import {
   ANGULAR_DAMPING,
   BALL_FRICTION,

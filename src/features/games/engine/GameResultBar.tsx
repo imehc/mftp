@@ -1,9 +1,12 @@
-import { cn } from "cn";
-import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
+import { cn } from "cn";
 import { ArrowLeft, RefreshCw, Trophy } from "lucide-react";
+import type { ReactNode } from "react";
+
 import { Button } from "~/components/ui/button";
+
 import { VictoryConfetti } from "./VictoryConfetti";
+
 export function GameResultBar({
   presentation = "bar",
   title,

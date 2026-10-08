@@ -1,5 +1,6 @@
-import { afterEach, expect, it, vi } from "vitest";
 import { Scene, type WebGLRenderer } from "three";
+import { afterEach, expect, it, vi } from "vitest";
+
 import { ViewerEnvironment } from "./environment";
 
 class TestWorker {
@@ -12,10 +13,12 @@ class TestWorker {
     TestWorker.instances.push(this);
   }
 }
+
 afterEach(() => {
   vi.unstubAllGlobals();
   TestWorker.instances = [];
 });
+
 it("清理已取消的 HDR 任务，忽略其延迟错误并在释放时终止", async () => {
   vi.stubGlobal("Worker", TestWorker);
   const environment = new ViewerEnvironment(
@@ -41,6 +44,7 @@ it("清理已取消的 HDR 任务，忽略其延迟错误并在释放时终止",
     name: null,
   });
 });
+
 it("清理工作线程并报告无效的 HDR 数据", async () => {
   vi.stubGlobal("Worker", TestWorker);
   const environment = new ViewerEnvironment(

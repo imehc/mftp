@@ -4,11 +4,11 @@ import type {
   SeatIndex,
 } from "../engine/types";
 import {
-  KOMI,
   type BoardSize,
   type GoMove,
   type GoPresentation,
   type GoState,
+  KOMI,
   type Stone,
 } from "./types";
 

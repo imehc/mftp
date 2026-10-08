@@ -5,6 +5,7 @@ import {
   type XiangqiHistoryPayload,
   type XiangqiMode,
 } from "./types";
+
 export function XiangqiModeMenu({
   onStart,
 }: {

@@ -1,11 +1,14 @@
 import { expect, it } from "vitest";
-import { browserSource } from "./browser";
+
 import { MissingResources } from "../domain/errors";
+import { browserSource } from "./browser";
+
 function file(path: string, contents: string) {
   const value = new File([contents], path.split("/").pop()!);
   Object.defineProperty(value, "webkitRelativePath", { value: path });
   return value;
 }
+
 it("批量源按所选模型目录隔离同名依赖", async () => {
   const a = file("one/model.gltf", "{}"),
     b = file("two/model.gltf", "{}");
@@ -27,6 +30,7 @@ it("批量源按所选模型目录隔离同名依赖", async () => {
   ).toBe("B");
   await second.close();
 });
+
 it("有歧义的文件必须显式映射且绝不静默覆盖", async () => {
   const entry = file("model.gltf", "{}");
   const source = browserSource(

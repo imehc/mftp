@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Pencil, Trash2 } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 
 import type { TodoRowActionsProps } from "./todo-row-actions";

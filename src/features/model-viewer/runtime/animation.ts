@@ -1,13 +1,15 @@
 import {
-  AnimationMixer,
-  LoopOnce,
   type AnimationAction,
   type AnimationClip,
+  AnimationMixer,
+  LoopOnce,
   type Object3D,
 } from "three";
+
 import type { ModelPlaybackState } from "~/bindings";
 
 export type LoopMode = "once" | "repeat" | "pingpong";
+
 export type AnimationState = {
   clips: { name: string; duration: number }[];
   selected: number;

@@ -1,4 +1,4 @@
-import { Vector3, type PerspectiveCamera } from "three";
+import { type PerspectiveCamera, Vector3 } from "three";
 
 export const axisDirections = {
   posX: [1, 0, 0],
@@ -8,6 +8,7 @@ export const axisDirections = {
   posZ: [0, 0, 1],
   negZ: [0, 0, -1],
 } as const;
+
 export type ViewAxis = keyof typeof axisDirections;
 
 export function orientCamera(

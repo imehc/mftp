@@ -91,6 +91,7 @@
     "@lingui/cli": "^6.9.0",
     "@lingui/vite-plugin": "^6.9.0",
     "@rolldown/plugin-babel": "^0.2.4",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/router-cli": "^1.167.40",
     "@tanstack/router-plugin": "^1.168.42",
@@ -105,6 +106,7 @@
     "eslint-plugin-lingui": "^0.16.0",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
     "globals": "^17.12.0",
     "lint-staged": "^17.5.1",
     "prettier": "^3.9.9",
@@ -121,11 +123,11 @@
     "pre-commit": "pnpm exec lint-staged"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "*.{js,mjs,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{js,mjs,json,css,html,md,yaml,yml}": [
+    "*.{json,css,html,md,yaml,yml}": [
       "prettier --write"
     ]
   }

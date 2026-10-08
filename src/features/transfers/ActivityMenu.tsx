@@ -1,10 +1,12 @@
-import { useRef, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { Activity, FileClock, Info } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { useRef, useState } from "react";
+
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -13,15 +15,15 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import {
+  DialogLayoutBody,
   DialogLayoutContent,
   DialogLayoutHeader,
-  DialogLayoutBody,
 } from "~/components/ui/dialog-layout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
-import { useTransfersStore, type TransferState } from "~/store/transfers";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { describeError } from "~/lib/errors";
+import { type TransferState, useTransfersStore } from "~/store/transfers";
+
 import { retryTransferRuntime } from "./runtime/transferRuntime";
 import { createTransferActions } from "./transfer-actions";
 import TransferItem from "./TransferItem";

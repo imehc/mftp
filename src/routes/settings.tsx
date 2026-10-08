@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import type { PoetryTranslationMode } from "~/bindings";
 import SettingsPage from "~/features/settings/SettingsPage";
 

@@ -7,21 +7,21 @@
  * 下一杆的走位进行评分。
  */
 import {
+  type AiStrategy,
   createRng,
+  type Difficulty,
   gaussian,
   yieldToUi,
-  type AiStrategy,
-  type Difficulty,
 } from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
 import { BALL_RADIUS, POCKETS, TABLE_H, TABLE_W } from "./constants";
 import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
 import {
   ballGroup,
-  remainingGroupBalls,
   type BallState,
   type BilliardsMove,
   type BilliardsState,
+  remainingGroupBalls,
 } from "./types";
 
 interface DifficultyProfile {

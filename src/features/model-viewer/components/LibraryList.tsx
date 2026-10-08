@@ -1,7 +1,8 @@
-import { useEffect, useId, useRef, useState } from "react";
-import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import { Box, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+
 import type { ModelLibraryEntry } from "~/bindings";
 import { Button } from "~/components/ui/button";
 import {
@@ -11,8 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { modelLibraryReadThumbnail } from "~/lib/ipc";
 import { formatBytes } from "~/lib/format";
+import { modelLibraryReadThumbnail } from "~/lib/ipc";
+
 import type { ModelLibraryController } from "../library/controller";
 
 function Thumbnail({

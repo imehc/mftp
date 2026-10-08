@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import {
   ArrowLeft,
   Database,
@@ -7,23 +8,24 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import { toast } from "sonner";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import {
   SettingsEntry,
   SettingsGroup,
 } from "~/features/settings/SettingsEntry";
-import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
+import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
+import { isDesktopPlatform } from "~/lib/platform";
 import { useSessionsStore } from "~/store/sessions";
 import { useTransfersStore } from "~/store/transfers";
-import { isDesktopPlatform } from "~/lib/platform";
-import { formatBytes } from "~/lib/format";
-import { describeError } from "~/lib/errors";
-import { useAbout } from "./use-about";
+
 import DataManagementDialogs from "./DataManagementDialogs";
+import { useAbout } from "./use-about";
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -33,6 +35,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
 export default function AboutPage() {
   const { t } = useLingui();
   const c = useAbout();

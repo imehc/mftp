@@ -1,6 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Pencil, Trash2 } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
+
 import type { RowActionsProps } from "./types";
 
 export default function RowActionsDesktop(props: RowActionsProps) {

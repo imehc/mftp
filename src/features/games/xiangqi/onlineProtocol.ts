@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { BOARD_ROWS, BOARD_COLS, type XiangqiMove } from "./types";
+
+import { BOARD_COLS, BOARD_ROWS, type XiangqiMove } from "./types";
 
 const position = z
   .number()

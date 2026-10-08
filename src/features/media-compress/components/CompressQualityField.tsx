@@ -1,8 +1,10 @@
-import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
+import { cn } from "cn";
+import type { ReactNode } from "react";
+
 import { Field, FieldLabel } from "~/components/ui/field";
 import { Slider } from "~/components/ui/slider";
-import { cn } from "cn";
+
 interface CompressQualityFieldProps {
   value: number;
   min: number;
@@ -15,6 +17,7 @@ interface CompressQualityFieldProps {
   rightHint?: ReactNode;
   className?: string;
 }
+
 export function CompressQualityField({
   value,
   min,

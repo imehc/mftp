@@ -1,6 +1,7 @@
 import { Box3, InstancedMesh, Matrix3, Matrix4, Mesh, Vector3 } from "three";
-import type { ModelEntry } from "../runtime/collection";
+
 import { modelError } from "../domain/errors";
+import type { ModelEntry } from "../runtime/collection";
 import type { MeshSample } from "./types";
 
 export function sourcePoint(entry: ModelEntry, world: Vector3) {

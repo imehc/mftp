@@ -1,24 +1,26 @@
-import { useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useState } from "react";
 import { toast } from "sonner";
-import type { SftpEntry } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { useTransfersStore } from "~/store/transfers";
+
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
 import {
   archiveStem,
-  isSameOrChildPath,
-  joinPath,
-  nextTransferId,
-  normalizeRemotePath,
-  validPlainName,
   type ConflictState,
   type DirectoryPickerState,
   type ExtractState,
+  isSameOrChildPath,
+  joinPath,
   type LoadingAction,
+  nextTransferId,
+  normalizeRemotePath,
   type PromptState,
+  validPlainName,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { describeError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import { useTransfersStore } from "~/store/transfers";
+import type { SftpEntry } from "~/types";
+
 interface UseSftpRemoteActionsOptions {
   sessionId: string;
   cwd: string | null;
@@ -28,6 +30,7 @@ interface UseSftpRemoteActionsOptions {
   setConflict: (value: ConflictState) => void;
   setDirectoryPicker: (value: DirectoryPickerState) => void;
 }
+
 export function useSftpRemoteActions({
   sessionId,
   cwd,
@@ -42,6 +45,7 @@ export function useSftpRemoteActions({
   const [deleteTarget, setDeleteTarget] = useState<SftpEntry | null>(null);
   const startTransfer = useTransfersStore((state) => state.start);
   const finishTransfer = useTransfersStore((state) => state.finish);
+
   async function onExtract(entry: SftpEntry) {
     if (!cwd) return;
     setExtractTarget({
@@ -50,6 +54,7 @@ export function useSftpRemoteActions({
       remoteParent: cwd,
     });
   }
+
   function chooseExtractParent() {
     if (!extractTarget) return;
     setDirectoryPicker({
@@ -68,6 +73,7 @@ export function useSftpRemoteActions({
       },
     });
   }
+
   async function confirmExtract() {
     if (!extractTarget) return;
     const outName = extractTarget.outName.trim();
@@ -82,6 +88,7 @@ export function useSftpRemoteActions({
       outName,
     );
   }
+
   async function extractWithName(
     entry: SftpEntry,
     remoteParent: string,
@@ -102,6 +109,7 @@ export function useSftpRemoteActions({
     }
     await runExtract(entry, remoteParent, outName);
   }
+
   function showExtractConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -119,6 +127,7 @@ export function useSftpRemoteActions({
       },
     });
   }
+
   async function resolveExtractConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -149,6 +158,7 @@ export function useSftpRemoteActions({
     }
     await extractWithName(entry, remoteParent, incomingName);
   }
+
   async function runExtract(
     entry: SftpEntry,
     remoteParent: string,
@@ -171,6 +181,7 @@ export function useSftpRemoteActions({
       setBusy(null);
     }
   }
+
   function onMove(entry: SftpEntry) {
     if (!cwd) return;
     setDirectoryPicker({
@@ -183,9 +194,11 @@ export function useSftpRemoteActions({
       },
     });
   }
+
   async function moveEntryTo(entry: SftpEntry, remoteParent: string) {
     await moveEntryWithName(entry, remoteParent, entry.name);
   }
+
   async function moveEntryWithName(
     entry: SftpEntry,
     remoteParent: string,
@@ -213,6 +226,7 @@ export function useSftpRemoteActions({
     }
     await runMoveEntry(entry, target);
   }
+
   function showMoveConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -230,6 +244,7 @@ export function useSftpRemoteActions({
       },
     });
   }
+
   async function resolveMoveConflict(
     entry: SftpEntry,
     remoteParent: string,
@@ -261,6 +276,7 @@ export function useSftpRemoteActions({
     }
     await moveEntryWithName(entry, remoteParent, incomingName);
   }
+
   async function runMoveEntry(entry: SftpEntry, target: string) {
     if (!cwd) return;
     const name = entry.name;
@@ -280,6 +296,7 @@ export function useSftpRemoteActions({
       setBusy(null);
     }
   }
+
   async function doMkdir(name: string) {
     if (!cwd) return;
     setPrompt(null);
@@ -290,6 +307,7 @@ export function useSftpRemoteActions({
       toast.error(describeError(e));
     }
   }
+
   async function doRename(entry: SftpEntry, name: string) {
     if (!cwd || name === entry.name) {
       setPrompt(null);
@@ -303,6 +321,7 @@ export function useSftpRemoteActions({
       toast.error(describeError(e));
     }
   }
+
   async function confirmDelete() {
     const entry = deleteTarget;
     if (!entry || !cwd) return;
@@ -333,6 +352,7 @@ export function useSftpRemoteActions({
       setBusy(null);
     }
   }
+
   return {
     extractTarget,
     setExtractTarget,

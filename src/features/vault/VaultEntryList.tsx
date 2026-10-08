@@ -1,22 +1,24 @@
-import { useRef } from "react";
-import { useLingui } from "@lingui/react/macro";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import {
-  DndContext,
-  PointerSensor,
-  KeyboardSensor,
   closestCenter,
-  useSensors,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
   useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useLingui } from "@lingui/react/macro";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useRef } from "react";
+
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import VaultEntryCard from "./VaultEntryCard";
+
 import type { VaultController } from "./use-vault";
+import VaultEntryCard from "./VaultEntryCard";
 
 export default function VaultEntryList({
   controller: c,

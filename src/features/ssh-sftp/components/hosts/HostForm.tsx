@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { Host } from "~/types";
-import { useHostsStore } from "~/store/hosts";
-import { Button } from "~/components/ui/button";
+import { useForm } from "@tanstack/react-form";
+import { useEffect, useState } from "react";
+
 import { Badge } from "~/components/ui/badge";
-import { Input } from "~/components/ui/input";
-import { PasswordInput } from "~/components/ui/password-input";
+import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
@@ -16,11 +13,12 @@ import {
 } from "~/components/ui/dialog-layout";
 import {
   Field as UiField,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldDescription,
 } from "~/components/ui/field";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -29,19 +27,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { firstFormError } from "~/lib/form-errors";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   createHostFormSchema,
   hostFormValuesToInput,
   hostToFormValues,
 } from "~/features/ssh-sftp/components/hosts/HostForm.schema";
 import { describeError } from "~/lib/errors";
+import { firstFormError } from "~/lib/form-errors";
+import { useHostsStore } from "~/store/hosts";
+import type { Host } from "~/types";
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** 要编辑的已有主机；为 null 表示新建。 */
   host: Host | null;
 }
+
 export default function HostForm({ open, onOpenChange, host }: Props) {
   const { t } = useLingui();
   const keys = useHostsStore((s) => s.keys);

@@ -1,5 +1,7 @@
-import { LoaderCircle } from "lucide-react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
+import { LoaderCircle } from "lucide-react";
+
 import { Dialog, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
@@ -15,11 +17,12 @@ import {
   parentPath,
   parseFileMode,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "cn";
+
 interface FileInfoDialogProps {
   info: InfoState;
   onOpenChange: (open: boolean) => void;
 }
+
 export default function FileInfoDialog({
   info,
   onOpenChange,
@@ -52,6 +55,7 @@ export default function FileInfoDialog({
     </Dialog>
   );
 }
+
 function FileInfoDetails({ entry, details, loading }: NonNullable<InfoState>) {
   const { t } = useLingui();
   const source = details ?? entry;
@@ -87,6 +91,7 @@ function FileInfoDetails({ entry, details, loading }: NonNullable<InfoState>) {
     </div>
   );
 }
+
 function PermissionDetails({
   permissions,
 }: {
@@ -98,6 +103,7 @@ function PermissionDetails({
     permissions.setGroupId ? t`设置用户组 ID` : null,
     permissions.sticky ? t`粘滞位` : null,
   ].filter((value): value is string => value != null);
+
   const accessLabel = (bits: number) => {
     switch (bits) {
       case 0:
@@ -118,6 +124,7 @@ function PermissionDetails({
         return t`读取、写入、执行`;
     }
   };
+
   return (
     <div className="bg-muted/60 flex flex-col gap-1.5 rounded-md px-2.5 py-2 text-xs">
       <PermissionRow label={t`所有者`} value={accessLabel(permissions.owner)} />
@@ -138,6 +145,7 @@ function PermissionDetails({
     </div>
   );
 }
+
 function PermissionRow({
   label,
   value,
@@ -156,6 +164,7 @@ function PermissionRow({
     </div>
   );
 }
+
 function InfoItem({
   label,
   value,

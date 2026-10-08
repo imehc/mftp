@@ -10,23 +10,24 @@
  * 缩放以适配视口，并在竖屏时旋转 90°。静态球桌绘制在 ./table，球视图
  * 在 ./balls，帧回放在 ./playback。
  */
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import gsap from "gsap";
 import {
   Application,
   Container,
-  Graphics,
   type FederatedPointerEvent,
+  Graphics,
 } from "pixi.js";
-import gsap from "gsap";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+
 import { BALL_RADIUS, HEAD_SPOT_X } from "../constants";
 import { insidePlayArea, overlapsAnyBall } from "../physics";
 import type { BallState, BilliardsPresentation } from "../types";
 import { unlockAudio } from "./audio";
 import { createBallLayer } from "./balls";
+import { createCueView } from "./cue";
 import { computeAimGuide } from "./guides";
 import { runPresentation } from "./playback";
 import { buildTable, OUTER_H, OUTER_W, PPM, px } from "./table";
-import { createCueView } from "./cue";
 
 export interface BilliardsStageHandle {
   /** 播放已结算的走子；当球桌再次静止时 resolve。 */
@@ -258,6 +259,7 @@ function createScene(
     root.scale.set(scale);
     root.rotation = portrait ? -Math.PI / 2 : 0;
   }
+
   relayout();
   app.renderer.on("resize", relayout);
 
@@ -344,6 +346,7 @@ function createScene(
     }
     if (dragging) updateDrag(e);
   });
+
   const endPointer = (e: FederatedPointerEvent) => {
     if (ballInHand && placingDrag) {
       placingDrag = false;
@@ -352,6 +355,7 @@ function createScene(
     }
     releaseDrag();
   };
+
   app.stage.on("pointerup", endPointer);
   app.stage.on("pointerupoutside", endPointer);
 

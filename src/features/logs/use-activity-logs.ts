@@ -1,9 +1,11 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
-import * as ipc from "~/lib/ipc";
+
 import { describeError, toIpcError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
 import type { ActivityLog, AppError } from "~/types";
+
 import { filterLogs } from "./log-utils";
 
 export function useActivityLogs() {
@@ -38,6 +40,7 @@ export function useActivityLogs() {
     failed: t`失败`,
     canceled: t`已取消`,
   };
+
   async function read(run: number) {
     try {
       const next = await ipc.activityLogs(
@@ -53,24 +56,28 @@ export function useActivityLogs() {
       if (mounted.current && generation.current === run) setLoading(false);
     }
   }
+
   function reload() {
     if (writing.current) return;
     setLoading(true);
     setError(null);
     return read(++generation.current);
   }
+
   function changeSource(value: string) {
     if (value === source) return;
     setLoading(true);
     setError(null);
     setSource(value);
   }
+
   function changeResult(value: string) {
     if (value === result) return;
     setLoading(true);
     setError(null);
     setResult(value);
   }
+
   const readForFilter = useEffectEvent(read);
   useEffect(() => {
     mounted.current = true;
@@ -79,6 +86,7 @@ export function useActivityLogs() {
       mounted.current = false;
     };
   }, [source, result]);
+
   // 先使旧读取失效，写失败保留确认和原数据，禁止自动重放删除。
   async function remove() {
     if (!deleting || writing.current) return;
@@ -104,6 +112,7 @@ export function useActivityLogs() {
       if (mounted.current) setBusy(false);
     }
   }
+
   const visible = logs.filter(
     (x) =>
       (source === "all" || x.source === source) &&
@@ -137,4 +146,5 @@ export function useActivityLogs() {
     remove,
   };
 }
+
 export type ActivityLogsController = ReturnType<typeof useActivityLogs>;

@@ -1,7 +1,8 @@
-import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PoemDetailPage from "~/features/poetry/PoemDetailPage";
+import { useEffect } from "react";
+
 import type { PoetryTranslationMode } from "~/bindings";
+import PoemDetailPage from "~/features/poetry/PoemDetailPage";
 import { useSettingsStore } from "~/store/settings";
 
 interface LibraryPoemSearch {

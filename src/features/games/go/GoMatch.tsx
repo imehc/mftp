@@ -2,18 +2,20 @@
  * 本地对局装配（人机 / 同屏）以及本地与联机共用的对局视图：状态栏、
  * 棋盘舞台与结果条。
  */
-import { useEffect, useRef, useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Flag, Undo2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
+
+import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { AiController, LocalController } from "../engine/controllers";
+import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
-import { GameResultBar } from "../engine/GameResultBar";
-import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { goAiStrategy } from "./ai";
 import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
 import { GoStage } from "./GoStage";
@@ -36,6 +38,7 @@ export interface OnlineViewProps {
   rematchWaiting: boolean;
   onRequestUndo(plies: number): void;
 }
+
 export function GoMatch({
   mode,
   onRematch,
@@ -114,6 +117,7 @@ export function GoMatch({
     />
   );
 }
+
 export function GoMatchView({
   mode,
   session,

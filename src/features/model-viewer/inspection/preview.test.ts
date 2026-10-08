@@ -1,5 +1,6 @@
-import { expect, it, vi } from "vitest";
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Texture } from "three";
+import { expect, it, vi } from "vitest";
+
 import { ModelCollection } from "../runtime/collection";
 import { MaterialPreview } from "./preview";
 

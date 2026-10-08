@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   startTransition,
   useEffect,
@@ -5,18 +6,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { useLingui } from "@lingui/react/macro";
-import { pickDirectoryNative } from "~/lib/files";
 import { toast } from "sonner";
-import { createPoller } from "~/lib/polling";
-import {
-  loadLanTransferCore,
-  loadLanTransferSecondary,
-  scheduleIdleTask,
-} from "./lanTransferData";
-import { useLanDiscovery } from "./useLanDiscovery";
+
+import { describeError, toIpcError } from "~/lib/errors";
+import { pickDirectoryNative } from "~/lib/files";
 import * as ipc from "~/lib/ipc";
+import { createPoller } from "~/lib/polling";
 import type {
+  AppError,
+  LanAuthRequest,
   LanConnectedDevice,
   LanNetworkAddress,
   LanSharedDir,
@@ -24,12 +22,17 @@ import type {
   LanTransferSettings,
   LanTransferStatus,
   LanTransferTask,
-  LanTrustedDeviceInput,
   LanTrustedDevice,
-  LanAuthRequest,
-  AppError,
+  LanTrustedDeviceInput,
 } from "~/types";
-import { describeError, toIpcError } from "~/lib/errors";
+
+import {
+  loadLanTransferCore,
+  loadLanTransferSecondary,
+  scheduleIdleTask,
+} from "./lanTransferData";
+import { useLanDiscovery } from "./useLanDiscovery";
+
 const DEFAULT_SETTINGS: LanTransferSettings = {
   deviceName: "",
   port: 3000,
@@ -40,6 +43,7 @@ const DEFAULT_SETTINGS: LanTransferSettings = {
   defaultPermission: "readWrite",
   maxConcurrentTransfers: 3,
 };
+
 export function useLanTransfer() {
   const { t } = useLingui();
   const [settings, setSettings] = useState<LanTransferSettings | null>(null);
@@ -71,11 +75,13 @@ export function useLanTransfer() {
     settings?.bindHost &&
     !addresses.some((address) => address.ip === settings.bindHost),
   );
+
   // 仅挂载时的预热；refreshCore/refreshSecondary 每次渲染都会重新定义，
   // 因此通过 effect event 读取，而不是进入依赖数组。
   async function refresh() {
     await Promise.all([refreshCore(), refreshSecondary()]);
   }
+
   async function refreshCore() {
     const epoch = reads.current.epoch;
     const request = ++reads.current.core;
@@ -96,6 +102,7 @@ export function useLanTransfer() {
       if (current()) setLoading(false);
     }
   }
+
   async function refreshSecondary() {
     const epoch = reads.current.epoch;
     const request = ++reads.current.secondary;
@@ -115,6 +122,7 @@ export function useLanTransfer() {
       if (current()) setSecondaryError(toIpcError(error).payload);
     }
   }
+
   async function refreshRuntime() {
     if (busy) return;
     const epoch = reads.current.epoch;
@@ -146,6 +154,7 @@ export function useLanTransfer() {
       if (current()) setRuntimeError(toIpcError(error).payload);
     }
   }
+
   const refreshCoreOnMount = useEffectEvent(refreshCore);
   const refreshSecondaryOnMount = useEffectEvent(refreshSecondary);
   useEffect(() => {
@@ -167,6 +176,7 @@ export function useLanTransfer() {
     });
     return () => poller.stop();
   }, [running]);
+
   async function start() {
     reads.current.epoch++;
     setLoading(false);
@@ -183,6 +193,7 @@ export function useLanTransfer() {
       setBusy(false);
     }
   }
+
   async function stop() {
     reads.current.epoch++;
     setLoading(false);
@@ -200,6 +211,7 @@ export function useLanTransfer() {
       setBusy(false);
     }
   }
+
   async function saveSettings(values: LanTransferSettings) {
     reads.current.epoch++;
     setLoading(false);
@@ -215,6 +227,7 @@ export function useLanTransfer() {
       setBusy(false);
     }
   }
+
   async function switchBindAuto() {
     if (!settings) return;
     reads.current.epoch++;
@@ -235,6 +248,7 @@ export function useLanTransfer() {
       setBusy(false);
     }
   }
+
   async function addShare(input: LanSharedDirInput) {
     reads.current.epoch++;
     setLoading(false);
@@ -250,6 +264,7 @@ export function useLanTransfer() {
       setBusy(false);
     }
   }
+
   async function addTrustedDevice(input: LanTrustedDeviceInput) {
     try {
       const device = await ipc.lanTransferAddTrustedDevice(input);
@@ -259,6 +274,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function deleteTrustedDevice(id: string) {
     try {
       await ipc.lanTransferDeleteTrustedDevice(id);
@@ -268,6 +284,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function deleteShare(id: string) {
     try {
       await ipc.lanTransferDeleteSharedDir(id);
@@ -277,6 +294,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function disconnectDevice(id: string) {
     try {
       await ipc.lanTransferDisconnectDevice(id);
@@ -291,6 +309,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function cancelTask(id: string) {
     try {
       await ipc.lanTransferCancelTask(id);
@@ -300,6 +319,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function refreshAuthRequests() {
     try {
       setAuthRequests(await ipc.lanTransferPendingAuthRequests());
@@ -307,6 +327,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function approveAuthRequest(id: string, permission: string) {
     try {
       await ipc.lanTransferApproveAuthRequest(id, permission);
@@ -322,6 +343,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function rejectAuthRequest(id: string) {
     try {
       await ipc.lanTransferRejectAuthRequest(id);
@@ -331,6 +353,7 @@ export function useLanTransfer() {
       toast.error(describeError(error));
     }
   }
+
   async function chooseDownloadDir() {
     if (running) return null;
     try {
@@ -340,9 +363,11 @@ export function useLanTransfer() {
       return null;
     }
   }
+
   function openSettings() {
     setSettingsOpen(true);
   }
+
   return {
     loading,
     coreError,

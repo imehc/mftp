@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import {
   AnimationClip,
   BufferGeometry,
@@ -11,8 +10,10 @@ import {
   Points,
   Texture,
 } from "three";
-import { inspectModel } from "./inspection";
+import { describe, expect, it } from "vitest";
+
 import { visibleSceneNodes } from "../domain/inspection";
+import { inspectModel } from "./inspection";
 
 function inspect(scene: Group) {
   return inspectModel({
@@ -25,6 +26,7 @@ function inspect(scene: Group) {
     dispose() {},
   }).snapshot;
 }
+
 function triangle() {
   const geometry = new BufferGeometry();
   geometry.setAttribute(
@@ -33,6 +35,7 @@ function triangle() {
   );
   return geometry;
 }
+
 describe("模型资源检查", () => {
   it("对资源去重但统计实例副本，并忽略三角形的线和点", () => {
     const scene = new Group();
@@ -68,6 +71,7 @@ describe("模型资源检查", () => {
       material.uuid,
     ]);
   });
+
   it("索引缓冲区只统计一次，并将不可用位置报告为未知而不是零", () => {
     const scene = new Group();
     const geometry = triangle();
@@ -86,6 +90,7 @@ describe("模型资源检查", () => {
       textures: 0,
     });
   });
+
   it("仅按源顺序展开已展开节点，并处理大型场景", () => {
     const scene = new Group();
     const branch = new Group();

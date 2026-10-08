@@ -1,20 +1,17 @@
-import { useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { baseName, pickFilePathNative } from "~/lib/files";
+import { useForm } from "@tanstack/react-form";
 import { KeyRound, Trash2, Upload } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useHostsStore } from "~/store/hosts";
+
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Input } from "~/components/ui/input";
-import {
-  Field as UiField,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "~/components/ui/field";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import {
   Empty,
   EmptyDescription,
@@ -23,20 +20,26 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import {
-  DialogLayoutContent,
-  DialogLayoutHeader,
-  DialogLayoutBody,
-} from "~/components/ui/dialog-layout";
-import { firstFormError } from "~/lib/form-errors";
+  Field as UiField,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import {
-  emptyKeyImportFormValues,
   createKeyImportSchema,
+  emptyKeyImportFormValues,
 } from "~/features/ssh-sftp/components/keys/KeyManager.schema";
 import { describeError } from "~/lib/errors";
+import { baseName, pickFilePathNative } from "~/lib/files";
+import { firstFormError } from "~/lib/form-errors";
+import { useHostsStore } from "~/store/hosts";
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
 export default function KeyManager({ open, onOpenChange }: Props) {
   const { t } = useLingui();
   const keys = useHostsStore((s) => s.keys);
@@ -66,6 +69,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       }
     },
   });
+
   async function pickFile() {
     try {
       const selected = await pickFilePathNative({
@@ -83,6 +87,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       toast.error(describeError(error));
     }
   }
+
   async function remove(id: string, name: string) {
     try {
       await deleteKey(id);
@@ -91,6 +96,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
       toast.error(describeError(e));
     }
   }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent

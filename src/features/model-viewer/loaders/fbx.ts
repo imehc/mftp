@@ -1,11 +1,13 @@
 import { BufferGeometry, type WebGLRenderer } from "three";
+
 import { IpcError } from "~/lib/errors";
-import type { ImportProgress, ModelHandle, ModelSource } from "../domain/types";
+
 import { MissingResources } from "../domain/errors";
+import type { ImportProgress, ModelHandle, ModelSource } from "../domain/types";
 import { ModelResources } from "../runtime/resources";
+import { readFbxImages } from "./fbx-images";
 import { FBX_FILE_LIMIT, fbxError } from "./fbx-policy";
 import { parseFbxTask } from "./fbx-task";
-import { readFbxImages } from "./fbx-images";
 import { unpackFbx } from "./fbx-transfer";
 
 export async function loadFbx(

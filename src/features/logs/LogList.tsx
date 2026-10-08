@@ -1,6 +1,8 @@
-import { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useRef } from "react";
+
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 import LogRowDesktop, { LogTableHead } from "./LogRow.desktop";
 import LogRowMobile from "./LogRow.mobile";
 import type { ActivityLogsController } from "./use-activity-logs";

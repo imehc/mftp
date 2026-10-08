@@ -1,4 +1,5 @@
 import { msg } from "@lingui/core/macro";
+
 import {
   canvasToBlob,
   detectImageOutputFormat,
@@ -6,11 +7,14 @@ import {
   isSupportedImageFile,
   mimeForFormat,
 } from "~/features/media-compress/image/compress";
-import { stripExtension } from "~/lib/files";
 import { translate } from "~/i18n/translate";
+import { stripExtension } from "~/lib/files";
+
 export type ResizeMethod = "ratio" | "dimension";
+
 export type DimensionMode =
   "exact" | "width" | "height" | "longest" | "shortest";
+
 export const RATIO_MIN = 1;
 export const RATIO_MAX = 200;
 export const RATIO_STEP = 1;
@@ -21,10 +25,12 @@ export const DIMENSION_MAX = 10_000;
 
 /** 有损格式的重新编码质量；PNG 仍保持无损。 */
 const RESIZE_ENCODE_QUALITY = 0.92;
+
 export interface ResizeSize {
   width: number;
   height: number;
 }
+
 export interface ResizeOptions {
   method: ResizeMethod;
   /** 百分比 1–200；method 为 "ratio" 时使用。 */
@@ -38,6 +44,7 @@ export interface ResizeOptions {
   /** "longest" / "shortest" 模式下的目标边长。 */
   edge: number | null;
 }
+
 export interface ImageResizeResult {
   blob: Blob;
   size: number;
@@ -46,17 +53,21 @@ export interface ImageResizeResult {
   width: number;
   height: number;
 }
+
 export function clampRatio(value: number): number {
   if (!Number.isFinite(value)) return DEFAULT_RATIO;
   return Math.min(RATIO_MAX, Math.max(RATIO_MIN, Math.round(value)));
 }
+
 export function clampDimension(value: number): number {
   if (!Number.isFinite(value)) return DIMENSION_MIN;
   return Math.min(DIMENSION_MAX, Math.max(DIMENSION_MIN, Math.round(value)));
 }
+
 function isPositiveInt(value: number | null): value is number {
   return value != null && Number.isFinite(value) && value >= 1;
 }
+
 function roundSide(value: number): number {
   return Math.max(1, Math.round(value));
 }
@@ -144,11 +155,13 @@ export function isTargetSizeAllowed(target: ResizeSize): boolean {
     target.height <= DIMENSION_MAX
   );
 }
+
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
     throw new DOMException(translate(msg`处理已取消`), "AbortError");
   }
 }
+
 export async function resizeImageFile(
   file: File,
   target: ResizeSize,

@@ -1,10 +1,12 @@
-import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft, Send } from "lucide-react";
-import type { BtTaskInfo } from "~/types";
+import { useState } from "react";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import type { BtTaskInfo } from "~/types";
+
 import FileBrowserPanel from "./FileBrowserPanel";
 import PeersPanel from "./PeersPanel";
 

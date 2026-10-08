@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+
 import type { AppError, GameRoomSummary } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
+
 import { discoverRooms } from "./discovery";
 
 export function useRoomDiscovery(gameId: string, enabled: boolean) {
@@ -18,6 +20,7 @@ export function useRoomDiscovery(gameId: string, enabled: boolean) {
     if (!enabled) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+
     const scan = async () => {
       setScanning(true);
       try {
@@ -35,6 +38,7 @@ export function useRoomDiscovery(gameId: string, enabled: boolean) {
         timer = setTimeout(scan, 4000);
       }
     };
+
     void scan();
     return () => {
       cancelled = true;

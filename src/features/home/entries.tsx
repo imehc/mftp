@@ -1,6 +1,5 @@
-import type { ComponentType, ReactNode } from "react";
-import { linkOptions, type LinkOptions } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
+import { type LinkOptions, linkOptions } from "@tanstack/react-router";
 import {
   Archive,
   BookMarked,
@@ -17,27 +16,33 @@ import {
   TerminalSquare,
   Wifi,
 } from "lucide-react";
+import type { ComponentType, ReactNode } from "react";
+
+import {
+  moduleAvailableOn,
+  moduleForTool,
+  type ModuleId,
+  moduleMetadata,
+  type ModulePlatform,
+  type ToolRoute,
+} from "~/lib/module-metadata";
 import {
   isAndroidPlatform,
   isIosPlatform,
   isMobilePlatform,
 } from "~/lib/platform";
-import {
-  moduleAvailableOn,
-  moduleForTool,
-  moduleMetadata,
-  type ModuleId,
-  type ModulePlatform,
-  type ToolRoute,
-} from "~/lib/module-metadata";
+
 export type HomeCategory = "tools" | "library" | "games";
+
 export const homeCategoryLabels: Record<HomeCategory, ReactNode> = {
   tools: <Trans>工具</Trans>,
   library: <Trans>文库</Trans>,
   games: <Trans>小游戏</Trans>,
 };
+
 /** 首页按平台筛选；平台/能力的事实来源是模块元数据。 */
 export type HomePlatform = ModulePlatform;
+
 export interface HomeEntry {
   /** 稳定模块 id；平台能力与 lastTool 恢复从模块元数据读取。 */
   id: ModuleId;
@@ -49,6 +54,7 @@ export interface HomeEntry {
   }>;
   title: ReactNode;
 }
+
 export const homeEntries: HomeEntry[] = [
   {
     id: "model-viewer",

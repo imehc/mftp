@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
 import { Plural } from "@lingui/react/macro";
+import type { ReactNode } from "react";
+
 import { Textarea } from "~/components/ui/textarea";
 
 export default function CryptoTextPanel({

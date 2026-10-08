@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { parseFbxTask } from "./fbx-task";
+
 import { FBX_PARSE_TIMEOUT } from "./fbx-policy";
+import { parseFbxTask } from "./fbx-task";
 
 class TestWorker {
   static instances: TestWorker[] = [];

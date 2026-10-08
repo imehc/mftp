@@ -1,13 +1,15 @@
-import { useState, useSyncExternalStore } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button } from "~/components/ui/button";
-import { FieldGroup, Field, FieldLabel } from "~/components/ui/field";
-import { Input } from "~/components/ui/input";
+import { useState, useSyncExternalStore } from "react";
+
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import { Spinner } from "~/components/ui/spinner";
 import { describeError } from "~/lib/errors";
+
+import { type Unit, unitFactor } from "../inspection/tools";
 import type { ModelViewerRuntime } from "../runtime/viewer";
-import { unitFactor, type Unit } from "../inspection/tools";
 import { InspectionChoice } from "./InspectionFields";
 
 export function DiagnosticsPanel({
@@ -39,10 +41,12 @@ export function DiagnosticsPanel({
   const mesh = state.topology?.[Number(meshIndex)] ?? state.topology?.[0];
   const distance = tools.distance === null ? "" : format(tools.distance);
   const version = state.validation?.validatorVersion;
+
   function run(kind: "validation" | "topology" | "dimensions") {
     const entry = runtime.models.current;
     if (entry) void runtime.tools.diagnostics.run(entry, kind, value);
   }
+
   const rows = mesh
     ? [
         [

@@ -1,9 +1,12 @@
 import { z } from "zod";
+
 import type { Host, HostInput } from "~/types";
+
 type TranslateTag = (
   literals: TemplateStringsArray,
   ...placeholders: unknown[]
 ) => string;
+
 export function createHostFormSchema(t: TranslateTag) {
   return z
     .object({
@@ -36,6 +39,7 @@ export function createHostFormSchema(t: TranslateTag) {
       }
     });
 }
+
 export const hostFormSchema = createHostFormSchema(((
   literals,
   ...placeholders
@@ -46,7 +50,9 @@ export const hostFormSchema = createHostFormSchema(((
     },
     ...placeholders,
   )) as TranslateTag);
+
 export type HostFormValues = z.infer<typeof hostFormSchema>;
+
 export const emptyHostFormValues: HostFormValues = {
   label: "",
   host: "",
@@ -57,6 +63,7 @@ export const emptyHostFormValues: HostFormValues = {
   keyId: null,
   defaultPath: "",
 };
+
 export function hostToFormValues(host: Host | null): HostFormValues {
   if (!host) return emptyHostFormValues;
   return {
@@ -70,6 +77,7 @@ export function hostToFormValues(host: Host | null): HostFormValues {
     defaultPath: host.defaultPath ?? "",
   };
 }
+
 export function hostFormValuesToInput(values: HostFormValues): HostInput {
   const defaultPath = values.defaultPath?.trim();
   return {

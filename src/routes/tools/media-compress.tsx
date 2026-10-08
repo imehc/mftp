@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import MediaCompressTool from "~/features/media-compress/MediaCompressTool";
 import { resolveCompressMode } from "~/features/media-compress/modes";
 import { useSettingsStore } from "~/store/settings";

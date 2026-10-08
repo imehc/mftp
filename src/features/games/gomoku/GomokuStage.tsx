@@ -12,15 +12,16 @@
  * React 只负责挂载/卸载 Application 并透传 props；点击、悬停虚影与落子
  * 弹出动画都直接在 Pixi 中进行。
  */
-import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import {
   Application,
   Container,
+  type FederatedPointerEvent,
   Graphics,
   Sprite,
-  type FederatedPointerEvent,
 } from "pixi.js";
-import gsap from "gsap";
+import { useEffect, useRef } from "react";
+
 import type { SeatIndex } from "../engine/types";
 import {
   BOARD_TEXTURE_SCALE,
@@ -230,6 +231,7 @@ function createScene(
     root.position.set(w / 2, h / 2);
     root.scale.set(Math.min(w, h) / FIT_EXTENT);
   }
+
   relayout();
   app.renderer.on("resize", relayout);
 
@@ -255,10 +257,12 @@ function createScene(
     hoverIndex = toIntersection(e);
     redrawGhost();
   });
+
   const clearHover = (): void => {
     hoverIndex = null;
     redrawGhost();
   };
+
   app.stage.on("pointerleave", clearHover);
   app.stage.on("pointercancel", clearHover);
   app.stage.on("pointertap", (e: FederatedPointerEvent) => {

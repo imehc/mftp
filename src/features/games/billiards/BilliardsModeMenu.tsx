@@ -1,8 +1,10 @@
 /** 模式选择菜单：练习、人机设置、同屏对战，以及历史记录。 */
-import { useState } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { ChevronRight, Play, Target, Users } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -10,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Label } from "~/components/ui/label";
+
 import type { Difficulty } from "../engine/ai";
 import { useGameHistory, useGamesHistoryStore } from "../engine/history";
 import {
@@ -18,6 +20,7 @@ import {
   type BilliardsHistoryPayload,
   type BilliardsMode,
 } from "./types";
+
 function historyModeLabel(payload: BilliardsHistoryPayload) {
   if (payload.mode === "practice") return <Trans>练习</Trans>;
   if (payload.mode === "hotseat") return <Trans>双人</Trans>;
@@ -35,6 +38,7 @@ function historyModeLabel(payload: BilliardsHistoryPayload) {
     </span>
   );
 }
+
 function historyResult(payload: BilliardsHistoryPayload) {
   if (payload.mode === "practice") return <Trans>清台</Trans>;
   if (payload.mode === "ai") {
@@ -46,6 +50,7 @@ function historyResult(payload: BilliardsHistoryPayload) {
     <Trans>玩家 2 胜</Trans>
   );
 }
+
 function formatHistoryTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
     month: "2-digit",
@@ -54,6 +59,7 @@ function formatHistoryTime(timestamp: number): string {
     minute: "2-digit",
   });
 }
+
 export function BilliardsModeMenu({
   onStart,
 }: {

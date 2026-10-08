@@ -3,12 +3,13 @@
  * 快照到既有对话框与视图 props。走法时序、悔棋/重赛响应匹配与输入
  * 锁全部由 OnlineMatchController 处理，页面只提供游戏规则定义与音效。
  */
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
+
 import { OnlineMatchController } from "./matchController";
-import type { UndoFlow } from "./OnlineMatchDialogs";
 import type { OnlineGame, OnlineTransport, Presentation } from "./matchTypes";
+import type { UndoFlow } from "./OnlineMatchDialogs";
 
 export function useOnlineMatch<S, M, P>(
   transport: OnlineTransport<M>,
@@ -21,10 +22,12 @@ export function useOnlineMatch<S, M, P>(
   useEffect(() => {
     presentationRef.current = presentation;
   });
+
   const attachPresentation = (controller: OnlineMatchController<S, M, P>) => {
     controller.onPresentation = (resolution) =>
       presentationRef.current(resolution);
   };
+
   const [entry, setEntry] = useState(() => {
     const controller = new OnlineMatchController(transport, definition);
     attachPresentation(controller);

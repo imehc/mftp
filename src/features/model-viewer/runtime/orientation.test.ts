@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { PerspectiveCamera, Vector3 } from "three";
+import { describe, expect, it } from "vitest";
+
 import { axisDirections, orientCamera, type ViewAxis } from "./orientation";
 
 describe("坐标轴视图", () => {

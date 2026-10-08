@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import type { HomeCategory } from "~/features/home/entries";
 import HomePage from "~/features/home/HomePage";
 

@@ -1,7 +1,6 @@
-import { useEffect, useEffectEvent, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
+import { cn } from "cn";
 import {
   ArrowUp,
   Folder,
@@ -10,7 +9,10 @@ import {
   LoaderCircle,
   RefreshCw,
 } from "lucide-react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
+
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
@@ -25,19 +27,19 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { Input } from "~/components/ui/input";
 import { FieldDescription } from "~/components/ui/field";
-import { firstFormError } from "~/lib/form-errors";
-import * as ipc from "~/lib/ipc";
-import type { SftpEntry } from "~/types";
+import { Input } from "~/components/ui/input";
 import {
   isSameOrChildPath,
   nameCollator,
   normalizeRemotePath,
   parentPath,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "cn";
 import { describeError } from "~/lib/errors";
+import { firstFormError } from "~/lib/form-errors";
+import * as ipc from "~/lib/ipc";
+import type { SftpEntry } from "~/types";
+
 interface RemoteDirectoryPickerProps {
   open: boolean;
   title: string;
@@ -47,6 +49,7 @@ interface RemoteDirectoryPickerProps {
   onOpenChange: (open: boolean) => void;
   onSelect: (path: string) => void;
 }
+
 export default function RemoteDirectoryPicker({
   open,
   title,
@@ -80,6 +83,7 @@ export default function RemoteDirectoryPicker({
     .filter((entry) => entry.isDir)
     .sort((a, b) => nameCollator.compare(a.name, b.name));
   const cannotSelect = !!disabledPath && isSameOrChildPath(path, disabledPath);
+
   const loadPath = async (nextPath: string) => {
     const normalized = normalizeRemotePath(nextPath.trim());
     setLoading(true);
@@ -96,12 +100,14 @@ export default function RemoteDirectoryPicker({
       setLoading(false);
     }
   };
+
   // loadPath 与表单提交 / goHome 共享；用 effect event，使对话框
   // 不会在父组件每次渲染时都重载。
   const loadPathOnOpen = useEffectEvent(loadPath);
   useEffect(() => {
     if (open) void loadPathOnOpen(initialPath);
   }, [open, initialPath]);
+
   async function goHome() {
     setLoading(true);
     try {
@@ -112,6 +118,7 @@ export default function RemoteDirectoryPicker({
       setLoading(false);
     }
   }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent

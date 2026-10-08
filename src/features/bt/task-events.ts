@@ -1,5 +1,6 @@
-import type { BtTaskEvent } from "~/types";
 import { useTransfersStore } from "~/store/transfers";
+import type { BtTaskEvent } from "~/types";
+
 import { forgetBtTask, transferIdOf } from "./task-sync";
 
 /** 事件类型与错误载荷由 Rust 导出，错误在面板渲染时再本地化。 */

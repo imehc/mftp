@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
 import {
   Ellipsis,
   LoaderCircle,
@@ -8,6 +9,7 @@ import {
   Unplug,
   Zap,
 } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { cn } from "cn";
 import type { Host } from "~/types";
 
 /** 同一行结构兼容鼠标与触控；操作无需悬停，连接逻辑由侧栏控制。 */

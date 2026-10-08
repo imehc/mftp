@@ -1,21 +1,23 @@
-import { useId, useSyncExternalStore } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useId, useSyncExternalStore } from "react";
 import {
   Line,
   LineChart,
   ReferenceLine,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from "recharts";
-import { Button } from "~/components/ui/button";
+
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { formatBytes } from "~/lib/format";
-import type { MemoryHistory } from "../runtime/memory";
+
 import { textureFormat } from "../runtime/inspection";
+import type { MemoryHistory } from "../runtime/memory";
 
 export function MemoryWarning({ memory }: { memory: MemoryHistory }) {
   const state = useSyncExternalStore(memory.subscribe, memory.snapshot);

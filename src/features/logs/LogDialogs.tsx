@@ -1,24 +1,26 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button } from "~/components/ui/button";
-import { Dialog, DialogTitle, DialogDescription } from "~/components/ui/dialog";
-import {
-  DialogLayoutContent,
-  DialogLayoutHeader,
-  DialogLayoutBody,
-  DialogLayoutFooter,
-} from "~/components/ui/dialog-layout";
+
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import type { ActivityLogsController } from "./use-activity-logs";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogDescription, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutFooter,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
+
 import { logDetail } from "./log-utils";
+import type { ActivityLogsController } from "./use-activity-logs";
 
 export default function LogDialogs({
   controller: c,

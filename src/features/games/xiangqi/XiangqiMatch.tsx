@@ -1,15 +1,17 @@
-import { useEffect, useRef, useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
+
+import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { AiController, LocalController } from "../engine/controllers";
+import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
-import { GameResultBar } from "../engine/GameResultBar";
-import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { xiangqiAiStrategy } from "./ai";
 import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
 import { matchResultLabel, resultReasonLabel, sideName } from "./labels";
@@ -23,6 +25,7 @@ import {
   type XiangqiState,
 } from "./types";
 import { XiangqiStage } from "./XiangqiStage";
+
 export function XiangqiMatch({
   mode,
   onRematch,
@@ -106,6 +109,7 @@ export function XiangqiMatch({
     />
   );
 }
+
 export interface XiangqiOnlineViewProps {
   peerName: string;
   localSeat: SeatIndex;
@@ -113,6 +117,7 @@ export interface XiangqiOnlineViewProps {
   rematchWaiting: boolean;
   onRequestUndo(plies: number): void;
 }
+
 export function XiangqiMatchView({
   mode,
   session,

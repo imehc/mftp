@@ -1,12 +1,14 @@
 import { listen } from "@tauri-apps/api/event";
+
+import type { AppDataModule } from "~/bindings";
 import {
   commands,
   type PoetryTranslation,
   type PoetryTranslationMode,
   type PoetryTranslationStreamEvent,
 } from "~/bindings";
-import { poetryTranslationStreamEvent } from "~/lib/events";
 import { toIpcError } from "~/lib/errors";
+import { poetryTranslationStreamEvent } from "~/lib/events";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
   BtControlAction,
@@ -22,7 +24,6 @@ import type {
   TodoItemInput,
   VaultEntryInput,
 } from "~/types";
-import type { AppDataModule } from "~/bindings";
 
 type CommandResult<T, E> =
   { status: "ok"; data: T } | { status: "error"; error: E };
@@ -423,6 +424,7 @@ export const poetryPackTranslationsList = (uid: string) =>
   unwrapCommand(commands.listPoetryPackTranslations(uid));
 export const poetryTranslationsList = (uid: string) =>
   unwrapCommand(commands.listPoetryTranslations(uid));
+
 export interface PoetryGenerationHandle {
   /**
    * 生成完成时返回译文；调用方在 `detach()` 之后不应再使用结果。
@@ -446,11 +448,13 @@ export const poetryTranslationGenerate = (
   const requestId = crypto.randomUUID();
   let detached = false;
   let unlisten: (() => void) | null = null;
+
   const cleanup = () => {
     const listener = unlisten;
     unlisten = null;
     listener?.();
   };
+
   const promise = listen<PoetryTranslationStreamEvent>(
     poetryTranslationStreamEvent(requestId),
     (event) => onDelta(event.payload.delta),
@@ -476,6 +480,7 @@ export const poetryTranslationGenerate = (
     },
   };
 };
+
 export const poetryTranslationUpdate = (
   uid: string,
   mode: PoetryTranslationMode,

@@ -1,6 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
+
 import type { TodoItem } from "~/types";
+
 import { formatTodoDate, formatTodoTimestamp } from "./todo-utils";
 
 /** 详情优先展示已有的计划/完成时间，没有时才回退到创建时间。 */
@@ -12,6 +14,7 @@ export default function TodoTimestamps({
   details?: boolean;
 }) {
   const { i18n, t } = useLingui();
+
   const timestamp = (value: number) => {
     const full = formatTodoTimestamp(value, i18n.locale);
     return (
@@ -24,6 +27,7 @@ export default function TodoTimestamps({
       </time>
     );
   };
+
   const created = {
     key: "created",
     label: t({

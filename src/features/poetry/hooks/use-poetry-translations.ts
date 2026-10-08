@@ -1,22 +1,23 @@
-import { useEffect, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { toIpcError } from "~/lib/errors";
-import { hasAiRequestSelection } from "~/features/ai-configuration/request-readiness";
-import {
-  poetryPackTranslationsList,
-  aiConfigurationGet,
-  poetryTranslationDelete,
-  poetryTranslationGenerate,
-  poetryTranslationsList,
-  poetryTranslationUpdate,
-} from "~/lib/ipc";
+
 import type {
   AppError,
   PoetryPackTranslation,
   PoetryTranslation,
   PoetryTranslationMode,
 } from "~/bindings";
+import { hasAiRequestSelection } from "~/features/ai-configuration/request-readiness";
+import { toIpcError } from "~/lib/errors";
+import {
+  aiConfigurationGet,
+  poetryPackTranslationsList,
+  poetryTranslationDelete,
+  poetryTranslationGenerate,
+  poetryTranslationsList,
+  poetryTranslationUpdate,
+} from "~/lib/ipc";
 
 /** 阅读内容切换只改变可见性，本 controller 在同一作品内持续持有请求和草稿。 */
 export function usePoetryTranslations(

@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { CalendarDays } from "lucide-react";
+
 import type { PoemDetail } from "~/types";
 
 /** 设计未单列每日推荐，保留为紧凑入口，避免挤压主要作品列表。 */

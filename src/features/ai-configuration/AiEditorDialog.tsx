@@ -1,36 +1,38 @@
-import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Dialog, DialogTitle } from "~/components/ui/dialog";
-import {
-  DialogLayoutContent,
-  DialogLayoutHeader,
-  DialogLayoutBody,
-  DialogLayoutFooter,
-} from "~/components/ui/dialog-layout";
+import { useState } from "react";
+
+import CandidateInput from "~/components/CandidateInput";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldDescription,
-  FieldError,
-} from "~/components/ui/field";
-import { Input } from "~/components/ui/input";
-import CandidateInput from "~/components/CandidateInput";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
+import { Dialog, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutFooter,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import { describeError } from "~/lib/errors";
-import { useAiConfiguration } from "./store";
+
 import { useAiEditor } from "./hooks/use-ai-editor";
+import { useAiConfiguration } from "./store";
 import type { AiEditorTarget } from "./types";
 
 export default function AiEditorDialog({
@@ -63,6 +65,7 @@ export default function AiEditorDialog({
         : target.item
           ? t`编辑模型`
           : t`添加模型`;
+
   function close() {
     setLocating(false);
     if (!busy) {
@@ -70,6 +73,7 @@ export default function AiEditorDialog({
       else onClose();
     }
   }
+
   return (
     <>
       <Dialog

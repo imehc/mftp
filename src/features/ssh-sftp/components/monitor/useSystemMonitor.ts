@@ -1,10 +1,12 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { msg } from "@lingui/core/macro";
-import type { AppError, Session, SystemStats } from "~/types";
-import * as ipc from "~/lib/ipc";
-import { toIpcError } from "~/lib/errors";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+
 import { translate } from "~/i18n/translate";
+import { toIpcError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
 import { useSessionsStore } from "~/store/sessions";
+import type { AppError, Session, SystemStats } from "~/types";
+
 export type RefreshIntervalMs = 0 | 2000 | 5000 | 10000;
 
 /// 单次统计往返的上限。后端把单次远程执行上限设为 10s，因此超过这个
@@ -15,6 +17,7 @@ const REFRESH_TIMEOUT_MS = 12_000;
 const MAX_CONSECUTIVE_FAILURES = 3;
 /// 环形缓冲上限：默认 5s 间隔下约 10 分钟的 120 个点。
 const HISTORY_LIMIT = 120;
+
 export interface MonitorPoint {
   /** 采样时刻（毫秒时间戳）。 */
   t: number;
@@ -41,6 +44,7 @@ useSessionsStore.subscribe((state) => {
     if (!alive.has(id)) historyMap.delete(id);
   }
 });
+
 function toPoint(stats: SystemStats): MonitorPoint {
   const memTotal = stats.memory.total;
   return {
@@ -53,6 +57,7 @@ function toPoint(stats: SystemStats): MonitorPoint {
     write: stats.diskIo.reduce((sum, d) => sum + d.writeBytesPerSec, 0),
   };
 }
+
 async function fetchSystemStats(sessionId: string): Promise<SystemStats> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
@@ -69,6 +74,7 @@ async function fetchSystemStats(sessionId: string): Promise<SystemStats> {
     clearTimeout(timer);
   }
 }
+
 export function useSystemMonitor(session: Session) {
   const sessionId = session.id;
   const [data, setData] = useState<SystemStats | null>(null);
@@ -83,6 +89,7 @@ export function useSystemMonitor(session: Session) {
   const seqRef = useRef(0);
   const inFlightRef = useRef(false);
   const failuresRef = useRef(0);
+
   const refresh = async () => {
     // 同一时刻只发一个请求：慢链路不能在共享的 SSH 连接锁后面堆积轮询
     // （正是这点让监控随时间劣化）。
@@ -121,6 +128,7 @@ export function useSystemMonitor(session: Session) {
     setPaused(false);
     void refresh();
   };
+
   // refresh 与 retry() / 调用方共享；通过 effect event 读取，使轮询
   // 定时器不会在每次渲染时都被拆除。
   const refreshInEffect = useEffectEvent(refresh);

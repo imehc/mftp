@@ -6,8 +6,9 @@ import {
   modelLibraryRead,
   modelLibraryWrite,
 } from "~/lib/ipc";
-import type { ModelHandle, ModelSource } from "../domain/types";
+
 import { modelError } from "../domain/errors";
+import type { ModelHandle, ModelSource } from "../domain/types";
 import { MAX_IMPORT_BYTES } from "../sources/browser";
 
 const CHUNK = 1024 * 1024;

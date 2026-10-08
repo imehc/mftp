@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+
 import { Button } from "~/components/ui/button";
 import { describeError } from "~/lib/errors";
 import type { AppError } from "~/types";

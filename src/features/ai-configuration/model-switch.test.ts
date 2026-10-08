@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+
 import type { AiConfigurationView, AiProviderView } from "~/bindings";
+
 import { createAiConfigurationStore } from "./store";
 
 function snapshot(): AiConfigurationView {
@@ -27,6 +29,7 @@ function snapshot(): AiConfigurationView {
     modelCandidates: [],
   };
 }
+
 const input = {
   expectedRevision: 1,
   expectedActiveProviderId: "a",
@@ -47,6 +50,7 @@ describe("全局 AI 模型选择", () => {
     expect(store.getState().view).toEqual(next);
     expect(store.getState().view?.providers[0].currentKeyId).toBe("a-key");
   });
+
   it("地址切换后拒绝其他地址、外部模型、过期版本和回调", async () => {
     const write = vi.fn(async () => snapshot());
     const store = createAiConfigurationStore(async () => snapshot(), write);
@@ -70,6 +74,7 @@ describe("全局 AI 模型选择", () => {
     expect(await store.getState().switchModel(input)).toBe(false);
     expect(write).not.toHaveBeenCalled();
   });
+
   it("阻止加载中、忙碌和损坏的地址且不重写所选模型", async () => {
     const write = vi.fn(async () => snapshot());
     const store = createAiConfigurationStore(async () => snapshot(), write);
@@ -87,6 +92,7 @@ describe("全局 AI 模型选择", () => {
     expect(await store.getState().switchModel(input)).toBe(false);
     expect(write).not.toHaveBeenCalled();
   });
+
   it("版本冲突后刷新但不重放选择操作", async () => {
     const next = snapshot();
     next.revision = 2;

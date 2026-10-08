@@ -1,6 +1,6 @@
+import { toIpcError } from "~/lib/errors";
 import { appDataReset } from "~/lib/ipc";
 import { isDesktopPlatform } from "~/lib/platform";
-import { toIpcError } from "~/lib/errors";
 import type { AppError } from "~/types";
 
 export async function resetApplicationData(

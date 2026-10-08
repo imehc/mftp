@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import type { Host, Session } from "~/types";
-import * as ipc from "~/lib/ipc";
+
 import { toIpcError } from "~/lib/errors";
+import * as ipc from "~/lib/ipc";
+import type { Host, Session } from "~/types";
 
 let counter = 0;
 const nextTabId = () => `tab-${++counter}`;

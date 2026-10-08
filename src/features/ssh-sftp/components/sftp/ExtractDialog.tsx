@@ -1,9 +1,10 @@
-import { useEffect } from "react";
-import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
 import { FolderOpen } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
+import { z } from "zod";
+
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -12,12 +13,13 @@ import {
   DialogFooter,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { FieldDescription } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
-import { firstFormError } from "~/lib/form-errors";
 import type { ExtractState } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { firstFormError } from "~/lib/form-errors";
+
 interface ExtractDialogProps {
   extractTarget: ExtractState;
   directoryPickerOpen: boolean;
@@ -25,6 +27,7 @@ interface ExtractDialogProps {
   chooseExtractParent: () => void;
   confirmExtract: () => void;
 }
+
 export default function ExtractDialog({
   extractTarget,
   directoryPickerOpen,

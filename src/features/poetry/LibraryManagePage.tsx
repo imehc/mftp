@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowDownToLine,
   ArrowLeft,
@@ -7,9 +7,8 @@ import {
   ScrollText,
   Trash2,
 } from "lucide-react";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,16 +19,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { describeError } from "~/lib/errors";
 import { isDesktopPlatform } from "~/lib/platform";
-import { usePoetryLocalData } from "./hooks/use-poetry-local-data";
-import { usePoetryCollectionsManage } from "./hooks/use-poetry-collections-manage";
+
 import {
+  CollectionDownloadFooter,
   CollectionGroups,
   CollectionSection,
-  CollectionDownloadFooter,
 } from "./components/CollectionManagement";
 import TranslationPackManager from "./components/TranslationPackManager";
+import { usePoetryCollectionsManage } from "./hooks/use-poetry-collections-manage";
+import { usePoetryLocalData } from "./hooks/use-poetry-local-data";
+
 export default function LibraryManagePage({
   search,
 }: {

@@ -1,8 +1,11 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { useHostsStore } from "./hosts";
+
 import { hostsList, keysList } from "~/lib/ipc";
 
+import { useHostsStore } from "./hosts";
+
 vi.mock("~/lib/ipc", () => ({ hostsList: vi.fn(), keysList: vi.fn() }));
+
 beforeEach(() => {
   vi.resetAllMocks();
   useHostsStore.getState().invalidate();
@@ -16,6 +19,7 @@ beforeEach(() => {
   vi.mocked(hostsList).mockResolvedValue([]);
   vi.mocked(keysList).mockResolvedValue([]);
 });
+
 it("并发读取复用请求，成功后不重复加载", async () => {
   await Promise.all([
     useHostsStore.getState().ensureLoaded(),
@@ -25,6 +29,7 @@ it("并发读取复用请求，成功后不重复加载", async () => {
   expect(hostsList).toHaveBeenCalledTimes(1);
   expect(useHostsStore.getState().loaded).toBe(true);
 });
+
 it("读取失败保留完整错误，重试成功清除错误", async () => {
   const error = {
     kind: "external" as const,
@@ -41,6 +46,7 @@ it("读取失败保留完整错误，重试成功清除错误", async () => {
   expect(useHostsStore.getState().loadError).toBeNull();
   expect(useHostsStore.getState().loaded).toBe(true);
 });
+
 it("清理使晚到的旧快照失效，后续读取不复用旧请求", async () => {
   let finish!: (value: Awaited<ReturnType<typeof hostsList>>) => void;
   vi.mocked(hostsList).mockReturnValueOnce(

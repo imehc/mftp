@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+
 import { aiKeyDelete, aiModelDelete, aiProviderDelete } from "~/lib/ipc";
+
 import { useAiConfiguration } from "../store";
 import type { AiDeleteTarget } from "../types";
 
@@ -32,6 +34,7 @@ export function useAiDelete(target: AiDeleteTarget, onClose: () => void) {
             .filter((item) => item.id !== target.item.id)
             .map((item) => ({ id: item.id, label: item.modelId }))
         : [];
+
   async function remove() {
     const ok = await execute(() =>
       target.kind === "provider"
@@ -55,6 +58,7 @@ export function useAiDelete(target: AiDeleteTarget, onClose: () => void) {
     );
     if (ok && alive.current) onClose();
   }
+
   return {
     busy,
     error,

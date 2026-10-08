@@ -1,6 +1,7 @@
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import AiModelMenuMobile from "./AiModelMenu.mobile";
+
 import AiModelMenuDesktop from "./AiModelMenu.desktop";
+import AiModelMenuMobile from "./AiModelMenu.mobile";
 
 export default function AiModelMenu() {
   const compact = !useDesktopLayout();

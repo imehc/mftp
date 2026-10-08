@@ -1,53 +1,36 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
+  closestCenter,
   DndContext,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
-  type DragEndEvent,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import {
-  SortableContext,
   arrayMove,
+  SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
 import { gsap } from "gsap";
 import {
   GripVertical,
+  KeyRound,
+  LoaderCircle,
   PanelLeftClose,
   PanelLeftOpen,
-  LoaderCircle,
   Plus,
   Server,
-  KeyRound,
   X,
 } from "lucide-react";
+import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { Host } from "~/types";
-import { useHostsStore } from "~/store/hosts";
-import { useSessionsStore } from "~/store/sessions";
-import { prefersReducedMotion } from "~/lib/motion";
-import { cn } from "cn";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "~/components/ui/empty";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,16 +41,37 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import HostRow from "./hosts/HostRow";
+import { Button } from "~/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "~/components/ui/empty";
+import { Input } from "~/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import HostForm from "~/features/ssh-sftp/components/hosts/HostForm";
-import KeyManager from "~/features/ssh-sftp/components/keys/KeyManager";
 import PassphrasePrompt from "~/features/ssh-sftp/components/hosts/PassphrasePrompt";
+import KeyManager from "~/features/ssh-sftp/components/keys/KeyManager";
 import { describeError } from "~/lib/errors";
+import { prefersReducedMotion } from "~/lib/motion";
+import { useHostsStore } from "~/store/hosts";
+import { useSessionsStore } from "~/store/sessions";
+import type { Host } from "~/types";
+
+import HostRow from "./hosts/HostRow";
+
 interface SidebarProps {
   collapsed: boolean;
   overlay?: boolean;
   onToggleCollapsed: () => void;
 }
+
 function SortableHostRow({
   id,
   children,
@@ -109,6 +113,7 @@ function SortableHostRow({
     </li>
   );
 }
+
 export default function Sidebar({
   collapsed,
   overlay = false,
@@ -168,6 +173,7 @@ export default function Sidebar({
   })();
   const canSortHosts = !collapsed && !query.trim() && filtered.length > 1;
   const sortableHostIds = hosts.map((host) => host.id);
+
   async function onHostDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -181,6 +187,7 @@ export default function Sidebar({
       toast.error(describeError(error));
     }
   }
+
   async function connect(host: Host) {
     const existing = sessionByHost.get(host.id);
     if (existing) {
@@ -201,6 +208,7 @@ export default function Sidebar({
       toast.error(describeError(e));
     }
   }
+
   async function disconnect(host: Host) {
     const session = sessionByHost.get(host.id);
     if (!session) return;
@@ -219,6 +227,7 @@ export default function Sidebar({
       });
     }
   }
+
   async function confirmDelete() {
     if (!deleteTarget) return;
     const name = deleteTarget.label;
@@ -231,10 +240,12 @@ export default function Sidebar({
       setDeleteTarget(null);
     }
   }
+
   function hostAddress(host: Host) {
     const target = `${host.host}:${host.port}`;
     return host.username ? `${host.username}@${target}` : target;
   }
+
   useLayoutEffect(() => {
     const sidebar = sidebarRef.current;
     if (!sidebar) return;
@@ -263,6 +274,7 @@ export default function Sidebar({
     }, sidebar);
     return () => context.revert();
   }, [collapsed]);
+
   function renderHostRow(host: Host) {
     const session = sessionByHost.get(host.id);
     const isConnected = session?.status === "connected";

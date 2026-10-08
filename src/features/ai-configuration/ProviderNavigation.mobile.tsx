@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Plus } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import {
   Select,
@@ -9,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+
 import { AI_LIMITS, type ProviderNavigationProps } from "./types";
 
 export default function ProviderNavigationMobile({

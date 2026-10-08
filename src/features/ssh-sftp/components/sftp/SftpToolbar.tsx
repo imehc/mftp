@@ -1,4 +1,3 @@
-import { createPortal } from "react-dom";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowUp,
@@ -9,6 +8,8 @@ import {
   RefreshCw,
   Upload,
 } from "lucide-react";
+import { createPortal } from "react-dom";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,

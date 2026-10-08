@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { BOARD_SIZE, type GomokuMove } from "./types";
 
 const coordinate = z

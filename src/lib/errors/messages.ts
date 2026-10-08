@@ -1,5 +1,6 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+
 import type { CustomErrorCode } from "~/bindings";
 
 export const customErrorMessages = {

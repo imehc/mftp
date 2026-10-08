@@ -5,12 +5,13 @@ import {
   LineBasicMaterial,
   Mesh,
   MeshBasicMaterial,
+  type PerspectiveCamera,
   Raycaster,
   SphereGeometry,
   Vector2,
   Vector3,
-  type PerspectiveCamera,
 } from "three";
+
 import type { ModelEntry } from "../runtime/collection";
 import { sourcePoint } from "./geometry";
 

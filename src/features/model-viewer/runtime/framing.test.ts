@@ -1,4 +1,3 @@
-import { expect, it } from "vitest";
 import {
   Box3,
   BoxGeometry,
@@ -8,6 +7,8 @@ import {
   PerspectiveCamera,
   Sphere,
 } from "three";
+import { expect, it } from "vitest";
+
 import { fitCamera, frameModel } from "./framing";
 
 it.each([1e-9, 1, 1e9])(

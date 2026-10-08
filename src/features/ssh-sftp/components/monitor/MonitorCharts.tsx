@@ -1,19 +1,22 @@
-import { type ReactNode, useState } from "react";
 import { Trans } from "@lingui/react/macro";
+import { type ReactNode, useState } from "react";
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  matchByDataKey,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
-  matchByDataKey,
 } from "recharts";
+
+import type { MonitorPoint } from "~/features/ssh-sftp/components/monitor/useSystemMonitor";
 import { formatBytes } from "~/lib/format";
 import { prefersReducedMotion } from "~/lib/motion";
-import type { MonitorPoint } from "~/features/ssh-sftp/components/monitor/useSystemMonitor";
+
 export type SeriesKey = Exclude<keyof MonitorPoint, "t">;
+
 export interface SeriesDef {
   key: SeriesKey;
   /** 承载系列颜色的 CSS 变量（明 / 暗色值设置在面板根上）。 */
@@ -26,6 +29,7 @@ export interface SeriesDef {
 
 /** 百分比图表把坐标轴固定在 0–100；速率图表按 bytes/s 自适应。 */
 type Unit = "percent" | "rate";
+
 const formatAxisTime = (t: number) =>
   new Date(t).toLocaleTimeString([], {
     hour: "2-digit",
@@ -34,10 +38,12 @@ const formatAxisTime = (t: number) =>
 const formatValue = (unit: Unit, value: number) =>
   unit === "percent" ? `${value.toFixed(1)}%` : `${formatBytes(value)}/s`;
 const matchMonitorPoint = matchByDataKey("t");
+
 interface TipEntry {
   dataKey?: string | number;
   value?: number | string;
 }
+
 function ChartTip({
   active,
   payload,
@@ -83,6 +89,7 @@ function ChartTip({
     </div>
   );
 }
+
 interface TimeSeriesCardProps {
   title: ReactNode;
   icon?: ReactNode;

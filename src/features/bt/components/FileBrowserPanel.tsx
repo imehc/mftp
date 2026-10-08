@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
@@ -10,19 +9,21 @@ import {
   LoaderCircle,
   RotateCcw,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
 import type {
   AppError,
   BtFileEntry,
   BtFileListing,
   BtTaskInfo,
 } from "~/bindings";
-import * as ipc from "~/lib/ipc";
-import { describeError, toIpcError } from "~/lib/errors";
-import { formatBytes } from "~/lib/format";
-import { previewKind } from "~/lib/preview-kind";
 import { Button } from "~/components/ui/button";
 import PreviewSurface from "~/features/preview/PreviewSurface";
+import { describeError, toIpcError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
+import * as ipc from "~/lib/ipc";
+import { previewKind } from "~/lib/preview-kind";
 
 export default function FileBrowserPanel({
   task,
@@ -95,11 +96,14 @@ export default function FileBrowserPanel({
       setOpening(false);
     }
   };
+
   const current = listing?.current;
+
   const navigate = (next: string) => {
     setPath(next);
     scroller.current?.scrollTo(0, 0);
   };
+
   const parent = (current?.path ?? path ?? "")
     .split("/")
     .slice(0, -1)

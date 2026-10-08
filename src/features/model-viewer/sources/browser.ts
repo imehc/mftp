@@ -1,4 +1,4 @@
-import { modelError, MissingResources } from "../domain/errors";
+import { MissingResources, modelError } from "../domain/errors";
 import type { ModelSource } from "../domain/types";
 import { isModelName } from "./paths";
 

@@ -1,10 +1,11 @@
+import { Trans } from "@lingui/react/macro";
 import { linkOptions } from "@tanstack/react-router";
 import { BookOpen, Gamepad2, LayoutGrid, Settings } from "lucide-react";
-import { Trans } from "@lingui/react/macro";
+
 import {
   availableHomeEntries,
-  homeCategoryLabels,
   type HomeCategory,
+  homeCategoryLabels,
 } from "~/features/home/entries";
 
 const icons = { tools: LayoutGrid, library: BookOpen, games: Gamepad2 };
@@ -40,4 +41,5 @@ export function navigationItems(showGames: boolean) {
     },
   ];
 }
+
 export type NavigationItem = ReturnType<typeof navigationItems>[number];

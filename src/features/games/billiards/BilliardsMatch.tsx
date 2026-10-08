@@ -2,9 +2,18 @@
  * 对局装配与视图：为所选模式构建 MatchRunner，并渲染 HUD（座位单元、
  * 球托盘、犯规提示）、Pixi 舞台、非模态结果条，以及旋转/力度底栏。
  */
-import { useEffect, useRef, useState } from "react";
 import { Plural, Trans } from "@lingui/react/macro";
+import { useEffect, useRef, useState } from "react";
+
 import { Badge } from "~/components/ui/badge";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
+import { AiController, LocalController } from "../engine/controllers";
+import { GameResultBar } from "../engine/GameResultBar";
+import { useGamesHistoryStore } from "../engine/history";
+import { MatchRunner, useMatchSnapshot } from "../engine/match";
+import type { PlayerController } from "../engine/types";
+import { billiardsAiStrategy } from "./ai";
 import { BilliardsControls } from "./BilliardsControls";
 import {
   ALL_TRAY,
@@ -13,18 +22,11 @@ import {
   seatName,
   seatTray,
 } from "./BilliardsScore";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import { AiController, LocalController } from "../engine/controllers";
-import { useGamesHistoryStore } from "../engine/history";
-import { MatchRunner, useMatchSnapshot } from "../engine/match";
-import type { PlayerController } from "../engine/types";
-import { GameResultBar } from "../engine/GameResultBar";
-import { billiardsAiStrategy } from "./ai";
-import { createBilliardsGame, createInitialState } from "./rules";
 import {
   BilliardsStage,
   type BilliardsStageHandle,
 } from "./render/BilliardsStage";
+import { createBilliardsGame, createInitialState } from "./rules";
 import {
   BILLIARDS_GAME_ID,
   type BilliardsHistoryPayload,
@@ -34,10 +36,12 @@ import {
   type BilliardsState,
   type FoulReason,
 } from "./types";
+
 interface Session {
   runner: MatchRunner<BilliardsState, BilliardsMove, BilliardsPresentation>;
   local: LocalController<BilliardsState, BilliardsMove>;
 }
+
 function foulLabel(foul: FoulReason) {
   switch (foul) {
     case "cue-potted":
@@ -50,6 +54,7 @@ function foulLabel(foul: FoulReason) {
       return <Trans>犯规：提前打进黑八</Trans>;
   }
 }
+
 export function BilliardsMatch({
   mode,
   onRematch,
@@ -120,6 +125,7 @@ export function BilliardsMatch({
     />
   );
 }
+
 function MatchView({
   mode,
   session,

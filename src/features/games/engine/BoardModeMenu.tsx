@@ -1,6 +1,7 @@
-import { useId, useState, type ReactNode } from "react";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { ChevronRight, Play, Users, Wifi } from "lucide-react";
+import { type ReactNode, useId, useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import {
@@ -11,9 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+
 import type { Difficulty } from "./ai";
-import type { SeatIndex } from "./types";
 import { useGameHistory, useGamesHistoryStore } from "./history";
+import type { SeatIndex } from "./types";
 
 export type BoardMode =
   | { kind: "ai"; difficulty: Difficulty; localSeat: SeatIndex }

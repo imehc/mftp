@@ -1,22 +1,24 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useLingui as useRuntimeLingui } from "@lingui/react";
-import { useTheme } from "next-themes";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Check } from "lucide-react";
+import { useTheme } from "next-themes";
+
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
+  DialogLayoutBody,
   DialogLayoutContent,
   DialogLayoutHeader,
-  DialogLayoutBody,
 } from "~/components/ui/dialog-layout";
-import { colorThemes, fontPresets } from "~/lib/color-theme";
 import { localeLabels, localeOptions } from "~/i18n/locales";
+import { colorThemes, fontPresets } from "~/lib/color-theme";
+import { isDesktopPlatform } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
-import { isDesktopPlatform } from "~/lib/platform";
 
 export type SettingsChoice =
   "appearance" | "theme" | "language" | "games" | "startup" | "transfer";
+
 export default function SettingsChoicesDialog({
   choice,
   onClose,

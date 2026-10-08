@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react/macro";
-import { LoaderCircle, RotateCcw } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { cn } from "cn";
+import { LoaderCircle, RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { Button } from "~/components/ui/button";
 import type { PreviewKind } from "~/lib/preview-kind";
-import MediaPlayer from "./MediaPlayer";
+
 import ImagePreview from "./ImagePreview";
+import MediaPlayer from "./MediaPlayer";
 import { readTextPreview, type TextPreview } from "./read-text-preview";
+
 export interface PreviewSurfaceProps {
   url: string;
   name: string;
@@ -14,10 +17,12 @@ export interface PreviewSurfaceProps {
   /** 整页预览独立处理安全区，嵌入来源面板时由来源外壳处理。 */
   bottomInset?: boolean;
 }
+
 export default function PreviewSurface(props: PreviewSurfaceProps) {
   // URL/类型切换须清理旧流与媒体状态；窗口尺寸变化则保留当前播放和缩放。
   return <PreviewContent key={`${props.kind}:${props.url}`} {...props} />;
 }
+
 function PreviewContent({
   url,
   name,
@@ -31,12 +36,14 @@ function PreviewContent({
   useEffect(() => {
     if (kind !== "text") return;
     const controller = new AbortController();
+
     const update = (value: TextPreview) => {
       if (!controller.signal.aborted) {
         setText(value);
         setLoading(false);
       }
     };
+
     void readTextPreview(url, controller.signal, update)
       .then(update)
       .catch(() => {
@@ -48,15 +55,18 @@ function PreviewContent({
     return () => controller.abort();
   }, [url, kind, attempt]);
   const ready = () => setLoading(false);
+
   const fail = () => {
     setFailed(true);
     setLoading(false);
   };
+
   const retry = () => {
     setFailed(false);
     setLoading(true);
     setAttempt((v) => v + 1);
   };
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       {kind === "image" ? (

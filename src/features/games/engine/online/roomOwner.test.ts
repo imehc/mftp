@@ -1,17 +1,15 @@
 import { beforeEach, expect, test, vi } from "vitest";
-import { installRoomMessages } from "./__fixtures__/room-i18n";
+
 import type { GameRoomStatus } from "~/bindings";
-import { RoomOwner } from "./roomOwner";
-import { OnlineMatchSession } from "./session";
-import { ONLINE_PROTOCOL_VERSION } from "./protocol";
-import { discoverRooms } from "./discovery";
 import { parseGomokuMove } from "~/features/games/gomoku/onlineProtocol";
 import {
   GAME_ROOM_CLOSED,
   GAME_ROOM_MESSAGE,
   GAME_ROOM_PEER,
 } from "~/lib/events";
+
 import { emit, registrations, resetEvents } from "./__fixtures__/room-events";
+import { installRoomMessages } from "./__fixtures__/room-i18n";
 import {
   leftInstances,
   onDiscover,
@@ -19,6 +17,10 @@ import {
   resetIpc,
   sentInstances,
 } from "./__fixtures__/room-ipc";
+import { discoverRooms } from "./discovery";
+import { ONLINE_PROTOCOL_VERSION } from "./protocol";
+import { RoomOwner } from "./roomOwner";
+import { OnlineMatchSession } from "./session";
 
 // 用可观测的 stub 替换 Tauri 事件与 IPC 出口：注册/解除时序、发送与退出的
 // 实例标识都要被断言，真实实现无法提供这些观察点。
@@ -33,6 +35,7 @@ beforeEach(() => {
 });
 
 const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (reason: unknown) => void;
@@ -42,6 +45,7 @@ function deferred<T>() {
   });
   return { promise, resolve, reject };
 }
+
 function status(instanceId: string, hosting = false): GameRoomStatus {
   return {
     instanceId,
@@ -58,6 +62,7 @@ function status(instanceId: string, hosting = false): GameRoomStatus {
     code: null,
   };
 }
+
 function owner() {
   const value = new RoomOwner<
     NonNullable<ReturnType<typeof parseGomokuMove>>
@@ -65,6 +70,7 @@ function owner() {
   value.activate();
   return value;
 }
+
 const frame = {
   v: ONLINE_PROTOCOL_VERSION,
   t: "move",
@@ -88,10 +94,12 @@ test("打开会话等待所有订阅完成，重复点击不能发起另一请�
   resetEvents(false);
   const room = owner();
   let calls = 0;
+
   const open = async () => {
     calls++;
     return status("one");
   };
+
   const first = room.start(parseGomokuMove, open);
   await room.start(parseGomokuMove, open);
   await tick();

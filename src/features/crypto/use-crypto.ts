@@ -1,5 +1,6 @@
-import { useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useState } from "react";
+
 import { decodeBase64, encodeBase64 } from "./base64";
 
 export function useCrypto() {
@@ -18,11 +19,13 @@ export function useCrypto() {
       ? t`内容无效，无法解码`
       : t`编码失败`
     : null;
+
   function swap() {
     if (!outcome.ok || !output) return;
     setInput(output);
     setMode(mode === "encode" ? "decode" : "encode");
   }
+
   return {
     mode,
     setMode,

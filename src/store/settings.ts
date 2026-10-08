@@ -1,14 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
 import {
-  resolveColorTheme,
-  resolveFontPreset,
   type ColorTheme,
   type FontPreset,
+  resolveColorTheme,
+  resolveFontPreset,
 } from "~/lib/color-theme";
 import { TOOL_ROUTES, type ToolRoute } from "~/lib/module-metadata";
 
 export type DirectoryTransferMode = "archive" | "direct";
+
 /**
  * 工具路由的唯一权威来源是 `~/lib/module-metadata`。`migrate` 依据
  * TOOL_ROUTES 重新校验已持久化的 `lastTool`，因此新增入口要登记模块元数据，
@@ -18,6 +20,7 @@ export type { ToolRoute };
 
 const isToolRoute = (value: string): value is ToolRoute =>
   (TOOL_ROUTES as readonly string[]).includes(value);
+
 export type AppLocale = "system" | "zh-CN" | "en";
 
 interface SettingsState {

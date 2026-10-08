@@ -1,15 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { TodoItem } from "~/types";
+
 import {
   buildTodoListRows,
   formatTodoDate,
   formatTodoTimestamp,
   localTimeKey,
+  matchesTodoQuery,
   plannedDate,
   plannedTimestamp,
   sortTodoItems,
   todoView,
-  matchesTodoQuery,
 } from "./todo-utils";
 
 function item(overrides: Partial<TodoItem> = {}): TodoItem {

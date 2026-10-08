@@ -1,11 +1,13 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Pencil, Plus, Trash2, PlugZap } from "lucide-react";
+import { Pencil, PlugZap, Plus, Trash2 } from "lucide-react";
+
 import type { AiProviderView } from "~/bindings";
-import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
-import { Separator } from "~/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Separator } from "~/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+
 import RowActionsDesktop from "./RowActions.desktop";
 import RowActionsMobile from "./RowActions.mobile";
 import { AI_LIMITS, type AiDeleteTarget, type AiEditorTarget } from "./types";

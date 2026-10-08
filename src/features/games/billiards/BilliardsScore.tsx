@@ -1,13 +1,17 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { Badge } from "~/components/ui/badge";
 import { cn } from "cn";
+
+import { Badge } from "~/components/ui/badge";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 import { BALL_HEX } from "./colors";
 import type { BilliardsMode, BilliardsState } from "./types";
+
 export function seatName(mode: BilliardsMode, seat: number) {
   if (mode.kind === "ai") return seat === 0 ? <Trans>你</Trans> : "AI";
   return seat === 0 ? <Trans>玩家 1</Trans> : <Trans>玩家 2</Trans>;
 }
+
 function BallIcon({ id, potted }: { id: number; potted: boolean }) {
   const { t } = useLingui();
   const label = potted ? t`${id} 号球，已进球` : t`${id} 号球，未进球`;
@@ -73,11 +77,13 @@ export function BallTray({
     </span>
   );
 }
+
 const SOLID_TRAY = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 const STRIPE_TRAY = [9, 10, 11, 12, 13, 14, 15, 8] as const;
 export const ALL_TRAY = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 ] as const;
+
 export function seatTray(
   state: BilliardsState,
   seat: number,

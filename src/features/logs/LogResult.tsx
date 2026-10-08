@@ -1,5 +1,6 @@
 import { Badge } from "~/components/ui/badge";
 import type { ActivityLog } from "~/types";
+
 export function LogResult({
   log,
   labels,

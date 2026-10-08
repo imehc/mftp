@@ -1,10 +1,12 @@
-import { useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
+import { useState } from "react";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+
 import type { ModelViewerRuntime } from "../runtime/viewer";
+import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { NavigationPanel } from "./NavigationPanel";
 import { PreviewPanel } from "./PreviewPanel";
-import { DiagnosticsPanel } from "./DiagnosticsPanel";
 
 export function InspectionPanel({
   runtime,

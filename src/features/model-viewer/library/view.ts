@@ -1,7 +1,9 @@
 import type { PerspectiveCamera, Vector3 } from "three";
+
 import type { ModelCameraState, ModelViewState } from "~/bindings";
-import type { ModelEntry } from "../runtime/collection";
+
 import type { InspectionTools } from "../inspection/tools";
+import type { ModelEntry } from "../runtime/collection";
 
 export function cameraState(
   camera: PerspectiveCamera,

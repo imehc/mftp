@@ -1,9 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+
 import type { TodoScheduleOverlayProps } from "./todo-schedule-overlay";
 
 export default function TodoSchedulePopoverDesktop({

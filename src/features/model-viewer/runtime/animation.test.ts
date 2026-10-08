@@ -1,4 +1,3 @@
-import { describe, expect, it, vi } from "vitest";
 import {
   AnimationClip,
   Bone,
@@ -10,6 +9,8 @@ import {
   Skeleton,
   SkinnedMesh,
 } from "three";
+import { describe, expect, it, vi } from "vitest";
+
 import { ModelAnimation } from "./animation";
 
 function fixture() {
@@ -49,6 +50,7 @@ describe("模型动画传输", () => {
     expect(third.animation.snapshot().time).toBeCloseTo(1.25);
     expect(third.animation.snapshot().playing).toBe(false);
   });
+
   it("从暂停开始，预览精确的暂停帧并在零点停止", () => {
     const { root, animation } = fixture();
     animation.update(1);
@@ -65,6 +67,7 @@ describe("模型动画传输", () => {
     expect(root.position.x).toBe(0);
     expect(animation.snapshot()).toMatchObject({ time: 0, playing: false });
   });
+
   it("只限制一次，从开头重新开始并跨越重复与乒乓边界", () => {
     const { root, animation } = fixture();
     animation.setLoop("once");
@@ -89,6 +92,7 @@ describe("模型动画传输", () => {
     animation.update(8.5);
     expect(root.position.x).toBeCloseTo(1);
   });
+
   it("拖动时不推进，仅在此前播放时恢复，切换片段时保留速度和循环", () => {
     const { root, animation } = fixture();
     animation.beginScrub();
@@ -117,6 +121,7 @@ describe("模型动画传输", () => {
     animation.seek(1);
     expect(root.position.y).toBe(3);
   });
+
   it("处理无片段、零时长、无效输入和释放操作", () => {
     const root = new Group();
     const empty = new ModelAnimation(root, [], vi.fn());
@@ -152,6 +157,7 @@ describe("模型动画传输", () => {
     expect(animated.position.x).toBe(0);
     expect(animation.running).toBe(false);
   });
+
   it("使用相同的暂停定位路径计算骨骼和变形轨道", () => {
     const root = new Group();
     const bone = new Bone();
@@ -177,6 +183,7 @@ describe("模型动画传输", () => {
     expect(bone.rotation.z).toBe(0);
     expect(mesh.morphTargetInfluences?.[0]).toBe(0);
   });
+
   it("每秒最多发布十个时间快照，同时计算每一帧", () => {
     const { root, animation } = fixture();
     const listener = vi.fn();

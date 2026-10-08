@@ -1,5 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+
 import type { CompressModeId } from "../types";
 
 export function CompressModeTabs({

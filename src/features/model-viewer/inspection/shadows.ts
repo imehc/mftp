@@ -3,11 +3,12 @@ import {
   DirectionalLight,
   Mesh,
   PlaneGeometry,
+  type Scene,
   ShadowMaterial,
   Vector3,
-  type Scene,
   type WebGLRenderer,
 } from "three";
+
 import type { ModelCollection } from "../runtime/collection";
 
 export class ViewerShadows {

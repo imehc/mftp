@@ -1,12 +1,5 @@
-import PoetryReadError from "./PoetryReadError";
-import {
-  DialogLayoutContent,
-  DialogLayoutHeader,
-  DialogLayoutBody,
-} from "~/components/ui/dialog-layout";
-import { usePoetryTranslations } from "../hooks/use-poetry-translations";
-import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import {
   LoaderCircle,
   Pencil,
@@ -14,6 +7,8 @@ import {
   Sparkles,
   Trash2,
 } from "lucide-react";
+
+import type { PoetryTranslationMode } from "~/bindings";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -28,10 +23,17 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import { Textarea } from "~/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { describeError } from "~/lib/errors";
-import type { PoetryTranslationMode } from "~/bindings";
+
+import { usePoetryTranslations } from "../hooks/use-poetry-translations";
+import PoetryReadError from "./PoetryReadError";
 
 interface Props {
   uid: string;

@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
 import {
   Download,
   File as FileIcon,
@@ -13,6 +13,8 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -21,18 +23,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import type { SftpEntry } from "~/types";
 import {
   entryType,
   formatMtime,
   formatSize,
   isArchive,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
-import { cn } from "cn";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import SftpActionsMobile from "./SftpActions.mobile";
-import type { SftpAction } from "./sftp-actions";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import type { SftpEntry } from "~/types";
+
+import type { SftpAction } from "./sftp-actions";
+import SftpActionsMobile from "./SftpActions.mobile";
+
 interface RowProps {
   entry: SftpEntry;
   loading: boolean;
@@ -45,6 +48,7 @@ interface RowProps {
   onRename: (entry: SftpEntry) => void;
   onDelete: (entry: SftpEntry) => void;
 }
+
 const SftpRow = function SftpRow({
   entry,
   loading,
@@ -157,4 +161,5 @@ const SftpRow = function SftpRow({
     </div>
   );
 };
+
 export default SftpRow;

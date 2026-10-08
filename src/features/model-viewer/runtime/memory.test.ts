@@ -1,25 +1,26 @@
-import { expect, it, vi } from "vitest";
 import {
+  AnimationClip,
   BufferGeometry,
+  CompressedTexture,
+  DataTexture,
   Float32BufferAttribute,
   Group,
   InterleavedBuffer,
   InterleavedBufferAttribute,
   Mesh,
   MeshBasicMaterial,
-  DataTexture,
+  NumberKeyframeTrack,
+  RGBA_S3TC_DXT5_Format,
   RGBAFormat,
   UnsignedByteType,
-  CompressedTexture,
-  RGBA_S3TC_DXT5_Format,
-  NumberKeyframeTrack,
-  AnimationClip,
 } from "three";
+import { expect, it, vi } from "vitest";
+
 import {
+  MemoryHistory,
   memoryInventory,
   memoryTotals,
   textureBytes,
-  MemoryHistory,
 } from "./memory";
 
 function model(scene: Group, animations: AnimationClip[] = []) {
@@ -33,6 +34,7 @@ function model(scene: Group, animations: AnimationClip[] = []) {
     dispose() {},
   };
 }
+
 it("跨模型对交错数组、共享几何体和纹理去重", () => {
   const data = new InterleavedBuffer(new Float32Array(18), 6);
   const geometry = new BufferGeometry();
@@ -55,6 +57,7 @@ it("跨模型对交错数组、共享几何体和纹理去重", () => {
   expect(memoryTotals([first])).toMatchObject({ cpu: 88, gpu: 88, known: 176 });
   expect(memoryTotals([first, second])).toEqual(memoryTotals([first]));
 });
+
 it("统计精确的 mip 尺寸、压缩块和未知格式", () => {
   const texture = new DataTexture(new Uint8Array(60), 3, 5);
   texture.generateMipmaps = true;
@@ -69,6 +72,7 @@ it("统计精确的 mip 尺寸、压缩块和未知格式", () => {
   texture.format = -99 as typeof texture.format;
   expect(textureBytes(texture)).toBeNull();
 });
+
 it("包含动画和变形 CPU 数组，但不假定知道 GPU 变形打包方式", () => {
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0], 3));
@@ -87,6 +91,7 @@ it("包含动画和变形 CPU 数组，但不假定知道 GPU 变形打包方式
     unknown: 1,
   });
 });
+
 it("历史记录有界，采样量不会随帧率增长", () => {
   const memory = new MemoryHistory();
   for (let time = 0; time < 200000; time += 10) memory.sample(time);

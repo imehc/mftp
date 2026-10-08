@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { cn } from "cn";
+import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "~/components/ui/button";
 
 export default function ImagePreview({
   url,
@@ -41,10 +42,12 @@ export default function ImagePreview({
       : 0;
   const width = natural.width * fit * zoom,
     height = natural.height * fit * zoom;
+
   function resize(next: number) {
     setZoom(Math.min(4, Math.max(0.5, next)));
     if (next === 1) viewport.current?.scrollTo({ left: 0, top: 0 });
   }
+
   return (
     <div className="flex h-full min-h-0 w-full flex-col gap-3">
       <div

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { getVersion } from "@tauri-apps/api/app";
 import { useLingui } from "@lingui/react/macro";
+import { getVersion } from "@tauri-apps/api/app";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import * as ipc from "~/lib/ipc";
+
 import { toIpcError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import * as ipc from "~/lib/ipc";
 import { isDesktopPlatform } from "~/lib/platform";
 import { useHostsStore } from "~/store/hosts";
 import type {
@@ -13,6 +14,7 @@ import type {
   AppError,
   LanTransferStatus,
 } from "~/types";
+
 import { resetApplicationData } from "./reset-app-data";
 
 export const DATA_MODULES: AppDataModule[] = [
@@ -22,6 +24,7 @@ export const DATA_MODULES: AppDataModule[] = [
   "poetry",
   "activityLogs",
 ];
+
 export function useAbout() {
   const { t } = useLingui();
   const [usage, setUsage] = useState<AppDataUsage | null>(null);
@@ -55,6 +58,7 @@ export function useAbout() {
         activityLogs: usage.activityLogsBytes,
       }
     : null;
+
   async function read(run: number) {
     const alive = () => mounted.current && generation.current === run;
     await Promise.all([
@@ -95,11 +99,13 @@ export function useAbout() {
     ]);
     if (alive()) setLoading(false);
   }
+
   function reload() {
     if (writing.current) return;
     setLoading(true);
     return read(++generation.current);
   }
+
   useEffect(() => {
     mounted.current = true;
     void read(++generation.current);
@@ -107,11 +113,13 @@ export function useAbout() {
       mounted.current = false;
     };
   }, []);
+
   function selectTarget(value: AppDataModule | "all" | null) {
     if (writing.current || resetWarnings) return;
     setWriteError(null);
     setTarget(value);
   }
+
   async function confirm() {
     if (!target || writing.current || resetWarnings) return;
     writing.current = true;
@@ -147,6 +155,7 @@ export function useAbout() {
       if (mounted.current) setBusy(false);
     }
   }
+
   return {
     usage,
     lan,
@@ -168,4 +177,5 @@ export function useAbout() {
     confirm,
   };
 }
+
 export type AboutController = ReturnType<typeof useAbout>;

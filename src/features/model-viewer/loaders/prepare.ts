@@ -2,8 +2,8 @@ import { MissingResources, modelError } from "../domain/errors";
 import type { ImportProgress, ModelSource } from "../domain/types";
 import { MAX_IMPORT_BYTES } from "../sources/browser";
 import { resourcePath } from "../sources/paths";
-import { parseDocument } from "./document";
 import { decodeDataUri } from "./data-uri";
+import { parseDocument } from "./document";
 
 export async function prepareGltf(
   source: ModelSource,
@@ -23,6 +23,7 @@ export async function prepareGltf(
   ) => {
     const url = URL.createObjectURL(new Blob([bytes], { type }));
     urls.add(url);
+
     return url;
   };
 
@@ -55,6 +56,7 @@ export async function prepareGltf(
       else allocation += size;
     }
     if (allocation > MAX_IMPORT_BYTES) throw modelError("large");
+
     if (missing.length) throw new MissingResources(missing);
     const cache = new Map<string, Uint8Array<ArrayBuffer>>();
     const validationBlobs = new Map<string, Blob>();
@@ -79,6 +81,7 @@ export async function prepareGltf(
         // Worker 只接收原始 URI 到已授权 Blob 的映射，避免引入路径工具的 UI 翻译依赖。
         validationSource.resources.set(uri, blob);
       }
+
       signal.throwIfAborted();
       cache.set(key, bytes);
       return bytes;

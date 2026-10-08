@@ -1,15 +1,18 @@
+import "./App.css";
+
+import { RouterProvider } from "@tanstack/react-router";
+import { ThemeProvider } from "next-themes";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { ThemeProvider } from "next-themes";
-import { RouterProvider } from "@tanstack/react-router";
-import { router } from "./router";
+
+import { AppRuntime } from "~/app/AppRuntime";
 import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
-import { checkForUpdateOnLaunch } from "~/lib/updater";
 import { applyStoredColorTheme } from "~/lib/color-theme";
-import { AppRuntime } from "~/app/AppRuntime";
-import "./App.css";
+import { checkForUpdateOnLaunch } from "~/lib/updater";
+
+import { router } from "./router";
 
 applyStoredColorTheme();
 

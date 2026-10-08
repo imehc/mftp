@@ -1,18 +1,19 @@
 import { useEffect } from "react";
+
 /**
  * 局域网中国象棋流程：大厅交接 + 共享对局控制器的网络对局视图接线。
  * 走法时序与悔棋/重赛协商由 OnlineMatchController 收口。
  */
 import { useSettingsStore } from "~/store/settings";
+
+import type { OnlineGame } from "../engine/online/matchTypes";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
 import { OnlineMatchDialogs } from "../engine/online/OnlineMatchDialogs";
-import type { OnlineGame } from "../engine/online/matchTypes";
-import { OnlineMatchSession, hashString } from "../engine/online/session";
-import { useOnlineRoom } from "../engine/online/useOnlineRoom";
+import { hashString, OnlineMatchSession } from "../engine/online/session";
 import { useOnlineMatch } from "../engine/online/useOnlineMatch";
+import { useOnlineRoom } from "../engine/online/useOnlineRoom";
 import type { MoveResolution } from "../engine/types";
 import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
-import { XiangqiMatchView } from "./XiangqiMatch";
 import { parseXiangqiMove } from "./onlineProtocol";
 import { createInitialXiangqiState, xiangqiGame } from "./rules";
 import {
@@ -22,6 +23,7 @@ import {
   type XiangqiPresentation,
   type XiangqiState,
 } from "./types";
+import { XiangqiMatchView } from "./XiangqiMatch";
 
 /** 分歧触发器，与对端的 RemoteMove.stateHash 比对。 */
 function hashXiangqiState(state: XiangqiState): string {
@@ -89,6 +91,7 @@ function OnlineMatch({
   onFinishedChange: (finished: boolean) => void;
 }) {
   const volume = useSettingsStore((state) => state.gamesVolume);
+
   const present = (
     resolution: MoveResolution<XiangqiState, XiangqiPresentation>,
   ) => {
@@ -101,6 +104,7 @@ function OnlineMatch({
       playFinishSound(volume);
     }
   };
+
   const {
     controller,
     snapshot,

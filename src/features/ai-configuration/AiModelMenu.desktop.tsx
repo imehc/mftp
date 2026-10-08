@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
 import { Bot } from "lucide-react";
+
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -13,6 +14,7 @@ import {
   DropdownMenuSubTrigger,
 } from "~/components/ui/dropdown-menu";
 import { describeError } from "~/lib/errors";
+
 import { useAiConfiguration } from "./store";
 
 /** 全局模型入口只消费公开配置；密钥读取与认证属于实际生成/测试用例。 */

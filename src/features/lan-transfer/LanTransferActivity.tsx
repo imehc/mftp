@@ -1,14 +1,16 @@
-import { useRef } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { msg } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { XCircle } from "lucide-react";
+import { useRef } from "react";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { msg } from "@lingui/core/macro";
-import { XCircle } from "lucide-react";
 import { translate } from "~/i18n/translate";
-import { formatBytes } from "~/lib/format";
 import { describeError } from "~/lib/errors";
+import { formatBytes } from "~/lib/format";
 import type { LanTransferTask } from "~/types";
+
 function formatDuration(ms: number) {
   if (!Number.isFinite(ms) || ms <= 0) return "-";
   const seconds = Math.ceil(ms / 1000);
@@ -20,6 +22,7 @@ function formatDuration(ms: number) {
   const restMinutes = minutes % 60;
   return `${hours}h ${restMinutes}m`;
 }
+
 function taskStatusLabel(value: string) {
   if (value === "running") return translate(msg`进行中`);
   if (value === "success") return translate(msg`完成`);
@@ -27,16 +30,19 @@ function taskStatusLabel(value: string) {
   if (value === "canceled") return translate(msg`已取消`);
   return value;
 }
+
 function taskDirectionLabel(value: string) {
   if (value === "upload") return translate(msg`上传`);
   if (value === "download") return translate(msg`下载`);
   return value;
 }
+
 function taskSpeed(task: LanTransferTask) {
   const elapsedMs = Math.max(0, task.updatedAt - task.startedAt);
   if (elapsedMs <= 0 || task.transferred <= 0) return 0;
   return task.transferred / (elapsedMs / 1000);
 }
+
 function taskEta(task: LanTransferTask) {
   if (task.status !== "running") {
     return formatDuration(task.updatedAt - task.startedAt);
@@ -45,6 +51,7 @@ function taskEta(task: LanTransferTask) {
   if (speed <= 0 || task.total <= task.transferred) return "-";
   return formatDuration(((task.total - task.transferred) / speed) * 1000);
 }
+
 export default function LanTransferActivity({
   tasks,
   cancelTask,

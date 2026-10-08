@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import type { AppError, PoemDetail } from "~/types";
-import { poetryPoem } from "~/lib/ipc";
+
 import { toIpcError } from "~/lib/errors";
+import { poetryPoem } from "~/lib/ipc";
+import type { AppError, PoemDetail } from "~/types";
 
 /** 详情只跟随路由读取；结果带作品标识，路由切换的首帧也不会显示上一首诗。 */
 export function usePoemRead(uid?: string) {

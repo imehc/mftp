@@ -4,17 +4,20 @@
  * 以及超时与发送失败的收口。
  */
 import { expect, test, vi } from "vitest";
+
 import type { GameRoomClosedReason } from "~/bindings";
-import type { GameDefinition } from "~/features/games/engine/types";
 import type { RemoteMove } from "~/features/games/engine/transport";
-import { ONLINE_PROTOCOL_VERSION, type MatchControlMessage } from "./protocol";
+import type { GameDefinition } from "~/features/games/engine/types";
+
 import { OnlineMatchController } from "./matchController";
 import type { OnlineTransport } from "./matchTypes";
+import { type MatchControlMessage, ONLINE_PROTOCOL_VERSION } from "./protocol";
 
 // 「竞速」游戏：每走一步计数加一，走满三步后最后落子的座位获胜。
 interface RaceState {
   count: number;
 }
+
 const raceGame: GameDefinition<RaceState, number, number> = {
   id: "race",
   seatCount: 2,
@@ -93,11 +96,13 @@ class FakeTransport implements OnlineTransport<number> {
 }
 
 type Match = OnlineMatchController<RaceState, number, number>;
+
 const settle = async (): Promise<void> => {
   for (let i = 0; i < 10; i++) {
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
   }
 };
+
 // 每次都从最新快照取本地控制器：重赛后 round 对象会整体更换。
 const play = (controller: Match, move: number): boolean =>
   controller.getSnapshot().match.local.submit(move);
@@ -414,6 +419,7 @@ test("向外发送失败会结束对局", async () => {
   expect(controllerB.getSnapshot().end).toBe(null);
   release();
 });
+
 test("对端离线会以 peer-left 状态结束对局", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();

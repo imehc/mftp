@@ -1,7 +1,5 @@
-import ActivityMenu from "~/features/transfers/ActivityMenu";
-import { Link } from "@tanstack/react-router";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Group, Panel, Separator } from "react-resizable-panels";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   BookMarked,
@@ -10,6 +8,8 @@ import {
   Shuffle,
   SlidersHorizontal,
 } from "lucide-react";
+import { Group, Panel, Separator } from "react-resizable-panels";
+
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import {
@@ -27,16 +27,18 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import PoetryReadError from "./components/PoetryReadError";
-import DailyPoemLink from "./components/DailyPoemLink";
+import ActivityMenu from "~/features/transfers/ActivityMenu";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { PoemSummary } from "~/types";
+
+import DailyPoemLink from "./components/DailyPoemLink";
 import PoemCard from "./components/PoemCard";
 import PoemDetailPane from "./components/PoemDetail";
 import PoemList from "./components/PoemList";
+import PoetryReadError from "./components/PoetryReadError";
 import SearchBar from "./components/SearchBar";
 import { usePoetryLibrary } from "./hooks/use-poetry-library";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import { usePoetryStore } from "./store/poetry-store";
 
 interface LibraryPageProps {
@@ -47,6 +49,7 @@ interface LibraryPageProps {
   onSearchChange: (patch: { q?: string }) => void;
   onOpenPoem: (uid: string) => void;
 }
+
 /** 有界搜索结果列表——单页最多约 60 条命中，不做虚拟化。 */
 function SearchResultList({
   items,
@@ -77,6 +80,7 @@ function SearchResultList({
     </div>
   );
 }
+
 export default function LibraryPage({
   search,
   onSearchChange,

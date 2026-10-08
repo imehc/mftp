@@ -1,15 +1,17 @@
-import { useState } from "react";
 import { Trans } from "@lingui/react/macro";
+import { useState } from "react";
+
 import { BoardModeMenu, GameSelect } from "../engine/BoardModeMenu";
 import { historyModeLabel, historyResult } from "./labels";
 import {
   BOARD_SIZES,
+  type BoardSize,
   DEFAULT_BOARD_SIZE,
   GO_GAME_ID,
-  type BoardSize,
   type GoHistoryPayload,
   type GoMode,
 } from "./types";
+
 export function GoModeMenu({ onStart }: { onStart: (mode: GoMode) => void }) {
   const [boardSize, setBoardSize] = useState<BoardSize>(DEFAULT_BOARD_SIZE);
   return (

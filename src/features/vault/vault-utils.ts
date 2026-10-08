@@ -1,5 +1,7 @@
 import type { VaultEntry } from "~/types";
+
 export const ALL_CATEGORIES = "__all__";
+
 export function filterVaultEntries(
   entries: VaultEntry[],
   search: string,

@@ -1,6 +1,9 @@
 import { expect, it } from "vitest";
-import { ALL_CATEGORIES, filterVaultEntries } from "./vault-utils";
+
 import type { VaultEntry } from "~/types";
+
+import { ALL_CATEGORIES, filterVaultEntries } from "./vault-utils";
+
 const entries: VaultEntry[] = [
   {
     id: "a",
@@ -21,6 +24,7 @@ const entries: VaultEntry[] = [
     updatedAt: 0,
   },
 ];
+
 it("标题/账号/网址/备注搜索忽略大小写和两侧空白", () => {
   expect(
     filterVaultEntries(entries, " user@ ", ALL_CATEGORIES).map((e) => e.id),
@@ -34,10 +38,12 @@ it("标题/账号/网址/备注搜索忽略大小写和两侧空白", () => {
     ),
   ).toEqual(["b"]);
 });
+
 it("分类与搜索同时匹配，清空筛选保留原有顺序", () => {
   expect(filterVaultEntries(entries, "Work", "个人")).toEqual([]);
   expect(filterVaultEntries(entries, "", ALL_CATEGORIES)).toEqual(entries);
 });
+
 it("搜索不使用密码内容", () => {
   expect(filterVaultEntries(entries, "hidden-secret", ALL_CATEGORIES)).toEqual(
     [],

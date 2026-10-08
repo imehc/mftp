@@ -1,14 +1,8 @@
-import { useId, useRef, useState, useSyncExternalStore } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useId, useRef, useState, useSyncExternalStore } from "react";
+
 import type { ModelLibraryEntry } from "~/bindings";
-import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +13,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import {
   Empty,
   EmptyDescription,
@@ -36,10 +37,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Switch } from "~/components/ui/switch";
 import { Spinner } from "~/components/ui/spinner";
+import { Switch } from "~/components/ui/switch";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+
 import type { ModelLibraryController } from "../library/controller";
 import { LibraryEntryEditor } from "./LibraryEntryEditor";
 import { LibraryList } from "./LibraryList";
@@ -56,11 +58,13 @@ export function LibraryPanel({
   const { t } = useLingui();
   const id = useId();
   const returnFocus = useRef<HTMLElement | null>(null);
+
   function restoreFocus() {
     const target = returnFocus.current;
     if (target?.isConnected) target.focus();
     else document.getElementById(`${id}-search`)?.focus();
   }
+
   const state = useSyncExternalStore(controller.subscribe, controller.snapshot);
   const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState(false);

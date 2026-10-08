@@ -1,13 +1,17 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+
+import type { AppError } from "~/bindings";
 import { Button } from "~/components/ui/button";
 import { describeError, toIpcError } from "~/lib/errors";
-import type { AppError } from "~/bindings";
 import { poetryBrowse } from "~/lib/ipc";
 import type { PoemSummary } from "~/types";
+
 import PoemCard from "./PoemCard";
+
 const PAGE_SIZE = 60;
+
 interface PoemListProps {
   /** 改变此 key 会重置列表（筛选 / 范围 / 查询发生变化）。 */
   resetKey: string;
@@ -19,6 +23,7 @@ interface PoemListProps {
   /** 移动端详情返回时恢复列表滚动锚点。 */
   scrollStorageKey?: string;
 }
+
 interface BrowseState {
   items: PoemSummary[];
   cursor: string | null;
@@ -87,6 +92,7 @@ export default function PoemList({
     }
     restoredScroll.current = true;
   }, [scrollStorageKey, state.items.length]);
+
   const loadMore = async () => {
     const seq = ++loadSeq.current;
     setLoading(true);

@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
 import { i18n } from "@lingui/core";
+import { describe, expect, it } from "vitest";
+
 import { resourcePath } from "./paths";
+
 i18n.loadAndActivate({ locale: "zh-CN", messages: {} });
 
 describe("模型资源 URI 边界", () => {
@@ -14,6 +16,7 @@ describe("模型资源 URI 边界", () => {
       resourcePath("a/picture.png"),
     );
   });
+
   it.each([
     "../secret",
     "a/../secret",

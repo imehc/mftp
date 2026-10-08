@@ -1,20 +1,22 @@
-import { useState, type ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, History, Search, X } from "lucide-react";
-import {
-  InputGroup,
-  InputGroupInput,
-  InputGroupAddon,
-  InputGroupButton,
-} from "~/components/ui/input-group";
+import { type ReactNode, useState } from "react";
+
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "~/components/ui/input-group";
 import type { PoetrySearchScope } from "~/types";
+
 interface SearchBarProps {
   input: string;
   scope: PoetrySearchScope;
@@ -27,6 +29,7 @@ interface SearchBarProps {
   onRemoveHistory?: (query: string) => void;
   onClearHistory?: () => void;
 }
+
 const SCOPES: Array<{
   value: PoetrySearchScope;
   label: React.ReactNode;
@@ -48,6 +51,7 @@ const SCOPES: Array<{
     label: <Trans>正文</Trans>,
   },
 ];
+
 export default function SearchBar({
   input,
   scope,

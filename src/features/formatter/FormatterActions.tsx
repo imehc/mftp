@@ -1,15 +1,17 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useRef } from "react";
 import { Ellipsis } from "lucide-react";
+import { useRef } from "react";
+
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+
 import type { FormatterController } from "./use-formatter";
 
 export function FormatterActions({

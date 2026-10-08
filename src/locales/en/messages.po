@@ -2197,7 +2197,7 @@ msgstr "Stalemate"
 msgid "困难"
 msgstr "Hard"
 
-#: src/features/home/home-descriptions.tsx:19
+#: src/features/home/home-descriptions.tsx:23
 msgid "围地对弈，探索棋局"
 msgstr "Build territory and explore the board"
 
@@ -2256,9 +2256,10 @@ msgstr "Share files on your local network"
 msgid "在数据管理页勾选合集并下载，即可离线浏览。"
 msgstr "Select collections in Data Management and download them to browse offline."
 
-#: src/features/home/home-descriptions.tsx:11
-msgid "在本地查看 GLB 与 glTF 三维模型"
-msgstr "View GLB and glTF models locally"
+#. 首页 3D 模型工具说明，列出支持的文件格式。
+#: src/features/home/home-descriptions.tsx:12
+msgid "在本地查看 GLB、glTF 与 FBX 三维模型"
+msgstr "View GLB, glTF and FBX models locally"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:77
 msgid "在线"
@@ -3752,7 +3753,7 @@ msgstr "Import and export data"
 msgid "数据管理"
 msgstr "Data Management"
 
-#: src/features/home/home-descriptions.tsx:12
+#: src/features/home/home-descriptions.tsx:16
 msgid "整理与校验文本数据"
 msgstr "Format and validate text data"
 
@@ -4544,7 +4545,7 @@ msgstr "Board Size"
 msgid "楚 河"
 msgstr "楚 河"
 
-#: src/features/home/home-descriptions.tsx:20
+#: src/features/home/home-descriptions.tsx:24
 msgid "楚河汉界，布局对弈"
 msgstr "Plan your moves across the river"
 
@@ -5576,7 +5577,7 @@ msgstr "Overwrite data"
 msgid "磁力链接"
 msgstr "Magnet link"
 
-#: src/features/home/home-descriptions.tsx:15
+#: src/features/home/home-descriptions.tsx:19
 msgid "磁力链接与种子下载"
 msgstr "Download magnet links and torrents"
 
@@ -5801,7 +5802,7 @@ msgstr "Manage AI configuration"
 msgid "管理模型、调整位置并检查资源。"
 msgstr "Manage models, adjust positions, and inspect resources."
 
-#: src/features/home/home-descriptions.tsx:13
+#: src/features/home/home-descriptions.tsx:17
 msgid "管理账号与密码"
 msgstr "Manage accounts and passwords"
 
@@ -5880,7 +5881,7 @@ msgstr "Wireframe"
 msgid "练习"
 msgstr "Practice"
 
-#: src/features/home/home-descriptions.tsx:17
+#: src/features/home/home-descriptions.tsx:21
 msgid "练习击球或开始对局"
 msgstr "Practice shots or start a match"
 
@@ -6193,7 +6194,7 @@ msgstr "Failed to fetch resource info"
 msgid "获取资源信息超时，请检查网络或稍后重试"
 msgstr "Fetching resource information timed out. Check your connection or try again later."
 
-#: src/features/home/home-descriptions.tsx:18
+#: src/features/home/home-descriptions.tsx:22
 msgid "落子连五，切磋棋艺"
 msgstr "Connect five and challenge your skills"
 
@@ -6279,7 +6280,7 @@ msgstr "Measure bounds"
 msgid "认证方式"
 msgstr "Authentication"
 
-#: src/features/home/home-descriptions.tsx:14
+#: src/features/home/home-descriptions.tsx:18
 msgid "记录任务与清单"
 msgstr "Keep track of tasks and lists"
 
@@ -7362,7 +7363,7 @@ msgstr "Keys A→Z"
 msgid "键降序"
 msgstr "Keys Z→A"
 
-#: src/features/home/home-descriptions.tsx:16
+#: src/features/home/home-descriptions.tsx:20
 msgid "阅读、收藏与翻译古诗词"
 msgstr "Read, save and translate classical poetry"
 

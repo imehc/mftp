@@ -1,4 +1,5 @@
 import { CanvasSource, Texture } from "pixi.js";
+
 import type { SeatIndex } from "../engine/types";
 
 // 确定性的栅格哈希 → 值噪声 → fbm；带种子，使木纹在每次启动都一致，

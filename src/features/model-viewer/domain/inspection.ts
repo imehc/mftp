@@ -6,6 +6,7 @@ export type SceneNode = {
   children: string[];
   materials: string[];
 };
+
 export type InspectionViewState = {
   tab: string;
   expanded: Set<string>;
@@ -13,6 +14,7 @@ export type InspectionViewState = {
   active: string | null;
   offset: number;
 };
+
 export type MaterialInfo = {
   id: string;
   name: string;
@@ -24,6 +26,7 @@ export type MaterialInfo = {
   doubleSided: boolean;
   textures: { slot: string; id: string }[];
 };
+
 export type TextureInfo = {
   id: string;
   name: string;
@@ -32,6 +35,7 @@ export type TextureInfo = {
   format: string | null;
   slots: string[];
 };
+
 export type ModelInspection = {
   root: string;
   nodes: Record<string, SceneNode>;

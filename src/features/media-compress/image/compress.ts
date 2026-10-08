@@ -1,8 +1,10 @@
 import { msg } from "@lingui/core/macro";
+
 import { translate } from "~/i18n/translate";
 import { stripExtension } from "~/lib/files";
 
 export type ImageInputFormat = "png" | "jpg" | "jpeg" | "webp";
+
 export type ImageOutputFormat = "jpg" | "png" | "webp" | "avif";
 
 /** 编码器质量 10–100，步长 10。越大保留细节越多。 */

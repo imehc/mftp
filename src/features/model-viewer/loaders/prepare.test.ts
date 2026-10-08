@@ -1,7 +1,8 @@
-import { expect, it, vi } from "vitest";
 import { i18n } from "@lingui/core";
-import { browserSource } from "../sources/browser";
+import { expect, it, vi } from "vitest";
+
 import { MissingResources } from "../domain/errors";
+import { browserSource } from "../sources/browser";
 import { prepareGltf } from "./prepare";
 
 i18n.loadAndActivate({ locale: "zh-CN", messages: {} });

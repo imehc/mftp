@@ -1,5 +1,7 @@
 import { Trans } from "@lingui/react/macro";
+
 import { TabsList, TabsTrigger } from "~/components/ui/tabs";
+
 export default function ReadingModeTabs() {
   return (
     <TabsList density="adaptive">

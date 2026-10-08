@@ -1,5 +1,6 @@
-import { expect, it } from "vitest";
 import { PerspectiveCamera } from "three";
+import { expect, it } from "vitest";
+
 import { flightDisplacement } from "./flight";
 
 it("使用面向相机的方向，限制对角速度并遵循垂直输入", () => {

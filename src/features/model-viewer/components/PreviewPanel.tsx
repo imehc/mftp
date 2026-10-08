@@ -1,10 +1,12 @@
-import { useRef, useState, useSyncExternalStore } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useRef, useState, useSyncExternalStore } from "react";
+
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { describeError } from "~/lib/errors";
+
 import type { ModelViewerRuntime } from "../runtime/viewer";
 import {
   InspectionChoice,

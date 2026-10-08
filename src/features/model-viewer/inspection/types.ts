@@ -1,4 +1,5 @@
 export type ValidationSource = { entry: Blob; resources: Map<string, Blob> };
+
 export type ValidationReport = {
   validatorVersion: string;
   issues: {
@@ -15,12 +16,14 @@ export type ValidationReport = {
     }[];
   };
 };
+
 export type MeshSample = {
   name: string;
   positions: Float64Array;
   normals: Float32Array | null;
   indices: Uint32Array;
 };
+
 export type TopologyReport = {
   name: string;
   triangles: number;
@@ -32,6 +35,7 @@ export type TopologyReport = {
   inwardShells: number;
   normalsAvailable: boolean;
 };
+
 export type AnalysisRequest =
   | { kind: "validation"; source: ValidationSource }
   | { kind: "topology"; meshes: MeshSample[]; tolerance: number };

@@ -1,8 +1,8 @@
 import { toIpcError } from "~/lib/errors";
+
 import { LocalController, RemoteController } from "../controllers";
 import { MatchRunner } from "../match";
 import type { RemoteMove } from "../transport";
-import { ONLINE_PROTOCOL_VERSION, type MatchControlMessage } from "./protocol";
 import type {
   MatchEnd,
   NegotiationRequest,
@@ -13,6 +13,7 @@ import type {
   OnlineTransport,
   Presentation,
 } from "./matchTypes";
+import { type MatchControlMessage, ONLINE_PROTOCOL_VERSION } from "./protocol";
 
 class GuardedLocal<S, M> extends LocalController<S, M> {
   constructor(
@@ -30,6 +31,7 @@ class GuardedLocal<S, M> extends LocalController<S, M> {
 }
 
 type Delivery<M> = { t: "move"; move: RemoteMove<M> } | MatchControlMessage;
+
 const MAX_INBOX = 128;
 // 超时后结束会话，不擅自恢复输入；对方可能已同意但响应还在途中。
 const NEGOTIATION_TIMEOUT_MS = 30_000;

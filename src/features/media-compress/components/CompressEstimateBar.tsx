@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
+import type { ReactNode } from "react";
+
 import { Badge } from "~/components/ui/badge";
 import { formatBytes } from "~/lib/format";
+
 interface CompressEstimateBarProps {
   estimatedBytes?: number | null;
   estimatedMin?: number | null;
@@ -15,6 +17,7 @@ interface CompressEstimateBarProps {
   primaryAction: ReactNode;
   secondaryAction?: ReactNode;
 }
+
 export function CompressEstimateBar({
   estimatedBytes,
   estimatedMin,

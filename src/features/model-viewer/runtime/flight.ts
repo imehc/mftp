@@ -1,4 +1,4 @@
-import { Euler, Vector3, type PerspectiveCamera } from "three";
+import { Euler, type PerspectiveCamera, Vector3 } from "three";
 
 export function flightDisplacement(
   camera: PerspectiveCamera,

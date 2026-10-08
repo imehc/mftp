@@ -1,10 +1,11 @@
-import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import { useLingui } from "@lingui/react/macro";
+import { Link } from "@tanstack/react-router";
+import { cn } from "cn";
+import { ArrowLeft } from "lucide-react";
+import type { ReactNode } from "react";
+
 import { Button } from "~/components/ui/button";
 import { TOUCH_TARGET_CHILDREN_CLASS } from "~/lib/touch";
-import { cn } from "cn";
 
 interface Props {
   title: ReactNode;

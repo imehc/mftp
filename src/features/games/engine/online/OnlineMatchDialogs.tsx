@@ -1,4 +1,5 @@
 import { Plural, Trans } from "@lingui/react/macro";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+
 export type UndoFlow =
   | {
       kind: "waiting";
@@ -19,6 +21,7 @@ export type UndoFlow =
       plies: number;
     }
   | null;
+
 interface OnlineMatchDialogsProps {
   undoFlow: UndoFlow;
   onRespondUndo: (accept: boolean) => void;
@@ -27,6 +30,7 @@ interface OnlineMatchDialogsProps {
   endReason: string | null;
   onExit: () => void;
 }
+
 export function OnlineMatchDialogs({
   undoFlow,
   onRespondUndo,

@@ -1,5 +1,6 @@
-import { expect, it } from "vitest";
 import { validateBytes } from "gltf-validator";
+import { expect, it } from "vitest";
+
 import { prepareGltf } from "../loaders/prepare";
 import { browserSource } from "../sources/browser";
 
@@ -38,6 +39,7 @@ it("重写加载器 URL 时保留原始授权字节供校验", async () => {
   prepared.dispose();
   await source.close();
 });
+
 it("使用官方校验器报告格式错误的规范字段", async () => {
   const report = await validateBytes(
     new TextEncoder().encode(

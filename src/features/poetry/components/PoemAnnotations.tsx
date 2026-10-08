@@ -1,6 +1,8 @@
-import { useId, useState } from "react";
 import { Trans } from "@lingui/react/macro";
+import { cn } from "cn";
 import { ChevronDown } from "lucide-react";
+import { useId, useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import {
   Sheet,
@@ -9,8 +11,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "~/components/ui/sheet";
-import { cn } from "cn";
 import type { AuthorBio } from "~/types";
+
 export function AnnotationSection({
   title,
   body,
@@ -26,6 +28,7 @@ export function AnnotationSection({
     </section>
   );
 }
+
 export function CollapsibleStrains({ strains }: { strains: string[] }) {
   const [open, setOpen] = useState(false);
   const contentId = useId();
@@ -61,6 +64,7 @@ export function CollapsibleStrains({ strains }: { strains: string[] }) {
     </section>
   );
 }
+
 export function AuthorBioSheet({
   bio,
   onClose,

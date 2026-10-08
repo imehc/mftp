@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { Button } from "~/components/ui/button";
+
 import type {
   MaterialInfo,
   ModelInspection,

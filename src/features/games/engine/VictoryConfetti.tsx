@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+
 import { prefersReducedMotion } from "~/lib/motion";
 
 const FALLBACK_PRIMARY = "#d84b3e";

@@ -1,28 +1,31 @@
-import { useEffect } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
 import { z } from "zod";
+
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from "~/components/ui/dialog";
-import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
+import { Input } from "~/components/ui/input";
 import { firstFormError } from "~/lib/form-errors";
+
 export interface ConflictResolution {
   incomingName: string;
   existingName: string;
 }
+
 interface Props {
   open: boolean;
   /** 远端已存在的冲突名称。 */

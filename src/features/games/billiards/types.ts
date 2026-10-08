@@ -18,6 +18,7 @@ export interface BilliardsHistoryPayload {
 }
 
 export type BilliardsVariant = "eight-ball" | "practice";
+
 export type BallGroup = "solids" | "stripes";
 
 /** 球 id：0 = 母球，1-7 全色，8 = 黑八，9-15 花色。 */

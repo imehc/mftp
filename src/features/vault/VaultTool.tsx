@@ -1,39 +1,41 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ListFilter, Plus, Search } from "lucide-react";
+
 import AppPageLayout from "~/components/AppPageLayout";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import {
-  InputGroup,
-  InputGroupInput,
-  InputGroupAddon,
-} from "~/components/ui/input-group";
-import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-  EmptyDescription,
 } from "~/components/ui/empty";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "~/components/ui/alert-dialog";
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "~/components/ui/input-group";
 import { describeError } from "~/lib/errors";
+
 import { useVault } from "./use-vault";
 import { ALL_CATEGORIES } from "./vault-utils";
 import VaultEntryDialog from "./VaultEntryDialog";

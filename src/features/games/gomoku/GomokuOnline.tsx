@@ -1,15 +1,17 @@
 import { useEffect } from "react";
+
 /**
  * 联机（局域网）流程：大厅交接 + 共享对局控制器的网络对局视图接线。
  * 走法/座位时序校验、悔棋与重赛协商均由 OnlineMatchController 收口。
  */
 import { useSettingsStore } from "~/store/settings";
+
+import type { OnlineGame } from "../engine/online/matchTypes";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
 import { OnlineMatchDialogs } from "../engine/online/OnlineMatchDialogs";
-import type { OnlineGame } from "../engine/online/matchTypes";
-import { OnlineMatchSession, hashString } from "../engine/online/session";
-import { useOnlineRoom } from "../engine/online/useOnlineRoom";
+import { hashString, OnlineMatchSession } from "../engine/online/session";
 import { useOnlineMatch } from "../engine/online/useOnlineMatch";
+import { useOnlineRoom } from "../engine/online/useOnlineRoom";
 import type { MoveResolution } from "../engine/types";
 import { playFinishSound, playStoneSound } from "./audio";
 import { GomokuMatchView } from "./GomokuMatch";
@@ -78,10 +80,12 @@ function OnlineMatch({
   onFinishedChange: (finished: boolean) => void;
 }) {
   const volume = useSettingsStore((s) => s.gamesVolume);
+
   const present = (resolution: MoveResolution<GomokuState, GomokuMove>) => {
     playStoneSound(volume);
     if (resolution.state.finished) playFinishSound(volume);
   };
+
   const {
     controller,
     snapshot,

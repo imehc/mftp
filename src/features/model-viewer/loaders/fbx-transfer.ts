@@ -1,15 +1,16 @@
 import {
   BufferAttribute,
   BufferGeometry,
+  type Group,
+  type JSONMeta,
   Material,
+  Mesh,
+  type Object3D,
   ObjectLoader,
   Texture,
-  Mesh,
-  type Group,
-  type Object3D,
   type TypedArray,
-  type JSONMeta,
 } from "three";
+
 import { FBX_BUFFER_LIMIT, FBX_NODE_LIMIT, fbxError } from "./fbx-policy";
 
 type AttributeData = {
@@ -165,6 +166,7 @@ export async function unpackFbx(
       data.itemSize,
       data.normalized,
     );
+
     result.name = data.name;
     return result;
   };

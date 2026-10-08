@@ -1,13 +1,15 @@
-import type { ReactNode } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Download } from "lucide-react";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { downloadBlob } from "~/lib/files";
-import { formatBytes } from "~/lib/format";
 import { sizeDeltaPercent } from "~/features/media-compress/format";
 import { describeError } from "~/lib/errors";
+import { downloadBlob } from "~/lib/files";
+import { formatBytes } from "~/lib/format";
+
 interface CompressResultCardProps {
   fileName: string;
   size: number;
@@ -20,6 +22,7 @@ interface CompressResultCardProps {
   /** 在体积徽标前渲染的额外徽标。 */
   extraBadges?: ReactNode;
 }
+
 export function CompressResultCard({
   fileName,
   size,
@@ -32,6 +35,7 @@ export function CompressResultCard({
 }: CompressResultCardProps) {
   const { t } = useLingui();
   const delta = sizeDeltaPercent(originalSize, size);
+
   async function onDownload() {
     try {
       const saved = await downloadBlob(blob, fileName);
@@ -43,6 +47,7 @@ export function CompressResultCard({
       toast.error(describeError(error));
     }
   }
+
   return (
     <section className="border-border bg-card flex flex-col gap-3 rounded-lg border p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">

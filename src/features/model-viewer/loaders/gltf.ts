@@ -4,11 +4,13 @@ import {
   Texture,
   type WebGLRenderer,
 } from "three";
-import { IpcError } from "~/lib/errors";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
-import { KTX2Loader } from "three/addons/loaders/KTX2Loader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { KTX2Loader } from "three/addons/loaders/KTX2Loader.js";
+
+import { IpcError } from "~/lib/errors";
+
 import { modelError } from "../domain/errors";
 import type { ImportProgress, ModelHandle, ModelSource } from "../domain/types";
 import { ModelResources } from "../runtime/resources";

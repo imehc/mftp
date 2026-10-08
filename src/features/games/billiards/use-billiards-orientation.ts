@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 /** 只释放本页申请的全屏与方向锁；异步申请结束时再次核对对局归属。 */
@@ -12,6 +12,7 @@ export function useBilliardsOrientation(active: boolean, landscape: boolean) {
     fullscreen: false,
     locked: false,
   });
+
   const release = () => {
     const state = lease.current;
     if (state.locked) screen.orientation?.unlock?.();
@@ -23,6 +24,7 @@ export function useBilliardsOrientation(active: boolean, landscape: boolean) {
       void document.exitFullscreen().catch(() => undefined);
     state.fullscreen = false;
   };
+
   useEffect(() => {
     const state = lease.current;
     state.active = active;

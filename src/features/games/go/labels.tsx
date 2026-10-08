@@ -1,13 +1,15 @@
 /** 围棋各界面共用的座位 / 结果 / 历史记录标签辅助函数。 */
 import { Trans } from "@lingui/react/macro";
 import { Circle } from "lucide-react";
+
 import type { SeatIndex } from "../engine/types";
 import {
-  KOMI,
   type GoHistoryPayload,
   type GoMode,
   type GoState,
+  KOMI,
 } from "./types";
+
 export function seatName(
   mode: GoMode,
   seat: SeatIndex,
@@ -59,6 +61,7 @@ export function scoreLine(state: GoState) {
     </Trans>
   );
 }
+
 export function matchResultLabel(
   mode: GoMode,
   winnerSeat: SeatIndex | null,
@@ -84,6 +87,7 @@ export function matchResultLabel(
   const seatNameValue = seatName(mode, winnerSeat, online);
   return <Trans>{seatNameValue} 获胜</Trans>;
 }
+
 export function historyModeLabel(payload: GoHistoryPayload) {
   if (payload.mode === "hotseat") return <Trans>双人</Trans>;
   if (payload.mode === "online") return <Trans>联机</Trans>;
@@ -101,6 +105,7 @@ export function historyModeLabel(payload: GoHistoryPayload) {
     </span>
   );
 }
+
 export function historyResult(payload: GoHistoryPayload) {
   if (payload.winnerSeat === null) return <Trans>平局</Trans>;
   if (payload.mode === "ai") {
@@ -123,6 +128,7 @@ export function historyResult(payload: GoHistoryPayload) {
     <Trans>白棋胜</Trans>
   );
 }
+
 export function formatHistoryTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
     month: "2-digit",

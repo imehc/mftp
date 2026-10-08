@@ -10,6 +10,7 @@ export interface Registration {
   resolve(): void;
   reject(error: unknown): void;
 }
+
 export const registrations: Registration[] = [];
 let automatic = true;
 

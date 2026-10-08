@@ -1,5 +1,6 @@
-import { useRef } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { cn } from "cn";
 import {
   File as FileIcon,
   FileText,
@@ -7,12 +8,13 @@ import {
   Image as ImageIcon,
   Music,
 } from "lucide-react";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import type { BtFileMeta } from "~/types";
-import { cn } from "cn";
-import { formatBytes } from "~/lib/format";
+import { useRef } from "react";
+
 import { Checkbox } from "~/components/ui/checkbox";
-import { previewKind, type PreviewKind } from "~/lib/preview-kind";
+import { formatBytes } from "~/lib/format";
+import { type PreviewKind, previewKind } from "~/lib/preview-kind";
+import type { BtFileMeta } from "~/types";
+
 const KIND_ICONS = {
   video: Film,
   audio: Music,
@@ -38,6 +40,7 @@ const TorrentFileList = function TorrentFileList({
   readOnly = false,
 }: TorrentFileListProps) {
   const { t } = useLingui();
+
   const kindLabel = (kind: PreviewKind) => {
     if (kind === "video") return t`视频`;
     if (kind === "audio") return t`音频`;
@@ -45,6 +48,7 @@ const TorrentFileList = function TorrentFileList({
     if (kind === "text") return t`文本`;
     return t`文件`;
   };
+
   const viewportRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: files.length,
@@ -126,4 +130,5 @@ const TorrentFileList = function TorrentFileList({
     </div>
   );
 };
+
 export default TorrentFileList;

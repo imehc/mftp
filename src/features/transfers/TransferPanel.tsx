@@ -1,10 +1,6 @@
-import TransferItem from "./TransferItem";
-import { transferMetrics } from "./transfer-metrics";
-import { createTransferActions } from "./transfer-actions";
-import { describeError } from "~/lib/errors";
-import { useLayoutEffect, useRef, useState } from "react";
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
 import { gsap } from "gsap";
 import {
   ChevronDown,
@@ -13,20 +9,28 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
-import { cn } from "cn";
-import { prefersReducedMotion } from "~/lib/motion";
-import { useTransfersStore } from "~/store/transfers";
-import { retryTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
-import { Button } from "~/components/ui/button";
+import { useLayoutEffect, useRef, useState } from "react";
+
 import {
   Alert,
   AlertAction,
   AlertDescription,
   AlertTitle,
 } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { retryTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
+import { describeError } from "~/lib/errors";
+import { prefersReducedMotion } from "~/lib/motion";
+import { useTransfersStore } from "~/store/transfers";
+
+import { createTransferActions } from "./transfer-actions";
+import { transferMetrics } from "./transfer-metrics";
+import TransferItem from "./TransferItem";
+
 export interface TransferPanelProps {
   animateOnMount?: boolean;
 }
+
 export default function TransferPanel({
   animateOnMount = true,
 }: TransferPanelProps) {

@@ -1,3 +1,5 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,13 +10,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { SftpEntry } from "~/types";
+
 interface DeleteConfirmDialogProps {
   target: SftpEntry | null;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
 }
+
 export default function DeleteConfirmDialog({
   target,
   onOpenChange,

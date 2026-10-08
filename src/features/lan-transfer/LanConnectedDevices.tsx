@@ -1,9 +1,12 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Monitor, Unplug } from "lucide-react";
+
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Monitor, Unplug } from "lucide-react";
 import type { LanConnectedDevice } from "~/types";
+
 import { lanPermissionLabel } from "./labels";
+
 export default function LanConnectedDevices({
   devices,
   disconnectDevice,

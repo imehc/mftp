@@ -1,5 +1,6 @@
 import { Group, Loader, LoadingManager, Texture } from "three";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
+
 import {
   FBX_FILE_LIMIT,
   FBX_TEXTURE_LIMIT,
@@ -7,7 +8,7 @@ import {
   fbxResourcePath,
   fbxTextureType,
 } from "./fbx-policy";
-import { packFbx, type FbxImage } from "./fbx-transfer";
+import { type FbxImage, packFbx } from "./fbx-transfer";
 
 /** 只在专属 Worker 内调用；处理结束即销毁 Worker，避免官方加载器模块级场景缓存常驻。 */
 export function parseFbx(bytes: ArrayBuffer) {

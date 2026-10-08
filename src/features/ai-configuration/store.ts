@@ -1,9 +1,11 @@
 import { create } from "zustand";
+
 import type { AiConfigurationView, AppError } from "~/bindings";
-import { aiConfigurationGet, aiModelSwitch } from "~/lib/ipc";
 import { toIpcError } from "~/lib/errors";
+import { aiConfigurationGet, aiModelSwitch } from "~/lib/ipc";
 
 type Operation = () => Promise<AiConfigurationView | void>;
+
 interface ConfigurationState {
   view: AiConfigurationView | null;
   loading: boolean;

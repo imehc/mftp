@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Layers, X } from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -13,11 +14,12 @@ import {
 } from "~/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+
 import type { ViewerSession, ViewerState } from "../runtime/session";
-import { ModelList } from "./ModelList";
-import { ModelInspector } from "./ModelInspector";
-import { MemoryPanel } from "./MemoryPanel";
 import { InspectionPanel } from "./InspectionPanel";
+import { MemoryPanel } from "./MemoryPanel";
+import { ModelInspector } from "./ModelInspector";
+import { ModelList } from "./ModelList";
 
 export function WorkspaceInspector({
   session,

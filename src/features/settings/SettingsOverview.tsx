@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useLingui } from "@lingui/react/macro";
 import { useLingui as useRuntimeLingui } from "@lingui/react";
-import { useTheme } from "next-themes";
+import { useLingui } from "@lingui/react/macro";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Database,
   FileClock,
@@ -16,16 +14,20 @@ import {
   RefreshCw,
   Sparkles,
 } from "lucide-react";
-import { useSettingsStore } from "~/store/settings";
-import { useUpdaterStore } from "~/store/updater";
+import { useTheme } from "next-themes";
+import { useState } from "react";
+
+import { localeLabels } from "~/i18n/locales";
 import { isDesktopPlatform } from "~/lib/platform";
 import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
-import { localeLabels } from "~/i18n/locales";
-import { SettingsEntry, SettingsGroup } from "./SettingsEntry";
+import { useSettingsStore } from "~/store/settings";
+import { useUpdaterStore } from "~/store/updater";
+
+import AutostartSettingDesktop from "./AutostartSetting.desktop";
 import SettingsChoicesDialog, {
   type SettingsChoice,
 } from "./SettingsChoicesDialog";
-import AutostartSettingDesktop from "./AutostartSetting.desktop";
+import { SettingsEntry, SettingsGroup } from "./SettingsEntry";
 
 export default function SettingsOverview({ onAi }: { onAi: () => void }) {
   const { t } = useLingui();

@@ -1,8 +1,8 @@
 import {
-  createRng,
-  yieldToUi,
   type AiStrategy,
+  createRng,
   type Difficulty,
+  yieldToUi,
 } from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
 import {

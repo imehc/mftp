@@ -1,5 +1,7 @@
 import type { ComponentProps } from "react";
+
 import ReadingSettingsPopover from "./ReadingSettingsPopover";
+
 export default function ReadingControlsDesktop({
   settings,
   settingsInHeader = false,

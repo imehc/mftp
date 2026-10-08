@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import type { RemoteMove } from "../transport";
 
 const index = z.number().int().nonnegative().safe();
@@ -39,9 +40,11 @@ const moveSchema = z.object({
 
 /** 游戏内部协议；Tauri 命令和事件类型仍由 Rust 生成。 */
 export type MatchControlMessage = z.infer<typeof controlSchema>;
+
 export type AppFrame<M> =
   | { v: typeof ONLINE_PROTOCOL_VERSION; t: "move"; move: RemoteMove<M> }
   | MatchControlMessage;
+
 export type MoveParser<M> = (value: unknown) => M | null;
 
 export function parseFrame<M>(

@@ -1,6 +1,6 @@
-import type { CSSProperties } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import type { CSSProperties } from "react";
+
 import {
   Select,
   SelectContent,
@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 /** 杆法与力度只控制展示和输入参数，不拥有对局或球桌资源。 */
 export function BilliardsControls({

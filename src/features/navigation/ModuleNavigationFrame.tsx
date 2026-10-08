@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
+
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useSettingsStore } from "~/store/settings";
-import { navigationItems, type NavigationItem } from "./NavigationItems";
-import NavigationRailDesktop from "./NavigationRail.desktop";
+
 import BottomNavigationMobile from "./BottomNavigation.mobile";
+import { type NavigationItem, navigationItems } from "./NavigationItems";
+import NavigationRailDesktop from "./NavigationRail.desktop";
 
 /** 展示框架不拥有页面状态；换导航布局时 children 保持在同一挂载位置。 */
 export default function ModuleNavigationFrame({

@@ -1,7 +1,9 @@
-import { TextureSource, type ObjectLoader } from "three";
+import { type ObjectLoader, TextureSource } from "three";
+
 import { IpcError } from "~/lib/errors";
-import type { ImportProgress, ModelSource } from "../domain/types";
+
 import { MissingResources } from "../domain/errors";
+import type { ImportProgress, ModelSource } from "../domain/types";
 import { FBX_FILE_LIMIT, FBX_PIXEL_LIMIT, fbxError } from "./fbx-policy";
 import type { FbxImage } from "./fbx-transfer";
 

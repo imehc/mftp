@@ -1,11 +1,13 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
 import { gameRoomCreate, gameRoomJoin, lanTransferSettings } from "~/lib/ipc";
 import type { GameRoomSummary } from "~/types";
-import type { RoomOwner } from "./roomOwner";
-import { onlineGameId, type MoveParser } from "./protocol";
-import { useRoomDiscovery } from "./useRoomDiscovery";
+
+import { type MoveParser, onlineGameId } from "./protocol";
 import { parseRoomAddress } from "./room-address";
+import type { RoomOwner } from "./roomOwner";
+import { useRoomDiscovery } from "./useRoomDiscovery";
 
 export function useOnlineLobby<M>(
   gameId: string,
@@ -40,6 +42,7 @@ export function useOnlineLobby<M>(
     };
   }, []);
   const playerName = () => nickname.trim() || t`玩家`;
+
   const create = () => {
     const name = playerName();
     return owner.start(parseMove, () =>
@@ -51,6 +54,7 @@ export function useOnlineLobby<M>(
       ),
     );
   };
+
   const openJoin = (room?: GameRoomSummary) => {
     setAddressInvalid(false);
     setCodeRequired(!!room?.hasCode);
@@ -61,6 +65,7 @@ export function useOnlineLobby<M>(
     setJoinCode("");
     setJoinOpen(true);
   };
+
   const join = () => {
     const address = parseRoomAddress(manualAddr);
     setAddressInvalid(!address);
@@ -75,11 +80,13 @@ export function useOnlineLobby<M>(
       ),
     );
   };
+
   const closeJoin = async () => {
     // 先完成旧启动请求的条件清理，再允许界面发起新的连接。
     await owner.cancel();
     setJoinOpen(false);
   };
+
   return {
     ...state,
     discovery,

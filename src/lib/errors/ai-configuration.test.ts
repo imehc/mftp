@@ -1,9 +1,10 @@
-import { beforeEach, expect, test } from "vitest";
 import { i18n } from "@lingui/core";
+import { beforeEach, expect, test } from "vitest";
+
 import type { CustomErrorCode } from "~/bindings";
 import { describeError } from "~/lib/errors";
-import { messages as zh } from "~/locales/zh-CN/messages";
 import { messages as en } from "~/locales/en/messages";
+import { messages as zh } from "~/locales/zh-CN/messages";
 
 const codes: CustomErrorCode[] = [
   "ai:authentication_expired",

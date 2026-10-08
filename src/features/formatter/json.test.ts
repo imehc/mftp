@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import {
   escapeJsonString,
   formatJson,
@@ -16,6 +17,7 @@ describe("格式化操作", () => {
     if (formatted.ok)
       expect(minifyJson(formatted.value)).toEqual({ ok: true, value: input });
   });
+
   it("无效输入返回错误，不产生替换文档", () => {
     for (const result of [
       validateJson('{"a":}'),
@@ -24,6 +26,7 @@ describe("格式化操作", () => {
     ])
       expect(result.ok).toBe(false);
   });
+
   it("升降序递归排序且保留特殊键", () => {
     const input = '{"z":1,"__proto__":{"b":2,"a":1},"a":[{"z":1,"a":2}]}';
     const asc = sortJsonKeys(input, { indent: "" }, "asc");
@@ -34,6 +37,7 @@ describe("格式化操作", () => {
     const desc = sortJsonKeys('{"a":1,"z":2}', { indent: "" }, "desc");
     expect(desc).toEqual({ ok: true, value: '{"z":2,"a":1}' });
   });
+
   it("转义与还原保留文档内容", () => {
     const input = '{"name":"诗词","newline":"a\\nb"}';
     const escaped = escapeJsonString(input);

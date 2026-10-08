@@ -5,6 +5,7 @@ import {
   MeshNormalMaterial,
   MeshStandardMaterial,
 } from "three";
+
 import type { ModelEntry } from "../runtime/collection";
 
 export type MaterialView = {

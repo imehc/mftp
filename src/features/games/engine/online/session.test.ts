@@ -1,20 +1,16 @@
-import { beforeEach, expect, test, vi } from "vitest";
 import { i18n } from "@lingui/core";
-import type { GameRoomStatus } from "~/types";
+import { beforeEach, expect, test, vi } from "vitest";
+
+import { goMoveParser } from "~/features/games/go/onlineProtocol";
+import { parseGomokuMove } from "~/features/games/gomoku/onlineProtocol";
+import { parseXiangqiMove } from "~/features/games/xiangqi/onlineProtocol";
 import {
   GAME_ROOM_CLOSED,
   GAME_ROOM_MESSAGE,
   GAME_ROOM_PEER,
 } from "~/lib/events";
-import { OnlineMatchSession, hashString } from "./session";
-import {
-  ONLINE_PROTOCOL_VERSION,
-  parseFrame,
-  type MatchControlMessage,
-} from "./protocol";
-import { parseGomokuMove } from "~/features/games/gomoku/onlineProtocol";
-import { goMoveParser } from "~/features/games/go/onlineProtocol";
-import { parseXiangqiMove } from "~/features/games/xiangqi/onlineProtocol";
+import type { GameRoomStatus } from "~/types";
+
 import {
   emit as emitRaw,
   registrations,
@@ -22,6 +18,12 @@ import {
 } from "./__fixtures__/room-events";
 import { installRoomMessages } from "./__fixtures__/room-i18n";
 import { leaves, resetIpc, sent } from "./__fixtures__/room-ipc";
+import {
+  type MatchControlMessage,
+  ONLINE_PROTOCOL_VERSION,
+  parseFrame,
+} from "./protocol";
+import { hashString, OnlineMatchSession } from "./session";
 
 // 用可观测的 stub 替换 Tauri 事件与 IPC 出口：注册/解除时序、发送与退出的
 // 实例标识都要被断言，真实实现无法提供这些观察点。
@@ -86,6 +88,7 @@ const rematchResponse: MatchControlMessage = {
   accept: true,
 };
 const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 function emit(topic: string, payload: unknown) {
   emitRaw(
     topic,
@@ -94,6 +97,7 @@ function emit(topic: string, payload: unknown) {
       : { instanceId: "instance", ...(payload as object) },
   );
 }
+
 async function createSession(
   state: GameRoomStatus,
   parse: typeof parseGomokuMove,
