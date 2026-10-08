@@ -19,6 +19,7 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 
+import { logAction, logObject } from "./log-labels";
 import { logDetail } from "./log-utils";
 import type { ActivityLogsController } from "./use-activity-logs";
 
@@ -67,11 +68,11 @@ export default function LogDialogs({
                 <dt className="text-muted-foreground">
                   <Trans>操作</Trans>
                 </dt>
-                <dd className="break-words">{row.requestType}</dd>
+                <dd className="break-words">{logAction(row)}</dd>
                 <dt className="text-muted-foreground">
                   <Trans>对象</Trans>
                 </dt>
-                <dd className="break-all">{row.ip || "—"}</dd>
+                <dd className="break-all">{logObject(row)}</dd>
                 <dt className="text-muted-foreground">
                   <Trans>结果</Trans>
                 </dt>
@@ -82,6 +83,24 @@ export default function LogDialogs({
                 <dd className="break-words whitespace-pre-wrap">
                   {logDetail(row) || "—"}
                 </dd>
+                <dt className="text-muted-foreground">
+                  <Trans comment="日志详情：后端保存的原始操作代码，用于排查问题">
+                    操作标识
+                  </Trans>
+                </dt>
+                <dd className="font-mono text-xs break-all">
+                  {row.requestType}
+                </dd>
+                {row.ip ? (
+                  <>
+                    <dt className="text-muted-foreground">
+                      <Trans comment="日志详情：后端保存的完整对象 ID、地址或路径">
+                        对象原值
+                      </Trans>
+                    </dt>
+                    <dd className="font-mono text-xs break-all">{row.ip}</dd>
+                  </>
+                ) : null}
               </dl>
             ) : null}
           </DialogLayoutBody>

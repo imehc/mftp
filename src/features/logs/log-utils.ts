@@ -1,6 +1,8 @@
 import { describeError } from "~/lib/errors";
 import type { ActivityLog } from "~/types";
 
+import { logAction, logObject } from "./log-labels";
+
 // 历史错误的 message 与 detail 通常相同；缺失 detail 时仍须显示原始诊断。
 export function logDetail(log: ActivityLog): string {
   const detail = log.detail || "";
@@ -28,6 +30,8 @@ export function filterLogs(
         labels[log.source],
         log.ip,
         log.requestType,
+        logAction(log),
+        logObject(log),
         log.result,
         labels[log.result],
         logDetail(log),

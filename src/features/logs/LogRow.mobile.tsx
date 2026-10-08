@@ -3,6 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "~/components/ui/button";
 import type { ActivityLog } from "~/types";
 
+import { logAction, logObject } from "./log-labels";
 import { logDetail } from "./log-utils";
 import { LogResult } from "./LogResult";
 import type { ActivityLogsController } from "./use-activity-logs";
@@ -20,11 +21,11 @@ export default function LogRowMobile({
     <article className="flex flex-col gap-1 border-b py-3">
       <div className="flex items-start justify-between gap-3">
         <h2 className="min-w-0 text-sm font-medium break-words">
-          {log.requestType}
+          {logAction(log)}
         </h2>
         <LogResult log={log} labels={c.resultLabels} />
       </div>
-      <p className="text-sm break-all">{log.ip || "—"}</p>
+      <p className="text-sm break-all">{logObject(log)}</p>
       <div className="flex items-center justify-between gap-2">
         <p className="text-muted-foreground min-w-0 text-xs break-words tabular-nums">
           {c.sourceLabels[log.source] ?? log.source} ·{" "}

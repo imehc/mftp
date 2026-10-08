@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 
 import type { ActivityLog } from "~/types";
 
+import { logAction, logObject } from "./log-labels";
 import { logDetail } from "./log-utils";
 import { LogResult } from "./LogResult";
 import type { ActivityLogsController } from "./use-activity-logs";
@@ -45,7 +46,8 @@ export default function LogRowDesktop({
   controller: ActivityLogsController;
 }) {
   const { t, i18n } = useLingui();
-  const action = log.requestType;
+  const action = logAction(log);
+  const object = logObject(log);
   return (
     <button
       type="button"
@@ -62,8 +64,12 @@ export default function LogRowDesktop({
       <span className="truncate text-xs">
         {c.sourceLabels[log.source] ?? log.source}
       </span>
-      <span className="truncate">{log.requestType}</span>
-      <span className="truncate">{log.ip || "—"}</span>
+      <span className="truncate" title={action}>
+        {action}
+      </span>
+      <span className="truncate" title={object}>
+        {object}
+      </span>
       <LogResult log={log} labels={c.resultLabels} />
       <span className="text-muted-foreground truncate text-xs">
         {logDetail(log) || "—"}
