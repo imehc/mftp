@@ -84,7 +84,7 @@ const failure = {
   args: { operation: "listen" },
 };
 
-test("open waits for all subscriptions; duplicate clicks cannot start another request", async () => {
+test("打开会话等待所有订阅完成，重复点击不能发起另一请求", async () => {
   resetEvents(false);
   const room = owner();
   let calls = 0;
@@ -107,7 +107,7 @@ test("open waits for all subscriptions; duplicate clicks cannot start another re
   await room.cancel();
 });
 
-test("registration failure preserves the full error and never opens or leaves a room", async () => {
+test("注册失败保留完整错误且绝不打开或离开房间", async () => {
   resetEvents(false);
   const room = owner();
   let calls = 0;
@@ -127,7 +127,7 @@ test("registration failure preserves the full error and never opens or leaves a 
   room.dispose();
 });
 
-test("cancellation during registration cleans late listeners without invoking the backend", async () => {
+test("注册期间取消会清理延迟监听器且不调用后端", async () => {
   resetEvents(false);
   const room = owner();
   let calls = 0;
@@ -145,7 +145,7 @@ test("cancellation during registration cleans late listeners without invoking th
   expect(leftInstances).toStrictEqual([]);
 });
 
-test("late open and real cleanup finish before the next owner starts", async () => {
+test("延迟打开和实际清理完成后才启动下一个持有者", async () => {
   const first = owner();
   const second = owner();
   const opening = deferred<GameRoomStatus>();
@@ -176,7 +176,7 @@ test("late open and real cleanup finish before the next owner starts", async () 
   expect(leftInstances).toStrictEqual(["old", "new"]);
 });
 
-test("peer and first move before IPC returns survive the handoff; stale events do not", async () => {
+test("IPC 返回前的对端和首个着法能跨越交接，过期事件不能", async () => {
   const room = owner();
   await room.start(parseGomokuMove, async () => {
     emit(GAME_ROOM_CLOSED, { instanceId: "old", reason: "closed" });
@@ -215,7 +215,7 @@ test("peer and first move before IPC returns survive the handoff; stale events d
   await room.cancel();
 });
 
-test("a terminal event before open resolves prevents a dead room handoff", async () => {
+test("打开完成前的终止事件会阻止无效房间交接", async () => {
   const room = owner();
   await room.start(parseGomokuMove, async () => {
     emit(GAME_ROOM_CLOSED, { instanceId: "dead", reason: "peer-left" });
@@ -226,7 +226,7 @@ test("a terminal event before open resolves prevents a dead room handoff", async
   expect(leftInstances).toStrictEqual(["dead"]);
 });
 
-test("replacing a ready owner closes its listeners and stale cleanup cannot leave the replacement", async () => {
+test("替换就绪持有者会关闭其监听器，过期清理不能影响替代者", async () => {
   const first = owner();
   await first.start(parseGomokuMove, async () => status("one"));
   const oldSession = first.getSnapshot().ready!.session;
@@ -251,7 +251,7 @@ test("replacing a ready owner closes its listeners and stale cleanup cannot leav
   expect(leftInstances).toStrictEqual(["one", "two"]);
 });
 
-test("StrictMode setup-cleanup-setup does not leave an unowned room or revive old work", async () => {
+test("严格模式的设置-清理-设置不会留下无主房间或恢复旧任务", async () => {
   const room = owner();
   room.dispose();
   room.activate();
@@ -270,7 +270,7 @@ test("StrictMode setup-cleanup-setup does not leave an unowned room or revive ol
   await room.cancel();
 });
 
-test("cleanup failure is visible and retained for retry before another open", async () => {
+test("清理失败可见，并在再次打开前保留以便重试", async () => {
   const room = owner();
   await room.start(parseGomokuMove, async () => status("one"));
   onLeave(async () => {
@@ -301,7 +301,7 @@ test("cleanup failure is visible and retained for retry before another open", as
   expect(leftInstances).toStrictEqual(["one", "one", "one", "two"]);
 });
 
-test("open errors never hand off stale status and allow retry", async () => {
+test("打开错误不会交接过期状态且允许重试", async () => {
   const room = owner();
   await room.start(parseGomokuMove, async () => {
     throw failure;
@@ -314,7 +314,7 @@ test("open errors never hand off stale status and allow retry", async () => {
   await room.cancel();
 });
 
-test("a waiting host hands off only its own presence and repeated cancel shares cleanup", async () => {
+test("等待中的主机只交接自身在线状态，重复取消共享清理过程", async () => {
   const room = owner();
   await room.start(parseGomokuMove, async () => status("host", true));
   expect(room.getSnapshot().hosting?.instanceId).toBe("host");
@@ -335,7 +335,7 @@ test("a waiting host hands off only its own presence and repeated cancel shares 
   expect(room.getSnapshot().cancelling).toBe(false);
 });
 
-test("effect reconnection never reuses a session already closed by cleanup", async () => {
+test("效果重连绝不复用已由清理关闭的会话", async () => {
   const room = owner();
   await room.start(parseGomokuMove, async () => status("one"));
   room.dispose();
@@ -349,7 +349,7 @@ test("effect reconnection never reuses a session already closed by cleanup", asy
   expect(leftInstances).toStrictEqual(["one", "two"]);
 });
 
-test("unbound event buffering is bounded and cannot silently lose the first move", async () => {
+test("未绑定事件缓冲有界且不会静默丢失首个着法", async () => {
   const session = await OnlineMatchSession.prepare(parseGomokuMove);
   for (let i = 0; i < 129; i++)
     emit(GAME_ROOM_MESSAGE, {
@@ -362,7 +362,7 @@ test("unbound event buffering is bounded and cannot silently lose the first move
   );
 });
 
-test("discovery reuses an in-flight scan and serializes different games without swallowing errors", async () => {
+test("发现过程复用进行中的扫描，并串行处理不同游戏且不吞掉错误", async () => {
   const first = deferred<[]>();
   const calls: string[] = [];
   onDiscover((game) => {

@@ -40,3 +40,15 @@ export const poetryTranslationStreamEvent = (requestId: string) =>
 
 /** BT 任务级事件（存到本地完成 / 失败）。载荷类型：`BtTaskEvent`。 */
 export const BT_TASK_EVENT = "bt://task-event";
+
+/** 桌面原生拖放的订阅入口；取消订阅由页面生命周期负责。 */
+export async function listenNativeFileDrop(
+  onDrop: (paths: string[]) => void,
+  onHover: (hovering: boolean) => void,
+) {
+  const { getCurrentWebview } = await import("@tauri-apps/api/webview");
+  return getCurrentWebview().onDragDropEvent((event) => {
+    onHover(event.payload.type === "enter" || event.payload.type === "over");
+    if (event.payload.type === "drop") onDrop(event.payload.paths);
+  });
+}

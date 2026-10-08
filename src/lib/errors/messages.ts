@@ -3,6 +3,24 @@ import { msg } from "@lingui/core/macro";
 import type { CustomErrorCode } from "~/bindings";
 
 export const customErrorMessages = {
+  "model:source_invalid": msg`请选择有效的 GLB、glTF 或 FBX 模型文件`,
+  "model:library_invalid": msg({
+    message: "模型库数据无效或已达到容量限制",
+    comment: "本地三维模型库拒绝无效数据或超过条目/资源上限的保存。",
+  }),
+  "model:library_missing": msg({
+    message: "模型库条目已不可用，请重新导入",
+    comment: "保存或读取的本地模型库条目已删除或未完整写入。",
+  }),
+  "model:library_version": msg({
+    message: "模型库版本不受支持，请升级应用",
+    comment: "本机数据库或保存视图来自更新版本，不能安全读取。",
+  }),
+  "model:resource_too_large": msg`模型资源过大，请选择较小的模型`,
+  "model:unsafe_path": msg`模型引用了不安全的资源路径，已阻止读取`,
+  "model:session_limit": msg`模型导入会话过多，请关闭后重新打开应用`,
+  "model:session_closed": msg`模型导入会话已关闭，请重新选择模型`,
+  "model:resource_missing": msg`模型缺少依赖文件，请补充选择`,
   "app:shutting_down": msg`应用正在退出，无法执行此操作`,
   "app:maintenance_in_progress": msg`应用正在清理数据，请稍后重试`,
   "app:operations_busy": msg`当前操作尚未完成，请稍后重试清理数据`,
@@ -240,6 +258,16 @@ export const appDataSectionNames: Record<string, MessageDescriptor> = {
 // 渲染时本地化。只有确实无法从后端拿到错误、又需要向用户解释的时序
 // （如终端打开前连接被关闭）才在这里登记。
 export const frontendErrorMessages = {
+  "model:invalid": msg`模型格式无效或文件已损坏，请检查后重新选择`,
+  "model:unsupported": msg`请选择一个 GLB、glTF 或 FBX 模型文件`,
+  "model:fbx_limit": msg`FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。`,
+  "model:fbx_texture": msg`FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。`,
+  "model:fbx_unit": msg`FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。`,
+  "model:unsafe": msg`模型包含网络地址或不安全路径，已阻止读取`,
+  "model:large": msg`本次导入的资源超过 512 MiB，请选择较小的模型`,
+  "model:analysis_limit": msg`模型超过检查上限，请选择较小的模型。`,
+  "model:decode": msg`模型解析失败，请检查模型与依赖文件是否完整`,
+  "model:webgl": msg`无法初始化 3D 显示，请重试或检查设备的图形支持`,
   "frontend:shell_closed_before_open": msg`远端连接在终端打开前已关闭`,
 };
 

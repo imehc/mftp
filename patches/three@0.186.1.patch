@@ -1,0 +1,35 @@
+diff --git a/examples/jsm/loaders/FBXLoader.js b/examples/jsm/loaders/FBXLoader.js
+index 23adc69e9faf639a076c7b68729fa4c5513b69b4..f42b35e22bf0ea8c481c00f3b78b847a13e161e1 100644
+--- a/examples/jsm/loaders/FBXLoader.js
++++ b/examples/jsm/loaders/FBXLoader.js
+@@ -308,7 +308,8 @@ class FBXTreeParser {
+ 			const filename = images[ id ];
+ 
+ 			if ( blobs[ filename ] !== undefined ) images[ id ] = blobs[ filename ];
+-			else images[ id ] = images[ id ].split( '\\' ).pop();
++			// Preserve the reference for the application's explicit resource resolver.
++			else images[ id ] = filename;
+ 
+ 		}
+ 
+@@ -484,8 +485,7 @@ class FBXTreeParser {
+ 
+ 		if ( fileName === undefined ) {
+ 
+-			console.warn( 'FBXLoader: Undefined filename, creating placeholder texture.' );
+-			return new Texture();
++			throw new Error( 'FBXLoader: Missing texture filename.' );
+ 
+ 		}
+ 
+@@ -1194,8 +1194,8 @@ class FBXTreeParser {
+ 			}
+ 
+ 
+-			let width = window.innerWidth;
+-			let height = window.innerHeight;
++			let width = typeof window === 'undefined' ? 1 : window.innerWidth;
++			let height = typeof window === 'undefined' ? 1 : window.innerHeight;
+ 
+ 			if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
+ 

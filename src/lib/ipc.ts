@@ -48,7 +48,58 @@ const voidCommand = async <E>(
   await unwrapCommand(promise);
 };
 
+// ---- 模型资源与本地库 ----
+export const modelViewerOpen = (path: string) =>
+  unwrapCommand(commands.modelViewerOpen(path));
+export const modelViewerAttach = (id: string, key: string, path: string) =>
+  voidCommand(commands.modelViewerAttach(id, key, path));
+export const modelViewerSize = (id: string, key: string) =>
+  unwrapCommand(commands.modelViewerSize(id, key));
+export const modelViewerRead = (
+  id: string,
+  key: string,
+  offset: number,
+  length: number,
+) => unwrapCommand(commands.modelViewerRead(id, key, offset, length));
+export const modelViewerClose = (id: string) =>
+  voidCommand(commands.modelViewerClose(id));
+
+export const modelLibraryCatalog = () =>
+  unwrapCommand(commands.modelLibraryCatalog());
+export const modelLibraryBegin = (
+  input: Parameters<typeof commands.modelLibraryBegin>[0],
+) => unwrapCommand(commands.modelLibraryBegin(input));
+export const modelLibraryWrite = (
+  id: string,
+  key: string,
+  offset: number,
+  bytes: number[],
+) => voidCommand(commands.modelLibraryWrite(id, key, offset, bytes));
+export const modelLibraryCommit = (id: string) =>
+  voidCommand(commands.modelLibraryCommit(id));
+export const modelLibraryDocument = (id: string) =>
+  unwrapCommand(commands.modelLibraryDocument(id));
+export const modelLibraryRead = (id: string, key: string, offset: number) =>
+  unwrapCommand(commands.modelLibraryRead(id, key, offset));
+export const modelLibraryEdit = (
+  id: string,
+  input: Parameters<typeof commands.modelLibraryEdit>[1],
+) => voidCommand(commands.modelLibraryEdit(id, input));
+export const modelLibrarySaveView = (
+  id: string,
+  view: Parameters<typeof commands.modelLibrarySaveView>[1],
+) => voidCommand(commands.modelLibrarySaveView(id, view));
+export const modelLibraryDelete = (id: string, draftOnly = false) =>
+  voidCommand(commands.modelLibraryDelete(id, draftOnly));
+export const modelLibraryThumbnail = (id: string, bytes: number[]) =>
+  voidCommand(commands.modelLibraryThumbnail(id, bytes));
+export const modelLibraryReadThumbnail = (id: string) =>
+  unwrapCommand(commands.modelLibraryReadThumbnail(id));
+export const modelLibraryCache = (max: number, clear: boolean) =>
+  voidCommand(commands.modelLibraryCache(max, clear));
+
 // ---- AI 多地址公开配置 ----
+
 export const aiConfigurationGet = () =>
   unwrapCommand(commands.aiConfigurationGet());
 export const aiProviderCreate = (

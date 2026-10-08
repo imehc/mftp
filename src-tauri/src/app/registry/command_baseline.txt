@@ -1,4 +1,21 @@
 # Pre-modularity IPC names; intentional additions must update this baseline.
+common model_viewer_open
+common model_viewer_attach
+common model_viewer_size
+common model_viewer_read
+common model_viewer_close
+common model_library_catalog
+common model_library_begin
+common model_library_write
+common model_library_commit
+common model_library_document
+common model_library_read
+common model_library_edit
+common model_library_save_view
+common model_library_delete
+common model_library_thumbnail
+common model_library_cache
+common model_library_read_thumbnail
 common ai_configuration_get
 common ai_provider_create
 common ai_provider_update

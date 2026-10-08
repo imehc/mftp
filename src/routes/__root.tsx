@@ -42,6 +42,7 @@ function RootLayout() {
   const vault = pathname === "/tools/vault";
   const formatter = pathname === "/tools/formatter";
   const media = pathname === "/tools/media-compress";
+  const modelViewer = pathname === "/tools/model-viewer";
   const crypto = pathname === "/tools/crypto";
   const lan = pathname === "/tools/lan-transfer";
   const ssh = pathname === "/tools/ssh-sftp";
@@ -72,6 +73,7 @@ function RootLayout() {
       lan ||
       crypto ||
       media ||
+      modelViewer ||
       formatter ||
       vault ||
       logs ||

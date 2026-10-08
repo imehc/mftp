@@ -23,12 +23,12 @@ function configuration(): AiConfigurationView {
   };
 }
 
-describe("AI request selection", () => {
-  it("accepts a saved reference without claiming its credential has been authenticated", () => {
+describe("AI 请求选择", () => {
+  it("接受已保存的引用，但不声称其凭据已认证", () => {
     expect(hasAiRequestSelection(configuration())).toBe(true);
   });
 
-  it("uses only the active address's own key and model", () => {
+  it("仅使用当前地址自身的密钥和模型", () => {
     const view = configuration();
     view.providers[0].currentKeyId = "b-key";
     expect(hasAiRequestSelection(view)).toBe(false);
@@ -39,7 +39,7 @@ describe("AI request selection", () => {
     expect(hasAiRequestSelection(view)).toBe(true);
   });
 
-  it("rejects missing credentials, invalid addresses and incomplete selections", () => {
+  it("拒绝缺少凭据、无效地址和不完整选择", () => {
     const cases: ((view: AiConfigurationView) => void)[] = [
       (view) => {
         view.activeProviderId = null;

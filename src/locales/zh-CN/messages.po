@@ -239,12 +239,30 @@ msgstr "{winnerSeatLabel} 获胜"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www（留空则用主目录）"
 
+#: src/features/model-viewer/ModelViewerPage.tsx:314
+msgid "3D 显示已中断"
+msgstr "3D 显示已中断"
+
+#. 本地 GLB/glTF 三维模型查看工具名称。
+#. 本地 GLB、glTF、FBX 三维模型查看工具名称。
+#. 本地 GLB、glTF、FBX 三维模型查看工具名称。
+#: src/features/home/entries.tsx:59
+#: src/features/model-viewer/ModelViewerPage.tsx:133
+#: src/features/model-viewer/ModelViewerPage.tsx:198
+msgid "3D 模型"
+msgstr "3D 模型"
+
+#. 可聚焦的模型渲染区域，支持鼠标、触屏与键盘。
+#: src/features/model-viewer/ModelViewerPage.tsx:418
+msgid "3D 模型画布"
+msgstr "3D 模型画布"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:115
 msgid "AI 先开球"
 msgstr "AI 先开球"
 
 #. AI 凭据认证期间应用退到后台或密钥被修改，需回到前台重新操作。
-#: src/lib/errors/messages.ts:169
+#: src/lib/errors/messages.ts:187
 msgid "AI 密钥认证已失效，请返回应用后重试"
 msgstr "AI 密钥认证已失效，请返回应用后重试"
 
@@ -255,7 +273,7 @@ msgstr "AI 密钥认证已失效，请返回应用后重试"
 msgid "AI 思考中…"
 msgstr "AI 思考中…"
 
-#: src/lib/errors/messages.ts:179
+#: src/lib/errors/messages.ts:197
 msgid "AI 数据库版本高于当前应用版本，请升级应用"
 msgstr "AI 数据库版本高于当前应用版本，请升级应用"
 
@@ -264,7 +282,7 @@ msgstr "AI 数据库版本高于当前应用版本，请升级应用"
 msgid "AI 服务"
 msgstr "AI 服务"
 
-#: src/lib/errors/messages.ts:158
+#: src/lib/errors/messages.ts:176
 msgid "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 msgstr "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 
@@ -272,11 +290,11 @@ msgstr "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 msgid "AI 服务地址"
 msgstr "AI 服务地址"
 
-#: src/lib/errors/messages.ts:164
+#: src/lib/errors/messages.ts:182
 msgid "AI 服务地址无效"
 msgstr "AI 服务地址无效"
 
-#: src/lib/errors/messages.ts:177
+#: src/lib/errors/messages.ts:195
 msgid "AI 服务返回内容超出大小限制"
 msgstr "AI 服务返回内容超出大小限制"
 
@@ -290,7 +308,7 @@ msgstr "AI 服务连接成功"
 msgid "AI 模型"
 msgstr "AI 模型"
 
-#: src/lib/errors/messages.ts:174
+#: src/lib/errors/messages.ts:192
 msgid "AI 流式请求标识无效"
 msgstr "AI 流式请求标识无效"
 
@@ -302,36 +320,36 @@ msgstr "AI 生成"
 msgid "AI 生成及人工修订的诗词译文，不包含 API Key"
 msgstr "AI 生成及人工修订的诗词译文，不包含 API Key"
 
-#: src/lib/errors/messages.ts:184
+#: src/lib/errors/messages.ts:202
 msgid "AI 翻译保存失败"
 msgstr "AI 翻译保存失败"
 
-#: src/lib/errors/messages.ts:173
+#: src/lib/errors/messages.ts:191
 msgid "AI 设置未保存，且密钥回滚失败"
 msgstr "AI 设置未保存，且密钥回滚失败"
 
 #: src/features/export/sections.tsx:34
-#: src/lib/errors/messages.ts:236
+#: src/lib/errors/messages.ts:254
 msgid "AI 译文"
 msgstr "AI 译文"
 
-#: src/lib/errors/messages.ts:176
+#: src/lib/errors/messages.ts:194
 msgid "AI 请求内容超出大小限制"
 msgstr "AI 请求内容超出大小限制"
 
-#: src/lib/errors/messages.ts:178
+#: src/lib/errors/messages.ts:196
 msgid "AI 输出内容超出大小限制"
 msgstr "AI 输出内容超出大小限制"
 
-#: src/lib/errors/messages.ts:214
+#: src/lib/errors/messages.ts:232
 msgid "AI 返回的译文格式无效"
 msgstr "AI 返回的译文格式无效"
 
-#: src/lib/errors/messages.ts:148
+#: src/lib/errors/messages.ts:166
 msgid "AI 配置已更新，请重新加载后重试"
 msgstr "AI 配置已更新，请重新加载后重试"
 
-#: src/lib/errors/messages.ts:168
+#: src/lib/errors/messages.ts:186
 msgid "API Key 为空或过长"
 msgstr "API Key 为空或过长"
 
@@ -344,20 +362,20 @@ msgid "BT"
 msgstr "BT"
 
 #: src/features/bt/BtTool.tsx:207
-#: src/features/home/entries.tsx:132
-#: src/lib/errors/messages.ts:226
+#: src/features/home/entries.tsx:142
+#: src/lib/errors/messages.ts:244
 msgid "BT 下载"
 msgstr "BT 下载"
 
-#: src/lib/errors/messages.ts:85
+#: src/lib/errors/messages.ts:103
 msgid "BT 任务已取消"
 msgstr "BT 任务已取消"
 
-#: src/lib/errors/messages.ts:90
+#: src/lib/errors/messages.ts:108
 msgid "BT 任务文件大小超出可保存范围"
 msgstr "BT 任务文件大小超出可保存范围"
 
-#: src/lib/errors/messages.ts:83
+#: src/lib/errors/messages.ts:101
 msgid "BT 预览服务尚未就绪"
 msgstr "BT 预览服务尚未就绪"
 
@@ -366,13 +384,47 @@ msgstr "BT 预览服务尚未就绪"
 msgid "CPU"
 msgstr "CPU"
 
+#. 模型底层数组与解码像素数据的估算。
+#: src/features/model-viewer/components/MemoryPanel.tsx:72
+msgid "CPU 数据估算"
+msgstr "CPU 数据估算"
+
 #: src/i18n/locales.ts:8
 msgid "English"
 msgstr "English"
 
-#: src/lib/errors/messages.ts:209
+#: src/features/model-viewer/components/ViewerHelp.tsx:70
+msgid "FBX 仅在当前会话预览，不保存到模型库。支持 PNG、JPEG、WebP 和 BMP 贴图；缺少外置贴图时可补选文件。"
+msgstr "FBX 仅在当前会话预览，不保存到模型库。支持 PNG、JPEG、WebP 和 BMP 贴图；缺少外置贴图时可补选文件。"
+
+#: src/features/model-viewer/components/ViewerHelp.tsx:76
+msgid "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
+msgstr "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
+
+#: src/lib/errors/messages.ts:265
+msgid "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
+msgstr "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
+
+#: src/lib/errors/messages.ts:264
+msgid "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
+msgstr "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
+
+#: src/lib/errors/messages.ts:263
+msgid "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
+msgstr "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
+
+#: src/lib/errors/messages.ts:227
 msgid "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
 msgstr "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
+
+#. 模型几何缓冲和纹理的估算，不是显存实测。
+#: src/features/model-viewer/components/MemoryPanel.tsx:79
+msgid "GPU 分配估算"
+msgstr "GPU 分配估算"
+
+#: src/features/model-viewer/components/PreviewPanel.tsx:80
+msgid "HDR · 最大 2048 × 1024 / 32 MiB"
+msgstr "HDR · 最大 2048 × 1024 / 32 MiB"
 
 #: src/features/bt/components/PeersPanel.tsx:69
 msgid "IP"
@@ -406,7 +458,7 @@ msgstr "PNG · JPG · WebP，默认保持原格式输出"
 msgid "PNG 为无损格式，压缩程度影响有限"
 msgstr "PNG 为无损格式，压缩程度影响有限"
 
-#: src/lib/errors/messages.ts:141
+#: src/lib/errors/messages.ts:159
 msgid "SFTP 写入长时间没有进展，请重试"
 msgstr "SFTP 写入长时间没有进展，请重试"
 
@@ -418,19 +470,19 @@ msgstr "SSH / SFTP"
 msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP 主机连接配置"
 
-#: src/lib/errors/messages.ts:111
+#: src/lib/errors/messages.ts:129
 msgid "SSH 会话不存在，请重新连接"
 msgstr "SSH 会话不存在，请重新连接"
 
-#: src/lib/errors/messages.ts:112
+#: src/lib/errors/messages.ts:130
 msgid "SSH 终端尚未打开"
 msgstr "SSH 终端尚未打开"
 
-#: src/lib/errors/messages.ts:113
+#: src/lib/errors/messages.ts:131
 msgid "SSH 终端已关闭"
 msgstr "SSH 终端已关闭"
 
-#: src/lib/errors/messages.ts:222
+#: src/lib/errors/messages.ts:240
 msgid "SSH 连接"
 msgstr "SSH 连接"
 
@@ -438,9 +490,24 @@ msgstr "SSH 连接"
 msgid "Top 进程"
 msgstr "Top 进程"
 
+#. 模型画布内坐标轴组件的操作提示与无障碍名称。
+#: src/features/model-viewer/components/ViewGizmo.tsx:17
+msgid "XYZ 方向：点击坐标轴切换视角，双击适配模型。也可按 X、Y、Z，按住 Shift 查看反方向。"
+msgstr "XYZ 方向：点击坐标轴切换视角，双击适配模型。也可按 X、Y、Z，按住 Shift 查看反方向。"
+
 #: src/features/games/xiangqi/labels.tsx:54
 msgid "三次重复局面"
 msgstr "三次重复局面"
+
+#. 拓扑分析中的三角形总数。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:49
+msgid "三角形"
+msgstr "三角形"
+
+#. 模型唯一三角形几何体中的面数，不含线和点。
+#: src/features/model-viewer/components/ModelInspector.tsx:33
+msgid "三角面数"
+msgstr "三角面数"
 
 #: src/features/formatter/use-formatter.ts:52
 msgid "上一个"
@@ -449,6 +516,10 @@ msgstr "上一个"
 #: src/features/games/go/GoMatch.tsx:279
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "上一手已停手：再停一手即终局，落子则重新计数"
+
+#: src/features/model-viewer/components/SceneTree.tsx:70
+msgid "上下键移动，左右键展开或收起；选择节点可查看关联材质。"
+msgstr "上下键移动，左右键展开或收起；选择节点可查看关联材质。"
 
 #: src/features/todo/TodoSchedulePicker.tsx:92
 msgid "上个月"
@@ -474,11 +545,11 @@ msgstr "上传文件"
 msgid "上传文件夹"
 msgstr "上传文件夹"
 
-#: src/lib/errors/messages.ts:53
+#: src/lib/errors/messages.ts:71
 msgid "上传文件的相对路径无效"
 msgstr "上传文件的相对路径无效"
 
-#: src/lib/errors/messages.ts:133
+#: src/lib/errors/messages.ts:151
 msgid "上传校验失败，远端临时文件不存在"
 msgstr "上传校验失败，远端临时文件不存在"
 
@@ -486,28 +557,33 @@ msgstr "上传校验失败，远端临时文件不存在"
 msgid "上传的文件夹"
 msgstr "上传的文件夹"
 
-#: src/lib/errors/messages.ts:56
+#: src/lib/errors/messages.ts:74
 msgid "上传目标不是普通文件或文件夹"
 msgstr "上传目标不是普通文件或文件夹"
 
-#: src/lib/errors/messages.ts:52
+#: src/lib/errors/messages.ts:70
 msgid "上传长度、分片范围或冲突处理方式无效"
 msgstr "上传长度、分片范围或冲突处理方式无效"
 
-#: src/lib/errors/messages.ts:208
+#. 自由相机沿竖直方向上升。
+#: src/features/model-viewer/components/CanvasControls.tsx:115
+msgid "上升"
+msgstr "上升"
+
+#: src/lib/errors/messages.ts:226
 msgid "上游接口返回数据缺少必要字段"
 msgstr "上游接口返回数据缺少必要字段"
 
-#: src/lib/errors/messages.ts:202
+#: src/lib/errors/messages.ts:220
 msgid "上游文件清单中没有匹配的文件"
 msgstr "上游文件清单中没有匹配的文件"
 
 #. 清单路径可能越过下载目录；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:203
+#: src/lib/errors/messages.ts:221
 msgid "上游文件清单包含不安全路径：{path}"
 msgstr "上游文件清单包含不安全路径：{path}"
 
-#: src/lib/errors/messages.ts:201
+#: src/lib/errors/messages.ts:219
 msgid "上游文件清单过大被截断，无法安全同步"
 msgstr "上游文件清单过大被截断，无法安全同步"
 
@@ -545,11 +621,11 @@ msgstr "下载 {entryName2}"
 msgid "下载中"
 msgstr "下载中"
 
-#: src/lib/errors/messages.ts:81
+#: src/lib/errors/messages.ts:99
 msgid "下载任务不存在"
 msgstr "下载任务不存在"
 
-#: src/lib/errors/messages.ts:89
+#: src/lib/errors/messages.ts:107
 msgid "下载会话无法恢复，请重新添加任务"
 msgstr "下载会话无法恢复，请重新添加任务"
 
@@ -574,7 +650,7 @@ msgstr "下载所选"
 msgid "下载文件"
 msgstr "下载文件"
 
-#: src/lib/errors/messages.ts:82
+#: src/lib/errors/messages.ts:100
 msgid "下载文件不存在"
 msgstr "下载文件不存在"
 
@@ -595,6 +671,11 @@ msgstr "下载根目录"
 msgid "下载进度"
 msgstr "下载进度"
 
+#. 自由相机沿竖直方向下降。
+#: src/features/model-viewer/components/CanvasControls.tsx:116
+msgid "下降"
+msgstr "下降"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:31
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:37
 msgid "不可用"
@@ -606,25 +687,41 @@ msgid "不指定时间"
 msgstr "不指定时间"
 
 #. SFTP 错误；path 是文件路径，特殊文件指设备、套接字等非普通文件。
-#: src/lib/errors/messages.ts:122
+#: src/lib/errors/messages.ts:140
 msgid "不支持传输特殊文件：{path}"
 msgstr "不支持传输特殊文件：{path}"
 
-#: src/lib/errors/messages.ts:136
+#: src/lib/errors/messages.ts:154
 msgid "不支持的压缩包格式"
 msgstr "不支持的压缩包格式"
 
-#: src/lib/errors/messages.ts:210
+#: src/lib/errors/messages.ts:228
 msgid "不支持的译文包格式"
 msgstr "不支持的译文包格式"
 
-#: src/lib/errors/messages.ts:126
+#: src/features/model-viewer/components/LibraryPanel.tsx:200
+msgid "不缓存"
+msgstr "不缓存"
+
+#: src/lib/errors/messages.ts:144
 msgid "不能删除根目录或受保护的路径"
 msgstr "不能删除根目录或受保护的路径"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:196
 msgid "不能移动到自身或子文件夹中"
 msgstr "不能移动到自身或子文件夹中"
+
+#. 模型没有可准确比较的静态顶点法线。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:84
+msgid "不适用"
+msgstr "不适用"
+
+#. 材质 opacity，0 透明到 1 不透明。
+#. 模型材质的不透明度，0 为透明，1 为不透明。
+#: src/features/model-viewer/components/PreviewPanel.tsx:153
+#: src/features/model-viewer/components/ResourceDetails.tsx:125
+msgid "不透明度"
+msgstr "不透明度"
 
 #: src/features/games/engine/online/useOnlineMatch.ts:71
 msgid "与对方的连接已断开。"
@@ -639,8 +736,13 @@ msgstr "两个名称不能相同。"
 msgid "两次输入的密码不一致"
 msgstr "两次输入的密码不一致"
 
+#. 在当前三维模型表面拾取两点测量距离。
+#: src/features/model-viewer/components/NavigationPanel.tsx:57
+msgid "两点测量"
+msgstr "两点测量"
+
 #: src/features/games/xiangqi/XiangqiGame.tsx:30
-#: src/features/home/entries.tsx:182
+#: src/features/home/entries.tsx:192
 msgid "中国象棋"
 msgstr "中国象棋"
 
@@ -662,6 +764,11 @@ msgstr "中杆"
 msgid "中等"
 msgstr "中等"
 
+#. 选择要编辑的 PBR 材质副本，不写回源文件。
+#: src/features/model-viewer/components/PreviewPanel.tsx:106
+msgid "临时材质"
+msgstr "临时材质"
+
 #: src/features/ai-configuration/AiConfigurationSettings.tsx:127
 msgid "为每个地址保存密钥和模型，切换时恢复各自的选择。"
 msgstr "为每个地址保存密钥和模型，切换时恢复各自的选择。"
@@ -673,7 +780,7 @@ msgstr "主数据库"
 #: src/features/export/sections.tsx:19
 #: src/features/logs/use-activity-logs.ts:31
 #: src/features/ssh-sftp/components/Sidebar.tsx:344
-#: src/lib/errors/messages.ts:233
+#: src/lib/errors/messages.ts:251
 msgid "主机"
 msgstr "主机"
 
@@ -704,14 +811,23 @@ msgstr "主题"
 msgid "主题与字体"
 msgstr "主题与字体"
 
+#: src/features/model-viewer/ModelViewerPage.tsx:456
+msgid "也可将模型文件拖到这里"
+msgstr "也可将模型文件拖到这里"
+
 #: src/features/crypto/CryptoTool.tsx:107
 msgid "互换"
 msgstr "互换"
 
 #: src/features/games/gomoku/GomokuGame.tsx:31
-#: src/features/home/entries.tsx:162
+#: src/features/home/entries.tsx:172
 msgid "五子棋"
 msgstr "五子棋"
+
+#. 3D 画布的轨道、自由移动、测量、摆放模式。
+#: src/features/model-viewer/components/NavigationPanel.tsx:31
+msgid "交互模式"
+msgstr "交互模式"
 
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:254
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
@@ -744,6 +860,10 @@ msgstr "仅上传"
 msgid "仅导入带作者、来源和许可证的本地 JSON"
 msgstr "仅导入带作者、来源和许可证的本地 JSON"
 
+#: src/features/model-viewer/components/PreviewPanel.tsx:205
+msgid "仅影响预览，切换模型时还原。"
+msgstr "仅影响预览，切换模型时还原。"
+
 #: src/features/media-compress/video/compress.ts:338
 #: src/features/media-compress/video/VideoCompressPanel.tsx:117
 #: src/features/media-compress/video/VideoCompressPanel.tsx:118
@@ -760,13 +880,30 @@ msgstr "仅支持 MP4、MOV、M4V 格式"
 msgid "仅支持 PNG、JPG、WebP 格式"
 msgstr "仅支持 PNG、JPG、WebP 格式"
 
-#: src/lib/errors/messages.ts:108
+#: src/lib/errors/messages.ts:126
 msgid "仅支持磁力链接或 .torrent 文件路径"
 msgstr "仅支持磁力链接或 .torrent 文件路径"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:117
+msgid "仅收藏"
+msgstr "仅收藏"
 
 #: src/features/preview/PreviewSurface.tsx:97
 msgid "仅显示开头部分"
 msgstr "仅显示开头部分"
+
+#. 模型仅在当前会话显示，不会保存到模型库或在退出后恢复。
+#: src/features/model-viewer/ModelViewerPage.tsx:298
+msgid "仅本次预览"
+msgstr "仅本次预览"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:221
+msgid "仅清理缩略图，模型保留。数据库空间会供后续写入复用。"
+msgstr "仅清理缩略图，模型保留。数据库空间会供后续写入复用。"
+
+#: src/features/model-viewer/components/MemoryPanel.tsx:138
+msgid "仅用于提示，不代表设备内存上限。"
+msgstr "仅用于提示，不代表设备内存上限。"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:274
 msgid "仅限同一局域网内联机"
@@ -784,11 +921,19 @@ msgstr "从左侧列表选择一篇，或试试每日一诗。"
 msgid "从本地 tar.gz 导入…"
 msgstr "从本地 tar.gz 导入…"
 
-#: src/lib/errors/messages.ts:102
+#: src/features/model-viewer/components/LibraryPanel.tsx:254
+msgid "从模型库删除？"
+msgstr "从模型库删除？"
+
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:282
+msgid "以下保留验证器的原始诊断、代码和文件位置。"
+msgstr "以下保留验证器的原始诊断、代码和文件位置。"
+
+#: src/lib/errors/messages.ts:120
 msgid "任务不存在或尚未初始化，请稍后重试"
 msgstr "任务不存在或尚未初始化，请稍后重试"
 
-#: src/lib/errors/messages.ts:86
+#: src/lib/errors/messages.ts:104
 msgid "任务中没有可导出的文件"
 msgstr "任务中没有可导出的文件"
 
@@ -796,11 +941,11 @@ msgstr "任务中没有可导出的文件"
 msgid "任务及应用内下载文件将被删除，操作无法恢复。"
 msgstr "任务及应用内下载文件将被删除，操作无法恢复。"
 
-#: src/lib/errors/messages.ts:91
+#: src/lib/errors/messages.ts:109
 msgid "任务尚未完成，无法转存"
 msgstr "任务尚未完成，无法转存"
 
-#: src/lib/errors/messages.ts:103
+#: src/lib/errors/messages.ts:121
 msgid "任务已完成，无法取消"
 msgstr "任务已完成，无法取消"
 
@@ -808,11 +953,11 @@ msgstr "任务已完成，无法取消"
 msgid "任务已添加，可在传输面板查看进度"
 msgstr "任务已添加，可在传输面板查看进度"
 
-#: src/lib/errors/messages.ts:92
+#: src/lib/errors/messages.ts:110
 msgid "任务已经转存"
 msgstr "任务已经转存"
 
-#: src/lib/errors/messages.ts:104
+#: src/lib/errors/messages.ts:122
 msgid "任务未运行"
 msgstr "任务未运行"
 
@@ -829,11 +974,11 @@ msgstr "任务进度同步暂不可用"
 msgid "传输"
 msgstr "传输"
 
-#: src/lib/errors/messages.ts:118
+#: src/lib/errors/messages.ts:136
 msgid "传输任务尚未开始或已结束"
 msgstr "传输任务尚未开始或已结束"
 
-#: src/lib/errors/messages.ts:120
+#: src/lib/errors/messages.ts:138
 msgid "传输已取消"
 msgstr "传输已取消"
 
@@ -920,6 +1065,7 @@ msgstr "使用系统应用打开 {entryName}"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:289
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:509
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:118
 #: src/features/poetry/components/PoetryTranslationSection.tsx:336
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:341
 #: src/features/todo/TodoItemDialog.tsx:182
@@ -935,6 +1081,11 @@ msgstr "保存中…"
 msgid "保存到"
 msgstr "保存到"
 
+#. 保存当前三维相机位置，仅当前会话有效。
+#: src/features/model-viewer/components/NavigationPanel.tsx:112
+msgid "保存当前视角"
+msgstr "保存当前视角"
+
 #: src/features/todo/hooks/use-todo.ts:100
 msgid "保存待办失败"
 msgstr "保存待办失败"
@@ -943,9 +1094,29 @@ msgstr "保存待办失败"
 msgid "保护备份"
 msgstr "保护备份"
 
+#. 为离线规范验证保留的 Blob 字节量，不等同于常驻内存。
+#: src/features/model-viewer/components/MemoryPanel.tsx:58
+msgid "保留的源数据"
+msgstr "保留的源数据"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:376
 msgid "保留音频"
 msgstr "保留音频"
+
+#. 模型检查区的统计信息标签。
+#: src/features/model-viewer/components/ModelInspector.tsx:146
+msgid "信息"
+msgstr "信息"
+
+#. 打开模型信息、场景树和材质检查浮层。
+#: src/features/model-viewer/components/ModelInspector.tsx:243
+msgid "信息与场景"
+msgstr "信息与场景"
+
+#. glTF 规范报告中的信息与建议数量合计。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:267
+msgid "信息与建议"
+msgstr "信息与建议"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:201
 msgid "修改日期"
@@ -954,6 +1125,10 @@ msgstr "修改日期"
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:77
 msgid "修改时间"
 msgstr "修改时间"
+
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:56
+msgid "修改模型库条目信息"
+msgstr "修改模型库条目信息"
 
 #: src/features/bt/components/TaskRow.tsx:90
 #: src/store/transfers.ts:12
@@ -964,6 +1139,11 @@ msgstr "做种中"
 #: src/features/games/go/GoMatch.tsx:295
 msgid "停一手"
 msgstr "停一手"
+
+#. 停止模型动画并回到片段起点。
+#: src/features/model-viewer/components/AnimationBar.tsx:213
+msgid "停止"
+msgstr "停止"
 
 #: src/features/media-compress/MediaProcessingGuard.tsx:103
 msgid "停止处理"
@@ -984,6 +1164,11 @@ msgstr "停止当前处理？"
 #: src/features/lan-transfer/LanTransferTool.tsx:56
 msgid "停止服务"
 msgstr "停止服务"
+
+#. 解码后模型纹理的像素格式，不是源文件扩展名。
+#: src/features/model-viewer/components/ResourceDetails.tsx:56
+msgid "像素格式"
+msgstr "像素格式"
 
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:88
 msgid "允许"
@@ -1064,13 +1249,18 @@ msgid "共享目录"
 msgstr "共享目录"
 
 #. 局域网浏览/下载引用了不存在的共享；share 是共享目录标识。
-#: src/lib/errors/messages.ts:58
+#: src/lib/errors/messages.ts:76
 msgid "共享目录不存在或已被移除：{share}"
 msgstr "共享目录不存在或已被移除：{share}"
 
-#: src/lib/errors/messages.ts:66
+#: src/lib/errors/messages.ts:84
 msgid "共享目录不存在或无法访问，请检查共享设置"
 msgstr "共享目录不存在或无法访问，请检查共享设置"
+
+#. 几何、动画等共用的底层数组分配，仅统计一次。
+#: src/features/model-viewer/components/MemoryPanel.tsx:276
+msgid "共用数据缓冲"
+msgstr "共用数据缓冲"
 
 #: src/features/about/AboutPage.tsx:55
 #: src/features/settings/AppSettingsMenu.tsx:110
@@ -1081,11 +1271,17 @@ msgstr "关于"
 msgid "关于与本地数据"
 msgstr "关于与本地数据"
 
+#. 本材质引用的纹理及下方对应预览。
+#: src/features/model-viewer/components/ResourceDetails.tsx:144
+msgid "关联纹理"
+msgstr "关联纹理"
+
 #: src/components/ui/dialog-layout.tsx:59
 #: src/components/ui/dialog.tsx:96
 #: src/components/ui/dialog.tsx:138
 #: src/components/ui/sheet.tsx:88
 #: src/features/bt/components/AddTorrentDialog.tsx:350
+#: src/features/model-viewer/components/LibraryPanel.tsx:308
 #: src/features/ssh-sftp/components/Sidebar.tsx:353
 #: src/features/ssh-sftp/components/Sidebar.tsx:367
 #: src/features/todo/TodoDetailsDialog.tsx:66
@@ -1118,6 +1314,16 @@ msgstr "关闭后，本次修改不会保存。"
 msgid "关闭时正文搜索走 LIKE 兜底，较慢"
 msgstr "关闭时正文搜索走 LIKE 兜底，较慢"
 
+#. 关闭三维模型检查浮层。
+#: src/features/model-viewer/components/ModelInspector.tsx:268
+msgid "关闭模型详情"
+msgstr "关闭模型详情"
+
+#. 关闭多模型查看器的检查浮层。
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:138
+msgid "关闭模型面板"
+msgstr "关闭模型面板"
+
 #: src/features/transfers/ActivityMenu.tsx:73
 msgid "关闭活动面板不会取消传输。"
 msgstr "关闭活动面板不会取消传输。"
@@ -1135,10 +1341,17 @@ msgstr "其他方式"
 msgid "其他用户"
 msgstr "其他用户"
 
+#. 模型内存估算和历史曲线标签。
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:58
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:164
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:243
 msgid "内存"
 msgstr "内存"
+
+#. 模型内存估算最近两分钟的曲线。
+#: src/features/model-viewer/components/MemoryPanel.tsx:143
+msgid "内存历史"
+msgstr "内存历史"
 
 #: src/features/formatter/FormatterTool.tsx:154
 msgid "内容"
@@ -1164,7 +1377,7 @@ msgstr "内容无效，无法解码"
 msgid "再来一局"
 msgstr "再来一局"
 
-#: src/lib/errors/messages.ts:152
+#: src/lib/errors/messages.ts:170
 msgid "最多保存 5 个 AI 服务地址"
 msgstr "最多保存 5 个 AI 服务地址"
 
@@ -1195,15 +1408,50 @@ msgstr "写入、执行"
 msgid "准备中"
 msgstr "准备中"
 
+#. 模型 GPU 上传状态。
+#: src/features/model-viewer/components/ModelList.tsx:33
+msgid "准备显示"
+msgstr "准备显示"
+
 #: src/features/media-compress/components/CompressResultCard.tsx:59
 msgid "减小 {delta}%"
 msgstr "减小 {delta}%"
+
+#. 模型场景中的唯一几何体资源数量。
+#: src/features/model-viewer/components/ModelInspector.tsx:52
+msgid "几何体数"
+msgstr "几何体数"
+
+#. 模型顶点、索引和实例数组内存。
+#: src/features/model-viewer/components/MemoryPanel.tsx:263
+msgid "几何数据"
+msgstr "几何数据"
+
+#. 在后台分析当前模型各网格实例的拓扑缺陷。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:167
+msgid "分析网格拓扑"
+msgstr "分析网格拓扑"
+
+#. 展开网格分析的计量范围和容量限制。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:173
+msgid "分析说明"
+msgstr "分析说明"
 
 #: src/features/todo/TodoItemDialog.tsx:98
 #: src/features/todo/TodoTool.tsx:142
 #: src/features/vault/VaultEntryDialog.tsx:208
 msgid "分类"
 msgstr "分类"
+
+#. 模型库中用户自定义的分类名称，留空表示不分组。
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:88
+msgid "分组"
+msgstr "分组"
+
+#. 模型纹理图像的像素尺寸。
+#: src/features/model-viewer/components/ResourceDetails.tsx:46
+msgid "分辨率"
+msgstr "分辨率"
 
 #. 计划时刻的分钟选择，00 至 59
 #: src/features/todo/hooks/use-todo-time-fields.ts:32
@@ -1247,6 +1495,7 @@ msgstr "创建时间"
 #: src/features/ai-configuration/RowActions.mobile.tsx:55
 #: src/features/bt/components/TaskDialogs.tsx:84
 #: src/features/bt/components/TaskRow.tsx:226
+#: src/features/model-viewer/components/LibraryPanel.tsx:272
 #: src/features/poetry/components/PoetryTranslationSection.tsx:356
 #: src/features/poetry/LibraryManagePage.tsx:194
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:90
@@ -1299,7 +1548,7 @@ msgstr "删除后无法撤销。删除当前项时，需要选择同地址下的
 msgid "删除密钥？"
 msgstr "删除密钥？"
 
-#: src/lib/errors/messages.ts:163
+#: src/lib/errors/messages.ts:181
 msgid "删除当前密钥或模型前，请选择此地址下的其他项作为替代"
 msgstr "删除当前密钥或模型前，请选择此地址下的其他项作为替代"
 
@@ -1336,6 +1585,15 @@ msgstr "删除服务地址"
 #: src/features/ai-configuration/AiDeleteDialog.tsx:47
 msgid "删除服务地址？"
 msgstr "删除服务地址？"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:257
+msgid "删除本机保存的副本，原始文件和当前画布不受影响。"
+msgstr "删除本机保存的副本，原始文件和当前画布不受影响。"
+
+#. 从本机模型库删除此条目，不操作用户的原始文件。
+#: src/features/model-viewer/components/LibraryList.tsx:216
+msgid "删除模型"
+msgstr "删除模型"
 
 #: src/features/ai-configuration/AiDeleteDialog.tsx:50
 msgid "删除模型？"
@@ -1414,7 +1672,7 @@ msgstr "加入"
 msgid "加入房间"
 msgstr "加入房间"
 
-#: src/lib/errors/messages.ts:43
+#: src/lib/errors/messages.ts:61
 msgid "加入游戏房间被拒绝"
 msgstr "加入游戏房间被拒绝"
 
@@ -1427,9 +1685,14 @@ msgid "加密导出"
 msgstr "加密导出"
 
 #: src/features/crypto/CryptoTool.tsx:29
-#: src/features/home/entries.tsx:79
+#: src/features/home/entries.tsx:89
 msgid "加解密"
 msgstr "加解密"
+
+#. 选择本地 Radiance HDR 文件作为三维场景照明环境。
+#: src/features/model-viewer/components/PreviewPanel.tsx:74
+msgid "加载 HDR 环境"
+msgstr "加载 HDR 环境"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:37
 #: src/features/lan-transfer/LanTransferTool.tsx:165
@@ -1451,9 +1714,56 @@ msgstr "加载中"
 msgid "加载中…"
 msgstr "加载中…"
 
+#. 三维模型动画控制条标题。
+#: src/features/model-viewer/components/AnimationBar.tsx:74
+msgid "动画"
+msgstr "动画"
+
+#. 模型动画停止后的状态通知。
+#: src/features/model-viewer/components/AnimationBar.tsx:205
+msgid "动画已停止并归零"
+msgstr "动画已停止并归零"
+
+#. 模型动画状态通知。
+#: src/features/model-viewer/components/AnimationBar.tsx:170
+msgid "动画已暂停"
+msgstr "动画已暂停"
+
+#. 当前模型的动画片段数量。
+#: src/features/model-viewer/components/ModelInspector.tsx:48
+msgid "动画数"
+msgstr "动画数"
+
+#. 模型动画关键帧数组内存。
+#: src/features/model-viewer/components/MemoryPanel.tsx:271
+msgid "动画数据"
+msgstr "动画数据"
+
+#. 拖动或用方向键、Home、End 定位动画。
+#: src/features/model-viewer/components/AnimationBar.tsx:286
+msgid "动画时间轴（秒）"
+msgstr "动画时间轴（秒）"
+
+#. 模型动画状态通知。
+#: src/features/model-viewer/components/AnimationBar.tsx:178
+msgid "动画正在播放"
+msgstr "动画正在播放"
+
+#. 模型动画片段的数量。
+#. 选择一个三维模型动画片段。
+#: src/features/model-viewer/components/AnimationBar.tsx:114
+#: src/features/model-viewer/components/MemoryPanel.tsx:310
+msgid "动画片段"
+msgstr "动画片段"
+
 #: src/features/formatter/use-formatter.ts:54
 msgid "区分大小写"
 msgstr "区分大小写"
+
+#. 模型动画循环模式：播放一次后停在末帧。
+#: src/features/model-viewer/components/AnimationBar.tsx:49
+msgid "单次"
+msgstr "单次"
 
 #: src/features/poetry/LibraryManagePage.tsx:237
 msgid "卸载"
@@ -1466,6 +1776,11 @@ msgstr "卸载 {name}"
 #: src/features/poetry/LibraryManagePage.tsx:227
 msgid "卸载合集"
 msgstr "卸载合集"
+
+#. 展开内存历史曲线的数值表格。
+#: src/features/model-viewer/components/MemoryPanel.tsx:218
+msgid "历史数值"
+msgstr "历史数值"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:171
 #: src/features/games/engine/BoardModeMenu.tsx:154
@@ -1481,20 +1796,20 @@ msgstr "压缩"
 msgid "压缩包"
 msgstr "压缩包"
 
-#: src/lib/errors/messages.ts:207
+#: src/lib/errors/messages.ts:225
 msgid "压缩包包含不安全路径"
 msgstr "压缩包包含不安全路径"
 
 #. 解压被拒绝；path 是压缩包内可能越过目标目录的路径。
-#: src/lib/errors/messages.ts:137
+#: src/lib/errors/messages.ts:155
 msgid "压缩包包含不安全路径：{path}"
 msgstr "压缩包包含不安全路径：{path}"
 
-#: src/lib/errors/messages.ts:88
+#: src/lib/errors/messages.ts:106
 msgid "压缩包目标文件已存在，请重试"
 msgstr "压缩包目标文件已存在，请重试"
 
-#: src/lib/errors/messages.ts:87
+#: src/lib/errors/messages.ts:105
 msgid "压缩包路径无效"
 msgstr "压缩包路径无效"
 
@@ -1585,11 +1900,16 @@ msgstr "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 msgid "双方棋局状态不一致，本局无法继续。"
 msgstr "双方棋局状态不一致，本局无法继续。"
 
+#. 模型材质是否渲染三角面的两侧。
+#: src/features/model-viewer/components/ResourceDetails.tsx:139
+msgid "双面渲染"
+msgstr "双面渲染"
+
 #: src/lib/updater.ts:159
 msgid "发现新版本 {stateVersion}"
 msgstr "发现新版本 {stateVersion}"
 
-#: src/lib/errors/messages.ts:217
+#: src/lib/errors/messages.ts:235
 msgid "发生未知错误，请重试"
 msgstr "发生未知错误，请重试"
 
@@ -1611,6 +1931,7 @@ msgstr "发生未知错误，请重试"
 #: src/features/lan-transfer/LanShareDialog.tsx:138
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:501
 #: src/features/logs/LogDialogs.tsx:122
+#: src/features/model-viewer/components/LibraryPanel.tsx:262
 #: src/features/poetry/components/PoetryTranslationSection.tsx:323
 #: src/features/poetry/components/PoetryTranslationSection.tsx:351
 #: src/features/poetry/components/PoetryTranslationSection.tsx:371
@@ -1647,9 +1968,21 @@ msgstr "取消后将丢弃本次处理进度，原文件会保留。"
 msgid "取消处理"
 msgstr "取消处理"
 
-#: src/lib/errors/messages.ts:97
+#. 停止本次模型导入，保留当前已打开模型。
+#. 停止本次模型导入，保留当前已打开模型。
+#: src/features/model-viewer/components/ImportStatus.tsx:59
+#: src/features/model-viewer/components/ImportStatus.tsx:121
+msgid "取消导入"
+msgstr "取消导入"
+
+#: src/lib/errors/messages.ts:115
 msgid "取消打包超时，请稍后重试"
 msgstr "取消打包超时，请稍后重试"
+
+#. 停止模型诊断后台任务。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:241
+msgid "取消检查"
+msgstr "取消检查"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:72
 msgid "取消等待"
@@ -1665,11 +1998,21 @@ msgstr "取消连接"
 msgid "取消静音"
 msgstr "取消静音"
 
+#. 当前模型 morph target 权重；编辑时暂停动画。
+#: src/features/model-viewer/components/PreviewPanel.tsx:180
+msgid "变形权重"
+msgstr "变形权重"
+
+#. 模型 morph target，选择后调整当前权重。
+#: src/features/model-viewer/components/PreviewPanel.tsx:171
+msgid "变形目标"
+msgstr "变形目标"
+
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:223
 msgid "口令保护"
 msgstr "口令保护"
 
-#: src/features/home/entries.tsx:142
+#: src/features/home/entries.tsx:152
 #: src/features/poetry/LibraryPage.tsx:143
 #: src/features/poetry/LibraryPage.tsx:288
 #: src/features/poetry/PoemDetailPage.tsx:41
@@ -1694,16 +2037,29 @@ msgstr "只读"
 msgid "可下载合集"
 msgstr "可下载合集"
 
+#: src/features/model-viewer/components/MemoryPanel.tsx:29
+msgid "可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。"
+msgstr "可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。"
+
+#: src/features/model-viewer/ModelViewerPage.tsx:321
+msgid "可以重试恢复图形显示，或返回其他工具。"
+msgstr "可以重试恢复图形显示，或返回其他工具。"
+
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:97
 msgid "可用 {formatBytesValue}"
 msgstr "可用 {formatBytesValue}"
+
+#. 封闭且绕序一致、但有向体积为负的连通壳体数。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:90
+msgid "可能朝内的壳体"
+msgstr "可能朝内的壳体"
 
 #: src/features/poetry/components/CollectionManagement.tsx:43
 msgid "可选"
 msgstr "可选"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:86
-#: src/features/home/entries.tsx:152
+#: src/features/home/entries.tsx:162
 msgid "台球"
 msgstr "台球"
 
@@ -1768,6 +2124,7 @@ msgstr "同网段 MFTP 客户端，点击可直接打开访问地址"
 #: src/features/lan-transfer/LanShareDialog.tsx:89
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:304
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:305
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:75
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:96
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:116
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:68
@@ -1799,6 +2156,10 @@ msgstr "后手（执白）"
 #: src/features/games/engine/BoardModeMenu.tsx:100
 msgid "后手（执黑）"
 msgstr "后手（执黑）"
+
+#: src/features/model-viewer/components/ResourceDetails.tsx:141
+msgid "否"
+msgstr "否"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:56
 msgid "启动服务"
@@ -1836,12 +2197,12 @@ msgstr "困毙"
 msgid "困难"
 msgstr "困难"
 
-#: src/features/home/home-descriptions.tsx:18
+#: src/features/home/home-descriptions.tsx:19
 msgid "围地对弈，探索棋局"
 msgstr "围地对弈，探索棋局"
 
 #: src/features/games/go/GoGame.tsx:31
-#: src/features/home/entries.tsx:172
+#: src/features/home/entries.tsx:182
 msgid "围棋"
 msgstr "围棋"
 
@@ -1883,6 +2244,10 @@ msgstr "图片文件"
 msgid "图片预览区域"
 msgstr "图片预览区域"
 
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:114
+msgid "在同一模型表面选取两点。"
+msgstr "在同一模型表面选取两点。"
+
 #: src/features/home/home-descriptions.tsx:8
 msgid "在局域网共享文件"
 msgstr "在局域网共享文件"
@@ -1890,6 +2255,10 @@ msgstr "在局域网共享文件"
 #: src/features/poetry/LibraryPage.tsx:155
 msgid "在数据管理页勾选合集并下载，即可离线浏览。"
 msgstr "在数据管理页勾选合集并下载，即可离线浏览。"
+
+#: src/features/home/home-descriptions.tsx:11
+msgid "在本地查看 GLB 与 glTF 三维模型"
+msgstr "在本地查看 GLB 与 glTF 三维模型"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:77
 msgid "在线"
@@ -1903,6 +2272,24 @@ msgstr "地址"
 #: src/features/games/engine/online/OnlineLobby.tsx:326
 msgid "地址格式应为 IP:端口"
 msgstr "地址格式应为 IP:端口"
+
+#. 模型检查区的场景树标签。
+#: src/features/model-viewer/components/ModelInspector.tsx:149
+msgid "场景"
+msgstr "场景"
+
+#: src/features/model-viewer/components/ModelList.tsx:288
+msgid "坐标用于预览摆放，不改变源模型尺寸。摆放模式可拖动模型，Esc 退出；也可直接输入坐标。"
+msgstr "坐标用于预览摆放，不改变源模型尺寸。摆放模式可拖动模型，Esc 退出；也可直接输入坐标。"
+
+#. PBR 材质基础色。
+#. 模型材质的基础颜色属性。
+#. 模型材质的基础颜色纹理用途。
+#: src/features/model-viewer/components/PreviewPanel.tsx:119
+#: src/features/model-viewer/components/ResourceDetails.tsx:79
+#: src/features/model-viewer/components/ResourceDetails.tsx:121
+msgid "基础颜色"
+msgstr "基础颜色"
 
 #: src/features/media-compress/components/MediaProgress.tsx:27
 msgid "处理中"
@@ -1937,29 +2324,29 @@ msgstr "备份内容"
 msgid "备份密码"
 msgstr "备份密码"
 
-#: src/lib/errors/messages.ts:25
+#: src/lib/errors/messages.ts:43
 msgid "备份文件中没有可导入的数据"
 msgstr "备份文件中没有可导入的数据"
 
 #. 某个数据节解析失败；section 已由前端本地化为数据节名称。
-#: src/lib/errors/messages.ts:26
+#: src/lib/errors/messages.ts:44
 msgid "备份文件中的「{section}」数据无效，无法导入"
 msgstr "备份文件中的「{section}」数据无效，无法导入"
 
-#: src/lib/errors/messages.ts:22
+#: src/lib/errors/messages.ts:40
 msgid "备份文件使用了不支持的加密算法，请升级应用后重试"
 msgstr "备份文件使用了不支持的加密算法，请升级应用后重试"
 
-#: src/lib/errors/messages.ts:21
+#: src/lib/errors/messages.ts:39
 msgid "备份文件使用了不支持的密钥派生算法，请升级应用后重试"
 msgstr "备份文件使用了不支持的密钥派生算法，请升级应用后重试"
 
 #. 导入文件信封校验失败；field 是备份文件的英文字段名（如 kdf、salt）。
-#: src/lib/errors/messages.ts:16
+#: src/lib/errors/messages.ts:34
 msgid "备份文件格式无效：缺少字段 {field} 或取值不正确"
 msgstr "备份文件格式无效：缺少字段 {field} 或取值不正确"
 
-#: src/lib/errors/messages.ts:23
+#: src/lib/errors/messages.ts:41
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "备份文件解密失败：密码错误或文件已损坏"
 
@@ -2004,6 +2391,10 @@ msgstr "复制结果"
 msgid "复制账号"
 msgstr "复制账号"
 
+#: src/features/model-viewer/components/ViewerHelp.tsx:64
+msgid "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请按完整路径逐项补选。"
+msgstr "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请按完整路径逐项补选。"
+
 #: src/features/settings/AppSettingsMenu.tsx:162
 #: src/features/settings/SettingsChoicesDialog.tsx:35
 #: src/features/settings/SettingsOverview.tsx:44
@@ -2032,7 +2423,7 @@ msgstr "失败"
 msgid "如果相关任务仍在运行，请先完成任务后再清理。"
 msgstr "如果相关任务仍在运行，请先完成任务后再清理。"
 
-#: src/features/home/entries.tsx:92
+#: src/features/home/entries.tsx:102
 #: src/features/media-compress/MediaCompressTool.tsx:41
 msgid "媒体处理"
 msgstr "媒体处理"
@@ -2050,9 +2441,18 @@ msgstr "字体"
 msgid "字号"
 msgstr "字号"
 
+#: src/features/model-viewer/components/MemoryPanel.tsx:305
+msgid "字节数未知"
+msgstr "字节数未知"
+
 #: src/features/settings/SettingsOverview.tsx:139
 msgid "存储、清理与项目帮助"
 msgstr "存储、清理与项目帮助"
+
+#. 模型库磁盘逻辑字节数和可清理缩略图缓存设置。
+#: src/features/model-viewer/components/LibraryPanel.tsx:168
+msgid "存储与缓存"
+msgstr "存储与缓存"
 
 #: src/features/about/AboutPage.tsx:109
 msgid "存储占用"
@@ -2083,6 +2483,11 @@ msgctxt "timestamp label"
 msgid "完成"
 msgstr "完成"
 
+#. 结束三维模型的拖动摆放。
+#: src/features/model-viewer/components/CanvasControls.tsx:172
+msgid "完成摆放"
+msgstr "完成摆放"
+
 #: src/features/todo/TodoTimestamps.tsx:44
 msgid "完成时间"
 msgstr "完成时间"
@@ -2110,13 +2515,13 @@ msgstr "宽高与原图比例不同时，图片会被拉伸变形"
 msgid "密码"
 msgstr "密码"
 
-#: src/lib/errors/messages.ts:232
+#: src/lib/errors/messages.ts:250
 msgid "密码库"
 msgstr "密码库"
 
 #: src/features/about/use-about.ts:43
 #: src/features/export/sections.tsx:14
-#: src/features/home/entries.tsx:112
+#: src/features/home/entries.tsx:122
 #: src/features/logs/use-activity-logs.ts:30
 #: src/features/vault/VaultTool.tsx:47
 msgid "密码本"
@@ -2133,7 +2538,7 @@ msgstr "密钥"
 msgid "密钥值"
 msgstr "密钥值"
 
-#: src/lib/errors/messages.ts:159
+#: src/lib/errors/messages.ts:177
 msgid "密钥标签须为 1–80 个字符，且不能包含控制字符"
 msgstr "密钥标签须为 1–80 个字符，且不能包含控制字符"
 
@@ -2196,10 +2601,16 @@ msgstr "导入"
 msgid "导入中…"
 msgstr "导入中…"
 
+#: src/features/model-viewer/components/ModelList.tsx:296
+msgid "导入会追加模型。隐藏保留资源，移除不会删除源文件。"
+msgstr "导入会追加模型。隐藏保留资源，移除不会删除源文件。"
+
 #: src/features/export/ImportPanel.tsx:110
 msgid "导入前请核对数据范围，覆盖模式会删除对应模块中的现有记录。"
 msgstr "导入前请核对数据范围，覆盖模式会删除对应模块中的现有记录。"
 
+#. 单个三维模型导入失败状态。
+#: src/features/model-viewer/components/ModelList.tsx:39
 #: src/features/poetry/components/TranslationPackManager.tsx:46
 msgid "导入失败"
 msgstr "导入失败"
@@ -2212,9 +2623,22 @@ msgstr "导入完成"
 msgid "导入密钥"
 msgstr "导入密钥"
 
+#. 选择并打开一个本地三维模型文件。
+#: src/features/model-viewer/ModelViewerPage.tsx:191
+msgid "导入模型"
+msgstr "导入模型"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:133
+msgid "导入模型后可在这里重新打开。"
+msgstr "导入模型后可在这里重新打开。"
+
 #: src/features/export/ImportPanel.tsx:85
 msgid "导入模式"
 msgstr "导入模式"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:95
+msgid "导入的模型自动保存在此设备。"
+msgstr "导入的模型自动保存在此设备。"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:208
 msgid "导入私钥后可在主机中选用。"
@@ -2235,6 +2659,11 @@ msgstr "导出为明文 JSON 文件，请妥善保管。"
 #: src/features/export/BackupPage.tsx:95
 msgid "导出所选数据"
 msgstr "导出所选数据"
+
+#. 自由相机与视角管理标签。
+#: src/features/model-viewer/components/InspectionPanel.tsx:29
+msgid "导航"
+msgstr "导航"
 
 #: src/features/games/xiangqi/XiangqiMatch.tsx:234
 msgid "将军"
@@ -2287,7 +2716,7 @@ msgstr "将返回模式选择，当前对局的进度将会丢失。"
 msgid "小时"
 msgstr "小时"
 
-#: src/features/home/entries.tsx:36
+#: src/features/home/entries.tsx:37
 #: src/features/settings/SettingsChoicesDialog.tsx:38
 #: src/features/settings/SettingsOverview.tsx:78
 msgid "小游戏"
@@ -2314,22 +2743,22 @@ msgstr "尺寸模式"
 msgid "局域网"
 msgstr "局域网"
 
-#: src/features/home/entries.tsx:69
+#: src/features/home/entries.tsx:79
 #: src/features/lan-transfer/LanServiceCard.tsx:36
 #: src/features/lan-transfer/LanTransferTool.tsx:34
-#: src/lib/errors/messages.ts:235
+#: src/lib/errors/messages.ts:253
 msgid "局域网传输"
 msgstr "局域网传输"
 
-#: src/lib/errors/messages.ts:49
+#: src/lib/errors/messages.ts:67
 msgid "局域网传输任务已达并发上限，请稍后重试"
 msgstr "局域网传输任务已达并发上限，请稍后重试"
 
-#: src/lib/errors/messages.ts:47
+#: src/lib/errors/messages.ts:65
 msgid "局域网传输已取消"
 msgstr "局域网传输已取消"
 
-#: src/lib/errors/messages.ts:48
+#: src/lib/errors/messages.ts:66
 msgid "局域网传输意外结束，请重试"
 msgstr "局域网传输意外结束，请重试"
 
@@ -2339,7 +2768,7 @@ msgid "局域网传输设置"
 msgstr "局域网传输设置"
 
 #: src/features/about/AboutPage.tsx:139
-#: src/lib/errors/messages.ts:224
+#: src/lib/errors/messages.ts:242
 msgid "局域网服务"
 msgstr "局域网服务"
 
@@ -2348,11 +2777,11 @@ msgstr "局域网服务"
 msgid "局域网联机"
 msgstr "局域网联机"
 
-#: src/lib/errors/messages.ts:51
+#: src/lib/errors/messages.ts:69
 msgid "局域网请求头超出大小限制"
 msgstr "局域网请求头超出大小限制"
 
-#: src/lib/errors/messages.ts:50
+#: src/lib/errors/messages.ts:68
 msgid "局域网请求无效或不完整"
 msgstr "局域网请求无效或不完整"
 
@@ -2361,7 +2790,19 @@ msgstr "局域网请求无效或不完整"
 msgid "展开侧边栏"
 msgstr "展开侧边栏"
 
-#: src/features/home/entries.tsx:34
+#. 场景树节点的展开按钮，name 为模型节点名称。
+#: src/features/model-viewer/components/SceneTree.tsx:175
+msgid "展开或收起 {name}"
+msgstr "展开或收起 {name}"
+
+#. 移动端动画条折叠按钮。
+#: src/features/model-viewer/components/AnimationBar.tsx:84
+msgid "展开或收起动画控制"
+msgstr "展开或收起动画控制"
+
+#. 三维查看器的自由相机、预览编辑与诊断工具。
+#: src/features/home/entries.tsx:35
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:61
 msgid "工具"
 msgstr "工具"
 
@@ -2384,7 +2825,12 @@ msgstr "已保存"
 msgid "已保存 · 未验证"
 msgstr "已保存 · 未验证"
 
-#: src/lib/errors/messages.ts:180
+#. 本机模型库条目列表。
+#: src/features/model-viewer/components/LibraryList.tsx:99
+msgid "已保存模型"
+msgstr "已保存模型"
+
+#: src/lib/errors/messages.ts:198
 msgid "已保存的 AI 翻译记录无效"
 msgstr "已保存的 AI 翻译记录无效"
 
@@ -2443,10 +2889,17 @@ msgstr "已删除共享目录"
 msgid "已删除白名单"
 msgstr "已删除白名单"
 
+#. 三维模型成功导入状态。
+#: src/features/model-viewer/components/ModelList.tsx:38
+msgid "已加载"
+msgstr "已加载"
+
+#. 模型导入任务已退出。
 #: src/features/bt/components/TaskRow.tsx:78
 #: src/features/home/HomeRecentActivity.tsx:21
 #: src/features/lan-transfer/LanTransferActivity.tsx:27
 #: src/features/logs/use-activity-logs.ts:39
+#: src/features/model-viewer/components/ModelList.tsx:41
 #: src/store/transfers.ts:184
 msgid "已取消"
 msgstr "已取消"
@@ -2498,6 +2951,11 @@ msgstr "已导入 {packCount} 个译文包"
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:60
 msgid "已导入密钥 {trimValue}"
 msgstr "已导入密钥 {trimValue}"
+
+#. 当前三维查看器的模型与导入任务列表。
+#: src/features/model-viewer/components/ModelList.tsx:109
+msgid "已导入模型"
+msgstr "已导入模型"
 
 #: src/features/export/use-backup.ts:93
 msgid "已导出"
@@ -2560,7 +3018,7 @@ msgstr "已替换 $ 处匹配"
 msgid "已替换第 $ 行的匹配"
 msgstr "已替换第 $ 行的匹配"
 
-#: src/lib/errors/messages.ts:185
+#: src/lib/errors/messages.ts:203
 msgid "已有诗词库同步任务在运行，请稍后重试"
 msgstr "已有诗词库同步任务在运行，请稍后重试"
 
@@ -2575,6 +3033,11 @@ msgstr "已添加白名单"
 #: src/features/poetry/hooks/use-poetry-translations.ts:120
 msgid "已生成"
 msgstr "已生成"
+
+#. 可计算 CPU 数据与 GPU 分配的估算合计，不含未知开销。
+#: src/features/model-viewer/components/MemoryPanel.tsx:52
+msgid "已知分配估算"
+msgstr "已知分配估算"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:271
 msgid "已移动 {name}"
@@ -2605,6 +3068,11 @@ msgstr "已选 {selectedSize} / {filesLength}"
 msgid "已选择"
 msgstr "已选择"
 
+#. 切换模型动画后的通知，clipName 为动画片段名称。
+#: src/features/model-viewer/components/AnimationBar.tsx:127
+msgid "已选择 {clipName}"
+msgstr "已选择 {clipName}"
+
 #: src/features/poetry/components/PoemAnnotations.tsx:49
 msgid "平仄"
 msgstr "平仄"
@@ -2615,6 +3083,11 @@ msgstr "平仄"
 #: src/features/games/gomoku/labels.tsx:93
 msgid "平局"
 msgstr "平局"
+
+#. 模型沿一行排列。
+#: src/features/model-viewer/components/ModelList.tsx:88
+msgid "并排"
+msgstr "并排"
 
 #: src/features/settings/SettingsOverview.tsx:112
 msgid "应用"
@@ -2637,11 +3110,11 @@ msgstr "应用启动后自动开启服务"
 msgid "应用数据已清空"
 msgstr "应用数据已清空"
 
-#: src/lib/errors/messages.ts:7
+#: src/lib/errors/messages.ts:25
 msgid "应用正在清理数据，请稍后重试"
 msgstr "应用正在清理数据，请稍后重试"
 
-#: src/lib/errors/messages.ts:6
+#: src/lib/errors/messages.ts:24
 msgid "应用正在退出，无法执行此操作"
 msgstr "应用正在退出，无法执行此操作"
 
@@ -2652,6 +3125,11 @@ msgstr "开启"
 #: src/features/bt/components/AddTorrentDialog.tsx:365
 msgid "开始下载"
 msgstr "开始下载"
+
+#. 进入画布拾取两点并测量距离。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:110
+msgid "开始两点测量"
+msgstr "开始两点测量"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:322
 #: src/features/media-compress/video/VideoCompressPanel.tsx:412
@@ -2677,6 +3155,10 @@ msgstr "开放"
 msgid "开放模式会跳过确认码"
 msgstr "开放模式会跳过确认码"
 
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:209
+msgid "开放网格无法确定内外。朝内壳体与法线不一致仅为检查提示，特殊美术法线可能是有意设置。退化三角形不参与边统计。"
+msgstr "开放网格无法确定内外。朝内壳体与法线不一致仅为检查提示，特殊美术法线可能是有意设置。退化三角形不参与边统计。"
+
 #: src/features/poetry/components/PoetryTranslationSection.tsx:212
 msgid "开放译文"
 msgstr "开放译文"
@@ -2684,6 +3166,11 @@ msgstr "开放译文"
 #: src/features/poetry/components/TranslationPackManager.tsx:74
 msgid "开放译文包"
 msgstr "开放译文包"
+
+#. 仅属于一个有效三角形的网格边数。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:53
+msgid "开放边"
+msgstr "开放边"
 
 #: src/features/settings/AutostartSetting.desktop.tsx:27
 msgid "开机自启"
@@ -2696,7 +3183,7 @@ msgstr "开机自启"
 msgid "当前"
 msgstr "当前"
 
-#: src/lib/errors/messages.ts:147
+#: src/lib/errors/messages.ts:165
 msgid "当前 AI 服务地址已变更，请重新打开模型菜单"
 msgstr "当前 AI 服务地址已变更，请重新打开模型菜单"
 
@@ -2708,7 +3195,7 @@ msgstr "当前 WebView 不支持音频转码"
 msgid "当前不可用"
 msgstr "当前不可用"
 
-#: src/lib/errors/messages.ts:44
+#: src/lib/errors/messages.ts:62
 msgid "当前不在游戏房间中"
 msgstr "当前不在游戏房间中"
 
@@ -2716,7 +3203,7 @@ msgstr "当前不在游戏房间中"
 msgid "当前仅支持 OpenAI Responses 接口格式"
 msgstr "当前仅支持 OpenAI Responses 接口格式"
 
-#: src/lib/errors/messages.ts:119
+#: src/lib/errors/messages.ts:137
 msgid "当前传输阶段无法暂停"
 msgstr "当前传输阶段无法暂停"
 
@@ -2758,21 +3245,36 @@ msgstr "当前对局的进度将会丢失。"
 msgid "当前已是最新版本"
 msgstr "当前已是最新版本"
 
-#: src/lib/errors/messages.ts:135
+#: src/lib/errors/messages.ts:153
 msgid "当前平台不支持创建本地符号链接"
 msgstr "当前平台不支持创建本地符号链接"
 
-#: src/lib/errors/messages.ts:8
+#: src/lib/errors/messages.ts:26
 msgid "当前操作尚未完成，请稍后重试清理数据"
 msgstr "当前操作尚未完成，请稍后重试清理数据"
+
+#. 模型导入时当前资源文件的字节读取进度。
+#: src/features/model-viewer/components/ImportStatus.tsx:71
+msgid "当前文件读取进度"
+msgstr "当前文件读取进度"
 
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:165
 msgid "当前显示上次采样"
 msgstr "当前显示上次采样"
 
+#. 选中模型包含共享引用的已知分配估算。
 #: src/features/ai-configuration/ProviderDetails.tsx:133
+#: src/features/model-viewer/components/MemoryPanel.tsx:86
 msgid "当前模型"
 msgstr "当前模型"
+
+#: src/features/model-viewer/components/PreviewPanel.tsx:192
+msgid "当前模型没有变形目标。"
+msgstr "当前模型没有变形目标。"
+
+#: src/features/model-viewer/components/PreviewPanel.tsx:165
+msgid "当前模型没有可编辑的 PBR 材质。"
+msgstr "当前模型没有可编辑的 PBR 材质。"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:142
 msgid "当前环境不支持 WebCodecs"
@@ -2806,19 +3308,24 @@ msgstr "当前设备不支持视频压缩"
 msgid "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可能失效。"
 
+#. 模型动画交替正向和反向播放。
+#: src/features/model-viewer/components/AnimationBar.tsx:60
+msgid "往返"
+msgstr "往返"
+
 #: src/features/about/use-about.ts:45
 #: src/features/export/sections.tsx:24
 #: src/features/logs/use-activity-logs.ts:29
-#: src/lib/errors/messages.ts:234
+#: src/lib/errors/messages.ts:252
 msgid "待办"
 msgstr "待办"
 
-#: src/features/home/entries.tsx:122
+#: src/features/home/entries.tsx:132
 #: src/features/todo/TodoTool.tsx:71
 msgid "待办事项"
 msgstr "待办事项"
 
-#: src/lib/errors/messages.ts:36
+#: src/lib/errors/messages.ts:54
 msgid "待办截止日期需使用 YYYY-MM-DD 格式"
 msgstr "待办截止日期需使用 YYYY-MM-DD 格式"
 
@@ -2827,7 +3334,7 @@ msgstr "待办截止日期需使用 YYYY-MM-DD 格式"
 msgid "待办操作"
 msgstr "待办操作"
 
-#: src/lib/errors/messages.ts:34
+#: src/lib/errors/messages.ts:52
 msgid "待办标题不能为空"
 msgstr "待办标题不能为空"
 
@@ -2836,7 +3343,7 @@ msgstr "待办标题不能为空"
 msgid "待办状态"
 msgstr "待办状态"
 
-#: src/lib/errors/messages.ts:35
+#: src/lib/errors/messages.ts:53
 msgid "待办计划时间无效"
 msgstr "待办计划时间无效"
 
@@ -2848,9 +3355,24 @@ msgstr "待办详情"
 msgid "待授权请求"
 msgstr "待授权请求"
 
+#. 模型动画的循环播放方式。
+#: src/features/model-viewer/components/AnimationBar.tsx:218
+msgid "循环模式"
+msgstr "循环模式"
+
 #: src/features/about/AboutPage.tsx:123
 msgid "总占用"
 msgstr "总占用"
+
+#. 当前动画片段总时长，duration 是本地化秒数。
+#: src/features/model-viewer/components/AnimationBar.tsx:335
+msgid "总时长 {duration} 秒"
+msgstr "总时长 {duration} 秒"
+
+#. 所有模型的已知分配估算，共享分配只计算一次。
+#: src/features/model-viewer/components/MemoryPanel.tsx:65
+msgid "总计（去重）"
+msgstr "总计（去重）"
 
 #: src/features/settings/SettingsOverview.tsx:85
 msgid "恢复上次工具"
@@ -2894,7 +3416,7 @@ msgstr "房间名（可选）"
 msgid "房间名称"
 msgstr "房间名称"
 
-#: src/lib/errors/messages.ts:42
+#: src/lib/errors/messages.ts:60
 msgid "房间的游戏类型不匹配"
 msgstr "房间的游戏类型不匹配"
 
@@ -2920,11 +3442,11 @@ msgstr "所有日志记录都会被删除，且无法恢复。"
 msgid "所有者"
 msgstr "所有者"
 
-#: src/lib/errors/messages.ts:14
+#: src/lib/errors/messages.ts:32
 msgid "所选文件不是有效的 JSON，请检查导入文件"
 msgstr "所选文件不是有效的 JSON，请检查导入文件"
 
-#: src/lib/errors/messages.ts:15
+#: src/lib/errors/messages.ts:33
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "所选文件不是本应用导出的备份文件"
 
@@ -2939,6 +3461,10 @@ msgstr "打开"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:314
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
+
+#: src/features/model-viewer/ModelViewerPage.tsx:440
+msgid "打开一个 3D 模型"
+msgstr "打开一个 3D 模型"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:62
 #: src/features/ssh-sftp/SshSftpTool.tsx:72
@@ -2981,6 +3507,10 @@ msgstr "扫码访问"
 msgid "折叠侧边栏"
 msgstr "折叠侧边栏"
 
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:278
+msgid "报告超过 200 条，以下结果已截断。"
+msgstr "报告超过 200 条，以下结果已截断。"
+
 #: src/features/games/billiards/BilliardsControls.tsx:28
 msgid "拉杆"
 msgstr "拉杆"
@@ -2990,7 +3520,7 @@ msgstr "拉杆"
 msgid "拒绝"
 msgstr "拒绝"
 
-#: src/lib/errors/messages.ts:105
+#: src/lib/errors/messages.ts:123
 msgid "拒绝清理非 BT 自有目录"
 msgstr "拒绝清理非 BT 自有目录"
 
@@ -3026,10 +3556,18 @@ msgstr "按合集筛选"
 msgid "按尺寸"
 msgstr "按尺寸"
 
+#: src/features/model-viewer/components/ModelInspector.tsx:82
+msgid "按当前场景的唯一几何体、材质和纹理对象统计，实例另列。顶点与三角面按完整几何体计算，不随可见性或绘制范围变化；线和点不计入三角面。"
+msgstr "按当前场景的唯一几何体、材质和纹理对象统计，实例另列。顶点与三角面按完整几何体计算，不随可见性或绘制范围变化；线和点不计入三角面。"
+
 #: src/features/about/AboutPage.tsx:172
 #: src/features/about/DataManagementDialogs.tsx:45
 msgid "按模块清理"
 msgstr "按模块清理"
+
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:142
+msgid "按模型原始尺寸测量。姿态变化后需重新选点。"
+msgstr "按模型原始尺寸测量。姿态变化后需重新选点。"
 
 #: src/features/media-compress/resize/ResizeControls.tsx:69
 msgid "按比例"
@@ -3065,6 +3603,11 @@ msgstr "推荐"
 msgid "提子 {value}:{value2}"
 msgstr "提子 {value}:{value2}"
 
+#. 模型已知分配估算的提醒阈值，单位 MiB。
+#: src/features/model-viewer/components/MemoryPanel.tsx:117
+msgid "提醒阈值（MiB）"
+msgstr "提醒阈值（MiB）"
+
 #: src/features/formatter/FormatterActions.tsx:102
 #: src/features/vault/VaultTool.tsx:89
 msgid "搜索"
@@ -3081,6 +3624,11 @@ msgstr "搜索主机"
 #: src/features/poetry/components/SearchBar.tsx:134
 msgid "搜索历史"
 msgstr "搜索历史"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:106
+#: src/features/model-viewer/components/LibraryPanel.tsx:112
+msgid "搜索名称或分组"
+msgstr "搜索名称或分组"
 
 #: src/features/todo/TodoTool.tsx:104
 #: src/features/todo/TodoTool.tsx:105
@@ -3104,6 +3652,15 @@ msgstr "搜索范围"
 msgid "搜索诗词"
 msgstr "搜索诗词"
 
+#. 切换画布拖动模型位置的模式。
+#. 进入拖动三维模型的交互模式。
+#: src/features/model-viewer/components/ModelList.tsx:240
+#: src/features/model-viewer/components/NavigationPanel.tsx:64
+msgid "摆放模型"
+msgstr "摆放模型"
+
+#. 播放模型动画。
+#: src/features/model-viewer/components/AnimationBar.tsx:194
 #: src/features/preview/MediaPlayer.tsx:141
 #: src/features/preview/MediaPlayer.tsx:142
 msgid "播放"
@@ -3112,6 +3669,11 @@ msgstr "播放"
 #: src/features/preview/MediaPlayer.tsx:152
 msgid "播放进度"
 msgstr "播放进度"
+
+#. 模型动画播放速度倍率。
+#: src/features/model-viewer/components/AnimationBar.tsx:249
+msgid "播放速度"
+msgstr "播放速度"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:192
 #: src/features/logs/LogDialogs.tsx:66
@@ -3133,9 +3695,25 @@ msgstr "操作"
 msgid "操作失败"
 msgstr "操作失败"
 
+#. 打开三维视角操作说明。
+#. 打开三维视角操作说明。
+#: src/features/model-viewer/components/ViewerHelp.tsx:29
+#: src/features/model-viewer/components/ViewerHelp.tsx:33
+msgid "操作帮助"
+msgstr "操作帮助"
+
+#: src/features/model-viewer/ModelViewerPage.tsx:443
+msgid "支持 GLB、glTF 和 FBX。模型包含外置资源时，需同时提供依赖文件。"
+msgstr "支持 GLB、glTF 和 FBX。模型包含外置资源时，需同时提供依赖文件。"
+
 #: src/features/bt/components/AddTorrentDialog.tsx:249
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "支持磁力链接与本地 .torrent 文件"
+
+#. 将模型标记为收藏。
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:102
+msgid "收藏"
+msgstr "收藏"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:121
 msgid "改为自动选择"
@@ -3174,7 +3752,7 @@ msgstr "数据导入与导出"
 msgid "数据管理"
 msgstr "数据管理"
 
-#: src/features/home/home-descriptions.tsx:11
+#: src/features/home/home-descriptions.tsx:12
 msgid "整理与校验文本数据"
 msgstr "整理与校验文本数据"
 
@@ -3186,7 +3764,7 @@ msgstr "整理与校验文本数据"
 msgid "文件"
 msgstr "文件"
 
-#: src/lib/errors/messages.ts:80
+#: src/lib/errors/messages.ts:98
 msgid "文件不属于此下载任务"
 msgstr "文件不属于此下载任务"
 
@@ -3195,7 +3773,7 @@ msgid "文件传输"
 msgstr "文件传输"
 
 #. SFTP 上传或下载校验；actual 为目标文件字节数，expected 为源文件字节数。
-#: src/lib/errors/messages.ts:127
+#: src/lib/errors/messages.ts:145
 msgid "文件传输校验失败：实际大小为 {actual} 字节，预期为 {expected} 字节"
 msgstr "文件传输校验失败：实际大小为 {actual} 字节，预期为 {expected} 字节"
 
@@ -3228,11 +3806,11 @@ msgstr "文件夹已在该位置"
 msgid "文件已在该位置"
 msgstr "文件已在该位置"
 
-#: src/lib/errors/messages.ts:95
+#: src/lib/errors/messages.ts:113
 msgid "文件选择包含无效或填充文件"
 msgstr "文件选择包含无效或填充文件"
 
-#: src/lib/errors/messages.ts:94
+#: src/lib/errors/messages.ts:112
 msgid "文件选择包含重复项"
 msgstr "文件选择包含重复项"
 
@@ -3244,7 +3822,7 @@ msgstr "文件预览"
 msgid "文学意译"
 msgstr "文学意译"
 
-#: src/features/home/entries.tsx:35
+#: src/features/home/entries.tsx:36
 msgid "文库"
 msgstr "文库"
 
@@ -3304,12 +3882,12 @@ msgstr "无匹配结果"
 msgid "无口令"
 msgstr "无口令"
 
-#: src/lib/errors/messages.ts:84
+#: src/lib/errors/messages.ts:102
 msgid "无效的 BT 任务标识"
 msgstr "无效的 BT 任务标识"
 
 #. 局域网绑定或可信设备校验；ip 是用户输入的地址。
-#: src/lib/errors/messages.ts:67
+#: src/lib/errors/messages.ts:85
 msgid "无效的 IP 地址：{ip}"
 msgstr "无效的 IP 地址：{ip}"
 
@@ -3326,15 +3904,23 @@ msgstr "无法使用系统应用打开"
 msgid "无法创建画布上下文"
 msgstr "无法创建画布上下文"
 
+#: src/lib/errors/messages.ts:270
+msgid "无法初始化 3D 显示，请重试或检查设备的图形支持"
+msgstr "无法初始化 3D 显示，请重试或检查设备的图形支持"
+
 #: src/features/preview/MediaPlayer.tsx:230
 msgid "无法播放，请重试或使用系统应用打开"
 msgstr "无法播放，请重试或使用系统应用打开"
 
-#: src/lib/errors/messages.ts:117
+#: src/features/model-viewer/ModelViewerPage.tsx:316
+msgid "无法显示 3D 内容"
+msgstr "无法显示 3D 内容"
+
+#: src/lib/errors/messages.ts:135
 msgid "无法获取本地用户名，请手动填写 SSH 用户名"
 msgstr "无法获取本地用户名，请手动填写 SSH 用户名"
 
-#: src/lib/errors/messages.ts:142
+#: src/lib/errors/messages.ts:160
 msgid "无法识别远端操作系统"
 msgstr "无法识别远端操作系统"
 
@@ -3354,6 +3940,10 @@ msgstr "无法转换该视频，可能是不支持的编码"
 msgid "无法转换该视频（{detail}）"
 msgstr "无法转换该视频（{detail}）"
 
+#: src/features/model-viewer/components/CanvasControls.tsx:218
+msgid "无法锁定鼠标，可拖动画布转向。"
+msgstr "无法锁定鼠标，可拖动画布转向。"
+
 #: src/features/settings/AppSettingsMenu.tsx:113
 msgid "日志"
 msgstr "日志"
@@ -3370,17 +3960,33 @@ msgstr "日志已清空"
 msgid "日志详情"
 msgstr "日志详情"
 
+#. 内存采样的时间列。
 #: src/features/logs/LogDialogs.tsx:54
 #: src/features/logs/LogFilters.tsx:89
 #: src/features/logs/LogRow.desktop.tsx:16
+#: src/features/model-viewer/components/MemoryPanel.tsx:225
 #: src/features/todo/TodoTimeSelect.desktop.tsx:32
 msgid "时间"
 msgstr "时间"
+
+#. 可输入的模型动画时间，单位秒。
+#: src/features/model-viewer/components/AnimationBar.tsx:301
+msgid "时间（秒）"
+msgstr "时间（秒）"
+
+#: src/features/model-viewer/components/ResourceDetails.tsx:141
+msgid "是"
+msgstr "是"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:216
 #: src/features/games/engine/online/OnlineLobby.tsx:332
 msgid "昵称"
 msgstr "昵称"
+
+#. 距离与包围盒尺寸的显示单位，不缩放模型。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:101
+msgid "显示单位"
+msgstr "显示单位"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:218
 msgid "显示名称（可选）"
@@ -3395,12 +4001,29 @@ msgstr "显示密码"
 msgid "显示小游戏"
 msgstr "显示小游戏"
 
+#. 模型可见性操作。
+#: src/features/model-viewer/components/ModelList.tsx:170
+msgid "显示或隐藏"
+msgstr "显示或隐藏"
+
+#. 切换指定三维模型的可见性。
+#: src/features/model-viewer/components/ModelList.tsx:166
+msgid "显示或隐藏 {name}"
+msgstr "显示或隐藏 {name}"
+
+#. 暂停模型动画。
 #: src/features/bt/components/TaskRow.tsx:152
+#: src/features/model-viewer/components/AnimationBar.tsx:192
 #: src/features/preview/MediaPlayer.tsx:141
 #: src/features/preview/MediaPlayer.tsx:142
 #: src/features/transfers/TransferItem.tsx:70
 msgid "暂停"
 msgstr "暂停"
+
+#. 暂停内存曲线采样，不暂停模型。
+#: src/features/model-viewer/components/MemoryPanel.tsx:153
+msgid "暂停记录"
+msgstr "暂停记录"
 
 #: src/features/bt/BtTool.tsx:262
 msgid "暂无下载任务"
@@ -3590,6 +4213,18 @@ msgstr "未启动"
 msgid "未启用服务地址"
 msgstr "未启用服务地址"
 
+#. 三维模型纹理缺少名称。
+#. 三维模型纹理缺少名称。
+#: src/features/model-viewer/components/ResourceDetails.tsx:30
+#: src/features/model-viewer/components/ResourceDetails.tsx:153
+msgid "未命名纹理"
+msgstr "未命名纹理"
+
+#. 场景树节点缺少名称。
+#: src/features/model-viewer/components/ModelInspector.tsx:176
+msgid "未命名节点"
+msgstr "未命名节点"
+
 #: src/features/todo/TodoList.tsx:207
 msgid "未安排"
 msgstr "未安排"
@@ -3602,41 +4237,52 @@ msgstr "未安装；仅点击时下载，可随时删除"
 msgid "未完成"
 msgstr "未完成"
 
-#: src/lib/errors/messages.ts:116
+#: src/lib/errors/messages.ts:134
 msgid "未找到可用的 SSH 代理或本地私钥"
 msgstr "未找到可用的 SSH 代理或本地私钥"
 
-#: src/lib/errors/messages.ts:149
+#: src/lib/errors/messages.ts:167
 msgid "未找到该 AI 服务地址，可能已被删除"
 msgstr "未找到该 AI 服务地址，可能已被删除"
 
-#: src/lib/errors/messages.ts:183
+#: src/lib/errors/messages.ts:201
 msgid "未找到该 AI 翻译"
 msgstr "未找到该 AI 翻译"
 
-#: src/lib/errors/messages.ts:33
+#: src/lib/errors/messages.ts:51
 msgid "未找到该 SSH 密钥，可能已被删除"
 msgstr "未找到该 SSH 密钥，可能已被删除"
 
-#: src/lib/errors/messages.ts:31
+#: src/lib/errors/messages.ts:49
 msgid "未找到该主机，可能已被删除"
 msgstr "未找到该主机，可能已被删除"
 
-#: src/lib/errors/messages.ts:30
+#: src/lib/errors/messages.ts:48
 msgid "未找到该密码条目，可能已被删除"
 msgstr "未找到该密码条目，可能已被删除"
 
-#: src/lib/errors/messages.ts:37
+#: src/lib/errors/messages.ts:55
 msgid "未找到该待办事项，可能已被删除"
 msgstr "未找到该待办事项，可能已被删除"
 
 #. 诗词详情读取失败；uid 是诗词唯一标识。
-#: src/lib/errors/messages.ts:187
+#: src/lib/errors/messages.ts:205
 msgid "未找到该诗词：{uid}"
 msgstr "未找到该诗词：{uid}"
 
+#: src/features/model-viewer/components/MemoryPanel.tsx:100
+#: src/features/model-viewer/components/MemoryPanel.tsx:328
+#: src/features/model-viewer/components/MemoryPanel.tsx:331
+#: src/features/model-viewer/components/ModelInspector.tsx:76
+#: src/features/model-viewer/components/ResourceDetails.tsx:52
+#: src/features/model-viewer/components/ResourceDetails.tsx:60
+#: src/features/model-viewer/components/ResourceDetails.tsx:109
+#: src/features/model-viewer/components/ResourceDetails.tsx:123
+msgid "未知"
+msgstr "未知"
+
 #. 同步请求引用了目录中不存在的数据来源；sourceId 是数据来源标识。
-#: src/lib/errors/messages.ts:196
+#: src/lib/errors/messages.ts:214
 msgid "未知的诗词数据来源：{sourceId}"
 msgstr "未知的诗词数据来源：{sourceId}"
 
@@ -3669,7 +4315,7 @@ msgstr "本地文件与数据工具"
 msgid "本地文件夹名称"
 msgstr "本地文件夹名称"
 
-#: src/lib/errors/messages.ts:121
+#: src/lib/errors/messages.ts:139
 msgid "本地源路径不是文件夹"
 msgstr "本地源路径不是文件夹"
 
@@ -3677,7 +4323,7 @@ msgstr "本地源路径不是文件夹"
 msgid "本地目录"
 msgstr "本地目录"
 
-#: src/lib/errors/messages.ts:134
+#: src/lib/errors/messages.ts:152
 msgid "本地目标已是文件夹，无法覆盖"
 msgstr "本地目标已是文件夹，无法覆盖"
 
@@ -3688,6 +4334,10 @@ msgstr "本地编码与解码"
 #: src/features/lan-transfer/LanServiceCard.tsx:28
 msgid "本机服务"
 msgstr "本机服务"
+
+#: src/lib/errors/messages.ts:267
+msgid "本次导入的资源超过 512 MiB，请选择较小的模型"
+msgstr "本次导入的资源超过 512 MiB，请选择较小的模型"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:301
 msgid "本次输入的内容将被清除。"
@@ -3702,11 +4352,42 @@ msgstr "权限"
 msgid "杆法"
 msgstr "杆法"
 
+#. 模型检查区的材质与纹理标签。
+#: src/features/model-viewer/components/ModelInspector.tsx:152
+msgid "材质"
+msgstr "材质"
+
+#. 无名称的模型材质，number 从 1 开始。
+#. 无名称的模型材质，number 从 1 开始。
+#: src/features/model-viewer/components/ModelInspector.tsx:200
+#: src/features/model-viewer/components/ResourceDetails.tsx:204
+msgid "材质 {number}"
+msgstr "材质 {number}"
+
+#. 三维模型的唯一材质列表。
+#: src/features/model-viewer/components/ResourceDetails.tsx:193
+msgid "材质列表"
+msgstr "材质列表"
+
+#. 材质数量与字节数的未知状态。
+#: src/features/model-viewer/components/MemoryPanel.tsx:302
+msgid "材质对象"
+msgstr "材质对象"
+
+#. 当前模型场景中的唯一材质数量。
+#: src/features/model-viewer/components/ModelInspector.tsx:40
+msgid "材质数"
+msgstr "材质数"
+
 #: src/features/logs/LogDialogs.tsx:60
 #: src/features/logs/LogFilters.tsx:77
 #: src/features/logs/LogRow.desktop.tsx:19
 msgid "来源"
 msgstr "来源"
+
+#: src/features/model-viewer/ModelViewerPage.tsx:472
+msgid "松开以打开模型"
+msgstr "松开以打开模型"
 
 #: src/features/formatter/use-formatter.ts:49
 msgid "查找"
@@ -3719,6 +4400,11 @@ msgstr "查看 GitHub Release 获取更新内容"
 #: src/features/transfers/ActivityMenu.tsx:65
 msgid "查看传输任务的进度和结果"
 msgstr "查看传输任务的进度和结果"
+
+#. 模型列表、当前模型检查和内存面板标签组。
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:46
+msgid "查看器面板"
+msgstr "查看器面板"
 
 #: src/features/settings/SettingsOverview.tsx:116
 msgid "查看操作和失败原因"
@@ -3741,6 +4427,14 @@ msgstr "查看更新"
 #: src/features/ai-configuration/ProviderNavigation.mobile.tsx:28
 msgid "查看服务地址"
 msgstr "查看服务地址"
+
+#: src/features/model-viewer/components/ViewerHelp.tsx:41
+msgid "查看模型"
+msgstr "查看模型"
+
+#: src/features/model-viewer/components/ModelInspector.tsx:258
+msgid "查看模型统计、场景节点及材质纹理。"
+msgstr "查看模型统计、场景节点及材质纹理。"
 
 #: src/features/transfers/ActivityMenu.tsx:35
 msgid "查看活动"
@@ -3803,7 +4497,7 @@ msgstr "校验"
 
 #: src/features/formatter/FormatterActions.tsx:32
 #: src/features/formatter/FormatterTool.tsx:84
-#: src/features/home/entries.tsx:102
+#: src/features/home/entries.tsx:112
 msgid "格式化"
 msgstr "格式化"
 
@@ -3815,6 +4509,11 @@ msgstr "格式化内容编辑器"
 #: src/features/settings/SettingsChoicesDialog.tsx:149
 msgid "桌面启动时恢复上次使用的工具。"
 msgstr "桌面启动时恢复上次使用的工具。"
+
+#. 当前选中模型的信息、场景和材质标签。
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:55
+msgid "检查"
+msgstr "检查"
 
 #: src/features/settings/AppSettingsMenu.tsx:69
 #: src/features/settings/SettingsOverview.tsx:127
@@ -3845,23 +4544,158 @@ msgstr "棋盘大小"
 msgid "楚 河"
 msgstr "楚 河"
 
-#: src/features/home/home-descriptions.tsx:19
+#: src/features/home/home-descriptions.tsx:20
 msgid "楚河汉界，布局对弈"
 msgstr "楚河汉界，布局对弈"
 
+#. 三维查看器的多模型列表标签。
 #: src/features/ai-configuration/AiEditorDialog.tsx:203
 #: src/features/ai-configuration/ProviderDetails.tsx:144
 #: src/features/ai-configuration/ProviderDetails.tsx:163
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:52
 msgid "模型"
 msgstr "模型"
+
+#. 多模型查看器共享检查浮层标题。
+#. 打开多模型管理、详情和内存的共享浮层。
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:111
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:123
+msgid "模型与检查"
+msgstr "模型与检查"
+
+#: src/features/model-viewer/ModelViewerPage.tsx:467
+msgid "模型中没有可显示的几何体"
+msgstr "模型中没有可显示的几何体"
+
+#. 3D 模型的二进制数据或纹理文件选择器类型。
+#: src/features/model-viewer/ModelViewerPage.tsx:163
+msgid "模型依赖文件"
+msgstr "模型依赖文件"
+
+#. 三维模型统计信息标题。
+#: src/features/model-viewer/components/ModelInspector.tsx:66
+msgid "模型信息"
+msgstr "模型信息"
+
+#: src/features/model-viewer/components/MemoryPanel.tsx:26
+msgid "模型内存估算已达到提醒阈值"
+msgstr "模型内存估算已达到提醒阈值"
+
+#. 三维查看器的动画控制区域名称。
+#: src/features/model-viewer/components/AnimationBar.tsx:66
+msgid "模型动画"
+msgstr "模型动画"
+
+#: src/lib/errors/messages.ts:266
+msgid "模型包含网络地址或不安全路径，已阻止读取"
+msgstr "模型包含网络地址或不安全路径，已阻止读取"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:186
 msgid "模型名称 / ID"
 msgstr "模型名称 / ID"
 
-#: src/lib/errors/messages.ts:160
+#: src/features/model-viewer/components/ViewerHelp.tsx:44
+msgid "模型和依赖文件仅在当前设备处理。"
+msgstr "模型和依赖文件仅在当前设备处理。"
+
+#. 可展开和键盘导航的三维模型节点树。
+#: src/features/model-viewer/components/SceneTree.tsx:76
+msgid "模型场景树"
+msgstr "模型场景树"
+
+#: src/lib/errors/messages.ts:22
+msgid "模型导入会话已关闭，请重新选择模型"
+msgstr "模型导入会话已关闭，请重新选择模型"
+
+#: src/lib/errors/messages.ts:21
+msgid "模型导入会话过多，请关闭后重新打开应用"
+msgstr "模型导入会话过多，请关闭后重新打开应用"
+
+#: src/features/model-viewer/components/ImportStatus.tsx:25
+msgid "模型导入失败"
+msgstr "模型导入失败"
+
+#. 多个三维模型的自动摆放方式。
+#: src/features/model-viewer/components/ModelList.tsx:78
+msgid "模型布局"
+msgstr "模型布局"
+
+#. 本机保存的三维模型集合。
+#. 本机保存的三维模型集合。
+#. 本机保存的三维模型集合。
+#: src/features/model-viewer/components/LibraryPanel.tsx:92
+#: src/features/model-viewer/ModelViewerPage.tsx:215
+#: src/features/model-viewer/ModelViewerPage.tsx:219
+msgid "模型库"
+msgstr "模型库"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:130
+msgid "模型库为空"
+msgstr "模型库为空"
+
+#. 本地三维模型库拒绝无效数据或超过条目/资源上限的保存。
+#: src/lib/errors/messages.ts:7
+msgid "模型库数据无效或已达到容量限制"
+msgstr "模型库数据无效或已达到容量限制"
+
+#. 保存或读取的本地模型库条目已删除或未完整写入。
+#: src/lib/errors/messages.ts:11
+msgid "模型库条目已不可用，请重新导入"
+msgstr "模型库条目已不可用，请重新导入"
+
+#. 本机数据库或保存视图来自更新版本，不能安全读取。
+#: src/lib/errors/messages.ts:15
+msgid "模型库版本不受支持，请升级应用"
+msgstr "模型库版本不受支持，请升级应用"
+
+#: src/lib/errors/messages.ts:20
+msgid "模型引用了不安全的资源路径，已阻止读取"
+msgstr "模型引用了不安全的资源路径，已阻止读取"
+
+#. 本地模型库条目的编辑和删除菜单。
+#: src/features/model-viewer/components/LibraryList.tsx:176
+msgid "模型操作"
+msgstr "模型操作"
+
+#: src/lib/errors/messages.ts:178
 msgid "模型显示名称不能超过 80 个字符或包含控制字符"
 msgstr "模型显示名称不能超过 80 个字符或包含控制字符"
+
+#: src/lib/errors/messages.ts:261
+msgid "模型格式无效或文件已损坏，请检查后重新选择"
+msgstr "模型格式无效或文件已损坏，请检查后重新选择"
+
+#. 模型信息、场景和材质标签组。
+#. 模型信息、场景和材质标签组。
+#: src/features/model-viewer/components/ModelInspector.tsx:140
+#: src/features/model-viewer/components/ModelInspector.tsx:229
+msgid "模型检查面板"
+msgstr "模型检查面板"
+
+#: src/lib/errors/messages.ts:23
+msgid "模型缺少依赖文件，请补充选择"
+msgstr "模型缺少依赖文件，请补充选择"
+
+#: src/lib/errors/messages.ts:269
+msgid "模型解析失败，请检查模型与依赖文件是否完整"
+msgstr "模型解析失败，请检查模型与依赖文件是否完整"
+
+#. 三维模型检查浮层标题。
+#: src/features/model-viewer/components/ModelInspector.tsx:255
+msgid "模型详情"
+msgstr "模型详情"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:174
+msgid "模型资源"
+msgstr "模型资源"
+
+#: src/lib/errors/messages.ts:19
+msgid "模型资源过大，请选择较小的模型"
+msgstr "模型资源过大，请选择较小的模型"
+
+#: src/lib/errors/messages.ts:268
+msgid "模型超过检查上限，请选择较小的模型。"
+msgstr "模型超过检查上限，请选择较小的模型。"
 
 #: src/features/crypto/CryptoTool.tsx:58
 msgid "模式"
@@ -3886,6 +4720,10 @@ msgstr "正在下载版本 {stateVersion3}"
 #: src/features/ai-configuration/AiEditorDialog.tsx:289
 msgid "正在保存"
 msgstr "正在保存"
+
+#: src/features/model-viewer/components/ImportStatus.tsx:49
+msgid "正在准备 3D 显示"
+msgstr "正在准备 3D 显示"
 
 #: src/lib/updater.ts:272
 msgid "正在准备版本 {stateVersion2}"
@@ -3919,6 +4757,10 @@ msgstr "正在加载日志…"
 msgid "正在加载物理引擎…"
 msgstr "正在加载物理引擎…"
 
+#: src/features/model-viewer/components/PreviewPanel.tsx:72
+msgid "正在加载环境…"
+msgstr "正在加载环境…"
+
 #: src/features/ssh-sftp/SshSftpTool.tsx:116
 msgid "正在加载系统监控…"
 msgstr "正在加载系统监控…"
@@ -3927,9 +4769,15 @@ msgstr "正在加载系统监控…"
 msgid "正在加载账号…"
 msgstr "正在加载账号…"
 
+#. 等待模型导入任务退出。
+#: src/features/model-viewer/components/ModelList.tsx:40
 #: src/store/transfers.ts:212
 msgid "正在取消"
 msgstr "正在取消"
+
+#: src/features/model-viewer/components/ImportStatus.tsx:43
+msgid "正在取消并释放资源"
+msgstr "正在取消并释放资源"
 
 #: src/features/poetry/components/CollectionManagement.tsx:173
 msgid "正在同步"
@@ -3946,6 +4794,11 @@ msgstr "正在处理"
 #: src/features/export/BackupPage.tsx:31
 msgid "正在处理备份，请稍候"
 msgstr "正在处理备份，请稍候"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:162
+#: src/features/model-viewer/components/LibraryPanel.tsx:319
+msgid "正在处理模型库"
+msgstr "正在处理模型库"
 
 #: src/features/poetry/components/CollectionManagement.tsx:162
 msgid "正在导入"
@@ -3996,6 +4849,10 @@ msgstr "正在校验"
 msgid "正在检查"
 msgstr "正在检查"
 
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:234
+msgid "正在检查…"
+msgstr "正在检查…"
+
 #: src/lib/updater.ts:150
 msgid "正在检查更新…"
 msgstr "正在检查更新…"
@@ -4026,6 +4883,20 @@ msgstr "正在获取资源信息…"
 msgid "正在解压 {name}…"
 msgstr "正在解压 {name}…"
 
+#. 模型解码状态。
+#: src/features/model-viewer/components/ModelList.tsx:32
+msgid "正在解析"
+msgstr "正在解析"
+
+#: src/features/model-viewer/components/ImportStatus.tsx:47
+msgid "正在解析模型"
+msgstr "正在解析模型"
+
+#. 模型文件读取状态。
+#: src/features/model-viewer/components/ModelList.tsx:31
+msgid "正在读取"
+msgstr "正在读取"
+
 #: src/features/export/ImportPanel.tsx:42
 msgid "正在读取…"
 msgstr "正在读取…"
@@ -4037,6 +4908,10 @@ msgstr "正在读取最新信息…"
 #: src/features/todo/TodoTool.tsx:182
 msgid "正在读取待办"
 msgstr "正在读取待办"
+
+#: src/features/model-viewer/components/ImportStatus.tsx:45
+msgid "正在读取模型资源"
+msgstr "正在读取模型资源"
 
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:42
 msgid "正在连接 {sessionTitle}…"
@@ -4059,11 +4934,11 @@ msgstr "正文全文索引"
 msgid "正文索引已更新"
 msgstr "正文索引已更新"
 
-#: src/lib/errors/messages.ts:156
+#: src/lib/errors/messages.ts:174
 msgid "此 AI 服务地址下已存在相同的密钥标签"
 msgstr "此 AI 服务地址下已存在相同的密钥标签"
 
-#: src/lib/errors/messages.ts:157
+#: src/lib/errors/messages.ts:175
 msgid "此 AI 服务地址下已存在相同的模型 ID"
 msgstr "此 AI 服务地址下已存在相同的模型 ID"
 
@@ -4071,37 +4946,81 @@ msgstr "此 AI 服务地址下已存在相同的模型 ID"
 msgid "此地址下已存在相同的标签或模型，可以打开已有项进行编辑。"
 msgstr "此地址下已存在相同的标签或模型，可以打开已有项进行编辑。"
 
+#: src/features/model-viewer/components/ResourceDetails.tsx:197
+msgid "此场景没有材质"
+msgstr "此场景没有材质"
+
+#: src/features/model-viewer/components/ResourceDetails.tsx:243
+msgid "此场景没有纹理"
+msgstr "此场景没有纹理"
+
 #: src/features/ai-configuration/ProviderDetails.tsx:79
 msgid "此服务地址需要修复，请先编辑地址。"
 msgstr "此服务地址需要修复，请先编辑地址。"
+
+#: src/features/model-viewer/components/ResourceDetails.tsx:160
+msgid "此材质未引用纹理"
+msgstr "此材质未引用纹理"
+
+#: src/features/model-viewer/components/AnimationBar.tsx:100
+msgid "此模型不包含动画"
+msgstr "此模型不包含动画"
+
+#: src/features/model-viewer/components/AnimationBar.tsx:342
+msgid "此片段时长为零，仅显示静态姿态。"
+msgstr "此片段时长为零，仅显示静态姿态。"
+
+#: src/features/model-viewer/components/ResourceDetails.tsx:41
+msgid "此纹理暂无法生成缩略图"
+msgstr "此纹理暂无法生成缩略图"
+
+#: src/features/model-viewer/components/ModelInspector.tsx:210
+msgid "此节点未引用材质"
+msgstr "此节点未引用材质"
 
 #: src/features/bt/components/PeersPanel.tsx:111
 msgid "每 2 秒刷新 · IP 已脱敏"
 msgstr "每 2 秒刷新 · IP 已脱敏"
 
-#: src/lib/errors/messages.ts:154
+#: src/lib/errors/messages.ts:172
 msgid "每个 AI 服务地址最多保存 10 个模型"
 msgstr "每个 AI 服务地址最多保存 10 个模型"
 
-#: src/lib/errors/messages.ts:153
+#: src/lib/errors/messages.ts:171
 msgid "每个 AI 服务地址最多保存 5 把密钥"
 msgstr "每个 AI 服务地址最多保存 5 把密钥"
 
-#: src/lib/errors/messages.ts:161
+#: src/lib/errors/messages.ts:179
 msgid "每个 AI 服务地址至少保留一个密钥条目"
 msgstr "每个 AI 服务地址至少保留一个密钥条目"
 
-#: src/lib/errors/messages.ts:162
+#: src/lib/errors/messages.ts:180
 msgid "每个 AI 服务地址至少保留一个模型"
 msgstr "每个 AI 服务地址至少保留一个模型"
+
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:175
+msgid "每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10 万三角形、1000 个实例；分析会暂停当前模型动画。"
+msgstr "每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10 万三角形、1000 个实例；分析会暂停当前模型动画。"
 
 #: src/features/poetry/components/DailyPoemLink.tsx:21
 msgid "每日一诗"
 msgstr "每日一诗"
 
+#: src/features/model-viewer/components/MemoryPanel.tsx:211
+msgid "每秒最多记录一次，保留最近 120 个样本；后台停止记录。虚线表示提醒阈值。"
+msgstr "每秒最多记录一次，保留最近 120 个样本；后台停止记录。虚线表示提醒阈值。"
+
 #: src/features/games/xiangqi/XiangqiStage.tsx:533
 msgid "汉 界"
 msgstr "汉 界"
+
+#: src/features/model-viewer/components/LibraryList.tsx:229
+msgid "没有匹配的模型"
+msgstr "没有匹配的模型"
+
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:197
+msgid "没有可分析的三角网格。"
+msgstr "没有可分析的三角网格。"
 
 #: src/features/preview/FilePreviewPage.tsx:23
 msgid "没有可预览的文件，请返回来源重新打开"
@@ -4129,6 +5048,21 @@ msgstr "没有进行中的待办"
 msgid "没有逾期未完成的待办"
 msgstr "没有逾期未完成的待办"
 
+#. 模型材质的法线纹理用途。
+#: src/features/model-viewer/components/ResourceDetails.tsx:81
+msgid "法线"
+msgstr "法线"
+
+#. 至少一个顶点法线与几何法线方向相反的三角形数。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:78
+msgid "法线方向不一致"
+msgstr "法线方向不一致"
+
+#. 用 RGB 颜色显示模型表面法线方向，兼容蒙皮和变形。
+#: src/features/model-viewer/components/PreviewPanel.tsx:42
+msgid "法线着色"
+msgstr "法线着色"
+
 #: src/features/poetry/components/PoemDetail.tsx:167
 #: src/features/poetry/components/PoemDetail.tsx:179
 msgid "注释"
@@ -4138,7 +5072,7 @@ msgstr "注释"
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
 
-#: src/lib/errors/messages.ts:193
+#: src/lib/errors/messages.ts:211
 msgid "注释包下载仅支持桌面端"
 msgstr "注释包下载仅支持桌面端"
 
@@ -4171,6 +5105,10 @@ msgstr "浅色"
 msgid "测试连接"
 msgstr "测试连接"
 
+#: src/features/model-viewer/components/ViewerHelp.tsx:88
+msgid "测量时点击同一模型的两个表面点；也可用方向键调整视角，按 Enter 选取画布中心点。"
+msgstr "测量时点击同一模型的两个表面点；也可用方向键调整视角，按 Enter 选取画布中心点。"
+
 #: src/features/media-compress/image/compress.ts:160
 msgid "浏览器无法导出 {mimeType}"
 msgstr "浏览器无法导出 {mimeType}"
@@ -4182,6 +5120,11 @@ msgstr "浏览器访问申请、弹窗确认和白名单回落请求"
 #: src/features/games/engine/online/useOnlineMatch.ts:67
 msgid "消息发送失败，连接可能已断开。"
 msgstr "消息发送失败，连接可能已断开。"
+
+#. 相机导航、预览编辑、测量诊断的标签组。
+#: src/features/model-viewer/components/InspectionPanel.tsx:23
+msgid "深度检查工具"
+msgstr "深度检查工具"
 
 #: src/features/settings/AppSettingsMenu.tsx:173
 #: src/features/settings/SettingsChoicesDialog.tsx:86
@@ -4257,6 +5200,10 @@ msgstr "清理{label}"
 msgid "清理{title}？"
 msgstr "清理{title}？"
 
+#: src/features/model-viewer/components/LibraryPanel.tsx:218
+msgid "清理缓存"
+msgstr "清理缓存"
+
 #: src/features/about/DataManagementDialogs.tsx:142
 msgid "清理范围"
 msgstr "清理范围"
@@ -4292,6 +5239,11 @@ msgstr "清空日志"
 msgid "清除 {finishedTransferCount}"
 msgstr "清除 {finishedTransferCount}"
 
+#. 取消 HDR 加载或移除当前 HDR 照明，并释放资源。
+#: src/features/model-viewer/components/PreviewPanel.tsx:91
+msgid "清除环境"
+msgstr "清除环境"
+
 #: src/features/todo/TodoSchedulePicker.tsx:137
 msgid "清除计划"
 msgstr "清除计划"
@@ -4300,31 +5252,31 @@ msgstr "清除计划"
 msgid "游戏"
 msgstr "游戏"
 
-#: src/lib/errors/messages.ts:225
+#: src/lib/errors/messages.ts:243
 msgid "游戏房间"
 msgstr "游戏房间"
 
-#: src/lib/errors/messages.ts:45
+#: src/lib/errors/messages.ts:63
 msgid "游戏房间中的对方尚未连接"
 msgstr "游戏房间中的对方尚未连接"
 
-#: src/lib/errors/messages.ts:39
+#: src/lib/errors/messages.ts:57
 msgid "游戏房间响应异常，请重新加入"
 msgstr "游戏房间响应异常，请重新加入"
 
-#: src/lib/errors/messages.ts:38
+#: src/lib/errors/messages.ts:56
 msgid "游戏房间地址格式不正确"
 msgstr "游戏房间地址格式不正确"
 
-#: src/lib/errors/messages.ts:41
+#: src/lib/errors/messages.ts:59
 msgid "游戏房间已满"
 msgstr "游戏房间已满"
 
-#: src/lib/errors/messages.ts:46
+#: src/lib/errors/messages.ts:64
 msgid "游戏房间数据过大，请缩短房间信息或减少发送内容"
 msgstr "游戏房间数据过大，请缩短房间信息或减少发送内容"
 
-#: src/lib/errors/messages.ts:40
+#: src/lib/errors/messages.ts:58
 msgid "游戏房间码不正确"
 msgstr "游戏房间码不正确"
 
@@ -4340,9 +5292,22 @@ msgstr "游戏音量"
 msgid "源文件"
 msgstr "源文件"
 
+#. 3D 模型入口文件的大小；sourceSize 是带单位的文件大小，不是内存估算。
+#: src/features/model-viewer/ModelViewerPage.tsx:304
+msgid "源文件 {sourceSize}"
+msgstr "源文件 {sourceSize}"
+
+#: src/features/model-viewer/components/ModelInspector.tsx:87
+msgid "源文件大小不等于内存占用。"
+msgstr "源文件大小不等于内存占用。"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:380
 msgid "源视频没有音轨"
 msgstr "源视频没有音轨"
+
+#: src/features/model-viewer/components/ViewerHelp.tsx:53
+msgid "点击 XYZ 坐标轴切换视角，双击画布或坐标轴可重新显示整个模型。"
+msgstr "点击 XYZ 坐标轴切换视角，双击画布或坐标轴可重新显示整个模型。"
 
 #: src/features/vault/VaultTool.tsx:172
 msgid "点击“新建”保存第一条账号密码"
@@ -4355,6 +5320,16 @@ msgstr "点击“新建”添加第一条待办"
 #: src/features/ssh-sftp/components/Sidebar.tsx:452
 msgid "点击右上角 + 新建主机"
 msgstr "点击右上角 + 新建主机"
+
+#. 源世界坐标中合并近点的距离阈值，以米计。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:146
+msgid "焊接容差（米）"
+msgstr "焊接容差（米）"
+
+#. 无名称的模型动画片段，number 从 1 开始。
+#: src/features/model-viewer/components/AnimationBar.tsx:38
+msgid "片段 {number}"
+msgstr "片段 {number}"
 
 #: src/lib/updater.ts:289
 msgid "版本 {stateVersion4} 已准备好"
@@ -4415,6 +5390,16 @@ msgstr "玩家 2"
 msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
+#. 模型材质的环境遮蔽纹理用途。
+#: src/features/model-viewer/components/ResourceDetails.tsx:89
+msgid "环境遮蔽"
+msgstr "环境遮蔽"
+
+#. 模型围绕中心排列。
+#: src/features/model-viewer/components/ModelList.tsx:94
+msgid "环形"
+msgstr "环形"
+
 #: src/features/poetry/components/PoetryTranslationSection.tsx:273
 msgid "生成"
 msgstr "生成"
@@ -4438,6 +5423,15 @@ msgstr "用户名"
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:124
 msgid "用户组"
 msgstr "用户组"
+
+#. 模型纹理在材质中的用途。
+#: src/features/model-viewer/components/ResourceDetails.tsx:62
+msgid "用途"
+msgstr "用途"
+
+#: src/features/model-viewer/components/ViewerHelp.tsx:58
+msgid "画布聚焦后，可用方向键旋转、Shift 加方向键平移、加减键缩放、Home 适配视图。坐标轴聚焦后，可按 X、Y、Z 切换方向，Shift 切换反方向。"
+msgstr "画布聚焦后，可用方向键旋转、Shift 加方向键平移、加减键缩放、Home 适配视图。坐标轴聚焦后，可按 X、Y、Z 切换方向，Shift 切换反方向。"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:184
 msgid "留空则使用 SSH 配置或本机用户"
@@ -4482,7 +5476,7 @@ msgstr "监控采集超时"
 msgid "目录中暂无文件"
 msgstr "目录中暂无文件"
 
-#: src/lib/errors/messages.ts:200
+#: src/lib/errors/messages.ts:218
 msgid "目录中缺少所需的诗词数据来源"
 msgstr "目录中缺少所需的诗词数据来源"
 
@@ -4508,7 +5502,7 @@ msgstr "目标尺寸需在 1–10000 像素之间"
 msgid "目标已存在同名项目"
 msgstr "目标已存在同名项目"
 
-#: src/lib/errors/messages.ts:55
+#: src/lib/errors/messages.ts:73
 msgid "目标文件正在上传，请稍后重试"
 msgstr "目标文件正在上传，请稍后重试"
 
@@ -4521,7 +5515,7 @@ msgstr "目标高度"
 msgid "直连"
 msgstr "直连"
 
-#: src/lib/errors/messages.ts:175
+#: src/lib/errors/messages.ts:193
 msgid "相同的 AI 任务正在执行中"
 msgstr "相同的 AI 任务正在执行中"
 
@@ -4582,7 +5576,7 @@ msgstr "确认覆盖"
 msgid "磁力链接"
 msgstr "磁力链接"
 
-#: src/features/home/home-descriptions.tsx:14
+#: src/features/home/home-descriptions.tsx:15
 msgid "磁力链接与种子下载"
 msgstr "磁力链接与种子下载"
 
@@ -4594,9 +5588,18 @@ msgstr "磁盘"
 msgid "磁盘 I/O"
 msgstr "磁盘 I/O"
 
-#: src/lib/errors/messages.ts:57
+#: src/lib/errors/messages.ts:75
 msgid "磁盘空间不足，无法保存上传内容"
 msgstr "磁盘空间不足，无法保存上传内容"
+
+#: src/features/model-viewer/components/NavigationPanel.tsx:117
+msgid "视角仅在本次会话保留。"
+msgstr "视角仅在本次会话保留。"
+
+#. 用户为本次会话保存的相机位置命名。
+#: src/features/model-viewer/components/NavigationPanel.tsx:94
+msgid "视角名称"
+msgstr "视角名称"
 
 #: src/features/bt/components/TorrentFileList.tsx:42
 msgid "视频"
@@ -4618,6 +5621,10 @@ msgstr "离开会停止当前媒体处理，原文件会保留。"
 msgid "离线"
 msgstr "离线"
 
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:228
+msgid "离线检查原始文件；部分扩展可能不受支持。"
+msgstr "离线检查原始文件；部分扩展可能不受支持。"
+
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:73
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:139
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:144
@@ -4636,17 +5643,47 @@ msgstr "移动"
 msgid "移动到第 {position} 项"
 msgstr "移动到第 {position} 项"
 
-#: src/lib/errors/messages.ts:191
+#. 拖动控制自由相机前后左右；方向键也可移动。
+#: src/features/model-viewer/components/CanvasControls.tsx:34
+msgid "移动摇杆"
+msgstr "移动摇杆"
+
+#: src/lib/errors/messages.ts:209
 msgid "移动端不支持从本地导入诗词库"
 msgstr "移动端不支持从本地导入诗词库"
 
-#: src/lib/errors/messages.ts:192
+#: src/lib/errors/messages.ts:210
 msgid "移动端不支持导入本地译文包"
 msgstr "移动端不支持导入本地译文包"
 
 #: src/features/settings/SettingsChoicesDialog.tsx:150
 msgid "移动端从首页启动，保留系统返回首页的行为。"
 msgstr "移动端从首页启动，保留系统返回首页的行为。"
+
+#. 自由相机在归一化预览空间内每秒的移动速度。
+#: src/features/model-viewer/components/NavigationPanel.tsx:72
+msgid "移动速度"
+msgstr "移动速度"
+
+#. 移除当前保存的三维相机视角。
+#: src/features/model-viewer/components/NavigationPanel.tsx:138
+msgid "移除"
+msgstr "移除"
+
+#. 从三维查看器移除模型，不删除源文件。
+#: src/features/model-viewer/components/ModelList.tsx:208
+msgid "移除 {name}"
+msgstr "移除 {name}"
+
+#. 移除查看器模型及资源，不删除源文件。
+#: src/features/model-viewer/components/ModelList.tsx:212
+msgid "移除模型"
+msgstr "移除模型"
+
+#. 删除用户命名的会话相机视角。
+#: src/features/model-viewer/components/NavigationPanel.tsx:133
+msgid "移除视角 {name}"
+msgstr "移除视角 {name}"
 
 #: src/features/formatter/FormatterActions.tsx:91
 msgid "移除转义"
@@ -4674,7 +5711,7 @@ msgid "端口"
 msgstr "端口"
 
 #. 局域网服务启动失败；startPort/endPort 是尝试的端口范围。
-#: src/lib/errors/messages.ts:75
+#: src/lib/errors/messages.ts:93
 msgid "端口 {startPort}-{endPort} 范围内没有可用端口，请更换起始端口后重试"
 msgstr "端口 {startPort}-{endPort} 范围内没有可用端口，请更换起始端口后重试"
 
@@ -4713,6 +5750,11 @@ msgstr "等待对方同意悔棋…"
 #: src/features/games/xiangqi/XiangqiMatch.tsx:247
 msgid "等待对方落子…"
 msgstr "等待对方落子…"
+
+#. 批量模型导入的排队状态。
+#: src/features/model-viewer/components/ModelList.tsx:30
+msgid "等待导入"
+msgstr "等待导入"
 
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:320
 msgid "等待监控数据"
@@ -4755,13 +5797,28 @@ msgstr "算法"
 msgid "管理 AI 配置"
 msgstr "管理 AI 配置"
 
-#: src/features/home/home-descriptions.tsx:12
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:128
+msgid "管理模型、调整位置并检查资源。"
+msgstr "管理模型、调整位置并检查资源。"
+
+#: src/features/home/home-descriptions.tsx:13
 msgid "管理账号与密码"
 msgstr "管理账号与密码"
 
+#. 三维模型材质类型。
+#: src/features/model-viewer/components/ResourceDetails.tsx:117
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:202
 msgid "类型"
 msgstr "类型"
+
+#. PBR 材质 roughness，0 光滑到 1 粗糙。
+#. 模型材质的粗糙度属性。
+#. 模型材质的粗糙度纹理用途。
+#: src/features/model-viewer/components/PreviewPanel.tsx:133
+#: src/features/model-viewer/components/ResourceDetails.tsx:85
+#: src/features/model-viewer/components/ResourceDetails.tsx:135
+msgid "粗糙度"
+msgstr "粗糙度"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:99
 msgid "粘滞位"
@@ -4776,7 +5833,7 @@ msgid "系统"
 msgstr "系统"
 
 #. SSH 系统监控错误；os 是远端操作系统名称。
-#: src/lib/errors/messages.ts:143
+#: src/lib/errors/messages.ts:161
 msgid "系统监控暂不支持 {os}，仅支持 Linux"
 msgstr "系统监控暂不支持 {os}，仅支持 Linux"
 
@@ -4792,11 +5849,38 @@ msgstr "红胜"
 msgid "约原体积的 {ratioPercent}%"
 msgstr "约原体积的 {ratioPercent}%"
 
+#. 无名称模型纹理的序号。
+#. 无名称的模型纹理，number 从 1 开始。
+#: src/features/model-viewer/components/MemoryPanel.tsx:321
+#: src/features/model-viewer/components/ResourceDetails.tsx:251
+msgid "纹理 {number}"
+msgstr "纹理 {number}"
+
+#. 三维模型按唯一纹理去重后的列表。
+#: src/features/model-viewer/components/ResourceDetails.tsx:239
+msgid "纹理列表"
+msgstr "纹理列表"
+
+#. 当前模型场景中的唯一纹理对象数量。
+#: src/features/model-viewer/components/ModelInspector.tsx:44
+msgid "纹理数"
+msgstr "纹理数"
+
+#. 模型纹理与解码像素估算。
+#: src/features/model-viewer/components/MemoryPanel.tsx:267
+msgid "纹理数据"
+msgstr "纹理数据"
+
+#. 将选中的三维模型显示为三角网格线框。
+#: src/features/model-viewer/components/PreviewPanel.tsx:35
+msgid "线框"
+msgstr "线框"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:22
 msgid "练习"
 msgstr "练习"
 
-#: src/features/home/home-descriptions.tsx:16
+#: src/features/home/home-descriptions.tsx:17
 msgid "练习击球或开始对局"
 msgstr "练习击球或开始对局"
 
@@ -4808,7 +5892,7 @@ msgstr "练习模式"
 msgid "终端"
 msgstr "终端"
 
-#: src/lib/errors/messages.ts:115
+#: src/lib/errors/messages.ts:133
 msgid "终端输入数据格式无效"
 msgstr "终端输入数据格式无效"
 
@@ -4822,9 +5906,14 @@ msgid "绑定 IP 不可用"
 msgstr "绑定 IP 不可用"
 
 #. 局域网服务绑定校验；ip 是被拒绝的绑定地址。
-#: src/lib/errors/messages.ts:71
+#: src/lib/errors/messages.ts:89
 msgid "绑定 IP 不是局域网地址：{ip}"
 msgstr "绑定 IP 不是局域网地址：{ip}"
+
+#. 退出三维画布的自由移动或测量模式。
+#: src/features/model-viewer/components/CanvasControls.tsx:174
+msgid "结束操作"
+msgstr "结束操作"
 
 #: src/features/crypto/CryptoTool.tsx:93
 #: src/features/logs/LogDialogs.tsx:74
@@ -4836,6 +5925,16 @@ msgstr "结果"
 #: src/features/crypto/CryptoTool.tsx:95
 msgid "结果会实时显示在这里"
 msgstr "结果会实时显示在这里"
+
+#. 相邻三角形共享边的方向相同，法线朝向可能不一致。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:64
+msgid "绕序冲突"
+msgstr "绕序冲突"
+
+#. 场景中网格、线和点的实例总数，包含 GPU 实例化副本。
+#: src/features/model-viewer/components/ModelInspector.tsx:56
+msgid "绘制实例数"
+msgstr "绘制实例数"
 
 #: src/features/bt/components/TaskRow.tsx:152
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:385
@@ -4858,13 +5957,22 @@ msgstr "继续处理"
 msgid "继续编辑"
 msgstr "继续编辑"
 
-#: src/lib/errors/messages.ts:54
+#. 恢复内存曲线采样。
+#: src/features/model-viewer/components/MemoryPanel.tsx:151
+msgid "继续记录"
+msgstr "继续记录"
+
+#: src/lib/errors/messages.ts:72
 msgid "续传位置与目标文件大小不一致，请刷新后重试"
 msgstr "续传位置与目标文件大小不一致，请刷新后重试"
 
 #: src/features/preview/PreviewSurface.tsx:127
 msgid "缓冲中…"
 msgstr "缓冲中…"
+
+#: src/features/model-viewer/components/LibraryPanel.tsx:179
+msgid "缓存上限"
+msgstr "缓存上限"
 
 #: src/features/crypto/CryptoTool.tsx:60
 msgid "编码"
@@ -4905,7 +6013,11 @@ msgstr "编辑密钥"
 msgid "编辑待办"
 msgstr "编辑待办"
 
+#. 编辑本地模型库的名称、分组和收藏状态。
+#. 编辑本地模型库的名称、分组和收藏状态。
 #: src/features/ai-configuration/AiEditorDialog.tsx:64
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:51
+#: src/features/model-viewer/components/LibraryList.tsx:200
 msgid "编辑模型"
 msgstr "编辑模型"
 
@@ -4933,23 +6045,42 @@ msgstr "缩放方式"
 msgid "缩放比例"
 msgstr "缩放比例"
 
+#: src/features/model-viewer/components/LibraryPanel.tsx:175
+msgid "缩略图缓存"
+msgstr "缩略图缓存"
+
 #: src/features/formatter/FormatterTool.tsx:121
 msgid "缩进"
 msgstr "缩进"
+
+#. 模型等待用户补充文件的状态。
+#: src/features/model-viewer/components/ModelList.tsx:34
+msgid "缺少依赖"
+msgstr "缺少依赖"
 
 #: src/features/vault/VaultEntryDialog.tsx:205
 msgid "网址"
 msgstr "网址"
 
+#. 模型按行列排列。
+#: src/features/model-viewer/components/ModelList.tsx:91
+msgid "网格"
+msgstr "网格"
+
+#. 选择查看某个网格实例的拓扑报告。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:184
+msgid "网格实例"
+msgstr "网格实例"
+
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:272
 msgid "网络"
 msgstr "网络"
 
-#: src/lib/errors/messages.ts:181
+#: src/lib/errors/messages.ts:199
 msgid "翻译内容不能为空"
 msgstr "翻译内容不能为空"
 
-#: src/lib/errors/messages.ts:182
+#: src/lib/errors/messages.ts:200
 msgid "翻译内容过长"
 msgstr "翻译内容过长"
 
@@ -4967,6 +6098,16 @@ msgstr "联机"
 msgid "联机对局"
 msgstr "联机对局"
 
+#. 将相机对准指定三维模型，必要时显示模型。
+#: src/features/model-viewer/components/ModelList.tsx:188
+msgid "聚焦 {name}"
+msgstr "聚焦 {name}"
+
+#. 将相机对准指定模型。
+#: src/features/model-viewer/components/ModelList.tsx:192
+msgid "聚焦模型"
+msgstr "聚焦模型"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:41
 #: src/features/games/go/labels.tsx:108
 #: src/features/games/go/labels.tsx:115
@@ -4977,10 +6118,20 @@ msgstr "联机对局"
 msgid "胜"
 msgstr "胜"
 
+#. 三维相机自动绕目标旋转，可关闭。
+#: src/features/model-viewer/components/NavigationPanel.tsx:87
+msgid "自动旋转"
+msgstr "自动旋转"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:184
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:189
 msgid "自动选择"
 msgstr "自动选择"
+
+#. 模型材质的自发光纹理用途。
+#: src/features/model-viewer/components/ResourceDetails.tsx:87
+msgid "自发光"
+msgstr "自发光"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:144
 msgid "自由清台"
@@ -4989,6 +6140,15 @@ msgstr "自由清台"
 #: src/features/games/billiards/BilliardsMatch.tsx:270
 msgid "自由球：拖动母球放置"
 msgstr "自由球：拖动母球放置"
+
+#. 第一人称飞行相机，无碰撞和重力。
+#: src/features/model-viewer/components/NavigationPanel.tsx:50
+msgid "自由移动"
+msgstr "自由移动"
+
+#: src/features/model-viewer/components/ViewerHelp.tsx:82
+msgid "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转向，Esc 退出。触屏可点按摇杆方向移动，或拖动摇杆连续移动，并使用升降按钮。"
+msgstr "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转向，Esc 退出。触屏可点按摇杆方向移动，或拖动摇杆连续移动，并使用升降按钮。"
 
 #: src/features/ai-configuration/RowActions.desktop.tsx:38
 #: src/features/ai-configuration/RowActions.mobile.tsx:57
@@ -5000,9 +6160,19 @@ msgstr "至少保留一项"
 msgid "至少修改其中一个名称。"
 msgstr "至少修改其中一个名称。"
 
-#: src/lib/errors/messages.ts:93
+#: src/lib/errors/messages.ts:111
 msgid "至少选择一个文件"
 msgstr "至少选择一个文件"
+
+#. 未命名的模型场景节点；number 为当前列表序号。
+#: src/features/model-viewer/components/SceneTree.tsx:138
+msgid "节点 {number}"
+msgstr "节点 {number}"
+
+#. 场景树当前选中节点的资源信息。
+#: src/features/model-viewer/components/ModelInspector.tsx:172
+msgid "节点详情"
+msgstr "节点详情"
 
 #: src/features/games/billiards/BilliardsScore.tsx:123
 msgid "花色球"
@@ -5019,17 +6189,27 @@ msgstr "获取资源信息…"
 msgid "获取资源信息失败"
 msgstr "获取资源信息失败"
 
-#: src/lib/errors/messages.ts:109
+#: src/lib/errors/messages.ts:127
 msgid "获取资源信息超时，请检查网络或稍后重试"
 msgstr "获取资源信息超时，请检查网络或稍后重试"
 
-#: src/features/home/home-descriptions.tsx:17
+#: src/features/home/home-descriptions.tsx:18
 msgid "落子连五，切磋棋艺"
 msgstr "落子连五，切磋棋艺"
 
 #: src/features/poetry/components/ReadingSettingsPopover.tsx:67
 msgid "行距"
 msgstr "行距"
+
+#. 为列表中指定的模型资源路径选择文件。
+#: src/features/model-viewer/components/ImportStatus.tsx:113
+msgid "补充文件"
+msgstr "补充文件"
+
+#. 为模型缺少的资源选择本地文件；key 是模型内的完整相对路径。
+#: src/features/model-viewer/components/ImportStatus.tsx:107
+msgid "补充文件：{key}"
+msgstr "补充文件：{key}"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:225
 msgid "要移动的文件"
@@ -5090,11 +6270,16 @@ msgstr "计划"
 msgid "计划时间"
 msgstr "计划时间"
 
+#. 按当前姿态重新计算源模型的世界轴对齐包围盒尺寸。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:127
+msgid "计算包围盒尺寸"
+msgstr "计算包围盒尺寸"
+
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:204
 msgid "认证方式"
 msgstr "认证方式"
 
-#: src/features/home/home-descriptions.tsx:13
+#: src/features/home/home-descriptions.tsx:14
 msgid "记录任务与清单"
 msgstr "记录任务与清单"
 
@@ -5129,6 +6314,11 @@ msgstr "访问时间"
 msgid "访问权限"
 msgstr "访问权限"
 
+#. 距离、尺寸与网格诊断标签。
+#: src/features/model-viewer/components/InspectionPanel.tsx:35
+msgid "诊断"
+msgstr "诊断"
+
 #: src/features/poetry/components/PoemDetail.tsx:112
 #: src/features/poetry/components/PoemDetail.tsx:208
 #: src/features/poetry/components/ReadingModeTabs.tsx:10
@@ -5143,7 +6333,7 @@ msgstr "译文与本地语料"
 msgid "译文内容"
 msgstr "译文内容"
 
-#: src/lib/errors/messages.ts:211
+#: src/lib/errors/messages.ts:229
 msgid "译文包内容无效"
 msgstr "译文包内容无效"
 
@@ -5159,7 +6349,7 @@ msgstr "译文模式"
 msgid "试试其他关键词或清除筛选"
 msgstr "试试其他关键词或清除筛选"
 
-#: src/lib/errors/messages.ts:213
+#: src/lib/errors/messages.ts:231
 msgid "诗词内容过大，无法发起 AI 翻译"
 msgstr "诗词内容过大，无法发起 AI 翻译"
 
@@ -5176,11 +6366,11 @@ msgstr "诗词同步"
 msgid "诗词库"
 msgstr "诗词库"
 
-#: src/lib/errors/messages.ts:223
+#: src/lib/errors/messages.ts:241
 msgid "诗词库同步"
 msgstr "诗词库同步"
 
-#: src/lib/errors/messages.ts:186
+#: src/lib/errors/messages.ts:204
 msgid "诗词库同步已取消"
 msgstr "诗词库同步已取消"
 
@@ -5192,27 +6382,27 @@ msgstr "诗词数据库"
 msgid "诗词数据管理"
 msgstr "诗词数据管理"
 
-#: src/lib/errors/messages.ts:195
+#: src/lib/errors/messages.ts:213
 msgid "诗词源文件解析失败"
 msgstr "诗词源文件解析失败"
 
-#: src/lib/errors/messages.ts:194
+#: src/lib/errors/messages.ts:212
 msgid "诗词目录配置无效"
 msgstr "诗词目录配置无效"
 
-#: src/lib/errors/messages.ts:155
+#: src/lib/errors/messages.ts:173
 msgid "该 AI 服务地址已存在"
 msgstr "该 AI 服务地址已存在"
 
-#: src/lib/errors/messages.ts:32
+#: src/lib/errors/messages.ts:50
 msgid "该主机存储的认证方式无效，请重新编辑并保存"
 msgstr "该主机存储的认证方式无效，请重新编辑并保存"
 
-#: src/lib/errors/messages.ts:24
+#: src/lib/errors/messages.ts:42
 msgid "该备份文件已加密，请输入密码"
 msgstr "该备份文件已加密，请输入密码"
 
-#: src/lib/errors/messages.ts:150
+#: src/lib/errors/messages.ts:168
 msgid "该密钥不存在或不属于此 AI 服务地址"
 msgstr "该密钥不存在或不属于此 AI 服务地址"
 
@@ -5228,11 +6418,11 @@ msgstr "该格式不支持预览"
 msgid "该格式不支持预览，可使用系统应用打开"
 msgstr "该格式不支持预览，可使用系统应用打开"
 
-#: src/lib/errors/messages.ts:13
+#: src/lib/errors/messages.ts:31
 msgid "该模块数据不在主数据库中，请通过对应功能入口清理"
 msgstr "该模块数据不在主数据库中，请通过对应功能入口清理"
 
-#: src/lib/errors/messages.ts:151
+#: src/lib/errors/messages.ts:169
 msgid "该模型不存在或不属于此 AI 服务地址"
 msgstr "该模型不存在或不属于此 AI 服务地址"
 
@@ -5240,11 +6430,11 @@ msgstr "该模型不存在或不属于此 AI 服务地址"
 msgid "该私钥有口令保护（连接时输入）"
 msgstr "该私钥有口令保护（连接时输入）"
 
-#: src/lib/errors/messages.ts:212
+#: src/lib/errors/messages.ts:230
 msgid "该诗词没有可翻译的正文"
 msgstr "该诗词没有可翻译的正文"
 
-#: src/lib/errors/messages.ts:98
+#: src/lib/errors/messages.ts:116
 msgid "该资源已下载完成；如需重新下载，请先删除现有任务"
 msgstr "该资源已下载完成；如需重新下载，请先删除现有任务"
 
@@ -5252,15 +6442,15 @@ msgstr "该资源已下载完成；如需重新下载，请先删除现有任务
 msgid "该资源已在下载列表中，不能重复添加"
 msgstr "该资源已在下载列表中，不能重复添加"
 
-#: src/lib/errors/messages.ts:100
+#: src/lib/errors/messages.ts:118
 msgid "该资源已有下载任务，不能用新的文件选择覆盖"
 msgstr "该资源已有下载任务，不能用新的文件选择覆盖"
 
-#: src/lib/errors/messages.ts:101
+#: src/lib/errors/messages.ts:119
 msgid "该资源已有任务，不能重复添加"
 msgstr "该资源已有任务，不能重复添加"
 
-#: src/lib/errors/messages.ts:99
+#: src/lib/errors/messages.ts:117
 msgid "该资源正在处理，不能重复添加"
 msgstr "该资源正在处理，不能重复添加"
 
@@ -5277,20 +6467,24 @@ msgstr "详情"
 msgid "语言"
 msgstr "语言"
 
-#: src/lib/errors/messages.ts:114
+#: src/features/model-viewer/components/ImportStatus.tsx:90
+msgid "请为下列路径选择对应文件。文件名相同但目录不同时，请确认每一项。"
+msgstr "请为下列路径选择对应文件。文件名相同但目录不同时，请确认每一项。"
+
+#: src/lib/errors/messages.ts:132
 msgid "请为主机选择认证密钥"
 msgstr "请为主机选择认证密钥"
 
-#: src/lib/errors/messages.ts:166
+#: src/lib/errors/messages.ts:184
 msgid "请先保存 AI 服务地址和模型"
 msgstr "请先保存 AI 服务地址和模型"
 
-#: src/lib/errors/messages.ts:167
+#: src/lib/errors/messages.ts:185
 msgid "请先保存 API Key"
 msgstr "请先保存 API Key"
 
 #. 数据清理被在途任务阻止；participant 已由前端本地化为任务名称。
-#: src/lib/errors/messages.ts:9
+#: src/lib/errors/messages.ts:27
 msgid "请先停止{participant}，稍后再清理数据"
 msgstr "请先停止{participant}，稍后再清理数据"
 
@@ -5312,7 +6506,7 @@ msgstr "请先选择视频文件"
 msgid "请先配置服务地址、模型和 API Key，再生成译文。"
 msgstr "请先配置服务地址、模型和 API Key，再生成译文。"
 
-#: src/lib/errors/messages.ts:165
+#: src/lib/errors/messages.ts:183
 msgid "请填写 AI 模型名称，或名称过长"
 msgstr "请填写 AI 模型名称，或名称过长"
 
@@ -5334,7 +6528,7 @@ msgid "请横向旋转设备，当前对局会保留"
 msgstr "请横向旋转设备，当前对局会保留"
 
 #. 局域网共享路径校验被拒；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:62
+#: src/lib/errors/messages.ts:80
 msgid "请求路径无效或超出共享目录：{path}"
 msgstr "请求路径无效或超出共享目录：{path}"
 
@@ -5376,6 +6570,10 @@ msgstr "请输入有效的目标尺寸"
 msgid "请输入路径"
 msgstr "请输入路径"
 
+#: src/lib/errors/messages.ts:262
+msgid "请选择一个 GLB、glTF 或 FBX 模型文件"
+msgstr "请选择一个 GLB、glTF 或 FBX 模型文件"
+
 #: src/features/lan-transfer/lanTransferForms.schema.ts:54
 msgid "请选择共享目录"
 msgstr "请选择共享目录"
@@ -5383,6 +6581,10 @@ msgstr "请选择共享目录"
 #: src/features/ai-configuration/AiDeleteDialog.tsx:94
 msgid "请选择替代项"
 msgstr "请选择替代项"
+
+#: src/lib/errors/messages.ts:6
+msgid "请选择有效的 GLB、glTF 或 FBX 模型文件"
+msgstr "请选择有效的 GLB、glTF 或 FBX 模型文件"
 
 #: src/features/todo/hooks/use-todo-editor.ts:63
 msgid "请选择有效的计划日期和时间"
@@ -5453,6 +6655,11 @@ msgstr "调整筛选条件或刷新后再试。"
 msgid "调整顺序"
 msgstr "调整顺序"
 
+#. glTF 规范报告中的警告数量。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:263
+msgid "警告"
+msgstr "警告"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:41
 #: src/features/games/go/labels.tsx:110
 #: src/features/games/go/labels.tsx:117
@@ -5472,11 +6679,11 @@ msgstr "负载 {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 msgid "账号"
 msgstr "账号"
 
-#: src/lib/errors/messages.ts:107
+#: src/lib/errors/messages.ts:125
 msgid "资源中没有可下载的文件"
 msgstr "资源中没有可下载的文件"
 
-#: src/lib/errors/messages.ts:106
+#: src/lib/errors/messages.ts:124
 msgid "资源信息未就绪，请先解析"
 msgstr "资源信息未就绪，请先解析"
 
@@ -5484,11 +6691,16 @@ msgstr "资源信息未就绪，请先解析"
 msgid "资源尚未下载完成，缺失分片可能导致预览中断。暂停任务会保持暂停。"
 msgstr "资源尚未下载完成，缺失分片可能导致预览中断。暂停任务会保持暂停。"
 
-#: src/lib/errors/messages.ts:96
+#. 选中模型的各类分配与资源数量。
+#: src/features/model-viewer/components/MemoryPanel.tsx:250
+msgid "资源明细"
+msgstr "资源明细"
+
+#: src/lib/errors/messages.ts:114
 msgid "资源标识与解析结果不一致，请重试"
 msgstr "资源标识与解析结果不一致，请重试"
 
-#: src/lib/errors/messages.ts:110
+#: src/lib/errors/messages.ts:128
 msgid "资源解析结果异常，请重试"
 msgstr "资源解析结果异常，请重试"
 
@@ -5500,6 +6712,11 @@ msgstr "赏析"
 #: src/features/settings/SettingsChoicesDialog.tsx:113
 msgid "赛博朋克"
 msgstr "赛博朋克"
+
+#. distance 是带单位的三维两点距离。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:116
+msgid "距离：{distance}"
+msgstr "距离：{distance}"
 
 #: src/features/settings/AppSettingsMenu.tsx:240
 #: src/features/settings/SettingsChoicesDialog.tsx:126
@@ -5519,6 +6736,11 @@ msgstr "跳转"
 #: src/features/formatter/use-formatter.ts:74
 msgid "跳转到行"
 msgstr "跳转到行"
+
+#. 围绕目标旋转三维相机。
+#: src/features/model-viewer/components/NavigationPanel.tsx:43
+msgid "轨道查看"
+msgstr "轨道查看"
 
 #: src/features/bt/BtTool.tsx:154
 #: src/features/bt/BtTool.tsx:170
@@ -5661,6 +6883,11 @@ msgstr "返回首页"
 msgid "返回首页？"
 msgstr "返回首页？"
 
+#. 恢复当前模型的材质、线框、法线显示和选择时的变形权重。
+#: src/features/model-viewer/components/PreviewPanel.tsx:200
+msgid "还原模型预览"
+msgstr "还原模型预览"
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:448
 msgid "还没有主机"
 msgstr "还没有主机"
@@ -5698,7 +6925,7 @@ msgstr "远端已有名称"
 msgid "远端文件夹名称"
 msgstr "远端文件夹名称"
 
-#: src/lib/errors/messages.ts:243
+#: src/lib/errors/messages.ts:271
 msgid "远端连接在终端打开前已关闭"
 msgstr "远端连接在终端打开前已关闭"
 
@@ -5769,9 +6996,19 @@ msgstr "退出对局"
 msgid "退出当前对局？"
 msgstr "退出当前对局？"
 
+#. 焊接后顶点重复或面积过小的三角形数。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:71
+msgid "退化三角形"
+msgstr "退化三角形"
+
 #: src/features/preview/ImagePreview.tsx:105
 msgid "适应窗口"
 msgstr "适应窗口"
+
+#. 在三维画布中心射线与模型交点处拾取测量点。
+#: src/features/model-viewer/components/CanvasControls.tsx:198
+msgid "选取中心点"
+msgstr "选取中心点"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:127
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:238
@@ -5779,6 +7016,10 @@ msgstr "适应窗口"
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:125
 msgid "选择"
 msgstr "选择"
+
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:82
+msgid "选择一个已加载模型以查看详情。"
+msgstr "选择一个已加载模型以查看详情。"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:278
 msgid "选择一个视频"
@@ -5870,6 +7111,11 @@ msgstr "选择月份"
 msgid "选择服务地址"
 msgstr "选择服务地址"
 
+#. 从设备选择本地三维模型文件。
+#: src/features/model-viewer/ModelViewerPage.tsx:452
+msgid "选择模型"
+msgstr "选择模型"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:268
 #: src/features/media-compress/video/VideoCompressPanel.tsx:286
 msgid "选择视频"
@@ -5895,6 +7141,10 @@ msgstr "选择移动位置"
 msgid "选择算法"
 msgstr "选择算法"
 
+#: src/features/model-viewer/components/CanvasControls.tsx:210
+msgid "选择终点"
+msgstr "选择终点"
+
 #: src/features/media-compress/resize/ImageResizePanel.tsx:315
 msgid "选择缩放比例"
 msgstr "选择缩放比例"
@@ -5914,6 +7164,10 @@ msgstr "选择计划时间"
 #: src/features/formatter/FormatterTool.tsx:104
 msgid "选择语言"
 msgstr "选择语言"
+
+#: src/features/model-viewer/components/CanvasControls.tsx:208
+msgid "选择起点"
+msgstr "选择起点"
 
 #: src/features/media-compress/video/VideoCompressPanel.tsx:339
 msgid "选择输出分辨率"
@@ -5936,9 +7190,22 @@ msgstr "选择需要清理的数据范围"
 msgid "选用"
 msgstr "选用"
 
+#. 模型材质的透明度纹理用途。
+#: src/features/model-viewer/components/ResourceDetails.tsx:91
+msgid "透明度"
+msgstr "透明度"
+
+#: src/features/model-viewer/components/MemoryPanel.tsx:106
+msgid "逐模型值包含共享引用，总计去重；隐藏模型仍占用内存。源数据字节量单列，不等于常驻内存。未计入临时预览、环境与诊断任务、材质对象、场景节点、着色器、驱动缓存与进程开销。"
+msgstr "逐模型值包含共享引用，总计去重；隐藏模型仍占用内存。源数据字节量单列，不等于常驻内存。未计入临时预览、环境与诊断任务、材质对象、场景节点、着色器、驱动缓存与进程开销。"
+
 #: src/features/about/DataManagementDialogs.tsx:127
 msgid "部分系统设置未能更新，请重新打开应用后检查。"
 msgstr "部分系统设置未能更新，请重新打开应用后检查。"
+
+#: src/features/model-viewer/components/MemoryPanel.tsx:112
+msgid "部分纹理、变形目标或动画分配无法估算，当前合计不完整。"
+msgstr "部分纹理、变形目标或动画分配无法估算，当前合计不完整。"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:262
 msgid "配置已更新，草稿已保留。请核对最新配置后再保存。"
@@ -5975,6 +7242,11 @@ msgstr "重启更新"
 msgid "重命名"
 msgstr "重命名"
 
+#. 模型动画从头反复播放。
+#: src/features/model-viewer/components/AnimationBar.tsx:56
+msgid "重复"
+msgstr "重复"
+
 #: src/features/games/engine/GameHeaderControls.tsx:73
 #: src/features/games/engine/GameHeaderControls.tsx:125
 msgid "重开"
@@ -6007,6 +7279,11 @@ msgstr "重新生成"
 #: src/features/preview/PreviewSurface.tsx:109
 msgid "重新读取"
 msgstr "重新读取"
+
+#. 恢复选中模型在最近一次自动布局中的位置。
+#: src/features/model-viewer/components/ModelList.tsx:248
+msgid "重置位置"
+msgstr "重置位置"
 
 #. 待办列表读取失败后重新加载
 #. 重新读取 BT 下载任务；通知监听失败时也会重新连接监听
@@ -6042,11 +7319,37 @@ msgstr "重新读取"
 msgid "重试"
 msgstr "重试"
 
+#. 用户主动重新保存未保存的模型或视图。
+#: src/features/model-viewer/components/LibraryPanel.tsx:298
+msgid "重试保存"
+msgstr "重试保存"
+
+#. 重新初始化或恢复 WebGL 三维画布。
+#: src/features/model-viewer/ModelViewerPage.tsx:331
+msgid "重试显示"
+msgstr "重试显示"
+
+#. PBR 材质 metalness，0 非金属到 1 金属。
+#. 模型材质的金属度属性。
+#. 模型材质的金属度纹理用途。
+#: src/features/model-viewer/components/PreviewPanel.tsx:143
+#: src/features/model-viewer/components/ResourceDetails.tsx:83
+#: src/features/model-viewer/components/ResourceDetails.tsx:131
+msgid "金属度"
+msgstr "金属度"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:69
 msgid "链接"
 msgstr "链接"
 
+#. 请求鼠标指针锁定以连续转动第一人称视角。
+#: src/features/model-viewer/components/CanvasControls.tsx:186
+msgid "锁定鼠标"
+msgstr "锁定鼠标"
+
+#. glTF 规范报告中的错误数量。
 #: src/features/bt/components/TaskRow.tsx:80
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:259
 #: src/store/transfers.ts:14
 msgid "错误"
 msgstr "错误"
@@ -6059,7 +7362,7 @@ msgstr "键升序"
 msgid "键降序"
 msgstr "键降序"
 
-#: src/features/home/home-descriptions.tsx:15
+#: src/features/home/home-descriptions.tsx:16
 msgid "阅读、收藏与翻译古诗词"
 msgstr "阅读、收藏与翻译古诗词"
 
@@ -6069,6 +7372,11 @@ msgstr "阅读、收藏与翻译古诗词"
 #: src/features/poetry/components/ReadingSettingsPopover.tsx:48
 msgid "阅读设置"
 msgstr "阅读设置"
+
+#. 显示模型投射和接收的实时阴影。
+#: src/features/model-viewer/components/PreviewPanel.tsx:50
+msgid "阴影"
+msgstr "阴影"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:136
 msgid "附近的房间"
@@ -6104,6 +7412,10 @@ msgstr "需口令"
 msgid "需要房间码"
 msgstr "需要房间码"
 
+#: src/features/model-viewer/components/ImportStatus.tsx:83
+msgid "需要补充依赖文件"
+msgstr "需要补充依赖文件"
+
 #. 游戏音量的静音切换按钮
 #: src/features/games/engine/GameVolumeControl.tsx:51
 #: src/features/preview/MediaPlayer.tsx:170
@@ -6116,6 +7428,11 @@ msgstr "静音"
 msgid "非当前地址"
 msgstr "非当前地址"
 
+#. 属于两个以上有效三角形的网格边数。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:57
+msgid "非流形边"
+msgstr "非流形边"
+
 #: src/features/preview/MediaPlayer.tsx:181
 msgid "音量"
 msgstr "音量"
@@ -6123,6 +7440,11 @@ msgstr "音量"
 #: src/features/bt/components/TorrentFileList.tsx:43
 msgid "音频"
 msgstr "音频"
+
+#. 模型唯一几何体中的顶点总数。
+#: src/features/model-viewer/components/ModelInspector.tsx:29
+msgid "顶点数"
+msgstr "顶点数"
 
 #: src/features/about/AboutPage.tsx:198
 #: src/features/settings/AppSettingsMenu.tsx:119
@@ -6137,12 +7459,32 @@ msgstr "预估 {estimatedBytesLabel}"
 msgid "预估 {estimatedMinLabel} ~ {estimatedMaxLabel}"
 msgstr "预估 {estimatedMinLabel} ~ {estimatedMaxLabel}"
 
+#. 模型显示效果、材质与变形编辑标签。
+#: src/features/model-viewer/components/InspectionPanel.tsx:32
+msgid "预览"
+msgstr "预览"
+
 #: src/components/ToolPageHeader.tsx:48
 #: src/features/games/engine/GameHeaderControls.tsx:28
 #: src/features/games/engine/GameHeaderControls.tsx:38
 #: src/features/settings/SettingsOverview.tsx:85
 msgid "首页"
 msgstr "首页"
+
+#. 使用本地 Khronos 验证器检查原始 glTF/GLB 及已授权依赖。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:223
+msgid "验证 glTF 规范"
+msgstr "验证 glTF 规范"
+
+#. version 是 Khronos glTF 规范验证器版本。
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:253
+msgid "验证器版本：{version}"
+msgstr "验证器版本：{version}"
+
+#. 模型骨骼矩阵数组内存。
+#: src/features/model-viewer/components/MemoryPanel.tsx:275
+msgid "骨骼数据"
+msgstr "骨骼数据"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:373
 msgid "高度"
@@ -6193,3 +7535,7 @@ msgstr "默认权限"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:304
 msgid "默认目录"
 msgstr "默认目录"
+
+#: src/features/model-viewer/components/ViewerHelp.tsx:48
+msgid "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"
+msgstr "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"

@@ -22,6 +22,15 @@ macro_rules! custom_codes {
 }
 
 custom_codes! {
+    ModelSourceInvalid => ("model:source_invalid", "Invalid model source or read range"),
+    ModelLibraryInvalid => ("model:library_invalid", "Invalid model library data or write range"),
+    ModelLibraryMissing => ("model:library_missing", "Model library entry is unavailable"),
+    ModelLibraryVersion => ("model:library_version", "Unsupported model library schema or view version"),
+    ModelResourceTooLarge => ("model:resource_too_large", "Model resource exceeds import limits"),
+    ModelUnsafePath => ("model:unsafe_path", "Model resource path is unsafe"),
+    ModelSessionLimit => ("model:session_limit", "Too many open model import sessions"),
+    ModelSessionClosed => ("model:session_closed", "Model import session is closed"),
+    ModelResourceMissing => ("model:resource_missing", "Model resource has not been selected"),
     AppShuttingDown => ("app:shutting_down", "Application is shutting down"),
     AppMaintenanceInProgress => ("app:maintenance_in_progress", "Application data maintenance is in progress"),
     AppOperationsBusy => ("app:operations_busy", "Execution pipeline did not become idle before maintenance deadline"),

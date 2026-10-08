@@ -3,7 +3,7 @@
 #[cfg(any(desktop, target_os = "android"))]
 use crate::modules::bt;
 use crate::modules::{
-    ai, game_room, hosts, keys, lan_transfer, maintenance, poetry, ssh, todo, vault,
+    ai, game_room, hosts, keys, lan_transfer, maintenance, model_viewer, poetry, ssh, todo, vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -34,6 +34,28 @@ macro_rules! common_modules {
     ($($platform:tt)*) => {
         define_registry! {
             "core" => { commands: [], types: [error::CustomErrorCode] },
+            "model_viewer" => {
+                commands: [
+                    model_viewer::commands::model_viewer_open,
+                    model_viewer::commands::model_viewer_attach,
+                    model_viewer::commands::model_viewer_size,
+                    model_viewer::commands::model_viewer_read,
+                    model_viewer::commands::model_viewer_close,
+                    model_viewer::library_commands::model_library_catalog,
+                    model_viewer::library_commands::model_library_begin,
+                    model_viewer::library_commands::model_library_write,
+                    model_viewer::library_commands::model_library_commit,
+                    model_viewer::library_commands::model_library_document,
+                    model_viewer::library_commands::model_library_read,
+                    model_viewer::library_commands::model_library_edit,
+                    model_viewer::library_commands::model_library_save_view,
+                    model_viewer::library_commands::model_library_delete,
+                    model_viewer::library_commands::model_library_thumbnail,
+                    model_viewer::library_commands::model_library_cache,
+                    model_viewer::library_commands::model_library_read_thumbnail,
+                ],
+                types: [],
+            },
             "ai" => {
                 commands: [
                     ai::configuration::commands::ai_configuration_get,

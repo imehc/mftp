@@ -4,6 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import {
   Archive,
   BookMarked,
+  Box,
   Braces,
   Circle,
   CircleDot,
@@ -49,6 +50,15 @@ export interface HomeEntry {
   title: ReactNode;
 }
 export const homeEntries: HomeEntry[] = [
+  {
+    id: "model-viewer",
+    category: "tools",
+    link: linkOptions({ to: "/tools/model-viewer", preload: "intent" }),
+    icon: Box,
+    title: (
+      <Trans comment="本地 GLB/glTF 三维模型查看工具名称。">3D 模型</Trans>
+    ),
+  },
   {
     id: "ssh-sftp",
     category: "tools",

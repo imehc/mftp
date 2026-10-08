@@ -121,6 +121,26 @@ export async function pickFilePathNative(
   return selected;
 }
 
+/** 原生多选只返回授权路径，不提前读取文件内容。 */
+export async function pickFilePathsNative(
+  options: NativeFilePickOptions,
+): Promise<string[] | null> {
+  if (!isTauriRuntime() || (isMobilePlatform() && !options.allowMobile))
+    return null;
+  const { open } = await import("@tauri-apps/plugin-dialog");
+  const selected = await open({
+    multiple: true,
+    directory: false,
+    title: options.title,
+    filters: [{ name: options.filterName, extensions: options.extensions }],
+  });
+  return Array.isArray(selected)
+    ? selected
+    : typeof selected === "string"
+      ? [selected]
+      : [];
+}
+
 /** 读取小文件为浏览器 File；大文件交给后端时使用路径入口，避免整包载入前端内存。 */
 export async function pickFileNative(
   options: NativeFilePickOptions,

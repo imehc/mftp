@@ -94,6 +94,7 @@ impl Storage {
         crate::modules::bt::schema::init(&mut conn)?;
         crate::modules::todo::schema::init(&mut conn)?;
         crate::modules::ai::schema::init(&mut conn)?;
+        crate::modules::model_viewer::schema::init(&mut conn)?;
         Ok(())
     }
 

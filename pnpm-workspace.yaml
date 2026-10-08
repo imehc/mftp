@@ -6,3 +6,6 @@ allowBuilds:
 # 两份实例会让 instanceof 校验失败,必须收敛到同一版本。
 overrides:
   "@codemirror/state": "$@codemirror/state"
+
+patchedDependencies:
+  three@0.186.1: patches/three@0.186.1.patch

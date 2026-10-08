@@ -29,8 +29,8 @@ function fixture() {
   return { a, b, view };
 }
 
-describe("existing AI candidate lookup", () => {
-  it("locates a trimmed label only within the edited address without activating it", () => {
+describe("现有 AI 候选项查找", () => {
+  it("仅在编辑中的地址内查找去除首尾空格的标签，不激活候选项", () => {
     const { a, view } = fixture();
     expect(
       findExistingItem(view, { kind: "key", provider: a }, " 个人 "),
@@ -41,7 +41,7 @@ describe("existing AI candidate lookup", () => {
     });
     expect(view.activeProviderId).toBe("b");
   });
-  it("excludes the item being edited and preserves model ID case sensitivity", () => {
+  it("排除正在编辑的项并保留模型 ID 的大小写敏感性", () => {
     const { a, view } = fixture();
     expect(
       findExistingItem(
@@ -64,7 +64,7 @@ describe("existing AI candidate lookup", () => {
       findExistingItem(view, { kind: "model", provider: a }, " model-A ")?.kind,
     ).toBe("model");
   });
-  it("uses the latest snapshot and never treats another address's candidate as a duplicate", () => {
+  it("使用最新快照，绝不把其他地址的候选项视为重复项", () => {
     const { a, view } = fixture();
     view.providers = [{ ...a, keys: [], models: [] }, view.providers[1]];
     expect(

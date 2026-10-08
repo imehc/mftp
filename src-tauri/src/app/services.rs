@@ -21,6 +21,8 @@ use crate::storage::Storage;
 
 /// The single shared service state injected via Tauri `State`.
 pub struct AppServices {
+    pub(crate) model_viewer: Arc<crate::modules::model_viewer::ModelViewerService>,
+    pub(crate) model_library: crate::modules::model_viewer::ModelLibraryRepository,
     pub storage: Storage,
     pub ai_tasks: Arc<AiTaskManager>,
     pub(crate) ai_configuration: Arc<AiConfigurationService<AiKeychain>>,
@@ -101,6 +103,8 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         }
     });
     let services = AppServices {
+        model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),
+        model_library: crate::modules::model_viewer::ModelLibraryRepository::new(storage.clone()),
         executor,
         ai_configuration,
         #[cfg(target_os = "android")]

@@ -33,8 +33,8 @@ const input = {
   modelId: "a-two",
 };
 
-describe("global AI model selection", () => {
-  it("switches the current address model using one backend snapshot without changing its key", async () => {
+describe("全局 AI 模型选择", () => {
+  it("使用一次后端快照切换当前地址模型且不改变其键", async () => {
     const view = snapshot();
     const next = snapshot();
     next.revision = 2;
@@ -47,7 +47,7 @@ describe("global AI model selection", () => {
     expect(store.getState().view).toEqual(next);
     expect(store.getState().view?.providers[0].currentKeyId).toBe("a-key");
   });
-  it("rejects other addresses, foreign models, stale versions and callbacks after an address switch", async () => {
+  it("地址切换后拒绝其他地址、外部模型、过期版本和回调", async () => {
     const write = vi.fn(async () => snapshot());
     const store = createAiConfigurationStore(async () => snapshot(), write);
     await store.getState().refresh();
@@ -70,7 +70,7 @@ describe("global AI model selection", () => {
     expect(await store.getState().switchModel(input)).toBe(false);
     expect(write).not.toHaveBeenCalled();
   });
-  it("blocks loading, busy and damaged addresses and does not rewrite the selected model", async () => {
+  it("阻止加载中、忙碌和损坏的地址且不重写所选模型", async () => {
     const write = vi.fn(async () => snapshot());
     const store = createAiConfigurationStore(async () => snapshot(), write);
     await store.getState().refresh();
@@ -87,7 +87,7 @@ describe("global AI model selection", () => {
     expect(await store.getState().switchModel(input)).toBe(false);
     expect(write).not.toHaveBeenCalled();
   });
-  it("refreshes after a version conflict without replaying the selection", async () => {
+  it("版本冲突后刷新但不重放选择操作", async () => {
     const next = snapshot();
     next.revision = 2;
     next.activeProviderId = "b";

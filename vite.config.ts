@@ -55,6 +55,7 @@ export default defineConfig(async () => ({
           // vendor chunk（Pixi）拉进首屏 HTML 的 modulepreload 列表。
           if (id.includes("vite/preload-helper")) return "runtime-preload";
           if (!id.includes("node_modules")) return;
+          if (id.includes("/three/")) return "vendor-three";
           if (id.includes("/pixi.js/") || id.includes("/@pixi/")) {
             return "vendor-pixi";
           }

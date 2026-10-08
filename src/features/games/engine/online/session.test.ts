@@ -110,7 +110,7 @@ beforeEach(() => {
   resetIpc();
 });
 
-test("malformed envelopes and controls are ignored without throwing", () => {
+test("忽略格式错误的信封和控制帧且不抛出异常", () => {
   for (const value of [
     null,
     [],
@@ -177,7 +177,7 @@ test("malformed envelopes and controls are ignored without throwing", () => {
   expect(parseFrame("{broken", parseGomokuMove)).toBe(null);
 });
 
-test("all current control frames and move envelopes retain their wire values", () => {
+test("所有当前控制帧和着法信封保留线路值", () => {
   for (const value of [
     { v: ONLINE_PROTOCOL_VERSION, t: "move", move },
     undoRequest,
@@ -190,7 +190,7 @@ test("all current control frames and move envelopes retain their wire values", (
     );
 });
 
-test("each game validates integral coordinates against its own board", () => {
+test("每个游戏都根据自身棋盘校验整数坐标", () => {
   expect(parseGomokuMove({ row: 14, col: 0 })).toStrictEqual({
     row: 14,
     col: 0,
@@ -240,7 +240,7 @@ test("each game validates integral coordinates against its own board", () => {
   ).toBe(null);
 });
 
-test("partial registration failure cleans successful and late listeners", async () => {
+test("部分注册失败时清理已成功和延迟完成的监听器", async () => {
   resetEvents(false);
   const attempt = createSession(status, parseGomokuMove);
   await tick();
@@ -263,7 +263,7 @@ test("partial registration failure cleans successful and late listeners", async 
   expect(leaves).toBe(0);
 });
 
-test("aborting registration returns promptly and cleans late completions", async () => {
+test("中止注册会及时返回并清理延迟完成项", async () => {
   resetEvents(false);
   const controller = new AbortController();
   const attempt = createSession(status, parseGomokuMove, controller.signal);
@@ -280,7 +280,7 @@ test("aborting registration returns promptly and cleans late completions", async
   expect(registrations.length).toBe(0);
 });
 
-test("closing is idempotent and callbacks already queued by the bridge are inert", async () => {
+test("关闭操作幂等，桥接层已排队的回调不会产生作用", async () => {
   const session = await createSession(status, parseGomokuMove);
   let moves = 0;
   session.onRemoteMove(() => moves++);
@@ -302,7 +302,7 @@ test("closing is idempotent and callbacks already queued by the bridge are inert
   expect(leaves).toBe(0);
 });
 
-test("a cleanup exception cannot prevent other listeners from being released", async () => {
+test("清理异常不能阻止其他监听器释放", async () => {
   const session = await createSession(status, parseGomokuMove);
   registrations[0].cleanupThrows = true;
   const warn = console.warn;
@@ -317,7 +317,7 @@ test("a cleanup exception cannot prevent other listeners from being released", a
   expect(session.isClosed).toBe(true);
 });
 
-test("queued moves and controls drain once in common arrival order", async () => {
+test("排队的着法和控制帧按共同到达顺序只排空一次", async () => {
   const session = await createSession(status, parseGomokuMove);
   emit(GAME_ROOM_MESSAGE, JSON.stringify(undoRequest));
   emit(GAME_ROOM_MESSAGE, rawMove);
@@ -332,7 +332,7 @@ test("queued moves and controls drain once in common arrival order", async () =>
   session.close();
 });
 
-test("asynchronous Tauri unlisten rejections are handled", async () => {
+test("处理异步 Tauri 取消监听的拒绝", async () => {
   const session = await createSession(status, parseGomokuMove);
   registrations[0].cleanupRejects = true;
   const warn = console.warn;
@@ -348,7 +348,7 @@ test("asynchronous Tauri unlisten rejections are handled", async () => {
   expect(registrations.every((entry) => entry.cleaned === 1)).toBeTruthy();
 });
 
-test("messages arriving during listener registration wait for their consumer", async () => {
+test("监听器注册期间到达的消息会等待消费者", async () => {
   resetEvents(false);
   const attempt = createSession(status, parseGomokuMove);
   await tick();
@@ -361,7 +361,7 @@ test("messages arriving during listener registration wait for their consumer", a
   session.close();
 });
 
-test("presence and closure received before consumer mounting are replayed", async () => {
+test("消费者挂载前收到的在线状态和关闭事件会重放", async () => {
   const session = await createSession(status, parseGomokuMove);
   emit(GAME_ROOM_PEER, { connected: false, name: null });
   const presence: boolean[] = [];
@@ -375,7 +375,7 @@ test("presence and closure received before consumer mounting are replayed", asyn
   expect(registrations.every((entry) => entry.cleaned === 1)).toBeTruthy();
 });
 
-test("buffer overflow terminates local delivery without canceling the backend", async () => {
+test("缓冲区溢出会终止本地投递但不取消后端", async () => {
   const session = await createSession(status, parseGomokuMove);
   for (let index = 0; index < 129; index++) emit(GAME_ROOM_MESSAGE, rawMove);
   expect(session.isClosed).toBe(true);
@@ -385,7 +385,7 @@ test("buffer overflow terminates local delivery without canceling the backend", 
   expect(leaves).toBe(0);
 });
 
-test("invalid frames do not reach consumers or prevent the next valid move", async () => {
+test("无效帧不会到达消费者，也不会阻止下一次有效着法", async () => {
   const session = await createSession(status, parseGomokuMove);
   const received: unknown[] = [];
   session.onRemoteMove((value) => received.push(value));
@@ -403,7 +403,7 @@ test("invalid frames do not reach consumers or prevent the next valid move", asy
   session.close();
 });
 
-test("sending keeps the existing move and control JSON shapes", async () => {
+test("发送时保留现有着法和控制 JSON 结构", async () => {
   const session = await createSession(status, parseGomokuMove);
   await session.sendMove(move);
   const acceptUndo: MatchControlMessage = {
@@ -419,7 +419,7 @@ test("sending keeps the existing move and control JSON shapes", async () => {
   session.close();
 });
 
-test("closed-session diagnostics use the active locale", async () => {
+test("已关闭会话的诊断使用当前语言环境", async () => {
   const controller = new AbortController();
   controller.abort();
   await expect(

@@ -10,6 +10,8 @@ export default tseslint.config(
     ignores: [
       "dist/**",
       "dist-ssr/**",
+      // 固定版本的第三方 WASM 解码器分发文件，保持上游原始字节。
+      "public/model-decoders/**",
       // 设计册包含拼接执行的浏览器/Figma 片段与生成包，由其独立 check 脚本验证。
       "docs/design/navigation-a/**",
       // Rust 管理的资源（如 lan_transfer 浏览器端）不属于前端代码
@@ -47,7 +49,11 @@ export default tseslint.config(
     },
   },
   {
-    files: ["*.config.{ts,js}", "scripts/**/*.mjs"],
+    files: [
+      "*.config.{ts,js}",
+      "scripts/**/*.mjs",
+      "docs/design/model-viewer/revision-2/build-plan.mjs",
+    ],
     languageOptions: {
       globals: { ...globals.node },
     },

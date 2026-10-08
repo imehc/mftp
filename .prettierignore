@@ -1,6 +1,7 @@
 dist
 dist-ssr
 pnpm-lock.yaml
+public/model-decoders
 src-tauri
 .codebuddy
 

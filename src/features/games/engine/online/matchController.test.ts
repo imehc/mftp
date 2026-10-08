@@ -143,7 +143,7 @@ function firstFrame<T extends MatchControlMessage["t"]>(
   return frame;
 }
 
-test("remote moves with wrong seq, seat or generation end the match", async () => {
+test("seq、座位或代数错误的远程着法会结束对局", async () => {
   const wrongSeq = newMatch();
   expect(play(wrongSeq.controllerA, 10)).toBe(true);
   await settle();
@@ -195,7 +195,7 @@ test("remote moves with wrong seq, seat or generation end the match", async () =
   future.release();
 });
 
-test("local input is locked while a negotiation is pending", async () => {
+test("协商进行时锁定本地输入", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();
   expect(play(controllerA, 10)).toBe(true);
@@ -234,7 +234,7 @@ test("local input is locked while a negotiation is pending", async () => {
   release();
 });
 
-test("a replayed undo agreement cannot rewind the board a second time", async () => {
+test("重放撤销协议不能再次回退棋盘", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();
   expect(play(controllerA, 10)).toBe(true);
@@ -270,7 +270,7 @@ test("a replayed undo agreement cannot rewind the board a second time", async ()
   release();
 });
 
-test("a duplicate peer request is ignored without a second response", async () => {
+test("忽略重复的对端请求且不发送第二次响应", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();
   expect(play(controllerA, 10)).toBe(true);
@@ -298,7 +298,7 @@ test("a duplicate peer request is ignored without a second response", async () =
   release();
 });
 
-test("crossed negotiation requests are each auto-rejected", async () => {
+test("交叉协商请求分别自动拒绝", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();
   expect(play(controllerA, 10)).toBe(true);
@@ -323,7 +323,7 @@ test("crossed negotiation requests are each auto-rejected", async () => {
   release();
 });
 
-test("an accepted rematch advances the round and swaps seats", async () => {
+test("接受再来一局后推进回合并交换座位", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();
   expect(play(controllerA, 10)).toBe(true);
@@ -378,7 +378,7 @@ test("an accepted rematch advances the round and swaps seats", async () => {
   release();
 });
 
-test("negotiation timeout ends the match and closes the transport", async () => {
+test("协商超时会结束对局并关闭传输", async () => {
   // 控制器内部的协商超时依赖 setTimeout；保留真实推进能力，
   // 只在需要时显式跨过 30s 的协商期限。
   vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -401,7 +401,7 @@ test("negotiation timeout ends the match and closes the transport", async () => 
   release();
 });
 
-test("an outbound send failure ends the match", async () => {
+test("向外发送失败会结束对局", async () => {
   const { transportA, controllerA, controllerB, release } = newMatch();
   expect(play(controllerA, 10)).toBe(true);
   await settle();
@@ -414,7 +414,7 @@ test("an outbound send failure ends the match", async () => {
   expect(controllerB.getSnapshot().end).toBe(null);
   release();
 });
-test("losing peer presence ends the match as peer-left", async () => {
+test("对端离线会以 peer-left 状态结束对局", async () => {
   const { transportA, transportB, controllerA, controllerB, release } =
     newMatch();
   transportA.emitPeerGone();

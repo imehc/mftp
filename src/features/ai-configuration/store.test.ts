@@ -31,8 +31,8 @@ const failure = {
   args: {},
 };
 
-describe("AI configuration synchronization", () => {
-  it("deduplicates concurrent metadata reads", async () => {
+describe("AI 配置同步", () => {
+  it("对并发元数据读取去重", async () => {
     const result = deferred<AiConfigurationView>();
     const read = vi.fn(() => result.promise);
     const store = createAiConfigurationStore(read);
@@ -44,7 +44,7 @@ describe("AI configuration synchronization", () => {
     expect(read).toHaveBeenCalledTimes(1);
     expect(store.getState().loading).toBe(false);
   });
-  it("does not let a late read overwrite a mutation snapshot", async () => {
+  it("不让延迟读取覆盖变更快照", async () => {
     const result = deferred<AiConfigurationView>();
     const store = createAiConfigurationStore(() => result.promise);
     const pending = store.getState().refresh();
@@ -54,7 +54,7 @@ describe("AI configuration synchronization", () => {
     expect(store.getState().view?.activeProviderId).toBe("B");
     expect(store.getState().view?.revision).toBe(2);
   });
-  it("rejects same-tick duplicate submissions without retaining their input", async () => {
+  it("拒绝同一时刻的重复提交且不保留输入", async () => {
     const result = deferred<AiConfigurationView>();
     const store = createAiConfigurationStore();
     const first = store.getState().execute(() => result.promise);
@@ -65,7 +65,7 @@ describe("AI configuration synchronization", () => {
     expect(await first).toBe(true);
     expect(store.getState().busy).toBe(false);
   });
-  it("refreshes conflicts but never replays the write or authentication", async () => {
+  it("刷新冲突但绝不重放写入或认证", async () => {
     const store = createAiConfigurationStore(async () => view(8));
     const mutation = vi.fn(async () => {
       throw failure;
@@ -75,7 +75,7 @@ describe("AI configuration synchronization", () => {
     expect(store.getState().view?.revision).toBe(8);
     expect(store.getState().error).toEqual(failure);
   });
-  it("keeps existing data on read errors instead of presenting empty configuration", async () => {
+  it("读取出错时保留现有数据，不显示空配置", async () => {
     const store = createAiConfigurationStore(async () => {
       throw failure;
     });
@@ -84,7 +84,7 @@ describe("AI configuration synchronization", () => {
     expect(store.getState().view?.activeProviderId).toBe("A");
     expect(store.getState().error).toEqual(failure);
   });
-  it("reloads partial deletion results while preserving the original error", async () => {
+  it("重新加载部分删除结果，同时保留原始错误", async () => {
     const store = createAiConfigurationStore(async () => view(6));
     await store.getState().execute(async () => view(5, "A"));
     const cleanup = {
@@ -98,7 +98,7 @@ describe("AI configuration synchronization", () => {
     expect(store.getState().view?.activeProviderId).toBeNull();
     expect(store.getState().error).toEqual(cleanup);
   });
-  it("replaces address and both selections atomically using the backend response", async () => {
+  it("使用后端响应原子替换地址和两个选择", async () => {
     const store = createAiConfigurationStore();
     const a = {
       id: "A",

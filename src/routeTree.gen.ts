@@ -27,6 +27,7 @@ import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
 import { Route as ToolsLanTransferRouteImport } from './routes/tools/lan-transfer'
 import { Route as ToolsMediaCompressRouteImport } from './routes/tools/media-compress'
+import { Route as ToolsModelViewerRouteImport } from './routes/tools/model-viewer'
 import { Route as ToolsSshSftpRouteImport } from './routes/tools/ssh-sftp'
 import { Route as ToolsTodoRouteImport } from './routes/tools/todo'
 import { Route as ToolsVaultRouteImport } from './routes/tools/vault'
@@ -122,6 +123,11 @@ const ToolsMediaCompressRoute = ToolsMediaCompressRouteImport.update({
   path: '/tools/media-compress',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsModelViewerRoute = ToolsModelViewerRouteImport.update({
+  id: '/tools/model-viewer',
+  path: '/tools/model-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsSshSftpRoute = ToolsSshSftpRouteImport.update({
   id: '/tools/ssh-sftp',
   path: '/tools/ssh-sftp',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
+  '/tools/model-viewer': typeof ToolsModelViewerRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
   '/tools/todo': typeof ToolsTodoRoute
   '/tools/vault': typeof ToolsVaultRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
+  '/tools/model-viewer': typeof ToolsModelViewerRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
   '/tools/todo': typeof ToolsTodoRoute
   '/tools/vault': typeof ToolsVaultRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/tools/image-compress': typeof ToolsImageCompressRoute
   '/tools/lan-transfer': typeof ToolsLanTransferRoute
   '/tools/media-compress': typeof ToolsMediaCompressRoute
+  '/tools/model-viewer': typeof ToolsModelViewerRoute
   '/tools/ssh-sftp': typeof ToolsSshSftpRoute
   '/tools/todo': typeof ToolsTodoRoute
   '/tools/vault': typeof ToolsVaultRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/tools/image-compress'
     | '/tools/lan-transfer'
     | '/tools/media-compress'
+    | '/tools/model-viewer'
     | '/tools/ssh-sftp'
     | '/tools/todo'
     | '/tools/vault'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/tools/image-compress'
     | '/tools/lan-transfer'
     | '/tools/media-compress'
+    | '/tools/model-viewer'
     | '/tools/ssh-sftp'
     | '/tools/todo'
     | '/tools/vault'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/tools/image-compress'
     | '/tools/lan-transfer'
     | '/tools/media-compress'
+    | '/tools/model-viewer'
     | '/tools/ssh-sftp'
     | '/tools/todo'
     | '/tools/vault'
@@ -309,6 +321,7 @@ export interface RootRouteChildren {
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
   ToolsLanTransferRoute: typeof ToolsLanTransferRoute
   ToolsMediaCompressRoute: typeof ToolsMediaCompressRoute
+  ToolsModelViewerRoute: typeof ToolsModelViewerRoute
   ToolsSshSftpRoute: typeof ToolsSshSftpRoute
   ToolsTodoRoute: typeof ToolsTodoRoute
   ToolsVaultRoute: typeof ToolsVaultRoute
@@ -444,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMediaCompressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/model-viewer': {
+      id: '/tools/model-viewer'
+      path: '/tools/model-viewer'
+      fullPath: '/tools/model-viewer'
+      preLoaderRoute: typeof ToolsModelViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/ssh-sftp': {
       id: '/tools/ssh-sftp'
       path: '/tools/ssh-sftp'
@@ -493,6 +513,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageCompressRoute: ToolsImageCompressRoute,
   ToolsLanTransferRoute: ToolsLanTransferRoute,
   ToolsMediaCompressRoute: ToolsMediaCompressRoute,
+  ToolsModelViewerRoute: ToolsModelViewerRoute,
   ToolsSshSftpRoute: ToolsSshSftpRoute,
   ToolsTodoRoute: ToolsTodoRoute,
   ToolsVaultRoute: ToolsVaultRoute,

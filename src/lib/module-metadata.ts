@@ -21,6 +21,7 @@ export const modules = [
   { id: "lan-transfer", tool: "lan-transfer", platforms: ["desktop"] },
   { id: "crypto", tool: "crypto" },
   { id: "media-compress", tool: "media-compress" },
+  { id: "model-viewer", tool: "model-viewer" },
   { id: "formatter", tool: "formatter" },
   { id: "vault", tool: "vault" },
   { id: "todo", tool: "todo" },

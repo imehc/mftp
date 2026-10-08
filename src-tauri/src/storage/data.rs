@@ -183,6 +183,7 @@ impl Storage {
         let mut changed = crate::modules::bt::schema::reset(&tx)?;
         changed += crate::modules::lan_transfer::schema::reset(&tx)?;
         changed += crate::modules::ai::schema::reset(&tx)?;
+        changed += crate::modules::model_viewer::schema::reset(&tx)?;
         for table in tables {
             changed += match table {
                 "hosts" => tx.execute("DELETE FROM hosts", [])?,
@@ -196,7 +197,8 @@ impl Storage {
                 "app_meta" => tx.execute(
                     "DELETE FROM app_meta WHERE key NOT IN (
                         'legacy_json_migrated', 'ai_schema_version', 'todo_schema_version',
-                        'bt_error_payload_schema_version', 'bt_download_only_migrated_v1'
+                        'bt_error_payload_schema_version', 'bt_download_only_migrated_v1',
+                        'model_viewer_schema_version'
                     )",
                     [],
                 )?,
