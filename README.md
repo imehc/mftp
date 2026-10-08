@@ -1,36 +1,101 @@
 # mftp
 
-一个轻量的桌面 SSH/SFTP 客户端，基于 **Tauri v2 + React 19 + Vite + Tailwind v4 + shadcn**。
-后端用 Rust `ssh2`（libssh2）实现 shell 与 SFTP 通道，前端用 xterm.js 呈现交互式终端。
+一个集成 SSH/SFTP、文件传输、下载、3D 模型查看和日常工具的跨平台应用，基于 **Tauri v2 + React 19 + TypeScript + Rust**。
+
+支持桌面、Android 和 iOS，各端使用自身的原生后端独立运行。界面提供中文、英文和明暗主题，按平台开放对应能力。
+
+[发布版本](https://github.com/imehc/mftp/releases)
 
 ## 功能
 
-| 模块          | 功能                                                                         |
-| ------------- | ---------------------------------------------------------------------------- |
-| SSH 终端      | 多标签、交互式 shell（xterm.js + ssh2 shell 通道），可调整大小               |
-| SFTP 文件管理 | 浏览、上传、下载、文件夹传输、删除、新建文件夹、重命名、移动、解压、冲突改名 |
-| 局域网传输    | 启动本机接收服务，二维码/浏览器访问，共享目录、白名单、确认码、权限控制      |
+| 模块          | 功能                                                                   |
+| ------------- | ---------------------------------------------------------------------- |
+| SSH 终端      | 主机与密钥管理、多标签交互式终端、远程系统监控                         |
+| SFTP 文件管理 | 浏览、上传下载、文件夹传输、重命名、移动、解压、冲突处理和文件预览     |
+| 局域网传输    | 本机接收服务、二维码和浏览器访问、共享目录、信任设备、确认码及权限控制 |
+| BT 下载       | 磁力链接与种子下载、任务控制、目录浏览、连接信息和原文件预览           |
+| 3D 模型       | GLB、glTF、FBX 预览，多模型场景、动画播放、资源检查、测量和本地模型库  |
+| 媒体处理      | 图片压缩、视频压缩和图片尺寸调整                                       |
+| JSON 格式化   | 语法校验、格式化、压缩、键排序、转义与反转义                           |
+| 编码工具      | 标准及 URL-safe Base64 编码、解码                                      |
+| 密码本        | 账号、密码、网址、分类和备注管理，支持搜索与筛选                       |
+| 待办事项      | 分类、备注、计划日期与时间、完成状态和逾期筛选                         |
+| 古诗词        | 下载合集后离线阅读、搜索、收藏，以及通过自配 AI 服务翻译和修订译文     |
+| 小游戏        | 台球、五子棋、围棋和中国象棋，提供练习、人机及房间对局等模式           |
 
-## 快速开始
+应用还提供 AI 服务配置、活动日志，以及主机、密码本、待办、局域网配置和诗词译文的分区导入导出。
 
-```bash
-pnpm install
-pnpm tauri dev     # 开发运行（桌面窗口）
-pnpm build         # 前端构建（会先编译多语言词典）
-pnpm tauri build   # 打包（同样会先编译多语言词典）
-```
+### 平台差异
 
-首次克隆后的 Plumb 和 TalkToFigma 配置见 [MCP 首次配置](docs/mcp-setup.md)。
+| 能力                                                | 桌面 | Android | iOS    |
+| --------------------------------------------------- | ---- | ------- | ------ |
+| SSH/SFTP、3D 模型、媒体处理、日常工具、诗词与小游戏 | 支持 | 支持    | 支持   |
+| 局域网传输模块                                      | 支持 | 不开放  | 不开放 |
+| BT 下载                                             | 支持 | 支持    | 不开放 |
+| 应用内自动更新、开机自启                            | 支持 | 不开放  | 不开放 |
+
+平台入口以 [`src/lib/module-metadata.ts`](src/lib/module-metadata.ts) 为准；原生插件也按平台分别注册。局域网传输模块的限制与小游戏房间功能分别管理。
+
+### 3D 模型查看
+
+模型及其依赖文件在当前设备处理。支持旋转、平移、缩放、坐标轴视角、自由移动、动画控制，以及场景树、材质纹理、几何统计、诊断和内存信息查看。
+
+| 格式 | 外置资源                                                | 本地模型库             |
+| ---- | ------------------------------------------------------- | ---------------------- |
+| GLB  | 依模型内容而定                                          | 可保存                 |
+| glTF | 外置的 `.bin`、纹理等资源需一并提供，缺失时可按路径补选 | 可保存                 |
+| FBX  | 支持 PNG、JPEG、WebP、BMP 贴图，缺失的外置贴图可补选    | 仅当前会话预览，不入库 |
+
+- 原生应用会将可归档的 GLB/glTF 模型保存到本机模型库，支持名称、分组、收藏、缩略图和视图状态管理。
+- 内置 Draco 与 KTX2/Basis 解码资源，随应用分发。
+- FBX 文件上限为 **64 MiB**，解析超时为 **30 秒**；模型展开数据、节点和纹理也有资源限制。
+- 鼠标拖动旋转、右键拖动平移、滚轮缩放；触屏单指旋转、双指平移或缩放。更多操作见查看器内的「操作帮助」。
 
 ## 技术栈
 
-- 前端：React 19、TypeScript、Vite、Tailwind v4、shadcn/ui、zustand、Lingui、@xterm/xterm
-- 后端：Tauri v2、Rust、ssh2（vendored-openssl）、tauri-plugin-dialog
+| 层级             | 技术                                                 |
+| ---------------- | ---------------------------------------------------- |
+| 应用与原生后端   | Tauri v2、Rust、ssh2/libssh2、SQLite                 |
+| 前端             | React 19、TypeScript、Vite、TanStack Router、Zustand |
+| UI 与交互        | shadcn/ui、Tailwind CSS v4、GSAP、TanStack Virtual   |
+| 终端与编辑器     | xterm.js、CodeMirror                                 |
+| 图形与媒体       | Three.js、PixiJS、Rapier、Mediabunny                 |
+| 下载与类型契约   | librqbit、Specta / tauri-specta                      |
+| 国际化与工程工具 | Lingui、pnpm、Vitest、ESLint、Prettier               |
+
+React Compiler 已启用。前后端 IPC 契约在 Rust 侧定义，由 Specta 生成 TypeScript 类型。
+
+## 项目结构
+
+```text
+src/
+├── routes/          # 路由、守卫和参数转交
+├── features/        # 按功能划分的页面、组件、状态和业务逻辑
+├── components/      # 跨功能组件，ui/ 为 shadcn 基础组件
+├── lib/             # 公共 IPC、事件、错误、平台和文件工具
+├── store/           # 全局状态与偏好
+├── locales/         # Lingui 翻译源
+├── themes/          # 主题样式
+└── bindings.ts      # Rust/Specta 生成的 IPC 类型
+
+src-tauri/src/
+├── app/             # 命令注册、服务装配和生命周期
+├── modules/         # 按功能划分的后端模块
+├── core/            # 共用执行与资源管理
+├── adapters/        # 平台与事件适配
+├── error/           # 统一错误协议
+└── storage/         # 数据库与迁移
+
+public/model-decoders/ # 随应用分发的模型解码器及许可证
+patches/               # 第三方依赖补丁
+scripts/               # 构建、版本与维护脚本
+docs/                  # 平台构建及开发说明
+```
 
 ## 注意事项
 
-- macOS 未签名包可能提示“mftp 已损坏，无法打开”，可执行：
+- macOS 未签名包可能提示“mftp 已损坏，无法打开”。确认安装包来源可信后，可移除隔离属性：
 
-> ```bash
-> xattr -dr com.apple.quarantine /Applications/mftp.app
-> ```
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/mftp.app
+  ```
