@@ -113,9 +113,7 @@ export default function DataManagementDialogs({
         <AlertDialogContent className="ui-density-adaptive md:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {c.resetWarnings ? (
-                <Trans>应用数据已清空</Trans>
-              ) : c.target === "all" ? (
+              {c.target === "all" ? (
                 <Trans>清空所有数据？</Trans>
               ) : (
                 t({
@@ -125,9 +123,7 @@ export default function DataManagementDialogs({
               )}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {c.resetWarnings ? (
-                <Trans>部分系统设置未能更新，请重新打开应用后检查。</Trans>
-              ) : c.target === "all" ? (
+              {c.target === "all" ? (
                 <Trans>
                   将删除所有应用内数据、缓存、日志和设置，并恢复首次打开状态。下载目录和共享目录中的文件会保留。
                 </Trans>
@@ -138,7 +134,7 @@ export default function DataManagementDialogs({
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {!c.resetWarnings && c.target && c.target !== "all" ? (
+          {c.target && c.target !== "all" ? (
             <div className="flex items-center justify-between gap-3 text-sm">
               <span>
                 <Trans>清理范围</Trans>
@@ -149,43 +145,28 @@ export default function DataManagementDialogs({
               </span>
             </div>
           ) : null}
-          {!c.resetWarnings ? (
-            <p className="text-muted-foreground text-xs">
-              <Trans>如果相关任务仍在运行，请先完成任务后再清理。</Trans>
-            </p>
-          ) : null}
+          <p className="text-muted-foreground text-xs">
+            <Trans>如果相关任务仍在运行，请先完成任务后再清理。</Trans>
+          </p>
           {c.writeError ? (
             <Alert variant="destructive">
               <AlertDescription>{describeError(c.writeError)}</AlertDescription>
             </Alert>
           ) : null}
-          {c.resetWarnings?.map((error, i) => (
-            <Alert key={i} variant="destructive">
-              <AlertDescription>{describeError(error)}</AlertDescription>
-            </Alert>
-          ))}
           <AlertDialogFooter>
-            {c.resetWarnings ? (
-              <Button onClick={() => window.location.assign("/")}>
-                <Trans>重新打开应用</Trans>
-              </Button>
-            ) : (
-              <>
-                <AlertDialogCancel disabled={c.busy}>
-                  <Trans>取消</Trans>
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  variant="destructive"
-                  disabled={c.busy}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    void c.confirm();
-                  }}
-                >
-                  {c.busy ? <Trans>正在清理…</Trans> : <Trans>确认清理</Trans>}
-                </AlertDialogAction>
-              </>
-            )}
+            <AlertDialogCancel disabled={c.busy}>
+              <Trans>取消</Trans>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={c.busy}
+              onClick={(e) => {
+                e.preventDefault();
+                void c.confirm();
+              }}
+            >
+              {c.busy ? <Trans>正在清理…</Trans> : <Trans>确认清理</Trans>}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

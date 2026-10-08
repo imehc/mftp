@@ -1,4 +1,21 @@
 # Pre-modularity IPC names; intentional additions must update this baseline.
+common model_system_poll
+common model_environment_begin
+common model_environment_write
+common model_environment_commit
+common model_environment_current
+common model_environment_read
+common model_environment_abort
+common model_environment_clear
+common model_attachment_list
+common model_attachment_add
+common model_attachment_read
+common model_attachment_delete
+common model_export_begin
+common model_export_write
+common model_export_present
+common model_export_cancel
+common model_export_close
 common model_viewer_open
 common model_viewer_attach
 common model_viewer_size
@@ -105,6 +122,9 @@ common data_import
 common app_data_usage
 common app_data_clear
 common app_data_reset
+common app_data_reset_status
+common app_data_reset_resume
+common app_data_reset_finish
 common poetry_collections
 common poetry_sync_check
 common poetry_sync_start

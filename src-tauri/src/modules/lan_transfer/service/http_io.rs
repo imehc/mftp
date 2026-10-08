@@ -18,16 +18,25 @@ pub(super) fn write_response(
     stream.write_all(body)
 }
 
+pub(super) struct FileResponseMetadata<'a> {
+    pub(super) content_type: &'a str,
+    pub(super) content_length: u64,
+    pub(super) headers: &'a [String],
+}
+
 pub(super) fn write_file_range_response(
     stream: &mut impl Write,
-    content_type: &str,
     file: &mut (impl Read + Seek),
     range: ResolvedRange,
-    content_length: u64,
-    headers: &[String],
+    metadata: FileResponseMetadata<'_>,
     tasks: &SharedTasks,
     task_id: &str,
 ) -> std::io::Result<()> {
+    let FileResponseMetadata {
+        content_type,
+        content_length,
+        headers,
+    } = metadata;
     let start = range.start;
     let end = range.end();
     let range_len = range.length;

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { installBtRuntime } from "~/features/bt/runtime/btRuntime";
+import { installModelSystemRuntime } from "~/features/model-viewer/system/inbox";
 import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
 import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
 import {
@@ -9,6 +10,8 @@ import {
   resolveColorTheme,
   resolveFontPreset,
 } from "~/lib/color-theme";
+import { applyDisplaySize } from "~/lib/display-size";
+import { router } from "~/router";
 import { useSettingsStore } from "~/store/settings";
 
 /**
@@ -19,7 +22,11 @@ import { useSettingsStore } from "~/store/settings";
  */
 export function AppRuntime() {
   const colorTheme = useSettingsStore((state) => state.colorTheme);
+  const displaySize = useSettingsStore((state) => state.displaySize);
   const fontPreset = useSettingsStore((state) => state.fontPreset);
+  useEffect(() => {
+    applyDisplaySize(displaySize);
+  }, [displaySize]);
   // 外观由根运行期应用，不依赖旧设置菜单是否挂载。
   useEffect(() => {
     applyColorTheme(resolveColorTheme(colorTheme));
@@ -28,11 +35,15 @@ export function AppRuntime() {
     applyFontPreset(resolveFontPreset(fontPreset));
   }, [fontPreset]);
   useEffect(() => {
+    const disposeModels = installModelSystemRuntime(() =>
+      router.navigate({ to: "/tools/model-viewer" }),
+    );
     const disposeTransfers = installTransferRuntime();
     const disposeBt = installBtRuntime();
     const disposePoetry = installPoetrySyncRuntime();
     return () => {
       // 逆序清理；单个模块的清理失败不应阻止其他模块释放资源。
+      disposeModels();
       disposePoetry();
       disposeBt();
       disposeTransfers();

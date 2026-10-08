@@ -12,19 +12,35 @@ import {
 } from "three";
 
 import { type IpcError, toIpcError } from "~/lib/errors";
+import { isTauriRuntime } from "~/lib/files";
 
 import { modelError } from "../domain/errors";
+import {
+  readEnvironment,
+  saveEnvironment,
+} from "../library/environment-storage";
 
 export class ViewerEnvironment {
   private state: {
     busy: boolean;
     name: string | null;
     error: IpcError | null;
-  } = { busy: false, name: null, error: null };
+    storageError: IpcError | null;
+    saving: boolean;
+  } = {
+    busy: false,
+    name: null,
+    error: null,
+    storageError: null,
+    saving: false,
+  };
   private listeners = new Set<() => void>();
   private generation = 0;
   private disposed = false;
   private finish: ((error?: unknown) => void) | null = null;
+  private storageTask: AbortController | null = null;
+  private source: File | null = null;
+  private restoreFailed = false;
   private target: WebGLRenderTarget | null = null;
   private texture: DataTexture | null = null;
   constructor(
@@ -43,11 +59,12 @@ export class ViewerEnvironment {
     this.state = { ...this.state, ...patch };
     this.listeners.forEach((l) => l());
   }
-  async load(file: File) {
+  async load(file: File, persist = true) {
     if (this.disposed) return;
     this.cancel();
     const generation = ++this.generation;
-    this.publish({ busy: true, error: null });
+    this.restoreFailed = false;
+    this.publish({ busy: true, error: null, storageError: null });
     try {
       await new Promise<void>((resolve, reject) => {
         const worker = new Worker(new URL("./hdr.worker.ts", import.meta.url), {
@@ -104,7 +121,11 @@ export class ViewerEnvironment {
         };
         worker.postMessage(file);
       });
-      if (generation === this.generation) this.publish({ name: file.name });
+      if (generation === this.generation) {
+        this.source = file;
+        this.publish({ name: file.name, storageError: null });
+        if (persist) await this.persist(generation);
+      }
     } catch (error) {
       if (generation === this.generation) {
         this.finish?.(error);
@@ -116,8 +137,10 @@ export class ViewerEnvironment {
   }
   cancel() {
     this.generation++;
+    this.storageTask?.abort();
+    this.storageTask = null;
     this.finish?.(new DOMException("Cancelled", "AbortError"));
-    this.publish({ busy: false });
+    this.publish({ busy: false, saving: false });
   }
   private release() {
     this.scene.environment = null;
@@ -128,14 +151,69 @@ export class ViewerEnvironment {
     this.texture = null;
   }
   clear() {
+    if (this.disposed) return;
     this.cancel();
     this.release();
-    this.publish({ name: null, error: null });
+    this.source = null;
+    this.restoreFailed = false;
+    this.publish({ name: null, error: null, storageError: null });
     this.invalidate();
+    void this.persist(this.generation);
+  }
+  async restore() {
+    if (this.disposed || !isTauriRuntime()) return;
+    this.cancel();
+    const generation = this.generation;
+    const task = new AbortController();
+    this.storageTask = task;
+    this.restoreFailed = false;
+    this.publish({ busy: true, storageError: null });
+    try {
+      const file = await readEnvironment(task.signal);
+      if (generation === this.generation && file) await this.load(file, false);
+    } catch (error) {
+      if (generation === this.generation) {
+        this.restoreFailed = true;
+        this.publish({ storageError: toIpcError(error) });
+      }
+    } finally {
+      if (generation === this.generation) {
+        this.storageTask = null;
+        this.publish({ busy: false });
+      }
+    }
+  }
+  private async persist(generation: number) {
+    if (!isTauriRuntime() || this.disposed) return;
+    const task = new AbortController();
+    this.storageTask = task;
+    this.publish({ saving: true });
+    try {
+      await saveEnvironment(this.source, task.signal);
+      if (generation === this.generation) this.publish({ storageError: null });
+    } catch (error) {
+      if (generation === this.generation)
+        this.publish({ storageError: toIpcError(error) });
+    } finally {
+      if (generation === this.generation) {
+        this.storageTask = null;
+        this.publish({ saving: false });
+      }
+    }
+  }
+  retrySave() {
+    if (!this.disposed && !this.state.busy && !this.state.saving)
+      return this.restoreFailed
+        ? this.restore()
+        : this.persist(this.generation);
+    return Promise.resolve();
   }
   dispose() {
     this.disposed = true;
-    this.clear();
+    this.cancel();
+    this.release();
+    this.source = null;
+    this.publish({ name: null, error: null, storageError: null });
     this.listeners.clear();
   }
 }

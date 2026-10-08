@@ -1,15 +1,13 @@
 use crate::error::{AppError, AppResult, CustomErrorCode};
-use crate::models::{AppDataClearResult, AppDataModule, AppDataUsage};
-use rusqlite::Connection;
+use crate::models::AppDataModule;
 use std::fs;
 use std::path::Path;
-use walkdir::WalkDir;
 
 use super::Storage;
 
 // A reset detaches the live BT directory into this prefix before deleting;
 // leftovers from a failed pass are swept by the next `Storage::new`.
-const BT_TOMBSTONE_PREFIX: &str = "bt.pending-delete-";
+pub(super) const BT_TOMBSTONE_PREFIX: &str = "bt.pending-delete-";
 
 fn detach_bt_directory(path: &Path, tombstone: &Path) -> AppResult<bool> {
     // An inaccessible path is not an absent one. Never delete in place if
@@ -21,117 +19,7 @@ fn detach_bt_directory(path: &Path, tombstone: &Path) -> AppResult<bool> {
     Ok(true)
 }
 
-fn file_family_size(path: &Path) -> u64 {
-    ["", "-wal", "-shm"]
-        .iter()
-        .filter_map(|suffix| fs::metadata(format!("{}{}", path.display(), suffix)).ok())
-        .map(|metadata| metadata.len())
-        .sum()
-}
-
-fn dir_size(path: &Path) -> u64 {
-    if !path.exists() {
-        return 0;
-    }
-    WalkDir::new(path)
-        .into_iter()
-        .filter_map(Result::ok)
-        .filter_map(|entry| entry.metadata().ok())
-        .filter(|metadata| metadata.is_file())
-        .map(|metadata| metadata.len())
-        .sum()
-}
-
-fn query_bytes(conn: &Connection, query: &str) -> u64 {
-    conn.query_row(query, [], |row| row.get::<_, Option<i64>>(0))
-        .ok()
-        .flatten()
-        .unwrap_or(0)
-        .max(0) as u64
-}
-
 impl Storage {
-    pub fn app_data_usage(&self) -> AppDataUsage {
-        let poetry = self.root.join("poetry.sqlite3");
-        let main_database_bytes = file_family_size(&self.db_path);
-        let poetry_database_bytes = file_family_size(&poetry);
-        let bt_internal_bytes = self.bt_internal_bytes();
-        let (vault_bytes, hosts_bytes, todo_bytes, activity_logs_bytes) = self
-            .conn()
-            .ok()
-            .map(|conn| {
-                (
-                    query_bytes(
-                        &conn,
-                        "SELECT COALESCE(SUM(
-                            LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(title, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(url, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(username, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(password, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(category, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(notes, '') AS BLOB))
-                        ), 0) FROM vault_entries",
-                    ),
-                    query_bytes(
-                        &conn,
-                        "SELECT (
-                            SELECT COALESCE(SUM(
-                                LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(label, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(host, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(username, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(auth_type, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(password, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(key_id, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(default_path, '') AS BLOB))
-                            ), 0) FROM hosts
-                        ) + (
-                            SELECT COALESCE(SUM(
-                                LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(label, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(filename, '') AS BLOB)) +
-                                LENGTH(CAST(COALESCE(private_key, '') AS BLOB))
-                            ), 0) FROM ssh_keys
-                        )",
-                    ),
-                    query_bytes(
-                        &conn,
-                        "SELECT COALESCE(SUM(
-                            LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(title, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(category, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(notes, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(due_date, '') AS BLOB))
-                        ), 0) FROM todo_items",
-                    ),
-                    query_bytes(
-                        &conn,
-                        "SELECT COALESCE(SUM(
-                            LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(source, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(ip, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(request_type, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(result, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(detail, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(error_payload, '') AS BLOB))
-                        ), 0) FROM activity_logs",
-                    ),
-                )
-            })
-            .unwrap_or_default();
-        AppDataUsage {
-            vault_bytes,
-            hosts_bytes,
-            todo_bytes,
-            main_database_bytes,
-            poetry_database_bytes,
-            activity_logs_bytes,
-            bt_internal_bytes,
-            total_bytes: main_database_bytes + poetry_database_bytes + bt_internal_bytes,
-        }
-    }
-
     pub fn clear_data_module(&self, module: AppDataModule) -> AppResult<u32> {
         let mut conn = self.conn()?;
         let tx = conn.transaction()?;
@@ -158,20 +46,27 @@ impl Storage {
         let path = self.root.join("poetry.sqlite3");
         for suffix in ["", "-wal", "-shm"] {
             let target = format!("{}{}", path.display(), suffix);
-            if Path::new(&target).exists() {
+            if Path::new(&target).try_exists()? {
                 fs::remove_file(target)?;
             }
         }
         let temp_dir = self.root.join("poetry-tmp");
-        if temp_dir.exists() {
+        if temp_dir.try_exists()? {
             fs::remove_dir_all(temp_dir)?;
         }
         Ok(())
     }
 
+    #[cfg(test)]
     pub fn reset_database(&self) -> AppResult<u32> {
         let mut conn = self.conn()?;
         let tx = conn.transaction()?;
+        let changed = Self::reset_database_in(&tx)?;
+        tx.commit()?;
+        Ok(changed)
+    }
+
+    pub(super) fn reset_database_in(tx: &rusqlite::Transaction<'_>) -> AppResult<u32> {
         let tables = [
             "hosts",
             "ssh_keys",
@@ -180,10 +75,10 @@ impl Storage {
             "todo_items",
             "app_meta",
         ];
-        let mut changed = crate::modules::bt::schema::reset(&tx)?;
-        changed += crate::modules::lan_transfer::schema::reset(&tx)?;
-        changed += crate::modules::ai::schema::reset(&tx)?;
-        changed += crate::modules::model_viewer::schema::reset(&tx)?;
+        let mut changed = crate::modules::bt::schema::reset(tx)?;
+        changed += crate::modules::lan_transfer::schema::reset(tx)?;
+        changed += crate::modules::ai::schema::reset(tx)?;
+        changed += crate::modules::model_viewer::schema::reset(tx)?;
         for table in tables {
             changed += match table {
                 "hosts" => tx.execute("DELETE FROM hosts", [])?,
@@ -205,7 +100,6 @@ impl Storage {
                 _ => 0,
             };
         }
-        tx.commit()?;
         Ok(changed as u32)
     }
 
@@ -222,7 +116,19 @@ impl Storage {
             .root
             .join(format!("{BT_TOMBSTONE_PREFIX}{}", uuid::Uuid::new_v4()));
         if detach_bt_directory(&path, &tombstone)? {
-            self.delete_bt_tombstone(&tombstone);
+            fs::remove_dir_all(&tombstone)?;
+        }
+        // A previous attempt may have detached successfully before deletion
+        // failed. Keep that phase pending until its detached data is gone.
+        for entry in fs::read_dir(&self.root)? {
+            let entry = entry?;
+            if entry
+                .file_name()
+                .to_string_lossy()
+                .starts_with(BT_TOMBSTONE_PREFIX)
+            {
+                fs::remove_dir_all(entry.path())?;
+            }
         }
         Ok(())
     }
@@ -249,38 +155,6 @@ impl Storage {
             {
                 self.delete_bt_tombstone(&entry.path());
             }
-        }
-    }
-
-    fn bt_internal_bytes(&self) -> u64 {
-        let mut bytes = dir_size(&self.root.join("bt"));
-        let Ok(entries) = fs::read_dir(&self.root) else {
-            return bytes;
-        };
-        for entry in entries.flatten() {
-            if entry
-                .file_name()
-                .to_string_lossy()
-                .starts_with(BT_TOMBSTONE_PREFIX)
-            {
-                bytes += dir_size(&entry.path());
-            }
-        }
-        bytes
-    }
-
-    pub fn data_clear_result(
-        &self,
-        module: AppDataModule,
-        records_deleted: u32,
-        before: u64,
-        preserved: Vec<String>,
-    ) -> AppDataClearResult {
-        AppDataClearResult {
-            module,
-            records_deleted,
-            bytes_freed: before.saturating_sub(self.app_data_usage().total_bytes),
-            preserved,
         }
     }
 }

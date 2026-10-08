@@ -2,11 +2,11 @@ use super::*;
 
 #[cfg(not(target_os = "android"))]
 #[path = "ai_native_tests.rs"]
-mod native;
+pub(super) mod native;
 
 #[cfg(not(target_os = "android"))]
 #[path = "ai_migration_native_tests.rs"]
-mod native_migration;
+pub(super) mod native_migration;
 
 #[test]
 fn references_accept_only_owned_accounts() {

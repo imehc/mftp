@@ -1,6 +1,7 @@
 use super::super::ports::{emit_progress, EventSink};
 use super::auth::SSH_OPERATION_TIMEOUT_MS;
 use super::transfer_io::{copy_download, seek_transfer, verify_size};
+use super::transfer_models::TransferProgressContext;
 use super::transfer_retry::{run_transfer, AttemptError};
 use super::types::{DirectoryTransferMode, Manager, TransferGuard};
 use crate::error::AppResult;
@@ -16,14 +17,22 @@ impl Manager {
         remote: &str,
         local: &Path,
         expected_size: Option<u64>,
-        events: Option<&EventSink>,
-        transfer_id: Option<&str>,
-        phase: &str,
-        completed_before: u64,
-        total: Option<u64>,
+        progress: TransferProgressContext<'_>,
         transfer: Option<&TransferGuard>,
     ) -> AppResult<()> {
-        let mut local_file = OpenOptions::new().create(true).write(true).open(local)?;
+        let TransferProgressContext {
+            events,
+            transfer_id,
+            phase,
+            completed_before,
+            total,
+        } = progress;
+        // Preserve the acknowledged prefix for resume; trim any stale tail below.
+        let mut local_file = OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .write(true)
+            .open(local)?;
         let initial_size = local_file.metadata()?.len();
         let transferred =
             Cell::new(expected_size.map_or(initial_size, |size| initial_size.min(size)));

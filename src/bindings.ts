@@ -4,6 +4,27 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 
 /** Commands */
 export const commands = {
+	modelSystemPoll: () => typedError<ModelSystemSnapshot, AppError>(__TAURI_INVOKE("model_system_poll")),
+	modelEnvironmentBegin: (name: string, size: number) => typedError<string, AppError>(__TAURI_INVOKE("model_environment_begin", { name, size })),
+	modelEnvironmentWrite: (id: string, offset: number, bytes: number[]) => typedError<null, AppError>(__TAURI_INVOKE("model_environment_write", { id, offset, bytes })),
+	modelEnvironmentCommit: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_environment_commit", { id })),
+	modelEnvironmentCurrent: () => typedError<{
+	id: string,
+	name: string,
+	size: number,
+} | null, AppError>(__TAURI_INVOKE("model_environment_current")),
+	modelEnvironmentRead: (id: string, offset: number) => typedError<number[], AppError>(__TAURI_INVOKE("model_environment_read", { id, offset })),
+	modelEnvironmentAbort: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_environment_abort", { id })),
+	modelEnvironmentClear: () => typedError<null, AppError>(__TAURI_INVOKE("model_environment_clear")),
+	modelAttachmentList: (model: string) => typedError<ModelAttachment[], AppError>(__TAURI_INVOKE("model_attachment_list", { model })),
+	modelAttachmentAdd: (model: string, name: string, bytes: number[]) => typedError<string, AppError>(__TAURI_INVOKE("model_attachment_add", { model, name, bytes })),
+	modelAttachmentRead: (model: string, id: string) => typedError<number[], AppError>(__TAURI_INVOKE("model_attachment_read", { model, id })),
+	modelAttachmentDelete: (model: string, id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_attachment_delete", { model, id })),
+	modelExportBegin: (name: string, size: number) => typedError<string, AppError>(__TAURI_INVOKE("model_export_begin", { name, size })),
+	modelExportWrite: (id: string, offset: number, bytes: number[]) => typedError<null, AppError>(__TAURI_INVOKE("model_export_write", { id, offset, bytes })),
+	modelExportPresent: (id: string, action: ModelExportAction) => typedError<ModelExportOutcome, AppError>(__TAURI_INVOKE("model_export_present", { id, action })),
+	modelExportCancel: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_export_cancel", { id })),
+	modelExportClose: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_export_close", { id })),
 	modelViewerOpen: (path: string) => typedError<ModelImportSession, AppError>(__TAURI_INVOKE("model_viewer_open", { path })),
 	modelViewerAttach: (id: string, key: string, path: string) => typedError<null, AppError>(__TAURI_INVOKE("model_viewer_attach", { id, key, path })),
 	modelViewerSize: (id: string, key: string) => typedError<number, AppError>(__TAURI_INVOKE("model_viewer_size", { id, key })),
@@ -116,6 +137,13 @@ export const commands = {
 	appDataUsage: () => typedError<AppDataUsage, AppError>(__TAURI_INVOKE("app_data_usage")),
 	appDataClear: (module: AppDataModule) => typedError<AppDataClearResult, AppError>(__TAURI_INVOKE("app_data_clear", { module })),
 	appDataReset: () => typedError<AppDataResetResult, AppError>(__TAURI_INVOKE("app_data_reset")),
+	appDataResetStatus: () => typedError<{
+	id: string,
+	recordsDeleted: number,
+	pending: AppDataResetStep[],
+} | null, AppError>(__TAURI_INVOKE("app_data_reset_status")),
+	appDataResetResume: (id: string) => typedError<AppDataResetResult, AppError>(__TAURI_INVOKE("app_data_reset_resume", { id })),
+	appDataResetFinish: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("app_data_reset_finish", { id })),
 	poetryCollections: () => typedError<PoetryCollectionStatus[], AppError>(__TAURI_INVOKE("poetry_collections")),
 	poetrySyncCheck: () => typedError<PoetrySyncPlan, AppError>(__TAURI_INVOKE("poetry_sync_check")),
 	poetrySyncStart: (collectionIds: string[]) => typedError<null, AppError>(__TAURI_INVOKE("poetry_sync_start", { collectionIds })),
@@ -345,17 +373,34 @@ export type AiStreamingUpdateInput = {
 export type AppDataClearResult = {
 	module: AppDataModule,
 	recordsDeleted: number,
-	bytesFreed: number,
+	bytesFreed: number | null,
+	usageError: AppError | null,
 	preserved: string[],
 };
 
 export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs";
 
-export type AppDataResetResult = {
+export type AppDataResetFailure = {
+	step: AppDataResetStep,
+	error: AppError,
+};
+
+export type AppDataResetProgress = {
+	id: string,
 	recordsDeleted: number,
-	bytesFreed: number,
+	pending: AppDataResetStep[],
+};
+
+export type AppDataResetResult = {
+	progress: AppDataResetProgress,
+	failures: AppDataResetFailure[],
+	recordsDeleted: number,
+	bytesFreed: number | null,
+	usageError: AppError | null,
 	preserved: string[],
 };
+
+export type AppDataResetStep = "poetry" | "bt" | "credentials";
 
 export type AppDataUsage = {
 	vaultBytes: number,
@@ -504,7 +549,7 @@ export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" 
 
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
-export type CustomErrorCode = "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+export type CustomErrorCode = "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
 
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts" | "todo" | "lan" | "aiTranslations";
@@ -706,12 +751,31 @@ export type LanTrustedDeviceInput = {
 	ip: string,
 };
 
+export type ModelAttachment = {
+	id: string,
+	name: string,
+	kind: ModelAttachmentKind,
+	size: number,
+};
+
+export type ModelAttachmentKind = "text" | "markdown" | "pdf";
+
 export type ModelCameraState = {
 	position: [number, number, number],
 	target: [number, number, number],
 	near: number,
 	far: number,
 };
+
+export type ModelEnvironment = {
+	id: string,
+	name: string,
+	size: number,
+};
+
+export type ModelExportAction = "save" | "share";
+
+export type ModelExportOutcome = "saved" | "cancelled" | "presented";
 
 export type ModelImportSession = {
 	id: string,
@@ -761,6 +825,12 @@ export type ModelLibraryResource = {
 	size: number,
 };
 
+export type ModelOpenRequest = {
+	id: string,
+	path: string,
+	name: string,
+};
+
 export type ModelPlaybackState = {
 	selected: number,
 	time: number,
@@ -775,6 +845,14 @@ export type ModelSavedView = {
 	name: string,
 	camera: ModelCameraState,
 };
+
+export type ModelSystemSnapshot = {
+	files: ModelOpenRequest[],
+	failed: boolean,
+	thermal: ModelThermalState,
+};
+
+export type ModelThermalState = "unknown" | "nominal" | "fair" | "serious" | "critical";
 
 export type ModelViewState = {
 	version: number,

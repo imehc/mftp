@@ -6,6 +6,7 @@ import type { AppError } from "~/bindings";
 import { Button } from "~/components/ui/button";
 import { describeError, toIpcError } from "~/lib/errors";
 import { poetryBrowse } from "~/lib/ipc";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import type { PoemSummary } from "~/types";
 
 import PoemCard from "./PoemCard";
@@ -132,6 +133,7 @@ export default function PoemList({
     estimateSize: () => 92,
     overscan: 8,
   });
+  useVirtualizerFontSize(virtualizer);
   return (
     <div
       ref={scrollRef}

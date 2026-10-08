@@ -2,6 +2,16 @@ import { frontendError, IpcError } from "~/lib/errors";
 
 export function modelError(
   code:
+    | "attachment_invalid"
+    | "system_open"
+    | "capture"
+    | "recording_unsupported"
+    | "recording_failed"
+    | "recording_limit"
+    | "recording_save"
+    | "export"
+    | "export_invalid"
+    | "export_mobile_only"
     | "invalid"
     | "unsupported"
     | "unsafe"

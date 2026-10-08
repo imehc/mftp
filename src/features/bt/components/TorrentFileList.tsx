@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { Checkbox } from "~/components/ui/checkbox";
 import { formatBytes } from "~/lib/format";
 import { type PreviewKind, previewKind } from "~/lib/preview-kind";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import type { BtFileMeta } from "~/types";
 
 const KIND_ICONS = {
@@ -56,6 +57,7 @@ const TorrentFileList = function TorrentFileList({
     estimateSize: () => 44,
     overscan: 10,
   });
+  useVirtualizerFontSize(virtualizer);
   const allSelected = files.length > 0 && selected.size === files.length;
   const selectedSize = selected.size;
   const filesLength = files.length;

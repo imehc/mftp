@@ -43,6 +43,7 @@ import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 
 import type { ModelLibraryController } from "../library/controller";
+import { AttachmentsDialog } from "./AttachmentsDialog";
 import { LibraryEntryEditor } from "./LibraryEntryEditor";
 import { LibraryList } from "./LibraryList";
 
@@ -69,6 +70,9 @@ export function LibraryPanel({
   const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState(false);
   const [editing, setEditing] = useState<ModelLibraryEntry | null>(null);
+  const [attachments, setAttachments] = useState<ModelLibraryEntry | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState<ModelLibraryEntry | null>(null);
   const catalog = state.catalog;
   const busy = state.busy > 0;
@@ -146,6 +150,10 @@ export function LibraryPanel({
               edit={(entry, trigger) => {
                 returnFocus.current = trigger;
                 setEditing(entry);
+              }}
+              attachments={(entry, trigger) => {
+                returnFocus.current = trigger;
+                setAttachments(entry);
               }}
               remove={(entry, trigger) => {
                 returnFocus.current = trigger;
@@ -231,6 +239,17 @@ export function LibraryPanel({
           ) : null}
         </DialogContent>
       </Dialog>
+      {attachments ? (
+        <AttachmentsDialog
+          key={attachments.id}
+          entry={attachments}
+          close={() => setAttachments(null)}
+          restoreFocus={restoreFocus}
+          changed={() => {
+            void controller.refresh().catch(controller.report);
+          }}
+        />
+      ) : null}
       {editing ? (
         <LibraryEntryEditor
           key={editing.id}
@@ -258,7 +277,9 @@ export function LibraryPanel({
               <Trans>从模型库删除？</Trans>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              <Trans>删除本机保存的副本，原始文件和当前画布不受影响。</Trans>
+              <Trans>
+                删除本机保存的模型及附件副本，原始文件和当前画布不受影响。
+              </Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

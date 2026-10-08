@@ -2,7 +2,7 @@
 //!
 //! Layout:
 //! - `catalog`   — declarative collection catalog (`catalog.json`); categories
-//!                 are data, never hardcoded
+//!   are data, never hardcoded
 //! - `adapter`   — config-driven parsing abstraction for source documents
 //! - `text`      — script folding, uids, FTS token generation
 //! - `db`        — `poetry.sqlite3` schema + import writer

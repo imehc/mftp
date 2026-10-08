@@ -84,7 +84,7 @@ pub(crate) async fn verify_roundtrip(
 #[test]
 #[ignore = "writes and removes fresh temporary accounts in the native credential store"]
 fn native_credential_roundtrip() {
-    let credentials = crate::adapters::ai::AiKeychain::default();
+    let credentials = crate::adapters::ai::AiKeychain::isolated_native_test();
     tauri::async_runtime::block_on(verify_roundtrip(&credentials, |step| {
         println!("native credential check: {step}");
     }))

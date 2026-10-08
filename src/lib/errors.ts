@@ -1,3 +1,5 @@
+import type { MessageDescriptor } from "@lingui/core";
+
 import type { AppError, CustomErrorCode } from "~/bindings";
 import { translate } from "~/i18n/translate";
 
@@ -93,37 +95,44 @@ export function toIpcError(value: unknown): IpcError {
 }
 
 // 个别 custom code 的 args 携带后端稳定标识，展示前先在公共层翻译为名称。
-function resolveValues(code: string, args: AppError["args"]): AppError["args"] {
+function resolveValues(
+  code: string,
+  args: AppError["args"],
+  localize: (message: MessageDescriptor) => string,
+): AppError["args"] {
   if (code === "app:data_busy") {
     const name = dataBusyParticipantNames[args.participant];
-    if (name) return { ...args, participant: translate(name) };
+    if (name) return { ...args, participant: localize(name) };
   }
   if (code === "appdata:section_invalid") {
     const name = appDataSectionNames[args.section];
-    if (name) return { ...args, section: translate(name) };
+    if (name) return { ...args, section: localize(name) };
   }
   return args;
 }
 
-export function describeError(value: unknown): string {
+// 渲染组件可传入 useLingui 的 t，让 React Compiler 跟踪语言变化。
+export function describeError(
+  value: unknown,
+  localize: (message: MessageDescriptor) => string = translate,
+): string {
   const { payload } = toIpcError(value);
   if (
     payload.kind === "custom" &&
     Object.hasOwn(customErrorMessages, payload.code)
   ) {
     const descriptor = customErrorMessages[payload.code as CustomErrorCode];
-    return translate({
+    return localize({
       ...descriptor,
-      values: resolveValues(payload.code, payload.args),
+      values: resolveValues(payload.code, payload.args, localize),
     });
   }
-  if (payload.code === "frontend:unknown")
-    return translate(unknownErrorMessage);
+  if (payload.code === "frontend:unknown") return localize(unknownErrorMessage);
   if (
     payload.kind === "external" &&
     Object.hasOwn(frontendErrorMessages, payload.code)
   ) {
-    return translate(frontendErrorMessages[payload.code as FrontendErrorCode]);
+    return localize(frontendErrorMessages[payload.code as FrontendErrorCode]);
   }
   return payload.message;
 }

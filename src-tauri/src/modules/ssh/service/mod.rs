@@ -31,6 +31,7 @@ mod upload;
 
 pub use auth::resolve_auth_material;
 pub use types::{AuthMaterial, AuthMethod, DirectoryTransferMode, Manager};
+pub(crate) use upload::UploadDirectoryTarget;
 
 #[cfg(test)]
 mod test_support;

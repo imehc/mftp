@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import UpdaterStatusBar from "~/features/updater/UpdaterStatusBar";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useSettingsStore } from "~/store/settings";
 
@@ -28,6 +29,7 @@ export default function ModuleNavigationFrame({
     >
       {wide ? <NavigationRailDesktop items={items} active={active} /> : null}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <UpdaterStatusBar />
         <div className="min-h-0 min-w-0 flex-1">{children}</div>
         {!wide && primary ? (
           <BottomNavigationMobile items={items} active={active} />

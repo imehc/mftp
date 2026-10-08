@@ -69,7 +69,7 @@ impl BtManager {
                 // Keep the routing table in the same platform-local BT data
                 // directory as the session, so restarts do not rebuild DHT
                 // state and desktop/mobile instances remain independent.
-                dht: Some(dht_config(&base)),
+                dht: Some(dht_config(base)),
                 persistence: Some(SessionPersistenceConfig::Json {
                     folder: Some(session_dir),
                 }),

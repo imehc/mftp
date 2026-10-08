@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Checkbox } from "~/components/ui/checkbox";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { TodoItem } from "~/types";
 
@@ -174,6 +175,7 @@ export default function TodoList({
     estimateSize: (index) => (rows[index]?.kind === "header" ? 32 : 70),
     overscan: 8,
   });
+  useVirtualizerFontSize(virtualizer);
 
   // 按稳定 key 保留已测行高；尺寸变化交给 measureElement 的观察器。
   // 数据更新时清空缓存会让未变尺寸的旧行退回估算值，产生重叠。

@@ -58,6 +58,7 @@ import { useSftpRemoteActions } from "~/features/ssh-sftp/components/sftp/useSft
 import { useSftpTransferActions } from "~/features/ssh-sftp/components/sftp/useSftpTransferActions";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useMediaQuery } from "~/lib/use-media-query";
 import type { Session, SftpEntry } from "~/types";
@@ -146,6 +147,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
     overscan: 12,
     scrollMargin: compact ? 0 : sftpHeaderHeight,
   });
+  useVirtualizerFontSize(rowVirtualizer);
   const headerGroup = table.getHeaderGroups()[0];
   const listColumnStyle = {
     "--sftp-list-columns": headerGroup.headers

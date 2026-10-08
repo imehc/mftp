@@ -15,7 +15,7 @@ use super::auth::{
 use super::file_ops::resolve_request_path;
 use super::http_io::{
     reject_transfer_limit, write_file_range_response, write_head_response, write_response,
-    write_response_with_headers,
+    write_response_with_headers, FileResponseMetadata,
 };
 use super::logging::{
     record_access, record_access_error, record_transfer_failure, record_transfer_history,
@@ -136,14 +136,16 @@ pub(super) fn handle_download(stream: &mut TcpStream, ctx: DownloadContext<'_>) 
                     );
                     let result = write_file_range_response(
                         stream,
-                        "application/octet-stream",
                         &mut file,
                         range,
-                        total,
-                        &[format!(
-                            "Content-Disposition: attachment; filename*=UTF-8''{}\r\n",
-                            percent_encode(&file_name)
-                        )],
+                        FileResponseMetadata {
+                            content_type: "application/octet-stream",
+                            content_length: total,
+                            headers: &[format!(
+                                "Content-Disposition: attachment; filename*=UTF-8''{}\r\n",
+                                percent_encode(&file_name)
+                            )],
+                        },
                         ctx.tasks,
                         &task_id,
                     );

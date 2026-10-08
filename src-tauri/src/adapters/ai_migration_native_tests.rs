@@ -182,7 +182,7 @@ pub(crate) async fn verify_migration<C: AiCredentials + 'static>(
 #[ignore = "uses fresh native credential references and an isolated migration database"]
 fn native_migration_and_recovery() {
     tauri::async_runtime::block_on(verify_migration(
-        crate::adapters::ai::AiKeychain::default(),
+        crate::adapters::ai::AiKeychain::isolated_native_test(),
         std::env::temp_dir(),
         |step| println!("native migration check: {step}"),
     ))

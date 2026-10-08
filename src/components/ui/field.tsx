@@ -1,7 +1,9 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
+
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (
     <fieldset
@@ -14,6 +16,7 @@ function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
     />
   );
 }
+
 function FieldLegend({
   className,
   variant = "legend",
@@ -33,6 +36,7 @@ function FieldLegend({
     />
   );
 }
+
 function FieldGroup({
   className,
   density = "default",
@@ -53,6 +57,7 @@ function FieldGroup({
     />
   );
 }
+
 const fieldVariants = cva(
   "group/field flex w-full gap-2 data-[invalid=true]:text-destructive",
   {
@@ -70,6 +75,7 @@ const fieldVariants = cva(
     },
   },
 );
+
 function Field({
   className,
   orientation = "vertical",
@@ -90,6 +96,7 @@ function Field({
     />
   );
 }
+
 function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -102,6 +109,7 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
     />
   );
 }
+
 function FieldLabel({
   className,
   ...props
@@ -118,6 +126,7 @@ function FieldLabel({
     />
   );
 }
+
 function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -130,6 +139,7 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
     />
   );
 }
+
 function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
@@ -144,6 +154,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     />
   );
 }
+
 function FieldSeparator({
   children,
   className,
@@ -173,6 +184,7 @@ function FieldSeparator({
     </div>
   );
 }
+
 function FieldError({
   className,
   children,
@@ -222,6 +234,7 @@ function FieldError({
     </div>
   );
 }
+
 export {
   Field,
   FieldLabel,

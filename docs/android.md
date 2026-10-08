@@ -65,7 +65,7 @@ adb install -r \
   src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk
 ```
 
-使用 `adb install` 可以获得比手机文件管理器更准确的安装错误码。当前应用的 `minSdk` 为 24、`targetSdk` 为 36，支持 Android 7.0 及以上系统，包括 Android 16。
+使用 `adb install` 可以获得比手机文件管理器更准确的安装错误码。当前应用的 `minSdk` 为 28、`targetSdk` 为 36，支持 Android 9 及以上系统，包括 Android 16。
 
 如果返回 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`，说明手机中已安装相同包名但签名不同的版本，常见情况是先前安装过 debug APK。Android 不允许使用 release 签名覆盖 debug 签名，需要先卸载旧版本：
 
@@ -137,3 +137,29 @@ Android 端与桌面端的功能差异（代码中已处理，无需手动关注
 - **release APK 装不上**：先确认文件不是 `*-unsigned.apk`，再用 `adb install -r <apk-path>` 获取准确错误码。`INSTALL_FAILED_UPDATE_INCOMPATIBLE` 表示已安装版本的签名不同，需要卸载旧版本或改用原签名 key 构建。
 - **`zsh: command not found: adb`**：将 `$HOME/Library/Android/sdk/platform-tools` 加入 `PATH`，或使用 `/Users/<you>/Library/Android/sdk/platform-tools/adb` 绝对路径执行。
 - Gradle 输出中的 deprecation 警告来自 Tauri 生成的模板，可忽略。
+
+## 原生插件独立编译检查
+
+`pnpm android:plugins:check` 只编译 `native-export`、`native-viewer` 两个 Android library，生成 AAR；不会生成完整 MFTP APK、启动 Gradle 安装任务或连接设备。用于本地和 PR CI 的 Kotlin/资源编译门槛，不代替 Android Rust 主库、整包或原生功能验收。
+
+环境：Node.js 22、pnpm、Cargo、JDK 17–24，以及 Android SDK `platforms;android-36`、`build-tools;36.0.0`。显式配置 `JAVA_HOME` 和 `ANDROID_HOME`（或 `ANDROID_SDK_ROOT`）。不需要 NDK，也不需要先启动应用。
+
+```bash
+# 首次允许 Cargo/Gradle 下载锁定依赖；复用仓库的 Gradle wrapper 和依赖版本
+pnpm android:plugins:check
+
+# 依赖已经缓存后，在全新的临时工程中离线重新编译
+pnpm android:plugins:check --offline
+
+# 仅验证环境并生成隔离工程/源码摘要，不执行 Gradle
+pnpm android:plugins:check --offline --prepare-only
+
+# 本机只安装了其他兼容 Build Tools 时可显式选择，实际版本会写进报告
+MFTP_ANDROID_BUILD_TOOLS=37.0.0 pnpm android:plugins:check --offline
+```
+
+脚本通过 `cargo metadata --locked --filter-platform aarch64-linux-android` 定位当前应用实际解析到的 Tauri API，避免从任意缓存目录挑选版本。Cargo 锁文件更新后，离线模式可能提示依赖未缓存，应先正常运行一次。
+
+每次在系统临时目录新建 `mftp-android-plugins-*` 工程，复制 Tauri API 和插件源码（不复制旧 build/.gradle），不会向源码目录写构建产物。控制台打印完整目录；`check-report.json` 记录 Tauri/JDK/SDK/Build Tools、源码 SHA-256、离线模式及 prepared/passed/failed 状态。成功输出在各插件的 `build/outputs/aar/*-debug.aar`。工程和报告保留供排查；可在确认不再需要后手动清理该次临时目录。
+
+PR 的 `Android plugins (compile only)` job 调用相同入口，使用 JDK 17 和 Build Tools 36.0.0，并上传摘要报告。CI 配置存在不表示远端执行已经通过，应以对应 PR 检查结果为准。

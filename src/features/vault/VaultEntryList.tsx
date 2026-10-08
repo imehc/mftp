@@ -15,6 +15,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
 
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import type { VaultController } from "./use-vault";
@@ -40,6 +41,7 @@ export default function VaultEntryList({
     estimateSize: () => 250,
     overscan: 3,
   });
+  useVirtualizerFontSize(virtualizer);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {

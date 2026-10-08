@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>附件隔离验证</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import "/src/App.css";
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import { I18nProvider } from "@lingui/react";
+      import { i18n } from "@lingui/core";
+      import { messages } from "/src/locales/en/messages.ts";
+      import { commands } from "/src/bindings.ts";
+      import { AttachmentsDialog } from "/src/features/model-viewer/components/AttachmentsDialog.tsx";
+      i18n.load("en", messages);
+      i18n.activate("en");
+      window.qaText =
+        "<script>window.qaExecuted=true</scr" +
+        'ipt>\n![remote](https://invalid.example/image.png)\n<iframe src="https://invalid.example/"></iframe>\n' +
+        "longword".repeat(70);
+      const attachment = {
+        id: "qa-attachment",
+        name: "readme-" + "long-name-".repeat(12) + ".md",
+        kind: "markdown",
+        size: 100,
+      };
+      commands.modelAttachmentList = async () => ({
+        status: "ok",
+        data: [attachment],
+      });
+      commands.modelAttachmentRead = async () => ({
+        status: "ok",
+        data: Array.from(new TextEncoder().encode(window.qaText)),
+      });
+      createRoot(document.getElementById("root")).render(
+        React.createElement(
+          I18nProvider,
+          { i18n },
+          React.createElement(AttachmentsDialog, {
+            entry: { id: "qa-model", name: "Isolated model.glb" },
+            close: () => {},
+            restoreFocus: () => {},
+            changed: () => {},
+          }),
+        ),
+      );
+    </script>
+  </body>
+</html>

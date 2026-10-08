@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { describeError } from "~/lib/errors";
+import { isTauriRuntime } from "~/lib/files";
 
 import type { ModelViewerRuntime } from "../runtime/viewer";
 import {
@@ -67,7 +68,7 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
       <Button
         density="adaptive"
         variant="outline"
-        disabled={environment.busy}
+        disabled={environment.busy || environment.saving}
         onClick={() => input.current?.click()}
       >
         {environment.busy ? (
@@ -81,16 +82,47 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
       <p className="text-muted-foreground text-xs">
         <Trans>HDR · 最大 2048 × 1024 / 32 MiB</Trans>
       </p>
+      {isTauriRuntime() ? (
+        <p className="text-muted-foreground text-xs">
+          <Trans>在此设备记住场景环境，下次进入查看器时恢复。</Trans>
+        </p>
+      ) : null}
+      {environment.saving ? (
+        <p role="status" className="text-muted-foreground text-xs">
+          <Trans>正在保存环境…</Trans>
+        </p>
+      ) : null}
+      {environment.storageError ? (
+        <Alert variant="destructive">
+          <AlertDescription>
+            <Trans>环境存储未完成，当前预览可能与已保存环境不同。</Trans>
+            <span>{describeError(environment.storageError)}</span>
+            <Button
+              density="adaptive"
+              variant="outline"
+              disabled={environment.busy || environment.saving}
+              onClick={() => void runtime.environment.retrySave()}
+            >
+              <Trans comment="用户显式重试读取、保存或清除 HDR 环境。">
+                重试环境存储
+              </Trans>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
       {environment.name ? (
         <p className="truncate text-sm">{environment.name}</p>
       ) : null}
-      {environment.name || environment.busy ? (
+      {environment.name ||
+      environment.busy ||
+      environment.error ||
+      environment.storageError ? (
         <Button
           density="adaptive"
           variant="outline"
           onClick={() => runtime.environment.clear()}
         >
-          <Trans comment="取消 HDR 加载或移除当前 HDR 照明，并释放资源。">
+          <Trans comment="取消 HDR 加载或移除当前 HDR 照明；原生应用同时移除已保存环境。">
             清除环境
           </Trans>
         </Button>

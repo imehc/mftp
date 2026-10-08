@@ -131,6 +131,13 @@ impl Lifecycle {
         self.phase.load(Ordering::SeqCst) == FINISHED
     }
 
+    pub(crate) fn check_recovery_admission(&self) -> AppResult<()> {
+        if self.phase.load(Ordering::SeqCst) != RUNNING {
+            return Err(AppError::custom(CustomErrorCode::AppShuttingDown));
+        }
+        self.operations.check_recovery_admission()
+    }
+
     pub(crate) fn finish_shutdown(&self) {
         self.phase.store(FINISHED, Ordering::SeqCst);
     }

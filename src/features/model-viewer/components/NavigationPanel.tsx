@@ -12,6 +12,7 @@ import {
   InspectionRange,
   InspectionToggle,
 } from "./InspectionFields";
+import { RuntimeControls } from "./RuntimeControls";
 
 export function NavigationPanel({
   runtime,
@@ -29,6 +30,7 @@ export function NavigationPanel({
   const [name, setName] = useState("");
   return (
     <FieldGroup>
+      <RuntimeControls runtime={runtime} onCanvas={onCanvas} />
       <InspectionChoice
         label={t({
           message: "交互模式",

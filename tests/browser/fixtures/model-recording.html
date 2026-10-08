@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>录屏验证运行中</title>
+  </head>
+  <body>
+    <div id="host" style="width: 640px; height: 360px">
+      <canvas id="canvas"></canvas>
+    </div>
+    <video id="video" controls muted></video>
+    <pre id="result">运行中</pre>
+    <script type="module">
+      import "/src/App.css";
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import { I18nProvider } from "@lingui/react";
+      import { i18n } from "@lingui/core";
+      import { messages } from "/src/locales/en/messages.ts";
+      import { RecordingExport } from "/src/features/model-viewer/components/RecordingExport.tsx";
+      import { Group, Mesh, BoxGeometry, MeshStandardMaterial } from "three";
+      import { ModelViewerRuntime } from "/src/features/model-viewer/runtime/viewer.ts";
+      import { createRecordingEncoder } from "/src/features/model-viewer/export/recording-encoder.ts";
+      import { ModelResources } from "/src/features/model-viewer/runtime/resources.ts";
+      const report = document.getElementById("result");
+      const runtime = new ModelViewerRuntime(
+        document.getElementById("canvas"),
+        () => {},
+      );
+      window.qaRuntime = runtime;
+      const timings = [];
+      const frames = [];
+      const frame = runtime.recording.frame.bind(runtime.recording);
+      runtime.recording.frame = (canvas, time) => {
+        frames.push({
+          time,
+          status: runtime.recording.snapshot().status,
+          pending: !!runtime.recording.job?.pending,
+        });
+        frame(canvas, time);
+      };
+      const visibility = [
+        { time: performance.now(), state: document.visibilityState },
+      ];
+      document.addEventListener("visibilitychange", () =>
+        visibility.push({
+          time: performance.now(),
+          state: document.visibilityState,
+        }),
+      );
+      runtime.recording.create = async (...args) => {
+        const encoder = await createRecordingEncoder(...args);
+        const add = encoder.add;
+        encoder.add = (canvas, time) => {
+          timings.push(time);
+          return add(canvas, time);
+        };
+        return encoder;
+      };
+      try {
+        const scene = new Group();
+        scene.add(
+          new Mesh(
+            new BoxGeometry(),
+            new MeshStandardMaterial({ color: 0x0088ff }),
+          ),
+        );
+        const resources = new ModelResources();
+        resources.track(scene);
+        await runtime.show(
+          {
+            scene,
+            name: "qa-box.glb",
+            format: "GLB",
+            size: 100,
+            animations: [],
+            hasGeometry: true,
+            dispose: () => resources.dispose(),
+          },
+          new AbortController().signal,
+        );
+        await runtime.recording.start(640, 360, "qa-box.glb");
+        const starting = runtime.recording.snapshot();
+        if (starting.status !== "recording")
+          throw starting.error || new Error(starting.status);
+        runtime.setAutoRotate(true);
+        await new Promise((resolve) => setTimeout(resolve, 2200));
+        await runtime.recording.stop();
+        runtime.setAutoRotate(false);
+        const state = runtime.recording.snapshot();
+        if (!state.result) throw state.error || new Error(state.status);
+        const { blob, width, height } = state.result;
+        const video = document.getElementById("video");
+        video.src = URL.createObjectURL(blob);
+        await new Promise((resolve, reject) => {
+          video.onloadeddata = resolve;
+          video.onerror = () => reject(new Error("Video decode failed"));
+          setTimeout(() => reject(new Error("Video decode timed out")), 10000);
+        });
+        video.currentTime = Math.min(1, video.duration / 2);
+        await new Promise((resolve) => {
+          video.onseeked = resolve;
+        });
+        const decoded = document.createElement("canvas");
+        decoded.width = width;
+        decoded.height = height;
+        const context = decoded.getContext("2d");
+        context.drawImage(video, 0, 0, width, height);
+        const pixels = context.getImageData(0, 0, width, height).data;
+        let colored = 0;
+        for (let i = 0; i < pixels.length; i += 4)
+          if (pixels[i + 2] > pixels[i] + 30) colored++;
+        i18n.load("en", messages);
+        i18n.activate("en");
+        document.documentElement.style.fontSize = "20px";
+        document.documentElement.classList.add("dark");
+        const panel = document.createElement("div");
+        panel.style.width = "320px";
+        panel.style.padding = "8px";
+        document.body.prepend(panel);
+        createRoot(panel).render(
+          React.createElement(
+            I18nProvider,
+            { i18n },
+            React.createElement(RecordingExport, {
+              runtime,
+              name: "qa-box.glb",
+              disabled: false,
+            }),
+          ),
+        );
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        const layout = {
+          width: panel.clientWidth,
+          scrollWidth: panel.scrollWidth,
+          buttons: [...panel.querySelectorAll("button")].map(
+            (button) => button.textContent,
+          ),
+        };
+        const result = {
+          layout,
+          timings,
+          frameCount: frames.length,
+          lastFrames: frames.slice(-5),
+          visibility,
+          status: state.status,
+          type: blob.type,
+          bytes: blob.size,
+          width: video.videoWidth,
+          height: video.videoHeight,
+          duration: video.duration,
+          coloredPixels: colored,
+          passed:
+            video.videoWidth === width &&
+            video.videoHeight === height &&
+            video.duration > 1 &&
+            colored > 100 &&
+            panel.scrollWidth <= panel.clientWidth,
+        };
+        report.textContent = JSON.stringify(result, null, 2);
+        document.title = result.passed ? "录屏验证通过" : "录屏验证失败";
+      } catch (error) {
+        report.textContent = JSON.stringify(
+          { failed: true, error: error?.payload ?? error?.message ?? error },
+          null,
+          2,
+        );
+        document.title = "录屏验证失败";
+      }
+    </script>
+  </body>
+</html>

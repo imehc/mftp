@@ -20,7 +20,10 @@ use crate::modules::{
 use crate::storage::Storage;
 
 /// The single shared service state injected via Tauri `State`.
+#[derive(Clone)]
 pub struct AppServices {
+    pub(crate) model_inbox: Arc<crate::modules::model_viewer::system::ModelOpenInbox>,
+    pub(crate) model_exports: Arc<crate::modules::model_viewer::ModelExportStore>,
     pub(crate) model_viewer: Arc<crate::modules::model_viewer::ModelViewerService>,
     pub(crate) model_library: crate::modules::model_viewer::ModelLibraryRepository,
     pub storage: Storage,
@@ -46,7 +49,7 @@ pub struct AppServices {
 pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     let data_dir = app.path().app_data_dir()?;
     let storage = Storage::new(data_dir.clone())?;
-    let operations = Arc::new(Operations::default());
+    let operations = Arc::new(Operations::with_reset_gate(storage.reset_gate()));
     let mut lifecycle = Lifecycle::new(operations.clone());
     // Stop-registration names share the maintenance participant ids, and the
     // busy capability registered here is the single source both the shutdown
@@ -97,12 +100,21 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         operations.clone(),
     );
     let recovery = ai_configuration.clone();
-    tauri::async_runtime::spawn(async move {
-        if let Err(error) = recovery.recover().await {
-            eprintln!("AI credential recovery pending: {}", error.code);
-        }
-    });
+    if !storage.reset_is_pending() {
+        tauri::async_runtime::spawn(async move {
+            if let Err(error) = recovery.recover().await {
+                eprintln!("AI credential recovery pending: {}", error.code);
+            }
+        });
+    }
     let services = AppServices {
+        model_inbox: app
+            .state::<Arc<crate::modules::model_viewer::system::ModelOpenInbox>>()
+            .inner()
+            .clone(),
+        model_exports: Arc::new(crate::modules::model_viewer::ModelExportStore::new(
+            app.path().app_cache_dir()?.join("mftp-model-exports"),
+        )),
         model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),
         model_library: crate::modules::model_viewer::ModelLibraryRepository::new(storage.clone()),
         executor,
@@ -132,6 +144,9 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
 
 #[cfg(desktop)]
 fn start_lan_if_configured(services: &AppServices) {
+    if services.storage.reset_is_pending() {
+        return;
+    }
     let start = || -> AppResult<()> {
         let settings = services.lan_repository.settings()?;
         if !settings.auto_start {

@@ -26,9 +26,11 @@ import { isMobilePlatform } from "~/lib/platform";
 
 import { AnimationBar } from "./components/AnimationBar";
 import { CanvasControls } from "./components/CanvasControls";
+import { CaptureToolbar } from "./components/CaptureToolbar";
 import { ImportStatus } from "./components/ImportStatus";
 import { LibraryPanel, LibraryStatus } from "./components/LibraryPanel";
 import { MemoryWarning } from "./components/MemoryPanel";
+import { ModelSystemStatus } from "./components/ModelSystemStatus";
 import { ViewerHelp } from "./components/ViewerHelp";
 import { ViewGizmo } from "./components/ViewGizmo";
 import { WorkspaceInspector } from "./components/WorkspaceInspector";
@@ -40,6 +42,7 @@ import { ViewerSession } from "./runtime/session";
 import { browserSource } from "./sources/browser";
 import { nativeSource } from "./sources/native";
 import { isModelName } from "./sources/paths";
+import { attachSystemInbox } from "./system/inbox";
 
 export default function ModelViewerPage() {
   const { t } = useLingui();
@@ -62,8 +65,13 @@ export default function ModelViewerPage() {
   useEffect(() => {
     if (!canvas.current) return;
     session.connect(canvas.current);
-    if (isTauriRuntime()) library.start();
+    const detachInbox = attachSystemInbox(session);
+    if (isTauriRuntime()) {
+      library.start();
+      void session.runtime?.environment.restore();
+    }
     return () => {
+      detachInbox();
       library.stop();
       session.dispose();
     };
@@ -255,6 +263,7 @@ export default function ModelViewerPage() {
             onOpenChange={setLibraryOpen}
           />
           <LibraryStatus controller={library} />
+          <ModelSystemStatus runtime={session.runtime} />
         </>
       ) : null}
       <input
@@ -489,13 +498,24 @@ export default function ModelViewerPage() {
                 }
               />
             ) : null}
-            <WorkspaceInspector
-              session={session}
-              state={state}
-              open={inspectorOpen}
-              onOpenChange={setInspectorOpen}
-            />
           </>
+        ) : null}
+        {session.runtime ? (
+          <aside className="order-first flex min-w-0 flex-col gap-3 empty:hidden md:order-last md:col-start-2 md:row-span-2 md:row-start-1">
+            <CaptureToolbar
+              runtime={session.runtime}
+              name={state.model?.name ?? ""}
+              disabled={!ready || !state.model}
+            />
+            {state.items.length > 0 ? (
+              <WorkspaceInspector
+                session={session}
+                state={state}
+                open={inspectorOpen}
+                onOpenChange={setInspectorOpen}
+              />
+            ) : null}
+          </aside>
         ) : null}
       </div>
     </AppPageLayout>

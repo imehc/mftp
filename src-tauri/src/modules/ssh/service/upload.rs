@@ -5,7 +5,7 @@ use super::errors::stale_app_error;
 use super::path_utils::{join_remote, remote_parent_of, remote_temp_sibling, shell_quote, uuid_v4};
 use super::remote_ops::remote_file_size;
 use super::transfer_io::{copy_upload, seek_transfer, verify_size};
-use super::transfer_models::{build_upload_plan, UploadEntryKind};
+use super::transfer_models::{build_upload_plan, TransferProgressContext, UploadEntryKind};
 use super::transfer_retry::{run_transfer, AttemptError, SFTP_TRANSFER_RETRIES};
 use super::types::{DirectoryTransferMode, Manager, TransferGuard, TransferIoOutcome};
 use crate::error::{AppError, AppResult, CustomErrorCode};
@@ -14,19 +14,27 @@ use std::cell::Cell;
 use std::path::Path;
 use std::time::{Duration, Instant};
 
+pub(crate) struct UploadDirectoryTarget<'a> {
+    pub(crate) parent: &'a str,
+    pub(crate) name: &'a str,
+}
+
 impl Manager {
     pub(super) fn upload_local_file_to_remote(
         &self,
         session_id: &str,
         local: &Path,
         remote: &str,
-        events: Option<&EventSink>,
-        transfer_id: Option<&str>,
-        phase: &str,
-        completed_before: u64,
-        total: u64,
+        progress: TransferProgressContext<'_>,
         transfer: Option<&TransferGuard>,
     ) -> AppResult<()> {
+        let TransferProgressContext {
+            events,
+            transfer_id,
+            phase,
+            completed_before,
+            total,
+        } = progress;
         let mut local_file = std::fs::File::open(local)?;
         let file_size = local_file.metadata()?.len();
         let transferred = Cell::new(0);
@@ -58,13 +66,7 @@ impl Manager {
                         .map_err(AttemptError::remote)?
                 };
                 seek_transfer(&mut local_file, &mut remote_file, size)?;
-                emit_progress(
-                    events,
-                    transfer_id,
-                    phase,
-                    completed_before + size,
-                    Some(total),
-                );
+                emit_progress(events, transfer_id, phase, completed_before + size, total);
                 let outcome = copy_upload(
                     &mut local_file,
                     &mut remote_file,
@@ -77,7 +79,7 @@ impl Manager {
                                 transfer_id,
                                 phase,
                                 completed_before + transferred.get(),
-                                Some(total),
+                                total,
                             );
                             last_emit = Instant::now();
                         }
@@ -107,7 +109,7 @@ impl Manager {
                     transfer_id,
                     &format!("网络波动，正在续传（{attempts}/{SFTP_TRANSFER_RETRIES}）"),
                     completed_before + transferred.get(),
-                    Some(total),
+                    total,
                 )
             },
         )?;
@@ -116,7 +118,7 @@ impl Manager {
             transfer_id,
             phase,
             completed_before + file_size,
-            Some(total),
+            total,
         );
         Ok(())
     }
@@ -125,12 +127,15 @@ impl Manager {
         &self,
         session_id: &str,
         local_dir: &str,
-        remote_parent: &str,
-        remote_name: &str,
+        target: UploadDirectoryTarget<'_>,
         transfer_mode: DirectoryTransferMode,
         events: Option<&EventSink>,
         transfer_id: Option<&str>,
     ) -> AppResult<()> {
+        let UploadDirectoryTarget {
+            parent: remote_parent,
+            name: remote_name,
+        } = target;
         match transfer_mode {
             DirectoryTransferMode::Archive => self.sftp_upload_dir_archive(
                 session_id,
@@ -168,20 +173,16 @@ impl Manager {
 
         let local_archive = std::env::temp_dir().join(format!("mftp-up-{}.tar.gz", uuid_v4()));
         let _temp_cleanup = self.track_local_temp(local_archive.clone())?;
-        if let Err(e) = pack_clean_tar_gz(
+        pack_clean_tar_gz(
             local_dir,
             remote_name,
             &local_archive,
             events,
             transfer_id,
             transfer.as_ref(),
-        ) {
-            return Err(e);
-        }
+        )?;
         if let Some(transfer) = &transfer {
-            if let Err(e) = transfer.check() {
-                return Err(e);
-            }
+            transfer.check()?
         }
 
         let archive_size = std::fs::metadata(&local_archive)?.len();
@@ -191,11 +192,13 @@ impl Manager {
             session_id,
             &local_archive,
             &remote_archive,
-            events,
-            transfer_id,
-            "上传压缩包中",
-            0,
-            archive_size,
+            TransferProgressContext {
+                events,
+                transfer_id,
+                phase: "上传压缩包中",
+                completed_before: 0,
+                total: Some(archive_size),
+            },
             transfer.as_ref(),
         )?;
 
@@ -285,11 +288,13 @@ impl Manager {
                         session_id,
                         &entry.local,
                         &temp_remote,
-                        events,
-                        transfer_id,
-                        "上传文件夹中",
-                        uploaded,
-                        total,
+                        TransferProgressContext {
+                            events,
+                            transfer_id,
+                            phase: "上传文件夹中",
+                            completed_before: uploaded,
+                            total: Some(total),
+                        },
                         transfer.as_ref(),
                     )?;
                     if let Some(transfer) = &transfer {

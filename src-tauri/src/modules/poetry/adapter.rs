@@ -43,10 +43,8 @@ fn first_string<'a>(obj: &'a Value, keys: &[String]) -> Option<&'a str> {
 fn collect_strings(obj: &Value, keys: &[String], into: &mut Vec<String>) {
     for key in keys {
         match obj.get(key) {
-            Some(Value::String(text)) => {
-                if !text.trim().is_empty() {
-                    into.push(text.clone());
-                }
+            Some(Value::String(text)) if !text.trim().is_empty() => {
+                into.push(text.clone());
             }
             Some(Value::Array(items)) => {
                 for item in items {

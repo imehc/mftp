@@ -53,7 +53,7 @@ impl ModelLibraryRepository {
                     has_thumbnail: r.get(7)? })
             })?.collect::<Result<Vec<_>, _>>()?;
         let library_bytes = tx.query_row(
-            "SELECT COALESCE(SUM(size), 0) FROM model_library WHERE ready = 1",
+            "SELECT (SELECT COALESCE(SUM(size), 0) FROM model_library WHERE ready = 1) + (SELECT COALESCE(SUM(LENGTH(bytes)), 0) FROM model_attachments) + (SELECT COALESCE(SUM(size), 0) FROM model_environment WHERE ready = 1)",
             [],
             |r| r.get::<_, i64>(0),
         )? as f64;

@@ -8,13 +8,17 @@ import ReactDOM from "react-dom/client";
 import { AppRuntime } from "~/app/AppRuntime";
 import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
+import ResetBoundary from "~/features/about/ResetBoundary";
+import UpdaterDialog from "~/features/updater/UpdaterDialog";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
 import { applyStoredColorTheme } from "~/lib/color-theme";
+import { applyStoredDisplaySize } from "~/lib/display-size";
 import { checkForUpdateOnLaunch } from "~/lib/updater";
 
 import { router } from "./router";
 
 applyStoredColorTheme();
+applyStoredDisplaySize();
 
 // 生产构建：屏蔽 WebView 默认的右键菜单（Back / Reload 等会破坏 SPA 的
 // 单页体验）。但在可编辑元素和文本选中处保留，以便使用原生复制 /
@@ -33,8 +37,11 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AppI18nProvider>
         <TooltipProvider>
-          <AppRuntime />
-          <RouterProvider router={router} />
+          <ResetBoundary>
+            <AppRuntime />
+            <RouterProvider router={router} />
+            <UpdaterDialog />
+          </ResetBoundary>
         </TooltipProvider>
         <Toaster position="bottom-right" />
       </AppI18nProvider>

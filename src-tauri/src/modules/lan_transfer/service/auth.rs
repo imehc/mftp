@@ -317,14 +317,9 @@ pub(super) fn effective_permission(
     {
         return None;
     }
-    let token = cookie_token(request);
-    let Some(token) = token else {
-        return None;
-    };
+    let token = cookie_token(request)?;
     let mut tokens = authorized_tokens.lock();
-    let Some(session) = tokens.get_mut(&token) else {
-        return None;
-    };
+    let session = tokens.get_mut(&token)?;
     if Instant::now().duration_since(session.last_seen) > SESSION_TIMEOUT {
         tokens.remove(&token);
         return None;

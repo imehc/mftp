@@ -415,7 +415,7 @@ fn parse_net_dev(before: &str, after: &str, dt: f64) -> Vec<SystemNetworkRate> {
             tx_bytes_per_sec: (current.1.saturating_sub(previous.1) as f64 / dt) as u64,
         });
     }
-    rates.sort_by(|left, right| right.rx_bytes_per_sec.cmp(&left.rx_bytes_per_sec));
+    rates.sort_by_key(|rate| std::cmp::Reverse(rate.rx_bytes_per_sec));
     rates
 }
 

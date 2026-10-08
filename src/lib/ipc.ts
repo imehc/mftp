@@ -1,6 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 
-import type { AppDataModule } from "~/bindings";
+import type { AppDataModule, ModelExportAction } from "~/bindings";
 import {
   commands,
   type PoetryTranslation,
@@ -382,6 +382,12 @@ export const appDataUsage = () => unwrapCommand(commands.appDataUsage());
 export const appDataClear = (module: AppDataModule) =>
   unwrapCommand(commands.appDataClear(module));
 export const appDataReset = () => unwrapCommand(commands.appDataReset());
+export const appDataResetStatus = () =>
+  unwrapCommand(commands.appDataResetStatus());
+export const appDataResetResume = (id: string) =>
+  unwrapCommand(commands.appDataResetResume(id));
+export const appDataResetFinish = (id: string) =>
+  voidCommand(commands.appDataResetFinish(id));
 
 // ---- 诗词库 ----
 export const poetryCollections = () =>
@@ -522,3 +528,46 @@ export const btPreviewFile = (infoHash: string, path: string) =>
   unwrapCommand(commands.btPreviewFile(infoHash, path));
 export const btOpenFile = (infoHash: string, path: string) =>
   voidCommand(commands.btOpenFile(infoHash, path));
+
+export const modelExportBegin = (name: string, size: number) =>
+  unwrapCommand(commands.modelExportBegin(name, size));
+export const modelExportWrite = (id: string, offset: number, bytes: number[]) =>
+  voidCommand(commands.modelExportWrite(id, offset, bytes));
+export const modelExportPresent = (id: string, action: ModelExportAction) =>
+  unwrapCommand(commands.modelExportPresent(id, action));
+export const modelExportCancel = (id: string) =>
+  voidCommand(commands.modelExportCancel(id));
+export const modelExportClose = (id: string) =>
+  voidCommand(commands.modelExportClose(id));
+
+export const modelAttachmentList = (model: string) =>
+  unwrapCommand(commands.modelAttachmentList(model));
+export const modelAttachmentAdd = (
+  model: string,
+  name: string,
+  bytes: number[],
+) => unwrapCommand(commands.modelAttachmentAdd(model, name, bytes));
+export const modelAttachmentRead = (model: string, id: string) =>
+  unwrapCommand(commands.modelAttachmentRead(model, id));
+export const modelAttachmentDelete = (model: string, id: string) =>
+  voidCommand(commands.modelAttachmentDelete(model, id));
+
+export const modelEnvironmentBegin = (name: string, size: number) =>
+  unwrapCommand(commands.modelEnvironmentBegin(name, size));
+export const modelEnvironmentWrite = (
+  id: string,
+  offset: number,
+  bytes: number[],
+) => voidCommand(commands.modelEnvironmentWrite(id, offset, bytes));
+export const modelEnvironmentCommit = (id: string) =>
+  voidCommand(commands.modelEnvironmentCommit(id));
+export const modelEnvironmentCurrent = () =>
+  unwrapCommand(commands.modelEnvironmentCurrent());
+export const modelEnvironmentRead = (id: string, offset: number) =>
+  unwrapCommand(commands.modelEnvironmentRead(id, offset));
+export const modelEnvironmentAbort = (id: string) =>
+  voidCommand(commands.modelEnvironmentAbort(id));
+export const modelEnvironmentClear = () =>
+  voidCommand(commands.modelEnvironmentClear());
+
+export const modelSystemPoll = () => unwrapCommand(commands.modelSystemPoll());

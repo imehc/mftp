@@ -20,6 +20,11 @@ use std::sync::{mpsc, Arc};
 use std::time::Duration;
 use tauri::{test::MockRuntime, Manager, State};
 
+#[path = "maintenance_reset_tests.rs"]
+mod reset_tests;
+#[path = "maintenance_usage_tests.rs"]
+mod usage_tests;
+
 struct UnusedFiles;
 impl FileAccess for UnusedFiles {
     fn download_dir(&self) -> AppResult<PathBuf> {
@@ -46,10 +51,14 @@ impl Fixture {
         let root =
             std::env::temp_dir().join(format!("maintenance-export-{}", uuid::Uuid::new_v4()));
         let storage = Storage::new(root.clone()).unwrap();
-        let operations = Arc::new(Operations::default());
+        let operations = Arc::new(Operations::with_reset_gate(storage.reset_gate()));
         // Construct idle services without native keychain calls, sockets or engines.
         let executor = Executor::new(factory(storage.clone()), operations.clone());
         let state = AppServices {
+            model_inbox: Arc::new(crate::modules::model_viewer::system::ModelOpenInbox::default()),
+            model_exports: Arc::new(crate::modules::model_viewer::ModelExportStore::new(
+                std::env::temp_dir().join(format!("mftp-unused-exports-{}", uuid::Uuid::new_v4())),
+            )),
             model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),
             model_library: crate::modules::model_viewer::ModelLibraryRepository::new(
                 storage.clone(),
@@ -58,7 +67,7 @@ impl Fixture {
             ai_tasks: Arc::new(AiTaskManager::new(operations.clone())),
             ai_configuration: crate::modules::ai::AiConfigurationService::new(
                 crate::modules::ai::AiRepository::new(storage.clone()),
-                Arc::new(AiKeychain::default()),
+                Arc::new(AiKeychain::in_memory()),
                 executor.clone(),
                 operations.clone(),
             ),

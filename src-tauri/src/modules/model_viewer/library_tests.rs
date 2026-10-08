@@ -181,7 +181,7 @@ fn malformed_manifest_camera_and_future_version_are_rejected() {
         .conn()
         .unwrap()
         .execute(
-            "UPDATE app_meta SET value = '2' WHERE key = 'model_viewer_schema_version'",
+            "UPDATE app_meta SET value = '99' WHERE key = 'model_viewer_schema_version'",
             [],
         )
         .unwrap();
@@ -192,6 +192,7 @@ fn malformed_manifest_camera_and_future_version_are_rejected() {
 fn reset_is_atomic_preserves_schema_and_cannot_resurrect_pending_import() {
     let f = Fixture::new();
     let id = f.saved();
+    let attachment = f.repo.add_attachment(&id, "notes.txt", b"kept").unwrap();
     let draft = f.repo.begin(input()).unwrap();
     let conn = f.repo.storage.conn().unwrap();
     conn.execute_batch(
@@ -201,12 +202,18 @@ fn reset_is_atomic_preserves_schema_and_cannot_resurrect_pending_import() {
     .unwrap();
     assert!(f.repo.storage.reset_database().is_err());
     assert_eq!(f.repo.read(&id, "", 0).unwrap(), b"glTF");
+    assert_eq!(f.repo.read_attachment(&id, &attachment).unwrap(), b"kept");
     conn.execute_batch("DROP TRIGGER reject_library_delete")
         .unwrap();
     f.repo.storage.reset_database().unwrap();
     assert!(f.repo.write(&draft, "", 0, b"glTF").is_err());
     assert!(f.repo.save_view(&id, view()).is_err());
     let reopened = ModelLibraryRepository::new(Storage::new(f.root.clone()).unwrap());
+    assert!(reopened.read_attachment(&id, &attachment).is_err());
+    let count: i64 = conn
+        .query_row("SELECT COUNT(*) FROM model_attachments", [], |r| r.get(0))
+        .unwrap();
+    assert_eq!(count, 0);
     assert!(reopened.catalog().unwrap().entries.is_empty());
     let version: String = conn
         .query_row(
@@ -215,7 +222,7 @@ fn reset_is_atomic_preserves_schema_and_cannot_resurrect_pending_import() {
             |r| r.get(0),
         )
         .unwrap();
-    assert_eq!(version, "1");
+    assert_eq!(version, "3");
 }
 
 #[test]
@@ -232,4 +239,120 @@ fn multiple_chunks_roundtrip_without_overreading() {
     assert_eq!(f.repo.read(&id, "", 0).unwrap(), bytes);
     assert_eq!(f.repo.read(&id, "", CHUNK as u32).unwrap(), [43]);
     assert!(f.repo.read(&id, "", 1).is_err());
+}
+
+#[test]
+fn attachments_preserve_bytes_and_are_not_thumbnail_cache() {
+    let fixture = Fixture::new();
+    let model = fixture.saved();
+    let data = b"# Notes\n<script>alert(1)</script>";
+    let id = fixture
+        .repo
+        .add_attachment(&model, "notes.md", data)
+        .unwrap();
+    assert_eq!(
+        fixture.repo.attachments(&model).unwrap()[0].size,
+        data.len() as u32
+    );
+    assert_eq!(
+        fixture.repo.catalog().unwrap().library_bytes,
+        (7 + data.len()) as f64
+    );
+    fixture.repo.configure_cache(0, true).unwrap();
+    assert_eq!(fixture.repo.read_attachment(&model, &id).unwrap(), data);
+    let other = fixture.saved();
+    assert!(fixture.repo.read_attachment(&other, &id).is_err());
+    assert!(fixture.repo.delete_attachment(&other, &id).is_err());
+    assert!(fixture
+        .repo
+        .add_attachment(&model, "notes.md", b"overwrite")
+        .is_err());
+    fixture.repo.delete(&model, false).unwrap();
+    assert!(fixture.repo.read_attachment(&model, &id).is_err());
+    let count: i64 = fixture
+        .repo
+        .storage
+        .conn()
+        .unwrap()
+        .query_row("SELECT COUNT(*) FROM model_attachments", [], |r| r.get(0))
+        .unwrap();
+    assert_eq!(count, 0);
+}
+
+#[test]
+fn attachments_reject_invalid_content_and_enforce_limits_atomically() {
+    let fixture = Fixture::new();
+    let model = fixture.saved();
+    for (name, bytes) in [
+        ("x.html", b"html".as_slice()),
+        ("../x.txt", b"text"),
+        ("x.txt", b"\xff"),
+        ("x.md", b"\0"),
+        ("x.pdf", b"not pdf"),
+        ("x.txt", b""),
+    ] {
+        assert!(fixture.repo.add_attachment(&model, name, bytes).is_err());
+    }
+    assert!(fixture
+        .repo
+        .add_attachment(&model, "large.txt", &vec![b'a'; 1024 * 1024 + 1])
+        .is_err());
+    assert!(fixture
+        .repo
+        .add_attachment("missing", "notes.txt", b"notes")
+        .is_err());
+    assert!(fixture.repo.attachments(&model).unwrap().is_empty());
+    for i in 0..16 {
+        fixture
+            .repo
+            .add_attachment(&model, &format!("{i}.txt"), b"ok")
+            .unwrap();
+    }
+    assert_eq!(
+        fixture
+            .repo
+            .add_attachment(&model, "17.txt", b"ok")
+            .unwrap_err()
+            .code,
+        "model:attachment_capacity"
+    );
+    let second = fixture.saved();
+    let mut pdf = vec![b' '; 8 * 1024 * 1024];
+    pdf[..5].copy_from_slice(b"%PDF-");
+    for i in 0..4 {
+        fixture
+            .repo
+            .add_attachment(&second, &format!("{i}.pdf"), &pdf)
+            .unwrap();
+    }
+    assert_eq!(
+        fixture
+            .repo
+            .add_attachment(&second, "extra.txt", b"ok")
+            .unwrap_err()
+            .code,
+        "model:attachment_capacity"
+    );
+    assert_eq!(fixture.repo.attachments(&second).unwrap().len(), 4);
+}
+
+#[test]
+fn attachment_migration_preserves_v1_models_and_is_idempotent() {
+    let fixture = Fixture::new();
+    let id = fixture.saved();
+    let mut conn = fixture.repo.storage.conn().unwrap();
+    conn.execute_batch("DROP TABLE model_environment_chunks; DROP TABLE model_environment; DROP TABLE model_attachments; UPDATE app_meta SET value = '1' WHERE key = 'model_viewer_schema_version';").unwrap();
+    super::super::schema::init(&mut conn).unwrap();
+    super::super::schema::init(&mut conn).unwrap();
+    drop(conn);
+    assert_eq!(fixture.repo.read(&id, "", 0).unwrap(), b"glTF");
+    let attachment = fixture
+        .repo
+        .add_attachment(&id, "kept.txt", b"kept")
+        .unwrap();
+    super::super::schema::init(&mut fixture.repo.storage.conn().unwrap()).unwrap();
+    assert_eq!(
+        fixture.repo.read_attachment(&id, &attachment).unwrap(),
+        b"kept"
+    );
 }

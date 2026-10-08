@@ -72,16 +72,43 @@ pub struct AppDataUsage {
 pub struct AppDataClearResult {
     pub module: AppDataModule,
     pub records_deleted: u32,
-    pub bytes_freed: u64,
+    pub bytes_freed: Option<u64>,
+    pub usage_error: Option<crate::error::AppError>,
     pub preserved: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppDataResetResult {
+    pub progress: AppDataResetProgress,
+    pub failures: Vec<AppDataResetFailure>,
     pub records_deleted: u32,
-    pub bytes_freed: u64,
+    pub bytes_freed: Option<u64>,
+    pub usage_error: Option<crate::error::AppError>,
     pub preserved: Vec<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AppDataResetStep {
+    Poetry,
+    Bt,
+    Credentials,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppDataResetProgress {
+    pub id: String,
+    pub records_deleted: u32,
+    pub pending: Vec<AppDataResetStep>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppDataResetFailure {
+    pub step: AppDataResetStep,
+    pub error: crate::error::AppError,
 }
 
 /// How imported records are applied to existing data.

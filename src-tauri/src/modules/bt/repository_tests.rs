@@ -27,11 +27,9 @@ fn sample_row(hash: &str) -> BtTaskRow {
 }
 
 fn read_meta(conn: &rusqlite::Connection, key: &str) -> Option<String> {
-    conn.query_row(
-        "SELECT value FROM app_meta WHERE key = ?1",
-        [key],
-        |row| row.get(0),
-    )
+    conn.query_row("SELECT value FROM app_meta WHERE key = ?1", [key], |row| {
+        row.get(0)
+    })
     .ok()
 }
 

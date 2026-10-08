@@ -41,7 +41,7 @@ import {
   resolveFontPreset,
 } from "~/lib/color-theme";
 import { isDesktopPlatform } from "~/lib/platform";
-import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
+import { checkForUpdateManually } from "~/lib/updater";
 import { type AppLocale, useSettingsStore } from "~/store/settings";
 import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 
@@ -63,22 +63,22 @@ export default function AppSettingsMenu() {
   const setFontPreset = useSettingsStore((s) => s.setFontPreset);
   const updaterStatus = useUpdaterStore((s) => s.status);
   const checking = updaterStatus === "checking";
-  const restarting = updaterStatus === "restarting";
   const ThemeIcon =
     themes.find((item) => item.value === theme)?.icon ?? Monitor;
   const updateLabels: Record<UpdaterStatus, string> = {
     idle: t`检查更新`,
     checking: t`正在检查`,
+    current: t`检查更新`,
     available: t`查看更新`,
     downloading: t`下载中`,
-    ready: t`重启更新`,
+    ready: t`查看更新`,
     restarting: t`重启中`,
     error: t`重新检查`,
   };
 
   function checkUpdate() {
-    if (updaterStatus === "ready") void restartToApplyUpdate();
-    else void checkForUpdateManually();
+    // 等菜单关闭和焦点恢复后再打开根级更新弹窗。
+    setTimeout(() => void checkForUpdateManually(), 0);
   }
 
   return (
@@ -124,10 +124,7 @@ export default function AppSettingsMenu() {
         {isDesktopPlatform() ? (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              disabled={checking || restarting}
-              onSelect={checkUpdate}
-            >
+            <DropdownMenuItem onSelect={checkUpdate}>
               {updaterStatus === "ready" ? (
                 <RotateCcw />
               ) : (

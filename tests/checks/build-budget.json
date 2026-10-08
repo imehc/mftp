@@ -1,0 +1,17 @@
+{
+  "baseline": "2026-10-08, app 0.2.1, D1 production build; bytes, not runtime memory or timing",
+  "limits": {
+    "initialGzip": 512000,
+    "javascript": 12582912,
+    "fonts": 8912896
+  },
+  "lazyChunks": [
+    "vendor-three",
+    "vendor-pixi",
+    "vendor-physics",
+    "vendor-media",
+    "vendor-xterm",
+    "vendor-codemirror",
+    "vendor-charts"
+  ]
+}

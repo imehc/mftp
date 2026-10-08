@@ -3,7 +3,7 @@ import { getVersion } from "@tauri-apps/api/app";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { toIpcError } from "~/lib/errors";
+import { describeError, toIpcError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import * as ipc from "~/lib/ipc";
 import { isDesktopPlatform } from "~/lib/platform";
@@ -15,7 +15,7 @@ import type {
   LanTransferStatus,
 } from "~/types";
 
-import { resetApplicationData } from "./reset-app-data";
+import { startReset } from "./reset-runtime";
 
 export const DATA_MODULES: AppDataModule[] = [
   "vault",
@@ -38,7 +38,6 @@ export function useAbout() {
   const [target, setTarget] = useState<AppDataModule | "all" | null>(null);
   const [busy, setBusy] = useState(false);
   const [writeError, setWriteError] = useState<AppError | null>(null);
-  const [resetWarnings, setResetWarnings] = useState<AppError[] | null>(null);
   const mounted = useRef(false),
     generation = useRef(0),
     writing = useRef(false);
@@ -115,13 +114,13 @@ export function useAbout() {
   }, []);
 
   function selectTarget(value: AppDataModule | "all" | null) {
-    if (writing.current || resetWarnings) return;
+    if (writing.current) return;
     setWriteError(null);
     setTarget(value);
   }
 
   async function confirm() {
-    if (!target || writing.current || resetWarnings) return;
+    if (!target || writing.current) return;
     writing.current = true;
     generation.current++;
     setBusy(true);
@@ -129,22 +128,31 @@ export function useAbout() {
     setWriteError(null);
     try {
       if (target === "all") {
-        const warnings = await resetApplicationData();
-        if (warnings.length) {
-          if (mounted.current) setResetWarnings(warnings);
-        } else window.location.assign("/");
+        await startReset();
       } else {
         const result = await ipc.appDataClear(target);
         if (target === "hosts") useHostsStore.getState().invalidate();
         if (!mounted.current) return;
-        const title = moduleTitles[target],
-          freed = formatBytes(result.bytesFreed);
-        toast.success(
-          t({
-            comment: "清理某模块成功，title 是模块名，freed 是释放的数据大小",
-            message: `${title}已清理，释放 ${freed}`,
-          }),
-        );
+        const title = moduleTitles[target];
+        if (result.bytesFreed === null) {
+          toast.success(
+            t({
+              comment: "模块清理成功但容量统计不可用，title 是模块名",
+              message: `${title}已清理`,
+            }),
+            result.usageError
+              ? { description: describeError(result.usageError) }
+              : undefined,
+          );
+        } else {
+          const freed = formatBytes(result.bytesFreed);
+          toast.success(
+            t({
+              comment: "清理某模块成功，title 是模块名，freed 是释放的数据大小",
+              message: `${title}已清理，释放 ${freed}`,
+            }),
+          );
+        }
         setTarget(null);
         await read(++generation.current);
       }
@@ -170,7 +178,6 @@ export function useAbout() {
     selectTarget,
     busy,
     writeError,
-    resetWarnings,
     moduleTitles,
     moduleBytes,
     reload,

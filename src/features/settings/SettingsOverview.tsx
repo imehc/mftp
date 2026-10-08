@@ -12,14 +12,16 @@ import {
   Palette,
   PanelsTopLeft,
   RefreshCw,
+  Scaling,
   Sparkles,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 
 import { localeLabels } from "~/i18n/locales";
+import { resolveDisplaySize } from "~/lib/display-size";
 import { isDesktopPlatform } from "~/lib/platform";
-import { checkForUpdateManually, restartToApplyUpdate } from "~/lib/updater";
+import { checkForUpdateManually } from "~/lib/updater";
 import { useSettingsStore } from "~/store/settings";
 import { useUpdaterStore } from "~/store/updater";
 
@@ -35,6 +37,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const settings = useSettingsStore();
+  const displaySize = resolveDisplaySize(settings.displaySize);
   const status = useUpdaterStore((state) => state.status);
   const [choice, setChoice] = useState<SettingsChoice | null>(null);
   return (
@@ -60,6 +63,19 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
               settings.colorTheme === "default" ? t`默认` : settings.colorTheme
             }
             onClick={() => setChoice("theme")}
+          />
+          <SettingsEntry
+            icon={Scaling}
+            title={t`显示大小`}
+            description={
+              displaySize.mode === "system"
+                ? t`跟随系统`
+                : new Intl.NumberFormat(undefined, {
+                    style: "percent",
+                    maximumFractionDigits: 1,
+                  }).format(displaySize.scale)
+            }
+            onClick={() => setChoice("display")}
           />
           <SettingsEntry
             icon={Languages}
@@ -122,17 +138,16 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
             <SettingsEntry
               icon={RefreshCw}
               title={
-                status === "ready"
-                  ? t`重启更新`
+                status === "ready" ||
+                status === "available" ||
+                status === "downloading" ||
+                status === "restarting"
+                  ? t`查看更新`
                   : status === "checking"
                     ? t`正在检查`
                     : t`检查更新`
               }
-              disabled={status === "checking" || status === "restarting"}
-              onClick={() => {
-                if (status === "ready") void restartToApplyUpdate();
-                else void checkForUpdateManually();
-              }}
+              onClick={() => void checkForUpdateManually()}
             />
           ) : null}
           <SettingsEntry

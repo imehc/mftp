@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>C4 runtime checks</title>
+  </head>
+  <body>
+    <div id="host" style="width: 640px; height: 360px">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="panel" style="width: 320px"></div>
+    <pre id="result">运行中</pre>
+    <script type="module">
+      import "/src/App.css";
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import { I18nProvider } from "@lingui/react";
+      import { i18n } from "@lingui/core";
+      import { messages } from "/src/locales/en/messages.ts";
+      import { RuntimeControls } from "/src/features/model-viewer/components/RuntimeControls.tsx";
+      import { ModelViewerRuntime } from "/src/features/model-viewer/runtime/viewer.ts";
+      const canvas = document.getElementById("canvas"),
+        host = document.getElementById("host");
+      const contexts = [];
+      const runtime = new ModelViewerRuntime(canvas, (lost) =>
+        contexts.push(lost),
+      );
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      try {
+        await wait(100);
+        const landscape = Math.abs(runtime.camera.aspect - 640 / 360) < 0.01;
+        host.style.width = "320px";
+        host.style.height = "568px";
+        await wait(100);
+        const portrait = Math.abs(runtime.camera.aspect - 320 / 568) < 0.01;
+        runtime.budget.setThermal("critical");
+        await wait(100);
+        const cap =
+          runtime.renderer.getPixelRatio() <= 1 &&
+          runtime.budget.interval === 50;
+        await runtime.motion.start();
+        const orientation = (alpha) =>
+          window.dispatchEvent(
+            new DeviceOrientationEvent("deviceorientation", {
+              alpha,
+              beta: 0,
+              gamma: 0,
+            }),
+          );
+        orientation(0);
+        const initial = runtime.camera.quaternion.clone();
+        orientation(30);
+        const sensor =
+          runtime.motion.active &&
+          runtime.camera.quaternion.angleTo(initial) > 0.1 &&
+          !runtime.controls.enabled;
+        canvas.dispatchEvent(new PointerEvent("pointerdown"));
+        const manual = !runtime.motion.active && runtime.controls.enabled;
+        await runtime.motion.start();
+        orientation(0);
+        Object.defineProperty(document, "hidden", {
+          configurable: true,
+          value: true,
+        });
+        document.dispatchEvent(new Event("visibilitychange"));
+        const background = !runtime.motion.active;
+        delete document.hidden;
+        document.dispatchEvent(new Event("visibilitychange"));
+        const gl = runtime.renderer.getContext(),
+          ext = gl.getExtension("WEBGL_lose_context");
+        ext.loseContext();
+        await wait(250);
+        ext.restoreContext();
+        await wait(700);
+        const recovered =
+          contexts.includes(true) &&
+          contexts.at(-1) === false &&
+          !gl.isContextLost();
+        i18n.load("en", messages);
+        i18n.activate("en");
+        document.documentElement.style.fontSize = "20px";
+        document.documentElement.classList.add("dark");
+        Object.defineProperty(navigator, "userAgent", {
+          configurable: true,
+          value: "QA Android",
+        });
+        const panel = document.getElementById("panel");
+        createRoot(panel).render(
+          React.createElement(
+            I18nProvider,
+            { i18n },
+            React.createElement(RuntimeControls, {
+              runtime,
+              onCanvas: () => {},
+            }),
+          ),
+        );
+        await wait(200);
+        panel.querySelector("details").open = true;
+        await wait(100);
+        const layout = panel.scrollWidth <= panel.clientWidth;
+        const result = {
+          landscape,
+          portrait,
+          cap,
+          sensor,
+          manual,
+          background,
+          recovered,
+          layout,
+          passed:
+            landscape &&
+            portrait &&
+            cap &&
+            sensor &&
+            manual &&
+            background &&
+            recovered &&
+            layout,
+        };
+        document.getElementById("result").textContent = JSON.stringify(result);
+      } catch (error) {
+        document.getElementById("result").textContent = JSON.stringify({
+          passed: false,
+          error: String(error),
+        });
+      } finally {
+        runtime.dispose();
+      }
+    </script>
+  </body>
+</html>

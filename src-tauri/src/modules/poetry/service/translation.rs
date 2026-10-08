@@ -117,8 +117,10 @@ pub(crate) async fn generate_poetry_translation<
             POETRY_TRANSLATION_LANGUAGE,
             mode,
             POETRY_TRANSLATION_PROMPT_VERSION,
-            &content,
-            &model,
+            translation_store::GeneratedTranslation {
+                content: &content,
+                model: &model,
+            },
         )
     })
     .await

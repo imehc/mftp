@@ -47,7 +47,9 @@ function downloadBlobInBrowser(blob: Blob, fileName: string) {
 export async function downloadBlob(
   blob: Blob,
   fileName: string,
+  signal?: AbortSignal,
 ): Promise<number | false> {
+  if (signal?.aborted) return false;
   if (!isTauriRuntime()) {
     downloadBlobInBrowser(blob, fileName);
     return blob.size;
@@ -56,15 +58,18 @@ export async function downloadBlob(
   const { save } = await import("@tauri-apps/plugin-dialog");
   const { writeFile, stat } = await import("@tauri-apps/plugin-fs");
 
+  if (signal?.aborted) return false;
   const target = await save({
     defaultPath: fileName,
     title: fileName,
   });
-  if (typeof target !== "string" || !target) {
+  if (signal?.aborted || typeof target !== "string" || !target) {
     return false;
   }
 
   const bytes = new Uint8Array(await blob.arrayBuffer());
+  // 对话框或字节转换期间离开页面时不再写入；已开始的写入必须等待完成。
+  if (signal?.aborted) return false;
   await writeFile(target, bytes);
 
   // 读回实际磁盘占用（文件系统块对齐可能不同）。

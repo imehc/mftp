@@ -4,6 +4,7 @@ use crate::modules::keys::model::SshKey;
 use rusqlite::{params, Connection, OptionalExtension};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::{atomic::AtomicBool, Arc};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const DB_FILE: &str = "mftp.sqlite3";
@@ -12,6 +13,8 @@ mod data;
 mod export;
 mod helpers;
 mod import;
+mod reset;
+mod usage;
 
 pub(crate) use helpers::{add_column_if_missing, bool_to_int};
 
@@ -21,6 +24,7 @@ use helpers::restrict_file_permissions;
 pub struct Storage {
     root: PathBuf,
     db_path: PathBuf,
+    reset_pending: Arc<AtomicBool>,
 }
 
 pub fn now_ms() -> i64 {
@@ -36,9 +40,11 @@ impl Storage {
         let storage = Storage {
             db_path: root.join(DB_FILE),
             root,
+            reset_pending: Arc::new(AtomicBool::new(false)),
         };
         storage.sweep_bt_tombstones();
         storage.init_db()?;
+        storage.init_reset_journal()?;
         restrict_file_permissions(&storage.db_path);
         storage.migrate_legacy_json()?;
         Ok(storage)

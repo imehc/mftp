@@ -60,7 +60,7 @@ fn reset_clears_internal_records_without_touching_external_files() {
         .execute("INSERT INTO app_meta(key,value) VALUES('test','value')", [])
         .unwrap();
     storage.reset_database().unwrap();
-    assert_eq!(storage.app_data_usage().main_database_bytes > 0, true);
+    assert!(storage.app_data_usage().unwrap().main_database_bytes > 0);
     assert!(external_file.exists());
     fs::remove_dir_all(root).unwrap();
     fs::remove_dir_all(external).unwrap();
@@ -212,7 +212,7 @@ fn bt_reset_detaches_internal_data_from_surviving_writers() {
     storage.remove_bt_internal_data().unwrap();
     assert!(!bt.exists());
     // The quiet tombstone got removed in the same call, not deferred.
-    assert_eq!(storage.app_data_usage().bt_internal_bytes, 0);
+    assert_eq!(storage.app_data_usage().unwrap().bt_internal_bytes, 0);
     survivor.write_all(b"stale").unwrap();
     survivor.flush().unwrap();
     assert!(!bt.exists());
@@ -223,11 +223,11 @@ fn bt_reset_detaches_internal_data_from_surviving_writers() {
 fn pending_bt_tombstones_count_as_usage_and_sweep_on_storage_startup() {
     let root = temp_root("bt-sweep");
     let storage = Storage::new(root.clone()).unwrap();
-    assert_eq!(storage.app_data_usage().bt_internal_bytes, 0);
+    assert_eq!(storage.app_data_usage().unwrap().bt_internal_bytes, 0);
     let tombstone = root.join(format!("{BT_TOMBSTONE_PREFIX}manual"));
     fs::create_dir_all(&tombstone).unwrap();
     fs::write(tombstone.join("dht.json"), vec![b'x'; 64]).unwrap();
-    assert_eq!(storage.app_data_usage().bt_internal_bytes, 64);
+    assert_eq!(storage.app_data_usage().unwrap().bt_internal_bytes, 64);
     drop(storage);
     Storage::new(root.clone()).unwrap();
     assert!(!tombstone.exists());

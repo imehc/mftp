@@ -104,6 +104,14 @@ pub(super) struct DownloadPlan {
     pub(super) total_file_bytes: u64,
 }
 
+pub(super) struct TransferProgressContext<'a> {
+    pub(super) events: Option<&'a EventSink>,
+    pub(super) transfer_id: Option<&'a str>,
+    pub(super) phase: &'a str,
+    pub(super) completed_before: u64,
+    pub(super) total: Option<u64>,
+}
+
 pub(super) struct ProgressReader<'a, R: Read> {
     pub(super) inner: R,
     pub(super) events: Option<&'a EventSink>,
@@ -118,9 +126,7 @@ pub(super) struct ProgressReader<'a, R: Read> {
 impl<R: Read> Read for ProgressReader<'_, R> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         if let Some(transfer) = self.transfer {
-            transfer
-                .check()
-                .map_err(|error| std::io::Error::other(error))?;
+            transfer.check().map_err(std::io::Error::other)?;
         }
         let n = self.inner.read(buf)?;
         if n > 0 {
@@ -148,9 +154,7 @@ pub(super) struct TransferReader<'a, R: Read> {
 impl<R: Read> Read for TransferReader<'_, R> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         if let Some(transfer) = self.transfer {
-            transfer
-                .check()
-                .map_err(|error| std::io::Error::other(error))?;
+            transfer.check().map_err(std::io::Error::other)?;
         }
         self.inner.read(buf)
     }

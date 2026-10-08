@@ -4,6 +4,7 @@ use super::path_utils::{
     create_local_symlink_overwrite, local_temp_sibling, rename_local_file_overwrite,
 };
 use super::transfer_models::DownloadEntryKind;
+use super::transfer_models::TransferProgressContext;
 use super::types::Manager;
 use crate::error::AppResult;
 use std::time::{Duration, Instant};
@@ -64,11 +65,13 @@ impl Manager {
                         &entry.remote,
                         &temp_local,
                         Some(size),
-                        events,
-                        transfer_id,
-                        "下载文件夹中",
-                        downloaded,
-                        Some(total),
+                        TransferProgressContext {
+                            events,
+                            transfer_id,
+                            phase: "下载文件夹中",
+                            completed_before: downloaded,
+                            total: Some(total),
+                        },
                         transfer.as_ref(),
                     );
                     if let Err(e) = download_res {

@@ -37,8 +37,10 @@ fn ai_translation_export_round_trips_without_connection_config() {
         "zh-CN",
         PoetryTranslationMode::Literal,
         1,
-        "白话译文",
-        "translation-model",
+        translation_store::GeneratedTranslation {
+            content: "白话译文",
+            model: "translation-model",
+        },
     )
     .unwrap();
 

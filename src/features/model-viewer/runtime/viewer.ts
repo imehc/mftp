@@ -1,8 +1,5 @@
 import {
-  DirectionalLight,
-  HemisphereLight,
   PerspectiveCamera,
-  Scene,
   Sphere,
   Spherical,
   Vector3,
@@ -14,11 +11,15 @@ import type { ModelViewState } from "~/bindings";
 
 import { modelError } from "../domain/errors";
 import type { ModelHandle } from "../domain/types";
+import { capturePng } from "../export/capture";
+import { ViewerRecording } from "../export/recording";
 import { ViewerEnvironment } from "../inspection/environment";
 import { ViewerShadows } from "../inspection/shadows";
 import type { Unit } from "../inspection/tools";
 import { InspectionTools, type InteractionMode } from "../inspection/tools";
 import { captureModelView } from "../library/view";
+import { MotionControl } from "../system/motion";
+import { RenderBudget } from "../system/render-budget";
 import { ModelCollection, type ModelLayout } from "./collection";
 import { FlightControls } from "./flight";
 import { fitCamera } from "./framing";
@@ -26,16 +27,8 @@ import { OrientationGizmo } from "./gizmo";
 import { MemoryHistory } from "./memory";
 import { orientCamera, type ViewAxis } from "./orientation";
 import { ModelPlacement } from "./placement";
+import { litScene } from "./scene";
 import { texturePreview } from "./texture-preview";
-
-function litScene() {
-  const scene = new Scene();
-  scene.add(new HemisphereLight(0xffffff, 0x777777, 2));
-  const light = new DirectionalLight(0xffffff, 3);
-  light.position.set(3, 5, 4);
-  scene.add(light);
-  return scene;
-}
 
 async function waitUntilVisible(signal: AbortSignal) {
   signal.throwIfAborted();
@@ -65,6 +58,7 @@ async function waitUntilVisible(signal: AbortSignal) {
 
 export class ModelViewerRuntime {
   readonly renderer: WebGLRenderer;
+  readonly recording: ViewerRecording;
   private recovery: WEBGL_lose_context | null;
   private scene = litScene();
   private camera = new PerspectiveCamera(45, 1, 0.001, 1000);
@@ -81,6 +75,8 @@ export class ModelViewerRuntime {
   readonly tools: InspectionTools;
   readonly flight: FlightControls;
   readonly environment: ViewerEnvironment;
+  readonly motion: MotionControl;
+  readonly budget = new RenderBudget(() => this.resize());
   private shadows: ViewerShadows;
   private reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   private gizmo: OrientationGizmo;
@@ -95,6 +91,7 @@ export class ModelViewerRuntime {
     private onModels: () => void = () => {},
   ) {
     this.renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true });
+    this.recording = new ViewerRecording(this.invalidate);
     this.gizmo = new OrientationGizmo(this.camera, canvas);
     // 上下文丢失后 getExtension 会返回 null，必须在初始化时保留恢复句柄。
     this.recovery = this.renderer
@@ -117,6 +114,13 @@ export class ModelViewerRuntime {
     this.environment = new ViewerEnvironment(
       this.scene,
       this.renderer,
+      this.invalidate,
+    );
+    this.motion = new MotionControl(
+      canvas,
+      this.camera,
+      this.controls.target,
+      () => this.setInteractive(this.interactive),
       this.invalidate,
     );
     this.shadows = new ViewerShadows(this.scene, this.renderer, this.models);
@@ -153,7 +157,9 @@ export class ModelViewerRuntime {
     if (!rect || !rect.width || !rect.height) return;
     this.camera.aspect = rect.width / rect.height;
     this.camera.updateProjectionMatrix();
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio || 1, this.budget.pixelRatio),
+    );
     this.renderer.setSize(rect.width, rect.height, false);
     this.invalidate();
   };
@@ -164,6 +170,11 @@ export class ModelViewerRuntime {
     this.frame = requestAnimationFrame((time) => {
       this.frame = null;
       if (this.disposed || this.lost || document.hidden) return;
+      if (!this.budget.shouldRender(time)) {
+        this.invalidate();
+        return;
+      }
+      const started = performance.now();
       const delta =
         this.lastFrame === null ? 0 : (time - this.lastFrame) / 1000;
       this.lastFrame = time;
@@ -173,8 +184,11 @@ export class ModelViewerRuntime {
       const moving = this.controls.enabled && this.controls.update(delta);
       this.shadows.sync();
       this.renderer.render(this.scene, this.camera);
+      this.budget.sample(delta * 1000, performance.now() - started);
+      this.recording.frame(this.canvas, time);
       if (this.models.entries.size) this.gizmo.render(this.renderer);
-      if (moving || animating || flying) this.invalidate();
+      if (moving || animating || flying || this.recording.active)
+        this.invalidate();
       else this.lastFrame = null;
     });
   };
@@ -183,9 +197,12 @@ export class ModelViewerRuntime {
     if (this.frame !== null) cancelAnimationFrame(this.frame);
     this.frame = null;
     this.lastFrame = null;
+    this.budget.pause();
   }
   private visibility = () => {
     if (document.hidden) {
+      this.motion.stop();
+      void this.recording.stop();
       this.stop();
       this.placement.cancel();
       this.flight.clear();
@@ -194,6 +211,8 @@ export class ModelViewerRuntime {
   private contextLost = (event: Event) => {
     event.preventDefault();
     this.lost = true;
+    this.motion.stop();
+    void this.recording.interrupt();
     this.setMode("orbit");
     this.flight.clear();
     this.tools.diagnostics.cancel();
@@ -267,6 +286,7 @@ export class ModelViewerRuntime {
       this.tools.detach();
     }
     this.models.remove(id);
+    if (!this.models.entries.size) void this.recording.stop();
     if (selected) this.tools.selectionChanged();
     this.renderer.renderLists.dispose();
     this.refreshMemory();
@@ -302,6 +322,7 @@ export class ModelViewerRuntime {
     this.canvas.parentElement?.focus();
   }
   setMode(mode: InteractionMode) {
+    if (mode !== "orbit") this.motion.stop();
     this.placement.cancel();
     this.flight.clear();
     this.placing = mode === "place";
@@ -370,6 +391,25 @@ export class ModelViewerRuntime {
     this.setAutoRotate(value.autoRotate);
     this.onModels();
     this.invalidate();
+  }
+  screenshot() {
+    if (
+      this.disposed ||
+      this.lost ||
+      !this.models.current ||
+      this.renderer.getContext().isContextLost()
+    )
+      throw modelError("capture");
+    this.shadows.sync();
+    this.renderer.render(this.scene, this.camera);
+    try {
+      if (this.renderer.getContext().isContextLost())
+        throw modelError("capture");
+      return capturePng(this.canvas);
+    } finally {
+      // 截图不含方向控件，复制后重新安排屏幕正常帧。
+      this.invalidate();
+    }
   }
   thumbnail() {
     if (this.disposed || this.lost || !this.models.current) return null;
@@ -464,13 +504,15 @@ export class ModelViewerRuntime {
   setInteractive(enabled: boolean) {
     this.interactive = enabled;
     const mode = this.tools.snapshot().mode;
-    this.controls.enabled = enabled && mode === "orbit" && !this.lost;
+    this.controls.enabled =
+      enabled && mode === "orbit" && !this.lost && !this.motion.active;
     this.placement.enabled = enabled && this.placing && !this.lost;
     this.flight.enabled = enabled && mode === "fly" && !this.lost;
     this.tools.measurement.enabled =
       enabled && mode === "measure" && !this.lost;
     this.controls.autoRotate =
       this.controls.enabled && this.tools.snapshot().autoRotate;
+    if (!enabled) this.motion.stop();
     if (!enabled) this.flight.clear();
     if (!enabled) this.placement.cancel();
   }
@@ -522,13 +564,16 @@ export class ModelViewerRuntime {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    void this.recording.dispose();
     this.stop();
     this.observer.disconnect();
+    this.motion.dispose();
     this.controls.dispose();
     this.placement.dispose();
     this.flight.dispose();
     this.tools.dispose();
     this.environment.dispose();
+    this.budget.dispose();
     this.shadows.dispose();
     this.reducedMotion.removeEventListener("change", this.motionChanged);
     this.gizmo.dispose();

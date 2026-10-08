@@ -1,6 +1,13 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
-import { Box, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
+import {
+  Box,
+  MoreHorizontal,
+  Paperclip,
+  Pencil,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
 import type { ModelLibraryEntry } from "~/bindings";
@@ -58,12 +65,14 @@ export function LibraryList({
   open,
   edit,
   remove,
+  attachments,
 }: {
   entries: ModelLibraryEntry[];
   controller: ModelLibraryController;
   busy: boolean;
   open: (id: string) => void;
   edit: (entry: ModelLibraryEntry, trigger: HTMLElement | null) => void;
+  attachments: (entry: ModelLibraryEntry, trigger: HTMLElement | null) => void;
   remove: (entry: ModelLibraryEntry, trigger: HTMLElement | null) => void;
 }) {
   const { t } = useLingui();
@@ -201,6 +210,21 @@ export function LibraryList({
                       <Pencil aria-hidden="true" />
                       <Trans comment="编辑本地模型库的名称、分组和收藏状态。">
                         编辑模型
+                      </Trans>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() =>
+                        attachments(
+                          entry,
+                          document.getElementById(
+                            `${listId}-actions-${row.index}`,
+                          ),
+                        )
+                      }
+                    >
+                      <Paperclip aria-hidden="true" />
+                      <Trans comment="管理此模型在本机保存的说明附件。">
+                        模型附件
                       </Trans>
                     </DropdownMenuItem>
                     <DropdownMenuItem

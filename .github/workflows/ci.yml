@@ -48,6 +48,8 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
 
       - name: Cache Rust
         uses: swatinem/rust-cache@v2
@@ -60,11 +62,133 @@ jobs:
       - name: Check React version consistency
         run: pnpm run react:check
 
+      - name: Check model offline resources
+        run: pnpm run model:offline-check
+
+      - name: Check application version consistency
+        run: pnpm run version:check
+
+      - name: Lint frontend
+        run: pnpm run lint
+
+      - name: Check Rust formatting
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+
+      - name: Lint Rust library
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --locked --lib -- -D warnings
+
       - name: Build frontend
         run: pnpm run build
+
+      - name: Check build size and lazy preload budgets
+        run: pnpm run build:budget
 
       - name: Run frontend tests
         run: pnpm test
 
       - name: Run Rust tests
         run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+
+      - name: Check generated IPC bindings
+        run: git diff --exit-code -- src/bindings.ts
+
+  apple-check:
+    name: macOS library and iOS plugins (compile only)
+    runs-on: macos-14
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Rust and iOS simulator target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios-sim
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+          key: apple-check
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend resources
+        run: pnpm run build
+
+      - name: Check macOS library
+        run: cargo check --manifest-path src-tauri/Cargo.toml --locked --lib
+
+      # These build Rust/Swift adapters only; they do not launch a simulator
+      # or validate the complete iOS application or native system behavior.
+      - name: Compile iOS export and viewer plugins
+        run: >-
+          cargo check --manifest-path src-tauri/Cargo.toml --locked
+          -p tauri-plugin-native-export -p tauri-plugin-native-viewer
+          --target aarch64-apple-ios-sim
+
+  android-plugins:
+    name: Android plugins (compile only)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+          cache-dependency-path: |
+            src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties
+            src-tauri/gen/android/*.gradle.kts
+            src-tauri/plugins/*/android/build.gradle.kts
+            src-tauri/Cargo.lock
+
+      - name: Setup Rust for locked dependency metadata
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install compile SDK and build tools
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      # The Node script has no frontend dependencies. It copies the exact locked
+      # Tauri API and plugins into a fresh workspace; no app/device is launched.
+      - name: Assemble isolated Android plugin libraries
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: pnpm run android:plugins:check
+
+      - name: Preserve source and environment report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-plugin-check-report
+          path: ${{ runner.temp }}/mftp-android-plugins-*/check-report.json
+          if-no-files-found: warn

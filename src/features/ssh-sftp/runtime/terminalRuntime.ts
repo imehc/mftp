@@ -15,6 +15,7 @@ import {
 } from "~/lib/event-subscription";
 import { sshClosedEvent, sshDataEvent } from "~/lib/events";
 import * as ipc from "~/lib/ipc";
+import { observeRootFontSize } from "~/lib/root-font-size";
 import { useSessionsStore } from "~/store/sessions";
 
 /**
@@ -40,6 +41,7 @@ interface TerminalEntry {
   /** 当前挂载点；为 null 表示不在页面上，此时不做 fit / resize。 */
   mountedAt: HTMLElement | null;
   observer: ResizeObserver;
+  stopFontSize: () => void;
   listeners: Set<OpeningListener>;
   subscriptions: Subscription[];
   onData: { dispose: () => void };
@@ -108,6 +110,7 @@ function disposeEntry(sessionId: string, entry: TerminalEntry): void {
   entry.disposed = true;
   entries.delete(sessionId);
   entry.observer.disconnect();
+  entry.stopFontSize();
   entry.onData.dispose();
   disposeSubscriptions(entry.subscriptions);
   entry.term.dispose();
@@ -239,6 +242,7 @@ function createEntry(sessionId: string): TerminalEntry | null {
     slot,
     mountedAt: null,
     observer,
+    stopFontSize: () => {},
     listeners: new Set(),
     subscriptions: [],
     // 终端 → 后端：将按键以 base64 转发。
@@ -248,6 +252,10 @@ function createEntry(sessionId: string): TerminalEntry | null {
     opening: false,
     disposed: false,
   };
+  entry.stopFontSize = observeRootFontSize((pixels) => {
+    term.options.fontSize = Math.round(((pixels * 13) / 16) * 100) / 100;
+    handleResize(entry, sessionId);
+  });
   entries.set(sessionId, entry);
   watchSessions();
   openShell(sessionId, entry);

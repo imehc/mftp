@@ -49,8 +49,8 @@ pub(super) fn snapshot_in(tx: &Transaction<'_>) -> AppResult<AiConfigurationView
     let mut labels = BTreeSet::new();
     let mut models = BTreeSet::new();
     for provider in &mut providers {
-        provider.keys = keys(&tx, &provider.id)?;
-        provider.models = provider_models(&tx, &provider.id)?;
+        provider.keys = keys(tx, &provider.id)?;
+        provider.models = provider_models(tx, &provider.id)?;
         for key in &provider.keys {
             add_candidate(&mut labels, &key.label);
         }

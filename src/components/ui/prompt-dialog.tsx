@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
 import { z } from "zod";
+
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,9 @@ import {
 } from "~/components/ui/dialog";
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import { Field, FieldDescription } from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import { firstFormError } from "~/lib/form-errors";
+
 interface Props {
   open: boolean;
   title: string;
@@ -58,7 +60,10 @@ export default function PromptDialog({
   }, [form, open, initialValue]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="ui-density-adaptive max-w-sm" showCloseButton={false}>
+      <DialogContent
+        className="ui-density-adaptive max-w-sm"
+        showCloseButton={false}
+      >
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>{title}</DialogTitle>
         </DialogLayoutHeader>

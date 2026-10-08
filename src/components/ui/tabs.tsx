@@ -1,7 +1,6 @@
-import * as React from "react";
-import { Tabs as TabsPrimitive } from "radix-ui";
-
 import { cn } from "cn";
+import { Tabs as TabsPrimitive } from "radix-ui";
+import * as React from "react";
 
 const TabsDensityContext = React.createContext<"default" | "adaptive">(
   "default",

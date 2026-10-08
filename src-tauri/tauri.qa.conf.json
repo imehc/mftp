@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MFTP QA",
+  "identifier": "com.imehc.mftp.qa",
+  "app": {
+    "windows": [{ "title": "MFTP QA", "width": 880, "height": 640 }]
+  },
+  "bundle": { "createUpdaterArtifacts": false },
+  "plugins": { "updater": { "endpoints": [] } }
+}

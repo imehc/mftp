@@ -206,8 +206,7 @@ impl PoetryLibrary {
         enable: bool,
         on_progress: impl Fn(i64, i64) + Send + Sync,
     ) -> AppResult<()> {
-        self.db()
-            .rebuild_body_index(enable, |done, total| on_progress(done, total))
+        self.db().rebuild_body_index(enable, on_progress)
     }
 
     pub fn delete_collection(&self, id: &str) -> AppResult<()> {
@@ -315,9 +314,8 @@ impl PoetryLibrary {
             bytes_total: None,
             imported: 0,
             total: None,
-            error: result.err().map(|error| {
+            error: result.err().inspect(|error| {
                 eprintln!("{error_log}: {}", error.message);
-                error
             }),
         });
     }
@@ -483,7 +481,7 @@ fn import_annotation_jsonl(
     // guwen/ sentence/ writer/; only lines carrying annotation fields are
     // relevant, so filter by content rather than by path.
     let mut json_files = Vec::new();
-    collect_matching_suffix(dir, dir, ".json", &mut json_files)?;
+    collect_matching_suffix(dir, ".json", &mut json_files)?;
     json_files.sort();
 
     // Pre-count lines so the progress toast can show X / Y.
@@ -554,7 +552,7 @@ fn import_annotation_jsonl(
                 ],
             )?;
             imported += 1;
-            if imported % 500 == 0 {
+            if imported.is_multiple_of(500) {
                 progress(PoetrySyncProgress {
                     collection_id: ANNOTATIONS_COLLECTION_ID.into(),
                     phase: "importing".into(),
@@ -571,19 +569,14 @@ fn import_annotation_jsonl(
 }
 
 #[cfg(desktop)]
-fn collect_matching_suffix(
-    root: &Path,
-    dir: &Path,
-    suffix: &str,
-    out: &mut Vec<PathBuf>,
-) -> AppResult<()> {
+fn collect_matching_suffix(dir: &Path, suffix: &str, out: &mut Vec<PathBuf>) -> AppResult<()> {
     let entries = fs::read_dir(dir)
         .map_err(|error| AppError::from(error).context(format!("read {}", dir.display())))?;
     for entry in entries {
         let entry = entry.map_err(AppError::from)?;
         let path = entry.path();
         if path.is_dir() {
-            collect_matching_suffix(root, &path, suffix, out)?;
+            collect_matching_suffix(&path, suffix, out)?;
         } else if path.to_string_lossy().ends_with(suffix) {
             out.push(path);
         }

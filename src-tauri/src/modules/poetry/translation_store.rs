@@ -171,6 +171,11 @@ pub(crate) fn all(storage: &Storage) -> AppResult<Vec<PoetryTranslation>> {
     rows.into_iter().map(translation_from_row).collect()
 }
 
+pub(crate) struct GeneratedTranslation<'a> {
+    pub(crate) content: &'a str,
+    pub(crate) model: &'a str,
+}
+
 pub(crate) fn upsert(
     storage: &Storage,
     poem_uid: &str,
@@ -178,9 +183,9 @@ pub(crate) fn upsert(
     language: &str,
     mode: PoetryTranslationMode,
     prompt_version: u32,
-    content: &str,
-    model: &str,
+    generated: GeneratedTranslation<'_>,
 ) -> AppResult<PoetryTranslation> {
+    let GeneratedTranslation { content, model } = generated;
     let content = normalize_content(content)?;
     let timestamp = now_ms();
     let conn = storage.conn()?;

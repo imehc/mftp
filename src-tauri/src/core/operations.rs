@@ -1,6 +1,9 @@
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use parking_lot::{Condvar, Mutex};
-use std::sync::Arc;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 use std::time::Duration;
 use tokio::sync::Notify;
 
@@ -27,15 +30,32 @@ impl State {
 /// own lease; admission alone is never evidence that domain IO has stopped.
 #[derive(Default)]
 pub(crate) struct Operations {
+    reset_pending: Arc<AtomicBool>,
     state: Mutex<State>,
     idle: Condvar,
     changed: Notify,
 }
 
 impl Operations {
+    pub(crate) fn with_reset_gate(reset_pending: Arc<AtomicBool>) -> Self {
+        Self {
+            reset_pending,
+            ..Self::default()
+        }
+    }
+
+    fn ensure_reset_complete(&self) -> AppResult<()> {
+        if self.reset_pending.load(Ordering::SeqCst) {
+            Err(AppError::custom(CustomErrorCode::AppResetPending))
+        } else {
+            Ok(())
+        }
+    }
+
     pub(crate) fn begin(self: &Arc<Self>) -> AppResult<OperationLease> {
         let mut state = self.state.lock();
         state.check_admission()?;
+        self.ensure_reset_complete()?;
         state.active += 1;
         Ok(OperationLease(self.clone()))
     }
@@ -51,6 +71,11 @@ impl Operations {
 
     /// The IPC gate is an early rejection only; workers must acquire a lease.
     pub(crate) fn check_admission(&self) -> AppResult<()> {
+        self.state.lock().check_admission()?;
+        self.ensure_reset_complete()
+    }
+
+    pub(crate) fn check_recovery_admission(&self) -> AppResult<()> {
         self.state.lock().check_admission()
     }
 
@@ -60,9 +85,27 @@ impl Operations {
         self: &Arc<Self>,
         timeout: Duration,
     ) -> AppResult<MaintenanceLease> {
+        self.reserve_maintenance(timeout, false).await
+    }
+
+    pub(crate) async fn recovery_maintenance(
+        self: &Arc<Self>,
+        timeout: Duration,
+    ) -> AppResult<MaintenanceLease> {
+        self.reserve_maintenance(timeout, true).await
+    }
+
+    async fn reserve_maintenance(
+        self: &Arc<Self>,
+        timeout: Duration,
+        recovery: bool,
+    ) -> AppResult<MaintenanceLease> {
         let lease = {
             let mut state = self.state.lock();
             state.check_admission()?;
+            if !recovery {
+                self.ensure_reset_complete()?;
+            }
             state.maintenance = true;
             MaintenanceLease(self.clone())
         };

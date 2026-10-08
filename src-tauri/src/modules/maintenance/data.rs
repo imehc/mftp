@@ -4,7 +4,7 @@ use crate::models::{AppDataClearResult, AppDataModule, AppDataResetResult, AppDa
 use std::sync::Arc;
 use tauri::State;
 
-use crate::core::execution::{run_blocking, run_blocking_guarded};
+use crate::core::execution::run_blocking;
 
 use super::participants;
 
@@ -25,12 +25,16 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
 }
 
 // The frontend localizes this stable key; the backend must not ship display copy.
-const PRESERVED_USER_FILES: &str = "bt-downloads-and-lan-shared-files";
+pub(super) const PRESERVED_USER_FILES: &str = "bt-downloads-and-lan-shared-files";
 
 #[tauri::command]
 #[specta::specta]
-pub fn app_data_usage(state: State<AppServices>) -> AppResult<AppDataUsage> {
-    Ok(state.storage.app_data_usage())
+pub async fn app_data_usage(state: State<'_, AppServices>) -> AppResult<AppDataUsage> {
+    let storage = state.storage.clone();
+    state
+        .executor
+        .blocking_unlogged(move || storage.app_data_usage())
+        .await
 }
 
 #[tauri::command]
@@ -42,7 +46,6 @@ pub async fn app_data_clear(
     let maintenance = state.executor.maintenance().await?;
     let ssh_maintenance = state.manager.maintenance().await?;
     state.lifecycle.ensure_no_busy(participants_for(module))?;
-    let before = state.storage.app_data_usage().total_bytes;
     let storage = state.storage.clone();
     let result = match module {
         AppDataModule::Vault
@@ -52,6 +55,7 @@ pub async fn app_data_clear(
             run_blocking(move || {
                 let _maintenance = maintenance;
                 let _ssh_maintenance = ssh_maintenance;
+                let before = storage.app_data_usage();
                 let count = storage.clear_data_module(module)?;
                 Ok(storage.data_clear_result(module, count, before, Vec::new()))
             })
@@ -63,6 +67,7 @@ pub async fn app_data_clear(
             run_blocking(move || {
                 let _maintenance = maintenance;
                 let _ssh_maintenance = ssh_maintenance;
+                let before = storage.app_data_usage();
                 poetry.delete_database()?;
                 Ok(storage.data_clear_result(AppDataModule::Poetry, 0, before, Vec::new()))
             })
@@ -75,53 +80,8 @@ pub async fn app_data_clear(
 #[tauri::command]
 #[specta::specta]
 pub async fn app_data_reset(state: State<'_, AppServices>) -> AppResult<AppDataResetResult> {
-    // Drain the shared pipeline (including logs) before domain maintenance:
-    // a pipeline operation may itself still need domain admission to finish.
     let maintenance = Arc::new(state.executor.maintenance().await?);
-    let ssh_maintenance = Arc::new(state.manager.maintenance().await?);
-    // Reset must wait for every registered participant; the list comes from
-    // the same Lifecycle registration the exit path stops.
-    let all_participants = state.lifecycle.participant_ids();
-    state.lifecycle.ensure_no_busy(&all_participants)?;
-    // BT runs locally on Android as well; iOS has no engine to stop.
-    // Retain exclusive admission through the actual reset worker, not only its
-    // async waiter. In-flight calls drain before checking the persisted state.
-    #[cfg(any(desktop, target_os = "android"))]
-    let bt_maintenance = state.bt.maintenance().await?;
-    let before = state.storage.app_data_usage().total_bytes;
-    // Reject failed SSH cleanup before stopping other domains or clearing AI
-    // credentials. A cancelled waiter must still retain both maintenance gates.
-    let ssh = state.manager.clone();
-    run_blocking_guarded((maintenance.clone(), ssh_maintenance.clone()), move || {
-        ssh.cleanup_local_temps()
-    })
-    .await?;
-    #[cfg(any(desktop, target_os = "android"))]
-    state.bt.stop_background_work().await;
-    let storage = state.storage.clone();
-    let cleanup_maintenance = maintenance.clone();
-    let result = run_blocking(move || {
-        let _maintenance = maintenance;
-        let _ssh_maintenance = ssh_maintenance;
-        #[cfg(any(desktop, target_os = "android"))]
-        let _bt_maintenance = bt_maintenance;
-        let records_deleted = storage.reset_database()?;
-        storage.clear_poetry_database()?;
-        // Detach before deleting; failure must not fall back to in-place
-        // removal. This isolates open handles, not librqbit's path-based writes.
-        storage.remove_bt_internal_data()?;
-        Ok(AppDataResetResult {
-            records_deleted,
-            bytes_freed: before.saturating_sub(storage.app_data_usage().total_bytes),
-            preserved: vec![PRESERVED_USER_FILES.into()],
-        })
-    })
-    .await?;
-    state
-        .ai_configuration
-        .cleanup_after_reset(cleanup_maintenance)
-        .await?;
-    Ok(result)
+    super::reset::run_owned(state.inner().clone(), maintenance, None).await
 }
 
 #[cfg(test)]

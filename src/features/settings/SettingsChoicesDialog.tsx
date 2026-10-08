@@ -16,8 +16,16 @@ import { isDesktopPlatform } from "~/lib/platform";
 import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
 
+import DisplaySizeSettings from "./DisplaySizeSettings";
+
 export type SettingsChoice =
-  "appearance" | "theme" | "language" | "games" | "startup" | "transfer";
+  | "display"
+  | "appearance"
+  | "theme"
+  | "language"
+  | "games"
+  | "startup"
+  | "transfer";
 
 export default function SettingsChoicesDialog({
   choice,
@@ -34,6 +42,7 @@ export default function SettingsChoicesDialog({
     state.transfers.some((item) => item.status === "running"),
   );
   const titles = {
+    display: t`显示大小`,
     appearance: t`外观`,
     theme: t`主题与字体`,
     language: t`语言`,
@@ -77,6 +86,7 @@ export default function SettingsChoicesDialog({
           <DialogTitle>{choice ? titles[choice] : ""}</DialogTitle>
         </DialogLayoutHeader>
         <DialogLayoutBody className="flex flex-col gap-2">
+          {choice === "display" ? <DisplaySizeSettings /> : null}
           {choice === "appearance"
             ? ["system", "light", "dark"].map((value) =>
                 option(

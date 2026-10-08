@@ -100,7 +100,7 @@ export function WorkspaceInspector({
     </Tabs>
   );
   return (
-    <aside className="order-first min-w-0 md:order-last md:col-start-2 md:row-span-2 md:row-start-1">
+    <div className="min-w-0">
       {wide ? (
         <div className="max-h-[min(48rem,80dvh)] overflow-auto rounded-xl border p-3">
           {content}
@@ -148,6 +148,6 @@ export function WorkspaceInspector({
           </DialogContent>
         </Dialog>
       )}
-    </aside>
+    </div>
   );
 }

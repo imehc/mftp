@@ -74,11 +74,13 @@ fn early_eof_is_failure_with_actual_progress_and_no_second_response() {
     let mut output = vec![];
     let result = write_file_range_response(
         &mut output,
-        "application/octet-stream",
         &mut Cursor::new(b"short"),
         RangeRequest::Absent.resolve(10).unwrap(),
-        10,
-        &[],
+        FileResponseMetadata {
+            content_type: "application/octet-stream",
+            content_length: 10,
+            headers: &[],
+        },
         &tasks,
         "task",
     );
@@ -167,11 +169,13 @@ fn empty_download_has_headers_and_cancellation_still_wins() {
     let mut output = vec![];
     write_file_range_response(
         &mut output,
-        "application/octet-stream",
         &mut Cursor::new(b""),
         RangeRequest::Absent.resolve(0).unwrap(),
-        0,
-        &[],
+        FileResponseMetadata {
+            content_type: "application/octet-stream",
+            content_length: 0,
+            headers: &[],
+        },
         &tasks,
         "task",
     )

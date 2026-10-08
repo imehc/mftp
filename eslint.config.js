@@ -68,8 +68,6 @@ export default tseslint.config(
       "src/bindings.ts",
       "src/routeTree.gen.ts",
       "src/locales/**/messages.ts",
-      // shadcn/ui 组件 —— 由上游维护，无需手动修改
-      "src/components/ui/**",
     ],
   },
   js.configs.recommended,
@@ -82,7 +80,12 @@ export default tseslint.config(
   },
   lingui.configs["flat/recommended"],
   {
-    files: ["src/**/*.{ts,tsx}", "*.config.{ts,js}", "scripts/**/*.mjs"],
+    files: [
+      "src/**/*.{ts,tsx}",
+      "*.config.{ts,js}",
+      "scripts/**/*.mjs",
+      "tests/**/*.mjs",
+    ],
     plugins: { "simple-import-sort": simpleImportSort },
     rules: {
       "simple-import-sort/imports": [
@@ -134,7 +137,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["*.config.{ts,js}", "scripts/**/*.mjs"],
+    files: ["*.config.{ts,js}", "scripts/**/*.mjs", "tests/**/*.mjs"],
     languageOptions: {
       globals: { ...globals.node },
     },

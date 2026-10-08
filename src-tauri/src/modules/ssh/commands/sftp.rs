@@ -189,6 +189,10 @@ pub async fn sftp_exists(
 
 #[tauri::command]
 #[specta::specta]
+#[expect(
+    clippy::too_many_arguments,
+    reason = "Tauri injects app and state; preserve the six existing IPC arguments"
+)]
 pub async fn sftp_upload_dir(
     app: AppHandle,
     state: State<'_, AppServices>,
@@ -208,8 +212,10 @@ pub async fn sftp_upload_dir(
         manager.sftp_upload_dir(
             &session_id,
             &local_dir,
-            &remote_parent,
-            &remote_name,
+            super::super::service::UploadDirectoryTarget {
+                parent: &remote_parent,
+                name: &remote_name,
+            },
             DirectoryTransferMode::parse(transfer_mode.as_deref()),
             Some(&events),
             transfer_id.as_deref(),

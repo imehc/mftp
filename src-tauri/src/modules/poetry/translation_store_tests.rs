@@ -23,8 +23,10 @@ fn translations_are_isolated_by_uid_and_fingerprint() {
         "zh-CN",
         PoetryTranslationMode::Literal,
         1,
-        "译文甲",
-        "model",
+        GeneratedTranslation {
+            content: "译文甲",
+            model: "model",
+        },
     )
     .unwrap();
     assert_eq!(
@@ -54,8 +56,10 @@ fn repeated_generation_updates_one_record_and_user_edits_are_marked() {
             "zh-CN",
             PoetryTranslationMode::Literary,
             1,
-            content,
-            "model",
+            GeneratedTranslation {
+                content: content,
+                model: "model",
+            },
         )
         .unwrap();
     }
@@ -88,8 +92,10 @@ fn user_edited_rows_survive_regenerated_content() {
         "zh-CN",
         PoetryTranslationMode::Literal,
         1,
-        "初版",
-        "model",
+        GeneratedTranslation {
+            content: "初版",
+            model: "model",
+        },
     )
     .unwrap();
     update(
@@ -110,8 +116,10 @@ fn user_edited_rows_survive_regenerated_content() {
         "zh-CN",
         PoetryTranslationMode::Literal,
         1,
-        "再生成",
-        "model",
+        GeneratedTranslation {
+            content: "再生成",
+            model: "model",
+        },
     )
     .unwrap();
     assert_eq!(regenerated.content, "再生成");

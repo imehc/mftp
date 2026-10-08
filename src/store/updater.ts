@@ -5,6 +5,7 @@ import type { AppError } from "~/types";
 export type UpdaterStatus =
   | "idle"
   | "checking"
+  | "current"
   | "available"
   | "downloading"
   | "ready"
@@ -13,22 +14,32 @@ export type UpdaterStatus =
 
 export interface UpdaterState {
   status: UpdaterStatus;
+  dialogOpen: boolean;
   version: string | null;
-  releaseNotes: string[];
+  currentVersion: string | null;
+  releaseNotes: string;
+  notesTruncated: boolean;
   downloaded: number;
   total?: number;
-  phase: "downloading" | "installing";
+  phase: "connecting" | "downloading" | "verifying";
+  connectionSlow: boolean;
+  installed: boolean;
   /** 更新插件的完整错误（external），到渲染时再本地化。 */
   error: AppError | null;
 }
 
 export const initialUpdaterState: UpdaterState = {
   status: "idle",
+  dialogOpen: false,
   version: null,
-  releaseNotes: [],
+  currentVersion: null,
+  releaseNotes: "",
+  notesTruncated: false,
   downloaded: 0,
   total: undefined,
-  phase: "downloading",
+  phase: "connecting",
+  connectionSlow: false,
+  installed: false,
   error: null,
 };
 

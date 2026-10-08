@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import { translate } from "~/i18n/translate";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import type { LanTransferTask } from "~/types";
 
 function formatDuration(ms: number) {
@@ -68,6 +69,7 @@ export default function LanTransferActivity({
     estimateSize: () => 112,
     overscan: 3,
   });
+  useVirtualizerFontSize(virtualizer);
   return (
     <section className="border-border bg-card shrink-0 rounded-lg border p-2.5">
       <div className="mb-2 flex items-center justify-between gap-2">

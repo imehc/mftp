@@ -1,6 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
 
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import type { BtTaskInfo } from "~/types";
 
 import TaskRow, { type TaskRowProps } from "./TaskRow";
@@ -20,6 +21,7 @@ export default function TaskList({
     estimateSize: () => 148,
     overscan: 4,
   });
+  useVirtualizerFontSize(virtualizer);
   return (
     <div
       ref={scroller}

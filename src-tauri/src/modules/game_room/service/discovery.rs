@@ -63,39 +63,36 @@ pub(super) fn discover_rooms(
             if let Ok(receiver) = daemon.browse(SERVICE_TYPE) {
                 let started = Instant::now();
                 while started.elapsed() < DISCOVER_WINDOW && !stop.is_stopped() {
-                    match receiver.recv_timeout(Duration::from_millis(180)) {
-                        Ok(ServiceEvent::ServiceResolved(info)) => {
-                            let prop =
-                                |key: &str| info.get_property_val_str(key).map(str::to_string);
-                            let (Some(room_id), Some(room_game)) = (prop("id"), prop("game"))
-                            else {
-                                continue;
-                            };
-                            if room_game != game_id {
-                                continue;
-                            }
-                            let Some(ip) = prop("ip").or_else(|| {
-                                info.get_addresses_v4()
-                                    .into_iter()
-                                    .next()
-                                    .map(|ip| ip.to_string())
-                            }) else {
-                                continue;
-                            };
-                            rooms.insert(
-                                room_id.clone(),
-                                GameRoomSummary {
-                                    room_id,
-                                    game_id: room_game,
-                                    room_name: present(prop("name")),
-                                    host_name: present(prop("host")),
-                                    ip,
-                                    port: info.get_port(),
-                                    has_code: prop("code").as_deref() == Some("1"),
-                                },
-                            );
+                    if let Ok(ServiceEvent::ServiceResolved(info)) =
+                        receiver.recv_timeout(Duration::from_millis(180))
+                    {
+                        let prop = |key: &str| info.get_property_val_str(key).map(str::to_string);
+                        let (Some(room_id), Some(room_game)) = (prop("id"), prop("game")) else {
+                            continue;
+                        };
+                        if room_game != game_id {
+                            continue;
                         }
-                        Ok(_) | Err(_) => {}
+                        let Some(ip) = prop("ip").or_else(|| {
+                            info.get_addresses_v4()
+                                .into_iter()
+                                .next()
+                                .map(|ip| ip.to_string())
+                        }) else {
+                            continue;
+                        };
+                        rooms.insert(
+                            room_id.clone(),
+                            GameRoomSummary {
+                                room_id,
+                                game_id: room_game,
+                                room_name: present(prop("name")),
+                                host_name: present(prop("host")),
+                                ip,
+                                port: info.get_port(),
+                                has_code: prop("code").as_deref() == Some("1"),
+                            },
+                        );
                     }
                 }
             }

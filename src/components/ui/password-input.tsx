@@ -1,12 +1,14 @@
-import * as React from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { useLingui } from "@lingui/react/macro";
+import { Eye, EyeOff } from "lucide-react";
+import * as React from "react";
+
+import { Button } from "~/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "~/components/ui/input-group";
-import { Button } from "~/components/ui/button";
+
 function PasswordInput({ className, ...props }: React.ComponentProps<"input">) {
   const { t } = useLingui();
   const [visible, setVisible] = React.useState(false);
@@ -30,4 +32,5 @@ function PasswordInput({ className, ...props }: React.ComponentProps<"input">) {
     </InputGroup>
   );
 }
+
 export { PasswordInput };

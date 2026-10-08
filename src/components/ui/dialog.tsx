@@ -1,10 +1,10 @@
-import * as React from "react";
-import { Dialog as DialogPrimitive } from "radix-ui";
 import { Trans } from "@lingui/react/macro";
-
 import { cn } from "cn";
-import { Button } from "~/components/ui/button";
 import { XIcon } from "lucide-react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import * as React from "react";
+
+import { Button } from "~/components/ui/button";
 
 function Dialog({
   ...props
@@ -69,7 +69,8 @@ function DialogContent({
           "app-viewport pointer-events-none fixed inset-0 z-50 grid place-items-center p-4 pt-[calc(1rem+var(--safe-top,0px))] pr-[calc(1rem+var(--safe-right,0px))] pb-[calc(1rem+var(--safe-bottom,0px))] pl-[calc(1rem+var(--safe-left,0px))]",
           placement === "responsive-sheet" &&
             "max-md:items-end max-md:px-0 max-md:pb-0",
-          placement === "responsive-page" && "max-md:pl-[var(--safe-left,0px)] max-md:pr-[var(--safe-right,0px)] max-md:pt-[var(--safe-top,0px)] max-md:pb-[var(--safe-bottom,0px)]",
+          placement === "responsive-page" &&
+            "max-md:pt-[var(--safe-top,0px)] max-md:pr-[var(--safe-right,0px)] max-md:pb-[var(--safe-bottom,0px)] max-md:pl-[var(--safe-left,0px)]",
         )}
       >
         <DialogPrimitive.Content
@@ -78,7 +79,8 @@ function DialogContent({
             "bg-popover text-popover-foreground ring-foreground/10 motion-safe:data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-open:slide-in-from-bottom-2 motion-safe:data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-closed:slide-out-to-bottom-2 pointer-events-auto relative grid max-h-full w-full gap-4 overflow-y-auto overscroll-contain rounded-xl p-4 text-sm ring-1 outline-none data-closed:duration-150 data-closed:ease-in data-open:duration-250 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none md:max-w-sm",
             placement === "responsive-sheet" &&
               "max-md:rounded-b-none max-md:pb-[calc(1rem+var(--safe-bottom,0px))]",
-            placement === "responsive-page" && "max-md:h-full max-md:rounded-none",
+            placement === "responsive-page" &&
+              "max-md:h-full max-md:rounded-none",
             className,
           )}
           {...props}

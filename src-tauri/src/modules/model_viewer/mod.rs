@@ -11,3 +11,15 @@ mod service;
 pub(crate) use repository::ModelLibraryRepository;
 
 pub(crate) use service::ModelViewerService;
+
+pub(crate) mod export_commands;
+mod export_store;
+pub(crate) use export_store::ModelExportStore;
+
+pub(crate) mod attachment_commands;
+mod attachments;
+
+mod environment;
+pub(crate) mod environment_commands;
+
+pub(crate) mod system;

@@ -29,9 +29,25 @@ pub(crate) fn run() -> AppResult<()> {
             )
         })?;
 
-    let app = tauri::Builder::default()
+    let app = tauri::Builder::default().manage(Arc::new(
+        crate::modules::model_viewer::system::ModelOpenInbox::default(),
+    ));
+    #[cfg(desktop)]
+    let app = app.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+        crate::modules::model_viewer::system::enqueue_arguments(
+            app,
+            args,
+            std::path::Path::new(&cwd),
+        );
+        if let Some(window) = app.get_webview_window("main") {
+            let _ = window.set_focus();
+        }
+    }));
+    let app = app
+        .plugin(tauri_plugin_native_viewer::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(crate::file_opener::init())
+        .plugin(tauri_plugin_native_export::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init());
@@ -50,6 +66,14 @@ pub(crate) fn run() -> AppResult<()> {
             let services = services::install(app.handle())?;
             app.manage(services.lifecycle.clone());
             app.manage(services);
+            #[cfg(desktop)]
+            if let Ok(cwd) = std::env::current_dir() {
+                crate::modules::model_viewer::system::enqueue_arguments(
+                    app.handle(),
+                    std::env::args().collect(),
+                    &cwd,
+                );
+            }
             Ok(())
         })
         .invoke_handler(guard_commands(registry.invoke_handler()))
@@ -63,11 +87,26 @@ fn guard_commands<R: tauri::Runtime>(
     commands: impl Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync + 'static,
 ) -> impl Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync + 'static {
     move |invoke| {
+        // These commands only cancel/close owned export IDs or remove unpublished HDR drafts. Keep cleanup
+        // available while maintenance or shutdown is draining the native worker.
+        if matches!(
+            invoke.message.command(),
+            "model_export_cancel" | "model_export_close" | "model_environment_abort"
+        ) {
+            return commands(invoke);
+        }
         let admission = invoke
             .message
-            .state_ref()
-            .try_get::<Arc<lifecycle::Lifecycle>>()
-            .map_or(Ok(()), |lifecycle| lifecycle.check_admission());
+            .webview_ref()
+            .try_state::<Arc<lifecycle::Lifecycle>>()
+            .map_or(Ok(()), |lifecycle| {
+                if crate::modules::maintenance::reset::is_recovery_command(invoke.message.command())
+                {
+                    lifecycle.check_recovery_admission()
+                } else {
+                    lifecycle.check_admission()
+                }
+            });
         if let Err(error) = admission {
             invoke.resolver.reject(error);
             true
@@ -84,6 +123,12 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
     #[cfg(target_os = "android")]
     state.ai_credentials.on_run_event(&event);
     match event {
+        #[cfg(any(target_os = "macos", target_os = "ios"))]
+        tauri::RunEvent::Opened { urls } => {
+            for url in urls {
+                state.model_inbox.push(url.to_string());
+            }
+        }
         tauri::RunEvent::ExitRequested { api, code, .. } => {
             if state.lifecycle.is_finished() {
                 return;

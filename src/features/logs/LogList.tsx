@@ -1,6 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
 
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import LogRowDesktop, { LogTableHead } from "./LogRow.desktop";
@@ -21,6 +22,7 @@ export default function LogList({
     estimateSize: () => (wide ? 60 : 145),
     overscan: 8,
   });
+  useVirtualizerFontSize(virtualizer);
   return (
     <>
       {wide ? <LogTableHead /> : null}

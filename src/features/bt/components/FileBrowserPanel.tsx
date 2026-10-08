@@ -24,6 +24,7 @@ import { describeError, toIpcError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import * as ipc from "~/lib/ipc";
 import { previewKind } from "~/lib/preview-kind";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 
 export default function FileBrowserPanel({
   task,
@@ -48,6 +49,7 @@ export default function FileBrowserPanel({
     estimateSize: () => 44,
     overscan: 8,
   });
+  useVirtualizerFontSize(virtualizer);
 
   useEffect(() => {
     let cancelled = false;

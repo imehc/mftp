@@ -12,6 +12,12 @@ pub(crate) struct Executor {
 }
 
 impl Executor {
+    pub(crate) async fn recovery_maintenance(&self) -> AppResult<MaintenanceLease> {
+        self.operations
+            .recovery_maintenance(Duration::from_secs(5))
+            .await
+    }
+
     pub(crate) async fn maintenance(&self) -> AppResult<MaintenanceLease> {
         // Bound the admission pause: a long transfer may need another command
         // to cancel it. Timeout rejects maintenance without starting deletion.

@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import { lingui, linguiTransformerBabelPreset } from "@lingui/vite-plugin";
+import { lingui } from "@lingui/vite-plugin";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -18,10 +18,9 @@ export default defineConfig(async () => ({
       autoCodeSplitting: true,
     }),
     react(),
-    babel({
-      presets: [reactCompilerPreset(), linguiTransformerBabelPreset()],
-    }),
-    lingui(),
+    // Lingui 先展开宏；React Compiler 继续由 Babel 处理。
+    lingui({ macroTransform: true }),
+    babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
   ],
 

@@ -164,13 +164,11 @@ pub(super) fn finish_task(
                 .clone()
                 .unwrap_or_else(|| AppError::custom(CustomErrorCode::LanTransferIncomplete)));
         }
-        "canceled" => {
-            if !cancelled {
-                result = Err(task
-                    .error
-                    .clone()
-                    .unwrap_or_else(|| AppError::custom(CustomErrorCode::LanTransferCancelled)));
-            }
+        "canceled" if !cancelled => {
+            result = Err(task
+                .error
+                .clone()
+                .unwrap_or_else(|| AppError::custom(CustomErrorCode::LanTransferCancelled)));
         }
         _ => {}
     }

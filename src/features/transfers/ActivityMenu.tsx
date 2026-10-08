@@ -22,6 +22,7 @@ import {
 import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { describeError } from "~/lib/errors";
+import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { type TransferState, useTransfersStore } from "~/store/transfers";
 
 import { retryTransferRuntime } from "./runtime/transferRuntime";
@@ -164,6 +165,7 @@ function ActivityList({ items }: { items: TransferState[] }) {
     getItemKey: (index) => items[index].id,
     overscan: 4,
   });
+  useVirtualizerFontSize(virtualizer);
   return (
     <div
       ref={scrollRef}

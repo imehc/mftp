@@ -7,6 +7,7 @@ import {
   resolveColorTheme,
   resolveFontPreset,
 } from "~/lib/color-theme";
+import { type DisplaySize, resolveDisplaySize } from "~/lib/display-size";
 import { TOOL_ROUTES, type ToolRoute } from "~/lib/module-metadata";
 
 export type DirectoryTransferMode = "archive" | "direct";
@@ -31,6 +32,7 @@ interface SettingsState {
   lastTool: ToolRoute | null;
   colorTheme: ColorTheme;
   fontPreset: FontPreset;
+  displaySize: DisplaySize;
   /** 首页游戏区默认折叠。 */
   showGames: boolean;
   /** 游戏音效主音量，取值范围 0..1。 */
@@ -42,6 +44,7 @@ interface SettingsState {
   setLastTool: (tool: ToolRoute | null) => void;
   setColorTheme: (theme: ColorTheme) => void;
   setFontPreset: (font: FontPreset) => void;
+  setDisplaySize: (value: DisplaySize) => void;
   setShowGames: (show: boolean) => void;
   setGamesVolume: (volume: number) => void;
 }
@@ -56,6 +59,7 @@ export const useSettingsStore = create<SettingsState>()(
       lastTool: null,
       colorTheme: "default",
       fontPreset: "theme",
+      displaySize: { mode: "system", scale: 1 },
       showGames: false,
       gamesVolume: 0.7,
       setDirectoryTransferMode: (mode) => set({ directoryTransferMode: mode }),
@@ -65,13 +69,15 @@ export const useSettingsStore = create<SettingsState>()(
       setLastTool: (tool) => set({ lastTool: tool }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
       setFontPreset: (font) => set({ fontPreset: font }),
+      setDisplaySize: (value) =>
+        set({ displaySize: resolveDisplaySize(value) }),
       setShowGames: (show) => set({ showGames: show }),
       setGamesVolume: (gamesVolume) => set({ gamesVolume }),
     }),
     {
       name: "mftp-settings",
-      // v5：新增了 "library" 工具路由。
-      version: 5,
+      // v6：显示大小偏好；旧用户继续跟随系统。
+      version: 6,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
@@ -90,6 +96,7 @@ export const useSettingsStore = create<SettingsState>()(
           lastTool,
           colorTheme: resolveColorTheme(state.colorTheme),
           fontPreset: resolveFontPreset(state.fontPreset),
+          displaySize: resolveDisplaySize(state.displaySize),
         } as SettingsState;
       },
     },

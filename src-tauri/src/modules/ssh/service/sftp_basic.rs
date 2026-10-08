@@ -5,6 +5,7 @@ use super::path_utils::{
     is_protected_remote_path, local_temp_sibling, remote_temp_sibling, rename_local_file_overwrite,
     shell_quote,
 };
+use super::transfer_models::TransferProgressContext;
 use super::transfer_models::{sftp_entries, sftp_file_info};
 use super::types::Manager;
 use crate::error::{AppError, AppResult, CustomErrorCode};
@@ -137,11 +138,13 @@ impl Manager {
             remote,
             &temp_local,
             None,
-            events,
-            transfer_id,
-            "下载中",
-            0,
-            None,
+            TransferProgressContext {
+                events,
+                transfer_id,
+                phase: "下载中",
+                completed_before: 0,
+                total: None,
+            },
             transfer.as_ref(),
         )?;
         let transferred = std::fs::metadata(&temp_local)?.len();
@@ -171,11 +174,13 @@ impl Manager {
             session_id,
             Path::new(local),
             &temp_remote,
-            events,
-            transfer_id,
-            "上传中",
-            0,
-            total,
+            TransferProgressContext {
+                events,
+                transfer_id,
+                phase: "上传中",
+                completed_before: 0,
+                total: Some(total),
+            },
             transfer.as_ref(),
         )?;
         if let Some(transfer) = &transfer {
