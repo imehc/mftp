@@ -13,12 +13,14 @@ import UpdaterDialog from "~/features/updater/UpdaterDialog";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
 import { applyStoredColorTheme } from "~/lib/color-theme";
 import { applyStoredDisplaySize } from "~/lib/display-size";
+import { applyStoredAppearance } from "~/lib/initial-appearance";
 import { checkForUpdateOnLaunch } from "~/lib/updater";
 
 import { router } from "./router";
 
 applyStoredColorTheme();
 applyStoredDisplaySize();
+applyStoredAppearance();
 
 // 生产构建：屏蔽 WebView 默认的右键菜单（Back / Reload 等会破坏 SPA 的
 // 单页体验）。但在可编辑元素和文本选中处保留，以便使用原生复制 /
@@ -34,7 +36,13 @@ if (import.meta.env.PROD) {
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    {/* 纯客户端首屏已在 render 前恢复主题；禁用库为 SSR 输出的内联脚本。 */}
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      scriptProps={{ type: "application/x-next-themes" }}
+    >
       <AppI18nProvider>
         <TooltipProvider>
           <ResetBoundary>

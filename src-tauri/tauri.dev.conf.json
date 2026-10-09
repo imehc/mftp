@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MFTP Dev",
+  "identifier": "com.imehc.mftp.dev",
+  "app": {
+    "windows": [
+      {
+        "title": "MFTP Dev", "width": 880, "height": 640
+      }
+    ]
+  },
+  "bundle": { "createUpdaterArtifacts": false },
+  "plugins": { "updater": { "endpoints": [] } }
+}

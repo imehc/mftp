@@ -11,6 +11,7 @@ use keyring::credential::CredentialBuilderApi;
 
 const PRODUCTION: &str = "com.imehc.mftp";
 const QA: &str = "com.imehc.mftp.qa";
+const DEVELOPMENT: &str = "com.imehc.mftp.dev";
 
 fn keychain(identifier: &str, store: &MemoryCredentialBuilder) -> AiKeychain {
     AiKeychain::with_builder(identifier, Arc::new(store.clone()))
@@ -26,7 +27,7 @@ fn installation_uses_final_tauri_identifier_and_preserves_production_service() {
     assert_eq!(qa["identifier"], QA);
     assert_eq!(qa["plugins"]["updater"]["endpoints"], serde_json::json!([]));
     assert_eq!(qa["bundle"]["createUpdaterArtifacts"], false);
-    for identifier in [PRODUCTION, QA, "com.imehc.mftp.qa.second"] {
+    for identifier in [PRODUCTION, QA, DEVELOPMENT] {
         let mut context = tauri::test::mock_context(tauri::test::noop_assets());
         context.config_mut().identifier = identifier.into();
         let app = tauri::test::mock_builder().build(context).unwrap();
@@ -62,7 +63,7 @@ async fn identical_accounts_are_isolated_for_overwrite_delete_and_reopen() {
     let store = MemoryCredentialBuilder::default();
     let production = keychain(PRODUCTION, &store);
     let qa = keychain(QA, &store);
-    let second = keychain("com.imehc.mftp.qa.second", &store);
+    let second = keychain(DEVELOPMENT, &store);
     for reference in [
         "default".to_string(),
         format!("ai-{}", uuid::Uuid::new_v4()),

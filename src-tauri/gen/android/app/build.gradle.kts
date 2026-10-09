@@ -45,6 +45,7 @@ android {
     }
     buildTypes {
         getByName("debug") {
+            applicationIdSuffix = ".dev"
             // Keep local development installs separate from signed releases.
             manifestPlaceholders["usesCleartextTraffic"] = "true"
             isDebuggable = true

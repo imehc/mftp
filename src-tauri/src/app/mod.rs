@@ -3,6 +3,8 @@ mod lifecycle;
 #[cfg(all(test, desktop))]
 mod maintenance_export_tests;
 pub(crate) mod registry;
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+mod runtime_config;
 pub(crate) mod services;
 
 use crate::error::AppResult;
@@ -12,7 +14,11 @@ use std::time::Duration;
 use tauri::Manager;
 
 pub(crate) fn run() -> AppResult<()> {
-    cleanup::cleanup_stale_local_transfer_files();
+    #[allow(unused_mut)]
+    let mut context = tauri::generate_context!();
+    #[cfg(any(target_os = "macos", target_os = "ios"))]
+    runtime_config::prepare(context.config_mut());
+    cleanup::cleanup_stale_local_transfer_files(&context.config().identifier);
     let registry = registry::specta_builder();
     // Bundled debug apps also run without a source tree. Export only in Tauri
     // development mode; tests export explicitly for all host builds.
@@ -77,7 +83,7 @@ pub(crate) fn run() -> AppResult<()> {
             Ok(())
         })
         .invoke_handler(guard_commands(registry.invoke_handler()))
-        .build(tauri::generate_context!())?;
+        .build(context)?;
 
     app.run(on_run_event);
     Ok(())
@@ -154,7 +160,7 @@ fn shutdown(app: &tauri::AppHandle, lifecycle: &Arc<lifecycle::Lifecycle>, exit_
     tauri::async_runtime::spawn_blocking(move || {
         let report = lifecycle.shutdown_blocking(Duration::from_secs(5));
         if report.completed() {
-            cleanup::cleanup_stale_local_transfer_files();
+            cleanup::cleanup_stale_local_transfer_files(&app.config().identifier);
         } else {
             eprintln!(
                 "shutdown incomplete: {:?}, pipeline idle: {}",

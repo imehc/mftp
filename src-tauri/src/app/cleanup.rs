@@ -1,7 +1,12 @@
 use std::fs;
 use std::time::{Duration, SystemTime};
 
-pub(super) fn cleanup_stale_local_transfer_files() {
+pub(super) fn cleanup_stale_local_transfer_files(identifier: &str) {
+    // Legacy archives are shared on desktop. Alternate installations may not
+    // sweep production files; their active transfer guards still clean up normally.
+    if identifier != "com.imehc.mftp" {
+        return;
+    }
     let Ok(entries) = fs::read_dir(std::env::temp_dir()) else {
         return;
     };

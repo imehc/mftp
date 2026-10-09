@@ -15,6 +15,12 @@
 
 ## 常用命令
 
+开发调试使用独立的 `com.imehc.mftp.dev` 安装包，桌面名称为 `MFTP Dev`，可与正式版并存。`bundle.android.debugApplicationIdSuffix` 由 Tauri CLI 同步到 Gradle；保留原 Kotlin/JNI namespace，避免破坏插件加载。开发包的数据、WebView 设置及 Android Keystore 位于独立应用沙盒，不自动迁移正式版数据。
+
+`pnpm tauri android dev`、`pnpm android:dev` 和 `pnpm android:build --debug` 均通过统一入口。Android 的 `dev --release` 被拒绝，因为 release 不应用 debug 包名后缀；需要正式产物时使用 `pnpm android:build`。开发入口的 `--config` 支持 JSON 文件或内联 JSON，覆盖项按顺序合并，但不能取消包名隔离；不使用 `TAURI_CONFIG` 手动注入配置。
+
+隔离只覆盖应用管理的数据。主动选择的外部文件、公共下载目录和远程服务器仍是共享资源。
+
 ```bash
 # 真机/模拟器开发调试（自动安装并打开，支持热更新）
 pnpm android:dev
@@ -163,3 +169,9 @@ MFTP_ANDROID_BUILD_TOOLS=37.0.0 pnpm android:plugins:check --offline
 每次在系统临时目录新建 `mftp-android-plugins-*` 工程，复制 Tauri API 和插件源码（不复制旧 build/.gradle），不会向源码目录写构建产物。控制台打印完整目录；`check-report.json` 记录 Tauri/JDK/SDK/Build Tools、源码 SHA-256、离线模式及 prepared/passed/failed 状态。成功输出在各插件的 `build/outputs/aar/*-debug.aar`。工程和报告保留供排查；可在确认不再需要后手动清理该次临时目录。
 
 PR 的 `Android plugins (compile only)` job 调用相同入口，使用 JDK 17 和 Build Tools 36.0.0，并上传摘要报告。CI 配置存在不表示远端执行已经通过，应以对应 PR 检查结果为准。
+
+## 启动图标
+
+`public/app-icon.png` 为原图。Android 自适应图标的前景画布为 108dp，常见启动器只显示中央约 72dp；直接铺满原图会裁掉留白，让图案显得过大。
+
+执行 `pnpm icons:android`，通过 Tauri 图标生成器将原图居中放入 72dp 区域，并生成五种密度的前景 PNG。该脚本只更新 Android 自适应前景，保留 macOS、iOS 和旧式 Android 图标。重新运行全平台图标生成或 Android init 后，也应运行此命令恢复安全留白。实际遮罩和动效由系统启动器决定。

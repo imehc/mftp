@@ -37,7 +37,8 @@
       "developmentTeam": "Q4TGGJ5RKN"
     },
     "android": {
-      "minSdkVersion": 28
+      "minSdkVersion": 28,
+      "debugApplicationIdSuffix": ".dev"
     },
     "icon": [
       "icons/32x32.png",

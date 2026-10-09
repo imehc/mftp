@@ -16,6 +16,12 @@ iOS 不需要类似 `scripts/android.sh` 的环境包装脚本(交叉编译 vend
 
 ## 常用命令
 
+`pnpm ios:dev` / `pnpm tauri ios dev` 自动使用 `tauri.dev.conf.json`，应用标识为 `com.imehc.mftp.dev`，名称为 `MFTP Dev`。Tauri CLI 在构建前同步 Xcode 的 bundle identifier 和产品名称，应用沙盒与 AI 凭据服务独立于正式版。`pnpm ios:build` 使用正式配置；`--debug` 构建使用开发配置。不手工修改生成的 pbxproj 来切换环境，应始终从对应 pnpm 命令进入。
+
+桌面端同样通过 `pnpm tauri dev` 自动隔离；macOS 数据目录为 `~/Library/Application Support/com.imehc.mftp.dev`，正式版仍为 `com.imehc.mftp`。开发环境首次启动为空，不导入或删除正式版数据。macOS 14+/iOS 17+ 的开发 WebView 使用独立 data store；旧系统仍由应用身份和开发 URL 区分。
+
+开发入口的 `--config` 支持 JSON 文件或内联 JSON，依次合并；桌面/iOS 可指定独立 QA 标识，但不能覆盖回正式标识，正式更新源始终关闭。普通 build、init、IDE 内部构建命令按 Tauri 原有方式处理。主动选择的外部文件和远程服务不属于隔离范围。
+
 ```bash
 # 模拟器/真机开发调试(会列出可选设备,支持热更新)
 pnpm ios:dev
