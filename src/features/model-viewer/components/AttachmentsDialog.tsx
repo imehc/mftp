@@ -20,13 +20,12 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { Dialog, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
@@ -67,23 +66,29 @@ export function AttachmentsDialog({
           if (!open) close();
         }}
       >
-        <DialogContent
+        <DialogLayoutContent
           placement="responsive-page"
-          className="ui-density-adaptive flex flex-col md:max-w-2xl"
+          showCloseButton={false}
+          className="ui-density-adaptive grid-rows-[auto_minmax(0,1fr)] md:max-w-2xl"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             restoreFocus();
           }}
         >
-          <DialogHeader>
-            <DialogTitle>
-              <Trans comment="模型库条目的说明文件管理。">模型附件</Trans>
-            </DialogTitle>
-            <DialogDescription className="break-all">
-              {entry.name}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto">
+          <DialogLayoutHeader showCloseButton>
+            <div className="flex min-w-0 flex-col gap-2">
+              <DialogTitle>
+                <Trans comment="模型库条目的说明文件管理。">模型附件</Trans>
+              </DialogTitle>
+              <DialogDescription
+                className="line-clamp-2 [overflow-wrap:anywhere]"
+                title={entry.name}
+              >
+                {entry.name}
+              </DialogDescription>
+            </div>
+          </DialogLayoutHeader>
+          <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 [overflow-wrap:anywhere]">
             <p className="text-muted-foreground text-sm">
               <Trans>
                 支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多
@@ -120,7 +125,10 @@ export function AttachmentsDialog({
                 </AlertDescription>
               </Alert>
             ) : null}
-            <p role="status" className="text-muted-foreground text-sm">
+            <p
+              role="status"
+              className="text-muted-foreground text-sm empty:hidden"
+            >
               {state.busy ? (
                 <Trans>正在处理附件…</Trans>
               ) : state.saved ? (
@@ -144,7 +152,7 @@ export function AttachmentsDialog({
                 </EmptyHeader>
               </Empty>
             ) : null}
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-3 empty:hidden">
               {state.entries?.map((attachment) => (
                 <li key={attachment.id} className="flex flex-col gap-2">
                   <span className="min-w-0 break-all">
@@ -212,8 +220,8 @@ export function AttachmentsDialog({
                 )}
               </section>
             ) : null}
-          </div>
-        </DialogContent>
+          </DialogLayoutBody>
+        </DialogLayoutContent>
       </Dialog>
       <AlertDialog
         open={!!deleting}

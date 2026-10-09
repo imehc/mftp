@@ -1,19 +1,20 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Layers, X } from "lucide-react";
+import { Layers } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
-  DialogClose,
-  DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import type { ViewerSession, ViewerState } from "../runtime/session";
 import { InspectionPanel } from "./InspectionPanel";
@@ -24,16 +25,17 @@ import { ModelList } from "./ModelList";
 export function WorkspaceInspector({
   session,
   state,
+  wide,
   open,
   onOpenChange,
 }: {
+  wide: boolean;
   session: ViewerSession;
   state: ViewerState;
   open: boolean;
   onOpenChange: (value: boolean) => void;
 }) {
   const { t } = useLingui();
-  const wide = useDesktopLayout();
   const [tab, setTab] = useState("models");
   useEffect(() => {
     if (wide && open) onOpenChange(false);
@@ -115,37 +117,27 @@ export function WorkspaceInspector({
               </Trans>
             </Button>
           </DialogTrigger>
-          <DialogContent
+          <DialogLayoutContent
             placement="responsive-sheet"
             showCloseButton={false}
-            className="ui-density-adaptive flex max-h-[85dvh] flex-col overflow-hidden"
+            className="ui-density-adaptive max-h-[85dvh] grid-rows-[auto_minmax(0,1fr)]"
           >
-            <DialogHeader className="shrink-0 pr-10">
-              <DialogTitle>
-                <Trans comment="多模型查看器共享检查浮层标题。">
-                  模型与检查
-                </Trans>
-              </DialogTitle>
-              <DialogDescription>
-                <Trans>管理模型、调整位置并检查资源。</Trans>
-              </DialogDescription>
-            </DialogHeader>
-            <div className="min-h-0 overflow-y-auto">{content}</div>
-            <DialogClose asChild>
-              <Button
-                density="adaptive"
-                variant="ghost"
-                size="icon-sm"
-                className="absolute top-2 right-2"
-                aria-label={t({
-                  message: "关闭模型面板",
-                  comment: "关闭多模型查看器的检查浮层。",
-                })}
-              >
-                <X aria-hidden="true" />
-              </Button>
-            </DialogClose>
-          </DialogContent>
+            <DialogLayoutHeader showCloseButton>
+              <div className="flex min-w-0 flex-col gap-2">
+                <DialogTitle>
+                  <Trans comment="多模型查看器共享检查浮层标题。">
+                    模型与检查
+                  </Trans>
+                </DialogTitle>
+                <DialogDescription>
+                  <Trans>管理模型、调整位置并检查资源。</Trans>
+                </DialogDescription>
+              </div>
+            </DialogLayoutHeader>
+            <DialogLayoutBody className="-m-1 min-w-0 p-1">
+              {content}
+            </DialogLayoutBody>
+          </DialogLayoutContent>
         </Dialog>
       )}
     </div>

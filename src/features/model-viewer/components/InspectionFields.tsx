@@ -31,7 +31,7 @@ export function InspectionChoice({
         <SelectTrigger id={id} density="adaptive" className="w-full min-w-0">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="ui-density-adaptive">
           <SelectGroup>
             {options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
@@ -93,7 +93,11 @@ export function InspectionToggle({
   const id = useId();
   return (
     <Field orientation="horizontal">
-      <FieldLabel htmlFor={id} className="min-h-11 flex-1">
+      <FieldLabel
+        htmlFor={id}
+        data-slot="touch-label"
+        className="min-h-8 min-w-0 flex-1"
+      >
         {label}
       </FieldLabel>
       <Switch id={id} checked={checked} onCheckedChange={onChange} />

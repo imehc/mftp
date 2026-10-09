@@ -94,7 +94,7 @@ export function MemoryPanel({
   ] as const;
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      <dl className="flex flex-col gap-3 text-xs">
+      <dl className="model-statistics text-xs">
         {rows.map(([label, bytes]) => (
           <div key={label} className="flex justify-between gap-2">
             <dt className="text-muted-foreground">{label}</dt>
@@ -216,7 +216,10 @@ export function MemoryPanel({
         </Trans>
       </p>
       <details className="text-xs">
-        <summary className="cursor-pointer py-2">
+        <summary
+          data-slot="touch-label"
+          className="min-h-8 cursor-pointer content-center py-1"
+        >
           <Trans comment="展开内存历史曲线的数值表格。">历史数值</Trans>
         </summary>
         <div className="max-h-40 overflow-auto">
@@ -251,7 +254,7 @@ export function MemoryPanel({
           <h3 className="text-sm font-medium">
             <Trans comment="选中模型的各类分配与资源数量。">资源明细</Trans>
           </h3>
-          <dl className="flex flex-col gap-2 text-xs">
+          <dl className="model-statistics text-xs">
             {(
               [
                 "geometry",

@@ -23,6 +23,7 @@ import { formatBytes } from "~/lib/format";
 import { modelLibraryReadThumbnail } from "~/lib/ipc";
 
 import type { ModelLibraryController } from "../library/controller";
+import { useVirtualProbe } from "./use-virtual-probe";
 
 function Thumbnail({
   entry,
@@ -97,15 +98,11 @@ export function LibraryList({
         .filter((i) => i >= 0)
         .sort((a, b) => a - b),
   });
-  useEffect(() => {
-    const observer = new ResizeObserver(() => virtualizer.measure());
-    if (probe.current) observer.observe(probe.current);
-    return () => observer.disconnect();
-  }, [virtualizer]);
+  useVirtualProbe(probe, virtualizer);
   return (
     <div
       ref={viewport}
-      className="relative h-72 min-h-48 flex-1 overflow-auto rounded-lg border md:h-96"
+      className="relative h-72 min-h-48 shrink-0 overflow-auto rounded-lg border md:h-96"
       role="list"
       aria-label={t({ message: "已保存模型", comment: "本机模型库条目列表。" })}
       onKeyDown={(event) => {

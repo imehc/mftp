@@ -17,7 +17,6 @@
     "model:offline-check": "node tests/checks/check-model-offline.mjs",
     "build:budget": "node tests/checks/check-build-budget.mjs",
     "android:plugins:check": "node tests/checks/check-android-plugins.mjs",
-    "qa:browser": "node tests/browser/run.mjs",
     "routes:generate": "node scripts/generate-routes.mjs",
     "version:check": "node scripts/version.mjs check",
     "version:bump": "node scripts/version.mjs bump",

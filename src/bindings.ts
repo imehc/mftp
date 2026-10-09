@@ -789,6 +789,8 @@ export type ModelImportSession = {
 	size: number,
 };
 
+export type ModelLayout = "row" | "grid" | "ring";
+
 export type ModelLibraryCatalog = {
 	entries: ModelLibraryEntry[],
 	libraryBytes: number,
@@ -862,6 +864,7 @@ export type ModelThermalState = "unknown" | "nominal" | "fair" | "serious" | "cr
 
 export type ModelViewState = {
 	version: number,
+	layout?: ModelLayout,
 	camera: ModelCameraState,
 	views: ModelSavedView[],
 	animation: ModelPlaybackState,

@@ -36,10 +36,22 @@ pub struct ModelPlaybackState {
     pub loop_mode: String,
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum ModelLayout {
+    #[default]
+    Row,
+    Grid,
+    Ring,
+}
+
 #[derive(Clone, Deserialize, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ModelViewState {
     pub version: u32,
+    // Old version-1 documents omit layout; keep their original row default.
+    #[serde(default)]
+    pub layout: ModelLayout,
     pub camera: ModelCameraState,
     pub views: Vec<ModelSavedView>,
     pub animation: ModelPlaybackState,

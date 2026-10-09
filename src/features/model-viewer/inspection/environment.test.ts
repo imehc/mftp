@@ -184,3 +184,27 @@ it("新 HDR 解码成功后才保存，存储失败保留预览并允许显式�
   expect(environment.snapshot().storageError).toBeNull();
   environment.dispose();
 });
+
+it("替换环境解码失败保留旧环境且不覆盖已保存数据", async () => {
+  vi.stubGlobal("Worker", TestWorker);
+  vi.mocked(isTauriRuntime).mockReturnValue(true);
+  vi.mocked(saveEnvironment).mockResolvedValue();
+  const scene = new Scene();
+  const environment = new ViewerEnvironment(
+    scene,
+    {} as WebGLRenderer,
+    vi.fn(),
+  );
+  const first = environment.load(new File(["hdr"], "kept.hdr"));
+  decoded(TestWorker.instances[0]);
+  await first;
+  const texture = scene.environment;
+  const replacement = environment.load(new File(["bad"], "invalid.hdr"));
+  TestWorker.instances[1].onmessage?.({ data: { error: true } });
+  await replacement;
+  expect(environment.snapshot().name).toBe("kept.hdr");
+  expect(environment.snapshot().error).not.toBeNull();
+  expect(scene.environment).toBe(texture);
+  expect(saveEnvironment).toHaveBeenCalledTimes(1);
+  environment.dispose();
+});

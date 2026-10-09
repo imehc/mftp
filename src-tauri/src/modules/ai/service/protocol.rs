@@ -211,25 +211,25 @@ impl StreamState {
                     responses::append_stream_text(output, text, limit, on_delta)?;
                 }
             }
-            "content_block_delta" => {
-                if value.pointer("/delta/type").and_then(Value::as_str) == Some("text_delta") {
-                    if self.stopped
-                        || self.text_block.is_none()
-                        || self.text_block != value.get("index").and_then(Value::as_u64)
-                    {
-                        return Err(invalid());
-                    }
-                    let text = value
-                        .pointer("/delta/text")
-                        .and_then(Value::as_str)
-                        .ok_or_else(invalid)?;
-                    responses::append_stream_text(output, text, limit, on_delta)?;
+            "content_block_delta"
+                if value.pointer("/delta/type").and_then(Value::as_str) == Some("text_delta") =>
+            {
+                if self.stopped
+                    || self.text_block.is_none()
+                    || self.text_block != value.get("index").and_then(Value::as_u64)
+                {
+                    return Err(invalid());
                 }
+                let text = value
+                    .pointer("/delta/text")
+                    .and_then(Value::as_str)
+                    .ok_or_else(invalid)?;
+                responses::append_stream_text(output, text, limit, on_delta)?;
             }
-            "content_block_stop" => {
-                if self.text_block == value.get("index").and_then(Value::as_u64) {
-                    self.text_block = None;
-                }
+            "content_block_stop"
+                if self.text_block == value.get("index").and_then(Value::as_u64) =>
+            {
+                self.text_block = None;
             }
             "message_delta" => {
                 if !self.started || self.text_block.is_some() {

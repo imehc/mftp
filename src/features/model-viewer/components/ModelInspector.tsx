@@ -1,17 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Info, X } from "lucide-react";
+import { Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
-  DialogClose,
-  DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import {
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
@@ -67,12 +69,9 @@ function ModelInformation({ inspection }: { inspection: ModelInspection }) {
       <h3 className="text-sm font-medium">
         <Trans comment="三维模型统计信息标题。">模型信息</Trans>
       </h3>
-      <dl className="flex flex-col divide-y">
+      <dl className="model-statistics text-xs">
         {rows.map(([label, value]) => (
-          <div
-            key={label}
-            className="flex items-start justify-between gap-4 py-3 text-xs"
-          >
+          <div key={label} className="contents">
             <dt className="text-muted-foreground">{label}</dt>
             <dd className="text-right tabular-nums">
               {value === null ? <Trans>未知</Trans> : i18n.number(value)}
@@ -247,35 +246,25 @@ export function ModelInspector({
               </Trans>
             </Button>
           </DialogTrigger>
-          <DialogContent
+          <DialogLayoutContent
             placement="responsive-sheet"
-            className="flex max-h-[85dvh] flex-col overflow-hidden"
+            className="ui-density-adaptive max-h-[85dvh] grid-rows-[auto_minmax(0,1fr)]"
             showCloseButton={false}
           >
-            <DialogHeader className="shrink-0 pr-10">
-              <DialogTitle>
-                <Trans comment="三维模型检查浮层标题。">模型详情</Trans>
-              </DialogTitle>
-              <DialogDescription>
-                <Trans>查看模型统计、场景节点及材质纹理。</Trans>
-              </DialogDescription>
-            </DialogHeader>
-            <div className="min-h-0 overflow-y-auto">{content}</div>
-            <DialogClose asChild>
-              <Button
-                density="adaptive"
-                variant="ghost"
-                size="icon-sm"
-                className="absolute top-2 right-2"
-                aria-label={t({
-                  message: "关闭模型详情",
-                  comment: "关闭三维模型检查浮层。",
-                })}
-              >
-                <X aria-hidden="true" />
-              </Button>
-            </DialogClose>
-          </DialogContent>
+            <DialogLayoutHeader showCloseButton>
+              <div className="flex min-w-0 flex-col gap-2">
+                <DialogTitle>
+                  <Trans comment="三维模型检查浮层标题。">模型详情</Trans>
+                </DialogTitle>
+                <DialogDescription>
+                  <Trans>查看模型统计、场景节点及材质纹理。</Trans>
+                </DialogDescription>
+              </div>
+            </DialogLayoutHeader>
+            <DialogLayoutBody className="-m-1 min-w-0 p-1">
+              {content}
+            </DialogLayoutBody>
+          </DialogLayoutContent>
         </Dialog>
       )}
     </aside>

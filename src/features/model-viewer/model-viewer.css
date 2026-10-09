@@ -1,0 +1,56 @@
+/* 工作区按自身可用宽度分栏；阈值用 px，避免根字号放大后误判为窄屏。 */
+.model-workspace {
+  container-type: inline-size;
+  container-name: model-workspace;
+}
+.model-workspace-grid {
+  --model-wide: 0;
+}
+
+/* 中窄桌面保留两栏并把侧栏收窄；画布始终占剩余宽度。 */
+@container model-workspace (min-width: 560px) {
+  .model-workspace-grid {
+    --model-wide: 1;
+  }
+  .model-workspace-grid:has(> .model-sidebar:not(:empty)) {
+    grid-template-columns: minmax(0, 1fr) min(13rem, 42%);
+    grid-template-rows: minmax(18rem, 1fr) auto;
+  }
+  .model-sidebar {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  .model-canvas {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+/* 宽桌面恢复既有 18rem 侧栏；百分比上限防止大字号下侧栏反超画布。 */
+@container model-workspace (min-width: 720px) {
+  .model-workspace-grid:has(> .model-sidebar:not(:empty)) {
+    grid-template-columns: minmax(0, 1fr) min(18rem, 40%);
+  }
+}
+
+/* 统计属性统一为标签/数值两列，长值与窄侧栏可换行。 */
+.model-statistics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(55%);
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+}
+.model-statistics > div {
+  display: contents;
+}
+.model-statistics dt {
+  min-width: 0;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+.model-statistics dd {
+  min-width: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}

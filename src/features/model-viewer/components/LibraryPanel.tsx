@@ -14,13 +14,12 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { Dialog, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import {
   Empty,
   EmptyDescription,
@@ -87,157 +86,181 @@ export function LibraryPanel({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent
+        <DialogLayoutContent
           placement="responsive-page"
-          className="ui-density-adaptive flex flex-col md:max-w-2xl"
+          showCloseButton={false}
+          className="ui-density-adaptive grid-rows-[auto_minmax(0,1fr)] md:max-w-2xl"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             document.getElementById("model-library-trigger")?.focus();
           }}
         >
-          <DialogHeader>
-            <DialogTitle>
-              <Trans comment="本机保存的三维模型集合。">模型库</Trans>
-            </DialogTitle>
-            <DialogDescription>
-              <Trans>导入的模型自动保存在此设备。</Trans>
-            </DialogDescription>
-          </DialogHeader>
-          {state.error ? (
-            <Alert variant="destructive">
-              <AlertDescription>{describeError(state.error)}</AlertDescription>
-            </Alert>
-          ) : null}
-          <FieldGroup density="compact">
-            <Field>
-              <FieldLabel htmlFor={`${id}-search`} className="sr-only">
-                <Trans>搜索名称或分组</Trans>
-              </FieldLabel>
-              <Input
-                id={`${id}-search`}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t`搜索名称或分组`}
-              />
-            </Field>
-            <Field orientation="horizontal">
-              <FieldLabel htmlFor={`${id}-favorites`}>
-                <Trans>仅收藏</Trans>
-              </FieldLabel>
-              <Switch
-                id={`${id}-favorites`}
-                checked={favorites}
-                onCheckedChange={setFavorites}
-              />
-            </Field>
-          </FieldGroup>
-          {!catalog?.entries.length && !busy ? (
-            <Empty>
-              <EmptyHeader>
-                <EmptyTitle>
-                  <Trans>模型库为空</Trans>
-                </EmptyTitle>
-                <EmptyDescription>
-                  <Trans>导入模型后可在这里重新打开。</Trans>
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          ) : (
-            <LibraryList
-              entries={entries}
-              controller={controller}
-              busy={busy}
-              edit={(entry, trigger) => {
-                returnFocus.current = trigger;
-                setEditing(entry);
-              }}
-              attachments={(entry, trigger) => {
-                returnFocus.current = trigger;
-                setAttachments(entry);
-              }}
-              remove={(entry, trigger) => {
-                returnFocus.current = trigger;
-                setDeleting(entry);
-              }}
-              open={(id) => {
-                onOpenChange(false);
-                void controller.open(id);
-              }}
-            />
-          )}
-          {busy ? (
-            <p
-              role="status"
-              className="text-muted-foreground flex items-center gap-2 text-sm"
-            >
-              <Spinner />
-              <Trans>正在处理模型库</Trans>
-            </p>
-          ) : null}
-          {catalog ? (
-            <details className="text-muted-foreground text-sm">
-              <summary className="cursor-pointer">
-                <Trans comment="模型库磁盘逻辑字节数和可清理缩略图缓存设置。">
-                  存储与缓存
-                </Trans>
-              </summary>
-              <FieldGroup density="compact" className="mt-3">
-                <p>
-                  <Trans>模型资源</Trans> {formatBytes(catalog.libraryBytes)} ·{" "}
-                  <Trans>缩略图缓存</Trans> {formatBytes(catalog.cacheBytes)}
-                </p>
-                <Field>
-                  <FieldLabel htmlFor={`${id}-limit`}>
-                    <Trans>缓存上限</Trans>
-                  </FieldLabel>
-                  <Select
-                    value={String(catalog.cacheLimit)}
+          <DialogLayoutHeader showCloseButton>
+            <div className="flex min-w-0 flex-col gap-2">
+              <DialogTitle>
+                <Trans comment="本机保存的三维模型集合。">模型库</Trans>
+              </DialogTitle>
+              <DialogDescription>
+                <Trans>导入的模型自动保存在此设备。</Trans>
+              </DialogDescription>
+            </div>
+          </DialogLayoutHeader>
+          <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 [overflow-wrap:anywhere]">
+            {state.error ? (
+              <Alert variant="destructive">
+                <AlertDescription className="flex min-w-0 flex-col gap-2">
+                  <span>{describeError(state.error)}</span>
+                  <Button
+                    density="adaptive"
+                    variant="outline"
                     disabled={busy}
-                    onValueChange={(value) =>
+                    onClick={() =>
+                      void controller.refresh().catch(controller.report)
+                    }
+                  >
+                    <Trans>重新加载</Trans>
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            <FieldGroup density="compact">
+              <Field>
+                <FieldLabel htmlFor={`${id}-search`} className="sr-only">
+                  <Trans>搜索名称或分组</Trans>
+                </FieldLabel>
+                <Input
+                  id={`${id}-search`}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={t`搜索名称或分组`}
+                />
+              </Field>
+              <Field orientation="horizontal">
+                <FieldLabel htmlFor={`${id}-favorites`}>
+                  <Trans>仅收藏</Trans>
+                </FieldLabel>
+                <Switch
+                  id={`${id}-favorites`}
+                  checked={favorites}
+                  onCheckedChange={setFavorites}
+                />
+              </Field>
+            </FieldGroup>
+            {catalog && !catalog.entries.length && !busy && !state.error ? (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyTitle>
+                    <Trans>模型库为空</Trans>
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    <Trans>导入模型后可在这里重新打开。</Trans>
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ) : catalog ? (
+              <LibraryList
+                entries={entries}
+                controller={controller}
+                busy={busy}
+                edit={(entry, trigger) => {
+                  returnFocus.current = trigger;
+                  setEditing(entry);
+                }}
+                attachments={(entry, trigger) => {
+                  returnFocus.current = trigger;
+                  setAttachments(entry);
+                }}
+                remove={(entry, trigger) => {
+                  returnFocus.current = trigger;
+                  setDeleting(entry);
+                }}
+                open={(id) => {
+                  onOpenChange(false);
+                  void controller.open(id);
+                }}
+              />
+            ) : null}
+            {busy ? (
+              <p
+                role="status"
+                className="text-muted-foreground flex items-center gap-2 text-sm"
+              >
+                <Spinner />
+                <Trans>正在处理模型库</Trans>
+              </p>
+            ) : null}
+            {catalog ? (
+              <details className="text-muted-foreground text-sm">
+                <summary
+                  data-slot="touch-label"
+                  className="min-h-8 cursor-pointer content-center py-1"
+                >
+                  <Trans comment="模型库磁盘逻辑字节数和可清理缩略图缓存设置。">
+                    存储与缓存
+                  </Trans>
+                </summary>
+                <FieldGroup density="compact" className="mt-3">
+                  <p>
+                    <Trans>模型资源</Trans> {formatBytes(catalog.libraryBytes)}{" "}
+                    · <Trans>缩略图缓存</Trans>{" "}
+                    {formatBytes(catalog.cacheBytes)}
+                  </p>
+                  <Field>
+                    <FieldLabel htmlFor={`${id}-limit`}>
+                      <Trans>缓存上限</Trans>
+                    </FieldLabel>
+                    <Select
+                      value={String(catalog.cacheLimit)}
+                      disabled={busy}
+                      onValueChange={(value) =>
+                        void controller
+                          .cache(Number(value), false)
+                          .catch(controller.report)
+                      }
+                    >
+                      <SelectTrigger id={`${id}-limit`} density="adaptive">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="ui-density-adaptive">
+                        <SelectGroup>
+                          {[0, 16, 64, 256].map((mb) => (
+                            <SelectItem
+                              key={mb}
+                              value={String(mb * 1024 * 1024)}
+                            >
+                              {mb ? (
+                                formatBytes(mb * 1024 * 1024)
+                              ) : (
+                                <Trans>不缓存</Trans>
+                              )}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Button
+                    density="adaptive"
+                    variant="outline"
+                    disabled={busy || !catalog.cacheBytes}
+                    onClick={() =>
                       void controller
-                        .cache(Number(value), false)
+                        .cache(catalog.cacheLimit, true)
                         .catch(controller.report)
                     }
                   >
-                    <SelectTrigger id={`${id}-limit`} density="adaptive">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {[0, 16, 64, 256].map((mb) => (
-                          <SelectItem key={mb} value={String(mb * 1024 * 1024)}>
-                            {mb ? (
-                              formatBytes(mb * 1024 * 1024)
-                            ) : (
-                              <Trans>不缓存</Trans>
-                            )}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Button
-                  density="adaptive"
-                  variant="outline"
-                  disabled={busy || !catalog.cacheBytes}
-                  onClick={() =>
-                    void controller
-                      .cache(catalog.cacheLimit, true)
-                      .catch(controller.report)
-                  }
-                >
-                  <Trans>清理缓存</Trans>
-                </Button>
-                <p className="text-xs">
-                  <Trans>
-                    仅清理缩略图，模型保留。数据库空间会供后续写入复用。
-                  </Trans>
-                </p>
-              </FieldGroup>
-            </details>
-          ) : null}
-        </DialogContent>
+                    <Trans>清理缓存</Trans>
+                  </Button>
+                  <p className="text-xs">
+                    <Trans>
+                      仅清理缩略图，模型保留。数据库空间会供后续写入复用。
+                    </Trans>
+                  </p>
+                </FieldGroup>
+              </details>
+            ) : null}
+          </DialogLayoutBody>
+        </DialogLayoutContent>
       </Dialog>
       {attachments ? (
         <AttachmentsDialog

@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import { cn } from "cn";
 import {
   Check,
@@ -11,7 +11,7 @@ import {
   RotateCcw,
   Trash2,
 } from "lucide-react";
-import { useEffect, useId, useRef } from "react";
+import { useId, useRef, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -27,6 +27,7 @@ import { formatBytes } from "~/lib/format";
 
 import type { ModelLayout } from "../runtime/collection";
 import type { ViewerSession, ViewerState } from "../runtime/session";
+import { useVirtualProbe } from "./use-virtual-probe";
 
 const statuses = {
   queued: msg({ message: "等待导入", comment: "批量模型导入的排队状态。" }),
@@ -54,6 +55,7 @@ export function ModelList({
   const id = useId();
   const viewport = useRef<HTMLDivElement>(null);
   const probe = useRef<HTMLSpanElement>(null);
+  const [focused, setFocused] = useState(0);
   const runtime = session.runtime;
   const items = state.items;
   const selected = items.find((item) => item.id === state.selected);
@@ -64,12 +66,17 @@ export function ModelList({
     estimateSize: () =>
       (probe.current?.getBoundingClientRect().height || 16) * 9,
     overscan: 3,
+    rangeExtractor: (range) =>
+      [
+        ...new Set([
+          ...defaultRangeExtractor(range),
+          Math.min(focused, items.length - 1),
+        ]),
+      ]
+        .filter((index) => index >= 0)
+        .sort((a, b) => a - b),
   });
-  useEffect(() => {
-    const observer = new ResizeObserver(() => virtualizer.measure());
-    if (probe.current) observer.observe(probe.current);
-    return () => observer.disconnect();
-  }, [virtualizer]);
+  useVirtualProbe(probe, virtualizer);
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <ToggleGroup
@@ -98,8 +105,8 @@ export function ModelList({
       </ToggleGroup>
       <div
         ref={viewport}
-        className="relative max-h-[40dvh] overflow-auto"
-        style={{ height: `${Math.min(3, items.length) * 9}rem` }}
+        className="relative max-h-[min(27rem,40dvh)] overflow-auto"
+        style={{ height: virtualizer.getTotalSize() }}
       >
         <span
           ref={probe}
@@ -125,6 +132,7 @@ export function ModelList({
                 key={item.id}
                 ref={virtualizer.measureElement}
                 data-index={row.index}
+                onFocusCapture={() => setFocused(row.index)}
                 className="absolute top-0 left-0 w-full pb-2"
                 style={{ transform: `translateY(${row.start}px)` }}
               >
@@ -227,7 +235,7 @@ export function ModelList({
         </div>
       </div>
       {selected ? (
-        <div className="flex flex-col gap-3">
+        <div className="@container/model-position flex min-w-0 flex-col gap-3">
           <p className="truncate text-sm font-medium" title={selected.name}>
             {selected.name}
           </p>
@@ -252,14 +260,21 @@ export function ModelList({
               </Trans>
             </Button>
           </div>
-          <FieldGroup className="grid grid-cols-3 gap-2">
+          <FieldGroup
+            density="compact"
+            className="grid grid-cols-1 gap-2 @min-[28rem]/model-position:grid-cols-3"
+          >
             {(["X", "Y", "Z"] as const).map((axis, index) => (
-              <Field key={`${selected.id}-${axis}`}>
+              <Field
+                key={`${selected.id}-${axis}`}
+                className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2"
+              >
                 <FieldLabel htmlFor={`${id}-${axis}`}>{axis}</FieldLabel>
                 <Input
                   id={`${id}-${axis}`}
                   type="number"
                   step="any"
+                  className="min-w-0 tabular-nums"
                   min={-10000}
                   max={10000}
                   key={`${selected.id}-${axis}-${selected.position[index]}`}

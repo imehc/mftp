@@ -27,6 +27,7 @@ impl Drop for Fixture {
 fn view() -> ModelViewState {
     ModelViewState {
         version: 1,
+        layout: ModelLayout::Row,
         camera: ModelCameraState {
             position: [2., 3., 4.],
             target: [0.; 3],
@@ -355,4 +356,68 @@ fn attachment_migration_preserves_v1_models_and_is_idempotent() {
         fixture.repo.read_attachment(&id, &attachment).unwrap(),
         b"kept"
     );
+}
+
+#[test]
+fn saved_layouts_roundtrip_without_losing_manual_positions() {
+    for layout in [ModelLayout::Row, ModelLayout::Grid, ModelLayout::Ring] {
+        let f = Fixture::new();
+        let id = f.saved();
+        let mut state = view();
+        state.layout = layout;
+        state.position = [4., 1., 2.];
+        f.repo.save_view(&id, state).unwrap();
+        let reopened = ModelLibraryRepository::new(Storage::new(f.root.clone()).unwrap());
+        let actual = reopened.document(&id).unwrap().view;
+        assert_eq!(actual.layout, layout);
+        assert_eq!(actual.position, [4., 1., 2.]);
+    }
+}
+
+#[test]
+fn legacy_layout_defaults_to_row_and_unknown_layout_does_not_destroy_data() {
+    let f = Fixture::new();
+    let id = f.saved();
+    let mut legacy = serde_json::to_value(view()).unwrap();
+    legacy.as_object_mut().unwrap().remove("layout");
+    for (value, valid) in [
+        (legacy.clone(), true),
+        (
+            {
+                legacy["layout"] = serde_json::json!("spiral");
+                legacy
+            },
+            false,
+        ),
+    ] {
+        let raw = serde_json::to_string(&value).unwrap();
+        f.repo
+            .storage
+            .conn()
+            .unwrap()
+            .execute(
+                "UPDATE model_library SET view_json = ?1 WHERE id = ?2",
+                [&raw, &id],
+            )
+            .unwrap();
+        let result = f.repo.document(&id);
+        if valid {
+            assert_eq!(result.unwrap().view.layout, ModelLayout::Row);
+        } else {
+            assert!(result.is_err());
+        }
+        let stored: String = f
+            .repo
+            .storage
+            .conn()
+            .unwrap()
+            .query_row(
+                "SELECT view_json FROM model_library WHERE id = ?1",
+                [&id],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(stored, raw);
+        assert_eq!(f.repo.read(&id, "", 0).unwrap(), b"glTF");
+    }
 }

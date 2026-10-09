@@ -62,7 +62,10 @@ export function RuntimeControls({
         </>
       ) : null}
       <details className="text-muted-foreground text-sm">
-        <summary className="cursor-pointer">
+        <summary
+          data-slot="touch-label"
+          className="min-h-8 cursor-pointer content-center py-1"
+        >
           <Trans>渲染与设备状态</Trans>
         </summary>
         <div className="mt-2 flex flex-col gap-2">

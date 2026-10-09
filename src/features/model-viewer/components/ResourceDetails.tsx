@@ -18,7 +18,7 @@ function TextureDetails({
   texture: TextureInfo;
   runtime: ModelViewerRuntime;
 }) {
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>();
   useEffect(() => {
     const frame = requestAnimationFrame(() =>
       setPreview(runtime.previewTexture(texture.id)),
@@ -32,18 +32,23 @@ function TextureDetails({
           <Trans comment="三维模型纹理缺少名称。">未命名纹理</Trans>
         )}
       </p>
-      {preview ? (
+      {preview === undefined ? (
+        <div
+          aria-hidden="true"
+          className="bg-muted size-32 max-w-full rounded-md"
+        />
+      ) : preview ? (
         <img
           src={preview}
           alt={texture.name || ""}
-          className="max-h-32 max-w-full self-start rounded-md object-contain"
+          className="size-32 max-w-full self-start rounded-md object-contain"
         />
       ) : (
         <p className="text-muted-foreground text-xs">
           <Trans>此纹理暂无法生成缩略图</Trans>
         </p>
       )}
-      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-xs">
+      <dl className="model-statistics text-xs">
         <dt>
           <Trans comment="模型纹理图像的像素尺寸。">分辨率</Trans>
         </dt>
@@ -114,7 +119,7 @@ export function MaterialDetails({
     );
   return (
     <div className="flex flex-col gap-3 pb-3">
-      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-xs">
+      <dl className="model-statistics text-xs">
         <dt>
           <Trans comment="三维模型材质类型。">类型</Trans>
         </dt>

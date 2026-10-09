@@ -84,7 +84,7 @@ export function ImportStatus({
           <AlertTitle>
             <Trans>需要补充依赖文件</Trans>
           </AlertTitle>
-          <AlertDescription className="flex flex-col gap-3">
+          <AlertDescription className="flex min-w-0 flex-col gap-3 [overflow-wrap:anywhere] [&_p:not(:last-child)]:mb-0">
             <p className="font-medium break-all">
               {state.items.find((item) => item.id === state.awaitingId)?.name}
             </p>

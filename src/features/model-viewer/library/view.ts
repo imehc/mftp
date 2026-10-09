@@ -1,9 +1,9 @@
 import type { PerspectiveCamera, Vector3 } from "three";
 
-import type { ModelCameraState, ModelViewState } from "~/bindings";
+import type { ModelCameraState, ModelLayout, ModelViewState } from "~/bindings";
 
 import type { InspectionTools } from "../inspection/tools";
-import type { ModelEntry } from "../runtime/collection";
+import type { ModelCollection, ModelEntry } from "../runtime/collection";
 
 export function cameraState(
   camera: PerspectiveCamera,
@@ -22,10 +22,12 @@ export function captureModelView(
   target: Vector3,
   tools: InspectionTools,
   entry: ModelEntry,
+  layout: ModelLayout,
 ): ModelViewState {
   const state = tools.snapshot();
   return {
     version: 1,
+    layout,
     camera: cameraState(camera, target),
     views: state.views.map(({ id, name, position, target, near, far }) => ({
       id,
@@ -46,4 +48,15 @@ export function captureModelView(
     shadows: state.shadows,
     autoRotate: state.autoRotate,
   };
+}
+
+export function restoreModelPlacement(
+  models: ModelCollection,
+  entry: ModelEntry,
+  value: ModelViewState,
+) {
+  // 恢复布局选项不重新排布，避免覆盖用户保存的位置或移动其他模型。
+  models.layout = value.layout ?? "row";
+  entry.layer.position.fromArray(value.position);
+  entry.layer.visible = value.visible;
 }

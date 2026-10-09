@@ -145,15 +145,11 @@ export function AnimationBar({
                 </SelectTrigger>
                 <SelectContent
                   position="popper"
-                  className="max-w-[calc(100vw-2rem)]"
+                  className="ui-density-adaptive max-w-[calc(100vw-2rem)]"
                 >
                   <SelectGroup>
                     {state.clips.map((clip, index) => (
-                      <SelectItem
-                        key={index}
-                        value={String(index)}
-                        className="min-h-11 md:min-h-8"
-                      >
+                      <SelectItem key={index} value={String(index)}>
                         <span className="truncate">
                           {clipLabel(clip.name, index)}
                         </span>
@@ -233,14 +229,10 @@ export function AnimationBar({
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="ui-density-adaptive">
                   <SelectGroup>
                     {loops.map((loop) => (
-                      <SelectItem
-                        className="min-h-11 md:min-h-8"
-                        key={loop.value}
-                        value={loop.value}
-                      >
+                      <SelectItem key={loop.value} value={loop.value}>
                         {loop.label}
                       </SelectItem>
                     ))}
@@ -264,14 +256,10 @@ export function AnimationBar({
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="ui-density-adaptive">
                   <SelectGroup>
                     {[0.25, 0.5, 1, 1.5, 2].map((speed) => (
-                      <SelectItem
-                        className="min-h-11 md:min-h-8"
-                        key={speed}
-                        value={String(speed)}
-                      >
+                      <SelectItem key={speed} value={String(speed)}>
                         {i18n.number(speed)}×
                       </SelectItem>
                     ))}

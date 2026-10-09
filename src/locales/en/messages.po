@@ -240,7 +240,7 @@ msgstr "{winnerSeatLabel} wins"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:328
+#: src/features/model-viewer/ModelViewerPage.tsx:332
 msgid "3D 显示已中断"
 msgstr "3D display interrupted"
 
@@ -248,13 +248,13 @@ msgstr "3D display interrupted"
 #. 本地 GLB、glTF、FBX 三维模型查看工具名称。
 #. 本地 GLB、glTF、FBX 三维模型查看工具名称。
 #: src/features/home/entries.tsx:65
-#: src/features/model-viewer/ModelViewerPage.tsx:144
-#: src/features/model-viewer/ModelViewerPage.tsx:211
+#: src/features/model-viewer/ModelViewerPage.tsx:148
+#: src/features/model-viewer/ModelViewerPage.tsx:215
 msgid "3D 模型"
 msgstr "3D Models"
 
 #. 可聚焦的模型渲染区域，支持鼠标、触屏与键盘。
-#: src/features/model-viewer/ModelViewerPage.tsx:432
+#: src/features/model-viewer/ModelViewerPage.tsx:452
 msgid "3D 模型画布"
 msgstr "3D model canvas"
 
@@ -417,11 +417,11 @@ msgstr "Estimated CPU data"
 msgid "English"
 msgstr "English"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:71
+#: src/features/model-viewer/components/ViewerHelp.tsx:81
 msgid "FBX 仅在当前会话预览，不保存到模型库。支持 PNG、JPEG、WebP 和 BMP 贴图；缺少外置贴图时可补选文件。"
 msgstr "FBX models are previewed for this session only and are not saved to the model library. PNG, JPEG, WebP and BMP textures are supported. Select any missing external textures to continue."
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:77
+#: src/features/model-viewer/components/ViewerHelp.tsx:87
 msgid "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
 msgstr "FBX files are limited to 64 MiB. Processing stops if the model or textures are too complex, or parsing takes over 30 seconds. Simplify the model and try again."
 
@@ -446,7 +446,7 @@ msgstr "The GitHub API rate limit is too low. Try again later or download using 
 msgid "GPU 分配估算"
 msgstr "Estimated GPU allocation"
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:83
+#: src/features/model-viewer/components/PreviewPanel.tsx:90
 msgid "HDR · 最大 2048 × 1024 / 32 MiB"
 msgstr "HDR · Up to 2048 × 1024 / 32 MiB"
 
@@ -470,7 +470,7 @@ msgstr "MFTP updates"
 msgid "MP4 · MOV · M4V，文件不会上传"
 msgstr "MP4 · MOV · M4V — files stay on device"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:196
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:204
 msgid "PDF 不在应用内预览。请保存副本后使用 PDF 阅读器打开。"
 msgstr "PDF previews are not available in the app. Save a copy and open it with a PDF reader."
 
@@ -486,8 +486,7 @@ msgstr "PNG · JPG · WebP — keeps source format"
 msgid "PNG · JPG · WebP，默认保持原格式输出"
 msgstr "PNG · JPG · WebP — keeps source format by default"
 
-#: src/features/model-viewer/components/CaptureToolbar.tsx:84
-#: src/features/model-viewer/components/ScreenshotExport.tsx:100
+#: src/features/model-viewer/components/CaptureToolbar.tsx:85
 msgid "PNG · 透明背景 · 不含工具面板"
 msgstr "PNG · Transparent background · No tool panels"
 
@@ -562,7 +561,7 @@ msgid "三角形"
 msgstr "Triangles"
 
 #. 模型唯一三角形几何体中的面数，不含线和点。
-#: src/features/model-viewer/components/ModelInspector.tsx:35
+#: src/features/model-viewer/components/ModelInspector.tsx:37
 msgid "三角面数"
 msgstr "Triangles"
 
@@ -574,7 +573,7 @@ msgstr "Previous"
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "The last move was a pass: pass again to end the game, or play to reset the count"
 
-#: src/features/model-viewer/components/SceneTree.tsx:74
+#: src/features/model-viewer/components/SceneTree.tsx:71
 msgid "上下键移动，左右键展开或收起；选择节点可查看关联材质。"
 msgstr "Use Up/Down to navigate and Left/Right to expand or collapse. Select a node to inspect its materials."
 
@@ -702,14 +701,12 @@ msgid "下载完成后可复制到系统下载目录或其他位置"
 msgstr "After downloading, copy files to the system Downloads folder or another location."
 
 #. 通过浏览器下载已经生成的模型视口视频。
-#: src/features/model-viewer/components/RecordingExport.tsx:57
+#: src/features/model-viewer/components/RecordingExport.tsx:88
 msgid "下载录屏"
 msgstr "Download recording"
 
 #. 通过浏览器下载三维场景的 PNG 截图。
-#. 通过浏览器下载三维场景的 PNG 截图。
-#: src/features/model-viewer/components/ScreenshotExport.tsx:62
-#: src/features/model-viewer/components/ScreenshotExport.tsx:76
+#: src/features/model-viewer/components/ScreenshotExport.tsx:60
 msgid "下载截图"
 msgstr "Download screenshot"
 
@@ -778,7 +775,7 @@ msgstr "Unsupported archive format"
 msgid "不支持的译文包格式"
 msgstr "Unsupported translation package format"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:212
+#: src/features/model-viewer/components/LibraryPanel.tsx:234
 msgid "不缓存"
 msgstr "Do not cache"
 
@@ -797,8 +794,8 @@ msgstr "Not applicable"
 
 #. 材质 opacity，0 透明到 1 不透明。
 #. 模型材质的不透明度，0 为透明，1 为不透明。
-#: src/features/model-viewer/components/PreviewPanel.tsx:187
-#: src/features/model-viewer/components/ResourceDetails.tsx:127
+#: src/features/model-viewer/components/PreviewPanel.tsx:200
+#: src/features/model-viewer/components/ResourceDetails.tsx:132
 msgid "不透明度"
 msgstr "Opacity"
 
@@ -816,7 +813,7 @@ msgid "两次输入的密码不一致"
 msgstr "Passwords do not match"
 
 #. 在当前三维模型表面拾取两点测量距离。
-#: src/features/model-viewer/components/NavigationPanel.tsx:61
+#: src/features/model-viewer/components/NavigationPanel.tsx:67
 msgid "两点测量"
 msgstr "Measure distance"
 
@@ -852,7 +849,7 @@ msgid "临时导出空间已满，请稍后重试。系统分享文件会保留�
 msgstr "Temporary export storage is full. Try again later. Shared files are kept for at least 24 hours."
 
 #. 选择要编辑的 PBR 材质副本，不写回源文件。
-#: src/features/model-viewer/components/PreviewPanel.tsx:140
+#: src/features/model-viewer/components/PreviewPanel.tsx:153
 msgid "临时材质"
 msgstr "Preview material"
 
@@ -906,7 +903,7 @@ msgstr "Theme"
 msgid "主题与字体"
 msgstr "Theme and font"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:470
+#: src/features/model-viewer/ModelViewerPage.tsx:492
 msgid "也可将模型文件拖到这里"
 msgstr "You can also drop a model file here"
 
@@ -924,7 +921,7 @@ msgid "五子棋房间"
 msgstr "Gomoku room"
 
 #. 3D 画布的轨道、自由移动、测量、摆放模式。
-#: src/features/model-viewer/components/NavigationPanel.tsx:35
+#: src/features/model-viewer/components/NavigationPanel.tsx:41
 msgid "交互模式"
 msgstr "Interaction mode"
 
@@ -955,7 +952,7 @@ msgstr "Play vs AI"
 msgid "仅上传"
 msgstr "Upload Only"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:238
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:246
 msgid "仅删除模型库中的附件副本，原始文件不受影响。"
 msgstr "Only the attachment copy in the model library will be removed. The original file is unchanged."
 
@@ -963,7 +960,7 @@ msgstr "Only the attachment copy in the model library will be removed. The origi
 msgid "仅导入带作者、来源和许可证的本地 JSON"
 msgstr "Import local JSON only when it includes author, source, and license metadata"
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:239
+#: src/features/model-viewer/components/PreviewPanel.tsx:259
 msgid "仅影响预览，切换模型时还原。"
 msgstr "Preview only. Resets when switching models."
 
@@ -987,7 +984,7 @@ msgstr "Only PNG, JPG, and WebP are supported"
 msgid "仅支持磁力链接或 .torrent 文件路径"
 msgstr "Only magnet links and .torrent file paths are supported"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:125
+#: src/features/model-viewer/components/LibraryPanel.tsx:140
 msgid "仅收藏"
 msgstr "Favorites only"
 
@@ -996,11 +993,11 @@ msgid "仅显示开头部分"
 msgstr "Showing the beginning only"
 
 #. 模型仅在当前会话显示，不会保存到模型库或在退出后恢复。
-#: src/features/model-viewer/ModelViewerPage.tsx:312
+#: src/features/model-viewer/ModelViewerPage.tsx:316
 msgid "仅本次预览"
 msgstr "This session only"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:233
+#: src/features/model-viewer/components/LibraryPanel.tsx:255
 msgid "仅清理缩略图，模型保留。数据库空间会供后续写入复用。"
 msgstr "Only thumbnails are cleared. Models are kept, and database space is reused for future writes."
 
@@ -1032,11 +1029,11 @@ msgstr "Rotate your device from the current view. Touching the canvas, opening a
 msgid "从本地 tar.gz 导入…"
 msgstr "Import from local tar.gz…"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:277
+#: src/features/model-viewer/components/LibraryPanel.tsx:300
 msgid "从模型库删除？"
 msgstr "Delete from library?"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:286
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:301
 msgid "以下保留验证器的原始诊断、代码和文件位置。"
 msgstr "Original validator diagnostics, codes and file locations follow."
 
@@ -1117,7 +1114,7 @@ msgstr "A transfer is in progress and cannot be changed right now."
 msgid "位置"
 msgstr "Location"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:75
+#: src/features/model-viewer/components/RuntimeControls.tsx:78
 msgid "低负载画质 · 像素比例上限 1 · 最高 20 帧/秒"
 msgstr "Low load \\u00b7 Pixel ratio up to 1 \\u00b7 Up to 20 fps"
 
@@ -1187,7 +1184,7 @@ msgstr "Open {entryName} with system app"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:515
-#: src/features/model-viewer/components/LibraryEntryEditor.tsx:120
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
 #: src/features/poetry/components/PoetryTranslationSection.tsx:338
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:344
 #: src/features/todo/TodoItemDialog.tsx:184
@@ -1208,17 +1205,17 @@ msgstr "Save transfer settings"
 msgid "保存到"
 msgstr "Save To"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:171
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:179
 msgid "保存副本"
 msgstr "Save a copy"
 
 #. 保存当前三维相机位置，仅当前会话有效。
-#: src/features/model-viewer/components/NavigationPanel.tsx:116
+#: src/features/model-viewer/components/NavigationPanel.tsx:124
 msgid "保存当前视角"
 msgstr "Save current view"
 
 #. 保存已经生成的模型视口视频。
-#: src/features/model-viewer/components/RecordingExport.tsx:55
+#: src/features/model-viewer/components/RecordingExport.tsx:86
 msgid "保存录屏"
 msgstr "Save recording"
 
@@ -1227,9 +1224,7 @@ msgid "保存待办失败"
 msgstr "Failed to save todo"
 
 #. 将三维场景的当前视角保存为本地 PNG 文件。
-#. 将三维场景的当前视角保存为本地 PNG 文件。
 #: src/features/model-viewer/components/ScreenshotExport.tsx:58
-#: src/features/model-viewer/components/ScreenshotExport.tsx:72
 msgid "保存截图"
 msgstr "Save screenshot"
 
@@ -1252,17 +1247,17 @@ msgid "信任设备"
 msgstr "Trusted device"
 
 #. 模型检查区的统计信息标签。
-#: src/features/model-viewer/components/ModelInspector.tsx:148
+#: src/features/model-viewer/components/ModelInspector.tsx:147
 msgid "信息"
 msgstr "Info"
 
 #. 打开模型信息、场景树和材质检查浮层。
-#: src/features/model-viewer/components/ModelInspector.tsx:245
+#: src/features/model-viewer/components/ModelInspector.tsx:244
 msgid "信息与场景"
 msgstr "Info & scene"
 
 #. glTF 规范报告中的信息与建议数量合计。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:271
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:286
 msgid "信息与建议"
 msgstr "Information and hints"
 
@@ -1274,7 +1269,7 @@ msgstr "Modified Date"
 msgid "修改时间"
 msgstr "Modified Time"
 
-#: src/features/model-viewer/components/LibraryEntryEditor.tsx:58
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:63
 msgid "修改模型库条目信息"
 msgstr "Edit model library details"
 
@@ -1289,7 +1284,7 @@ msgid "停一手"
 msgstr "Pass"
 
 #. 停止模型动画并回到片段起点。
-#: src/features/model-viewer/components/AnimationBar.tsx:217
+#: src/features/model-viewer/components/AnimationBar.tsx:213
 msgid "停止"
 msgstr "Stop"
 
@@ -1315,7 +1310,7 @@ msgid "停止当前处理？"
 msgstr "Stop the current process?"
 
 #. 结束模型视口录制并生成待保存视频。
-#: src/features/model-viewer/components/RecordingExport.tsx:96
+#: src/features/model-viewer/components/RecordingExport.tsx:91
 msgid "停止录屏"
 msgstr "Stop recording"
 
@@ -1328,7 +1323,7 @@ msgid "停止陀螺仪控制"
 msgstr "Stop motion control"
 
 #. 解码后模型纹理的像素格式，不是源文件扩展名。
-#: src/features/model-viewer/components/ResourceDetails.tsx:58
+#: src/features/model-viewer/components/ResourceDetails.tsx:63
 msgid "像素格式"
 msgstr "Pixel format"
 
@@ -1427,7 +1422,7 @@ msgid "共享目录不存在或无法访问，请检查共享设置"
 msgstr "The shared folder does not exist or cannot be accessed. Check the sharing settings."
 
 #. 几何、动画等共用的底层数组分配，仅统计一次。
-#: src/features/model-viewer/components/MemoryPanel.tsx:278
+#: src/features/model-viewer/components/MemoryPanel.tsx:281
 msgid "共用数据缓冲"
 msgstr "Shared data buffers"
 
@@ -1441,7 +1436,7 @@ msgid "关于与本地数据"
 msgstr "About and local data"
 
 #. 本材质引用的纹理及下方对应预览。
-#: src/features/model-viewer/components/ResourceDetails.tsx:146
+#: src/features/model-viewer/components/ResourceDetails.tsx:151
 msgid "关联纹理"
 msgstr "Linked textures"
 
@@ -1450,7 +1445,7 @@ msgstr "Linked textures"
 #: src/components/ui/dialog.tsx:140
 #: src/components/ui/sheet.tsx:88
 #: src/features/bt/components/AddTorrentDialog.tsx:363
-#: src/features/model-viewer/components/LibraryPanel.tsx:333
+#: src/features/model-viewer/components/LibraryPanel.tsx:356
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
 #: src/features/ssh-sftp/components/Sidebar.tsx:365
 #: src/features/ssh-sftp/components/Sidebar.tsx:379
@@ -1484,16 +1479,6 @@ msgstr "Your changes will not be saved if you close."
 msgid "关闭时正文搜索走 LIKE 兜底，较慢"
 msgstr "When off, body search falls back to LIKE and is slower"
 
-#. 关闭三维模型检查浮层。
-#: src/features/model-viewer/components/ModelInspector.tsx:270
-msgid "关闭模型详情"
-msgstr "Close model details"
-
-#. 关闭多模型查看器的检查浮层。
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:140
-msgid "关闭模型面板"
-msgstr "Close model panel"
-
 #: src/features/transfers/ActivityMenu.tsx:76
 msgid "关闭活动面板不会取消传输。"
 msgstr "Closing this panel does not cancel transfers."
@@ -1512,7 +1497,7 @@ msgid "其他用户"
 msgstr "Others"
 
 #. 模型内存估算和历史曲线标签。
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:60
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:62
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:170
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:247
 msgid "内存"
@@ -1563,8 +1548,8 @@ msgstr "Shortest side"
 msgid "最近活动"
 msgstr "Recent activity"
 
-#: src/features/model-viewer/components/CaptureToolbar.tsx:87
-#: src/features/model-viewer/components/RecordingExport.tsx:140
+#: src/features/model-viewer/components/CaptureToolbar.tsx:88
+#: src/features/model-viewer/components/RecordingExport.tsx:230
 msgid "最长 60 秒 · 黑色背景 · 无音频 · 不含工具面板"
 msgstr "Up to 60 seconds · Black background · No audio or tool panels"
 
@@ -1584,7 +1569,7 @@ msgid "准备中"
 msgstr "Preparing"
 
 #. 模型 GPU 上传状态。
-#: src/features/model-viewer/components/ModelList.tsx:35
+#: src/features/model-viewer/components/ModelList.tsx:36
 msgid "准备显示"
 msgstr "Preparing display"
 
@@ -1593,32 +1578,36 @@ msgid "减小 {delta}%"
 msgstr "Reduced {delta}%"
 
 #. 模型场景中的唯一几何体资源数量。
-#: src/features/model-viewer/components/ModelInspector.tsx:54
+#: src/features/model-viewer/components/ModelInspector.tsx:56
 msgid "几何体数"
 msgstr "Geometries"
 
 #. 模型顶点、索引和实例数组内存。
-#: src/features/model-viewer/components/MemoryPanel.tsx:265
+#: src/features/model-viewer/components/MemoryPanel.tsx:268
 msgid "几何数据"
 msgstr "Geometry data"
 
 #. 通过移动系统分享面板分享已经生成的模型视口视频。
-#: src/features/model-viewer/components/RecordingExport.tsx:70
+#. 通过移动系统分享面板分享已经生成的模型视口视频。
+#: src/features/model-viewer/components/RecordingExport.tsx:146
+#: src/features/model-viewer/components/RecordingExport.tsx:153
 msgid "分享录屏"
 msgstr "Share recording"
 
 #. 通过移动系统分享面板分享模型视口 PNG 截图。
-#: src/features/model-viewer/components/ScreenshotExport.tsx:93
+#. 通过移动系统分享面板分享模型视口 PNG 截图。
+#: src/features/model-viewer/components/ScreenshotExport.tsx:100
+#: src/features/model-viewer/components/ScreenshotExport.tsx:107
 msgid "分享截图"
 msgstr "Share screenshot"
 
 #. 在后台分析当前模型各网格实例的拓扑缺陷。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:171
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:177
 msgid "分析网格拓扑"
 msgstr "Analyze topology"
 
 #. 展开网格分析的计量范围和容量限制。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:177
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:186
 msgid "分析说明"
 msgstr "About this analysis"
 
@@ -1629,12 +1618,12 @@ msgid "分类"
 msgstr "Category"
 
 #. 模型库中用户自定义的分类名称，留空表示不分组。
-#: src/features/model-viewer/components/LibraryEntryEditor.tsx:90
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:98
 msgid "分组"
 msgstr "Group"
 
 #. 模型纹理图像的像素尺寸。
-#: src/features/model-viewer/components/ResourceDetails.tsx:48
+#: src/features/model-viewer/components/ResourceDetails.tsx:53
 msgid "分辨率"
 msgstr "Resolution"
 
@@ -1685,7 +1674,7 @@ msgstr "Create game room"
 #: src/features/ai-configuration/RowActions.mobile.tsx:57
 #: src/features/bt/components/TaskDialogs.tsx:85
 #: src/features/bt/components/TaskRow.tsx:228
-#: src/features/model-viewer/components/LibraryPanel.tsx:297
+#: src/features/model-viewer/components/LibraryPanel.tsx:320
 #: src/features/poetry/components/PoetryTranslationSection.tsx:358
 #: src/features/poetry/LibraryManagePage.tsx:197
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:91
@@ -1799,12 +1788,12 @@ msgstr "Delete service address"
 msgid "删除服务地址？"
 msgstr "Delete service address?"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:280
+#: src/features/model-viewer/components/LibraryPanel.tsx:303
 msgid "删除本机保存的模型及附件副本，原始文件和当前画布不受影响。"
 msgstr "Delete the local model and attachment copies. The original files and current canvas are unchanged."
 
 #. 从本机模型库删除此条目，不操作用户的原始文件。
-#: src/features/model-viewer/components/LibraryList.tsx:242
+#: src/features/model-viewer/components/LibraryList.tsx:239
 msgid "删除模型"
 msgstr "Delete model"
 
@@ -1923,7 +1912,7 @@ msgid "加解密"
 msgstr "Encode / Decode"
 
 #. 选择本地 Radiance HDR 文件作为三维场景照明环境。
-#: src/features/model-viewer/components/PreviewPanel.tsx:77
+#: src/features/model-viewer/components/PreviewPanel.tsx:84
 msgid "加载 HDR 环境"
 msgstr "Load HDR environment"
 
@@ -1953,39 +1942,39 @@ msgid "动画"
 msgstr "Animation"
 
 #. 模型动画停止后的状态通知。
-#: src/features/model-viewer/components/AnimationBar.tsx:209
+#: src/features/model-viewer/components/AnimationBar.tsx:205
 msgid "动画已停止并归零"
 msgstr "Animation stopped and reset"
 
 #. 模型动画状态通知。
-#: src/features/model-viewer/components/AnimationBar.tsx:174
+#: src/features/model-viewer/components/AnimationBar.tsx:170
 msgid "动画已暂停"
 msgstr "Animation paused"
 
 #. 当前模型的动画片段数量。
-#: src/features/model-viewer/components/ModelInspector.tsx:50
+#: src/features/model-viewer/components/ModelInspector.tsx:52
 msgid "动画数"
 msgstr "Animations"
 
 #. 模型动画关键帧数组内存。
-#: src/features/model-viewer/components/MemoryPanel.tsx:273
+#: src/features/model-viewer/components/MemoryPanel.tsx:276
 msgid "动画数据"
 msgstr "Animation data"
 
 #. 拖动或用方向键、Home、End 定位动画。
-#: src/features/model-viewer/components/AnimationBar.tsx:290
+#: src/features/model-viewer/components/AnimationBar.tsx:278
 msgid "动画时间轴（秒）"
 msgstr "Animation timeline (seconds)"
 
 #. 模型动画状态通知。
-#: src/features/model-viewer/components/AnimationBar.tsx:182
+#: src/features/model-viewer/components/AnimationBar.tsx:178
 msgid "动画正在播放"
 msgstr "Animation playing"
 
 #. 模型动画片段的数量。
 #. 选择一个三维模型动画片段。
 #: src/features/model-viewer/components/AnimationBar.tsx:118
-#: src/features/model-viewer/components/MemoryPanel.tsx:312
+#: src/features/model-viewer/components/MemoryPanel.tsx:315
 msgid "动画片段"
 msgstr "Animation clip"
 
@@ -2011,7 +2000,7 @@ msgid "卸载合集"
 msgstr "Uninstall collection"
 
 #. 展开内存历史曲线的数值表格。
-#: src/features/model-viewer/components/MemoryPanel.tsx:220
+#: src/features/model-viewer/components/MemoryPanel.tsx:223
 msgid "历史数值"
 msgstr "History values"
 
@@ -2134,7 +2123,7 @@ msgid "双方棋局状态不一致，本局无法继续。"
 msgstr "The players have different board states. This game cannot continue."
 
 #. 模型材质是否渲染三角面的两侧。
-#: src/features/model-viewer/components/ResourceDetails.tsx:141
+#: src/features/model-viewer/components/ResourceDetails.tsx:146
 msgid "双面渲染"
 msgstr "Double sided"
 
@@ -2164,8 +2153,8 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/lan-transfer/LanShareDialog.tsx:143
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:507
 #: src/features/logs/LogDialogs.tsx:143
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:244
-#: src/features/model-viewer/components/LibraryPanel.tsx:287
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:252
+#: src/features/model-viewer/components/LibraryPanel.tsx:310
 #: src/features/poetry/components/PoetryTranslationSection.tsx:325
 #: src/features/poetry/components/PoetryTranslationSection.tsx:353
 #: src/features/poetry/components/PoetryTranslationSection.tsx:373
@@ -2221,7 +2210,7 @@ msgid "取消打包超时，请稍后重试"
 msgstr "Canceling the archive operation timed out. Please try again later."
 
 #. 停止模型诊断后台任务。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:245
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:260
 msgid "取消检查"
 msgstr "Cancel inspection"
 
@@ -2245,12 +2234,12 @@ msgid "取消静音"
 msgstr "Unmute"
 
 #. 当前模型 morph target 权重；编辑时暂停动画。
-#: src/features/model-viewer/components/PreviewPanel.tsx:214
+#: src/features/model-viewer/components/PreviewPanel.tsx:232
 msgid "变形权重"
 msgstr "Morph weight"
 
 #. 模型 morph target，选择后调整当前权重。
-#: src/features/model-viewer/components/PreviewPanel.tsx:205
+#: src/features/model-viewer/components/PreviewPanel.tsx:220
 msgid "变形目标"
 msgstr "Morph target"
 
@@ -2291,7 +2280,7 @@ msgstr "Available collections"
 msgid "可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。"
 msgstr "Remove unused models to release resources. This threshold is not the device’s available memory."
 
-#: src/features/model-viewer/ModelViewerPage.tsx:335
+#: src/features/model-viewer/ModelViewerPage.tsx:339
 msgid "可以重试恢复图形显示，或返回其他工具。"
 msgstr "Retry the 3D display or return to another tool."
 
@@ -2379,7 +2368,7 @@ msgstr "MFTP clients on the same subnet. Click to open the access URL."
 #: src/features/lan-transfer/LanShareDialog.tsx:94
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:310
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:311
-#: src/features/model-viewer/components/LibraryEntryEditor.tsx:77
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:85
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:99
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:122
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:72
@@ -2412,7 +2401,7 @@ msgstr "Second (White)"
 msgid "后手（执黑）"
 msgstr "Play second (Black)"
 
-#: src/features/model-viewer/components/ResourceDetails.tsx:143
+#: src/features/model-viewer/components/ResourceDetails.tsx:148
 msgid "否"
 msgstr "No"
 
@@ -2508,7 +2497,7 @@ msgstr "Image files"
 msgid "图片预览区域"
 msgstr "Image preview area"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:118
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:122
 msgid "在同一模型表面选取两点。"
 msgstr "Pick two points on the same model."
 
@@ -2525,7 +2514,7 @@ msgstr "Select collections in Data Management and download them to browse offlin
 msgid "在本地查看 GLB、glTF 与 FBX 三维模型"
 msgstr "View GLB, glTF and FBX models locally"
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:87
+#: src/features/model-viewer/components/PreviewPanel.tsx:94
 msgid "在此设备记住场景环境，下次进入查看器时恢复。"
 msgstr "Remember the scene environment on this device and restore it next time you open the viewer."
 
@@ -2543,20 +2532,20 @@ msgid "地址格式应为 IP:端口"
 msgstr "Address must be in IP:port form"
 
 #. 模型检查区的场景树标签。
-#: src/features/model-viewer/components/ModelInspector.tsx:151
+#: src/features/model-viewer/components/ModelInspector.tsx:150
 msgid "场景"
 msgstr "Scene"
 
-#: src/features/model-viewer/components/ModelList.tsx:290
+#: src/features/model-viewer/components/ModelList.tsx:305
 msgid "坐标用于预览摆放，不改变源模型尺寸。摆放模式可拖动模型，Esc 退出；也可直接输入坐标。"
 msgstr "Coordinates position the preview without changing source dimensions. Drag models in placement mode, press Esc to exit, or enter coordinates."
 
 #. PBR 材质基础色。
 #. 模型材质的基础颜色属性。
 #. 模型材质的基础颜色纹理用途。
-#: src/features/model-viewer/components/PreviewPanel.tsx:153
-#: src/features/model-viewer/components/ResourceDetails.tsx:81
-#: src/features/model-viewer/components/ResourceDetails.tsx:123
+#: src/features/model-viewer/components/PreviewPanel.tsx:166
+#: src/features/model-viewer/components/ResourceDetails.tsx:86
+#: src/features/model-viewer/components/ResourceDetails.tsx:128
 msgid "基础颜色"
 msgstr "Base color"
 
@@ -2660,7 +2649,7 @@ msgstr "Copy result"
 msgid "复制账号"
 msgstr "Copy username"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:65
+#: src/features/model-viewer/components/ViewerHelp.tsx:75
 msgid "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请按完整路径逐项补选。"
 msgstr "External glTF resources require matching bin and texture files. Select each missing file using its full relative path."
 
@@ -2710,7 +2699,7 @@ msgstr "Font"
 msgid "字号"
 msgstr "Font size"
 
-#: src/features/model-viewer/components/MemoryPanel.tsx:307
+#: src/features/model-viewer/components/MemoryPanel.tsx:310
 msgid "字节数未知"
 msgstr "Byte size unknown"
 
@@ -2719,7 +2708,7 @@ msgid "存储、清理与项目帮助"
 msgstr "Storage, cleanup and project help"
 
 #. 模型库磁盘逻辑字节数和可清理缩略图缓存设置。
-#: src/features/model-viewer/components/LibraryPanel.tsx:180
+#: src/features/model-viewer/components/LibraryPanel.tsx:198
 msgid "存储与缓存"
 msgstr "Storage and cache"
 
@@ -2897,7 +2886,7 @@ msgstr "Import SSH key"
 msgid "导入中…"
 msgstr "Importing..."
 
-#: src/features/model-viewer/components/ModelList.tsx:298
+#: src/features/model-viewer/components/ModelList.tsx:313
 msgid "导入会追加模型。隐藏保留资源，移除不会删除源文件。"
 msgstr "Imports add models. Hiding retains resources; removing a model keeps its source file."
 
@@ -2906,7 +2895,7 @@ msgid "导入前请核对数据范围，覆盖模式会删除对应模块中的�
 msgstr "Review the backup contents before importing. Overwrite mode deletes existing records in the included modules."
 
 #. 单个三维模型导入失败状态。
-#: src/features/model-viewer/components/ModelList.tsx:41
+#: src/features/model-viewer/components/ModelList.tsx:42
 #: src/features/poetry/components/TranslationPackManager.tsx:47
 msgid "导入失败"
 msgstr "Import failed"
@@ -2925,11 +2914,11 @@ msgid "导入应用数据"
 msgstr "Import app data"
 
 #. 选择并打开一个本地三维模型文件。
-#: src/features/model-viewer/ModelViewerPage.tsx:204
+#: src/features/model-viewer/ModelViewerPage.tsx:208
 msgid "导入模型"
 msgstr "Import model"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:141
+#: src/features/model-viewer/components/LibraryPanel.tsx:156
 msgid "导入模型后可在这里重新打开。"
 msgstr "Import a model to reopen it here."
 
@@ -2937,7 +2926,7 @@ msgstr "Import a model to reopen it here."
 msgid "导入模式"
 msgstr "Import mode"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:103
+#: src/features/model-viewer/components/LibraryPanel.tsx:104
 msgid "导入的模型自动保存在此设备。"
 msgstr "Imported models are saved automatically on this device."
 
@@ -2987,8 +2976,8 @@ msgstr "The export file is invalid or exceeds 64 MiB. Generate it again."
 
 #. 打开三维截图与录屏的格式和限制说明。
 #. 打开三维截图与录屏的格式和限制说明。
-#: src/features/model-viewer/components/CaptureToolbar.tsx:67
-#: src/features/model-viewer/components/CaptureToolbar.tsx:77
+#: src/features/model-viewer/components/CaptureToolbar.tsx:65
+#: src/features/model-viewer/components/CaptureToolbar.tsx:75
 msgid "导出说明"
 msgstr "Export details"
 
@@ -3130,7 +3119,7 @@ msgid "展开侧边栏"
 msgstr "Expand Sidebar"
 
 #. 场景树节点的展开按钮，name 为模型节点名称。
-#: src/features/model-viewer/components/SceneTree.tsx:179
+#: src/features/model-viewer/components/SceneTree.tsx:176
 msgid "展开或收起 {name}"
 msgstr "Expand or collapse {name}"
 
@@ -3141,7 +3130,7 @@ msgstr "Expand or collapse animation controls"
 
 #. 三维查看器的自由相机、预览编辑与诊断工具。
 #: src/features/home/entries.tsx:38
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:63
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:65
 msgid "工具"
 msgstr "Tools"
 
@@ -3166,7 +3155,7 @@ msgid "已保存 · 未验证"
 msgstr "Saved · Unverified"
 
 #. 本机模型库条目列表。
-#: src/features/model-viewer/components/LibraryList.tsx:110
+#: src/features/model-viewer/components/LibraryList.tsx:107
 msgid "已保存模型"
 msgstr "Saved models"
 
@@ -3230,15 +3219,15 @@ msgid "已删除白名单"
 msgstr "Trusted device removed"
 
 #. 三维模型成功导入状态。
-#: src/features/model-viewer/components/ModelList.tsx:40
+#: src/features/model-viewer/components/ModelList.tsx:41
 msgid "已加载"
 msgstr "Loaded"
 
-#: src/features/model-viewer/components/RecordingExport.tsx:162
+#: src/features/model-viewer/components/RecordingExport.tsx:71
 msgid "已发起录屏下载，请在浏览器中查看。"
 msgstr "Recording download started. Check your browser."
 
-#: src/features/model-viewer/components/ScreenshotExport.tsx:109
+#: src/features/model-viewer/components/ScreenshotExport.tsx:45
 msgid "已发起截图下载，请在浏览器中查看。"
 msgstr "Screenshot download started. Check your browser."
 
@@ -3247,7 +3236,7 @@ msgstr "Screenshot download started. Check your browser."
 #: src/features/home/HomeRecentActivity.tsx:22
 #: src/features/lan-transfer/LanTransferActivity.tsx:31
 #: src/features/logs/use-activity-logs.ts:41
-#: src/features/model-viewer/components/ModelList.tsx:43
+#: src/features/model-viewer/components/ModelList.tsx:44
 #: src/store/transfers.ts:188
 msgid "已取消"
 msgstr "Cancelled"
@@ -3261,7 +3250,7 @@ msgstr "Task cancelled"
 msgid "已取消压缩"
 msgstr "Compression cancelled"
 
-#: src/features/model-viewer/components/ScreenshotExport.tsx:114
+#: src/features/model-viewer/components/ScreenshotExport.tsx:50
 msgid "已取消截图导出。"
 msgstr "Screenshot export cancelled."
 
@@ -3310,7 +3299,7 @@ msgid "已导入密钥 {trimValue}"
 msgstr "Imported key {trimValue}"
 
 #. 当前三维查看器的模型与导入任务列表。
-#: src/features/model-viewer/components/ModelList.tsx:111
+#: src/features/model-viewer/components/ModelList.tsx:118
 msgid "已导入模型"
 msgstr "Imported models"
 
@@ -3331,8 +3320,8 @@ msgstr "Launch at Login enabled"
 msgid "已开始调整账号顺序"
 msgstr "Account reordering started"
 
-#: src/features/model-viewer/components/RecordingExport.tsx:157
-#: src/features/model-viewer/components/ScreenshotExport.tsx:112
+#: src/features/model-viewer/components/RecordingExport.tsx:68
+#: src/features/model-viewer/components/ScreenshotExport.tsx:48
 msgid "已打开系统分享，请在目标应用中确认。"
 msgstr "System sharing opened. Confirm in the receiving app."
 
@@ -3454,7 +3443,7 @@ msgid "平局"
 msgstr "Draw"
 
 #. 模型沿一行排列。
-#: src/features/model-viewer/components/ModelList.tsx:90
+#: src/features/model-viewer/components/ModelList.tsx:97
 msgid "并排"
 msgstr "Row"
 
@@ -3517,7 +3506,7 @@ msgid "开始下载"
 msgstr "Start download"
 
 #. 进入画布拾取两点并测量距离。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:114
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:118
 msgid "开始两点测量"
 msgstr "Measure distance"
 
@@ -3545,7 +3534,7 @@ msgstr "Open"
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:213
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:222
 msgid "开放网格无法确定内外。朝内壳体与法线不一致仅为检查提示，特殊美术法线可能是有意设置。退化三角形不参与边统计。"
 msgstr "Open meshes have no definite inside or outside. Inward shells and opposing normals are advisory; custom normals may be intentional. Degenerate triangles are excluded from edge counts."
 
@@ -3654,11 +3643,11 @@ msgstr "Showing the previous sample"
 msgid "当前模型"
 msgstr "Current model"
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:226
+#: src/features/model-viewer/components/PreviewPanel.tsx:244
 msgid "当前模型没有变形目标。"
 msgstr "This model has no morph targets."
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:199
+#: src/features/model-viewer/components/PreviewPanel.tsx:212
 msgid "当前模型没有可编辑的 PBR 材质。"
 msgstr "This model has no editable PBR materials."
 
@@ -3703,9 +3692,7 @@ msgid "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可�
 msgstr "The configured address {bindHost} is not on an available network interface. The access URL may not work."
 
 #. 开始录制三维场景的当前视口，不录制麦克风或其他应用。
-#. 开始录制三维场景的当前视口，不录制麦克风或其他应用。
-#: src/features/model-viewer/components/RecordingExport.tsx:122
-#: src/features/model-viewer/components/RecordingExport.tsx:131
+#: src/features/model-viewer/components/RecordingExport.tsx:93
 msgid "录制视口"
 msgstr "Record viewport"
 
@@ -3713,11 +3700,11 @@ msgstr "Record viewport"
 msgid "录屏保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the recording. Check the destination and available space, then try again."
 
-#: src/features/model-viewer/components/RecordingExport.tsx:160
+#: src/features/model-viewer/components/RecordingExport.tsx:71
 msgid "录屏已保存。"
 msgstr "Recording saved."
 
-#: src/features/model-viewer/components/RecordingExport.tsx:165
+#: src/features/model-viewer/components/RecordingExport.tsx:61
 msgid "录屏已生成。保存前请留在此页面。"
 msgstr "Recording ready. Stay on this page until you have saved it."
 
@@ -3785,7 +3772,7 @@ msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
 #. 模型动画的循环播放方式。
-#: src/features/model-viewer/components/AnimationBar.tsx:222
+#: src/features/model-viewer/components/AnimationBar.tsx:218
 msgid "循环模式"
 msgstr "Loop mode"
 
@@ -3794,7 +3781,7 @@ msgid "总占用"
 msgstr "Total usage"
 
 #. 当前动画片段总时长，duration 是本地化秒数。
-#: src/features/model-viewer/components/AnimationBar.tsx:339
+#: src/features/model-viewer/components/AnimationBar.tsx:327
 msgid "总时长 {duration} 秒"
 msgstr "Duration: {duration} seconds"
 
@@ -3843,7 +3830,7 @@ msgid "我确认将密钥和生成请求发送到新的服务地址。"
 msgstr "I confirm that keys and generation requests will be sent to the new service address."
 
 #. 三维查看器侧栏的导出操作区。
-#: src/features/model-viewer/components/CaptureToolbar.tsx:39
+#: src/features/model-viewer/components/CaptureToolbar.tsx:41
 msgid "截图与录屏"
 msgstr "Capture tools"
 
@@ -3851,7 +3838,7 @@ msgstr "Capture tools"
 msgid "截图保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the screenshot. Check the destination and available space, then try again."
 
-#: src/features/model-viewer/components/ScreenshotExport.tsx:107
+#: src/features/model-viewer/components/ScreenshotExport.tsx:45
 msgid "截图已保存。"
 msgstr "Screenshot saved."
 
@@ -3918,7 +3905,7 @@ msgstr "Open"
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "Open this directory when starting SFTP. If it does not exist, fall back to the home directory, then the root directory."
 
-#: src/features/model-viewer/ModelViewerPage.tsx:454
+#: src/features/model-viewer/ModelViewerPage.tsx:474
 msgid "打开一个 3D 模型"
 msgstr "Open a 3D model"
 
@@ -3973,7 +3960,7 @@ msgstr "Approve access request"
 msgid "折叠侧边栏"
 msgstr "Collapse Sidebar"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:282
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:297
 msgid "报告超过 200 条，以下结果已截断。"
 msgstr "The report exceeds 200 issues and has been truncated."
 
@@ -4014,7 +4001,7 @@ msgstr "Drop an image here, or choose a file"
 msgid "拖放视频到此处，或选择文件"
 msgstr "Drop a video here, or choose a file"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:103
+#: src/features/model-viewer/components/RuntimeControls.tsx:106
 msgid "持续慢帧或系统热状态升高时自动降级，稳定后逐步恢复。耗时来自应用采样，不代表 GPU 时间或设备温度。"
 msgstr "Quality decreases automatically during sustained slow frames or elevated system thermal status, then gradually recovers when stable. Timings are sampled by the app and do not represent GPU time or device temperature."
 
@@ -4031,7 +4018,7 @@ msgstr "Filter by collection"
 msgid "按尺寸"
 msgstr "By size"
 
-#: src/features/model-viewer/components/ModelInspector.tsx:84
+#: src/features/model-viewer/components/ModelInspector.tsx:83
 msgid "按当前场景的唯一几何体、材质和纹理对象统计，实例另列。顶点与三角面按完整几何体计算，不随可见性或绘制范围变化；线和点不计入三角面。"
 msgstr "Counts use unique geometry, material and texture objects in the current scene. Instances are listed separately. Vertex and triangle counts include entire geometries regardless of visibility or draw range; lines and points are excluded from triangles."
 
@@ -4040,7 +4027,7 @@ msgstr "Counts use unique geometry, material and texture objects in the current 
 msgid "按模块清理"
 msgstr "Clear by module"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:146
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:150
 msgid "按模型原始尺寸测量。姿态变化后需重新选点。"
 msgstr "Uses original model dimensions. Pick points again after pose changes."
 
@@ -4052,7 +4039,7 @@ msgstr "By ratio"
 msgid "按空格开始排序，用方向键移动，再按空格确认，按 Escape 取消。"
 msgstr "Press Space to start sorting, use the arrow keys to move, press Space to confirm, or Escape to cancel."
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:203
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:211
 msgid "按纯文本展示，不加载文档中的链接或图片。"
 msgstr "Shown as plain text. Links and images in the document are not loaded."
 
@@ -4109,8 +4096,8 @@ msgstr "Search hosts"
 msgid "搜索历史"
 msgstr "Search history"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:114
-#: src/features/model-viewer/components/LibraryPanel.tsx:120
+#: src/features/model-viewer/components/LibraryPanel.tsx:129
+#: src/features/model-viewer/components/LibraryPanel.tsx:135
 msgid "搜索名称或分组"
 msgstr "Search names or groups"
 
@@ -4138,13 +4125,13 @@ msgstr "Search poems"
 
 #. 切换画布拖动模型位置的模式。
 #. 进入拖动三维模型的交互模式。
-#: src/features/model-viewer/components/ModelList.tsx:242
-#: src/features/model-viewer/components/NavigationPanel.tsx:68
+#: src/features/model-viewer/components/ModelList.tsx:250
+#: src/features/model-viewer/components/NavigationPanel.tsx:74
 msgid "摆放模型"
 msgstr "Place model"
 
 #. 播放模型动画。
-#: src/features/model-viewer/components/AnimationBar.tsx:198
+#: src/features/model-viewer/components/AnimationBar.tsx:194
 #: src/features/preview/MediaPlayer.tsx:145
 #: src/features/preview/MediaPlayer.tsx:146
 msgid "播放"
@@ -4155,7 +4142,7 @@ msgid "播放进度"
 msgstr "Playback position"
 
 #. 模型动画播放速度倍率。
-#: src/features/model-viewer/components/AnimationBar.tsx:253
+#: src/features/model-viewer/components/AnimationBar.tsx:245
 msgid "播放速度"
 msgstr "Speed"
 
@@ -4181,8 +4168,8 @@ msgstr "Operation failed"
 
 #. 打开三维视角操作说明。
 #. 打开三维视角操作说明。
-#: src/features/model-viewer/components/ViewerHelp.tsx:30
-#: src/features/model-viewer/components/ViewerHelp.tsx:34
+#: src/features/model-viewer/components/ViewerHelp.tsx:33
+#: src/features/model-viewer/components/ViewerHelp.tsx:37
 msgid "操作帮助"
 msgstr "Controls"
 
@@ -4191,11 +4178,11 @@ msgstr "Controls"
 msgid "操作标识"
 msgstr "Operation code"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:457
+#: src/features/model-viewer/ModelViewerPage.tsx:477
 msgid "支持 GLB、glTF 和 FBX。模型包含外置资源时，需同时提供依赖文件。"
 msgstr "Supports GLB, glTF and FBX. Models with external resources also need their resource files."
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:88
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:93
 msgid "支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多 16 项、合计 32 MiB。"
 msgstr "Supports UTF-8 text, Markdown (1 MiB), and PDF (8 MiB). Up to 16 attachments and 32 MiB per model."
 
@@ -4204,7 +4191,7 @@ msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "Supports magnet links and local .torrent files"
 
 #. 将模型标记为收藏。
-#: src/features/model-viewer/components/LibraryEntryEditor.tsx:104
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:112
 msgid "收藏"
 msgstr "Favorite"
 
@@ -4442,7 +4429,7 @@ msgstr "Could not open the model from the system. Select a valid GLB file and op
 msgid "无法播放，请重试或使用系统应用打开"
 msgstr "Unable to play. Retry or open with a system app."
 
-#: src/features/model-viewer/ModelViewerPage.tsx:330
+#: src/features/model-viewer/ModelViewerPage.tsx:334
 msgid "无法显示 3D 内容"
 msgstr "3D display unavailable"
 
@@ -4506,17 +4493,17 @@ msgstr "Log details"
 #: src/features/logs/LogDialogs.tsx:57
 #: src/features/logs/LogFilters.tsx:92
 #: src/features/logs/LogRow.desktop.tsx:20
-#: src/features/model-viewer/components/MemoryPanel.tsx:227
+#: src/features/model-viewer/components/MemoryPanel.tsx:230
 #: src/features/todo/TodoTimeSelect.desktop.tsx:33
 msgid "时间"
 msgstr "Time"
 
 #. 可输入的模型动画时间，单位秒。
-#: src/features/model-viewer/components/AnimationBar.tsx:305
+#: src/features/model-viewer/components/AnimationBar.tsx:293
 msgid "时间（秒）"
 msgstr "Time (seconds)"
 
-#: src/features/model-viewer/components/ResourceDetails.tsx:143
+#: src/features/model-viewer/components/ResourceDetails.tsx:148
 msgid "是"
 msgstr "Yes"
 
@@ -4526,7 +4513,7 @@ msgid "昵称"
 msgstr "Nickname"
 
 #. 距离与包围盒尺寸的显示单位，不缩放模型。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:105
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:109
 msgid "显示单位"
 msgstr "Display units"
 
@@ -4550,18 +4537,18 @@ msgid "显示小游戏"
 msgstr "Show games"
 
 #. 模型可见性操作。
-#: src/features/model-viewer/components/ModelList.tsx:172
+#: src/features/model-viewer/components/ModelList.tsx:180
 msgid "显示或隐藏"
 msgstr "Show or hide"
 
 #. 切换指定三维模型的可见性。
-#: src/features/model-viewer/components/ModelList.tsx:168
+#: src/features/model-viewer/components/ModelList.tsx:176
 msgid "显示或隐藏 {name}"
 msgstr "Show or hide {name}"
 
 #. 暂停模型动画。
 #: src/features/bt/components/TaskRow.tsx:154
-#: src/features/model-viewer/components/AnimationBar.tsx:196
+#: src/features/model-viewer/components/AnimationBar.tsx:192
 #: src/features/preview/MediaPlayer.tsx:145
 #: src/features/preview/MediaPlayer.tsx:146
 #: src/features/transfers/TransferItem.tsx:73
@@ -4659,7 +4646,7 @@ msgstr "No accounts"
 msgid "暂无连接的节点"
 msgstr "No connected peers"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:142
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:150
 msgid "暂无附件"
 msgstr "No attachments"
 
@@ -4821,12 +4808,12 @@ msgstr "No active service address"
 #. 三维模型纹理缺少名称。
 #. 三维模型纹理缺少名称。
 #: src/features/model-viewer/components/ResourceDetails.tsx:32
-#: src/features/model-viewer/components/ResourceDetails.tsx:155
+#: src/features/model-viewer/components/ResourceDetails.tsx:160
 msgid "未命名纹理"
 msgstr "Unnamed texture"
 
 #. 场景树节点缺少名称。
-#: src/features/model-viewer/components/ModelInspector.tsx:178
+#: src/features/model-viewer/components/ModelInspector.tsx:177
 msgid "未命名节点"
 msgstr "Unnamed node"
 
@@ -4876,13 +4863,13 @@ msgid "未找到该诗词：{uid}"
 msgstr "The poem was not found: {uid}"
 
 #: src/features/model-viewer/components/MemoryPanel.tsx:102
-#: src/features/model-viewer/components/MemoryPanel.tsx:330
 #: src/features/model-viewer/components/MemoryPanel.tsx:333
-#: src/features/model-viewer/components/ModelInspector.tsx:78
-#: src/features/model-viewer/components/ResourceDetails.tsx:54
-#: src/features/model-viewer/components/ResourceDetails.tsx:62
-#: src/features/model-viewer/components/ResourceDetails.tsx:111
-#: src/features/model-viewer/components/ResourceDetails.tsx:125
+#: src/features/model-viewer/components/MemoryPanel.tsx:336
+#: src/features/model-viewer/components/ModelInspector.tsx:77
+#: src/features/model-viewer/components/ResourceDetails.tsx:59
+#: src/features/model-viewer/components/ResourceDetails.tsx:67
+#: src/features/model-viewer/components/ResourceDetails.tsx:116
+#: src/features/model-viewer/components/ResourceDetails.tsx:130
 msgid "未知"
 msgstr "Unknown"
 
@@ -4970,29 +4957,29 @@ msgid "杆法"
 msgstr "Spin"
 
 #. 模型检查区的材质与纹理标签。
-#: src/features/model-viewer/components/ModelInspector.tsx:154
+#: src/features/model-viewer/components/ModelInspector.tsx:153
 msgid "材质"
 msgstr "Materials"
 
 #. 无名称的模型材质，number 从 1 开始。
 #. 无名称的模型材质，number 从 1 开始。
-#: src/features/model-viewer/components/ModelInspector.tsx:202
-#: src/features/model-viewer/components/ResourceDetails.tsx:206
+#: src/features/model-viewer/components/ModelInspector.tsx:201
+#: src/features/model-viewer/components/ResourceDetails.tsx:211
 msgid "材质 {number}"
 msgstr "Material {number}"
 
 #. 三维模型的唯一材质列表。
-#: src/features/model-viewer/components/ResourceDetails.tsx:195
+#: src/features/model-viewer/components/ResourceDetails.tsx:200
 msgid "材质列表"
 msgstr "Materials"
 
 #. 材质数量与字节数的未知状态。
-#: src/features/model-viewer/components/MemoryPanel.tsx:304
+#: src/features/model-viewer/components/MemoryPanel.tsx:307
 msgid "材质对象"
 msgstr "Material objects"
 
 #. 当前模型场景中的唯一材质数量。
-#: src/features/model-viewer/components/ModelInspector.tsx:42
+#: src/features/model-viewer/components/ModelInspector.tsx:44
 msgid "材质数"
 msgstr "Materials"
 
@@ -5002,7 +4989,7 @@ msgstr "Materials"
 msgid "来源"
 msgstr "Source"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:486
+#: src/features/model-viewer/ModelViewerPage.tsx:508
 msgid "松开以打开模型"
 msgstr "Drop to open the model"
 
@@ -5011,7 +4998,7 @@ msgid "查找"
 msgstr "Find"
 
 #. 阅读或查看模型附件的信息。
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:163
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:171
 msgid "查看"
 msgstr "View"
 
@@ -5034,7 +5021,7 @@ msgid "查看发布页面了解更新内容。"
 msgstr "Visit the releases page to see what has changed."
 
 #. 模型列表、当前模型检查和内存面板标签组。
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:48
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:50
 msgid "查看器面板"
 msgstr "Viewer panels"
 
@@ -5066,7 +5053,7 @@ msgstr "View Update"
 msgid "查看服务地址"
 msgstr "View service address"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:42
+#: src/features/model-viewer/components/ViewerHelp.tsx:50
 msgid "查看模型"
 msgstr "View a model"
 
@@ -5097,7 +5084,7 @@ msgstr "View details"
 msgid "查看资源信息"
 msgstr "View resource details"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:71
+#: src/features/model-viewer/components/RuntimeControls.tsx:74
 msgid "标准画质 · 像素比例上限 2"
 msgstr "Standard quality \\u00b7 Pixel ratio up to 2"
 
@@ -5153,7 +5140,7 @@ msgid "桌面启动时恢复上次使用的工具。"
 msgstr "Restore the last used tool when starting the desktop app."
 
 #. 当前选中模型的信息、场景和材质标签。
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:57
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:59
 msgid "检查"
 msgstr "Inspect"
 
@@ -5184,28 +5171,28 @@ msgstr "Plan your moves across the river"
 #: src/features/ai-configuration/AiEditorDialog.tsx:210
 #: src/features/ai-configuration/ProviderDetails.tsx:150
 #: src/features/ai-configuration/ProviderDetails.tsx:169
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:54
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:56
 msgid "模型"
 msgstr "Model"
 
 #. 多模型查看器共享检查浮层标题。
 #. 打开多模型管理、详情和内存的共享浮层。
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:113
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:125
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:115
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:128
 msgid "模型与检查"
 msgstr "Models and inspection"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:481
+#: src/features/model-viewer/ModelViewerPage.tsx:503
 msgid "模型中没有可显示的几何体"
 msgstr "This model has no geometry to display"
 
 #. 3D 模型的二进制数据或纹理文件选择器类型。
-#: src/features/model-viewer/ModelViewerPage.tsx:174
+#: src/features/model-viewer/ModelViewerPage.tsx:178
 msgid "模型依赖文件"
 msgstr "Model resource files"
 
 #. 三维模型统计信息标题。
-#: src/features/model-viewer/components/ModelInspector.tsx:68
+#: src/features/model-viewer/components/ModelInspector.tsx:70
 msgid "模型信息"
 msgstr "Model information"
 
@@ -5226,12 +5213,12 @@ msgstr "The model contains a network address or an unsafe path. Reading was bloc
 msgid "模型名称 / ID"
 msgstr "Model name / ID"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:45
+#: src/features/model-viewer/components/ViewerHelp.tsx:53
 msgid "模型和依赖文件仅在当前设备处理。"
 msgstr "Models and resource files are processed only on this device."
 
 #. 可展开和键盘导航的三维模型节点树。
-#: src/features/model-viewer/components/SceneTree.tsx:80
+#: src/features/model-viewer/components/SceneTree.tsx:77
 msgid "模型场景树"
 msgstr "Model scene tree"
 
@@ -5248,20 +5235,20 @@ msgid "模型导入失败"
 msgstr "Model import failed"
 
 #. 多个三维模型的自动摆放方式。
-#: src/features/model-viewer/components/ModelList.tsx:80
+#: src/features/model-viewer/components/ModelList.tsx:87
 msgid "模型布局"
 msgstr "Model layout"
 
 #. 本机保存的三维模型集合。
 #. 本机保存的三维模型集合。
 #. 本机保存的三维模型集合。
-#: src/features/model-viewer/components/LibraryPanel.tsx:100
-#: src/features/model-viewer/ModelViewerPage.tsx:228
+#: src/features/model-viewer/components/LibraryPanel.tsx:101
 #: src/features/model-viewer/ModelViewerPage.tsx:232
+#: src/features/model-viewer/ModelViewerPage.tsx:236
 msgid "模型库"
 msgstr "Model library"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:138
+#: src/features/model-viewer/components/LibraryPanel.tsx:153
 msgid "模型库为空"
 msgstr "Your model library is empty"
 
@@ -5285,7 +5272,7 @@ msgid "模型引用了不安全的资源路径，已阻止读取"
 msgstr "The model references an unsafe resource path. Reading was blocked."
 
 #. 本地模型库条目的编辑和删除菜单。
-#: src/features/model-viewer/components/LibraryList.tsx:187
+#: src/features/model-viewer/components/LibraryList.tsx:184
 msgid "模型操作"
 msgstr "Model actions"
 
@@ -5299,8 +5286,8 @@ msgstr "The model format is invalid or the file is damaged. Check the file and t
 
 #. 模型信息、场景和材质标签组。
 #. 模型信息、场景和材质标签组。
-#: src/features/model-viewer/components/ModelInspector.tsx:142
-#: src/features/model-viewer/components/ModelInspector.tsx:231
+#: src/features/model-viewer/components/ModelInspector.tsx:141
+#: src/features/model-viewer/components/ModelInspector.tsx:230
 msgid "模型检查面板"
 msgstr "Model inspector"
 
@@ -5317,7 +5304,7 @@ msgstr "Unable to decode the model. Check that the model and its resource files 
 msgid "模型详情"
 msgstr "Model details"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:186
+#: src/features/model-viewer/components/LibraryPanel.tsx:204
 msgid "模型资源"
 msgstr "Model resources"
 
@@ -5331,8 +5318,8 @@ msgstr "This model exceeds the inspection limit. Choose a smaller model."
 
 #. 模型库条目的说明文件管理。
 #. 管理此模型在本机保存的说明附件。
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:80
-#: src/features/model-viewer/components/LibraryList.tsx:226
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:81
+#: src/features/model-viewer/components/LibraryList.tsx:223
 msgid "模型附件"
 msgstr "Model attachments"
 
@@ -5360,7 +5347,7 @@ msgstr "Downloading update"
 msgid "正在保存"
 msgstr "Saving"
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:92
+#: src/features/model-viewer/components/PreviewPanel.tsx:99
 msgid "正在保存环境…"
 msgstr "Saving environment…"
 
@@ -5368,7 +5355,7 @@ msgstr "Saving environment…"
 msgid "正在准备 3D 显示"
 msgstr "Preparing 3D display"
 
-#: src/features/model-viewer/components/RecordingExport.tsx:150
+#: src/features/model-viewer/components/RecordingExport.tsx:195
 msgid "正在准备录屏编码器…"
 msgstr "Preparing video encoder…"
 
@@ -5400,7 +5387,7 @@ msgstr "Loading logs…"
 msgid "正在加载物理引擎…"
 msgstr "Loading physics engine..."
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:75
+#: src/features/model-viewer/components/PreviewPanel.tsx:82
 msgid "正在加载环境…"
 msgstr "Loading environment…"
 
@@ -5413,7 +5400,7 @@ msgid "正在加载账号…"
 msgstr "Loading accounts\\u2026"
 
 #. 等待模型导入任务退出。
-#: src/features/model-viewer/components/ModelList.tsx:42
+#: src/features/model-viewer/components/ModelList.tsx:43
 #: src/store/transfers.ts:216
 msgid "正在取消"
 msgstr "Cancelling"
@@ -5438,12 +5425,12 @@ msgstr "Processing"
 msgid "正在处理备份，请稍候"
 msgstr "Processing backup, please wait"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:174
-#: src/features/model-viewer/components/LibraryPanel.tsx:344
+#: src/features/model-viewer/components/LibraryPanel.tsx:189
+#: src/features/model-viewer/components/LibraryPanel.tsx:367
 msgid "正在处理模型库"
 msgstr "Updating model library"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:125
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:133
 msgid "正在处理附件…"
 msgstr "Processing attachment…"
 
@@ -5464,12 +5451,16 @@ msgid "正在导出…"
 msgstr "Exporting…"
 
 #. 正在通过文件保存或系统分享导出模型录屏。
-#: src/features/model-viewer/components/RecordingExport.tsx:51
+#. 正在通过文件保存或系统分享导出模型录屏。
+#: src/features/model-viewer/components/RecordingExport.tsx:77
+#: src/features/model-viewer/components/RecordingExport.tsx:205
 msgid "正在导出录屏…"
 msgstr "Exporting recording…"
 
 #. 模型截图正在编码或等待保存对话框完成。
+#. 模型截图正在编码或等待保存对话框完成。
 #: src/features/model-viewer/components/ScreenshotExport.tsx:54
+#: src/features/model-viewer/components/ScreenshotExport.tsx:123
 msgid "正在导出截图…"
 msgstr "Exporting screenshot…"
 
@@ -5478,7 +5469,7 @@ msgid "正在建立正文索引…"
 msgstr "Building full-text index…"
 
 #. seconds 是当前模型视口已录制的秒数。
-#: src/features/model-viewer/components/RecordingExport.tsx:152
+#: src/features/model-viewer/components/RecordingExport.tsx:197
 msgid "正在录制：{seconds} 秒"
 msgstr "Recording: {seconds} s"
 
@@ -5523,7 +5514,7 @@ msgstr "Verifying update…"
 msgid "正在检查"
 msgstr "Checking"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:238
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:253
 msgid "正在检查…"
 msgstr "Inspecting…"
 
@@ -5552,7 +5543,9 @@ msgid "正在生成"
 msgstr "Generating"
 
 #. 正在等待编码完成并生成模型录屏文件。
-#: src/features/model-viewer/components/RecordingExport.tsx:118
+#. 正在等待编码完成并生成模型录屏文件。
+#: src/features/model-viewer/components/RecordingExport.tsx:81
+#: src/features/model-viewer/components/RecordingExport.tsx:201
 msgid "正在生成录屏…"
 msgstr "Finishing recording…"
 
@@ -5571,7 +5564,7 @@ msgid "正在解压 {name}…"
 msgstr "Extracting {name}…"
 
 #. 模型解码状态。
-#: src/features/model-viewer/components/ModelList.tsx:34
+#: src/features/model-viewer/components/ModelList.tsx:35
 msgid "正在解析"
 msgstr "Decoding"
 
@@ -5580,7 +5573,7 @@ msgid "正在解析模型"
 msgstr "Decoding model"
 
 #. 模型文件读取状态。
-#: src/features/model-viewer/components/ModelList.tsx:33
+#: src/features/model-viewer/components/ModelList.tsx:34
 msgid "正在读取"
 msgstr "Reading"
 
@@ -5641,11 +5634,11 @@ msgstr "This model ID already exists under this AI service address."
 msgid "此地址下已存在相同的标签或模型，可以打开已有项进行编辑。"
 msgstr "This address already has this label or model. Open the existing item to edit it."
 
-#: src/features/model-viewer/components/ResourceDetails.tsx:199
+#: src/features/model-viewer/components/ResourceDetails.tsx:204
 msgid "此场景没有材质"
 msgstr "This scene has no materials."
 
-#: src/features/model-viewer/components/ResourceDetails.tsx:245
+#: src/features/model-viewer/components/ResourceDetails.tsx:250
 msgid "此场景没有纹理"
 msgstr "This scene has no textures."
 
@@ -5653,7 +5646,7 @@ msgstr "This scene has no textures."
 msgid "此服务地址需要修复，请先编辑地址。"
 msgstr "This service address needs repair. Edit the address first."
 
-#: src/features/model-viewer/components/ResourceDetails.tsx:162
+#: src/features/model-viewer/components/ResourceDetails.tsx:167
 msgid "此材质未引用纹理"
 msgstr "This material has no textures."
 
@@ -5665,15 +5658,15 @@ msgstr "This model has no animations."
 msgid "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 msgstr "This model has reached its attachment limit: 16 files or 32 MiB in total."
 
-#: src/features/model-viewer/components/AnimationBar.tsx:346
+#: src/features/model-viewer/components/AnimationBar.tsx:334
 msgid "此片段时长为零，仅显示静态姿态。"
 msgstr "This clip has zero duration and shows a static pose."
 
-#: src/features/model-viewer/components/ResourceDetails.tsx:43
+#: src/features/model-viewer/components/ResourceDetails.tsx:48
 msgid "此纹理暂无法生成缩略图"
 msgstr "A preview is unavailable for this texture."
 
-#: src/features/model-viewer/components/ModelInspector.tsx:212
+#: src/features/model-viewer/components/ModelInspector.tsx:211
 msgid "此节点未引用材质"
 msgstr "This node has no materials."
 
@@ -5697,7 +5690,7 @@ msgstr "Each AI service address must keep at least one key entry."
 msgid "每个 AI 服务地址至少保留一个模型"
 msgstr "Each AI service address must keep at least one model."
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:179
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:188
 msgid "每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10 万三角形、1000 个实例；分析会暂停当前模型动画。"
 msgstr "Each mesh instance is analyzed in its current pose, without welding across meshes. Limit: 200,000 vertices, 100,000 triangles and 1,000 instances. Analysis pauses the current model animation."
 
@@ -5713,11 +5706,11 @@ msgstr "Records at most once per second and keeps the latest 120 samples. Record
 msgid "汉 界"
 msgstr "汉 界"
 
-#: src/features/model-viewer/components/LibraryList.tsx:255
+#: src/features/model-viewer/components/LibraryList.tsx:252
 msgid "没有匹配的模型"
 msgstr "No matching models"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:201
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:210
 msgid "没有可分析的三角网格。"
 msgstr "No triangle meshes to analyze."
 
@@ -5748,7 +5741,7 @@ msgid "没有逾期未完成的待办"
 msgstr "No overdue todos"
 
 #. 模型材质的法线纹理用途。
-#: src/features/model-viewer/components/ResourceDetails.tsx:83
+#: src/features/model-viewer/components/ResourceDetails.tsx:88
 msgid "法线"
 msgstr "Normal"
 
@@ -5758,7 +5751,7 @@ msgid "法线方向不一致"
 msgstr "Opposing normals"
 
 #. 用 RGB 颜色显示模型表面法线方向，兼容蒙皮和变形。
-#: src/features/model-viewer/components/PreviewPanel.tsx:45
+#: src/features/model-viewer/components/PreviewPanel.tsx:49
 msgid "法线着色"
 msgstr "Normal shading"
 
@@ -5804,7 +5797,7 @@ msgstr "Light"
 msgid "测试连接"
 msgstr "Test connection"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:89
+#: src/features/model-viewer/components/ViewerHelp.tsx:99
 msgid "测量时点击同一模型的两个表面点；也可用方向键调整视角，按 Enter 选取画布中心点。"
 msgstr "Pick two surface points on the same model. You can also adjust the view with arrow keys and press Enter to pick the center point."
 
@@ -5893,7 +5886,7 @@ msgstr "Add model"
 msgid "添加转义"
 msgstr "Escape"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:113
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:118
 msgid "添加附件"
 msgstr "Add attachment"
 
@@ -5920,7 +5913,7 @@ msgstr "Clear {label}"
 msgid "清理{title}？"
 msgstr "Clear {title}?"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:230
+#: src/features/model-viewer/components/LibraryPanel.tsx:252
 msgid "清理缓存"
 msgstr "Clear cache"
 
@@ -5960,12 +5953,14 @@ msgid "清除 {finishedTransferCount}"
 msgstr "Clear {finishedTransferCount}"
 
 #. 丢弃本次录屏的内存副本，不删除已经保存的文件。
-#: src/features/model-viewer/components/RecordingExport.tsx:81
+#. 丢弃本次录屏的内存副本，不删除已经保存的文件。
+#: src/features/model-viewer/components/RecordingExport.tsx:171
+#: src/features/model-viewer/components/RecordingExport.tsx:178
 msgid "清除本次录屏"
 msgstr "Clear recording"
 
 #. 取消 HDR 加载或移除当前 HDR 照明；原生应用同时移除已保存环境。
-#: src/features/model-viewer/components/PreviewPanel.tsx:125
+#: src/features/model-viewer/components/PreviewPanel.tsx:136
 msgid "清除环境"
 msgstr "Clear environment"
 
@@ -5973,7 +5968,7 @@ msgstr "Clear environment"
 msgid "清除计划"
 msgstr "Clear schedule"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:66
+#: src/features/model-viewer/components/RuntimeControls.tsx:69
 msgid "渲染与设备状态"
 msgstr "Rendering and device status"
 
@@ -6024,11 +6019,11 @@ msgid "源文件"
 msgstr "Source file"
 
 #. 3D 模型入口文件的大小；sourceSize 是带单位的文件大小，不是内存估算。
-#: src/features/model-viewer/ModelViewerPage.tsx:318
+#: src/features/model-viewer/ModelViewerPage.tsx:322
 msgid "源文件 {sourceSize}"
 msgstr "Source file: {sourceSize}"
 
-#: src/features/model-viewer/components/ModelInspector.tsx:89
+#: src/features/model-viewer/components/ModelInspector.tsx:88
 msgid "源文件大小不等于内存占用。"
 msgstr "Source file size is not memory usage."
 
@@ -6036,7 +6031,7 @@ msgstr "Source file size is not memory usage."
 msgid "源视频没有音轨"
 msgstr "Source video has no audio track"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:54
+#: src/features/model-viewer/components/ViewerHelp.tsx:64
 msgid "点击 XYZ 坐标轴切换视角，双击画布或坐标轴可重新显示整个模型。"
 msgstr "Click an XYZ axis to change the view. Double-click the canvas or axes to fit the whole model."
 
@@ -6053,7 +6048,7 @@ msgid "点击右上角 + 新建主机"
 msgstr "Click + in the top right to create a host"
 
 #. 源世界坐标中合并近点的距离阈值，以米计。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:150
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:156
 msgid "焊接容差（米）"
 msgstr "Weld tolerance (m)"
 
@@ -6122,17 +6117,17 @@ msgstr "Player 2"
 msgid "玩家 2 胜"
 msgstr "Player 2 wins"
 
-#: src/features/model-viewer/components/PreviewPanel.tsx:98
+#: src/features/model-viewer/components/PreviewPanel.tsx:106
 msgid "环境存储未完成，当前预览可能与已保存环境不同。"
 msgstr "Environment storage did not complete. The current preview may differ from the saved environment."
 
 #. 模型材质的环境遮蔽纹理用途。
-#: src/features/model-viewer/components/ResourceDetails.tsx:91
+#: src/features/model-viewer/components/ResourceDetails.tsx:96
 msgid "环境遮蔽"
 msgstr "Ambient occlusion"
 
 #. 模型围绕中心排列。
-#: src/features/model-viewer/components/ModelList.tsx:96
+#: src/features/model-viewer/components/ModelList.tsx:103
 msgid "环形"
 msgstr "Ring"
 
@@ -6161,7 +6156,7 @@ msgid "用户组"
 msgstr "Group"
 
 #. 模型纹理在材质中的用途。
-#: src/features/model-viewer/components/ResourceDetails.tsx:64
+#: src/features/model-viewer/components/ResourceDetails.tsx:69
 msgid "用途"
 msgstr "Usage"
 
@@ -6170,7 +6165,7 @@ msgstr "Usage"
 msgid "申请访问权限"
 msgstr "Request access"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:59
+#: src/features/model-viewer/components/ViewerHelp.tsx:69
 msgid "画布聚焦后，可用方向键旋转、Shift 加方向键平移、加减键缩放、Home 适配视图。坐标轴聚焦后，可按 X、Y、Z 切换方向，Shift 切换反方向。"
 msgstr "With the canvas focused, use arrow keys to rotate, Shift + arrows to pan, plus/minus to zoom, and Home to fit the view. With the axes focused, press X, Y or Z to choose a direction; hold Shift for the opposite direction."
 
@@ -6337,12 +6332,12 @@ msgstr "Disk I/O"
 msgid "磁盘空间不足，无法保存上传内容"
 msgstr "There is not enough disk space to save the upload"
 
-#: src/features/model-viewer/components/NavigationPanel.tsx:121
+#: src/features/model-viewer/components/NavigationPanel.tsx:129
 msgid "视角仅在本次会话保留。"
 msgstr "Views are kept for this session only."
 
 #. 用户为本次会话保存的相机位置命名。
-#: src/features/model-viewer/components/NavigationPanel.tsx:98
+#: src/features/model-viewer/components/NavigationPanel.tsx:106
 msgid "视角名称"
 msgstr "View name"
 
@@ -6371,7 +6366,7 @@ msgstr "Leave game room"
 msgid "离线"
 msgstr "Offline"
 
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:232
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:243
 msgid "离线检查原始文件；部分扩展可能不受支持。"
 msgstr "Checks the original file offline. Some extensions may be unsupported."
 
@@ -6411,34 +6406,34 @@ msgid "移动端从首页启动，保留系统返回首页的行为。"
 msgstr "The mobile app starts from Home so the system back action can return there."
 
 #. 自由相机在归一化预览空间内每秒的移动速度。
-#: src/features/model-viewer/components/NavigationPanel.tsx:76
+#: src/features/model-viewer/components/NavigationPanel.tsx:82
 msgid "移动速度"
 msgstr "Movement speed"
 
 #. 从模型库移除附件副本。
 #. 移除当前保存的三维相机视角。
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:182
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:252
-#: src/features/model-viewer/components/NavigationPanel.tsx:142
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:190
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:260
+#: src/features/model-viewer/components/NavigationPanel.tsx:150
 msgid "移除"
 msgstr "Remove"
 
 #. 从三维查看器移除模型，不删除源文件。
-#: src/features/model-viewer/components/ModelList.tsx:210
+#: src/features/model-viewer/components/ModelList.tsx:218
 msgid "移除 {name}"
 msgstr "Remove {name}"
 
 #. 移除查看器模型及资源，不删除源文件。
-#: src/features/model-viewer/components/ModelList.tsx:214
+#: src/features/model-viewer/components/ModelList.tsx:222
 msgid "移除模型"
 msgstr "Remove model"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:235
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:243
 msgid "移除此附件？"
 msgstr "Remove this attachment?"
 
 #. 删除用户命名的会话相机视角。
-#: src/features/model-viewer/components/NavigationPanel.tsx:137
+#: src/features/model-viewer/components/NavigationPanel.tsx:145
 msgid "移除视角 {name}"
 msgstr "Remove view {name}"
 
@@ -6512,7 +6507,7 @@ msgid "等待对方落子…"
 msgstr "Waiting for the opponent's move..."
 
 #. 批量模型导入的排队状态。
-#: src/features/model-viewer/components/ModelList.tsx:32
+#: src/features/model-viewer/components/ModelList.tsx:33
 msgid "等待导入"
 msgstr "Queued"
 
@@ -6567,7 +6562,7 @@ msgstr "Manage AI configuration"
 msgid "管理下载任务"
 msgstr "Manage download task"
 
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:130
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:133
 msgid "管理模型、调整位置并检查资源。"
 msgstr "Manage models, adjust positions, and inspect resources."
 
@@ -6576,7 +6571,7 @@ msgid "管理账号与密码"
 msgstr "Manage accounts and passwords"
 
 #. 三维模型材质类型。
-#: src/features/model-viewer/components/ResourceDetails.tsx:119
+#: src/features/model-viewer/components/ResourceDetails.tsx:124
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:230
 msgid "类型"
 msgstr "Type"
@@ -6584,9 +6579,9 @@ msgstr "Type"
 #. PBR 材质 roughness，0 光滑到 1 粗糙。
 #. 模型材质的粗糙度属性。
 #. 模型材质的粗糙度纹理用途。
-#: src/features/model-viewer/components/PreviewPanel.tsx:167
-#: src/features/model-viewer/components/ResourceDetails.tsx:87
-#: src/features/model-viewer/components/ResourceDetails.tsx:137
+#: src/features/model-viewer/components/PreviewPanel.tsx:180
+#: src/features/model-viewer/components/ResourceDetails.tsx:92
+#: src/features/model-viewer/components/ResourceDetails.tsx:142
 msgid "粗糙度"
 msgstr "Roughness"
 
@@ -6610,23 +6605,23 @@ msgstr "System sharing is only available in the mobile app."
 msgid "系统导出未完成，请检查目标位置或分享应用后重试。"
 msgstr "System export did not complete. Check the destination or sharing app and try again."
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:88
+#: src/features/model-viewer/components/RuntimeControls.tsx:91
 msgid "系统热状态：严重"
 msgstr "System thermal status: critical"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:80
+#: src/features/model-viewer/components/RuntimeControls.tsx:83
 msgid "系统热状态：当前平台不提供"
 msgstr "System thermal status: unavailable on this platform"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:82
+#: src/features/model-viewer/components/RuntimeControls.tsx:85
 msgid "系统热状态：正常"
 msgstr "System thermal status: nominal"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:84
+#: src/features/model-viewer/components/RuntimeControls.tsx:87
 msgid "系统热状态：轻度升高"
 msgstr "System thermal status: slightly elevated"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:86
+#: src/features/model-viewer/components/RuntimeControls.tsx:89
 msgid "系统热状态：较高"
 msgstr "System thermal status: serious"
 
@@ -6649,28 +6644,28 @@ msgstr "About {ratioPercent}% of original size"
 
 #. 无名称模型纹理的序号。
 #. 无名称的模型纹理，number 从 1 开始。
-#: src/features/model-viewer/components/MemoryPanel.tsx:323
-#: src/features/model-viewer/components/ResourceDetails.tsx:253
+#: src/features/model-viewer/components/MemoryPanel.tsx:326
+#: src/features/model-viewer/components/ResourceDetails.tsx:258
 msgid "纹理 {number}"
 msgstr "Texture {number}"
 
 #. 三维模型按唯一纹理去重后的列表。
-#: src/features/model-viewer/components/ResourceDetails.tsx:241
+#: src/features/model-viewer/components/ResourceDetails.tsx:246
 msgid "纹理列表"
 msgstr "Textures"
 
 #. 当前模型场景中的唯一纹理对象数量。
-#: src/features/model-viewer/components/ModelInspector.tsx:46
+#: src/features/model-viewer/components/ModelInspector.tsx:48
 msgid "纹理数"
 msgstr "Textures"
 
 #. 模型纹理与解码像素估算。
-#: src/features/model-viewer/components/MemoryPanel.tsx:269
+#: src/features/model-viewer/components/MemoryPanel.tsx:272
 msgid "纹理数据"
 msgstr "Texture data"
 
 #. 将选中的三维模型显示为三角网格线框。
-#: src/features/model-viewer/components/PreviewPanel.tsx:38
+#: src/features/model-viewer/components/PreviewPanel.tsx:42
 msgid "线框"
 msgstr "Wireframe"
 
@@ -6730,7 +6725,7 @@ msgid "绕序冲突"
 msgstr "Winding conflicts"
 
 #. 场景中网格、线和点的实例总数，包含 GPU 实例化副本。
-#: src/features/model-viewer/components/ModelInspector.tsx:58
+#: src/features/model-viewer/components/ModelInspector.tsx:60
 msgid "绘制实例数"
 msgstr "Draw instances"
 
@@ -6778,7 +6773,7 @@ msgstr "The resume offset does not match the destination size. Refresh and try a
 msgid "缓冲中…"
 msgstr "Buffering…"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:191
+#: src/features/model-viewer/components/LibraryPanel.tsx:210
 msgid "缓存上限"
 msgstr "Cache limit"
 
@@ -6824,8 +6819,8 @@ msgstr "Edit Todo"
 #. 编辑本地模型库的名称、分组和收藏状态。
 #. 编辑本地模型库的名称、分组和收藏状态。
 #: src/features/ai-configuration/AiEditorDialog.tsx:67
-#: src/features/model-viewer/components/LibraryEntryEditor.tsx:53
-#: src/features/model-viewer/components/LibraryList.tsx:211
+#: src/features/model-viewer/components/LibraryEntryEditor.tsx:58
+#: src/features/model-viewer/components/LibraryList.tsx:208
 msgid "编辑模型"
 msgstr "Edit model"
 
@@ -6853,7 +6848,7 @@ msgstr "Resize method"
 msgid "缩放比例"
 msgstr "Scale"
 
-#: src/features/model-viewer/components/LibraryPanel.tsx:187
+#: src/features/model-viewer/components/LibraryPanel.tsx:205
 msgid "缩略图缓存"
 msgstr "Thumbnail cache"
 
@@ -6862,7 +6857,7 @@ msgid "缩进"
 msgstr "Indent"
 
 #. 模型等待用户补充文件的状态。
-#: src/features/model-viewer/components/ModelList.tsx:36
+#: src/features/model-viewer/components/ModelList.tsx:37
 msgid "缺少依赖"
 msgstr "Missing resources"
 
@@ -6871,12 +6866,12 @@ msgid "网址"
 msgstr "URL"
 
 #. 模型按行列排列。
-#: src/features/model-viewer/components/ModelList.tsx:93
+#: src/features/model-viewer/components/ModelList.tsx:100
 msgid "网格"
 msgstr "Grid"
 
 #. 选择查看某个网格实例的拓扑报告。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:188
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:197
 msgid "网格实例"
 msgstr "Mesh instance"
 
@@ -6907,12 +6902,12 @@ msgid "联机对局"
 msgstr "Online game"
 
 #. 将相机对准指定三维模型，必要时显示模型。
-#: src/features/model-viewer/components/ModelList.tsx:190
+#: src/features/model-viewer/components/ModelList.tsx:198
 msgid "聚焦 {name}"
 msgstr "Focus {name}"
 
 #. 将相机对准指定模型。
-#: src/features/model-viewer/components/ModelList.tsx:194
+#: src/features/model-viewer/components/ModelList.tsx:202
 msgid "聚焦模型"
 msgstr "Focus model"
 
@@ -6927,7 +6922,7 @@ msgid "胜"
 msgstr "Win"
 
 #. 三维相机自动绕目标旋转，可关闭。
-#: src/features/model-viewer/components/NavigationPanel.tsx:91
+#: src/features/model-viewer/components/NavigationPanel.tsx:97
 msgid "自动旋转"
 msgstr "Auto-rotate"
 
@@ -6937,7 +6932,7 @@ msgid "自动选择"
 msgstr "Automatic"
 
 #. 模型材质的自发光纹理用途。
-#: src/features/model-viewer/components/ResourceDetails.tsx:89
+#: src/features/model-viewer/components/ResourceDetails.tsx:94
 msgid "自发光"
 msgstr "Emissive"
 
@@ -6950,11 +6945,11 @@ msgid "自由球：拖动母球放置"
 msgstr "Ball in hand: drag the cue ball to place it"
 
 #. 第一人称飞行相机，无碰撞和重力。
-#: src/features/model-viewer/components/NavigationPanel.tsx:54
+#: src/features/model-viewer/components/NavigationPanel.tsx:60
 msgid "自由移动"
 msgstr "Free movement"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:83
+#: src/features/model-viewer/components/ViewerHelp.tsx:93
 msgid "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转向，Esc 退出。触屏可点按摇杆方向移动，或拖动摇杆连续移动，并使用升降按钮。"
 msgstr "Free movement: WASD to move, Q/E for down/up, Shift to accelerate, drag to look around, Esc to exit. Tap a direction on the joystick to step, drag for continuous movement, or use the up/down buttons."
 
@@ -6973,16 +6968,16 @@ msgid "至少选择一个文件"
 msgstr "Select at least one file"
 
 #. 未命名的模型场景节点；number 为当前列表序号。
-#: src/features/model-viewer/components/SceneTree.tsx:142
+#: src/features/model-viewer/components/SceneTree.tsx:139
 msgid "节点 {number}"
 msgstr "Node {number}"
 
 #. 场景树当前选中节点的资源信息。
-#: src/features/model-viewer/components/ModelInspector.tsx:174
+#: src/features/model-viewer/components/ModelInspector.tsx:173
 msgid "节点详情"
 msgstr "Node details"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:73
+#: src/features/model-viewer/components/RuntimeControls.tsx:76
 msgid "节能画质 · 像素比例上限 1.5 · 最高 30 帧/秒"
 msgstr "Power saving \\u00b7 Pixel ratio up to 1.5 \\u00b7 Up to 30 fps"
 
@@ -7088,7 +7083,7 @@ msgid "计划时间"
 msgstr "Scheduled for"
 
 #. 按当前姿态重新计算源模型的世界轴对齐包围盒尺寸。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:131
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:135
 msgid "计算包围盒尺寸"
 msgstr "Measure bounds"
 
@@ -7532,7 +7527,7 @@ msgid "调整顺序"
 msgstr "Reorder"
 
 #. glTF 规范报告中的警告数量。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:267
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:282
 msgid "警告"
 msgstr "Warnings"
 
@@ -7568,7 +7563,7 @@ msgid "资源尚未下载完成，缺失分片可能导致预览中断。暂停�
 msgstr "This download is incomplete. Missing pieces may interrupt preview. Paused tasks remain paused."
 
 #. 选中模型的各类分配与资源数量。
-#: src/features/model-viewer/components/MemoryPanel.tsx:252
+#: src/features/model-viewer/components/MemoryPanel.tsx:255
 msgid "资源明细"
 msgstr "Resource details"
 
@@ -7590,7 +7585,7 @@ msgid "赛博朋克"
 msgstr "Cyberpunk"
 
 #. distance 是带单位的三维两点距离。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:120
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:124
 msgid "距离：{distance}"
 msgstr "Distance: {distance}"
 
@@ -7620,7 +7615,7 @@ msgid "跳转到行"
 msgstr "Go to line"
 
 #. 围绕目标旋转三维相机。
-#: src/features/model-viewer/components/NavigationPanel.tsx:47
+#: src/features/model-viewer/components/NavigationPanel.tsx:53
 msgid "轨道查看"
 msgstr "Orbit"
 
@@ -7770,7 +7765,7 @@ msgid "返回首页？"
 msgstr "Return home?"
 
 #. 恢复当前模型的材质、线框、法线显示和选择时的变形权重。
-#: src/features/model-viewer/components/PreviewPanel.tsx:234
+#: src/features/model-viewer/components/PreviewPanel.tsx:254
 msgid "还原模型预览"
 msgstr "Reset preview"
 
@@ -7875,7 +7870,7 @@ msgstr "No capture for sixty rounds"
 msgid "连续失败，已暂停刷新"
 msgstr "Repeated failures, refresh paused"
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:99
+#: src/features/model-viewer/components/RuntimeControls.tsx:102
 msgid "连续渲染后显示采样数据。"
 msgstr "Samples appear after continuous rendering."
 
@@ -7916,7 +7911,7 @@ msgstr "Pick center point"
 msgid "选择"
 msgstr "Choose"
 
-#: src/features/model-viewer/components/WorkspaceInspector.tsx:84
+#: src/features/model-viewer/components/WorkspaceInspector.tsx:86
 msgid "选择一个已加载模型以查看详情。"
 msgstr "Select a loaded model to inspect its details."
 
@@ -8011,7 +8006,7 @@ msgid "选择服务地址"
 msgstr "Choose a service address"
 
 #. 从设备选择本地三维模型文件。
-#: src/features/model-viewer/ModelViewerPage.tsx:466
+#: src/features/model-viewer/ModelViewerPage.tsx:486
 msgid "选择模型"
 msgstr "Choose model"
 
@@ -8080,7 +8075,7 @@ msgstr "Select output format"
 msgid "选择连接"
 msgstr "Select connection"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:96
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:101
 msgid "选择附件"
 msgstr "Choose an attachment"
 
@@ -8094,7 +8089,7 @@ msgid "选用"
 msgstr "Use"
 
 #. 模型材质的透明度纹理用途。
-#: src/features/model-viewer/components/ResourceDetails.tsx:93
+#: src/features/model-viewer/components/ResourceDetails.tsx:98
 msgid "透明度"
 msgstr "Alpha"
 
@@ -8110,7 +8105,7 @@ msgstr "Some texture, morph target, or animation allocations cannot be estimated
 msgid "配置已更新，草稿已保留。请核对最新配置后再保存。"
 msgstr "The configuration has changed. Your draft is preserved. Review the latest configuration before saving."
 
-#: src/features/model-viewer/components/RuntimeControls.tsx:93
+#: src/features/model-viewer/components/RuntimeControls.tsx:96
 msgid "采样帧间隔 {frameMs} ms · 渲染提交耗时 {workMs} ms"
 msgstr "Sampled frame interval: {frameMs} ms \\u00b7 Render submission: {workMs} ms"
 
@@ -8154,7 +8149,8 @@ msgstr "Restart"
 #: src/features/ai-configuration/AiConfigurationSettings.tsx:119
 #: src/features/ai-configuration/AiModelMenu.desktop.tsx:61
 #: src/features/ai-configuration/AiModelMenu.mobile.tsx:64
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:135
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:143
+#: src/features/model-viewer/components/LibraryPanel.tsx:121
 msgid "重新加载"
 msgstr "Reload"
 
@@ -8185,7 +8181,7 @@ msgid "重新读取"
 msgstr "Reload file"
 
 #. 恢复选中模型在最近一次自动布局中的位置。
-#: src/features/model-viewer/components/ModelList.tsx:250
+#: src/features/model-viewer/components/ModelList.tsx:258
 msgid "重置位置"
 msgstr "Reset position"
 
@@ -8232,7 +8228,7 @@ msgid "重试"
 msgstr "Retry"
 
 #. 用户主动重新保存未保存的模型或视图。
-#: src/features/model-viewer/components/LibraryPanel.tsx:323
+#: src/features/model-viewer/components/LibraryPanel.tsx:346
 msgid "重试保存"
 msgstr "Retry saving"
 
@@ -8241,12 +8237,12 @@ msgid "重试安装"
 msgstr "Retry installation"
 
 #. 重新初始化或恢复 WebGL 三维画布。
-#: src/features/model-viewer/ModelViewerPage.tsx:345
+#: src/features/model-viewer/ModelViewerPage.tsx:349
 msgid "重试显示"
 msgstr "Retry display"
 
 #. 用户显式重试读取、保存或清除 HDR 环境。
-#: src/features/model-viewer/components/PreviewPanel.tsx:106
+#: src/features/model-viewer/components/PreviewPanel.tsx:115
 msgid "重试环境存储"
 msgstr "Retry environment storage"
 
@@ -8257,9 +8253,9 @@ msgstr "Retry restart"
 #. PBR 材质 metalness，0 非金属到 1 金属。
 #. 模型材质的金属度属性。
 #. 模型材质的金属度纹理用途。
-#: src/features/model-viewer/components/PreviewPanel.tsx:177
-#: src/features/model-viewer/components/ResourceDetails.tsx:85
-#: src/features/model-viewer/components/ResourceDetails.tsx:133
+#: src/features/model-viewer/components/PreviewPanel.tsx:190
+#: src/features/model-viewer/components/ResourceDetails.tsx:90
+#: src/features/model-viewer/components/ResourceDetails.tsx:138
 msgid "金属度"
 msgstr "Metalness"
 
@@ -8274,7 +8270,7 @@ msgstr "Lock pointer"
 
 #. glTF 规范报告中的错误数量。
 #: src/features/bt/components/TaskRow.tsx:82
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:263
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:278
 #: src/store/transfers.ts:15
 msgid "错误"
 msgstr "Error"
@@ -8299,11 +8295,11 @@ msgid "阅读设置"
 msgstr "Reading settings"
 
 #. 显示模型投射和接收的实时阴影。
-#: src/features/model-viewer/components/PreviewPanel.tsx:53
+#: src/features/model-viewer/components/PreviewPanel.tsx:57
 msgid "阴影"
 msgstr "Shadows"
 
-#: src/features/model-viewer/components/AttachmentsDialog.tsx:127
+#: src/features/model-viewer/components/AttachmentsDialog.tsx:135
 msgid "附件副本已保存。"
 msgstr "Attachment copy saved."
 
@@ -8375,7 +8371,7 @@ msgid "音频"
 msgstr "Audio"
 
 #. 模型唯一几何体中的顶点总数。
-#: src/features/model-viewer/components/ModelInspector.tsx:31
+#: src/features/model-viewer/components/ModelInspector.tsx:33
 msgid "顶点数"
 msgstr "Vertices"
 
@@ -8407,12 +8403,12 @@ msgid "首页"
 msgstr "Home"
 
 #. 使用本地 Khronos 验证器检查原始 glTF/GLB 及已授权依赖。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:227
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:238
 msgid "验证 glTF 规范"
 msgstr "Validate glTF"
 
 #. version 是 Khronos glTF 规范验证器版本。
-#: src/features/model-viewer/components/DiagnosticsPanel.tsx:257
+#: src/features/model-viewer/components/DiagnosticsPanel.tsx:272
 msgid "验证器版本：{version}"
 msgstr "Validator version: {version}"
 
@@ -8422,7 +8418,7 @@ msgid "验证访问权限"
 msgstr "Verify access"
 
 #. 模型骨骼矩阵数组内存。
-#: src/features/model-viewer/components/MemoryPanel.tsx:277
+#: src/features/model-viewer/components/MemoryPanel.tsx:280
 msgid "骨骼数据"
 msgstr "Skeleton data"
 
@@ -8476,6 +8472,6 @@ msgstr "Default Permission"
 msgid "默认目录"
 msgstr "Default Directory"
 
-#: src/features/model-viewer/components/ViewerHelp.tsx:49
+#: src/features/model-viewer/components/ViewerHelp.tsx:59
 msgid "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"
 msgstr "Drag to rotate, right-drag to pan, and scroll to zoom. On a touchscreen, use one finger to rotate and two fingers to pan or zoom."

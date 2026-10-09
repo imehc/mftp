@@ -2,11 +2,12 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import { cn } from "cn";
 import { Check, ChevronDown, ChevronRight } from "lucide-react";
-import { useEffect, useId, useRef } from "react";
+import { useId, useRef } from "react";
 
 import { Button } from "~/components/ui/button";
 
 import { type ModelInspection, visibleSceneNodes } from "../domain/inspection";
+import { useVirtualProbe } from "./use-virtual-probe";
 
 export function SceneTree({
   inspection,
@@ -48,11 +49,7 @@ export function SceneTree({
         (a, b) => a - b,
       ),
   });
-  useEffect(() => {
-    const observer = new ResizeObserver(() => virtualizer.measure());
-    if (probe.current) observer.observe(probe.current);
-    return () => observer.disconnect();
-  }, [virtualizer]);
+  useVirtualProbe(probe, virtualizer);
 
   function toggle(id: string) {
     const next = new Set(expanded);
@@ -163,7 +160,7 @@ export function SceneTree({
                 )}
                 style={{
                   transform: `translateY(${item.start}px)`,
-                  paddingLeft: `${Math.min(depth, 6) * 0.75 + 0.25}rem`,
+                  paddingLeft: `min(${Math.min(depth, 6) * 0.5 + 0.25}rem, 20%)`,
                 }}
                 onClick={() => {
                   onSelected(node.id);
@@ -174,7 +171,7 @@ export function SceneTree({
                   <Button
                     variant="ghost"
                     density="adaptive"
-                    size="icon-sm"
+                    size="icon"
                     tabIndex={-1}
                     aria-label={t({
                       message: `展开或收起 ${name}`,
@@ -194,13 +191,20 @@ export function SceneTree({
                     )}
                   </Button>
                 ) : (
-                  <span className="w-8 shrink-0" aria-hidden="true" />
+                  <span
+                    data-slot="touch-label"
+                    className="w-8 shrink-0"
+                    aria-hidden="true"
+                  />
                 )}
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate" title={name}>
                     {name}
                   </span>
-                  <span className="text-muted-foreground text-xs">
+                  <span
+                    className="text-muted-foreground truncate text-xs"
+                    title={node.type}
+                  >
                     {node.type}
                   </span>
                 </span>

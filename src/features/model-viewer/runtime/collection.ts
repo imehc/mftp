@@ -1,12 +1,14 @@
 import { Box3, Group, Vector3 } from "three";
 
+import type { ModelLayout } from "~/bindings";
+
 import type { InspectionViewState } from "../domain/inspection";
 import type { ModelHandle } from "../domain/types";
 import { ModelAnimation } from "./animation";
 import { frameModel } from "./framing";
 import { inspectModel } from "./inspection";
 
-export type ModelLayout = "row" | "grid" | "ring";
+export type { ModelLayout } from "~/bindings";
 
 export type ModelEntry = {
   id: string;

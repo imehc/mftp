@@ -1,3 +1,5 @@
+import "./model-viewer.css";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
 import { Box, FolderOpen, Library } from "lucide-react";
@@ -31,6 +33,7 @@ import { ImportStatus } from "./components/ImportStatus";
 import { LibraryPanel, LibraryStatus } from "./components/LibraryPanel";
 import { MemoryWarning } from "./components/MemoryPanel";
 import { ModelSystemStatus } from "./components/ModelSystemStatus";
+import { useWorkspaceLayout } from "./components/use-workspace-layout";
 import { ViewerHelp } from "./components/ViewerHelp";
 import { ViewGizmo } from "./components/ViewGizmo";
 import { WorkspaceInspector } from "./components/WorkspaceInspector";
@@ -46,6 +49,7 @@ import { attachSystemInbox } from "./system/inbox";
 
 export default function ModelViewerPage() {
   const { t } = useLingui();
+  const { workspace, wide } = useWorkspaceLayout();
   const [session] = useState(() => new ViewerSession());
   const [library] = useState(() => new ModelLibraryController(session));
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -330,7 +334,7 @@ export default function ModelViewerPage() {
               <Trans>无法显示 3D 内容</Trans>
             )}
           </AlertTitle>
-          <AlertDescription className="flex flex-col gap-2">
+          <AlertDescription className="flex flex-col gap-2 [&_p:not(:last-child)]:mb-0">
             <p>
               <Trans>可以重试恢复图形显示，或返回其他工具。</Trans>
             </p>
@@ -349,174 +353,176 @@ export default function ModelViewerPage() {
           </AlertDescription>
         </Alert>
       ) : null}
-      <div
-        className={cn(
-          "grid min-w-0 flex-1 gap-3",
-          state.items.length > 0 &&
-            "md:grid-cols-[minmax(0,1fr)_minmax(14rem,18rem)]",
-        )}
-      >
+      <div className="model-workspace flex min-w-0 flex-1 flex-col">
         <div
-          className={cn(
-            "bg-muted/30 relative flex min-h-72 flex-1 rounded-xl border md:min-h-96",
-            hovering && "border-primary ring-primary ring-2",
-          )}
-          onDragOver={(event) => {
-            if (isMobilePlatform()) return;
-            event.preventDefault();
-            setHovering(true);
-          }}
-          onDragLeave={() => setHovering(false)}
-          onDrop={(event) => {
-            event.preventDefault();
-            setHovering(false);
-            if (
-              !nativeDesktop &&
-              !isMobilePlatform() &&
-              event.dataTransfer.files.length
-            )
-              openFiles(Array.from(event.dataTransfer.files));
-          }}
+          ref={workspace}
+          className="model-workspace-grid grid min-w-0 flex-1 gap-3"
         >
+          {session.runtime ? (
+            <aside className="model-sidebar flex min-w-0 flex-col gap-3 empty:hidden">
+              <CaptureToolbar
+                runtime={session.runtime}
+                name={state.model?.name ?? ""}
+                disabled={!ready || !state.model}
+              />
+              {state.items.length > 0 ? (
+                <WorkspaceInspector
+                  wide={wide}
+                  session={session}
+                  state={state}
+                  open={inspectorOpen}
+                  onOpenChange={setInspectorOpen}
+                />
+              ) : null}
+            </aside>
+          ) : null}
           <div
-            ref={canvas}
-            role="img"
-            tabIndex={state.model && ready ? 0 : -1}
-            className="focus-visible:ring-ring absolute inset-0 size-full rounded-xl focus-visible:ring-2 focus-visible:outline-none"
-            onDoubleClick={() => {
-              if (ready && state.model) session.runtime?.fit();
-            }}
-            onKeyDown={(event) => {
-              if (!ready || !state.model) return;
-              const runtime = session.runtime;
-              const mode = runtime?.tools.snapshot().mode;
-              if (mode === "fly") return;
-              if (mode === "measure" && event.key === "Enter") {
-                runtime?.tools.measurement.pickAt();
-                event.preventDefault();
-                return;
-              }
-              if (event.key === "Escape" && runtime?.placing) {
-                runtime.setPlacing(false);
-                event.preventDefault();
-                return;
-              }
-              switch (event.key) {
-                case "ArrowLeft":
-                  runtime?.step(-1, 0, event.shiftKey);
-                  break;
-                case "ArrowRight":
-                  runtime?.step(1, 0, event.shiftKey);
-                  break;
-                case "ArrowUp":
-                  runtime?.step(0, -1, event.shiftKey);
-                  break;
-                case "ArrowDown":
-                  runtime?.step(0, 1, event.shiftKey);
-                  break;
-                case "+":
-                case "=":
-                  runtime?.zoom(0.8);
-                  break;
-                case "-":
-                  runtime?.zoom(1.25);
-                  break;
-                case "Home":
-                  runtime?.fit();
-                  break;
-                default:
-                  return;
-              }
+            className={cn(
+              "model-canvas bg-muted/30 relative flex min-h-72 min-w-0 flex-1 rounded-xl border md:min-h-96",
+              hovering && "border-primary ring-primary ring-2",
+            )}
+            onDragOver={(event) => {
+              if (isMobilePlatform()) return;
               event.preventDefault();
+              setHovering(true);
             }}
-            aria-label={t({
-              message: "3D 模型画布",
-              comment: "可聚焦的模型渲染区域，支持鼠标、触屏与键盘。",
-            })}
-          />
-          {state.model && ready && session.runtime ? (
-            <ViewGizmo runtime={session.runtime} />
-          ) : null}
-          <ViewerHelp open={help} onOpenChange={setHelp} />
-          {state.model && ready && session.runtime ? (
-            <CanvasControls
-              runtime={session.runtime}
-              interactive={!help && !inspectorOpen && !libraryOpen}
+            onDragLeave={() => setHovering(false)}
+            onDrop={(event) => {
+              event.preventDefault();
+              setHovering(false);
+              if (
+                !nativeDesktop &&
+                !isMobilePlatform() &&
+                event.dataTransfer.files.length
+              )
+                openFiles(Array.from(event.dataTransfer.files));
+            }}
+          >
+            <div
+              ref={canvas}
+              role="img"
+              tabIndex={state.model && ready ? 0 : -1}
+              className="focus-visible:ring-ring absolute inset-0 size-full rounded-xl focus-visible:ring-2 focus-visible:outline-none"
+              onDoubleClick={() => {
+                if (ready && state.model) session.runtime?.fit();
+              }}
+              onKeyDown={(event) => {
+                if (!ready || !state.model) return;
+                const runtime = session.runtime;
+                const mode = runtime?.tools.snapshot().mode;
+                if (mode === "fly") return;
+                if (mode === "measure" && event.key === "Enter") {
+                  runtime?.tools.measurement.pickAt();
+                  event.preventDefault();
+                  return;
+                }
+                if (event.key === "Escape" && runtime?.placing) {
+                  runtime.setPlacing(false);
+                  event.preventDefault();
+                  return;
+                }
+                switch (event.key) {
+                  case "ArrowLeft":
+                    runtime?.step(-1, 0, event.shiftKey);
+                    break;
+                  case "ArrowRight":
+                    runtime?.step(1, 0, event.shiftKey);
+                    break;
+                  case "ArrowUp":
+                    runtime?.step(0, -1, event.shiftKey);
+                    break;
+                  case "ArrowDown":
+                    runtime?.step(0, 1, event.shiftKey);
+                    break;
+                  case "+":
+                  case "=":
+                    runtime?.zoom(0.8);
+                    break;
+                  case "-":
+                    runtime?.zoom(1.25);
+                    break;
+                  case "Home":
+                    runtime?.fit();
+                    break;
+                  default:
+                    return;
+                }
+                event.preventDefault();
+              }}
+              aria-label={t({
+                message: "3D 模型画布",
+                comment: "可聚焦的模型渲染区域，支持鼠标、触屏与键盘。",
+              })}
             />
-          ) : null}
-          {!state.model && ready ? (
-            <Empty className="relative m-auto max-w-lg">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <Box aria-hidden="true" />
-                </EmptyMedia>
-                <EmptyTitle>
-                  <Trans>打开一个 3D 模型</Trans>
-                </EmptyTitle>
-                <EmptyDescription>
-                  <Trans>
-                    支持 GLB、glTF 和
-                    FBX。模型包含外置资源时，需同时提供依赖文件。
-                  </Trans>
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <Button density="adaptive" onClick={() => void chooseModel()}>
-                  <FolderOpen data-icon="inline-start" aria-hidden="true" />
-                  <Trans comment="从设备选择本地三维模型文件。">选择模型</Trans>
-                </Button>
-                {!isMobilePlatform() ? (
-                  <p className="text-muted-foreground text-xs">
-                    <Trans>也可将模型文件拖到这里</Trans>
-                  </p>
-                ) : null}
-              </EmptyContent>
-            </Empty>
-          ) : null}
-          {state.model && !state.model.hasGeometry ? (
-            <p
-              role="status"
-              className="text-muted-foreground relative m-auto p-4 text-sm"
-            >
-              <Trans>模型中没有可显示的几何体</Trans>
-            </p>
-          ) : null}
-          {hovering ? (
-            <div className="bg-background/90 pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl p-4 text-sm">
-              <Trans>松开以打开模型</Trans>
-            </div>
+            {state.model && ready && session.runtime ? (
+              <ViewGizmo runtime={session.runtime} />
+            ) : null}
+            <ViewerHelp open={help} onOpenChange={setHelp} />
+            {state.model && ready && session.runtime ? (
+              <CanvasControls
+                runtime={session.runtime}
+                interactive={!help && !inspectorOpen && !libraryOpen}
+              />
+            ) : null}
+            {!state.model && ready ? (
+              <Empty className="relative m-auto max-w-lg">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Box aria-hidden="true" />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    <Trans>打开一个 3D 模型</Trans>
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    <Trans>
+                      支持 GLB、glTF 和
+                      FBX。模型包含外置资源时，需同时提供依赖文件。
+                    </Trans>
+                  </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  <Button density="adaptive" onClick={() => void chooseModel()}>
+                    <FolderOpen data-icon="inline-start" aria-hidden="true" />
+                    <Trans comment="从设备选择本地三维模型文件。">
+                      选择模型
+                    </Trans>
+                  </Button>
+                  {!isMobilePlatform() ? (
+                    <p className="text-muted-foreground text-xs">
+                      <Trans>也可将模型文件拖到这里</Trans>
+                    </p>
+                  ) : null}
+                </EmptyContent>
+              </Empty>
+            ) : null}
+            {state.model && !state.model.hasGeometry ? (
+              <p
+                role="status"
+                className="text-muted-foreground relative m-auto p-4 text-sm"
+              >
+                <Trans>模型中没有可显示的几何体</Trans>
+              </p>
+            ) : null}
+            {hovering ? (
+              <div className="bg-background/90 pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl p-4 text-sm">
+                <Trans>松开以打开模型</Trans>
+              </div>
+            ) : null}
+          </div>
+          {state.items.length > 0 && session.runtime ? (
+            <>
+              {session.runtime.animation ? (
+                <AnimationBar
+                  key={`animation-${state.selected}`}
+                  animation={session.runtime.animation}
+                  disabled={
+                    !ready || !session.runtime.models.current?.layer.visible
+                  }
+                />
+              ) : null}
+            </>
           ) : null}
         </div>
-        {state.items.length > 0 && session.runtime ? (
-          <>
-            {session.runtime.animation ? (
-              <AnimationBar
-                key={`animation-${state.selected}`}
-                animation={session.runtime.animation}
-                disabled={
-                  !ready || !session.runtime.models.current?.layer.visible
-                }
-              />
-            ) : null}
-          </>
-        ) : null}
-        {session.runtime ? (
-          <aside className="order-first flex min-w-0 flex-col gap-3 empty:hidden md:order-last md:col-start-2 md:row-span-2 md:row-start-1">
-            <CaptureToolbar
-              runtime={session.runtime}
-              name={state.model?.name ?? ""}
-              disabled={!ready || !state.model}
-            />
-            {state.items.length > 0 ? (
-              <WorkspaceInspector
-                session={session}
-                state={state}
-                open={inspectorOpen}
-                onOpenChange={setInspectorOpen}
-              />
-            ) : null}
-          </aside>
-        ) : null}
       </div>
     </AppPageLayout>
   );

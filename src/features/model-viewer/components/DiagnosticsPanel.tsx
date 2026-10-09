@@ -100,141 +100,156 @@ export function DiagnosticsPanel({
       ]
     : [];
   return (
-    <FieldGroup>
-      <InspectionChoice
-        label={t({
-          message: "显示单位",
-          comment: "距离与包围盒尺寸的显示单位，不缩放模型。",
-        })}
-        value={tools.unit}
-        onChange={(v) => runtime.tools.setUnit(v as Unit)}
-        options={["m", "cm", "mm", "ft"].map((v) => ({ value: v, label: v }))}
-      />
-      <Button density="adaptive" variant="outline" onClick={onMeasure}>
-        <Trans comment="进入画布拾取两点并测量距离。">开始两点测量</Trans>
-      </Button>
-      <p className="text-sm" role="status">
-        {tools.distance === null ? (
-          <Trans>在同一模型表面选取两点。</Trans>
-        ) : (
-          <Trans comment="distance 是带单位的三维两点距离。">
-            距离：{distance}
-          </Trans>
-        )}
-      </p>
-      <Button
-        density="adaptive"
-        variant="outline"
-        disabled={!!state.busy}
-        onClick={() => run("dimensions")}
-      >
-        <Trans comment="按当前姿态重新计算源模型的世界轴对齐包围盒尺寸。">
-          计算包围盒尺寸
-        </Trans>
-      </Button>
-      {state.dimensions ? (
-        <dl className="grid grid-cols-[auto_1fr] gap-2 text-sm">
-          {state.dimensions.map((n, i) => (
-            <div className="contents" key={i}>
-              <dt>{["X", "Y", "Z"][i]}</dt>
-              <dd className="text-right tabular-nums">{format(n)}</dd>
-            </div>
-          ))}
-        </dl>
-      ) : null}
-      <p className="text-muted-foreground text-xs">
-        <Trans>按模型原始尺寸测量。姿态变化后需重新选点。</Trans>
-      </p>
-      <Field data-invalid={!valid}>
-        <FieldLabel htmlFor="model-weld-tolerance">
-          <Trans comment="源世界坐标中合并近点的距离阈值，以米计。">
-            焊接容差（米）
-          </Trans>
-        </FieldLabel>
-        <Input
-          id="model-weld-tolerance"
-          type="number"
-          min={1e-9}
-          max={1}
-          step="any"
-          value={tolerance}
-          aria-invalid={!valid}
-          onChange={(e) => setTolerance(e.target.value)}
+    <FieldGroup
+      density="compact"
+      className="min-w-0 gap-4 [overflow-wrap:anywhere]"
+    >
+      <FieldGroup density="compact">
+        <InspectionChoice
+          label={t({
+            message: "显示单位",
+            comment: "距离与包围盒尺寸的显示单位，不缩放模型。",
+          })}
+          value={tools.unit}
+          onChange={(v) => runtime.tools.setUnit(v as Unit)}
+          options={["m", "cm", "mm", "ft"].map((v) => ({ value: v, label: v }))}
         />
-      </Field>
-      <Button
-        density="adaptive"
-        variant="outline"
-        disabled={!!state.busy || !valid}
-        onClick={() => run("topology")}
-      >
-        <Trans comment="在后台分析当前模型各网格实例的拓扑缺陷。">
-          分析网格拓扑
-        </Trans>
-      </Button>
-      <details className="text-muted-foreground text-xs">
-        <summary className="min-h-11 cursor-pointer py-3">
-          <Trans comment="展开网格分析的计量范围和容量限制。">分析说明</Trans>
-        </summary>
-        <Trans>
-          每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10
-          万三角形、1000 个实例；分析会暂停当前模型动画。
-        </Trans>
-      </details>
-      {state.topology ? (
-        <>
-          {state.topology.length ? (
-            <InspectionChoice
-              label={t({
-                message: "网格实例",
-                comment: "选择查看某个网格实例的拓扑报告。",
-              })}
-              value={String(Math.max(0, state.topology.indexOf(mesh!)))}
-              options={state.topology.map((m, i) => ({
-                value: String(i),
-                label: `${i + 1} · ${m.name}`,
-              }))}
-              onChange={setMeshIndex}
-            />
+        <Button density="adaptive" variant="outline" onClick={onMeasure}>
+          <Trans comment="进入画布拾取两点并测量距离。">开始两点测量</Trans>
+        </Button>
+        <p className="text-sm" role="status">
+          {tools.distance === null ? (
+            <Trans>在同一模型表面选取两点。</Trans>
           ) : (
-            <p className="text-sm">
-              <Trans>没有可分析的三角网格。</Trans>
-            </p>
+            <Trans comment="distance 是带单位的三维两点距离。">
+              距离：{distance}
+            </Trans>
           )}
-          <dl className="flex flex-col gap-2 text-xs">
-            {rows.map(([label, count]) => (
-              <div key={label} className="flex justify-between gap-2">
-                <dt>{label}</dt>
-                <dd className="tabular-nums">{count}</dd>
+        </p>
+        <Button
+          density="adaptive"
+          variant="outline"
+          disabled={!!state.busy}
+          onClick={() => run("dimensions")}
+        >
+          <Trans comment="按当前姿态重新计算源模型的世界轴对齐包围盒尺寸。">
+            计算包围盒尺寸
+          </Trans>
+        </Button>
+        {state.dimensions ? (
+          <dl className="model-statistics text-xs">
+            {state.dimensions.map((n, i) => (
+              <div className="contents" key={i}>
+                <dt>{["X", "Y", "Z"][i]}</dt>
+                <dd className="text-right tabular-nums">{format(n)}</dd>
               </div>
             ))}
           </dl>
-          <p className="text-muted-foreground text-xs">
-            <Trans>
-              开放网格无法确定内外。朝内壳体与法线不一致仅为检查提示，特殊美术法线可能是有意设置。退化三角形不参与边统计。
+        ) : null}
+        <p className="text-muted-foreground text-xs">
+          <Trans>按模型原始尺寸测量。姿态变化后需重新选点。</Trans>
+        </p>
+      </FieldGroup>
+      <FieldGroup density="compact">
+        <Field data-invalid={!valid}>
+          <FieldLabel htmlFor="model-weld-tolerance">
+            <Trans comment="源世界坐标中合并近点的距离阈值，以米计。">
+              焊接容差（米）
             </Trans>
-          </p>
-        </>
-      ) : null}
-      <Button
-        density="adaptive"
-        variant="outline"
-        disabled={
-          !!state.busy || !runtime.models.current?.handle.validationSource
-        }
-        onClick={() => run("validation")}
-      >
-        <Trans comment="使用本地 Khronos 验证器检查原始 glTF/GLB 及已授权依赖。">
-          验证 glTF 规范
-        </Trans>
-      </Button>
-      <p className="text-muted-foreground text-xs">
-        <Trans>离线检查原始文件；部分扩展可能不受支持。</Trans>
-      </p>
+          </FieldLabel>
+          <Input
+            id="model-weld-tolerance"
+            type="number"
+            min={1e-9}
+            max={1}
+            step="any"
+            value={tolerance}
+            aria-invalid={!valid}
+            onChange={(e) => setTolerance(e.target.value)}
+          />
+        </Field>
+        <Button
+          density="adaptive"
+          variant="outline"
+          disabled={!!state.busy || !valid}
+          onClick={() => run("topology")}
+        >
+          <Trans comment="在后台分析当前模型各网格实例的拓扑缺陷。">
+            分析网格拓扑
+          </Trans>
+        </Button>
+        <details className="text-muted-foreground text-xs">
+          <summary
+            data-slot="touch-label"
+            className="min-h-8 cursor-pointer content-center py-1"
+          >
+            <Trans comment="展开网格分析的计量范围和容量限制。">分析说明</Trans>
+          </summary>
+          <Trans>
+            每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10
+            万三角形、1000 个实例；分析会暂停当前模型动画。
+          </Trans>
+        </details>
+        {state.topology ? (
+          <>
+            {state.topology.length ? (
+              <InspectionChoice
+                label={t({
+                  message: "网格实例",
+                  comment: "选择查看某个网格实例的拓扑报告。",
+                })}
+                value={String(Math.max(0, state.topology.indexOf(mesh!)))}
+                options={state.topology.map((m, i) => ({
+                  value: String(i),
+                  label: `${i + 1} · ${m.name}`,
+                }))}
+                onChange={setMeshIndex}
+              />
+            ) : (
+              <p className="text-sm">
+                <Trans>没有可分析的三角网格。</Trans>
+              </p>
+            )}
+            <dl className="model-statistics text-xs">
+              {rows.map(([label, count]) => (
+                <div key={label} className="flex justify-between gap-2">
+                  <dt>{label}</dt>
+                  <dd className="tabular-nums">{count}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-muted-foreground text-xs">
+              <Trans>
+                开放网格无法确定内外。朝内壳体与法线不一致仅为检查提示，特殊美术法线可能是有意设置。退化三角形不参与边统计。
+              </Trans>
+            </p>
+          </>
+        ) : null}
+      </FieldGroup>
+      <FieldGroup density="compact">
+        <Button
+          density="adaptive"
+          variant="outline"
+          disabled={
+            !!state.busy || !runtime.models.current?.handle.validationSource
+          }
+          onClick={() => run("validation")}
+        >
+          <Trans comment="使用本地 Khronos 验证器检查原始 glTF/GLB 及已授权依赖。">
+            验证 glTF 规范
+          </Trans>
+        </Button>
+        <p className="text-muted-foreground text-xs">
+          <Trans>离线检查原始文件；部分扩展可能不受支持。</Trans>
+        </p>
+      </FieldGroup>
       {state.busy ? (
-        <div className="flex items-center gap-2" role="status">
+        <div
+          className="flex min-w-0 flex-wrap items-center gap-2"
+          role="status"
+        >
           <Spinner aria-hidden="true" />
-          <span className="text-sm">
+          <span className="min-w-0 flex-1 text-sm">
             <Trans>正在检查…</Trans>
           </span>
           <Button
@@ -258,7 +273,7 @@ export function DiagnosticsPanel({
               验证器版本：{version}
             </Trans>
           </p>
-          <dl className="grid grid-cols-2 gap-2">
+          <dl className="model-statistics text-xs">
             <dt>
               <Trans comment="glTF 规范报告中的错误数量。">错误</Trans>
             </dt>

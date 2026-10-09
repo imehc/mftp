@@ -14,9 +14,9 @@ use tauri::Manager;
 pub(crate) fn run() -> AppResult<()> {
     cleanup::cleanup_stale_local_transfer_files();
     let registry = registry::specta_builder();
-    // Source files do not exist on mobile devices. Only desktop development
-    // exports bindings at startup; tests export explicitly for all host builds.
-    #[cfg(all(debug_assertions, desktop))]
+    // Bundled debug apps also run without a source tree. Export only in Tauri
+    // development mode; tests export explicitly for all host builds.
+    #[cfg(all(dev, desktop))]
     registry
         .export(
             specta_typescript::Typescript::default(),

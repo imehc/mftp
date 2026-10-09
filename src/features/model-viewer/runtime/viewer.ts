@@ -17,7 +17,7 @@ import { ViewerEnvironment } from "../inspection/environment";
 import { ViewerShadows } from "../inspection/shadows";
 import type { Unit } from "../inspection/tools";
 import { InspectionTools, type InteractionMode } from "../inspection/tools";
-import { captureModelView } from "../library/view";
+import { captureModelView, restoreModelPlacement } from "../library/view";
 import { MotionControl } from "../system/motion";
 import { RenderBudget } from "../system/render-budget";
 import { ModelCollection, type ModelLayout } from "./collection";
@@ -355,15 +355,20 @@ export class ModelViewerRuntime {
   captureState(id = this.models.selected) {
     const entry = id ? this.models.entries.get(id) : undefined;
     return entry
-      ? captureModelView(this.camera, this.controls.target, this.tools, entry)
+      ? captureModelView(
+          this.camera,
+          this.controls.target,
+          this.tools,
+          entry,
+          this.models.layout,
+        )
       : null;
   }
   restoreState(id: string, value: ModelViewState) {
     const entry = this.models.entries.get(id);
     if (!entry || value.version !== 1) return;
     this.setMode("orbit");
-    entry.layer.position.fromArray(value.position);
-    entry.layer.visible = value.visible;
+    restoreModelPlacement(this.models, entry, value);
     entry.animation.restore(value.animation);
     this.tools.publish({
       unit: value.unit as Unit,
