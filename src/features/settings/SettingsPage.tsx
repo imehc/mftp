@@ -63,7 +63,7 @@ export default function SettingsPage({
           </div>
         }
       />
-      <div className="app-scroll-safe-end mx-auto min-h-0 w-full max-w-5xl flex-1 overflow-auto px-3 pt-3">
+      <div className="app-page-gutter app-scroll-safe-end mx-auto min-h-0 w-full max-w-5xl flex-1 overflow-auto">
         {ai ? (
           <AiConfigurationSettings />
         ) : (

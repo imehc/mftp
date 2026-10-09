@@ -7,7 +7,7 @@ use librqbit::{Session, TorrentStatsState};
 
 use super::super::model::BtTaskState;
 use super::super::ports::{emit_progress, EventSink};
-use super::workers::Workers;
+use super::workers::Worker;
 use super::{info_hash_hex, PUMP_INTERVAL};
 use crate::modules::bt::repository::BtRepository;
 
@@ -38,10 +38,11 @@ pub(super) fn spawn_progress_pump(
     events: EventSink,
     session: Arc<Session>,
     repository: BtRepository,
-) -> Workers {
-    let (workers, worker) = Workers::new();
+    worker: Worker,
+) {
     tokio::spawn(worker.clone().track(async move {
         let mut tick = tokio::time::interval(PUMP_INTERVAL);
+        let mut query_failed = false;
         loop {
             tokio::select! {
                 biased;
@@ -72,11 +73,21 @@ pub(super) fn spawn_progress_pump(
             // muted once: the panel row may be registered after completion
             // (reopened page, task re-added), and the store ignores updates
             // for rows that already settled.
-            let rows = repository.list_bt_tasks().unwrap_or_default();
-            let task_states = rows
-                .into_iter()
-                .map(|row| (row.info_hash, (row.package_mode, row.status)))
-                .collect::<std::collections::HashMap<_, _>>();
+            let repository = repository.clone();
+            let task_states = match worker.blocking(move || repository.progress_states()).await {
+                Ok(states) => {
+                    query_failed = false;
+                    states
+                }
+                Err(error) => {
+                    // One diagnostic per failure streak; never publish guessed state.
+                    if !query_failed {
+                        eprintln!("BT progress query failed: {}", error.code);
+                    }
+                    query_failed = true;
+                    continue;
+                }
+            };
             for (hash, progress, total, finished, phase) in snapshot.into_inner() {
                 let task = task_states.get(&hash);
                 let is_archive = task.is_some_and(|(package_mode, _)| package_mode == "archive");
@@ -101,5 +112,4 @@ pub(super) fn spawn_progress_pump(
             }
         }
     }));
-    workers
 }

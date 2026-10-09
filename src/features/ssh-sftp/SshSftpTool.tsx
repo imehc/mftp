@@ -205,6 +205,7 @@ export default function SshSftpTool() {
     <div className="ui-density-adaptive bg-background text-foreground flex h-full w-full flex-col overflow-hidden">
       {/* 紧凑布局沿用统一标题栏：标题在所有宽度可见，操作满足触控尺寸。 */}
       <ToolPageHeader
+        variant="compact"
         title={t`SSH / SFTP`}
         showHome={false}
         leading={

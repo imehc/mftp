@@ -168,3 +168,44 @@ async fn cancelled_temporary_stop_is_drained_before_a_later_engine_request() {
     assert!(manager.engine.lock().await.is_none());
     assert!(!manager.stopping.load(Ordering::SeqCst));
 }
+
+#[tokio::test]
+async fn failed_initialization_discards_partial_engine_and_can_retry_after_repair() {
+    let fixture = Fixture::new();
+    let manager = &fixture.manager;
+    let db = fixture.root.join("db/mftp.sqlite3");
+    let conn = rusqlite::Connection::open(&db).unwrap();
+    conn.execute("ALTER TABLE bt_tasks RENAME TO saved_tasks", [])
+        .unwrap();
+    let offline_session = || {
+        Session::new_with_opts(
+            fixture.root.join("bt/data"),
+            SessionOptions {
+                dht: None,
+                disable_trackers: true,
+                persistence: None,
+                listen: None,
+                ..Default::default()
+            },
+        )
+    };
+    let session = offline_session().await.unwrap();
+    let mut guard = manager.engine.lock().await;
+    let error = manager
+        .complete_initialization(&mut guard, &session)
+        .await
+        .unwrap_err();
+    assert_eq!(error.code, "db:sqlite");
+    assert!(guard.is_none());
+    // Repair only the injected fault. The next explicit initialization can succeed.
+    conn.execute("ALTER TABLE saved_tasks RENAME TO bt_tasks", [])
+        .unwrap();
+    let session = offline_session().await.unwrap();
+    manager
+        .complete_initialization(&mut guard, &session)
+        .await
+        .unwrap();
+    assert!(!guard.as_ref().unwrap().stopping);
+    manager.stop_engine(&mut guard).await;
+    assert!(guard.is_none());
+}

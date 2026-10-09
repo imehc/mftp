@@ -67,7 +67,7 @@ pub struct BtManager {
     events: EventSink,
     files: Arc<dyn FileAccess>,
     repository: BtRepository,
-    engine: Mutex<Option<Engine>>,
+    engine: Arc<Mutex<Option<Engine>>>,
     stopping: std::sync::atomic::AtomicBool,
     /// Cooperative cancellation flags for the jobs that publish a finished
     /// download: moving a plain file out, packing an archive.
@@ -126,7 +126,7 @@ impl BtManager {
             events,
             files,
             repository,
-            engine: Mutex::new(None),
+            engine: Arc::new(Mutex::new(None)),
             stopping: std::sync::atomic::AtomicBool::new(false),
             finalize_jobs: Arc::new(jobs::FinalizeJobs::default()),
             finalize_gate: Arc::new(Mutex::new(())),

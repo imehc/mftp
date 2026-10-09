@@ -74,15 +74,15 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
         trailing={<ActivityMenu />}
       />
       <div className="app-scroll-safe-end min-h-0 flex-1 overflow-auto">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 pt-4 md:px-4">
+        <div className="app-page-gutter mx-auto flex w-full max-w-6xl flex-col gap-4">
           <div className="flex items-center justify-between gap-3">
-            <h1 className="text-sm font-semibold">
+            <h2 className="text-sm font-semibold">
               {selected === "tools" ? (
                 <Trans>全部工具</Trans>
               ) : (
                 homeCategoryLabels[selected]
               )}
-            </h1>
+            </h2>
             <span className="text-muted-foreground text-xs">
               {entries.length}
             </span>

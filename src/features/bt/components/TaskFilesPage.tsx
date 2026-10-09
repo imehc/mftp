@@ -28,6 +28,7 @@ export default function TaskFilesPage({
   return (
     <div className="ui-density-adaptive flex h-full min-h-0 flex-col">
       <ToolPageHeader
+        variant="compact"
         title={task.label}
         showHome={false}
         leading={

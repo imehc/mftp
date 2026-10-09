@@ -42,7 +42,7 @@ impl BtManager {
     /// session's torrents automatically on startup, so replaying rows from
     /// the storage table here is unnecessary.
     pub(super) async fn ensure_engine(&self) -> AppResult<Arc<Session>> {
-        let mut guard = self.engine.lock().await;
+        let mut guard = self.engine.clone().lock_owned().await;
         if self.stopping.load(Ordering::SeqCst) {
             return Err(AppError::custom(CustomErrorCode::AppShuttingDown));
         }
@@ -60,8 +60,16 @@ impl BtManager {
         let base = &self.base_dir;
         let session_dir = base.join("session");
         let data_dir = base.join("data");
-        std::fs::create_dir_all(&session_dir)?;
-        std::fs::create_dir_all(&data_dir)?;
+        // Moving the engine lock into the worker keeps shutdown behind real IO,
+        // even if the initialization future is cancelled before a session exists.
+        let (returned_guard, session_dir, data_dir) =
+            crate::core::execution::run_blocking(move || {
+                std::fs::create_dir_all(&session_dir)?;
+                std::fs::create_dir_all(&data_dir)?;
+                Ok((guard, session_dir, data_dir))
+            })
+            .await?;
+        guard = returned_guard;
 
         let session = Session::new_with_opts(
             data_dir,
@@ -102,24 +110,7 @@ impl BtManager {
         .context("failed to start BT engine")
         .map_err(|e| AppError::external("bt:startup", format!("{e:#}")))?;
 
-        let pump = spawn_progress_pump(
-            self.events.clone(),
-            session.clone(),
-            self.repository.clone(),
-        );
-        let stream_server =
-            super::stream_server::StreamServer::spawn(session.clone(), self.repository.clone())
-                .await;
-        *guard = Some(Engine {
-            session: session.clone(),
-            pump,
-            stream_server,
-            stopping: false,
-        });
-        self.cleanup_legacy_bt_tasks(&session).await;
-        self.pause_restored_torrents(&session).await;
-        self.resume_finalize_jobs(&session).await;
-        self.cleanup_orphan_owned_dirs(&session);
+        self.complete_initialization(&mut guard, &session).await?;
         // Shutdown waits for this same lock, including initialization. Do not
         // hand a newly initialized engine back to a caller after stop was requested.
         if self.stopping.load(Ordering::SeqCst) {
@@ -128,21 +119,80 @@ impl BtManager {
         Ok(session)
     }
 
+    async fn complete_initialization(
+        &self,
+        guard: &mut Option<Engine>,
+        session: &Arc<Session>,
+    ) -> AppResult<()> {
+        let (pump, worker) = super::workers::Workers::new();
+        *guard = Some(Engine {
+            session: Arc::clone(session),
+            pump,
+            stream_server: None,
+            // An interrupted or failed initializer must never expose a ready engine.
+            stopping: true,
+        });
+        let initialized = async {
+            self.cleanup_legacy_bt_tasks(session, &worker).await?;
+            self.pause_restored_torrents(session, &worker).await?;
+            self.resume_finalize_jobs(session, &worker).await?;
+            self.cleanup_orphan_owned_dirs(session, &worker).await?;
+            AppResult::Ok(())
+        }
+        .await;
+        if let Err(error) = initialized {
+            drop(worker);
+            self.stop_engine(guard).await;
+            return Err(error);
+        }
+        let stream_server =
+            super::stream_server::StreamServer::spawn(Arc::clone(session), self.repository.clone())
+                .await;
+        if let Some(engine) = guard.as_mut() {
+            engine.stream_server = stream_server;
+            engine.stopping = false;
+        }
+        spawn_progress_pump(
+            self.events.clone(),
+            Arc::clone(session),
+            self.repository.clone(),
+            worker,
+        );
+        Ok(())
+    }
+
     /// Remove rows created before every task moved into the app-private
     /// download directory. Their user-directory files are left untouched.
-    async fn cleanup_legacy_bt_tasks(&self, session: &Arc<Session>) {
-        let rows = self.repository.list_bt_tasks().unwrap_or_default();
+    async fn cleanup_legacy_bt_tasks(
+        &self,
+        session: &Arc<Session>,
+        worker: &super::workers::Worker,
+    ) -> AppResult<()> {
+        let repository = self.repository.clone();
+        let rows = worker.blocking(move || repository.list_bt_tasks()).await?;
         for row in rows
             .into_iter()
             .filter(|row| row.mode == "preview" || !row.dest_dir.is_empty())
         {
-            if let Ok(hash) = parse_info_hash(&row.info_hash) {
-                let _ = session.delete(hash.into(), false).await;
+            let hash = parse_info_hash(&row.info_hash)?;
+            if find_handle(session, &hash)?.is_some() {
+                session
+                    .delete(hash.into(), false)
+                    .await
+                    .map_err(AppError::bt_engine)?;
             }
-            let _ = self.repository.delete_bt_access(&row.info_hash);
-            let _ = self.repository.delete_bt_task(&row.info_hash);
+            let repository = self.repository.clone();
+            worker
+                .blocking(move || {
+                    repository.delete_bt_access(&row.info_hash)?;
+                    repository.delete_bt_task(&row.info_hash)
+                })
+                .await?;
         }
-        let _ = self.repository.finish_bt_download_only_migration();
+        let repository = self.repository.clone();
+        worker
+            .blocking(move || repository.finish_bt_download_only_migration())
+            .await
     }
 
     /// librqbit's persistence restores `is_paused` verbatim, so torrents that
@@ -151,11 +201,15 @@ impl BtManager {
     /// instead and let explicit actions (resume, preview, re-download) start
     /// traffic. Archive tasks are exempt: `resume_finalize_jobs` needs them
     /// downloading to finish packaging.
-    async fn pause_restored_torrents(&self, session: &Arc<Session>) {
-        let archive_pending: HashSet<String> = self
-            .repository
-            .list_bt_archive_tasks()
-            .unwrap_or_default()
+    async fn pause_restored_torrents(
+        &self,
+        session: &Arc<Session>,
+        worker: &super::workers::Worker,
+    ) -> AppResult<()> {
+        let repository = self.repository.clone();
+        let archive_pending: HashSet<String> = worker
+            .blocking(move || repository.list_bt_archive_tasks())
+            .await?
             .into_iter()
             .filter(|row| row.status == "active" || row.status == "packaging")
             .map(|row| row.info_hash)
@@ -169,8 +223,24 @@ impl BtManager {
             }
         });
         for handle in handles.into_inner() {
-            let _ = session.pause(&handle).await;
+            use librqbit::TorrentStatsState;
+            // Failed/paused torrents are already inactive. librqbit rejects
+            // pause for them, including a state change racing with this call.
+            if matches!(
+                handle.stats().state,
+                TorrentStatsState::Live | TorrentStatsState::Initializing { .. }
+            ) {
+                if let Err(error) = session.pause(&handle).await {
+                    if !matches!(
+                        handle.stats().state,
+                        TorrentStatsState::Paused | TorrentStatsState::Error
+                    ) {
+                        return Err(AppError::bt_engine(error));
+                    }
+                }
+            }
         }
+        Ok(())
     }
 
     /// Undo `pause_restored_torrents` for one task. Every explicit user entry

@@ -31,3 +31,27 @@ fn private_cleanup_rejects_user_directories() {
     std::fs::remove_dir_all(root).unwrap();
     std::fs::remove_dir_all(user).unwrap();
 }
+
+#[test]
+fn failed_ownership_query_preserves_all_directories() {
+    use crate::modules::bt::repository::BtRepository;
+    let root = temp_root("failed-query");
+    let storage = crate::storage::Storage::new(root.join("db")).unwrap();
+    let repository = BtRepository::new(storage.clone());
+    let downloads = root.join("downloads");
+    let owned = downloads.join("a".repeat(40));
+    std::fs::create_dir_all(&owned).unwrap();
+    std::fs::write(owned.join("keep"), b"original").unwrap();
+    rusqlite::Connection::open(storage.db_path())
+        .unwrap()
+        .execute("DROP TABLE bt_tasks", [])
+        .unwrap();
+    assert_eq!(
+        cleanup_orphans(&repository, &downloads, Default::default())
+            .unwrap_err()
+            .code,
+        "db:sqlite"
+    );
+    assert_eq!(std::fs::read(owned.join("keep")).unwrap(), b"original");
+    std::fs::remove_dir_all(root).unwrap();
+}

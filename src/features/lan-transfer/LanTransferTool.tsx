@@ -79,7 +79,7 @@ export default function LanTransferTool() {
           </Button>
         </div>
       }
-      contentClassName="flex flex-col gap-3"
+      contentDensity="compact"
     >
       {lan.coreError || lan.secondaryError || lan.runtimeError ? (
         <Alert variant="destructive">

@@ -32,6 +32,8 @@ fn join(manager: &GameRoomManager, port: u16) -> GameRoomStatus {
 }
 
 #[tokio::test]
+// Serializes fixed network ports across independent test runtimes; spawned workers never acquire this lock.
+#[expect(clippy::await_holding_lock)]
 async fn stale_leave_cannot_close_a_replacement_and_current_leave_releases_its_lease() {
     let _network = tests::network_guard();
     let (manager, _events) = manager();

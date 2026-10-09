@@ -45,6 +45,7 @@ export function BoardGameHeader({
   return (
     <>
       <ToolPageHeader
+        variant="compact"
         showHome={false}
         title={title}
         leading={

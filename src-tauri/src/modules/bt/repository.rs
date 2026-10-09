@@ -97,6 +97,14 @@ impl BtRepository {
                 |row| row.get(0),
             )
             .optional()?;
+        // Old releases could commit the flag before cache cleanup succeeded.
+        // Retry only this app-owned path even when the SQL migration is done.
+        let cache_dir = self.storage.root_path().join("bt").join("cache");
+        match std::fs::remove_dir_all(&cache_dir) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
         if done.as_deref() == Some("1") {
             return Ok(());
         }
@@ -111,10 +119,6 @@ impl BtRepository {
         )?;
         transaction.commit()?;
 
-        let cache_dir = self.storage.root_path().join("bt").join("cache");
-        if cache_dir.exists() {
-            std::fs::remove_dir_all(cache_dir)?;
-        }
         Ok(())
     }
 
@@ -184,6 +188,15 @@ impl BtRepository {
             &format!("SELECT {COLS} FROM bt_tasks ORDER BY created_at DESC"),
             &[],
         )
+    }
+
+    pub(super) fn progress_states(
+        &self,
+    ) -> AppResult<std::collections::HashMap<String, (String, String)>> {
+        let conn = self.storage.conn()?;
+        let mut statement = conn.prepare("SELECT info_hash, package_mode, status FROM bt_tasks")?;
+        let rows = statement.query_map([], |row| Ok((row.get(0)?, (row.get(1)?, row.get(2)?))))?;
+        Ok(rows.collect::<Result<_, _>>()?)
     }
 
     pub(super) fn get_bt_task(&self, info_hash: &str) -> AppResult<Option<BtTaskRow>> {

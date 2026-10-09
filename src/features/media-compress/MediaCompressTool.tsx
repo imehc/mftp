@@ -46,7 +46,7 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
         title={<Trans>媒体处理</Trans>}
         adaptiveDensity
         bottomInset="scroll"
-        contentClassName="flex flex-col gap-3"
+        contentDensity="compact"
       >
         <CompressModeTabs
           value={mode}

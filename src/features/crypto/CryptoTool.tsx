@@ -29,7 +29,7 @@ export default function CryptoTool() {
       adaptiveDensity
       bottomInset="scroll"
       title={<Trans>加解密</Trans>}
-      contentClassName="flex flex-col gap-3"
+      contentDensity="compact"
     >
       <div className="flex flex-wrap items-center gap-3">
         <Field orientation="horizontal" className="w-auto">

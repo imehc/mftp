@@ -104,9 +104,7 @@ export function WorkspaceInspector({
   return (
     <div className="min-w-0">
       {wide ? (
-        <div className="max-h-[min(48rem,80dvh)] overflow-auto rounded-xl border p-3">
-          {content}
-        </div>
+        <div className="min-w-0 rounded-xl border p-3">{content}</div>
       ) : (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogTrigger asChild>

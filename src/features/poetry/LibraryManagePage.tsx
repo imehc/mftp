@@ -99,7 +99,7 @@ export default function LibraryManagePage({
         }
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4 md:px-5">
+      <div className="app-page-gutter app-scroll-safe-end min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
           <p className="text-muted-foreground text-sm">
             <Trans>下载后即可离线搜索和阅读。</Trans>

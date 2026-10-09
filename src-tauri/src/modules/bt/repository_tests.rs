@@ -380,3 +380,59 @@ fn download_only_migration_is_idempotent_and_preserves_downloads_and_user_files(
     }
     std::fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn failed_cache_cleanup_is_retried_with_and_without_an_old_completion_flag() {
+    for already_done in [false, true] {
+        let root = temp_root("cleanup-retry");
+        let repository = BtRepository::new(Storage::new(root.clone()).unwrap());
+        let conn = repository.storage.conn().unwrap();
+        if already_done {
+            write_meta(&conn, "bt_download_only_migrated_v1", "1");
+        }
+        let cache = root.join("bt/cache");
+        std::fs::create_dir_all(cache.parent().unwrap()).unwrap();
+        // A file where a directory is expected fails independently of root privileges.
+        std::fs::write(&cache, b"keep until cleanup is possible").unwrap();
+        assert!(repository.finish_bt_download_only_migration().is_err());
+        assert_eq!(
+            read_meta(&conn, "bt_download_only_migrated_v1").as_deref(),
+            already_done.then_some("1")
+        );
+        assert_eq!(
+            std::fs::read(&cache).unwrap(),
+            b"keep until cleanup is possible"
+        );
+        std::fs::remove_file(&cache).unwrap();
+        std::fs::create_dir(&cache).unwrap();
+        std::fs::write(cache.join("stale"), b"cache").unwrap();
+        repository.finish_bt_download_only_migration().unwrap();
+        assert!(!cache.exists());
+        assert_eq!(
+            read_meta(&conn, "bt_download_only_migrated_v1").as_deref(),
+            Some("1")
+        );
+        drop(conn);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+}
+
+#[test]
+fn progress_snapshot_reads_only_state_and_preserves_query_errors() {
+    let root = temp_root("progress");
+    let repository = BtRepository::new(Storage::new(root.clone()).unwrap());
+    let row = sample_row(&"a".repeat(40));
+    repository.upsert_bt_task(&row).unwrap();
+    let conn = repository.storage.conn().unwrap();
+    conn.execute("UPDATE bt_tasks SET file_indices = 'invalid json'", [])
+        .unwrap();
+    assert_eq!(
+        repository.progress_states().unwrap()[&row.info_hash],
+        ("archive".into(), "packaging".into())
+    );
+    assert!(repository.list_bt_tasks().is_err());
+    conn.execute("DROP TABLE bt_tasks", []).unwrap();
+    assert_eq!(repository.progress_states().unwrap_err().code, "db:sqlite");
+    drop(conn);
+    std::fs::remove_dir_all(root).unwrap();
+}

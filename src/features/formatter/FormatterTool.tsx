@@ -87,7 +87,7 @@ export default function FormatterTool() {
       adaptiveDensity
       bottomInset="scroll"
       actions={<FormatterActions controller={c} />}
-      contentClassName="flex flex-col gap-3"
+      contentDensity="compact"
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <div className="flex items-center gap-2">

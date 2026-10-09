@@ -30,7 +30,7 @@ fn connection_and_early_attempt_errors_reach_the_same_bounded_retry_loop() {
             let _guard = connection.lock();
             attempts.set(attempts.get() + 1);
             if attempts.get() < 3 {
-                Err(disconnected()).map_err(AttemptError::remote)?;
+                Err(AttemptError::remote(disconnected()))?;
             }
             Ok(TransferIoOutcome::Complete)
         },

@@ -203,6 +203,7 @@ export default function BtTool() {
     >
       <div className={filesTask ? "hidden" : "flex min-h-0 flex-1 flex-col"}>
         <ToolPageHeader
+          variant="compact"
           showHome={false}
           status={<ActivityMenu />}
           leading={

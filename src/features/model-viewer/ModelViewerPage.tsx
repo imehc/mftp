@@ -220,7 +220,6 @@ export default function ModelViewerPage() {
       scroll="page"
       adaptiveDensity
       bottomInset="scroll"
-      contentClassName="flex flex-col gap-4"
       actions={
         <div className="flex items-center gap-2">
           {isTauriRuntime() ? (
@@ -353,9 +352,13 @@ export default function ModelViewerPage() {
           </AlertDescription>
         </Alert>
       ) : null}
-      <div className="model-workspace flex min-w-0 flex-1 flex-col">
+      <div
+        ref={workspace}
+        className="model-workspace flex min-w-0 flex-1 flex-col"
+      >
         <div
-          ref={workspace}
+          data-wide={wide}
+          data-sidebar={state.items.length > 0}
           className="model-workspace-grid grid min-w-0 flex-1 gap-3"
         >
           {session.runtime ? (

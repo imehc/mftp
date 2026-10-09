@@ -35,10 +35,45 @@ pub(crate) fn add_column_if_missing(
 }
 
 #[cfg(unix)]
-pub(super) fn restrict_file_permissions(path: &Path) {
+pub(super) fn restrict_file_permissions(path: &Path) -> std::io::Result<()> {
     use std::os::unix::fs::PermissionsExt;
-    let _ = fs::set_permissions(path, fs::Permissions::from_mode(0o600));
+    fs::set_permissions(path, fs::Permissions::from_mode(0o600))
 }
 
 #[cfg(not(unix))]
-pub(super) fn restrict_file_permissions(_path: &Path) {}
+pub(super) fn restrict_file_permissions(_path: &Path) -> std::io::Result<()> {
+    Ok(())
+}
+
+/// Create the database privately before SQLite can create journals or write data.
+pub(super) fn prepare_database(path: &Path) -> AppResult<()> {
+    let mut options = fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.mode(0o600);
+    }
+    match options.open(path) {
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {}
+        Err(error) => return Err(error.into()),
+    }
+    restrict_file_permissions(path)?;
+    // SQLite derives new sidecar permissions from the database on Unix.
+    // Existing journals must be secured before any connection opens them.
+    for suffix in ["-wal", "-shm", "-journal"] {
+        let mut companion = path.as_os_str().to_os_string();
+        companion.push(suffix);
+        match restrict_file_permissions(Path::new(&companion)) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+    }
+    Ok(())
+}
+
+#[cfg(all(test, unix))]
+#[path = "helpers_tests.rs"]
+mod tests;

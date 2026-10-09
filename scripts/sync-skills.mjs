@@ -23,7 +23,9 @@ function readLock() {
 }
 
 function run(args) {
-  const result = spawnSync("npx", ["skills", ...args], { stdio: "inherit" });
+  const result = spawnSync("pnpm", ["dlx", "skills", ...args], {
+    stdio: "inherit",
+  });
   if (result.error) throw result.error;
   return result.status ?? 1;
 }
@@ -41,7 +43,7 @@ function main() {
       ...names.flatMap((name) => ["--skill", name]),
       "-y",
     ];
-    console.log(`\n> npx skills ${cmd.join(" ")}`);
+    console.log(`\n> pnpm dlx skills ${cmd.join(" ")}`);
     if (dryRun) continue;
     if (run(cmd) !== 0) failures.push(source);
   }

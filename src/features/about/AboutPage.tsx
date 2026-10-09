@@ -76,7 +76,7 @@ export default function AboutPage() {
           </Button>
         }
       />
-      <div className="app-scroll-safe-end mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-3 overflow-auto px-3 pt-3 md:px-4 md:pt-4">
+      <div className="app-page-gutter app-scroll-safe-end mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-4 overflow-auto">
         <div className="flex shrink-0 flex-col items-center gap-2 py-6">
           <div
             className="bg-foreground text-background flex size-10 items-center justify-center rounded-xl text-xl font-semibold"

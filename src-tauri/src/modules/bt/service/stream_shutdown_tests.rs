@@ -56,10 +56,12 @@ async fn progress_pump_releases_its_captured_resources_before_completion() {
     let events: crate::modules::bt::ports::EventSink = Arc::new(move |_| {
         let _retained = witness.clone();
     });
-    let pump = super::super::stats::spawn_progress_pump(
+    let (pump, worker) = super::super::workers::Workers::new();
+    super::super::stats::spawn_progress_pump(
         events,
         fixture.session.clone(),
         fixture.repository.clone(),
+        worker,
     );
     pump.cancel();
     timeout(Duration::from_secs(1), pump.wait()).await.unwrap();

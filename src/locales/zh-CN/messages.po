@@ -240,7 +240,7 @@ msgstr "{winnerSeatLabel} 获胜"
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www（留空则用主目录）"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:332
+#: src/features/model-viewer/ModelViewerPage.tsx:331
 msgid "3D 显示已中断"
 msgstr "3D 显示已中断"
 
@@ -254,7 +254,7 @@ msgid "3D 模型"
 msgstr "3D 模型"
 
 #. 可聚焦的模型渲染区域，支持鼠标、触屏与键盘。
-#: src/features/model-viewer/ModelViewerPage.tsx:452
+#: src/features/model-viewer/ModelViewerPage.tsx:451
 msgid "3D 模型画布"
 msgstr "3D 模型画布"
 
@@ -371,7 +371,7 @@ msgstr "AVIF（不支持）"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:219
+#: src/features/bt/BtTool.tsx:220
 #: src/features/home/entries.tsx:148
 #: src/lib/errors/messages.ts:249
 msgid "BT 下载"
@@ -458,7 +458,7 @@ msgstr "IP"
 msgid "IP 地址"
 msgstr "IP 地址"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:319
+#: src/features/games/engine/online/OnlineLobby.tsx:320
 msgid "IP:端口 直连"
 msgstr "IP:端口 直连"
 
@@ -508,7 +508,7 @@ msgstr "SFTP 会话"
 msgid "SFTP 写入长时间没有进展，请重试"
 msgstr "SFTP 写入长时间没有进展，请重试"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:208
+#: src/features/ssh-sftp/SshSftpTool.tsx:209
 msgid "SSH / SFTP"
 msgstr "SSH / SFTP"
 
@@ -696,7 +696,7 @@ msgid "下载后即可离线搜索和阅读。"
 msgstr "下载后即可离线搜索和阅读。"
 
 #: src/features/bt/components/AddTorrentDialog.tsx:352
-#: src/features/bt/components/TaskFilesPage.tsx:75
+#: src/features/bt/components/TaskFilesPage.tsx:76
 msgid "下载完成后可复制到系统下载目录或其他位置"
 msgstr "下载完成后可复制到系统下载目录或其他位置"
 
@@ -876,7 +876,7 @@ msgstr "主机"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:95
-#: src/features/ssh-sftp/SshSftpTool.tsx:314
+#: src/features/ssh-sftp/SshSftpTool.tsx:315
 msgid "主机列表"
 msgstr "主机列表"
 
@@ -903,7 +903,7 @@ msgstr "主题"
 msgid "主题与字体"
 msgstr "主题与字体"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:492
+#: src/features/model-viewer/ModelViewerPage.tsx:491
 msgid "也可将模型文件拖到这里"
 msgstr "也可将模型文件拖到这里"
 
@@ -993,7 +993,7 @@ msgid "仅显示开头部分"
 msgstr "仅显示开头部分"
 
 #. 模型仅在当前会话显示，不会保存到模型库或在退出后恢复。
-#: src/features/model-viewer/ModelViewerPage.tsx:316
+#: src/features/model-viewer/ModelViewerPage.tsx:315
 msgid "仅本次预览"
 msgstr "仅本次预览"
 
@@ -1005,7 +1005,7 @@ msgstr "仅清理缩略图，模型保留。数据库空间会供后续写入复
 msgid "仅用于提示，不代表设备内存上限。"
 msgstr "仅用于提示，不代表设备内存上限。"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:278
+#: src/features/games/engine/online/OnlineLobby.tsx:279
 msgid "仅限同一局域网内联机"
 msgstr "仅限同一局域网内联机"
 
@@ -1069,7 +1069,7 @@ msgstr "任务已经转存"
 msgid "任务未运行"
 msgstr "任务未运行"
 
-#: src/features/bt/BtTool.tsx:239
+#: src/features/bt/BtTool.tsx:240
 msgid "任务状态通知暂不可用"
 msgstr "任务状态通知暂不可用"
 
@@ -1368,7 +1368,7 @@ msgstr "全色球"
 msgid "全部"
 msgstr "全部"
 
-#: src/features/bt/BtTool.tsx:286
+#: src/features/bt/BtTool.tsx:287
 msgid "全部任务"
 msgstr "全部任务"
 
@@ -1440,7 +1440,7 @@ msgstr "关于与本地数据"
 msgid "关联纹理"
 msgstr "关联纹理"
 
-#: src/components/ui/dialog-layout.tsx:60
+#: src/components/ui/dialog-layout.tsx:62
 #: src/components/ui/dialog.tsx:98
 #: src/components/ui/dialog.tsx:140
 #: src/components/ui/sheet.tsx:88
@@ -1654,8 +1654,8 @@ msgstr "创建"
 msgid "创建或加入房间"
 msgstr "创建或加入房间"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:216
-#: src/features/games/engine/online/OnlineLobby.tsx:256
+#: src/features/games/engine/online/OnlineLobby.tsx:217
+#: src/features/games/engine/online/OnlineLobby.tsx:257
 msgid "创建房间"
 msgstr "创建房间"
 
@@ -1850,7 +1850,7 @@ msgstr "刷新"
 msgid "刷新 AI 配置"
 msgstr "刷新 AI 配置"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:82
+#: src/features/games/engine/online/OnlineLobby.tsx:83
 msgid "刷新房间"
 msgstr "刷新房间"
 
@@ -1880,12 +1880,12 @@ msgstr "力度"
 msgid "功能"
 msgstr "功能"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:188
-#: src/features/games/engine/online/OnlineLobby.tsx:377
+#: src/features/games/engine/online/OnlineLobby.tsx:189
+#: src/features/games/engine/online/OnlineLobby.tsx:378
 msgid "加入"
 msgstr "加入"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:296
+#: src/features/games/engine/online/OnlineLobby.tsx:297
 msgid "加入房间"
 msgstr "加入房间"
 
@@ -1921,13 +1921,13 @@ msgstr "加载 HDR 环境"
 msgid "加载中"
 msgstr "加载中"
 
-#: src/features/bt/BtTool.tsx:264
+#: src/features/bt/BtTool.tsx:265
 #: src/features/bt/components/FileBrowserPanel.tsx:190
 #: src/features/bt/components/PeersPanel.tsx:62
 #: src/features/poetry/components/CollectionManagement.tsx:125
 #: src/features/poetry/components/PoemList.tsx:192
 #: src/features/poetry/LibraryManagePage.tsx:146
-#: src/features/preview/PreviewScreen.tsx:79
+#: src/features/preview/PreviewScreen.tsx:80
 #: src/features/preview/PreviewSurface.tsx:139
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:203
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:274
@@ -2144,12 +2144,12 @@ msgstr "发生未知错误，请重试"
 #: src/features/bt/components/TaskRow.tsx:219
 #: src/features/export/BackupPage.tsx:112
 #: src/features/export/BackupPage.tsx:152
-#: src/features/games/billiards/BilliardsHeader.tsx:110
-#: src/features/games/engine/BoardGameHeader.tsx:107
+#: src/features/games/billiards/BilliardsHeader.tsx:111
+#: src/features/games/engine/BoardGameHeader.tsx:108
 #: src/features/games/engine/GameHeaderControls.tsx:54
 #: src/features/games/engine/GameHeaderControls.tsx:127
 #: src/features/games/engine/GameHeaderControls.tsx:155
-#: src/features/games/engine/online/OnlineLobby.tsx:370
+#: src/features/games/engine/online/OnlineLobby.tsx:371
 #: src/features/lan-transfer/LanShareDialog.tsx:143
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:507
 #: src/features/logs/LogDialogs.tsx:143
@@ -2214,7 +2214,7 @@ msgstr "取消打包超时，请稍后重试"
 msgid "取消检查"
 msgstr "取消检查"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:76
+#: src/features/games/engine/online/OnlineLobby.tsx:77
 msgid "取消等待"
 msgstr "取消等待"
 
@@ -2223,8 +2223,8 @@ msgstr "取消等待"
 msgid "取消诗词同步"
 msgstr "取消诗词同步"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:274
-#: src/features/games/engine/online/OnlineLobby.tsx:370
+#: src/features/games/engine/online/OnlineLobby.tsx:275
+#: src/features/games/engine/online/OnlineLobby.tsx:371
 msgid "取消连接"
 msgstr "取消连接"
 
@@ -2280,7 +2280,7 @@ msgstr "可下载合集"
 msgid "可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。"
 msgstr "可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:339
+#: src/features/model-viewer/ModelViewerPage.tsx:338
 msgid "可以重试恢复图形显示，或返回其他工具。"
 msgstr "可以重试恢复图形显示，或返回其他工具。"
 
@@ -2297,7 +2297,7 @@ msgstr "可能朝内的壳体"
 msgid "可选"
 msgstr "可选"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:88
+#: src/features/games/billiards/BilliardsHeader.tsx:89
 #: src/features/home/entries.tsx:168
 msgid "台球"
 msgstr "台球"
@@ -2522,12 +2522,12 @@ msgstr "在此设备记住场景环境，下次进入查看器时恢复。"
 msgid "在线"
 msgstr "在线"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:313
+#: src/features/games/engine/online/OnlineLobby.tsx:314
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:128
 msgid "地址"
 msgstr "地址"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:330
+#: src/features/games/engine/online/OnlineLobby.tsx:331
 msgid "地址格式应为 IP:端口"
 msgstr "地址格式应为 IP:端口"
 
@@ -2623,12 +2623,12 @@ msgstr "备注"
 msgid "复制"
 msgstr "复制"
 
-#: src/features/bt/components/TaskFilesPage.tsx:71
+#: src/features/bt/components/TaskFilesPage.tsx:72
 #: src/features/bt/components/TaskRow.tsx:209
 msgid "复制到用户目录"
 msgstr "复制到用户目录"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:112
+#: src/features/games/engine/online/OnlineLobby.tsx:113
 #: src/features/lan-transfer/LanServiceCard.tsx:50
 msgid "复制地址"
 msgstr "复制地址"
@@ -2637,7 +2637,7 @@ msgstr "复制地址"
 msgid "复制密码"
 msgstr "复制密码"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:130
+#: src/features/games/engine/online/OnlineLobby.tsx:131
 msgid "复制房间码"
 msgstr "复制房间码"
 
@@ -3026,8 +3026,8 @@ msgstr "将结果写回输入并切换模式"
 msgid "将覆盖当前人工修订。"
 msgstr "将覆盖当前人工修订。"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:105
-#: src/features/games/engine/BoardGameHeader.tsx:101
+#: src/features/games/billiards/BilliardsHeader.tsx:106
+#: src/features/games/engine/BoardGameHeader.tsx:102
 #: src/features/games/engine/GameHeaderControls.tsx:150
 msgid "将返回模式选择，当前对局的进度将会丢失。"
 msgstr "将返回模式选择，当前对局的进度将会丢失。"
@@ -3604,7 +3604,7 @@ msgstr "当前地址"
 msgid "当前密钥"
 msgstr "当前密钥"
 
-#: src/features/games/engine/BoardGameHeader.tsx:99
+#: src/features/games/engine/BoardGameHeader.tsx:100
 msgid "当前对局尚未结束，离开后将丢失进度。"
 msgstr "当前对局尚未结束，离开后将丢失进度。"
 
@@ -3842,15 +3842,15 @@ msgstr "截图保存失败，请检查保存位置和可用空间后重试。"
 msgid "截图已保存。"
 msgstr "截图已保存。"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:168
+#: src/features/games/engine/online/OnlineLobby.tsx:169
 msgid "房间"
 msgstr "房间"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:237
+#: src/features/games/engine/online/OnlineLobby.tsx:238
 msgid "房间名（可选）"
 msgstr "房间名（可选）"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:231
+#: src/features/games/engine/online/OnlineLobby.tsx:232
 msgid "房间名称"
 msgstr "房间名称"
 
@@ -3858,12 +3858,12 @@ msgstr "房间名称"
 msgid "房间的游戏类型不匹配"
 msgstr "房间的游戏类型不匹配"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:121
-#: src/features/games/engine/online/OnlineLobby.tsx:347
+#: src/features/games/engine/online/OnlineLobby.tsx:122
+#: src/features/games/engine/online/OnlineLobby.tsx:348
 msgid "房间码"
 msgstr "房间码"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:242
+#: src/features/games/engine/online/OnlineLobby.tsx:243
 msgid "房间码（可选）"
 msgstr "房间码（可选）"
 
@@ -3905,13 +3905,13 @@ msgstr "打开"
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:474
+#: src/features/model-viewer/ModelViewerPage.tsx:473
 msgid "打开一个 3D 模型"
 msgstr "打开一个 3D 模型"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:63
 #: src/features/ssh-sftp/SshSftpTool.tsx:77
-#: src/features/ssh-sftp/SshSftpTool.tsx:224
+#: src/features/ssh-sftp/SshSftpTool.tsx:225
 msgid "打开主机列表"
 msgstr "打开主机列表"
 
@@ -4178,7 +4178,7 @@ msgstr "操作帮助"
 msgid "操作标识"
 msgstr "操作标识"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:477
+#: src/features/model-viewer/ModelViewerPage.tsx:476
 msgid "支持 GLB、glTF 和 FBX。模型包含外置资源时，需同时提供依赖文件。"
 msgstr "支持 GLB、glTF 和 FBX。模型包含外置资源时，需同时提供依赖文件。"
 
@@ -4241,7 +4241,7 @@ msgstr "数据管理"
 msgid "整理与校验文本数据"
 msgstr "整理与校验文本数据"
 
-#: src/features/bt/components/TaskFilesPage.tsx:48
+#: src/features/bt/components/TaskFilesPage.tsx:49
 #: src/features/bt/components/TorrentFileList.tsx:50
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:80
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:334
@@ -4299,7 +4299,7 @@ msgstr "文件选择包含无效或填充文件"
 msgid "文件选择包含重复项"
 msgstr "文件选择包含重复项"
 
-#: src/features/preview/PreviewScreen.tsx:50
+#: src/features/preview/PreviewScreen.tsx:51
 msgid "文件预览"
 msgstr "文件预览"
 
@@ -4429,7 +4429,7 @@ msgstr "无法打开系统转交的模型。请选择有效 GLB 文件并重新�
 msgid "无法播放，请重试或使用系统应用打开"
 msgstr "无法播放，请重试或使用系统应用打开"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:334
+#: src/features/model-viewer/ModelViewerPage.tsx:333
 msgid "无法显示 3D 内容"
 msgstr "无法显示 3D 内容"
 
@@ -4449,7 +4449,7 @@ msgstr "无法获取本地用户名，请手动填写 SSH 用户名"
 msgid "无法识别远端操作系统"
 msgstr "无法识别远端操作系统"
 
-#: src/features/bt/BtTool.tsx:237
+#: src/features/bt/BtTool.tsx:238
 msgid "无法读取下载任务"
 msgstr "无法读取下载任务"
 
@@ -4507,8 +4507,8 @@ msgstr "时间（秒）"
 msgid "是"
 msgstr "是"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:220
-#: src/features/games/engine/online/OnlineLobby.tsx:336
+#: src/features/games/engine/online/OnlineLobby.tsx:221
+#: src/features/games/engine/online/OnlineLobby.tsx:337
 msgid "昵称"
 msgstr "昵称"
 
@@ -4565,7 +4565,7 @@ msgstr "暂停传输"
 msgid "暂停记录"
 msgstr "暂停记录"
 
-#: src/features/bt/BtTool.tsx:274
+#: src/features/bt/BtTool.tsx:275
 msgid "暂无下载任务"
 msgstr "暂无下载任务"
 
@@ -4791,7 +4791,7 @@ msgstr "未保存密钥"
 msgid "未分组"
 msgstr "未分组"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:154
+#: src/features/games/engine/online/OnlineLobby.tsx:155
 msgid "未发现房间，可输入地址加入"
 msgstr "未发现房间，可输入地址加入"
 
@@ -4989,7 +4989,7 @@ msgstr "材质数"
 msgid "来源"
 msgstr "来源"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:508
+#: src/features/model-viewer/ModelViewerPage.tsx:507
 msgid "松开以打开模型"
 msgstr "松开以打开模型"
 
@@ -5182,7 +5182,7 @@ msgstr "模型"
 msgid "模型与检查"
 msgstr "模型与检查"
 
-#: src/features/model-viewer/ModelViewerPage.tsx:503
+#: src/features/model-viewer/ModelViewerPage.tsx:502
 msgid "模型中没有可显示的几何体"
 msgstr "模型中没有可显示的几何体"
 
@@ -5243,8 +5243,8 @@ msgstr "模型布局"
 #. 本机保存的三维模型集合。
 #. 本机保存的三维模型集合。
 #: src/features/model-viewer/components/LibraryPanel.tsx:101
-#: src/features/model-viewer/ModelViewerPage.tsx:232
-#: src/features/model-viewer/ModelViewerPage.tsx:236
+#: src/features/model-viewer/ModelViewerPage.tsx:231
+#: src/features/model-viewer/ModelViewerPage.tsx:235
 msgid "模型库"
 msgstr "模型库"
 
@@ -5489,7 +5489,7 @@ msgstr "正在打开文件夹…"
 msgid "正在打开终端…"
 msgstr "正在打开终端…"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:152
+#: src/features/games/engine/online/OnlineLobby.tsx:153
 msgid "正在搜索…"
 msgstr "正在搜索…"
 
@@ -5830,8 +5830,8 @@ msgid "深色"
 msgstr "深色"
 
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:32
-#: src/features/bt/BtTool.tsx:225
-#: src/features/bt/BtTool.tsx:279
+#: src/features/bt/BtTool.tsx:226
+#: src/features/bt/BtTool.tsx:280
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:51
 #: src/features/lan-transfer/LanShareDialog.tsx:151
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:349
@@ -6019,7 +6019,7 @@ msgid "源文件"
 msgstr "源文件"
 
 #. 3D 模型入口文件的大小；sourceSize 是带单位的文件大小，不是内存估算。
-#: src/features/model-viewer/ModelViewerPage.tsx:322
+#: src/features/model-viewer/ModelViewerPage.tsx:321
 msgid "源文件 {sourceSize}"
 msgstr "源文件 {sourceSize}"
 
@@ -6094,9 +6094,9 @@ msgstr "状态不可用"
 msgid "状态读取失败"
 msgstr "状态读取失败"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:178
-#: src/features/games/engine/online/OnlineLobby.tsx:226
-#: src/features/games/engine/online/OnlineLobby.tsx:342
+#: src/features/games/engine/online/OnlineLobby.tsx:179
+#: src/features/games/engine/online/OnlineLobby.tsx:227
+#: src/features/games/engine/online/OnlineLobby.tsx:343
 #: src/features/games/engine/online/use-online-lobby.ts:44
 msgid "玩家"
 msgstr "玩家"
@@ -6486,7 +6486,7 @@ msgstr "端口必须是整数"
 msgid "第 {resultLine} 行第 {resultColumn} 列附近有语法错误"
 msgstr "第 {resultLine} 行第 {resultColumn} 列附近有语法错误"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:102
+#: src/features/games/engine/online/OnlineLobby.tsx:103
 msgid "等待对手加入…"
 msgstr "等待对手加入…"
 
@@ -6897,7 +6897,7 @@ msgstr "耗时 {taskEtaValue2}"
 msgid "联机"
 msgstr "联机"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:55
+#: src/features/games/engine/online/OnlineLobby.tsx:56
 msgid "联机对局"
 msgstr "联机对局"
 
@@ -7510,7 +7510,7 @@ msgstr "调整密码条目顺序"
 msgid "调整尺寸"
 msgstr "调整尺寸"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:291
+#: src/features/ssh-sftp/SshSftpTool.tsx:292
 msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
 
@@ -7645,7 +7645,7 @@ msgstr "输入 API Key"
 msgid "输入内容后自动校验"
 msgstr "输入内容后自动校验"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:201
+#: src/features/games/engine/online/OnlineLobby.tsx:202
 msgid "输入地址"
 msgstr "输入地址"
 
@@ -7702,7 +7702,7 @@ msgstr "近 7 天"
 msgid "返回上级目录"
 msgstr "返回上级目录"
 
-#: src/features/bt/components/TaskFilesPage.tsx:37
+#: src/features/bt/components/TaskFilesPage.tsx:38
 #: src/features/poetry/LibraryPage.tsx:340
 msgid "返回列表"
 msgstr "返回列表"
@@ -7718,13 +7718,13 @@ msgstr "返回古诗词"
 msgid "返回应用"
 msgstr "返回应用"
 
-#: src/features/preview/PreviewScreen.tsx:56
+#: src/features/preview/PreviewScreen.tsx:57
 msgid "返回来源"
 msgstr "返回来源"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:45
-#: src/features/games/engine/BoardGameHeader.tsx:55
-#: src/features/games/engine/online/OnlineLobby.tsx:60
+#: src/features/games/engine/BoardGameHeader.tsx:56
+#: src/features/games/engine/online/OnlineLobby.tsx:61
 msgid "返回模式选择"
 msgstr "返回模式选择"
 
@@ -7748,15 +7748,13 @@ msgstr "返回诗词"
 msgid "返回选择"
 msgstr "返回选择"
 
-#: src/components/AppPageLayout.tsx:51
-#: src/components/AppPageLayout.tsx:51
-#: src/components/ToolPageHeader.tsx:45
-#: src/components/ToolPageHeader.tsx:45
-#: src/features/bt/BtTool.tsx:213
+#: src/components/ToolPageHeader.tsx:51
+#: src/components/ToolPageHeader.tsx:51
+#: src/features/bt/BtTool.tsx:214
 #: src/features/games/billiards/BilliardsHeader.tsx:52
-#: src/features/games/engine/BoardGameHeader.tsx:65
+#: src/features/games/engine/BoardGameHeader.tsx:66
 #: src/features/games/engine/GameHeaderControls.tsx:58
-#: src/features/ssh-sftp/SshSftpTool.tsx:212
+#: src/features/ssh-sftp/SshSftpTool.tsx:213
 msgid "返回首页"
 msgstr "返回首页"
 
@@ -7810,7 +7808,7 @@ msgstr "远端文件夹名称"
 msgid "远端连接在终端打开前已关闭"
 msgstr "远端连接在终端打开前已关闭"
 
-#: src/features/bt/components/TaskFilesPage.tsx:51
+#: src/features/bt/components/TaskFilesPage.tsx:52
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:55
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:91
@@ -7825,7 +7823,7 @@ msgstr "连接与模型设置"
 msgid "连接中"
 msgstr "连接中"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:377
+#: src/features/games/engine/online/OnlineLobby.tsx:378
 msgid "连接中…"
 msgstr "连接中…"
 
@@ -7874,8 +7872,8 @@ msgstr "连续失败，已暂停刷新"
 msgid "连续渲染后显示采样数据。"
 msgstr "连续渲染后显示采样数据。"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:113
-#: src/features/games/engine/BoardGameHeader.tsx:115
+#: src/features/games/billiards/BilliardsHeader.tsx:114
+#: src/features/games/engine/BoardGameHeader.tsx:116
 #: src/features/games/engine/GameHeaderControls.tsx:158
 msgid "退出"
 msgstr "退出"
@@ -7884,8 +7882,8 @@ msgstr "退出"
 msgid "退出对局"
 msgstr "退出对局"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:102
-#: src/features/games/engine/BoardGameHeader.tsx:95
+#: src/features/games/billiards/BilliardsHeader.tsx:103
+#: src/features/games/engine/BoardGameHeader.tsx:96
 #: src/features/games/engine/GameHeaderControls.tsx:147
 msgid "退出当前对局？"
 msgstr "退出当前对局？"
@@ -8006,7 +8004,7 @@ msgid "选择服务地址"
 msgstr "选择服务地址"
 
 #. 从设备选择本地三维模型文件。
-#: src/features/model-viewer/ModelViewerPage.tsx:486
+#: src/features/model-viewer/ModelViewerPage.tsx:485
 msgid "选择模型"
 msgstr "选择模型"
 
@@ -8203,7 +8201,7 @@ msgstr "重置状态已改变，请重新检查状态"
 #. 重新连接传输进度事件监听
 #: src/features/about/AboutPage.tsx:107
 #: src/features/about/DataManagementDialogs.tsx:61
-#: src/features/bt/BtTool.tsx:255
+#: src/features/bt/BtTool.tsx:256
 #: src/features/bt/components/FileBrowserPanel.tsx:203
 #: src/features/bt/components/TaskRow.tsx:165
 #: src/features/games/billiards/BilliardsGame.tsx:90
@@ -8237,7 +8235,7 @@ msgid "重试安装"
 msgstr "重试安装"
 
 #. 重新初始化或恢复 WebGL 三维画布。
-#: src/features/model-viewer/ModelViewerPage.tsx:349
+#: src/features/model-viewer/ModelViewerPage.tsx:348
 msgid "重试显示"
 msgstr "重试显示"
 
@@ -8307,7 +8305,7 @@ msgstr "附件副本已保存。"
 msgid "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 msgstr "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:140
+#: src/features/games/engine/online/OnlineLobby.tsx:141
 msgid "附近的房间"
 msgstr "附近的房间"
 
@@ -8337,7 +8335,7 @@ msgstr "难度"
 msgid "需口令"
 msgstr "需口令"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:173
+#: src/features/games/engine/online/OnlineLobby.tsx:174
 msgid "需要房间码"
 msgstr "需要房间码"
 
@@ -8395,7 +8393,7 @@ msgstr "预估 {estimatedMinLabel} ~ {estimatedMaxLabel}"
 msgid "预览"
 msgstr "预览"
 
-#: src/components/ToolPageHeader.tsx:49
+#: src/components/ToolPageHeader.tsx:63
 #: src/features/games/engine/GameHeaderControls.tsx:30
 #: src/features/games/engine/GameHeaderControls.tsx:40
 #: src/features/settings/SettingsOverview.tsx:103

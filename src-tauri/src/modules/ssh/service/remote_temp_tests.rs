@@ -7,7 +7,7 @@ fn owned_temp_is_cleaned_on_early_error_without_replacing_the_error() {
     let calls = Cell::new(0);
     let expected =
         AppError::custom(CustomErrorCode::SftpTransferCancelled).with_arg("task", "original");
-    let result = (|| -> AppResult<()> {
+    let result: AppResult<()> = {
         let _cleanup = Cleanup {
             owned: true,
             action: Some(|| {
@@ -16,7 +16,7 @@ fn owned_temp_is_cleaned_on_early_error_without_replacing_the_error() {
             }),
         };
         Err(expected.clone())
-    })();
+    };
     assert_eq!(result.unwrap_err(), expected);
     assert_eq!(calls.get(), 1);
 }

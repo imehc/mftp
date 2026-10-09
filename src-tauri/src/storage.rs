@@ -18,7 +18,7 @@ mod usage;
 
 pub(crate) use helpers::{add_column_if_missing, bool_to_int};
 
-use helpers::restrict_file_permissions;
+use helpers::prepare_database;
 
 #[derive(Clone)]
 pub struct Storage {
@@ -42,10 +42,10 @@ impl Storage {
             root,
             reset_pending: Arc::new(AtomicBool::new(false)),
         };
+        prepare_database(&storage.db_path)?;
         storage.sweep_bt_tombstones();
         storage.init_db()?;
         storage.init_reset_journal()?;
-        restrict_file_permissions(&storage.db_path);
         storage.migrate_legacy_json()?;
         Ok(storage)
     }

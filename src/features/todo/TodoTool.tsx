@@ -76,7 +76,7 @@ export default function TodoTool() {
       bottomInset={
         !loading && !loadError && filteredItems.length > 0 ? "scroll" : "page"
       }
-      contentClassName="gap-1 pt-1 md:gap-3 md:pt-4"
+      contentDensity="compact"
       actions={
         <Button
           variant={desktopActions ? "default" : "ghost"}

@@ -46,6 +46,7 @@ export default function PreviewScreen({
       className="ui-density-adaptive bg-background flex h-full min-h-0 flex-col"
     >
       <ToolPageHeader
+        variant="compact"
         showHome={false}
         title={name || t`文件预览`}
         leading={

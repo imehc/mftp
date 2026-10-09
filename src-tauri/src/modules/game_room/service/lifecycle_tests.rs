@@ -54,6 +54,8 @@ fn handshake(stream: &mut TcpStream) {
 }
 
 #[tokio::test]
+// Serializes fixed network ports across independent test runtimes; spawned workers never acquire this lock.
+#[expect(clippy::await_holding_lock)]
 async fn runtime_blocks_maintenance_until_leave_and_can_restart_but_not_after_shutdown() {
     let _network = super::tests::network_guard();
     let operations = Arc::new(Operations::default());
@@ -183,6 +185,8 @@ impl ActivitySink for NoLog {
 }
 
 #[tokio::test]
+// Serializes fixed network ports across independent test runtimes; spawned workers never acquire this lock.
+#[expect(clippy::await_holding_lock)]
 async fn canceled_leave_waiter_retains_generation_and_admission_until_callback_finishes() {
     let _network = super::tests::network_guard();
     let operations = Arc::new(Operations::default());

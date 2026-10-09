@@ -82,7 +82,7 @@ fn denied_directory_access_retains_the_io_error() {
     fs::create_dir(&directory).unwrap();
     fs::write(directory.join("data"), b"keep").unwrap();
     let permissions = fs::metadata(&directory).unwrap().permissions();
-    fs::set_permissions(&directory, fs::Permissions::from_mode(0)).unwrap();
+    fs::set_permissions(&directory, fs::Permissions::from_mode(0o0)).unwrap();
     let result = fixture.storage.app_data_usage();
     let denied = fs::read_dir(&directory).is_err();
     fs::set_permissions(&directory, permissions).unwrap();

@@ -22,6 +22,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* 页面边距与密度分离；业务区域的 gap 仍由布局组件和命名变体负责。 */
+@utility app-page-gutter {
+  padding-inline: 0.75rem;
+  padding-top: 0.75rem;
+  @media (width >= theme(--breakpoint-md)) {
+    padding-inline: 1rem;
+    padding-top: 1rem;
+  }
+}
+
+@utility app-page-bottom {
+  padding-bottom: 0.75rem;
+  @media (width >= theme(--breakpoint-md)) {
+    padding-bottom: 1rem;
+  }
+}
+
 @theme inline {
   /* 保留 Tailwind 默认断点；移动 / PC 布局统一由 md（48rem）切换。 */
   --font-heading: var(--font-sans);

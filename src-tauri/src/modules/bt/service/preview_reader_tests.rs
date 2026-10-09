@@ -22,6 +22,8 @@ async fn original_file_seek_and_read_use_the_requested_range_without_copying() {
 }
 
 #[tokio::test]
+// The lock deliberately stalls a blocking IO worker; async waits never acquire it.
+#[expect(clippy::await_holding_lock)]
 async fn cancelling_a_pending_file_read_waits_for_the_real_io_worker() {
     let path = std::env::temp_dir().join(format!("bt-reader-stop-{}", uuid::Uuid::new_v4()));
     std::fs::write(&path, b"original").unwrap();

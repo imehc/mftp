@@ -57,7 +57,7 @@ fn repeated_generation_updates_one_record_and_user_edits_are_marked() {
             PoetryTranslationMode::Literary,
             1,
             GeneratedTranslation {
-                content: content,
+                content,
                 model: "model",
             },
         )

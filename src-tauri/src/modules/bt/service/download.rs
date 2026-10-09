@@ -228,77 +228,90 @@ impl BtManager {
         .map_err(|_| AppError::custom(CustomErrorCode::BtFinalizeCancelTimeout))
     }
 
-    pub(super) async fn resume_finalize_jobs(&self, session: &Arc<Session>) {
-        self.resume_archive_jobs(session).await;
-        self.resume_direct_jobs(session).await;
-    }
-
-    /// Re-arm plain downloads. Their file may well have completed while the app
-    /// was closed, in which case the job moves it out on the first tick.
-    /// Without a handle the engine lost the torrent; leave the row active and
-    /// let re-adding it restore both.
-    async fn resume_direct_jobs(&self, session: &Arc<Session>) {
-        let Ok(rows) = self.repository.list_bt_direct_downloads() else {
-            return;
-        };
-        for row in rows {
-            let Ok(hash) = parse_info_hash(&row.info_hash) else {
-                continue;
+    pub(super) async fn resume_finalize_jobs(
+        &self,
+        session: &Arc<Session>,
+        worker: &super::workers::Worker,
+    ) -> AppResult<()> {
+        // Read both sets before starting jobs: a failed query must not become
+        // an empty restore set or leave only half of the jobs re-armed.
+        let repository = self.repository.clone();
+        let (archives, direct) = worker
+            .blocking(move || {
+                Ok((
+                    repository.list_bt_archive_tasks()?,
+                    repository.list_bt_direct_downloads()?,
+                ))
+            })
+            .await?;
+        for row in archives {
+            let hash = parse_info_hash(&row.info_hash)?;
+            let output_path = row.output_path.clone();
+            let output_exists = if row.status == "packaging" {
+                worker
+                    .blocking(move || match output_path {
+                        Some(path) => match std::fs::metadata(path) {
+                            Ok(meta) => Ok(meta.is_file()),
+                            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
+                            Err(error) => Err(error.into()),
+                        },
+                        None => Ok(false),
+                    })
+                    .await?
+            } else {
+                false
             };
-            if let Ok(Some(handle)) = find_handle(session, &hash) {
-                self.start_finalize_job(row, handle);
-            }
-        }
-    }
-
-    async fn resume_archive_jobs(&self, session: &Arc<Session>) {
-        let Ok(rows) = self.repository.list_bt_archive_tasks() else {
-            return;
-        };
-        for row in rows {
-            let Ok(hash) = parse_info_hash(&row.info_hash) else {
-                continue;
-            };
-            let output_exists = row
-                .output_path
-                .as_deref()
-                .map(Path::new)
-                .is_some_and(Path::is_file);
-            if row.status == "completed" {
-                if find_handle(session, &hash).ok().flatten().is_some() {
-                    let _ = session.delete(hash.into(), false).await;
+            let handle = find_handle(session, &hash)?;
+            if row.status == "completed" || (output_exists && row.status == "packaging") {
+                if handle.is_some() {
+                    session
+                        .delete(hash.into(), false)
+                        .await
+                        .map_err(AppError::bt_engine)?;
                 }
-                continue;
-            }
-            if output_exists && row.status == "packaging" {
-                if find_handle(session, &hash).ok().flatten().is_some() {
-                    let _ = session.delete(hash.into(), false).await;
+                if row.status == "packaging" {
+                    let repository = self.repository.clone();
+                    let restored = row.clone();
+                    worker
+                        .blocking(move || {
+                            repository.update_bt_task_state(
+                                &restored.info_hash,
+                                "completed",
+                                restored.output_path.as_deref(),
+                                None,
+                            )
+                        })
+                        .await?;
+                    super::super::ports::emit_task(
+                        &self.events,
+                        super::BtTaskEvent::PackageCompleted {
+                            info_hash: row.info_hash,
+                        },
+                    );
                 }
-                let _ = self.repository.update_bt_task_state(
-                    &row.info_hash,
-                    "completed",
-                    row.output_path.as_deref(),
-                    None,
-                );
-                super::super::ports::emit_task(
-                    &self.events,
-                    super::BtTaskEvent::PackageCompleted {
-                        info_hash: row.info_hash.clone(),
-                    },
-                );
-                continue;
-            }
-            if let Ok(Some(handle)) = find_handle(session, &hash) {
+            } else if let Some(handle) = handle {
                 self.start_finalize_job(row, handle);
             } else {
-                let _ = self.repository.update_bt_task_state(
-                    &row.info_hash,
-                    "error",
-                    None,
-                    Some(&AppError::custom(CustomErrorCode::BtSessionRestoreFailed)),
-                );
+                let repository = self.repository.clone();
+                worker
+                    .blocking(move || {
+                        repository.update_bt_task_state(
+                            &row.info_hash,
+                            "error",
+                            None,
+                            Some(&AppError::custom(CustomErrorCode::BtSessionRestoreFailed)),
+                        )
+                    })
+                    .await?;
             }
         }
+        for row in direct {
+            let hash = parse_info_hash(&row.info_hash)?;
+            if let Some(handle) = find_handle(session, &hash)? {
+                self.start_finalize_job(row, handle);
+            }
+        }
+        Ok(())
     }
 
     pub(super) fn remove_owned_task_dir(&self, row: &BtTaskRow) -> AppResult<()> {
@@ -309,47 +322,25 @@ impl BtManager {
         )
     }
 
-    pub(super) fn cleanup_orphan_owned_dirs(&self, session: &Session) {
-        let mut referenced = HashSet::new();
-        let roots: HashSet<PathBuf> = [self.private_download_root()]
-            .into_iter()
-            .flatten()
-            .collect();
-        if let Ok(rows) = self.repository.list_bt_tasks() {
-            for row in rows {
-                if row.dest_dir.is_empty() {
-                    referenced.insert(PathBuf::from(row.work_dir));
-                }
-            }
-        }
-        let session_dirs = std::cell::RefCell::new(Vec::new());
+    pub(super) async fn cleanup_orphan_owned_dirs(
+        &self,
+        session: &Session,
+        worker: &super::workers::Worker,
+    ) -> AppResult<()> {
+        let session_dirs = std::cell::RefCell::new(HashSet::new());
         session.with_torrents(|torrents| {
             for (_, handle) in torrents {
                 session_dirs
                     .borrow_mut()
-                    .push(handle.output_folder().to_path_buf());
+                    .insert(handle.output_folder().to_path_buf());
             }
         });
-        referenced.extend(session_dirs.into_inner());
-        for root in &roots {
-            let Ok(entries) = std::fs::read_dir(root) else {
-                continue;
-            };
-            for entry in entries.flatten() {
-                let is_directory = entry
-                    .file_type()
-                    .map(|file_type| file_type.is_dir())
-                    .unwrap_or(false);
-                let path = entry.path();
-                let owned_hash_dir = path
-                    .file_name()
-                    .and_then(|name| name.to_str())
-                    .is_some_and(|name| parse_info_hash(name).is_ok());
-                if owned_hash_dir && is_directory && !referenced.contains(&path) {
-                    let _ = std::fs::remove_dir_all(path);
-                }
-            }
-        }
+        let referenced = session_dirs.into_inner();
+        let root = self.base_dir.join("downloads");
+        let repository = self.repository.clone();
+        worker
+            .blocking(move || super::staging::cleanup_orphans(&repository, &root, referenced))
+            .await
     }
 }
 

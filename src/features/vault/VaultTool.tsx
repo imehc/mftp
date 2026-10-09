@@ -50,7 +50,7 @@ export default function VaultTool() {
       adaptiveDensity
       scroll="content"
       bottomInset="scroll"
-      contentClassName="gap-3"
+      contentDensity="compact"
       actions={
         c.sorting ? (
           <Button
