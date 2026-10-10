@@ -13,7 +13,9 @@ export function goMoveParser(boardSize: BoardSize) {
     z.object({ kind: z.literal("pass") }),
   ]);
   return (value: unknown): GoMove | null => {
-    const parsed = schema.safeParse(value);
-    return parsed.success ? parsed.data : null;
+    if (!z.validate(schema, value)) return null;
+    // 验证只返回布尔值，显式提取字段以保留原解析器的输出边界。
+    if (value.kind === "pass") return { kind: "pass" };
+    return { kind: "play", row: value.row, col: value.col };
   };
 }

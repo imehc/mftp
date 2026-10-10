@@ -13,7 +13,12 @@ import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
 import { xiangqiAiStrategy } from "./ai";
-import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
+import {
+  playCheckSound,
+  playFinishSound,
+  playMoveSound,
+  xiangqiAudio,
+} from "./audio";
 import { matchResultLabel, resultReasonLabel, sideName } from "./labels";
 import { createInitialXiangqiState, legalMoves, xiangqiGame } from "./rules";
 import {
@@ -94,6 +99,7 @@ export function XiangqiMatch({
     return () => {
       cancelled = true;
       runner.dispose();
+      xiangqiAudio.stop();
       setSession(null);
     };
     // 每个 keyed 的 XiangqiMatch 实例持有唯一的不可变 mode 配置。

@@ -3,7 +3,7 @@
  * UI 输入和 AI 策略（以及第三阶段的远端对手）适配到该契约上。
  */
 import { abortableDelay, type AiStrategy, type Difficulty } from "./ai";
-import type { MoveRequestContext, PlayerController, SeatIndex } from "./types";
+import type { MoveRequestContext, PlayerController } from "./types";
 
 /**
  * 把 UI 输入桥接进对局循环：`requestMove` 挂起一个 promise，
@@ -164,10 +164,3 @@ export class RemoteController<S, M> implements PlayerController<S, M> {
 
 export type AnyController<S, M> =
   LocalController<S, M> | AiController<S, M> | RemoteController<S, M>;
-
-export function isLocalSeat<S, M>(
-  controllers: readonly PlayerController<S, M>[],
-  seat: SeatIndex | null,
-): boolean {
-  return seat !== null && controllers[seat]?.kind === "local";
-}

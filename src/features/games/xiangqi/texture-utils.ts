@@ -1,6 +1,8 @@
 /** Pixi 中国象棋舞台的缓存程序化材质。 */
 import { CanvasSource, Texture } from "pixi.js";
 
+import { fbm, hash2, valueNoise } from "../engine/noise";
+
 export const BOARD_TEXTURE_WIDTH = 864;
 export const BOARD_TEXTURE_HEIGHT = 960;
 export const BOARD_TEXTURE_PAD = 52;
@@ -11,40 +13,6 @@ export const BOARD_SURFACE_HEIGHT =
 export const PIECE_TEXTURE_SIZE = 184;
 export const PIECE_CENTER = PIECE_TEXTURE_SIZE / 2;
 export const PIECE_RADIUS = 69;
-
-function hash2(ix: number, iy: number): number {
-  let hash = (ix * 374761393 + iy * 668265263) | 0;
-  hash = Math.imul(hash ^ (hash >>> 13), 1274126177);
-  return ((hash ^ (hash >>> 16)) >>> 0) / 4294967296;
-}
-
-function valueNoise(x: number, y: number): number {
-  const ix = Math.floor(x);
-  const iy = Math.floor(y);
-  const fx = x - ix;
-  const fy = y - iy;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uy = fy * fy * (3 - 2 * fy);
-  const a = hash2(ix, iy);
-  const b = hash2(ix + 1, iy);
-  const c = hash2(ix, iy + 1);
-  const d = hash2(ix + 1, iy + 1);
-  return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
-}
-
-function fbm(x: number, y: number, octaves: number): number {
-  let sum = 0;
-  let amplitude = 0.5;
-  let norm = 0;
-  for (let octave = 0; octave < octaves; octave++) {
-    sum += valueNoise(x, y) * amplitude;
-    norm += amplitude;
-    x *= 2;
-    y *= 2;
-    amplitude *= 0.5;
-  }
-  return sum / norm;
-}
 
 function drawElmSurface(width: number, height: number): HTMLCanvasElement {
   const canvas = document.createElement("canvas");

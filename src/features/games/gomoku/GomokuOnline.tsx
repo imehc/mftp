@@ -13,7 +13,7 @@ import { hashString, OnlineMatchSession } from "../engine/online/session";
 import { useOnlineMatch } from "../engine/online/useOnlineMatch";
 import { useOnlineRoom } from "../engine/online/useOnlineRoom";
 import type { MoveResolution } from "../engine/types";
-import { playFinishSound, playStoneSound } from "./audio";
+import { gomokuAudio, playFinishSound, playStoneSound } from "./audio";
 import { GomokuMatchView } from "./GomokuMatch";
 import { parseGomokuMove } from "./onlineProtocol";
 import { createInitialGomokuState, gomokuGame } from "./rules";
@@ -94,6 +94,7 @@ function OnlineMatch({
     rematchWaiting,
     rematchIncoming,
   } = useOnlineMatch(session, GOMOKU_ONLINE, present);
+  useEffect(() => () => gomokuAudio.stop(), [snapshot.round]);
   const mode: GomokuMode = { kind: "online" };
   return (
     <>

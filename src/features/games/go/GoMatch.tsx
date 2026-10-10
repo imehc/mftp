@@ -17,7 +17,12 @@ import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
 import { goAiStrategy } from "./ai";
-import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
+import {
+  goAudio,
+  playCaptureSound,
+  playFinishSound,
+  playStoneSound,
+} from "./audio";
 import { GoStage } from "./GoStage";
 import { matchResultLabel, scoreLine, seatName } from "./labels";
 import { cellIndex, createInitialGoState, goGame, legalPlays } from "./rules";
@@ -102,6 +107,7 @@ export function GoMatch({
     return () => {
       cancelled = true;
       runner.dispose();
+      goAudio.stop();
       setSession(null);
     };
     // 每个 <GoMatch key=...> 实例的 mode 标识是稳定的。

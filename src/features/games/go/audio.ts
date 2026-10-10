@@ -1,43 +1,31 @@
-let context: AudioContext | null = null;
+import { createTonePlayer } from "../engine/tone-player";
 
-function getAudioContext(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  const AudioCtor = window.AudioContext;
-  if (!AudioCtor) return null;
-  context ??= new AudioCtor();
-  return context;
-}
+export const goAudio = createTonePlayer();
 
 export function unlockGoAudio(): void {
-  void getAudioContext()?.resume();
-}
-
-function playTone(frequency: number, duration: number, volume: number): void {
-  const ctx = getAudioContext();
-  if (!ctx || volume <= 0) return;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  const now = ctx.currentTime;
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(frequency, now);
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(volume * 0.18, now + 0.012);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-  osc.connect(gain).connect(ctx.destination);
-  osc.start(now);
-  osc.stop(now + duration + 0.02);
+  goAudio.unlock();
 }
 
 export function playStoneSound(volume: number): void {
-  playTone(340, 0.09, volume);
-}
-
-export function playCaptureSound(volume: number): void {
-  playTone(300, 0.08, volume);
-  window.setTimeout(() => playTone(240, 0.1, volume), 60);
+  goAudio.play([{ frequency: 340, duration: 0.09 }], volume);
 }
 
 export function playFinishSound(volume: number): void {
-  playTone(523.25, 0.12, volume);
-  window.setTimeout(() => playTone(659.25, 0.16, volume), 90);
+  goAudio.play(
+    [
+      { frequency: 523.25, duration: 0.12 },
+      { frequency: 659.25, duration: 0.16, delay: 0.09 },
+    ],
+    volume,
+  );
+}
+
+export function playCaptureSound(volume: number): void {
+  goAudio.play(
+    [
+      { frequency: 300, duration: 0.08 },
+      { frequency: 240, duration: 0.1, delay: 0.06 },
+    ],
+    volume,
+  );
 }

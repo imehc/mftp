@@ -2,13 +2,15 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
-import { unlockXiangqiAudio } from "./audio";
+import { useGameAudio } from "../engine/use-game-audio";
+import { unlockXiangqiAudio, xiangqiAudio } from "./audio";
 import type { XiangqiMode } from "./types";
 import { XiangqiMatch } from "./XiangqiMatch";
 import { XiangqiModeMenu } from "./XiangqiModeMenu";
 import { XiangqiOnlineFlow } from "./XiangqiOnline";
 
 export default function XiangqiGame() {
+  useGameAudio(xiangqiAudio);
   const [mode, setMode] = useState<XiangqiMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
   const [onlinePlaying, setOnlinePlaying] = useState(false);

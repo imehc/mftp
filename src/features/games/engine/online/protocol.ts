@@ -38,6 +38,12 @@ const moveSchema = z.object({
   }),
 });
 
+// 按消息类型直接分派，避免正常落子帧先产生控制消息校验错误。
+const frameSchema = z.discriminatedUnion("t", [
+  ...controlSchema.options,
+  moveSchema,
+]);
+
 /** 游戏内部协议；Tauri 命令和事件类型仍由 Rust 生成。 */
 export type MatchControlMessage = z.infer<typeof controlSchema>;
 
@@ -57,19 +63,18 @@ export function parseFrame<M>(
   } catch {
     return null;
   }
-  const control = controlSchema.safeParse(value);
-  if (control.success) {
-    const message = control.data;
+  const parsed = frameSchema.safeParse(value);
+  if (!parsed.success) return null;
+  const message = parsed.data;
+  if (message.t !== "move") {
     if ("plies" in message && message.plies > message.atMove) return null;
     return message;
   }
-  const envelope = moveSchema.safeParse(value);
-  if (!envelope.success) return null;
-  const move = parseMove(envelope.data.move.move);
+  const move = parseMove(message.move.move);
   if (move === null) return null;
   return {
     v: ONLINE_PROTOCOL_VERSION,
     t: "move",
-    move: { ...envelope.data.move, move },
+    move: { ...message.move, move },
   };
 }

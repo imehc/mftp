@@ -10,6 +10,6 @@ const coordinate = z
 const moveSchema = z.object({ row: coordinate, col: coordinate });
 
 export function parseGomokuMove(value: unknown): GomokuMove | null {
-  const parsed = moveSchema.safeParse(value);
-  return parsed.success ? parsed.data : null;
+  if (!z.validate(moveSchema, value)) return null;
+  return { row: value.row, col: value.col };
 }

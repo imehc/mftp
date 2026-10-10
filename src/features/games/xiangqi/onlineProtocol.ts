@@ -10,7 +10,6 @@ const position = z
 const moveSchema = z.object({ from: position, to: position });
 
 export function parseXiangqiMove(value: unknown): XiangqiMove | null {
-  const parsed = moveSchema.safeParse(value);
-  if (!parsed.success || parsed.data.from === parsed.data.to) return null;
-  return parsed.data;
+  if (!z.validate(moveSchema, value) || value.from === value.to) return null;
+  return { from: value.from, to: value.to };
 }

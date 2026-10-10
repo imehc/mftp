@@ -5,7 +5,7 @@ import { type ReactNode, useId, useState } from "react";
 import AppPageContent from "~/components/AppPageContent";
 import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
-import { Label } from "~/components/ui/label";
+import { Field, FieldLabel } from "~/components/ui/field";
 import {
   SelectContent,
   SelectGroup,
@@ -35,8 +35,8 @@ export function GameSelect({
 }) {
   const id = useId();
   return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <Field orientation="choice">
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <FixedSelect value={value} onValueChange={onChange}>
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
@@ -51,7 +51,7 @@ export function GameSelect({
           </SelectGroup>
         </SelectContent>
       </FixedSelect>
-    </div>
+    </Field>
   );
 }
 

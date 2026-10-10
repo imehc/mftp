@@ -13,7 +13,12 @@ import { hashString, OnlineMatchSession } from "../engine/online/session";
 import { useOnlineMatch } from "../engine/online/useOnlineMatch";
 import { useOnlineRoom } from "../engine/online/useOnlineRoom";
 import type { MoveResolution } from "../engine/types";
-import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
+import {
+  playCheckSound,
+  playFinishSound,
+  playMoveSound,
+  xiangqiAudio,
+} from "./audio";
 import { parseXiangqiMove } from "./onlineProtocol";
 import { createInitialXiangqiState, xiangqiGame } from "./rules";
 import {
@@ -113,6 +118,7 @@ function OnlineMatch({
     rematchWaiting,
     rematchIncoming,
   } = useOnlineMatch(session, XIANGQI_ONLINE, present);
+  useEffect(() => () => xiangqiAudio.stop(), [snapshot.round]);
   const mode: XiangqiMode = { kind: "online" };
   return (
     <>

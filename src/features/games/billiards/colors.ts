@@ -19,7 +19,3 @@ export const BALL_HEX: Record<number, string> = {
   15: "#8b2320",
   8: "#161616",
 };
-
-export function ballColorNumber(id: number): number {
-  return parseInt((BALL_HEX[id] ?? "#ffffff").slice(1), 16);
-}

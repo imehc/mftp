@@ -3,13 +3,15 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
-import { unlockGoAudio } from "./audio";
+import { useGameAudio } from "../engine/use-game-audio";
+import { goAudio, unlockGoAudio } from "./audio";
 import { GoMatch } from "./GoMatch";
 import { GoModeMenu } from "./GoModeMenu";
 import { GoOnlineFlow } from "./GoOnline";
 import type { GoMode } from "./types";
 
 export default function GoGame() {
+  useGameAudio(goAudio);
   const [mode, setMode] = useState<GoMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
   const [onlinePlaying, setOnlinePlaying] = useState(false);

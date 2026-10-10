@@ -2,50 +2,10 @@
  * 台球渲染器的程序化画布纹理：木框的橡木纹理、台面的编织台呢，以及
  * 球的受光球面叠加。全部在挂载时生成一次并缓存，因此开销只付在首帧，
  * 之后不再重复。
- *
- * 噪声内核镜像自 ../../go/texture-utils——由带种子的栅格哈希驱动值噪声
- * 与 fbm——因此每次启动表面都完全一致（不用 Math.random，也就不会在
- * 两个联机对手间出现漂移）。
  */
 import { Texture } from "pixi.js";
 
-// --- 带种子噪声 --------------------------------------------------
-
-function hash2(ix: number, iy: number): number {
-  let h = (ix * 374761393 + iy * 668265263) | 0;
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-
-function valueNoise(x: number, y: number): number {
-  const ix = Math.floor(x);
-  const iy = Math.floor(y);
-  const fx = x - ix;
-  const fy = y - iy;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uy = fy * fy * (3 - 2 * fy);
-  const a = hash2(ix, iy);
-  const b = hash2(ix + 1, iy);
-  const c = hash2(ix, iy + 1);
-  const d = hash2(ix + 1, iy + 1);
-  return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
-}
-
-function fbm(x: number, y: number, octaves: number): number {
-  let sum = 0;
-  let amp = 0.5;
-  let norm = 0;
-  let fx = x;
-  let fy = y;
-  for (let i = 0; i < octaves; i++) {
-    sum += amp * valueNoise(fx, fy);
-    norm += amp;
-    amp *= 0.5;
-    fx *= 2;
-    fy *= 2;
-  }
-  return sum / norm;
-}
+import { fbm, hash2, valueNoise } from "../../engine/noise";
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 

@@ -17,7 +17,7 @@ import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController, SeatIndex } from "../engine/types";
 import { gomokuAiStrategy } from "./ai";
-import { playFinishSound, playStoneSound } from "./audio";
+import { gomokuAudio, playFinishSound, playStoneSound } from "./audio";
 import { GomokuStage } from "./GomokuStage";
 import { matchResultLabel, seatName } from "./labels";
 import { createInitialGomokuState, gomokuGame } from "./rules";
@@ -99,6 +99,7 @@ export function GomokuMatch({
     return () => {
       cancelled = true;
       runner.dispose();
+      gomokuAudio.stop();
       setSession(null);
     };
     // 每个 <GomokuMatch key=...> 实例的 mode 标识是稳定的。

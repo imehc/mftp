@@ -3,13 +3,15 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
-import { unlockGomokuAudio } from "./audio";
+import { useGameAudio } from "../engine/use-game-audio";
+import { gomokuAudio, unlockGomokuAudio } from "./audio";
 import { GomokuMatch } from "./GomokuMatch";
 import { GomokuModeMenu } from "./GomokuModeMenu";
 import { GomokuOnlineFlow } from "./GomokuOnline";
 import type { GomokuMode } from "./types";
 
 export default function GomokuGame() {
+  useGameAudio(gomokuAudio);
   const [mode, setMode] = useState<GomokuMode | null>(null);
   const [matchKey, setMatchKey] = useState(0);
   const [onlinePlaying, setOnlinePlaying] = useState(false);

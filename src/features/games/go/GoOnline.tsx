@@ -14,7 +14,12 @@ import { hashString, OnlineMatchSession } from "../engine/online/session";
 import { useOnlineMatch } from "../engine/online/useOnlineMatch";
 import { useOnlineRoom } from "../engine/online/useOnlineRoom";
 import type { MoveResolution } from "../engine/types";
-import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
+import {
+  goAudio,
+  playCaptureSound,
+  playFinishSound,
+  playStoneSound,
+} from "./audio";
 import { GoMatchView } from "./GoMatch";
 import { goMoveParser } from "./onlineProtocol";
 import { createInitialGoState, goGame } from "./rules";
@@ -121,6 +126,7 @@ function OnlineMatch({
     rematchWaiting,
     rematchIncoming,
   } = useOnlineMatch(session, GO_ONLINE[boardSize], present);
+  useEffect(() => () => goAudio.stop(), [snapshot.round]);
   const mode: GoMode = { kind: "online", boardSize };
   return (
     <>

@@ -85,24 +85,6 @@ export function matchResultLabel(
   return <Trans>{sideNameValue} 获胜</Trans>;
 }
 
-export function historyModeLabel(payload: XiangqiHistoryPayload) {
-  if (payload.mode === "hotseat") return <Trans>双人</Trans>;
-  if (payload.mode === "online") return <Trans>联机</Trans>;
-  return (
-    <span>
-      <Trans>人机</Trans>
-      {" · "}
-      {payload.difficulty === "easy" ? (
-        <Trans>简单</Trans>
-      ) : payload.difficulty === "hard" ? (
-        <Trans>困难</Trans>
-      ) : (
-        <Trans>中等</Trans>
-      )}
-    </span>
-  );
-}
-
 export function historyResult(payload: XiangqiHistoryPayload) {
   if (payload.winnerSeat === null) {
     return <Trans>和棋</Trans>;
@@ -124,11 +106,4 @@ export function historyResult(payload: XiangqiHistoryPayload) {
   return payload.winnerSeat === 0 ? <Trans>红胜</Trans> : <Trans>黑胜</Trans>;
 }
 
-export function formatHistoryTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleString(undefined, {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+export { historyModeLabel, formatHistoryTime } from "../engine/history-labels";

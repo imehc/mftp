@@ -193,22 +193,6 @@ export function computeTerritoryOwners(
   return owners;
 }
 
-export function isLegalPlay(state: GoState, row: number, col: number): boolean {
-  if (state.finished || !inBounds(state.boardSize, row, col)) return false;
-  const index = cellIndex(state.boardSize, row, col);
-  const placed = resolvePlacement(
-    state.board,
-    state.boardSize,
-    index,
-    state.turnSeat,
-    state.koPoint,
-  );
-  return (
-    placed !== null &&
-    !state.positionHistory.includes(boardPositionKey(placed.board))
-  );
-}
-
 export function legalPlays(state: GoState): GoMove[] {
   if (state.finished) return [];
   const moves: GoMove[] = [];

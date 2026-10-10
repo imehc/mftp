@@ -4,17 +4,10 @@ import { ChevronRight, Play, Target, Users } from "lucide-react";
 import { useState } from "react";
 
 import AppPageContent from "~/components/AppPageContent";
-import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
-import { Label } from "~/components/ui/label";
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 
 import type { Difficulty } from "../engine/ai";
+import { GameSelect } from "../engine/BoardModeMenu";
 import { useGameHistory, useGamesHistoryStore } from "../engine/history";
 import {
   BILLIARDS_GAME_ID,
@@ -78,51 +71,25 @@ export function BilliardsModeMenu({
           <h2 className="text-sm font-semibold">
             <Trans>人机对战</Trans>
           </h2>
-          <div className="space-y-1.5">
-            <Label htmlFor="billiards-difficulty">
-              <Trans>难度</Trans>
-            </Label>
-            <FixedSelect
-              value={difficulty}
-              onValueChange={(value) => setDifficulty(value as Difficulty)}
-            >
-              <SelectTrigger id="billiards-difficulty" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">
-                  <Trans>简单</Trans>
-                </SelectItem>
-                <SelectItem value="medium">
-                  <Trans>中等</Trans>
-                </SelectItem>
-                <SelectItem value="hard">
-                  <Trans>困难</Trans>
-                </SelectItem>
-              </SelectContent>
-            </FixedSelect>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="billiards-break">
-              <Trans>先后手</Trans>
-            </Label>
-            <FixedSelect
-              value={playerBreaks ? "me" : "ai"}
-              onValueChange={(value) => setPlayerBreaks(value === "me")}
-            >
-              <SelectTrigger id="billiards-break" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="me">
-                  <Trans>我先开球</Trans>
-                </SelectItem>
-                <SelectItem value="ai">
-                  <Trans>AI 先开球</Trans>
-                </SelectItem>
-              </SelectContent>
-            </FixedSelect>
-          </div>
+          <GameSelect
+            label={<Trans>难度</Trans>}
+            value={difficulty}
+            onChange={(value) => setDifficulty(value as Difficulty)}
+            options={[
+              { value: "easy", label: t`简单` },
+              { value: "medium", label: t`中等` },
+              { value: "hard", label: t`困难` },
+            ]}
+          />
+          <GameSelect
+            label={<Trans>先后手</Trans>}
+            value={playerBreaks ? "me" : "ai"}
+            onChange={(value) => setPlayerBreaks(value === "me")}
+            options={[
+              { value: "me", label: t`我先开球` },
+              { value: "ai", label: t`AI 先开球` },
+            ]}
+          />
           <Button
             fullWidth
             className="md:w-fit md:self-start"

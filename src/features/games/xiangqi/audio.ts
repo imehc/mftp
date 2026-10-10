@@ -1,16 +1,18 @@
-let context: AudioContext | null = null;
+import { createGameAudioResources } from "../engine/game-audio-resources";
+
+const audio = createGameAudioResources();
 let knockNoise: AudioBuffer | null = null;
 
-function getAudioContext(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  const AudioCtor = window.AudioContext;
-  if (!AudioCtor) return null;
-  context ??= new AudioCtor();
-  return context;
-}
+export const xiangqiAudio = {
+  stop: audio.stop,
+  dispose(): void {
+    audio.dispose();
+    knockNoise = null;
+  },
+};
 
 export function unlockXiangqiAudio(): void {
-  void getAudioContext()?.resume();
+  audio.unlock();
 }
 
 function noiseBuffer(ctx: AudioContext): AudioBuffer {
@@ -45,6 +47,7 @@ function playWoodKnock(
   source.connect(filter).connect(gain).connect(ctx.destination);
   source.start(start);
   source.stop(start + 0.075);
+  audio.track(source, filter, gain);
 
   const body = ctx.createOscillator();
   const bodyGain = ctx.createGain();
@@ -56,6 +59,7 @@ function playWoodKnock(
   body.connect(bodyGain).connect(ctx.destination);
   body.start(start);
   body.stop(start + 0.08);
+  audio.track(body, bodyGain);
 }
 
 function playResonance(
@@ -79,17 +83,18 @@ function playResonance(
   oscillator.connect(gain).connect(ctx.destination);
   oscillator.start(start);
   oscillator.stop(start + duration + 0.02);
+  audio.track(oscillator, gain);
 }
 
 export function playMoveSound(volume: number, captured: boolean): void {
-  const ctx = getAudioContext();
+  const ctx = audio.getContext();
   if (!ctx || volume <= 0) return;
   playWoodKnock(ctx, volume, 0, captured ? 820 : 1060);
   if (captured) playWoodKnock(ctx, volume * 0.82, 0.065, 610);
 }
 
 export function playCheckSound(volume: number, checkmate = false): void {
-  const ctx = getAudioContext();
+  const ctx = audio.getContext();
   if (!ctx || volume <= 0) return;
   playResonance(
     ctx,
@@ -109,7 +114,7 @@ export function playCheckSound(volume: number, checkmate = false): void {
 }
 
 export function playFinishSound(volume: number): void {
-  const ctx = getAudioContext();
+  const ctx = audio.getContext();
   if (!ctx || volume <= 0) return;
   playResonance(ctx, 261.63, 0.25, volume, 0.12);
   playResonance(ctx, 392, 0.32, volume, 0.2);
