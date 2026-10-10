@@ -16,18 +16,16 @@ import {
   CUSHION_THICKNESS,
   FOOT_SPOT_X,
   HEAD_SPOT_X,
+  JAW_RADIUS,
   POCKETS,
   TABLE_H,
   TABLE_W,
 } from "../constants";
-import { cushionSegments } from "../physics";
+import { cushionSegments } from "../geometry";
 import { FRAME, OUTER_H, OUTER_W, PPM, px } from "./layout";
-import { CLOTH_BASE, makeClothTile, makeWoodCanvas } from "./textures";
+import { makeClothTile, makeWoodCanvas } from "./textures";
 
 export { OUTER_H, OUTER_W, PPM, px };
-
-/** 台呢基色（r, g, b 形式），用于拼接 rgba() 字符串。 */
-const CLOTH_RGB = CLOTH_BASE.join(", ");
 
 /**
  * 绘制球桌的超采样系数。根容器会缩放以适配视口，因此纹理按大于标称
@@ -137,14 +135,13 @@ function paintTable(): HTMLCanvasElement {
   // 每个凸包为 [inner0, inner1, outer1, outer0]。明暗从 rails 处受光的
   // 顶面一直延伸到与台面相接的库边尖端。
   for (const segment of cushionSegments()) {
-    const [ix0, iy0, ix1, iy1, ox1, oy1, ox0, oy0] = segment.points;
+    const [ix0, iy0, ix1, iy1, ox1, oy1, ox0, oy0] = segment.profile;
 
     const path = (): void => {
       ctx.beginPath();
-      ctx.moveTo(px(ix0), px(iy0));
-      ctx.lineTo(px(ix1), px(iy1));
-      ctx.lineTo(px(ox1), px(oy1));
-      ctx.lineTo(px(ox0), px(oy0));
+      ctx.moveTo(px(segment.points[0]), px(segment.points[1]));
+      for (let i = 2; i < segment.points.length; i += 2)
+        ctx.lineTo(px(segment.points[i]), px(segment.points[i + 1]));
       ctx.closePath();
     };
 
@@ -159,13 +156,20 @@ function paintTable(): HTMLCanvasElement {
     face.addColorStop(0.82, "#1a5335");
     face.addColorStop(1, "#123d26");
 
+    // 投影沿真实库边轮廓生成，台呢及袋口通道共享同一底色与光照，
+    // 避免按矩形台面裁剪阴影造成通道与台面之间的色块断层。
+    ctx.save();
     path();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.32)";
+    ctx.shadowBlur = px(0.012) * SS;
+    ctx.shadowOffsetX = px(0.002) * SS;
+    ctx.shadowOffsetY = px(0.004) * SS;
     ctx.fillStyle = face;
     ctx.fill();
+    ctx.restore();
 
-    // 颚面。每个库边在袋口处被截断，而那段切口是覆盖台面的同种台呢——
-    // 因此在切口处落到台面颜色，并朝内重新融入受光的库边顶面。渐变
-    // 垂直于切口，以贴合斜接。
+    // 袋口斜切面低于库边顶面，应呈背光的倒角。不能用台呢纯色覆盖端头，
+    // 否则会抹掉厚度，留下像直角拼接的绿色方块。
     ctx.save();
     path();
     ctx.clip();
@@ -188,16 +192,16 @@ function paintTable(): HTMLCanvasElement {
         nx = -nx;
         ny = -ny;
       }
-      const reach = px(0.055);
+      const reach = px(0.028);
       const g = ctx.createLinearGradient(
         ex,
         ey,
         ex + nx * reach,
         ey + ny * reach,
       );
-      g.addColorStop(0, `rgba(${CLOTH_RGB}, 1)`);
-      g.addColorStop(0.45, `rgba(${CLOTH_RGB}, 0.72)`);
-      g.addColorStop(1, `rgba(${CLOTH_RGB}, 0)`);
+      g.addColorStop(0, "rgba(3, 21, 12, 0.72)");
+      g.addColorStop(0.45, "rgba(3, 21, 12, 0.25)");
+      g.addColorStop(1, "rgba(3, 21, 12, 0)");
       path();
       ctx.fillStyle = g;
       ctx.fill();
@@ -209,44 +213,18 @@ function paintTable(): HTMLCanvasElement {
 
     // 库边尖端与台面相接处的暗缝。
     ctx.beginPath();
-    ctx.moveTo(px(ix0), px(iy0));
-    ctx.lineTo(px(ix1), px(iy1));
-    ctx.lineWidth = px(0.004);
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+    const edgeLength = Math.hypot(ix1 - ix0, iy1 - iy0);
+    const inset = (JAW_RADIUS * 2) / edgeLength;
+    ctx.moveTo(px(ix0 + (ix1 - ix0) * inset), px(iy0 + (iy1 - iy0) * inset));
+    ctx.lineTo(px(ix1 - (ix1 - ix0) * inset), px(iy1 - (iy1 - iy0) * inset));
+    ctx.lineCap = "round";
+    ctx.lineWidth = px(0.0025);
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
     ctx.stroke();
   }
 
-  // 库边投在台呢上的阴影，在顶部与左侧 rails 下方最强，以匹配木框
-  // 所用的光照。
-  const bedX = px(-TABLE_W / 2);
   const bedY = px(-TABLE_H / 2);
-  const bedW = px(TABLE_W);
   const bedH = px(TABLE_H);
-  const reach = px(0.055);
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(bedX, bedY, bedW, bedH);
-  ctx.clip();
-
-  const edgeShadow = (
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    strength: number,
-  ): void => {
-    const g = ctx.createLinearGradient(x0, y0, x1, y1);
-    g.addColorStop(0, `rgba(0, 0, 0, ${strength})`);
-    g.addColorStop(1, "rgba(0, 0, 0, 0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(bedX, bedY, bedW, bedH);
-  };
-
-  edgeShadow(bedX, bedY, bedX, bedY + reach, 0.34);
-  edgeShadow(bedX, bedY, bedX + reach, bedY, 0.3);
-  edgeShadow(bedX, bedY + bedH, bedX, bedY + bedH - reach, 0.2);
-  edgeShadow(bedX + bedW, bedY, bedX + bedW - reach, bedY, 0.18);
-  ctx.restore();
 
   // --- 标记 ------------------------------------------------------
   ctx.beginPath();

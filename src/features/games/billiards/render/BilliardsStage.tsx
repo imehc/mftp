@@ -22,10 +22,11 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { BALL_RADIUS, HEAD_SPOT_X } from "../constants";
 import { insidePlayArea, overlapsAnyBall } from "../physics";
 import type { BallState, BilliardsPresentation } from "../types";
-import { unlockAudio } from "./audio";
+import { createAimPreview } from "./aim-preview";
+import { playCueImpact, stopBilliardsAudio, unlockAudio } from "./audio";
 import { createBallLayer } from "./balls";
 import { createCueView } from "./cue";
-import { computeAimGuide } from "./guides";
+import { drawGuide } from "./guide-view";
 import { runPresentation } from "./playback";
 import { buildTable, OUTER_H, OUTER_W, PPM, px } from "./table";
 
@@ -36,7 +37,7 @@ export interface BilliardsStageHandle {
    * 为非交互（AI）的一杆展示并挥动球杆：瞄准，后拉到击球力度，然后
    * 击出。击出后 resolve。
    */
-  animateAiCue(angle: number, power: number): Promise<void>;
+  animateCue(angle: number, power: number, ai: boolean): Promise<void>;
 }
 
 export interface BilliardsStageProps {
@@ -59,7 +60,7 @@ interface Scene {
   setFollowDraw(followDraw: number): void;
   setInteraction(interactive: boolean, ballInHand: boolean): void;
   playPresentation(presentation: BilliardsPresentation): Promise<void>;
-  animateAiCue(angle: number, power: number): Promise<void>;
+  animateCue(angle: number, power: number, ai: boolean): Promise<void>;
   destroy(): void;
 }
 
@@ -81,7 +82,11 @@ function createScene(
 
   // --- 叠加层 -----------------------------------------------------
   const guideLayer = new Graphics();
-  const { layer: cueLayer, stick: cueStick } = createCueView();
+  const {
+    layer: cueLayer,
+    stick: cueStick,
+    shadow: cueShadow,
+  } = createCueView();
   const ghostLayer = new Graphics();
   root.addChild(guideLayer, cueLayer, ghostLayer);
 
@@ -90,7 +95,7 @@ function createScene(
   let interactive = false;
   let ballInHand = false;
   let followDraw = 0;
-  let aimAngle = Math.PI; // 默认：从头顶线朝向球堆
+  let aimAngle = 0; // 默认：从头顶线朝向球堆
   const cuePull = { value: 0 };
   let playing = false;
   /** AI 击球进行中：即使非交互也显示球杆。 */
@@ -100,6 +105,12 @@ function createScene(
   /** 自由球：临时母球位置，以真实球显示。 */
   let placing: { x: number; y: number; valid: boolean } | null = null;
   let placingDrag = false;
+  let activePointer: number | null = null;
+  let shotPending = false;
+  let disposed = false;
+  let cancelPlayback: (() => void) | null = null;
+  let cancelCue: (() => void) | null = null;
+  const preview = createAimPreview(redrawOverlays);
 
   /** 拖动距离（米）：开始蓄力前的死区，以及完整行程。 */
   const PULL_DEADZONE = 0.07;
@@ -138,36 +149,18 @@ function createScene(
     return hit ? { x: hit[0], y: hit[1] } : { x: 0, y: 0 };
   }
 
-  function drawDashedLine(
-    g: Graphics,
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    color: number,
-    alpha: number,
-  ): void {
-    const dash = 8;
-    const gap = 5;
-    const dx = x1 - x0;
-    const dy = y1 - y0;
-    const len = Math.hypot(dx, dy);
-    if (len < 1) return;
-    const ux = dx / len;
-    const uy = dy / len;
-    for (let d = 0; d < len; d += dash + gap) {
-      const e = Math.min(d + dash, len);
-      g.moveTo(x0 + ux * d, y0 + uy * d).lineTo(x0 + ux * e, y0 + uy * e);
-    }
-    g.stroke({ width: 1.5, color, alpha });
-  }
-
   function redrawOverlays(): void {
     guideLayer.clear();
     ghostLayer.clear();
     cueLayer.visible = false;
 
-    if (playing) return;
+    if (playing) {
+      if (aiAiming) {
+        const cue = cuePos();
+        if (cue) drawCueStick(px(cue.x), px(cue.y));
+      }
+      return;
+    }
 
     if (aiAiming) {
       // AI 回合：不画瞄准辅助，只挥动球杆击球。
@@ -197,44 +190,16 @@ function createScene(
     }
     if (!interactive || ballInHand) return;
 
-    const guide = computeAimGuide(balls, aimAngle, followDraw);
-    if (!guide) return;
-
-    const cx = px(guide.cue.x);
-    const cy = px(guide.cue.y);
-    const ix = px(guide.contact.x);
-    const iy = px(guide.contact.y);
-    drawDashedLine(guideLayer, cx, cy, ix, iy, 0xffffff, 0.65);
-    // 虚拟球：细环加极淡填充，让它看起来是位置而非另一颗球。
-    guideLayer
-      .circle(ix, iy, r)
-      .fill({ color: 0xffffff, alpha: 0.06 })
-      .circle(ix, iy, r)
-      .stroke({ width: 1.2, color: 0xffffff, alpha: 0.75 });
-
-    if (guide.target) {
-      const len = px(0.16 + 0.4 * guide.target.fullness);
-      guideLayer
-        .moveTo(px(guide.target.center.x), px(guide.target.center.y))
-        .lineTo(
-          px(guide.target.center.x) + guide.target.dir.x * len,
-          px(guide.target.center.y) + guide.target.dir.y * len,
-        )
-        .stroke({ width: 1.8, color: 0xffe57f, alpha: 0.85 });
-    }
-    if (guide.cueDeflection && guide.target) {
-      const len = px(0.1 + 0.28 * (1 - guide.target.fullness));
-      guideLayer
-        .moveTo(ix, iy)
-        .lineTo(
-          ix + guide.cueDeflection.x * len,
-          iy + guide.cueDeflection.y * len,
-        )
-        .stroke({ width: 1.2, color: 0xffffff, alpha: 0.35 });
-    }
-
-    // 球后方的球杆，随力度后拉。
-    drawCueStick(cx, cy);
+    const cue = cuePos();
+    if (!cue) return;
+    const guide = preview.get(
+      balls,
+      aimAngle,
+      dragging ? Math.max(0.06, cuePull.value) : 0.5,
+      followDraw,
+    );
+    if (guide) drawGuide(guideLayer, guide);
+    drawCueStick(px(cue.x), px(cue.y));
   }
 
   /** 将球杆摆到 (cx, cy) 后方，沿 aimAngle 方向瞄准。 */
@@ -242,7 +207,13 @@ function createScene(
     cueLayer.visible = true;
     cueLayer.position.set(cx, cy);
     cueLayer.rotation = aimAngle + Math.PI;
-    cueStick.x = r * 1.4 + cuePull.value * px(0.34);
+    cueStick.x = r + px(0.005) + cuePull.value * px(0.28);
+    // 光照固定在球桌左上方；阴影偏移先转回球杆局部坐标。
+    const rotation = cueLayer.rotation;
+    cueShadow.position.set(
+      cueStick.x + 2 * Math.cos(rotation) + 3 * Math.sin(rotation),
+      -2 * Math.sin(rotation) + 3 * Math.cos(rotation),
+    );
   }
 
   // --- 布局 -------------------------------------------------------
@@ -251,7 +222,8 @@ function createScene(
     const h = app.screen.height;
     const worldW = px(OUTER_W * 2);
     const worldH = px(OUTER_H * 2);
-    const portrait = h > w;
+    // 朝向只随视口改变，结算文案或侧栏占用不能旋转整张球桌。
+    const portrait = window.matchMedia("(orientation: portrait)").matches;
     const fitW = portrait ? worldH : worldW;
     const fitH = portrait ? worldW : worldH;
     const scale = Math.min(w / fitW, h / fitH) * 0.98;
@@ -295,21 +267,19 @@ function createScene(
     dragging = false;
     const pull = cuePull.value;
     if (pull >= FIRE_THRESHOLD) {
-      // 击打：球杆快速前送，随后由击球接管。
-      gsap.to(cuePull, {
-        value: 0,
-        duration: 0.09,
-        ease: "power4.in",
-        onUpdate: redrawOverlays,
-      });
+      shotPending = true;
+      aiAiming = true;
+      // 先锁定本杆，worker 结算后由统一挥杆时间线呈现触球。
       callbacks.onPowerPreview(0);
       callbacks.onShot(aimAngle, Math.max(0.06, pull));
     } else {
       // 在死区内松手：保留瞄准，球杆弹性回位。
       gsap.to(cuePull, {
         value: 0,
-        duration: 0.45,
-        ease: "elastic.out(1, 0.4)",
+        duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? 0
+          : 0.18,
+        ease: "power2.out",
         onUpdate: redrawOverlays,
       });
       callbacks.onPowerPreview(0);
@@ -329,7 +299,11 @@ function createScene(
 
   app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
     unlockAudio();
-    if (playing || !interactive) return;
+    if (playing || shotPending || !interactive) return;
+    if (activePointer !== null || (e.pointerType === "mouse" && e.button !== 0))
+      return;
+    activePointer = e.pointerId;
+    app.canvas.setPointerCapture(e.pointerId);
     if (ballInHand) {
       placingDrag = true;
       updatePlacement(e, false);
@@ -339,7 +313,8 @@ function createScene(
     updateDrag(e);
   });
   app.stage.on("pointermove", (e: FederatedPointerEvent) => {
-    if (playing || !interactive) return;
+    if (e.pointerId !== activePointer) return;
+    if (playing || shotPending || !interactive) return;
     if (ballInHand) {
       if (placingDrag) updatePlacement(e, false);
       return;
@@ -348,6 +323,10 @@ function createScene(
   });
 
   const endPointer = (e: FederatedPointerEvent) => {
+    if (e.pointerId !== activePointer) return;
+    activePointer = null;
+    if (app.canvas.hasPointerCapture(e.pointerId))
+      app.canvas.releasePointerCapture(e.pointerId);
     if (ballInHand && placingDrag) {
       placingDrag = false;
       updatePlacement(e, true);
@@ -359,6 +338,27 @@ function createScene(
   app.stage.on("pointerup", endPointer);
   app.stage.on("pointerupoutside", endPointer);
 
+  const cancelPointer = (event?: PointerEvent) => {
+    if (event && event.pointerId !== activePointer) return;
+    const pointer = activePointer;
+    activePointer = null;
+    if (pointer !== null && app.canvas.hasPointerCapture(pointer))
+      app.canvas.releasePointerCapture(pointer);
+    dragging = false;
+    placingDrag = false;
+    if (!shotPending) cuePull.value = 0;
+    callbacks.onPowerPreview(0);
+    redrawOverlays();
+  };
+
+  app.canvas.addEventListener("pointercancel", cancelPointer);
+
+  const lostCapture = () => {
+    if (activePointer !== null) cancelPointer();
+  };
+
+  app.canvas.addEventListener("lostpointercapture", lostCapture);
+
   // --- 回放 -------------------------------------------------------
   function playPresentation(
     presentation: BilliardsPresentation,
@@ -366,48 +366,82 @@ function createScene(
     playing = true;
     placing = null;
     dragging = false;
-    cuePull.value = 0;
     redrawOverlays();
     if (presentation.frames.length === 0) {
       playing = false;
       return Promise.resolve();
     }
-    return runPresentation(app, presentation, {
+    const playback = runPresentation(app, presentation, {
       moveBall: ballLayer.move,
       ballView: ballLayer.view,
+      maskPocket: ballLayer.maskPocket,
       onDone: () => {
         playing = false;
-        redrawOverlays();
+        cancelPlayback = null;
+        if (!disposed) redrawOverlays();
       },
     });
+    cancelPlayback = playback.cancel;
+    return playback.done;
   }
 
-  function animateAiCue(angle: number, power: number): Promise<void> {
+  function animateCue(
+    angle: number,
+    power: number,
+    ai: boolean,
+  ): Promise<void> {
     aimAngle = angle;
-    cuePull.value = 0;
+    cuePull.value = ai ? 0 : power;
     aiAiming = true;
+    shotPending = true;
     redrawOverlays();
     return new Promise((resolve) => {
-      // 后拉耗时 0.4 秒，再以 0.09 秒前送击出。
-      gsap.to(cuePull, {
-        value: power,
-        duration: 0.4,
-        ease: "power2.inOut",
-        onUpdate: redrawOverlays,
-        onComplete: () => {
-          gsap.to(cuePull, {
-            value: 0,
-            duration: 0.09,
-            ease: "power4.in",
-            onUpdate: redrawOverlays,
-            onComplete: () => {
-              aiAiming = false;
-              redrawOverlays();
-              resolve();
-            },
-          });
-        },
-      });
+      let complete = false;
+
+      const done = () => {
+        if (complete) return;
+        complete = true;
+        cancelCue = null;
+        aiAiming = false;
+        shotPending = false;
+        gsap.killTweensOf(cuePull);
+        if (!disposed) redrawOverlays();
+        resolve();
+      };
+
+      cancelCue = done;
+      const strike = () =>
+        gsap.to(cuePull, {
+          value: -0.018,
+          duration: 0.09,
+          ease: "power2.in",
+          onUpdate: redrawOverlays,
+          onComplete: () => {
+            if (disposed) {
+              done();
+              return;
+            }
+            playCueImpact(power);
+            // 触球时兑现等待，回放和声音同帧起步；球杆继续短随挥。
+            resolve();
+            gsap.to(cuePull, {
+              value: -0.16,
+              duration: 0.08,
+              ease: "power2.out",
+              onUpdate: redrawOverlays,
+              onComplete: done,
+            });
+          },
+        });
+      if (ai)
+        gsap.to(cuePull, {
+          value: power,
+          duration: 0.3,
+          ease: "power2.inOut",
+          onUpdate: redrawOverlays,
+          onComplete: strike,
+        });
+      else strike();
     });
   }
 
@@ -432,15 +466,22 @@ function createScene(
         placing = null;
         placingDrag = false;
       }
-      if (!interactive) {
+      if (!interactive && !shotPending) {
         dragging = false;
         cuePull.value = 0;
       }
       redrawOverlays();
     },
     playPresentation,
-    animateAiCue,
+    animateCue,
     destroy() {
+      disposed = true;
+      stopBilliardsAudio();
+      preview.dispose();
+      cancelPlayback?.();
+      cancelCue?.();
+      app.canvas.removeEventListener("pointercancel", cancelPointer);
+      app.canvas.removeEventListener("lostpointercapture", lostCapture);
       gsap.killTweensOf(cuePull);
       app.renderer.off("resize", relayout);
     },
@@ -519,8 +560,8 @@ export const BilliardsStage = forwardRef<
     () => ({
       playPresentation: (presentation) =>
         sceneRef.current?.playPresentation(presentation) ?? Promise.resolve(),
-      animateAiCue: (angle, power) =>
-        sceneRef.current?.animateAiCue(angle, power) ?? Promise.resolve(),
+      animateCue: (angle, power, ai) =>
+        sceneRef.current?.animateCue(angle, power, ai) ?? Promise.resolve(),
     }),
     [],
   );

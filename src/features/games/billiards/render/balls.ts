@@ -17,7 +17,7 @@ import {
 } from "pixi.js";
 
 import { BALL_HEX } from "../colors";
-import { BALL_RADIUS } from "../constants";
+import { BALL_RADIUS, POCKETS } from "../constants";
 import type { BallState } from "../types";
 import { px } from "./layout";
 import { getBallShadingTexture } from "./textures";
@@ -273,6 +273,8 @@ export interface BallLayer {
   layer: Container;
   /** 单个球 id（0–15）的视图。 */
   view(id: number): Container | undefined;
+  /** 入袋后由实际袋沿遮挡球面，不把球拉向袋心。 */
+  maskPocket(id: number, pocket: number): void;
   /** 移动球视图；`rolling` 会随之推进 3D 滚动。 */
   move(id: number, x: number, y: number, rolling: boolean): void;
   /** 把所有视图对齐到结算状态（位置、可见性）。 */
@@ -285,6 +287,7 @@ export function createBallLayer(): BallLayer {
   const layer = new Container();
   const ballViews = new Map<number, Container>();
   const entries = new Map<number, BallEntry>();
+  const masks = new Map<number, Graphics>();
   const RINGS = 10;
   const SEG = 48;
 
@@ -378,11 +381,25 @@ export function createBallLayer(): BallLayer {
   return {
     layer,
     view: (id) => ballViews.get(id),
+    maskPocket(id, pocketId) {
+      const view = ballViews.get(id);
+      const pocket = POCKETS.find((p) => p.id === pocketId);
+      if (!view || !pocket || masks.has(id)) return;
+      const mask = new Graphics()
+        .circle(px(pocket.x), px(pocket.y), px(pocket.radius * 0.9))
+        .fill(0xffffff);
+      layer.addChild(mask);
+      masks.set(id, mask);
+      view.mask = mask;
+    },
     move: moveBallView,
     sync(balls) {
       for (const ball of balls) {
         const view = ballViews.get(ball.id);
         if (!view) continue;
+        view.mask = null;
+        masks.get(ball.id)?.destroy();
+        masks.delete(ball.id);
         view.visible = !ball.potted;
         view.scale.set(1);
         view.alpha = 1;

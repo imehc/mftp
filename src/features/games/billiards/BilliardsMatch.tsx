@@ -13,7 +13,7 @@ import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
 import { MatchRunner, useMatchSnapshot } from "../engine/match";
 import type { PlayerController } from "../engine/types";
-import { billiardsAiStrategy } from "./ai";
+import { createBilliardsAiStrategy } from "./ai";
 import { BilliardsControls } from "./BilliardsControls";
 import {
   ALL_TRAY,
@@ -27,6 +27,7 @@ import {
   type BilliardsStageHandle,
 } from "./render/BilliardsStage";
 import { createBilliardsGame, createInitialState } from "./rules";
+import { createSimulationClient } from "./simulation-client";
 import {
   BILLIARDS_GAME_ID,
   type BilliardsHistoryPayload,
@@ -70,14 +71,21 @@ export function BilliardsMatch({
   const [session, setSession] = useState<Session | null>(null);
   useEffect(() => {
     const variant = mode.kind === "practice" ? "practice" : "eight-ball";
-    const game = createBilliardsGame(variant);
+    const simulation = createSimulationClient();
+    const game = createBilliardsGame(variant, simulation.shot);
     const local = new LocalController<BilliardsState, BilliardsMove>();
     const controllers: PlayerController<BilliardsState, BilliardsMove>[] =
       mode.kind === "practice"
         ? [local]
         : mode.kind === "hotseat"
           ? [local, local]
-          : [local, new AiController(billiardsAiStrategy, mode.difficulty)];
+          : [
+              local,
+              new AiController(
+                createBilliardsAiStrategy(simulation.shot),
+                mode.difficulty,
+              ),
+            ];
     const runner = new MatchRunner(
       game,
       createInitialState(
@@ -87,8 +95,12 @@ export function BilliardsMatch({
       controllers,
       {
         onMoveResolved: async ({ seat, move, resolution }) => {
-          if (move.type === "shot" && controllers[seat]?.kind === "ai") {
-            await stageRef.current?.animateAiCue(move.angle, move.power);
+          if (move.type === "shot") {
+            await stageRef.current?.animateCue(
+              move.angle,
+              move.power,
+              controllers[seat]?.kind === "ai",
+            );
           }
           await stageRef.current?.playPresentation(resolution.presentation);
         },
@@ -109,6 +121,7 @@ export function BilliardsMatch({
     return () => {
       cancelled = true;
       runner.dispose();
+      simulation.dispose();
       setSession(null);
     };
     // 每个 <BilliardsMatch key=...> 实例的 mode 标识是稳定的。
@@ -243,9 +256,6 @@ function MatchView({
               />
             </Badge>
             {desktop ? <BallTray state={state} ids={ALL_TRAY} /> : null}
-            {outcome?.foul ? (
-              <Badge variant="destructive">{foulLabel(outcome.foul)}</Badge>
-            ) : null}
           </div>
         ) : (
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
@@ -266,24 +276,6 @@ function MatchView({
                   other="第 # 杆"
                 />
               </Badge>
-              {aiThinking ? (
-                <Badge variant="outline">
-                  <Trans>AI 思考中…</Trans>
-                </Badge>
-              ) : null}
-              {ballInHand ? (
-                <Badge variant="secondary">
-                  <Trans>自由球：拖动母球放置</Trans>
-                </Badge>
-              ) : null}
-              {outcome?.foul ? (
-                <Badge variant="destructive">{foulLabel(outcome.foul)}</Badge>
-              ) : null}
-              {outcome?.respottedEight ? (
-                <Badge variant="outline">
-                  <Trans>黑八已重置</Trans>
-                </Badge>
-              ) : null}
             </div>
             <SeatCell
               mode={mode}
@@ -297,6 +289,29 @@ function MatchView({
       </div>
 
       <div className="billiards-stage relative z-0 min-h-0 min-w-0 flex-1 overflow-hidden">
+        <div className="billiards-status" role="status" aria-live="polite">
+          <div className="flex min-w-0 flex-col items-center justify-center gap-1 text-center text-xs">
+            {outcome?.foul ? (
+              <span className="text-destructive">
+                {foulLabel(outcome.foul)}
+              </span>
+            ) : null}
+            {ballInHand ? (
+              <span>
+                <Trans>自由球：拖动母球放置</Trans>
+              </span>
+            ) : aiThinking ? (
+              <span className="text-muted-foreground">
+                <Trans>AI 思考中…</Trans>
+              </span>
+            ) : outcome?.respottedEight ? (
+              <span className="text-muted-foreground">
+                <Trans>黑八已重置</Trans>
+              </span>
+            ) : null}
+          </div>
+        </div>
+
         <BilliardsStage
           ref={stageRef}
           balls={state.balls}
@@ -322,68 +337,73 @@ function MatchView({
           }}
         />
       </div>
-      {state.finished ? (
-        <div className="billiards-result shrink-0">
-          <GameResultBar
-            title={
-              state.variant === "practice" ? (
-                <Trans>清台完成！</Trans>
-              ) : snapshot.winnerSeat !== null ? (
-                <Trans>{winnerSeatLabel} 获胜</Trans>
-              ) : (
-                <Trans>对局结束</Trans>
-              )
-            }
-            celebrate={
-              state.variant === "practice" ||
-              (snapshot.winnerSeat !== null &&
-                (mode.kind === "hotseat" ||
-                  (mode.kind === "ai" && snapshot.winnerSeat === 0)))
-            }
-            details={
-              <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 md:justify-start">
-                <Plural
-                  value={{
-                    shotCount: state.shotCount,
-                  }}
-                  one="总杆数 #"
-                  other="总杆数 #"
-                />
-                {mode.kind !== "practice"
-                  ? [0, 1].map((seat) => {
-                      const tray = seatTray(state, seat);
-                      return (
-                        <span
-                          key={seat}
-                          className="inline-flex items-center gap-1.5"
-                        >
-                          {seatName(mode, seat)}
-                          {tray ? <BallTray state={state} ids={tray} /> : null}
-                          <Plural
-                            value={{
-                              foulCount: state.foulCounts[seat] ?? 0,
-                            }}
-                            one="犯规 # 次"
-                            other="犯规 # 次"
-                          />
-                        </span>
-                      );
-                    })
-                  : null}
-              </span>
-            }
-            onRematch={onRematch}
-            onExit={onExit}
+      <div className="billiards-actions">
+        {state.finished ? (
+          <div className="billiards-result shrink-0">
+            <GameResultBar
+              presentation="actions"
+              title={
+                state.variant === "practice" ? (
+                  <Trans>清台完成！</Trans>
+                ) : snapshot.winnerSeat !== null ? (
+                  <Trans>{winnerSeatLabel} 获胜</Trans>
+                ) : (
+                  <Trans>对局结束</Trans>
+                )
+              }
+              celebrate={
+                state.variant === "practice" ||
+                (snapshot.winnerSeat !== null &&
+                  (mode.kind === "hotseat" ||
+                    (mode.kind === "ai" && snapshot.winnerSeat === 0)))
+              }
+              details={
+                <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 md:justify-start">
+                  <Plural
+                    value={{
+                      shotCount: state.shotCount,
+                    }}
+                    one="总杆数 #"
+                    other="总杆数 #"
+                  />
+                  {mode.kind !== "practice"
+                    ? [0, 1].map((seat) => {
+                        const tray = seatTray(state, seat);
+                        return (
+                          <span
+                            key={seat}
+                            className="inline-flex items-center gap-1.5"
+                          >
+                            {seatName(mode, seat)}
+                            {tray ? (
+                              <BallTray state={state} ids={tray} />
+                            ) : null}
+                            <Plural
+                              value={{
+                                foulCount: state.foulCounts[seat] ?? 0,
+                              }}
+                              one="犯规 # 次"
+                              other="犯规 # 次"
+                            />
+                          </span>
+                        );
+                      })
+                    : null}
+                </span>
+              }
+              onRematch={onRematch}
+              onExit={onExit}
+            />
+          </div>
+        ) : (
+          <BilliardsControls
+            followDraw={followDraw}
+            onFollowDraw={setFollowDraw}
+            power={powerPercent}
+            interactive={activeIsLocal && !ballInHand}
           />
-        </div>
-      ) : (
-        <BilliardsControls
-          followDraw={followDraw}
-          onFollowDraw={setFollowDraw}
-          power={powerPercent}
-          interactive={activeIsLocal && !ballInHand}
-        />
-      )}
+        )}
+      </div>
     </>
   );
 }

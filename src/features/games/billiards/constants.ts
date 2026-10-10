@@ -11,37 +11,40 @@ export const TABLE_W = 2.54;
 export const TABLE_H = 1.27;
 
 /**
- * 街机比例的球：按真实 57mm 比例在俯视图里会显得过小，因此和大多数
- * 台球游戏一样，我们渲染（并模拟）放大的球。下方袋口尺寸以此为准。
+ * 美式球直径 57.15mm。渲染、碰撞、摆球和瞄准均使用相同半径。
  */
-export const BALL_RADIUS = 0.042;
+export const BALL_RADIUS = 0.028575;
 export const BALL_MASS = 0.17; // kg
 
 /** 固定模拟步长。实时对局与 AI 评估都使用它。 */
-export const FIXED_DT = 1 / 120;
+export const FIXED_DT = 1 / 960;
 /** 速度低于此值（米/秒）的球视为已停止。 */
-export const STOP_SPEED = 0.02;
+export const STOP_SPEED = 0.008;
 /** 安全上限，防止异常球局无限模拟下去。 */
 export const MAX_SIM_SECONDS = 40;
 
 /** 台呢滚动阻力近似（rapier 线性阻尼）。 */
-export const LINEAR_DAMPING = 0.72;
+export const LINEAR_DAMPING = 0.12;
+/** 低速滚动阻力，避免指数衰减造成球在停止前长时间滑行。 */
+export const ROLLING_DECELERATION = 0.2;
+/** 呈现仅采样 120Hz，物理细分不增加回放内存。 */
+export const FRAME_DT = 1 / 120;
 export const ANGULAR_DAMPING = 1.2;
-export const BALL_RESTITUTION = 0.9;
-export const BALL_FRICTION = 0.06;
-export const CUSHION_RESTITUTION = 0.7;
+export const BALL_RESTITUTION = 0.94;
+export const BALL_FRICTION = 0.035;
+export const CUSHION_RESTITUTION = 0.78;
 export const CUSHION_FRICTION = 0.14;
 
 /** 力度为 1 时的母球速度（米/秒）——大致相当于一记大力开球。 */
-export const MAX_SHOT_SPEED = 8.5;
+export const MAX_SHOT_SPEED = 7.5;
 /** 跟杆/缩杆的额外冲量系数，在首次接触时施加。 */
-export const FOLLOW_DRAW_FACTOR = 0.7;
+export const FOLLOW_DRAW_FACTOR = 0.48;
 
 /** 库边碰撞体厚度（从台面区域向外延伸）。 */
 export const CUSHION_THICKNESS = 0.06;
 /** 袋口：库边内沿相对每个袋口中心的退让量。 */
-export const CORNER_MOUTH = 0.1;
-export const SIDE_MOUTH = 0.084;
+export const CORNER_MOUTH = 0.085;
+export const SIDE_MOUTH = 0.07;
 
 export interface PocketSpec {
   id: number;
@@ -59,17 +62,14 @@ export interface PocketSpec {
 export const POCKET_CAPTURE_SCALE = 0.6;
 
 /**
- * 袋口颚：每个袋口两条内库边的尖端各放一个小圆角碰撞体。速度快或
- * 角度差的球会蹭到颚点弹回台面而非落袋——正是它阻止了“力够大就
- * 总能进好几个”。JAW_RADIUS 是主要的难度旋钮：越大 = 袋口越窄 =
- * 越难进。角袋尖端间距约 0.141 米，中袋约 0.168 米，球半径 0.042。
+ * 袋口颚的倒圆尺度；共享轮廓同时参与库边碰撞和绘制，
+ * 不再叠加视觉中不存在的圆形碰撞体。球心须越过袋口后才下沉。
  */
-export const JAW_RADIUS = 0.02;
-export const JAW_RESTITUTION = 0.6;
+export const JAW_RADIUS = 0.009;
 
 const CORNER_OFFSET = 0.024;
-const CORNER_POCKET_RADIUS = 0.098;
-const SIDE_POCKET_RADIUS = 0.084;
+const CORNER_POCKET_RADIUS = 0.065;
+const SIDE_POCKET_RADIUS = 0.06;
 
 export const POCKETS: readonly PocketSpec[] = [
   // 角袋（沿对角线向外偏移）。

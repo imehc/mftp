@@ -19,7 +19,11 @@ import { BilliardsHeader } from "./BilliardsHeader";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
 import { ensurePhysicsReady } from "./physics";
-import { setGameAudioVolume, unlockAudio } from "./render/audio";
+import {
+  prepareBilliardsAudio,
+  setGameAudioVolume,
+  unlockAudio,
+} from "./render/audio";
 import type { BilliardsMode } from "./types";
 import { useBilliardsOrientation } from "./use-billiards-orientation";
 
@@ -50,7 +54,7 @@ export default function BilliardsGame() {
   }, [gamesVolume]);
   useEffect(() => {
     let cancelled = false;
-    void ensurePhysicsReady()
+    void Promise.all([ensurePhysicsReady(), prepareBilliardsAudio()])
       .then(() => {
         if (!cancelled) setPhysicsReady(true);
       })

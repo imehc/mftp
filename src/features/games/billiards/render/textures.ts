@@ -182,7 +182,7 @@ export function makeClothTile(size = 256): HTMLCanvasElement {
       const drift = periodicFbm(u, v, CELLS, 3) - 0.5;
       const fiber = periodicNoise((x / size) * 96, (y / size) * 96, 96) - 0.5;
 
-      const shade = 1 + weave * 0.045 + drift * 0.14 + fiber * 0.06;
+      const shade = 1 + weave * 0.035 + drift * 0.09 + fiber * 0.045;
       const o = (y * size + x) * 4;
       data[o] = Math.min(255, CLOTH_BASE[0] * shade);
       data[o + 1] = Math.min(255, CLOTH_BASE[1] * shade);
@@ -210,7 +210,7 @@ let ballShading: Texture | null = null;
  * 半透明圆，因为叠加圆会在明暗分界处出现条带。
  */
 export function getBallShadingTexture(): Texture {
-  if (ballShading) return ballShading;
+  if (ballShading && !ballShading.destroyed) return ballShading;
 
   const size = SHADE_TEX;
   const [canvas, ctx] = makeCanvas(size, size);
@@ -254,7 +254,7 @@ export function getBallShadingTexture(): Texture {
 
       // 光泽：一束锐利的主高光加一层宽泛的光泽。
       const ndh = Math.max(0, nx * hx + ny * hy + nz * hz);
-      const spec = Math.pow(ndh, 42) * 0.9 + Math.pow(ndh, 5) * 0.09;
+      const spec = Math.pow(ndh, 56) * 0.72 + Math.pow(ndh, 7) * 0.07;
 
       // 沿阴影边缘的台呢反弹光，避免边缘发死。
       const ndb = Math.max(0, nx * bx + ny * by + nz * bz);

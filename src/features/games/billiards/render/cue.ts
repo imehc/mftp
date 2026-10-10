@@ -6,9 +6,9 @@ export function createCueView() {
   const layer = new Container();
   const shadow = new Graphics();
   const stick = new Graphics();
-  const stickLength = px(1.05);
-  const tipHalfWidth = 3.2;
-  const buttHalfWidth = 6.8;
+  const stickLength = px(1.45);
+  const tipHalfWidth = px(0.0065);
+  const buttHalfWidth = px(0.015);
   const halfWidthAt = (x: number) =>
     tipHalfWidth + (buttHalfWidth - tipHalfWidth) * (x / stickLength);
 

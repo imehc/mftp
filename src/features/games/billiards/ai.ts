@@ -16,6 +16,7 @@ import {
 import type { SeatIndex } from "../engine/types";
 import { BALL_RADIUS, POCKETS, TABLE_H, TABLE_W } from "./constants";
 import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
+import type { ShotSimulator } from "./simulation-client";
 import {
   ballGroup,
   type BallState,
@@ -206,113 +207,122 @@ function chooseCuePlacement(state: BilliardsState, seat: SeatIndex): Vec {
   return best ?? { x: 0, y: 0 };
 }
 
-export const billiardsAiStrategy: AiStrategy<BilliardsState, BilliardsMove> = {
-  async chooseMove(state, seat, difficulty, signal) {
-    throwIfAborted(signal);
-    const profile = PROFILES[difficulty];
-    const rng = createRng(stateSeed(state) ^ seat);
-
-    if (state.ballInHand) {
-      const spot = chooseCuePlacement(state, seat);
-      return { type: "place-cue", x: spot.x, y: spot.y };
-    }
-
-    const cue = state.balls.find((b) => b.id === 0);
-    if (!cue) throw new Error("billiards ai: cue missing");
-
-    // 开球：直接砸向球堆顶点。
-    if (!state.breakDone) {
-      const rack = state.balls.filter((b) => !b.potted && b.id !== 0);
-      const apex = rack.reduce((a, b) => (a.x < b.x ? a : b));
-      const angle =
-        Math.atan2(apex.y - cue.y, apex.x - cue.x) +
-        gaussian(rng) * profile.angleSigma * 2;
-      return { type: "shot", angle, power: 1, followDraw: 0 };
-    }
-
-    const targets = targetBallIds(state, seat);
-    const geometric = potCandidates(state.balls, targets);
-    const pool = geometric.slice(0, profile.simCandidates);
-
-    let bestMove: Extract<BilliardsMove, { type: "shot" }> | null = null;
-    let bestScore = -Infinity;
-    const scored: Array<{
-      move: Extract<BilliardsMove, { type: "shot" }>;
-      score: number;
-    }> = [];
-
-    for (const candidate of pool) {
+export function createBilliardsAiStrategy(
+  simulate: ShotSimulator = simulateShot,
+): AiStrategy<BilliardsState, BilliardsMove> {
+  return {
+    async chooseMove(state, seat, difficulty, signal) {
       throwIfAborted(signal);
-      const move = {
-        type: "shot" as const,
-        angle: candidate.angle + gaussian(rng) * profile.angleSigma,
-        power: Math.min(
-          1,
-          Math.max(0.08, candidate.power + gaussian(rng) * profile.powerSigma),
-        ),
+      const profile = PROFILES[difficulty];
+      const rng = createRng(stateSeed(state) ^ seat);
+
+      if (state.ballInHand) {
+        const spot = chooseCuePlacement(state, seat);
+        return { type: "place-cue", x: spot.x, y: spot.y };
+      }
+
+      const cue = state.balls.find((b) => b.id === 0);
+      if (!cue) throw new Error("billiards ai: cue missing");
+
+      // 开球：直接砸向球堆顶点。
+      if (!state.breakDone) {
+        const rack = state.balls.filter((b) => !b.potted && b.id !== 0);
+        const apex = rack.reduce((a, b) => (a.x < b.x ? a : b));
+        const angle =
+          Math.atan2(apex.y - cue.y, apex.x - cue.x) +
+          gaussian(rng) * profile.angleSigma * 2;
+        return { type: "shot", angle, power: 1, followDraw: 0 };
+      }
+
+      const targets = targetBallIds(state, seat);
+      const geometric = potCandidates(state.balls, targets);
+      const pool = geometric.slice(0, profile.simCandidates);
+
+      let bestMove: Extract<BilliardsMove, { type: "shot" }> | null = null;
+      let bestScore = -Infinity;
+      const scored: Array<{
+        move: Extract<BilliardsMove, { type: "shot" }>;
+        score: number;
+      }> = [];
+
+      for (const candidate of pool) {
+        throwIfAborted(signal);
+        const move = {
+          type: "shot" as const,
+          angle: candidate.angle + gaussian(rng) * profile.angleSigma,
+          power: Math.min(
+            1,
+            Math.max(
+              0.08,
+              candidate.power + gaussian(rng) * profile.powerSigma,
+            ),
+          ),
+          followDraw: 0,
+        };
+        const sim = await simulate(state.balls, move);
+        throwIfAborted(signal);
+
+        let score = 0;
+        const ownPotted = sim.pottedInOrder.filter((id) =>
+          targets.includes(id),
+        ).length;
+        score += ownPotted * 100;
+        if (sim.cuePotted) score -= 320;
+        if (sim.firstContact === null) score -= 160;
+        else if (!targets.includes(sim.firstContact)) score -= 320;
+        const eightPotted = sim.pottedInOrder.includes(8);
+        const onEight = targets.length === 1 && targets[0] === 8;
+        if (eightPotted) score += onEight && !sim.cuePotted ? 900 : -1000;
+
+        if (profile.positionPlay && ownPotted > 0 && !sim.cuePotted) {
+          const after: BilliardsState = { ...state, balls: sim.balls };
+          score += positionScore(after, seat) * 70;
+        }
+        score += candidate.quality * 10; // 稳定的平局打破项，倾向更容易的球
+
+        scored.push({ move, score });
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+        await yieldToUi();
+      }
+
+      // 简单 AI 偶尔会故意选更差的选项。
+      if (
+        bestMove &&
+        scored.length > 1 &&
+        profile.blunderChance > 0 &&
+        rng() < profile.blunderChance
+      ) {
+        const others = scored.filter((s) => s.move !== bestMove);
+        bestMove = others[Math.floor(rng() * others.length)].move;
+      }
+
+      if (bestMove) return bestMove;
+
+      // 没有可进的球：轻碰最近的合法球（粗略的防守）。
+      const fallbackTargets =
+        targets.length > 0
+          ? targets
+          : state.balls.filter((b) => !b.potted && b.id !== 0).map((b) => b.id);
+      const nearest = fallbackTargets
+        .map((id) => state.balls.find((b) => b.id === id))
+        .filter((b): b is BallState => !!b)
+        .reduce((a, b) =>
+          Math.hypot(a.x - cue.x, a.y - cue.y) <
+          Math.hypot(b.x - cue.x, b.y - cue.y)
+            ? a
+            : b,
+        );
+      return {
+        type: "shot",
+        angle:
+          Math.atan2(nearest.y - cue.y, nearest.x - cue.x) +
+          gaussian(rng) * profile.angleSigma,
+        power: 0.3,
         followDraw: 0,
       };
-      const sim = simulateShot(state.balls, move);
-
-      let score = 0;
-      const ownPotted = sim.pottedInOrder.filter((id) =>
-        targets.includes(id),
-      ).length;
-      score += ownPotted * 100;
-      if (sim.cuePotted) score -= 320;
-      if (sim.firstContact === null) score -= 160;
-      const eightPotted = sim.pottedInOrder.includes(8);
-      const onEight = targets.length === 1 && targets[0] === 8;
-      if (eightPotted) score += onEight && !sim.cuePotted ? 900 : -1000;
-
-      if (profile.positionPlay && ownPotted > 0 && !sim.cuePotted) {
-        const after: BilliardsState = { ...state, balls: sim.balls };
-        score += positionScore(after, seat) * 70;
-      }
-      score += candidate.quality * 10; // 稳定的平局打破项，倾向更容易的球
-
-      scored.push({ move, score });
-      if (score > bestScore) {
-        bestScore = score;
-        bestMove = move;
-      }
-      await yieldToUi();
-    }
-
-    // 简单 AI 偶尔会故意选更差的选项。
-    if (
-      bestMove &&
-      scored.length > 1 &&
-      profile.blunderChance > 0 &&
-      rng() < profile.blunderChance
-    ) {
-      const others = scored.filter((s) => s.move !== bestMove);
-      bestMove = others[Math.floor(rng() * others.length)].move;
-    }
-
-    if (bestMove) return bestMove;
-
-    // 没有可进的球：轻碰最近的合法球（粗略的防守）。
-    const fallbackTargets =
-      targets.length > 0
-        ? targets
-        : state.balls.filter((b) => !b.potted && b.id !== 0).map((b) => b.id);
-    const nearest = fallbackTargets
-      .map((id) => state.balls.find((b) => b.id === id))
-      .filter((b): b is BallState => !!b)
-      .reduce((a, b) =>
-        Math.hypot(a.x - cue.x, a.y - cue.y) <
-        Math.hypot(b.x - cue.x, b.y - cue.y)
-          ? a
-          : b,
-      );
-    return {
-      type: "shot",
-      angle:
-        Math.atan2(nearest.y - cue.y, nearest.x - cue.x) +
-        gaussian(rng) * profile.angleSigma,
-      power: 0.3,
-      followDraw: 0,
-    };
-  },
-};
+    },
+  };
+}

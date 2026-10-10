@@ -33,9 +33,9 @@ export function BilliardsControls({
   return (
     <footer
       style={{ "--billiards-power": `${power}%` } as CSSProperties}
-      className="billiards-controls flex shrink-0 flex-col gap-1 px-3 pt-1 pb-[calc(0.5rem+var(--safe-bottom,0px))]"
+      className="billiards-controls flex shrink-0 items-center gap-3 px-3 py-1"
     >
-      <div className="billiards-power flex min-w-0 items-center gap-2 text-xs">
+      <div className="billiards-power flex min-w-0 flex-1 items-center gap-2 text-xs">
         <span>
           <Trans>力度</Trans>
         </span>
@@ -57,6 +57,7 @@ export function BilliardsControls({
         </span>
         {mobile ? (
           <Select
+            disabled={!interactive}
             value={String(followDraw)}
             onValueChange={(value) => onFollowDraw(Number(value))}
           >
@@ -74,21 +75,25 @@ export function BilliardsControls({
         ) : null}
       </div>
       {!mobile ? (
-        <div className="flex items-center justify-between gap-2">
+        <div className="-order-1 flex shrink-0 items-center gap-2">
           <Tabs
             value={String(followDraw)}
             onValueChange={(value) => onFollowDraw(Number(value))}
           >
             <TabsList density="adaptive" aria-label={t`杆法`}>
               {options.map((option) => (
-                <TabsTrigger key={option.value} value={option.value}>
+                <TabsTrigger
+                  key={option.value}
+                  value={option.value}
+                  disabled={!interactive}
+                >
                   {option.label}
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
           {interactive ? (
-            <span className="text-muted-foreground text-xs">
+            <span className="text-muted-foreground hidden text-xs xl:inline">
               <Trans>按住桌面向母球后方拖动蓄力，松手击球</Trans>
             </span>
           ) : null}

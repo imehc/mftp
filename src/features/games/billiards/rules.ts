@@ -18,6 +18,7 @@ import {
   RACK_LAYOUT,
 } from "./constants";
 import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
+import type { ShotSimulator } from "./simulation-client";
 import {
   ballGroup,
   type BallState,
@@ -125,11 +126,12 @@ function applyPlaceCue(
   return { state: next, presentation: singleFramePresentation(balls) };
 }
 
-function applyPracticeShot(
+async function applyPracticeShot(
   state: BilliardsState,
   move: Extract<BilliardsMove, { type: "shot" }>,
-): MoveResolution<BilliardsState, BilliardsPresentation> {
-  const sim = simulateShot(state.balls, move);
+  simulate: ShotSimulator,
+): Promise<MoveResolution<BilliardsState, BilliardsPresentation>> {
+  const sim = await simulate(state.balls, move);
   let balls = sim.balls;
   let foul: FoulReason | null = null;
   if (sim.cuePotted) {
@@ -173,17 +175,18 @@ function respotCueForPractice(balls: BallState[]): BallState[] {
   );
 }
 
-function applyEightBallShot(
+async function applyEightBallShot(
   state: BilliardsState,
   move: Extract<BilliardsMove, { type: "shot" }>,
   seat: SeatIndex,
-): MoveResolution<BilliardsState, BilliardsPresentation> {
+  simulate: ShotSimulator,
+): Promise<MoveResolution<BilliardsState, BilliardsPresentation>> {
   const shooterGroup = state.groups[seat];
   const clearedBefore =
     shooterGroup !== null && remainingGroupBalls(state, shooterGroup) === 0;
   const isBreak = !state.breakDone;
 
-  const sim = simulateShot(state.balls, move);
+  const sim = await simulate(state.balls, move);
   const pottedNonEight = sim.pottedInOrder.filter((id) => id !== 8);
   const eightPotted = sim.pottedInOrder.includes(8);
 
@@ -286,6 +289,7 @@ function applyEightBallShot(
 
 export function createBilliardsGame(
   variant: BilliardsVariant,
+  simulate: ShotSimulator = simulateShot,
 ): GameDefinition<BilliardsState, BilliardsMove, BilliardsPresentation> {
   return {
     id: variant === "practice" ? "billiards-practice" : "billiards-8ball",
@@ -303,8 +307,8 @@ export function createBilliardsGame(
         throw new Error("billiards: place the cue ball first");
       }
       return state.variant === "practice"
-        ? applyPracticeShot(state, move)
-        : applyEightBallShot(state, move, seat);
+        ? applyPracticeShot(state, move, simulate)
+        : applyEightBallShot(state, move, seat, simulate);
     },
   };
 }

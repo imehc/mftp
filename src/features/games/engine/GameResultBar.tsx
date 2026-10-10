@@ -16,7 +16,7 @@ export function GameResultBar({
   onRematch,
   onExit,
 }: {
-  presentation?: "bar" | "page";
+  presentation?: "bar" | "page" | "actions";
   title: ReactNode;
   details?: ReactNode;
   rematchWaiting?: boolean;
@@ -53,6 +53,7 @@ export function GameResultBar({
           <div
             className={cn(
               "min-w-0 text-center",
+              presentation === "actions" && "sr-only",
               presentation === "bar" && "md:text-left",
             )}
           >

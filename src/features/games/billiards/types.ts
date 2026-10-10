@@ -84,7 +84,16 @@ export interface SimFrame {
 export type SimEvent =
   | { type: "ball-ball"; t: number; a: number; b: number; impact: number }
   | { type: "cushion"; t: number; ball: number; impact: number }
-  | { type: "pocket"; t: number; ball: number; pocket: number };
+  | {
+      type: "pocket";
+      t: number;
+      ball: number;
+      pocket: number;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+    };
 
 export interface BilliardsPresentation {
   frames: SimFrame[];
