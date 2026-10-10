@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import AppPageLayout from "~/components/AppPageLayout";
 import { CopyButton } from "~/components/CopyButton";
+import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
@@ -15,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { describeError } from "~/lib/errors";
 
 import CryptoTextPanel from "./CryptoTextPanel";
@@ -51,21 +51,26 @@ export default function CryptoTool() {
             </SelectContent>
           </Select>
         </Field>
-        <Tabs
+        <FixedSelect
           value={crypto.mode}
           onValueChange={(value) => {
             if (value === "encode" || value === "decode") crypto.setMode(value);
           }}
         >
-          <TabsList density="adaptive" aria-label={t`模式`}>
-            <TabsTrigger value="encode">
-              <Trans>编码</Trans>
-            </TabsTrigger>
-            <TabsTrigger value="decode">
-              <Trans>解码</Trans>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+          <SelectTrigger aria-label={t`模式`} className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="encode">
+                <Trans>编码</Trans>
+              </SelectItem>
+              <SelectItem value="decode">
+                <Trans>解码</Trans>
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </FixedSelect>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         <CryptoTextPanel

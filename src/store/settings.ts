@@ -30,6 +30,7 @@ interface SettingsState {
   sidebarSize: number;
   sidebarCollapsed: boolean;
   lastTool: ToolRoute | null;
+  restoreLastTool: boolean;
   colorTheme: ColorTheme;
   fontPreset: FontPreset;
   displaySize: DisplaySize;
@@ -42,6 +43,7 @@ interface SettingsState {
   setSidebarSize: (size: number) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setLastTool: (tool: ToolRoute | null) => void;
+  setRestoreLastTool: (restore: boolean) => void;
   setColorTheme: (theme: ColorTheme) => void;
   setFontPreset: (font: FontPreset) => void;
   setDisplaySize: (value: DisplaySize) => void;
@@ -57,6 +59,7 @@ export const useSettingsStore = create<SettingsState>()(
       sidebarSize: 20,
       sidebarCollapsed: false,
       lastTool: null,
+      restoreLastTool: true,
       colorTheme: "default",
       fontPreset: "theme",
       displaySize: { mode: "system", scale: 1 },
@@ -67,6 +70,7 @@ export const useSettingsStore = create<SettingsState>()(
       setSidebarSize: (size) => set({ sidebarSize: size }),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
       setLastTool: (tool) => set({ lastTool: tool }),
+      setRestoreLastTool: (restoreLastTool) => set({ restoreLastTool }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
       setFontPreset: (font) => set({ fontPreset: font }),
       setDisplaySize: (value) =>
@@ -76,8 +80,8 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      // v6：显示大小偏好；旧用户继续跟随系统。
-      version: 6,
+      // v7：启动恢复开关；旧用户保留默认恢复行为。
+      version: 7,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
@@ -94,6 +98,10 @@ export const useSettingsStore = create<SettingsState>()(
         return {
           ...state,
           lastTool,
+          restoreLastTool:
+            typeof state.restoreLastTool === "boolean"
+              ? state.restoreLastTool
+              : true,
           colorTheme: resolveColorTheme(state.colorTheme),
           fontPreset: resolveFontPreset(state.fontPreset),
           displaySize: resolveDisplaySize(state.displaySize),

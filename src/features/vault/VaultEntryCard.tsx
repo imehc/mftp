@@ -45,7 +45,7 @@ export default function VaultEntryCard({
   return (
     <section
       ref={setNodeRef}
-      className="border-border bg-card relative flex min-w-0 flex-col rounded-lg border"
+      className="border-border bg-card relative flex min-w-0 flex-col rounded-xl border"
       style={{
         transform: CSS.Translate.toString(transform),
         transition,

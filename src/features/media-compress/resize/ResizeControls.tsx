@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 
+import ToggleGroup from "~/components/FixedToggleGroup";
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   InputGroup,
@@ -8,7 +9,7 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "~/components/ui/input-group";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   DIMENSION_MAX,
   type DimensionMode,

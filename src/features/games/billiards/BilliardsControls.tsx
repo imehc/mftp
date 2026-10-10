@@ -1,14 +1,13 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { CSSProperties } from "react";
 
+import FixedSelect from "~/components/FixedSelect";
 import {
-  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 /** 杆法与力度只控制展示和输入参数，不拥有对局或球桌资源。 */
@@ -56,7 +55,7 @@ export function BilliardsControls({
           {power}%
         </span>
         {mobile ? (
-          <Select
+          <FixedSelect
             disabled={!interactive}
             value={String(followDraw)}
             onValueChange={(value) => onFollowDraw(Number(value))}
@@ -71,27 +70,30 @@ export function BilliardsControls({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </FixedSelect>
         ) : null}
       </div>
       {!mobile ? (
         <div className="-order-1 flex shrink-0 items-center gap-2">
-          <Tabs
+          <FixedSelect
             value={String(followDraw)}
             onValueChange={(value) => onFollowDraw(Number(value))}
           >
-            <TabsList density="adaptive" aria-label={t`杆法`}>
+            <SelectTrigger aria-label={t`杆法`} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
               {options.map((option) => (
-                <TabsTrigger
+                <SelectItem
                   key={option.value}
                   value={option.value}
                   disabled={!interactive}
                 >
                   {option.label}
-                </TabsTrigger>
+                </SelectItem>
               ))}
-            </TabsList>
-          </Tabs>
+            </SelectContent>
+          </FixedSelect>
           {interactive ? (
             <span className="text-muted-foreground hidden text-xs xl:inline">
               <Trans>按住桌面向母球后方拖动蓄力，松手击球</Trans>

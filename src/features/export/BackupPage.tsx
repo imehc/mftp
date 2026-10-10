@@ -3,6 +3,7 @@ import { useBlocker, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { toast } from "sonner";
 
+import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
@@ -71,21 +72,19 @@ export default function BackupPage() {
             </TabsTrigger>
           </TabsList>
         </div>
-        <div className="min-h-0 flex-1 overflow-auto px-3 py-3 md:px-4">
-          <div className="mx-auto flex max-w-4xl flex-col gap-3">
-            {c.error ? (
-              <Alert variant="destructive">
-                <AlertDescription>{describeError(c.error)}</AlertDescription>
-              </Alert>
-            ) : null}
-            <TabsContent value="export">
-              <ExportPanel controller={c} />
-            </TabsContent>
-            <TabsContent value="import">
-              <ImportPanel controller={c} />
-            </TabsContent>
-          </div>
-        </div>
+        <AppPageContent>
+          {c.error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{describeError(c.error)}</AlertDescription>
+            </Alert>
+          ) : null}
+          <TabsContent value="export">
+            <ExportPanel controller={c} />
+          </TabsContent>
+          <TabsContent value="import">
+            <ImportPanel controller={c} />
+          </TabsContent>
+        </AppPageContent>
       </Tabs>
       <DialogFooter className="mx-0 mb-0 shrink-0 rounded-none border-t px-3 pt-3 pb-[max(0.75rem,var(--safe-bottom,0px))] md:px-4">
         {c.tab === "export" ? (

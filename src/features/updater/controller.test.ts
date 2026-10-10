@@ -65,6 +65,27 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
+it("关闭状态行不取消下载，再次手动检查重新显示并复用任务", async () => {
+  const update = await available();
+  const pending = deferred<void>();
+  update.download.mockReturnValue(pending.promise);
+  const task = controller.startUpdateDownload();
+  controller.dismissUpdaterBanner();
+  expect(store.useUpdaterStore.getState()).toMatchObject({
+    status: "downloading",
+    bannerDismissed: true,
+  });
+  expect(update.close).not.toHaveBeenCalled();
+  store.setUpdaterState({ downloaded: 128 });
+  expect(store.useUpdaterStore.getState().bannerDismissed).toBe(true);
+  const reopened = controller.checkForUpdateManually();
+  expect(store.useUpdaterStore.getState().bannerDismissed).toBe(false);
+  expect(update.download).toHaveBeenCalledTimes(1);
+  expect(mocks.check).toHaveBeenCalledTimes(1);
+  pending.resolve();
+  await Promise.all([task, reopened]);
+});
+
 it("检查时关闭再打开复用原生请求，迟到的句柄仍可下载", async () => {
   const pending = deferred<ReturnType<typeof updateFixture>>();
   mocks.check.mockReturnValue(pending.promise);

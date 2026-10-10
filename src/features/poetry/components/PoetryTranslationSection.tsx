@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import type { PoetryTranslationMode } from "~/bindings";
+import ToggleGroup from "~/components/FixedToggleGroup";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -29,7 +30,7 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 import { Textarea } from "~/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { ToggleGroupItem } from "~/components/ui/toggle-group";
 import { describeError } from "~/lib/errors";
 
 import { usePoetryTranslations } from "../hooks/use-poetry-translations";

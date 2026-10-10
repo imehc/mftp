@@ -203,7 +203,7 @@ export default function BtTool() {
     >
       <div className={filesTask ? "hidden" : "flex min-h-0 flex-1 flex-col"}>
         <ToolPageHeader
-          variant="compact"
+          variant="standard"
           showHome={false}
           status={<ActivityMenu />}
           leading={
@@ -230,7 +230,7 @@ export default function BtTool() {
             </Button>
           }
         />
-        <div className="flex min-h-0 flex-1 flex-col gap-2 px-2.5 pt-2.5 md:px-3 md:pt-3">
+        <div className="app-page-gutter app-page-width mx-auto flex min-h-0 w-full flex-1 flex-col gap-3">
           {loadError || subscriptionError ? (
             <Alert variant="destructive">
               <AlertTitle>

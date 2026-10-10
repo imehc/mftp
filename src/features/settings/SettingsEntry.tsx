@@ -24,7 +24,7 @@ export function SettingsEntry({
       {...props}
     >
       <span className="bg-muted flex size-8 shrink-0 items-center justify-center rounded-lg">
-        <Icon className="size-4" />
+        <Icon aria-hidden className="size-4" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-medium">{title}</span>
@@ -47,7 +47,7 @@ export function SettingsGroup({
   children: ReactNode;
 }) {
   return (
-    <section className="bg-card min-w-0 rounded-xl border p-3">
+    <section className="bg-card @container/settings min-w-0 rounded-xl border p-3">
       <h2 className="mb-2 text-sm font-semibold">{title}</h2>
       {children}
     </section>

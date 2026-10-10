@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, ChevronUp, Pause, Play, Square } from "lucide-react";
 import { useId, useState, useSyncExternalStore } from "react";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
@@ -217,7 +218,7 @@ export function AnimationBar({
               <FieldLabel htmlFor={`${id}-loop`}>
                 <Trans comment="模型动画的循环播放方式。">循环模式</Trans>
               </FieldLabel>
-              <Select
+              <FixedSelect
                 value={state.loop}
                 disabled={disabled || !state.duration}
                 onValueChange={(value) => animation.setLoop(value as LoopMode)}
@@ -238,13 +239,13 @@ export function AnimationBar({
                     ))}
                   </SelectGroup>
                 </SelectContent>
-              </Select>
+              </FixedSelect>
             </Field>
             <Field className="min-w-0 flex-[1_1_5rem]">
               <FieldLabel htmlFor={`${id}-speed`}>
                 <Trans comment="模型动画播放速度倍率。">播放速度</Trans>
               </FieldLabel>
-              <Select
+              <FixedSelect
                 value={String(state.speed)}
                 disabled={disabled || !state.duration}
                 onValueChange={(value) => animation.setSpeed(Number(value))}
@@ -265,7 +266,7 @@ export function AnimationBar({
                     ))}
                   </SelectGroup>
                 </SelectContent>
-              </Select>
+              </FixedSelect>
             </Field>
           </FieldGroup>
           <Slider

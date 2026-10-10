@@ -16,7 +16,7 @@ export default function LanConnectedDevices({
 }) {
   const { t } = useLingui();
   return (
-    <section className="border-border bg-card rounded-lg border p-2.5">
+    <section className="border-border bg-card rounded-xl border p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold">
           <Trans>连接设备</Trans>

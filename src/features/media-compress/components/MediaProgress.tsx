@@ -18,7 +18,7 @@ export default function MediaProgress({
   const percent =
     progress == null ? null : Math.round(Math.min(100, Math.max(0, progress)));
   return (
-    <section className="border-border bg-card flex flex-col gap-4 rounded-lg border p-4">
+    <section className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4">
       <h2 className="flex items-center gap-2 text-sm font-semibold">
         <LoaderCircle className="size-4 animate-spin" />
         <Trans>正在处理</Trans>

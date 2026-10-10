@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 
+import ToggleGroup from "~/components/FixedToggleGroup";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
@@ -27,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   createHostFormSchema,
   hostFormValuesToInput,

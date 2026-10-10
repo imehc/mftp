@@ -31,9 +31,9 @@ export default function LanTransferTool() {
     <AppPageLayout
       adaptiveDensity
       bottomInset="scroll"
-      title={
-        <span className="inline-flex items-center gap-2">
-          <Trans>局域网传输</Trans>
+      title={<Trans>局域网传输</Trans>}
+      actions={
+        <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
           <Badge variant={lan.running ? "secondary" : "outline"}>
             {lan.loading
               ? t`加载中`
@@ -43,10 +43,6 @@ export default function LanTransferTool() {
                   ? t`运行中`
                   : t`已停止`}
           </Badge>
-        </span>
-      }
-      actions={
-        <div className="flex items-center gap-2">
           <Button
             density="adaptive"
             variant="outline"

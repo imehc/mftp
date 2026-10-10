@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ListFilter, Search } from "lucide-react";
 import { useState } from "react";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
@@ -33,15 +34,18 @@ function FilterSelect({
   onChange,
   options,
   disabled,
+  fixed = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: Record<string, string>;
   disabled: boolean;
+  fixed?: boolean;
 }) {
+  const Choice = fixed ? FixedSelect : Select;
   return (
-    <Select value={value} onValueChange={onChange} disabled={disabled}>
+    <Choice value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
         density="adaptive"
         aria-label={label}
@@ -58,7 +62,7 @@ function FilterSelect({
           ))}
         </SelectGroup>
       </SelectContent>
-    </Select>
+    </Choice>
   );
 }
 
@@ -75,6 +79,7 @@ export default function LogFilters({
     value: string;
     onChange: (value: string) => void;
     options: Record<string, string>;
+    fixed?: boolean;
   }> = [
     {
       label: t`来源`,
@@ -84,12 +89,14 @@ export default function LogFilters({
     },
     {
       label: t`结果`,
+      fixed: true,
       value: c.result,
       onChange: c.setResult,
       options: { all: t`全部结果`, ...c.resultLabels },
     },
     {
       label: t`时间`,
+      fixed: true,
       value: c.range,
       onChange: c.setRange,
       options: { all: t`全部时间`, "7d": t`近 7 天` },

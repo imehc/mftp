@@ -63,7 +63,7 @@ export default function MediaCompressTool({ mode }: MediaCompressToolProps) {
 
         <Suspense
           fallback={
-            <div className="border-border bg-card text-muted-foreground flex min-h-40 items-center justify-center gap-2 rounded-lg border text-sm">
+            <div className="border-border bg-card text-muted-foreground flex min-h-40 items-center justify-center gap-2 rounded-xl border text-sm">
               <LoaderCircle className="animate-spin" />
               <Trans>正在加载处理工具…</Trans>
             </div>

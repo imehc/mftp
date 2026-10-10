@@ -80,50 +80,52 @@ export default function ActivityLogsPage() {
           </>
         }
       />
-      <LogFilters controller={c} />
-      {c.error ? (
-        <div
-          role="status"
-          className="text-destructive flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2 text-sm"
-        >
-          <span>{describeError(c.error)}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            density="adaptive"
-            disabled={c.loading || c.busy}
-            onClick={() => void c.reload()}
+      <div className="app-page-width mx-auto flex min-h-0 w-full flex-1 flex-col">
+        <LogFilters controller={c} />
+        {c.error ? (
+          <div
+            role="status"
+            className="text-destructive flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2 text-sm"
           >
-            <Trans>重试</Trans>
-          </Button>
-        </div>
-      ) : null}
-      {c.loading && !c.filtered.length ? (
-        <p role="status" className="text-muted-foreground p-4 text-sm">
-          <Trans>正在加载日志…</Trans>
-        </p>
-      ) : c.error && !c.filtered.length ? null : c.filtered.length ? (
-        <LogList controller={c} />
-      ) : (
-        <Empty className="app-scroll-safe-end flex-1">
-          <EmptyHeader>
-            <EmptyTitle>
-              {c.query ||
-              c.source !== "all" ||
-              c.result !== "all" ||
-              c.range !== "all" ? (
-                <Trans>无匹配结果</Trans>
-              ) : (
-                <Trans>暂无日志</Trans>
-              )}
-            </EmptyTitle>
-            <EmptyDescription>
-              <Trans>调整筛选条件或刷新后再试。</Trans>
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      )}
-      <LogDialogs controller={c} />
+            <span>{describeError(c.error)}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              density="adaptive"
+              disabled={c.loading || c.busy}
+              onClick={() => void c.reload()}
+            >
+              <Trans>重试</Trans>
+            </Button>
+          </div>
+        ) : null}
+        {c.loading && !c.filtered.length ? (
+          <p role="status" className="text-muted-foreground p-4 text-sm">
+            <Trans>正在加载日志…</Trans>
+          </p>
+        ) : c.error && !c.filtered.length ? null : c.filtered.length ? (
+          <LogList controller={c} />
+        ) : (
+          <Empty className="app-scroll-safe-end flex-1">
+            <EmptyHeader>
+              <EmptyTitle>
+                {c.query ||
+                c.source !== "all" ||
+                c.result !== "all" ||
+                c.range !== "all" ? (
+                  <Trans>无匹配结果</Trans>
+                ) : (
+                  <Trans>暂无日志</Trans>
+                )}
+              </EmptyTitle>
+              <EmptyDescription>
+                <Trans>调整筛选条件或刷新后再试。</Trans>
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        )}
+        <LogDialogs controller={c} />
+      </div>
     </main>
   );
 }

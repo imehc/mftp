@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -76,7 +77,7 @@ export default function AboutPage() {
           </Button>
         }
       />
-      <div className="app-page-gutter app-scroll-safe-end mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-4 overflow-auto">
+      <AppPageContent bottomInset="scroll">
         <div className="flex shrink-0 flex-col items-center gap-2 py-6">
           <div
             className="bg-foreground text-background flex size-10 items-center justify-center rounded-xl text-xl font-semibold"
@@ -108,7 +109,7 @@ export default function AboutPage() {
             </Button>
           </div>
         ) : null}
-        <div className="grid shrink-0 gap-3 md:grid-cols-2">
+        <div className="grid shrink-0 gap-4 md:grid-cols-2">
           <SettingsGroup title={<Trans>存储占用</Trans>}>
             <InfoRow
               label={t`主数据库`}
@@ -201,7 +202,7 @@ export default function AboutPage() {
             <Trans>项目帮助</Trans>
           </Button>
         </div>
-      </div>
+      </AppPageContent>
       <DataManagementDialogs controller={c} />
     </main>
   );

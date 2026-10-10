@@ -15,6 +15,7 @@ export type UpdaterStatus =
 export interface UpdaterState {
   status: UpdaterStatus;
   dialogOpen: boolean;
+  bannerDismissed: boolean;
   version: string | null;
   currentVersion: string | null;
   releaseNotes: string;
@@ -31,6 +32,7 @@ export interface UpdaterState {
 export const initialUpdaterState: UpdaterState = {
   status: "idle",
   dialogOpen: false,
+  bannerDismissed: false,
   version: null,
   currentVersion: null,
   releaseNotes: "",

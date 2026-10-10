@@ -21,7 +21,7 @@ export default function CryptoTextPanel({
   error?: string | null;
 }) {
   return (
-    <section className="border-border bg-card flex min-h-72 min-w-0 flex-col overflow-hidden rounded-lg border md:min-h-96">
+    <section className="border-border bg-card flex min-h-72 min-w-0 flex-col overflow-hidden rounded-xl border md:min-h-96">
       <div className="flex items-center justify-between gap-2 px-3 pt-3">
         <label htmlFor={id} className="text-sm font-medium">
           {label}

@@ -67,6 +67,7 @@ it("设置迁移保留既有用户偏好，手动选择可持久化并重新读�
     5,
   )) as ReturnType<typeof store.getState>;
   expect(migrated).toMatchObject({
+    restoreLastTool: true,
     locale: "en",
     colorTheme: "tiesen",
     fontPreset: "outfit",
@@ -89,4 +90,30 @@ it("设置迁移保留既有用户偏好，手动选择可持久化并重新读�
   store.getState().setLocale("en");
   store.getState().setColorTheme("tiesen");
   expect(store.getState().displaySize.scale).toBe(1.125);
+});
+
+it("新增大小可应用，历史大小仍可读取，关闭恢复偏好可持久化", async () => {
+  for (const scale of [0.75, 1.25, 0.875, 1, 1.125]) {
+    expect(resolveDisplaySize({ mode: "manual", scale })).toEqual({
+      mode: "manual",
+      scale,
+    });
+  }
+  const { useSettingsStore: store } = await import("../store/settings");
+  const migrated = await store.persist
+    .getOptions()
+    .migrate?.({ restoreLastTool: false, lastTool: "crypto" }, 6);
+  expect(migrated).toMatchObject({
+    restoreLastTool: false,
+    lastTool: "crypto",
+  });
+  store.getState().setRestoreLastTool(false);
+  expect(store.getState().restoreLastTool).toBe(false);
+});
+
+it("移除的150%偏好回退到125%", () => {
+  expect(resolveDisplaySize({ mode: "manual", scale: 1.5 })).toEqual({
+    mode: "manual",
+    scale: 1.25,
+  });
 });

@@ -22,6 +22,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@utility app-page-width {
+  max-width: 72rem;
+}
+
 /* 页面边距与密度分离；业务区域的 gap 仍由布局组件和命名变体负责。 */
 @utility app-page-gutter {
   padding-inline: 0.75rem;
@@ -188,7 +192,7 @@
   html {
     @apply font-sans;
     /* 默认不覆盖系统/WebView 字号；手动比例统一驱动 rem，安全区的 px 不缩放。 */
-    font-size: calc(100% * clamp(0.875, var(--ui-scale, 1), 1.25));
+    font-size: calc(100% * clamp(0.75, var(--ui-scale, 1), 1.25));
   }
 
   /* 安全区域留白：env() 在 iOS（WKWebView + viewport-fit=cover）上生效，
@@ -222,6 +226,10 @@
   .app-scroll-safe-end {
     padding-bottom: max(0.75rem, var(--safe-bottom, 0px));
     scroll-padding-bottom: max(0.75rem, var(--safe-bottom, 0px));
+    @media (width >= theme(--breakpoint-md)) {
+      padding-bottom: max(1rem, var(--safe-bottom, 0px));
+      scroll-padding-bottom: max(1rem, var(--safe-bottom, 0px));
+    }
   }
 
   /* Android 的键盘可覆盖 WebView 而不改变 dvh；原生入口提供实际可用高度。 */

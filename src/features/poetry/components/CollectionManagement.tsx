@@ -20,7 +20,7 @@ export function CollectionSection({
   children: ReactNode;
 }) {
   return (
-    <section className="bg-card flex flex-col gap-2 rounded-xl border p-3 md:p-4">
+    <section className="bg-card flex flex-col gap-2 rounded-xl border p-3">
       <h2 className="text-sm font-semibold">{title}</h2>
       {children}
     </section>
@@ -233,8 +233,8 @@ export function CollectionDownloadFooter({
 }) {
   const count = controller.selectedPendingIds.length;
   return (
-    <footer className="bg-background shrink-0 border-t px-3 pt-2 pb-[calc(0.5rem+var(--safe-bottom,0px))] md:px-5">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
+    <footer className="bg-background shrink-0 border-t">
+      <div className="app-page-width app-page-gutter app-page-bottom mx-auto flex w-full items-center justify-between gap-3">
         <span className="text-muted-foreground text-xs">
           <Plural value={count} one="已选择 # 个合集" other="已选择 # 个合集" />
         </span>

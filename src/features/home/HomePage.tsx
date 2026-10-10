@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useEffectEvent, useRef } from "react";
 
+import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import ActivityMenu from "~/features/transfers/ActivityMenu";
 import { toolRouteOf } from "~/lib/module-metadata";
@@ -73,53 +74,51 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
         }
         trailing={<ActivityMenu />}
       />
-      <div className="app-scroll-safe-end min-h-0 flex-1 overflow-auto">
-        <div className="app-page-gutter mx-auto flex w-full max-w-6xl flex-col gap-4">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold">
-              {selected === "tools" ? (
-                <Trans>全部工具</Trans>
-              ) : (
-                homeCategoryLabels[selected]
-              )}
-            </h2>
-            <span className="text-muted-foreground text-xs">
-              {entries.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-            {entries.map((entry) => {
-              const Icon = entry.icon;
-              const tool = toolRouteOf(entry.id);
-              return (
-                <Link
-                  key={entry.id}
-                  {...entry.link}
-                  onClick={() => (tool ? setLastTool(tool) : undefined)}
-                  className="bg-card hover:bg-accent focus-visible:ring-ring flex min-h-20 min-w-0 items-center gap-3 rounded-xl border p-3 outline-none focus-visible:ring-2"
-                >
-                  <span className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">
-                    <Icon className="size-5" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium">
-                      {entry.title}
-                    </span>
-                    <span className="text-muted-foreground mt-1 block text-xs">
-                      {homeDescriptions[entry.id]}
-                    </span>
-                  </span>
-                  <ChevronRight
-                    aria-hidden
-                    className="text-muted-foreground size-4 shrink-0"
-                  />
-                </Link>
-              );
-            })}
-          </div>
-          <HomeRecentActivity />
+      <AppPageContent bottomInset="scroll">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold">
+            {selected === "tools" ? (
+              <Trans>全部工具</Trans>
+            ) : (
+              homeCategoryLabels[selected]
+            )}
+          </h2>
+          <span className="text-muted-foreground text-xs">
+            {entries.length}
+          </span>
         </div>
-      </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+          {entries.map((entry) => {
+            const Icon = entry.icon;
+            const tool = toolRouteOf(entry.id);
+            return (
+              <Link
+                key={entry.id}
+                {...entry.link}
+                onClick={() => (tool ? setLastTool(tool) : undefined)}
+                className="bg-card hover:bg-accent focus-visible:ring-ring flex min-h-20 min-w-0 items-center gap-3 rounded-xl border p-3 outline-none focus-visible:ring-2"
+              >
+                <span className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">
+                  <Icon className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium">
+                    {entry.title}
+                  </span>
+                  <span className="text-muted-foreground mt-1 block text-xs">
+                    {homeDescriptions[entry.id]}
+                  </span>
+                </span>
+                <ChevronRight
+                  aria-hidden
+                  className="text-muted-foreground size-4 shrink-0"
+                />
+              </Link>
+            );
+          })}
+        </div>
+        <HomeRecentActivity />
+      </AppPageContent>
     </main>
   );
 }

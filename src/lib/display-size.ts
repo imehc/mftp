@@ -1,18 +1,24 @@
-export const displayScales = [0.875, 1, 1.125, 1.25] as const;
+export const displayScales = [0.75, 1.25] as const;
+// 旧倍率仍可读取，避免升级后悄悄改变用户字号；新控件只展示 displayScales。
+const supportedScales = [0.875, 1, 1.125, ...displayScales] as const;
 
 export type DisplaySize = {
   mode: "system" | "manual";
-  scale: (typeof displayScales)[number];
+  scale: (typeof supportedScales)[number];
 };
 
 export function resolveDisplaySize(value: unknown): DisplaySize {
   const size =
-    value && typeof value === "object" ? (value as Partial<DisplaySize>) : {};
+    value && typeof value === "object"
+      ? (value as { mode?: unknown; scale?: unknown })
+      : {};
   return {
     mode: size.mode === "manual" ? "manual" : "system",
-    scale: displayScales.includes(size.scale as DisplaySize["scale"])
+    scale: supportedScales.includes(size.scale as DisplaySize["scale"])
       ? (size.scale as DisplaySize["scale"])
-      : 1,
+      : size.scale === 1.5
+        ? 1.25
+        : 1,
   };
 }
 

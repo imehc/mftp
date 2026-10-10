@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import type { PoetryTranslationMode } from "~/bindings";
+import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import AiConfigurationSettings from "~/features/ai-configuration/AiConfigurationSettings";
@@ -63,7 +64,7 @@ export default function SettingsPage({
           </div>
         }
       />
-      <div className="app-page-gutter app-scroll-safe-end mx-auto min-h-0 w-full max-w-5xl flex-1 overflow-auto">
+      <AppPageContent bottomInset="scroll">
         {ai ? (
           <AiConfigurationSettings />
         ) : (
@@ -73,7 +74,7 @@ export default function SettingsPage({
             }
           />
         )}
-      </div>
+      </AppPageContent>
     </main>
   );
 }

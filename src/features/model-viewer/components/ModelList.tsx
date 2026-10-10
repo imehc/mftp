@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useId, useRef, useState } from "react";
 
+import ToggleGroup from "~/components/FixedToggleGroup";
 import { Button } from "~/components/ui/button";
 import {
   Field,
@@ -21,7 +22,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { ToggleGroupItem } from "~/components/ui/toggle-group";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 

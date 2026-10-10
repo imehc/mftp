@@ -11,9 +11,9 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import {
-  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -130,7 +130,7 @@ export default function SystemMonitorPanel({ session }: Props) {
         <div className="flex-1" />
         <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
           <Trans>刷新间隔</Trans>
-          <Select
+          <FixedSelect
             value={String(intervalMs)}
             onValueChange={(value) =>
               setIntervalMs(Number(value) as RefreshIntervalMs)
@@ -155,7 +155,7 @@ export default function SystemMonitorPanel({ session }: Props) {
               <SelectItem value="5000">{formatSeconds(5)}</SelectItem>
               <SelectItem value="10000">{formatSeconds(10)}</SelectItem>
             </SelectContent>
-          </Select>
+          </FixedSelect>
         </span>
       </div>
 

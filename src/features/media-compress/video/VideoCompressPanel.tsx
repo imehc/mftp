@@ -4,12 +4,12 @@ import { FileVideo, VideoOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
-  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -234,7 +234,7 @@ export default function VideoCompressPanel() {
     return (
       <section
         role="status"
-        className="border-border bg-card flex flex-col items-center gap-3 rounded-lg border p-6 text-center"
+        className="border-border bg-card flex flex-col items-center gap-3 rounded-xl border p-6 text-center"
       >
         <VideoOff className="text-muted-foreground size-6" />
         <h2 className="text-sm font-semibold">
@@ -319,7 +319,7 @@ export default function VideoCompressPanel() {
       />
 
       {file ? (
-        <section className="border-border bg-card min-w-0 rounded-lg border p-3">
+        <section className="border-border bg-card min-w-0 rounded-xl border p-3">
           <h2 className="mb-3 text-sm font-semibold">
             <Trans>输出设置</Trans>
           </h2>
@@ -328,7 +328,7 @@ export default function VideoCompressPanel() {
               <FieldLabel>
                 <Trans>输出分辨率</Trans>
               </FieldLabel>
-              <Select
+              <FixedSelect
                 value={resolution}
                 onValueChange={(value) => {
                   if (
@@ -360,7 +360,7 @@ export default function VideoCompressPanel() {
                     <SelectItem value="360p">360p</SelectItem>
                   </SelectGroup>
                 </SelectContent>
-              </Select>
+              </FixedSelect>
             </Field>
 
             <CompressQualityField

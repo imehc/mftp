@@ -20,7 +20,7 @@ export default function LanSharedDirsSection({
   const { t } = useLingui();
   const sharesCount = shares.length;
   return (
-    <section className="border-border bg-card flex flex-col rounded-lg border">
+    <section className="border-border bg-card flex flex-col rounded-xl border">
       <div className="border-border flex shrink-0 items-center justify-between gap-2 border-b px-2.5 py-2">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold">

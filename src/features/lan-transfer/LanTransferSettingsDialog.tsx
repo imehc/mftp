@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { FolderOpen, ShieldAlert, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 
+import ToggleGroup from "~/components/FixedToggleGroup";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -29,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   createLanSettingsSchema,
   createLanTrustedDeviceSchema,

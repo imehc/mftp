@@ -108,11 +108,11 @@ export default function TodoTool() {
           className="pl-9"
         />
       </div>
-      <div className="flex shrink-0 flex-col md:flex-row md:items-center md:gap-2">
+      <div className="flex shrink-0 flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
         <Tabs
           value={view}
           onValueChange={(value) => setView(value as TodoView)}
-          className="gap-0"
+          className="max-w-full min-w-0 gap-0"
         >
           <TabsList
             density="adaptive"

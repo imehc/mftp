@@ -3,11 +3,11 @@ import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
-  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -257,7 +257,7 @@ export default function ImageCompressPanel() {
       />
 
       {file ? (
-        <section className="border-border bg-card min-w-0 rounded-lg border p-3">
+        <section className="border-border bg-card min-w-0 rounded-xl border p-3">
           <h2 className="mb-3 text-sm font-semibold">
             <Trans>输出设置</Trans>
           </h2>
@@ -266,7 +266,7 @@ export default function ImageCompressPanel() {
               <FieldLabel>
                 <Trans>输出格式</Trans>
               </FieldLabel>
-              <Select
+              <FixedSelect
                 value={outputFormat}
                 onValueChange={(value) => {
                   if (
@@ -293,7 +293,7 @@ export default function ImageCompressPanel() {
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
-              </Select>
+              </FixedSelect>
             </Field>
 
             <CompressQualityField

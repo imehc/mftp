@@ -216,7 +216,7 @@ export default function ModelViewerPage() {
           3D 模型
         </Trans>
       }
-      maxWidth="max-w-none"
+      width="full"
       scroll="page"
       adaptiveDensity
       bottomInset="scroll"

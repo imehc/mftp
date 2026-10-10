@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import AppPageLayout from "~/components/AppPageLayout";
 import { CopyButton } from "~/components/CopyButton";
+import FixedSelect from "~/components/FixedSelect";
 import {
   Select,
   SelectContent,
@@ -122,7 +123,7 @@ export default function FormatterTool() {
           <label htmlFor="formatter-indent" className="text-xs">
             <Trans>缩进</Trans>
           </label>
-          <Select
+          <FixedSelect
             value={c.indent}
             onValueChange={(next) => {
               if (next === "2" || next === "4" || next === "tab")
@@ -147,10 +148,10 @@ export default function FormatterTool() {
                 <SelectItem value="tab">Tab</SelectItem>
               </SelectGroup>
             </SelectContent>
-          </Select>
+          </FixedSelect>
         </div>
       </div>
-      <section className="border-border bg-card flex min-h-96 min-w-0 flex-1 flex-col rounded-lg border">
+      <section className="border-border bg-card flex min-h-96 min-w-0 flex-1 flex-col rounded-xl border">
         <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs">
           <h2 className="font-medium">
             <Trans>内容</Trans>

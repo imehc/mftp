@@ -3,10 +3,10 @@ import { useForm } from "@tanstack/react-form";
 import { CheckCircle2, RefreshCw, Shield, ShieldOff } from "lucide-react";
 import { z } from "zod";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
-  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -52,7 +52,7 @@ function LanAuthRequestPermissionForm({
     <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
       <form.Field name="permission">
         {(field) => (
-          <Select
+          <FixedSelect
             value={field.state.value}
             onValueChange={(value) => {
               if (
@@ -84,7 +84,7 @@ function LanAuthRequestPermissionForm({
                 </SelectItem>
               </SelectGroup>
             </SelectContent>
-          </Select>
+          </FixedSelect>
         )}
       </form.Field>
       <Button onClick={() => void form.handleSubmit()}>
@@ -105,7 +105,7 @@ export default function LanPendingAuthRequestsPanel({
   const { t } = useLingui();
   const sorted = [...requests].sort((a, b) => b.requestedAt - a.requestedAt);
   return (
-    <section className="border-border bg-card flex flex-col rounded-lg border">
+    <section className="border-border bg-card flex flex-col rounded-xl border">
       <div className="border-border flex shrink-0 items-center justify-between gap-2 border-b px-2.5 py-2">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold">

@@ -1,5 +1,6 @@
 import { type ReactNode, useId } from "react";
 
+import FixedSelect from "~/components/FixedSelect";
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
   Select,
@@ -17,17 +18,20 @@ export function InspectionChoice({
   value,
   options,
   onChange,
+  fixed = false,
 }: {
   label: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
+  fixed?: boolean;
 }) {
   const id = useId();
+  const Choice = fixed ? FixedSelect : Select;
   return (
     <Field>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <Select value={value} onValueChange={onChange}>
+      <Choice value={value} onValueChange={onChange}>
         <SelectTrigger id={id} density="adaptive" className="w-full min-w-0">
           <SelectValue />
         </SelectTrigger>
@@ -40,7 +44,7 @@ export function InspectionChoice({
             ))}
           </SelectGroup>
         </SelectContent>
-      </Select>
+      </Choice>
     </Field>
   );
 }

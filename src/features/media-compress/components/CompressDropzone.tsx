@@ -64,7 +64,7 @@ export function CompressDropzone({
   return (
     <section
       className={cn(
-        "border-border bg-card rounded-lg border p-3 transition-colors",
+        "border-border bg-card rounded-xl border p-3 transition-colors",
         !preview && "md:col-span-2 md:border-dashed",
         dragOver ? "border-primary bg-accent/40" : "border-border bg-card",
       )}

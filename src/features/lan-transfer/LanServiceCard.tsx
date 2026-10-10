@@ -23,7 +23,7 @@ export default function LanServiceCard({
   const onlineConnections = status?.running ? status.onlineConnections : 0;
   const [qrOpen, setQrOpen] = useState(false);
   return (
-    <section className="border-border bg-card rounded-lg border p-3">
+    <section className="border-border bg-card rounded-xl border p-3">
       <header className="mb-3">
         <h2 className="text-sm font-semibold">
           <Trans>本机服务</Trans>

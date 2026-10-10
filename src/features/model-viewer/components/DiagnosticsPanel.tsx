@@ -106,6 +106,7 @@ export function DiagnosticsPanel({
     >
       <FieldGroup density="compact">
         <InspectionChoice
+          fixed
           label={t({
             message: "显示单位",
             comment: "距离与包围盒尺寸的显示单位，不缩放模型。",

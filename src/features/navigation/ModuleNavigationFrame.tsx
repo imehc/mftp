@@ -29,8 +29,8 @@ export default function ModuleNavigationFrame({
     >
       {wide ? <NavigationRailDesktop items={items} active={active} /> : null}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <UpdaterStatusBar />
         <div className="min-h-0 min-w-0 flex-1">{children}</div>
+        <UpdaterStatusBar />
         {!wide && primary ? (
           <BottomNavigationMobile items={items} active={active} />
         ) : null}

@@ -22,8 +22,12 @@ export function CompressModeTabs({
           onChange(next);
       }}
     >
-      <TabsList density="adaptive" aria-label={t`媒体处理模式`}>
+      <TabsList
+        className="h-auto max-w-full flex-wrap"
+        aria-label={t`媒体处理模式`}
+      >
         <TabsTrigger
+          className="h-8"
           id="media-tab-image"
           aria-controls="media-panel-image"
           value="image"
@@ -32,6 +36,7 @@ export function CompressModeTabs({
           <Trans>图片压缩</Trans>
         </TabsTrigger>
         <TabsTrigger
+          className="h-8"
           id="media-tab-video"
           aria-controls="media-panel-video"
           value="video"
@@ -40,6 +45,7 @@ export function CompressModeTabs({
           <Trans>视频压缩</Trans>
         </TabsTrigger>
         <TabsTrigger
+          className="h-8"
           id="media-tab-resize"
           aria-controls="media-panel-resize"
           value="resize"

@@ -49,7 +49,7 @@ export function CompressResultCard({
   }
 
   return (
-    <section className="border-border bg-card flex flex-col gap-3 rounded-lg border p-3">
+    <section className="border-border bg-card flex flex-col gap-3 rounded-xl border p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-muted-foreground min-w-0 text-xs font-medium">
           <h2 className="truncate">{title ?? <Trans>压缩结果</Trans>}</h2>

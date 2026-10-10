@@ -1,6 +1,7 @@
 import { cn } from "cn";
 import type { ReactNode } from "react";
 
+import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
   description?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
-  maxWidth?: string;
+  width?: "standard" | "full";
   scroll?: "page" | "content";
   adaptiveDensity?: boolean;
   contentDensity?: "standard" | "compact";
@@ -22,7 +23,7 @@ export default function AppPageLayout({
   description,
   actions,
   children,
-  maxWidth = "max-w-5xl",
+  width = "standard",
   scroll = "page",
   adaptiveDensity = true,
   contentDensity = "standard",
@@ -42,20 +43,15 @@ export default function AppPageLayout({
         description={description}
         trailing={actions}
       />
-      <div
-        className={cn(
-          "app-page-gutter mx-auto flex min-h-0 w-full flex-1 flex-col",
-          contentDensity === "compact" ? "gap-3" : "gap-4",
-          scroll === "page" ? "overflow-auto" : "flex flex-col overflow-hidden",
-          bottomInset === "page"
-            ? "app-page-bottom"
-            : scroll === "page" && "app-scroll-safe-end",
-          maxWidth,
-          contentClassName,
-        )}
+      <AppPageContent
+        width={width}
+        scroll={scroll}
+        density={contentDensity}
+        bottomInset={bottomInset}
+        className={contentClassName}
       >
         {children}
-      </div>
+      </AppPageContent>
     </main>
   );
 }

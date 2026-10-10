@@ -71,7 +71,7 @@ export default function LanTransferActivity({
   });
   useVirtualizerFontSize(virtualizer);
   return (
-    <section className="border-border bg-card shrink-0 rounded-lg border p-2.5">
+    <section className="border-border bg-card shrink-0 rounded-xl border p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold">
           <Trans>传输活动</Trans>
