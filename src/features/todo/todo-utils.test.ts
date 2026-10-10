@@ -6,6 +6,7 @@ import {
   buildTodoListRows,
   formatTodoDate,
   formatTodoTimestamp,
+  groupTodoItems,
   localTimeKey,
   matchesTodoQuery,
   plannedDate,
@@ -179,4 +180,20 @@ it("搜索匹配标题、备注和分类，忽略首尾空白与大小写", () =
   expect(matchesTodoQuery(task, "工作")).toBe(true);
   expect(matchesTodoQuery(item(), " ")).toBe(true);
   expect(matchesTodoQuery(item(), "missing")).toBe(false);
+});
+
+it("一次分类保留顺序且完成状态优先于逾期", () => {
+  const now = new Date("2026-10-10T12:00:00").getTime();
+  const tasks = [
+    item({ id: "a" }),
+    item({ id: "b", dueAt: now }),
+    item({ id: "c", dueAt: now - 1, completed: true }),
+    item({ id: "d", dueDate: "2026-10-09" }),
+    item({ id: "e", dueAt: now + 1 }),
+  ];
+  const groups = groupTodoItems(tasks, now);
+  expect(groups.active.map((entry) => entry.id)).toEqual(["a", "e"]);
+  expect(groups.overdue.map((entry) => entry.id)).toEqual(["b", "d"]);
+  expect(groups.completed.map((entry) => entry.id)).toEqual(["c"]);
+  expect(tasks.map((entry) => entry.id)).toEqual(["a", "b", "c", "d", "e"]);
 });

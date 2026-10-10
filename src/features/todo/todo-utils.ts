@@ -67,6 +67,17 @@ export function todoView(item: TodoItem, now: number): TodoView {
   return "active";
 }
 
+/** 一次分类并保留输入顺序；最终分组展示仍由 buildTodoListRows 排序。 */
+export function groupTodoItems(items: TodoItem[], now: number) {
+  const groups: Record<TodoView, TodoItem[]> = {
+    active: [],
+    overdue: [],
+    completed: [],
+  };
+  for (const item of items) groups[todoView(item, now)].push(item);
+  return groups;
+}
+
 export function sortTodoItems(items: TodoItem[]): TodoItem[] {
   return [...items].sort((left, right) => {
     const leftDate = plannedDate(left);

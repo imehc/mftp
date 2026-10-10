@@ -5,7 +5,6 @@ import AppPageLayout from "~/components/AppPageLayout";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -59,7 +58,9 @@ export default function TodoTool() {
     dialogOpen,
     setDialogOpen,
     editing,
-    setEditing,
+    edit,
+    saving,
+    deleteError,
     deleting,
     setDeleting,
     pendingIds,
@@ -83,11 +84,8 @@ export default function TodoTool() {
           size={desktopActions ? "default" : "icon"}
           aria-label={t`新建待办`}
           title={t`新建待办`}
-          disabled={loading}
-          onClick={() => {
-            setEditing(null);
-            setDialogOpen(true);
-          }}
+          disabled={loading || !!loadError || saving}
+          onClick={() => edit(null)}
         >
           <Plus data-icon={desktopActions ? "inline-start" : undefined} />
           {desktopActions ? <Trans>新建</Trans> : null}
@@ -217,10 +215,7 @@ export default function TodoTool() {
           items={filteredItems}
           pendingIds={pendingIds}
           onToggle={(item) => void handleToggle(item)}
-          onEdit={(item) => {
-            setEditing(item);
-            setDialogOpen(true);
-          }}
+          onEdit={edit}
           onDelete={setDeleting}
         />
       )}
@@ -229,10 +224,8 @@ export default function TodoTool() {
         open={dialogOpen}
         item={editing}
         categories={categories}
-        onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) setEditing(null);
-        }}
+        onOpenChange={setDialogOpen}
+        busy={saving || (!!editing && pendingIds.has(editing.id))}
         onSubmit={handleSubmit}
       />
 
@@ -249,16 +242,24 @@ export default function TodoTool() {
               <Trans>删除后无法恢复。</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {deleteError ? (
+            <Alert variant="destructive">
+              <AlertDescription>{describeError(deleteError)}</AlertDescription>
+            </Alert>
+          ) : null}
           <AlertDialogFooter>
-            <AlertDialogCancel>
+            <AlertDialogCancel
+              disabled={!!deleting && pendingIds.has(deleting.id)}
+            >
               <Trans>取消</Trans>
             </AlertDialogCancel>
-            <AlertDialogAction
+            <Button
+              disabled={!!deleting && pendingIds.has(deleting.id)}
               variant="destructive"
               onClick={() => void handleDelete()}
             >
               <Trans>删除</Trans>
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

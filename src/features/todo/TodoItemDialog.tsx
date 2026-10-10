@@ -25,6 +25,7 @@ import TodoSchedulePicker from "./TodoSchedulePicker";
 
 interface TodoItemDialogProps {
   open: boolean;
+  busy: boolean;
   item: TodoItem | null;
   categories: string[];
   onOpenChange: (open: boolean) => void;
@@ -33,6 +34,7 @@ interface TodoItemDialogProps {
 
 export default function TodoItemDialog({
   open,
+  busy,
   item,
   categories,
   onOpenChange,
@@ -179,7 +181,7 @@ export default function TodoItemDialog({
               <Button
                 type="submit"
                 form="todo-item-form"
-                disabled={isSubmitting}
+                disabled={isSubmitting || busy}
               >
                 <Trans>保存</Trans>
               </Button>
