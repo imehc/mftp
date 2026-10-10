@@ -20,7 +20,7 @@ export default function SettingChoice({
   value,
   onChange,
   options,
-  fixed = false,
+  segmented = false,
   disabled,
   description,
 }: {
@@ -30,11 +30,11 @@ export default function SettingChoice({
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: ReactNode }[];
-  fixed?: boolean;
+  segmented?: boolean;
   disabled?: boolean;
   description?: ReactNode;
 }) {
-  const Choice = fixed ? FixedSelect : Select;
+  const Choice = segmented ? FixedSelect : Select;
   return (
     <SettingsControl
       id={id}
@@ -46,9 +46,14 @@ export default function SettingChoice({
         value={value}
         onValueChange={onChange}
         disabled={disabled}
-        {...(fixed ? { alignment: "end" as const } : {})}
+        {...(segmented ? { alignment: "end" as const } : {})}
       >
-        <SelectTrigger id={id} aria-label={title} className="w-40 max-w-full">
+        <SelectTrigger
+          wrapValue
+          id={id}
+          aria-label={title}
+          className="w-40 max-w-full"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

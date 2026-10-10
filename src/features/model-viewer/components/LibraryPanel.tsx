@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useId, useRef, useState, useSyncExternalStore } from "react";
 
 import type { ModelLibraryEntry } from "~/bindings";
-import FixedSelect from "~/components/FixedSelect";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -30,6 +29,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -209,7 +209,7 @@ export function LibraryPanel({
                     <FieldLabel htmlFor={`${id}-limit`}>
                       <Trans>缓存上限</Trans>
                     </FieldLabel>
-                    <FixedSelect
+                    <Select
                       value={String(catalog.cacheLimit)}
                       disabled={busy}
                       onValueChange={(value) =>
@@ -237,7 +237,7 @@ export function LibraryPanel({
                           ))}
                         </SelectGroup>
                       </SelectContent>
-                    </FixedSelect>
+                    </Select>
                   </Field>
                   <Button
                     density="adaptive"

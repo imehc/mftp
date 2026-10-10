@@ -18,7 +18,6 @@ export default function TransferSetting() {
       id="settings-transfer"
       icon={FolderTree}
       title={t`文件夹传输`}
-      fixed
       value={mode}
       disabled={running}
       description={running ? t`传输进行中，暂不可修改。` : undefined}

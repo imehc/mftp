@@ -32,12 +32,17 @@ function inspect(children: ReactNode): {
   return result;
 }
 
-/** 仅供业务显式标记的固定选项；保留原 Select 作为数量和空间不足时的回退。 */
+/** 仅在页面适合直接切换/比较选项时显式使用；固定数据本身不是采用分段的理由。
+ * 保留原 Select 作为数量和空间不足时的回退。 */
 export default function FixedSelect({
   children,
   alignment = "start",
+  className,
   ...props
-}: ComponentProps<typeof Select> & { alignment?: "start" | "end" }) {
+}: ComponentProps<typeof Select> & {
+  alignment?: "start" | "end";
+  className?: string;
+}) {
   const { items, trigger } = inspect(children);
   const host = useRef<HTMLDivElement>(null);
   const segments = useRef<HTMLDivElement>(null);
@@ -92,6 +97,7 @@ export default function FixedSelect({
       className={cn(
         "relative w-full min-w-0",
         alignment === "end" && "flex justify-end",
+        className,
       )}
       data-fixed-choice={segmented ? "segments" : "select"}
     >

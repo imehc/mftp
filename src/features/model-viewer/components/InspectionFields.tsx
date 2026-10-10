@@ -18,18 +18,18 @@ export function InspectionChoice({
   value,
   options,
   onChange,
-  fixed = false,
+  segmented = false,
 }: {
   label: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
-  fixed?: boolean;
+  segmented?: boolean;
 }) {
   const id = useId();
-  const Choice = fixed ? FixedSelect : Select;
+  const Choice = segmented ? FixedSelect : Select;
   return (
-    <Field>
+    <Field orientation={segmented ? "choice" : "vertical"}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <Choice value={value} onValueChange={onChange}>
         <SelectTrigger id={id} density="adaptive" className="w-full min-w-0">

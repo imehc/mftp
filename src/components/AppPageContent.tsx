@@ -27,14 +27,15 @@ export default function AppPageContent({
       <div
         className={cn(
           "app-page-gutter mx-auto flex w-full min-w-0 flex-col",
-          width === "standard" && "app-page-width",
+          {
+            "app-page-width": width === "standard",
+            "app-page-bottom": bottomInset === "page",
+            "app-scroll-safe-end": bottomInset !== "page" && scroll === "page",
+          },
           scroll === "content"
             ? "min-h-0 flex-1 overflow-hidden"
             : "min-h-full",
           density === "standard" ? "gap-4" : "gap-3",
-          bottomInset === "page"
-            ? "app-page-bottom"
-            : scroll === "page" && "app-scroll-safe-end",
           className,
         )}
       >

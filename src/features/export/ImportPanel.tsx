@@ -1,11 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FileInput } from "lucide-react";
 
-import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { PasswordInput } from "~/components/ui/password-input";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -86,7 +86,7 @@ export default function ImportPanel({
               <FieldLabel htmlFor="import-mode">
                 <Trans>导入模式</Trans>
               </FieldLabel>
-              <FixedSelect
+              <Select
                 value={c.mode}
                 disabled={c.busy || c.picking}
                 onValueChange={(v) => {
@@ -94,7 +94,11 @@ export default function ImportPanel({
                     c.setMode(v);
                 }}
               >
-                <SelectTrigger id="import-mode" className="w-full min-w-0">
+                <SelectTrigger
+                  wrapValue
+                  id="import-mode"
+                  className="w-full min-w-0"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -106,7 +110,7 @@ export default function ImportPanel({
                     ))}
                   </SelectGroup>
                 </SelectContent>
-              </FixedSelect>
+              </Select>
             </Field>
             <p className="text-muted-foreground text-xs">
               <Trans>

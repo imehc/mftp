@@ -11,10 +11,11 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
-import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import {
+  Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -130,7 +131,7 @@ export default function SystemMonitorPanel({ session }: Props) {
         <div className="flex-1" />
         <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
           <Trans>刷新间隔</Trans>
-          <FixedSelect
+          <Select
             value={String(intervalMs)}
             onValueChange={(value) =>
               setIntervalMs(Number(value) as RefreshIntervalMs)
@@ -144,18 +145,20 @@ export default function SystemMonitorPanel({ session }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="ui-density-adaptive">
-              <SelectItem value="0">
-                {t({
-                  context: "state",
-                  comment: "Option that turns automatic monitor refresh off",
-                  message: "关闭",
-                })}
-              </SelectItem>
-              <SelectItem value="2000">{formatSeconds(2)}</SelectItem>
-              <SelectItem value="5000">{formatSeconds(5)}</SelectItem>
-              <SelectItem value="10000">{formatSeconds(10)}</SelectItem>
+              <SelectGroup>
+                <SelectItem value="0">
+                  {t({
+                    context: "state",
+                    comment: "Option that turns automatic monitor refresh off",
+                    message: "关闭",
+                  })}
+                </SelectItem>
+                <SelectItem value="2000">{formatSeconds(2)}</SelectItem>
+                <SelectItem value="5000">{formatSeconds(5)}</SelectItem>
+                <SelectItem value="10000">{formatSeconds(10)}</SelectItem>
+              </SelectGroup>
             </SelectContent>
-          </FixedSelect>
+          </Select>
         </span>
       </div>
 

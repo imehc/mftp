@@ -25,7 +25,7 @@ export default function DisplaySizeSettings() {
       id="settings-display"
       icon={Scaling}
       title={t`显示大小`}
-      fixed
+      segmented
       value={selected}
       description={
         legacy

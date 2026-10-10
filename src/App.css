@@ -267,6 +267,42 @@
     }
   }
 
+  /* 分段的可见底板保持 40/32 比例，实际按钮独占触控布局，不叠加热区。 */
+  [data-slot="toggle-group"][data-variant="segmented"]::before,
+  [data-slot="toggle-group-item"][data-variant="segmented"]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  [data-slot="toggle-group"][data-variant="segmented"] {
+    min-height: 2.5rem;
+  }
+  [data-slot="toggle-group"][data-variant="segmented"]::before {
+    height: 2.5rem;
+    background: var(--muted);
+  }
+  [data-slot="toggle-group-item"][data-variant="segmented"]::before {
+    height: 2rem;
+  }
+  [data-slot="toggle-group-item"][data-variant="segmented"][data-state="on"]::before {
+    background: var(--background);
+    box-shadow: var(--shadow-sm);
+  }
+  @media (width < theme(--breakpoint-md)), (pointer: coarse) {
+    .ui-density-adaptive [data-slot="toggle-group"][data-variant="segmented"] {
+      height: max(44px, 2.75rem);
+    }
+    .ui-density-adaptive
+      [data-slot="toggle-group-item"][data-variant="segmented"] {
+      min-width: max(44px, 2.75rem);
+    }
+  }
+
   /* 点击区域属于按钮自身且不重叠；伪元素仅绘制居中的紧凑外观。 */
   :is(
     [data-slot="tabs-list"],

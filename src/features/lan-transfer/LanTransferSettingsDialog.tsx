@@ -187,7 +187,7 @@ export default function LanTransferSettingsDialog({
                       }
                       disabled={running}
                     >
-                      <SelectTrigger aria-label={t`绑定 IP`}>
+                      <SelectTrigger wrapValue aria-label={t`绑定 IP`}>
                         <SelectValue placeholder={t`自动选择`} />
                       </SelectTrigger>
                       <SelectContent>
@@ -416,9 +416,7 @@ export default function LanTransferSettingsDialog({
                   <FieldLabel>
                     <Trans>默认权限</Trans>
                   </FieldLabel>
-                  <ToggleGroup
-                    aria-label={t`默认权限`}
-                    type="single"
+                  <Select
                     value={field.state.value}
                     onValueChange={(value) => {
                       if (!value || running) return;
@@ -430,20 +428,25 @@ export default function LanTransferSettingsDialog({
                         field.handleChange(value);
                       }
                     }}
-                    variant="outline"
                     disabled={running}
-                    className="justify-start"
                   >
-                    <ToggleGroupItem value="readOnly">
-                      <Trans>只读</Trans>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="readWrite">
-                      <Trans>读写</Trans>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="uploadOnly">
-                      <Trans>仅上传</Trans>
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+                    <SelectTrigger aria-label={t`默认权限`} className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="readOnly">
+                          <Trans>只读</Trans>
+                        </SelectItem>
+                        <SelectItem value="readWrite">
+                          <Trans>读写</Trans>
+                        </SelectItem>
+                        <SelectItem value="uploadOnly">
+                          <Trans>仅上传</Trans>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </UiField>
               )}
             </form.Field>

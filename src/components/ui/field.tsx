@@ -64,6 +64,8 @@ const fieldVariants = cva(
     variants: {
       orientation: {
         vertical: "flex-col *:w-full [&>.sr-only]:w-auto",
+        choice:
+          "grid min-w-0 grid-cols-[fit-content(40%)_minmax(0,1fr)] items-center [&>[data-slot=field-label]]:min-w-0 [&>[data-slot=field-label]]:break-words [&>[data-fixed-choice]]:flex [&>[data-fixed-choice]]:justify-end",
         horizontal:
           "flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
         responsive:

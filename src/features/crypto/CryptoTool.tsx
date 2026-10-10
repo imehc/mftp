@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ArrowDownUp, Eraser, Info } from "lucide-react";
+import { ArrowDownUp, Eraser } from "lucide-react";
 import { toast } from "sonner";
 
 import AppPageLayout from "~/components/AppPageLayout";
@@ -52,6 +52,8 @@ export default function CryptoTool() {
           </Select>
         </Field>
         <FixedSelect
+          className="flex-1"
+          alignment="end"
           value={crypto.mode}
           onValueChange={(value) => {
             if (value === "encode" || value === "decode") crypto.setMode(value);
@@ -141,10 +143,6 @@ export default function CryptoTool() {
           </FieldDescription>
         </div>
       </Field>
-      <p className="text-muted-foreground flex items-center gap-2 pb-3 text-xs">
-        <Info className="size-4 shrink-0" />
-        <Trans>内容在本机实时处理。</Trans>
-      </p>
     </AppPageLayout>
   );
 }

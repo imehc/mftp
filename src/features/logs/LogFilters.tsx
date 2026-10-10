@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ListFilter, Search } from "lucide-react";
 import { useState } from "react";
 
-import FixedSelect from "~/components/FixedSelect";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
 import {
@@ -34,18 +33,15 @@ function FilterSelect({
   onChange,
   options,
   disabled,
-  fixed = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: Record<string, string>;
   disabled: boolean;
-  fixed?: boolean;
 }) {
-  const Choice = fixed ? FixedSelect : Select;
   return (
-    <Choice value={value} onValueChange={onChange} disabled={disabled}>
+    <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
         density="adaptive"
         aria-label={label}
@@ -62,7 +58,7 @@ function FilterSelect({
           ))}
         </SelectGroup>
       </SelectContent>
-    </Choice>
+    </Select>
   );
 }
 
@@ -79,7 +75,6 @@ export default function LogFilters({
     value: string;
     onChange: (value: string) => void;
     options: Record<string, string>;
-    fixed?: boolean;
   }> = [
     {
       label: t`来源`,
@@ -89,22 +84,20 @@ export default function LogFilters({
     },
     {
       label: t`结果`,
-      fixed: true,
       value: c.result,
       onChange: c.setResult,
       options: { all: t`全部结果`, ...c.resultLabels },
     },
     {
       label: t`时间`,
-      fixed: true,
       value: c.range,
       onChange: c.setRange,
       options: { all: t`全部时间`, "7d": t`近 7 天` },
     },
   ];
   return (
-    <div className="border-border flex shrink-0 items-center gap-2 border-b px-3 py-2 md:px-4">
-      <InputGroup className="min-w-0 flex-1">
+    <div className="border-border flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2 md:px-4">
+      <InputGroup className="min-w-0 flex-1 basis-40">
         <InputGroupAddon>
           <Search />
         </InputGroupAddon>
@@ -116,7 +109,7 @@ export default function LogFilters({
         />
       </InputGroup>
       {wide ? (
-        <div className="flex shrink-0 gap-2">
+        <div className="grid min-w-0 flex-[3_1_36rem] grid-cols-3 items-center gap-2">
           {filters.map((filter) => (
             <FilterSelect key={filter.label} {...filter} disabled={c.busy} />
           ))}

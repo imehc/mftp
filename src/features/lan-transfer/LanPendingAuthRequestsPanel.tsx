@@ -3,10 +3,10 @@ import { useForm } from "@tanstack/react-form";
 import { CheckCircle2, RefreshCw, Shield, ShieldOff } from "lucide-react";
 import { z } from "zod";
 
-import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -52,7 +52,7 @@ function LanAuthRequestPermissionForm({
     <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
       <form.Field name="permission">
         {(field) => (
-          <FixedSelect
+          <Select
             value={field.state.value}
             onValueChange={(value) => {
               if (
@@ -84,7 +84,7 @@ function LanAuthRequestPermissionForm({
                 </SelectItem>
               </SelectGroup>
             </SelectContent>
-          </FixedSelect>
+          </Select>
         )}
       </form.Field>
       <Button onClick={() => void form.handleSubmit()}>

@@ -38,7 +38,7 @@ export function NavigationPanel({
       </FieldGroup>
       <FieldGroup density="compact">
         <InspectionChoice
-          fixed
+          segmented
           label={t({
             message: "交互模式",
             comment: "3D 画布的轨道、自由移动、测量、摆放模式。",

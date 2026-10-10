@@ -10,7 +10,6 @@ import { toast } from "sonner";
 
 import AppPageLayout from "~/components/AppPageLayout";
 import { CopyButton } from "~/components/CopyButton";
-import FixedSelect from "~/components/FixedSelect";
 import {
   Select,
   SelectContent,
@@ -91,8 +90,11 @@ export default function FormatterTool() {
       contentDensity="compact"
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <div className="flex items-center gap-2">
-          <label htmlFor="formatter-language" className="text-xs">
+        <div className="flex shrink-0 items-center gap-2">
+          <label
+            htmlFor="formatter-language"
+            className="shrink-0 text-xs whitespace-nowrap"
+          >
             <Trans>语言</Trans>
           </label>
           <Select
@@ -119,11 +121,14 @@ export default function FormatterTool() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="formatter-indent" className="text-xs">
+        <div className="flex shrink-0 items-center gap-2">
+          <label
+            htmlFor="formatter-indent"
+            className="shrink-0 text-xs whitespace-nowrap"
+          >
             <Trans>缩进</Trans>
           </label>
-          <FixedSelect
+          <Select
             value={c.indent}
             onValueChange={(next) => {
               if (next === "2" || next === "4" || next === "tab")
@@ -148,7 +153,7 @@ export default function FormatterTool() {
                 <SelectItem value="tab">Tab</SelectItem>
               </SelectGroup>
             </SelectContent>
-          </FixedSelect>
+          </Select>
         </div>
       </div>
       <section className="border-border bg-card flex min-h-96 min-w-0 flex-1 flex-col rounded-xl border">

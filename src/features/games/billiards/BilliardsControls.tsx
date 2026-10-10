@@ -3,7 +3,9 @@ import type { CSSProperties } from "react";
 
 import FixedSelect from "~/components/FixedSelect";
 import {
+  Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -55,7 +57,7 @@ export function BilliardsControls({
           {power}%
         </span>
         {mobile ? (
-          <FixedSelect
+          <Select
             disabled={!interactive}
             value={String(followDraw)}
             onValueChange={(value) => onFollowDraw(Number(value))}
@@ -64,13 +66,15 @@ export function BilliardsControls({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {options.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
-          </FixedSelect>
+          </Select>
         ) : null}
       </div>
       {!mobile ? (
@@ -83,15 +87,17 @@ export function BilliardsControls({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {options.map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={!interactive}
-                >
-                  {option.label}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {options.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    disabled={!interactive}
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </FixedSelect>
           {interactive ? (

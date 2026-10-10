@@ -25,7 +25,7 @@ export default function AppearanceSettings() {
         id="settings-appearance"
         icon={Monitor}
         title={t`外观`}
-        fixed
+        segmented
         value={theme ?? "system"}
         onChange={setTheme}
         options={[
@@ -77,7 +77,6 @@ export default function AppearanceSettings() {
         id="settings-locale"
         icon={Languages}
         title={t`语言`}
-        fixed
         value={settings.locale}
         onChange={(value) => {
           const locale = localeOptions.find((option) => option === value);
