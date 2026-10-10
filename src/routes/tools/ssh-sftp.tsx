@@ -1,15 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import SshSftpTool from "~/features/ssh-sftp/SshSftpTool";
-import { useSettingsStore } from "~/store/settings";
 
 function SshSftpRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
-
-  useEffect(() => {
-    setLastTool("ssh-sftp");
-  }, [setLastTool]);
+  useRememberTool("ssh-sftp");
 
   return <SshSftpTool />;
 }

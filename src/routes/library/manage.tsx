@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import LibraryManagePage from "~/features/poetry/LibraryManagePage";
-import { useSettingsStore } from "~/store/settings";
 
 interface LibraryManageSearch {
   /** 来源列表的检索词与所选诗词；返回 /library 时原样带回，保留查询上下文。 */
@@ -11,12 +10,8 @@ interface LibraryManageSearch {
 }
 
 function LibraryManageRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
+  useRememberTool("library");
   const search = Route.useSearch();
-
-  useEffect(() => {
-    setLastTool("library");
-  }, [setLastTool]);
 
   return <LibraryManagePage search={search} />;
 }

@@ -1,16 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import BtTool from "~/features/bt/BtTool";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import { btAvailableGuard } from "~/lib/platform";
-import { useSettingsStore } from "~/store/settings";
 
 function BtRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
-
-  useEffect(() => {
-    setLastTool("bt");
-  }, [setLastTool]);
+  useRememberTool("bt");
 
   return <BtTool />;
 }

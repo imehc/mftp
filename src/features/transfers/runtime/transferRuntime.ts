@@ -1,5 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 
+import { createBackoffScheduler } from "~/lib/backoff-scheduler";
 import { toIpcError } from "~/lib/errors";
 import {
   createSubscription,
@@ -10,8 +11,6 @@ import { useTransfersStore } from "~/store/transfers";
 import type { TransferProgress } from "~/types";
 
 const FLUSH_MS = 100;
-const RECONNECT_BASE_MS = 1000;
-const RECONNECT_MAX_MS = 30000;
 
 /**
  * 传输进度运行期。
@@ -23,8 +22,7 @@ const RECONNECT_MAX_MS = 30000;
 
 let installed = false;
 let subscription: Subscription | null = null;
-let reconnectAttempt = 0;
-let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let reconnect: ReturnType<typeof createBackoffScheduler> | null = null;
 let pending = new Map<string, TransferProgress>();
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -34,26 +32,6 @@ function flush(): void {
   const updates = [...pending.values()];
   pending = new Map();
   useTransfersStore.getState().updateProgressBatch(updates);
-}
-
-function clearReconnect(): void {
-  if (reconnectTimer !== null) {
-    clearTimeout(reconnectTimer);
-    reconnectTimer = null;
-  }
-}
-
-function scheduleReconnect(): void {
-  clearReconnect();
-  const delay = Math.min(
-    RECONNECT_BASE_MS * 2 ** reconnectAttempt,
-    RECONNECT_MAX_MS,
-  );
-  reconnectAttempt += 1;
-  reconnectTimer = setTimeout(() => {
-    reconnectTimer = null;
-    installSubscription();
-  }, delay);
 }
 
 function installSubscription(): void {
@@ -71,14 +49,14 @@ function installSubscription(): void {
       onError: (cause) => {
         failed = true;
         useTransfersStore.getState().setRuntimeError(toIpcError(cause));
-        scheduleReconnect();
+        reconnect?.schedule();
       },
     },
   );
   subscription = next;
   void next.ready.then(() => {
     if (subscription !== next || failed) return;
-    reconnectAttempt = 0;
+    reconnect?.reset();
     if (useTransfersStore.getState().runtimeError) {
       useTransfersStore.getState().setRuntimeError(null);
     }
@@ -88,18 +66,25 @@ function installSubscription(): void {
 /** 订阅失败后由面板触发的立即重连。 */
 export function retryTransferRuntime(): void {
   if (!installed) return;
-  clearReconnect();
-  reconnectAttempt = 0;
+  reconnect?.reset();
   installSubscription();
 }
 
 export function installTransferRuntime(): () => void {
   if (installed) return () => undefined;
   installed = true;
+  reconnect = createBackoffScheduler(installSubscription, {
+    baseMs: 1000,
+    maxMs: 30000,
+  });
   installSubscription();
+  let released = false;
   return () => {
+    if (released) return;
+    released = true;
     installed = false;
-    clearReconnect();
+    reconnect?.stop();
+    reconnect = null;
     subscription?.dispose();
     subscription = null;
     if (flushTimer !== null) {

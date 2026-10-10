@@ -1,16 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import LanTransferTool from "~/features/lan-transfer/LanTransferTool";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import { desktopOnlyGuard } from "~/lib/platform";
-import { useSettingsStore } from "~/store/settings";
 
 function LanTransferRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
-
-  useEffect(() => {
-    setLastTool("lan-transfer");
-  }, [setLastTool]);
+  useRememberTool("lan-transfer");
 
   return <LanTransferTool />;
 }

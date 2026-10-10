@@ -1,15 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import CryptoTool from "~/features/crypto/CryptoTool";
-import { useSettingsStore } from "~/store/settings";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 
 function CryptoRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
-
-  useEffect(() => {
-    setLastTool("crypto");
-  }, [setLastTool]);
+  useRememberTool("crypto");
 
   return <CryptoTool />;
 }

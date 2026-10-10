@@ -1,5 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 
+import { createBackoffScheduler } from "~/lib/backoff-scheduler";
 import { toIpcError } from "~/lib/errors";
 import {
   createSubscription,
@@ -17,8 +18,6 @@ import { syncBtTasks } from "../task-sync";
 import { refreshBtTasks, useBtTasksStore } from "../tasks-store";
 
 const POLL_INTERVAL_MS = 2000;
-const RECONNECT_BASE_MS = 1000;
-const RECONNECT_MAX_MS = 30000;
 
 /**
  * BT 模块运行期：任务快照的读取、事件监听与向传输面板的投影都与页面无关，
@@ -28,9 +27,8 @@ const RECONNECT_MAX_MS = 30000;
 let installed = false;
 let poller: Poller | null = null;
 let subscription: Subscription | null = null;
-let pageLeases = 0;
-let reconnectAttempt = 0;
-let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let pageLeases = new Set<symbol>();
+let reconnect: ReturnType<typeof createBackoffScheduler> | null = null;
 let unsubscribeTransfers: (() => void) | null = null;
 let unsubscribeTasks: (() => void) | null = null;
 
@@ -46,7 +44,7 @@ export function isBtRuntimeAvailable(): boolean {
  * BT 页挂载期间的 `acquireBtPage` 和已登记的 BT 传输是唯一的两个触发源。
  */
 function shouldPoll(): boolean {
-  if (pageLeases > 0) return true;
+  if (pageLeases.size > 0) return true;
   return useTransfersStore
     .getState()
     .transfers.some(
@@ -55,7 +53,7 @@ function shouldPoll(): boolean {
 }
 
 function reevaluatePolling(): void {
-  const wanted = shouldPoll();
+  const wanted = installed && shouldPoll();
   if (wanted && !poller) {
     poller = createPoller(() => refreshBtTasks(), {
       intervalMs: POLL_INTERVAL_MS,
@@ -65,26 +63,6 @@ function reevaluatePolling(): void {
     poller?.stop();
     poller = null;
   }
-}
-
-function clearReconnect(): void {
-  if (reconnectTimer !== null) {
-    clearTimeout(reconnectTimer);
-    reconnectTimer = null;
-  }
-}
-
-function scheduleReconnect(): void {
-  clearReconnect();
-  const delay = Math.min(
-    RECONNECT_BASE_MS * 2 ** reconnectAttempt,
-    RECONNECT_MAX_MS,
-  );
-  reconnectAttempt += 1;
-  reconnectTimer = setTimeout(() => {
-    reconnectTimer = null;
-    installSubscription();
-  }, delay);
 }
 
 function installSubscription(): void {
@@ -103,7 +81,7 @@ function installSubscription(): void {
         useBtTasksStore
           .getState()
           .setSubscriptionError(toIpcError(cause).payload);
-        scheduleReconnect();
+        reconnect?.schedule();
       },
     },
   );
@@ -111,7 +89,7 @@ function installSubscription(): void {
   void next.ready.then(() => {
     // 注册成功才清错误并重置退避；被替换或被释放的旧订阅不再影响状态。
     if (subscription !== next || failed) return;
-    reconnectAttempt = 0;
+    reconnect?.reset();
     if (useBtTasksStore.getState().subscriptionError) {
       useBtTasksStore.getState().setSubscriptionError(null);
     }
@@ -121,21 +99,21 @@ function installSubscription(): void {
 /** 监听失败后由界面触发的立即重连。 */
 export function retryBtSubscription(): void {
   if (!installed) return;
-  clearReconnect();
-  reconnectAttempt = 0;
+  reconnect?.reset();
   installSubscription();
   void refreshBtTasks();
 }
 
 /** BT 页挂载期间申请高频轮询；返回幂等的释放函数。 */
 export function acquireBtPage(): () => void {
-  pageLeases += 1;
+  if (!isBtRuntimeAvailable()) return () => undefined;
+  const leases = pageLeases;
+  const lease = Symbol();
+  leases.add(lease);
   reevaluatePolling();
-  let released = false;
   return () => {
-    if (released) return;
-    released = true;
-    pageLeases = Math.max(0, pageLeases - 1);
+    // 只释放所属运行期的令牌，旧页面卸载不影响重新安装后的页面。
+    if (!leases.delete(lease) || leases !== pageLeases) return;
     reevaluatePolling();
   };
 }
@@ -143,6 +121,10 @@ export function acquireBtPage(): () => void {
 export function installBtRuntime(): () => void {
   if (!isBtRuntimeAvailable() || installed) return () => undefined;
   installed = true;
+  reconnect = createBackoffScheduler(installSubscription, {
+    baseMs: 1000,
+    maxMs: 30000,
+  });
   installSubscription();
   // 刻意不在启动时读取任务列表：后端的 `bt_list` 会顺带初始化 BT 引擎，
   // 而用户可能从不使用 BT。快照在页面打开或已有 BT 传输时按需校准。
@@ -155,16 +137,20 @@ export function installBtRuntime(): () => void {
     reevaluatePolling();
   });
   reevaluatePolling();
+  let released = false;
   return () => {
+    if (released) return;
+    released = true;
     installed = false;
-    clearReconnect();
+    reconnect?.stop();
+    reconnect = null;
     subscription?.dispose();
     subscription = null;
     unsubscribeTransfers?.();
     unsubscribeTransfers = null;
     unsubscribeTasks?.();
     unsubscribeTasks = null;
-    pageLeases = 0;
+    pageLeases = new Set();
     poller?.stop();
     poller = null;
   };

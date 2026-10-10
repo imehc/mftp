@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import MediaCompressTool from "~/features/media-compress/MediaCompressTool";
 import { resolveCompressMode } from "~/features/media-compress/modes";
-import { useSettingsStore } from "~/store/settings";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 
 export const Route = createFileRoute("/tools/media-compress")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -13,12 +12,8 @@ export const Route = createFileRoute("/tools/media-compress")({
 });
 
 function MediaCompressRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
+  useRememberTool("media-compress");
   const { mode } = Route.useSearch();
-
-  useEffect(() => {
-    setLastTool("media-compress");
-  }, [setLastTool]);
 
   return <MediaCompressTool mode={mode} />;
 }

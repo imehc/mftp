@@ -32,9 +32,10 @@ import TransferItem from "./TransferItem";
 export default function ActivityMenu() {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
-  const transfers = useTransfersStore((s) => s.transfers);
+  const failures = useTransfersStore(
+    (state) => state.transfers.filter((item) => item.status === "error").length,
+  );
   const runtimeError = useTransfersStore((s) => s.runtimeError);
-  const failures = transfers.filter((item) => item.status === "error").length;
   const label = failures ? t`查看活动，${failures} 个任务失败` : t`查看活动`;
   return (
     <Dialog open={open} onOpenChange={setOpen}>

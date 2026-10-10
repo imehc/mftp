@@ -1,15 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import FormatterTool from "~/features/formatter/FormatterTool";
-import { useSettingsStore } from "~/store/settings";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 
 function FormatterRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
-
-  useEffect(() => {
-    setLastTool("formatter");
-  }, [setLastTool]);
+  useRememberTool("formatter");
 
   return <FormatterTool />;
 }

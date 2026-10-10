@@ -75,26 +75,33 @@ export default function TaskRow({
     task.state === "Seeding";
   const controllable =
     !terminal && task.status !== "Error" && task.status !== "Packaging";
-  const status =
-    task.status === "Cancelled"
-      ? t`已取消`
-      : task.status === "Error"
-        ? t`错误`
-        : task.status === "Packaging"
-          ? t`正在整理文件`
-          : task.status === "Completed"
-            ? t`已完成`
-            : task.state === "Initializing"
-              ? t`获取资源信息…`
-              : task.state === "Paused"
-                ? t`已暂停`
-                : task.state === "Seeding"
-                  ? t`做种中`
-                  : task.state === "Downloading"
-                    ? stalled
-                      ? t`暂无可用节点`
-                      : t`下载中`
-                    : t`未运行`;
+
+  function statusLabel(): string {
+    switch (task.status) {
+      case "Cancelled":
+        return t`已取消`;
+      case "Error":
+        return t`错误`;
+      case "Packaging":
+        return t`正在整理文件`;
+      case "Completed":
+        return t`已完成`;
+    }
+    switch (task.state) {
+      case "Initializing":
+        return t`获取资源信息…`;
+      case "Paused":
+        return t`已暂停`;
+      case "Seeding":
+        return t`做种中`;
+      case "Downloading":
+        return stalled ? t`暂无可用节点` : t`下载中`;
+      default:
+        return t`未运行`;
+    }
+  }
+
+  const status = statusLabel();
   return (
     <article className="bg-card overflow-hidden rounded-xl border text-sm">
       <div className="flex flex-col gap-2 p-3">

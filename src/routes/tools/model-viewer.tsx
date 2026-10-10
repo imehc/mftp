@@ -1,17 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import ModelViewerPage from "~/features/model-viewer/ModelViewerPage";
-import { useSettingsStore } from "~/store/settings";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 
 export const Route = createFileRoute("/tools/model-viewer")({
   component: ModelViewerRoute,
 });
 
 function ModelViewerRoute() {
-  const setLastTool = useSettingsStore((state) => state.setLastTool);
-  useEffect(() => {
-    setLastTool("model-viewer");
-  }, [setLastTool]);
+  useRememberTool("model-viewer");
   return <ModelViewerPage />;
 }

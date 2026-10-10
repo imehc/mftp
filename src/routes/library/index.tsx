@@ -1,9 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
 
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import LibraryPage from "~/features/poetry/LibraryPage";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
-import { useSettingsStore } from "~/store/settings";
 
 interface LibrarySearch {
   /** 内联全文检索词；保留在 URL 中以便返回 / 分享。 */
@@ -14,12 +13,8 @@ interface LibrarySearch {
 
 function LibraryRoute() {
   const desktop = useDesktopLayout();
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
+  useRememberTool("library");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setLastTool("library");
-  }, [setLastTool]);
 
   const search = Route.useSearch();
   const onSearchChange = (patch: { q?: string }) =>

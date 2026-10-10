@@ -1,9 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import type { PoetryTranslationMode } from "~/bindings";
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import PoemDetailPage from "~/features/poetry/PoemDetailPage";
-import { useSettingsStore } from "~/store/settings";
 
 interface LibraryPoemSearch {
   q?: string;
@@ -15,14 +14,10 @@ interface LibraryPoemSearch {
  *（例如某个合集重新同步后）仍必须能渲染出完整页面。
  */
 function LibraryPoemRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
+  useRememberTool("library");
   const navigate = useNavigate();
   const uid = Route.useParams().id;
   const { q, mode } = Route.useSearch();
-
-  useEffect(() => {
-    setLastTool("library");
-  }, [setLastTool]);
 
   return (
     <PoemDetailPage

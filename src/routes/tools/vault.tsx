@@ -1,15 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import VaultTool from "~/features/vault/VaultTool";
-import { useSettingsStore } from "~/store/settings";
 
 function VaultRoute() {
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
-
-  useEffect(() => {
-    setLastTool("vault");
-  }, [setLastTool]);
+  useRememberTool("vault");
 
   return <VaultTool />;
 }

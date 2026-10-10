@@ -1,15 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
+import { useRememberTool } from "~/features/navigation/use-remember-tool";
 import TodoTool from "~/features/todo/TodoTool";
-import { useSettingsStore } from "~/store/settings";
 
 function TodoRoute() {
-  const setLastTool = useSettingsStore((state) => state.setLastTool);
-
-  useEffect(() => {
-    setLastTool("todo");
-  }, [setLastTool]);
+  useRememberTool("todo");
 
   return <TodoTool />;
 }
