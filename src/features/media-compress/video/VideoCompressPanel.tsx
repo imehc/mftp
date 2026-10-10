@@ -1,15 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { FileVideo, VideoOff } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useRef } from "react";
 
-import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -21,214 +20,48 @@ import { CompressEstimateBar } from "~/features/media-compress/components/Compre
 import { CompressQualityField } from "~/features/media-compress/components/CompressQualityField";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
 import { formatDuration } from "~/features/media-compress/format";
-import type { CompressPhase } from "~/features/media-compress/types";
-import { useCompressResult } from "~/features/media-compress/useCompressResult";
 import {
-  audioCodecsSupported,
-  compressVideoFile,
-  DEFAULT_VIDEO_QUALITY,
-  estimateVideoOutput,
-  isSupportedVideoFile,
-  probeVideoFile,
   VIDEO_QUALITY_MAX,
   VIDEO_QUALITY_MIN,
   VIDEO_QUALITY_STEP,
-  type VideoMeta,
-  type VideoResolution,
-  webCodecsSupported,
 } from "~/features/media-compress/video/compress";
-import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 
 import MediaProgress from "../components/MediaProgress";
-import { useMediaProcessing } from "../MediaProcessingGuard";
+import { useVideoCompress } from "./use-video-compress";
 
 export default function VideoCompressPanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [meta, setMeta] = useState<VideoMeta | null>(null);
-  const [resolution, setResolution] = useState<VideoResolution>("original");
-  const [quality, setQuality] = useState(DEFAULT_VIDEO_QUALITY);
-  const [keepAudio, setKeepAudio] = useState(true);
-  const [phase, setPhase] = useState<CompressPhase>("idle");
-  useMediaProcessing("video", phase === "compressing");
-  const [progress, setProgress] = useState(0);
-  const [stage, setStage] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const codecOk = webCodecsSupported();
-  const audioCodecOk = audioCodecsSupported();
-  const lastParamsRef = useRef<string>("");
-  const probeRunRef = useRef(0);
-  const { result, clearResult, setResult, setResultSize } = useCompressResult();
-  const effectiveKeepAudio = keepAudio && audioCodecOk;
-  const estimate = (() => {
-    if (!meta) return null;
-    return estimateVideoOutput(meta, {
-      resolution,
-      quality,
-      keepAudio: effectiveKeepAudio,
-    });
-  })();
-  const paramsKey = `${resolution}-${quality}-${keepAudio}`;
-  // 当编解码器变为不可用时，在渲染期间重置 keepAudio（React 的
-  //“在 prop 变化时调整 state”模式），而不是用 effect。
-  const [prevCodecOk, setPrevCodecOk] = useState(audioCodecOk);
-  if (prevCodecOk !== audioCodecOk) {
-    setPrevCodecOk(audioCodecOk);
-    if (!audioCodecOk) setKeepAudio(false);
-  }
-
-  function resetResultState() {
-    clearResult();
-    setError(null);
-    setProgress(0);
-    setStage("");
-  }
-
-  useEffect(() => {
-    if (phase !== "done" || lastParamsRef.current === paramsKey) return;
-    setPhase("idle");
-    setProgress(0);
-    setStage("");
-  }, [paramsKey, phase]);
-  useEffect(() => {
-    return () => {
-      abortRef.current?.abort();
-      probeRunRef.current += 1;
-    };
-  }, []);
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  async function applyFile(next: File | null) {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    const runId = probeRunRef.current + 1;
-    probeRunRef.current = runId;
-    lastParamsRef.current = "";
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    resetResultState();
-    setPreviewUrl(null);
-    setPhase("idle");
-    setMeta(null);
-    setFile(null);
-    if (!next) return;
-    if (!isSupportedVideoFile(next)) {
-      setError(t`仅支持 MP4、MOV、M4V 格式`);
-      toast.error(t`仅支持 MP4、MOV、M4V 格式`);
-      return;
-    }
-    setFile(next);
-    setPreviewUrl(URL.createObjectURL(next));
-    setPhase("probing");
-    try {
-      const info = await probeVideoFile(next);
-      if (probeRunRef.current !== runId) return;
-      setMeta(info);
-      setPhase("idle");
-    } catch (err) {
-      if (probeRunRef.current !== runId) return;
-      setError(describeError(err));
-      setPhase("error");
-      toast.error(describeError(err));
-    }
-  }
-
-  async function onCompress() {
-    if (!file) {
-      toast.error(t`请先选择视频文件`);
-      return;
-    }
-    if (!codecOk) {
-      toast.error(t`当前环境不支持 WebCodecs`);
-      return;
-    }
-    if (phase === "done" && lastParamsRef.current === paramsKey) {
-      toast.message(t`参数未变化，无需重新处理`);
-      return;
-    }
-    resetResultState();
-
-    // 开始新的压缩前，先取消正在进行的压缩。
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-    probeRunRef.current += 1;
-    setPhase("compressing");
-    setProgress(0);
-    setStage("reading");
-    try {
-      const currentMeta =
-        meta ?? (await probeVideoFile(file, controller.signal));
-      if (abortRef.current !== controller) return;
-      setMeta(currentMeta);
-      const result = await compressVideoFile(
-        file,
-        {
-          resolution,
-          quality,
-          keepAudio: effectiveKeepAudio,
-        },
-        (value, nextStage) => {
-          if (abortRef.current !== controller) return;
-          setProgress(value);
-          setStage(nextStage);
-        },
-        controller.signal,
-        currentMeta,
-      );
-      if (abortRef.current !== controller) return;
-      setResult(result);
-      setPhase("done");
-      setProgress(100);
-      lastParamsRef.current = paramsKey;
-      toast.success(t`压缩完成`);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        // 来自被取代的上一次压缩的陈旧处理器 —— 忽略。
-        if (abortRef.current !== controller) return;
-        // 用户通过取消按钮主动取消。
-        setPhase("idle");
-        setProgress(0);
-        setStage("");
-        toast.message(t`已取消压缩`);
-        return;
-      }
-      const message = describeError(err);
-      if (abortRef.current !== controller) return;
-      setError(message);
-      setPhase("error");
-      toast.error(message);
-    } finally {
-      if (abortRef.current === controller) {
-        abortRef.current = null;
-      }
-    }
-  }
+  const {
+    file,
+    previewUrl,
+    meta,
+    resolution,
+    setResolution,
+    quality,
+    setQuality,
+    keepAudio,
+    setKeepAudio,
+    phase,
+    progress,
+    error,
+    codecOk,
+    audioCodecOk,
+    estimate,
+    stageLabel,
+    result,
+    setResultSize,
+    applyFile,
+    onCompress,
+    cancel,
+  } = useVideoCompress();
 
   function onClear() {
     void applyFile(null);
     if (inputRef.current) inputRef.current.value = "";
   }
 
-  const stageLabel =
-    stage === "demuxing"
-      ? t`解析中`
-      : stage === "compressing"
-        ? t`编码中`
-        : stage === "done"
-          ? t`完成`
-          : stage === "reading"
-            ? t`读取中`
-            : phase === "probing"
-              ? t`读取信息`
-              : t`准备中`;
   const processingView = phase === "compressing";
   if (!codecOk) {
     return (
@@ -256,7 +89,7 @@ export default function VideoCompressPanel() {
       fileName={file?.name ?? ""}
       progress={progress}
       label={stageLabel}
-      onCancel={() => abortRef.current?.abort()}
+      onCancel={cancel}
     />
   ) : (
     <div className="grid min-w-0 grid-cols-1 items-start gap-3 md:grid-cols-2">
@@ -328,7 +161,7 @@ export default function VideoCompressPanel() {
               <FieldLabel>
                 <Trans>输出分辨率</Trans>
               </FieldLabel>
-              <FixedSelect
+              <Select
                 value={resolution}
                 onValueChange={(value) => {
                   if (
@@ -360,7 +193,7 @@ export default function VideoCompressPanel() {
                     <SelectItem value="360p">360p</SelectItem>
                   </SelectGroup>
                 </SelectContent>
-              </FixedSelect>
+              </Select>
             </Field>
 
             <CompressQualityField
@@ -401,7 +234,6 @@ export default function VideoCompressPanel() {
             estimatedBytes={estimate?.estimatedBytes}
             estimatedMin={estimate?.estimatedMin}
             estimatedMax={estimate?.estimatedMax}
-            ratio={estimate?.ratio}
             emptyHint={<Trans>选择视频后显示预估体积</Trans>}
             extraBadges={
               estimate ? (

@@ -1,4 +1,6 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
+
+import { createObjectUrlOwner } from "./object-url";
 
 export interface CompressResultValue {
   blob: Blob;
@@ -21,24 +23,16 @@ const EMPTY_RESULT: CompressResultState = {
 };
 
 export function useCompressResult() {
-  const urlRef = useRef<string | null>(null);
+  const [urls] = useState(createObjectUrlOwner);
   const [result, setResultState] = useState(EMPTY_RESULT);
 
-  const revokeCurrentUrl = () => {
-    if (!urlRef.current) return;
-    URL.revokeObjectURL(urlRef.current);
-    urlRef.current = null;
-  };
-
   const clearResult = () => {
-    revokeCurrentUrl();
+    urls.clear();
     setResultState(EMPTY_RESULT);
   };
 
   const setResult = (next: CompressResultValue) => {
-    revokeCurrentUrl();
-    const url = URL.createObjectURL(next.blob);
-    urlRef.current = url;
+    const url = urls.replace(next.blob);
     setResultState({
       ...next,
       url,
@@ -52,8 +46,8 @@ export function useCompressResult() {
     }));
   };
 
-  // 仅在卸载时回收；revokeCurrentUrl 与上方的 setter 共享。
-  const revokeOnUnmount = useEffectEvent(revokeCurrentUrl);
+  // 仅在卸载时回收；与替换、清空共用同一 URL 所有者。
+  const revokeOnUnmount = useEffectEvent(() => urls.clear());
   useEffect(() => revokeOnUnmount, []);
   return {
     result,

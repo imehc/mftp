@@ -44,7 +44,7 @@ export function CompressEstimateBar({
     <>
       <div className="border-border mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3">
         <div className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-xs">
-          {estimatedBytes != null && ratio != null ? (
+          {estimatedBytes != null ? (
             <>
               {estimatedMin != null && estimatedMax != null ? (
                 <Badge variant="outline">
@@ -58,9 +58,11 @@ export function CompressEstimateBar({
                 </Badge>
               )}
               {extraBadges}
-              <span>
-                <Trans>约原体积的 {ratioPercent}%</Trans>
-              </span>
+              {ratio != null ? (
+                <span>
+                  <Trans>约原体积的 {ratioPercent}%</Trans>
+                </span>
+              ) : null}
             </>
           ) : (
             <span>{emptyHint}</span>

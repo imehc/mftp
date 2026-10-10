@@ -1,13 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ImageIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useRef } from "react";
 
-import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Field, FieldLabel } from "~/components/ui/field";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -18,201 +17,52 @@ import { Slider } from "~/components/ui/slider";
 import { CompressDropzone } from "~/features/media-compress/components/CompressDropzone";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
 import {
-  type ImageMeta,
-  isSupportedImageFile,
-  probeImageFile,
-} from "~/features/media-compress/image/compress";
-import {
-  computeTargetSize,
-  DEFAULT_RATIO,
-  type DimensionMode,
-  isTargetSizeAllowed,
   RATIO_MAX,
   RATIO_MIN,
   RATIO_STEP,
-  resizeImageFile,
-  type ResizeMethod,
-  type ResizeSize,
 } from "~/features/media-compress/resize/resize";
 import {
   DIMENSION_MODES,
   DimensionInput,
   dimensionModeLabel,
   isDimensionMode,
-  parseDimensionInput,
   ResizeMethodTabs,
 } from "~/features/media-compress/resize/ResizeControls";
-import type { CompressPhase } from "~/features/media-compress/types";
-import { useCompressResult } from "~/features/media-compress/useCompressResult";
-import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 
 import MediaProgress from "../components/MediaProgress";
-import { useMediaProcessing } from "../MediaProcessingGuard";
+import { useImageResize } from "./use-image-resize";
 
 export default function ImageResizePanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const probeRunRef = useRef(0);
-  const lastParamsRef = useRef<string>("");
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [meta, setMeta] = useState<ImageMeta | null>(null);
-  const [phase, setPhase] = useState<CompressPhase>("idle");
-  useMediaProcessing("resize", phase === "compressing");
-  const [error, setError] = useState<string | null>(null);
-  const [method, setMethod] = useState<ResizeMethod>("ratio");
-  const [ratio, setRatio] = useState(DEFAULT_RATIO);
-  const [dimensionMode, setDimensionMode] = useState<DimensionMode>("width");
-  const [widthInput, setWidthInput] = useState("");
-  const [heightInput, setHeightInput] = useState("");
-  const [edgeInput, setEdgeInput] = useState("");
-  const [resultDims, setResultDims] = useState<ResizeSize | null>(null);
-  const { result, clearResult, setResult, setResultSize } = useCompressResult();
-  useEffect(() => {
-    return () => {
-      abortRef.current?.abort();
-      probeRunRef.current += 1;
-    };
-  }, []);
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  // 预填输入，使每种模式都从源尺寸（即原样）开始。
-  function seedInputs(info: ImageMeta, mode: DimensionMode) {
-    setWidthInput(String(info.width));
-    setHeightInput(String(info.height));
-    setEdgeInput(
-      String(
-        mode === "shortest"
-          ? Math.min(info.width, info.height)
-          : Math.max(info.width, info.height),
-      ),
-    );
-  }
-
-  const target = (() => {
-    if (!meta) return null;
-    return computeTargetSize(
-      {
-        width: meta.width,
-        height: meta.height,
-      },
-      {
-        method,
-        ratio,
-        dimensionMode,
-        width: parseDimensionInput(widthInput),
-        height: parseDimensionInput(heightInput),
-        edge: parseDimensionInput(edgeInput),
-      },
-    );
-  })();
-  const targetAllowed = target != null && isTargetSizeAllowed(target);
-  const paramsKey = `${method}-${ratio}-${dimensionMode}-${widthInput}-${heightInput}-${edgeInput}`;
-  // 完成后若任意参数发生变化，允许重新处理。
-  useEffect(() => {
-    if (phase !== "done" || lastParamsRef.current === paramsKey) return;
-    setPhase("idle");
-  }, [paramsKey, phase]);
-
-  function resetResultState() {
-    clearResult();
-    setResultDims(null);
-    setError(null);
-  }
-
-  async function applyFile(next: File | null) {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    const runId = probeRunRef.current + 1;
-    probeRunRef.current = runId;
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    resetResultState();
-    setPreviewUrl(null);
-    setPhase("idle");
-    setMeta(null);
-    setFile(null);
-    lastParamsRef.current = "";
-    if (!next) return;
-    if (!isSupportedImageFile(next)) {
-      setError(t`仅支持 PNG、JPG、WebP 格式`);
-      toast.error(t`仅支持 PNG、JPG、WebP 格式`);
-      return;
-    }
-    setFile(next);
-    setPreviewUrl(URL.createObjectURL(next));
-    setPhase("probing");
-    try {
-      const info = await probeImageFile(next);
-      if (probeRunRef.current !== runId) return;
-      setMeta(info);
-      seedInputs(info, dimensionMode);
-      setPhase("idle");
-    } catch (err) {
-      if (probeRunRef.current !== runId) return;
-      setError(describeError(err));
-      setPhase("error");
-      toast.error(describeError(err));
-    }
-  }
-
-  function onDimensionModeChange(next: DimensionMode) {
-    setDimensionMode(next);
-    // 重新预填，使切换模式时总是先预览原样尺寸。
-    if (meta) seedInputs(meta, next);
-  }
-
-  async function onProcess() {
-    if (!file || !meta) {
-      toast.error(t`请先选择图片文件`);
-      return;
-    }
-    if (!target || !targetAllowed) {
-      toast.error(t`目标尺寸需在 1–10000 像素之间`);
-      return;
-    }
-    if (phase === "done" && lastParamsRef.current === paramsKey) {
-      toast.message(t`参数未变化，无需重新处理`);
-      return;
-    }
-    resetResultState();
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-    setPhase("compressing");
-    try {
-      const output = await resizeImageFile(file, target, controller.signal);
-      if (abortRef.current !== controller) return;
-      setResult(output);
-      setResultDims({
-        width: output.width,
-        height: output.height,
-      });
-      setPhase("done");
-      lastParamsRef.current = paramsKey;
-      toast.success(t`处理完成`);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        if (abortRef.current !== controller) return;
-        setPhase("idle");
-        return;
-      }
-      if (abortRef.current !== controller) return;
-      const message = describeError(err);
-      setError(message);
-      setPhase("error");
-      toast.error(message);
-    } finally {
-      if (abortRef.current === controller) {
-        abortRef.current = null;
-      }
-    }
-  }
+  const {
+    file,
+    previewUrl,
+    meta,
+    phase,
+    error,
+    method,
+    setMethod,
+    ratio,
+    setRatio,
+    dimensionMode,
+    onDimensionModeChange,
+    widthInput,
+    setWidthInput,
+    heightInput,
+    setHeightInput,
+    edgeInput,
+    setEdgeInput,
+    resultDims,
+    result,
+    setResultSize,
+    target,
+    targetAllowed,
+    applyFile,
+    onProcess,
+    cancel,
+  } = useImageResize();
 
   function onClear() {
     void applyFile(null);
@@ -224,12 +74,8 @@ export default function ImageResizePanel() {
   const targetHeight = target?.height;
   const metaWidth = meta?.width;
   const metaHeight = meta?.height;
-  const processingView = phase === "compressing";
-  return processingView ? (
-    <MediaProgress
-      fileName={file?.name ?? ""}
-      onCancel={() => abortRef.current?.abort()}
-    />
+  return processing ? (
+    <MediaProgress fileName={file?.name ?? ""} onCancel={cancel} />
   ) : (
     <div className="grid min-w-0 grid-cols-1 items-start gap-3 md:grid-cols-2">
       <CompressDropzone
@@ -291,7 +137,7 @@ export default function ImageResizePanel() {
             <Trans>输出设置</Trans>
           </h2>
           <div className="grid gap-3">
-            <Field>
+            <Field orientation="choice">
               <FieldLabel>
                 <Trans>缩放方式</Trans>
               </FieldLabel>
@@ -339,7 +185,7 @@ export default function ImageResizePanel() {
                 <FieldLabel>
                   <Trans>尺寸模式</Trans>
                 </FieldLabel>
-                <FixedSelect
+                <Select
                   value={dimensionMode}
                   onValueChange={(value) => {
                     if (isDimensionMode(value)) onDimensionModeChange(value);
@@ -361,7 +207,7 @@ export default function ImageResizePanel() {
                       ))}
                     </SelectGroup>
                   </SelectContent>
-                </FixedSelect>
+                </Select>
               </Field>
             )}
           </div>

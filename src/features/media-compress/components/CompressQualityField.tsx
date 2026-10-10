@@ -53,7 +53,7 @@ export function CompressQualityField({
         className="mt-1"
       />
       <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
-        <span>
+        <span className="shrink-0">
           <Trans>更小</Trans>
         </span>
         {rightHint ?? (

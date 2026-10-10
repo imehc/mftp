@@ -59,11 +59,6 @@ export function clampRatio(value: number): number {
   return Math.min(RATIO_MAX, Math.max(RATIO_MIN, Math.round(value)));
 }
 
-export function clampDimension(value: number): number {
-  if (!Number.isFinite(value)) return DIMENSION_MIN;
-  return Math.min(DIMENSION_MAX, Math.max(DIMENSION_MIN, Math.round(value)));
-}
-
 function isPositiveInt(value: number | null): value is number {
   return value != null && Number.isFinite(value) && value >= 1;
 }

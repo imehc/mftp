@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ImageIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useRef } from "react";
 
 import FixedSelect from "~/components/FixedSelect";
 import { Badge } from "~/components/ui/badge";
@@ -19,175 +18,37 @@ import { CompressEstimateBar } from "~/features/media-compress/components/Compre
 import { CompressQualityField } from "~/features/media-compress/components/CompressQualityField";
 import { CompressResultCard } from "~/features/media-compress/components/CompressResultCard";
 import {
-  compressImageFile,
-  DEFAULT_IMAGE_QUALITY,
-  detectImageOutputFormat,
-  estimateImageOutput,
   IMAGE_QUALITY_MAX,
   IMAGE_QUALITY_MIN,
   IMAGE_QUALITY_STEP,
-  type ImageMeta,
-  type ImageOutputFormat,
-  isAvifExportSupported,
-  isSupportedImageFile,
-  probeImageFile,
 } from "~/features/media-compress/image/compress";
-import type { CompressPhase } from "~/features/media-compress/types";
-import { useCompressResult } from "~/features/media-compress/useCompressResult";
-import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 
 import MediaProgress from "../components/MediaProgress";
-import { useMediaProcessing } from "../MediaProcessingGuard";
+import { useImageCompress } from "./use-image-compress";
 
 export default function ImageCompressPanel() {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [meta, setMeta] = useState<ImageMeta | null>(null);
-  const [outputFormat, setOutputFormat] = useState<ImageOutputFormat>("jpg");
-  const [quality, setQuality] = useState(DEFAULT_IMAGE_QUALITY);
-  const [phase, setPhase] = useState<CompressPhase>("idle");
-  useMediaProcessing("image", phase === "compressing");
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [avifOk, setAvifOk] = useState(true);
-  const lastParamsRef = useRef<string>("");
-  const probeRunRef = useRef(0);
-  const { result, clearResult, setResult, setResultSize } = useCompressResult();
-  useEffect(() => {
-    void isAvifExportSupported().then(setAvifOk);
-  }, []);
-  useEffect(() => {
-    return () => {
-      abortRef.current?.abort();
-      probeRunRef.current += 1;
-    };
-  }, []);
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-  const estimate = (() => {
-    if (!meta) return null;
-    return estimateImageOutput(meta, {
-      outputFormat,
-      quality,
-    });
-  })();
-  const paramsKey = `${outputFormat}-${quality}`;
-  useEffect(() => {
-    if (phase !== "done" || lastParamsRef.current === paramsKey) return;
-    setPhase("idle");
-    setProgress(0);
-  }, [paramsKey, phase]);
-
-  function resetResultState() {
-    clearResult();
-    setError(null);
-    setProgress(0);
-  }
-
-  async function applyFile(next: File | null) {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    const runId = probeRunRef.current + 1;
-    probeRunRef.current = runId;
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    resetResultState();
-    setPreviewUrl(null);
-    setPhase("idle");
-    setMeta(null);
-    setFile(null);
-    lastParamsRef.current = "";
-    if (!next) return;
-    if (!isSupportedImageFile(next)) {
-      setError(t`仅支持 PNG、JPG、WebP 格式`);
-      toast.error(t`仅支持 PNG、JPG、WebP 格式`);
-      return;
-    }
-
-    // 默认让导出格式与源文件保持一致。
-    setOutputFormat(detectImageOutputFormat(next));
-    setFile(next);
-    setPreviewUrl(URL.createObjectURL(next));
-    setPhase("probing");
-    try {
-      const info = await probeImageFile(next);
-      if (probeRunRef.current !== runId) return;
-      setMeta(info);
-      setPhase("idle");
-    } catch (err) {
-      if (probeRunRef.current !== runId) return;
-      setError(describeError(err));
-      setPhase("error");
-      toast.error(describeError(err));
-    }
-  }
-
-  async function onCompress() {
-    if (!file) {
-      toast.error(t`请先选择图片文件`);
-      return;
-    }
-    if (outputFormat === "avif" && !avifOk) {
-      toast.error(t`当前环境不支持导出 AVIF`);
-      return;
-    }
-    if (phase === "done" && lastParamsRef.current === paramsKey) {
-      toast.message(t`参数未变化，无需重新处理`);
-      return;
-    }
-    resetResultState();
-
-    // 开始新的压缩前，先取消正在进行的压缩。
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-    probeRunRef.current += 1;
-    setPhase("compressing");
-    setProgress(0);
-    try {
-      const result = await compressImageFile(
-        file,
-        {
-          outputFormat,
-          quality,
-        },
-        (value) => {
-          if (abortRef.current !== controller) return;
-          setProgress(value);
-        },
-        controller.signal,
-      );
-      if (abortRef.current !== controller) return;
-      setResult(result);
-      setPhase("done");
-      setProgress(100);
-      lastParamsRef.current = paramsKey;
-      toast.success(t`压缩完成`);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        if (abortRef.current !== controller) return;
-        setPhase("idle");
-        setProgress(0);
-        toast.message(t`已取消压缩`);
-        return;
-      }
-      if (abortRef.current !== controller) return;
-      const message = describeError(err);
-      setError(message);
-      setPhase("error");
-      toast.error(message);
-    } finally {
-      if (abortRef.current === controller) {
-        abortRef.current = null;
-      }
-    }
-  }
+  const {
+    file,
+    previewUrl,
+    meta,
+    outputFormat,
+    setOutputFormat,
+    quality,
+    setQuality,
+    phase,
+    progress,
+    error,
+    avifOk,
+    estimate,
+    result,
+    setResultSize,
+    applyFile,
+    onCompress,
+    cancel,
+  } = useImageCompress();
 
   function onClear() {
     void applyFile(null);
@@ -199,7 +60,7 @@ export default function ImageCompressPanel() {
     <MediaProgress
       fileName={file?.name ?? ""}
       progress={progress}
-      onCancel={() => abortRef.current?.abort()}
+      onCancel={cancel}
     />
   ) : (
     <div className="grid min-w-0 grid-cols-1 items-start gap-3 md:grid-cols-2">
@@ -262,7 +123,7 @@ export default function ImageCompressPanel() {
             <Trans>输出设置</Trans>
           </h2>
           <div className="grid gap-3">
-            <Field>
+            <Field orientation="choice">
               <FieldLabel>
                 <Trans>输出格式</Trans>
               </FieldLabel>
@@ -288,9 +149,7 @@ export default function ImageCompressPanel() {
                     <SelectItem value="jpg">JPG</SelectItem>
                     <SelectItem value="png">PNG</SelectItem>
                     <SelectItem value="webp">WebP</SelectItem>
-                    <SelectItem value="avif" disabled={!avifOk}>
-                      {avifOk ? "AVIF" : t`AVIF（不支持）`}
-                    </SelectItem>
+                    {avifOk ? <SelectItem value="avif">AVIF</SelectItem> : null}
                   </SelectGroup>
                 </SelectContent>
               </FixedSelect>
@@ -306,7 +165,7 @@ export default function ImageCompressPanel() {
               onChange={setQuality}
               rightHint={
                 outputFormat === "png" ? (
-                  <span className="min-w-0 truncate text-right">
+                  <span className="min-w-0 text-right">
                     <Trans>PNG 为无损格式，压缩程度影响有限</Trans>
                   </span>
                 ) : undefined

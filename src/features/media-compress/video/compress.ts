@@ -12,6 +12,8 @@ import {
 
 import { translate } from "~/i18n/translate";
 
+import { awaitConversion } from "./await-conversion";
+
 export type VideoResolution = "original" | "1080p" | "720p" | "480p" | "360p";
 
 /** 码率质量 10–100，步长 10。越大保留细节越多。 */
@@ -396,17 +398,40 @@ export async function compressVideoFile(
   }
 
   let conversion: Conversion | null = null;
+  let result: VideoCompressResult | null = null;
+  let failure: { error: unknown } | null = null;
 
-  // Mediabunny 初始化时可能在 Conversion 产生前花费时间解封装。
-  // 释放 input 能让取消立即更新 UI，并避免陈旧的写入。
+  const cleanup: Promise<{ error: unknown } | null>[] = [];
+  let cancelRequested = false;
+  let conversionCancelled = false;
+
+  const requestCleanup = (action: () => unknown) => {
+    // 立即接住清理失败，最终统一等待并报告，不能把释放失败当作取消成功。
+    cleanup.push(
+      Promise.resolve()
+        .then(action)
+        .then(
+          () => null,
+          (error: unknown) => ({ error }),
+        ),
+    );
+  };
+
   const abort = () => {
-    void conversion?.cancel();
-    input.dispose();
-    void output.cancel().catch(() => undefined);
+    if (conversion && !conversionCancelled) {
+      conversionCancelled = true;
+      const current = conversion;
+      requestCleanup(() => current.cancel());
+    }
+    if (!cancelRequested) {
+      cancelRequested = true;
+      requestCleanup(() => input.dispose());
+      requestCleanup(() => output.cancel());
+    }
   };
 
   try {
-    conversion = await raceAbort(
+    const initialized = await awaitConversion(
       Conversion.init({
         input,
         output,
@@ -415,10 +440,16 @@ export async function compressVideoFile(
           ? { codec: "aac", bitrate: 128_000 }
           : { discard: true },
         showWarnings: false,
+      }).then((initialized) => {
+        conversion = initialized;
+        // 初始化晚于取消结束时，新得到的转换资源也必须释放。
+        if (signal?.aborted) abort();
+        return initialized;
       }),
       signal,
       abort,
     );
+    conversion = initialized;
 
     if (!conversion.isValid) {
       const detail = conversion.discardedTracks
@@ -436,7 +467,7 @@ export async function compressVideoFile(
     };
 
     onProgress?.(5, "compressing");
-    await raceAbort(conversion.execute(), signal, abort);
+    await awaitConversion(conversion.execute(), signal, abort);
     throwIfAborted(signal);
 
     const buffer = target.buffer;
@@ -449,32 +480,25 @@ export async function compressVideoFile(
     const stem = file.name.replace(/\.[^.]+$/, "") || "video";
 
     // 若压缩后比原文件还大，则直接返回原文件。
-    if (blob.size >= file.size) {
-      return {
-        blob: file,
-        size: file.size,
-        fileName: `${stem}.${file.name.split(".").pop()?.toLowerCase() ?? "mp4"}`,
-      };
-    }
-
-    return {
-      blob,
-      size: blob.size,
-      fileName: `${stem}.mp4`,
-    };
+    result =
+      blob.size >= file.size
+        ? {
+            blob: file,
+            size: file.size,
+            fileName: `${stem}.${file.name.split(".").pop()?.toLowerCase() ?? "mp4"}`,
+          }
+        : { blob, size: blob.size, fileName: `${stem}.mp4` };
   } catch (err) {
-    if (isCanceledError(err, signal)) {
-      throw abortError();
-    }
-    throw err;
+    abort();
+    failure = { error: isCanceledError(err, signal) ? abortError() : err };
   } finally {
-    if (conversion) {
-      conversion.onProgress = undefined as never;
-    }
-    try {
-      input.dispose();
-    } catch {
-      // 忽略该错误
-    }
+    if (!cancelRequested) requestCleanup(() => input.dispose());
+    if (conversion) conversion.onProgress = undefined as never;
   }
+  const cleanupResults = await Promise.all(cleanup);
+  const failedCleanup = cleanupResults.find((entry) => entry !== null);
+  if (failedCleanup) throw failedCleanup.error;
+  if (failure) throw failure.error;
+  if (!result) throw new Error("Conversion finished without a result");
+  return result;
 }
