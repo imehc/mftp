@@ -178,7 +178,11 @@ export default function AiConfigurationSettings() {
         />
       ) : null}
       {deleting && view ? (
-        <AiDeleteDialog target={deleting} onClose={() => setDeleting(null)} />
+        <AiDeleteDialog
+          view={view}
+          target={deleting}
+          onClose={() => setDeleting(null)}
+        />
       ) : null}
     </section>
   );

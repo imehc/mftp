@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 
+import type { AiConfigurationView } from "~/bindings";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -26,9 +27,11 @@ import type { AiDeleteTarget } from "./types";
 
 export default function AiDeleteDialog({
   target,
+  view,
   onClose,
 }: {
   target: AiDeleteTarget;
+  view: AiConfigurationView;
   onClose: () => void;
 }) {
   const { t } = useLingui();
@@ -43,7 +46,7 @@ export default function AiDeleteDialog({
     setReplacement,
     remove,
     rebase,
-  } = useAiDelete(target, onClose);
+  } = useAiDelete(target, view, onClose);
   const title =
     target.kind === "provider"
       ? t`删除服务地址？`
