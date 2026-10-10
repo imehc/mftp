@@ -144,6 +144,8 @@ export default function SshSftpTool() {
   }, [ensureHosts]);
   const compact = !useDesktopLayout();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const drawerOpenerRef = useRef<HTMLElement | null>(null);
   // 断点切换时收起抽屉：在渲染期修正状态，避免先渲染一帧旧布局。
   const [drawerBreakpoint, setDrawerBreakpoint] = useState(compact);
   if (drawerBreakpoint !== compact) {
@@ -303,6 +305,21 @@ export default function SshSftpTool() {
       </Group>
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
         <SheetContent
+          ref={drawerRef}
+          tabIndex={-1}
+          onOpenAutoFocus={(event) => {
+            // 首次聚焦抽屉本身，避免关闭按钮自动获焦弹出 Tooltip。
+            event.preventDefault();
+            drawerOpenerRef.current = document.activeElement as HTMLElement;
+            drawerRef.current?.focus();
+          }}
+          onCloseAutoFocus={(event) => {
+            // 抽屉由工作区按钮打开，没有 SheetTrigger，需要显式还原焦点。
+            if (drawerOpenerRef.current?.isConnected) {
+              event.preventDefault();
+              drawerOpenerRef.current.focus();
+            }
+          }}
           side="left"
           showCloseButton={false}
           className="ui-density-adaptive w-full max-w-full gap-0 p-0 md:max-w-md"
