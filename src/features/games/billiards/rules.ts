@@ -6,17 +6,13 @@
  * 相对 WPA 规则的简化（详见 docs/games.md）：无击球后必须碰库的
  * 要求、第一颗落袋的球决定组别、开球进黑八重置、自由球可在任意位置。
  */
+import { createRng } from "../engine/ai";
 import type {
   GameDefinition,
   MoveResolution,
   SeatIndex,
 } from "../engine/types";
-import {
-  BALL_RADIUS,
-  FOOT_SPOT_X,
-  HEAD_SPOT_X,
-  RACK_LAYOUT,
-} from "./constants";
+import { BALL_RADIUS, FOOT_SPOT_X, HEAD_SPOT_X } from "./constants";
 import {
   applyNineBallAction,
   nineBallSeat,
@@ -45,19 +41,46 @@ import {
   type ShotOutcome,
 } from "./types";
 
-export function createInitialBalls(): BallState[] {
+/**
+ * 黑八摆球：8 号固定在第三排中间，最后一排两个底角必须一颗全色、一颗
+ * 花色（左右随机），其余球按种子随机。种子在对局创建时固定，重赛可复现。
+ */
+export function createInitialBalls(seed = 1): BallState[] {
   const balls: BallState[] = [{ id: 0, x: HEAD_SPOT_X, y: 0, potted: false }];
   const spacing = BALL_RADIUS * 2 + 0.0004;
   const rowStep = (spacing * Math.sqrt(3)) / 2;
-  RACK_LAYOUT.forEach((row, i) => {
-    row.forEach((id, j) => {
+  const rng = createRng(seed);
+
+  const shuffle = <T>(items: T[]): T[] => {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+  };
+
+  const solids = shuffle([1, 2, 3, 4, 5, 6, 7]);
+  const stripes = shuffle([9, 10, 11, 12, 13, 14, 15]);
+  // 先抽出底角的一全一花，再把剩余 12 颗混在一起填其余位置。
+  const corners = shuffle([solids.pop()!, stripes.pop()!]);
+  const rest = shuffle([...solids, ...stripes]);
+  const rows = [1, 2, 3, 4, 5];
+  rows.forEach((count, i) => {
+    for (let j = 0; j < count; j++) {
+      const bottom = i === rows.length - 1;
+      const id =
+        i === 2 && j === 1
+          ? 8
+          : bottom && (j === 0 || j === count - 1)
+            ? corners[j === 0 ? 0 : 1]
+            : rest.pop()!;
       balls.push({
         id,
         x: FOOT_SPOT_X + i * rowStep,
         y: (j - i / 2) * spacing,
         potted: false,
       });
-    });
+    }
   });
   return balls.sort((a, b) => a.id - b.id);
 }
@@ -75,8 +98,8 @@ export function createInitialState(
       discipline === "nine-ball"
         ? createNineBallRack(seed)
         : discipline === "snooker"
-          ? createSnookerRack(reds)
-          : createInitialBalls(),
+          ? createSnookerRack(reds, seed)
+          : createInitialBalls(seed),
     discipline,
     reds: discipline === "snooker" ? reds : undefined,
     turnSeat: firstSeat,

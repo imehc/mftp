@@ -1,3 +1,4 @@
+import { createRng } from "../engine/ai";
 import { SNOOKER } from "./equipment";
 import type { BallState, RedCount } from "./types";
 
@@ -20,18 +21,28 @@ export function insideD(x: number, y: number): boolean {
   return x <= BAULK_X + 1e-10 && Math.hypot(x - BAULK_X, y) <= D_RADIUS + 1e-10;
 }
 
-export function createSnookerRack(reds: RedCount): BallState[] {
+/**
+ * 斯诺克摆球：彩球固定点位；红球紧靠粉球后方摆成三角形，底边平行顶库，
+ * 球间贴紧。红球没有号码顺序，按种子随机分配 id 只是为了让每局外观
+ * 不同，不影响规则。
+ */
+export function createSnookerRack(reds: RedCount, seed = 1): BallState[] {
   const diameter = SNOOKER.ballRadius * 2;
   const balls: BallState[] = [
     { id: 0, x: BAULK_X - D_RADIUS / 2, y: D_RADIUS / 2, potted: false },
     ...COLOR_IDS.map((id) => ({ id, ...COLOR_SPOTS[id], potted: false })),
   ];
   const rows = reds === 6 ? 3 : reds === 10 ? 4 : 5;
-  let id = 8;
+  const rng = createRng(seed);
+  const ids = Array.from({ length: reds }, (_, i) => 8 + i);
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
   for (let row = 0; row < rows; row++)
     for (let col = 0; col <= row; col++) {
       balls.push({
-        id: id++,
+        id: ids.pop()!,
         x:
           COLOR_SPOTS[6].x +
           diameter +
@@ -41,5 +52,5 @@ export function createSnookerRack(reds: RedCount): BallState[] {
         potted: false,
       });
     }
-  return balls;
+  return balls.sort((a, b) => a.id - b.id);
 }

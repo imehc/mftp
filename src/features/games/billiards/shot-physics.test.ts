@@ -112,7 +112,11 @@ it("相同开球结果确定且时间线从零开始，无非有限坐标", () =
   expect(
     first.balls.every((b) => Number.isFinite(b.x) && Number.isFinite(b.y)),
   ).toBe(true);
-  expect(first.firstContact).toBe(1);
+  // 摆球随种子随机，正向开球的首碰应是顶点球（x 最小的目标球）。
+  const apex = balls
+    .filter((b) => b.id !== 0)
+    .reduce((a, b) => (a.x < b.x ? a : b));
+  expect(first.firstContact).toBe(apex.id);
 });
 
 it("高速极薄切在不同采样相位下均先撞目标球", () => {
