@@ -34,7 +34,7 @@ export function createSnookerState(
     variant: "snooker",
     reds,
     frameSeed: seed,
-    balls: createSnookerRack(reds),
+    balls: createSnookerRack(reds, seed),
     turnSeat: firstSeat,
     on: { kind: "red" },
     placementRegion: "d",

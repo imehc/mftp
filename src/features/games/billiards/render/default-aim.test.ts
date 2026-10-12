@@ -128,7 +128,11 @@ describe("默认目标遵守当前球权和碰撞路径", () => {
 describe("每杆初始化与中式八球台面", () => {
   it("开球朝向球堆顶点，初始摆球位于台面且不重叠", () => {
     const state = createInitialState("eight-ball");
-    expect(defaultAim(state)).toEqual({ angle: 0, targetId: 1 });
+    // 摆球随种子随机，顶点是 x 最小的目标球。
+    const apex = state.balls
+      .filter((b) => b.id !== 0)
+      .reduce((a, b) => (a.x < b.x ? a : b));
+    expect(defaultAim(state)).toEqual({ angle: 0, targetId: apex.id });
     for (const ball of state.balls) {
       expect(insidePlayArea(ball.x, ball.y)).toBe(true);
       expect(overlapsAnyBall(state.balls, ball.x, ball.y, ball.id)).toBe(false);

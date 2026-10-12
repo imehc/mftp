@@ -38,15 +38,3 @@ export const CUSHION_FRICTION = 0.14;
 export const MAX_SHOT_SPEED = 7.5;
 /** 跟杆/缩杆的额外冲量系数，在首次接触时施加。 */
 export const FOLLOW_DRAW_FACTOR = 0.48;
-
-/**
- * 固定黑八摆球布局（从顶点起逐行）：黑八居中于第三行，后两角为
- * 一全色一花色。固定（不随机）以保证初始状态确定。
- */
-export const RACK_LAYOUT: readonly (readonly number[])[] = [
-  [1],
-  [9, 2],
-  [3, 8, 10],
-  [11, 7, 14, 4],
-  [5, 13, 15, 6, 12],
-];
