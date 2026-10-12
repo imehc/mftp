@@ -1,14 +1,16 @@
 import { Container, Graphics } from "pixi.js";
 
-import { px } from "./table";
+import { CHINESE_EIGHT, type TableEquipment } from "../equipment";
+import { px } from "./layout";
 
-export function createCueView() {
+export function createCueView(equipment: TableEquipment = CHINESE_EIGHT) {
   const layer = new Container();
   const shadow = new Graphics();
   const stick = new Graphics();
-  const stickLength = px(1.45);
-  const tipHalfWidth = px(0.0065);
-  const buttHalfWidth = px(0.015);
+  // 球杆和球桌共用米制比例，各模式长度为已确认器材选型。
+  const stickLength = px(equipment.cueLength);
+  const tipHalfWidth = px(equipment.cueTipDiameter / 2);
+  const buttHalfWidth = px(equipment.cueButtDiameter / 2);
   const halfWidthAt = (x: number) =>
     tipHalfWidth + (buttHalfWidth - tipHalfWidth) * (x / stickLength);
 

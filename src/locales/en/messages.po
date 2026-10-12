@@ -22,11 +22,15 @@ msgstr "{0, plural, one {# character} other {# characters}}"
 msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# character} other {# characters}}"
 
+#: src/features/games/billiards/BilliardsScore.tsx:149
+msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
+msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
+
 #: src/features/poetry/components/CollectionManagement.tsx:52
 msgid "{count, plural, one {# 篇} other {# 篇}}"
 msgstr "{count, plural, one {# poem} other {# poems}}"
 
-#: src/features/games/billiards/BilliardsScore.tsx:64
+#: src/features/games/billiards/BilliardsScore.tsx:84
 msgid "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{count, plural, one {# ball left} other {# balls left}}"
 
@@ -50,7 +54,7 @@ msgstr "{deviceCount, plural, one {# device} other {# devices}}"
 msgid "{finishedTransferCount, plural, one {清除 # 个已完成任务} other {清除 # 个已完成任务}}"
 msgstr "{finishedTransferCount, plural, one {Clear # completed task} other {Clear # completed tasks}}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:381
+#: src/features/games/billiards/BilliardsMatchView.tsx:378
 msgid "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
 msgstr "{foulCount, plural, one {# foul} other {# fouls}}"
 
@@ -71,11 +75,11 @@ msgstr "{hours, plural, one {# hour} other {# hours}}"
 msgid "{hours, plural, one {# 小时前} other {# 小时前}}"
 msgstr "{hours, plural, one {# hour ago} other {# hours ago}}"
 
-#: src/features/games/billiards/BilliardsScore.tsx:17
+#: src/features/games/billiards/BilliardsScore.tsx:33
 msgid "{id} 号球，已进球"
 msgstr "Ball {id}, potted"
 
-#: src/features/games/billiards/BilliardsScore.tsx:17
+#: src/features/games/billiards/BilliardsScore.tsx:34
 msgid "{id} 号球，未进球"
 msgstr "Ball {id}, remaining"
 
@@ -140,9 +144,17 @@ msgstr "{onlineConnections} active connections"
 msgid "{pausedTransferCount, plural, one {# 个已暂停} other {# 个已暂停}}"
 msgstr "{pausedTransferCount, plural, one {# transfer paused} other {# transfers paused}}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:250
+#: src/features/games/billiards/SnookerHud.tsx:84
+msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
+msgstr "{redCount, plural, one {# red left} other {# reds left}}"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:177
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {# ball remaining} other {# balls remaining}}"
+
+#: src/features/games/billiards/NineBallHud.tsx:40
+msgid "{remainingBalls, plural, one {剩余 # 球} other {剩余 # 球}}"
+msgstr "{remainingBalls, plural, one {# ball remaining} other {# balls remaining}}"
 
 #: src/features/transfers/transfer-metrics.ts:16
 msgid "{rounded, plural, one {# 秒} other {# 秒}}"
@@ -171,20 +183,20 @@ msgstr "{sharesCount, plural, one {# directory; restart the service to fully app
 msgid "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 msgstr "{sharesCount, plural, one {# directory} other {# directories}}"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:164
+#: src/features/games/billiards/BilliardsModeMenu.tsx:263
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# shot} other {# shots}}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:229
+#: src/features/games/billiards/BilliardsMatchView.tsx:156
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {# shot total} other {# shots total}}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:362
+#: src/features/games/billiards/BilliardsMatchView.tsx:351
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:241
-#: src/features/games/billiards/BilliardsMatch.tsx:271
+#: src/features/games/billiards/BilliardsMatchView.tsx:168
+#: src/features/games/billiards/BilliardsMatchView.tsx:217
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "Shot #"
 
@@ -231,8 +243,8 @@ msgstr "{undoPlies, plural, one {Undo # move. Accept?} other {Undo # moves. Acce
 msgid "{value} 的私钥口令"
 msgstr "Private key passphrase for {value}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:223
-#: src/features/games/billiards/BilliardsMatch.tsx:349
+#: src/features/games/billiards/BilliardsMatchView.tsx:150
+#: src/features/games/billiards/BilliardsMatchView.tsx:338
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} wins"
 
@@ -258,7 +270,11 @@ msgstr "3D Models"
 msgid "3D 模型画布"
 msgstr "3D model canvas"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:90
+#: src/features/games/billiards/NineBallHud.tsx:202
+msgid "9 号球已复位"
+msgstr "9-ball re-spotted"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:164
 msgid "AI 先开球"
 msgstr "AI breaks"
 
@@ -271,7 +287,7 @@ msgstr "AI keys"
 msgid "AI 密钥认证已失效，请返回应用后重试"
 msgstr "AI key authentication has expired. Return to the app and try again."
 
-#: src/features/games/billiards/BilliardsMatch.tsx:305
+#: src/features/games/billiards/BilliardsMatchView.tsx:259
 #: src/features/games/go/GoMatch.tsx:260
 #: src/features/games/gomoku/GomokuMatch.tsx:225
 #: src/features/games/xiangqi/XiangqiMatch.tsx:239
@@ -748,6 +764,11 @@ msgstr "Download progress"
 msgid "下降"
 msgstr "Move down"
 
+#. 斯诺克放弃自由球提名，直接打原目标
+#: src/features/games/billiards/SnookerHud.tsx:253
+msgid "不使用"
+msgstr "Decline"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:35
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:42
 msgid "不可用"
@@ -826,12 +847,17 @@ msgstr "Chinese chess room"
 msgid "中国象棋棋盘"
 msgstr "Chinese chess board"
 
+#: src/features/games/billiards/BilliardsModeMenu.tsx:101
+#: src/features/games/billiards/BilliardsModeMenu.tsx:250
+msgid "中式八球"
+msgstr "Chinese eight-ball"
+
 #: src/features/games/billiards/BilliardsControls.tsx:31
 msgid "中杆"
 msgstr "Center"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:30
-#: src/features/games/billiards/BilliardsModeMenu.tsx:80
+#: src/features/games/billiards/BilliardsModeMenu.tsx:41
+#: src/features/games/billiards/BilliardsModeMenu.tsx:154
 #: src/features/games/engine/BoardMatchLayout.tsx:57
 #: src/features/games/engine/BoardModeMenu.tsx:92
 #: src/features/games/engine/history-labels.tsx:26
@@ -915,6 +941,11 @@ msgstr "Gomoku room"
 msgid "交互模式"
 msgstr "Interaction mode"
 
+#. 九球推杆或违规开球后，让刚才出杆的人继续击球
+#: src/features/games/billiards/NineBallHud.tsx:147
+msgid "交回对方"
+msgstr "Pass back"
+
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:261
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "Swapped {formatBytesValue} / {formatBytesValue2}"
@@ -924,13 +955,13 @@ msgid "人工修订"
 msgstr "Manually revised"
 
 #. 棋类对局模式：玩家对战 AI。
-#: src/features/games/billiards/BilliardsModeMenu.tsx:23
+#: src/features/games/billiards/BilliardsModeMenu.tsx:34
 #: src/features/games/engine/BoardMatchLayout.tsx:51
 #: src/features/games/engine/history-labels.tsx:19
 msgid "人机"
 msgstr "Vs AI"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:72
+#: src/features/games/billiards/BilliardsModeMenu.tsx:146
 #: src/features/games/engine/BoardModeMenu.tsx:84
 msgid "人机对战"
 msgstr "Play vs AI"
@@ -1111,7 +1142,7 @@ msgstr "Low load \\u00b7 Pixel ratio up to 1 \\u00b7 Up to 20 fps"
 msgid "作者"
 msgstr "Author"
 
-#: src/features/games/billiards/BilliardsScore.tsx:11
+#: src/features/games/billiards/BilliardsScore.tsx:14
 #: src/features/games/engine/black-white-labels.tsx:32
 #: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/xiangqi/labels.tsx:30
@@ -1166,6 +1197,10 @@ msgstr "Open with system app"
 #: src/features/bt/components/FileBrowserPanel.tsx:258
 msgid "使用系统应用打开 {entryName}"
 msgstr "Open {entryName} with system app"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:137
+msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
+msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win. Includes the three-ball break requirement, push-out decisions and three consecutive fouls."
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:519
@@ -1316,7 +1351,7 @@ msgstr "Pixel format"
 msgid "允许"
 msgstr "Allow"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:85
+#: src/features/games/billiards/BilliardsModeMenu.tsx:159
 #: src/features/games/engine/BoardModeMenu.tsx:97
 msgid "先后手"
 msgstr "Break order"
@@ -1328,6 +1363,11 @@ msgstr "Play first (Red)"
 #: src/features/games/engine/BoardModeMenu.tsx:101
 msgid "先手（执黑）"
 msgstr "First (Black)"
+
+#. 六红球第五次漏击后的特殊母球放置权，不是自由球
+#: src/features/games/billiards/SnookerHud.tsx:191
+msgid "全台手中球"
+msgstr "Ball in hand anywhere"
 
 #: src/features/formatter/use-formatter.ts:61
 msgid "全字匹配"
@@ -1343,7 +1383,7 @@ msgstr "Fullscreen"
 msgid "全文索引"
 msgstr "Full-text index"
 
-#: src/features/games/billiards/BilliardsScore.tsx:127
+#: src/features/games/billiards/BilliardsScore.tsx:157
 msgid "全色球"
 msgstr "Solids"
 
@@ -1385,6 +1425,11 @@ msgstr "All Sources"
 #: src/features/logs/LogFilters.tsx:89
 msgid "全部结果"
 msgstr "All Results"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:120
+#: src/features/games/billiards/BilliardsModeMenu.tsx:240
+msgid "六红球"
+msgstr "Six reds"
 
 #: src/features/poetry/components/TranslationPackManager.tsx:45
 msgid "共 {count} 条译文"
@@ -1477,7 +1522,7 @@ msgstr "Closing this panel does not cancel transfers."
 msgid "关闭连接"
 msgstr "Close connection"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:104
+#: src/features/games/billiards/BilliardsModeMenu.tsx:180
 #: src/features/games/engine/BoardModeMenu.tsx:117
 msgid "其他方式"
 msgstr "Other modes"
@@ -1518,6 +1563,11 @@ msgstr "Invalid content, cannot decode"
 msgid "再来一局"
 msgstr "One more game"
 
+#. 九球计分栏，必须首先击中的最低号目标球
+#: src/features/games/billiards/NineBallHud.tsx:34
+msgid "最低目标"
+msgstr "Lowest ball"
+
 #: src/lib/errors/messages.ts:175
 msgid "最多保存 5 个 AI 服务地址"
 msgstr "You can save up to 5 AI service addresses."
@@ -1538,6 +1588,12 @@ msgstr "Recent activity"
 #: src/features/model-viewer/components/RecordingExport.tsx:230
 msgid "最长 60 秒 · 黑色背景 · 无音频 · 不含工具面板"
 msgstr "Up to 60 seconds · Black background · No audio or tool panels"
+
+#. 斯诺克某位球员本局最高单杆分数
+#. placeholder {0}: state.highestBreaks[seat]
+#: src/features/games/billiards/SnookerHud.tsx:64
+msgid "最高单杆 {0}"
+msgstr "Highest break {0}"
 
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:311
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:114
@@ -1964,6 +2020,22 @@ msgstr "Animation clip"
 msgid "区分大小写"
 msgstr "Match case"
 
+#: src/features/games/billiards/BilliardsModeMenu.tsx:122
+#: src/features/games/billiards/BilliardsModeMenu.tsx:244
+msgid "十五红球"
+msgstr "Fifteen reds"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:121
+#: src/features/games/billiards/BilliardsModeMenu.tsx:242
+msgid "十红球变体"
+msgstr "Ten-red variant"
+
+#. 斯诺克当前连续得分
+#. placeholder {0}: state.currentBreak
+#: src/features/games/billiards/SnookerHud.tsx:72
+msgid "单杆 {0}"
+msgstr "Break {0}"
+
 #. 模型动画循环模式：播放一次后停在末帧。
 #: src/features/model-viewer/components/AnimationBar.tsx:53
 msgid "单次"
@@ -1986,7 +2058,7 @@ msgstr "Uninstall collection"
 msgid "历史数值"
 msgstr "History values"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:142
+#: src/features/games/billiards/BilliardsModeMenu.tsx:218
 #: src/features/games/engine/BoardModeMenu.tsx:154
 msgid "历史记录"
 msgstr "History"
@@ -2051,6 +2123,11 @@ msgstr "Compressed result"
 msgid "压缩结果预览"
 msgstr "Compressed preview"
 
+#. 斯诺克漏击后恢复球位，让犯规方再打，罚分保留
+#: src/features/games/billiards/SnookerHud.tsx:179
+msgid "原位重打"
+msgstr "Replay from original position"
+
 #: src/features/media-compress/resize/ImageResizePanel.tsx:274
 msgid "原图 {metaWidth} × {metaHeight} px"
 msgstr "Original {metaWidth} × {metaHeight} px"
@@ -2084,12 +2161,12 @@ msgid "参数未变化，无需重新处理"
 msgstr "Parameters unchanged, nothing to redo"
 
 #. 棋类对局模式：两人在同一设备对战。
-#: src/features/games/billiards/BilliardsModeMenu.tsx:20
+#: src/features/games/billiards/BilliardsModeMenu.tsx:31
 #: src/features/games/engine/history-labels.tsx:12
 msgid "双人"
 msgstr "2P"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:110
+#: src/features/games/billiards/BilliardsModeMenu.tsx:186
 #: src/features/games/engine/BoardMatchLayout.tsx:35
 #: src/features/games/engine/BoardModeMenu.tsx:123
 msgid "双人对战"
@@ -2126,6 +2203,7 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/export/BackupPage.tsx:111
 #: src/features/export/BackupPage.tsx:151
 #: src/features/games/billiards/BilliardsHeader.tsx:111
+#: src/features/games/billiards/SnookerHud.tsx:325
 #: src/features/games/engine/BoardGameHeader.tsx:108
 #: src/features/games/engine/GameHeaderControls.tsx:77
 #: src/features/games/engine/GameHeaderControls.tsx:105
@@ -2264,6 +2342,10 @@ msgstr "Remove unused models to release resources. This threshold is not the dev
 msgid "可以重试恢复图形显示，或返回其他工具。"
 msgstr "Retry the 3D display or return to another tool."
 
+#: src/features/games/billiards/SnookerHud.tsx:127
+msgid "可整球直击却连续两次漏击，再次原位漏击将判负。"
+msgstr "Two consecutive misses with a full ball visible; another replayed miss forfeits the frame."
+
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:101
 msgid "可用 {formatBytesValue}"
 msgstr "Available {formatBytesValue}"
@@ -2282,6 +2364,10 @@ msgstr "Optional"
 msgid "台球"
 msgstr "Billiards"
 
+#: src/features/games/billiards/SnookerHud.tsx:310
+msgid "台面余分 {remaining}，落后方需要罚分追赶；对局继续。"
+msgstr "{remaining} points remaining on the table; the trailing player needs penalties to catch up. Play continues."
+
 #: src/features/export/ImportPanel.tsx:27
 msgid "合并：相同记录更新，其余插入"
 msgstr "Merge: update matching records and insert the rest"
@@ -2290,7 +2376,11 @@ msgstr "Merge: update matching records and insert the rest"
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "Devices on the same LAN can access directly. Use only on trusted networks, and limit access with the default permission."
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:111
+#: src/features/games/billiards/SnookerHud.tsx:123
+msgid "同分黑球已复位。抽签获选者决定谁先打，母球在 D 区。"
+msgstr "Scores tied; the black has been re-spotted. The drawn player chooses who plays first, cue ball in the D."
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:187
 #: src/features/games/engine/BoardMatchLayout.tsx:63
 #: src/features/games/engine/BoardModeMenu.tsx:124
 msgid "同屏轮流"
@@ -2304,6 +2394,11 @@ msgstr "Accept"
 #: src/features/games/engine/online/OnlineMatchDialogs.tsx:78
 msgid "同意后双方交换先后手，立即开始新对局。"
 msgstr "Once accepted, colors swap and a new game starts immediately."
+
+#. 台球僵持协商，接受并重新摆球
+#: src/features/games/billiards/NineBallHud.tsx:111
+msgid "同意重摆"
+msgstr "Accept re-rack"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:460
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:463
@@ -2419,8 +2514,8 @@ msgstr "Draw"
 msgid "困毙"
 msgstr "Stalemate"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:28
-#: src/features/games/billiards/BilliardsModeMenu.tsx:81
+#: src/features/games/billiards/BilliardsModeMenu.tsx:39
+#: src/features/games/billiards/BilliardsModeMenu.tsx:155
 #: src/features/games/engine/BoardMatchLayout.tsx:55
 #: src/features/games/engine/BoardModeMenu.tsx:93
 #: src/features/games/engine/history-labels.tsx:24
@@ -2525,6 +2620,11 @@ msgstr "Coordinates position the preview without changing source dimensions. Dra
 #: src/features/model-viewer/components/ResourceDetails.tsx:128
 msgid "基础颜色"
 msgstr "Base color"
+
+#. 九球合法开球后的一次push-out声明
+#: src/features/games/billiards/NineBallHud.tsx:181
+msgid "声明推杆"
+msgstr "Declare push-out"
 
 #: src/features/media-compress/components/MediaProgress.tsx:28
 msgid "处理中"
@@ -2804,10 +2904,16 @@ msgstr "Key Manager"
 msgid "对局中断"
 msgstr "Game Interrupted"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:225
-#: src/features/games/billiards/BilliardsMatch.tsx:351
+#: src/features/games/billiards/BilliardsMatchView.tsx:152
+#: src/features/games/billiards/BilliardsMatchView.tsx:340
 msgid "对局结束"
 msgstr "Match over"
+
+#. 斯诺克犯规罚分计入对手比分
+#. placeholder {0}: state.lastScore.penalty
+#: src/features/games/billiards/SnookerHud.tsx:303
+msgid "对手获罚分 {0}"
+msgstr "Opponent awarded {0} penalty points"
 
 #: src/features/games/engine/black-white-labels.tsx:34
 #: src/features/games/xiangqi/labels.tsx:32
@@ -2829,6 +2935,10 @@ msgstr "Opponent declined the rematch"
 #: src/features/games/engine/online/useOnlineMatch.ts:53
 msgid "对方拒绝了悔棋"
 msgstr "Opponent declined the undo"
+
+#: src/features/games/billiards/NineBallHud.tsx:88
+msgid "对方提议僵持重摆。接受后由本局原开球者开球。"
+msgstr "Your opponent proposes a stalemate re-rack. The original breaker will break again."
 
 #: src/features/games/engine/online/OnlineMatchDialogs.tsx:49
 msgid "对方请求悔棋"
@@ -3200,6 +3310,10 @@ msgstr "Trusted device removed"
 msgid "已加载"
 msgstr "Loaded"
 
+#: src/features/games/billiards/SnookerHud.tsx:129
+msgid "已原位连续漏击四次。第五次后对手可能获得全台手中球。"
+msgstr "Four consecutive replayed misses. After the fifth the opponent may receive ball in hand anywhere."
+
 #: src/features/model-viewer/components/RecordingExport.tsx:71
 msgid "已发起录屏下载，请在浏览器中查看。"
 msgstr "Recording download started. Check your browser."
@@ -3395,6 +3509,10 @@ msgstr "Extracted to {outName}"
 msgid "已连接"
 msgstr "Connected"
 
+#: src/features/games/billiards/NineBallHud.tsx:80
+msgid "已连续两次犯规，再次连续犯规将判负。"
+msgstr "Two consecutive fouls. Another consecutive foul will lose the rack."
+
 #: src/features/bt/components/TorrentFileList.tsx:76
 msgid "已选 {selectedSize} / {filesLength}"
 msgstr "Selected {selectedSize} / {filesLength}"
@@ -3494,7 +3612,7 @@ msgstr "Start compression"
 msgid "开始处理"
 msgstr "Start"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:99
+#: src/features/games/billiards/BilliardsModeMenu.tsx:175
 #: src/features/games/engine/BoardModeMenu.tsx:112
 msgid "开始对局"
 msgstr "Start match"
@@ -3529,6 +3647,10 @@ msgstr "Open edges"
 #: src/features/settings/AutostartSetting.desktop.tsx:17
 msgid "开机自启"
 msgstr "Launch at Login"
+
+#: src/features/games/billiards/NineBallHud.tsx:197
+msgid "开球母球须在头线后，可调整至出杆。"
+msgstr "Place the cue ball behind the head string. You may adjust it until you shoot."
 
 #: src/features/ai-configuration/ProviderDetails.tsx:217
 #: src/features/ai-configuration/ProviderDetails.tsx:258
@@ -3747,6 +3869,12 @@ msgstr "Pending"
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
+#. placeholder {0}: state.scores[seat]
+#. placeholder {1}: state.highestBreaks[seat]
+#: src/features/games/billiards/BilliardsMatchView.tsx:369
+msgid "得分 {0}，最高单杆 {1}"
+msgstr "Score {0}, highest break {1}"
+
 #. 模型动画的循环播放方式。
 #: src/features/model-viewer/components/AnimationBar.tsx:218
 msgid "循环模式"
@@ -3789,7 +3917,7 @@ msgstr "Undo"
 msgid "成功"
 msgstr "Success"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:89
+#: src/features/games/billiards/BilliardsModeMenu.tsx:163
 msgid "我先开球"
 msgstr "I break"
 
@@ -3859,6 +3987,14 @@ msgstr "The selected file is not valid JSON. Check the import file."
 #: src/lib/errors/messages.ts:38
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "The selected file is not a backup exported by this app"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:251
+msgid "手中球：可在全台放置母球"
+msgstr "Ball in hand: place the cue ball anywhere"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:249
+msgid "手中球：在 D 区拖动母球放置"
+msgstr "Ball in hand: drag the cue ball within the D"
 
 #: src/store/transfers.ts:16
 msgid "打包中"
@@ -4018,6 +4154,11 @@ msgstr "Try a different keyword"
 msgid "排序操作结束"
 msgstr "Reordering ended"
 
+#. 九球推杆或违规开球后，接受当前球位并自己击球
+#: src/features/games/billiards/NineBallHud.tsx:135
+msgid "接受桌面"
+msgstr "Accept table"
+
 #. 添加或编辑 AI 服务商时选择上游 API 协议
 #: src/features/ai-configuration/AiProtocolField.tsx:26
 msgid "接口格式"
@@ -4032,6 +4173,10 @@ msgstr "Receive Directory"
 msgid "推杆"
 msgstr "Follow"
 
+#: src/features/games/billiards/NineBallHud.tsx:86
+msgid "推杆结束。可自己接打，或交回推杆者。"
+msgstr "Push-out complete. Play the next shot or pass it back to the shooter."
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:211
 #: src/features/poetry/components/CollectionManagement.tsx:42
 msgid "推荐"
@@ -4040,6 +4185,11 @@ msgstr "Recommended"
 #: src/features/games/go/GoMatch.tsx:251
 msgid "提子 {value}:{value2}"
 msgstr "Captures {value}:{value2}"
+
+#. 台球对局请求双方同意重新摆球
+#: src/features/games/billiards/NineBallHud.tsx:193
+msgid "提议重摆"
+msgstr "Propose re-rack"
 
 #. 模型已知分配估算的提醒阈值，单位 MiB。
 #: src/features/model-viewer/components/MemoryPanel.tsx:119
@@ -4293,6 +4443,11 @@ msgstr "Disconnect device"
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
 msgid "断开连接"
 msgstr "Disconnect"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:104
+#: src/features/games/billiards/BilliardsModeMenu.tsx:237
+msgid "斯诺克"
+msgstr "Snooker"
 
 #. 导入结果行的新增和更新数量
 #: src/features/export/ImportPanel.tsx:132
@@ -4743,7 +4898,7 @@ msgstr "The service is running. Stop it before changing port, receive directory,
 msgid "未保存密钥"
 msgstr "No key saved"
 
-#: src/features/games/billiards/BilliardsScore.tsx:131
+#: src/features/games/billiards/BilliardsScore.tsx:161
 msgid "未分组"
 msgstr "Open table"
 
@@ -4843,6 +4998,10 @@ msgstr "Orientation sensor permission was not granted. Manual controls remain av
 msgid "未记录"
 msgstr "Not recorded"
 
+#: src/features/games/billiards/NineBallHud.tsx:82
+msgid "未达到三球开球要求。可接受桌面或交回开球者；交回后允许推杆。"
+msgstr "The three-ball break requirement was not met. Accept the table or pass it back; the breaker may then push out."
+
 #: src/features/bt/components/TaskRow.tsx:100
 msgid "未运行"
 msgstr "Not running"
@@ -4887,9 +5046,18 @@ msgstr "The local destination is a folder and cannot be overwritten"
 msgid "本地编码与解码"
 msgstr "Encode and decode locally"
 
+#: src/features/games/billiards/SnookerHud.tsx:320
+msgid "本局将结束，对手获胜并保存当前比分。"
+msgstr "This frame will end; the opponent wins and the current score is saved."
+
 #: src/features/lan-transfer/LanServiceCard.tsx:29
 msgid "本机服务"
 msgstr "Local service"
+
+#. 九球本杆已声明推杆，再按可取消
+#: src/features/games/billiards/NineBallHud.tsx:179
+msgid "本杆推杆"
+msgstr "Push-out declared"
 
 #: src/lib/errors/messages.ts:292
 msgid "本次导入的资源超过 512 MiB，请选择较小的模型"
@@ -5110,6 +5278,11 @@ msgstr "Check status"
 #: src/features/games/go/GoModeMenu.tsx:23
 msgid "棋盘大小"
 msgstr "Board Size"
+
+#. 斯诺克彩球，4分
+#: src/features/games/billiards/SnookerBall.tsx:22
+msgid "棕球"
+msgstr "Brown"
 
 #: src/features/games/xiangqi/XiangqiStage.tsx:541
 msgid "楚 河"
@@ -5622,6 +5795,11 @@ msgstr "A preview is unavailable for this texture."
 msgid "此节点未引用材质"
 msgstr "This node has no materials."
 
+#. 斯诺克白色击球球，无分值
+#: src/features/games/billiards/SnookerBall.tsx:16
+msgid "母球"
+msgstr "Cue ball"
+
 #: src/features/bt/components/PeersPanel.tsx:115
 msgid "每 2 秒刷新 · IP 已脱敏"
 msgstr "Refreshes every 2s · IPs masked"
@@ -5842,12 +6020,12 @@ msgstr "Escape"
 msgid "添加附件"
 msgstr "Add attachment"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:37
+#: src/features/games/billiards/BilliardsModeMenu.tsx:48
 msgid "清台"
 msgstr "Cleared"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:221
-#: src/features/games/billiards/BilliardsMatch.tsx:347
+#: src/features/games/billiards/BilliardsMatchView.tsx:148
+#: src/features/games/billiards/BilliardsMatchView.tsx:336
 msgid "清台完成！"
 msgstr "Table cleared!"
 
@@ -5876,7 +6054,7 @@ msgstr "Scope"
 #. 清除此游戏在本机保存的对局记录
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/formatter/FormatterActions.tsx:110
-#: src/features/games/billiards/BilliardsModeMenu.tsx:149
+#: src/features/games/billiards/BilliardsModeMenu.tsx:225
 #: src/features/games/engine/BoardModeMenu.tsx:163
 #: src/features/media-compress/components/CompressDropzone.tsx:122
 #: src/features/poetry/components/SearchBar.tsx:149
@@ -6018,21 +6196,49 @@ msgstr "Version {version} · Current {currentVersion}"
 msgid "特殊权限"
 msgstr "Special"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:55
+#: src/features/games/billiards/BilliardsMatchView.tsx:45
+msgid "犯规：开球无进球且不足四个目标球碰库"
+msgstr "Foul: no ball pocketed and fewer than four object balls reached a rail on the break"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:31
+msgid "犯规：打进非目标球"
+msgstr "Foul: potted a ball not on"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:33
+msgid "犯规：推动贴球"
+msgstr "Foul: push shot on a touching ball"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:47
 msgid "犯规：提前打进黑八"
 msgstr "Foul: the 8-ball was pocketed early"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:51
+#: src/features/games/billiards/BilliardsMatchView.tsx:41
+msgid "犯规：未先碰到合法目标球"
+msgstr "Foul: a legal target was not contacted first"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:39
 msgid "犯规：未碰到任何球"
 msgstr "Foul: no ball was contacted"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:49
+#: src/features/games/billiards/BilliardsMatchView.tsx:43
+msgid "犯规：未进球且首碰后无球碰库"
+msgstr "Foul: no ball pocketed or rail reached after first contact"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:37
 msgid "犯规：母球落袋"
 msgstr "Foul: cue ball pocketed"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:53
-msgid "犯规：首先碰到的不是本方球"
-msgstr "Foul: the first contact was not your ball"
+#: src/features/games/billiards/BilliardsMatchView.tsx:35
+msgid "犯规：用指定球做障碍"
+msgstr "Foul: snookered with the nominated ball"
+
+#: src/features/games/billiards/SnookerHud.tsx:137
+msgid "犯规。可自己接打，或要求对方从留下位置重打。"
+msgstr "Foul. Play on yourself, or have the opponent play again from where the balls lie."
+
+#: src/features/games/billiards/SnookerHud.tsx:133
+msgid "犯规并漏击。可接打、要求对方留下位置重打，或在允许时恢复原位。"
+msgstr "Foul and a miss. Play on, have the opponent play again as the balls lie, or replace the balls where allowed."
 
 #: src/features/bt/components/PeersPanel.tsx:85
 msgid "状态"
@@ -6053,21 +6259,26 @@ msgstr "Status unavailable"
 msgid "玩家"
 msgstr "Player"
 
-#: src/features/games/billiards/BilliardsScore.tsx:12
+#: src/features/games/billiards/BilliardsScore.tsx:15
 msgid "玩家 1"
 msgstr "Player 1"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:42
+#: src/features/games/billiards/BilliardsModeMenu.tsx:53
 msgid "玩家 1 胜"
 msgstr "Player 1 wins"
 
-#: src/features/games/billiards/BilliardsScore.tsx:12
+#: src/features/games/billiards/BilliardsScore.tsx:15
 msgid "玩家 2"
 msgstr "Player 2"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:44
+#: src/features/games/billiards/BilliardsModeMenu.tsx:55
 msgid "玩家 2 胜"
 msgstr "Player 2 wins"
+
+#. 台球开局菜单，选择中式八球、九球或斯诺克规则
+#: src/features/games/billiards/BilliardsModeMenu.tsx:87
+msgid "玩法"
+msgstr "Discipline"
 
 #: src/features/model-viewer/components/PreviewPanel.tsx:106
 msgid "环境存储未完成，当前预览可能与已保存环境不同。"
@@ -6111,6 +6322,11 @@ msgstr "Group"
 #: src/features/model-viewer/components/ResourceDetails.tsx:69
 msgid "用途"
 msgstr "Usage"
+
+#. 斯诺克要求另一位球员从桌面当前球位击球
+#: src/features/games/billiards/SnookerHud.tsx:168
+msgid "由对方击球"
+msgstr "Opponent to play"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:73
@@ -6254,6 +6470,13 @@ msgstr "Confirmation Code"
 #: src/features/export/BackupPage.tsx:161
 msgid "确认覆盖"
 msgstr "Overwrite data"
+
+#. 九球两犯警告，确认后继续对局
+#. 斯诺克漏击判负或六红球五次规则的赛前警告确认
+#: src/features/games/billiards/NineBallHud.tsx:100
+#: src/features/games/billiards/SnookerHud.tsx:147
+msgid "确认警告"
+msgstr "Acknowledge warning"
 
 #: src/features/bt/components/AddTorrentDialog.tsx:269
 #: src/features/bt/components/AddTorrentDialog.tsx:280
@@ -6480,8 +6703,8 @@ msgstr "Filter logs"
 msgid "简体中文"
 msgstr "Simplified Chinese"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:26
-#: src/features/games/billiards/BilliardsModeMenu.tsx:79
+#: src/features/games/billiards/BilliardsModeMenu.tsx:37
+#: src/features/games/billiards/BilliardsModeMenu.tsx:153
 #: src/features/games/engine/BoardMatchLayout.tsx:53
 #: src/features/games/engine/BoardModeMenu.tsx:91
 #: src/features/games/engine/history-labels.tsx:22
@@ -6515,6 +6738,11 @@ msgstr "Manage accounts and passwords"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:230
 msgid "类型"
 msgstr "Type"
+
+#. 斯诺克彩球，6分
+#: src/features/games/billiards/SnookerBall.tsx:26
+msgid "粉球"
+msgstr "Pink"
 
 #. PBR 材质 roughness，0 光滑到 1 粗糙。
 #. 模型材质的粗糙度属性。
@@ -6570,9 +6798,22 @@ msgstr "System thermal status: serious"
 msgid "系统监控暂不支持 {os}，仅支持 Linux"
 msgstr "System monitoring does not support {os} yet. Only Linux is supported."
 
+#: src/features/games/billiards/BilliardsModeMenu.tsx:126
+msgid "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
+msgstr "Alternate reds and colours, then clear the colours in order. Six-red includes the five-miss rule; ten-red follows the fifteen-red flow. The auto referee only calls a miss when a clear direct shot fails to hit the ball on; when fully snookered it calls a plain foul and does not judge effort."
+
 #: src/features/games/xiangqi/labels.tsx:43
 msgid "红方"
 msgstr "Red"
+
+#. 斯诺克球名，1分；多个红球外观相同
+#: src/features/games/billiards/SnookerBall.tsx:10
+msgid "红球"
+msgstr "Red"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:116
+msgid "红球数"
+msgstr "Reds"
 
 #: src/features/games/xiangqi/labels.tsx:106
 msgid "红胜"
@@ -6609,15 +6850,19 @@ msgstr "Texture data"
 msgid "线框"
 msgstr "Wireframe"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:19
+#: src/features/games/billiards/BilliardsModeMenu.tsx:30
 msgid "练习"
 msgstr "Practice"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:131
+msgid "练习为自由清台，不计算正式比赛单杆。"
+msgstr "Practice is a free clearance; no official breaks are recorded."
 
 #: src/features/home/home-descriptions.tsx:22
 msgid "练习击球或开始对局"
 msgstr "Practice shots or start a match"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:116
+#: src/features/games/billiards/BilliardsModeMenu.tsx:192
 msgid "练习模式"
 msgstr "Practice Mode"
 
@@ -6647,6 +6892,11 @@ msgstr "The bind IP is not a LAN address: {ip}"
 #: src/features/model-viewer/components/CanvasControls.tsx:177
 msgid "结束操作"
 msgstr "Done"
+
+#. 仅剩黑球且分差超过7分，按当前比分结束
+#: src/features/games/billiards/SnookerHud.tsx:294
+msgid "结束本局"
+msgstr "End frame"
 
 #: src/features/crypto/CryptoTool.tsx:102
 #: src/features/logs/LogDialogs.tsx:77
@@ -6695,6 +6945,10 @@ msgstr "Continue processing"
 msgid "继续完成重置"
 msgstr "Continue reset"
 
+#: src/features/games/billiards/NineBallHud.tsx:123
+msgid "继续当前球局"
+msgstr "Keep playing"
+
 #: src/features/ai-configuration/AiEditorDialog.tsx:313
 #: src/features/vault/VaultEntryDialog.tsx:270
 msgid "继续编辑"
@@ -6708,6 +6962,11 @@ msgstr "Resume recording"
 #: src/lib/errors/messages.ts:77
 msgid "续传位置与目标文件大小不一致，请刷新后重试"
 msgstr "The resume offset does not match the destination size. Refresh and try again."
+
+#. 斯诺克彩球，3分
+#: src/features/games/billiards/SnookerBall.tsx:20
+msgid "绿球"
+msgstr "Green"
 
 #: src/features/preview/PreviewSurface.tsx:137
 msgid "缓冲中…"
@@ -6819,6 +7078,11 @@ msgstr "Mesh instance"
 msgid "网络"
 msgstr "Network"
 
+#: src/features/games/billiards/BilliardsModeMenu.tsx:107
+#: src/features/games/billiards/BilliardsModeMenu.tsx:248
+msgid "美式九球"
+msgstr "American nine-ball"
+
 #: src/lib/errors/messages.ts:204
 msgid "翻译内容不能为空"
 msgstr "The translation cannot be empty"
@@ -6852,7 +7116,7 @@ msgstr "Focus model"
 
 #. 棋类历史记录：本地玩家获胜。
 #. 棋类历史记录：本地玩家获胜。
-#: src/features/games/billiards/BilliardsModeMenu.tsx:39
+#: src/features/games/billiards/BilliardsModeMenu.tsx:50
 #: src/features/games/engine/black-white-labels.tsx:89
 #: src/features/games/engine/black-white-labels.tsx:96
 #: src/features/games/xiangqi/labels.tsx:94
@@ -6875,11 +7139,21 @@ msgstr "Automatic"
 msgid "自发光"
 msgstr "Emissive"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:117
+#. 斯诺克犯规后或同分黑球抽签后选择自己击球
+#: src/features/games/billiards/SnookerHud.tsx:158
+msgid "自己接打"
+msgstr "Play on"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:193
 msgid "自由清台"
 msgstr "Clear the table freely"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:301
+#. 斯诺克犯规后被做障碍，可提名另一球代替ball-on，与母球手中球不同
+#: src/features/games/billiards/SnookerHud.tsx:233
+msgid "自由球"
+msgstr "Free ball"
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:254
 msgid "自由球：拖动母球放置"
 msgstr "Ball in hand: drag the cue ball to place it"
 
@@ -6920,7 +7194,7 @@ msgstr "Node details"
 msgid "节能画质 · 像素比例上限 1.5 · 最高 30 帧/秒"
 msgstr "Power saving \\u00b7 Pixel ratio up to 1.5 \\u00b7 Up to 30 fps"
 
-#: src/features/games/billiards/BilliardsScore.tsx:129
+#: src/features/games/billiards/BilliardsScore.tsx:159
 msgid "花色球"
 msgstr "Stripes"
 
@@ -6942,6 +7216,11 @@ msgstr "Fetching resource information timed out. Check your connection or try ag
 #: src/features/home/home-descriptions.tsx:23
 msgid "落子连五，切磋棋艺"
 msgstr "Connect five and challenge your skills"
+
+#. 斯诺克彩球，5分
+#: src/features/games/billiards/SnookerBall.tsx:24
+msgid "蓝球"
+msgstr "Blue"
 
 #: src/features/poetry/components/ReadingSettingsPopover.tsx:68
 msgid "行距"
@@ -7029,6 +7308,16 @@ msgstr "Measure bounds"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:208
 msgid "认证方式"
 msgstr "Authentication"
+
+#. 斯诺克主动认输本局
+#: src/features/games/billiards/SnookerHud.tsx:283
+#: src/features/games/billiards/SnookerHud.tsx:331
+msgid "认输"
+msgstr "Concede"
+
+#: src/features/games/billiards/SnookerHud.tsx:317
+msgid "认输本局？"
+msgstr "Concede this frame?"
 
 #: src/features/home/home-descriptions.tsx:19
 msgid "记录任务与清单"
@@ -7372,6 +7661,11 @@ msgstr "Choose a GLB, glTF or FBX model file."
 msgid "请选择共享目录"
 msgstr "Select a shared folder"
 
+#: src/features/games/billiards/SnookerHud.tsx:79
+#: src/features/games/billiards/SnookerHud.tsx:216
+msgid "请选择彩球"
+msgstr "Choose a colour"
+
 #: src/features/ai-configuration/AiDeleteDialog.tsx:99
 msgid "请选择替代项"
 msgstr "Choose a replacement"
@@ -7456,6 +7750,12 @@ msgstr "Resize left panel"
 msgid "调整搜索内容或分类后重试"
 msgstr "Try changing the search or category"
 
+#. 台球手中球权利未消费，重新拖动母球
+#: src/features/games/billiards/NineBallHud.tsx:165
+#: src/features/games/billiards/SnookerHud.tsx:274
+msgid "调整母球"
+msgstr "Reposition cue ball"
+
 #: src/features/logs/ActivityLogsPage.tsx:122
 msgid "调整筛选条件或刷新后再试。"
 msgstr "Adjust the filters or refresh and try again."
@@ -7471,7 +7771,7 @@ msgstr "Warnings"
 
 #. 棋类历史记录：本地玩家落败。
 #. 棋类历史记录：本地玩家落败。
-#: src/features/games/billiards/BilliardsModeMenu.tsx:39
+#: src/features/games/billiards/BilliardsModeMenu.tsx:50
 #: src/features/games/engine/black-white-labels.tsx:91
 #: src/features/games/engine/black-white-labels.tsx:98
 #: src/features/games/xiangqi/labels.tsx:96
@@ -7828,6 +8128,11 @@ msgstr "Fit to window"
 #: src/features/model-viewer/components/CanvasControls.tsx:201
 msgid "选取中心点"
 msgstr "Pick center point"
+
+#. 斯诺克进红后，出杆前指定本杆彩球
+#: src/features/games/billiards/SnookerHud.tsx:206
+msgid "选彩"
+msgstr "Nominate colour"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:132
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:245
@@ -8249,7 +8554,7 @@ msgstr "Hide password"
 msgid "随机"
 msgstr "Random"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:75
+#: src/features/games/billiards/BilliardsModeMenu.tsx:149
 #: src/features/games/engine/BoardModeMenu.tsx:87
 msgid "难度"
 msgstr "Difficulty"
@@ -8347,11 +8652,16 @@ msgstr "Height"
 msgid "高质量"
 msgstr "High quality"
 
+#. 斯诺克彩球，2分
+#: src/features/games/billiards/SnookerBall.tsx:18
+msgid "黄球"
+msgstr "Yellow"
+
 #: src/features/games/go/labels.tsx:12
 msgid "黑 {black} 子 · 白 {white} 子 + 贴目 {KOMI} = {whiteWithKomi}"
 msgstr "Black {black} · White {white} + {KOMI} komi = {whiteWithKomi}"
 
-#: src/features/games/billiards/BilliardsMatch.tsx:309
+#: src/features/games/billiards/BilliardsMatchView.tsx:263
 msgid "黑八已重置"
 msgstr "8-ball re-spotted"
 
@@ -8366,6 +8676,11 @@ msgstr "Black"
 #: src/features/games/engine/black-white-labels.tsx:102
 msgid "黑棋胜"
 msgstr "Black wins"
+
+#. 斯诺克彩球，7分
+#: src/features/games/billiards/SnookerBall.tsx:28
+msgid "黑球"
+msgstr "Black"
 
 #: src/features/games/xiangqi/labels.tsx:106
 msgid "黑胜"

@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { BALL_RADIUS, FIXED_DT, POCKETS, TABLE_H } from "./constants";
 import { ensurePhysicsReady, simulateShot } from "./physics";
+import { POCKET_GEOMETRIES, pocketWorld } from "./pocket-geometry";
 import { computeAimGuide } from "./render/guides";
 import { createInitialBalls } from "./rules";
 import type { BallState, SimFrame } from "./types";
@@ -164,5 +165,51 @@ it("六个袋口的正向入射均能落袋并保留向外速度", () => {
       expect(event.pocket).toBe(pocket.id);
       expect(event.vx * pocket.x + event.vy * pocket.y).toBeGreaterThan(0);
     }
+  }
+});
+
+describe("六袋实际通道的落袋回归", () => {
+  it("偏离净通道的入射先碰袋颚，不穿过圆弧直接落袋", () => {
+    for (const p of POCKET_GEOMETRIES) {
+      for (const side of [-1, 1]) {
+        const start = pocketWorld(
+          p.spec,
+          side * (p.width / 2 - BALL_RADIUS + 0.006),
+          p.turnDepth - 0.2,
+        );
+        const sim = simulateShot(
+          [ball(0, start.x, start.y)],
+          {
+            angle: Math.atan2(p.spec.dy, p.spec.dx),
+            power: 0.5,
+            followDraw: 0,
+          },
+          true,
+        );
+        expect(sim.firstImpact).not.toBeNull();
+        expect(sim.firstImpact?.targetId).toBeNull();
+        expect(sim.cuePotted).toBe(false);
+        expect(sim.events.some((event) => event.type === "cushion")).toBe(true);
+      }
+    }
+  });
+
+  for (const pocket of POCKETS) {
+    it(`第 ${pocket.id + 1} 个袋口沿真实喉部进球，低中高力度均可落袋`, () => {
+      const x = Math.sign(pocket.x);
+      const y = Math.sign(pocket.y);
+      const distance = Math.hypot(x, y);
+      const dir = { x: x / distance, y: y / distance };
+      for (const power of [0.15, 0.5, 0.9]) {
+        const sim = simulateShot(
+          [ball(0, pocket.x - dir.x * 0.3, pocket.y - dir.y * 0.3)],
+          { angle: Math.atan2(dir.y, dir.x), power, followDraw: 0 },
+        );
+        expect(sim.cuePotted).toBe(true);
+        expect(sim.events.find((e) => e.type === "pocket")).toMatchObject({
+          pocket: pocket.id,
+        });
+      }
+    });
   }
 });

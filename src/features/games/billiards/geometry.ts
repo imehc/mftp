@@ -1,86 +1,56 @@
 /** 球桌几何由模拟、瞄准与渲染共同使用，单位为米。 */
-import {
-  BALL_RADIUS,
-  CORNER_MOUTH,
-  CUSHION_THICKNESS,
-  JAW_RADIUS,
-  POCKET_CAPTURE_SCALE,
-  POCKETS,
-  SIDE_MOUTH,
-  TABLE_H,
-  TABLE_W,
-} from "./constants";
+import { CHINESE_EIGHT, type TableEquipment } from "./equipment";
+import type { Point } from "./pocket-geometry";
+import { getPocketGeometries, pocketRayDistance } from "./pocket-geometry";
 
-interface CushionSegment {
-  /** 凸包顶点，逆时针：先内沿，后外沿，含 45° 袋口颚。 */
+export interface CushionSegment {
+  /** 内沿起点、终点、袋颚后端；用于库面明暗与标记，不另造碰撞轮廓。 */
   profile: number[];
   points: number[];
+  jaws: Point[][];
 }
 
-export type { CushionSegment };
+const flat = (points: readonly Point[]) => points.flatMap(({ x, y }) => [x, y]);
 
-/** 将库边的硬折角倒圆；同一组细分顶点用于碰撞、预览和材质轮廓。 */
-function roundedCushion(profile: number[]): CushionSegment {
-  const points: number[] = [];
-  const count = profile.length / 2;
-  for (let i = 0; i < count; i++) {
-    const x = profile[i * 2];
-    const y = profile[i * 2 + 1];
-    const previous = (i + count - 1) % count;
-    const next = (i + 1) % count;
-    const ax = profile[previous * 2] - x;
-    const ay = profile[previous * 2 + 1] - y;
-    const bx = profile[next * 2] - x;
-    const by = profile[next * 2 + 1] - y;
-    const al = Math.hypot(ax, ay);
-    const bl = Math.hypot(bx, by);
-    const inset = Math.min(JAW_RADIUS * 2, al / 3, bl / 3);
-    for (let step = 0; step <= 6; step++) {
-      const t = step / 6;
-      points.push(
-        x + (((1 - t) ** 2 * ax) / al) * inset + ((t ** 2 * bx) / bl) * inset,
-        y + (((1 - t) ** 2 * ay) / al) * inset + ((t ** 2 * by) / bl) * inset,
-      );
-    }
-  }
-  return { profile, points };
+function railJaws(
+  axis: "x" | "y",
+  value: number,
+  equipment: TableEquipment,
+): Point[][] {
+  const along = axis === "x" ? "y" : "x";
+  return getPocketGeometries(equipment)
+    .flatMap((p) => [p.left, p.right])
+    .filter((jaw) => Math.abs(jaw[0][axis] - value) < 1e-8)
+    .sort((a, b) => a[0][along] - b[0][along]);
 }
 
-/**
- * 六段库边（每条长边被中袋分成两段，每条短边一段）。两端切 45°，
- * 使球从袋口颚弹开而非撞上平直的墙。导出给渲染器，以绘制与物理
- * 碰撞完全一致的形状。
- */
-export function cushionSegments(): CushionSegment[] {
-  const t = CUSHION_THICKNESS;
-  const hw = TABLE_W / 2;
-  const hh = TABLE_H / 2;
-  const segments: CushionSegment[] = [];
+/** 从相邻袋口的真实曲线闭合库边，避免六段独立圆角与洞口拼接。 */
+function rail(a: Point[], b: Point[]): CushionSegment {
+  return {
+    profile: flat([a[0], b[0], b[b.length - 1], a[a.length - 1]]),
+    points: flat([...a].reverse().concat(b)),
+    jaws: [a, b],
+  };
+}
 
-  // 长边（上 y=+hh，下 y=-hh），各在中袋处断开。
+const cushionCache = new WeakMap<TableEquipment, readonly CushionSegment[]>();
+
+export function cushionSegments(
+  equipment: TableEquipment = CHINESE_EIGHT,
+): readonly CushionSegment[] {
+  const cached = cushionCache.get(equipment);
+  if (cached) return cached;
+  const cushions: CushionSegment[] = [];
   for (const sy of [-1, 1]) {
-    for (const [x0, x1] of [
-      [-hw + CORNER_MOUTH, -SIDE_MOUTH],
-      [SIDE_MOUTH, hw - CORNER_MOUTH],
-    ]) {
-      const yIn = sy * hh;
-      const yOut = sy * (hh + t);
-      segments.push(
-        roundedCushion([x0, yIn, x1, yIn, x1 + t, yOut, x0 - t, yOut]),
-      );
-    }
+    const ends = railJaws("y", (sy * equipment.tableHeight) / 2, equipment);
+    cushions.push(rail(ends[0], ends[1]), rail(ends[2], ends[3]));
   }
-  // 短边（左 x=-hw，右 x=+hw）。
   for (const sx of [-1, 1]) {
-    const xIn = sx * hw;
-    const xOut = sx * (hw + t);
-    const y0 = -hh + CORNER_MOUTH;
-    const y1 = hh - CORNER_MOUTH;
-    segments.push(
-      roundedCushion([xIn, y0, xIn, y1, xOut, y1 + t, xOut, y0 - t]),
-    );
+    const ends = railJaws("x", (sx * equipment.tableWidth) / 2, equipment);
+    cushions.push(rail(ends[0], ends[1]));
   }
-  return segments;
+  cushionCache.set(equipment, cushions);
+  return cushions;
 }
 
 /** 圆形扫掠到球、袋口或库边的距离，用来截断离开方向线。 */
@@ -90,8 +60,10 @@ export function guideClearance(
   balls: readonly { id: number; x: number; y: number; potted: boolean }[],
   ignore: readonly number[],
   limit: number,
+  equipment: TableEquipment = CHINESE_EIGHT,
 ): number {
-  let distance = limit;
+  const BALL_RADIUS = equipment.ballRadius;
+  let distance = pocketRayDistance(origin, dir, limit, equipment);
 
   const circle = (x: number, y: number, radius: number) => {
     const dx = x - origin.x;
@@ -108,9 +80,7 @@ export function guideClearance(
     if (!ball.potted && !ignore.includes(ball.id))
       circle(ball.x, ball.y, BALL_RADIUS * 2);
   }
-  for (const pocket of POCKETS)
-    circle(pocket.x, pocket.y, pocket.radius * POCKET_CAPTURE_SCALE);
-  for (const { points } of cushionSegments()) {
+  for (const { points } of cushionSegments(equipment)) {
     for (let i = 0; i < points.length; i += 2) {
       const ax = points[i];
       const ay = points[i + 1];

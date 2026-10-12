@@ -1,10 +1,15 @@
-/* 比分和操作始终为紧凑固定行；状态浮在画布上，不挤占球桌空间。 */
+/* 规则计分按内容增高，状态浮在画布上；横屏侧栏独立滚动。 */
 .billiards-score {
   height: 3rem;
   padding-block: 0.25rem;
   display: grid;
   align-items: center;
   overflow: auto;
+}
+.billiards-score[data-rules="true"] {
+  height: auto;
+  min-height: 3rem;
+  overflow: visible;
 }
 .billiards-status {
   position: absolute;
@@ -32,6 +37,17 @@
   justify-content: center;
 }
 
+/* 规则决策是当前必需操作，按内容增长并保留画布，不挤入固定旋转栏。 */
+.billiards-actions[data-rules="true"] {
+  height: auto;
+  flex: 0 1 auto;
+  max-height: 45%;
+}
+.billiards-actions[data-rules="true"] > .billiards-controls {
+  height: auto;
+  min-height: 3.5rem;
+}
+
 /* 横屏只重排同一批节点，球桌、控制器与击球回放不重新挂载。 */
 .billiards-game[data-landscape="true"] {
   display: grid;
@@ -49,6 +65,7 @@
   grid-row: 2 / -1;
   max-width: 7rem;
   height: 100%;
+  overflow: auto;
   min-height: 0;
   padding: 0.5rem;
 }
@@ -69,6 +86,7 @@
   grid-column: 3;
   grid-row: 1 / -1;
   height: 100%;
+  max-height: 100%;
 }
 .billiards-game[data-landscape="true"] .billiards-controls {
   padding: 0.5rem 0.25rem;

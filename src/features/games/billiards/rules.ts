@@ -17,16 +17,30 @@ import {
   HEAD_SPOT_X,
   RACK_LAYOUT,
 } from "./constants";
+import {
+  applyNineBallAction,
+  nineBallSeat,
+  reduceNineBallShot,
+  validateNineShot,
+} from "./nine-ball";
 import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
+import { equipmentForState, nearestLineSpot } from "./placement";
+import { createNineBallRack } from "./racks";
 import type { ShotSimulator } from "./simulation-client";
+import { reduceSnookerShot, snookerSeat } from "./snooker";
+import { applySnookerAction, validateSnookerShot } from "./snooker-actions";
+import { createSnookerRack } from "./snooker-equipment";
 import {
   ballGroup,
   type BallState,
+  type BilliardsDiscipline,
   type BilliardsMove,
   type BilliardsPresentation,
   type BilliardsState,
   type BilliardsVariant,
+  type EightBallState,
   type FoulReason,
+  type RedCount,
   remainingGroupBalls,
   type ShotOutcome,
 } from "./types";
@@ -49,12 +63,22 @@ export function createInitialBalls(): BallState[] {
 }
 
 export function createInitialState(
-  variant: BilliardsVariant,
+  variant: "eight-ball" | "practice",
   firstSeat: SeatIndex = 0,
-): BilliardsState {
+  discipline: BilliardsDiscipline = "eight-ball",
+  seed = 1,
+  reds: RedCount = 15,
+): EightBallState {
   return {
     variant,
-    balls: createInitialBalls(),
+    balls:
+      discipline === "nine-ball"
+        ? createNineBallRack(seed)
+        : discipline === "snooker"
+          ? createSnookerRack(reds)
+          : createInitialBalls(),
+    discipline,
+    reds: discipline === "snooker" ? reds : undefined,
     turnSeat: firstSeat,
     groups: variant === "practice" ? [null] : [null, null],
     openTable: true,
@@ -107,36 +131,36 @@ function singleFramePresentation(
 }
 
 function applyPlaceCue(
-  state: BilliardsState,
+  state: EightBallState,
   move: Extract<BilliardsMove, { type: "place-cue" }>,
-): MoveResolution<BilliardsState, BilliardsPresentation> {
+): MoveResolution<EightBallState, BilliardsPresentation> {
   if (!state.ballInHand) {
     throw new Error("billiards: cue ball is not in hand");
   }
   if (
-    !insidePlayArea(move.x, move.y) ||
-    overlapsAnyBall(state.balls, move.x, move.y, 0)
+    !insidePlayArea(move.x, move.y, equipmentForState(state)) ||
+    overlapsAnyBall(state.balls, move.x, move.y, 0, equipmentForState(state))
   ) {
     throw new Error("billiards: illegal cue ball placement");
   }
   const balls = state.balls.map((ball) =>
     ball.id === 0 ? { ...ball, x: move.x, y: move.y, potted: false } : ball,
   );
-  const next: BilliardsState = { ...state, balls, ballInHand: false };
+  const next: EightBallState = { ...state, balls, ballInHand: false };
   return { state: next, presentation: singleFramePresentation(balls) };
 }
 
 async function applyPracticeShot(
-  state: BilliardsState,
+  state: EightBallState,
   move: Extract<BilliardsMove, { type: "shot" }>,
   simulate: ShotSimulator,
-): Promise<MoveResolution<BilliardsState, BilliardsPresentation>> {
+): Promise<MoveResolution<EightBallState, BilliardsPresentation>> {
   const sim = await simulate(state.balls, move);
   let balls = sim.balls;
   let foul: FoulReason | null = null;
   if (sim.cuePotted) {
     foul = "cue-potted";
-    balls = respotCueForPractice(balls);
+    balls = respotCueForPractice(balls, state);
   }
   const finished = balls.every((ball) => ball.id === 0 || ball.potted);
   const outcome: ShotOutcome = {
@@ -145,7 +169,7 @@ async function applyPracticeShot(
     continueTurn: true,
     respottedEight: false,
   };
-  const next: BilliardsState = {
+  const next: EightBallState = {
     ...state,
     balls,
     breakDone: true,
@@ -160,27 +184,43 @@ async function applyPracticeShot(
   };
 }
 
-function respotCueForPractice(balls: BallState[]): BallState[] {
-  const candidates: Array<[number, number]> = [[HEAD_SPOT_X, 0]];
-  for (let d = 1; d <= 40; d++) {
-    candidates.push([HEAD_SPOT_X - d * BALL_RADIUS, 0]);
-    candidates.push([HEAD_SPOT_X + d * BALL_RADIUS, 0]);
-  }
+function respotCueForPractice(
+  balls: BallState[],
+  state: EightBallState,
+): BallState[] {
+  const equipment = equipmentForState(state);
+  const limit = equipment.tableWidth / 2 - equipment.ballRadius;
   const spot =
-    candidates.find(
-      ([x, y]) => insidePlayArea(x, y) && !overlapsAnyBall(balls, x, y, 0),
-    ) ?? candidates[0];
+    nearestLineSpot(
+      balls,
+      0,
+      -equipment.tableWidth / 4,
+      -limit,
+      0,
+      equipment,
+      () => 0.0001,
+    ) ??
+    nearestLineSpot(
+      balls,
+      0,
+      -equipment.tableWidth / 4,
+      limit,
+      0,
+      equipment,
+      () => 0.0001,
+    );
+  if (!spot) throw new Error("billiards: no legal practice cue spot");
   return balls.map((ball) =>
-    ball.id === 0 ? { ...ball, x: spot[0], y: spot[1], potted: false } : ball,
+    ball.id === 0 ? { ...ball, ...spot, potted: false } : ball,
   );
 }
 
 async function applyEightBallShot(
-  state: BilliardsState,
+  state: EightBallState,
   move: Extract<BilliardsMove, { type: "shot" }>,
   seat: SeatIndex,
   simulate: ShotSimulator,
-): Promise<MoveResolution<BilliardsState, BilliardsPresentation>> {
+): Promise<MoveResolution<EightBallState, BilliardsPresentation>> {
   const shooterGroup = state.groups[seat];
   const clearedBefore =
     shooterGroup !== null && remainingGroupBalls(state, shooterGroup) === 0;
@@ -264,7 +304,7 @@ async function applyEightBallShot(
     continueTurn,
     respottedEight,
   };
-  const next: BilliardsState = {
+  const next: EightBallState = {
     ...state,
     balls,
     turnSeat: finished || continueTurn ? state.turnSeat : 1 - seat,
@@ -289,26 +329,76 @@ async function applyEightBallShot(
 
 export function createBilliardsGame(
   variant: BilliardsVariant,
-  simulate: ShotSimulator = simulateShot,
+  simulate?: ShotSimulator,
 ): GameDefinition<BilliardsState, BilliardsMove, BilliardsPresentation> {
   return {
-    id: variant === "practice" ? "billiards-practice" : "billiards-8ball",
+    id: `billiards-${variant}`,
     seatCount: variant === "practice" ? 1 : 2,
-    currentSeat: (state) => (state.finished ? null : state.turnSeat),
+    currentSeat: (state) =>
+      state.finished
+        ? null
+        : state.variant === "nine-ball"
+          ? nineBallSeat(state)
+          : state.variant === "snooker"
+            ? snookerSeat(state)
+            : state.turnSeat,
     winnerSeat: (state) => state.winnerSeat,
     isFinished: (state) => state.finished,
-    applyMove: (state, move, seat) => {
+    applyMove: async (state, move, seat) => {
+      const simulateForState: ShotSimulator =
+        simulate ??
+        ((balls, shot) =>
+          simulateShot(balls, shot, false, equipmentForState(state)));
       if (state.finished) throw new Error("billiards: match already finished");
-      if (seat !== state.turnSeat) {
+      if (
+        seat !==
+        (state.variant === "nine-ball"
+          ? nineBallSeat(state)
+          : state.variant === "snooker"
+            ? snookerSeat(state)
+            : state.turnSeat)
+      ) {
         throw new Error("billiards: move from inactive seat");
       }
+      if (state.variant === "snooker") {
+        if (move.type !== "shot") {
+          const next = applySnookerAction(state, move);
+          return {
+            state: next,
+            presentation: singleFramePresentation(next.balls),
+          };
+        }
+        validateSnookerShot(state, move);
+        const sim = await simulateForState(state.balls, move);
+        return {
+          state: reduceSnookerShot(state, sim, move),
+          presentation: { frames: sim.frames, events: sim.events },
+        };
+      }
+      if (state.variant === "nine-ball") {
+        if (move.type !== "shot") {
+          const next = applyNineBallAction(state, move);
+          return {
+            state: next,
+            presentation: singleFramePresentation(next.balls),
+          };
+        }
+        validateNineShot(state, move);
+        const sim = await simulateForState(state.balls, move);
+        return {
+          state: reduceNineBallShot(state, sim, move.pushOut),
+          presentation: { frames: sim.frames, events: sim.events },
+        };
+      }
       if (move.type === "place-cue") return applyPlaceCue(state, move);
+      if (move.type !== "shot" || move.pushOut)
+        throw new Error("billiards: unsupported action");
       if (state.ballInHand) {
         throw new Error("billiards: place the cue ball first");
       }
       return state.variant === "practice"
-        ? applyPracticeShot(state, move, simulate)
-        : applyEightBallShot(state, move, seat, simulate);
+        ? applyPracticeShot(state, move, simulateForState)
+        : applyEightBallShot(state, move, seat, simulateForState);
     },
   };
 }

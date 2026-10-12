@@ -5,14 +5,25 @@ import { useState } from "react";
 
 import AppPageContent from "~/components/AppPageContent";
 import { Button } from "~/components/ui/button";
+import { Field, FieldLabel } from "~/components/ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 import type { Difficulty } from "../engine/ai";
 import { GameSelect } from "../engine/BoardModeMenu";
 import { useGameHistory, useGamesHistoryStore } from "../engine/history";
 import {
   BILLIARDS_GAME_ID,
+  type BilliardsDiscipline,
   type BilliardsHistoryPayload,
   type BilliardsMode,
+  type RedCount,
 } from "./types";
 
 function historyModeLabel(payload: BilliardsHistoryPayload) {
@@ -60,12 +71,75 @@ export function BilliardsModeMenu({
   onStart: (mode: BilliardsMode) => void;
 }) {
   const { t } = useLingui();
+  const [discipline, setDiscipline] =
+    useState<BilliardsDiscipline>("eight-ball");
+  const [reds, setReds] = useState<RedCount>(15);
+  const config =
+    discipline === "snooker" ? ({ discipline, reds } as const) : { discipline };
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [playerBreaks, setPlayerBreaks] = useState(true);
   const records = useGameHistory<BilliardsHistoryPayload>(BILLIARDS_GAME_ID);
   const clearGame = useGamesHistoryStore((s) => s.clearGame);
   return (
     <AppPageContent bottomInset="scroll">
+      <Field orientation="horizontal">
+        <FieldLabel htmlFor="billiards-discipline">
+          <Trans comment="台球开局菜单，选择中式八球、九球或斯诺克规则">
+            玩法
+          </Trans>
+        </FieldLabel>
+        <Select
+          value={discipline}
+          onValueChange={(value) => setDiscipline(value as BilliardsDiscipline)}
+        >
+          <SelectTrigger id="billiards-discipline" wrapValue>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="eight-ball">
+                <Trans>中式八球</Trans>
+              </SelectItem>
+              <SelectItem value="snooker">
+                <Trans>斯诺克</Trans>
+              </SelectItem>
+              <SelectItem value="nine-ball">
+                <Trans>美式九球</Trans>
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </Field>
+      {discipline === "snooker" ? (
+        <>
+          <GameSelect
+            label={<Trans>红球数</Trans>}
+            value={String(reds)}
+            onChange={(value) => setReds(Number(value) as RedCount)}
+            options={[
+              { value: "6", label: t`六红球` },
+              { value: "10", label: t`十红球变体` },
+              { value: "15", label: t`十五红球` },
+            ]}
+          />
+          <p className="text-muted-foreground text-xs">
+            <Trans>
+              红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。
+            </Trans>
+          </p>
+          <p className="text-muted-foreground text-xs">
+            <Trans>练习为自由清台，不计算正式比赛单杆。</Trans>
+          </p>
+        </>
+      ) : null}
+      {discipline === "nine-ball" ? (
+        <p className="text-muted-foreground text-xs">
+          <Trans>
+            依次首碰最低号球，合法进 9
+            号获胜。采用三球开球、推杆选择及连续三犯规则。
+          </Trans>
+        </p>
+      ) : null}
       <div className="grid gap-3 md:grid-cols-2">
         <section className="flex flex-col gap-3 rounded-xl border p-4">
           <h2 className="text-sm font-semibold">
@@ -93,7 +167,9 @@ export function BilliardsModeMenu({
           <Button
             fullWidth
             className="md:w-fit md:self-start"
-            onClick={() => onStart({ kind: "ai", difficulty, playerBreaks })}
+            onClick={() =>
+              onStart({ kind: "ai", difficulty, playerBreaks, ...config })
+            }
           >
             <Play />
             <Trans>开始对局</Trans>
@@ -120,7 +196,7 @@ export function BilliardsModeMenu({
             <button
               key={item.kind}
               type="button"
-              onClick={() => onStart({ kind: item.kind })}
+              onClick={() => onStart({ kind: item.kind, ...config })}
               className="hover:bg-accent focus-visible:ring-ring flex min-h-[max(44px,4rem)] w-full items-center gap-3 border-b text-left last:border-0 focus-visible:ring-2"
             >
               <item.icon className="text-muted-foreground size-5 shrink-0" />
@@ -155,11 +231,34 @@ export function BilliardsModeMenu({
                 <span className="text-muted-foreground shrink-0 text-left tabular-nums">
                   {formatHistoryTime(record.finishedAt)}
                 </span>
-                <span className="min-w-0 truncate text-center">
+                <span className="min-w-0 text-center break-words">
+                  {record.payload.discipline === "snooker" ? (
+                    <span>
+                      <Trans>斯诺克</Trans>
+                      {" · "}
+                      {record.payload.reds === 6 ? (
+                        <Trans>六红球</Trans>
+                      ) : record.payload.reds === 10 ? (
+                        <Trans>十红球变体</Trans>
+                      ) : (
+                        <Trans>十五红球</Trans>
+                      )}
+                    </span>
+                  ) : record.payload.discipline === "nine-ball" ? (
+                    <Trans>美式九球</Trans>
+                  ) : (
+                    <Trans>中式八球</Trans>
+                  )}
+                  {" · "}
                   {historyModeLabel(record.payload)}
                 </span>
                 <span className="text-muted-foreground shrink-0 text-right">
                   {historyResult(record.payload)}
+                  {record.payload.scores ? (
+                    <span className="block tabular-nums">
+                      {record.payload.scores.join(" : ")}
+                    </span>
+                  ) : null}
                   {" · "}
                   <Plural
                     value={{

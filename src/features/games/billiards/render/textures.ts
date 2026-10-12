@@ -241,3 +241,29 @@ export function getBallShadingTexture(): Texture {
   ballShading = Texture.from(canvas);
   return ballShading;
 }
+
+/** 深棕皮革的细粒面，仅用于四角护边，避免金属式条带高光。 */
+export function makeLeatherTile(): HTMLCanvasElement {
+  const [canvas, ctx] = makeCanvas(128, 128);
+  const image = ctx.createImageData(128, 128);
+  for (let y = 0; y < 128; y++) {
+    for (let x = 0; x < 128; x++) {
+      // 多尺度皮纹叠加局部坡度受光；颗粒既有暗凹也有暖色亮脊，避免纯噪点。
+      const u = x * 0.55;
+      const v = y * 0.55;
+      const height = valueNoise(u, v);
+      const dx = valueNoise(u + 0.22, v) - valueNoise(u - 0.22, v);
+      const dy = valueNoise(u, v + 0.22) - valueNoise(u, v - 0.22);
+      const light = -(dx * 0.6 + dy * 0.8) * 24;
+      const grain = (hash2(x, y) - 0.5) * 3;
+      const pore = (height - 0.5) * 7 + light + grain;
+      const offset = (y * 128 + x) * 4;
+      image.data[offset] = 63 + pore;
+      image.data[offset + 1] = 42 + pore * 0.85;
+      image.data[offset + 2] = 29 + pore * 0.7;
+      image.data[offset + 3] = 255;
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  return canvas;
+}

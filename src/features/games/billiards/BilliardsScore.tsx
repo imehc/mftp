@@ -4,7 +4,10 @@ import { cn } from "cn";
 import { Badge } from "~/components/ui/badge";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
-import { BALL_HEX } from "./colors";
+import { ballDefinition } from "./ball-definitions";
+import type { EquipmentId } from "./equipment";
+import { equipmentForState } from "./placement";
+import { useSnookerBallName } from "./SnookerBall";
 import type { BilliardsMode, BilliardsState } from "./types";
 
 export function seatName(mode: BilliardsMode, seat: number) {
@@ -12,17 +15,30 @@ export function seatName(mode: BilliardsMode, seat: number) {
   return seat === 0 ? <Trans>玩家 1</Trans> : <Trans>玩家 2</Trans>;
 }
 
-function BallIcon({ id, potted }: { id: number; potted: boolean }) {
+export function BallIcon({
+  id,
+  potted,
+  equipment = "chinese-eight",
+}: {
+  id: number;
+  potted: boolean;
+  equipment?: EquipmentId;
+}) {
   const { t } = useLingui();
-  const label = potted ? t`${id} 号球，已进球` : t`${id} 号球，未进球`;
-  const striped = id >= 9 && id <= 15;
-  const color = BALL_HEX[id];
+  const name = useSnookerBallName();
+  const label =
+    equipment === "snooker"
+      ? name(id)
+      : potted
+        ? t`${id} 号球，已进球`
+        : t`${id} 号球，未进球`;
+  const { striped, color, number } = ballDefinition(id, equipment);
   return (
     <span
       role="img"
       aria-label={label}
       className={cn(
-        "relative inline-flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full",
+        "relative inline-flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-black/25 dark:ring-white/30",
         potted && "opacity-25 saturate-0",
       )}
       style={{
@@ -31,15 +47,17 @@ function BallIcon({ id, potted }: { id: number; potted: boolean }) {
     >
       {striped ? (
         <span
-          className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2"
+          className="absolute inset-x-0 top-1/2 h-3 -translate-y-1/2"
           style={{
             backgroundColor: color,
           }}
         />
       ) : null}
-      <span className="relative inline-flex size-2.5 items-center justify-center rounded-full bg-[#f6f1e7] text-[0.4375rem] leading-none font-bold text-neutral-900">
-        {id}
-      </span>
+      {number !== null ? (
+        <span className="relative inline-flex size-2.5 items-center justify-center rounded-full bg-[#f6f1e7] text-[0.4375rem] leading-none font-bold text-neutral-900">
+          {number}
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -56,7 +74,9 @@ export function BallTray({
   if (!desktop) {
     const count = ids.filter(
       (id) =>
-        (ids.length > 8 || id !== 8) &&
+        (equipmentForState(state).id !== "chinese-eight" ||
+          ids.length > 8 ||
+          id !== 8) &&
         !state.balls.find((ball) => ball.id === id)?.potted,
     ).length;
     return (
@@ -71,6 +91,7 @@ export function BallTray({
         <BallIcon
           key={id}
           id={id}
+          equipment={equipmentForState(state).id}
           potted={state.balls.find((ball) => ball.id === id)?.potted ?? false}
         />
       ))}
@@ -88,6 +109,7 @@ export function seatTray(
   state: BilliardsState,
   seat: number,
 ): readonly number[] | null {
+  if (state.variant === "nine-ball" || state.variant === "snooker") return null;
   const group = state.groups[seat];
   if (group === "solids") return SOLID_TRAY;
   if (group === "stripes") return STRIPE_TRAY;
@@ -123,7 +145,15 @@ export function SeatCell({
       </Badge>
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-muted-foreground text-xs">
-          {state.groups[seat] === "solids" ? (
+          {state.variant === "nine-ball" ? (
+            <Plural
+              value={{ consecutiveFouls: state.consecutiveFouls[seat] }}
+              one="连续犯规 # 次"
+              other="连续犯规 # 次"
+            />
+          ) : state.variant === "snooker" ? (
+            state.scores[seat]
+          ) : state.groups[seat] === "solids" ? (
             <Trans>全色球</Trans>
           ) : state.groups[seat] === "stripes" ? (
             <Trans>花色球</Trans>

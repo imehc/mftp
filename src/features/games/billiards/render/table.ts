@@ -12,18 +12,12 @@
  */
 import { Container, Sprite, Texture } from "pixi.js";
 
-import {
-  CUSHION_THICKNESS,
-  FOOT_SPOT_X,
-  HEAD_SPOT_X,
-  JAW_RADIUS,
-  POCKETS,
-  TABLE_H,
-  TABLE_W,
-} from "../constants";
+import { CHINESE_EIGHT, type TableEquipment } from "../equipment";
 import { cushionSegments } from "../geometry";
-import { FRAME, OUTER_H, OUTER_W, PPM, px } from "./layout";
-import { makeClothTile, makeWoodCanvas } from "./textures";
+import { BAULK_X, COLOR_SPOTS, D_RADIUS } from "../snooker-equipment";
+import { OUTER_H, OUTER_W, PPM, px, tableLayout } from "./layout";
+import { paintPockets } from "./pockets";
+import { makeClothTile, makeLeatherTile, makeWoodCanvas } from "./textures";
 
 export { OUTER_H, OUTER_W, PPM, px };
 
@@ -55,7 +49,15 @@ function roundRectPath(
 }
 
 /** 将球桌绘制到尺寸为木框加投影内边距的画布上。 */
-function paintTable(): HTMLCanvasElement {
+function paintTable(equipment: TableEquipment): HTMLCanvasElement {
+  const { FRAME, OUTER_W, OUTER_H } = tableLayout(equipment);
+  const {
+    tableWidth: TABLE_W,
+    tableHeight: TABLE_H,
+    cushionWidth: CUSHION_THICKNESS,
+  } = equipment;
+  const FOOT_SPOT_X = TABLE_W / 4;
+  const HEAD_SPOT_X = -TABLE_W / 4;
   const halfW = px(OUTER_W + PAD);
   const halfH = px(OUTER_H + PAD);
   const canvas = document.createElement("canvas");
@@ -113,6 +115,78 @@ function paintTable(): HTMLCanvasElement {
   ctx.strokeStyle = "rgba(255, 214, 160, 0.14)";
   ctx.stroke();
 
+  // 四角护边与木框共用外轮廓，随后由台呢开口裁出内侧，避免浮在台面上。
+  ctx.save();
+  roundRectPath(ctx, -fw, -fh, fw * 2, fh * 2, fr);
+  ctx.clip();
+  const leather = ctx.createPattern(makeLeatherTile(), "repeat");
+  for (const sx of [-1, 1]) {
+    for (const sy of [-1, 1]) {
+      const cap = px(0.235);
+      const x = sx < 0 ? -fw : fw - cap;
+      const y = sy < 0 ? -fh : fh - cap;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, cap, cap);
+      ctx.clip();
+      ctx.fillStyle = leather ?? "#30231c";
+      ctx.fillRect(x, y, cap, cap);
+      // 皮革只有柔和漫反射，压边比粒面更暗，不出现银色镜面条纹。
+      const softness = ctx.createLinearGradient(-fw, -fh, fw, fh);
+      softness.addColorStop(0, "rgba(214, 172, 126, 0.22)");
+      softness.addColorStop(0.45, "rgba(192, 149, 102, 0.03)");
+      softness.addColorStop(1, "rgba(0, 0, 0, 0.25)");
+      ctx.fillStyle = softness;
+      ctx.fillRect(x, y, cap, cap);
+      ctx.strokeStyle = "rgba(12, 7, 4, 0.7)";
+      ctx.lineWidth = px(0.003);
+      ctx.strokeRect(x, y, cap, cap);
+      // 护边有厚度：暗色滚边内侧接柔和受光面，轮廓共用桌框圆角。
+      roundRectPath(
+        ctx,
+        -fw + px(0.004),
+        -fh + px(0.004),
+        (fw - px(0.004)) * 2,
+        (fh - px(0.004)) * 2,
+        fr - px(0.004),
+      );
+      ctx.lineWidth = px(0.01);
+      ctx.strokeStyle = "rgba(13, 7, 3, 0.48)";
+      ctx.stroke();
+      roundRectPath(
+        ctx,
+        -fw + px(0.009),
+        -fh + px(0.009),
+        (fw - px(0.009)) * 2,
+        (fh - px(0.009)) * 2,
+        fr - px(0.009),
+      );
+      const edgeLight = ctx.createLinearGradient(-fw, -fh, fw, fh);
+      edgeLight.addColorStop(0, "rgba(208, 158, 108, 0.38)");
+      edgeLight.addColorStop(0.5, "rgba(171, 118, 73, 0.15)");
+      edgeLight.addColorStop(1, "rgba(5, 3, 1, 0.3)");
+      ctx.lineWidth = px(0.006);
+      ctx.strokeStyle = edgeLight;
+      ctx.stroke();
+      // 沿真实圆角缝制，线迹跟随木框外轮廓，避免方形贴纸感。
+      const inset = px(0.019);
+      roundRectPath(
+        ctx,
+        -fw + inset,
+        -fh + inset,
+        (fw - inset) * 2,
+        (fh - inset) * 2,
+        fr - inset,
+      );
+      ctx.setLineDash([px(0.004), px(0.003)]);
+      ctx.lineWidth = px(0.0012);
+      ctx.strokeStyle = "rgba(171, 129, 88, 0.5)";
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+  ctx.restore();
+
   // --- 台面 ------------------------------------------------------
   // 台呢覆盖整个 rails 开口；库边再叠在其外圈之上，这样台呢与库边
   // 之间不会出现接缝。
@@ -131,10 +205,12 @@ function paintTable(): HTMLCanvasElement {
   }
   ctx.restore();
 
+  paintPockets(ctx, equipment);
+
   // --- 库边 ------------------------------------------------------
   // 每个凸包为 [inner0, inner1, outer1, outer0]。明暗从 rails 处受光的
   // 顶面一直延伸到与台面相接的库边尖端。
-  for (const segment of cushionSegments()) {
+  for (const segment of cushionSegments(equipment)) {
     const [ix0, iy0, ix1, iy1, ox1, oy1, ox0, oy0] = segment.profile;
 
     const path = (): void => {
@@ -145,81 +221,74 @@ function paintTable(): HTMLCanvasElement {
       ctx.closePath();
     };
 
+    // 用内沿法线投影库宽，袋颚非对称退让不能把整段库面的渐变带偏。
+    const edgeX = ix1 - ix0;
+    const edgeY = iy1 - iy0;
+    const edgeSize = Math.hypot(edgeX, edgeY);
+    const normalX = -edgeY / edgeSize;
+    const normalY = edgeX / edgeSize;
+    const depth =
+      ((ox0 + ox1 - ix0 - ix1) * normalX + (oy0 + oy1 - iy0 - iy1) * normalY) /
+      2;
+    const nx = -normalX * depth;
+    const ny = -normalY * depth;
+    const centerX = (ix0 + ix1) / 2;
+    const centerY = (iy0 + iy1) / 2;
     const face = ctx.createLinearGradient(
-      px((ox0 + ox1) / 2),
-      px((oy0 + oy1) / 2),
-      px((ix0 + ix1) / 2),
-      px((iy0 + iy1) / 2),
+      px(centerX - nx),
+      px(centerY - ny),
+      px(centerX),
+      px(centerY),
     );
-    face.addColorStop(0, "#2f8757");
-    face.addColorStop(0.4, "#26714a");
-    face.addColorStop(0.82, "#1a5335");
-    face.addColorStop(1, "#123d26");
+    // 左上方统一主光，仅坡面朝向影响受光强度。
+    const facingLight = -(nx * 0.6 + ny * 0.8) / Math.hypot(nx, ny);
+    const light = 1 + facingLight * 0.18;
+    const tint = (r: number, g: number, b: number) =>
+      `rgb(${Math.round(r * light)}, ${Math.round(g * light)}, ${Math.round(b * light)})`;
+    face.addColorStop(0, tint(43, 119, 78));
+    face.addColorStop(0.22, tint(49, 131, 85));
+    face.addColorStop(0.72, tint(36, 105, 66));
+    face.addColorStop(0.94, tint(27, 82, 51));
+    face.addColorStop(1, tint(23, 69, 44));
 
     // 投影沿真实库边轮廓生成，台呢及袋口通道共享同一底色与光照，
     // 避免按矩形台面裁剪阴影造成通道与台面之间的色块断层。
     ctx.save();
     path();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.32)";
-    ctx.shadowBlur = px(0.012) * SS;
-    ctx.shadowOffsetX = px(0.002) * SS;
-    ctx.shadowOffsetY = px(0.004) * SS;
+    ctx.shadowColor = "rgba(3, 18, 12, 0.42)";
+    ctx.shadowBlur = px(0.007) * SS;
+    ctx.shadowOffsetX = px(0.004) * SS;
+    ctx.shadowOffsetY = px(0.006) * SS;
     ctx.fillStyle = face;
     ctx.fill();
     ctx.restore();
 
-    // 袋口斜切面低于库边顶面，应呈背光的倒角。不能用台呢纯色覆盖端头，
-    // 否则会抹掉厚度，留下像直角拼接的绿色方块。
+    // 弧形袋颚沿真实曲线产生局部近接阴影；不以斜切直线渐变铺满整段库边。
     ctx.save();
     path();
     ctx.clip();
-
-    const jaw = (
-      ex: number,
-      ey: number,
-      cutX: number,
-      cutY: number,
-      towardX: number,
-      towardY: number,
-    ): void => {
-      // 切口的内法线：指向库边本体而非朝袋口外侧的垂直方向。
-      let nx = -(cutY - ey);
-      let ny = cutX - ex;
-      const len = Math.hypot(nx, ny) || 1;
-      nx /= len;
-      ny /= len;
-      if (nx * (towardX - ex) + ny * (towardY - ey) < 0) {
-        nx = -nx;
-        ny = -ny;
-      }
-      const reach = px(0.028);
-      const g = ctx.createLinearGradient(
-        ex,
-        ey,
-        ex + nx * reach,
-        ey + ny * reach,
-      );
-      g.addColorStop(0, "rgba(3, 21, 12, 0.72)");
-      g.addColorStop(0.45, "rgba(3, 21, 12, 0.25)");
-      g.addColorStop(1, "rgba(3, 21, 12, 0)");
-      path();
-      ctx.fillStyle = g;
-      ctx.fill();
-    };
-
-    jaw(px(ix0), px(iy0), px(ox0), px(oy0), px(ix1), px(iy1));
-    jaw(px(ix1), px(iy1), px(ox1), px(oy1), px(ix0), px(iy0));
+    for (const jaw of segment.jaws) {
+      ctx.beginPath();
+      ctx.moveTo(px(jaw[0].x), px(jaw[0].y));
+      for (const point of jaw.slice(1)) ctx.lineTo(px(point.x), px(point.y));
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "rgba(3, 23, 13, 0.18)";
+      ctx.lineWidth = px(0.024);
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(2, 18, 11, 0.24)";
+      ctx.lineWidth = px(0.008);
+      ctx.stroke();
+    }
     ctx.restore();
 
     // 库边尖端与台面相接处的暗缝。
     ctx.beginPath();
-    const edgeLength = Math.hypot(ix1 - ix0, iy1 - iy0);
-    const inset = (JAW_RADIUS * 2) / edgeLength;
-    ctx.moveTo(px(ix0 + (ix1 - ix0) * inset), px(iy0 + (iy1 - iy0) * inset));
-    ctx.lineTo(px(ix1 - (ix1 - ix0) * inset), px(iy1 - (iy1 - iy0) * inset));
+    ctx.moveTo(px(ix0), px(iy0));
+    ctx.lineTo(px(ix1), px(iy1));
     ctx.lineCap = "round";
-    ctx.lineWidth = px(0.0025);
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.lineWidth = px(0.0015);
+    ctx.strokeStyle = "rgba(4, 24, 15, 0.28)";
     ctx.stroke();
   }
 
@@ -227,17 +296,33 @@ function paintTable(): HTMLCanvasElement {
   const bedH = px(TABLE_H);
 
   // --- 标记 ------------------------------------------------------
+  const snooker = equipment.id === "snooker";
+  const lineX = snooker ? BAULK_X : HEAD_SPOT_X;
   ctx.beginPath();
-  ctx.moveTo(px(HEAD_SPOT_X), bedY);
-  ctx.lineTo(px(HEAD_SPOT_X), bedY + bedH);
-  ctx.lineWidth = px(0.004);
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.13)";
+  ctx.moveTo(px(lineX), bedY);
+  ctx.lineTo(px(lineX), bedY + bedH);
+  ctx.lineWidth = px(snooker ? 0.0015 : 0.004);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
   ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(px(FOOT_SPOT_X), 0, px(0.011), 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(238, 232, 220, 0.42)";
-  ctx.fill();
+  if (snooker) {
+    ctx.beginPath();
+    ctx.arc(px(BAULK_X), 0, px(D_RADIUS), Math.PI / 2, Math.PI * 1.5);
+    ctx.stroke();
+  }
+  for (const spot of snooker
+    ? Object.values(COLOR_SPOTS)
+    : [{ x: FOOT_SPOT_X, y: 0 }]) {
+    ctx.beginPath();
+    ctx.arc(
+      px(spot.x),
+      px(spot.y),
+      px(snooker ? 0.004 : 0.011),
+      0,
+      Math.PI * 2,
+    );
+    ctx.fillStyle = "rgba(238, 232, 220, 0.42)";
+    ctx.fill();
+  }
 
   // 库边瞄准点：嵌入木框的珍珠母镶饰。
   const sightY = px(TABLE_H / 2 + CUSHION_THICKNESS + FRAME / 2);
@@ -271,94 +356,27 @@ function paintTable(): HTMLCanvasElement {
     ctx.fill();
   };
 
-  for (const k of [-3, -2, -1, 1, 2, 3]) {
+  for (const k of snooker ? [] : [-3, -2, -1, 1, 2, 3]) {
     const x = px((k * TABLE_W) / 8);
     drawSight(x, -sightY);
     drawSight(x, sightY);
   }
-  for (const k of [-1, 0, 1]) {
+  for (const k of snooker ? [] : [-1, 0, 1]) {
     const y = px((k * TABLE_H) / 4);
     drawSight(-sightX, y);
     drawSight(sightX, y);
-  }
-
-  // --- 袋口 ------------------------------------------------------
-  for (const pocket of POCKETS) {
-    const cx = px(pocket.x);
-    const cy = px(pocket.y);
-    const pr = px(pocket.radius);
-
-    // 台呢喉部：台面向洞口下陷，越远越暗。它位于皮圈之下，因此看起来
-    // 是凹陷而非画上去的一圈。
-    const throat = ctx.createRadialGradient(
-      cx,
-      cy,
-      pr * 0.3,
-      cx,
-      cy,
-      pr * 1.15,
-    );
-    throat.addColorStop(0, "rgba(0, 0, 0, 0.55)");
-    throat.addColorStop(0.65, "rgba(0, 0, 0, 0.28)");
-    throat.addColorStop(1, "rgba(0, 0, 0, 0)");
-    ctx.beginPath();
-    ctx.arc(cx, cy, pr * 1.15, 0, Math.PI * 2);
-    ctx.fillStyle = throat;
-    ctx.fill();
-
-    // 袋口周围的皮圈。
-    const collar = ctx.createRadialGradient(
-      cx,
-      cy,
-      pr * 0.6,
-      cx,
-      cy,
-      pr * 1.08,
-    );
-    collar.addColorStop(0, "#3a281c");
-    collar.addColorStop(0.7, "#241811");
-    collar.addColorStop(1, "rgba(12, 8, 5, 0)");
-    ctx.beginPath();
-    ctx.arc(cx, cy, pr * 1.08, 0, Math.PI * 2);
-    ctx.fillStyle = collar;
-    ctx.fill();
-
-    // 洞口：中心为黑，朝受光的近缘渐亮。
-    const hole = ctx.createRadialGradient(
-      cx - pr * 0.2,
-      cy - pr * 0.2,
-      pr * 0.06,
-      cx,
-      cy,
-      pr * 0.92,
-    );
-    hole.addColorStop(0, "#000000");
-    hole.addColorStop(0.72, "#050505");
-    hole.addColorStop(1, "#1c1613");
-    ctx.beginPath();
-    ctx.arc(cx, cy, pr * 0.9, 0, Math.PI * 2);
-    ctx.fillStyle = hole;
-    ctx.fill();
-
-    // 边缘：近侧暗，远侧横过受光。
-    ctx.beginPath();
-    ctx.arc(cx, cy, pr * 0.9, 0, Math.PI * 2);
-    const rim = ctx.createLinearGradient(cx - pr, cy - pr, cx + pr, cy + pr);
-    rim.addColorStop(0, "rgba(0, 0, 0, 0.8)");
-    rim.addColorStop(0.55, "rgba(90, 66, 48, 0.5)");
-    rim.addColorStop(1, "rgba(168, 132, 92, 0.55)");
-    ctx.lineWidth = px(0.008);
-    ctx.strokeStyle = rim;
-    ctx.stroke();
   }
 
   return canvas;
 }
 
 /** 构建静态球桌：木框、台呢、库边、标记、袋口。 */
-export function buildTable(): Container {
+export function buildTable(
+  equipment: TableEquipment = CHINESE_EIGHT,
+): Container {
+  const { OUTER_W, OUTER_H } = tableLayout(equipment);
   const container = new Container();
-  const sprite = new Sprite(Texture.from(paintTable()));
+  const sprite = new Sprite(Texture.from(paintTable(equipment)));
   sprite.x = px(-(OUTER_W + PAD));
   sprite.y = px(-(OUTER_H + PAD));
   sprite.width = px((OUTER_W + PAD) * 2);

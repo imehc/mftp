@@ -1,3 +1,4 @@
+import { CHINESE_EIGHT, type TableEquipment } from "../equipment";
 /** 指示线取自同参数物理模拟；保留正常的摩擦偏转和杆法影响。 */
 import { guideClearance } from "../geometry";
 import { simulateShot, type Vec2 } from "../physics";
@@ -33,10 +34,16 @@ export function computeAimGuide(
   angle: number,
   followDraw = 0,
   power = 0.5,
+  equipment: TableEquipment = CHINESE_EIGHT,
 ): AimGuide | null {
   const cue = balls.find((b) => b.id === 0 && !b.potted);
   if (!cue) return null;
-  const sim = simulateShot(balls, { angle, power, followDraw }, true);
+  const sim = simulateShot(
+    balls,
+    { angle, power, followDraw },
+    true,
+    equipment,
+  );
   const impact = sim.firstImpact;
   const dir = { x: Math.cos(angle), y: Math.sin(angle) };
   const cueEnd = sim.balls.find((b) => b.id === 0)!;
@@ -61,6 +68,7 @@ export function computeAimGuide(
             balls,
             [0, impact.targetId],
             0.5,
+            equipment,
           ),
         }
       : null;
@@ -77,6 +85,7 @@ export function computeAimGuide(
           balls,
           [0, ...(target ? [target.id] : [])],
           0.3,
+          equipment,
         )
       : 0,
   };

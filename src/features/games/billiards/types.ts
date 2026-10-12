@@ -4,24 +4,38 @@ import type { SeatIndex } from "../engine/types";
 
 export const BILLIARDS_GAME_ID = "billiards";
 
-export type BilliardsMode =
+export type BilliardsDiscipline = "eight-ball" | "nine-ball" | "snooker";
+
+export type RedCount = 6 | 10 | 15;
+
+export type BilliardsMode = (
   | { kind: "practice" }
   | { kind: "ai"; difficulty: Difficulty; playerBreaks: boolean }
-  | { kind: "hotseat" };
+  | { kind: "hotseat"; firstSeat?: SeatIndex }
+) &
+  (
+    | { discipline?: "eight-ball" | "nine-ball" }
+    | { discipline: "snooker"; reds: RedCount }
+  );
 
 export interface BilliardsHistoryPayload {
+  version?: 2;
+  discipline?: BilliardsDiscipline;
   mode: BilliardsMode["kind"];
   difficulty?: Difficulty;
   winnerSeat: number | null;
   shots: number;
   fouls: number[];
+  reds?: RedCount;
+  scores?: number[];
+  highestBreaks?: number[];
 }
 
-export type BilliardsVariant = "eight-ball" | "practice";
+export type BilliardsVariant = BilliardsDiscipline | "practice";
 
 export type BallGroup = "solids" | "stripes";
 
-/** 球 id：0 = 母球，1-7 全色，8 = 黑八，9-15 花色。 */
+/** id是稳定标识；颜色/编号/分值由BallDefinition决定，不能跨玩法推断。 */
 export interface BallState {
   id: number;
   x: number;
@@ -30,7 +44,15 @@ export interface BallState {
 }
 
 export type FoulReason =
-  "cue-potted" | "no-contact" | "wrong-first-contact" | "potted-eight-early";
+  | "cue-potted"
+  | "no-contact"
+  | "wrong-first-contact"
+  | "potted-eight-early"
+  | "no-rail"
+  | "illegal-break"
+  | "wrong-ball-potted"
+  | "touching-ball-moved"
+  | "snooker-behind-nomination";
 
 export interface ShotOutcome {
   foul: FoulReason | null;
@@ -40,15 +62,12 @@ export interface ShotOutcome {
   continueTurn: boolean;
   /** 开球时黑八落袋并被放回脚点。 */
   respottedEight: boolean;
+  respottedNine?: boolean;
 }
 
-export interface BilliardsState {
-  variant: BilliardsVariant;
+export interface BaseBilliardsState {
   balls: BallState[];
   turnSeat: SeatIndex;
-  /** 每个座位的已分配组别；球桌“封闭”前为 null。 */
-  groups: (BallGroup | null)[];
-  openTable: boolean;
   breakDone: boolean;
   ballInHand: boolean;
   winnerSeat: SeatIndex | null;
@@ -61,6 +80,84 @@ export interface BilliardsState {
   lastOutcome: ShotOutcome | null;
 }
 
+export interface EightBallState extends BaseBilliardsState {
+  variant: "eight-ball" | "practice";
+  /** 每个座位的已分配组别；球桌“封闭”前为 null。 */
+  groups: (BallGroup | null)[];
+  openTable: boolean;
+  /** 练习可使用其他器材与球组，不套用其对战规则。 */
+  discipline?: BilliardsDiscipline;
+  reds?: RedCount;
+}
+
+export type NineBallDecision =
+  | { kind: "push-out" | "illegal-break"; seat: SeatIndex; shooter: SeatIndex }
+  | { kind: "warning"; seat: SeatIndex }
+  | { kind: "stalemate"; seat: SeatIndex; proposer: SeatIndex };
+
+export interface NineBallState extends BaseBilliardsState {
+  variant: "nine-ball";
+  rackSeed: number;
+  breaker: SeatIndex;
+  placementRegion: "head" | "table" | null;
+  pushOutAvailable: boolean;
+  consecutiveFouls: number[];
+  warned: boolean[];
+  decision: NineBallDecision | null;
+}
+
+export type SnookerOn =
+  | { kind: "red" }
+  | { kind: "color"; nominated: number | null }
+  | { kind: "clearance"; color: number };
+
+export interface SnookerPosition {
+  balls: BallState[];
+  on: SnookerOn;
+  placementRegion: "d" | "table" | null;
+  freeBall: boolean;
+  nominatedFree: number | null;
+}
+
+export interface MissRun {
+  shooter: SeatIndex;
+  count: number;
+  fullBallFailures: number;
+  warned: boolean;
+  sixWarned: boolean;
+}
+
+export type SnookerDecision =
+  | {
+      kind: "foul";
+      seat: SeatIndex;
+      shooter: SeatIndex;
+      replace: SnookerPosition | null;
+      anywhere: boolean;
+      warning: "three-miss" | "six-red" | null;
+    }
+  | { kind: "black-choice"; seat: SeatIndex };
+
+export interface SnookerState extends BaseBilliardsState, SnookerPosition {
+  variant: "snooker";
+  reds: RedCount;
+  frameSeed: number;
+  scores: number[];
+  currentBreak: number;
+  highestBreaks: number[];
+  decision: SnookerDecision | null;
+  missRun: MissRun | null;
+  lastScore: {
+    points: number;
+    penalty: number;
+    miss: boolean;
+    respotted: number[];
+  } | null;
+  respottedBlack: boolean;
+}
+
+export type BilliardsState = EightBallState | NineBallState | SnookerState;
+
 export type BilliardsMove =
   | {
       type: "shot";
@@ -70,8 +167,27 @@ export type BilliardsMove =
       power: number;
       /** 跟杆/缩杆旋转：-1（缩杆）.. 1（跟杆）。 */
       followDraw: number;
+      /** 推杆声明与实际出杆原子提交。 */
+      pushOut?: boolean;
     }
-  | { type: "place-cue"; x: number; y: number };
+  | { type: "place-cue"; x: number; y: number }
+  | { type: "reposition-cue" }
+  | {
+      type: "decision";
+      choice:
+        | "accept"
+        | "return"
+        | "acknowledge"
+        | "rerack"
+        | "decline"
+        | "replace"
+        | "anywhere";
+    }
+  | { type: "propose-stalemate" }
+  | { type: "nominate"; ballId: number }
+  | { type: "nominate-free"; ballId: number | null }
+  | { type: "concede" }
+  | { type: "claim-frame" };
 
 /** 一步被记录的模拟（每颗未落袋球的位置）。 */
 export interface SimFrame {
@@ -107,7 +223,7 @@ export function ballGroup(id: number): BallGroup | "eight" | "cue" {
 }
 
 export function remainingGroupBalls(
-  state: BilliardsState,
+  state: EightBallState,
   group: BallGroup,
 ): number {
   return state.balls.filter(

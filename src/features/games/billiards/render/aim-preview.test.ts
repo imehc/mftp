@@ -89,3 +89,24 @@ it("球局变化和销毁后不会发布旧局面的轨迹", async () => {
   await second.promise;
   expect(update).not.toHaveBeenCalled();
 });
+
+it("默认方向重置后，同一组球的旧预览也不能重新出现", async () => {
+  const first = deferred();
+  const second = deferred();
+  client.preview
+    .mockReturnValueOnce(first.promise)
+    .mockReturnValueOnce(second.promise);
+  const update = vi.fn();
+  const preview = createAimPreview(update);
+  preview.get(balls, 0, 0.5, 0);
+  preview.invalidate();
+  expect(preview.get(balls, Math.PI / 2, 0.5, 0)).toBeNull();
+  first.resolve(guide);
+  await first.promise;
+  expect(update).not.toHaveBeenCalled();
+  const nextGuide = { ...guide, dir: { x: 0, y: 1 } };
+  second.resolve(nextGuide);
+  await second.promise;
+  expect(preview.get(balls, Math.PI / 2, 0.5, 0)).toBe(nextGuide);
+  preview.dispose();
+});

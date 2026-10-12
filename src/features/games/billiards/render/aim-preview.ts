@@ -1,10 +1,14 @@
+import { type EquipmentId } from "../equipment";
 import { createSimulationClient } from "../simulation-client";
 import type { BallState } from "../types";
 import type { AimGuide } from "./guides";
 
 /** 合并连续输入；同一球局保留最近计算结果，避免异步等待造成闪烁。 */
-export function createAimPreview(onUpdate: () => void) {
-  const client = createSimulationClient();
+export function createAimPreview(
+  onUpdate: () => void,
+  equipmentId: EquipmentId = "chinese-eight",
+) {
+  const client = createSimulationClient(equipmentId);
   let current: {
     balls: readonly BallState[];
     angle: number;
@@ -13,15 +17,21 @@ export function createAimPreview(onUpdate: () => void) {
   } | null = null;
   let guide: AimGuide | null = null;
   let busy = false;
+  let generation = 0;
   let disposed = false;
 
   const run = async () => {
     if (busy || !current || disposed) return;
     busy = true;
     const input = current;
+    const runGeneration = generation;
     try {
       const result = await client.preview(input.balls, input);
-      if (!disposed && current?.balls === input.balls) {
+      if (
+        !disposed &&
+        generation === runGeneration &&
+        current?.balls === input.balls
+      ) {
         // 连续拖动也要发布已完成结果，否则输入快于 worker 时始终没有指示线。
         guide = result;
         onUpdate();
@@ -58,6 +68,11 @@ export function createAimPreview(onUpdate: () => void) {
         void run();
       }
       return guide;
+    },
+    invalidate() {
+      generation++;
+      current = null;
+      guide = null;
     },
     dispose() {
       disposed = true;

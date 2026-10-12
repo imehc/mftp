@@ -4,8 +4,6 @@ import RAPIER from "@dimforge/rapier2d-compat";
 import {
   ANGULAR_DAMPING,
   BALL_FRICTION,
-  BALL_MASS,
-  BALL_RADIUS,
   BALL_RESTITUTION,
   CUSHION_FRICTION,
   CUSHION_RESTITUTION,
@@ -15,14 +13,13 @@ import {
   LINEAR_DAMPING,
   MAX_SHOT_SPEED,
   MAX_SIM_SECONDS,
-  POCKET_CAPTURE_SCALE,
-  POCKETS,
   ROLLING_DECELERATION,
   STOP_SPEED,
-  TABLE_H,
-  TABLE_W,
 } from "./constants";
+import { CHINESE_EIGHT, type TableEquipment } from "./equipment";
 import { cushionSegments } from "./geometry";
+import { pocketAt } from "./pocket-geometry";
+import { createShotFacts, distanceToEdge, type ShotFacts } from "./shot-facts";
 import type { BallState, SimEvent, SimFrame } from "./types";
 
 export { cushionSegments } from "./geometry";
@@ -61,6 +58,7 @@ export interface ShotSimResult {
   balls: BallState[];
   frames: SimFrame[];
   events: SimEvent[];
+  facts: ShotFacts;
   firstContact: number | null;
   firstImpact: FirstImpact | null;
   cuePotted: boolean;
@@ -72,30 +70,40 @@ interface Contact {
   b: number | undefined;
   impact: number;
   order: number;
+  rail?: number;
 }
 
 /** 用碰前扫掠时间排列同一物理步的接触，避免依赖 WASM 回调顺序。 */
-function contactTime(a: Vec2, b: Vec2, va: Vec2, vb: Vec2): number {
+function contactTime(
+  a: Vec2,
+  b: Vec2,
+  va: Vec2,
+  vb: Vec2,
+  radius: number,
+): number {
   const x = a.x - b.x;
   const y = a.y - b.y;
   const vx = va.x - vb.x;
   const vy = va.y - vb.y;
   const dot = x * vx + y * vy;
   const vv = vx * vx + vy * vy;
-  const gap = x * x + y * y - (BALL_RADIUS * 2) ** 2;
+  const gap = x * x + y * y - (radius * 2) ** 2;
   const discriminant = dot * dot - vv * gap;
   if (gap <= 0 || vv < 1e-12 || discriminant < 0) return 0;
   return Math.max(0, (-dot - Math.sqrt(discriminant)) / vv);
 }
 
-function buildWorld(): RAPIER.World {
+function buildWorld(
+  equipment: TableEquipment,
+  rails: Map<number, number>,
+): RAPIER.World {
   const world = new RAPIER.World({ x: 0, y: 0 });
   world.timestep = FIXED_DT;
   // 默认的毫米级容差对 57mm 球的薄切过大，必须按球的尺寸缩小。
   world.integrationParameters.normalizedAllowedLinearError = 0.00001;
   world.integrationParameters.normalizedPredictionDistance = 0.00005;
   world.numSolverIterations = 8;
-  for (const segment of cushionSegments()) {
+  for (const [index, segment] of cushionSegments(equipment).entries()) {
     const hull = RAPIER.ColliderDesc.convexHull(
       new Float32Array(segment.points),
     );
@@ -103,15 +111,24 @@ function buildWorld(): RAPIER.World {
       world.free();
       throw new Error("billiards: invalid cushion hull");
     }
-    world.createCollider(
+    const collider = world.createCollider(
       hull
         .setRestitution(CUSHION_RESTITUTION)
         .setRestitutionCombineRule(RAPIER.CoefficientCombineRule.Min)
         .setFriction(CUSHION_FRICTION),
     );
+    rails.set(collider.handle, index);
   }
-  const fw = TABLE_W / 2 + 0.16;
-  const fh = TABLE_H / 2 + 0.16;
+  const fw =
+    equipment.tableWidth / 2 +
+    equipment.cushionWidth +
+    equipment.frameWidth +
+    0.01;
+  const fh =
+    equipment.tableHeight / 2 +
+    equipment.cushionWidth +
+    equipment.frameWidth +
+    0.01;
   for (const [x, y, hx, hy] of [
     [0, fh, fw + 0.1, 0.05],
     [0, -fh, fw + 0.1, 0.05],
@@ -129,11 +146,17 @@ export function simulateShot(
   ballsIn: readonly BallState[],
   shot: ShotParams,
   preview = false,
+  equipment: TableEquipment = CHINESE_EIGHT,
 ): ShotSimResult {
+  const BALL_RADIUS = equipment.ballRadius;
+  const BALL_MASS = equipment.ballMass;
   if (![shot.angle, shot.power, shot.followDraw].every(Number.isFinite)) {
     throw new Error("billiards: invalid shot parameters");
   }
-  const world = buildWorld();
+  const rails = new Map<number, number>();
+  const cushions = cushionSegments(equipment);
+  const world = buildWorld(equipment, rails);
+  const recorder = createShotFacts(ballsIn, equipment);
   const queue = new RAPIER.EventQueue(true);
   try {
     const bodies = new Map<number, RAPIER.RigidBody>();
@@ -152,8 +175,11 @@ export function simulateShot(
           .setRestitution(BALL_RESTITUTION)
           .setFriction(BALL_FRICTION)
           .setDensity(BALL_MASS / (Math.PI * BALL_RADIUS ** 2))
-          .setActiveEvents(RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
-          .setContactForceEventThreshold(0.0001),
+          .setActiveEvents(
+            RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS |
+              RAPIER.ActiveEvents.COLLISION_EVENTS,
+          )
+          .setContactForceEventThreshold(0),
         body,
       );
       bodies.set(ball.id, body);
@@ -196,6 +222,13 @@ export function simulateShot(
       }
       world.step(queue);
       const contacts: Contact[] = [];
+      queue.drainCollisionEvents((a, b, started) => {
+        if (started) return;
+        const ball = ids.get(a) ?? ids.get(b);
+        const rail = rails.get(a) ?? rails.get(b);
+        if (ball !== undefined && rail !== undefined)
+          recorder.releaseRail(ball, rail);
+      });
       queue.drainContactForceEvents((event) => {
         const a = ids.get(event.collider1()) ?? ids.get(event.collider2());
         if (a === undefined) return;
@@ -210,14 +243,32 @@ export function simulateShot(
         const impact = Math.abs(
           (va.x - vb.x) * normal.x + (va.y - vb.y) * normal.y,
         );
+        const rail = rails.get(other);
+        const before = positions.get(a)!;
+        const railTime =
+          rail === undefined || impact < 1e-12
+            ? 0
+            : Math.max(
+                0,
+                (distanceToEdge(before.x, before.y, cushions[rail].points) -
+                  BALL_RADIUS) /
+                  impact,
+              );
         contacts.push({
           a,
           b,
           impact,
+          rail,
           order:
             b === undefined
-              ? 0
-              : contactTime(positions.get(a)!, positions.get(b)!, va, vb),
+              ? railTime
+              : contactTime(
+                  positions.get(a)!,
+                  positions.get(b)!,
+                  va,
+                  vb,
+                  BALL_RADIUS,
+                ),
         });
       });
       contacts.sort(
@@ -228,7 +279,10 @@ export function simulateShot(
       );
       let cueHit: Contact | undefined;
       for (const contact of contacts) {
-        const { a, b, impact } = contact;
+        const { a, b, impact, rail } = contact;
+        const contactT = t - FIXED_DT + Math.min(FIXED_DT, contact.order);
+        if (b !== undefined) recorder.ballContact(a, b, contactT);
+        else if (rail !== undefined) recorder.railContact(a, rail, contactT);
         const key =
           b === undefined ? `${a}:rail` : `${Math.min(a, b)}:${Math.max(a, b)}`;
         if (t - (lastContact.get(key) ?? -1) > 0.04 && impact > 0.015) {
@@ -280,13 +334,9 @@ export function simulateShot(
       for (const [id, body] of bodies) {
         const pos = body.translation();
         const vel = body.linvel();
-        // 感应范围只检查球心，且必须越过台面边界，不能按两圆相交吸球。
-        const pocket = POCKETS.find(
-          (p) =>
-            Math.hypot(pos.x - p.x, pos.y - p.y) <
-              p.radius * POCKET_CAPTURE_SCALE &&
-            (Math.abs(pos.x) > TABLE_W / 2 || Math.abs(pos.y) > TABLE_H / 2),
-        );
+        // 共享开孔与支撑边判定，不把绘制半径当成落袋范围。
+        recorder.position(id, positions.get(id)!.x, pos.x);
+        const pocket = pocketAt(pos, equipment);
         if (pocket) {
           // 保存消失前的精确位置，让呈现能插值到入袋时刻，而不是先停住再跳入袋口。
           if (!preview && frames[frames.length - 1]?.t !== t) sample(t);
@@ -335,6 +385,7 @@ export function simulateShot(
       }),
       frames,
       events,
+      facts: recorder.facts,
       firstContact,
       firstImpact,
       cuePotted: potted.has(0),
@@ -351,20 +402,25 @@ export function overlapsAnyBall(
   x: number,
   y: number,
   ignoreId?: number,
+  equipment: TableEquipment = CHINESE_EIGHT,
 ): boolean {
   return balls.some(
     (b) =>
       !b.potted &&
       b.id !== ignoreId &&
-      Math.hypot(b.x - x, b.y - y) < BALL_RADIUS * 2 + 0.0001,
+      Math.hypot(b.x - x, b.y - y) < equipment.ballRadius * 2 + 0.0001,
   );
 }
 
-export function insidePlayArea(x: number, y: number): boolean {
+export function insidePlayArea(
+  x: number,
+  y: number,
+  equipment: TableEquipment = CHINESE_EIGHT,
+): boolean {
   return (
     Number.isFinite(x) &&
     Number.isFinite(y) &&
-    Math.abs(x) <= TABLE_W / 2 - BALL_RADIUS &&
-    Math.abs(y) <= TABLE_H / 2 - BALL_RADIUS
+    Math.abs(x) <= equipment.tableWidth / 2 - equipment.ballRadius &&
+    Math.abs(y) <= equipment.tableHeight / 2 - equipment.ballRadius
   );
 }

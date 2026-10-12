@@ -14,15 +14,24 @@ import {
   yieldToUi,
 } from "../engine/ai";
 import type { SeatIndex } from "../engine/types";
-import { BALL_RADIUS, POCKETS, TABLE_H, TABLE_W } from "./constants";
-import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
-import type { ShotSimulator } from "./simulation-client";
 import {
-  ballGroup,
+  CHINESE_EIGHT,
+  createPocketSpecs,
+  type TableEquipment,
+} from "./equipment";
+import { reduceNineBallShot } from "./nine-ball";
+import { simulateShot } from "./physics";
+import { legalCuePlacement } from "./placement";
+import { defaultAim } from "./render/default-aim";
+import type { ShotSimulator } from "./simulation-client";
+import { reduceSnookerShot } from "./snooker";
+import { COLOR_IDS, isRed } from "./snooker-equipment";
+import { findDPlacement } from "./snooker-visibility";
+import { targetBallIds } from "./targets";
+import {
   type BallState,
   type BilliardsMove,
   type BilliardsState,
-  remainingGroupBalls,
 } from "./types";
 
 interface DifficultyProfile {
@@ -74,7 +83,9 @@ function pathClear(
   a: Vec,
   b: Vec,
   ignore: readonly number[],
+  equipment: TableEquipment,
 ): boolean {
+  const BALL_RADIUS = equipment.ballRadius;
   const d = { x: b.x - a.x, y: b.y - a.y };
   const len = Math.hypot(d.x, d.y);
   if (len < 1e-6) return true;
@@ -90,18 +101,6 @@ function pathClear(
   return true;
 }
 
-/** 当前局面下该座位可合法击打的目标球 id。 */
-function targetBallIds(state: BilliardsState, seat: SeatIndex): number[] {
-  const alive = state.balls.filter((b) => !b.potted && b.id !== 0);
-  if (state.variant === "practice") return alive.map((b) => b.id);
-  const group = state.groups[seat];
-  if (group === null) return alive.filter((b) => b.id !== 8).map((b) => b.id);
-  if (remainingGroupBalls(state, group) === 0) {
-    return alive.filter((b) => b.id === 8).map((b) => b.id);
-  }
-  return alive.filter((b) => ballGroup(b.id) === group).map((b) => b.id);
-}
-
 interface Candidate {
   angle: number;
   power: number;
@@ -112,7 +111,9 @@ interface Candidate {
 function potCandidates(
   balls: readonly BallState[],
   targetIds: readonly number[],
+  equipment: TableEquipment,
 ): Candidate[] {
+  const BALL_RADIUS = equipment.ballRadius;
   const cue = balls.find((b) => b.id === 0);
   if (!cue || cue.potted) return [];
   const out: Candidate[] = [];
@@ -120,7 +121,7 @@ function potCandidates(
   for (const id of targetIds) {
     const ball = balls.find((b) => b.id === id);
     if (!ball || ball.potted) continue;
-    for (const pocket of POCKETS) {
+    for (const pocket of createPocketSpecs(equipment)) {
       const toPocket = norm({ x: pocket.x - ball.x, y: pocket.y - ball.y });
       const ghost = {
         x: ball.x - toPocket.x * BALL_RADIUS * 2,
@@ -130,8 +131,8 @@ function potCandidates(
       // 切角：瞄准线与进球线之间夹角的余弦。
       const cut = aim.x * toPocket.x + aim.y * toPocket.y;
       if (cut < 0.08) continue; // 实际不可能进的切球
-      if (!pathClear(balls, cue, ghost, [0, id])) continue;
-      if (!pathClear(balls, ball, pocket, [0, id])) continue;
+      if (!pathClear(balls, cue, ghost, [0, id], equipment)) continue;
+      if (!pathClear(balls, ball, pocket, [0, id], equipment)) continue;
 
       const dCue = Math.hypot(ghost.x - cue.x, ghost.y - cue.y);
       const dPocket = Math.hypot(pocket.x - ball.x, pocket.y - ball.y);
@@ -152,9 +153,13 @@ function potCandidates(
 }
 
 /** 用低成本估计后续一杆的进攻前景。 */
-function positionScore(state: BilliardsState, seat: SeatIndex): number {
+function positionScore(
+  state: BilliardsState,
+  seat: SeatIndex,
+  equipment: TableEquipment,
+): number {
   const targets = targetBallIds(state, seat);
-  const best = potCandidates(state.balls, targets)[0];
+  const best = potCandidates(state.balls, targets, equipment)[0];
   return best ? best.quality : 0;
 }
 
@@ -176,7 +181,19 @@ function throwIfAborted(signal: AbortSignal): void {
   }
 }
 
-function chooseCuePlacement(state: BilliardsState, seat: SeatIndex): Vec {
+function chooseCuePlacement(
+  state: BilliardsState,
+  seat: SeatIndex,
+  equipment: TableEquipment,
+): Vec {
+  if (state.variant === "snooker" && state.placementRegion === "d") {
+    const spot =
+      findDPlacement(state.balls, state.on) ?? findDPlacement(state.balls);
+    if (!spot) throw new Error("billiards ai: no legal D placement");
+    return spot;
+  }
+  const TABLE_W = equipment.tableWidth;
+  const TABLE_H = equipment.tableHeight;
   const targets = targetBallIds(state, seat);
   const candidates: Vec[] = [];
   const nx = 9;
@@ -192,32 +209,107 @@ function chooseCuePlacement(state: BilliardsState, seat: SeatIndex): Vec {
   let best: Vec | null = null;
   let bestQuality = -1;
   for (const pos of candidates) {
-    if (!insidePlayArea(pos.x, pos.y)) continue;
-    if (overlapsAnyBall(state.balls, pos.x, pos.y, 0)) continue;
+    if (!legalCuePlacement(state, pos.x, pos.y)) continue;
     const balls = state.balls.map((b) =>
       b.id === 0 ? { ...b, x: pos.x, y: pos.y, potted: false } : b,
     );
-    const top = potCandidates(balls, targets)[0];
+    const top = potCandidates(balls, targets, equipment)[0];
     const quality = top ? top.quality : 0;
     if (quality > bestQuality) {
       bestQuality = quality;
       best = pos;
     }
   }
-  return best ?? { x: 0, y: 0 };
+  if (!best) throw new Error("billiards ai: no legal cue placement");
+  return best;
 }
 
 export function createBilliardsAiStrategy(
-  simulate: ShotSimulator = simulateShot,
+  simulate: ShotSimulator | undefined = undefined,
+  equipment: TableEquipment = CHINESE_EIGHT,
 ): AiStrategy<BilliardsState, BilliardsMove> {
+  const simulateForTable: ShotSimulator =
+    simulate ?? ((balls, shot) => simulateShot(balls, shot, false, equipment));
   return {
     async chooseMove(state, seat, difficulty, signal) {
       throwIfAborted(signal);
       const profile = PROFILES[difficulty];
       const rng = createRng(stateSeed(state) ^ seat);
 
+      if (state.variant === "nine-ball" && state.decision) {
+        const decision = state.decision;
+        if (decision.kind === "warning")
+          return { type: "decision", choice: "acknowledge" };
+        if (decision.kind === "stalemate")
+          return { type: "decision", choice: "rerack" };
+        return {
+          type: "decision",
+          choice:
+            positionScore(state, seat, equipment) > 0.12 ? "accept" : "return",
+        };
+      }
+      if (state.variant === "snooker") {
+        const decision = state.decision;
+        if (decision?.kind === "black-choice")
+          return { type: "decision", choice: "accept" };
+        if (decision?.kind === "foul") {
+          if (decision.warning)
+            return { type: "decision", choice: "acknowledge" };
+          if (decision.anywhere)
+            return { type: "decision", choice: "anywhere" };
+          return {
+            type: "decision",
+            choice:
+              decision.replace && positionScore(state, seat, equipment) < 0.1
+                ? "replace"
+                : "accept",
+          };
+        }
+        if (state.on.kind === "color" && state.on.nominated === null) {
+          const choices = COLOR_IDS.map((id) => ({
+            id,
+            quality:
+              (potCandidates(state.balls, [id], equipment)[0]?.quality ?? 0) *
+              id,
+          }));
+          choices.sort((a, b) => b.quality - a.quality || b.id - a.id);
+          return { type: "nominate", ballId: choices[0].id };
+        }
+        if (
+          state.freeBall &&
+          state.nominatedFree === null &&
+          !state.ballInHand
+        ) {
+          const targets = targetBallIds(state, seat);
+          const alternative = potCandidates(
+            state.balls,
+            state.balls
+              .filter(
+                (ball) => ball.id && !ball.potted && !targets.includes(ball.id),
+              )
+              .map((ball) => ball.id),
+            equipment,
+          )[0];
+          const ordinary = potCandidates(state.balls, targets, equipment)[0];
+          if (
+            alternative &&
+            alternative.quality > (ordinary?.quality ?? 0) + 0.05
+          ) {
+            const ball = state.balls
+              .filter((b) => b.id && !b.potted && !targets.includes(b.id))
+              .sort(
+                (a, b) =>
+                  (potCandidates(state.balls, [b.id], equipment)[0]?.quality ??
+                    0) -
+                  (potCandidates(state.balls, [a.id], equipment)[0]?.quality ??
+                    0),
+              )[0];
+            return { type: "nominate-free", ballId: ball.id };
+          }
+        }
+      }
       if (state.ballInHand) {
-        const spot = chooseCuePlacement(state, seat);
+        const spot = chooseCuePlacement(state, seat, equipment);
         return { type: "place-cue", x: spot.x, y: spot.y };
       }
 
@@ -226,16 +318,27 @@ export function createBilliardsAiStrategy(
 
       // 开球：直接砸向球堆顶点。
       if (!state.breakDone) {
-        const rack = state.balls.filter((b) => !b.potted && b.id !== 0);
+        const rack = state.balls.filter(
+          (b) =>
+            !b.potted &&
+            b.id !== 0 &&
+            (state.variant !== "snooker" || isRed(b.id)),
+        );
         const apex = rack.reduce((a, b) => (a.x < b.x ? a : b));
         const angle =
-          Math.atan2(apex.y - cue.y, apex.x - cue.x) +
+          (defaultAim(state, equipment)?.angle ??
+            Math.atan2(apex.y - cue.y, apex.x - cue.x)) +
           gaussian(rng) * profile.angleSigma * 2;
-        return { type: "shot", angle, power: 1, followDraw: 0 };
+        return {
+          type: "shot",
+          angle,
+          power: state.variant === "snooker" ? 0.35 : 1,
+          followDraw: 0,
+        };
       }
 
       const targets = targetBallIds(state, seat);
-      const geometric = potCandidates(state.balls, targets);
+      const geometric = potCandidates(state.balls, targets, equipment);
       const pool = geometric.slice(0, profile.simCandidates);
 
       let bestMove: Extract<BilliardsMove, { type: "shot" }> | null = null;
@@ -259,7 +362,7 @@ export function createBilliardsAiStrategy(
           ),
           followDraw: 0,
         };
-        const sim = await simulate(state.balls, move);
+        const sim = await simulateForTable(state.balls, move);
         throwIfAborted(signal);
 
         let score = 0;
@@ -272,11 +375,36 @@ export function createBilliardsAiStrategy(
         else if (!targets.includes(sim.firstContact)) score -= 320;
         const eightPotted = sim.pottedInOrder.includes(8);
         const onEight = targets.length === 1 && targets[0] === 8;
-        if (eightPotted) score += onEight && !sim.cuePotted ? 900 : -1000;
+        if (state.variant === "nine-ball") {
+          const after = reduceNineBallShot(state, sim);
+          score = after.finished
+            ? after.winnerSeat === seat
+              ? 1200
+              : -1200
+            : after.lastOutcome?.foul
+              ? -400
+              : sim.pottedInOrder.length * 100;
+        } else if (state.variant === "snooker") {
+          const after = reduceSnookerShot(state, sim, move);
+          score = after.finished
+            ? after.winnerSeat === seat
+              ? 1200
+              : -1200
+            : (after.lastScore?.points ?? 0) * 40 -
+              (after.lastScore?.penalty ?? 0) * 80;
+          if (profile.positionPlay && after.lastOutcome?.continueTurn)
+            score += positionScore(after, seat, equipment) * 70;
+        } else if (state.variant !== "practice" && eightPotted)
+          score += onEight && !sim.cuePotted ? 900 : -1000;
 
-        if (profile.positionPlay && ownPotted > 0 && !sim.cuePotted) {
+        if (
+          profile.positionPlay &&
+          state.variant !== "snooker" &&
+          ownPotted > 0 &&
+          !sim.cuePotted
+        ) {
           const after: BilliardsState = { ...state, balls: sim.balls };
-          score += positionScore(after, seat) * 70;
+          score += positionScore(after, seat, equipment) * 70;
         }
         score += candidate.quality * 10; // 稳定的平局打破项，倾向更容易的球
 
@@ -318,7 +446,8 @@ export function createBilliardsAiStrategy(
       return {
         type: "shot",
         angle:
-          Math.atan2(nearest.y - cue.y, nearest.x - cue.x) +
+          (defaultAim(state, equipment)?.angle ??
+            Math.atan2(nearest.y - cue.y, nearest.x - cue.x)) +
           gaussian(rng) * profile.angleSigma,
         power: 0.3,
         followDraw: 0,

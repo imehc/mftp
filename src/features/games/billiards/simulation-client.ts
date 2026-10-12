@@ -1,3 +1,4 @@
+import { type EquipmentId } from "./equipment";
 /** 每个对局/预览拥有自己的 worker，结束时终止计算并兑现所有等待。 */
 import type { ShotParams, ShotSimResult } from "./physics";
 import type { AimGuide } from "./render/guides";
@@ -11,6 +12,7 @@ export type ShotSimulator = (
 export interface SimulationRequest {
   id: number;
   kind: "shot" | "preview";
+  equipmentId: EquipmentId;
   balls: readonly BallState[];
   shot: ShotParams;
 }
@@ -19,7 +21,9 @@ export type SimulationResponse =
   | { id: number; result: ShotSimResult | AimGuide | null }
   | { id: number; error: string };
 
-export function createSimulationClient() {
+export function createSimulationClient(
+  equipmentId: EquipmentId = "chinese-eight",
+) {
   const worker = new Worker(
     new URL("./simulation.worker.ts", import.meta.url),
     { type: "module" },
@@ -66,6 +70,7 @@ export function createSimulationClient() {
         worker.postMessage({
           id,
           kind,
+          equipmentId,
           balls,
           shot,
         } satisfies SimulationRequest);

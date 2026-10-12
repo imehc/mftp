@@ -120,7 +120,9 @@ export default function BilliardsGame() {
                     ...m,
                     playerBreaks: !m.playerBreaks,
                   }
-                : m,
+                : m?.kind === "hotseat"
+                  ? { ...m, firstSeat: 1 - (m.firstSeat ?? 0) }
+                  : m,
             );
             setMatchFinished(false);
             setMatchKey((k) => k + 1);

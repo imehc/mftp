@@ -16,14 +16,13 @@ import {
   Texture,
 } from "pixi.js";
 
-import { BALL_HEX } from "../colors";
-import { BALL_RADIUS, POCKETS } from "../constants";
+import { type BallDefinition, ballDefinition } from "../ball-definitions";
+import { CHINESE_EIGHT, type TableEquipment } from "../equipment";
+import { getPocketGeometries } from "../pocket-geometry";
 import type { BallState } from "../types";
 import { px } from "./layout";
 import { getBallShadingTexture } from "./textures";
 
-/** 根缩放为 1 时球的像素半径。 */
-const r = px(BALL_RADIUS);
 /** 等距柱状贴图分辨率（2:1）。 */
 const TEX_W = 256;
 const TEX_H = 128;
@@ -71,14 +70,13 @@ function rodrigues(axis: [number, number, number], angle: number): Mat3 {
  * 将球表面绘制成等距柱状贴图：整球按经度→u、纬度→v 展开，静止时
  * 朝向相机的“正面”点位于贴图中心（u=0.5, v=0.5）。
  */
-function buildBallTexture(id: number): Texture {
+function buildBallTexture(definition: BallDefinition): Texture {
   const canvas = document.createElement("canvas");
   canvas.width = TEX_W;
   canvas.height = TEX_H;
   const ctx = canvas.getContext("2d")!;
-  const hex = BALL_HEX[id] ?? "#ffffff";
-  const striped = id >= 9 && id <= 15;
-  const base = striped || id === 0 ? "#f6f1e7" : hex;
+  const { color: hex, striped } = definition;
+  const base = striped ? "#f6f1e7" : hex;
 
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, TEX_W, TEX_H);
@@ -91,13 +89,31 @@ function buildBallTexture(id: number): Texture {
 
   const cx = TEX_W / 2;
   const cy = TEX_H / 2;
-  if (id === 0) {
-    // 母球：一个小红点。
-    ctx.beginPath();
-    ctx.arc(cx, cy, TEX_H * 0.05, 0, Math.PI * 2);
-    ctx.fillStyle = "#d93025";
-    ctx.fill();
-  } else {
+  if (definition.spottedCue) {
+    // 六个球面等大圆斑分别朝向 ±X、±Y、±Z，避免极点与经度接缝拉伸。
+    // 纹理只构建一次；滚动沿用球面 UV，不在每帧重绘。
+    const pixels = ctx.getImageData(0, 0, TEX_W, TEX_H);
+    const edge = Math.cos(0.15);
+    for (let y = 0; y < TEX_H; y++) {
+      const latitude = ((y + 0.5) / TEX_H - 0.5) * Math.PI;
+      for (let x = 0; x < TEX_W; x++) {
+        const longitude = ((x + 0.5) / TEX_W - 0.5) * Math.PI * 2;
+        const horizontal = Math.cos(latitude);
+        const axis = Math.max(
+          Math.abs(horizontal * Math.sin(longitude)),
+          Math.abs(Math.sin(latitude)),
+          Math.abs(horizontal * Math.cos(longitude)),
+        );
+        const coverage = Math.max(0, Math.min(1, (axis - edge) / 0.003 + 0.5));
+        const offset = (y * TEX_W + x) * 4;
+        for (const [channel, value] of [217, 48, 37].entries()) {
+          pixels.data[offset + channel] +=
+            (value - pixels.data[offset + channel]) * coverage;
+        }
+      }
+    }
+    ctx.putImageData(pixels, 0, 0);
+  } else if (definition.number !== null) {
     const rad = TEX_H * 0.2;
     ctx.beginPath();
     ctx.arc(cx, cy, rad, 0, Math.PI * 2);
@@ -107,7 +123,7 @@ function buildBallTexture(id: number): Texture {
     ctx.font = `bold ${Math.round(TEX_H * 0.26)}px system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(String(id), cx, cy + 1);
+    ctx.fillText(String(definition.number), cx, cy + 1);
   }
 
   const tex = Texture.from(canvas);
@@ -271,7 +287,7 @@ interface BallEntry {
 
 export interface BallLayer {
   layer: Container;
-  /** 单个球 id（0–15）的视图。 */
+  /** 稳定球 id 对应的视图。 */
   view(id: number): Container | undefined;
   /** 入袋后由实际袋沿遮挡球面，不把球拉向袋心。 */
   maskPocket(id: number, pocket: number): void;
@@ -283,11 +299,17 @@ export interface BallLayer {
   settleAll(): void;
 }
 
-export function createBallLayer(): BallLayer {
+export function createBallLayer(
+  equipment: TableEquipment = CHINESE_EIGHT,
+  ballIds: readonly number[] = Array.from({ length: 16 }, (_, id) => id),
+): BallLayer {
+  const BALL_RADIUS = equipment.ballRadius;
+  const r = px(BALL_RADIUS);
   const layer = new Container();
   const ballViews = new Map<number, Container>();
   const entries = new Map<number, BallEntry>();
   const masks = new Map<number, Graphics>();
+  const textures = new Map<string, Texture>();
   const RINGS = 10;
   const SEG = 48;
 
@@ -310,7 +332,14 @@ export function createBallLayer(): BallLayer {
       uvs: disc.uvs,
       indices: disc.indices,
     });
-    const mesh = new Mesh({ geometry, texture: buildBallTexture(id) });
+    const definition = ballDefinition(id, equipment.id);
+    const key = JSON.stringify(definition);
+    let texture = textures.get(key);
+    if (!texture) {
+      texture = buildBallTexture(definition);
+      textures.set(key, texture);
+    }
+    const mesh = new Mesh({ geometry, texture });
     view.addChild(mesh);
 
     // 固定球面明暗：一层共享的受光球面叠加（漫反射衰减、高光、台呢
@@ -371,7 +400,7 @@ export function createBallLayer(): BallLayer {
     entry.lastY = y;
   }
 
-  for (let id = 0; id <= 15; id++) {
+  for (const id of ballIds) {
     const view = buildBall(id);
     view.visible = false;
     ballViews.set(id, view);
@@ -383,10 +412,12 @@ export function createBallLayer(): BallLayer {
     view: (id) => ballViews.get(id),
     maskPocket(id, pocketId) {
       const view = ballViews.get(id);
-      const pocket = POCKETS.find((p) => p.id === pocketId);
+      const pocket = getPocketGeometries(equipment).find(
+        (p) => p.spec.id === pocketId,
+      );
       if (!view || !pocket || masks.has(id)) return;
       const mask = new Graphics()
-        .circle(px(pocket.x), px(pocket.y), px(pocket.radius * 0.9))
+        .poly(pocket.opening.flatMap(({ x, y }) => [px(x), px(y)]))
         .fill(0xffffff);
       layer.addChild(mask);
       masks.set(id, mask);
