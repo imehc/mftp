@@ -48,6 +48,33 @@ export function defaultAim(
     if (!fallback || open > fallback.open + 1e-9)
       fallback = { angle, targetId: ball.id, open };
   }
+  // 球径变大后红球中心线可能全被粉球遮挡；检查球面两侧仍能合法擦到的方向。
+  // 忽略同为合法目标的红球：先碰邻近红球仍是正确首碰，彩球和库边不能穿越。
+  if (state.variant === "snooker") {
+    for (const { ball, distance } of candidates) {
+      if (distance <= BALL_RADIUS * 2) continue;
+      const centerAngle = Math.atan2(ball.y - cue.y, ball.x - cue.x);
+      const halfAngle = Math.asin((BALL_RADIUS * 2) / distance);
+      for (const offset of [-0.4, 0.4, -0.7, 0.7]) {
+        const angle = centerAngle + halfAngle * offset;
+        const dir = { x: Math.cos(angle), y: Math.sin(angle) };
+        const projection = (ball.x - cue.x) * dir.x + (ball.y - cue.y) * dir.y;
+        const perpendicular = distance * Math.sin(halfAngle * offset);
+        const contactDistance =
+          projection - Math.sqrt((BALL_RADIUS * 2) ** 2 - perpendicular ** 2);
+        const clearance = guideClearance(
+          cue,
+          dir,
+          state.balls,
+          [0, ...legal],
+          contactDistance,
+          equipment,
+        );
+        if (clearance >= contactDistance - 1e-6)
+          return { angle, targetId: ball.id };
+      }
+    }
+  }
   return fallback && { angle: fallback.angle, targetId: fallback.targetId };
 }
 

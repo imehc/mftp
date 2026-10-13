@@ -11,13 +11,13 @@ export interface BallDefinition {
 }
 
 const snookerColors: Readonly<Record<number, string>> = {
-  0: "#f6f1e7",
+  0: "#f5efcf",
   2: "#f7b500",
-  3: "#1e7e34",
-  4: "#854b2f",
-  5: "#2158c4",
-  6: "#ef8b9a",
-  7: "#161616",
+  3: "#006446",
+  4: "#743207",
+  5: "#004ab3",
+  6: "#ed729b",
+  7: "#060607",
 };
 
 export function ballDefinition(
@@ -26,7 +26,7 @@ export function ballDefinition(
 ): BallDefinition {
   if (equipment === "snooker")
     return {
-      color: isRed(id) ? "#d93025" : snookerColors[id],
+      color: isRed(id) ? "#b7070e" : snookerColors[id],
       number: null,
       striped: false,
       spottedCue: false,
@@ -36,7 +36,7 @@ export function ballDefinition(
     color: BALL_HEX[id],
     number: id === 0 ? null : id,
     striped: id >= 9,
-    spottedCue: id === 0,
+    spottedCue: false,
     value: 0,
   };
 }

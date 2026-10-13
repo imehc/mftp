@@ -1,18 +1,34 @@
 /** 同一时间线驱动位置、碰撞音和下沉；取消时立即移除 ticker 并结束等待。 */
-import type { Application, Container, Ticker } from "pixi.js";
+export interface PlaybackTick {
+  deltaMS: number;
+}
+
+export interface PlaybackClock {
+  ticker: {
+    add(callback: (tick: PlaybackTick) => void): unknown;
+    remove(callback: (tick: PlaybackTick) => void): unknown;
+  };
+}
+
+export interface PlaybackBallView {
+  visible: boolean;
+  alpha: number;
+  sink?(progress: number, event: Extract<SimEvent, { type: "pocket" }>): void;
+}
 
 import type { BilliardsPresentation, SimEvent } from "../types";
 import { playImpactEvent } from "./audio";
 
 export interface PlaybackHooks {
+  dropDuration?: number;
   moveBall(id: number, x: number, y: number, rolling: boolean): void;
-  ballView(id: number): Container | undefined;
+  ballView(id: number): PlaybackBallView | undefined;
   maskPocket(id: number, pocket: number): void;
   onDone(): void;
 }
 
 export function runPresentation(
-  app: Application,
+  app: PlaybackClock,
   presentation: BilliardsPresentation,
   hooks: PlaybackHooks,
 ): { done: Promise<void>; cancel(): void } {
@@ -35,7 +51,7 @@ export function runPresentation(
     resolveDone();
   };
 
-  const tick = (ticker: Ticker): void => {
+  const tick = (ticker: PlaybackTick): void => {
     // 回到前台时不补播一长串碰撞；物理时间线以可见帧继续。
     elapsed += Math.min(ticker.deltaMS, 50) / 1000;
     while (eventIndex < events.length && events[eventIndex].t <= elapsed) {
@@ -71,20 +87,25 @@ export function runPresentation(
     }
     let dropping = false;
     for (const [id, event] of drops) {
-      const progress = Math.min(1, (elapsed - event.t) / 0.24);
+      const progress = Math.min(
+        1,
+        (elapsed - event.t) / (hooks.dropDuration ?? 0.24),
+      );
       const view = hooks.ballView(id);
       if (!view) continue;
-      // 保持原入射方向，衰减水平速度并下沉；不向袋心插值造成横向拐弯。
-      const speed = Math.hypot(event.vx, event.vy);
-      const travel = Math.min(0.032, speed * 0.045) * (1 - (1 - progress) ** 2);
-      hooks.moveBall(
-        id,
-        event.x + (speed > 0 ? (event.vx / speed) * travel : 0),
-        event.y + (speed > 0 ? (event.vy / speed) * travel : 0),
-        true,
-      );
-      view.scale.set(1 - progress * 0.6);
-      view.alpha = 1 - progress ** 2;
+      if (view.sink) view.sink(progress, event);
+      else {
+        const speed = Math.hypot(event.vx, event.vy);
+        const travel =
+          Math.min(0.032, speed * 0.045) * (1 - (1 - progress) ** 2);
+        hooks.moveBall(
+          id,
+          event.x + (speed > 0 ? (event.vx / speed) * travel : 0),
+          event.y + (speed > 0 ? (event.vy / speed) * travel : 0),
+          true,
+        );
+        view.alpha = 1 - progress ** 2;
+      }
       view.visible = progress < 1;
       dropping ||= progress < 1;
     }

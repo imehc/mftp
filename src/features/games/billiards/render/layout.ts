@@ -10,6 +10,7 @@ export const PPM = 320;
 export function tableLayout(equipment: TableEquipment) {
   return {
     FRAME: equipment.frameWidth,
+    CORNER_RADIUS: equipment.frameWidth * 0.9,
     OUTER_W:
       equipment.tableWidth / 2 + equipment.cushionWidth + equipment.frameWidth,
     OUTER_H:

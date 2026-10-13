@@ -70,8 +70,10 @@ describe("九球摆球与区域", () => {
           targets[i].x - targets[j].x,
           targets[i].y - targets[j].y,
         );
-        expect(distance).toBeGreaterThanOrEqual(0.05715 - 1e-12);
-        if (distance < 0.05715 + 1e-12) touching++;
+        expect(distance).toBeGreaterThanOrEqual(
+          AMERICAN_NINE.ballRadius * 2 - 1e-12,
+        );
+        if (distance < AMERICAN_NINE.ballRadius * 2 + 1e-12) touching++;
       }
     expect(touching).toBe(16);
   });
@@ -105,9 +107,12 @@ describe("九球摆球与区域", () => {
     const result = respotNine([
       ball(9, 1),
       ball(2, 0.635),
-      ball(0, 0.635 + 0.05715),
+      ball(0, 0.635 + AMERICAN_NINE.ballRadius * 2),
     ]);
-    expect(result[0].x).toBeCloseTo(0.635 + 0.05715 * 2 + 0.0001, 10);
+    expect(result[0].x).toBeCloseTo(
+      0.635 + AMERICAN_NINE.ballRadius * 2 * 2 + 0.0001,
+      10,
+    );
     expect(result[0].potted).toBe(false);
   });
 
@@ -122,7 +127,10 @@ describe("九球摆球与区域", () => {
       ...occupied,
       { id: 9, x: 0, y: 0, potted: true },
     ]);
-    expect(result.at(-1)?.x).toBeCloseTo(0.635 - 0.05715, 10);
+    expect(result.at(-1)?.x).toBeCloseTo(
+      0.635 - AMERICAN_NINE.ballRadius * 2,
+      10,
+    );
   });
 });
 

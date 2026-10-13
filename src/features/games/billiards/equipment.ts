@@ -23,6 +23,7 @@ export interface TableEquipment {
   readonly ballRadius: number;
   readonly ballMass: number;
   readonly cushionWidth: number;
+  readonly cushionHeight: number;
   readonly frameWidth: number;
   readonly cueLength: number;
   readonly cueTipDiameter: number;
@@ -51,51 +52,71 @@ export const CHINESE_EIGHT = Object.freeze({
   id: "chinese-eight",
   tableWidth: 2.54,
   tableHeight: 1.27,
-  ballRadius: 0.028575,
+  // 游戏参考图采用更醒目的球桌比例，碰撞、摆球与渲染共用球径。
+  ballRadius: 0.028575 * 1.6,
   ballMass: 0.17,
-  cushionWidth: 0.06,
-  frameWidth: 0.09,
-  cueLength: 1.45,
-  cueTipDiameter: 0.0125,
-  cueButtDiameter: 0.03,
-  corner: roundCorner,
-  side: roundSide,
+  cushionWidth: 0.05,
+  cushionHeight: 0.036,
+  frameWidth: 0.11,
+  cueLength: 1.8,
+  cueTipDiameter: 0.016,
+  cueButtDiameter: 0.042,
+  corner: Object.freeze({ ...roundCorner, width: 0.085 * 1.45 }),
+  side: Object.freeze({ ...roundSide, width: 0.095 * 1.4 }),
 } as const satisfies TableEquipment);
 
-/** WPA的mouth取库鼻转折点间距，不能当作圆弧袋颚的最窄处。 */
+/** 九球保留斜切入口；游戏比例随放大的球增加开口，mouth仍取库鼻转折点间距。 */
 export const AMERICAN_NINE = Object.freeze({
   ...CHINESE_EIGHT,
   id: "american-nine",
+  ballRadius: 0.0525,
   cushionWidth: 0.05,
-  frameWidth: 0.1,
-  cueLength: 1.473,
-  cueTipDiameter: 0.013,
+  frameWidth: 0.11,
+  cueLength: 1.82,
+  cueTipDiameter: 0.017,
+  cueButtDiameter: 0.044,
   corner: Object.freeze({
     shape: "cut",
-    width: 0.1143,
+    width: 0.151,
     cutAngle: 142,
     shelf: 0.0381,
   } as const),
   side: Object.freeze({
     shape: "cut",
-    width: 0.127,
+    width: 0.168,
     cutAngle: 104,
     shelf: 0.00635,
   } as const),
 } as const satisfies TableEquipment);
 
-/** 6/10/15红球共用器材；142g与85/95mm袋口属于项目选型。 */
+/** 6/10/15红球共用器材；参考图的球/台面与边框比例用于游戏，不作赛事尺寸。 */
 export const SNOOKER = Object.freeze({
   ...CHINESE_EIGHT,
   id: "snooker",
   tableWidth: 3.569,
   tableHeight: 1.778,
-  ballRadius: 0.02625,
+  ballRadius: 0.02625 * 1.75,
+  cushionHeight: 0.047,
+  corner: Object.freeze({
+    ...roundCorner,
+    width: 0.17,
+    jawRadius: 0.035,
+    rearFlare: 0.0105,
+    supportDepth: 0.017,
+  }),
+  side: Object.freeze({
+    ...roundSide,
+    width: 0.18,
+    jawRadius: 0.035,
+    rearFlare: 0,
+    supportDepth: 0.049,
+  }),
   ballMass: 0.142,
-  cushionWidth: 0.05,
-  frameWidth: 0.1,
-  cueTipDiameter: 0.0095,
-  cueButtDiameter: 0.029,
+  cushionWidth: 0.07,
+  frameWidth: 0.155,
+  cueLength: 2.82,
+  cueTipDiameter: 0.013,
+  cueButtDiameter: 0.048,
 } as const satisfies TableEquipment);
 
 export const EQUIPMENT: Readonly<Record<EquipmentId, TableEquipment>> =

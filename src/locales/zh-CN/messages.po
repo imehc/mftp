@@ -8704,3 +8704,22 @@ msgstr "默认目录"
 #: src/features/model-viewer/components/ViewerHelp.tsx:59
 msgid "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"
 msgstr "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"
+
+#. 球桌内选球的透明命中控件；球名仅供读屏，不显示在球桌上
+#: src/features/games/billiards/render/BallSelectionOverlay.tsx:52
+msgid "{ballName}，{points} 分"
+msgstr "{ballName}，{points} 分"
+
+#. 球桌中央选球区域，球体下方仅显示实际分值
+#: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
+msgid "{points} 分"
+msgstr "{points} 分"
+
+#. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
+#: src/lib/errors/messages.ts:297
+msgid "球桌显示已中断，请重开对局。"
+msgstr "球桌显示已中断，请重开对局。"
+
+#: src/features/games/billiards/render/BallSelectionOverlay.tsx:32
+msgid "选择目标球"
+msgstr "选择目标球"

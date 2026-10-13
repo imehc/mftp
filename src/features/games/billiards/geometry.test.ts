@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { CHINESE_EIGHT } from "./equipment";
 import { cushionSegments } from "./geometry";
 import {
   POCKET_GEOMETRIES,
@@ -34,15 +35,15 @@ function separation(a: number[], b: number[]): number {
 }
 
 describe("中式八球袋口的实际内沿最近距离", () => {
-  it("四个角袋均为 85mm，两个中袋均为 95mm", () => {
+  it("六个袋口的真实最窄距离符合器材配置", () => {
     const segments = cushionSegments();
     for (const [a, b, width] of [
-      [0, 4, 0.085],
-      [1, 5, 0.085],
-      [2, 4, 0.085],
-      [3, 5, 0.085],
-      [0, 1, 0.095],
-      [2, 3, 0.095],
+      [0, 4, CHINESE_EIGHT.corner.width],
+      [1, 5, CHINESE_EIGHT.corner.width],
+      [2, 4, CHINESE_EIGHT.corner.width],
+      [3, 5, CHINESE_EIGHT.corner.width],
+      [0, 1, CHINESE_EIGHT.side.width],
+      [2, 3, CHINESE_EIGHT.side.width],
     ]) {
       const first = segments[a].points;
       const second = segments[b].points;

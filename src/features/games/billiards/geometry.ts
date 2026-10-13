@@ -7,6 +7,8 @@ export interface CushionSegment {
   /** 内沿起点、终点、袋颚后端；用于库面明暗与标记，不另造碰撞轮廓。 */
   profile: number[];
   points: number[];
+  /** 包呢上沿允许在捕获区内平顺收口，库鼻仍使用原碰撞轮廓。 */
+  facingPoints: number[];
   jaws: Point[][];
 }
 
@@ -25,10 +27,17 @@ function railJaws(
 }
 
 /** 从相邻袋口的真实曲线闭合库边，避免六段独立圆角与洞口拼接。 */
-function rail(a: Point[], b: Point[]): CushionSegment {
+function rail(
+  a: Point[],
+  b: Point[],
+  facings: Map<Point[], Point[]>,
+): CushionSegment {
   return {
     profile: flat([a[0], b[0], b[b.length - 1], a[a.length - 1]]),
     points: flat([...a].reverse().concat(b)),
+    facingPoints: flat(
+      [...(facings.get(a) ?? a)].reverse().concat(facings.get(b) ?? b),
+    ),
     jaws: [a, b],
   };
 }
@@ -41,13 +50,21 @@ export function cushionSegments(
   const cached = cushionCache.get(equipment);
   if (cached) return cached;
   const cushions: CushionSegment[] = [];
+  const facings = new Map<Point[], Point[]>();
+  for (const pocket of getPocketGeometries(equipment)) {
+    facings.set(pocket.left, pocket.facingLeft);
+    facings.set(pocket.right, pocket.facingRight);
+  }
   for (const sy of [-1, 1]) {
     const ends = railJaws("y", (sy * equipment.tableHeight) / 2, equipment);
-    cushions.push(rail(ends[0], ends[1]), rail(ends[2], ends[3]));
+    cushions.push(
+      rail(ends[0], ends[1], facings),
+      rail(ends[2], ends[3], facings),
+    );
   }
   for (const sx of [-1, 1]) {
     const ends = railJaws("x", (sx * equipment.tableWidth) / 2, equipment);
-    cushions.push(rail(ends[0], ends[1]));
+    cushions.push(rail(ends[0], ends[1], facings));
   }
   cushionCache.set(equipment, cushions);
   return cushions;

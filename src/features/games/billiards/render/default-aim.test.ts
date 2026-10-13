@@ -139,7 +139,8 @@ describe("每杆初始化与中式八球台面", () => {
     }
     expect(TABLE_W).toBe(2.54);
     expect(TABLE_H).toBe(1.27);
-    expect((2 * BALL_RADIUS) / TABLE_W).toBeCloseTo(0.0225, 5);
+    expect((2 * BALL_RADIUS) / TABLE_W).toBeGreaterThanOrEqual(0.034);
+    expect((2 * BALL_RADIUS) / TABLE_W).toBeLessThanOrEqual(0.04);
   });
 
   it("普通重渲染不抢手动瞄准，连续出杆、双人换手与重开会重新初始化", () => {

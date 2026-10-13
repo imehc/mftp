@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { createBilliardsAiStrategy } from "./ai";
 import { ballDefinition } from "./ball-definitions";
 import { SNOOKER } from "./equipment";
-import { ensurePhysicsReady, simulateShot } from "./physics";
+import { ensurePhysicsReady, insidePlayArea, simulateShot } from "./physics";
 import { legalCuePlacement } from "./placement";
 import { defaultAim } from "./render/default-aim";
 import { createSnookerState, reduceSnookerShot } from "./snooker";
@@ -38,18 +38,20 @@ describe("斯诺克器材与复位", () => {
     (reds) => {
       const balls = createSnookerRack(reds);
       expect(balls).toHaveLength(reds + 7);
+      for (const ball of balls)
+        expect(insidePlayArea(ball.x, ball.y, SNOOKER)).toBe(true);
       for (const id of COLOR_IDS)
         expect(balls.find((b) => b.id === id)).toMatchObject(COLOR_SPOTS[id]);
       for (let i = 0; i < balls.length; i++)
         for (let j = i + 1; j < balls.length; j++)
           expect(
             Math.hypot(balls[i].x - balls[j].x, balls[i].y - balls[j].y),
-          ).toBeGreaterThanOrEqual(0.0525 - 1e-12);
+          ).toBeGreaterThanOrEqual(SNOOKER.ballRadius * 2 - 1e-12);
       // 红球 id 随种子打乱，用最靠近粉球的红球校验顶点间距。
       const apex = balls
         .filter((b) => b.id >= 8)
         .reduce((a, b) => (a.x < b.x ? a : b));
-      expect(apex.x - COLOR_SPOTS[6].x).toBeGreaterThan(0.0525);
+      expect(apex.x - COLOR_SPOTS[6].x).toBeGreaterThan(SNOOKER.ballRadius * 2);
       expect(ballDefinition(8, "snooker")).toEqual(
         ballDefinition(reds + 7, "snooker"),
       );
@@ -88,12 +90,15 @@ describe("斯诺克器材与复位", () => {
       { ...ball(5, 0, 0), potted: true },
     ];
     const next = respotColors(balls, [5]).find((b) => b.id === 5)!;
-    expect(next.x).toBeCloseTo(0.0526, 9);
+    expect(next.x).toBeCloseTo(SNOOKER.ballRadius * 2 + 0.0001, 9);
     expect(next.y).toBe(0);
     expect(
       balls
         .filter((b) => !b.potted)
-        .every((b) => Math.hypot(b.x - next.x, b.y - next.y) > 0.0525),
+        .every(
+          (b) =>
+            Math.hypot(b.x - next.x, b.y - next.y) > SNOOKER.ballRadius * 2,
+        ),
     ).toBe(true);
   });
 
@@ -105,9 +110,14 @@ describe("斯诺克器材与复位", () => {
       { ...ball(7, 0, 0), potted: true },
     ];
     for (let i = 1; i < 7; i++)
-      balls.push(ball(30 + i, COLOR_SPOTS[7].x + i * 0.0525, 0));
+      balls.push(
+        ball(30 + i, COLOR_SPOTS[7].x + i * (SNOOKER.ballRadius * 2), 0),
+      );
     const next = respotColors(balls, [7]).find((b) => b.id === 7)!;
-    expect(next.x).toBeCloseTo(COLOR_SPOTS[7].x - 0.0526, 8);
+    expect(next.x).toBeCloseTo(
+      COLOR_SPOTS[7].x - (SNOOKER.ballRadius * 2 + 0.0001),
+      8,
+    );
   });
 });
 
@@ -116,7 +126,7 @@ describe("斯诺克连续能见性与有效障碍", () => {
   const target = ball(8, 0.5, 0);
 
   it("中心线通畅但一侧极薄边被挡仍是斯诺克", () => {
-    const obstacle = ball(7, 0, 0.07);
+    const obstacle = ball(7, 0, SNOOKER.ballRadius * (0.07 / 0.02625));
     expect(targetVisibility(cue, target, [obstacle])).toMatchObject({
       full: true,
       bothEdges: false,
@@ -136,7 +146,11 @@ describe("斯诺克连续能见性与有效障碍", () => {
       true,
     );
     expect(targetVisibility(cue, target, [ball(7, 0, 0)]).any).toBe(false);
-    expect(targetVisibility(cue, target, [ball(7, 0, 0.03)])).toMatchObject({
+    expect(
+      targetVisibility(cue, target, [
+        ball(7, 0, SNOOKER.ballRadius * (0.03 / 0.02625)),
+      ]),
+    ).toMatchObject({
       full: false,
       bothEdges: false,
       any: true,
@@ -145,8 +159,10 @@ describe("斯诺克连续能见性与有效障碍", () => {
 
   it("相切阈值两侧可区分，不以中心线取代极薄边", () => {
     const tangentY =
-      (0.0525 / Math.sqrt(1 - 0.0525 ** 2)) * 0.5 +
-      0.0525 / Math.sqrt(1 - 0.0525 ** 2);
+      ((SNOOKER.ballRadius * 2) /
+        Math.sqrt(1 - (SNOOKER.ballRadius * 2) ** 2)) *
+        0.5 +
+      (SNOOKER.ballRadius * 2) / Math.sqrt(1 - (SNOOKER.ballRadius * 2) ** 2);
     expect(
       targetVisibility(cue, target, [ball(7, 0, tangentY + 1e-6)]).bothEdges,
     ).toBe(true);

@@ -8704,3 +8704,22 @@ msgstr "Default Directory"
 #: src/features/model-viewer/components/ViewerHelp.tsx:59
 msgid "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"
 msgstr "Drag to rotate, right-drag to pan, and scroll to zoom. On a touchscreen, use one finger to rotate and two fingers to pan or zoom."
+
+#. 球桌内选球的透明命中控件；球名仅供读屏，不显示在球桌上
+#: src/features/games/billiards/render/BallSelectionOverlay.tsx:52
+msgid "{ballName}，{points} 分"
+msgstr "{ballName}, {points} pts"
+
+#. 球桌中央选球区域，球体下方仅显示实际分值
+#: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
+msgid "{points} 分"
+msgstr "{points} pts"
+
+#. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
+#: src/lib/errors/messages.ts:297
+msgid "球桌显示已中断，请重开对局。"
+msgstr "The table display was interrupted. Restart the match to continue."
+
+#: src/features/games/billiards/render/BallSelectionOverlay.tsx:32
+msgid "选择目标球"
+msgstr "Choose target ball"
