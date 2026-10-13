@@ -1,15 +1,9 @@
-/* 规则计分按内容增高，状态浮在画布上；横屏侧栏独立滚动。 */
 .billiards-score {
-  height: 3rem;
+  height: 3.5rem;
+  flex: 0 0 3.5rem;
   padding-block: 0.25rem;
-  display: grid;
+  display: flex;
   align-items: center;
-  overflow: auto;
-}
-.billiards-score[data-rules="true"] {
-  height: auto;
-  min-height: 3rem;
-  overflow: visible;
 }
 .billiards-status {
   position: absolute;
@@ -26,29 +20,42 @@
   padding: 0.375rem 0.75rem;
 }
 .billiards-actions {
+  container-type: inline-size;
   height: calc(3.5rem + var(--safe-bottom, 0px));
   flex: 0 0 calc(3.5rem + var(--safe-bottom, 0px));
   padding-bottom: var(--safe-bottom, 0px);
-  min-height: 0;
-  overflow: auto;
+  min-height: 44px;
 }
 .billiards-actions > .billiards-controls {
   height: 100%;
   justify-content: center;
 }
 
-/* 规则决策是当前必需操作，按内容增长并保留画布，不挤入固定旋转栏。 */
-.billiards-actions[data-rules="true"] {
-  height: auto;
-  flex: 0 1 auto;
-  max-height: 45%;
+.billiards-stroke {
+  width: 7rem;
 }
-.billiards-actions[data-rules="true"] > .billiards-controls {
-  height: auto;
-  min-height: 3.5rem;
+.billiards-rule-trigger {
+  width: 5.5rem;
+  min-width: 0;
+  flex-shrink: 0;
+}
+@media (min-width: 48rem) and (pointer: fine) {
+  .billiards-stroke {
+    width: 10rem;
+  }
+}
+@container (max-width: 28rem) {
+  .billiards-power > span:first-child {
+    display: none;
+  }
+  .billiards-stroke {
+    width: min(5rem, 22cqw);
+  }
+  .billiards-rule-trigger {
+    width: min(5rem, 22cqw);
+  }
 }
 
-/* 横屏只重排同一批节点，球桌、控制器与击球回放不重新挂载。 */
 .billiards-game[data-landscape="true"] {
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr) 7rem;
@@ -65,16 +72,22 @@
   grid-row: 2 / -1;
   max-width: 7rem;
   height: 100%;
-  overflow: auto;
+  flex-direction: column;
   min-height: 0;
   padding: 0.5rem;
 }
-.billiards-game[data-landscape="true"] .billiards-score > div {
+.billiards-game[data-landscape="true"] .billiards-summary {
+  padding: 0;
+}
+.billiards-game[data-landscape="true"] .billiards-target {
+  flex-direction: column;
+}
+.billiards-game[data-landscape="true"] .billiards-summary > div {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
-.billiards-game[data-landscape="true"] .billiards-score > div > div {
+.billiards-game[data-landscape="true"] .billiards-summary > div > div {
   align-items: center;
 }
 .billiards-game[data-landscape="true"] .billiards-stage {
@@ -90,6 +103,27 @@
 }
 .billiards-game[data-landscape="true"] .billiards-controls {
   padding: 0.5rem 0.25rem;
+}
+.billiards-game[data-landscape="true"] .billiards-decision-notice {
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem;
+}
+.billiards-game[data-landscape="true"] .billiards-decision-notice > span {
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+.billiards-game[data-landscape="true"] .billiards-control-content {
+  height: 100%;
+  padding: 0;
+  flex-direction: column;
+}
+.billiards-game[data-landscape="true"] .billiards-stroke {
+  width: 6rem;
+}
+.billiards-game[data-landscape="true"] .billiards-rule-trigger {
+  width: 6rem;
 }
 .billiards-game[data-landscape="true"] .billiards-power {
   height: 100%;
@@ -111,10 +145,6 @@
   padding-right: var(--safe-right, 0px);
 }
 
-.billiards-game[data-landscape="true"]
-  .billiards-result
-  section
-  > div
-  > div:last-child {
+.billiards-game[data-landscape="true"] .billiards-result {
   flex-direction: column;
 }

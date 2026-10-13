@@ -9,6 +9,7 @@ import { AiController, LocalController } from "../engine/controllers";
 import { MatchRunner } from "../engine/match";
 import type { PlayerController } from "../engine/types";
 import { createBilliardsAiStrategy } from "./ai";
+import { BilliardsHeader, type BilliardsHeaderProps } from "./BilliardsHeader";
 import { MatchView } from "./BilliardsMatchView";
 import { createNineBallState } from "./nine-ball";
 import { equipmentForState } from "./placement";
@@ -33,11 +34,13 @@ export function BilliardsMatch({
   onRematch,
   onExit,
   onFinishedChange,
+  headerProps,
 }: {
   mode: BilliardsMode;
   onRematch: () => void;
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
+  headerProps: BilliardsHeaderProps;
 }) {
   const stageRef = useRef<BilliardsStageHandle | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -119,7 +122,13 @@ export function BilliardsMatch({
     };
     // 每个 <BilliardsMatch key=...> 实例的 mode 标识是稳定的。
   }, [mode]);
-  if (!session) return <div className="flex-1" />;
+  if (!session)
+    return (
+      <>
+        <BilliardsHeader {...headerProps} />
+        <div className="flex-1" />
+      </>
+    );
   return (
     <>
       {error ? (
@@ -129,6 +138,7 @@ export function BilliardsMatch({
       ) : null}
       <MatchView
         mode={mode}
+        headerProps={headerProps}
         session={session}
         stageRef={stageRef}
         onRematch={onRematch}

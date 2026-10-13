@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Maximize2, Minimize2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, FlagIcon, Maximize2, Minimize2 } from "lucide-react";
+import { type ReactNode, useState } from "react";
 
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import {
@@ -19,6 +19,20 @@ import { Button } from "~/components/ui/button";
 import { GameActionsMenu } from "../engine/GameActionsMenu";
 import { GameVolumeControl } from "../engine/GameVolumeControl";
 
+export interface BilliardsHeaderProps {
+  active: boolean;
+  finished: boolean;
+  landscape: boolean;
+  mobile: boolean;
+  onRotate(): void;
+  onRestart(): void;
+  onExit(): void;
+  details?: ReactNode;
+  onConcede?(): void;
+  canConcede?: boolean;
+  onMenuOpenChange?(open: boolean): void;
+}
+
 export function BilliardsHeader({
   active,
   finished,
@@ -27,15 +41,11 @@ export function BilliardsHeader({
   onRotate,
   onRestart,
   onExit,
-}: {
-  active: boolean;
-  finished: boolean;
-  landscape: boolean;
-  mobile: boolean;
-  onRotate: () => void;
-  onRestart: () => void;
-  onExit: () => void;
-}) {
+  details,
+  onConcede,
+  canConcede = false,
+  onMenuOpenChange,
+}: BilliardsHeaderProps) {
   const { t } = useLingui();
   const [confirmExit, setConfirmExit] = useState(false);
   const back = active ? (
@@ -71,6 +81,23 @@ export function BilliardsHeader({
       canRestart
       onRestart={onRestart}
       onExit={onExit}
+      onOpenChange={onMenuOpenChange}
+      extraActions={
+        onConcede
+          ? (closeThen) => (
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={!canConcede}
+                className="justify-start"
+                onClick={() => closeThen(onConcede)}
+              >
+                <FlagIcon data-icon="inline-start" />
+                <Trans comment="斯诺克主动认输本局">认输</Trans>
+              </Button>
+            )
+          : undefined
+      }
     />
   ) : (
     <GameVolumeControl />
@@ -80,6 +107,7 @@ export function BilliardsHeader({
       {landscape && active ? (
         <div className="billiards-landscape-nav flex items-center justify-center">
           {rotate}
+          {details}
           {actions}
         </div>
       ) : (
@@ -91,6 +119,7 @@ export function BilliardsHeader({
           trailing={
             <>
               {rotate}
+              {details}
               {actions}
             </>
           }

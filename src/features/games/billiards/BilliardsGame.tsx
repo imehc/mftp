@@ -66,20 +66,23 @@ export default function BilliardsGame() {
     };
   }, [attempt]);
   const rotate = useBilliardsOrientation(mode !== null, landscape);
+  const headerProps = {
+    active: mode !== null,
+    finished: matchFinished,
+    landscape,
+    mobile,
+    onRotate: () => void rotate(),
+    onRestart: restartMatch,
+    onExit: exitMatch,
+  };
   return (
     <main
       data-landscape={landscape && mode !== null}
       className="billiards-game ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
     >
-      <BilliardsHeader
-        active={mode !== null}
-        finished={matchFinished}
-        landscape={landscape}
-        mobile={mobile}
-        onRotate={() => void rotate()}
-        onRestart={restartMatch}
-        onExit={exitMatch}
-      />
+      {!physicsReady || mode === null ? (
+        <BilliardsHeader {...headerProps} />
+      ) : null}
       {!physicsReady ? (
         <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
           {physicsError ? (
@@ -112,6 +115,7 @@ export default function BilliardsGame() {
         <BilliardsMatch
           key={`${JSON.stringify(mode)}-${matchKey}`}
           mode={mode}
+          headerProps={headerProps}
           onRematch={() => {
             // 每次重赛交换开球方，让 AI 与玩家轮流开球。
             setMode((m) =>
