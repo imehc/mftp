@@ -1,8 +1,7 @@
-import type { Application, Container, Ticker } from "pixi.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { playImpactEvent } from "./audio";
-import { runPresentation } from "./playback";
+import { type PlaybackTick, runPresentation } from "./playback";
 
 vi.mock("./audio", () => ({ playImpactEvent: vi.fn() }));
 
@@ -11,7 +10,7 @@ beforeEach(() => {
 });
 
 function setup() {
-  let tick: ((ticker: Ticker) => void) | null = null;
+  let tick: ((ticker: PlaybackTick) => void) | null = null;
   const app = {
     ticker: {
       add: (callback: typeof tick) => {
@@ -25,21 +24,49 @@ function setup() {
   const view = { scale: { set: vi.fn() }, alpha: 1, visible: true };
   const hooks = {
     moveBall: vi.fn(),
-    ballView: () => view as unknown as Container,
+    ballView: () => view,
     maskPocket: vi.fn(),
     onDone: vi.fn(),
   };
   return {
-    app: app as unknown as Application,
+    app,
     hooks,
     view,
     advance(ms: number) {
-      tick?.({ deltaMS: ms } as Ticker);
+      tick?.({ deltaMS: ms });
     },
   };
 }
 
 describe("击球回放生命周期", () => {
+  it("三维落袋回调完整控制入口移动和下沉，通用回放不重复移动或淡出", async () => {
+    const state = setup();
+    const sink = vi.fn();
+    const view = { visible: true, alpha: 1, sink };
+    const event = {
+      type: "pocket" as const,
+      t: 0,
+      ball: 0,
+      pocket: 5,
+      x: 0,
+      y: 0.65,
+      vx: 0,
+      vy: 1,
+    };
+    const playback = runPresentation(
+      state.app,
+      { frames: [{ t: 0, balls: [] }], events: [event] },
+      { ...state.hooks, ballView: () => view },
+    );
+    state.advance(50);
+    expect(sink).toHaveBeenLastCalledWith(0.05 / 0.24, event);
+    expect(state.hooks.moveBall).not.toHaveBeenCalled();
+    expect(view.alpha).toBe(1);
+    for (let step = 0; step < 4; step++) state.advance(50);
+    await playback.done;
+    expect(view.visible).toBe(false);
+  });
+
   it("从零时刻插值，声音仅在事件时间触发一次", async () => {
     const s = setup();
     const playback = runPresentation(

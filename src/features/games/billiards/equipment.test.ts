@@ -35,7 +35,7 @@ describe("器材配置隔离与袋口测量", () => {
       const b = pocket.right[0];
       const side = pocket.spec.kind === "side";
       expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeCloseTo(
-        side ? 0.127 : 0.1143,
+        side ? AMERICAN_NINE.side.width : AMERICAN_NINE.corner.width,
         8,
       );
       const entry = pocketLocal(pocket.spec, {

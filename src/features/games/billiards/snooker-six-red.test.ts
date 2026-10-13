@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { SNOOKER } from "./equipment";
 import type { ShotSimResult } from "./physics";
 import { createSnookerState, reduceSnookerShot, snookerSeat } from "./snooker";
 import { applySnookerAction } from "./snooker-actions";
@@ -19,7 +20,7 @@ function position(): SnookerState {
         : b.id === 8
           ? { ...b, x: 0.5, y: 0.3 }
           : b.id === 5
-            ? { ...b, x: 0, y: 0.33 }
+            ? { ...b, x: 0, y: 0.3 + SNOOKER.ballRadius * (0.03 / 0.02625) }
             : { ...b, potted: b.id > 8 },
     ),
   };

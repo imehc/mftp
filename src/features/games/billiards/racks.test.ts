@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { BALL_RADIUS, FOOT_SPOT_X } from "./constants";
+import { AMERICAN_NINE, SNOOKER } from "./equipment";
 import { createNineBallRack } from "./racks";
 import { createInitialBalls } from "./rules";
 import { COLOR_SPOTS, createSnookerRack, isRed } from "./snooker-equipment";
@@ -76,7 +77,7 @@ describe("黑八摆球", () => {
 describe("九球摆球", () => {
   it("1 号在顶点、9 号在菱形中心，其余随机", () => {
     const rack = createNineBallRack(5);
-    const diameter = 0.05715;
+    const diameter = AMERICAN_NINE.ballRadius * 2;
     const layout = rows(rack, (diameter * Math.sqrt(3)) / 2);
     expect(layout.map((r) => r.length)).toEqual([1, 2, 3, 2, 1]);
     expect(layout[0][0].id).toBe(1);
@@ -98,7 +99,7 @@ describe("九球摆球", () => {
 });
 
 describe("斯诺克摆球", () => {
-  const diameter = 0.0525;
+  const diameter = SNOOKER.ballRadius * 2;
   const rowStep = (diameter * Math.sqrt(3)) / 2;
 
   it.each([6, 10, 15] as RedCount[])(

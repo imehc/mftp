@@ -294,6 +294,10 @@ export const frontendErrorMessages = {
   "model:decode": msg`模型解析失败，请检查模型与依赖文件是否完整`,
   "model:webgl": msg`无法初始化 3D 显示，请重试或检查设备的图形支持`,
   "frontend:shell_closed_before_open": msg`远端连接在终端打开前已关闭`,
+  "billiards:context_lost": msg({
+    message: "球桌显示已中断，请重开对局。",
+    comment: "台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复",
+  }),
 };
 
 export type FrontendErrorCode = keyof typeof frontendErrorMessages;
