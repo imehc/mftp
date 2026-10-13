@@ -212,7 +212,7 @@ export function BilliardsModeMenu({
         </section>
       </div>
       {records.length > 0 ? (
-        <div className="border-border flex flex-col gap-2 rounded-xl border p-3">
+        <div className="border-border @container flex flex-col gap-2 rounded-xl border p-3">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground text-xs font-medium">
               <Trans>历史记录</Trans>
@@ -225,13 +225,16 @@ export function BilliardsModeMenu({
               <Trans>清空</Trans>
             </Button>
           </div>
-          <ul className="flex max-h-44 flex-col gap-1 overflow-auto text-xs">
+          <ul className="flex max-h-44 flex-col gap-2 overflow-auto text-xs @lg:gap-1">
             {records.slice(0, 12).map((record) => (
-              <li key={record.id} className="grid grid-cols-3 gap-2">
-                <span className="text-muted-foreground shrink-0 text-left tabular-nums">
+              <li
+                key={record.id}
+                className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-3 gap-y-1 @lg:grid-cols-[auto_minmax(0,1fr)_auto]"
+              >
+                <span className="text-muted-foreground col-start-1 row-start-1 text-left whitespace-nowrap tabular-nums">
                   {formatHistoryTime(record.finishedAt)}
                 </span>
-                <span className="min-w-0 text-center break-words">
+                <span className="col-span-2 row-start-2 min-w-0 @lg:col-span-1 @lg:col-start-2 @lg:row-start-1 @lg:text-center">
                   {record.payload.discipline === "snooker" ? (
                     <span>
                       <Trans>斯诺克</Trans>
@@ -252,10 +255,11 @@ export function BilliardsModeMenu({
                   {" · "}
                   {historyModeLabel(record.payload)}
                 </span>
-                <span className="text-muted-foreground shrink-0 text-right">
+                <span className="text-muted-foreground col-start-2 row-start-1 min-w-0 text-right @lg:col-start-3">
                   {historyResult(record.payload)}
                   {record.payload.scores ? (
-                    <span className="block tabular-nums">
+                    <span className="whitespace-nowrap tabular-nums">
+                      {" · "}
                       {record.payload.scores.join(" : ")}
                     </span>
                   ) : null}

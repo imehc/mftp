@@ -193,7 +193,7 @@ msgstr "{sharesCount, plural, one {# directory; restart the service to fully app
 msgid "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 msgstr "{sharesCount, plural, one {# directory} other {# directories}}"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:263
+#: src/features/games/billiards/BilliardsModeMenu.tsx:267
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# shot} other {# shots}}"
 
@@ -857,7 +857,7 @@ msgid "中国象棋棋盘"
 msgstr "Chinese chess board"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:101
-#: src/features/games/billiards/BilliardsModeMenu.tsx:250
+#: src/features/games/billiards/BilliardsModeMenu.tsx:253
 msgid "中式八球"
 msgstr "Chinese eight-ball"
 
@@ -1436,7 +1436,7 @@ msgid "全部结果"
 msgstr "All Results"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:120
-#: src/features/games/billiards/BilliardsModeMenu.tsx:240
+#: src/features/games/billiards/BilliardsModeMenu.tsx:243
 msgid "六红球"
 msgstr "Six reds"
 
@@ -2030,12 +2030,12 @@ msgid "区分大小写"
 msgstr "Match case"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:122
-#: src/features/games/billiards/BilliardsModeMenu.tsx:244
+#: src/features/games/billiards/BilliardsModeMenu.tsx:247
 msgid "十五红球"
 msgstr "Fifteen reds"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:121
-#: src/features/games/billiards/BilliardsModeMenu.tsx:242
+#: src/features/games/billiards/BilliardsModeMenu.tsx:245
 msgid "十红球变体"
 msgstr "Ten-red variant"
 
@@ -4474,7 +4474,7 @@ msgid "断开连接"
 msgstr "Disconnect"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:104
-#: src/features/games/billiards/BilliardsModeMenu.tsx:237
+#: src/features/games/billiards/BilliardsModeMenu.tsx:240
 msgid "斯诺克"
 msgstr "Snooker"
 
@@ -6086,9 +6086,9 @@ msgid "清理范围"
 msgstr "Scope"
 
 #. 清除此游戏在本机保存的对局记录
-#: src/features/games/billiards/BilliardsModeMenu.tsx:225
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/formatter/FormatterActions.tsx:110
+#: src/features/games/billiards/BilliardsModeMenu.tsx:225
 #: src/features/games/engine/BoardModeMenu.tsx:163
 #: src/features/media-compress/components/CompressDropzone.tsx:122
 #: src/features/poetry/components/SearchBar.tsx:149
@@ -7141,7 +7141,7 @@ msgid "网络"
 msgstr "Network"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:107
-#: src/features/games/billiards/BilliardsModeMenu.tsx:248
+#: src/features/games/billiards/BilliardsModeMenu.tsx:251
 msgid "美式九球"
 msgstr "American nine-ball"
 
