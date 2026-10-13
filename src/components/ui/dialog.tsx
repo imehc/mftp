@@ -51,14 +51,24 @@ function DialogContent({
   children,
   showCloseButton = true,
   placement = "center",
+  focusMode = false,
+  animate = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
   placement?: "center" | "responsive-sheet" | "responsive-page";
+  focusMode?: boolean;
+  animate?: boolean;
 }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay
+        className={
+          focusMode
+            ? "bg-black/30 supports-backdrop-filter:backdrop-blur-sm"
+            : undefined
+        }
+      />
       {/*
         Portal 挂在 body 下，拿不到 .app-shell 的安全区 padding，必须自己
         处理有效视口：外层只负责居中与安全区留白（pointer-events-none 让
@@ -77,6 +87,10 @@ function DialogContent({
           data-slot="dialog-content"
           className={cn(
             "bg-popover text-popover-foreground ring-foreground/10 motion-safe:data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-open:slide-in-from-bottom-2 motion-safe:data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-closed:slide-out-to-bottom-2 pointer-events-auto relative grid max-h-full w-full gap-4 overflow-y-auto overscroll-contain rounded-xl p-4 text-sm ring-1 outline-none data-closed:duration-150 data-closed:ease-in data-open:duration-250 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none md:max-w-sm",
+            focusMode &&
+              "data-open:zoom-in-100 data-open:slide-in-from-bottom-0 data-closed:zoom-out-100 data-closed:slide-out-to-bottom-0 data-closed:duration-100 data-closed:ease-out data-open:duration-150",
+            !animate &&
+              "motion-safe:data-closed:animate-none motion-safe:data-open:animate-none",
             placement === "responsive-sheet" &&
               "max-md:rounded-b-none max-md:pb-[calc(1rem+var(--safe-bottom,0px))]",
             placement === "responsive-page" &&

@@ -140,10 +140,10 @@ export function SeatCell({
           : "items-start justify-self-start",
       )}
     >
-      <Badge variant={active ? "secondary" : "outline"}>
-        {seatName(mode, seat)}
+      <Badge className="max-w-full" variant={active ? "secondary" : "outline"}>
+        <span className="truncate">{seatName(mode, seat)}</span>
       </Badge>
-      <div className="flex flex-wrap items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-1.5">
         <span className="text-muted-foreground text-xs">
           {state.variant === "nine-ball" ? (
             <Plural

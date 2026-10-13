@@ -3,27 +3,40 @@ import { Plural, Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
-import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
+import { BilliardsConcedeDialog } from "./BilliardsConcedeDialog";
 import { BilliardsControls } from "./BilliardsControls";
+import { BilliardsDecisionNotice } from "./BilliardsDecisionNotice";
+import { BilliardsDetails } from "./BilliardsDetails";
+import { BilliardsHeader, type BilliardsHeaderProps } from "./BilliardsHeader";
 import type { Session } from "./BilliardsMatch";
-import { BallTray, SeatCell, seatName, seatTray } from "./BilliardsScore";
-import { NineBallActions, NineBallScore } from "./NineBallHud";
+import { BilliardsRulePanel } from "./BilliardsRulePanel";
+import { BallTray, SeatCell, seatName } from "./BilliardsScore";
+import { NineBallScore } from "./NineBallHud";
 import { equipmentForState } from "./placement";
 import {
   BilliardsStage,
   type BilliardsStageHandle,
 } from "./render/BilliardsStage";
-import { SnookerActions, SnookerScore } from "./SnookerHud";
+import type { AimTarget } from "./render/scene-contract";
+import { type BilliardsPanel, canSubmitRuleMove } from "./rule-panel-state";
+import { snookerValue } from "./snooker-equipment";
+import { snookerRuleActions } from "./snooker-rule-actions";
+import { snookerSelection } from "./snooker-selection";
+import { SnookerScore } from "./SnookerHud";
+import { SnookerTargetControl } from "./SnookerTargetControl";
 import {
   BILLIARDS_GAME_ID,
   type BilliardsHistoryPayload,
   type BilliardsMode,
+  type BilliardsMove,
   type FoulReason,
 } from "./types";
+import { useRulePanel } from "./use-rule-panel";
 
 function foulLabel(foul: FoulReason) {
   switch (foul) {
@@ -56,6 +69,7 @@ export function MatchView({
   onExit,
   onFinishedChange,
   onStageError,
+  headerProps,
 }: {
   mode: BilliardsMode;
   session: Session;
@@ -66,6 +80,7 @@ export function MatchView({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
   onStageError: (error: unknown) => void;
+  headerProps: BilliardsHeaderProps;
 }) {
   const desktop = useDesktopLayout();
   const { runner, local } = session;
@@ -73,7 +88,21 @@ export function MatchView({
   const state = snapshot.state;
   const [followDraw, setFollowDraw] = useState(0);
   const [powerPreview, setPowerPreview] = useState(0);
-  const [pushOut, setPushOut] = useState(false);
+  const [aimTarget, setAimTarget] = useState<AimTarget | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectionBusy, setSelectionBusy] = useState(false);
+  const [selectionReturning, setSelectionReturning] = useState(false);
+  const [storedSelectionKind, setSelectionKind] = useState<"color" | "free">(
+    "color",
+  );
+  const pushScope = `${state.shotCount}:${state.turnSeat}`;
+  const [pushDeclaration, setPushDeclaration] = useState({
+    scope: "",
+    value: false,
+  });
+  const pushOut = pushDeclaration.scope === pushScope && pushDeclaration.value;
+  const setPushOut = (value: boolean) =>
+    setPushDeclaration({ scope: pushScope, value });
   const addRecord = useGamesHistoryStore((s) => s.addRecord);
   const recordedRef = useRef(false);
 
@@ -121,12 +150,57 @@ export function MatchView({
     activeIsLocal &&
     !decisionPending &&
     (!nominationPending || state.ballInHand);
+  const selectionKind = nominationPending ? "color" : storedSelectionKind;
+  const selectionChoices =
+    state.variant === "snooker" ? snookerSelection(state) : null;
+  const { panel, setPanel } = useRulePanel(
+    state,
+    snapshot.moveCount,
+    snapshot.phase,
+    snapshot.activeSeat,
+    activeIsLocal,
+  );
+
+  const openPanel = (next: BilliardsPanel) => {
+    if (next) {
+      stageRef.current?.cancelInput();
+      setPowerPreview(0);
+    }
+    setPanel(next);
+  };
+
+  useEffect(() => {
+    if (panel !== "target" && panel !== "rules") return;
+
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !event.defaultPrevented) {
+        event.preventDefault();
+        setPanel(null);
+      }
+    };
+
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, [panel, setPanel]);
+
+  const submitRule = (move: BilliardsMove) => {
+    const current = runner.getSnapshot();
+    if (!canSubmitRuleMove(snapshot, current, activeIsLocal)) return false;
+    setPushOut(false);
+    return local.submit(move);
+  };
+
   const ballInHand = canInteract && state.ballInHand;
   const outcome = state.lastOutcome;
   const remaining = state.balls.filter(
     (ball) => !ball.potted && ball.id !== 0,
   ).length;
   const powerPercent = Math.round(powerPreview * 100);
+  const points = aimTarget ? snookerValue(aimTarget.ballId) : 0;
+  const snookerActions =
+    state.variant === "snooker" ? snookerRuleActions(state) : null;
+  const hasSnookerActions =
+    snookerActions && (snookerActions.reposition || snookerActions.claim);
   useEffect(() => {
     onFinishedChange(state.finished);
   }, [onFinishedChange, state.finished]);
@@ -135,84 +209,76 @@ export function MatchView({
     snapshot.winnerSeat !== null ? seatName(mode, snapshot.winnerSeat) : "";
   return (
     <>
-      <div
-        data-rules={
-          state.variant === "snooker" || state.variant === "nine-ball"
+      <BilliardsHeader
+        {...headerProps}
+        details={
+          <BilliardsDetails
+            state={state}
+            mode={mode}
+            open={panel === "details"}
+            onOpenChange={(next) => openPanel(next ? "details" : null)}
+          />
         }
-        className="billiards-score min-h-8 shrink-0 px-3 py-2 text-xs"
-      >
-        {state.finished ? (
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            <Badge variant="secondary">
-              {state.variant === "practice" ? (
-                <Trans>清台完成！</Trans>
-              ) : snapshot.winnerSeat !== null ? (
-                <Trans>{winnerSeatLabel} 获胜</Trans>
-              ) : (
-                <Trans>对局结束</Trans>
-              )}
-            </Badge>
-            <Badge variant="outline">
-              <Plural
-                value={{
-                  shotCount: state.shotCount,
-                }}
-                one="共 # 杆"
-                other="共 # 杆"
-              />
-            </Badge>
-          </div>
-        ) : mode.kind === "practice" ? (
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            <Badge variant="outline">
-              <Plural
-                value={{
-                  shotNumber: state.shotCount + 1,
-                }}
-                one="第 # 杆"
-                other="第 # 杆"
-              />
-            </Badge>
-            <Badge variant="outline">
-              <Plural
-                value={{
-                  remainingBallCount: remaining,
-                }}
-                one="剩余 # 球"
-                other="剩余 # 球"
-              />
-            </Badge>
-            {desktop ? (
-              <BallTray
-                state={state}
-                ids={state.balls
-                  .filter((ball) => ball.id)
-                  .map((ball) => ball.id)}
-              />
-            ) : null}
-          </div>
-        ) : state.variant === "snooker" ? (
-          <SnookerScore
-            state={state}
-            mode={mode}
-            activeSeat={snapshot.activeSeat}
-          />
-        ) : state.variant === "nine-ball" ? (
-          <NineBallScore
-            state={state}
-            mode={mode}
-            activeSeat={snapshot.activeSeat}
-          />
-        ) : (
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
-            <SeatCell
-              mode={mode}
-              state={state}
-              seat={0}
-              active={snapshot.activeSeat === 0}
-              align="start"
-            />
-            <div className="flex max-w-[50vw] flex-wrap items-center justify-center gap-1.5">
+        canConcede={activeIsLocal && !state.finished}
+        onConcede={
+          state.variant === "snooker" && !state.finished
+            ? () => {
+                if (
+                  canSubmitRuleMove(
+                    snapshot,
+                    runner.getSnapshot(),
+                    activeIsLocal,
+                  )
+                )
+                  openPanel("concede");
+              }
+            : undefined
+        }
+        onMenuOpenChange={(next) => {
+          setMenuOpen(next);
+          if (next) {
+            stageRef.current?.cancelInput();
+            setPowerPreview(0);
+          }
+        }}
+      />
+      <BilliardsConcedeDialog
+        open={panel === "concede"}
+        enabled={
+          activeIsLocal && state.variant === "snooker" && !state.finished
+        }
+        onOpenChange={(next) => {
+          if (!next) openPanel(null);
+        }}
+        onConcede={() => {
+          if (submitRule({ type: "concede" })) openPanel(null);
+        }}
+      />
+      <div className="billiards-score shrink-0 text-xs">
+        <div className="billiards-summary mx-auto w-full max-w-6xl min-w-0 px-3 md:px-4">
+          {state.finished ? (
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              <Badge variant="secondary">
+                {state.variant === "practice" ? (
+                  <Trans>清台完成！</Trans>
+                ) : snapshot.winnerSeat !== null ? (
+                  <Trans>{winnerSeatLabel} 获胜</Trans>
+                ) : (
+                  <Trans>对局结束</Trans>
+                )}
+              </Badge>
+              <Badge variant="outline">
+                <Plural
+                  value={{
+                    shotCount: state.shotCount,
+                  }}
+                  one="共 # 杆"
+                  other="共 # 杆"
+                />
+              </Badge>
+            </div>
+          ) : mode.kind === "practice" ? (
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
               <Badge variant="outline">
                 <Plural
                   value={{
@@ -222,19 +288,118 @@ export function MatchView({
                   other="第 # 杆"
                 />
               </Badge>
+              <Badge variant="outline">
+                <Plural
+                  value={{
+                    remainingBallCount: remaining,
+                  }}
+                  one="剩余 # 球"
+                  other="剩余 # 球"
+                />
+              </Badge>
+              {desktop ? (
+                <BallTray
+                  state={state}
+                  ids={state.balls
+                    .filter((ball) => ball.id)
+                    .map((ball) => ball.id)}
+                />
+              ) : null}
             </div>
-            <SeatCell
-              mode={mode}
+          ) : state.variant === "snooker" ? (
+            <SnookerScore
               state={state}
-              seat={1}
-              active={snapshot.activeSeat === 1}
-              align="end"
+              mode={mode}
+              activeSeat={snapshot.activeSeat}
+              target={
+                <SnookerTargetControl
+                  state={state}
+                  enabled={
+                    activeIsLocal &&
+                    !selectionReturning &&
+                    (!selectionBusy || panel === "target")
+                  }
+                  open={panel === "target"}
+                  kind={selectionKind}
+                  onKind={setSelectionKind}
+                  onOpenChange={(next) => openPanel(next ? "target" : null)}
+                  onMove={submitRule}
+                />
+              }
             />
-          </div>
-        )}
+          ) : state.variant === "nine-ball" ? (
+            <NineBallScore
+              state={state}
+              mode={mode}
+              activeSeat={snapshot.activeSeat}
+            />
+          ) : (
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
+              <SeatCell
+                mode={mode}
+                state={state}
+                seat={0}
+                active={snapshot.activeSeat === 0}
+                align="start"
+              />
+              <div className="flex max-w-[50vw] flex-wrap items-center justify-center gap-1.5">
+                <Badge variant="outline">
+                  <Plural
+                    value={{
+                      shotNumber: state.shotCount + 1,
+                    }}
+                    one="第 # 杆"
+                    other="第 # 杆"
+                  />
+                </Badge>
+              </div>
+              <SeatCell
+                mode={mode}
+                state={state}
+                seat={1}
+                active={snapshot.activeSeat === 1}
+                align="end"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="billiards-stage relative z-0 min-h-0 min-w-0 flex-1 overflow-hidden">
+      <div
+        className="billiards-stage relative z-0 min-h-0 min-w-0 flex-1 overflow-hidden"
+        onPointerDown={(event) => {
+          if (panel === "rules" && event.target instanceof HTMLCanvasElement)
+            openPanel(null);
+        }}
+      >
+        {state.variant === "snooker" || state.variant === "nine-ball" ? (
+          <BilliardsRulePanel
+            state={state}
+            mode={mode}
+            enabled={activeIsLocal}
+            panel={panel}
+            onPanel={openPanel}
+            onMove={submitRule}
+            pushOut={pushOut}
+            onPushOut={(value) => {
+              if (runner.getSnapshot().state === state && activeIsLocal)
+                setPushOut(value);
+            }}
+          />
+        ) : null}
+        {aimTarget && panel === null && !menuOpen && canInteract ? (
+          <div
+            className="billiards-aim-points pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full text-xs font-semibold whitespace-nowrap text-white tabular-nums [text-shadow:0_1px_3px_#000,0_0_2px_#000]"
+            style={{
+              left: `clamp(1.5rem, ${aimTarget.x}%, calc(100% - 1.5rem))`,
+              top: `max(1.5rem, calc(${aimTarget.y}% - 0.75rem))`,
+            }}
+          >
+            <Trans comment="斯诺克瞄准时首个将碰到的目标球的实际分值">
+              {points} 分
+            </Trans>
+          </div>
+        ) : null}
         <div className="billiards-status" role="status" aria-live="polite">
           <div className="flex min-w-0 flex-col items-center justify-center gap-1 text-center text-xs">
             {outcome?.foul ? (
@@ -272,11 +437,54 @@ export function MatchView({
           onError={onStageError}
           state={state}
           equipment={equipmentForState(state)}
-          interactive={canInteract}
+          interactive={canInteract && panel === null && !menuOpen}
           followDraw={followDraw}
           onPowerPreview={setPowerPreview}
+          onAimTarget={setAimTarget}
+          selection={
+            panel === "target" &&
+            state.variant === "snooker" &&
+            selectionChoices
+              ? {
+                  ids:
+                    selectionKind === "color"
+                      ? selectionChoices.colors
+                      : selectionChoices.free,
+                  selectedId:
+                    selectionKind === "color"
+                      ? state.on.kind === "color"
+                        ? state.on.nominated
+                        : null
+                      : state.nominatedFree,
+                }
+              : null
+          }
+          onSelectionActive={(active, phase) => {
+            setSelectionBusy(active);
+            setSelectionReturning(phase === "returning");
+          }}
+          onDismissSelection={() => openPanel(null)}
+          onSelectedBall={(ballId) => {
+            if (
+              panel === "target" &&
+              submitRule({
+                type: selectionKind === "color" ? "nominate" : "nominate-free",
+                ballId,
+              })
+            )
+              openPanel(null);
+          }}
           onShot={(angle, power) => {
-            if (!canInteract || state.ballInHand || nominationPending) return;
+            if (
+              !canInteract ||
+              panel !== null ||
+              menuOpen ||
+              selectionBusy ||
+              state.ballInHand ||
+              nominationPending ||
+              runner.getSnapshot().state !== state
+            )
+              return;
             const declaredPush =
               state.variant === "nine-ball" &&
               state.pushOutAvailable &&
@@ -291,6 +499,13 @@ export function MatchView({
             });
           }}
           onPlaceCue={(x, y) => {
+            if (
+              !canInteract ||
+              panel !== null ||
+              menuOpen ||
+              runner.getSnapshot().state !== state
+            )
+              return;
             local.submit({
               type: "place-cue",
               x,
@@ -299,105 +514,67 @@ export function MatchView({
           }}
         />
       </div>
-      <div
-        className="billiards-actions"
-        data-rules={
-          (state.variant === "nine-ball" || state.variant === "snooker") &&
-          !state.finished
-        }
-      >
-        {state.variant === "snooker" && !state.finished ? (
-          <SnookerActions
-            state={state}
-            mode={mode}
-            enabled={activeIsLocal}
-            onMove={(move) => local.submit(move)}
-          />
-        ) : null}
-        {state.variant === "nine-ball" && !state.finished ? (
-          <NineBallActions
-            state={state}
-            mode={mode}
-            enabled={activeIsLocal}
-            pushOut={pushOut}
-            onPushOut={setPushOut}
-            onMove={(move) => {
-              setPushOut(false);
-              local.submit(move);
+      <div className="billiards-actions">
+        {state.finished ? (
+          <div className="billiards-result flex h-full items-center justify-center gap-2 px-2">
+            <Button size="sm" density="adaptive" onClick={onRematch}>
+              <Trans>再来一局</Trans>
+            </Button>
+            <Button
+              size="sm"
+              density="adaptive"
+              variant="ghost"
+              onClick={onExit}
+            >
+              <Trans>退出</Trans>
+            </Button>
+          </div>
+        ) : decisionPending && activeIsLocal ? (
+          <BilliardsDecisionNotice
+            foul={
+              state.variant === "snooker" && state.decision?.kind === "foul"
+            }
+            open={panel === "rules"}
+            onOpen={() => {
+              if (
+                canSubmitRuleMove(snapshot, runner.getSnapshot(), activeIsLocal)
+              )
+                openPanel("rules");
             }}
           />
-        ) : null}
-        {state.finished ? (
-          <div className="billiards-result shrink-0">
-            <GameResultBar
-              presentation="actions"
-              title={
-                state.variant === "practice" ? (
-                  <Trans>清台完成！</Trans>
-                ) : snapshot.winnerSeat !== null ? (
-                  <Trans>{winnerSeatLabel} 获胜</Trans>
-                ) : (
-                  <Trans>对局结束</Trans>
-                )
-              }
-              celebrate={
-                state.variant === "practice" ||
-                (snapshot.winnerSeat !== null &&
-                  (mode.kind === "hotseat" ||
-                    (mode.kind === "ai" && snapshot.winnerSeat === 0)))
-              }
-              details={
-                <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 md:justify-start">
-                  <Plural
-                    value={{
-                      shotCount: state.shotCount,
-                    }}
-                    one="总杆数 #"
-                    other="总杆数 #"
-                  />
-                  {mode.kind !== "practice"
-                    ? [0, 1].map((seat) => {
-                        const tray = seatTray(state, seat);
-                        return (
-                          <span
-                            key={seat}
-                            className="inline-flex items-center gap-1.5"
-                          >
-                            {seatName(mode, seat)}
-                            {state.variant === "snooker" ? (
-                              <span>
-                                <Trans>
-                                  得分 {state.scores[seat]}，最高单杆{" "}
-                                  {state.highestBreaks[seat]}
-                                </Trans>
-                              </span>
-                            ) : null}
-                            {tray ? (
-                              <BallTray state={state} ids={tray} />
-                            ) : null}
-                            <Plural
-                              value={{
-                                foulCount: state.foulCounts[seat] ?? 0,
-                              }}
-                              one="犯规 # 次"
-                              other="犯规 # 次"
-                            />
-                          </span>
-                        );
-                      })
-                    : null}
-                </span>
-              }
-              onRematch={onRematch}
-              onExit={onExit}
-            />
-          </div>
-        ) : decisionPending ? null : (
+        ) : (
           <BilliardsControls
             followDraw={followDraw}
             onFollowDraw={setFollowDraw}
             power={powerPercent}
-            interactive={canInteract && !ballInHand && !nominationPending}
+            interactive={
+              canInteract &&
+              panel === null &&
+              !menuOpen &&
+              !selectionBusy &&
+              !ballInHand &&
+              !nominationPending
+            }
+            action={
+              <>
+                {state.variant === "nine-ball" || hasSnookerActions ? (
+                  <Button
+                    size="sm"
+                    density="adaptive"
+                    variant="outline"
+                    className="billiards-rule-trigger"
+                    aria-haspopup="dialog"
+                    aria-expanded={panel === "rules"}
+                    disabled={!activeIsLocal}
+                    onClick={() =>
+                      openPanel(panel === "rules" ? null : "rules")
+                    }
+                  >
+                    {pushOut ? <Trans>本杆推杆</Trans> : <Trans>操作</Trans>}
+                  </Button>
+                ) : null}
+              </>
+            }
           />
         )}
       </div>

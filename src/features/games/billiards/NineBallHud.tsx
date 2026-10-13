@@ -1,6 +1,5 @@
-import { Plural, Trans } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 
 import { BallIcon, SeatCell, seatName } from "./BilliardsScore";
@@ -17,9 +16,6 @@ export function NineBallScore({
   activeSeat: number | null;
 }) {
   const targetId = lowestBall(state);
-  const remainingBalls = state.balls.filter(
-    (ball) => ball.id !== 0 && !ball.potted,
-  ).length;
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <SeatCell
@@ -30,14 +26,13 @@ export function NineBallScore({
         align="start"
       />
       <div className="flex flex-col items-center gap-1">
-        <span className="text-muted-foreground">
+        <span className="text-inherit">
           <Trans comment="九球计分栏，必须首先击中的最低号目标球">
             最低目标
           </Trans>
         </span>
-        <span className="inline-flex flex-wrap items-center justify-center gap-1">
+        <span className="inline-flex items-center justify-center gap-1">
           {targetId !== null ? <BallIcon id={targetId} potted={false} /> : null}
-          <Plural value={remainingBalls} one="剩余 # 球" other="剩余 # 球" />
         </span>
       </div>
       <SeatCell
@@ -69,90 +64,80 @@ export function NineBallActions({
   const decision = state.decision;
   const decisionSeat = decision ? seatName(mode, decision.seat) : null;
   return (
-    <div className="flex shrink-0 flex-col gap-2 px-3 py-2 text-xs">
+    <div className="flex flex-col gap-3 text-xs">
       {decision ? (
-        <Alert>
-          <AlertDescription>
-            <span>
-              {decisionSeat}
-              {" · "}
-              {decision.kind === "warning" ? (
-                <Trans>已连续两次犯规，再次连续犯规将判负。</Trans>
-              ) : decision.kind === "illegal-break" ? (
-                <Trans>
-                  未达到三球开球要求。可接受桌面或交回开球者；交回后允许推杆。
-                </Trans>
-              ) : decision.kind === "push-out" ? (
-                <Trans>推杆结束。可自己接打，或交回推杆者。</Trans>
-              ) : (
-                <Trans>对方提议僵持重摆。接受后由本局原开球者开球。</Trans>
-              )}
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {decision.kind === "warning" ? (
+        <div className="flex flex-col gap-3">
+          <span>
+            {decisionSeat}
+            {" · "}
+            {decision.kind === "warning" ? (
+              <Trans>已连续两次犯规，再次连续犯规将判负。</Trans>
+            ) : decision.kind === "illegal-break" ? (
+              <Trans>
+                未达到三球开球要求。可接受桌面或交回开球者；交回后允许推杆。
+              </Trans>
+            ) : decision.kind === "push-out" ? (
+              <Trans>推杆结束。可自己接打，或交回推杆者。</Trans>
+            ) : (
+              <Trans>对方提议僵持重摆。接受后由本局原开球者开球。</Trans>
+            )}
+          </span>
+          <div className="flex flex-wrap gap-2 [text-shadow:none]">
+            {decision.kind === "warning" ? (
+              <Button
+                size="sm"
+                disabled={!enabled}
+                onClick={() =>
+                  onMove({ type: "decision", choice: "acknowledge" })
+                }
+              >
+                <Trans comment="九球两犯警告，确认后继续对局">确认警告</Trans>
+              </Button>
+            ) : decision.kind === "stalemate" ? (
+              <>
                 <Button
                   size="sm"
                   disabled={!enabled}
+                  onClick={() => onMove({ type: "decision", choice: "rerack" })}
+                >
+                  <Trans comment="台球僵持协商，接受并重新摆球">同意重摆</Trans>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={!enabled}
                   onClick={() =>
-                    onMove({ type: "decision", choice: "acknowledge" })
+                    onMove({ type: "decision", choice: "decline" })
                   }
                 >
-                  <Trans comment="九球两犯警告，确认后继续对局">确认警告</Trans>
+                  <Trans>继续当前球局</Trans>
                 </Button>
-              ) : decision.kind === "stalemate" ? (
-                <>
-                  <Button
-                    size="sm"
-                    disabled={!enabled}
-                    onClick={() =>
-                      onMove({ type: "decision", choice: "rerack" })
-                    }
-                  >
-                    <Trans comment="台球僵持协商，接受并重新摆球">
-                      同意重摆
-                    </Trans>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={!enabled}
-                    onClick={() =>
-                      onMove({ type: "decision", choice: "decline" })
-                    }
-                  >
-                    <Trans>继续当前球局</Trans>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    size="sm"
-                    disabled={!enabled}
-                    onClick={() =>
-                      onMove({ type: "decision", choice: "accept" })
-                    }
-                  >
-                    <Trans comment="九球推杆或违规开球后，接受当前球位并自己击球">
-                      接受桌面
-                    </Trans>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={!enabled}
-                    onClick={() =>
-                      onMove({ type: "decision", choice: "return" })
-                    }
-                  >
-                    <Trans comment="九球推杆或违规开球后，让刚才出杆的人继续击球">
-                      交回对方
-                    </Trans>
-                  </Button>
-                </>
-              )}
-            </div>
-          </AlertDescription>
-        </Alert>
+              </>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  disabled={!enabled}
+                  onClick={() => onMove({ type: "decision", choice: "accept" })}
+                >
+                  <Trans comment="九球推杆或违规开球后，接受当前球位并自己击球">
+                    接受桌面
+                  </Trans>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={!enabled}
+                  onClick={() => onMove({ type: "decision", choice: "return" })}
+                >
+                  <Trans comment="九球推杆或违规开球后，让刚才出杆的人继续击球">
+                    交回对方
+                  </Trans>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
           {state.placementRegion ? (
