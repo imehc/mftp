@@ -102,7 +102,7 @@ export function CollectionGroups({ controller }: { controller: Controller }) {
             <p>
               <Trans>读取失败</Trans>
             </p>
-            <p className="text-muted-foreground text-xs break-words">
+            <p className="text-muted-foreground text-xs wrap-break-word">
               {describeError(error)}
             </p>
           </div>
@@ -196,7 +196,7 @@ function CollectionSync({ controller }: { controller: Controller }) {
         ) : null}
       </div>
       {progress.error ? (
-        <p role="alert" className="text-destructive text-xs break-words">
+        <p role="alert" className="text-destructive text-xs wrap-break-word">
           {describeError(progress.error)}
         </p>
       ) : (

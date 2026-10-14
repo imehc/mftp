@@ -130,7 +130,7 @@ export default function LibraryManagePage({
                 role="alert"
                 className="flex flex-wrap items-center justify-between gap-2"
               >
-                <p className="text-destructive text-xs break-words">
+                <p className="text-destructive text-xs wrap-break-word">
                   {describeError(extrasError)}
                 </p>
                 <Button

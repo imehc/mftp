@@ -68,7 +68,7 @@ export function InspectionRange({
   return (
     <Field>
       <FieldLabel htmlFor={id} className="min-w-0 justify-between">
-        <span className="min-w-0 break-words">{label}</span>
+        <span className="min-w-0 wrap-break-word">{label}</span>
         <span className="tabular-nums">{value.toFixed(2)}</span>
       </FieldLabel>
       <Slider

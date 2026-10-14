@@ -53,7 +53,7 @@ function SelectTrigger({
         density === "adaptive" &&
           "relative isolate border-0 text-xs dark:bg-transparent dark:hover:bg-transparent",
         wrapValue &&
-          "min-h-8 py-1 text-left whitespace-normal [--control-surface-height:100%] data-[size=default]:h-auto data-[size=sm]:h-auto *:data-[slot=select-value]:line-clamp-none *:data-[slot=select-value]:block *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:break-words",
+          "min-h-8 py-1 text-left whitespace-normal [--control-surface-height:100%] data-[size=default]:h-auto data-[size=sm]:h-auto *:data-[slot=select-value]:line-clamp-none *:data-[slot=select-value]:block *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:wrap-break-word",
         className,
       )}
       {...props}

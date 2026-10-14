@@ -125,7 +125,7 @@ export function SceneTree({
         <span
           ref={probe}
           aria-hidden="true"
-          className="pointer-events-none absolute h-[1rem] w-px opacity-0"
+          className="pointer-events-none absolute h-4 w-px opacity-0"
         />
         <div
           className="relative w-full"

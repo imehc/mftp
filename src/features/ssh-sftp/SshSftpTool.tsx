@@ -289,7 +289,7 @@ export default function SshSftpTool() {
           className={
             compact
               ? "hidden"
-              : "group bg-border/60 hover:bg-border data-[resize-handle-active]:bg-primary/50 relative w-1 shrink-0 transition-colors"
+              : "group bg-border/60 hover:bg-border data-resize-handle-active:bg-primary/50 relative w-1 shrink-0 transition-colors"
           }
           aria-label={t`调整左侧面板宽度`}
         >

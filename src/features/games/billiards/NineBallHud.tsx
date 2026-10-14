@@ -82,7 +82,7 @@ export function NineBallActions({
               <Trans>对方提议僵持重摆。接受后由本局原开球者开球。</Trans>
             )}
           </span>
-          <div className="flex flex-wrap gap-2 [text-shadow:none]">
+          <div className="flex flex-wrap gap-2 text-shadow-none">
             {decision.kind === "warning" ? (
               <Button
                 size="sm"

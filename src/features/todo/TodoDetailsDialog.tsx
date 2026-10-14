@@ -39,12 +39,12 @@ export default function TodoDetailsDialog({
                 {item.category ? (
                   <Badge
                     variant="outline"
-                    className="h-auto min-h-5 max-w-full break-words whitespace-normal"
+                    className="h-auto min-h-5 max-w-full wrap-break-word whitespace-normal"
                   >
                     {item.category}
                   </Badge>
                 ) : null}
-                <h3 className="text-base leading-6 font-medium break-words">
+                <h3 className="text-base leading-6 font-medium wrap-break-word">
                   {item.title}
                 </h3>
                 <TodoTimestamps item={item} details />
@@ -54,7 +54,7 @@ export default function TodoDetailsDialog({
                   <h3 className="text-sm font-medium">
                     <Trans>备注</Trans>
                   </h3>
-                  <p className="text-muted-foreground text-sm break-words whitespace-pre-wrap">
+                  <p className="text-muted-foreground text-sm wrap-break-word whitespace-pre-wrap">
                     {item.notes}
                   </p>
                 </section>

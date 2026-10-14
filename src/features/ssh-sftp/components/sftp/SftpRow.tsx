@@ -83,7 +83,7 @@ const SftpRow = function SftpRow({
   return (
     <div
       className={cn(
-        "group border-border/40 hover:bg-muted/50 grid grid-cols-[var(--sftp-list-columns)] items-center border-b px-3 py-1.5 text-sm max-md:min-h-16 max-md:grid-cols-[minmax(0,1fr)_auto]",
+        "group border-border/40 hover:bg-muted/50 grid grid-cols-(--sftp-list-columns) items-center border-b px-3 py-1.5 text-sm max-md:min-h-16 max-md:grid-cols-[minmax(0,1fr)_auto]",
         menuOpen && "bg-muted/50",
       )}
     >

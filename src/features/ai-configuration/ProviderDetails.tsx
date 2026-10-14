@@ -185,7 +185,7 @@ export default function ProviderDetails({
                   {models ? <Trans>添加模型</Trans> : <Trans>添加密钥</Trans>}
                 </Button>
               </div>
-              <div className="border-border h-[17rem] overflow-y-auto overscroll-contain rounded-lg border">
+              <div className="border-border h-68 overflow-y-auto overscroll-contain rounded-lg border">
                 <div className="bg-muted text-muted-foreground sticky top-0 z-10 flex justify-between gap-2 px-3 py-2 text-xs">
                   <span>
                     {models ? (

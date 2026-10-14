@@ -115,7 +115,7 @@ export default function PoemDetail({
                 <Trans>译文</Trans>
               )}
             </span>
-            <h2 className="text-2xl font-semibold tracking-wide break-words">
+            <h2 className="text-2xl font-semibold tracking-wide wrap-break-word">
               {detail.title}
             </h2>
             <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
@@ -155,7 +155,7 @@ export default function PoemDetail({
             })}
           >
             <div
-              className="font-poetry flex flex-col gap-3 text-center break-words"
+              className="font-poetry flex flex-col gap-3 text-center wrap-break-word"
               style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
             >
               {detail.body.map((paragraph, index) => (

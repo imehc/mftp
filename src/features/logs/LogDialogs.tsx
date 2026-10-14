@@ -62,13 +62,13 @@ export default function LogDialogs({
                 <dt className="text-muted-foreground">
                   <Trans>来源</Trans>
                 </dt>
-                <dd className="break-words">
+                <dd className="wrap-break-word">
                   {c.sourceLabels[row.source] ?? row.source}
                 </dd>
                 <dt className="text-muted-foreground">
                   <Trans>操作</Trans>
                 </dt>
-                <dd className="break-words">{logAction(row)}</dd>
+                <dd className="wrap-break-word">{logAction(row)}</dd>
                 <dt className="text-muted-foreground">
                   <Trans>对象</Trans>
                 </dt>
@@ -80,7 +80,7 @@ export default function LogDialogs({
                 <dt className="text-muted-foreground">
                   <Trans>详情</Trans>
                 </dt>
-                <dd className="break-words whitespace-pre-wrap">
+                <dd className="wrap-break-word whitespace-pre-wrap">
                   {logDetail(row) || "—"}
                 </dd>
                 <dt className="text-muted-foreground">

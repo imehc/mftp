@@ -59,7 +59,7 @@ export default function ActivityMenu() {
       <DialogLayoutContent
         placement="responsive-sheet"
         showCloseButton={false}
-        className="ui-density-adaptive gap-3 md:max-w-[28.75rem]"
+        className="ui-density-adaptive gap-3 md:max-w-115"
       >
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>

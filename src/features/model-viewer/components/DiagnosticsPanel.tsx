@@ -100,10 +100,7 @@ export function DiagnosticsPanel({
       ]
     : [];
   return (
-    <FieldGroup
-      density="compact"
-      className="min-w-0 gap-4 [overflow-wrap:anywhere]"
-    >
+    <FieldGroup density="compact" className="min-w-0 gap-4 wrap-anywhere">
       <FieldGroup density="compact">
         <InspectionChoice
           segmented
@@ -303,10 +300,7 @@ export function DiagnosticsPanel({
           </p>
           <ol className="flex min-w-0 flex-col gap-3">
             {state.validation.issues.messages.map((issue, i) => (
-              <li
-                className="min-w-0 [overflow-wrap:anywhere] break-words"
-                key={i}
-              >
+              <li className="min-w-0 wrap-anywhere" key={i}>
                 <p className="font-mono">{issue.code}</p>
                 <p>{issue.message}</p>
                 {issue.pointer ? (

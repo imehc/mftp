@@ -35,7 +35,7 @@ export default function ProviderNavigationDesktop({
       <p className="text-muted-foreground text-xs">
         {view.providers.length} / {AI_LIMITS.providers}
       </p>
-      <div className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto">
+      <div className="flex max-h-112 flex-col gap-2 overflow-y-auto">
         {view.providers.map((provider) => (
           <button
             key={provider.id}

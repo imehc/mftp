@@ -252,7 +252,7 @@ export default function AddTorrentDialog({
       <DialogContent
         placement="responsive-page"
         showCloseButton={false}
-        className="ui-density-adaptive flex max-h-full min-h-0 flex-col overflow-hidden md:max-w-[30rem]"
+        className="ui-density-adaptive flex max-h-full min-h-0 flex-col overflow-hidden md:max-w-120"
       >
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>
@@ -325,7 +325,7 @@ export default function AddTorrentDialog({
                 <Trans>解析结果</Trans>
               </h2>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="min-w-0 text-sm font-medium break-words">
+                <span className="min-w-0 text-sm font-medium wrap-break-word">
                   {probe.name}
                 </span>
                 <span className="text-muted-foreground text-xs tabular-nums">

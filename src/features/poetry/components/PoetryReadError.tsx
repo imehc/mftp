@@ -19,7 +19,7 @@ export default function PoetryReadError({
       <p>
         <Trans>读取失败</Trans>
       </p>
-      <p className="text-muted-foreground max-w-full text-xs break-words">
+      <p className="text-muted-foreground max-w-full text-xs wrap-break-word">
         {describeError(error)}
       </p>
       <Button variant="outline" density="adaptive" onClick={onRetry}>

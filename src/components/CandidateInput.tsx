@@ -127,7 +127,7 @@ export default function CandidateInput({
       </PopoverAnchor>
       <PopoverContent
         align="start"
-        className="ui-density-adaptive w-[var(--radix-popover-trigger-width)] max-w-[calc(100vw-2rem)] gap-0 p-1"
+        className="ui-density-adaptive w-(--radix-popover-trigger-width) max-w-[calc(100vw-2rem)] gap-0 p-1"
         onOpenAutoFocus={(event) => event.preventDefault()}
         onCloseAutoFocus={(event) => event.preventDefault()}
         onInteractOutside={(event) => {

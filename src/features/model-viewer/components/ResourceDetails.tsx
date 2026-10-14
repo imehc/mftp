@@ -68,7 +68,7 @@ function TextureDetails({
         <dt>
           <Trans comment="模型纹理在材质中的用途。">用途</Trans>
         </dt>
-        <dd className="break-words">
+        <dd className="wrap-break-word">
           {texture.slots.map((slot) => (
             <div key={slot}>
               <TextureSlot slot={slot} />

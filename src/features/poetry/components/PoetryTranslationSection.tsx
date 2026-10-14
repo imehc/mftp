@@ -92,7 +92,7 @@ export default function PoetryTranslationSection({
       {error ? (
         <Alert variant="destructive">
           <AlertTitle>{t`操作失败`}</AlertTitle>
-          <AlertDescription className="break-words">
+          <AlertDescription className="wrap-break-word">
             {describeError(error)}
           </AlertDescription>
         </Alert>

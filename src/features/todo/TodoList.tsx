@@ -108,7 +108,7 @@ function TodoRow({
           <span
             title={item.title}
             className={cn(
-              "block min-w-0 text-sm font-medium break-words",
+              "block min-w-0 text-sm font-medium wrap-break-word",
               compactActions && "line-clamp-2",
             )}
           >
@@ -138,7 +138,7 @@ function TodoRow({
             aria-label={t`查看详情`}
             onClick={() => onViewDetails(item)}
             className={cn(
-              "text-muted-foreground focus-visible:ring-ring col-span-2 col-start-2 mt-1 min-h-6 w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left text-xs leading-4 break-words whitespace-pre-wrap focus-visible:ring-2 focus-visible:outline-none md:min-h-0",
+              "text-muted-foreground focus-visible:ring-ring col-span-2 col-start-2 mt-1 min-h-6 w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left text-xs leading-4 wrap-break-word whitespace-pre-wrap focus-visible:ring-2 focus-visible:outline-none md:min-h-0",
               item.completed && "opacity-70",
             )}
           >

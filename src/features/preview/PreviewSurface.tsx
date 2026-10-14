@@ -99,7 +99,7 @@ function PreviewContent({
           )}
           tabIndex={0}
         >
-          <pre className="font-mono text-sm leading-relaxed break-words whitespace-pre-wrap">
+          <pre className="font-mono text-sm leading-relaxed wrap-break-word whitespace-pre-wrap">
             {text?.body}
           </pre>
           {text?.truncated ? (

@@ -55,7 +55,7 @@ export default function Terminal({ session }: Props) {
           <EmptyTitle>
             <Trans>连接失败</Trans>
           </EmptyTitle>
-          <EmptyDescription className="break-words">
+          <EmptyDescription className="wrap-break-word">
             {session.error ? describeError(session.error) : null}
           </EmptyDescription>
         </EmptyHeader>

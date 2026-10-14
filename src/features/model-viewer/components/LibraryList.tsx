@@ -133,7 +133,7 @@ export function LibraryList({
     >
       <span
         ref={probe}
-        className="pointer-events-none absolute h-[1rem] w-px"
+        className="pointer-events-none absolute h-4 w-px"
         aria-hidden="true"
       />
       <div

@@ -114,7 +114,7 @@ export function useScreenshotExport({
   );
   const feedback =
     available && (busy || state.error) ? (
-      <div className="flex min-w-0 flex-col gap-2 [overflow-wrap:anywhere]">
+      <div className="flex min-w-0 flex-col gap-2 wrap-anywhere">
         {busy ? (
           <p
             role="status"

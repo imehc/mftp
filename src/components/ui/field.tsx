@@ -50,7 +50,7 @@ function FieldGroup({
         "group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3",
         density === "default" && "*:data-[slot=field-group]:gap-4",
         density === "compact" &&
-          "gap-3 [&_[data-slot=field-description]]:text-xs [&_[data-slot=field]]:gap-1.5",
+          "gap-3 **:data-[slot=field]:gap-1.5 **:data-[slot=field-description]:text-xs",
         className,
       )}
       {...props}
@@ -65,7 +65,7 @@ const fieldVariants = cva(
       orientation: {
         vertical: "flex-col *:w-full [&>.sr-only]:w-auto",
         choice:
-          "grid min-w-0 grid-cols-[fit-content(40%)_minmax(0,1fr)] items-center [&>[data-slot=field-label]]:min-w-0 [&>[data-slot=field-label]]:break-words [&>[data-fixed-choice]]:flex [&>[data-fixed-choice]]:justify-end",
+          "grid min-w-0 grid-cols-[fit-content(40%)_minmax(0,1fr)] items-center *:data-[slot=field-label]:min-w-0 *:data-[slot=field-label]:wrap-break-word *:data-fixed-choice:flex *:data-fixed-choice:justify-end",
         horizontal:
           "flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
         responsive:

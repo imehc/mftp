@@ -34,9 +34,7 @@ export default function TodoScheduleDialogMobile({
         </DialogLayoutHeader>
         <DialogLayoutBody className="flex flex-col gap-3">
           {/* 七列按正文实际宽度分配，系统字号增大时不能沿用视口推算的最小列宽。 */}
-          <div className="@container mx-auto w-full max-w-[21rem]">
-            {calendar}
-          </div>
+          <div className="@container mx-auto w-full max-w-84">{calendar}</div>
           {controls}
         </DialogLayoutBody>
         <DialogLayoutFooter className="flex-col gap-3 md:flex-col">

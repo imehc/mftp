@@ -66,7 +66,7 @@ export function BoardMatchLayout({
         </div>
         <div
           role="status"
-          className="flex max-w-[65%] min-w-0 flex-wrap justify-end gap-1.5 text-xs [&_[data-slot=badge]]:whitespace-normal"
+          className="flex max-w-[65%] min-w-0 flex-wrap justify-end gap-1.5 text-xs **:data-[slot=badge]:whitespace-normal"
         >
           <Badge variant="secondary">{title}</Badge>
           {status}

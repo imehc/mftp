@@ -20,14 +20,14 @@ export default function LogRowMobile({
   return (
     <article className="flex flex-col gap-1 border-b py-3">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="min-w-0 text-sm font-medium break-words">
+        <h2 className="min-w-0 text-sm font-medium wrap-break-word">
           {logAction(log)}
         </h2>
         <LogResult log={log} labels={c.resultLabels} />
       </div>
       <p className="text-sm break-all">{logObject(log)}</p>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-muted-foreground min-w-0 text-xs break-words tabular-nums">
+        <p className="text-muted-foreground min-w-0 text-xs wrap-break-word tabular-nums">
           {c.sourceLabels[log.source] ?? log.source} ·{" "}
           {new Date(log.createdAt).toLocaleString(i18n.locale)}
         </p>
@@ -41,7 +41,7 @@ export default function LogRowMobile({
         </Button>
       </div>
       {detail ? (
-        <p className="text-muted-foreground line-clamp-2 text-xs break-words">
+        <p className="text-muted-foreground line-clamp-2 text-xs wrap-break-word">
           {detail}
         </p>
       ) : null}

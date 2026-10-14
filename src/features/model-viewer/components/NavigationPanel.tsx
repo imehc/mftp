@@ -29,10 +29,7 @@ export function NavigationPanel({
   const [speed, setSpeed] = useState(runtime.flight.speed);
   const [name, setName] = useState("");
   return (
-    <FieldGroup
-      density="compact"
-      className="min-w-0 gap-4 [overflow-wrap:anywhere]"
-    >
+    <FieldGroup density="compact" className="min-w-0 gap-4 wrap-anywhere">
       <FieldGroup density="compact">
         <RuntimeControls runtime={runtime} onCanvas={onCanvas} />
       </FieldGroup>

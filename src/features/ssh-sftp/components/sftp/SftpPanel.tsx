@@ -293,7 +293,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
             )}
             style={listColumnStyle}
           >
-            <div className="border-border bg-background text-muted-foreground sticky top-0 z-10 hidden grid-cols-[var(--sftp-list-columns)] border-b px-3 text-xs font-medium md:grid">
+            <div className="border-border bg-background text-muted-foreground sticky top-0 z-10 hidden grid-cols-(--sftp-list-columns) border-b px-3 text-xs font-medium md:grid">
               {headerGroup.headers.map((header) => {
                 const id = header.column.id;
                 const sortable = id !== "actions";

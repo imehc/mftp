@@ -80,7 +80,7 @@ function DialogContent({
           placement === "responsive-sheet" &&
             "max-md:items-end max-md:px-0 max-md:pb-0",
           placement === "responsive-page" &&
-            "max-md:pt-[var(--safe-top,0px)] max-md:pr-[var(--safe-right,0px)] max-md:pb-[var(--safe-bottom,0px)] max-md:pl-[var(--safe-left,0px)]",
+            "max-md:pt-(--safe-top,0px) max-md:pr-(--safe-right,0px) max-md:pb-(--safe-bottom,0px) max-md:pl-(--safe-left,0px)",
         )}
       >
         <DialogPrimitive.Content

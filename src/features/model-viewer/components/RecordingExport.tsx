@@ -185,7 +185,7 @@ export function useRecordingExport({
   );
   const feedback =
     state.status !== "idle" && !result ? (
-      <div className="flex min-w-0 flex-col gap-2 [overflow-wrap:anywhere]">
+      <div className="flex min-w-0 flex-col gap-2 wrap-anywhere">
         <p
           role="status"
           aria-atomic="true"

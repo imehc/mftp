@@ -112,7 +112,7 @@ export function ModelList({
         <span
           ref={probe}
           aria-hidden="true"
-          className="pointer-events-none absolute h-[1rem] w-px opacity-0"
+          className="pointer-events-none absolute h-4 w-px opacity-0"
         />
         <div
           role="list"
@@ -164,7 +164,7 @@ export function ModelList({
                     {t(statuses[item.status])}
                   </p>
                   {item.error ? (
-                    <p className="text-destructive px-1 text-xs break-words">
+                    <p className="text-destructive px-1 text-xs wrap-break-word">
                       {describeError(item.error)}
                     </p>
                   ) : null}

@@ -105,7 +105,7 @@ export function LibraryPanel({
               </DialogDescription>
             </div>
           </DialogLayoutHeader>
-          <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 [overflow-wrap:anywhere]">
+          <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 wrap-anywhere">
             {state.error ? (
               <Alert variant="destructive">
                 <AlertDescription className="flex min-w-0 flex-col gap-2">

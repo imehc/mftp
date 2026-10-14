@@ -158,7 +158,9 @@ function PermissionRow({
   return (
     <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2">
       <span className="text-muted-foreground">{label}</span>
-      <span className={cn("text-foreground break-words", mono && "font-mono")}>
+      <span
+        className={cn("text-foreground wrap-break-word", mono && "font-mono")}
+      >
         {value}
       </span>
     </div>
@@ -179,7 +181,7 @@ function InfoItem({
       <dt className="text-muted-foreground">{label}</dt>
       <dd
         className={cn(
-          "text-foreground min-w-0 break-words",
+          "text-foreground min-w-0 wrap-break-word",
           mono && "font-mono text-xs break-all",
         )}
       >

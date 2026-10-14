@@ -140,7 +140,7 @@ export default function TransferItem({
         </div>
       ) : null}
       {transfer.error || transfer.controlError ? (
-        <div className="text-destructive break-words">
+        <div className="text-destructive wrap-break-word">
           {describeError(transfer.error ?? transfer.controlError)}
         </div>
       ) : null}

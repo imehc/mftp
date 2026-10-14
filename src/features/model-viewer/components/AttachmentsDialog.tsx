@@ -81,14 +81,14 @@ export function AttachmentsDialog({
                 <Trans comment="模型库条目的说明文件管理。">模型附件</Trans>
               </DialogTitle>
               <DialogDescription
-                className="line-clamp-2 [overflow-wrap:anywhere]"
+                className="line-clamp-2 wrap-anywhere"
                 title={entry.name}
               >
                 {entry.name}
               </DialogDescription>
             </div>
           </DialogLayoutHeader>
-          <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 [overflow-wrap:anywhere]">
+          <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 wrap-anywhere">
             <p className="text-muted-foreground text-sm">
               <Trans>
                 支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多

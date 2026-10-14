@@ -35,7 +35,7 @@ export default function SettingsControl({
         <Icon aria-hidden className="size-4" />
       </span>
       <FieldContent className="min-w-16">
-        <FieldLabel htmlFor={id} className="max-w-full break-words">
+        <FieldLabel htmlFor={id} className="max-w-full wrap-break-word">
           {title}
         </FieldLabel>
         {description ? (

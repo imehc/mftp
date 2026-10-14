@@ -118,7 +118,7 @@ function ProcessRow({ proc }: { proc: SystemStats["topProcesses"][number] }) {
         <span className="w-9 text-right">{proc.cpu.toFixed(1)}%</span>
         <span className="bg-muted hidden h-1 flex-1 overflow-hidden rounded-full md:block">
           <span
-            className="block h-full bg-[var(--viz-1)]"
+            className="block h-full bg-(--viz-1)"
             style={{
               width: `${Math.min(100, proc.cpu)}%`,
             }}
@@ -129,7 +129,7 @@ function ProcessRow({ proc }: { proc: SystemStats["topProcesses"][number] }) {
         <span className="w-9 text-right">{proc.memory.toFixed(1)}%</span>
         <span className="bg-muted hidden h-1 flex-1 overflow-hidden rounded-full md:block">
           <span
-            className="block h-full bg-[var(--viz-3)]"
+            className="block h-full bg-(--viz-3)"
             style={{
               width: `${Math.min(100, proc.memory)}%`,
             }}

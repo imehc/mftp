@@ -38,7 +38,7 @@ function PoemCard({ poem, query, active, onSelect }: PoemCardProps) {
         active && "bg-accent",
       )}
     >
-      <span className="line-clamp-2 text-sm font-semibold break-words">
+      <span className="line-clamp-2 text-sm font-semibold wrap-break-word">
         <Highlight text={poem.title} query={query} />
       </span>
       <span

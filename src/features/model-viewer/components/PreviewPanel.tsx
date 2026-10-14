@@ -32,10 +32,7 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
     state.materials.find((m) => m.id === materialId) ?? state.materials[0];
   const morph = state.morphs.find((m) => m.id === morphId) ?? state.morphs[0];
   return (
-    <FieldGroup
-      density="compact"
-      className="min-w-0 gap-4 [overflow-wrap:anywhere]"
-    >
+    <FieldGroup density="compact" className="min-w-0 gap-4 wrap-anywhere">
       <FieldGroup density="compact" className="gap-2">
         <InspectionToggle
           label={

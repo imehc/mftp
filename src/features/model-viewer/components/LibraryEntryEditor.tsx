@@ -121,7 +121,7 @@ export function LibraryEntryEditor({
             </FieldGroup>
             {error ? (
               <Alert variant="destructive">
-                <AlertDescription className="[overflow-wrap:anywhere]">
+                <AlertDescription className="wrap-anywhere">
                   {describeError(error)}
                 </AlertDescription>
               </Alert>

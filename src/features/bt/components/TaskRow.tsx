@@ -107,7 +107,7 @@ export default function TaskRow({
       <div className="flex flex-col gap-2 p-3">
         <button
           type="button"
-          className="min-w-0 text-left font-medium break-words hover:underline"
+          className="min-w-0 text-left font-medium wrap-break-word hover:underline"
           title={task.label}
           onClick={() => onOpenFiles(task)}
         >
@@ -137,13 +137,13 @@ export default function TaskRow({
           />
         </div>
         {task.error ? (
-          <p className="text-destructive text-xs break-words">
+          <p className="text-destructive text-xs wrap-break-word">
             {describeError(task.error)}
           </p>
         ) : null}
       </div>
       <div className="flex min-h-11 items-center gap-2 border-t px-2">
-        <p className="text-muted-foreground min-w-0 flex-1 text-xs break-words">
+        <p className="text-muted-foreground min-w-0 flex-1 text-xs wrap-break-word">
           {status}
           {task.state === "Downloading" &&
           !terminal &&

@@ -154,7 +154,7 @@ export default function AboutPage() {
                 {c.lanError ? (
                   <p
                     role="status"
-                    className="text-destructive text-xs break-words"
+                    className="text-destructive text-xs wrap-break-word"
                   >
                     {describeError(c.lanError)}
                   </p>
