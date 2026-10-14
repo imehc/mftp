@@ -152,7 +152,7 @@ msgstr "{pausedTransferCount, plural, one {# 个已暂停} other {# 个已暂停
 
 #. 斯诺克瞄准时首个将碰到的目标球的实际分值
 #. 球桌中央选球区域，球体下方仅显示实际分值
-#: src/features/games/billiards/BilliardsMatchView.tsx:401
+#: src/features/games/billiards/BilliardsMatchView.tsx:397
 #: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
 msgid "{points} 分"
 msgstr "{points} 分"
@@ -162,7 +162,7 @@ msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgstr "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:80
-#: src/features/games/billiards/BilliardsMatchView.tsx:295
+#: src/features/games/billiards/BilliardsMatchView.tsx:291
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 
@@ -193,11 +193,11 @@ msgstr "{sharesCount, plural, one {# 个目录，目录变更需重启服务后�
 msgid "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 msgstr "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:267
+#: src/features/games/billiards/BilliardsModeMenu.tsx:253
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# 杆} other {# 杆}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:274
+#: src/features/games/billiards/BilliardsMatchView.tsx:270
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 
@@ -205,8 +205,8 @@ msgstr "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:286
-#: src/features/games/billiards/BilliardsMatchView.tsx:350
+#: src/features/games/billiards/BilliardsMatchView.tsx:282
+#: src/features/games/billiards/BilliardsMatchView.tsx:346
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 
@@ -253,7 +253,7 @@ msgstr "{undoPlies, plural, one {将撤销 # 手棋，是否同意？} other {�
 msgid "{value} 的私钥口令"
 msgstr "{value} 的私钥口令"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:268
+#: src/features/games/billiards/BilliardsMatchView.tsx:264
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} 获胜"
 
@@ -283,7 +283,7 @@ msgstr "3D 模型画布"
 msgid "9 号球已复位"
 msgstr "9 号球已复位"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:164
+#: src/features/games/billiards/BilliardsModeMenu.tsx:150
 msgid "AI 先开球"
 msgstr "AI 先开球"
 
@@ -296,7 +296,7 @@ msgstr "AI 密钥"
 msgid "AI 密钥认证已失效，请返回应用后重试"
 msgstr "AI 密钥认证已失效，请返回应用后重试"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:427
+#: src/features/games/billiards/BilliardsMatchView.tsx:423
 #: src/features/games/go/GoMatch.tsx:203
 #: src/features/games/gomoku/GomokuMatch.tsx:174
 #: src/features/games/xiangqi/XiangqiMatch.tsx:184
@@ -867,8 +867,8 @@ msgstr "中国象棋房间"
 msgid "中国象棋棋盘"
 msgstr "中国象棋棋盘"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:101
-#: src/features/games/billiards/BilliardsModeMenu.tsx:253
+#: src/features/games/billiards/BilliardsModeMenu.tsx:105
+#: src/features/games/billiards/BilliardsModeMenu.tsx:239
 msgid "中式八球"
 msgstr "中式八球"
 
@@ -877,7 +877,7 @@ msgid "中杆"
 msgstr "中杆"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:41
-#: src/features/games/billiards/BilliardsModeMenu.tsx:154
+#: src/features/games/billiards/BilliardsModeMenu.tsx:140
 #: src/features/games/engine/BoardMatchLayout.tsx:57
 #: src/features/games/engine/BoardModeMenu.tsx:92
 #: src/features/games/engine/history-labels.tsx:26
@@ -981,7 +981,7 @@ msgstr "人工修订"
 msgid "人机"
 msgstr "人机"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:146
+#: src/features/games/billiards/BilliardsModeMenu.tsx:132
 #: src/features/games/engine/BoardModeMenu.tsx:84
 msgid "人机对战"
 msgstr "人机对战"
@@ -1218,7 +1218,7 @@ msgstr "使用系统应用打开"
 msgid "使用系统应用打开 {entryName}"
 msgstr "使用系统应用打开 {entryName}"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:137
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:65
 msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
 msgstr "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
 
@@ -1371,7 +1371,7 @@ msgstr "像素格式"
 msgid "允许"
 msgstr "允许"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:159
+#: src/features/games/billiards/BilliardsModeMenu.tsx:145
 #: src/features/games/engine/BoardModeMenu.tsx:97
 msgid "先后手"
 msgstr "先后手"
@@ -1446,8 +1446,8 @@ msgstr "全部来源"
 msgid "全部结果"
 msgstr "全部结果"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:120
-#: src/features/games/billiards/BilliardsModeMenu.tsx:243
+#: src/features/games/billiards/BilliardsModeMenu.tsx:123
+#: src/features/games/billiards/BilliardsModeMenu.tsx:229
 msgid "六红球"
 msgstr "六红球"
 
@@ -1542,7 +1542,7 @@ msgstr "关闭活动面板不会取消传输。"
 msgid "关闭连接"
 msgstr "关闭连接"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:180
+#: src/features/games/billiards/BilliardsModeMenu.tsx:166
 #: src/features/games/engine/BoardModeMenu.tsx:117
 msgid "其他方式"
 msgstr "其他方式"
@@ -1579,7 +1579,7 @@ msgstr "内容不是有效的转义字符串"
 msgid "内容无效，无法解码"
 msgstr "内容无效，无法解码"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:525
+#: src/features/games/billiards/BilliardsMatchView.tsx:521
 #: src/features/games/engine/GameResultBar.tsx:83
 msgid "再来一局"
 msgstr "再来一局"
@@ -2040,13 +2040,13 @@ msgstr "动画片段"
 msgid "区分大小写"
 msgstr "区分大小写"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:122
-#: src/features/games/billiards/BilliardsModeMenu.tsx:247
+#: src/features/games/billiards/BilliardsModeMenu.tsx:125
+#: src/features/games/billiards/BilliardsModeMenu.tsx:233
 msgid "十五红球"
 msgstr "十五红球"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:121
-#: src/features/games/billiards/BilliardsModeMenu.tsx:245
+#: src/features/games/billiards/BilliardsModeMenu.tsx:124
+#: src/features/games/billiards/BilliardsModeMenu.tsx:231
 msgid "十红球变体"
 msgstr "十红球变体"
 
@@ -2077,7 +2077,7 @@ msgstr "卸载合集"
 msgid "历史数值"
 msgstr "历史数值"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:218
+#: src/features/games/billiards/BilliardsModeMenu.tsx:204
 #: src/features/games/engine/BoardModeMenu.tsx:154
 msgid "历史记录"
 msgstr "历史记录"
@@ -2185,7 +2185,7 @@ msgstr "参数未变化，无需重新处理"
 msgid "双人"
 msgstr "双人"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:186
+#: src/features/games/billiards/BilliardsModeMenu.tsx:172
 #: src/features/games/engine/BoardMatchLayout.tsx:35
 #: src/features/games/engine/BoardModeMenu.tsx:123
 msgid "双人对战"
@@ -2409,7 +2409,7 @@ msgstr "同一局域网内设备可直接访问。仅在可信网络中使用，
 msgid "同分黑球已复位。抽签获选者决定谁先打，母球在 D 区。"
 msgstr "同分黑球已复位。抽签获选者决定谁先打，母球在 D 区。"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:187
+#: src/features/games/billiards/BilliardsModeMenu.tsx:173
 #: src/features/games/engine/BoardMatchLayout.tsx:63
 #: src/features/games/engine/BoardModeMenu.tsx:124
 msgid "同屏轮流"
@@ -2544,7 +2544,7 @@ msgid "困毙"
 msgstr "困毙"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:39
-#: src/features/games/billiards/BilliardsModeMenu.tsx:155
+#: src/features/games/billiards/BilliardsModeMenu.tsx:141
 #: src/features/games/engine/BoardMatchLayout.tsx:55
 #: src/features/games/engine/BoardModeMenu.tsx:93
 #: src/features/games/engine/history-labels.tsx:24
@@ -2946,7 +2946,7 @@ msgstr "对局存档损坏或版本不兼容，无法恢复。原存档未被删
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:270
+#: src/features/games/billiards/BilliardsMatchView.tsx:266
 msgid "对局结束"
 msgstr "对局结束"
 
@@ -3662,7 +3662,7 @@ msgstr "开始压缩"
 msgid "开始处理"
 msgstr "开始处理"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:175
+#: src/features/games/billiards/BilliardsModeMenu.tsx:161
 #: src/features/games/engine/BoardModeMenu.tsx:112
 msgid "开始对局"
 msgstr "开始对局"
@@ -3969,7 +3969,7 @@ msgstr "悔棋"
 msgid "成功"
 msgstr "成功"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:163
+#: src/features/games/billiards/BilliardsModeMenu.tsx:149
 msgid "我先开球"
 msgstr "我先开球"
 
@@ -4040,11 +4040,11 @@ msgstr "所选文件不是有效的 JSON，请检查导入文件"
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "所选文件不是本应用导出的备份文件"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:419
+#: src/features/games/billiards/BilliardsMatchView.tsx:415
 msgid "手中球：可在全台放置母球"
 msgstr "手中球：可在全台放置母球"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:417
+#: src/features/games/billiards/BilliardsMatchView.tsx:413
 msgid "手中球：在 D 区拖动母球放置"
 msgstr "手中球：在 D 区拖动母球放置"
 
@@ -4312,7 +4312,7 @@ msgid "播放速度"
 msgstr "播放速度"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:198
-#: src/features/games/billiards/BilliardsMatchView.tsx:577
+#: src/features/games/billiards/BilliardsRuleControl.tsx:47
 #: src/features/logs/LogDialogs.tsx:69
 #: src/features/logs/LogRow.desktop.tsx:26
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:232
@@ -4493,8 +4493,9 @@ msgstr "断开设备连接"
 msgid "断开连接"
 msgstr "断开连接"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:104
-#: src/features/games/billiards/BilliardsModeMenu.tsx:240
+#: src/features/games/billiards/BilliardsModeMenu.tsx:108
+#: src/features/games/billiards/BilliardsModeMenu.tsx:226
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:42
 msgid "斯诺克"
 msgstr "斯诺克"
 
@@ -5112,7 +5113,7 @@ msgid "本机服务"
 msgstr "本机服务"
 
 #. 九球本杆已声明推杆，再按可取消
-#: src/features/games/billiards/BilliardsMatchView.tsx:577
+#: src/features/games/billiards/BilliardsRuleControl.tsx:45
 #: src/features/games/billiards/NineBallHud.tsx:164
 msgid "本杆推杆"
 msgstr "本杆推杆"
@@ -5250,6 +5251,11 @@ msgstr "查看活动"
 #: src/features/transfers/ActivityMenu.tsx:39
 msgid "查看活动，{failures} 个任务失败"
 msgstr "查看活动，{failures} 个任务失败"
+
+#. 台球开局页标题栏图标，打开当前所选玩法的规则说明
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:21
+msgid "查看游戏规则"
+msgstr "查看游戏规则"
 
 #: src/features/bt/components/TaskRow.tsx:201
 msgid "查看节点明细"
@@ -5571,7 +5577,7 @@ msgstr "正在加载处理工具…"
 msgid "正在加载日志…"
 msgstr "正在加载日志…"
 
-#: src/features/games/billiards/BilliardsGame.tsx:110
+#: src/features/games/billiards/BilliardsGame.tsx:121
 msgid "正在加载物理引擎…"
 msgstr "正在加载物理引擎…"
 
@@ -6095,7 +6101,7 @@ msgstr "添加附件"
 msgid "清台"
 msgstr "清台"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:266
+#: src/features/games/billiards/BilliardsMatchView.tsx:262
 msgid "清台完成！"
 msgstr "清台完成！"
 
@@ -6124,7 +6130,7 @@ msgstr "清理范围"
 #. 清除此游戏在本机保存的对局记录
 #: src/features/crypto/CryptoTool.tsx:96
 #: src/features/formatter/FormatterActions.tsx:110
-#: src/features/games/billiards/BilliardsModeMenu.tsx:225
+#: src/features/games/billiards/BilliardsModeMenu.tsx:211
 #: src/features/games/engine/BoardModeMenu.tsx:163
 #: src/features/media-compress/components/CompressDropzone.tsx:122
 #: src/features/poetry/components/SearchBar.tsx:149
@@ -6209,6 +6215,11 @@ msgstr "游戏房间码不正确"
 #: src/features/games/engine/online/session.ts:49
 msgid "游戏房间连接已结束，请重新加入"
 msgstr "游戏房间连接已结束，请重新加入"
+
+#. 台球开局页的玩法说明弹窗标题
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:47
+msgid "游戏规则"
+msgstr "游戏规则"
 
 #: src/features/games/engine/GameVolumeControl.tsx:21
 msgid "游戏音量"
@@ -6361,7 +6372,7 @@ msgid "玩家 2 胜"
 msgstr "玩家 2 胜"
 
 #. 台球开局菜单，选择中式八球、九球或斯诺克规则
-#: src/features/games/billiards/BilliardsModeMenu.tsx:87
+#: src/features/games/billiards/BilliardsModeMenu.tsx:89
 msgid "玩法"
 msgstr "玩法"
 
@@ -6802,7 +6813,7 @@ msgid "简体中文"
 msgstr "简体中文"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:37
-#: src/features/games/billiards/BilliardsModeMenu.tsx:153
+#: src/features/games/billiards/BilliardsModeMenu.tsx:139
 #: src/features/games/engine/BoardMatchLayout.tsx:53
 #: src/features/games/engine/BoardModeMenu.tsx:91
 #: src/features/games/engine/history-labels.tsx:22
@@ -6896,7 +6907,7 @@ msgstr "系统热状态：较高"
 msgid "系统监控暂不支持 {os}，仅支持 Linux"
 msgstr "系统监控暂不支持 {os}，仅支持 Linux"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:126
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:55
 msgid "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
 msgstr "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
 
@@ -6909,7 +6920,7 @@ msgstr "红方"
 msgid "红球"
 msgstr "红球"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:116
+#: src/features/games/billiards/BilliardsModeMenu.tsx:119
 msgid "红球数"
 msgstr "红球数"
 
@@ -6952,7 +6963,7 @@ msgstr "线框"
 msgid "练习"
 msgstr "练习"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:131
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:60
 msgid "练习为自由清台，不计算正式比赛单杆。"
 msgstr "练习为自由清台，不计算正式比赛单杆。"
 
@@ -6960,7 +6971,7 @@ msgstr "练习为自由清台，不计算正式比赛单杆。"
 msgid "练习击球或开始对局"
 msgstr "练习击球或开始对局"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:192
+#: src/features/games/billiards/BilliardsModeMenu.tsx:178
 msgid "练习模式"
 msgstr "练习模式"
 
@@ -7181,8 +7192,9 @@ msgstr "网格实例"
 msgid "网络"
 msgstr "网络"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:107
-#: src/features/games/billiards/BilliardsModeMenu.tsx:251
+#: src/features/games/billiards/BilliardsModeMenu.tsx:111
+#: src/features/games/billiards/BilliardsModeMenu.tsx:237
+#: src/features/games/billiards/BilliardsRulesDialog.tsx:44
 msgid "美式九球"
 msgstr "美式九球"
 
@@ -7247,7 +7259,7 @@ msgstr "自发光"
 msgid "自己接打"
 msgstr "自己接打"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:193
+#: src/features/games/billiards/BilliardsModeMenu.tsx:179
 msgid "自由清台"
 msgstr "自由清台"
 
@@ -7258,7 +7270,7 @@ msgstr "自由清台"
 msgid "自由球"
 msgstr "自由球"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:422
+#: src/features/games/billiards/BilliardsMatchView.tsx:418
 msgid "自由球：拖动母球放置"
 msgstr "自由球：拖动母球放置"
 
@@ -7856,6 +7868,7 @@ msgid "调整搜索内容或分类后重试"
 msgstr "调整搜索内容或分类后重试"
 
 #. 台球手中球权利未消费，重新拖动母球
+#: src/features/games/billiards/BilliardsRuleControl.tsx:43
 #: src/features/games/billiards/NineBallHud.tsx:150
 #: src/features/games/billiards/SnookerHud.tsx:181
 msgid "调整母球"
@@ -8205,7 +8218,7 @@ msgid "连续渲染后显示采样数据。"
 msgstr "连续渲染后显示采样数据。"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:143
-#: src/features/games/billiards/BilliardsMatchView.tsx:533
+#: src/features/games/billiards/BilliardsMatchView.tsx:529
 #: src/features/games/engine/BoardGameHeader.tsx:95
 #: src/features/games/engine/GameHeaderControls.tsx:108
 msgid "退出"
@@ -8547,7 +8560,7 @@ msgstr "重置状态已改变，请重新检查状态"
 #: src/features/bt/BtTool.tsx:256
 #: src/features/bt/components/FileBrowserPanel.tsx:203
 #: src/features/bt/components/TaskRow.tsx:172
-#: src/features/games/billiards/BilliardsGame.tsx:106
+#: src/features/games/billiards/BilliardsGame.tsx:117
 #: src/features/games/engine/GameSessionNotice.tsx:74
 #: src/features/lan-transfer/LanTransferTool.tsx:95
 #: src/features/logs/ActivityLogsPage.tsx:98
@@ -8666,7 +8679,7 @@ msgstr "隐藏密码"
 msgid "随机"
 msgstr "随机"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:149
+#: src/features/games/billiards/BilliardsModeMenu.tsx:135
 #: src/features/games/engine/BoardModeMenu.tsx:87
 msgid "难度"
 msgstr "难度"
@@ -8773,7 +8786,7 @@ msgstr "黄球"
 msgid "黑 {black} 子 · 白 {white} 子 + 贴目 {KOMI} = {whiteWithKomi}"
 msgstr "黑 {black} 子 · 白 {white} 子 + 贴目 {KOMI} = {whiteWithKomi}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:431
+#: src/features/games/billiards/BilliardsMatchView.tsx:427
 msgid "黑八已重置"
 msgstr "黑八已重置"
 

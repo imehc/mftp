@@ -66,13 +66,15 @@ function formatHistoryTime(timestamp: number): string {
 }
 
 export function BilliardsModeMenu({
+  discipline,
+  onDisciplineChange,
   onStart,
 }: {
+  discipline: BilliardsDiscipline;
+  onDisciplineChange(discipline: BilliardsDiscipline): void;
   onStart: (mode: BilliardsMode) => void;
 }) {
   const { t } = useLingui();
-  const [discipline, setDiscipline] =
-    useState<BilliardsDiscipline>("eight-ball");
   const [reds, setReds] = useState<RedCount>(15);
   const config =
     discipline === "snooker" ? ({ discipline, reds } as const) : { discipline };
@@ -90,7 +92,9 @@ export function BilliardsModeMenu({
         </FieldLabel>
         <Select
           value={discipline}
-          onValueChange={(value) => setDiscipline(value as BilliardsDiscipline)}
+          onValueChange={(value) =>
+            onDisciplineChange(value as BilliardsDiscipline)
+          }
         >
           <SelectTrigger id="billiards-discipline" wrapValue>
             <SelectValue />
@@ -111,34 +115,16 @@ export function BilliardsModeMenu({
         </Select>
       </Field>
       {discipline === "snooker" ? (
-        <>
-          <GameSelect
-            label={<Trans>红球数</Trans>}
-            value={String(reds)}
-            onChange={(value) => setReds(Number(value) as RedCount)}
-            options={[
-              { value: "6", label: t`六红球` },
-              { value: "10", label: t`十红球变体` },
-              { value: "15", label: t`十五红球` },
-            ]}
-          />
-          <p className="text-muted-foreground text-xs">
-            <Trans>
-              红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。
-            </Trans>
-          </p>
-          <p className="text-muted-foreground text-xs">
-            <Trans>练习为自由清台，不计算正式比赛单杆。</Trans>
-          </p>
-        </>
-      ) : null}
-      {discipline === "nine-ball" ? (
-        <p className="text-muted-foreground text-xs">
-          <Trans>
-            依次首碰最低号球，合法进 9
-            号获胜。采用三球开球、推杆选择及连续三犯规则。
-          </Trans>
-        </p>
+        <GameSelect
+          label={<Trans>红球数</Trans>}
+          value={String(reds)}
+          onChange={(value) => setReds(Number(value) as RedCount)}
+          options={[
+            { value: "6", label: t`六红球` },
+            { value: "10", label: t`十红球变体` },
+            { value: "15", label: t`十五红球` },
+          ]}
+        />
       ) : null}
       <div className="grid gap-3 md:grid-cols-2">
         <section className="flex flex-col gap-3 rounded-xl border p-4">
