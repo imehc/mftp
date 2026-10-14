@@ -20,6 +20,7 @@ import { useGameLifecycle } from "../engine/use-game-session";
 import { BilliardsHeader } from "./BilliardsHeader";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
+import { BilliardsRulesDialog } from "./BilliardsRulesDialog";
 import { ensurePhysicsReady } from "./physics";
 import {
   prepareBilliardsAudio,
@@ -27,6 +28,7 @@ import {
   unlockAudio,
 } from "./render/audio";
 import { billiardsSessions } from "./session";
+import type { BilliardsDiscipline } from "./types";
 import { useBilliardsOrientation } from "./use-billiards-orientation";
 
 export default function BilliardsGame() {
@@ -35,6 +37,8 @@ export default function BilliardsGame() {
   const [physicsError, setPhysicsError] = useState<AppError | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [physicsReady, setPhysicsReady] = useState(false);
+  const [discipline, setDiscipline] =
+    useState<BilliardsDiscipline>("eight-ball");
   const lifecycle = useGameLifecycle(billiardsSessions);
   const { mode, matchKey } = lifecycle;
   const [matchFinished, setMatchFinished] = useState(false);
@@ -85,7 +89,14 @@ export default function BilliardsGame() {
       >
         {!physicsReady || mode === null ? (
           <>
-            <BilliardsHeader {...headerProps} />
+            <BilliardsHeader
+              {...headerProps}
+              details={
+                mode === null ? (
+                  <BilliardsRulesDialog discipline={discipline} />
+                ) : null
+              }
+            />
             <GameSessionNotice
               store={billiardsSessions}
               onRestore={unlockAudio}
@@ -113,6 +124,8 @@ export default function BilliardsGame() {
         ) : mode === null ? (
           lifecycle.canStart ? (
             <BilliardsModeMenu
+              discipline={discipline}
+              onDisciplineChange={setDiscipline}
               onStart={(nextMode) => {
                 // 进入对局是一次用户手势——正是解锁 WebAudio 的恰当时机
                 // （iOS 自动播放策略）。

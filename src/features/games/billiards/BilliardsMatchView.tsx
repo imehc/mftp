@@ -15,6 +15,7 @@ import { BilliardsDecisionNotice } from "./BilliardsDecisionNotice";
 import { BilliardsDetails } from "./BilliardsDetails";
 import { BilliardsHeader, type BilliardsHeaderProps } from "./BilliardsHeader";
 import type { Session } from "./BilliardsMatch";
+import { BilliardsRuleControl } from "./BilliardsRuleControl";
 import { BilliardsRulePanel } from "./BilliardsRulePanel";
 import { BallTray, SeatCell, seatName } from "./BilliardsScore";
 import { NineBallScore } from "./NineBallHud";
@@ -27,7 +28,6 @@ import type { AimTarget } from "./render/scene-contract";
 import { type BilliardsPanel, canSubmitRuleMove } from "./rule-panel-state";
 import { billiardsSessions } from "./session";
 import { snookerValue } from "./snooker-equipment";
-import { snookerRuleActions } from "./snooker-rule-actions";
 import { snookerSelection } from "./snooker-selection";
 import { SnookerScore } from "./SnookerHud";
 import { SnookerTargetControl } from "./SnookerTargetControl";
@@ -199,10 +199,6 @@ export function MatchView({
   ).length;
   const powerPercent = Math.round(powerPreview * 100);
   const points = aimTarget ? snookerValue(aimTarget.ballId) : 0;
-  const snookerActions =
-    state.variant === "snooker" ? snookerRuleActions(state) : null;
-  const hasSnookerActions =
-    snookerActions && (snookerActions.reposition || snookerActions.claim);
   useEffect(() => {
     onFinishedChange(state.finished);
   }, [onFinishedChange, state.finished]);
@@ -560,24 +556,23 @@ export function MatchView({
               !nominationPending
             }
             action={
-              <>
-                {state.variant === "nine-ball" || hasSnookerActions ? (
-                  <Button
-                    size="sm"
-                    density="adaptive"
-                    variant="outline"
-                    className="billiards-rule-trigger"
-                    aria-haspopup="dialog"
-                    aria-expanded={panel === "rules"}
-                    disabled={!activeIsLocal}
-                    onClick={() =>
-                      openPanel(panel === "rules" ? null : "rules")
-                    }
-                  >
-                    {pushOut ? <Trans>本杆推杆</Trans> : <Trans>操作</Trans>}
-                  </Button>
-                ) : null}
-              </>
+              <BilliardsRuleControl
+                state={state}
+                enabled={
+                  activeIsLocal &&
+                  !menuOpen &&
+                  !selectionBusy &&
+                  (panel === null || panel === "rules")
+                }
+                open={panel === "rules"}
+                pushOut={pushOut}
+                onOpenChange={(open) => openPanel(open ? "rules" : null)}
+                onReposition={() => {
+                  stageRef.current?.cancelInput();
+                  setPowerPreview(0);
+                  submitRule({ type: "reposition-cue" });
+                }}
+              />
             }
           />
         )}
