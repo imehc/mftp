@@ -65,6 +65,7 @@ export type ControllerKind = "local" | "ai" | "remote";
  */
 export interface PlayerController<S, M> {
   readonly kind: ControllerKind;
+  readonly awaitingInput?: boolean;
   requestMove(ctx: MoveRequestContext<S>): Promise<M>;
   dispose?(): void;
 }

@@ -2,6 +2,8 @@ import { disable } from "@tauri-apps/plugin-autostart";
 import { beforeEach, expect, it, vi } from "vitest";
 
 import type { AppDataResetResult } from "~/bindings";
+import { clearGameCheckpoints } from "~/features/games/engine/checkpoint-storage";
+import { disposeGameResources } from "~/features/games/engine/session-registry";
 import {
   appDataReset,
   appDataResetFinish,
@@ -17,6 +19,12 @@ vi.mock("~/lib/ipc", () => ({
   appDataResetResume: vi.fn(),
 }));
 vi.mock("~/lib/platform", () => ({ isDesktopPlatform: vi.fn() }));
+vi.mock("~/features/games/engine/checkpoint-storage", () => ({
+  clearGameCheckpoints: vi.fn(),
+}));
+vi.mock("~/features/games/engine/session-registry", () => ({
+  disposeGameResources: vi.fn(),
+}));
 vi.mock("@tauri-apps/plugin-autostart", () => ({ disable: vi.fn() }));
 const failure = {
   kind: "external" as const,
@@ -47,6 +55,8 @@ it("后端拒绝时不更改系统启动和任何偏好", async () => {
   expect(removeItem).not.toHaveBeenCalled();
   expect(disable).not.toHaveBeenCalled();
   expect(appDataResetFinish).not.toHaveBeenCalled();
+  expect(disposeGameResources).not.toHaveBeenCalled();
+  expect(clearGameCheckpoints).not.toHaveBeenCalled();
 });
 
 it("部分完成时保留具体阶段和错误，不提前清理偏好或确认完成", async () => {
@@ -94,6 +104,18 @@ it("后端完成后先清理系统启动与偏好，再确认操作完成", asyn
     "finish",
   ]);
   expect(appDataResetFinish).toHaveBeenCalledWith("reset-id");
+  expect(disposeGameResources).toHaveBeenCalledOnce();
+  expect(clearGameCheckpoints).toHaveBeenCalledOnce();
+});
+
+it("游戏存档清理失败保留重置恢复记录，不确认清理完成", async () => {
+  vi.mocked(clearGameCheckpoints).mockRejectedValueOnce(
+    new Error("isolated cleanup failure"),
+  );
+  const outcome = await resetApplicationData({ removeItem: vi.fn() });
+  expect(outcome.finished).toBe(false);
+  expect(outcome.warnings[0].code).toBe("games:checkpoint_delete");
+  expect(appDataResetFinish).not.toHaveBeenCalled();
 });
 
 it("移动端不调用开机启动，偏好失败仍处理后续项并保留恢复记录", async () => {

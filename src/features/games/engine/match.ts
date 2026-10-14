@@ -23,6 +23,7 @@ export interface MoveResolvedInfo<S, M, P> {
 }
 
 export interface MatchHooks<S, M, P> {
+  onCheckpoint?(history: readonly S[]): void;
   /**
    * 在应用走法与开始下一回合之间被等待 —— 在此播放该步的
    * 表现（动画 / 音效）。
@@ -54,20 +55,30 @@ export class MatchRunner<S, M, P = unknown> {
   private turnAbort: AbortController | null = null;
   private snapshot: MatchSnapshot<S>;
   private started = false;
+  private paused = false;
+  private wake: (() => void) | null = null;
+  readonly id: string;
 
   constructor(
     readonly game: GameDefinition<S, M, P>,
     initialState: S,
     readonly controllers: readonly PlayerController<S, M>[],
     private readonly hooks: MatchHooks<S, M, P> = {},
+    checkpoint?: { id: string; history?: readonly S[] },
   ) {
     if (controllers.length !== game.seatCount) {
       throw new Error(
         `${game.id}: expected ${game.seatCount} controllers, got ${controllers.length}`,
       );
     }
-    this.history = [initialState];
-    this.snapshot = this.buildSnapshot(initialState, 0);
+    this.id = checkpoint?.id ?? crypto.randomUUID();
+    this.history = checkpoint?.history
+      ? [...checkpoint.history]
+      : [initialState];
+    this.snapshot = this.buildSnapshot(
+      this.history[this.history.length - 1],
+      this.history.length - 1,
+    );
   }
 
   start(): void {
@@ -76,9 +87,39 @@ export class MatchRunner<S, M, P = unknown> {
     void this.loop();
   }
 
+  get hasStarted(): boolean {
+    return this.started;
+  }
+
   dispose(): void {
+    if (this.abortController.signal.aborted) return;
     this.abortController.abort(new DOMException("Disposed", "AbortError"));
+    this.wake?.();
     for (const controller of this.controllers) controller.dispose?.();
+  }
+
+  pause(): void {
+    this.paused = true;
+    const seat = this.snapshot.activeSeat;
+    if (
+      this.snapshot.phase === "awaiting-move" &&
+      seat !== null &&
+      this.controllers[seat]?.kind !== "remote" &&
+      this.controllers[seat]?.awaitingInput !== false
+    ) {
+      this.epoch++;
+      this.turnAbort?.abort(new DOMException("Paused", "AbortError"));
+    }
+  }
+
+  resume(): void {
+    this.paused = false;
+    this.wake?.();
+    this.wake = null;
+  }
+
+  getCheckpoint(): readonly S[] {
+    return [...this.history];
   }
 
   /**
@@ -99,6 +140,7 @@ export class MatchRunner<S, M, P = unknown> {
       ),
     );
     this.turnAbort?.abort(new DOMException("Superseded", "AbortError"));
+    this.hooks.onCheckpoint?.(this.getCheckpoint());
     return true;
   }
 
@@ -129,6 +171,11 @@ export class MatchRunner<S, M, P = unknown> {
     const { signal } = this.abortController;
     try {
       while (!signal.aborted && this.snapshot.phase !== "finished") {
+        while (this.paused && !signal.aborted)
+          await new Promise<void>((resolve) => {
+            this.wake = resolve;
+          });
+        if (signal.aborted) return;
         const { state, moveCount } = this.snapshot;
         const seat = this.game.currentSeat(state);
         if (seat === null) break;
@@ -163,6 +210,9 @@ export class MatchRunner<S, M, P = unknown> {
         const resolution = await this.game.applyMove(state, move, seat);
         if (signal.aborted) return;
 
+        this.history.push(resolution.state);
+        this.hooks.onCheckpoint?.(this.getCheckpoint());
+
         await this.hooks.onMoveResolved?.({
           seat,
           move,
@@ -171,13 +221,19 @@ export class MatchRunner<S, M, P = unknown> {
         });
         if (signal.aborted) return;
 
-        this.history.push(resolution.state);
         this.publish(this.buildSnapshot(resolution.state, moveCount + 1));
       }
     } catch (error) {
       if (isAbortError(error) || signal.aborted) return;
       this.hooks.onError?.(error);
-      this.publish({ ...this.snapshot, phase: "finished", activeSeat: null });
+      this.publish({
+        ...this.buildSnapshot(
+          this.history[this.history.length - 1],
+          this.history.length - 1,
+        ),
+        phase: "finished",
+        activeSeat: null,
+      });
     }
   }
 }

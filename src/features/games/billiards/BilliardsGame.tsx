@@ -15,6 +15,8 @@ import { useMediaQuery } from "~/lib/use-media-query";
 import { useSettingsStore } from "~/store/settings";
 import type { AppError } from "~/types";
 
+import { GameSessionNotice } from "../engine/GameSessionNotice";
+import { useGameLifecycle } from "../engine/use-game-session";
 import { BilliardsHeader } from "./BilliardsHeader";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
@@ -24,7 +26,7 @@ import {
   setGameAudioVolume,
   unlockAudio,
 } from "./render/audio";
-import type { BilliardsMode } from "./types";
+import { billiardsSessions } from "./session";
 import { useBilliardsOrientation } from "./use-billiards-orientation";
 
 export default function BilliardsGame() {
@@ -33,19 +35,19 @@ export default function BilliardsGame() {
   const [physicsError, setPhysicsError] = useState<AppError | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [physicsReady, setPhysicsReady] = useState(false);
-  const [mode, setMode] = useState<BilliardsMode | null>(null);
-  const [matchKey, setMatchKey] = useState(0);
+  const lifecycle = useGameLifecycle(billiardsSessions);
+  const { mode, matchKey } = lifecycle;
   const [matchFinished, setMatchFinished] = useState(false);
   const gamesVolume = useSettingsStore((s) => s.gamesVolume);
 
   const exitMatch = () => {
     setMatchFinished(false);
-    setMode(null);
+    lifecycle.exit();
   };
 
   const restartMatch = () => {
     setMatchFinished(false);
-    setMatchKey((key) => key + 1);
+    lifecycle.restart();
   };
 
   // 让 WebAudio 主增益与持久化的设置保持同步。
@@ -76,65 +78,74 @@ export default function BilliardsGame() {
     onExit: exitMatch,
   };
   return (
-    <main
-      data-landscape={landscape && mode !== null}
-      className="billiards-game ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
-    >
-      {!physicsReady || mode === null ? (
-        <BilliardsHeader {...headerProps} />
-      ) : null}
-      {!physicsReady ? (
-        <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-          {physicsError ? (
-            <div className="flex flex-col items-center gap-3">
-              <p role="alert">{describeError(physicsError)}</p>
-              <Button
-                onClick={() => {
-                  setPhysicsError(null);
-                  setAttempt((value) => value + 1);
-                }}
-              >
-                <Trans>重试</Trans>
-              </Button>
-            </div>
-          ) : (
-            <Trans>正在加载物理引擎…</Trans>
-          )}
-        </div>
-      ) : mode === null ? (
-        <BilliardsModeMenu
-          onStart={(nextMode) => {
-            // 进入对局是一次用户手势——正是解锁 WebAudio 的恰当时机
-            // （iOS 自动播放策略）。
-            unlockAudio();
-            setMatchFinished(false);
-            setMode(nextMode);
-          }}
-        />
-      ) : (
-        <BilliardsMatch
-          key={`${JSON.stringify(mode)}-${matchKey}`}
-          mode={mode}
-          headerProps={headerProps}
-          onRematch={() => {
-            // 每次重赛交换开球方，让 AI 与玩家轮流开球。
-            setMode((m) =>
-              m?.kind === "ai"
-                ? {
-                    ...m,
-                    playerBreaks: !m.playerBreaks,
-                  }
-                : m?.kind === "hotseat"
-                  ? { ...m, firstSeat: 1 - (m.firstSeat ?? 0) }
-                  : m,
-            );
-            setMatchFinished(false);
-            setMatchKey((k) => k + 1);
-          }}
-          onExit={exitMatch}
-          onFinishedChange={setMatchFinished}
-        />
-      )}
-    </main>
+    <div className="flex h-full min-h-0 flex-col">
+      <main
+        data-landscape={landscape && mode !== null}
+        className="billiards-game ui-density-adaptive bg-background text-foreground flex min-h-0 flex-1 flex-col overflow-hidden"
+      >
+        {!physicsReady || mode === null ? (
+          <>
+            <BilliardsHeader {...headerProps} />
+            <GameSessionNotice
+              store={billiardsSessions}
+              onRestore={unlockAudio}
+            />
+          </>
+        ) : null}
+        {!physicsReady ? (
+          <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
+            {physicsError ? (
+              <div className="flex flex-col items-center gap-3">
+                <p role="alert">{describeError(physicsError)}</p>
+                <Button
+                  onClick={() => {
+                    setPhysicsError(null);
+                    setAttempt((value) => value + 1);
+                  }}
+                >
+                  <Trans>重试</Trans>
+                </Button>
+              </div>
+            ) : (
+              <Trans>正在加载物理引擎…</Trans>
+            )}
+          </div>
+        ) : mode === null ? (
+          lifecycle.canStart ? (
+            <BilliardsModeMenu
+              onStart={(nextMode) => {
+                // 进入对局是一次用户手势——正是解锁 WebAudio 的恰当时机
+                // （iOS 自动播放策略）。
+                unlockAudio();
+                setMatchFinished(false);
+                lifecycle.start(nextMode);
+              }}
+            />
+          ) : null
+        ) : (
+          <BilliardsMatch
+            key={matchKey}
+            mode={mode}
+            headerProps={headerProps}
+            onRematch={() => {
+              // 每次重赛交换开球方，让 AI 与玩家轮流开球。
+              lifecycle.rematch((m) =>
+                m?.kind === "ai"
+                  ? {
+                      ...m,
+                      playerBreaks: !m.playerBreaks,
+                    }
+                  : m?.kind === "hotseat"
+                    ? { ...m, firstSeat: 1 - (m.firstSeat ?? 0) }
+                    : m,
+              );
+              setMatchFinished(false);
+            }}
+            onExit={exitMatch}
+            onFinishedChange={setMatchFinished}
+          />
+        )}
+      </main>
+    </div>
   );
 }

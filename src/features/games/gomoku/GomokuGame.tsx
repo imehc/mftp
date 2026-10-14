@@ -3,29 +3,31 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
+import { useGameLifecycle } from "../engine/use-game-session";
 import { gomokuAudio, unlockGomokuAudio } from "./audio";
 import { GomokuMatch } from "./GomokuMatch";
 import { GomokuModeMenu } from "./GomokuModeMenu";
 import { GomokuOnlineFlow } from "./GomokuOnline";
-import type { GomokuMode } from "./types";
+import { gomokuSessions } from "./session";
 
 export default function GomokuGame() {
   useGameAudio(gomokuAudio);
-  const [mode, setMode] = useState<GomokuMode | null>(null);
-  const [matchKey, setMatchKey] = useState(0);
+  const lifecycle = useGameLifecycle(gomokuSessions);
+  const { mode, matchKey } = lifecycle;
   const [onlinePlaying, setOnlinePlaying] = useState(false);
   const [matchFinished, setMatchFinished] = useState(false);
 
   const exitMatch = () => {
     setOnlinePlaying(false);
     setMatchFinished(false);
-    setMode(null);
+    lifecycle.exit();
   };
 
   const restartMatch = () => {
     setMatchFinished(false);
-    setMatchKey((key) => key + 1);
+    lifecycle.restart();
   };
 
   return (
@@ -43,14 +45,17 @@ export default function GomokuGame() {
           onExit={exitMatch}
         />
       ) : null}
+      <GameSessionNotice store={gomokuSessions} onRestore={unlockGomokuAudio} />
       {mode === null ? (
-        <GomokuModeMenu
-          onStart={(nextMode) => {
-            unlockGomokuAudio();
-            setMatchFinished(false);
-            setMode(nextMode);
-          }}
-        />
+        lifecycle.canStart ? (
+          <GomokuModeMenu
+            onStart={(nextMode) => {
+              unlockGomokuAudio();
+              setMatchFinished(false);
+              lifecycle.start(nextMode);
+            }}
+          />
+        ) : null
       ) : mode.kind === "online" ? (
         <GomokuOnlineFlow
           onPlayingChange={setOnlinePlaying}
@@ -59,10 +64,10 @@ export default function GomokuGame() {
         />
       ) : (
         <GomokuMatch
-          key={`${JSON.stringify(mode)}-${matchKey}`}
+          key={matchKey}
           mode={mode}
           onRematch={() => {
-            setMode((current) =>
+            lifecycle.rematch((current) =>
               current?.kind === "ai"
                 ? {
                     ...current,
@@ -71,7 +76,6 @@ export default function GomokuGame() {
                 : current,
             );
             setMatchFinished(false);
-            setMatchKey((key) => key + 1);
           }}
           onExit={exitMatch}
           onFinishedChange={setMatchFinished}

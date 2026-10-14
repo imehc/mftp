@@ -2,29 +2,31 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
+import { useGameLifecycle } from "../engine/use-game-session";
 import { unlockXiangqiAudio, xiangqiAudio } from "./audio";
-import type { XiangqiMode } from "./types";
+import { xiangqiSessions } from "./session";
 import { XiangqiMatch } from "./XiangqiMatch";
 import { XiangqiModeMenu } from "./XiangqiModeMenu";
 import { XiangqiOnlineFlow } from "./XiangqiOnline";
 
 export default function XiangqiGame() {
   useGameAudio(xiangqiAudio);
-  const [mode, setMode] = useState<XiangqiMode | null>(null);
-  const [matchKey, setMatchKey] = useState(0);
+  const lifecycle = useGameLifecycle(xiangqiSessions);
+  const { mode, matchKey } = lifecycle;
   const [onlinePlaying, setOnlinePlaying] = useState(false);
   const [matchFinished, setMatchFinished] = useState(false);
 
   const exitMatch = () => {
     setOnlinePlaying(false);
     setMatchFinished(false);
-    setMode(null);
+    lifecycle.exit();
   };
 
   const restartMatch = () => {
     setMatchFinished(false);
-    setMatchKey((key) => key + 1);
+    lifecycle.restart();
   };
 
   return (
@@ -42,14 +44,20 @@ export default function XiangqiGame() {
           onExit={exitMatch}
         />
       ) : null}
+      <GameSessionNotice
+        store={xiangqiSessions}
+        onRestore={unlockXiangqiAudio}
+      />
       {mode === null ? (
-        <XiangqiModeMenu
-          onStart={(nextMode) => {
-            unlockXiangqiAudio();
-            setMatchFinished(false);
-            setMode(nextMode);
-          }}
-        />
+        lifecycle.canStart ? (
+          <XiangqiModeMenu
+            onStart={(nextMode) => {
+              unlockXiangqiAudio();
+              setMatchFinished(false);
+              lifecycle.start(nextMode);
+            }}
+          />
+        ) : null
       ) : mode.kind === "online" ? (
         <XiangqiOnlineFlow
           onPlayingChange={setOnlinePlaying}
@@ -58,10 +66,10 @@ export default function XiangqiGame() {
         />
       ) : (
         <XiangqiMatch
-          key={`${JSON.stringify(mode)}-${matchKey}`}
+          key={matchKey}
           mode={mode}
           onRematch={() => {
-            setMode((current) =>
+            lifecycle.rematch((current) =>
               current?.kind === "ai"
                 ? {
                     ...current,
@@ -70,7 +78,6 @@ export default function XiangqiGame() {
                 : current,
             );
             setMatchFinished(false);
-            setMatchKey((key) => key + 1);
           }}
           onExit={exitMatch}
           onFinishedChange={setMatchFinished}

@@ -126,15 +126,15 @@ msgstr "{minutes, plural, one {# minute ago} other {# minutes ago}}"
 msgid "{moveCount, plural, one {# 手} other {# 手}}"
 msgstr "{moveCount, plural, one {# move} other {# moves}}"
 
-#: src/features/games/go/GoMatch.tsx:337
-#: src/features/games/gomoku/GomokuMatch.tsx:275
-#: src/features/games/xiangqi/XiangqiMatch.tsx:301
+#: src/features/games/go/GoMatch.tsx:280
+#: src/features/games/gomoku/GomokuMatch.tsx:224
+#: src/features/games/xiangqi/XiangqiMatch.tsx:246
 msgid "{moveCount, plural, one {共 # 手} other {共 # 手}}"
 msgstr "{moveCount, plural, one {# move total} other {# moves total}}"
 
-#: src/features/games/go/GoMatch.tsx:242
-#: src/features/games/gomoku/GomokuMatch.tsx:215
-#: src/features/games/xiangqi/XiangqiMatch.tsx:224
+#: src/features/games/go/GoMatch.tsx:185
+#: src/features/games/gomoku/GomokuMatch.tsx:164
+#: src/features/games/xiangqi/XiangqiMatch.tsx:169
 msgid "{moveNumber, plural, one {第 # 手} other {第 # 手}}"
 msgstr "Move #"
 
@@ -152,7 +152,7 @@ msgstr "{pausedTransferCount, plural, one {# transfer paused} other {# transfers
 
 #. 斯诺克瞄准时首个将碰到的目标球的实际分值
 #. 球桌中央选球区域，球体下方仅显示实际分值
-#: src/features/games/billiards/BilliardsMatchView.tsx:398
+#: src/features/games/billiards/BilliardsMatchView.tsx:401
 #: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
 msgid "{points} 分"
 msgstr "{points} pts"
@@ -162,7 +162,7 @@ msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgstr "{redCount, plural, one {# red left} other {# reds left}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:80
-#: src/features/games/billiards/BilliardsMatchView.tsx:292
+#: src/features/games/billiards/BilliardsMatchView.tsx:295
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {# ball remaining} other {# balls remaining}}"
 
@@ -197,7 +197,7 @@ msgstr "{sharesCount, plural, one {# directory} other {# directories}}"
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# shot} other {# shots}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:271
+#: src/features/games/billiards/BilliardsMatchView.tsx:274
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {# shot total} other {# shots total}}"
 
@@ -205,8 +205,8 @@ msgstr "{shotCount, plural, one {# shot total} other {# shots total}}"
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:283
-#: src/features/games/billiards/BilliardsMatchView.tsx:347
+#: src/features/games/billiards/BilliardsMatchView.tsx:286
+#: src/features/games/billiards/BilliardsMatchView.tsx:350
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "Shot #"
 
@@ -253,7 +253,7 @@ msgstr "{undoPlies, plural, one {Undo # move. Accept?} other {Undo # moves. Acce
 msgid "{value} 的私钥口令"
 msgstr "Private key passphrase for {value}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:265
+#: src/features/games/billiards/BilliardsMatchView.tsx:268
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} wins"
 
@@ -296,10 +296,10 @@ msgstr "AI keys"
 msgid "AI 密钥认证已失效，请返回应用后重试"
 msgstr "AI key authentication has expired. Return to the app and try again."
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:424
-#: src/features/games/go/GoMatch.tsx:260
-#: src/features/games/gomoku/GomokuMatch.tsx:225
-#: src/features/games/xiangqi/XiangqiMatch.tsx:239
+#: src/features/games/billiards/BilliardsMatchView.tsx:427
+#: src/features/games/go/GoMatch.tsx:203
+#: src/features/games/gomoku/GomokuMatch.tsx:174
+#: src/features/games/xiangqi/XiangqiMatch.tsx:184
 msgid "AI 思考中…"
 msgstr "AI thinking..."
 
@@ -446,15 +446,15 @@ msgstr "FBX models are previewed for this session only and are not saved to the 
 msgid "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
 msgstr "FBX files are limited to 64 MiB. Processing stops if the model or textures are too complex, or parsing takes over 30 seconds. Simplify the model and try again."
 
-#: src/lib/errors/messages.ts:290
+#: src/lib/errors/messages.ts:294
 msgid "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
 msgstr "The FBX file has no valid unit information. Set the units in your modeling software and export it again."
 
-#: src/lib/errors/messages.ts:289
+#: src/lib/errors/messages.ts:293
 msgid "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
 msgstr "This FBX texture format is not supported. Use PNG, JPEG, WebP or BMP."
 
-#: src/lib/errors/messages.ts:288
+#: src/lib/errors/messages.ts:292
 msgid "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 msgstr "The FBX model exceeds the processing limits or parsing timed out. Simplify the model or textures and try again. Files must not exceed 64 MiB."
 
@@ -590,7 +590,7 @@ msgstr "Triangles"
 msgid "上一个"
 msgstr "Previous"
 
-#: src/features/games/go/GoMatch.tsx:278
+#: src/features/games/go/GoMatch.tsx:221
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "The last move was a pass: pass again to end the game, or play to reset the count"
 
@@ -825,9 +825,20 @@ msgstr "Not applicable"
 msgid "不透明度"
 msgstr "Opacity"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:74
+#: src/features/games/engine/online/useOnlineMatch.ts:64
 msgid "与对方的连接已断开。"
 msgstr "Connection to the opponent was lost."
+
+#. 删除未完成的游戏存档，随后可开始新对局
+#. 确认删除未完成的游戏存档
+#: src/features/games/engine/GameSessionNotice.tsx:85
+#: src/features/games/engine/GameSessionNotice.tsx:112
+msgid "丢弃存档"
+msgstr "Discard save"
+
+#: src/features/games/engine/GameSessionNotice.tsx:97
+msgid "丢弃对局存档？"
+msgstr "Discard this saved game?"
 
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:82
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:202
@@ -843,7 +854,7 @@ msgstr "Passwords do not match"
 msgid "两点测量"
 msgstr "Measure distance"
 
-#: src/features/games/xiangqi/XiangqiGame.tsx:37
+#: src/features/games/xiangqi/XiangqiGame.tsx:39
 #: src/features/home/entries.tsx:198
 msgid "中国象棋"
 msgstr "Chinese Chess"
@@ -873,7 +884,7 @@ msgstr "Center"
 msgid "中等"
 msgstr "Medium"
 
-#: src/lib/errors/messages.ts:267
+#: src/lib/errors/messages.ts:271
 msgid "临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。"
 msgstr "Temporary export storage is full. Try again later. Shared files are kept for at least 24 hours."
 
@@ -936,7 +947,7 @@ msgstr "You can also drop a model file here"
 msgid "互换"
 msgstr "Swap"
 
-#: src/features/games/gomoku/GomokuGame.tsx:38
+#: src/features/games/gomoku/GomokuGame.tsx:40
 #: src/features/home/entries.tsx:178
 msgid "五子棋"
 msgstr "Gomoku"
@@ -1307,8 +1318,8 @@ msgstr "Edit model library details"
 msgid "做种中"
 msgstr "Seeding"
 
-#: src/features/games/go/GoMatch.tsx:290
-#: src/features/games/go/GoMatch.tsx:294
+#: src/features/games/go/GoMatch.tsx:233
+#: src/features/games/go/GoMatch.tsx:237
 msgid "停一手"
 msgstr "Pass"
 
@@ -1568,7 +1579,7 @@ msgstr "Content is not a valid escaped string"
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:521
+#: src/features/games/billiards/BilliardsMatchView.tsx:525
 #: src/features/games/engine/GameResultBar.tsx:83
 msgid "再来一局"
 msgstr "One more game"
@@ -2184,7 +2195,7 @@ msgstr "Two-Player Match"
 msgid "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 msgstr "Double-click or press ⌘/Ctrl + . to show or hide games"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:68
+#: src/features/games/engine/online/useOnlineMatch.ts:58
 msgid "双方棋局状态不一致，本局无法继续。"
 msgstr "The players have different board states. This game cannot continue."
 
@@ -2192,6 +2203,10 @@ msgstr "The players have different board states. This game cannot continue."
 #: src/features/model-viewer/components/ResourceDetails.tsx:146
 msgid "双面渲染"
 msgstr "Double sided"
+
+#: src/features/games/engine/GameSessionNotice.tsx:45
+msgid "发现上次的对局存档，是否继续？"
+msgstr "A saved game was found. Would you like to continue?"
 
 #: src/features/updater/use-updater-label.ts:16
 msgid "发现新版本"
@@ -2212,9 +2227,10 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/export/BackupPage.tsx:151
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:48
 #: src/features/games/billiards/BilliardsHeader.tsx:140
-#: src/features/games/engine/BoardGameHeader.tsx:108
+#: src/features/games/engine/BoardGameHeader.tsx:92
 #: src/features/games/engine/GameHeaderControls.tsx:77
 #: src/features/games/engine/GameHeaderControls.tsx:105
+#: src/features/games/engine/GameSessionNotice.tsx:105
 #: src/features/games/engine/online/OnlineLobby.tsx:367
 #: src/features/lan-transfer/LanShareDialog.tsx:143
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:511
@@ -2324,7 +2340,7 @@ msgstr "Classical Poetry"
 msgid "古诗词语料还没有下载"
 msgstr "Poetry corpus not downloaded yet"
 
-#: src/lib/errors/messages.ts:268
+#: src/lib/errors/messages.ts:272
 msgid "另一个系统导出尚未结束，请先完成或关闭系统面板。"
 msgstr "Another system export is in progress. Complete or close the system dialog first."
 
@@ -2539,7 +2555,7 @@ msgstr "Hard"
 msgid "围地对弈，探索棋局"
 msgstr "Build territory and explore the board"
 
-#: src/features/games/go/GoGame.tsx:38
+#: src/features/games/go/GoGame.tsx:40
 #: src/features/home/entries.tsx:188
 msgid "围棋"
 msgstr "Go"
@@ -2820,7 +2836,7 @@ msgstr "Security Mode"
 msgid "安装"
 msgstr "Install"
 
-#: src/lib/errors/messages.ts:279
+#: src/lib/errors/messages.ts:283
 msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "Installation did not finish. Retry the installation or try again later."
 
@@ -2922,7 +2938,15 @@ msgstr "Key Manager"
 msgid "对局中断"
 msgstr "Game Interrupted"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:267
+#: src/lib/errors/messages.ts:267
+msgid "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
+msgstr "This saved game is damaged or uses an incompatible version and cannot be restored. The original save has not been deleted."
+
+#: src/lib/errors/messages.ts:268
+msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
+msgstr "The game has not been saved successfully. Please retry. The latest progress may be lost if the app exits unexpectedly."
+
+#: src/features/games/billiards/BilliardsMatchView.tsx:270
 msgid "对局结束"
 msgstr "Match over"
 
@@ -2942,7 +2966,7 @@ msgstr "Opponent awarded {penalty} penalty points"
 msgid "对方"
 msgstr "Opponent"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:72
+#: src/features/games/engine/online/useOnlineMatch.ts:62
 msgid "对方已离开房间。"
 msgstr "The opponent left the room."
 
@@ -2950,11 +2974,11 @@ msgstr "The opponent left the room."
 msgid "对方想再来一局"
 msgstr "Opponent wants a rematch"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:53
+#: src/features/games/engine/online/useOnlineMatch.ts:43
 msgid "对方拒绝了再来一局"
 msgstr "Opponent declined the rematch"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:53
+#: src/features/games/engine/online/useOnlineMatch.ts:43
 msgid "对方拒绝了悔棋"
 msgstr "Opponent declined the undo"
 
@@ -2966,7 +2990,7 @@ msgstr "Your opponent proposes a stalemate re-rack. The original breaker will br
 msgid "对方请求悔棋"
 msgstr "Opponent requests an undo"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:75
+#: src/features/games/engine/online/useOnlineMatch.ts:65
 msgid "对方长时间未回应协商，对局已结束。"
 msgstr "The other player did not respond in time. The game has ended."
 
@@ -3078,7 +3102,7 @@ msgstr "Export app data"
 msgid "导出所选数据"
 msgstr "Export selected data"
 
-#: src/lib/errors/messages.ts:266
+#: src/lib/errors/messages.ts:270
 msgid "导出文件无效或超过 64 MiB，请重新生成。"
 msgstr "The export file is invalid or exceeds 64 MiB. Generate it again."
 
@@ -3094,7 +3118,7 @@ msgstr "Export details"
 msgid "导航"
 msgstr "Navigation"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:234
+#: src/features/games/xiangqi/XiangqiMatch.tsx:179
 msgid "将军"
 msgstr "Check"
 
@@ -3135,7 +3159,7 @@ msgid "将覆盖当前人工修订。"
 msgstr "This will overwrite the current manual revision."
 
 #: src/features/games/billiards/BilliardsHeader.tsx:135
-#: src/features/games/engine/BoardGameHeader.tsx:102
+#: src/features/games/engine/BoardGameHeader.tsx:87
 #: src/features/games/engine/GameHeaderControls.tsx:100
 msgid "将返回模式选择，当前对局的进度将会丢失。"
 msgstr "This returns to mode selection and discards the current match progress."
@@ -3388,7 +3412,7 @@ msgstr "Copied to your folder"
 msgid "已复制到系统下载目录"
 msgstr "Copied to the system Downloads folder"
 
-#: src/lib/errors/messages.ts:284
+#: src/lib/errors/messages.ts:288
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "An attachment with this name already exists. Rename the file or remove the old attachment first."
 
@@ -3727,10 +3751,6 @@ msgstr "Active address"
 msgid "当前密钥"
 msgstr "Current key"
 
-#: src/features/games/engine/BoardGameHeader.tsx:100
-msgid "当前对局尚未结束，离开后将丢失进度。"
-msgstr "This game is still in progress. Leaving will discard it."
-
 #: src/features/games/engine/GameHeaderControls.tsx:72
 msgid "当前对局的进度将会丢失。"
 msgstr "Current match progress will be lost."
@@ -3791,7 +3811,7 @@ msgstr "AVIF export is not supported in this environment"
 msgid "当前环境不支持导出 AVIF，请改用 WebP 或 JPG"
 msgstr "AVIF export is unavailable. Use WebP or JPG instead."
 
-#: src/lib/errors/messages.ts:271
+#: src/lib/errors/messages.ts:275
 msgid "当前环境不支持录屏编码，可改用截图。"
 msgstr "Video recording is not supported in this environment. You can take a screenshot instead."
 
@@ -3820,7 +3840,7 @@ msgstr "The configured address {bindHost} is not on an available network interfa
 msgid "录制视口"
 msgstr "Record viewport"
 
-#: src/lib/errors/messages.ts:274
+#: src/lib/errors/messages.ts:278
 msgid "录屏保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the recording. Check the destination and available space, then try again."
 
@@ -3832,11 +3852,11 @@ msgstr "Recording saved."
 msgid "录屏已生成。保存前请留在此页面。"
 msgstr "Recording ready. Stay on this page until you have saved it."
 
-#: src/lib/errors/messages.ts:272
+#: src/lib/errors/messages.ts:276
 msgid "录屏未完成，请恢复模型显示后重试。"
 msgstr "Recording failed. Restore the model view and try again."
 
-#: src/lib/errors/messages.ts:273
+#: src/lib/errors/messages.ts:277
 msgid "录屏超过 64 MiB 上限，请缩短录制时间后重试。"
 msgstr "The recording exceeded the 64 MiB limit. Try a shorter recording."
 
@@ -3939,9 +3959,9 @@ msgstr "Restore last tool"
 msgid "恢复首次打开状态"
 msgstr "Restore the initial state"
 
-#: src/features/games/go/GoMatch.tsx:308
-#: src/features/games/gomoku/GomokuMatch.tsx:257
-#: src/features/games/xiangqi/XiangqiMatch.tsx:271
+#: src/features/games/go/GoMatch.tsx:251
+#: src/features/games/gomoku/GomokuMatch.tsx:206
+#: src/features/games/xiangqi/XiangqiMatch.tsx:216
 msgid "悔棋"
 msgstr "Undo"
 
@@ -3966,7 +3986,7 @@ msgstr "I confirm that keys and generation requests will be sent to the new serv
 msgid "截图与录屏"
 msgstr "Capture tools"
 
-#: src/lib/errors/messages.ts:276
+#: src/lib/errors/messages.ts:280
 msgid "截图保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the screenshot. Check the destination and available space, then try again."
 
@@ -4020,11 +4040,11 @@ msgstr "The selected file is not valid JSON. Check the import file."
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "The selected file is not a backup exported by this app"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:416
+#: src/features/games/billiards/BilliardsMatchView.tsx:419
 msgid "手中球：可在全台放置母球"
 msgstr "Ball in hand: place the cue ball anywhere"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:414
+#: src/features/games/billiards/BilliardsMatchView.tsx:417
 msgid "手中球：在 D 区拖动母球放置"
 msgstr "Ball in hand: drag the cue ball within the D"
 
@@ -4210,7 +4230,7 @@ msgstr "Push-out complete. Play the next shot or pass it back to the shooter."
 msgid "推荐"
 msgstr "Recommended"
 
-#: src/features/games/go/GoMatch.tsx:251
+#: src/features/games/go/GoMatch.tsx:194
 msgid "提子 {value}:{value2}"
 msgstr "Captures {value}:{value2}"
 
@@ -4292,7 +4312,7 @@ msgid "播放速度"
 msgstr "Speed"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:198
-#: src/features/games/billiards/BilliardsMatchView.tsx:571
+#: src/features/games/billiards/BilliardsMatchView.tsx:577
 #: src/features/logs/LogDialogs.tsx:69
 #: src/features/logs/LogRow.desktop.tsx:26
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:232
@@ -4563,11 +4583,15 @@ msgstr "Could not open with a system app"
 msgid "无法创建画布上下文"
 msgstr "Cannot create canvas context"
 
-#: src/lib/errors/messages.ts:295
+#: src/lib/errors/messages.ts:299
 msgid "无法初始化 3D 显示，请重试或检查设备的图形支持"
 msgstr "Unable to initialize the 3D display. Retry or check your device’s graphics support."
 
-#: src/lib/errors/messages.ts:285
+#: src/lib/errors/messages.ts:269
+msgid "无法删除对局存档，请重试。"
+msgstr "Unable to delete the saved game. Please retry."
+
+#: src/lib/errors/messages.ts:289
 msgid "无法打开系统转交的模型。请选择有效 GLB 文件并重新打开；导入缓存上限为 512 MiB。"
 msgstr "Could not open the model from the system. Select a valid GLB file and open it again. The import cache limit is 512 MiB."
 
@@ -4579,11 +4603,11 @@ msgstr "Unable to play. Retry or open with a system app."
 msgid "无法显示 3D 内容"
 msgstr "3D display unavailable"
 
-#: src/lib/errors/messages.ts:277
+#: src/lib/errors/messages.ts:281
 msgid "无法检查更新，请稍后重试或查看发布页面。"
 msgstr "Could not check for updates. Try again later or visit the releases page."
 
-#: src/lib/errors/messages.ts:275
+#: src/lib/errors/messages.ts:279
 msgid "无法生成截图，请恢复模型显示后重试。"
 msgstr "Could not create a screenshot. Restore the model view and try again."
 
@@ -4598,6 +4622,10 @@ msgstr "Could not identify the remote operating system"
 #: src/features/bt/BtTool.tsx:238
 msgid "无法读取下载任务"
 msgstr "Unable to load downloads"
+
+#: src/lib/errors/messages.ts:266
+msgid "无法读取对局存档，请重试。原存档未被删除。"
+msgstr "Unable to read the saved game. Please retry. The original save has not been deleted."
 
 #: src/features/media-compress/video/compress.ts:267
 msgid "无法读取视频信息"
@@ -4834,7 +4862,7 @@ msgstr "Smaller"
 msgid "更换"
 msgstr "Replace"
 
-#: src/lib/errors/messages.ts:278
+#: src/lib/errors/messages.ts:282
 msgid "更新下载或校验失败，请重新检查更新。"
 msgstr "The update could not be downloaded or verified. Check for updates again."
 
@@ -4847,7 +4875,7 @@ msgstr "Update host"
 msgid "更新于 {updatedLabel}"
 msgstr "Updated at {updatedLabel}"
 
-#: src/lib/errors/messages.ts:281
+#: src/lib/errors/messages.ts:285
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
@@ -5084,12 +5112,12 @@ msgid "本机服务"
 msgstr "Local service"
 
 #. 九球本杆已声明推杆，再按可取消
-#: src/features/games/billiards/BilliardsMatchView.tsx:571
+#: src/features/games/billiards/BilliardsMatchView.tsx:577
 #: src/features/games/billiards/NineBallHud.tsx:164
 msgid "本杆推杆"
 msgstr "Push-out declared"
 
-#: src/lib/errors/messages.ts:292
+#: src/lib/errors/messages.ts:296
 msgid "本次导入的资源超过 512 MiB，请选择较小的模型"
 msgstr "This import exceeds 512 MiB. Choose a smaller model."
 
@@ -5365,7 +5393,7 @@ msgstr "Estimated model memory reached the threshold"
 msgid "模型动画"
 msgstr "Model animation"
 
-#: src/lib/errors/messages.ts:291
+#: src/lib/errors/messages.ts:295
 msgid "模型包含网络地址或不安全路径，已阻止读取"
 msgstr "The model contains a network address or an unsafe path. Reading was blocked."
 
@@ -5440,7 +5468,7 @@ msgstr "Model actions"
 msgid "模型显示名称不能超过 80 个字符或包含控制字符"
 msgstr "Model display names must not exceed 80 characters or contain control characters."
 
-#: src/lib/errors/messages.ts:286
+#: src/lib/errors/messages.ts:290
 msgid "模型格式无效或文件已损坏，请检查后重新选择"
 msgstr "The model format is invalid or the file is damaged. Check the file and try again."
 
@@ -5455,7 +5483,7 @@ msgstr "Model inspector"
 msgid "模型缺少依赖文件，请补充选择"
 msgstr "The model is missing resource files. Select them to continue."
 
-#: src/lib/errors/messages.ts:294
+#: src/lib/errors/messages.ts:298
 msgid "模型解析失败，请检查模型与依赖文件是否完整"
 msgstr "Unable to decode the model. Check that the model and its resource files are complete."
 
@@ -5472,7 +5500,7 @@ msgstr "Model resources"
 msgid "模型资源过大，请选择较小的模型"
 msgstr "Model resources are too large. Choose a smaller model."
 
-#: src/lib/errors/messages.ts:293
+#: src/lib/errors/messages.ts:297
 msgid "模型超过检查上限，请选择较小的模型。"
 msgstr "This model exceeds the inspection limit. Choose a smaller model."
 
@@ -5543,7 +5571,7 @@ msgstr "Loading media tool…"
 msgid "正在加载日志…"
 msgstr "Loading logs…"
 
-#: src/features/games/billiards/BilliardsGame.tsx:101
+#: src/features/games/billiards/BilliardsGame.tsx:110
 msgid "正在加载物理引擎…"
 msgstr "Loading physics engine..."
 
@@ -5745,6 +5773,10 @@ msgstr "Reading…"
 msgid "正在读取最新信息…"
 msgstr "Reading latest information..."
 
+#: src/features/games/engine/GameSessionNotice.tsx:34
+msgid "正在读取对局存档…"
+msgstr "Reading saved game…"
+
 #: src/features/todo/TodoTool.tsx:182
 msgid "正在读取待办"
 msgstr "Loading todos"
@@ -5802,6 +5834,10 @@ msgstr "This scene has no materials."
 msgid "此场景没有纹理"
 msgstr "This scene has no textures."
 
+#: src/features/games/engine/GameSessionNotice.tsx:100
+msgid "此操作会删除该游戏的存档，无法继续上次的对局。"
+msgstr "This will delete the save for this game. You will not be able to continue the previous match."
+
 #: src/features/ai-configuration/ProviderDetails.tsx:85
 msgid "此服务地址需要修复，请先编辑地址。"
 msgstr "This service address needs repair. Edit the address first."
@@ -5814,7 +5850,7 @@ msgstr "This material has no textures."
 msgid "此模型不包含动画"
 msgstr "This model has no animations."
 
-#: src/lib/errors/messages.ts:283
+#: src/lib/errors/messages.ts:287
 msgid "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 msgstr "This model has reached its attachment limit: 16 files or 32 MiB in total."
 
@@ -5979,7 +6015,7 @@ msgstr "The browser cannot export {mimeType}"
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "Browser access requests, confirmation prompts, and trusted-device fallback requests"
 
-#: src/features/games/engine/online/useOnlineMatch.ts:70
+#: src/features/games/engine/online/useOnlineMatch.ts:60
 msgid "消息发送失败，连接可能已断开。"
 msgstr "The message could not be sent. The connection may have closed."
 
@@ -6059,7 +6095,7 @@ msgstr "Add attachment"
 msgid "清台"
 msgstr "Cleared"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:263
+#: src/features/games/billiards/BilliardsMatchView.tsx:266
 msgid "清台完成！"
 msgstr "Table cleared!"
 
@@ -6230,39 +6266,39 @@ msgstr "Version {version} · Current {currentVersion}"
 msgid "特殊权限"
 msgstr "Special"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:58
+#: src/features/games/billiards/BilliardsMatchView.tsx:60
 msgid "犯规：开球无进球且不足四个目标球碰库"
 msgstr "Foul: no ball pocketed and fewer than four object balls reached a rail on the break"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:44
+#: src/features/games/billiards/BilliardsMatchView.tsx:46
 msgid "犯规：打进非目标球"
 msgstr "Foul: potted a ball not on"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:46
+#: src/features/games/billiards/BilliardsMatchView.tsx:48
 msgid "犯规：推动贴球"
 msgstr "Foul: push shot on a touching ball"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:60
+#: src/features/games/billiards/BilliardsMatchView.tsx:62
 msgid "犯规：提前打进黑八"
 msgstr "Foul: the 8-ball was pocketed early"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:54
+#: src/features/games/billiards/BilliardsMatchView.tsx:56
 msgid "犯规：未先碰到合法目标球"
 msgstr "Foul: a legal target was not contacted first"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:52
+#: src/features/games/billiards/BilliardsMatchView.tsx:54
 msgid "犯规：未碰到任何球"
 msgstr "Foul: no ball was contacted"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:56
+#: src/features/games/billiards/BilliardsMatchView.tsx:58
 msgid "犯规：未进球且首碰后无球碰库"
 msgstr "Foul: no ball pocketed or rail reached after first contact"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:50
+#: src/features/games/billiards/BilliardsMatchView.tsx:52
 msgid "犯规：母球落袋"
 msgstr "Foul: cue ball pocketed"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:48
+#: src/features/games/billiards/BilliardsMatchView.tsx:50
 msgid "犯规：用指定球做障碍"
 msgstr "Foul: snookered with the nominated ball"
 
@@ -6344,7 +6380,7 @@ msgid "环形"
 msgstr "Ring"
 
 #. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
-#: src/lib/errors/messages.ts:297
+#: src/lib/errors/messages.ts:301
 msgid "球桌显示已中断，请重开对局。"
 msgstr "The table display was interrupted. Restart the match to continue."
 
@@ -6721,15 +6757,15 @@ msgstr "Waiting for an opponent..."
 msgid "等待对方…"
 msgstr "Waiting for opponent..."
 
-#: src/features/games/go/GoMatch.tsx:273
-#: src/features/games/gomoku/GomokuMatch.tsx:238
-#: src/features/games/xiangqi/XiangqiMatch.tsx:252
+#: src/features/games/go/GoMatch.tsx:216
+#: src/features/games/gomoku/GomokuMatch.tsx:187
+#: src/features/games/xiangqi/XiangqiMatch.tsx:197
 msgid "等待对方同意悔棋…"
 msgstr "Waiting for the opponent to accept the undo..."
 
-#: src/features/games/go/GoMatch.tsx:268
-#: src/features/games/gomoku/GomokuMatch.tsx:233
-#: src/features/games/xiangqi/XiangqiMatch.tsx:247
+#: src/features/games/go/GoMatch.tsx:211
+#: src/features/games/gomoku/GomokuMatch.tsx:182
+#: src/features/games/xiangqi/XiangqiMatch.tsx:192
 msgid "等待对方落子…"
 msgstr "Waiting for the opponent's move..."
 
@@ -6827,11 +6863,11 @@ msgstr "Paste or type {languageLabel} content"
 msgid "系统"
 msgstr "System"
 
-#: src/lib/errors/messages.ts:270
+#: src/lib/errors/messages.ts:274
 msgid "系统分享仅在移动应用中可用。"
 msgstr "System sharing is only available in the mobile app."
 
-#: src/lib/errors/messages.ts:269
+#: src/lib/errors/messages.ts:273
 msgid "系统导出未完成，请检查目标位置或分享应用后重试。"
 msgstr "System export did not complete. Check the destination or sharing app and try again."
 
@@ -7006,6 +7042,11 @@ msgstr "Continue processing"
 #: src/features/about/ResetBoundary.tsx:159
 msgid "继续完成重置"
 msgstr "Continue reset"
+
+#. 恢复已保存的本地游戏对局
+#: src/features/games/engine/GameSessionNotice.tsx:58
+msgid "继续对局"
+msgstr "Continue game"
 
 #: src/features/games/billiards/NineBallHud.tsx:113
 msgid "继续当前球局"
@@ -7217,7 +7258,7 @@ msgstr "Clear the table freely"
 msgid "自由球"
 msgstr "Free ball"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:419
+#: src/features/games/billiards/BilliardsMatchView.tsx:422
 msgid "自由球：拖动母球放置"
 msgstr "Ball in hand: drag the cue ball to place it"
 
@@ -7722,7 +7763,7 @@ msgstr "Enter a valid target size"
 msgid "请输入路径"
 msgstr "Enter a path"
 
-#: src/lib/errors/messages.ts:287
+#: src/lib/errors/messages.ts:291
 msgid "请选择一个 GLB、glTF 或 FBX 模型文件"
 msgstr "Choose a GLB, glTF or FBX model file."
 
@@ -7920,12 +7961,12 @@ msgstr "Orbit"
 msgid "转存失败"
 msgstr "Failed to save"
 
-#: src/features/games/go/GoMatch.tsx:233
-#: src/features/games/gomoku/GomokuMatch.tsx:206
+#: src/features/games/go/GoMatch.tsx:176
+#: src/features/games/gomoku/GomokuMatch.tsx:155
 msgid "轮到 {seatNameValue}"
 msgstr "{seatNameValue}'s turn"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:214
+#: src/features/games/xiangqi/XiangqiMatch.tsx:159
 msgid "轮到 {sideNameValue}"
 msgstr "{sideNameValue}'s turn"
 
@@ -8019,7 +8060,7 @@ msgid "返回来源"
 msgstr "Return to source"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:55
-#: src/features/games/engine/BoardGameHeader.tsx:56
+#: src/features/games/engine/BoardGameHeader.tsx:50
 #: src/features/games/engine/online/OnlineLobby.tsx:62
 msgid "返回模式选择"
 msgstr "Back to modes"
@@ -8048,7 +8089,7 @@ msgstr "Back to Menu"
 #: src/components/ToolPageHeader.tsx:51
 #: src/features/bt/BtTool.tsx:214
 #: src/features/games/billiards/BilliardsHeader.tsx:62
-#: src/features/games/engine/BoardGameHeader.tsx:66
+#: src/features/games/engine/BoardGameHeader.tsx:60
 #: src/features/ssh-sftp/SshSftpTool.tsx:215
 msgid "返回首页"
 msgstr "Back to Home"
@@ -8095,7 +8136,7 @@ msgstr "Existing Remote Name"
 msgid "远端文件夹名称"
 msgstr "Remote Folder Name"
 
-#: src/lib/errors/messages.ts:296
+#: src/lib/errors/messages.ts:300
 msgid "远端连接在终端打开前已关闭"
 msgstr "Remote connection closed before the terminal opened"
 
@@ -8164,8 +8205,8 @@ msgid "连续渲染后显示采样数据。"
 msgstr "Samples appear after continuous rendering."
 
 #: src/features/games/billiards/BilliardsHeader.tsx:143
-#: src/features/games/billiards/BilliardsMatchView.tsx:529
-#: src/features/games/engine/BoardGameHeader.tsx:116
+#: src/features/games/billiards/BilliardsMatchView.tsx:533
+#: src/features/games/engine/BoardGameHeader.tsx:95
 #: src/features/games/engine/GameHeaderControls.tsx:108
 msgid "退出"
 msgstr "Exit"
@@ -8175,7 +8216,7 @@ msgid "退出对局"
 msgstr "Exit Match"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:132
-#: src/features/games/engine/BoardGameHeader.tsx:96
+#: src/features/games/engine/BoardGameHeader.tsx:84
 #: src/features/games/engine/GameHeaderControls.tsx:97
 msgid "退出当前对局？"
 msgstr "Exit the current match?"
@@ -8417,7 +8458,7 @@ msgstr "Collecting…"
 msgid "重启中"
 msgstr "Restarting"
 
-#: src/lib/errors/messages.ts:280
+#: src/lib/errors/messages.ts:284
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "Could not restart. Try again or reopen the app manually."
 
@@ -8506,7 +8547,8 @@ msgstr "The reset has changed. Check its status again."
 #: src/features/bt/BtTool.tsx:256
 #: src/features/bt/components/FileBrowserPanel.tsx:203
 #: src/features/bt/components/TaskRow.tsx:172
-#: src/features/games/billiards/BilliardsGame.tsx:97
+#: src/features/games/billiards/BilliardsGame.tsx:106
+#: src/features/games/engine/GameSessionNotice.tsx:74
 #: src/features/lan-transfer/LanTransferTool.tsx:95
 #: src/features/logs/ActivityLogsPage.tsx:98
 #: src/features/poetry/components/CollectionManagement.tsx:115
@@ -8603,7 +8645,7 @@ msgstr "Shadows"
 msgid "附件副本已保存。"
 msgstr "Attachment copy saved."
 
-#: src/lib/errors/messages.ts:282
+#: src/lib/errors/messages.ts:286
 msgid "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 msgstr "Invalid attachment. Choose UTF-8 text or Markdown (up to 1 MiB), or PDF (up to 8 MiB)."
 
@@ -8731,7 +8773,7 @@ msgstr "Yellow"
 msgid "黑 {black} 子 · 白 {white} 子 + 贴目 {KOMI} = {whiteWithKomi}"
 msgstr "Black {black} · White {white} + {KOMI} komi = {whiteWithKomi}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:428
+#: src/features/games/billiards/BilliardsMatchView.tsx:431
 msgid "黑八已重置"
 msgstr "8-ball re-spotted"
 

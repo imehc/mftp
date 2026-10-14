@@ -17,6 +17,7 @@ import { frontendError } from "~/lib/errors";
 
 import { CHINESE_EIGHT, type TableEquipment } from "../equipment";
 import type { BilliardsPresentation, BilliardsState } from "../types";
+import { stopBilliardsAudio } from "./audio";
 import { BallSelectionOverlay } from "./BallSelectionOverlay";
 import type { BilliardsScene, SceneCallbacks } from "./scene-contract";
 import type { BallSelectionRequest, BallSelectionView } from "./scene-contract";
@@ -44,6 +45,7 @@ export interface BilliardsStageProps {
   onDismissSelection?(): void;
   onAimTarget?: SceneCallbacks["onAimTarget"];
   state: BilliardsState;
+  resume?: boolean;
   equipment?: TableEquipment;
   /** 本地玩家此时可以瞄准/击球。 */
   interactive: boolean;
@@ -70,6 +72,15 @@ export const BilliardsStage = forwardRef<
     null,
   );
   propsRef.current = props;
+
+  useEffect(() => {
+    const stopHidden = () => {
+      if (document.hidden) stopBilliardsAudio();
+    };
+
+    document.addEventListener("visibilitychange", stopHidden);
+    return () => document.removeEventListener("visibilitychange", stopHidden);
+  }, []);
 
   useEffect(() => {
     const host = containerRef.current;
@@ -163,7 +174,7 @@ export const BilliardsStage = forwardRef<
         equipment,
         propsRef.current.state.balls.map((ball) => ball.id),
         mobile,
-        hasEntered(entryHost),
+        hasEntered(entryHost) || propsRef.current.resume === true,
       );
       sceneRef.current = scene;
 

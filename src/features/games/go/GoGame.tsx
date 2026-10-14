@@ -3,29 +3,31 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
+import { useGameLifecycle } from "../engine/use-game-session";
 import { goAudio, unlockGoAudio } from "./audio";
 import { GoMatch } from "./GoMatch";
 import { GoModeMenu } from "./GoModeMenu";
 import { GoOnlineFlow } from "./GoOnline";
-import type { GoMode } from "./types";
+import { goSessions } from "./session";
 
 export default function GoGame() {
   useGameAudio(goAudio);
-  const [mode, setMode] = useState<GoMode | null>(null);
-  const [matchKey, setMatchKey] = useState(0);
+  const lifecycle = useGameLifecycle(goSessions);
+  const { mode, matchKey } = lifecycle;
   const [onlinePlaying, setOnlinePlaying] = useState(false);
   const [matchFinished, setMatchFinished] = useState(false);
 
   const exitMatch = () => {
     setOnlinePlaying(false);
     setMatchFinished(false);
-    setMode(null);
+    lifecycle.exit();
   };
 
   const restartMatch = () => {
     setMatchFinished(false);
-    setMatchKey((key) => key + 1);
+    lifecycle.restart();
   };
 
   return (
@@ -43,14 +45,17 @@ export default function GoGame() {
           onExit={exitMatch}
         />
       ) : null}
+      <GameSessionNotice store={goSessions} onRestore={unlockGoAudio} />
       {mode === null ? (
-        <GoModeMenu
-          onStart={(nextMode) => {
-            unlockGoAudio();
-            setMatchFinished(false);
-            setMode(nextMode);
-          }}
-        />
+        lifecycle.canStart ? (
+          <GoModeMenu
+            onStart={(nextMode) => {
+              unlockGoAudio();
+              setMatchFinished(false);
+              lifecycle.start(nextMode);
+            }}
+          />
+        ) : null
       ) : mode.kind === "online" ? (
         <GoOnlineFlow
           onPlayingChange={setOnlinePlaying}
@@ -60,10 +65,10 @@ export default function GoGame() {
         />
       ) : (
         <GoMatch
-          key={`${JSON.stringify(mode)}-${matchKey}`}
+          key={matchKey}
           mode={mode}
           onRematch={() => {
-            setMode((current) =>
+            lifecycle.rematch((current) =>
               current?.kind === "ai"
                 ? {
                     ...current,
@@ -72,7 +77,6 @@ export default function GoGame() {
                 : current,
             );
             setMatchFinished(false);
-            setMatchKey((key) => key + 1);
           }}
           onExit={exitMatch}
           onFinishedChange={setMatchFinished}

@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link, useBlocker } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
@@ -36,12 +36,6 @@ export function BoardGameHeader({
 }) {
   const { t } = useLingui();
   const [confirm, setConfirm] = useState(false);
-  const blocker = useBlocker({
-    shouldBlockFn: ({ current, next }) =>
-      active && !finished && current.pathname !== next.pathname,
-    enableBeforeUnload: active && !finished,
-    withResolver: true,
-  });
   return (
     <>
       <ToolPageHeader
@@ -83,36 +77,21 @@ export function BoardGameHeader({
           )
         }
       />
-      <AlertDialog
-        open={confirm || blocker.status === "blocked"}
-        onOpenChange={(open) => {
-          setConfirm(open);
-          if (!open) blocker.reset?.();
-        }}
-      >
+      <AlertDialog open={confirm} onOpenChange={setConfirm}>
         <AlertDialogContent className="ui-density-adaptive">
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>退出当前对局？</Trans>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {blocker.status === "blocked" ? (
-                <Trans>当前对局尚未结束，离开后将丢失进度。</Trans>
-              ) : (
-                <Trans>将返回模式选择，当前对局的进度将会丢失。</Trans>
-              )}
+              <Trans>将返回模式选择，当前对局的进度将会丢失。</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
               <Trans>取消</Trans>
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (blocker.status === "blocked") blocker.proceed();
-                else onExit();
-              }}
-            >
+            <AlertDialogAction onClick={onExit}>
               <Trans>退出</Trans>
             </AlertDialogAction>
           </AlertDialogFooter>

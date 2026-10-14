@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { installBtRuntime } from "~/features/bt/runtime/btRuntime";
+import { installGameSessionRuntime } from "~/features/games/engine/session-registry";
 import { installModelSystemRuntime } from "~/features/model-viewer/system/inbox";
 import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
 import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
@@ -41,9 +42,11 @@ export function AppRuntime() {
     const disposeTransfers = installTransferRuntime();
     const disposeBt = installBtRuntime();
     const disposePoetry = installPoetrySyncRuntime();
+    const disposeGames = installGameSessionRuntime();
     return () => {
       // 逆序清理；单个模块的清理失败不应阻止其他模块释放资源。
       disposeModels();
+      disposeGames();
       disposePoetry();
       disposeBt();
       disposeTransfers();

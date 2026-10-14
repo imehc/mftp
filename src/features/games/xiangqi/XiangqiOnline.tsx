@@ -63,7 +63,7 @@ export function XiangqiOnlineFlow({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
-  const { owner, ready } = useOnlineRoom<XiangqiMove>(XIANGQI_GAME_ID);
+  const { owner, ready } = useOnlineRoom(XIANGQI_GAME_ID, XIANGQI_ONLINE);
   useEffect(() => {
     onPlayingChange(ready !== null);
   }, [ready, onPlayingChange]);
@@ -117,7 +117,7 @@ function OnlineMatch({
     endReason,
     rematchWaiting,
     rematchIncoming,
-  } = useOnlineMatch(session, XIANGQI_ONLINE, present);
+  } = useOnlineMatch(session, present);
   useEffect(() => () => xiangqiAudio.stop(), [snapshot.round]);
   const mode: XiangqiMode = { kind: "online" };
   return (

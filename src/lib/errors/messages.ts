@@ -263,6 +263,10 @@ export const appDataSectionNames: Record<string, MessageDescriptor> = {
 // 渲染时本地化。只有确实无法从后端拿到错误、又需要向用户解释的时序
 // （如终端打开前连接被关闭）才在这里登记。
 export const frontendErrorMessages = {
+  "games:checkpoint_read": msg`无法读取对局存档，请重试。原存档未被删除。`,
+  "games:checkpoint_invalid": msg`对局存档损坏或版本不兼容，无法恢复。原存档未被删除。`,
+  "games:checkpoint_write": msg`对局尚未成功保存，请重试。异常退出后可能丢失最新进度。`,
+  "games:checkpoint_delete": msg`无法删除对局存档，请重试。`,
   "model:export_invalid": msg`导出文件无效或超过 64 MiB，请重新生成。`,
   "model:export_capacity": msg`临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。`,
   "model:export_busy": msg`另一个系统导出尚未结束，请先完成或关闭系统面板。`,

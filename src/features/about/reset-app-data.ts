@@ -1,4 +1,6 @@
 import type { AppDataResetResult } from "~/bindings";
+import { clearGameCheckpoints } from "~/features/games/engine/checkpoint-storage";
+import { disposeGameResources } from "~/features/games/engine/session-registry";
 import { toIpcError } from "~/lib/errors";
 import {
   appDataReset,
@@ -26,6 +28,17 @@ async function finishClientReset(
   const warnings: AppError[] = [];
   if (result.progress.pending.length)
     return { result, warnings, finished: false };
+  disposeGameResources();
+  try {
+    await clearGameCheckpoints();
+  } catch {
+    warnings.push({
+      kind: "external",
+      code: "games:checkpoint_delete",
+      message: "Game checkpoint reset failed",
+      args: {},
+    });
+  }
   if (isDesktopPlatform()) {
     try {
       const { disable } = await import("@tauri-apps/plugin-autostart");
