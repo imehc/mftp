@@ -18,6 +18,7 @@ import type { Session } from "./BilliardsMatch";
 import { BilliardsRuleControl } from "./BilliardsRuleControl";
 import { BilliardsRulePanel } from "./BilliardsRulePanel";
 import { BallTray, SeatCell, seatName } from "./BilliardsScore";
+import { BilliardsVictory } from "./BilliardsVictory";
 import { NineBallScore } from "./NineBallHud";
 import { equipmentForState } from "./placement";
 import {
@@ -207,6 +208,11 @@ export function MatchView({
     snapshot.winnerSeat !== null ? seatName(mode, snapshot.winnerSeat) : "";
   return (
     <>
+      <BilliardsVictory
+        state={state}
+        mode={mode}
+        winnerSeat={snapshot.winnerSeat}
+      />
       <BilliardsHeader
         {...headerProps}
         details={
