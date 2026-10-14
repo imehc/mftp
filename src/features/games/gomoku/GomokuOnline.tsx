@@ -47,7 +47,7 @@ export function GomokuOnlineFlow({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
-  const { owner, ready } = useOnlineRoom<GomokuMove>(GOMOKU_GAME_ID);
+  const { owner, ready } = useOnlineRoom(GOMOKU_GAME_ID, GOMOKU_ONLINE);
   useEffect(() => {
     onPlayingChange(ready !== null);
   }, [ready, onPlayingChange]);
@@ -93,7 +93,7 @@ function OnlineMatch({
     endReason,
     rematchWaiting,
     rematchIncoming,
-  } = useOnlineMatch(session, GOMOKU_ONLINE, present);
+  } = useOnlineMatch(session, present);
   useEffect(() => () => gomokuAudio.stop(), [snapshot.round]);
   const mode: GomokuMode = { kind: "online" };
   return (

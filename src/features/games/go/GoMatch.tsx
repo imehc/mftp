@@ -4,35 +4,28 @@
  */
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Flag, Undo2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
-import { AiController, LocalController } from "../engine/controllers";
 import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
-import { MatchRunner, useMatchSnapshot } from "../engine/match";
-import type { PlayerController, SeatIndex } from "../engine/types";
-import { goAiStrategy } from "./ai";
-import {
-  goAudio,
-  playCaptureSound,
-  playFinishSound,
-  playStoneSound,
-} from "./audio";
+import { useMatchSnapshot } from "../engine/match";
+import type { SeatIndex } from "../engine/types";
+import { useLocalGameSession } from "../engine/use-game-session";
+import { playCaptureSound, playFinishSound, playStoneSound } from "./audio";
 import { GoStage } from "./GoStage";
 import { matchResultLabel, scoreLine, seatName } from "./labels";
-import { cellIndex, createInitialGoState, goGame, legalPlays } from "./rules";
+import { cellIndex, legalPlays } from "./rules";
+import { goSessions } from "./session";
 import {
   GO_GAME_ID,
   type GoHistoryPayload,
   type GoMode,
-  type GoMove,
   type GoSession,
-  type GoState,
 } from "./types";
 
 /** 对局走局域网房间通道时额外的视图状态。 */
@@ -55,63 +48,12 @@ export function GoMatch({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
-  const [session, setSession] = useState<GoSession | null>(null);
-  const volume = useSettingsStore((s) => s.gamesVolume);
-  // runner 每个 keyed 实例只构建一次；音量通过最新值 ref 读取，
-  // 以免对局中途改音量导致 runner 重建。
-  const volumeRef = useRef(volume);
-  useEffect(() => {
-    volumeRef.current = volume;
-  }, [volume]);
-  useEffect(() => {
-    const local = new LocalController<GoState, GoMove>();
-    let controllers: PlayerController<GoState, GoMove>[];
-    if (mode.kind === "hotseat") {
-      controllers = [local, local];
-    } else {
-      const ai = new AiController(
-        goAiStrategy,
-        mode.kind === "ai" ? mode.difficulty : "medium",
-        350,
-      );
-      // 执白即后手：AI 占据 0 号位（黑），由它开局。
-      controllers =
-        mode.kind === "ai" && mode.localSeat === 1 ? [ai, local] : [local, ai];
-    }
-    const boardSize = mode.kind === "online" ? 19 : mode.boardSize;
-    const runner = new MatchRunner(
-      goGame,
-      createInitialGoState(boardSize),
-      controllers,
-      {
-        onMoveResolved: ({ resolution }) => {
-          if (resolution.presentation.captured.length > 0)
-            playCaptureSound(volumeRef.current);
-          else playStoneSound(volumeRef.current);
-          if (resolution.state.finished) playFinishSound(volumeRef.current);
-        },
-        onError: (error) => console.error("go match error", error),
-      },
-    );
-    runner.start();
-    // 用微任务延迟，使 setState 发生在 effect 主体之外；cancelled 标记
-    // 防止严格模式重挂载时发布已销毁的 runner。
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled)
-        setSession({
-          runner,
-          local,
-        });
-    });
-    return () => {
-      cancelled = true;
-      runner.dispose();
-      goAudio.stop();
-      setSession(null);
-    };
-    // 每个 <GoMatch key=...> 实例的 mode 标识是稳定的。
-  }, [mode]);
+  const volume = useSettingsStore((state) => state.gamesVolume);
+  const session = useLocalGameSession(goSessions, ({ resolution }) => {
+    if (resolution.presentation.captured.length > 0) playCaptureSound(volume);
+    else playStoneSound(volume);
+    if (resolution.state.finished) playFinishSound(volume);
+  });
   if (!session) return <div className="flex-1" />;
   return (
     <GoMatchView
@@ -185,7 +127,7 @@ export function GoMatchView({
     if (!state.finished || recordedRef.current) return;
     recordedRef.current = true;
     addRecord({
-      id: crypto.randomUUID(),
+      id: runner.id,
       gameId: GO_GAME_ID,
       finishedAt: Date.now(),
       payload: {
@@ -208,6 +150,7 @@ export function GoMatchView({
     // 对局实例的整个生命周期内都是稳定的。
   }, [
     addRecord,
+    runner.id,
     mode,
     online,
     snapshot.winnerSeat,

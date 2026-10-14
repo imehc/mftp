@@ -212,4 +212,12 @@ export class RoomOwner<M> {
     this.active = false;
     void this.cancel();
   }
+
+  async close(): Promise<void> {
+    await this.cancel();
+    await serialize(async () => {
+      for (const id of pendingCleanup) await release(id);
+    });
+    this.active = false;
+  }
 }

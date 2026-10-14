@@ -75,7 +75,10 @@ export function GoOnlineFlow({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
-  const { owner, ready } = useOnlineRoom<GoMove>(`${GO_GAME_ID}-${boardSize}`);
+  const { owner, ready } = useOnlineRoom(
+    `${GO_GAME_ID}-${boardSize}`,
+    GO_ONLINE[boardSize],
+  );
   useEffect(() => {
     onPlayingChange(ready !== null);
   }, [ready, onPlayingChange]);
@@ -125,7 +128,7 @@ function OnlineMatch({
     endReason,
     rematchWaiting,
     rematchIncoming,
-  } = useOnlineMatch(session, GO_ONLINE[boardSize], present);
+  } = useOnlineMatch(session, present);
   useEffect(() => () => goAudio.stop(), [snapshot.round]);
   const mode: GoMode = { kind: "online", boardSize };
   return (

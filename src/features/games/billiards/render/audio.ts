@@ -74,7 +74,8 @@ export function setGameAudioVolume(value: number): void {
 }
 
 function playMaterial(material: ImpactMaterial, intensity: number): void {
-  if (volume <= 0) return;
+  if (volume <= 0 || (typeof document !== "undefined" && document.hidden))
+    return;
   const context = ensureContext();
   if (!context || !master || !samples || context.state !== "running") return;
   const choices = samples[material];
@@ -141,6 +142,7 @@ export function playImpactEvent(event: SimEvent): void {
 }
 
 function vibrate(ms: number): void {
+  if (typeof document !== "undefined" && document.hidden) return;
   const now = performance.now();
   if (now - lastVibration < 90) return;
   lastVibration = now;

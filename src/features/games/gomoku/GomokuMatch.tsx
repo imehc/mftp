@@ -4,30 +4,27 @@
  */
 import { Plural, Trans } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
-import { AiController, LocalController } from "../engine/controllers";
 import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
-import { MatchRunner, useMatchSnapshot } from "../engine/match";
-import type { PlayerController, SeatIndex } from "../engine/types";
-import { gomokuAiStrategy } from "./ai";
-import { gomokuAudio, playFinishSound, playStoneSound } from "./audio";
+import { useMatchSnapshot } from "../engine/match";
+import type { SeatIndex } from "../engine/types";
+import { useLocalGameSession } from "../engine/use-game-session";
+import { playFinishSound, playStoneSound } from "./audio";
 import { GomokuStage } from "./GomokuStage";
 import { matchResultLabel, seatName } from "./labels";
-import { createInitialGomokuState, gomokuGame } from "./rules";
+import { gomokuSessions } from "./session";
 import {
   GOMOKU_GAME_ID,
   type GomokuHistoryPayload,
   type GomokuMode,
-  type GomokuMove,
   type GomokuSession,
-  type GomokuState,
 } from "./types";
 
 /** 对局走局域网房间通道时额外的视图状态。 */
@@ -50,60 +47,11 @@ export function GomokuMatch({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
-  const [session, setSession] = useState<GomokuSession | null>(null);
-  const volume = useSettingsStore((s) => s.gamesVolume);
-  // runner 每个 keyed 实例只构建一次；音量通过最新值 ref 读取，
-  // 以免对局中途改音量导致 runner 重建。
-  const volumeRef = useRef(volume);
-  useEffect(() => {
-    volumeRef.current = volume;
-  }, [volume]);
-  useEffect(() => {
-    const local = new LocalController<GomokuState, GomokuMove>();
-    let controllers: PlayerController<GomokuState, GomokuMove>[];
-    if (mode.kind === "hotseat") {
-      controllers = [local, local];
-    } else {
-      const ai = new AiController(
-        gomokuAiStrategy,
-        mode.kind === "ai" ? mode.difficulty : "medium",
-        350,
-      );
-      // 执白即后手：AI 占据 0 号位（黑），由它开局。
-      controllers =
-        mode.kind === "ai" && mode.localSeat === 1 ? [ai, local] : [local, ai];
-    }
-    const runner = new MatchRunner(
-      gomokuGame,
-      createInitialGomokuState(),
-      controllers,
-      {
-        onMoveResolved: ({ resolution }) => {
-          playStoneSound(volumeRef.current);
-          if (resolution.state.finished) playFinishSound(volumeRef.current);
-        },
-        onError: (error) => console.error("gomoku match error", error),
-      },
-    );
-    runner.start();
-    // 用微任务延迟，使 setState 发生在 effect 主体之外；cancelled 标记
-    // 防止严格模式重挂载时发布已销毁的 runner。
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled)
-        setSession({
-          runner,
-          local,
-        });
-    });
-    return () => {
-      cancelled = true;
-      runner.dispose();
-      gomokuAudio.stop();
-      setSession(null);
-    };
-    // 每个 <GomokuMatch key=...> 实例的 mode 标识是稳定的。
-  }, [mode]);
+  const volume = useSettingsStore((state) => state.gamesVolume);
+  const session = useLocalGameSession(gomokuSessions, ({ resolution }) => {
+    playStoneSound(volume);
+    if (resolution.state.finished) playFinishSound(volume);
+  });
   if (!session) return <div className="flex-1" />;
   return (
     <GomokuMatchView
@@ -169,7 +117,7 @@ export function GomokuMatchView({
     if (!state.finished || recordedRef.current) return;
     recordedRef.current = true;
     addRecord({
-      id: crypto.randomUUID(),
+      id: runner.id,
       gameId: GOMOKU_GAME_ID,
       finishedAt: Date.now(),
       payload: {
@@ -189,6 +137,7 @@ export function GomokuMatchView({
     // 对局实例的整个生命周期内都是稳定的。
   }, [
     addRecord,
+    runner.id,
     mode,
     online,
     snapshot.winnerSeat,

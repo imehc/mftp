@@ -26,9 +26,13 @@ export const useGamesHistoryStore = create<GamesHistoryState>()(
     (set) => ({
       records: [],
       addRecord: (record) =>
-        set((state) => ({
-          records: [record, ...state.records].slice(0, MAX_RECORDS),
-        })),
+        set((state) =>
+          state.records.some((entry) => entry.id === record.id)
+            ? state
+            : {
+                records: [record, ...state.records].slice(0, MAX_RECORDS),
+              },
+        ),
       clearGame: (gameId) =>
         set((state) => ({
           records: state.records.filter((r) => r.gameId !== gameId),

@@ -6,6 +6,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
+import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
 import { BilliardsConcedeDialog } from "./BilliardsConcedeDialog";
@@ -24,6 +25,7 @@ import {
 } from "./render/BilliardsStage";
 import type { AimTarget } from "./render/scene-contract";
 import { type BilliardsPanel, canSubmitRuleMove } from "./rule-panel-state";
+import { billiardsSessions } from "./session";
 import { snookerValue } from "./snooker-equipment";
 import { snookerRuleActions } from "./snooker-rule-actions";
 import { snookerSelection } from "./snooker-selection";
@@ -111,7 +113,7 @@ export function MatchView({
     if (!state.finished || recordedRef.current) return;
     recordedRef.current = true;
     addRecord({
-      id: crypto.randomUUID(),
+      id: runner.id,
       gameId: BILLIARDS_GAME_ID,
       finishedAt: Date.now(),
       payload: {
@@ -130,7 +132,7 @@ export function MatchView({
     });
     // 上面的 recordedRef 保证只记录一条；这里的每个依赖项在本 keyed
     // 对局实例的整个生命周期内都是稳定的。
-  }, [addRecord, mode, snapshot.winnerSeat, state]);
+  }, [addRecord, mode, runner.id, snapshot.winnerSeat, state]);
   const activeIsLocal =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
@@ -255,6 +257,7 @@ export function MatchView({
         }}
       />
       <div className="billiards-score shrink-0 text-xs">
+        <GameSessionNotice store={billiardsSessions} />
         <div className="billiards-summary mx-auto w-full max-w-6xl min-w-0 px-3 md:px-4">
           {state.finished ? (
             <div className="flex flex-wrap items-center justify-center gap-1.5">
@@ -433,6 +436,7 @@ export function MatchView({
 
         <BilliardsStage
           ref={stageRef}
+          resume={runner.hasStarted || snapshot.moveCount > 0}
           onReady={() => runner.start()}
           onError={onStageError}
           state={state}

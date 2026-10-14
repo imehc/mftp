@@ -72,6 +72,13 @@ export class OnlineMatchController<S, M, P> {
     };
   }
   getSnapshot = () => this.snapshot;
+
+  attachPresentation(present: Presentation<S, P>): () => void {
+    this.onPresentation = present;
+    return () => {
+      if (this.onPresentation === present) this.onPresentation = undefined;
+    };
+  }
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
     return () => {

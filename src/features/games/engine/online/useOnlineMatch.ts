@@ -4,16 +4,16 @@
  * 锁全部由 OnlineMatchController 处理，页面只提供游戏规则定义与音效。
  */
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
-import { OnlineMatchController } from "./matchController";
-import type { OnlineGame, OnlineTransport, Presentation } from "./matchTypes";
+import { areGamesForeground } from "../session-registry";
+import type { OnlineTransport, Presentation } from "./matchTypes";
+import { retainedOnlineController } from "./online-session-store";
 import type { UndoFlow } from "./OnlineMatchDialogs";
 
 export function useOnlineMatch<S, M, P>(
   transport: OnlineTransport<M>,
-  definition: OnlineGame<S, M, P>,
   presentation: Presentation<S, P>,
 ) {
   const { t } = useLingui();
@@ -23,28 +23,18 @@ export function useOnlineMatch<S, M, P>(
     presentationRef.current = presentation;
   });
 
-  const attachPresentation = (controller: OnlineMatchController<S, M, P>) => {
-    controller.onPresentation = (resolution) =>
-      presentationRef.current(resolution);
-  };
-
-  const [entry, setEntry] = useState(() => {
-    const controller = new OnlineMatchController(transport, definition);
-    attachPresentation(controller);
-    return { transport, controller };
-  });
-  // 会话（房间代次）更换时才重建控制器；重赛在控制器内部换 runner。
-  if (entry.transport !== transport) {
-    const controller = new OnlineMatchController(transport, definition);
-    attachPresentation(controller);
-    setEntry({ transport, controller });
-  }
-  const { controller } = entry;
+  const controller = retainedOnlineController<S, M, P>(transport);
   const snapshot = useSyncExternalStore(
     controller.subscribe,
     controller.getSnapshot,
   );
-  useEffect(() => controller.retain(), [controller]);
+  useEffect(() => {
+    const present: Presentation<S, P> = (resolution) => {
+      if (areGamesForeground()) presentationRef.current(resolution);
+    };
+
+    return controller.attachPresentation(present);
+  }, [controller]);
   const noticedRef = useRef(0);
   useEffect(() => {
     const notice = snapshot.notice;

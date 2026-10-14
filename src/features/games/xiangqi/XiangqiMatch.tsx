@@ -1,33 +1,26 @@
 import { Plural, Trans } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
-import { AiController, LocalController } from "../engine/controllers";
 import { GameResultBar } from "../engine/GameResultBar";
 import { useGamesHistoryStore } from "../engine/history";
-import { MatchRunner, useMatchSnapshot } from "../engine/match";
-import type { PlayerController, SeatIndex } from "../engine/types";
-import { xiangqiAiStrategy } from "./ai";
-import {
-  playCheckSound,
-  playFinishSound,
-  playMoveSound,
-  xiangqiAudio,
-} from "./audio";
+import { useMatchSnapshot } from "../engine/match";
+import type { SeatIndex } from "../engine/types";
+import { useLocalGameSession } from "../engine/use-game-session";
+import { playCheckSound, playFinishSound, playMoveSound } from "./audio";
 import { matchResultLabel, resultReasonLabel, sideName } from "./labels";
-import { createInitialXiangqiState, legalMoves, xiangqiGame } from "./rules";
+import { legalMoves } from "./rules";
+import { xiangqiSessions } from "./session";
 import {
   XIANGQI_GAME_ID,
   type XiangqiHistoryPayload,
   type XiangqiMode,
-  type XiangqiMove,
   type XiangqiSession,
-  type XiangqiState,
 } from "./types";
 import { XiangqiStage } from "./XiangqiStage";
 
@@ -47,63 +40,14 @@ export function XiangqiMatch({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
 }) {
-  const [session, setSession] = useState<XiangqiSession | null>(null);
   const volume = useSettingsStore((state) => state.gamesVolume);
-  // runner 每个 keyed 实例只构建一次；音量通过最新值 ref 读取，
-  // 以免对局中途改音量导致 runner 重建。
-  const volumeRef = useRef(volume);
-  useEffect(() => {
-    volumeRef.current = volume;
-  }, [volume]);
-  useEffect(() => {
-    const local = new LocalController<XiangqiState, XiangqiMove>();
-    let controllers: PlayerController<XiangqiState, XiangqiMove>[];
-    if (mode.kind === "hotseat") {
-      controllers = [local, local];
-    } else {
-      const ai = new AiController(xiangqiAiStrategy, mode.difficulty, 350);
-      controllers = mode.localSeat === 0 ? [local, ai] : [ai, local];
-    }
-    const runner = new MatchRunner(
-      xiangqiGame,
-      createInitialXiangqiState(),
-      controllers,
-      {
-        onMoveResolved: ({ resolution }) => {
-          playMoveSound(
-            volumeRef.current,
-            resolution.presentation.captured !== null,
-          );
-          if (resolution.state.resultReason === "checkmate") {
-            playCheckSound(volumeRef.current, true);
-          } else if (resolution.state.inCheck) {
-            playCheckSound(volumeRef.current);
-          } else if (resolution.state.finished) {
-            playFinishSound(volumeRef.current);
-          }
-        },
-        onError: (error) => console.error("xiangqi match error", error),
-      },
-    );
-    runner.start();
-    // 用微任务延迟，使 setState 发生在 effect 主体之外；cancelled 标记
-    // 防止严格模式重挂载时发布已销毁的 runner。
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled)
-        setSession({
-          runner,
-          local,
-        });
-    });
-    return () => {
-      cancelled = true;
-      runner.dispose();
-      xiangqiAudio.stop();
-      setSession(null);
-    };
-    // 每个 keyed 的 XiangqiMatch 实例持有唯一的不可变 mode 配置。
-  }, [mode]);
+  const session = useLocalGameSession(xiangqiSessions, ({ resolution }) => {
+    playMoveSound(volume, resolution.presentation.captured !== null);
+    if (resolution.state.resultReason === "checkmate")
+      playCheckSound(volume, true);
+    else if (resolution.state.inCheck) playCheckSound(volume);
+    else if (resolution.state.finished) playFinishSound(volume);
+  });
   if (!session) return <div className="flex-1" />;
   return (
     <XiangqiMatchView
@@ -175,7 +119,7 @@ export function XiangqiMatchView({
     if (!state.finished || !state.resultReason || recordedRef.current) return;
     recordedRef.current = true;
     addRecord({
-      id: crypto.randomUUID(),
+      id: runner.id,
       gameId: XIANGQI_GAME_ID,
       finishedAt: Date.now(),
       payload: {
@@ -196,6 +140,7 @@ export function XiangqiMatchView({
     // 每个依赖都稳定。
   }, [
     addRecord,
+    runner.id,
     mode,
     online,
     snapshot.winnerSeat,
