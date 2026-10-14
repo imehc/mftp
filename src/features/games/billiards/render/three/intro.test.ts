@@ -3,11 +3,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createIntro, hasEntered, markEntered } from "./intro";
 
-function setup(repeat = false, reduced = false) {
+function setup(repeat = false, reduced = false, resume = false) {
   const options = {
     repeat,
     reduced,
+    resume,
     camera: vi.fn(),
+    rack: vi.fn(),
     reveal: vi.fn(),
     update: vi.fn(),
     ready: vi.fn(),
@@ -25,18 +27,36 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("台球克制入场与重开", () => {
-  it("首次整体显现后仍有可见推近，镜头收稳后才交接输入", () => {
+describe("台球摆球与连贯拉远入场", () => {
+  it("显现后推球到位，先抬框再退出，同时连贯拉远后交接输入", () => {
     const { options, timeline } = setup();
     expect(options.camera).toHaveBeenLastCalledWith(1);
     expect(options.reveal).toHaveBeenLastCalledWith(0);
-    expect(timeline.duration()).toBeCloseTo(0.5);
-    timeline.totalTime(0.18, false);
-    expect(options.camera.mock.lastCall![0]).toBeGreaterThan(0.5);
-    expect(options.camera.mock.lastCall![0]).toBeLessThan(1);
+    expect(timeline.duration()).toBeCloseTo(2.2);
+    const pace = 2.2 / 1.55;
+    timeline.totalTime(0.4 * pace, false);
+    expect(options.camera).toHaveBeenLastCalledWith(1);
+    expect(options.rack.mock.lastCall![0].push).toBeGreaterThan(0);
+    expect(options.rack.mock.lastCall![0].push).toBeLessThan(1);
     expect(options.reveal).toHaveBeenLastCalledWith(1);
     expect(options.ready).not.toHaveBeenCalled();
-    timeline.totalTime(0.5, false);
+    timeline.totalTime(0.82 * pace, false);
+    expect(options.rack.mock.lastCall![0].push).toBe(1);
+    expect(options.rack.mock.lastCall![0].lift).toBeGreaterThan(0);
+    expect(options.rack.mock.lastCall![0].exit).toBe(0);
+    expect(options.camera.mock.lastCall![0]).toBeLessThan(1);
+    timeline.totalTime(1.15 * pace, false);
+    expect(options.rack.mock.lastCall![0].lift).toBe(1);
+    expect(options.rack.mock.lastCall![0].exit).toBeGreaterThan(0);
+    expect(options.camera.mock.lastCall![0]).toBeGreaterThan(0);
+    expect(options.ready).not.toHaveBeenCalled();
+    timeline.totalTime(2.2, false);
+    expect(options.rack.mock.lastCall![0]).toMatchObject({
+      push: 1,
+      lift: 1,
+      exit: 1,
+      opacity: 0,
+    });
     expect(options.camera).toHaveBeenLastCalledWith(0);
     expect(options.reveal).toHaveBeenLastCalledWith(1);
     expect(options.ready).toHaveBeenCalledTimes(1);
@@ -45,16 +65,20 @@ describe("台球克制入场与重开", () => {
     );
   });
 
-  it("同页重开保留半幅短推近，不会退化为瞬间出现", () => {
+  it("同页重开缩短整套摆球拉远而不是省略推球", () => {
     const { options, timeline } = setup(true);
-    expect(options.camera).toHaveBeenLastCalledWith(0.5);
-    expect(timeline.duration()).toBeCloseTo(0.28);
-    timeline.totalTime(0.14, false);
+    expect(options.camera).toHaveBeenLastCalledWith(1);
+    expect(timeline.duration()).toBeCloseTo(1.3);
+    const pace = 1.3 / 0.93;
+    timeline.totalTime(0.24 * pace, false);
+    expect(options.rack.mock.lastCall![0].push).toBeGreaterThan(0);
+    expect(options.rack.mock.lastCall![0].push).toBeLessThan(1);
+    timeline.totalTime(0.6 * pace, false);
     expect(options.camera.mock.lastCall![0]).toBeGreaterThan(0);
-    expect(options.camera.mock.lastCall![0]).toBeLessThan(0.5);
+    expect(options.camera.mock.lastCall![0]).toBeLessThan(1);
     expect(options.reveal).toHaveBeenLastCalledWith(1);
     expect(options.ready).not.toHaveBeenCalled();
-    timeline.totalTime(0.28, false);
+    timeline.totalTime(1.3, false);
     expect(options.camera).toHaveBeenLastCalledWith(0);
     expect(options.ready).toHaveBeenCalledTimes(1);
   });
@@ -74,6 +98,17 @@ describe("台球克制入场与重开", () => {
       expect(options.ready).toHaveBeenCalledTimes(1);
     },
   );
+
+  it("恢复对局覆盖重开标记，仅以最终取景短淡入", () => {
+    const { options, timeline } = setup(true, false, true);
+    expect(timeline.duration()).toBeCloseTo(0.16);
+    timeline.totalTime(0.16, false);
+    expect(options.camera.mock.calls.every(([value]) => value === 0)).toBe(
+      true,
+    );
+    expect(options.rack.mock.lastCall![0].push).toBe(0);
+    expect(options.ready).toHaveBeenCalledTimes(1);
+  });
 
   it("销毁移除时间线且幂等，迟到更新和完成不再触发场景回调", () => {
     const { options, intro, timeline } = setup();

@@ -1,8 +1,9 @@
 import { Group, type WebGLRenderer } from "three";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { CHINESE_EIGHT } from "../../equipment";
+import { CHINESE_EIGHT, SNOOKER, type TableEquipment } from "../../equipment";
 import { createInitialState } from "../../rules";
+import { createSnookerState } from "../../snooker";
 import { createCue } from "./cue";
 import { createTableInput } from "./input";
 import { createIntro } from "./intro";
@@ -12,6 +13,10 @@ const mocks = vi.hoisted(() => ({
   disposeIntro: vi.fn(),
   disposeInput: vi.fn(),
   disposeResources: vi.fn(),
+  syncBalls: vi.fn(),
+  prepareRack: vi.fn((_state: unknown) => true),
+  updateRack: vi.fn(),
+  finishRack: vi.fn(),
 }));
 
 vi.mock("../audio", () => ({
@@ -29,7 +34,7 @@ vi.mock("./balls", () => ({
   createBallLayer: () => ({
     layer: new Group(),
     meshes: new Map(),
-    sync: vi.fn(),
+    sync: mocks.syncBalls,
   }),
 }));
 vi.mock("./ball-selection", () => ({
@@ -76,9 +81,34 @@ vi.mock("./input", () => ({
 vi.mock("./intro", () => ({
   createIntro: vi.fn(() => ({ dispose: mocks.disposeIntro })),
 }));
+vi.mock("./rack-intro", () => ({
+  createRackIntro: () => {
+    let active = false;
+    return {
+      layer: new Group(),
+      get active() {
+        return active;
+      },
+      prepare(state: unknown) {
+        active = mocks.prepareRack(state);
+        return active;
+      },
+      update: mocks.updateRack,
+      finish() {
+        active = false;
+        mocks.finishRack();
+      },
+    };
+  },
+}));
 
-function setup(compile: Promise<void> = Promise.resolve()) {
-  vi.stubGlobal("window", { matchMedia: () => ({ matches: false }) });
+function setup(
+  compile: Promise<void> = Promise.resolve(),
+  resume = false,
+  reduced = false,
+  equipment: TableEquipment = CHINESE_EIGHT,
+) {
+  vi.stubGlobal("window", { matchMedia: () => ({ matches: reduced }) });
   const renderer = {
     domElement: {
       style: { opacity: "1" },
@@ -94,13 +124,18 @@ function setup(compile: Promise<void> = Promise.resolve()) {
     onReady: vi.fn(),
     onError: vi.fn(),
   };
-  const state = createInitialState("practice");
+  const state =
+    equipment.id === "snooker"
+      ? createSnookerState(15)
+      : createInitialState("practice");
   const scene = createScene(
     renderer,
     callbacks,
-    CHINESE_EIGHT,
+    equipment,
     state.balls.map((ball) => ball.id),
     false,
+    false,
+    resume,
   );
   scene.resize(1024, 600);
   scene.setPosition(state, true);
@@ -114,6 +149,22 @@ afterEach(() => {
 });
 
 describe("台球入场场景生命周期", () => {
+  it("斯诺克直接全桌淡入且不创建摆球工具", async () => {
+    const { scene, callbacks } = setup(
+      Promise.resolve(),
+      false,
+      false,
+      SNOOKER,
+    );
+    await Promise.resolve();
+    expect(mocks.prepareRack).not.toHaveBeenCalled();
+    const intro = vi.mocked(createIntro).mock.lastCall![0];
+    expect(intro.resume).toBe(true);
+    intro.ready();
+    expect(callbacks.onReady).toHaveBeenCalledTimes(1);
+    scene.destroy();
+  });
+
   it("预热和入场期间锁定输入，完成时才交接最新请求的交互状态", async () => {
     const { scene, state, callbacks, input, renderer } = setup();
     expect(input.enabled()).toBe(false);
@@ -123,19 +174,65 @@ describe("台球入场场景生命周期", () => {
     const cue = vi.mocked(createCue).mock.results.at(-1)!.value;
     const poses = cue.pose.mock.calls.length;
     const intro = vi.mocked(createIntro).mock.lastCall![0];
-    // 预热完成后也保持隐藏，由时间线统一显现场景，避免先闪出完整球桌。
     expect(renderer.domElement.style.opacity).toBe("0");
     intro.reveal(0.5);
     intro.update();
     expect(renderer.domElement.style.opacity).toBe("0.5");
-    expect(cue.pose).toHaveBeenCalledTimes(poses + 1);
+    expect(cue.pose).toHaveBeenCalledTimes(poses);
+    expect(mocks.prepareRack).toHaveBeenCalledTimes(1);
+    expect(mocks.updateRack).toHaveBeenCalled();
+    const syncs = mocks.syncBalls.mock.calls.length;
     scene.setPosition(state, false);
+    expect(mocks.syncBalls).toHaveBeenCalledTimes(syncs);
     vi.mocked(createIntro).mock.lastCall![0].ready();
     expect(input.enabled()).toBe(false);
+    expect(callbacks.onReady).toHaveBeenCalledTimes(1);
+    expect(mocks.finishRack).toHaveBeenCalledTimes(1);
+    intro.ready();
     expect(callbacks.onReady).toHaveBeenCalledTimes(1);
     scene.setPosition(state, true);
     expect(input.enabled()).toBe(true);
     expect(createIntro).toHaveBeenCalledTimes(1);
+    scene.destroy();
+  });
+
+  it.each([
+    [true, false],
+    [false, true],
+  ])(
+    "恢复或减少动态效果不创建球框（恢复：%s，减少：%s）",
+    async (resume, reduced) => {
+      const { scene } = setup(Promise.resolve(), resume, reduced);
+      await Promise.resolve();
+      expect(mocks.prepareRack).not.toHaveBeenCalled();
+      expect(vi.mocked(createIntro).mock.lastCall![0].resume).toBe(true);
+      scene.destroy();
+    },
+  );
+
+  it("预热失败沿用错误回调且不交接输入", async () => {
+    const error = new Error("shader warmup failed");
+    const { scene, callbacks, input } = setup(Promise.reject(error));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(callbacks.onError).toHaveBeenCalledWith(error);
+    expect(callbacks.onReady).not.toHaveBeenCalled();
+    expect(input.enabled()).toBe(false);
+    scene.destroy();
+  });
+
+  it("入场同步不打断临时球位，完成时以最新真实快照收尾", async () => {
+    const { scene, state } = setup();
+    await Promise.resolve();
+    const next = {
+      ...state,
+      balls: state.balls.map((ball) => ({ ...ball, x: ball.x + 0.01 })),
+    };
+    const syncs = mocks.syncBalls.mock.calls.length;
+    scene.setPosition(next, true);
+    expect(mocks.syncBalls).toHaveBeenCalledTimes(syncs);
+    vi.mocked(createIntro).mock.lastCall![0].ready();
+    expect(mocks.syncBalls).toHaveBeenLastCalledWith(next.balls);
     scene.destroy();
   });
 

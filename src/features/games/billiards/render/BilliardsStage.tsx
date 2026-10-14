@@ -174,7 +174,8 @@ export const BilliardsStage = forwardRef<
         equipment,
         propsRef.current.state.balls.map((ball) => ball.id),
         mobile,
-        hasEntered(entryHost) || propsRef.current.resume === true,
+        hasEntered(entryHost),
+        propsRef.current.resume === true,
       );
       sceneRef.current = scene;
 

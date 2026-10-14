@@ -11,7 +11,16 @@ import { describe, expect, it } from "vitest";
 
 import { EQUIPMENT } from "../../equipment";
 import { tableLayout } from "../layout";
+import type { CameraFocus } from "./camera";
 import { createTableCamera } from "./camera";
+
+const focus: CameraFocus = {
+  x: 0.8,
+  z: 0,
+  halfWidth: 0.45,
+  halfHeight: 0.35,
+  ceiling: 0.3,
+};
 
 const viewports = [
   [320, 600, true],
@@ -23,7 +32,7 @@ const viewports = [
   [844, 240, false],
 ] as const;
 
-describe("台球正俯视与微推近取景", () => {
+describe("台球正俯视与摆球近景取景", () => {
   it("斯诺克采用正交投影，左右及顶库球的轮廓均保持等宽高", () => {
     const equipment = EQUIPMENT.snooker;
     const rig = createTableCamera(equipment);
@@ -61,13 +70,14 @@ describe("台球正俯视与微推近取景", () => {
   });
 
   for (const equipment of Object.values(EQUIPMENT)) {
-    it(`${equipment.id} 在横竖窄屏全程包含外框的全部包围角点`, () => {
+    it(`${equipment.id} 在横竖窄屏最终完整包含外框角点`, () => {
       const rig = createTableCamera(equipment);
       const { OUTER_W, OUTER_H } = tableLayout(equipment);
       for (const [width, height, portrait] of viewports) {
         rig.resize(width, height, portrait);
-        for (let step = 0; step <= 40; step++) {
-          rig.entrance(step / 40);
+        {
+          rig.focus(focus);
+          rig.entrance(0);
           for (const x of [-OUTER_W - 0.015, OUTER_W + 0.015]) {
             for (const z of [-OUTER_H - 0.015, OUTER_H + 0.015]) {
               for (const y of [-0.1, 0.06]) {
@@ -104,11 +114,13 @@ describe("台球正俯视与微推近取景", () => {
 
     it(`${equipment.id} 入场中调整尺寸不会重置镜头进度`, () => {
       const resized = createTableCamera(equipment);
+      resized.focus(focus);
       resized.resize(1440, 600, false);
       resized.entrance(0.43);
       for (const [width, height, portrait] of viewports) {
         resized.resize(width, height, portrait);
         const expected = createTableCamera(equipment);
+        expected.focus(focus);
         expected.resize(width, height, portrait);
         expected.entrance(0.43);
         expect(
@@ -122,6 +134,7 @@ describe("台球正俯视与微推近取景", () => {
 
     it(`${equipment.id} 各入场进度下投影与台面求交一致`, () => {
       const rig = createTableCamera(equipment);
+      rig.focus(focus);
       const plane = new Plane(new Vector3(0, 1, 0), 0);
       const ray = new Raycaster();
       for (const [width, height, portrait] of viewports) {
@@ -153,24 +166,48 @@ describe("台球正俯视与微推近取景", () => {
     });
   }
 
-  it("入场全程不旋转或倾斜，只小幅单向推近", () => {
+  it("近景全程不旋转或倾斜，连续拉远至原全桌取景", () => {
     const rig = createTableCamera(EQUIPMENT["chinese-eight"]);
     for (const [width, height, portrait] of viewports) {
       rig.resize(width, height, portrait);
+      rig.focus(focus);
       rig.entrance(0);
       const finalDistance = rig.camera.position.y;
       const orientation = rig.camera.quaternion.clone();
       rig.entrance(1);
-      expect(rig.camera.position.y / finalDistance).toBeCloseTo(1.08, 10);
+      expect(rig.camera.position.y).toBeLessThan(finalDistance);
       let previousDistance = rig.camera.position.y;
       for (let step = 40; step >= 0; step--) {
         rig.entrance(step / 40);
-        expect(rig.camera.position.x).toBe(0);
+        expect(rig.camera.position.x).toBeCloseTo(focus.x * (step / 40));
         expect(rig.camera.position.z).toBe(0);
         expect(rig.camera.quaternion.angleTo(orientation)).toBeCloseTo(0, 7);
-        expect(rig.camera.position.y).toBeLessThanOrEqual(previousDistance);
-        expect(rig.camera.position.y).toBeGreaterThanOrEqual(finalDistance);
+        expect(rig.camera.position.y).toBeGreaterThanOrEqual(
+          previousDistance - 1e-12,
+        );
+        expect(rig.camera.position.y).toBeLessThanOrEqual(finalDistance);
         previousDistance = rig.camera.position.y;
+      }
+    }
+  });
+
+  it("各投影和方向的近景包含球框包围范围", () => {
+    for (const equipment of Object.values(EQUIPMENT)) {
+      const rig = createTableCamera(equipment);
+      rig.focus(focus);
+      rig.entrance(1);
+      for (const [width, height, portrait] of viewports) {
+        rig.resize(width, height, portrait);
+        for (const horizontal of [-1, 1])
+          for (const vertical of [-1, 1]) {
+            const corner = new Vector3(
+              focus.x + horizontal * focus.halfWidth,
+              focus.ceiling,
+              vertical * focus.halfHeight,
+            ).project(rig.camera);
+            expect(Math.abs(corner.x)).toBeLessThan(1);
+            expect(Math.abs(corner.y)).toBeLessThan(1);
+          }
       }
     }
   });

@@ -8,6 +8,9 @@ export function createResources() {
       resources.add(resource);
       return resource;
     },
+    release(resource: BufferGeometry | Material | Texture) {
+      if (resources.delete(resource)) resource.dispose();
+    },
     dispose() {
       for (const resource of resources) resource.dispose();
       resources.clear();

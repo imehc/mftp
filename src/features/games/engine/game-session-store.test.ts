@@ -70,6 +70,23 @@ afterEach(() => {
 });
 
 describe("跨页面会话与跨进程检查点", () => {
+  it("零走法存档恢复保留来源标记，新局不误判为恢复", async () => {
+    const first = fixture();
+    await first.store.load();
+    first.store.start("local");
+    const fresh = first.store.ensureSession()!;
+    expect(fresh.restored).toBe(false);
+    await tick();
+    const next = fixture(first.value());
+    await next.store.load();
+    next.store.restore();
+    const restored = next.store.ensureSession()!;
+    expect(restored.restored).toBe(true);
+    expect(restored.runner.hasStarted).toBe(false);
+    expect(restored.runner.getCheckpoint()).toEqual([0]);
+    expect(next.store.ensureSession()).toBe(restored);
+  });
+
   it("检查点版本可独立演进，不猜测恢复不兼容规则的存档", async () => {
     const first = fixture(undefined, 2);
     await first.store.load();

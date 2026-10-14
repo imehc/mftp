@@ -432,7 +432,9 @@ export function MatchView({
 
         <BilliardsStage
           ref={stageRef}
-          resume={runner.hasStarted || snapshot.moveCount > 0}
+          resume={
+            session.restored || runner.hasStarted || snapshot.moveCount > 0
+          }
           onReady={() => runner.start()}
           onError={onStageError}
           state={state}

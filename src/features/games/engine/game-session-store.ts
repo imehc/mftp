@@ -21,6 +21,7 @@ export interface GameCheckpoint<Mode, State> {
 }
 
 export interface LocalGameSession<State, Move, Presentation> {
+  restored?: boolean;
   runner: MatchRunner<State, Move, Presentation>;
   local: LocalController<State, Move>;
   dispose?(): void;
@@ -201,6 +202,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
         },
         { id: active.id, history: this.restored?.history },
       );
+      session.restored = this.restored !== undefined;
       this.restored = undefined;
       this.publish({ active: { ...active, session }, error: null });
       this.save(active.id, session.runner.getCheckpoint());

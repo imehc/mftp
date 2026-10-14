@@ -3,7 +3,15 @@ import { OrthographicCamera, PerspectiveCamera } from "three";
 import type { TableEquipment } from "../../equipment";
 import { tableLayout } from "../layout";
 
-/** 固定正俯视机位；按当前视口完整取景，resize 保留微推近的剩余进度。 */
+export interface CameraFocus {
+  x: number;
+  z: number;
+  halfWidth: number;
+  halfHeight: number;
+  ceiling: number;
+}
+
+/** 正俯视机位从球堆近景拉回全桌，resize 不重置当前过渡进度。 */
 export function createTableCamera(equipment: TableEquipment) {
   const camera =
     equipment.id === "snooker"
@@ -13,6 +21,7 @@ export function createTableCamera(equipment: TableEquipment) {
   let intro = 0;
   let portrait = false;
   let aspect = 1;
+  let focus: CameraFocus | null = null;
 
   function apply() {
     camera.up.set(portrait ? 1 : 0, 0, portrait ? 0 : -1);
@@ -20,21 +29,29 @@ export function createTableCamera(equipment: TableEquipment) {
     const tanH = tanV * aspect;
     const halfWidth = (portrait ? OUTER_H : OUTER_W) + 0.015;
     const halfHeight = (portrait ? OUTER_W : OUTER_H) + 0.015;
-    // 预留桌框厚度与边距；入场只改变 8% 距离，桌面朝向与最终取景保持一致。
-    const distance =
-      (0.06 + Math.max(halfWidth / tanH, halfHeight / tanV)) *
-      1.055 *
-      (1 + intro * 0.08);
-    camera.position.set(0, distance, 0);
+    const fullDistance =
+      (0.06 + Math.max(halfWidth / tanH, halfHeight / tanV)) * 1.055;
+    const nearDistance = focus
+      ? focus.ceiling +
+        Math.max(
+          (portrait ? focus.halfHeight : focus.halfWidth) / tanH,
+          (portrait ? focus.halfWidth : focus.halfHeight) / tanV,
+        ) *
+          1.1
+      : fullDistance;
+    const distance = fullDistance + (nearDistance - fullDistance) * intro;
+    const targetX = (focus?.x ?? 0) * intro;
+    const targetZ = (focus?.z ?? 0) * intro;
+    camera.position.set(targetX, distance, targetZ);
     if (camera instanceof OrthographicCamera) {
       camera.left = -distance * tanH;
       camera.right = distance * tanH;
       camera.top = distance * tanV;
       camera.bottom = -distance * tanV;
     } else camera.aspect = aspect;
-    camera.far = distance * 4;
+    camera.far = fullDistance * 4;
     camera.updateProjectionMatrix();
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(targetX, 0, targetZ);
     camera.updateMatrixWorld();
   }
 
@@ -47,6 +64,10 @@ export function createTableCamera(equipment: TableEquipment) {
     },
     entrance(value: number) {
       intro = Math.max(0, Math.min(1, value));
+      apply();
+    },
+    focus(next: CameraFocus | null) {
+      focus = next;
       apply();
     },
   };

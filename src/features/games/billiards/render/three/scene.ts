@@ -24,6 +24,7 @@ import { createHud } from "./hud";
 import { createTableInput } from "./input";
 import { createIntro } from "./intro";
 import { createLighting } from "./lighting";
+import { createRackIntro } from "./rack-intro";
 import { createResources } from "./resources";
 import { buildTable } from "./table";
 
@@ -34,6 +35,7 @@ export function createScene(
   ballIds: readonly number[],
   mobile: boolean,
   repeatIntro = false,
+  resumeIntro = false,
 ): BilliardsScene & { resize(width: number, height: number): void } {
   const resources = createResources();
 
@@ -58,7 +60,8 @@ export function createScene(
     const ballLayer = createBallLayer(equipment, ballIds, mobile, resources);
     const hud = createHud(equipment, resources);
     const cueView = createCue(equipment, resources);
-    world.add(ballLayer.layer, hud.layer, cueView.layer);
+    const rack = createRackIntro(equipment, ballLayer, camera, resources);
+    world.add(ballLayer.layer, hud.layer, cueView.layer, rack.layer);
     const lighting = createLighting(renderer, world, equipment, mobile);
     releaseLighting = lighting.dispose;
     renderer.domElement.style.opacity = "0";
@@ -193,6 +196,8 @@ export function createScene(
       clock.invalidate();
 
       if (!ready) {
+        rack.update();
+        if (rack.active && rack.layer.visible) return;
         const cue = cuePos();
         if (cue) {
           drawCueStick(cue.x, cue.y);
@@ -443,6 +448,12 @@ export function createScene(
     function startIntro() {
       if (introStarted) return;
       introStarted = true;
+      const resume =
+        resumeIntro ||
+        reduced ||
+        equipment.id === "snooker" ||
+        !position ||
+        !rack.prepare(position);
       // 先预热实际球桌着色器；异步完成前退出不再创建动画或触发 runner。
       void renderer
         .compileAsync(world, camera.camera)
@@ -451,13 +462,16 @@ export function createScene(
           intro = createIntro({
             repeat: repeatIntro,
             reduced,
+            resume,
             camera: camera.entrance,
+            rack: rack.update,
             reveal(value) {
               renderer.domElement.style.opacity = String(value);
             },
             update: redrawOverlays,
             ready() {
-              if (disposed) return;
+              if (disposed || ready) return;
+              rack.finish();
               ready = true;
               if (position) setPosition(position, requestedInteractive);
               callbacks.onReady();
@@ -477,7 +491,7 @@ export function createScene(
       requestedInteractive = nextInteractive;
       interactive = nextInteractive && ready;
       ballInHand = interactive && state.ballInHand;
-      if (!playing && !selection.active) ballLayer.sync(balls);
+      if (!playing && !selection.active && !rack.active) ballLayer.sync(balls);
       if (ballInHand) {
         if (!placing) {
           const spot = defaultCueSpot();
@@ -530,6 +544,7 @@ export function createScene(
         if (disposed) return;
         disposed = true;
         intro?.dispose();
+        rack.finish();
         renderer.domElement.style.opacity = "1";
         renderer.domElement.removeEventListener(
           "pointerdown",
