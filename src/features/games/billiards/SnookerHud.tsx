@@ -6,8 +6,10 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { FieldGroup } from "~/components/ui/field";
 
+import { foulLabel, FoulSummary } from "./BilliardsFoulFeedback";
 import { seatName } from "./BilliardsScore";
-import { availablePoints, needsPenaltyPoints, snookerSeat } from "./snooker";
+import { foulFeedback } from "./foul-feedback";
+import { availablePoints, needsPenaltyPoints } from "./snooker";
 import { snookerRuleActions } from "./snooker-rule-actions";
 import type { BilliardsMode, BilliardsMove, SnookerState } from "./types";
 
@@ -68,42 +70,54 @@ export function SnookerActions({
 }) {
   const decision = state.decision;
   const actions = snookerRuleActions(state);
-  const player = seatName(mode, snookerSeat(state));
+  const player = seatName(mode, decision?.seat ?? state.turnSeat);
+  const otherPlayer = seatName(mode, 1 - (decision?.seat ?? state.turnSeat));
+  const offender =
+    decision?.kind === "foul" ? seatName(mode, decision.shooter) : null;
   const remaining = availablePoints(state);
-  const penalty = state.lastScore?.penalty ?? 0;
+  const feedback = foulFeedback(state);
   const choose = (
     choice: Extract<BilliardsMove, { type: "decision" }>["choice"],
   ) => onMove({ type: "decision", choice });
   return (
     <div className="flex flex-col gap-3 text-sm">
+      {feedback ? (
+        <div className="flex flex-col gap-1" role="status">
+          <p>
+            <FoulSummary feedback={feedback} mode={mode} />
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {foulLabel(feedback.reason)}
+          </p>
+        </div>
+      ) : null}
       {decision ? (
         <div className="flex flex-col gap-3">
           <p className="leading-relaxed">
-            {player}
-            {" · "}
             {decision.kind === "black-choice" ? (
-              <Trans>同分黑球已复位。抽签获选者决定谁先打，母球在 D 区。</Trans>
+              <Trans comment="斯诺克同分黑球，player 是抽签获选的决策者">
+                同分黑球已复位。{player} 抽签获选，决定谁先打，母球在 D 区。
+              </Trans>
             ) : decision.warning === "three-miss" ? (
-              <Trans>可整球直击却连续两次漏击，再次原位漏击将判负。</Trans>
+              <Trans comment="offender 是连续漏击的犯规者，不是确认警告的人">
+                {offender} 可整球直击却连续两次漏击，再次原位漏击将判负。
+              </Trans>
             ) : decision.warning === "six-red" ? (
-              <Trans>
-                已原位连续漏击四次。第五次后对手可能获得全台手中球。
+              <Trans comment="六红球警告；offender 是犯规者，player 是可能获得手中球的决策者">
+                {offender} 已原位连续漏击四次。第五次后 {player}{" "}
+                可能获得全台手中球。
               </Trans>
             ) : state.lastScore?.miss ? (
-              <Trans>
-                犯规并漏击。可接打、要求对方留下位置重打，或在允许时恢复原位。
+              <Trans comment="斯诺克漏击；player 是选择接打方式的人，offender 是重打者">
+                本杆判为漏击。由 {player} 选择接打、要求 {offender}{" "}
+                从留下位置重打，或在允许时恢复原位。
               </Trans>
             ) : (
-              <Trans>犯规。可自己接打，或要求对方从留下位置重打。</Trans>
+              <Trans comment="斯诺克犯规；player 是决策者，offender 是犯规者">
+                由 {player} 选择接打，或要求 {offender} 从留下位置重打。
+              </Trans>
             )}
           </p>
-          {penalty > 0 ? (
-            <p className="text-muted-foreground" role="status">
-              <Trans comment="斯诺克犯规处理弹层，本杆判罚的分数">
-                犯规罚分：{penalty} 分
-              </Trans>
-            </p>
-          ) : null}
           <div className="flex flex-col">
             {decision.kind === "foul" && decision.warning ? (
               <SnookerRuleChoice
@@ -120,7 +134,11 @@ export function SnookerActions({
                 <SnookerRuleChoice
                   disabled={!enabled}
                   onClick={() => choose("accept")}
-                  description={<Trans>由你完成下一杆。</Trans>}
+                  description={
+                    <Trans comment="player 是当前有权选择接打方式的人">
+                      由 {player} 完成下一杆。
+                    </Trans>
+                  }
                 >
                   <Trans comment="斯诺克犯规后或同分黑球抽签后选择自己击球">
                     自己接打
@@ -129,7 +147,11 @@ export function SnookerActions({
                 <SnookerRuleChoice
                   disabled={!enabled}
                   onClick={() => choose("return")}
-                  description={<Trans>由对方完成下一杆。</Trans>}
+                  description={
+                    <Trans comment="otherPlayer 是决策者指定的另一位击球者">
+                      由 {otherPlayer} 完成下一杆。
+                    </Trans>
+                  }
                 >
                   <Trans comment="斯诺克要求另一位球员从桌面当前球位击球">
                     由对方击球
@@ -155,8 +177,8 @@ export function SnookerActions({
                     disabled={!enabled}
                     onClick={() => choose("anywhere")}
                     description={
-                      <Trans comment="六红球特殊手中球，可在全台合法位置摆放母球">
-                        在全台合法位置摆放母球，由你击球。
+                      <Trans comment="六红球特殊手中球，player 是获得摆球和击球权的决策者">
+                        在全台合法位置摆放母球，由 {player} 击球。
                       </Trans>
                     }
                   >
@@ -196,13 +218,6 @@ export function SnookerActions({
           ) : null}
         </FieldGroup>
       )}
-      {!decision && state.lastScore?.penalty ? (
-        <span role="status">
-          <Trans comment="斯诺克犯规罚分计入对手比分">
-            对手获罚分 {penalty}
-          </Trans>
-        </span>
-      ) : null}
       {needsPenaltyPoints(state) ? (
         <span className="text-inherit">
           <Trans>台面余分 {remaining}，落后方需要罚分追赶；对局继续。</Trans>

@@ -360,6 +360,7 @@ export function reduceSnookerShot(
       (count, seat) => count + (foul && seat === shooter ? 1 : 0),
     ),
     lastOutcome: {
+      shooter,
       foul,
       potted: sim.pottedInOrder,
       continueTurn,

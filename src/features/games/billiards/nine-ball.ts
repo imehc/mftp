@@ -131,6 +131,7 @@ export function reduceNineBallShot(
       (count, seat) => count + (seat === shooter && foul ? 1 : 0),
     ),
     lastOutcome: {
+      shooter,
       foul,
       potted,
       continueTurn,

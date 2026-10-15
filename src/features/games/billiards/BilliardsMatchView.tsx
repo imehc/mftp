@@ -18,6 +18,7 @@ import type { Session } from "./BilliardsMatch";
 import { BilliardsRuleControl } from "./BilliardsRuleControl";
 import { BilliardsRulePanel } from "./BilliardsRulePanel";
 import { BallTray, SeatCell, seatName } from "./BilliardsScore";
+import { BilliardsStatus } from "./BilliardsStatus";
 import { BilliardsVictory } from "./BilliardsVictory";
 import { NineBallScore } from "./NineBallHud";
 import { equipmentForState } from "./placement";
@@ -37,32 +38,9 @@ import {
   type BilliardsHistoryPayload,
   type BilliardsMode,
   type BilliardsMove,
-  type FoulReason,
 } from "./types";
+import { useFoulNotification } from "./use-foul-notification";
 import { useRulePanel } from "./use-rule-panel";
-
-function foulLabel(foul: FoulReason) {
-  switch (foul) {
-    case "wrong-ball-potted":
-      return <Trans>犯规：打进非目标球</Trans>;
-    case "touching-ball-moved":
-      return <Trans>犯规：推动贴球</Trans>;
-    case "snooker-behind-nomination":
-      return <Trans>犯规：用指定球做障碍</Trans>;
-    case "cue-potted":
-      return <Trans>犯规：母球落袋</Trans>;
-    case "no-contact":
-      return <Trans>犯规：未碰到任何球</Trans>;
-    case "wrong-first-contact":
-      return <Trans>犯规：未先碰到合法目标球</Trans>;
-    case "no-rail":
-      return <Trans>犯规：未进球且首碰后无球碰库</Trans>;
-    case "illegal-break":
-      return <Trans>犯规：开球无进球且不足四个目标球碰库</Trans>;
-    case "potted-eight-early":
-      return <Trans>犯规：提前打进黑八</Trans>;
-  }
-}
 
 export function MatchView({
   mode,
@@ -87,6 +65,7 @@ export function MatchView({
 }) {
   const desktop = useDesktopLayout();
   const { runner, local } = session;
+  useFoulNotification(runner, mode);
   const snapshot = useMatchSnapshot(runner);
   const state = snapshot.state;
   const [followDraw, setFollowDraw] = useState(0);
@@ -194,7 +173,6 @@ export function MatchView({
   };
 
   const ballInHand = canInteract && state.ballInHand;
-  const outcome = state.lastOutcome;
   const remaining = state.balls.filter(
     (ball) => !ball.potted && ball.id !== 0,
   ).length;
@@ -405,36 +383,12 @@ export function MatchView({
             </Trans>
           </div>
         ) : null}
-        <div className="billiards-status" role="status" aria-live="polite">
-          <div className="flex min-w-0 flex-col items-center justify-center gap-1 text-center text-xs">
-            {outcome?.foul ? (
-              <span className="text-destructive">
-                {foulLabel(outcome.foul)}
-              </span>
-            ) : null}
-            {ballInHand ? (
-              <span>
-                {state.variant === "snooker" ? (
-                  state.placementRegion === "d" ? (
-                    <Trans>手中球：在 D 区拖动母球放置</Trans>
-                  ) : (
-                    <Trans>手中球：可在全台放置母球</Trans>
-                  )
-                ) : (
-                  <Trans>自由球：拖动母球放置</Trans>
-                )}
-              </span>
-            ) : aiThinking ? (
-              <span className="text-muted-foreground">
-                <Trans>AI 思考中…</Trans>
-              </span>
-            ) : outcome?.respottedEight ? (
-              <span className="text-muted-foreground">
-                <Trans>黑八已重置</Trans>
-              </span>
-            ) : null}
-          </div>
-        </div>
+        <BilliardsStatus
+          state={state}
+          mode={mode}
+          ballInHand={ballInHand}
+          aiThinking={aiThinking}
+        />
 
         <BilliardsStage
           ref={stageRef}

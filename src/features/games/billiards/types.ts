@@ -55,6 +55,7 @@ export type FoulReason =
   | "snooker-behind-nomination";
 
 export interface ShotOutcome {
+  shooter?: SeatIndex;
   foul: FoulReason | null;
   /** 本杆落袋的球 id，按进袋顺序（不含母球）。 */
   potted: number[];

@@ -187,6 +187,7 @@ async function applyPracticeShot(
   }
   const finished = balls.every((ball) => ball.id === 0 || ball.potted);
   const outcome: ShotOutcome = {
+    shooter: state.turnSeat,
     foul,
     potted: sim.pottedInOrder,
     continueTurn: true,
@@ -322,6 +323,7 @@ async function applyEightBallShot(
   }
 
   const outcome: ShotOutcome = {
+    shooter: seat,
     foul,
     potted: sim.pottedInOrder,
     continueTurn,

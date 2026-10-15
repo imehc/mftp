@@ -63,23 +63,34 @@ export function NineBallActions({
 }) {
   const decision = state.decision;
   const decisionSeat = decision ? seatName(mode, decision.seat) : null;
+  const shooter =
+    decision && "shooter" in decision ? seatName(mode, decision.shooter) : null;
+  const proposer =
+    decision?.kind === "stalemate" ? seatName(mode, decision.proposer) : null;
   return (
     <div className="flex flex-col gap-3 text-xs">
       {decision ? (
         <div className="flex flex-col gap-3">
           <span>
-            {decisionSeat}
-            {" · "}
             {decision.kind === "warning" ? (
-              <Trans>已连续两次犯规，再次连续犯规将判负。</Trans>
+              <Trans comment="九球两犯警告；decisionSeat 就是被警告的犯规者">
+                {decisionSeat} 已连续两次犯规，再次连续犯规将判负。
+              </Trans>
             ) : decision.kind === "illegal-break" ? (
-              <Trans>
-                未达到三球开球要求。可接受桌面或交回开球者；交回后允许推杆。
+              <Trans comment="九球三球开球要求；shooter 是开球者，decisionSeat 是选择接打方式的人">
+                {shooter} 未达到三球开球要求。由 {decisionSeat}{" "}
+                选择接受桌面或交回 {shooter}；交回后允许推杆。
               </Trans>
             ) : decision.kind === "push-out" ? (
-              <Trans>推杆结束。可自己接打，或交回推杆者。</Trans>
+              <Trans comment="九球推杆；shooter 是刚完成推杆的人，decisionSeat 是决策者">
+                {shooter} 推杆结束。由 {decisionSeat} 选择接打，或交回 {shooter}
+                。
+              </Trans>
             ) : (
-              <Trans>对方提议僵持重摆。接受后由本局原开球者开球。</Trans>
+              <Trans comment="九球僵持协商；proposer 是提议者，decisionSeat 是收到提议的人">
+                {proposer} 提议僵持重摆，由 {decisionSeat}{" "}
+                决定是否接受。接受后由本局原开球者开球。
+              </Trans>
             )}
           </span>
           <div className="flex flex-wrap gap-2 text-shadow-none">

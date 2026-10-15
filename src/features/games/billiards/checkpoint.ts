@@ -60,6 +60,7 @@ const base = {
   foulCounts: z.array(countSchema).min(1).max(2),
   lastOutcome: z
     .strictObject({
+      shooter: seatSchema.optional(),
       foul: z
         .enum([
           "cue-potted",
@@ -190,6 +191,8 @@ export const billiardsCheckpointSchema = checkpointSchema(
     if (
       state.variant !== variant ||
       state.turnSeat >= seats ||
+      (state.lastOutcome?.shooter !== undefined &&
+        state.lastOutcome.shooter >= seats) ||
       state.foulCounts.length !== seats
     )
       return false;
