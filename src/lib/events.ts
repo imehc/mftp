@@ -34,6 +34,12 @@ export const sshClosedEvent = (sessionId: string) =>
 /** 诗词库的同步 / 导入 / 索引进度。载荷类型：`PoetrySyncProgress`。 */
 export const LIBRARY_SYNC_PROGRESS = "library://sync-progress";
 
+/**
+ * 外部服务活动面板出现新版本。载荷为空；监听方据此重读快照，
+ * 事件本身不携带记录内容。游标仍是权威信号，事件只是提示。
+ */
+export const ACTIVITY_PANEL = "diagnostics://activity";
+
 /** 单次诗词译文生成的流式增量。载荷类型：`PoetryTranslationStreamEvent`。 */
 export const poetryTranslationStreamEvent = (requestId: string) =>
   `ai://poetry-translation/${requestId}`;

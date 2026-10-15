@@ -1,4 +1,5 @@
 import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 
 import type { AppError, CustomErrorCode } from "~/bindings";
 import { translate } from "~/i18n/translate";
@@ -117,6 +118,8 @@ export function describeError(
   localize: (message: MessageDescriptor) => string = translate,
 ): string {
   const { payload } = toIpcError(value);
+  if (payload.code === "diagnostics:unavailable")
+    return localize(msg`执行日志已关闭或达到容量上限，请重新进入页面。`);
   if (
     payload.kind === "custom" &&
     Object.hasOwn(customErrorMessages, payload.code)

@@ -45,7 +45,10 @@ src-tauri/src/
 - 业务归所属 feature/module，公共层只放共用能力；临时状态留页面，跨页资源按自身生命周期管理。
 - IPC 统一走 `src/lib/ipc.ts`，事件统一走 `src/lib/events.ts`；契约在 Rust 定义，由 Specta 自动生成前端类型。
 - 新功能沿用统一注册入口：前端接入路由、模块元数据和平台守卫；后端在 `app/registry` 登记命令与事件类型，同步 `command_baseline.txt`，由 `app/services` 装配。
-- 错误统一为 `AppError { kind, code, message, args }`，全链路保留；按 kind/code 判断，前端用 `describeError` 展示。业务错误用英文诊断，展示文案走 Lingui。
+- 错误统一为 `AppError { kind, code, message, args }`，全链路保留；按 kind/code 判断，前端用 `describeError` 展示。React 组件使用 `describeError(error, t)`，`t` 来自 `useLingui()`，确保 React Compiler 能追踪语言切换。业务错误用英文诊断，展示文案走 Lingui。
+- 访问外部服务的功能统一接入共享执行日志，覆盖 HTTP/AI、SSH、SFTP 及后续协议；由各协议在实际执行边界采集请求/操作、参数或命令、返回结果和原始错误，按操作身份关联现有操作摘要。不得以 IPC 入参、推测内容或诊断摘要冒充实际收发内容，也不得为新功能另建独立日志体系。
+- 执行日志是**全局、仅内存、可丢弃**的实时活动面板：进程内只有一个作用域，底栏挂在应用外壳上供所有页面查看，空闲时隐藏；关闭面板、窗口销毁或应用退出即释放，不落盘、不导出、不作为历史日志保存。前端以事件推送（`diagnostics://activity`）驱动重读快照，兜底轮询仅在事件丢失时生效；游标是权威信号。
+- 执行日志仅对密钥、密码、token、私钥、认证头等凭据脱敏，其余已采集内容原样保留；原始错误详情与结构化 `AppError` 并存。凭据在进入日志缓冲前处理，覆盖请求、响应及错误中的回显；明确标注脱敏、截断和未采集内容，不伪造不可观察的协议数据。采集与缓冲必须有界，日志失败不得改变业务结果、触发重试或阻塞传输；通知监听者须在释放记录锁之后进行，不默认录制交互终端逐键输入或文件内容。
 - 用户可见文案全部走 Lingui；提交 `messages.po`。文案改动后执行 `pnpm run extract && pnpm run compile && pnpm build`。
 
 - 阻塞工作放后端 blocking 管道；异步处理竞态、取消和清理，任务完成以实际 worker 退出为准。

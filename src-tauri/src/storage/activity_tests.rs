@@ -54,6 +54,7 @@ fn old_log_table_is_renamed_once_and_rows_survive() {
     assert_eq!(logs.len(), 1);
     assert_eq!(logs[0].id, "row-1");
     assert_eq!(logs[0].detail.as_deref(), Some("kept"));
+    assert!(logs[0].operation_id.is_none());
     {
         let conn = storage.conn().unwrap();
         let names = table_names(&conn);
@@ -90,6 +91,38 @@ fn structured_error_round_trips_through_the_payload_column() {
     assert_eq!(logs[0].result, "failed");
     assert_eq!(logs[0].detail.as_deref(), Some("business metadata"));
     assert_eq!(logs[0].error.as_ref(), Some(&error));
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn traced_activity_identity_survives_reopening_without_duplicating_rows() {
+    let root = test_root("trace");
+    let storage = Storage::new(root.clone()).unwrap();
+    storage
+        .record_traced_result(
+            "ai",
+            "provider",
+            "ai_provider_test",
+            None,
+            None,
+            "operation-1",
+        )
+        .unwrap();
+    drop(storage);
+    let reopened = Storage::new(root.clone()).unwrap();
+    let rows = reopened.list_activity_logs(10, None, None).unwrap();
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].operation_id.as_deref(), Some("operation-1"));
+    let version: String = reopened
+        .conn()
+        .unwrap()
+        .query_row(
+            "SELECT value FROM app_meta WHERE key='activity_diagnostics_schema_version'",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap();
+    assert_eq!(version, "1");
     std::fs::remove_dir_all(root).unwrap();
 }
 

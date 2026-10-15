@@ -4,6 +4,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 
+import ExecutionLogDock from "~/features/connection-diagnostics/ExecutionLogDock";
 import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
 import { resolveNavigation } from "~/features/navigation/resolve-navigation";
 import { useStartupNavigation } from "~/features/navigation/use-startup-navigation";
@@ -44,7 +45,13 @@ function RootLayout() {
           <Outlet />
         </ModuleNavigationFrame>
       ) : (
-        <Outlet />
+        <div className="flex h-full min-h-0 flex-col">
+          <div className="min-h-0 min-w-0 flex-1">
+            <Outlet />
+          </div>
+          {/* 无导航框架的页面同样要能看到外部服务活动面板。 */}
+          <ExecutionLogDock />
+        </div>
       )}
     </div>
   );

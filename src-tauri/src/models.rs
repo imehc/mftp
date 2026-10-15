@@ -26,6 +26,8 @@ pub struct ActivityLog {
     pub result: String,
     #[serde(default)]
     pub detail: Option<String>,
+    #[serde(default)]
+    pub operation_id: Option<String>,
     /// Full structured error for failed/canceled rows: versioned payload on
     /// new writes, compatibility-wrapped text on pre-column rows. Localized
     /// by the frontend through kind/code; `detail` keeps business metadata.

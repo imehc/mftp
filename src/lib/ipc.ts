@@ -139,6 +139,10 @@ export const aiProviderTest = (
   input: Parameters<typeof commands.aiProviderTest>[0],
 ) => voidCommand(commands.aiProviderTest(input));
 
+export const diagnosticsSnapshot = (after: number) =>
+  unwrapCommand(commands.diagnosticsSnapshot(after));
+export const diagnosticsClear = () => commands.diagnosticsClear();
+
 // ---- 主机 ----
 export const hostsList = () => unwrapCommand(commands.hostsList());
 export const hostGet = (id: string) => unwrapCommand(commands.hostGet(id));

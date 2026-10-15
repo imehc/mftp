@@ -14,6 +14,26 @@ use super::{now_ms, Storage};
 const LEGACY_WATERMARK_KEY: &str = "activity_log_error_legacy_before_ms";
 
 impl Storage {
+    pub(crate) fn record_traced_result(
+        &self,
+        source: &str,
+        address: &str,
+        action: &str,
+        detail: Option<&str>,
+        error: Option<&AppError>,
+        operation_id: &str,
+    ) -> AppResult<()> {
+        append_traced_log(
+            self.db_path(),
+            source,
+            address,
+            action,
+            if error.is_some() { "failed" } else { "success" },
+            detail,
+            error,
+            Some(operation_id),
+        )
+    }
     pub fn record_result(
         &self,
         source: &str,
@@ -43,7 +63,7 @@ impl Storage {
         let legacy_before_ms = read_legacy_watermark(&conn)?;
         let mut stmt = conn.prepare(
             r#"
-            SELECT id, created_at, source, ip, request_type, result, detail, error_payload
+            SELECT id, created_at, source, ip, request_type, result, detail, error_payload, operation_id
             FROM activity_logs
             WHERE (?2 IS NULL OR source = ?2)
               AND (?3 IS NULL OR result = ?3)
@@ -73,6 +93,7 @@ impl Storage {
                     None
                 };
                 Ok(ActivityLog {
+                    operation_id: row.get(8)?,
                     id: row.get(0)?,
                     created_at,
                     source: row.get(2)?,
@@ -111,15 +132,44 @@ pub(crate) fn append_activity_log(
     detail: Option<&str>,
     error: Option<&AppError>,
 ) -> AppResult<()> {
+    append_traced_log(
+        db_path, source, address, action, result, detail, error, None,
+    )
+}
+
+#[expect(
+    clippy::too_many_arguments,
+    reason = "Preserve the existing activity writer contract while attaching an optional execution identity"
+)]
+fn append_traced_log(
+    db_path: &Path,
+    source: &str,
+    address: &str,
+    action: &str,
+    result: &str,
+    detail: Option<&str>,
+    error: Option<&AppError>,
+    operation_id: Option<&str>,
+) -> AppResult<()> {
     let error_payload = match error {
         Some(error) => Some(persistence::encode(error)?),
         None => None,
     };
     let conn = rusqlite::Connection::open(db_path)?;
     conn.execute(
-        "INSERT INTO activity_logs(id,created_at,source,ip,request_type,result,detail,error_payload) VALUES(?1,?2,?3,?4,?5,?6,?7,?8)",
-        params![uuid::Uuid::new_v4().to_string(), now_ms(), source, address, action, result, detail, error_payload],
+        "INSERT INTO activity_logs(id,created_at,source,ip,request_type,result,detail,error_payload,operation_id) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9)",
+        params![uuid::Uuid::new_v4().to_string(), now_ms(), source, address, action, result, detail, error_payload, operation_id],
     )?;
+    Ok(())
+}
+
+pub(super) fn ensure_diagnostics_schema(conn: &Connection) -> AppResult<()> {
+    // Version 1 is additive. Reopening after a partial migration is harmless;
+    // historical rows remain null and no prior detail/error data is rewritten.
+    if !column_exists(conn, "activity_logs", "operation_id")? {
+        conn.execute("ALTER TABLE activity_logs ADD COLUMN operation_id TEXT", [])?;
+    }
+    conn.execute("INSERT INTO app_meta(key,value) VALUES('activity_diagnostics_schema_version','1') ON CONFLICT(key) DO NOTHING", [])?;
     Ok(())
 }
 

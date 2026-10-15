@@ -55,6 +55,7 @@ impl Fixture {
         // Construct idle services without native keychain calls, sockets or engines.
         let executor = Executor::new(factory(storage.clone()), operations.clone());
         let state = AppServices {
+            diagnostics: Arc::new(crate::core::diagnostics::Diagnostics::default()),
             model_inbox: Arc::new(crate::modules::model_viewer::system::ModelOpenInbox::default()),
             model_exports: Arc::new(crate::modules::model_viewer::ModelExportStore::new(
                 std::env::temp_dir().join(format!("mftp-unused-exports-{}", uuid::Uuid::new_v4())),
@@ -95,6 +96,8 @@ impl Fixture {
         let app = tauri::test::mock_builder()
             .manage(state)
             .invoke_handler(tauri::generate_handler![
+                crate::modules::diagnostics::diagnostics_snapshot,
+                crate::modules::diagnostics::diagnostics_clear,
                 crate::modules::ai::configuration::commands::ai_configuration_get,
                 crate::modules::ai::configuration::commands::ai_provider_create,
                 crate::modules::ai::configuration::commands::ai_provider_update,

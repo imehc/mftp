@@ -1,6 +1,7 @@
 //! Feature-owned backend modules, migrated incrementally.
 
 pub(crate) mod ai;
+pub(crate) mod diagnostics;
 
 pub(crate) mod bt;
 

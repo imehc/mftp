@@ -104,7 +104,8 @@ impl Storage {
                             LENGTH(CAST(COALESCE(request_type, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(result, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(detail, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(error_payload, '') AS BLOB))
+                            LENGTH(CAST(COALESCE(error_payload, '') AS BLOB)) +
+                            LENGTH(CAST(COALESCE(operation_id, '') AS BLOB))
                         ), 0) FROM activity_logs",
             )?,
         );

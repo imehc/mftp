@@ -9,6 +9,7 @@ import { filterLogs } from "./log-utils";
 
 const id = "12345678-abcd-4321-abcd-123456789abc";
 const log: ActivityLog = {
+  operationId: null,
   id: "log",
   createdAt: 0,
   source: "hosts",

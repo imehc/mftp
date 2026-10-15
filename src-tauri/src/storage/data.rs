@@ -93,7 +93,7 @@ impl Storage {
                     "DELETE FROM app_meta WHERE key NOT IN (
                         'legacy_json_migrated', 'ai_schema_version', 'todo_schema_version',
                         'bt_error_payload_schema_version', 'bt_download_only_migrated_v1',
-                        'model_viewer_schema_version'
+                        'model_viewer_schema_version', 'activity_diagnostics_schema_version'
                     )",
                     [],
                 )?,

@@ -144,6 +144,7 @@ fn reset_preserves_migration_versions_and_clears_settings_atomically() {
         ("ai_schema_version", "4"),
         ("bt_error_payload_schema_version", "99"),
         ("bt_download_only_migrated_v1", "1"),
+        ("activity_diagnostics_schema_version", "1"),
     ] {
         assert_eq!(read_meta(&storage, key).as_deref(), Some(value));
     }

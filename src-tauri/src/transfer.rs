@@ -9,3 +9,8 @@ pub const TRANSFER_PROGRESS_EVENT: &str = "sftp-transfer-progress";
 /// BT task-level events (save-to-local done/failed). Payload: `modules::bt::BtTaskEvent`.
 #[cfg(any(desktop, target_os = "android"))]
 pub const BT_TASK_EVENT: &str = "bt://task-event";
+
+/// The external-service activity panel gained a revision. Payload: the new
+/// cursor. Frontend listens to this instead of polling; it re-reads the
+/// snapshot through `diagnostics_snapshot` (the event carries no record data).
+pub const ACTIVITY_PANEL_EVENT: &str = "diagnostics://activity";

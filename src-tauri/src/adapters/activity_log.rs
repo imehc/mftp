@@ -6,6 +6,16 @@ pub(crate) struct StorageActivityLog(pub Storage);
 
 impl ActivitySink for StorageActivityLog {
     fn record(&self, context: &OperationContext, error: Option<&AppError>) -> AppResult<()> {
+        if let Some(id) = context.operation_id.as_deref() {
+            return self.0.record_traced_result(
+                context.source,
+                &context.address,
+                context.action,
+                context.detail.as_deref(),
+                error,
+                id,
+            );
+        }
         write_result(
             &self.0,
             context.source,

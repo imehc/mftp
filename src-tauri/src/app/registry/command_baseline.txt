@@ -1,4 +1,6 @@
 # Pre-modularity IPC names; intentional additions must update this baseline.
+common diagnostics_snapshot
+common diagnostics_clear
 common model_system_poll
 common model_environment_begin
 common model_environment_write

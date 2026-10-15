@@ -6,6 +6,7 @@ pub(crate) struct OperationContext {
     pub action: &'static str,
     pub address: String,
     pub detail: Option<String>,
+    pub operation_id: Option<String>,
 }
 
 impl OperationContext {
@@ -19,6 +20,7 @@ impl OperationContext {
             action,
             address: address.into(),
             detail: None,
+            operation_id: None,
         }
     }
 

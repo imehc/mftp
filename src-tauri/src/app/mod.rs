@@ -93,11 +93,14 @@ fn guard_commands<R: tauri::Runtime>(
     commands: impl Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync + 'static,
 ) -> impl Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync + 'static {
     move |invoke| {
-        // These commands only cancel/close owned export IDs or remove unpublished HDR drafts. Keep cleanup
+        // These commands only release owned resources or unpublished drafts. Keep cleanup
         // available while maintenance or shutdown is draining the native worker.
         if matches!(
             invoke.message.command(),
-            "model_export_cancel" | "model_export_close" | "model_environment_abort"
+            "model_export_cancel"
+                | "model_export_close"
+                | "model_environment_abort"
+                | "diagnostics_clear"
         ) {
             return commands(invoke);
         }
@@ -129,6 +132,14 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
     #[cfg(target_os = "android")]
     state.ai_credentials.on_run_event(&event);
     match event {
+        tauri::RunEvent::WindowEvent {
+            event: tauri::WindowEvent::Destroyed,
+            ..
+        } => {
+            // The activity panel is memory-only and global; a destroyed window
+            // takes its last records with it.
+            state.diagnostics.clear();
+        }
         #[cfg(any(target_os = "macos", target_os = "ios"))]
         tauri::RunEvent::Opened { urls } => {
             for url in urls {

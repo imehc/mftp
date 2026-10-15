@@ -7,6 +7,7 @@ import { filterLogs, logDetail } from "./log-utils";
 
 const now = 10 * 24 * 60 * 60 * 1000;
 const row: ActivityLog = {
+  operationId: null,
   id: "a",
   createdAt: now,
   source: "sftp",

@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use tauri::Manager as _;
+use tauri::{Emitter as _, Manager as _};
 
 use super::lifecycle::Lifecycle;
 use crate::adapters::{activity_log::StorageActivityLog, ai::AiKeychain, room_events};
@@ -22,6 +22,7 @@ use crate::storage::Storage;
 /// The single shared service state injected via Tauri `State`.
 #[derive(Clone)]
 pub struct AppServices {
+    pub(crate) diagnostics: Arc<crate::core::diagnostics::Diagnostics>,
     pub(crate) model_inbox: Arc<crate::modules::model_viewer::system::ModelOpenInbox>,
     pub(crate) model_exports: Arc<crate::modules::model_viewer::ModelExportStore>,
     pub(crate) model_viewer: Arc<crate::modules::model_viewer::ModelViewerService>,
@@ -50,6 +51,21 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     let data_dir = app.path().app_data_dir()?;
     let storage = Storage::new(data_dir.clone())?;
     let operations = Arc::new(Operations::with_reset_gate(storage.reset_gate()));
+    // One process-wide activity panel backs every external-service protocol.
+    // Each revision is announced so the UI can update without polling; the
+    // cursor in the snapshot stays authoritative, so a dropped event only
+    // costs latency and never loses a record.
+    let diagnostics = Arc::new(crate::core::diagnostics::Diagnostics::with_listener({
+        let app = app.clone();
+        Some(Arc::new(move || {
+            if let Err(error) = app.emit(crate::transfer::ACTIVITY_PANEL_EVENT, ()) {
+                eprintln!(
+                    "Activity panel event delivery failed: {}",
+                    crate::error::AppError::from(error).code
+                );
+            }
+        }))
+    }));
     let mut lifecycle = Lifecycle::new(operations.clone());
     // Stop-registration names share the maintenance participant ids, and the
     // busy capability registered here is the single source both the shutdown
@@ -108,6 +124,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         });
     }
     let services = AppServices {
+        diagnostics,
         model_inbox: app
             .state::<Arc<crate::modules::model_viewer::system::ModelOpenInbox>>()
             .inner()

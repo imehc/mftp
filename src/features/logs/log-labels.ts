@@ -7,6 +7,8 @@ import type { ActivityLog } from "~/types";
 // 操作代码只用于查找；按来源区分同名操作，未知代码保留原文以兼容历史记录。
 // lingui-set comment="活动日志中的操作名称，描述已发起的操作，不表示操作成功"
 const actionMessages: Record<string, MessageDescriptor> = {
+  "ai:ai_provider_test": msg`测试 AI 服务`,
+  "ai:ai_provider_test_streaming": msg`测试 AI 流式服务`,
   "todo:create": msg`新增待办`,
   "todo:update": msg`更新待办`,
   "todo:delete": msg`删除待办`,
@@ -23,6 +25,13 @@ const actionMessages: Record<string, MessageDescriptor> = {
   "ssh:connect": msg`连接主机`,
   "ssh:open_shell": msg`打开终端`,
   "ssh:disconnect": msg`断开连接`,
+  "ssh:shell_lifetime": msg`终端会话`,
+  "ssh:ssh_system_stats": msg`读取系统监控`,
+  "sftp:sftp_home": msg`读取登录目录`,
+  "sftp:sftp_start_dir": msg`解析起始目录`,
+  "sftp:sftp_list": msg`列出目录`,
+  "sftp:sftp_info": msg`读取文件信息`,
+  "sftp:sftp_exists": msg`检查文件是否存在`,
   "sftp:mkdir": msg`新建文件夹`,
   "sftp:rename": msg`重命名文件`,
   "sftp:delete": msg`删除文件`,
@@ -74,9 +83,12 @@ const actionMessages: Record<string, MessageDescriptor> = {
 };
 // lingui-reset
 
-export function logAction(log: ActivityLog): string {
+export function logAction(
+  log: Pick<ActivityLog, "source" | "requestType">,
+  localize = translate,
+): string {
   const message = actionMessages[`${log.source}:${log.requestType}`];
-  return message ? translate(message) : log.requestType;
+  return message ? localize(message) : log.requestType;
 }
 
 // lingui-set comment="活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示"
@@ -88,6 +100,8 @@ const hostObject = msg({
 
 function objectKind(log: ActivityLog): MessageDescriptor | null {
   switch (log.source) {
+    case "ai":
+      return msg`AI 服务`;
     case "todo":
       return msg`待办事项`;
     case "hosts":

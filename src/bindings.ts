@@ -4,6 +4,8 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 
 /** Commands */
 export const commands = {
+	diagnosticsSnapshot: (after: number) => typedError<DiagnosticSnapshot, AppError>(__TAURI_INVOKE("diagnostics_snapshot", { after })),
+	diagnosticsClear: () => __TAURI_INVOKE<void>("diagnostics_clear"),
 	modelSystemPoll: () => typedError<ModelSystemSnapshot, AppError>(__TAURI_INVOKE("model_system_poll")),
 	modelEnvironmentBegin: (name: string, size: number) => typedError<string, AppError>(__TAURI_INVOKE("model_environment_begin", { name, size })),
 	modelEnvironmentWrite: (id: string, offset: number, bytes: number[]) => typedError<null, AppError>(__TAURI_INVOKE("model_environment_write", { id, offset, bytes })),
@@ -54,7 +56,8 @@ export const commands = {
 	aiProviderSelect: (input: AiProviderSelectionInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_provider_select", { input })),
 	aiModelSwitch: (input: AiModelSwitchInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_model_switch", { input })),
 	aiStreamingUpdate: (input: AiStreamingUpdateInput) => typedError<AiConfigurationView, AppError>(__TAURI_INVOKE("ai_streaming_update", { input })),
-	aiProviderTest: (input: AiProviderTargetInput) => typedError<null, AppError>(__TAURI_INVOKE("ai_provider_test", { input })),
+	aiProviderTest: (input: AiProviderTargetInput) => typedError<AiProviderTestReport, AppError>(__TAURI_INVOKE("ai_provider_test", { input })),
+	aiProviderTestStreaming: (input: AiProviderTargetInput) => typedError<AiProviderTestReport, AppError>(__TAURI_INVOKE("ai_provider_test_streaming", { input })),
 	hostsList: () => typedError<Host[], AppError>(__TAURI_INVOKE("hosts_list")),
 	hostGet: (id: string) => typedError<Host, AppError>(__TAURI_INVOKE("host_get", { id })),
 	hostCreate: (input: HostInput) => typedError<Host, AppError>(__TAURI_INVOKE("host_create", { input })),
@@ -228,12 +231,36 @@ export type ActivityLog = {
 	requestType: string,
 	result: string,
 	detail?: string | null,
+	operationId?: string | null,
 	/**
 	 *  Full structured error for failed/canceled rows: versioned payload on
 	 *  new writes, compatibility-wrapped text on pre-column rows. Localized
 	 *  by the frontend through kind/code; `detail` keeps business metadata.
 	 */
 	error?: AppError | null,
+};
+
+/**
+ *  Relative monotonic milliseconds, bounded counters and local enums only.
+ *  No prompts, output, URLs, credentials, provider IDs or opaque reasoning data.
+ */
+export type AiCompletionDiagnostics = {
+	protocol: AiProtocol,
+	phase: AiObservedPhase,
+	elapsedMs: number,
+	receivedBytes: number,
+	receivedTextBytes: number,
+	streamTextDeltaCount: number,
+	receivedReasoningBytes: number,
+	hadReasoningActivity: boolean,
+	lastTransportActivityMs: number | null,
+	lastReasoningProgressMs: number | null,
+	lastTextProgressMs: number | null,
+	finishReason: AiFinishReason | null,
+	responseStartedMs: number | null,
+	firstEventMs: number | null,
+	phaseStartedMs: number,
+	hardDeadlineMs: number,
 };
 
 export type AiConfigurationView = {
@@ -244,6 +271,15 @@ export type AiConfigurationView = {
 	labelCandidates: string[],
 	modelCandidates: string[],
 };
+
+// Adapter-normalized indices; raw provider IDs and signatures stay in the backend.
+export type AiContentBlock = {
+	outputIndex: number,
+	contentIndex: number,
+};
+
+// Normalized allowlist: never copy an arbitrary provider finish reason into IPC.
+export type AiFinishReason = "stop" | "length" | "contentFilter" | "toolCall" | "incomplete" | "failed" | "unknown";
 
 export type AiKeyDeleteInput = {
 	expectedRevision: number,
@@ -307,6 +343,16 @@ export type AiModelView = {
 	displayName: string | null,
 };
 
+// An observed phase is evidence, not an inference from latency or a model name.
+export type AiObservedPhase = "connecting" | "waiting" | "reasoning" | "text";
+
+/**
+ *  The runtime requires bounded, nonempty text and validates JSON syntax (an object
+ *  for GameMove). After protocol completion, callers must enforce their domain
+ *  schema and, for game moves, the current match, position, seat, and legal moves.
+ */
+export type AiOutputPolicy = "text" | "structuredJson" | "gameMove";
+
 export type AiProtocol = "responses" | "chatCompletions" | "anthropicMessages";
 
 export type AiProviderCreateInput = AiProviderCreateInput_Serialize | AiProviderCreateInput_Deserialize;
@@ -338,6 +384,9 @@ export type AiProviderDeleteInput = {
 	providerId: string,
 };
 
+// Stable external error codes shared by all AI protocols.
+export type AiProviderErrorCode = "ai:request_policy_invalid" | "ai:cancelled" | "ai:output_invalid" | "ai:provider_timeout" | "ai:provider_connection_timeout" | "ai:provider_first_event_timeout" | "ai:provider_stream_idle" | "ai:provider_progress_timeout" | "ai:provider_incomplete" | "ai:provider_no_text" | "ai:provider_limit_reached" | "ai:provider_protocol" | "ai:provider_status" | "ai:provider_failed";
+
 export type AiProviderSelectionInput = {
 	expectedRevision: number,
 	providerId: string,
@@ -349,6 +398,29 @@ export type AiProviderTargetInput = {
 	expectedRevision: number,
 	providerId: string,
 };
+
+export type AiProviderTestMode = "nonStreaming" | "streaming";
+
+/**
+ *  Only saved public configuration and bounded runtime diagnostics cross IPC.
+ *  Neither generated text nor provider-supplied error bodies belong in a report.
+ */
+export type AiProviderTestReport = {
+	mode: AiProviderTestMode,
+	protocol: AiProtocol,
+	endpoint: string,
+	model: string,
+	serviceReachable: boolean,
+	nonStreaming: AiProviderTestStatus,
+	streaming: AiProviderTestStatus,
+	reasoning: AiTestReasoningEvidence,
+	usage: AiUsage,
+	elapsedMs: number,
+	diagnostics: AiCompletionDiagnostics | null,
+	error: AppError | null,
+};
+
+export type AiProviderTestStatus = "notTested" | "passed" | "unverified" | "failed";
 
 export type AiProviderUpdateInput = {
 	expectedRevision: number,
@@ -371,9 +443,44 @@ export type AiProviderView = {
 	models: AiModelView[],
 };
 
+export type AiReasoningKind = "summary" | "visibleThinking";
+
+export type AiRunOutcome = "completed" | "timedOut" | "cancelled" | "incomplete" | "noText" | "limitReached" | "providerFailed" | "protocolInvalid";
+
+/**
+ *  The runtime assigns a local UUID and increasing sequence for each request.
+ *  A retry gets a new UUID; consumers reject events from superseded requests.
+ */
+export type AiStreamEvent = {
+	requestId: string,
+	sequence: number,
+	elapsedMs: number,
+	payload: AiStreamEventPayload,
+};
+
+// This payload contains private task text. Do not persist or broadcast it.
+export type AiStreamEventPayload = { type: "started" } | { type: "phaseChanged"; phase: AiObservedPhase; block: AiContentBlock | null } | { type: "reasoningDelta"; block: AiContentBlock; kind: AiReasoningKind; text: string } | { type: "heartbeat" } | { type: "softWait"; hardDeadlineMs: number } | { type: "deadlineExtended"; hardDeadlineMs: number } | { type: "reasoningTruncated" } | { type: "textDelta"; block: AiContentBlock; text: string } | { type: "usage"; usage: AiUsage } | { type: "completed"; finishReason: AiFinishReason; diagnostics: AiCompletionDiagnostics } | { type: "incomplete"; error: AppError; reason: AiFinishReason; diagnostics: AiCompletionDiagnostics } | { type: "failed"; error: AppError; diagnostics: AiCompletionDiagnostics } | { type: "cancelled"; diagnostics: AiCompletionDiagnostics };
+
 export type AiStreamingUpdateInput = {
 	expectedRevision: number,
 	streamingEnabled: boolean,
+};
+
+// Evidence from this request only; false means unobserved, never unsupported.
+export type AiTestReasoningEvidence = {
+	phaseObserved: boolean,
+	activityObserved: boolean,
+	publicContentObserved: boolean,
+	reasoningTokens: number | null,
+};
+
+export type AiTimeoutStage = "connection" | "firstEvent" | "transportIdle" | "reasoningProgress" | "textProgress" | "unobservedProgress" | "hardDeadline";
+
+// Missing usage is unknown, not zero. Reasoning tokens may be part of output tokens.
+export type AiUsage = {
+	inputTokens: number | null,
+	outputTokens: number | null,
+	reasoningTokens: number | null,
 };
 
 export type AppDataClearResult = {
@@ -556,6 +663,62 @@ export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" 
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
 export type CustomErrorCode = "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+
+export type DiagnosticBodyEnd = "receiving" | "complete" | "protocolEnd" | "interrupted";
+
+export type DiagnosticDetail = { kind: "httpRequest"; method: string; url: string; headers: DiagnosticHeader[]; headersTruncated: boolean; body: DiagnosticText } | { kind: "httpResponse"; status: number; headers: DiagnosticHeader[]; headersTruncated: boolean; body: DiagnosticText } | { kind: "transportError"; body: DiagnosticText } | { kind: "command"; command: DiagnosticText; stdout: DiagnosticText; stderr: DiagnosticText; stdoutCaptured: boolean; exitStatus: number | null; exitSignal: string | null };
+
+export type DiagnosticHeader = {
+	name: string,
+	value: string,
+	encoding: string,
+	redacted: boolean,
+};
+
+export type DiagnosticOperation = {
+	id: string,
+	source: string,
+	action: string,
+	target: string,
+	correlationId: string | null,
+	trace: DiagnosticText | null,
+	progress: DiagnosticProgress | null,
+	discardedDetails: number,
+	metadataTruncated: boolean,
+	redacted: boolean,
+	startedAt: number,
+	elapsedMs: number,
+	status: DiagnosticStatus,
+	phase: DiagnosticPhase,
+	details: DiagnosticDetail[],
+	error: AppError | null,
+};
+
+export type DiagnosticPhase = "preparing" | "sending" | "receiving" | "executing" | "finished";
+
+export type DiagnosticProgress = {
+	phase: string,
+	completed: number,
+	total: number | null,
+};
+
+export type DiagnosticSnapshot = {
+	cursor: number,
+	discarded: number,
+	operations: DiagnosticOperation[] | null,
+};
+
+export type DiagnosticStatus = "running" | "passed" | "unverified" | "failed" | "interrupted";
+
+export type DiagnosticText = {
+	text: string,
+	encoding: string,
+	receivedBytes: number,
+	capturedBytes: number,
+	redacted: boolean,
+	truncated: boolean,
+	end: DiagnosticBodyEnd,
+};
 
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts" | "todo" | "lan" | "aiTranslations";

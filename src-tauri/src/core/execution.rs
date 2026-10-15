@@ -12,6 +12,19 @@ pub(crate) struct Executor {
 }
 
 impl Executor {
+    pub(crate) async fn record_outcome(&self, context: OperationContext, error: Option<AppError>) {
+        let activity = self.activity.clone();
+        // The caller retains its real worker lease; log failures cannot change
+        // the already completed network result or make a caller replay it.
+        let result = run_blocking(move || {
+            record(activity.as_ref(), &context, &error.map_or(Ok(()), Err));
+            Ok(())
+        })
+        .await;
+        if let Err(error) = result {
+            eprintln!("activity log worker failed: {}", error.code);
+        }
+    }
     pub(crate) async fn recovery_maintenance(&self) -> AppResult<MaintenanceLease> {
         self.operations
             .recovery_maintenance(Duration::from_secs(5))
@@ -50,15 +63,30 @@ impl Executor {
         T: Send + 'static,
         F: FnOnce() -> AppResult<T> + Send + 'static,
     {
+        self.blocking_diagnostic(context, None, operation).await
+    }
+
+    pub(crate) async fn blocking_diagnostic<T, F>(
+        &self,
+        context: OperationContext,
+        log: Option<super::diagnostics::DiagnosticRecorder>,
+        operation: F,
+    ) -> AppResult<T>
+    where
+        T: Send + 'static,
+        F: FnOnce() -> AppResult<T> + Send + 'static,
+    {
         let lease = self.operations.begin()?;
         let activity = self.activity.clone();
         run_blocking(move || {
             // The real worker owns admission until its operation and log finish,
             // even when the command future is dropped while it is queued/running.
             let _lease = lease;
-            let result = operation();
-            record(activity.as_ref(), &context, &result);
-            result
+            super::diagnostics::context::run(log, || {
+                let result = operation();
+                record(activity.as_ref(), &context, &result);
+                result
+            })
         })
         .await
     }

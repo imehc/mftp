@@ -93,6 +93,7 @@ impl Storage {
             "TEXT NOT NULL DEFAULT 'lan'",
         )?;
         activity::ensure_error_payload_column(&conn)?;
+        activity::ensure_diagnostics_schema(&conn)?;
         crate::modules::hosts::schema::init(&conn)?;
         crate::modules::keys::schema::init(&conn)?;
         crate::modules::lan_transfer::schema::init(&mut conn)?;

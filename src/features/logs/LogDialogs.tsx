@@ -91,6 +91,18 @@ export default function LogDialogs({
                 <dd className="font-mono text-xs break-all">
                   {row.requestType}
                 </dd>
+                {row.operationId ? (
+                  <>
+                    <dt className="text-muted-foreground">
+                      <Trans comment="用于关联持久操作摘要与内存执行详情的同一次操作身份">
+                        执行记录 ID
+                      </Trans>
+                    </dt>
+                    <dd className="font-mono text-xs break-all">
+                      {row.operationId}
+                    </dd>
+                  </>
+                ) : null}
                 {row.ip ? (
                   <>
                     <dt className="text-muted-foreground">
