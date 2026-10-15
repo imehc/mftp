@@ -90,8 +90,15 @@ macro_rules! common_modules {
                     ai::configuration::commands::ai_model_switch,
                     ai::configuration::commands::ai_streaming_update,
                     ai::configuration::commands::ai_provider_test,
+                    ai::configuration::commands::ai_provider_test_streaming,
                 ],
-                types: [],
+                types: [
+                    ai::completion::AiStreamEvent,
+                    ai::completion::AiProviderErrorCode,
+                    ai::completion::AiRunOutcome,
+                    ai::completion::AiTimeoutStage,
+                    ai::completion::AiOutputPolicy,
+                ],
             },
             "hosts" => {
                 commands: [

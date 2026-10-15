@@ -1,6 +1,9 @@
 use super::*;
-use crate::core::execution::run_blocking_guarded;
-use crate::modules::ai::configuration::{input::*, model::AiConfigurationView};
+use crate::modules::ai::configuration::{
+    input::*,
+    model::AiConfigurationView,
+    testing::{AiProviderTestMode, AiProviderTestReport},
+};
 
 impl<C: AiCredentials + 'static> AiConfigurationService<C> {
     async fn selection_change(
@@ -66,30 +69,97 @@ impl<C: AiCredentials + 'static> AiConfigurationService<C> {
         Ok(AiRequestSnapshot { config, api_key })
     }
 
+    #[cfg(test)]
     pub(crate) async fn test_provider(
         self: &Arc<Self>,
         input: AiProviderTargetInput,
-    ) -> AppResult<()> {
-        self.test_saved(Some(input)).await
+    ) -> AppResult<AiProviderTestReport> {
+        self.test_saved(Some(input), AiProviderTestMode::NonStreaming)
+            .await
     }
 
+    #[cfg(test)]
+    pub(crate) async fn test_provider_streaming(
+        self: &Arc<Self>,
+        input: AiProviderTargetInput,
+    ) -> AppResult<AiProviderTestReport> {
+        self.test_saved(Some(input), AiProviderTestMode::Streaming)
+            .await
+    }
+
+    #[cfg(test)]
     pub(super) async fn test_saved(
         self: &Arc<Self>,
         target: Option<AiProviderTargetInput>,
-    ) -> AppResult<()> {
+        mode: AiProviderTestMode,
+    ) -> AppResult<AiProviderTestReport> {
+        self.test_logged(target, mode, None).await
+    }
+
+    pub(crate) async fn test_provider_logged(
+        self: &Arc<Self>,
+        input: AiProviderTargetInput,
+        mode: AiProviderTestMode,
+        log: Option<crate::core::diagnostics::DiagnosticRecorder>,
+    ) -> AppResult<AiProviderTestReport> {
+        self.test_logged(Some(input), mode, log).await
+    }
+
+    async fn test_logged(
+        self: &Arc<Self>,
+        target: Option<AiProviderTargetInput>,
+        mode: AiProviderTestMode,
+        mut log: Option<crate::core::diagnostics::DiagnosticRecorder>,
+    ) -> AppResult<AiProviderTestReport> {
         let service = self.clone();
+        let mut activity = crate::core::activity::OperationContext::new(
+            "ai",
+            if mode == AiProviderTestMode::Streaming {
+                "ai_provider_test_streaming"
+            } else {
+                "ai_provider_test"
+            },
+            target
+                .as_ref()
+                .map(|target| target.provider_id.clone())
+                .unwrap_or_else(|| "local".into()),
+        );
+        activity.operation_id = log.as_ref().map(|log| log.id().to_string());
         // Keep one continuous lease from snapshot admission to real HTTP worker
         // completion, even when the IPC waiter closes during either phase.
         tauri::async_runtime::spawn(async move {
-            let lease = service.operations.begin()?;
-            let snapshot = {
-                let _lock = service.coordinator.lock().await;
-                service.snapshot_locked(target).await?
-            };
-            run_blocking_guarded(lease, move || {
-                test_connection(&snapshot.config, &snapshot.api_key)
-            })
-            .await
+            let lease = service.operations.begin();
+            let result: AppResult<AiProviderTestReport> = async {
+                lease.as_ref().map_err(Clone::clone)?;
+                let snapshot = {
+                    let _lock = service.coordinator.lock().await;
+                    service.snapshot_locked(target).await?
+                };
+                if let Some(log) = log.as_mut() {
+                    log.add_secret(&snapshot.api_key);
+                    log.target(&snapshot.config.model);
+                }
+                Ok(super::super::probe::run_probe_logged(
+                    &snapshot.config,
+                    &snapshot.api_key,
+                    mode,
+                    crate::modules::ai::completion::AiTimeoutPolicy::default(),
+                    log.as_mut(),
+                )
+                .await)
+            }
+            .await;
+            if lease.is_ok() {
+            service.executor.record_outcome(activity, match &result { Ok(report) => report.error.clone(), Err(error) => Some(error.clone()) }).await;
+            }
+            if let Some(log) = log.as_mut() {
+                if result.as_ref().is_ok_and(|report| report.streaming == crate::modules::ai::configuration::testing::AiProviderTestStatus::Unverified) { log.unverified(); }
+                log.finish(match &result {
+                    Ok(report) => report.error.as_ref(),
+                    Err(error) => Some(error),
+                });
+            }
+            result
         })
         .await
         .map_err(AppError::from)?

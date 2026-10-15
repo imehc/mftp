@@ -111,6 +111,7 @@ impl Fixture {
                 crate::modules::ai::configuration::commands::ai_model_switch,
                 crate::modules::ai::configuration::commands::ai_streaming_update,
                 crate::modules::ai::configuration::commands::ai_provider_test,
+                crate::modules::ai::configuration::commands::ai_provider_test_streaming,
                 crate::modules::maintenance::export::data_export,
                 crate::modules::maintenance::export::data_inspect,
                 crate::modules::maintenance::export::data_import,

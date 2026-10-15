@@ -1,4 +1,3 @@
-use super::client::test_connection;
 #[cfg(test)]
 use super::url::validate_connection;
 use crate::core::{

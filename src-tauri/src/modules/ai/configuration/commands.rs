@@ -1,5 +1,5 @@
 //! Typed management IPC. The existing four connection commands remain compatible.
-use super::{input::*, model::AiConfigurationView};
+use super::{input::*, model::AiConfigurationView, testing::AiProviderTestReport};
 use crate::{app::services::AppServices, error::AppResult};
 use tauri::State;
 
@@ -102,6 +102,25 @@ pub async fn ai_streaming_update(
 pub async fn ai_provider_test(
     state: State<'_, AppServices>,
     input: AiProviderTargetInput,
-) -> AppResult<()> {
-    state.ai_configuration.test_provider(input).await
+) -> AppResult<AiProviderTestReport> {
+    let log = state.diagnostics.begin("ai", "test", &input.provider_id);
+    state
+        .ai_configuration
+        .test_provider_logged(input, super::testing::AiProviderTestMode::NonStreaming, log)
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn ai_provider_test_streaming(
+    state: State<'_, AppServices>,
+    input: AiProviderTargetInput,
+) -> AppResult<AiProviderTestReport> {
+    let log = state
+        .diagnostics
+        .begin("ai", "testStreaming", &input.provider_id);
+    state
+        .ai_configuration
+        .test_provider_logged(input, super::testing::AiProviderTestMode::Streaming, log)
+        .await
 }

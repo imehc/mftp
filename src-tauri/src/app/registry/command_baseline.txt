@@ -48,6 +48,7 @@ common ai_provider_select
 common ai_model_switch
 common ai_streaming_update
 common ai_provider_test
+common ai_provider_test_streaming
 common hosts_list
 common host_get
 common host_create

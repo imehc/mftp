@@ -13,5 +13,6 @@ mod providers;
 mod read;
 pub(super) mod schema;
 mod selection;
+pub(crate) mod testing;
 mod transaction;
 pub(super) mod validation;

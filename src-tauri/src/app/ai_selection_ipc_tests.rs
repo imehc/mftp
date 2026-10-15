@@ -1,6 +1,39 @@
 use super::*;
 
 #[test]
+fn provider_test_records_into_the_shared_panel_and_links_one_activity_result() {
+    let f = Fixture::new();
+    let main = tauri::WebviewWindowBuilder::new(&f.app, "main", Default::default())
+        .build()
+        .unwrap();
+    let _ = invoke(
+        &main,
+        "ai_provider_test",
+        json!({"input":{"expectedRevision":0,"providerId":"missing"}}),
+    )
+    .unwrap_err();
+    let snapshot = invoke(&main, "diagnostics_snapshot", json!({"after":0})).unwrap();
+    let record = &snapshot["operations"][0];
+    assert_eq!(record["status"], "failed");
+    assert_eq!(record["details"], json!([]));
+    let logs = f.storage.list_activity_logs(10, Some("ai"), None).unwrap();
+    assert_eq!(logs.len(), 1);
+    assert_eq!(logs[0].operation_id.as_deref(), record["id"].as_str());
+    // The panel is shared, not owned per webview: another window sees the same
+    // records, and only an explicit clear discards them.
+    let other = tauri::WebviewWindowBuilder::new(&f.app, "other", Default::default())
+        .build()
+        .unwrap();
+    let seen = invoke(&other, "diagnostics_snapshot", json!({"after":0})).unwrap();
+    assert_eq!(seen["operations"][0]["id"], record["id"]);
+    invoke(&other, "diagnostics_clear", json!({})).unwrap();
+    assert_eq!(
+        invoke(&main, "diagnostics_snapshot", json!({"after":0})).unwrap()["operations"],
+        json!([])
+    );
+}
+
+#[test]
 fn selection_handlers_restore_saved_rows_and_keep_test_read_only() {
     let f = Fixture::new();
     let repo = AiRepository::new(f.storage.clone());
@@ -106,6 +139,10 @@ fn selection_and_test_handlers_reject_maintenance_without_native_io() {
         ),
         (
             "ai_provider_test",
+            json!({"expectedRevision":0,"providerId":"a"}),
+        ),
+        (
+            "ai_provider_test_streaming",
             json!({"expectedRevision":0,"providerId":"a"}),
         ),
     ] {

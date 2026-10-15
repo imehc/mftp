@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
+import { Spinner } from "~/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 import { protocolLabels } from "./protocol-labels";
@@ -24,6 +25,7 @@ interface Props {
   onDelete: (target: AiDeleteTarget) => void;
   onActivate: () => void;
   onTest: () => void;
+  testing: boolean;
   onSelect: (keyId: string, modelId: string) => void;
 }
 
@@ -38,6 +40,7 @@ export default function ProviderDetails({
   onDelete,
   onActivate,
   onTest,
+  testing,
   onSelect,
 }: Props) {
   const { t } = useLingui();
@@ -49,7 +52,7 @@ export default function ProviderDetails({
     (item) => item.id === provider.currentModelId,
   );
   return (
-    <div className="border-border flex min-w-0 flex-col gap-3 md:rounded-lg md:border md:p-4">
+    <div className="border-border flex min-w-0 flex-col gap-3 md:rounded-xl md:border md:p-3">
       <div className="flex min-h-[max(44px,2.75rem)] items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-medium">{provider.name}</h3>
@@ -86,7 +89,7 @@ export default function ProviderDetails({
           </AlertDescription>
         </Alert>
       ) : null}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button
           density="adaptive"
           variant="outline"
@@ -109,8 +112,12 @@ export default function ProviderDetails({
           }
           onClick={onTest}
         >
-          <PlugZap data-icon="inline-start" />
-          <Trans>测试连接</Trans>
+          {testing ? (
+            <Spinner data-icon="inline-start" aria-hidden="true" />
+          ) : (
+            <PlugZap data-icon="inline-start" aria-hidden="true" />
+          )}
+          <Trans>测试服务</Trans>
         </Button>
         <Button
           density="adaptive"

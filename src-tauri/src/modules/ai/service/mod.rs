@@ -1,5 +1,10 @@
 mod client;
 mod connection;
+mod deadlines;
+mod probe;
+mod protocol;
+mod runtime;
+mod sse;
 mod tasks;
 pub(super) mod url;
 

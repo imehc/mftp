@@ -1,9 +1,23 @@
+use crate::error::{AppError, AppResult, CustomErrorCode};
+use crate::modules::ai::completion::{
+    AiCompletionRequest, AiOutput, AiProviderErrorCode, AiReasoningPolicy,
+};
+use crate::modules::ai::{AiConnectionConfig, AiProtocol};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
 use serde_json::{json, Value};
 
-use super::responses;
-use crate::error::{AppError, AppResult, CustomErrorCode};
-use crate::modules::ai::{AiConnectionConfig, AiProtocol};
+#[path = "protocol/anthropic.rs"]
+mod anthropic;
+#[path = "protocol/chat.rs"]
+mod chat;
+#[path = "protocol/responses.rs"]
+mod responses;
+#[path = "protocol/usage.rs"]
+mod usage;
+
+pub(super) fn invalid() -> AppError {
+    AiProviderErrorCode::Protocol.error()
+}
 
 pub(super) fn headers(protocol: AiProtocol, key: &str) -> AppResult<HeaderMap> {
     let mut headers = HeaderMap::new();
@@ -22,234 +36,153 @@ pub(super) fn headers(protocol: AiProtocol, key: &str) -> AppResult<HeaderMap> {
 
 pub(super) fn request_body(
     config: &AiConnectionConfig,
-    instructions: &str,
-    input: &str,
-    limit: u32,
-    stream: bool,
+    request: &AiCompletionRequest<'_>,
 ) -> Value {
+    let text = request.text;
     let mut body = match config.protocol {
-        AiProtocol::Responses => json!({
-            "model": config.model, "instructions": instructions, "input": input,
-            "max_output_tokens": limit,
-        }),
-        AiProtocol::ChatCompletions => json!({
-            "model": config.model,
-            "messages": [{"role": "system", "content": instructions}, {"role": "user", "content": input}],
-            "max_completion_tokens": limit,
-        }),
-        AiProtocol::AnthropicMessages => json!({
-            "model": config.model, "system": instructions,
-            "messages": [{"role": "user", "content": input}], "max_tokens": limit,
-        }),
+        AiProtocol::Responses => {
+            json!({"model":config.model,"instructions":text.instructions,"input":text.input,"max_output_tokens":text.max_output_tokens})
+        }
+        AiProtocol::ChatCompletions => {
+            json!({"model":config.model,"messages":[{"role":"system","content":text.instructions},{"role":"user","content":text.input}],"max_completion_tokens":text.max_output_tokens})
+        }
+        AiProtocol::AnthropicMessages => {
+            json!({"model":config.model,"system":text.instructions,"messages":[{"role":"user","content":text.input}],"max_tokens":text.max_output_tokens})
+        }
     };
-    if stream {
+    if request.streaming {
         body["stream"] = json!(true);
+    }
+    match request.reasoning {
+        AiReasoningPolicy::ProviderDefault => {}
+        AiReasoningPolicy::Responses { effort, summary } => {
+            let mut reasoning = json!({});
+            if let Some(effort) = effort {
+                reasoning["effort"] = json!(effort);
+            }
+            if summary {
+                reasoning["summary"] = json!("auto");
+            }
+            if reasoning.as_object().is_some_and(|value| !value.is_empty()) {
+                body["reasoning"] = reasoning;
+            }
+        }
+        AiReasoningPolicy::ChatCompletions { effort, .. } => {
+            if let Some(effort) = effort {
+                body["reasoning_effort"] = json!(effort);
+            }
+        }
+        AiReasoningPolicy::Anthropic { budget_tokens } => {
+            body["thinking"] = json!({"type":"enabled","budget_tokens":budget_tokens});
+        }
     }
     body
 }
 
-fn invalid() -> AppError {
-    AppError::external(
-        "ai:provider_protocol",
-        "AI provider returned invalid text data",
-    )
+pub(super) enum EventStatus {
+    Ignored,
+    Accepted,
+    Completed,
 }
 
-fn failed() -> AppError {
-    AppError::external(
-        "ai:provider_failed",
-        "AI provider did not complete the text response",
-    )
+pub(super) struct Adapter {
+    protocol: AiProtocol,
+    responses: responses::Responses,
+    chat: chat::Chat,
+    anthropic: anthropic::Anthropic,
 }
 
-pub(super) fn nonempty(output: String) -> AppResult<String> {
-    if output.trim().is_empty() {
-        Err(invalid())
-    } else {
-        Ok(output)
-    }
-}
-
-fn successful_stop(protocol: AiProtocol, reason: Option<&str>) -> AppResult<()> {
-    match (protocol, reason) {
-        (AiProtocol::ChatCompletions, Some("stop"))
-        | (AiProtocol::AnthropicMessages, Some("end_turn" | "stop_sequence")) => Ok(()),
-        _ => Err(failed()),
-    }
-}
-
-pub(super) fn parse_output(protocol: AiProtocol, bytes: &[u8]) -> AppResult<String> {
-    if protocol == AiProtocol::Responses {
-        return responses::parse_output_text(bytes);
-    }
-    let value: Value = serde_json::from_slice(bytes).map_err(|_| invalid())?;
-    if value.get("error").is_some() {
-        return Err(failed());
-    }
-    let output = match protocol {
-        AiProtocol::ChatCompletions => {
-            let choice = value.pointer("/choices/0").ok_or_else(invalid)?;
-            successful_stop(
-                protocol,
-                choice.get("finish_reason").and_then(Value::as_str),
-            )?;
-            choice
-                .pointer("/message/content")
-                .and_then(Value::as_str)
-                .ok_or_else(invalid)?
-                .to_string()
+impl Adapter {
+    pub(super) fn new(protocol: AiProtocol, reasoning: AiReasoningPolicy) -> Self {
+        Self {
+            protocol,
+            responses: responses::Responses::default(),
+            chat: chat::Chat::new(reasoning),
+            anthropic: anthropic::Anthropic::default(),
         }
-        AiProtocol::AnthropicMessages => {
-            successful_stop(protocol, value.get("stop_reason").and_then(Value::as_str))?;
-            let blocks = value
-                .get("content")
-                .and_then(Value::as_array)
-                .ok_or_else(invalid)?;
-            let mut output = String::new();
-            for block in blocks {
-                if block.get("type").and_then(Value::as_str) == Some("text") {
-                    output.push_str(
-                        block
-                            .get("text")
-                            .and_then(Value::as_str)
-                            .ok_or_else(invalid)?,
-                    );
-                }
-            }
-            output
+    }
+
+    pub(super) fn plain(&mut self, bytes: &[u8], output: &mut AiOutput<'_>) -> AppResult<()> {
+        let value: Value = serde_json::from_slice(bytes).map_err(|_| invalid())?;
+        if !value.is_object() {
+            return Err(invalid());
         }
-        AiProtocol::Responses => return Err(invalid()),
-    };
-    nonempty(output.trim().to_string())
-}
+        if value.get("error").is_some_and(|value| !value.is_null()) {
+            return Err(AiProviderErrorCode::Failed.error());
+        }
+        match self.protocol {
+            AiProtocol::Responses => self.responses.plain(&value, output),
+            AiProtocol::ChatCompletions => self.chat.plain(&value, output),
+            AiProtocol::AnthropicMessages => self.anthropic.plain(&value, output),
+        }
+    }
 
-#[derive(Default)]
-pub(super) struct StreamState {
-    stopped: bool,
-    started: bool,
-    text_block: Option<u64>,
-}
-
-impl StreamState {
-    pub(super) fn handle<F>(
+    pub(super) fn event(
         &mut self,
-        protocol: AiProtocol,
         event: &str,
         data: &str,
-        limit: usize,
-        output: &mut String,
-        on_delta: &mut F,
-    ) -> AppResult<bool>
-    where
-        F: FnMut(&str) -> AppResult<()>,
-    {
-        if protocol == AiProtocol::Responses {
-            return responses::handle_stream_event(event, data, limit, output, on_delta);
-        }
-        if protocol == AiProtocol::ChatCompletions && data.trim() == "[DONE]" {
-            return if self.stopped {
-                Ok(true)
+        output: &mut AiOutput<'_>,
+    ) -> AppResult<EventStatus> {
+        if data.trim() == "[DONE]" {
+            return if self.protocol == AiProtocol::ChatCompletions {
+                self.chat.done()
             } else {
-                Err(failed())
+                Err(AiProviderErrorCode::Incomplete.error())
             };
         }
         let value: Value = serde_json::from_str(data).map_err(|_| invalid())?;
-        if value.get("error").is_some() {
-            return Err(failed());
-        }
-        if protocol == AiProtocol::ChatCompletions {
-            let choices = value
-                .get("choices")
-                .and_then(Value::as_array)
-                .ok_or_else(invalid)?;
-            for choice in choices {
-                if choice.get("index").and_then(Value::as_u64) != Some(0) {
-                    continue;
-                }
-                if self.stopped {
-                    return Err(invalid());
-                }
-                if let Some(text) = choice.pointer("/delta/content").filter(|v| !v.is_null()) {
-                    responses::append_stream_text(
-                        output,
-                        text.as_str().ok_or_else(invalid)?,
-                        limit,
-                        on_delta,
-                    )?;
-                }
-                if let Some(reason) = choice.get("finish_reason").filter(|v| !v.is_null()) {
-                    successful_stop(protocol, reason.as_str())?;
-                    self.stopped = true;
-                }
-            }
-            return Ok(false);
+        if !value.is_object() {
+            return Err(invalid());
         }
         let kind = value.get("type").and_then(Value::as_str).unwrap_or(event);
-        match kind {
-            "error" => return Err(failed()),
-            "message_start" => {
-                if self.started {
-                    return Err(invalid());
-                }
-                self.started = true;
-            }
-            "content_block_start" => {
-                if !self.started || self.stopped || self.text_block.is_some() {
-                    return Err(invalid());
-                }
-                if value.pointer("/content_block/type").and_then(Value::as_str) == Some("text") {
-                    self.text_block = Some(
-                        value
-                            .get("index")
-                            .and_then(Value::as_u64)
-                            .ok_or_else(invalid)?,
-                    );
-                    let text = value
-                        .pointer("/content_block/text")
-                        .and_then(Value::as_str)
-                        .ok_or_else(invalid)?;
-                    responses::append_stream_text(output, text, limit, on_delta)?;
-                }
-            }
-            "content_block_delta"
-                if value.pointer("/delta/type").and_then(Value::as_str) == Some("text_delta") =>
-            {
-                if self.stopped
-                    || self.text_block.is_none()
-                    || self.text_block != value.get("index").and_then(Value::as_u64)
-                {
-                    return Err(invalid());
-                }
-                let text = value
-                    .pointer("/delta/text")
-                    .and_then(Value::as_str)
-                    .ok_or_else(invalid)?;
-                responses::append_stream_text(output, text, limit, on_delta)?;
-            }
-            "content_block_stop"
-                if self.text_block == value.get("index").and_then(Value::as_u64) =>
-            {
-                self.text_block = None;
-            }
-            "message_delta" => {
-                if !self.started || self.text_block.is_some() {
-                    return Err(invalid());
-                }
-                successful_stop(
-                    protocol,
-                    value.pointer("/delta/stop_reason").and_then(Value::as_str),
-                )?;
-                self.stopped = true;
-            }
-            "message_stop" => {
-                return if self.stopped {
-                    Ok(true)
-                } else {
-                    Err(failed())
-                }
-            }
-            _ => {}
+        if self.protocol != AiProtocol::ChatCompletions
+            && !event.is_empty()
+            && event != "message"
+            && kind != event
+        {
+            return Err(invalid());
         }
-        Ok(false)
+        let status = match self.protocol {
+            AiProtocol::Responses => self.responses.event(kind, &value, output),
+            AiProtocol::ChatCompletions => self.chat.event(&value, output),
+            AiProtocol::AnthropicMessages => self.anthropic.event(kind, &value, output),
+        }?;
+        if !matches!(status, EventStatus::Ignored) {
+            output.observation.accepted_event();
+        }
+        Ok(status)
     }
 }
+
+fn index(value: &Value, name: &str) -> AppResult<u32> {
+    value
+        .get(name)
+        .and_then(Value::as_u64)
+        .and_then(|value| u32::try_from(value).ok())
+        .ok_or_else(invalid)
+}
+
+fn text<'a>(value: &'a Value, name: &str) -> AppResult<&'a str> {
+    value.get(name).and_then(Value::as_str).ok_or_else(invalid)
+}
+
+#[cfg(test)]
+pub(super) fn parse_output(protocol: AiProtocol, bytes: &[u8]) -> AppResult<String> {
+    use crate::modules::ai::completion::{AiEmitter, AiObservation, AiTextRequest};
+    let text = AiTextRequest {
+        instructions: String::new(),
+        input: String::new(),
+        max_output_tokens: 32,
+        output_limit_bytes: 1024 * 1024,
+    };
+    let request = AiCompletionRequest::text(&text, false);
+    let observation = std::sync::Arc::new(AiObservation::new(protocol));
+    let emitter = AiEmitter::new(observation.clone(), |_| {});
+    let mut output = AiOutput::new(&request, observation, emitter);
+    Adapter::new(protocol, request.reasoning).plain(bytes, &mut output)?;
+    Ok(output.result()?.text.trim().into())
+}
+
+#[cfg(test)]
+#[path = "protocol/adapter_tests.rs"]
+mod tests;

@@ -1,11 +1,11 @@
 //! Shared AI connection primitives. IPC exposes only bounded application
 //! tasks; credentials and provider requests stay behind this module.
 //!
-//! The service layer is a generic, size-bounded text pipeline: the provider
-//! request carries instructions assembled by the calling feature module and
-//! the response text is returned unparsed. Domain prompts and result
-//! interpretation belong to the callers (e.g. poetry translation).
+//! The service layer normalizes bounded text and reasoning events with shared
+//! deadlines and cancellation. Calling features own prompts, domain schemas,
+//! result interpretation, and persistence (e.g. poetry translation).
 
+pub(crate) mod completion;
 mod legacy_schema;
 mod model;
 mod ports;

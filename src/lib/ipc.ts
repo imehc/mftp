@@ -137,7 +137,10 @@ export const aiStreamingUpdate = (
 ) => unwrapCommand(commands.aiStreamingUpdate(input));
 export const aiProviderTest = (
   input: Parameters<typeof commands.aiProviderTest>[0],
-) => voidCommand(commands.aiProviderTest(input));
+) => unwrapCommand(commands.aiProviderTest(input));
+export const aiProviderTestStreaming = (
+  input: Parameters<typeof commands.aiProviderTestStreaming>[0],
+) => unwrapCommand(commands.aiProviderTestStreaming(input));
 
 export const diagnosticsSnapshot = (after: number) =>
   unwrapCommand(commands.diagnosticsSnapshot(after));

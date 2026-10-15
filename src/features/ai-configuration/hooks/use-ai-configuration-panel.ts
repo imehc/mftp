@@ -1,19 +1,16 @@
-import { useLingui } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 import {
   aiProviderActivate,
   aiProviderSelect,
-  aiProviderTest,
   aiStreamingUpdate,
 } from "~/lib/ipc";
 
 import { useAiConfiguration } from "../store";
 import type { AiDeleteTarget, AiEditorTarget } from "../types";
+import { useProviderTests } from "./use-provider-tests";
 
 export function useAiConfigurationPanel() {
-  const { t } = useLingui();
   const { view, loading, busy, error, refresh, execute, clearError } =
     useAiConfiguration();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -31,6 +28,8 @@ export function useAiConfigurationPanel() {
     (item) => item.id === view.activeProviderId,
   );
 
+  const { test, testing } = useProviderTests(view, provider);
+
   function edit(target: AiEditorTarget) {
     clearError();
     setEditor(target);
@@ -39,19 +38,6 @@ export function useAiConfigurationPanel() {
   function remove(target: AiDeleteTarget) {
     clearError();
     setDeleting(target);
-  }
-
-  async function test() {
-    if (!view || !provider) return;
-    if (
-      await execute(() =>
-        aiProviderTest({
-          expectedRevision: view.revision,
-          providerId: provider.id,
-        }),
-      )
-    )
-      toast.success(t`AI 服务连接成功`);
   }
 
   function saved() {
@@ -116,6 +102,7 @@ export function useAiConfigurationPanel() {
     edit,
     remove,
     test,
+    testing,
     activate,
     select,
     streaming,

@@ -15,6 +15,10 @@ struct Probe {
 }
 impl Probe {
     fn new(failure: bool) -> Self {
+        Self::with_streaming(failure, false)
+    }
+
+    fn with_streaming(failure: bool, streaming: bool) -> Self {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let url = format!("http://{}/custom", listener.local_addr().unwrap());
         listener.set_nonblocking(true).unwrap();
@@ -53,10 +57,20 @@ impl Probe {
             } else {
                 (
                     "200 OK",
-                    r#"{"output":[{"content":[{"type":"output_text","text":"OK"}]}]}"#,
+                    r#"{"status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":"OK"}]}]}"#,
                 )
             };
-            write!(stream, "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            let body = if streaming && !failure {
+                "data: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"OK\"}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[{\"content\":[{\"type\":\"output_text\",\"text\":\"OK\"}]}]}}\n\n"
+            } else {
+                body
+            };
+            let content_type = if streaming {
+                "text/event-stream"
+            } else {
+                "application/json"
+            };
+            write!(stream, "HTTP/1.1 {status}\r\nContent-Type: {content_type}\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
         });
         Self {
             url,
@@ -144,7 +158,7 @@ async fn targeted_request_keeps_saved_identity_during_switch_replace_and_delete(
     assert_eq!(path, "POST /custom/v1/responses HTTP/1.1");
     assert_eq!(auth, "Bearer private-secret-b");
     assert_eq!(body["model"], "model-a");
-    assert_eq!(body["input"], "Reply with only OK.");
+    assert_eq!(body["input"], "Briefly confirm that you can respond.");
     assert_eq!(f.service.configuration().await.unwrap(), b);
     let v = tokio::time::timeout(
         Duration::from_secs(2),
@@ -187,7 +201,14 @@ async fn abandoned_native_http_waiter_keeps_maintenance_until_worker_finishes() 
     f.service.create_provider(draft).await.unwrap();
     // Exercise the old test command's shared path as well as the new target path.
     let service = f.service.clone();
-    let waiter = tokio::spawn(async move { service.test_saved(None).await });
+    let waiter = tokio::spawn(async move {
+        service
+            .test_saved(
+                None,
+                crate::modules::ai::configuration::testing::AiProviderTestMode::NonStreaming,
+            )
+            .await
+    });
     let (_, auth, _) = probe.captured().await;
     assert_eq!(auth, "Bearer private-secret-a");
     waiter.abort();
@@ -218,8 +239,42 @@ async fn provider_failure_does_not_change_selection_or_echo_remote_message() {
     let test = tokio::spawn(async move { service.test_provider(input).await });
     probe.captured().await;
     probe.finish();
-    let error = test.await.unwrap().unwrap_err();
+    let report = test.await.unwrap().unwrap();
+    assert!(report.service_reachable);
+    let error = report.error.unwrap();
     assert_eq!(error.kind, crate::error::AppErrorKind::External);
     assert!(!format!("{error:?}").contains("private-secret"));
     assert_eq!(f.service.configuration().await.unwrap(), original);
+}
+
+#[tokio::test]
+async fn independent_streaming_probe_holds_maintenance_until_its_worker_exits() {
+    let f = Fixture::new();
+    let mut probe = Probe::with_streaming(false, true);
+    let mut draft = create(0, "streaming");
+    draft.base_url = probe.url.clone();
+    let view = f.service.create_provider(draft).await.unwrap();
+    let input = target(&view, &view.providers[0].id);
+    let service = f.service.clone();
+    let waiter = tokio::spawn(async move { service.test_provider_streaming(input).await });
+    let (_, auth, body) = probe.captured().await;
+    assert_eq!(auth, "Bearer private-secret-streaming");
+    assert_eq!(body["stream"], true);
+    assert_eq!(body["max_output_tokens"], 4096);
+    waiter.abort();
+    assert!(f
+        .service
+        .operations
+        .maintenance(Duration::from_millis(30))
+        .await
+        .is_err());
+    probe.finish();
+    let lease = f
+        .service
+        .operations
+        .maintenance(Duration::from_secs(3))
+        .await
+        .unwrap();
+    drop(lease);
+    assert_eq!(f.service.configuration().await.unwrap(), view);
 }

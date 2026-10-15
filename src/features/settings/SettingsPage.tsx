@@ -64,17 +64,17 @@ export default function SettingsPage({
           </div>
         }
       />
-      <AppPageContent bottomInset="scroll">
-        {ai ? (
-          <AiConfigurationSettings />
-        ) : (
+      {ai ? (
+        <AiConfigurationSettings />
+      ) : (
+        <AppPageContent bottomInset="scroll">
           <SettingsOverview
             onAi={() =>
               void navigate({ to: "/settings", search: { panel: "ai" } })
             }
           />
-        )}
-      </AppPageContent>
+        </AppPageContent>
+      )}
     </main>
   );
 }

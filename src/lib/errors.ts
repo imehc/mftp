@@ -1,9 +1,14 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 
-import type { AppError, CustomErrorCode } from "~/bindings";
+import type {
+  AiProviderErrorCode,
+  AppError,
+  CustomErrorCode,
+} from "~/bindings";
 import { translate } from "~/i18n/translate";
 
+import { aiProviderErrorMessages } from "./errors/ai-provider";
 import {
   appDataSectionNames,
   customErrorMessages,
@@ -131,6 +136,14 @@ export function describeError(
     });
   }
   if (payload.code === "frontend:unknown") return localize(unknownErrorMessage);
+  if (
+    payload.kind === "external" &&
+    Object.hasOwn(aiProviderErrorMessages, payload.code)
+  ) {
+    return localize(
+      aiProviderErrorMessages[payload.code as AiProviderErrorCode],
+    );
+  }
   if (
     payload.kind === "external" &&
     Object.hasOwn(frontendErrorMessages, payload.code)

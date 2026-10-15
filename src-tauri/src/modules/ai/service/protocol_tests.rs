@@ -15,8 +15,8 @@ fn reply(protocol: AiProtocol) -> String {
 fn stream(protocol: AiProtocol) -> String {
     let events = match protocol {
         AiProtocol::Responses => vec![
-            json!({"type":"response.output_text.delta","delta":"OK"}),
-            json!({"type":"response.completed"}),
+            json!({"type":"response.output_text.delta","output_index":0,"content_index":0,"delta":"OK"}),
+            json!({"type":"response.completed","response":serde_json::from_str::<Value>(&reply(protocol)).unwrap()}),
         ],
         AiProtocol::ChatCompletions => vec![
             json!({"choices":[{"index":0,"delta":{"content":"OK"},"finish_reason":null}]}),
@@ -43,6 +43,23 @@ fn stream(protocol: AiProtocol) -> String {
 }
 
 fn server(body: String, status: u16) -> (String, std::thread::JoinHandle<(String, Value)>) {
+    server_with_length(body, status, true)
+}
+
+fn server_with_length(
+    body: String,
+    status: u16,
+    known_length: bool,
+) -> (String, std::thread::JoinHandle<(String, Value)>) {
+    server_delayed(body, status, known_length, Duration::ZERO)
+}
+
+fn server_delayed(
+    body: String,
+    status: u16,
+    known_length: bool,
+    delay: Duration,
+) -> (String, std::thread::JoinHandle<(String, Value)>) {
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let url = format!("http://{}/custom/v1", listener.local_addr().unwrap());
     let worker = std::thread::spawn(move || {
@@ -76,9 +93,18 @@ fn server(body: String, status: u16) -> (String, std::thread::JoinHandle<(String
             bytes.extend_from_slice(&chunk[..size]);
         }
         let request = serde_json::from_slice(&bytes[body_start..body_start + length]).unwrap();
-        let response = format!("HTTP/1.1 {status} Test\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len());
+        std::thread::sleep(delay);
+        let length_header = if known_length {
+            format!("Content-Length: {}\r\n", body.len())
+        } else {
+            String::new()
+        };
+        let response = format!("HTTP/1.1 {status} Test\r\nContent-Type: text/event-stream\r\n{length_header}Connection: close\r\n\r\n{body}");
         // Split inside SSE frames so parsing must tolerate network chunk boundaries.
-        for chunk in response.as_bytes().chunks(17) {
+        for chunk in response
+            .as_bytes()
+            .chunks(if known_length { 17 } else { 4096 })
+        {
             if socket.write_all(chunk).is_err() {
                 break;
             }
@@ -166,15 +192,21 @@ async fn all_protocols_use_selected_wire_format_for_plain_and_streaming_requests
     }
 }
 
-#[test]
-fn connection_probe_uses_each_selected_protocol() {
+#[tokio::test]
+async fn connection_probe_uses_each_selected_protocol() {
     for protocol in [
         AiProtocol::Responses,
         AiProtocol::ChatCompletions,
         AiProtocol::AnthropicMessages,
     ] {
         let (url, worker) = server(reply(protocol), 200);
-        test_connection(&config(url, protocol, false), "fake-key").unwrap();
+        let report = test_connection(
+            &config(url, protocol, false),
+            "fake-key",
+            AiProviderTestMode::NonStreaming,
+        )
+        .await;
+        assert!(report.error.is_none(), "{report:?}");
         let (header, _) = worker.join().unwrap();
         let path = super::super::url::protocol_endpoint("http://local/custom/v1", protocol);
         assert!(header.starts_with(&format!(
@@ -280,3 +312,15 @@ async fn cancelling_each_protocol_closes_the_stream_without_replaying() {
         worker.join().unwrap();
     }
 }
+
+#[path = "diagnostic_tests.rs"]
+mod diagnostic_tests;
+
+#[path = "runtime_tests.rs"]
+mod runtime_tests;
+
+#[path = "probe_tests.rs"]
+mod probe_tests;
+
+#[path = "transport_log_tests.rs"]
+mod transport_log_tests;
