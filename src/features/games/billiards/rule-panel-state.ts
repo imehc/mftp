@@ -35,6 +35,8 @@ export function reconcileRulePanel(
   scope: string,
   prompt: string | null,
 ): RulePanelState {
+  if (previous.panel === "details")
+    return scope === previous.scope ? previous : { ...previous, scope };
   const newPrompt = prompt !== null && prompt !== previous.prompted;
   if (scope === previous.scope && !newPrompt) return previous;
   return {

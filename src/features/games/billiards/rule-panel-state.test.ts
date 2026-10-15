@@ -98,8 +98,8 @@ describe("台球规则弹层生命周期", () => {
     ).toBe(null);
   });
 
-  it("回合、重开和结束会清理旧面板及认输确认", () => {
-    for (const panel of ["rules", "target", "details", "concede"] as const) {
+  it("回合和结束会清理旧操作面板及认输确认", () => {
+    for (const panel of ["rules", "target", "concede"] as const) {
       const previous = { ...closed, scope: "old", panel };
       expect(reconcileRulePanel(previous, "next", null).panel).toBe(null);
       expect(reconcileRulePanel(previous, "finished", null).panel).toBe(null);
@@ -107,6 +107,74 @@ describe("台球规则弹层生命周期", () => {
     expect(rulePromptKey({ ...nomination(), finished: true }, 3, true)).toBe(
       null,
     );
+  });
+
+  it("主动打开的详情在对方思考、出杆、回合切换和结束时保持打开", () => {
+    let previous: RulePanelState = {
+      ...closed,
+      scope: "1:awaiting-move:1:false",
+      panel: "details",
+    };
+    for (const scope of [
+      "1:resolving:1:false",
+      "2:awaiting-move:1:false",
+      "2:resolving:1:false",
+      "3:awaiting-move:0:false",
+      "4:finished:null:true",
+    ]) {
+      previous = reconcileRulePanel(previous, scope, null);
+      expect(previous).toMatchObject({
+        scope,
+        panel: "details",
+        prompted: null,
+      });
+      expect(reconcileRulePanel(previous, scope, null)).toBe(previous);
+    }
+    const dismissed = { ...previous, panel: null };
+    expect(reconcileRulePanel(dismissed, previous.scope, null)).toBe(dismissed);
+  });
+
+  it.each(["nine-ball:2:0:decision:3", "snooker:2:0:nominate"])(
+    "详情打开时暂缓 %s，关闭后只提示一次",
+    (prompt) => {
+      const details: RulePanelState = {
+        scope: "old",
+        panel: "details",
+        prompted: "previous",
+      };
+      const deferred = reconcileRulePanel(details, "next", prompt);
+      expect(deferred).toMatchObject({
+        panel: "details",
+        prompted: "previous",
+      });
+      expect(reconcileRulePanel(deferred, "next", prompt)).toBe(deferred);
+      const opened = reconcileRulePanel(
+        { ...deferred, panel: null },
+        "next",
+        prompt,
+      );
+      expect(opened.panel).toBe(
+        prompt.endsWith(":nominate") ? "target" : "rules",
+      );
+      expect(opened.prompted).toBe(prompt);
+      const dismissed = { ...opened, panel: null };
+      expect(reconcileRulePanel(dismissed, "next", prompt)).toBe(dismissed);
+    },
+  );
+
+  it("详情关闭时不补弹已经过期的决策，已提示过的选择也不重复弹出", () => {
+    const prompt = "snooker:2:0:decision:3";
+    const deferred = reconcileRulePanel(
+      { ...closed, panel: "details" },
+      "next",
+      prompt,
+    );
+    const finished = reconcileRulePanel(deferred, "finished", null);
+    expect(
+      reconcileRulePanel({ ...finished, panel: null }, "finished", null).panel,
+    ).toBeNull();
+    const viewed = { ...deferred, prompted: prompt, panel: null };
+    expect(reconcileRulePanel(viewed, "next", prompt)).toBe(viewed);
   });
 
   it("新一杆再次进入选彩会获得新的提示", () => {
