@@ -72,16 +72,14 @@ describe("中式八球袋口的实际内沿最近距离", () => {
 
   it("六袋均须跨过支撑边且处在开孔内，辅助线采用同一边界", () => {
     for (const p of POCKET_GEOMETRIES) {
-      const before = pocketWorld(p.spec, 0, p.supportDepth - 0.0001);
-      const after = pocketWorld(p.spec, 0, p.supportDepth + 0.0001);
+      const before = pocketWorld(p.spec, 0, p.front - 0.0001);
+      const after = pocketWorld(p.spec, 0, p.front + 0.0001);
       expect(pocketAt(before)).toBeUndefined();
       expect(pocketAt(after)?.id).toBe(p.spec.id);
       expect(
-        pocketAt(
-          pocketWorld(p.spec, p.rearHalf + 0.001, p.supportDepth + 0.01),
-        ),
+        pocketAt(pocketWorld(p.spec, p.cavityRadius + 0.001, p.front + 0.01)),
       ).toBeUndefined();
-      const origin = pocketWorld(p.spec, 0, p.supportDepth - 0.1);
+      const origin = pocketWorld(p.spec, 0, p.front - 0.1);
       expect(
         pocketRayDistance(origin, { x: p.spec.dx, y: p.spec.dy }, 1),
       ).toBeCloseTo(0.1, 8);

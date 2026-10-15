@@ -116,39 +116,23 @@ describe("袋口前缘收圆与有效进球区域", () => {
       }
     });
 
-    it(`${equipment.id} 收圆后与完整袋颚定义的捕获区域保持一致`, () => {
+    it(`${equipment.id} 可见圆孔内外与球心捕获范围保持一致`, () => {
       for (const pocket of getPocketGeometries(equipment)) {
-        const original = [
-          ...pocket.right,
-          ...Array.from({ length: 40 }, (_, i) => {
-            const angle = ((i + 1) / 40) * Math.PI;
-            return pocketWorld(
-              pocket.spec,
-              pocket.rearHalf * Math.cos(angle),
-              pocket.rearDepth + pocket.rearHalf * Math.sin(angle),
-            );
-          }),
-          ...pocket.left.slice(0, -1).reverse(),
-        ];
         for (
-          let u = -pocket.rearHalf - 0.0021;
-          u < pocket.rearHalf + 0.002;
-          u += 0.002
+          let offset = -pocket.cavityRadius - 0.0021;
+          offset < pocket.cavityRadius + 0.002;
+          offset += 0.004
         ) {
           for (
-            let v = pocket.supportDepth + 0.0001;
-            v < pocket.rearDepth + pocket.rearHalf + 0.002;
-            v += 0.002
+            let depth = pocket.front - 0.0021;
+            depth < pocket.cavityDepth + pocket.cavityRadius + 0.002;
+            depth += 0.004
           ) {
-            const point = pocketWorld(pocket.spec, u, v);
-            const local = pocketLocal(pocket.spec, point);
+            const point = pocketWorld(pocket.spec, offset, depth);
             expect(
               pocketAt(point, equipment)?.id === pocket.spec.id,
-              `${pocket.spec.id}: ${u}, ${v}`,
-            ).toBe(
-              Math.abs(local.x) <= pocket.rearHalf &&
-                insidePolygon(point, original),
-            );
+              `${pocket.spec.id}: ${offset}, ${depth}`,
+            ).toBe(insidePolygon(point, pocket.opening));
           }
         }
       }

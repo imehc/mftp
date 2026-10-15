@@ -78,16 +78,11 @@ describe("器材配置隔离与袋口测量", () => {
     for (const equipment of Object.values(EQUIPMENT)) {
       for (const pocket of getPocketGeometries(equipment)) {
         expect(
-          pocketAt(
-            pocketWorld(pocket.spec, 0, pocket.supportDepth - 1e-5),
-            equipment,
-          ),
+          pocketAt(pocketWorld(pocket.spec, 0, pocket.front - 1e-5), equipment),
         ).toBeUndefined();
         expect(
-          pocketAt(
-            pocketWorld(pocket.spec, 0, pocket.supportDepth + 1e-5),
-            equipment,
-          )?.id,
+          pocketAt(pocketWorld(pocket.spec, 0, pocket.front + 1e-5), equipment)
+            ?.id,
         ).toBe(pocket.spec.id);
       }
     }

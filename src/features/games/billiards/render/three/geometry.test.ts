@@ -12,6 +12,7 @@ import { EQUIPMENT } from "../../equipment";
 import { cushionSegments } from "../../geometry";
 import {
   getPocketGeometries,
+  pocketAt,
   pocketLocal,
   pocketWorld,
 } from "../../pocket-geometry";
@@ -83,6 +84,15 @@ describe("三维球桌与物理轮廓对齐", () => {
           new Vector3(0, -1, 0),
         );
         expect(shelfRay.intersectObject(shelfMesh).length).toBeGreaterThan(0);
+        expect(pocketAt(before, equipment)).toBeUndefined();
+        const justInside = pocketWorld(pocket.spec, 0, pocket.front + 0.002);
+        const entryRay = new Raycaster(
+          new Vector3(justInside.x, 1, justInside.y),
+          new Vector3(0, -1, 0),
+        );
+        expect(pocketAt(justInside, equipment)?.id).toBe(pocket.spec.id);
+        for (const mesh of [shelfMesh, rimMesh, lipMesh])
+          expect(entryRay.intersectObject(mesh)).toHaveLength(0);
         for (const offset of [-0.6, 0, 0.6]) {
           const center = pocketWorld(
             pocket.spec,

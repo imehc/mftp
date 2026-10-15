@@ -334,7 +334,7 @@ export function simulateShot(
       for (const [id, body] of bodies) {
         const pos = body.translation();
         const vel = body.linvel();
-        // 共享开孔与支撑边判定，不把绘制半径当成落袋范围。
+        // 球心跨过可见开孔即失去支撑，不再等待独立的固定袋深。
         recorder.position(id, positions.get(id)!.x, pos.x);
         const pocket = pocketAt(pos, equipment);
         if (pocket) {

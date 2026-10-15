@@ -154,7 +154,7 @@ function buildPocket(spec: PocketSpec, equipment: TableEquipment) {
     Math.max(Math.abs(spec.dx), Math.abs(spec.dy)) * cavityDepth -
     cavityRadius;
   const rimWidth = Math.min(0.014, outsideClearance * 0.8);
-  // 只在支撑线前收圆台呢切口；袋颚净宽与进入支撑线后的捕获区域不变。
+  // 入口造型参数只控制包呢过渡，失去台面支撑的位置由可见圆孔决定。
   const roundingDepth = Math.min(
     (supportDepth - front) * 0.95,
     settings.width * 0.35,
@@ -170,14 +170,6 @@ function buildPocket(spec: PocketSpec, equipment: TableEquipment) {
       openingSide.push({ x: a.x + (b.x - a.x) * t, y: lipDepth });
     }
     if (b.y >= lipDepth) openingSide.push(b);
-  }
-  const captureBack: Point[] = [];
-  for (let i = 0; i <= 40; i++) {
-    const angle = (i / 40) * Math.PI;
-    captureBack.push({
-      x: rearHalf * Math.cos(angle),
-      y: rearDepth + rearHalf * Math.sin(angle),
-    });
   }
   const shoulder: Point[] = [];
   for (let i = 0; i <= 24; i++) {
@@ -208,15 +200,6 @@ function buildPocket(spec: PocketSpec, equipment: TableEquipment) {
       Math.hypot(point.x - backPoints[i - 1].x, point.y - backPoints[i - 1].y) >
         1e-9,
   );
-  // 捕获区域保留原支撑线与后弧；衬里后移只增加下沉后的容纳空间。
-  const captureLocal = [
-    ...jaw,
-    ...captureBack.slice(1),
-    ...jaw
-      .slice(0, -1)
-      .reverse()
-      .map(({ x, y }) => ({ x: -x, y })),
-  ];
   const entryLocal = [
     ...openingSide,
     ...back.slice(1),
@@ -271,6 +254,7 @@ function buildPocket(spec: PocketSpec, equipment: TableEquipment) {
     facingRearHalf,
     facingLeft,
     facingRight,
+    // 仅保留为袋颚与包呢造型的基准，不作为落袋阈值。
     supportDepth,
     front: cavityDepth - cavityRadius,
     entryFront: front,
@@ -280,7 +264,6 @@ function buildPocket(spec: PocketSpec, equipment: TableEquipment) {
     right,
     opening,
     openingLocal,
-    captureLocal,
     back: back.map(({ x, y }) => pocketWorld(spec, x, y)),
     backNormals: back.map((_, i) => {
       const before = back[Math.max(0, i - 1)];
@@ -338,7 +321,7 @@ export function insidePolygon(point: Point, points: readonly Point[]): boolean {
   return inside;
 }
 
-/** 球心须进入实际开孔并越过支撑线；不以贴图半径放大吸球区。 */
+/** 球心进入可见开孔才失去台面支撑；球边覆盖孔口不触发落袋。 */
 export function pocketAt(
   point: Point,
   equipment: TableEquipment = CHINESE_EIGHT,
@@ -346,15 +329,15 @@ export function pocketAt(
   return getPocketGeometries(equipment).find((p) => {
     const local = pocketLocal(p.spec, point);
     return (
-      local.y >= p.supportDepth &&
-      local.y <= p.rearDepth + p.rearHalf &&
-      Math.abs(local.x) <= p.rearHalf &&
-      insidePolygon(local, p.captureLocal)
+      local.y >= p.front &&
+      local.y <= p.cavityDepth + p.cavityRadius &&
+      Math.abs(local.x) <= p.cavityRadius &&
+      insidePolygon(local, p.openingLocal)
     );
   })?.spec;
 }
 
-/** 辅助线在与正式模拟相同的支撑边结束。 */
+/** 对可见开孔的凸多边形做射线裁剪，与正式模拟使用相同的支撑边。 */
 export function pocketRayDistance(
   origin: Point,
   dir: Point,
@@ -362,18 +345,35 @@ export function pocketRayDistance(
   equipment: TableEquipment = CHINESE_EIGHT,
 ): number {
   let nearest = limit;
-  for (const p of getPocketGeometries(equipment)) {
-    const local = pocketLocal(p.spec, origin);
-    const speed = dir.x * p.spec.dx + dir.y * p.spec.dy;
-    if (speed <= 1e-9) continue;
-    const distance = (p.supportDepth - local.y) / speed;
-    if (distance < 0 || distance >= nearest) continue;
-    const at = {
-      x: origin.x + distance * dir.x,
-      y: origin.y + distance * dir.y,
+  for (const pocket of getPocketGeometries(equipment)) {
+    const local = pocketLocal(pocket.spec, origin);
+    const direction = {
+      x: -pocket.spec.dy * dir.x + pocket.spec.dx * dir.y,
+      y: pocket.spec.dx * dir.x + pocket.spec.dy * dir.y,
     };
-    if (insidePolygon(pocketLocal(p.spec, at), p.captureLocal))
-      nearest = distance;
+    let enter = 0;
+    let leave = nearest;
+    const points = pocket.openingLocal;
+    for (let index = 0; index < points.length; index++) {
+      const start = points[index];
+      const end = points[(index + 1) % points.length];
+      const edgeX = end.x - start.x;
+      const edgeY = end.y - start.y;
+      const side = edgeX * (local.y - start.y) - edgeY * (local.x - start.x);
+      const rate = edgeX * direction.y - edgeY * direction.x;
+      if (Math.abs(rate) < 1e-12) {
+        if (side < 0) {
+          leave = -1;
+          break;
+        }
+        continue;
+      }
+      const distance = -side / rate;
+      if (rate > 0) enter = Math.max(enter, distance);
+      else leave = Math.min(leave, distance);
+      if (enter >= leave) break;
+    }
+    if (enter < leave - 1e-10) nearest = Math.min(nearest, enter);
   }
   return nearest;
 }

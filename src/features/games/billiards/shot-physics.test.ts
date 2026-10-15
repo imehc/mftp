@@ -1,8 +1,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { BALL_RADIUS, FIXED_DT, POCKETS, TABLE_H } from "./constants";
+import { EQUIPMENT } from "./equipment";
 import { ensurePhysicsReady, simulateShot } from "./physics";
-import { POCKET_GEOMETRIES, pocketWorld } from "./pocket-geometry";
+import {
+  getPocketGeometries,
+  pocketAt,
+  pocketLocal,
+  pocketWorld,
+} from "./pocket-geometry";
 import { computeAimGuide } from "./render/guides";
 import { createInitialBalls } from "./rules";
 import type { BallState, SimFrame } from "./types";
@@ -82,7 +88,7 @@ it("中袋落袋记录保留入射速度，台面内擦袋口不会被吸入", (
   const event = toward.events.find((e) => e.type === "pocket");
   expect(event?.type).toBe("pocket");
   if (event?.type === "pocket") {
-    expect(event.y).toBeGreaterThan(TABLE_H / 2);
+    expect(pocketAt(event)?.id).toBe(event.pocket);
     expect(event.vy).toBeGreaterThan(0);
     expect(Math.abs(event.vx)).toBeLessThan(1e-5);
   }
@@ -173,27 +179,33 @@ it("六个袋口的正向入射均能落袋并保留向外速度", () => {
 });
 
 describe("六袋实际通道的落袋回归", () => {
-  it("偏离净通道的入射先碰袋颚，不穿过圆弧直接落袋", () => {
-    for (const p of POCKET_GEOMETRIES) {
-      for (const side of [-1, 1]) {
-        const start = pocketWorld(
-          p.spec,
-          side * (p.width / 2 - BALL_RADIUS + 0.006),
-          p.turnDepth - 0.2,
-        );
-        const sim = simulateShot(
-          [ball(0, start.x, start.y)],
-          {
-            angle: Math.atan2(p.spec.dy, p.spec.dx),
-            power: 0.5,
-            followDraw: 0,
-          },
-          true,
-        );
-        expect(sim.firstImpact).not.toBeNull();
-        expect(sim.firstImpact?.targetId).toBeNull();
-        expect(sim.cuePotted).toBe(false);
-        expect(sim.events.some((event) => event.type === "cushion")).toBe(true);
+  it("擦向入口袋颚的入射先碰库，不穿过袋颚直接落袋", () => {
+    for (const equipment of Object.values(EQUIPMENT)) {
+      for (const pocket of getPocketGeometries(equipment)) {
+        const entrance = pocketLocal(pocket.spec, pocket.right[0]);
+        for (const side of [-1, 1]) {
+          const start = pocketWorld(
+            pocket.spec,
+            side * (entrance.x - equipment.ballRadius + 0.006),
+            entrance.y - 0.2,
+          );
+          const sim = simulateShot(
+            [ball(0, start.x, start.y)],
+            {
+              angle: Math.atan2(pocket.spec.dy, pocket.spec.dx),
+              power: 0.5,
+              followDraw: 0,
+            },
+            true,
+            equipment,
+          );
+          expect(sim.firstImpact).not.toBeNull();
+          expect(sim.firstImpact?.targetId).toBeNull();
+          expect(sim.cuePotted).toBe(false);
+          expect(sim.events.some((event) => event.type === "cushion")).toBe(
+            true,
+          );
+        }
       }
     }
   });

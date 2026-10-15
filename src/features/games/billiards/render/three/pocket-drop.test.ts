@@ -13,11 +13,7 @@ describe("后移袋孔的台呢入口与下沉衔接", () => {
   for (const equipment of Object.values(EQUIPMENT)) {
     it(`${equipment.id} 的六袋均先经过石板入口再在袋孔下沉`, () => {
       for (const pocket of getPocketGeometries(equipment)) {
-        const start = pocketWorld(
-          pocket.spec,
-          0.005,
-          pocket.supportDepth + 0.0001,
-        );
+        const start = pocketWorld(pocket.spec, 0.005, pocket.front + 0.001);
         const event: PocketEvent = {
           type: "pocket",
           t: 0,
@@ -30,7 +26,7 @@ describe("后移袋孔的台呢入口与下沉衔接", () => {
         const initial = pocketDropPosition(equipment, pocket, event, 0);
         expect(initial.x).toBeCloseTo(start.x, 10);
         expect(initial.z).toBeCloseTo(start.y, 10);
-        let previousDepth = pocket.supportDepth;
+        let previousDepth = pocket.front;
         for (let step = 0; step <= 58; step++) {
           const position = pocketDropPosition(
             equipment,
