@@ -186,9 +186,6 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.12.0(jiti@2.7.0))
-      '@lingui/babel-plugin-lingui-macro':
-        specifier: ^6.9.0
-        version: 6.9.0(@babel/core@8.0.6)
       '@lingui/cli':
         specifier: ^6.9.0
         version: 6.9.0(rolldown@1.2.9)
