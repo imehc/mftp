@@ -46,11 +46,9 @@ export function useTodo() {
   const categories = [
     ...new Set(items.flatMap((item) => (item.category ? [item.category] : []))),
   ].sort((left, right) => left.localeCompare(right));
-  const itemsByView = groupTodoItems(items, now);
-  const filteredItems = itemsByView[view].filter(
-    (item) =>
-      (category === ALL_TODO_CATEGORIES || item.category === category) &&
-      matchesTodoQuery(item, query),
+  const itemsByView = groupTodoItems(items, now, category);
+  const filteredItems = itemsByView[view].filter((item) =>
+    matchesTodoQuery(item, query),
   );
 
   async function handleSubmit(input: TodoItemInput) {

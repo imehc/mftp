@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { TodoItem } from "~/types";
 
 import {
+  ALL_TODO_CATEGORIES,
   buildTodoListRows,
   formatTodoDate,
   formatTodoTimestamp,
@@ -196,4 +197,64 @@ it("一次分类保留顺序且完成状态优先于逾期", () => {
   expect(groups.overdue.map((entry) => entry.id)).toEqual(["b", "d"]);
   expect(groups.completed.map((entry) => entry.id)).toEqual(["c"]);
   expect(tasks.map((entry) => entry.id)).toEqual(["a", "b", "c", "d", "e"]);
+});
+
+describe("分类筛选后的待办状态数量", () => {
+  const now = new Date("2026-10-10T12:00:00").getTime();
+  const tasks = [
+    item({ id: "work-active", category: "工作" }),
+    item({ id: "life-active", category: "生活" }),
+    item({ id: "work-overdue", category: "工作", dueAt: now }),
+    item({ id: "life-overdue", category: "生活", dueDate: "2026-10-09" }),
+    item({ id: "work-completed", category: "工作", completed: true }),
+    item({ id: "life-completed", category: "生活", completed: true }),
+    item({ id: "uncategorized" }),
+  ];
+
+  it.each([
+    ["工作", "work"],
+    ["生活", "life"],
+  ])("选择%s后，三个状态均只包含当前分类", (category, prefix) => {
+    const groups = groupTodoItems(tasks, now, category);
+    expect(groups.active.map((entry) => entry.id)).toEqual([
+      `${prefix}-active`,
+    ]);
+    expect(groups.overdue.map((entry) => entry.id)).toEqual([
+      `${prefix}-overdue`,
+    ]);
+    expect(groups.completed.map((entry) => entry.id)).toEqual([
+      `${prefix}-completed`,
+    ]);
+  });
+
+  it("切回全部分类恢复总数，并包含未分类待办", () => {
+    groupTodoItems(tasks, now, "工作");
+    const groups = groupTodoItems(tasks, now, ALL_TODO_CATEGORIES);
+    expect(groups.active).toHaveLength(3);
+    expect(groups.overdue).toHaveLength(2);
+    expect(groups.completed).toHaveLength(2);
+    expect(groups.active.at(-1)?.id).toBe("uncategorized");
+    expect(tasks).toHaveLength(7);
+  });
+
+  it("当前分类已无待办时，三个状态数量均为零", () => {
+    expect(groupTodoItems(tasks, now, "空分类")).toEqual({
+      active: [],
+      overdue: [],
+      completed: [],
+    });
+  });
+
+  it("当前分类内完成待办后，仅对应状态的数量改变", () => {
+    const updated = tasks.map((entry) =>
+      entry.id === "work-overdue" ? { ...entry, completed: true } : entry,
+    );
+    const groups = groupTodoItems(updated, now, "工作");
+    expect(groups.active).toHaveLength(1);
+    expect(groups.overdue).toHaveLength(0);
+    expect(groups.completed.map((entry) => entry.id)).toEqual([
+      "work-overdue",
+      "work-completed",
+    ]);
+  });
 });

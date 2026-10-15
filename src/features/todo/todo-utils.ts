@@ -68,13 +68,21 @@ export function todoView(item: TodoItem, now: number): TodoView {
 }
 
 /** 一次分类并保留输入顺序；最终分组展示仍由 buildTodoListRows 排序。 */
-export function groupTodoItems(items: TodoItem[], now: number) {
+export function groupTodoItems(
+  items: TodoItem[],
+  now: number,
+  category = ALL_TODO_CATEGORIES,
+) {
   const groups: Record<TodoView, TodoItem[]> = {
     active: [],
     overdue: [],
     completed: [],
   };
-  for (const item of items) groups[todoView(item, now)].push(item);
+  for (const item of items) {
+    if (category !== ALL_TODO_CATEGORIES && item.category !== category)
+      continue;
+    groups[todoView(item, now)].push(item);
+  }
   return groups;
 }
 
