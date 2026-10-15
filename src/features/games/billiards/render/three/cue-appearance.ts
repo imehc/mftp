@@ -1,4 +1,4 @@
-import type { EquipmentId } from "../../equipment";
+import type { EquipmentId, TableEquipment } from "../../equipment";
 
 export interface CueBand {
   end: number;
@@ -12,6 +12,19 @@ export interface CueAppearance {
   shaftEnd: number;
   shaftDiameterRatio: number;
   bands: readonly CueBand[];
+}
+
+export function cueRadius(equipment: TableEquipment, position: number) {
+  const appearance = CUE_APPEARANCE[equipment.id];
+  const jointDiameter =
+    equipment.cueButtDiameter * appearance.shaftDiameterRatio;
+  const shaft = position <= appearance.shaftEnd;
+  const fraction = shaft
+    ? position / appearance.shaftEnd
+    : (position - appearance.shaftEnd) / (1 - appearance.shaftEnd);
+  const from = shaft ? equipment.cueTipDiameter : jointDiameter;
+  const to = shaft ? jointDiameter : equipment.cueButtDiameter;
+  return (from + (to - from) * fraction) / 2;
 }
 
 export const CUE_APPEARANCE: Readonly<Record<EquipmentId, CueAppearance>> = {

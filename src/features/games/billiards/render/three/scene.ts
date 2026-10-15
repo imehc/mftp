@@ -20,6 +20,7 @@ import { createBallLayer } from "./balls";
 import { createTableCamera } from "./camera";
 import { createRenderClock } from "./clock";
 import { createCue } from "./cue";
+import { CUE_CONTACT_PULL, CUE_FOLLOW_THROUGH } from "./cue-clearance";
 import { createHud } from "./hud";
 import { createTableInput } from "./input";
 import { createIntro } from "./intro";
@@ -65,10 +66,13 @@ export function createScene(
     const lighting = createLighting(renderer, world, equipment, mobile);
     releaseLighting = lighting.dispose;
     renderer.domElement.style.opacity = "0";
-    const clock = createRenderClock(
-      () => renderer.render(world, camera.camera),
-      callbacks.onError,
-    );
+    const clock = createRenderClock(() => {
+      if (playing && aiAiming) {
+        const cue = cuePos();
+        if (cue) drawCueStick(cue.x, cue.y);
+      }
+      renderer.render(world, camera.camera);
+    }, callbacks.onError);
     // --- 可变场景状态 -----------------------------------------------
     let balls: BallState[] = [];
     let position: BilliardsState | null = null;
@@ -252,7 +256,20 @@ export function createScene(
 
     /** 将球杆摆到 (cx, cy) 后方，沿 aimAngle 方向瞄准。 */
     function drawCueStick(cx: number, cy: number): void {
-      cueView.pose(cx, cy, aimAngle, cuePull.value);
+      const obstacles = playing
+        ? balls.map((ball) => {
+            const mesh = ballLayer.meshes.get(ball.id);
+            return mesh
+              ? {
+                  ...ball,
+                  x: mesh.position.x,
+                  y: mesh.position.z,
+                  potted: !mesh.visible,
+                }
+              : ball;
+          })
+        : balls;
+      cueView.pose(cx, cy, aimAngle, cuePull.value, obstacles);
     }
 
     function updateDrag(p: { x: number; y: number }): void {
@@ -412,7 +429,7 @@ export function createScene(
         cancelCue = done;
         const strike = () =>
           gsap.to(cuePull, {
-            value: -0.018,
+            value: CUE_CONTACT_PULL,
             duration: reduced ? 0.05 : 0.09,
             ease: "power2.in",
             onUpdate: redrawOverlays,
@@ -425,7 +442,7 @@ export function createScene(
               // 触球时兑现等待，回放和声音同帧起步；球杆继续短随挥。
               resolve();
               gsap.to(cuePull, {
-                value: -0.16,
+                value: CUE_FOLLOW_THROUGH,
                 duration: reduced ? 0.04 : 0.08,
                 ease: "power2.out",
                 onUpdate: redrawOverlays,

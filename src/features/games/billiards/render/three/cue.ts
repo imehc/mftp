@@ -8,7 +8,13 @@ import {
 } from "three";
 
 import type { TableEquipment } from "../../equipment";
-import { CUE_APPEARANCE, type CueBand } from "./cue-appearance";
+import type { BallState } from "../../types";
+import { CUE_APPEARANCE, type CueBand, cueRadius } from "./cue-appearance";
+import {
+  createCueClearance,
+  CUE_PULL_DISTANCE,
+  CUE_TIP_GAP,
+} from "./cue-clearance";
 import type { Resources } from "./resources";
 
 function cueTexture(band: CueBand, resources: Resources) {
@@ -59,26 +65,15 @@ export function createCue(equipment: TableEquipment, resources: Resources) {
   layer.add(stick);
   const length = equipment.cueLength;
   const appearance = CUE_APPEARANCE[equipment.id];
-
-  const radius = (position: number) => {
-    const jointDiameter =
-      equipment.cueButtDiameter * appearance.shaftDiameterRatio;
-    const shaft = position <= appearance.shaftEnd;
-    const fraction = shaft
-      ? position / appearance.shaftEnd
-      : (position - appearance.shaftEnd) / (1 - appearance.shaftEnd);
-    const from = shaft ? equipment.cueTipDiameter : jointDiameter;
-    const to = shaft ? jointDiameter : equipment.cueButtDiameter;
-    return (from + (to - from) * fraction) / 2;
-  };
+  const clearance = createCueClearance(equipment);
 
   let start = 0;
   for (const band of appearance.bands) {
     const end = band.end;
     const geometry = resources.own(
       new CylinderGeometry(
-        radius(end),
-        radius(start),
+        cueRadius(equipment, end),
+        cueRadius(equipment, start),
         (end - start) * length,
         48,
       ),
@@ -102,13 +97,29 @@ export function createCue(equipment: TableEquipment, resources: Resources) {
   layer.visible = false;
   return {
     layer,
-    pose(x: number, z: number, angle: number, pull: number, entrance = 0) {
+    pose(
+      x: number,
+      z: number,
+      angle: number,
+      pull: number,
+      balls: readonly BallState[] = [],
+      entrance = 0,
+    ) {
+      const elevation = clearance(x, z, angle, balls, entrance * length);
+      const offset =
+        equipment.ballRadius +
+        CUE_TIP_GAP +
+        pull * CUE_PULL_DISTANCE +
+        entrance * length;
       layer.visible = true;
       layer.position.set(x, equipment.ballRadius, z);
       layer.rotation.y = Math.PI - angle;
-      stick.position.x =
-        equipment.ballRadius + 0.005 + pull * 0.28 + entrance * length;
-      stick.rotation.z = Math.PI / 30;
+      stick.position.set(
+        Math.cos(elevation) * offset,
+        Math.sin(elevation) * offset,
+        0,
+      );
+      stick.rotation.z = elevation;
     },
   };
 }

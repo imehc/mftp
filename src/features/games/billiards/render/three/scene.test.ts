@@ -150,7 +150,7 @@ afterEach(() => {
 
 describe("台球入场场景生命周期", () => {
   it("斯诺克直接全桌淡入且不创建摆球工具", async () => {
-    const { scene, callbacks } = setup(
+    const { scene, callbacks, state } = setup(
       Promise.resolve(),
       false,
       false,
@@ -162,6 +162,8 @@ describe("台球入场场景生命周期", () => {
     expect(intro.resume).toBe(true);
     intro.ready();
     expect(callbacks.onReady).toHaveBeenCalledTimes(1);
+    const cue = vi.mocked(createCue).mock.results.at(-1)!.value;
+    expect(cue.pose.mock.lastCall?.[4]).toEqual(state.balls);
     scene.destroy();
   });
 
