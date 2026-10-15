@@ -1,5 +1,6 @@
 use super::monitor::MonitorSample;
 use super::shell_lifecycle::ShellHandle;
+use crate::core::diagnostics::Diagnostics;
 use crate::core::operations::Operations;
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use parking_lot::{Condvar, Mutex};
@@ -56,7 +57,7 @@ pub(super) enum ShellJob {
 /// backs it (reused both for SFTP ops and for `exec` channels running remote
 /// commands like `tar` / `unzip`).
 pub(super) struct SftpConn {
-    pub(super) sftp: ssh2::Sftp,
+    pub(super) sftp: super::logged_sftp::LoggedSftp,
     pub(super) session: Session,
 }
 
@@ -171,6 +172,8 @@ impl Drop for TransferGuard {
 }
 
 pub struct Manager {
+    pub(super) diagnostics: Arc<Diagnostics>,
+    pub(super) logs: Arc<super::diagnostics::ConnectionLogs>,
     pub(super) auth: Mutex<HashMap<String, Arc<AuthMaterial>>>,
     pub(super) shells: Arc<Mutex<HashMap<String, Arc<ShellHandle>>>>,
     pub(super) operations: Arc<Operations>,

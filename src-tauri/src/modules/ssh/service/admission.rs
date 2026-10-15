@@ -53,6 +53,7 @@ impl Manager {
         self.sftp.lock().clear();
         self.monitor.lock().clear();
         self.transfers.lock().clear();
+        self.logs.transfers.lock().clear();
         let _ = self.cleanup_local_temps();
     }
 }

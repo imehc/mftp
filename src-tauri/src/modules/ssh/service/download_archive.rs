@@ -47,6 +47,7 @@ impl Manager {
                 let output = execute(
                     session,
                     &cmd,
+                    false,
                     || self.command_control(session_id, &mat, transfer),
                     |bytes| {
                         local_file.write_all(bytes).map_err(AttemptError::local)?;

@@ -72,7 +72,10 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     // report and the maintenance admission list query.
     let manager = lifecycle.install(
         participants::SSH,
-        Arc::new(Manager::new(data_dir.join("transfer-temp-files.json"))),
+        Arc::new(Manager::with_diagnostics(
+            diagnostics.clone(),
+            data_dir.join("transfer-temp-files.json"),
+        )),
         Manager::shutdown_all,
         |manager: &Manager| Ok(manager.is_busy()),
     );

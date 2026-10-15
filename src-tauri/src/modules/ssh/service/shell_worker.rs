@@ -1,6 +1,10 @@
 use super::super::ports::{EventSink, SshEvent};
+use super::diagnostics::ProtocolError;
 use super::shell_lifecycle::ShellHandle;
 use super::types::ShellJob;
+use crate::core::diagnostics::context;
+use crate::error::AppResult;
+use serde_json::json;
 use ssh2::Session;
 use std::io::{Read, Write};
 use std::sync::mpsc::{Receiver, TryRecvError};
@@ -18,11 +22,26 @@ impl ShellIo for ssh2::Channel {
         ssh2::Channel::eof(self)
     }
     fn resize(&mut self, cols: u32, rows: u32) {
-        let _ = self.request_pty_size(cols, rows, None, None);
+        let _ = super::diagnostics::call(
+            "ssh.resizePty",
+            json!({"cols":cols,"rows":rows}),
+            || self.request_pty_size(cols, rows, None, None),
+            super::diagnostics::unit,
+        );
     }
     fn close(&mut self) {
-        let _ = ssh2::Channel::close(self);
-        let _ = self.wait_close();
+        let _ = super::diagnostics::call(
+            "ssh.channelClose",
+            json!({}),
+            || ssh2::Channel::close(self),
+            super::diagnostics::unit,
+        );
+        let _ = super::diagnostics::call(
+            "ssh.waitClose",
+            json!({}),
+            || self.wait_close(),
+            super::diagnostics::unit,
+        );
     }
 }
 
@@ -35,10 +54,11 @@ pub(super) fn shell_worker(
     channel: ssh2::Channel,
     rx: Receiver<ShellJob>,
     handle: &ShellHandle,
-) {
+) -> AppResult<()> {
     // A short bounded poll applies to writes, resize and shutdown as well.
     sess.set_timeout(30);
-    run_shell(
+    context::event(&json!({"event":"shellStarted","inputCaptured":false,"outputCaptured":false}));
+    let result = run_shell(
         channel,
         &rx,
         || handle.is_closing(),
@@ -53,6 +73,8 @@ pub(super) fn shell_worker(
     events(SshEvent::Closed {
         session_id: &session_id,
     });
+    context::event(&json!({"event":"shellWorkerExited"}));
+    result.map_err(Into::into)
 }
 
 fn run_shell(
@@ -60,32 +82,31 @@ fn run_shell(
     rx: &Receiver<ShellJob>,
     closing: impl Fn() -> bool,
     mut output: impl FnMut(&[u8]),
-) {
+) -> std::io::Result<()> {
     let mut buf = [0u8; 32 * 1024];
-    'pump: loop {
+    let result = 'pump: loop {
         // Limit control work per poll so a continuous write queue cannot
         // starve output. Explicit stop has priority over queued writes.
         for _ in 0..64 {
             if closing() {
-                break 'pump;
+                break 'pump Ok(());
             }
             match rx.try_recv() {
                 Ok(ShellJob::Write(data)) => {
-                    if channel
-                        .write_all(&data)
-                        .and_then(|_| channel.flush())
-                        .is_err()
-                    {
-                        break 'pump;
+                    if let Err(error) = channel.write_all(&data).and_then(|_| channel.flush()) {
+                        context::event(
+                            &json!({"event":"error","method":"ssh.shellWrite","error":error.diagnostic()}),
+                        );
+                        break 'pump Err(error);
                     }
                 }
                 Ok(ShellJob::Resize(cols, rows)) => channel.resize(cols, rows),
-                Ok(ShellJob::Close) | Err(TryRecvError::Disconnected) => break 'pump,
+                Ok(ShellJob::Close) | Err(TryRecvError::Disconnected) => break 'pump Ok(()),
                 Err(TryRecvError::Empty) => break,
             }
         }
         match channel.read(&mut buf) {
-            Ok(0) if channel.eof() => break,
+            Ok(0) if channel.eof() => break Ok(()),
             Ok(0) => {}
             // EOF may already be set while more than one buffer is pending.
             // Only a zero read proves the buffered final output is drained.
@@ -97,10 +118,16 @@ fn run_shell(
                         | std::io::ErrorKind::TimedOut
                         | std::io::ErrorKind::Interrupted
                 ) => {}
-            Err(_) => break,
+            Err(error) => {
+                context::event(
+                    &json!({"event":"error","method":"ssh.shellRead","error":error.diagnostic()}),
+                );
+                break Err(error);
+            }
         }
-    }
+    };
     channel.close();
+    result
 }
 
 #[cfg(test)]

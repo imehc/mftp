@@ -1,6 +1,5 @@
 use crate::app::services::AppServices;
 use crate::core::activity::OperationContext;
-use crate::core::execution::run_blocking_guarded;
 use crate::error::AppResult;
 use crate::modules::ssh::DirectoryTransferMode;
 use crate::modules::ssh::{SftpEntry, SftpFileInfo};
@@ -10,7 +9,7 @@ use tauri::{AppHandle, State};
 #[specta::specta]
 pub async fn sftp_home(state: State<'_, AppServices>, session_id: String) -> AppResult<String> {
     let manager = state.manager.clone();
-    run_blocking_guarded(state.manager.operation()?, move || {
+    super::reading(&state, &session_id.clone(), "sftp_home", move || {
         manager.sftp_home(&session_id)
     })
     .await
@@ -24,7 +23,7 @@ pub async fn sftp_start_dir(
     preferred: Option<String>,
 ) -> AppResult<String> {
     let manager = state.manager.clone();
-    run_blocking_guarded(state.manager.operation()?, move || {
+    super::reading(&state, &session_id.clone(), "sftp_start_dir", move || {
         manager.sftp_start_dir(&session_id, preferred.as_deref())
     })
     .await
@@ -38,7 +37,7 @@ pub async fn sftp_list(
     path: String,
 ) -> AppResult<Vec<SftpEntry>> {
     let manager = state.manager.clone();
-    run_blocking_guarded(state.manager.operation()?, move || {
+    super::reading(&state, &session_id.clone(), "sftp_list", move || {
         manager.sftp_list(&session_id, &path)
     })
     .await
@@ -52,7 +51,7 @@ pub async fn sftp_info(
     path: String,
 ) -> AppResult<SftpFileInfo> {
     let manager = state.manager.clone();
-    run_blocking_guarded(state.manager.operation()?, move || {
+    super::reading(&state, &session_id.clone(), "sftp_info", move || {
         manager.sftp_info(&session_id, &path)
     })
     .await
@@ -68,7 +67,7 @@ pub async fn sftp_mkdir(
     let manager = state.manager.clone();
     let context =
         OperationContext::new("sftp", "mkdir", session_id.clone()).with_detail(path.clone());
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.sftp_mkdir(&session_id, &path)
     })
     .await
@@ -86,7 +85,7 @@ pub async fn sftp_rename(
     let log_session = session_id.clone();
     let detail = format!("{from} → {to}");
     let context = OperationContext::new("sftp", "rename", log_session).with_detail(detail);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.sftp_rename(&session_id, &from, &to)
     })
     .await
@@ -107,7 +106,7 @@ pub async fn sftp_delete(
     let log_session = session_id.clone();
     let log_path = path.clone();
     let context = OperationContext::new("sftp", "delete", log_session).with_detail(log_path);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, transfer_id.clone().as_deref(), move || {
         manager.sftp_delete(
             &session_id,
             &path,
@@ -134,7 +133,7 @@ pub async fn sftp_download(
     let log_session = session_id.clone();
     let detail = format!("{remote} → {local}");
     let context = OperationContext::new("sftp", "download", log_session).with_detail(detail);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, transfer_id.clone().as_deref(), move || {
         manager.sftp_download(
             &session_id,
             &remote,
@@ -161,7 +160,7 @@ pub async fn sftp_upload(
     let log_session = session_id.clone();
     let detail = format!("{local} → {remote}");
     let context = OperationContext::new("sftp", "upload", log_session).with_detail(detail);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, transfer_id.clone().as_deref(), move || {
         manager.sftp_upload(
             &session_id,
             &local,
@@ -181,7 +180,7 @@ pub async fn sftp_exists(
     path: String,
 ) -> AppResult<bool> {
     let manager = state.manager.clone();
-    run_blocking_guarded(state.manager.operation()?, move || {
+    super::reading(&state, &session_id.clone(), "sftp_exists", move || {
         manager.sftp_exists(&session_id, &path)
     })
     .await
@@ -208,7 +207,7 @@ pub async fn sftp_upload_dir(
     let log_session = session_id.clone();
     let detail = format!("{local_dir} → {remote_parent}/{remote_name}");
     let context = OperationContext::new("sftp", "upload_dir", log_session).with_detail(detail);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, transfer_id.clone().as_deref(), move || {
         manager.sftp_upload_dir(
             &session_id,
             &local_dir,
@@ -240,7 +239,7 @@ pub async fn sftp_download_dir(
     let log_session = session_id.clone();
     let detail = format!("{remote_dir} → {local_dir}");
     let context = OperationContext::new("sftp", "download_dir", log_session).with_detail(detail);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, transfer_id.clone().as_deref(), move || {
         manager.sftp_download_dir(
             &session_id,
             &remote_dir,
@@ -262,7 +261,7 @@ pub async fn sftp_cancel_transfer(
     let manager = state.manager.clone();
     let log_transfer = transfer_id.clone();
     let context = OperationContext::new("sftp", "cancel_transfer", log_transfer);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.cancel_transfer(&transfer_id);
         Ok(())
     })
@@ -278,7 +277,7 @@ pub async fn sftp_pause_transfer(
     let manager = state.manager.clone();
     let log_transfer = transfer_id.clone();
     let context = OperationContext::new("sftp", "pause_transfer", log_transfer);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.pause_transfer(&transfer_id)
     })
     .await
@@ -293,7 +292,7 @@ pub async fn sftp_resume_transfer(
     let manager = state.manager.clone();
     let log_transfer = transfer_id.clone();
     let context = OperationContext::new("sftp", "resume_transfer", log_transfer);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.resume_transfer(&transfer_id)
     })
     .await
@@ -308,7 +307,7 @@ pub async fn sftp_reset_connection(
     let manager = state.manager.clone();
     let log_session = session_id.clone();
     let context = OperationContext::new("sftp", "reset_connection", log_session);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.reset_sftp_conn(&session_id);
         Ok(())
     })
@@ -328,7 +327,7 @@ pub async fn sftp_extract(
     let log_session = session_id.clone();
     let detail = format!("{remote_archive} → {remote_parent}");
     let context = OperationContext::new("sftp", "extract", log_session).with_detail(detail);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.sftp_extract(
             &session_id,
             &remote_archive,

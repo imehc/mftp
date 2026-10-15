@@ -44,6 +44,7 @@ impl Manager {
         let result = execute(
             &session,
             command,
+            true,
             || {
                 // A remote mutation cannot be paused halfway through. Its caller
                 // enters the unpausable phase, but cancellation still interrupts IO.
@@ -104,8 +105,20 @@ impl Manager {
         let session = connect(&material)?;
         session.set_blocking(false);
         let deadline = Instant::now() + Duration::from_secs(30);
-        let sftp = retry_until(|| session.sftp(), &mut control, deadline)
-            .map_err(AttemptError::into_error)?;
+        let sftp = retry_until(
+            || {
+                super::diagnostics::call(
+                    "ssh.sftp",
+                    serde_json::json!({}),
+                    || session.sftp(),
+                    super::diagnostics::unit,
+                )
+            },
+            &mut control,
+            deadline,
+        )
+        .map_err(AttemptError::into_error)?;
+        let sftp = super::logged_sftp::LoggedSftp::new(sftp);
         loop {
             control()?;
             let stat = retry_until(|| sftp.lstat(Path::new(marker)), &mut control, deadline)

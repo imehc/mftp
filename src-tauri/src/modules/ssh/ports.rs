@@ -23,6 +23,7 @@ pub(super) fn emit_progress(
     transferred: u64,
     total: Option<u64>,
 ) {
+    crate::core::diagnostics::context::record(|log| log.progress(phase, transferred, total));
     let (Some(events), Some(id)) = (events, transfer_id) else {
         return;
     };

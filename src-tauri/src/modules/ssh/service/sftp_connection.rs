@@ -24,7 +24,13 @@ impl Manager {
             return Ok(connection.clone());
         }
         let session = connect(&material)?;
-        let sftp = session.sftp()?;
+        let sftp = super::diagnostics::call(
+            "ssh.sftp",
+            serde_json::json!({}),
+            || session.sftp(),
+            super::diagnostics::unit,
+        )?;
+        let sftp = super::logged_sftp::LoggedSftp::new(sftp);
         let connection = Arc::new(Mutex::new(SftpConn { sftp, session }));
         self.with_current_slot(session_id, &material, &slot, || {
             *cached = Some(connection.clone());

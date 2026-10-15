@@ -1,9 +1,11 @@
 use super::super::ports::EventSink;
 use super::auth::connect;
+use super::diagnostics::{call, unit};
 use super::shell_lifecycle::{ShellCompletion, ShellHandle};
 use super::shell_worker::shell_worker;
 use super::types::{AuthMaterial, Manager, ShellJob};
 use crate::error::{AppError, AppResult, CustomErrorCode};
+use serde_json::json;
 use std::sync::Arc;
 
 impl Manager {
@@ -65,19 +67,41 @@ impl Manager {
             }
         };
         let sess = connect(&mat)?;
-        let mut channel = sess.channel_session()?;
-        channel.request_pty("xterm-256color", None, Some((cols, rows, 0, 0)))?;
-        channel.shell()?;
+        let mut channel = call(
+            "ssh.channelSession",
+            json!({}),
+            || sess.channel_session(),
+            unit,
+        )?;
+        call(
+            "ssh.requestPty",
+            json!({"terminal":"xterm-256color","cols":cols,"rows":rows}),
+            || channel.request_pty("xterm-256color", None, Some((cols, rows, 0, 0))),
+            unit,
+        )?;
+        call(
+            "ssh.shell",
+            json!({"inputCaptured":false,"outputCaptured":false}),
+            || channel.shell(),
+            unit,
+        )?;
         if handle.is_closing() {
             return Err(AppError::custom(CustomErrorCode::SshShellClosed));
         }
         let id = session_id.to_string();
+        let (log, _) = self.diagnostic(
+            &crate::core::activity::OperationContext::new("ssh", "shell_lifetime", session_id),
+            None,
+        );
         std::thread::Builder::new()
             .name("ssh-shell".into())
             .spawn(move || {
                 let _completion = completion;
                 handle.started();
-                shell_worker(events, id, sess, channel, rx, &handle);
+                crate::core::diagnostics::context::run(log, || {
+                    shell_worker(events, id, sess, channel, rx, &handle)
+                })
+                .ok();
             })?;
         Ok(())
     }
@@ -105,10 +129,17 @@ impl Manager {
     }
 
     pub fn disconnect(&self, session_id: &str) {
+        crate::core::diagnostics::context::event(
+            &json!({"event":"disconnectRequested","sessionId":session_id}),
+        );
         let shell = {
             // Publication and invalidation use auth -> cache/map lock order.
             let mut auth = self.auth.lock();
             auth.remove(session_id);
+            self.logs
+                .transfers
+                .lock()
+                .retain(|_, owner| owner != session_id);
             self.sftp.lock().remove(session_id);
             self.clear_monitor_cache(session_id);
             self.shells.lock().get(session_id).cloned()

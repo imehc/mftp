@@ -1,5 +1,7 @@
+use super::diagnostics::{call, unit};
 use super::types::{AuthMaterial, AuthMethod};
 use crate::error::{AppError, AppResult, CustomErrorCode};
+use serde_json::json;
 use ssh2::{ErrorCode, Session};
 use std::env;
 use std::fs;
@@ -17,17 +19,34 @@ pub(super) fn connect(mat: &AuthMaterial) -> AppResult<Session> {
     let mut sess = Session::new()?;
     sess.set_timeout(SSH_OPERATION_TIMEOUT_MS);
     sess.set_tcp_stream(tcp);
-    sess.handshake()?;
+    call("ssh.handshake", json!({}), || sess.handshake(), unit)?;
     match &mat.method {
         AuthMethod::Password(Some(pw)) => {
-            sess.userauth_password(&mat.username, pw)?;
+            call(
+                "ssh.authenticate",
+                json!({"method":"password","username":mat.username,"password":"[REDACTED]"}),
+                || sess.userauth_password(&mat.username, pw),
+                unit,
+            )?;
         }
         AuthMethod::Password(None) => authenticate_with_local_defaults(&sess, mat)?,
         AuthMethod::Key {
             private_key,
             passphrase,
         } => {
-            sess.userauth_pubkey_memory(&mat.username, None, private_key, passphrase.as_deref())?;
+            call(
+                "ssh.authenticate",
+                json!({"method":"publicKey","username":mat.username,"privateKey":"[REDACTED]","passphrase":passphrase.as_ref().map(|_|"[REDACTED]")}),
+                || {
+                    sess.userauth_pubkey_memory(
+                        &mat.username,
+                        None,
+                        private_key,
+                        passphrase.as_deref(),
+                    )
+                },
+                unit,
+            )?;
         }
     }
     if !sess.authenticated() {
@@ -40,7 +59,12 @@ pub(super) fn connect(mat: &AuthMaterial) -> AppResult<Session> {
 fn authenticate_with_local_defaults(sess: &Session, mat: &AuthMaterial) -> AppResult<()> {
     let mut last_error = None;
     let mut attempts = 1;
-    match sess.userauth_agent(&mat.username) {
+    match call(
+        "ssh.authenticate",
+        json!({"method":"agent","username":mat.username}),
+        || sess.userauth_agent(&mat.username),
+        unit,
+    ) {
         Ok(()) if sess.authenticated() => return Ok(()),
         Ok(()) => {}
         Err(error) => last_error = Some(AppError::from(error)),
@@ -50,7 +74,12 @@ fn authenticate_with_local_defaults(sess: &Session, mat: &AuthMaterial) -> AppRe
             continue;
         }
         attempts += 1;
-        match sess.userauth_pubkey_file(&mat.username, None, &path, None) {
+        match call(
+            "ssh.authenticate",
+            json!({"method":"identityFile","username":mat.username,"path":super::diagnostics::path(&path)}),
+            || sess.userauth_pubkey_file(&mat.username, None, &path, None),
+            unit,
+        ) {
             Ok(()) if sess.authenticated() => return Ok(()),
             Ok(()) => {}
             Err(error) => last_error = Some(AppError::from(error)),
@@ -71,16 +100,25 @@ fn connect_tcp(host: &str, port: u16) -> AppResult<TcpStream> {
             .with_arg("host", host)
             .with_arg("port", port)
     };
-    let mut addrs: Vec<SocketAddr> = (host, port)
-        .to_socket_addrs()
-        .map_err(|error| context(error).context("Resolving SSH host"))?
-        .collect();
+    let mut addrs: Vec<SocketAddr> = call(
+        "ssh.resolve",
+        json!({"host":host,"port":port}),
+        || (host, port).to_socket_addrs(),
+        |_| json!({"resolved":true}),
+    )
+    .map_err(|error| context(error).context("Resolving SSH host"))?
+    .collect();
     if host.eq_ignore_ascii_case("localhost") {
         addrs.sort_by_key(|addr| if addr.is_ipv4() { 0 } else { 1 });
     }
     let mut last_error = None;
     for addr in addrs {
-        match TcpStream::connect_timeout(&addr, Duration::from_secs(SSH_CONNECT_TIMEOUT_SECS)) {
+        match call(
+            "ssh.tcpConnect",
+            json!({"address":addr.to_string(),"timeoutSeconds":SSH_CONNECT_TIMEOUT_SECS}),
+            || TcpStream::connect_timeout(&addr, Duration::from_secs(SSH_CONNECT_TIMEOUT_SECS)),
+            unit,
+        ) {
             Ok(tcp) => {
                 let _ = tcp.set_nodelay(true);
                 return Ok(tcp);

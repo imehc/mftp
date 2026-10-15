@@ -241,6 +241,7 @@ export const gameRoomLeave = (instanceId: string) =>
 // ---- SSH 命令 ----
 export const sshConnect = (hostId: string, passphrase?: string) =>
   unwrapCommand(commands.sshConnect(hostId, passphrase ?? null));
+
 export const sshOpenShell = (sessionId: string, cols: number, rows: number) =>
   voidCommand(commands.sshOpenShell(sessionId, cols, rows));
 export const sshWrite = (sessionId: string, data: string) =>

@@ -74,7 +74,8 @@ fn eof_does_not_truncate_multiple_buffers_of_final_output() {
             trace.borrow_mut().push("data");
             output.extend_from_slice(chunk);
         },
-    );
+    )
+    .unwrap();
     assert_eq!(output, bytes);
     assert_eq!(
         *trace.borrow(),
@@ -92,7 +93,8 @@ fn stop_preempts_pending_writes_and_releases_channel() {
         &rx,
         || true,
         |_| panic!("output after stop"),
-    );
+    )
+    .unwrap();
     assert_eq!(*trace.borrow(), vec!["close", "drop"]);
 }
 
@@ -108,7 +110,8 @@ fn a_write_backlog_yields_to_output_and_flush_failure_closes() {
         &rx,
         || false,
         |_| trace.borrow_mut().push("data"),
-    );
+    )
+    .unwrap();
     assert_eq!(
         trace.borrow().iter().position(|entry| *entry == "data"),
         Some(64)
@@ -117,11 +120,13 @@ fn a_write_backlog_yields_to_output_and_flush_failure_closes() {
     let mut channel = channel(vec![1], &trace);
     channel.fail_flush = true;
     tx.send(ShellJob::Write(vec![1])).unwrap();
-    run_shell(
+    let error = run_shell(
         channel,
         &rx,
         || false,
         |_| panic!("read after flush failure"),
-    );
+    )
+    .unwrap_err();
+    assert_eq!(error.kind(), io::ErrorKind::BrokenPipe);
     assert_eq!(*trace.borrow(), vec!["write", "close", "drop"]);
 }

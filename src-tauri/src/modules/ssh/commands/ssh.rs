@@ -1,6 +1,6 @@
 use crate::app::services::AppServices;
 use crate::core::activity::OperationContext;
-use crate::core::execution::{run_blocking, run_blocking_guarded};
+use crate::core::execution::run_blocking;
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::modules::hosts::model::{AuthType, Host};
 use crate::modules::keys::KeyRepository;
@@ -57,7 +57,7 @@ pub async fn ssh_connect(
         OperationContext::new("ssh", "connect", host.host.clone()).with_detail(host.label.clone());
     let key_repository = state.key_repository.clone();
     let manager = state.manager.clone();
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         let mat = build_auth(&key_repository, &host, passphrase)?;
         let session_id = uuid::Uuid::new_v4().to_string();
         manager.register(&session_id, mat);
@@ -79,7 +79,7 @@ pub async fn ssh_open_shell(
     let manager = state.manager.clone();
     let log_session = session_id.clone();
     let context = OperationContext::new("ssh", "open_shell", log_session);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.open_shell(events, &session_id, cols, rows)
     })
     .await
@@ -113,7 +113,7 @@ pub async fn ssh_disconnect(state: State<'_, AppServices>, session_id: String) -
     let manager = state.manager.clone();
     let log_session = session_id.clone();
     let context = OperationContext::new("ssh", "disconnect", log_session);
-    super::blocking(&state, context, move || {
+    super::blocking(&state, context, None, move || {
         manager.disconnect(&session_id);
         Ok(())
     })
@@ -127,7 +127,7 @@ pub async fn ssh_system_stats(
     session_id: String,
 ) -> AppResult<SystemStats> {
     let manager = state.manager.clone();
-    run_blocking_guarded(state.manager.operation()?, move || {
+    super::reading(&state, &session_id.clone(), "ssh_system_stats", move || {
         manager.system_stats(&session_id)
     })
     .await

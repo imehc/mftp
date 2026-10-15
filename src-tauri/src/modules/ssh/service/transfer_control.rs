@@ -1,5 +1,7 @@
 use super::types::{Manager, TransferFlag, TransferGuard};
+use crate::core::diagnostics::context;
 use crate::error::{AppError, AppResult, CustomErrorCode};
+use serde_json::json;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
@@ -23,6 +25,7 @@ impl Manager {
         control.cancelled = true;
         control.paused = false;
         flag.control_changed.notify_all();
+        context::event(&json!({"event":"cancelRequested","transferId":transfer_id}));
     }
 
     pub fn pause_transfer(&self, transfer_id: &str) -> AppResult<()> {
@@ -38,6 +41,7 @@ impl Manager {
             return Err(AppError::custom(CustomErrorCode::SftpTransferCancelled));
         }
         control.paused = true;
+        context::event(&json!({"event":"pauseRequested","transferId":transfer_id}));
         Ok(())
     }
 
@@ -52,6 +56,7 @@ impl Manager {
         }
         control.paused = false;
         flag.control_changed.notify_all();
+        context::event(&json!({"event":"resumeRequested","transferId":transfer_id}));
         Ok(())
     }
 

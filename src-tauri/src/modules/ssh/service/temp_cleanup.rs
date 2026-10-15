@@ -1,4 +1,5 @@
 use super::types::Manager;
+use crate::core::diagnostics::Diagnostics;
 use crate::error::AppResult;
 use parking_lot::Mutex;
 use std::collections::{HashMap, HashSet};
@@ -41,7 +42,16 @@ fn remove_local_temp_path(path: &Path) -> std::io::Result<()> {
 }
 
 impl Manager {
+    /// A manager with its own panel, for tests that do not need the app-wide
+    /// one. The app itself always shares the process-wide panel.
+    #[cfg(test)]
     pub fn new(local_temp_journal: PathBuf) -> Self {
+        Self::with_diagnostics(Arc::default(), local_temp_journal)
+    }
+
+    /// Share the process-wide activity panel instead of a private one. The app
+    /// uses this so SSH records land in the same panel as AI and SFTP.
+    pub fn with_diagnostics(diagnostics: Arc<Diagnostics>, local_temp_journal: PathBuf) -> Self {
         let pending_journal = local_temp_journal.with_extension("json.tmp");
         let mut remaining = HashSet::new();
         for journal in [&local_temp_journal, &pending_journal] {
@@ -57,6 +67,8 @@ impl Manager {
         }
 
         let manager = Self {
+            diagnostics,
+            logs: Arc::default(),
             auth: Mutex::new(HashMap::new()),
             shells: Arc::new(Mutex::new(HashMap::new())),
             operations: Arc::default(),

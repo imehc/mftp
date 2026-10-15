@@ -1,6 +1,9 @@
+use super::diagnostics::{call, unit, ProtocolError};
 use super::transfer_retry::{AttemptError, AttemptResult};
 use super::types::TransferIoOutcome;
+use crate::core::diagnostics::context;
 use crate::error::{AppError, AppResult};
+use serde_json::json;
 use std::io::{self, Read};
 use std::time::{Duration, Instant};
 
@@ -20,14 +23,24 @@ trait OutputChannel {
     fn eof(&self) -> bool;
 }
 
-struct CommandChannel(ssh2::Channel);
+struct CommandChannel(ssh2::Channel, Option<usize>);
 
 impl OutputChannel for CommandChannel {
     fn stdout(&mut self, buffer: &mut [u8]) -> io::Result<usize> {
-        self.0.read(buffer)
+        let result = self.0.read(buffer);
+        if let (Some(index), Ok(size)) = (self.1, &result) {
+            context::record(|log| log.command_bytes(index, false, &buffer[..*size]));
+        }
+        record_read_error("ssh.stdout", &result);
+        result
     }
     fn stderr(&mut self, buffer: &mut [u8]) -> io::Result<usize> {
-        self.0.stderr().read(buffer)
+        let result = self.0.stderr().read(buffer);
+        if let (Some(index), Ok(size)) = (self.1, &result) {
+            context::record(|log| log.command_bytes(index, true, &buffer[..*size]));
+        }
+        record_read_error("ssh.stderr", &result);
+        result
     }
     fn eof(&self) -> bool {
         self.0.eof()
@@ -38,7 +51,7 @@ impl Drop for CommandChannel {
     fn drop(&mut self) {
         // Nonblocking best effort. Dropping our channel/session releases client
         // resources; it cannot prove that every remote descendant has exited.
-        let _ = self.0.close();
+        let _ = call("ssh.channelClose", json!({}), || self.0.close(), unit);
     }
 }
 
@@ -48,15 +61,43 @@ impl Drop for CommandChannel {
 pub(super) fn execute(
     session: &ssh2::Session,
     command: &str,
+    capture_stdout: bool,
     mut control: impl FnMut() -> AppResult<bool>,
     output: impl FnMut(&[u8]) -> AttemptResult<()>,
 ) -> AttemptResult<CommandOutput> {
     session.set_blocking(false);
-    let mut channel = CommandChannel(retry_ssh(|| session.channel_session(), &mut control)?);
-    retry_ssh(|| channel.0.exec(command), &mut control)?;
+    let mut channel = CommandChannel(
+        retry_ssh(
+            || {
+                call(
+                    "ssh.channelSession",
+                    json!({}),
+                    || session.channel_session(),
+                    unit,
+                )
+            },
+            &mut control,
+        )?,
+        None,
+    );
+    channel.1 = context::record(|log| log.command(command, capture_stdout)).flatten();
+    retry_ssh(
+        || {
+            call(
+                "ssh.exec",
+                json!({"command":command,"stdoutCaptured":capture_stdout}),
+                || channel.0.exec(command),
+                unit,
+            )
+        },
+        &mut control,
+    )?;
     // These commands never consume input. EOF prevents a remote tool from
     // waiting indefinitely for an interactive prompt.
-    retry_ssh(|| channel.0.send_eof(), &mut control)?;
+    retry_ssh(
+        || call("ssh.sendEof", json!({}), || channel.0.send_eof(), unit),
+        &mut control,
+    )?;
     let mut keepalive_at = Instant::now();
     let (outcome, stderr) = pump(&mut channel, &mut control, output, || {
         if keepalive_at.elapsed() >= Duration::from_secs(5) {
@@ -77,12 +118,27 @@ pub(super) fn execute(
             stderr,
         });
     }
-    retry_ssh(|| channel.0.wait_close(), &mut control)?;
-    let signal = channel.0.exit_signal().map_err(AttemptError::remote)?;
+    retry_ssh(
+        || call("ssh.waitClose", json!({}), || channel.0.wait_close(), unit),
+        &mut control,
+    )?;
+    let signal = call("ssh.exitSignal", json!({}), || channel.0.exit_signal(), |signal| json!({"signal":signal.exit_signal,"message":signal.error_message,"language":signal.lang_tag})).map_err(AttemptError::remote)?;
     if let Some(signal) = signal.exit_signal {
+        if let Some(index) = channel.1 {
+            context::record(|log| log.command_end(index, None, Some(&signal)));
+        }
         return Err(AttemptError::remote(AppError::ssh_remote_exit(-1, &signal)));
     }
-    let exit_code = channel.0.exit_status().map_err(AttemptError::remote)?;
+    let exit_code = call(
+        "ssh.exitStatus",
+        json!({}),
+        || channel.0.exit_status(),
+        |status| json!(status),
+    )
+    .map_err(AttemptError::remote)?;
+    if let Some(index) = channel.1 {
+        context::record(|log| log.command_end(index, Some(exit_code), None));
+    }
     Ok(CommandOutput {
         outcome,
         exit_code,
@@ -92,6 +148,17 @@ pub(super) fn execute(
 
 pub(super) fn is_pending(error: &ssh2::Error) -> bool {
     matches!(error.code(), ssh2::ErrorCode::Session(-37))
+}
+
+fn record_read_error(method: &str, result: &io::Result<usize>) {
+    if let Err(error) = result {
+        if !matches!(
+            error.kind(),
+            io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted
+        ) {
+            context::event(&json!({"event":"error","method":method,"error":error.diagnostic()}));
+        }
+    }
 }
 
 pub(super) fn retry_ssh<T>(

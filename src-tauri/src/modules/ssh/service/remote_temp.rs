@@ -197,7 +197,7 @@ impl Drop for RemoteTempDir<'_> {
     }
 }
 
-fn remove_remote_tree(sftp: &ssh2::Sftp, path: &Path) -> AppResult<()> {
+fn remove_remote_tree(sftp: &super::logged_sftp::LoggedSftp, path: &Path) -> AppResult<()> {
     let stat = match sftp.lstat(path) {
         Ok(stat) => stat,
         Err(error) if matches!(error.code(), ssh2::ErrorCode::SFTP(2 | 10)) => return Ok(()),
