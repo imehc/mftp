@@ -580,6 +580,11 @@ export function MatchView({
                   setPowerPreview(0);
                   submitRule({ type: "reposition-cue" });
                 }}
+                onProposeStalemate={() => {
+                  stageRef.current?.cancelInput();
+                  setPowerPreview(0);
+                  submitRule({ type: "propose-stalemate" });
+                }}
               />
             }
           />

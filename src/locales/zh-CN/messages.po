@@ -4444,6 +4444,8 @@ msgid "提子 {value}:{value2}"
 msgstr "提子 {value}:{value2}"
 
 #. 台球对局请求双方同意重新摆球
+#. 台球对局请求双方同意重新摆球
+#: src/features/games/billiards/BilliardsRuleControl.tsx:55
 #: src/features/games/billiards/NineBallHud.tsx:178
 msgid "提议重摆"
 msgstr "提议重摆"
@@ -4521,7 +4523,7 @@ msgid "播放速度"
 msgstr "播放速度"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:205
-#: src/features/games/billiards/BilliardsRuleControl.tsx:47
+#: src/features/games/billiards/BilliardsRuleControl.tsx:60
 #: src/features/logs/LogDialogs.tsx:69
 #: src/features/logs/LogRow.desktop.tsx:26
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:232
@@ -5353,7 +5355,7 @@ msgid "本机服务"
 msgstr "本机服务"
 
 #. 九球本杆已声明推杆，再按可取消
-#: src/features/games/billiards/BilliardsRuleControl.tsx:45
+#: src/features/games/billiards/BilliardsRuleControl.tsx:58
 #: src/features/games/billiards/NineBallHud.tsx:164
 msgid "本杆推杆"
 msgstr "本杆推杆"
@@ -8209,7 +8211,7 @@ msgid "调整搜索内容或分类后重试"
 msgstr "调整搜索内容或分类后重试"
 
 #. 台球手中球权利未消费，重新拖动母球
-#: src/features/games/billiards/BilliardsRuleControl.tsx:43
+#: src/features/games/billiards/BilliardsRuleControl.tsx:52
 #: src/features/games/billiards/NineBallHud.tsx:150
 #: src/features/games/billiards/SnookerHud.tsx:181
 msgid "调整母球"
