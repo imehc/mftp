@@ -7,7 +7,6 @@ import { Button } from "~/components/ui/button";
 import {
   Popover,
   PopoverContent,
-  PopoverDescription,
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
@@ -32,7 +31,6 @@ export default function ExecutionLogDock() {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
   const titleId = useId();
-  const descriptionId = useId();
   const logs = useExecutionLogs();
   const latest = logs.operations.at(-1);
   if (!latest && !logs.error) return null;
@@ -91,7 +89,6 @@ export default function ExecutionLogDock() {
             align="center"
             collisionPadding={12}
             aria-labelledby={titleId}
-            aria-describedby={descriptionId}
             className="ui-density-adaptive max-h-[min(40dvh,var(--radix-popover-content-available-height))] w-(--radix-popover-trigger-width) overflow-hidden [@media(max-height:30rem)]:max-h-[min(70dvh,var(--radix-popover-content-available-height))]"
           >
             <PopoverHeader className="shrink-0">
@@ -109,11 +106,6 @@ export default function ExecutionLogDock() {
                   <X />
                 </Button>
               </div>
-              <PopoverDescription id={descriptionId} className="text-xs">
-                <Trans>
-                  仅凭据脱敏，其余已采集内容按原样显示。详细记录不落盘，关闭即丢弃。
-                </Trans>
-              </PopoverDescription>
             </PopoverHeader>
             <ExecutionLogList logs={logs} label={label} />
           </PopoverContent>

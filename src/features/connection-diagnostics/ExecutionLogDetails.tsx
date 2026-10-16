@@ -15,11 +15,6 @@ export default function ExecutionLogDetails({
   const { t } = useLingui();
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      {details.length === 0 && !trace ? (
-        <p className="text-muted-foreground text-xs">
-          <Trans>尚未发送外部请求。</Trans>
-        </p>
-      ) : null}
       {trace ? (
         <section className="flex min-w-0 flex-col gap-2">
           <h4 className="text-sm font-medium">
@@ -27,11 +22,6 @@ export default function ExecutionLogDetails({
               协议调用（库边界）
             </Trans>
           </h4>
-          <p className="text-muted-foreground text-xs">
-            <Trans>
-              记录实际库调用及其返回；网络报文、终端输入输出和文件内容未采集。高频文件读写按次数、字节数和偏移汇总。
-            </Trans>
-          </p>
           <ExecutionLogBody body={trace} />
         </section>
       ) : null}
@@ -50,16 +40,9 @@ export default function ExecutionLogDetails({
               )}
             </h4>
             {detail.kind === "httpRequest" ? (
-              <>
-                <p className="font-mono text-xs break-all">
-                  {detail.method} {detail.url}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  <Trans>
-                    请求构造完成时采集；传输层自动添加的请求头未采集。
-                  </Trans>
-                </p>
-              </>
+              <p className="font-mono text-xs break-all">
+                {detail.method} {detail.url}
+              </p>
             ) : null}
             {detail.kind === "httpResponse" ? (
               <p className="font-mono text-xs">HTTP {detail.status}</p>

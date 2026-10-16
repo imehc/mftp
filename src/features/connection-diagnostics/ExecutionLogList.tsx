@@ -63,11 +63,6 @@ export default function ExecutionLogList({
             <Trans>部分操作因记录上限未保留，最多显示 20 次操作。</Trans>
           </p>
         ) : null}
-        {logs.operations.length === 0 ? (
-          <p className="text-muted-foreground py-3 text-sm">
-            <Trans>执行操作后，可在这里查看实际请求、响应和错误。</Trans>
-          </p>
-        ) : null}
         {logs.operations.map((entry) => {
           const correlationId = entry.correlationId;
           return (

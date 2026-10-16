@@ -1123,10 +1123,6 @@ msgstr "人机对战"
 msgid "仅上传"
 msgstr "仅上传"
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:113
-msgid "仅凭据脱敏，其余已采集内容按原样显示。详细记录不落盘，关闭即丢弃。"
-msgstr "仅凭据脱敏，其余已采集内容按原样显示。详细记录不落盘，关闭即丢弃。"
-
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:246
 msgid "仅删除模型库中的附件副本，原始文件不受影响。"
 msgstr "仅删除模型库中的附件副本，原始文件不受影响。"
@@ -1280,7 +1276,7 @@ msgstr "传输任务"
 msgid "传输任务尚未开始或已结束"
 msgstr "传输任务尚未开始或已结束"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:49
+#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:39
 msgid "传输原始错误"
 msgstr "传输原始错误"
 
@@ -1648,7 +1644,7 @@ msgid "关于与本地数据"
 msgstr "关于与本地数据"
 
 #. 连接日志中关联传输任务的 ID，不代表任务已完成
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:86
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:81
 msgid "关联传输：{correlationId}"
 msgstr "关联传输：{correlationId}"
 
@@ -1826,8 +1822,8 @@ msgid "几何数据"
 msgstr "几何数据"
 
 #: src/features/connection-diagnostics/ExecutionLogBody.tsx:18
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:73
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:102
+#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:56
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:97
 msgid "凭据已脱敏"
 msgstr "凭据已脱敏"
 
@@ -2237,7 +2233,7 @@ msgstr "区分大小写"
 msgid "十五红球"
 msgstr "十五红球"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:73
+#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:56
 msgid "十六进制"
 msgstr "十六进制"
 
@@ -2370,7 +2366,7 @@ msgstr "原始值"
 msgid "原始分辨率"
 msgstr "原始分辨率"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:47
+#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:37
 msgid "原始响应"
 msgstr "原始响应"
 
@@ -3176,7 +3172,7 @@ msgstr "完整路径"
 msgid "实际执行命令"
 msgstr "实际执行命令"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:45
+#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:35
 msgid "实际请求"
 msgstr "实际请求"
 
@@ -3470,10 +3466,6 @@ msgstr "小时"
 msgid "小游戏"
 msgstr "小游戏"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:20
-msgid "尚未发送外部请求。"
-msgstr "尚未发送外部请求。"
-
 #: src/features/poetry/components/CollectionManagement.tsx:145
 msgid "尚未安装合集"
 msgstr "尚未安装合集"
@@ -3559,7 +3551,7 @@ msgstr "展开或收起 {name}"
 msgid "展开或收起动画控制"
 msgstr "展开或收起动画控制"
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:62
+#: src/features/connection-diagnostics/ExecutionLogDock.tsx:60
 msgid "展开执行日志"
 msgstr "展开执行日志"
 
@@ -4445,11 +4437,7 @@ msgstr "打开网址"
 msgid "执行"
 msgstr "执行"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:68
-msgid "执行操作后，可在这里查看实际请求、响应和错误。"
-msgstr "执行操作后，可在这里查看实际请求、响应和错误。"
-
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:100
+#: src/features/connection-diagnostics/ExecutionLogDock.tsx:97
 msgid "执行日志"
 msgstr "执行日志"
 
@@ -4457,7 +4445,7 @@ msgstr "执行日志"
 msgid "执行日志已关闭或达到容量上限，请重新进入页面。"
 msgstr "执行日志已关闭或达到容量上限，请重新进入页面。"
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:78
+#: src/features/connection-diagnostics/ExecutionLogDock.tsx:76
 msgid "执行日志暂不可用"
 msgstr "执行日志暂不可用"
 
@@ -4470,7 +4458,7 @@ msgstr "执行日志记录"
 msgid "执行记录 ID"
 msgstr "执行记录 ID"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:122
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:117
 msgid "执行详情"
 msgstr "执行详情"
 
@@ -4720,7 +4708,7 @@ msgstr "操作"
 msgid "操作中断"
 msgstr "操作中断"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:99
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:94
 msgid "操作信息已截断"
 msgstr "操作信息已截断"
 
@@ -4778,8 +4766,8 @@ msgstr "收藏"
 msgid "收起"
 msgstr "收起"
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:62
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:106
+#: src/features/connection-diagnostics/ExecutionLogDock.tsx:60
+#: src/features/connection-diagnostics/ExecutionLogDock.tsx:103
 msgid "收起执行日志"
 msgstr "收起执行日志"
 
@@ -5637,7 +5625,7 @@ msgstr "查看传输任务的进度和结果"
 msgid "查看共享目录"
 msgstr "查看共享目录"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:145
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:140
 msgid "查看最新记录"
 msgstr "查看最新记录"
 
@@ -7989,10 +7977,6 @@ msgstr "认输本局？"
 msgid "记录任务与清单"
 msgstr "记录任务与清单"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:31
-msgid "记录实际库调用及其返回；网络报文、终端输入输出和文件内容未采集。高频文件读写按次数、字节数和偏移汇总。"
-msgstr "记录实际库调用及其返回；网络报文、终端输入输出和文件内容未采集。高频文件读写按次数、字节数和偏移汇总。"
-
 #: src/features/ai-configuration/ProviderDetails.tsx:81
 msgid "设为当前"
 msgstr "设为当前"
@@ -8275,10 +8259,6 @@ msgstr "请检查重置状态后再继续，避免重复清理。"
 #: src/features/games/billiards/use-billiards-orientation.ts:72
 msgid "请横向旋转设备，当前对局会保留"
 msgstr "请横向旋转设备，当前对局会保留"
-
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:58
-msgid "请求构造完成时采集；传输层自动添加的请求头未采集。"
-msgstr "请求构造完成时采集；传输层自动添加的请求头未采集。"
 
 #. 局域网共享路径校验被拒；path 是被拒绝的相对路径。
 #: src/lib/errors/messages.ts:99
@@ -9064,11 +9044,11 @@ msgstr "透明度"
 msgid "逐模型值包含共享引用，总计去重；隐藏模型仍占用内存。源数据字节量单列，不等于常驻内存。未计入临时预览、环境与诊断任务、材质对象、场景节点、着色器、驱动缓存与进程开销。"
 msgstr "逐模型值包含共享引用，总计去重；隐藏模型仍占用内存。源数据字节量单列，不等于常驻内存。未计入临时预览、环境与诊断任务、材质对象、场景节点、着色器、驱动缓存与进程开销。"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:93
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:88
 msgid "部分命令详情超出记录上限。"
 msgstr "部分命令详情超出记录上限。"
 
-#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:79
+#: src/features/connection-diagnostics/ExecutionLogDetails.tsx:62
 msgid "部分响应头或请求头超出记录上限。"
 msgstr "部分响应头或请求头超出记录上限。"
 
