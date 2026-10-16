@@ -12,6 +12,7 @@
     "vendor-media",
     "vendor-xterm",
     "vendor-codemirror",
-    "vendor-charts"
+    "vendor-charts",
+    "vendor-todo-editor"
   ]
 }
