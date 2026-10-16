@@ -5,20 +5,6 @@
   display: flex;
   align-items: center;
 }
-.billiards-status {
-  position: absolute;
-  inset: 0.25rem 0.5rem auto;
-  z-index: 1;
-  pointer-events: none;
-  display: grid;
-  justify-items: center;
-}
-.billiards-status > div:has(span) {
-  max-width: 100%;
-  border-radius: 0.5rem;
-  background: color-mix(in oklab, var(--background) 92%, transparent);
-  padding: 0.375rem 0.75rem;
-}
 .billiards-actions {
   container-type: inline-size;
   height: calc(3.5rem + var(--safe-bottom, 0px));

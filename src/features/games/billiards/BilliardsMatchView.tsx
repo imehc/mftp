@@ -18,7 +18,6 @@ import type { Session } from "./BilliardsMatch";
 import { BilliardsRuleControl } from "./BilliardsRuleControl";
 import { BilliardsRulePanel } from "./BilliardsRulePanel";
 import { BallTray, SeatCell, seatName } from "./BilliardsScore";
-import { BilliardsStatus } from "./BilliardsStatus";
 import { BilliardsVictory } from "./BilliardsVictory";
 import { NineBallScore } from "./NineBallHud";
 import { equipmentForState } from "./placement";
@@ -39,7 +38,7 @@ import {
   type BilliardsMode,
   type BilliardsMove,
 } from "./types";
-import { useFoulNotification } from "./use-foul-notification";
+import { useBilliardsNotices } from "./use-billiards-notices";
 import { useRulePanel } from "./use-rule-panel";
 
 export function MatchView({
@@ -65,7 +64,6 @@ export function MatchView({
 }) {
   const desktop = useDesktopLayout();
   const { runner, local } = session;
-  useFoulNotification(runner, mode);
   const snapshot = useMatchSnapshot(runner);
   const state = snapshot.state;
   const [followDraw, setFollowDraw] = useState(0);
@@ -173,6 +171,7 @@ export function MatchView({
   };
 
   const ballInHand = canInteract && state.ballInHand;
+  useBilliardsNotices(state, mode, ballInHand);
   const remaining = state.balls.filter(
     (ball) => !ball.potted && ball.id !== 0,
   ).length;
@@ -387,12 +386,6 @@ export function MatchView({
             </Trans>
           </div>
         ) : null}
-        <BilliardsStatus
-          state={state}
-          mode={mode}
-          ballInHand={ballInHand}
-          aiThinking={aiThinking}
-        />
 
         <BilliardsStage
           ref={stageRef}

@@ -21,6 +21,7 @@ import { BilliardsHeader } from "./BilliardsHeader";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
 import { BilliardsRulesDialog } from "./BilliardsRulesDialog";
+import { BilliardsToaster } from "./BilliardsToaster";
 import { ensurePhysicsReady } from "./physics";
 import {
   prepareBilliardsAudio,
@@ -83,6 +84,7 @@ export default function BilliardsGame() {
   };
   return (
     <div className="flex h-full min-h-0 flex-col">
+      <BilliardsToaster />
       <main
         data-landscape={landscape && mode !== null}
         className="billiards-game ui-density-adaptive bg-background text-foreground flex min-h-0 flex-1 flex-col overflow-hidden"
