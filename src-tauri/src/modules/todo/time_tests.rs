@@ -9,6 +9,7 @@ fn input(completed: bool) -> TodoItemInput {
         due_date: Some("2026-10-01".into()),
         due_at: Some(1_790_830_860_000),
         completed,
+        priority: None,
     }
 }
 

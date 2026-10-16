@@ -15,6 +15,9 @@ function item(id = "a"): TodoItem {
     dueAt: null,
     completed: false,
     completedAt: null,
+    priority: null,
+    abandoned: false,
+    abandonedAt: null,
     createdAt: 1,
     updatedAt: 1,
   };
@@ -67,6 +70,13 @@ async function setup() {
       ...item(id),
       completed,
     })),
+    setAbandoned: vi.fn(
+      async (id: string, abandoned: boolean): Promise<TodoItem> => ({
+        ...item(id),
+        abandoned,
+        abandonedAt: abandoned ? 2 : null,
+      }),
+    ),
     remove: vi.fn(async (_id: string) => {}),
   };
   const controller = createTodoController(api);
@@ -211,5 +221,51 @@ describe("待办写入生命周期", () => {
     expect(state().items[0].title).toBe("changed");
     expect(state().summaryError).toEqual(failure);
     expect(api.save).toHaveBeenCalledTimes(1);
+  });
+
+  it("废弃切换用返回的权威条目替换本地数据", async () => {
+    const { api, controller, state } = await setup();
+    expect(await controller.abandon(item())).toEqual({ ok: true });
+    expect(api.setAbandoned).toHaveBeenLastCalledWith("a", true);
+    const updated = state().items.find((entry) => entry.id === "a");
+    expect(updated?.abandoned).toBe(true);
+    expect(updated?.abandonedAt).toBe(2);
+  });
+
+  it("已废弃条目再次操作时恢复", async () => {
+    const { api, controller, state } = await setup();
+    await controller.abandon(item());
+    expect(await controller.abandon(state().items[0])).toEqual({ ok: true });
+    expect(api.setAbandoned).toHaveBeenLastCalledWith("a", false);
+    expect(state().items.find((entry) => entry.id === "a")?.abandoned).toBe(
+      false,
+    );
+  });
+
+  it("废弃失败返回结构化错误且不改变本地条目", async () => {
+    const { api, controller, state } = await setup();
+    api.setAbandoned.mockRejectedValueOnce(failure);
+    expect(await controller.abandon(item())).toEqual({
+      ok: false,
+      error: failure,
+    });
+    expect(state().items.find((entry) => entry.id === "a")?.abandoned).toBe(
+      false,
+    );
+  });
+
+  it("卸载后废弃结果失效但请求退出前仍保留写锁", async () => {
+    const { api, controller, state } = await setup();
+    const pending = deferred<TodoItem>();
+    api.setAbandoned.mockImplementationOnce(() => pending.promise);
+    const updating = controller.abandon(item());
+    controller.stop();
+    expect(state().pendingIds.has("a")).toBe(true);
+    pending.resolve({ ...item(), abandoned: true });
+    expect(await updating).toBeNull();
+    expect(state().items.find((entry) => entry.id === "a")?.abandoned).toBe(
+      false,
+    );
+    expect(state().pendingIds.size).toBe(0);
   });
 });

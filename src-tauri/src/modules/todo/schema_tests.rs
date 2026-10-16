@@ -41,6 +41,48 @@ fn legacy_todo_migration_is_idempotent_and_reset_keeps_version_after_reopen() {
             |row| row.get(0),
         )
         .unwrap();
-    assert_eq!(version, "2");
+    assert_eq!(version, "3");
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn version_two_database_upgrades_to_three_and_preserves_rows() {
+    let root = std::env::temp_dir().join(format!("todo-schema-v2-{}", uuid::Uuid::new_v4()));
+    std::fs::create_dir_all(&root).unwrap();
+    let conn = Connection::open(root.join("mftp.sqlite3")).unwrap();
+    // A fully migrated version 2 database: both migration blocks must be skipped,
+    // and re-running them must not downgrade the stored version.
+    conn.execute_batch(
+        "CREATE TABLE app_meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+         INSERT INTO app_meta(key, value) VALUES('todo_schema_version', '2');
+         CREATE TABLE todo_items(
+             id TEXT PRIMARY KEY, title TEXT NOT NULL, category TEXT, notes TEXT, due_date TEXT,
+             completed INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
+             due_at INTEGER, completed_at INTEGER, revision INTEGER NOT NULL DEFAULT 0);
+         INSERT INTO todo_items(id, title, completed, created_at, updated_at, revision)
+             VALUES('kept', 'Kept task', 0, 1, 2, 0);",
+    )
+    .unwrap();
+    drop(conn);
+
+    let storage = Storage::new(root.clone()).unwrap();
+    let version: String = storage
+        .conn()
+        .unwrap()
+        .query_row(
+            "SELECT value FROM app_meta WHERE key='todo_schema_version'",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap();
+    assert_eq!(version, "3");
+    let items = super::super::repository::TodoRepository::new(storage)
+        .list()
+        .unwrap();
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0].title, "Kept task");
+    assert_eq!(items[0].priority, None);
+    assert!(!items[0].abandoned);
+    assert_eq!(items[0].abandoned_at, None);
     std::fs::remove_dir_all(root).unwrap();
 }

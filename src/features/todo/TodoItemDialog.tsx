@@ -29,6 +29,7 @@ import {
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Spinner } from "~/components/ui/spinner";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { describeError } from "~/lib/errors";
 import { firstFormError } from "~/lib/form-errors";
 import type { TodoItem } from "~/types";
@@ -194,7 +195,7 @@ function TodoItemForm({
                   >
                     <form.Field name="category">
                       {(field) => (
-                        <Field className="md:col-span-2">
+                        <Field>
                           <FieldLabel htmlFor="todo-category">
                             <Trans>分类</Trans>
                           </FieldLabel>
@@ -205,6 +206,41 @@ function TodoItemForm({
                             value={field.state.value}
                             onChange={field.handleChange}
                           />
+                        </Field>
+                      )}
+                    </form.Field>
+                    <form.Field name="priority">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor="todo-priority">
+                            <Trans>优先级</Trans>
+                          </FieldLabel>
+                          <ToggleGroup
+                            type="single"
+                            id="todo-priority"
+                            variant="outline"
+                            className="ui-density-adaptive w-fit max-w-full"
+                            value={field.state.value}
+                            onValueChange={(value) => {
+                              if (
+                                value === "" ||
+                                value === "high" ||
+                                value === "medium" ||
+                                value === "low"
+                              )
+                                field.handleChange(value);
+                            }}
+                          >
+                            <ToggleGroupItem value="high">
+                              <Trans>高</Trans>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="medium">
+                              <Trans>中</Trans>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="low">
+                              <Trans>低</Trans>
+                            </ToggleGroupItem>
+                          </ToggleGroup>
                         </Field>
                       )}
                     </form.Field>

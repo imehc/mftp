@@ -138,6 +138,7 @@ export const commands = {
 	todoNoteImageCopy: (draftId: string, sourceItemId: string, assetId: string) => typedError<TodoNoteImageInfo, AppError>(__TAURI_INVOKE("todo_note_image_copy", { draftId, sourceItemId, assetId })),
 	todoNoteSave: (input: TodoNoteSaveInput) => typedError<TodoNoteDetails, AppError>(__TAURI_INVOKE("todo_note_save", { input })),
 	todoItemSetCompleted: (id: string, completed: boolean) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_set_completed", { id, completed })),
+	todoItemSetAbandoned: (id: string, abandoned: boolean) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_set_abandoned", { id, abandoned })),
 	/**
 	 *  Serialize the selected sections as a JSON document, optionally encrypted
 	 *  with a password (Argon2id + ChaCha20-Poly1305). The frontend handles the
@@ -1357,6 +1358,9 @@ export type TodoItem = {
 	dueAt?: number | null,
 	completed: boolean,
 	completedAt?: number | null,
+	priority?: TodoPriority | null,
+	abandoned?: boolean,
+	abandonedAt?: number | null,
 	createdAt: number,
 	updatedAt: number,
 };
@@ -1369,6 +1373,7 @@ export type TodoItemInput = {
 	dueDate?: string | null,
 	dueAt?: number | null,
 	completed: boolean,
+	priority?: TodoPriority | null,
 };
 
 export type TodoNoteBlock = { type: "paragraph"; content: TodoNoteInline[] } | { type: "codeBlock"; text: string };
@@ -1425,6 +1430,9 @@ export type TodoNoteSummary = {
 	imageCount: number,
 	firstImage: TodoNoteImageInfo | null,
 };
+
+// Optional todo priority; absence means none was chosen.
+export type TodoPriority = "high" | "medium" | "low";
 
 export type TransferProgress = TransferProgress_Serialize | TransferProgress_Deserialize;
 

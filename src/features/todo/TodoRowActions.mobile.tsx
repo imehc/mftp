@@ -1,5 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  Ellipsis,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -15,10 +21,13 @@ import type { TodoRowActionsProps } from "./todo-row-actions";
 /** 卡片右上角的次级操作不参与正文行高，仍保留独立的 24px 点击区。 */
 export default function TodoRowActionsMobile({
   disabled,
+  abandoned,
   onEdit,
   onDelete,
+  onToggleAbandon,
 }: TodoRowActionsProps) {
   const { t } = useLingui();
+  const AbandonIcon = abandoned ? ArchiveRestore : Archive;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -41,6 +50,10 @@ export default function TodoRowActionsMobile({
           <DropdownMenuItem onSelect={onEdit}>
             <Pencil />
             <Trans>编辑待办</Trans>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={onToggleAbandon}>
+            <AbandonIcon />
+            {abandoned ? <Trans>恢复待办</Trans> : <Trans>标记为已废弃</Trans>}
           </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onSelect={onDelete}>
             <Trash2 />

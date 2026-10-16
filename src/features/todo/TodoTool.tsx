@@ -35,7 +35,12 @@ import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import { useTodo } from "./hooks/use-todo";
 import { TodoNoteImages } from "./notes/use-note-image";
-import { ALL_TODO_CATEGORIES, type TodoView } from "./todo-utils";
+import {
+  ALL_TODO_CATEGORIES,
+  ALL_TODO_PRIORITIES,
+  type TodoPriorityFilter,
+  type TodoView,
+} from "./todo-utils";
 import TodoItemDialog from "./TodoItemDialog";
 import TodoList from "./TodoList";
 
@@ -61,6 +66,9 @@ function TodoWorkspace() {
     setQuery,
     category,
     setCategory,
+    priority,
+    setPriority,
+    priorities,
     view,
     setView,
     categories,
@@ -77,6 +85,7 @@ function TodoWorkspace() {
     pendingIds,
     handleSubmit,
     handleToggle,
+    handleToggleAbandon,
     handleDelete,
   } = useTodo();
 
@@ -127,7 +136,7 @@ function TodoWorkspace() {
             density="adaptive"
             aria-label={t({
               message: "待办状态",
-              comment: "切换进行中、逾期和已完成待办的标签栏",
+              comment: "切换进行中、逾期、已完成和已废弃待办的标签栏",
             })}
             className="w-full md:w-auto"
           >
@@ -143,9 +152,46 @@ function TodoWorkspace() {
               <Trans>已完成</Trans>
               <Badge variant="outline">{itemsByView.completed.length}</Badge>
             </TabsTrigger>
+            <TabsTrigger value="abandoned">
+              <Trans>已废弃</Trans>
+              <Badge variant="outline">{itemsByView.abandoned.length}</Badge>
+            </TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="flex min-w-0 items-center gap-2 md:ml-auto">
+          <Select
+            value={priority}
+            onValueChange={(value) => setPriority(value as TodoPriorityFilter)}
+          >
+            <SelectTrigger
+              density="adaptive"
+              className="min-w-0 flex-1 md:w-32 md:flex-none"
+              aria-label={t({
+                message: "优先级",
+                comment: "按优先级筛选待办列表",
+              })}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="ui-density-adaptive">
+              <SelectGroup>
+                <SelectItem value={ALL_TODO_PRIORITIES}>
+                  <Trans>全部优先级</Trans>
+                </SelectItem>
+                {priorities.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item === "high" ? (
+                      <Trans>高</Trans>
+                    ) : item === "medium" ? (
+                      <Trans>中</Trans>
+                    ) : (
+                      <Trans>低</Trans>
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger
               density="adaptive"
@@ -219,12 +265,16 @@ function TodoWorkspace() {
                 <Trans>点击“新建”添加第一条待办</Trans>
               ) : category !== ALL_TODO_CATEGORIES ? (
                 <Trans>当前分类没有待办</Trans>
+              ) : priority !== ALL_TODO_PRIORITIES ? (
+                <Trans>当前优先级没有待办</Trans>
               ) : view === "active" ? (
                 <Trans>没有进行中的待办</Trans>
               ) : view === "overdue" ? (
                 <Trans>没有逾期未完成的待办</Trans>
-              ) : (
+              ) : view === "completed" ? (
                 <Trans>还没有已完成的待办</Trans>
+              ) : (
+                <Trans>还没有已废弃的待办</Trans>
               )}
             </EmptyDescription>
           </EmptyHeader>
@@ -235,6 +285,7 @@ function TodoWorkspace() {
           summaries={summaries}
           pendingIds={pendingIds}
           onToggle={(item) => void handleToggle(item)}
+          onToggleAbandon={(item) => void handleToggleAbandon(item)}
           onEdit={edit}
           onDelete={setDeleting}
         />

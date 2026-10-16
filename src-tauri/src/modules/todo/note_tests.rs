@@ -5,7 +5,7 @@ use base64::{engine::general_purpose::STANDARD, Engine};
 use parking_lot::Mutex;
 use serde_json::json;
 
-use super::model::TodoItemInput;
+use super::model::{TodoItemInput, TodoPriority};
 use super::note_model::{
     TodoNoteBlock, TodoNoteDocument, TodoNoteInline, TodoNoteSaveInput, MAX_NOTE_BYTES,
 };
@@ -99,6 +99,7 @@ fn metadata() -> TodoItemInput {
         due_date: None,
         due_at: None,
         completed: false,
+        priority: None,
     }
 }
 
@@ -241,6 +242,38 @@ fn image_only_notes_and_explicit_clear_are_distinct() {
     assert!(cleared.document.blocks.is_empty());
     assert_eq!(fixture.scalar("SELECT COUNT(*) FROM todo_note_images"), 0);
     assert_eq!(fixture.scalar("SELECT COUNT(*) FROM todo_notes"), 0);
+}
+
+#[test]
+fn note_save_updates_priority_and_keeps_abandoned() {
+    let _serial = TEST_LOCK.lock();
+    let fixture = Fixture::new();
+    let saved = fixture.saved();
+    fixture
+        .repository
+        .set_abandoned(&saved.item.id, true)
+        .unwrap();
+    let draft = fixture
+        .repository
+        .begin_note_draft(Some(&saved.item.id))
+        .unwrap();
+    let resaved = fixture
+        .service
+        .save(TodoNoteSaveInput {
+            draft_id: draft.id,
+            metadata: TodoItemInput {
+                priority: Some(TodoPriority::High),
+                ..metadata()
+            },
+            document: document(vec![]),
+        })
+        .unwrap();
+    assert_eq!(resaved.item.priority, Some(TodoPriority::High));
+    assert!(
+        resaved.item.abandoned,
+        "saving a note must not clear abandoned state"
+    );
+    assert!(resaved.item.abandoned_at.is_some());
 }
 
 #[test]

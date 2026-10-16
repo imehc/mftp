@@ -5,7 +5,7 @@ use rusqlite::{params, Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use super::model::{TodoItem, TodoItemInput};
+use super::model::{TodoItem, TodoItemInput, TodoPriority};
 use super::note_assets::insert_image;
 use super::note_image::MAX_IMAGE_BYTES;
 use super::note_model::TodoNoteDocument;
@@ -108,12 +108,12 @@ pub(crate) fn export(storage: &Storage) -> AppResult<Value> {
         });
     }
     tx.commit()?;
-    Ok(serde_json::to_value(TodoBackup { version: 2, items })?)
+    Ok(serde_json::to_value(TodoBackup { version: 3, items })?)
 }
 
 pub(crate) fn import(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<(u32, u32)> {
     let mut data: TodoBackup = serde_json::from_value(value.clone()).map_err(|_| invalid())?;
-    if data.version != 2 || data.items.len() > MAX_BACKUP_ITEMS {
+    if !(2..=3).contains(&data.version) || data.items.len() > MAX_BACKUP_ITEMS {
         return Err(invalid());
     }
     let mut asset_bytes = 0;
@@ -129,12 +129,17 @@ pub(crate) fn import(conn: &Connection, value: &Value, mode: ImportMode) -> AppR
             due_date: entry.item.due_date.clone(),
             due_at: entry.item.due_at,
             completed: entry.item.completed,
+            priority: entry.item.priority,
         })?;
         if !item_ids.insert(entry.item.id.as_str())
             || entry.item.id.is_empty()
             || entry
                 .item
                 .completed_at
+                .is_some_and(|time| !(0..=253_402_300_799_999).contains(&time))
+            || entry
+                .item
+                .abandoned_at
                 .is_some_and(|time| !(0..=253_402_300_799_999).contains(&time))
         {
             return Err(invalid());
@@ -210,12 +215,17 @@ pub(crate) fn import(conn: &Connection, value: &Value, mode: ImportMode) -> AppR
             .remap_images(|id| Ok(remap.get(id).ok_or_else(invalid)?.0.clone()))?;
         let notes = entry.document.plain_text();
         let item = &entry.item;
-        conn.execute("INSERT INTO todo_items(id,title,category,notes,due_date,due_at,completed,completed_at,created_at,updated_at,revision)
-            VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,1)
+        // Preserve the mutually exclusive invariant even if a backup carries both flags.
+        let abandoned = item.abandoned;
+        let completed = item.completed && !abandoned;
+        conn.execute("INSERT INTO todo_items(id,title,category,notes,due_date,due_at,completed,completed_at,created_at,updated_at,revision,priority,abandoned,abandoned_at)
+            VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,1,?11,?12,?13)
             ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,notes=excluded.notes,due_date=excluded.due_date,
-            due_at=excluded.due_at,completed=excluded.completed,completed_at=excluded.completed_at,updated_at=excluded.updated_at,revision=todo_items.revision+1",
-            params![item.id, item.title, item.category, notes, item.due_date, item.due_at, item.completed as i64,
-                item.completed_at.filter(|_| item.completed), item.created_at, if exists { now_ms() } else { item.updated_at }])?;
+            due_at=excluded.due_at,completed=excluded.completed,completed_at=excluded.completed_at,updated_at=excluded.updated_at,revision=todo_items.revision+1,
+            priority=excluded.priority,abandoned=excluded.abandoned,abandoned_at=excluded.abandoned_at",
+            params![item.id, item.title, item.category, notes, item.due_date, item.due_at, completed as i64,
+                item.completed_at.filter(|_| completed), item.created_at, if exists { now_ms() } else { item.updated_at },
+                item.priority.map(TodoPriority::as_str), abandoned as i64, item.abandoned_at.filter(|_| abandoned)])?;
         for (_, (id, image)) in remap {
             insert_image(conn, &id, Some(&item.id), None, &image)?;
         }

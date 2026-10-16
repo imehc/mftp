@@ -12,9 +12,13 @@ import type { TodoItem, TodoItemInput } from "~/types";
 
 import { localTimeKey, plannedDate, plannedTimestamp } from "../todo-utils";
 
+/** 优先级表单值：空串表示未设置，其余与 `TodoPriority` 一致。 */
+const TODO_PRIORITY_VALUES = ["", "high", "medium", "low"] as const;
+
 const emptyValues = {
   title: "",
   category: "",
+  priority: "" as (typeof TODO_PRIORITY_VALUES)[number],
   dueDate: "",
   dueTime: "",
   completed: false,
@@ -25,6 +29,7 @@ function toFormValues(item: TodoItem | null) {
   return {
     title: item.title,
     category: item.category ?? "",
+    priority: item.priority ?? "",
     dueDate: plannedDate(item) ?? "",
     dueTime: item.dueAt != null ? localTimeKey(new Date(item.dueAt)) : "",
     completed: item.completed,
@@ -52,6 +57,7 @@ export function useTodoEditor({
             .trim()
             .min(1, t`请输入待办标题`),
           category: z.string(),
+          priority: z.enum(TODO_PRIORITY_VALUES),
           document: z.custom<TodoNoteDocument>(),
           dueDate: z.string(),
           dueTime: z.string(),
@@ -77,6 +83,12 @@ export function useTodoEditor({
         title: value.title.trim(),
         category: category || null,
         notes: null,
+        priority:
+          value.priority === "high" ||
+          value.priority === "medium" ||
+          value.priority === "low"
+            ? value.priority
+            : null,
         dueDate: value.dueDate || null,
         dueAt: value.dueTime
           ? plannedTimestamp(value.dueDate, value.dueTime)

@@ -53,6 +53,21 @@ export default function TodoTimestamps({
         <Trans comment="旧待办未记录完成时刻，不使用更新时间推测">未记录</Trans>
       ),
   };
+  const abandoned = {
+    key: "abandoned",
+    label: t({
+      message: "废弃",
+      context: "timestamp label",
+      comment: "待办废弃时间的紧凑标签",
+    }),
+    fullLabel: t`废弃时间`,
+    value:
+      item.abandonedAt != null ? (
+        timestamp(item.abandonedAt)
+      ) : (
+        <Trans comment="旧待办未记录废弃时刻，不使用更新时间推测">未记录</Trans>
+      ),
+  };
   const planned = {
     key: "planned",
     label: t({
@@ -77,12 +92,17 @@ export default function TodoTimestamps({
   const detailFields = [
     ...(planned.value ? [planned] : []),
     ...(item.completed && item.completedAt != null ? [completed] : []),
+    ...(item.abandoned && item.abandonedAt != null ? [abandoned] : []),
   ];
   const fields = details
     ? detailFields.length
       ? detailFields
       : [created]
-    : [created, ...(item.completed ? [completed] : [])];
+    : [
+        created,
+        ...(item.completed ? [completed] : []),
+        ...(item.abandoned ? [abandoned] : []),
+      ];
 
   return (
     <dl

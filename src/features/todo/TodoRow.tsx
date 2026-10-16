@@ -63,6 +63,7 @@ export default function TodoRow({
   pending,
   compactActions,
   onToggle,
+  onToggleAbandon,
   onEdit,
   onDelete,
   onViewDetails,
@@ -72,12 +73,19 @@ export default function TodoRow({
   pending: boolean;
   compactActions: boolean;
   onToggle: (item: TodoItem) => void;
+  onToggleAbandon: (item: TodoItem) => void;
   onEdit: (item: TodoItem) => void;
   onDelete: (item: TodoItem) => void;
   onViewDetails: (item: TodoItem) => void;
 }) {
   const { t } = useLingui();
   const Actions = compactActions ? TodoRowActionsMobile : TodoRowActionsDesktop;
+  const priorityLabel =
+    item.priority === "high"
+      ? t`高`
+      : item.priority === "medium"
+        ? t`中`
+        : t`低`;
   return (
     <div className="pb-2">
       <div
@@ -100,7 +108,7 @@ export default function TodoRow({
         >
           <Checkbox
             checked={item.completed}
-            disabled={pending}
+            disabled={pending || item.abandoned}
             onCheckedChange={() => onToggle(item)}
             aria-label={item.completed ? t`标记为未完成` : t`标记为完成`}
           />
@@ -137,9 +145,29 @@ export default function TodoRow({
                     <span className="truncate">{item.category}</span>
                   </Badge>
                 ) : null}
+                {item.abandoned ? (
+                  <Badge variant="outline" className="mr-1.5 align-text-bottom">
+                    <Trans>已废弃</Trans>
+                  </Badge>
+                ) : null}
+                {item.priority ? (
+                  <Badge
+                    variant={
+                      item.priority === "high"
+                        ? "destructive"
+                        : item.priority === "medium"
+                          ? "default"
+                          : "secondary"
+                    }
+                    className="mr-1.5 align-text-bottom"
+                  >
+                    {priorityLabel}
+                  </Badge>
+                ) : null}
                 <span
                   className={cn(
-                    item.completed && "text-muted-foreground line-through",
+                    (item.completed || item.abandoned) &&
+                      "text-muted-foreground line-through",
                   )}
                 >
                   {item.title}
@@ -150,7 +178,7 @@ export default function TodoRow({
               <p
                 className={cn(
                   "text-muted-foreground line-clamp-2 cursor-text text-xs leading-4 wrap-break-word whitespace-pre-wrap select-text",
-                  item.completed && "opacity-70",
+                  (item.completed || item.abandoned) && "opacity-70",
                 )}
               >
                 {item.notes}
@@ -165,8 +193,10 @@ export default function TodoRow({
         </div>
         <Actions
           disabled={pending}
+          abandoned={item.abandoned ?? false}
           onEdit={() => onEdit(item)}
           onDelete={() => onDelete(item)}
+          onToggleAbandon={() => onToggleAbandon(item)}
         />
       </div>
     </div>

@@ -4,6 +4,7 @@ import type { TodoItem } from "~/types";
 
 import {
   ALL_TODO_CATEGORIES,
+  ALL_TODO_PRIORITIES,
   buildTodoListRows,
   formatTodoDate,
   formatTodoTimestamp,
@@ -237,11 +238,12 @@ describe("分类筛选后的待办状态数量", () => {
     expect(tasks).toHaveLength(7);
   });
 
-  it("当前分类已无待办时，三个状态数量均为零", () => {
+  it("当前分类已无待办时，四个状态数量均为零", () => {
     expect(groupTodoItems(tasks, now, "空分类")).toEqual({
       active: [],
       overdue: [],
       completed: [],
+      abandoned: [],
     });
   });
 
@@ -256,5 +258,63 @@ describe("分类筛选后的待办状态数量", () => {
       "work-overdue",
       "work-completed",
     ]);
+  });
+});
+
+describe("优先级筛选与已废弃视图", () => {
+  const now = new Date("2026-10-10T12:00:00").getTime();
+
+  it("已废弃优先于已完成归类，互斥状态下显示为已废弃", () => {
+    const tasks = [
+      item({ id: "abandoned", abandoned: true, abandonedAt: 5 }),
+      item({ id: "completed", completed: true, completedAt: 5 }),
+    ];
+    const groups = groupTodoItems(tasks, now);
+    expect(groups.abandoned.map((entry) => entry.id)).toEqual(["abandoned"]);
+    expect(groups.completed.map((entry) => entry.id)).toEqual(["completed"]);
+    // 脏数据同时带两种标志时，已废弃优先且不进入已完成。
+    expect(todoView(item({ abandoned: true, completed: true }), now)).toBe(
+      "abandoned",
+    );
+  });
+
+  it("按优先级筛选只保留匹配项，不过滤值时保留全部且不重排", () => {
+    const tasks = [
+      item({ id: "high", priority: "high", updatedAt: 3 }),
+      item({ id: "medium", priority: "medium", updatedAt: 2 }),
+      item({ id: "none", updatedAt: 1 }),
+      item({ id: "low", priority: "low", updatedAt: 0 }),
+    ];
+    const filtered = groupTodoItems(tasks, now, ALL_TODO_CATEGORIES, "high");
+    expect(filtered.active.map((entry) => entry.id)).toEqual(["high"]);
+    const all = groupTodoItems(
+      tasks,
+      now,
+      ALL_TODO_CATEGORIES,
+      ALL_TODO_PRIORITIES,
+    );
+    expect(all.active.map((entry) => entry.id)).toEqual([
+      "high",
+      "medium",
+      "none",
+      "low",
+    ]);
+    // 优先级不参与列表排序：仍按更新时间倒序。
+    expect(sortTodoItems(tasks).map((entry) => entry.id)).toEqual([
+      "high",
+      "medium",
+      "none",
+      "low",
+    ]);
+  });
+
+  it("分类与优先级叠加过滤，两者都满足才进入分组", () => {
+    const tasks = [
+      item({ id: "work-high", category: "工作", priority: "high" }),
+      item({ id: "life-high", category: "生活", priority: "high" }),
+      item({ id: "work-low", category: "工作", priority: "low" }),
+    ];
+    const groups = groupTodoItems(tasks, now, "工作", "high");
+    expect(groups.active.map((entry) => entry.id)).toEqual(["work-high"]);
   });
 });

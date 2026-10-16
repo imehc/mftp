@@ -18,6 +18,7 @@ interface TodoListProps {
   summaries: TodoNoteSummary[];
   pendingIds: Set<string>;
   onToggle: (item: TodoItem) => void;
+  onToggleAbandon: (item: TodoItem) => void;
   onEdit: (item: TodoItem) => void;
   onDelete: (item: TodoItem) => void;
 }
@@ -27,6 +28,7 @@ export default function TodoList({
   summaries,
   pendingIds,
   onToggle,
+  onToggleAbandon,
   onEdit,
   onDelete,
 }: TodoListProps) {
@@ -91,6 +93,7 @@ export default function TodoList({
                     compactActions={!desktopActions}
                     pending={pendingIds.has(row.item.id)}
                     onToggle={onToggle}
+                    onToggleAbandon={onToggleAbandon}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onViewDetails={(item) => setDetailsId(item.id)}

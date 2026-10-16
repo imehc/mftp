@@ -2,6 +2,7 @@ use std::sync::OnceLock;
 
 use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 
+use super::model::TodoPriority;
 use super::note_assets::image_info;
 use super::note_model::{
     TodoNoteDetails, TodoNoteDocument, TodoNoteDraft, TodoNoteSaveInput, TodoNoteSummary,
@@ -176,8 +177,8 @@ impl TodoRepository {
             Some(id) => {
                 let changed = tx.execute("UPDATE todo_items SET title=?2, category=?3, notes=?4, due_date=?5, due_at=?6,
                     completed=?7, completed_at=CASE WHEN ?7=0 THEN NULL WHEN completed=0 THEN ?8 ELSE completed_at END,
-                    updated_at=?8, revision=revision+1 WHERE id=?1 AND revision=?9",
-                    params![id, metadata.title, metadata.category, metadata.notes, metadata.due_date, metadata.due_at, bool_to_int(metadata.completed), now, base_revision])?;
+                    priority=?10, updated_at=?8, revision=revision+1 WHERE id=?1 AND revision=?9",
+                    params![id, metadata.title, metadata.category, metadata.notes, metadata.due_date, metadata.due_at, bool_to_int(metadata.completed), now, base_revision, metadata.priority.map(TodoPriority::as_str)])?;
                 if changed != 1 {
                     return Err(AppError::custom(CustomErrorCode::TodoNoteConflict));
                 }
@@ -185,9 +186,9 @@ impl TodoRepository {
             }
             None => {
                 let id = uuid::Uuid::new_v4().to_string();
-                tx.execute("INSERT INTO todo_items(id,title,category,notes,due_date,due_at,completed,completed_at,created_at,updated_at,revision)
-                    VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?9,1)",
-                    params![id, metadata.title, metadata.category, metadata.notes, metadata.due_date, metadata.due_at, bool_to_int(metadata.completed), metadata.completed.then_some(now), now])?;
+                tx.execute("INSERT INTO todo_items(id,title,category,notes,due_date,due_at,completed,completed_at,created_at,updated_at,revision,priority)
+                    VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?9,1,?10)",
+                    params![id, metadata.title, metadata.category, metadata.notes, metadata.due_date, metadata.due_at, bool_to_int(metadata.completed), metadata.completed.then_some(now), now, metadata.priority.map(TodoPriority::as_str)])?;
                 id
             }
         };

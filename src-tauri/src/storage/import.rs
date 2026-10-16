@@ -3,7 +3,7 @@ use crate::models::{ImportMode, ImportReport, ImportSectionReport};
 use crate::modules::hosts::model::Host;
 use crate::modules::lan_transfer::LanExportData;
 use crate::modules::poetry::model::PoetryTranslation;
-use crate::modules::todo::model::TodoItem;
+use crate::modules::todo::model::{TodoItem, TodoPriority};
 use crate::modules::vault::model::VaultEntry;
 use rusqlite::{params, Connection};
 use serde_json::Value;
@@ -196,7 +196,7 @@ fn import_todo(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<
         conn.execute("DELETE FROM todo_items", [])?;
     }
     for mut item in items {
-        if [item.due_at, item.completed_at]
+        if [item.due_at, item.completed_at, item.abandoned_at]
             .into_iter()
             .flatten()
             .any(|value| !(0..=253_402_300_799_999).contains(&value))
@@ -206,13 +206,16 @@ fn import_todo(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<
         if mode == ImportMode::Append {
             item.id = uuid::Uuid::new_v4().to_string();
         }
+        // Preserve the mutually exclusive invariant even if a backup carries both flags.
+        let abandoned = item.abandoned;
+        let completed = item.completed && !abandoned;
         if mode == ImportMode::Merge {
             conn.execute("DELETE FROM todo_note_drafts WHERE item_id=?1", [&item.id])?;
             conn.execute("DELETE FROM todo_notes WHERE item_id=?1", [&item.id])?;
             conn.execute("DELETE FROM todo_note_images WHERE item_id=?1", [&item.id])?;
             let updated = conn.execute(
-                "UPDATE todo_items SET title=?2, category=?3, notes=?4, due_date=?5, completed=?6, updated_at=?7, due_at=?8, completed_at=?9, revision=revision+1 WHERE id=?1",
-                params![item.id, item.title, item.category, item.notes, item.due_date, item.completed as i64, now_ms(), item.due_at, item.completed_at.filter(|_| item.completed)],
+                "UPDATE todo_items SET title=?2, category=?3, notes=?4, due_date=?5, completed=?6, updated_at=?7, due_at=?8, completed_at=?9, revision=revision+1, priority=?10, abandoned=?11, abandoned_at=?12 WHERE id=?1",
+                params![item.id, item.title, item.category, item.notes, item.due_date, completed as i64, now_ms(), item.due_at, item.completed_at.filter(|_| completed), item.priority.map(TodoPriority::as_str), abandoned as i64, item.abandoned_at.filter(|_| abandoned)],
             )?;
             if updated > 0 {
                 counts.updated += 1;
@@ -220,8 +223,8 @@ fn import_todo(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<
             }
         }
         conn.execute(
-            "INSERT INTO todo_items(id,title,category,notes,due_date,completed,created_at,updated_at,due_at,completed_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)",
-            params![item.id, item.title, item.category, item.notes, item.due_date, item.completed as i64, item.created_at, item.updated_at, item.due_at, item.completed_at.filter(|_| item.completed)],
+            "INSERT INTO todo_items(id,title,category,notes,due_date,completed,created_at,updated_at,due_at,completed_at,priority,abandoned,abandoned_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13)",
+            params![item.id, item.title, item.category, item.notes, item.due_date, completed as i64, item.created_at, item.updated_at, item.due_at, item.completed_at.filter(|_| completed), item.priority.map(TodoPriority::as_str), abandoned as i64, item.abandoned_at.filter(|_| abandoned)],
         )?;
         counts.inserted += 1;
     }

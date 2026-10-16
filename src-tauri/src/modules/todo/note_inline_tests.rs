@@ -48,6 +48,7 @@ fn inline_images_preserve_order_projection_and_backup_ownership() {
                 due_date: None,
                 due_at: None,
                 completed: false,
+                priority: None,
             },
             document: document.clone(),
         })
@@ -95,6 +96,7 @@ fn inline_images_preserve_order_projection_and_backup_ownership() {
                 due_date: None,
                 due_at: None,
                 completed: false,
+                priority: None,
             },
             document: paragraph(vec![TodoNoteInline::Text {
                 text: "删除图片后".into(),

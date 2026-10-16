@@ -4,6 +4,7 @@ import type { TodoNoteSaveInput, TodoNoteSummary } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import {
   todoItemDelete,
+  todoItemSetAbandoned,
   todoItemSetCompleted,
   todoItemsList,
   todoNoteSave,
@@ -34,6 +35,7 @@ const defaultApi = {
   save: todoNoteSave,
   summaries: todoNoteSummaries,
   setCompleted: todoItemSetCompleted,
+  setAbandoned: todoItemSetAbandoned,
   remove: todoItemDelete,
 };
 
@@ -200,6 +202,24 @@ export function createTodoController(api = defaultApi) {
     });
   }
 
+  async function abandon(item: TodoItem) {
+    const current = store
+      .getState()
+      .items.find((entry) => entry.id === item.id);
+    if (!current) return null;
+    const life = lifetime;
+    return write(current.id, false, async () => {
+      // 与 set_completed 相同口径：以返回的权威条目替换，避免与完成状态互斥后不一致。
+      const saved = await api.setAbandoned(current.id, !current.abandoned);
+      if (!active || lifetime !== life) return;
+      store.setState((state) => ({
+        items: sortTodoItems(
+          state.items.map((entry) => (entry.id === saved.id ? saved : entry)),
+        ),
+      }));
+    });
+  }
+
   async function remove() {
     const target = store.getState().deleting;
     if (!target) return null;
@@ -237,6 +257,7 @@ export function createTodoController(api = defaultApi) {
     setDeleting,
     submit,
     toggle,
+    abandon,
     remove,
     start() {
       active = true;

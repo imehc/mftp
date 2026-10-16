@@ -15,13 +15,22 @@ pub(crate) fn init(conn: &mut Connection) -> AppResult<()> {
         .optional()?;
     if version
         .as_deref()
-        .is_some_and(|value| !matches!(value, "1" | "2"))
+        .is_some_and(|value| !matches!(value, "1" | "2" | "3"))
     {
         return Err(AppError::from(std::io::Error::new(
             std::io::ErrorKind::InvalidData,
             "Unsupported todo schema version",
         )));
     }
+    // Monotonic guard: each block must run only when the stored version is older.
+    // A `!= Some(target)` check would let a newer database replay an older block
+    // and downgrade the stored version.
+    let current = match version.as_deref() {
+        Some("1") => 1,
+        Some("2") => 2,
+        Some("3") => 3,
+        _ => 0,
+    };
     tx.execute_batch(
         r#"
             CREATE TABLE IF NOT EXISTS todo_items (
@@ -39,7 +48,7 @@ pub(crate) fn init(conn: &mut Connection) -> AppResult<()> {
             ON todo_items(due_date, completed, updated_at DESC);
         "#,
     )?;
-    if version.is_none() {
+    if current < 1 {
         // Date-only records and unknown historical completion times stay intact.
         add_column_if_missing(&tx, "todo_items", "due_at", "INTEGER")?;
         add_column_if_missing(&tx, "todo_items", "completed_at", "INTEGER")?;
@@ -48,7 +57,7 @@ pub(crate) fn init(conn: &mut Connection) -> AppResult<()> {
             [],
         )?;
     }
-    if version.as_deref() != Some("2") {
+    if current < 2 {
         add_column_if_missing(&tx, "todo_items", "revision", "INTEGER NOT NULL DEFAULT 0")?;
         tx.execute_batch(
             "CREATE TABLE IF NOT EXISTS todo_notes (
@@ -82,6 +91,16 @@ pub(crate) fn init(conn: &mut Connection) -> AppResult<()> {
         )?;
         tx.execute(
             "UPDATE app_meta SET value='2' WHERE key='todo_schema_version'",
+            [],
+        )?;
+    }
+    if current < 3 {
+        // Priority is optional; abandoned items stay mutually exclusive with completed.
+        add_column_if_missing(&tx, "todo_items", "priority", "TEXT")?;
+        add_column_if_missing(&tx, "todo_items", "abandoned", "INTEGER NOT NULL DEFAULT 0")?;
+        add_column_if_missing(&tx, "todo_items", "abandoned_at", "INTEGER")?;
+        tx.execute(
+            "UPDATE app_meta SET value='3' WHERE key='todo_schema_version'",
             [],
         )?;
     }

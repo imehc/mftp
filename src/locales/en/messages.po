@@ -978,6 +978,13 @@ msgstr "Passwords do not match"
 msgid "两点测量"
 msgstr "Measure distance"
 
+#: src/features/todo/TodoDetailsDialog.tsx:101
+#: src/features/todo/TodoItemDialog.tsx:274
+#: src/features/todo/TodoRow.tsx:87
+#: src/features/todo/TodoTool.tsx:186
+msgid "中"
+msgstr "Medium"
+
 #: src/features/games/xiangqi/XiangqiGame.tsx:39
 #: src/features/home/entries.tsx:198
 msgid "中国象棋"
@@ -1252,6 +1259,12 @@ msgstr "Task status notifications are unavailable"
 msgid "任务进度同步暂不可用"
 msgstr "Task progress sync is unavailable"
 
+#. 按优先级筛选待办列表
+#: src/features/todo/TodoItemDialog.tsx:252
+#: src/features/todo/TodoTool.tsx:169
+msgid "优先级"
+msgstr "Priority"
+
 #: src/features/transfers/TransferPanel.tsx:189
 msgid "传输"
 msgstr "Transfers"
@@ -1291,6 +1304,13 @@ msgstr "A transfer is in progress and cannot be changed right now."
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:75
 msgid "位置"
 msgstr "Location"
+
+#: src/features/todo/TodoDetailsDialog.tsx:103
+#: src/features/todo/TodoItemDialog.tsx:277
+#: src/features/todo/TodoRow.tsx:88
+#: src/features/todo/TodoTool.tsx:188
+msgid "低"
+msgstr "Low"
 
 #: src/features/model-viewer/components/RuntimeControls.tsx:78
 msgid "低负载画质 · 像素比例上限 1 · 最高 20 帧/秒"
@@ -1365,7 +1385,7 @@ msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
 #: src/features/poetry/components/PoetryTranslationSection.tsx:339
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:345
-#: src/features/todo/TodoItemDialog.tsx:302
+#: src/features/todo/TodoItemDialog.tsx:339
 #: src/features/vault/VaultEntryDialog.tsx:251
 msgid "保存"
 msgstr "Save"
@@ -1397,7 +1417,7 @@ msgstr "Save current view"
 msgid "保存录屏"
 msgstr "Save recording"
 
-#: src/features/todo/hooks/use-todo.ts:62
+#: src/features/todo/hooks/use-todo.ts:67
 msgid "保存待办失败"
 msgstr "Failed to save todo"
 
@@ -1555,7 +1575,11 @@ msgstr "All"
 msgid "全部任务"
 msgstr "All tasks"
 
-#: src/features/todo/TodoTool.tsx:160
+#: src/features/todo/TodoTool.tsx:179
+msgid "全部优先级"
+msgstr "All priorities"
+
+#: src/features/todo/TodoTool.tsx:206
 #: src/features/vault/VaultTool.tsx:114
 msgid "全部分类"
 msgstr "All categories"
@@ -1831,8 +1855,8 @@ msgstr "Analyze topology"
 msgid "分析说明"
 msgstr "About this analysis"
 
-#: src/features/todo/TodoItemDialog.tsx:199
-#: src/features/todo/TodoTool.tsx:153
+#: src/features/todo/TodoItemDialog.tsx:200
+#: src/features/todo/TodoTool.tsx:199
 #: src/features/vault/VaultEntryDialog.tsx:215
 msgid "分类"
 msgstr "Category"
@@ -1912,7 +1936,7 @@ msgstr "Creating directory"
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:48
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:77
 #: src/features/ssh-sftp/components/Sidebar.tsx:536
-#: src/features/todo/TodoTool.tsx:283
+#: src/features/todo/TodoTool.tsx:334
 #: src/features/vault/VaultEntryCard.tsx:101
 #: src/features/vault/VaultTool.tsx:214
 msgid "删除"
@@ -1959,7 +1983,7 @@ msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "You can generate it again later. The original text and annotations are unaffected."
 
 #: src/features/logs/LogDialogs.tsx:149
-#: src/features/todo/TodoTool.tsx:262
+#: src/features/todo/TodoTool.tsx:313
 msgid "删除后无法恢复。"
 msgstr "This cannot be undone."
 
@@ -1982,13 +2006,13 @@ msgstr "Before deleting the current key or model, select another one under this 
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:14
-#: src/features/todo/TodoRowActions.desktop.tsx:32
-#: src/features/todo/TodoRowActions.desktop.tsx:33
-#: src/features/todo/TodoRowActions.mobile.tsx:47
+#: src/features/todo/TodoRowActions.desktop.tsx:45
+#: src/features/todo/TodoRowActions.desktop.tsx:46
+#: src/features/todo/TodoRowActions.mobile.tsx:60
 msgid "删除待办"
 msgstr "Delete todo"
 
-#: src/features/todo/TodoTool.tsx:259
+#: src/features/todo/TodoTool.tsx:310
 msgid "删除待办？"
 msgstr "Delete todo?"
 
@@ -2438,9 +2462,9 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:136
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:239
 #: src/features/ssh-sftp/components/Sidebar.tsx:533
-#: src/features/todo/TodoItemDialog.tsx:95
-#: src/features/todo/TodoItemDialog.tsx:291
-#: src/features/todo/TodoTool.tsx:276
+#: src/features/todo/TodoItemDialog.tsx:96
+#: src/features/todo/TodoItemDialog.tsx:328
+#: src/features/todo/TodoTool.tsx:327
 #: src/features/transfers/TransferItem.tsx:88
 #: src/features/vault/VaultEntryDialog.tsx:242
 #: src/features/vault/VaultTool.tsx:205
@@ -2781,7 +2805,7 @@ msgstr "The image exceeds the 8192 pixel edge limit. Resize it before adding it.
 msgid "图片压缩"
 msgstr "Image Compress"
 
-#: src/features/todo/TodoRow.tsx:160
+#: src/features/todo/TodoRow.tsx:188
 msgid "图片备注"
 msgstr "Image note"
 
@@ -2952,8 +2976,8 @@ msgid "备份本机数据"
 msgstr "Back up local data"
 
 #: src/features/todo/notes/TodoNoteEditor.tsx:81
-#: src/features/todo/TodoDetailsDialog.tsx:105
-#: src/features/todo/TodoItemDialog.tsx:252
+#: src/features/todo/TodoDetailsDialog.tsx:131
+#: src/features/todo/TodoItemDialog.tsx:289
 #: src/features/vault/VaultEntryDialog.tsx:220
 msgid "备注"
 msgstr "Notes"
@@ -3609,7 +3633,7 @@ msgstr "Launch at Login disabled"
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
 #: src/features/poetry/hooks/use-poetry-translations.ts:174
-#: src/features/todo/hooks/use-todo.ts:78
+#: src/features/todo/hooks/use-todo.ts:91
 #: src/features/vault/use-vault.ts:108
 msgid "已删除"
 msgstr "Deleted"
@@ -3709,7 +3733,7 @@ msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 #: src/features/about/ResetBoundary.tsx:130
 #: src/features/bt/components/TaskRow.tsx:88
 #: src/features/home/HomeRecentActivity.tsx:20
-#: src/features/todo/TodoTool.tsx:143
+#: src/features/todo/TodoTool.tsx:152
 msgid "已完成"
 msgstr "Completed"
 
@@ -3729,6 +3753,12 @@ msgstr "Imported models"
 #: src/features/export/use-backup.ts:100
 msgid "已导出"
 msgstr "Exported"
+
+#: src/features/todo/TodoDetailsDialog.tsx:85
+#: src/features/todo/TodoRow.tsx:150
+#: src/features/todo/TodoTool.tsx:156
+msgid "已废弃"
+msgstr "Abandoned"
 
 #: src/features/settings/AutostartSetting.desktop.tsx:25
 #: src/features/settings/SettingsOverview.tsx:45
@@ -3923,6 +3953,16 @@ msgstr "Finish the pending app reset before continuing."
 msgid "应用重置已完成"
 msgstr "App reset complete"
 
+#. 待办废弃时间的紧凑标签
+#: src/features/todo/TodoTimestamps.tsx:58
+msgctxt "timestamp label"
+msgid "废弃"
+msgstr "Abandoned"
+
+#: src/features/todo/TodoTimestamps.tsx:63
+msgid "废弃时间"
+msgstr "Abandoned at"
+
 #: src/features/poetry/LibraryManagePage.tsx:174
 msgid "开启"
 msgstr "On"
@@ -4008,6 +4048,10 @@ msgstr "Currently unavailable"
 msgid "当前不在游戏房间中"
 msgstr "You are not in a game room"
 
+#: src/features/todo/TodoTool.tsx:269
+msgid "当前优先级没有待办"
+msgstr "No todos with this priority"
+
 #: src/lib/errors/messages.ts:156
 msgid "当前传输阶段无法暂停"
 msgstr "The transfer cannot be paused at this stage"
@@ -4016,7 +4060,7 @@ msgstr "The transfer cannot be paused at this stage"
 msgid "当前位置不可放置"
 msgstr "Cannot drop here"
 
-#: src/features/todo/TodoTool.tsx:221
+#: src/features/todo/TodoTool.tsx:267
 msgid "当前分类没有待办"
 msgstr "No todos in this category"
 
@@ -4162,7 +4206,7 @@ msgstr "Todos"
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/home/entries.tsx:138
 #: src/features/logs/log-labels.ts:106
-#: src/features/todo/TodoTool.tsx:85
+#: src/features/todo/TodoTool.tsx:94
 msgid "待办事项"
 msgstr "Todo"
 
@@ -4175,7 +4219,7 @@ msgid "待办截止日期需使用 YYYY-MM-DD 格式"
 msgstr "The task due date must use YYYY-MM-DD format"
 
 #. 待办列表行的更多操作菜单
-#: src/features/todo/TodoRowActions.mobile.tsx:31
+#: src/features/todo/TodoRowActions.mobile.tsx:40
 msgid "待办操作"
 msgstr "Task actions"
 
@@ -4183,8 +4227,8 @@ msgstr "Task actions"
 msgid "待办标题不能为空"
 msgstr "The task title cannot be empty"
 
-#. 切换进行中、逾期和已完成待办的标签栏
-#: src/features/todo/TodoTool.tsx:128
+#. 切换进行中、逾期、已完成和已废弃待办的标签栏
+#: src/features/todo/TodoTool.tsx:137
 msgid "待办状态"
 msgstr "Task status"
 
@@ -4245,6 +4289,12 @@ msgstr "Restore the last used tool"
 #: src/features/settings/SettingsOverview.tsx:59
 msgid "恢复上次工具"
 msgstr "Restore last tool"
+
+#: src/features/todo/TodoRowActions.desktop.tsx:35
+#: src/features/todo/TodoRowActions.desktop.tsx:36
+#: src/features/todo/TodoRowActions.mobile.tsx:56
+msgid "恢复待办"
+msgstr "Restore todo"
 
 #: src/features/about/AboutPage.tsx:184
 msgid "恢复首次打开状态"
@@ -4607,8 +4657,8 @@ msgstr "Search history"
 msgid "搜索名称或分组"
 msgstr "Search names or groups"
 
-#: src/features/todo/TodoTool.tsx:115
-#: src/features/todo/TodoTool.tsx:116
+#: src/features/todo/TodoTool.tsx:124
+#: src/features/todo/TodoTool.tsx:125
 msgid "搜索待办"
 msgstr "Search tasks"
 
@@ -4743,13 +4793,13 @@ msgid "放大"
 msgstr "Larger"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:323
-#: src/features/todo/TodoItemDialog.tsx:324
+#: src/features/todo/TodoItemDialog.tsx:361
 #: src/features/vault/VaultEntryDialog.tsx:278
 msgid "放弃修改"
 msgstr "Discard changes"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:305
-#: src/features/todo/TodoItemDialog.tsx:313
+#: src/features/todo/TodoItemDialog.tsx:350
 #: src/features/vault/VaultEntryDialog.tsx:262
 msgid "放弃未保存的修改？"
 msgstr "Discard unsaved changes?"
@@ -4899,7 +4949,7 @@ msgstr "Add task"
 
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:55
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:67
-#: src/features/todo/TodoTool.tsx:102
+#: src/features/todo/TodoTool.tsx:111
 msgid "新建"
 msgstr "New"
 
@@ -4909,10 +4959,10 @@ msgstr "New"
 msgid "新建主机"
 msgstr "New Host"
 
-#: src/features/todo/TodoItemDialog.tsx:75
-#: src/features/todo/TodoItemDialog.tsx:146
-#: src/features/todo/TodoTool.tsx:96
-#: src/features/todo/TodoTool.tsx:97
+#: src/features/todo/TodoItemDialog.tsx:76
+#: src/features/todo/TodoItemDialog.tsx:147
+#: src/features/todo/TodoTool.tsx:105
+#: src/features/todo/TodoTool.tsx:106
 msgid "新建待办"
 msgstr "New Todo"
 
@@ -5149,7 +5199,7 @@ msgstr "No keys yet. Import one in Key Manager first."
 msgid "暂无对局记录"
 msgstr "No games played yet"
 
-#: src/features/todo/TodoTool.tsx:212
+#: src/features/todo/TodoTool.tsx:258
 msgid "暂无待办"
 msgstr "No todos"
 
@@ -5277,7 +5327,8 @@ msgstr "The update is installed. Restart the app to apply it."
 msgid "更新待办"
 msgstr "Update task"
 
-#: src/features/todo/hooks/use-todo.ts:70
+#: src/features/todo/hooks/use-todo.ts:75
+#: src/features/todo/hooks/use-todo.ts:83
 msgid "更新待办失败"
 msgstr "Failed to update todo"
 
@@ -5365,7 +5416,7 @@ msgstr "Unnamed texture"
 msgid "未命名节点"
 msgstr "Unnamed node"
 
-#: src/features/todo/TodoList.tsx:82
+#: src/features/todo/TodoList.tsx:84
 msgid "未安排"
 msgstr "Unscheduled"
 
@@ -5373,7 +5424,7 @@ msgstr "Unscheduled"
 msgid "未安装；仅点击时下载，可随时删除"
 msgstr "Not installed; downloaded on demand only, removable anytime"
 
-#: src/features/todo/TodoTool.tsx:139
+#: src/features/todo/TodoTool.tsx:148
 msgid "未完成"
 msgstr "Overdue"
 
@@ -5431,7 +5482,9 @@ msgid "未获得方向传感器权限，可继续手动操作。"
 msgstr "Orientation sensor permission was not granted. Manual controls remain available."
 
 #. 旧待办未记录完成时刻，不使用更新时间推测
+#. 旧待办未记录废弃时刻，不使用更新时间推测
 #: src/features/todo/TodoTimestamps.tsx:53
+#: src/features/todo/TodoTimestamps.tsx:68
 msgid "未记录"
 msgstr "Not recorded"
 
@@ -5656,7 +5709,7 @@ msgid "查看节点明细"
 msgstr "View peer details"
 
 #. 打开待办的完整内容和时间信息
-#: src/features/todo/TodoRow.tsx:119
+#: src/features/todo/TodoRow.tsx:127
 msgid "查看详情"
 msgstr "View details"
 
@@ -5690,16 +5743,22 @@ msgstr "Standard error (stderr)"
 msgid "标签"
 msgstr "Label"
 
-#: src/features/todo/TodoRow.tsx:105
+#: src/features/todo/TodoRow.tsx:113
 msgid "标记为完成"
 msgstr "Mark as completed"
 
-#: src/features/todo/TodoRow.tsx:105
+#: src/features/todo/TodoRowActions.desktop.tsx:35
+#: src/features/todo/TodoRowActions.desktop.tsx:36
+#: src/features/todo/TodoRowActions.mobile.tsx:56
+msgid "标记为已废弃"
+msgstr "Mark as abandoned"
+
+#: src/features/todo/TodoRow.tsx:113
 msgid "标记为未完成"
 msgstr "Mark as incomplete"
 
 #: src/features/poetry/components/SearchBar.tsx:43
-#: src/features/todo/TodoItemDialog.tsx:166
+#: src/features/todo/TodoItemDialog.tsx:167
 #: src/features/vault/VaultEntryDialog.tsx:207
 msgid "标题"
 msgstr "Title"
@@ -5997,7 +6056,7 @@ msgstr "Loading environment…"
 msgid "正在加载系统监控…"
 msgstr "Loading system monitor…"
 
-#: src/features/todo/TodoItemDialog.tsx:262
+#: src/features/todo/TodoItemDialog.tsx:299
 msgid "正在加载编辑器"
 msgstr "Loading editor"
 
@@ -6212,8 +6271,8 @@ msgstr "Reading latest information..."
 msgid "正在读取图片"
 msgstr "Loading image"
 
-#: src/features/todo/TodoDetailsDialog.tsx:100
-#: src/features/todo/TodoItemDialog.tsx:89
+#: src/features/todo/TodoDetailsDialog.tsx:126
+#: src/features/todo/TodoItemDialog.tsx:90
 msgid "正在读取备注"
 msgstr "Loading note"
 
@@ -6221,7 +6280,7 @@ msgstr "Loading note"
 msgid "正在读取对局存档…"
 msgstr "Reading saved game…"
 
-#: src/features/todo/TodoTool.tsx:201
+#: src/features/todo/TodoTool.tsx:247
 msgid "正在读取待办"
 msgstr "Loading todos"
 
@@ -6373,15 +6432,15 @@ msgstr "No child folders"
 msgid "没有找到作品"
 msgstr "No poems found"
 
-#: src/features/todo/TodoTool.tsx:210
+#: src/features/todo/TodoTool.tsx:256
 msgid "没有找到相关待办"
 msgstr "No matching tasks"
 
-#: src/features/todo/TodoTool.tsx:223
+#: src/features/todo/TodoTool.tsx:271
 msgid "没有进行中的待办"
 msgstr "No todos in progress"
 
-#: src/features/todo/TodoTool.tsx:225
+#: src/features/todo/TodoTool.tsx:273
 msgid "没有逾期未完成的待办"
 msgstr "No overdue todos"
 
@@ -6702,7 +6761,7 @@ msgstr "Click an XYZ axis to change the view. Double-click the canvas or axes to
 msgid "点击“新建”保存第一条账号密码"
 msgstr "Click “New” to save your first account credential"
 
-#: src/features/todo/TodoTool.tsx:219
+#: src/features/todo/TodoTool.tsx:265
 msgid "点击“新建”添加第一条待办"
 msgstr "Click “New” to add your first todo"
 
@@ -7596,11 +7655,11 @@ msgstr "Edit address"
 msgid "编辑密钥"
 msgstr "Edit key"
 
-#: src/features/todo/TodoItemDialog.tsx:75
-#: src/features/todo/TodoItemDialog.tsx:146
-#: src/features/todo/TodoRowActions.desktop.tsx:22
-#: src/features/todo/TodoRowActions.desktop.tsx:23
-#: src/features/todo/TodoRowActions.mobile.tsx:43
+#: src/features/todo/TodoItemDialog.tsx:76
+#: src/features/todo/TodoItemDialog.tsx:147
+#: src/features/todo/TodoRowActions.desktop.tsx:25
+#: src/features/todo/TodoRowActions.desktop.tsx:26
+#: src/features/todo/TodoRowActions.mobile.tsx:52
 msgid "编辑待办"
 msgstr "Edit Todo"
 
@@ -7895,15 +7954,15 @@ msgid "解码"
 msgstr "Decode"
 
 #. 待办计划时间的紧凑标签
-#: src/features/todo/TodoTimestamps.tsx:58
+#: src/features/todo/TodoTimestamps.tsx:73
 msgctxt "timestamp label"
 msgid "计划"
 msgstr "Planned"
 
-#: src/features/todo/TodoItemDialog.tsx:224
+#: src/features/todo/TodoItemDialog.tsx:225
 #: src/features/todo/TodoScheduleDialog.mobile.tsx:32
 #: src/features/todo/TodoSchedulePopover.desktop.tsx:25
-#: src/features/todo/TodoTimestamps.tsx:63
+#: src/features/todo/TodoTimestamps.tsx:78
 msgid "计划时间"
 msgstr "Scheduled for"
 
@@ -8016,7 +8075,7 @@ msgstr "Translation pack imported"
 msgid "译文模式"
 msgstr "Translation mode"
 
-#: src/features/todo/TodoTool.tsx:217
+#: src/features/todo/TodoTool.tsx:263
 msgid "试试其他关键词或清除筛选"
 msgstr "Try another keyword or clear the filters"
 
@@ -8256,7 +8315,7 @@ msgstr "Enter passphrase"
 msgid "请输入密钥值"
 msgstr "Enter a key value"
 
-#: src/features/todo/hooks/use-todo-editor.ts:53
+#: src/features/todo/hooks/use-todo-editor.ts:58
 msgid "请输入待办标题"
 msgstr "Enter a todo title"
 
@@ -8284,7 +8343,7 @@ msgstr "Choose a replacement"
 msgid "请选择有效的 GLB、glTF 或 FBX 模型文件"
 msgstr "Choose a valid GLB, glTF or FBX model file."
 
-#: src/features/todo/hooks/use-todo-editor.ts:68
+#: src/features/todo/hooks/use-todo-editor.ts:74
 msgid "请选择有效的计划日期和时间"
 msgstr "Select a valid scheduled date and time"
 
@@ -8329,7 +8388,7 @@ msgstr "Reading metadata"
 msgid "读取失败"
 msgstr "Failed to load"
 
-#: src/features/todo/TodoTool.tsx:185
+#: src/features/todo/TodoTool.tsx:231
 msgid "读取待办失败"
 msgstr "Failed to load todos"
 
@@ -8632,9 +8691,13 @@ msgstr "Reset preview"
 msgid "还没有主机"
 msgstr "No hosts yet"
 
-#: src/features/todo/TodoTool.tsx:227
+#: src/features/todo/TodoTool.tsx:275
 msgid "还没有已完成的待办"
 msgstr "No completed todos yet"
+
+#: src/features/todo/TodoTool.tsx:277
+msgid "还没有已废弃的待办"
+msgstr "No abandoned todos yet"
 
 #: src/features/ssh-sftp/SshSftpTool.tsx:71
 msgid "还没有打开的连接"
@@ -8647,7 +8710,7 @@ msgstr "Progress {completed} / {total}"
 
 #: src/features/home/HomeRecentActivity.tsx:19
 #: src/features/lan-transfer/LanTransferActivity.tsx:28
-#: src/features/todo/TodoTool.tsx:135
+#: src/features/todo/TodoTool.tsx:144
 #: src/features/transfers/ActivityMenu.tsx:128
 msgid "进行中"
 msgstr "In Progress"
@@ -9142,10 +9205,10 @@ msgstr "The reset has changed. Check its status again."
 #: src/features/ssh-sftp/components/Sidebar.tsx:441
 #: src/features/todo/notes/NoteEditorNodes.tsx:97
 #: src/features/todo/notes/TodoNoteImage.tsx:115
-#: src/features/todo/TodoDetailsDialog.tsx:94
-#: src/features/todo/TodoItemDialog.tsx:83
-#: src/features/todo/TodoTool.tsx:178
-#: src/features/todo/TodoTool.tsx:194
+#: src/features/todo/TodoDetailsDialog.tsx:120
+#: src/features/todo/TodoItemDialog.tsx:84
+#: src/features/todo/TodoTool.tsx:224
+#: src/features/todo/TodoTool.tsx:240
 #: src/features/transfers/ActivityMenu.tsx:120
 #: src/features/transfers/TransferItem.tsx:104
 #: src/features/transfers/TransferItem.tsx:113
@@ -9354,6 +9417,13 @@ msgstr "Verify access"
 #: src/features/model-viewer/components/MemoryPanel.tsx:280
 msgid "骨骼数据"
 msgstr "Skeleton data"
+
+#: src/features/todo/TodoDetailsDialog.tsx:99
+#: src/features/todo/TodoItemDialog.tsx:271
+#: src/features/todo/TodoRow.tsx:85
+#: src/features/todo/TodoTool.tsx:184
+msgid "高"
+msgstr "High"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:229
 msgid "高度"

@@ -129,6 +129,7 @@ common todo_note_image_read
 common todo_note_image_copy
 common todo_note_save
 common todo_item_set_completed
+common todo_item_set_abandoned
 common data_export
 common data_inspect
 common data_import

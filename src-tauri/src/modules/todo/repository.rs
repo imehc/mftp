@@ -1,13 +1,14 @@
-use super::model::{TodoItem, TodoItemInput};
+use super::model::{TodoItem, TodoItemInput, TodoPriority};
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::storage::{bool_to_int, now_ms, Storage};
 use rusqlite::{params, OptionalExtension, Row};
 
 pub(super) const SELECT_COLUMNS: &str =
-    "id, title, category, notes, due_date, completed, created_at, updated_at, due_at, completed_at";
+    "id, title, category, notes, due_date, completed, created_at, updated_at, due_at, completed_at, priority, abandoned, abandoned_at";
 
 pub(super) fn row_to_item(row: &Row) -> rusqlite::Result<TodoItem> {
     let completed: i64 = row.get(5)?;
+    let abandoned: i64 = row.get(11)?;
     Ok(TodoItem {
         id: row.get(0)?,
         title: row.get(1)?,
@@ -19,6 +20,9 @@ pub(super) fn row_to_item(row: &Row) -> rusqlite::Result<TodoItem> {
         updated_at: row.get(7)?,
         due_at: row.get(8)?,
         completed_at: row.get(9)?,
+        priority: TodoPriority::from_db(row.get(10)?),
+        abandoned: abandoned != 0,
+        abandoned_at: row.get(12)?,
     })
 }
 
@@ -121,6 +125,9 @@ impl TodoRepository {
             due_at: input.due_at,
             completed: input.completed,
             completed_at: input.completed.then_some(now),
+            priority: input.priority,
+            abandoned: false,
+            abandoned_at: None,
             created_at: now,
             updated_at: now,
         };
@@ -128,8 +135,8 @@ impl TodoRepository {
         conn.execute(
             r#"
             INSERT INTO todo_items(
-                id, title, category, notes, due_date, completed, created_at, updated_at, due_at, completed_at
-            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
+                id, title, category, notes, due_date, completed, created_at, updated_at, due_at, completed_at, priority
+            ) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
             "#,
             params![
                 item.id,
@@ -142,6 +149,7 @@ impl TodoRepository {
                 item.updated_at,
                 item.due_at,
                 item.completed_at,
+                item.priority.map(TodoPriority::as_str),
             ],
         )?;
         Ok(item)
@@ -176,6 +184,7 @@ impl TodoRepository {
                 updated_at = ?7,
                 revision = revision + 1,
                 due_at = ?8,
+                priority = ?9,
                 completed_at = CASE
                     WHEN ?6 = 0 THEN NULL
                     WHEN completed = 0 THEN ?7
@@ -192,6 +201,7 @@ impl TodoRepository {
                 bool_to_int(input.completed),
                 now_ms(),
                 input.due_at,
+                input.priority.map(TodoPriority::as_str),
             ],
         )?;
         if changed == 0 {
@@ -213,11 +223,39 @@ impl TodoRepository {
         let mut connection = self.storage.conn()?;
         let conn =
             connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        // Completing clears any abandoned state; both are mutually exclusive.
         let changed = conn.execute(
             "UPDATE todo_items SET completed=?2, updated_at=?3, revision=revision+1,
-             completed_at=CASE WHEN ?2=0 THEN NULL WHEN completed=0 THEN ?3 ELSE completed_at END
+             completed_at=CASE WHEN ?2=0 THEN NULL WHEN completed=0 THEN ?3 ELSE completed_at END,
+             abandoned=CASE WHEN ?2=1 THEN 0 ELSE abandoned END,
+             abandoned_at=CASE WHEN ?2=1 THEN NULL ELSE abandoned_at END
              WHERE id=?1",
             params![id, bool_to_int(completed), now_ms()],
+        )?;
+        if changed == 0 {
+            return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));
+        }
+        let item = conn.query_row(
+            &format!("SELECT {SELECT_COLUMNS} FROM todo_items WHERE id=?1"),
+            [id],
+            row_to_item,
+        )?;
+        conn.commit()?;
+        Ok(item)
+    }
+
+    pub(crate) fn set_abandoned(&self, id: &str, abandoned: bool) -> AppResult<TodoItem> {
+        let mut connection = self.storage.conn()?;
+        let conn =
+            connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        // Abandoning clears any completed state; both are mutually exclusive.
+        let changed = conn.execute(
+            "UPDATE todo_items SET abandoned=?2, updated_at=?3, revision=revision+1,
+             abandoned_at=CASE WHEN ?2=0 THEN NULL WHEN abandoned=0 THEN ?3 ELSE abandoned_at END,
+             completed=CASE WHEN ?2=1 THEN 0 ELSE completed END,
+             completed_at=CASE WHEN ?2=1 THEN NULL ELSE completed_at END
+             WHERE id=?1",
+            params![id, bool_to_int(abandoned), now_ms()],
         )?;
         if changed == 0 {
             return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));

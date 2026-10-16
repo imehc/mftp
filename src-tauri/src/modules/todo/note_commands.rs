@@ -139,6 +139,20 @@ pub async fn todo_item_set_completed(
 
 #[tauri::command]
 #[specta::specta]
+pub async fn todo_item_set_abandoned(
+    state: State<'_, AppServices>,
+    id: String,
+    abandoned: bool,
+) -> AppResult<TodoItem> {
+    let repository = state.todo_repository.clone();
+    state
+        .executor
+        .blocking_unlogged(move || repository.set_abandoned(&id, abandoned))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn todo_note_clipboard_read(
     state: State<'_, AppServices>,
     draft_id: String,

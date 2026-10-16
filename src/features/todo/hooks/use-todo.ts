@@ -10,8 +10,11 @@ import type { TodoItem } from "~/types";
 import { createTodoController } from "../todo-controller";
 import {
   ALL_TODO_CATEGORIES,
+  ALL_TODO_PRIORITIES,
   groupTodoItems,
   matchesTodoQuery,
+  TODO_PRIORITIES,
+  type TodoPriorityFilter,
   type TodoView,
 } from "../todo-utils";
 
@@ -23,6 +26,8 @@ export function useTodo() {
   const { items } = state;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(ALL_TODO_CATEGORIES);
+  const [priority, setPriority] =
+    useState<TodoPriorityFilter>(ALL_TODO_PRIORITIES);
   const [view, setView] = useState<TodoView>("active");
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
@@ -47,7 +52,7 @@ export function useTodo() {
   const categories = [
     ...new Set(items.flatMap((item) => (item.category ? [item.category] : []))),
   ].sort((left, right) => left.localeCompare(right));
-  const itemsByView = groupTodoItems(items, now, category);
+  const itemsByView = groupTodoItems(items, now, category, priority);
   const filteredItems = itemsByView[view].filter((item) =>
     matchesTodoQuery(item, query),
   );
@@ -72,6 +77,14 @@ export function useTodo() {
       });
   }
 
+  async function handleToggleAbandon(item: TodoItem) {
+    const result = await controller.abandon(item);
+    if (result && !result.ok)
+      toast.error(t`更新待办失败`, {
+        description: describeError(result.error, t),
+      });
+  }
+
   async function handleDelete() {
     const result = await controller.remove();
     if (result?.ok)
@@ -88,6 +101,9 @@ export function useTodo() {
     setQuery,
     category,
     setCategory,
+    priority,
+    setPriority,
+    priorities: TODO_PRIORITIES,
     view,
     setView,
     categories,
@@ -95,6 +111,7 @@ export function useTodo() {
     filteredItems,
     handleSubmit,
     handleToggle,
+    handleToggleAbandon,
     handleDelete,
   };
 }

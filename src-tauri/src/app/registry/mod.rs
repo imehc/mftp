@@ -226,6 +226,7 @@ macro_rules! common_modules {
                     todo::note_commands::todo_note_image_copy,
                     todo::note_commands::todo_note_save,
                     todo::note_commands::todo_item_set_completed,
+                    todo::note_commands::todo_item_set_abandoned,
                 ],
                 types: [],
             },

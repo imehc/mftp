@@ -1,11 +1,19 @@
 import { format, isThisYear } from "date-fns";
 
+import type { TodoPriority } from "~/bindings";
 import { dateLocale } from "~/lib/date-locale";
 import type { TodoItem } from "~/types";
 
 export const ALL_TODO_CATEGORIES = "__all__";
+export const ALL_TODO_PRIORITIES = "__all__";
 
-export type TodoView = "active" | "overdue" | "completed";
+/** 优先级筛选值：全部，或某个具体优先级；不提供「未设置」筛选。 */
+export type TodoPriorityFilter = typeof ALL_TODO_PRIORITIES | TodoPriority;
+
+/** 优先级展示顺序（高 → 低），不参与列表排序。 */
+export const TODO_PRIORITIES: TodoPriority[] = ["high", "medium", "low"];
+
+export type TodoView = "active" | "overdue" | "completed" | "abandoned";
 
 export function localDateKey(date: Date): string {
   const year = date.getFullYear();
@@ -60,6 +68,8 @@ export function formatTodoTimestamp(
 }
 
 export function todoView(item: TodoItem, now: number): TodoView {
+  // 已废弃优先判定：它与已完成互斥，但历史/脏数据下先显示为已废弃。
+  if (item.abandoned) return "abandoned";
   if (item.completed) return "completed";
   if (item.dueAt != null) return item.dueAt <= now ? "overdue" : "active";
   if (item.dueDate && item.dueDate < localDateKey(new Date(now)))
@@ -72,14 +82,18 @@ export function groupTodoItems(
   items: TodoItem[],
   now: number,
   category = ALL_TODO_CATEGORIES,
+  priority: TodoPriorityFilter = ALL_TODO_PRIORITIES,
 ) {
   const groups: Record<TodoView, TodoItem[]> = {
     active: [],
     overdue: [],
     completed: [],
+    abandoned: [],
   };
   for (const item of items) {
     if (category !== ALL_TODO_CATEGORIES && item.category !== category)
+      continue;
+    if (priority !== ALL_TODO_PRIORITIES && item.priority !== priority)
       continue;
     groups[todoView(item, now)].push(item);
   }

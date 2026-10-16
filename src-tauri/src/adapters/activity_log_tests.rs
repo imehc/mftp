@@ -38,6 +38,7 @@ fn todo_pipeline_writes_once_and_logs_only_explicit_metadata() {
                 due_date: None,
                 due_at: None,
                 completed: false,
+                priority: None,
             })
         },
     ))

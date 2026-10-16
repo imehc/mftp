@@ -355,6 +355,8 @@ export const todoItemDelete = (id: string) =>
   voidCommand(commands.todoItemDelete(id));
 export const todoItemSetCompleted = (id: string, completed: boolean) =>
   unwrapCommand(commands.todoItemSetCompleted(id, completed));
+export const todoItemSetAbandoned = (id: string, abandoned: boolean) =>
+  unwrapCommand(commands.todoItemSetAbandoned(id, abandoned));
 export const todoNoteDetails = (id: string) =>
   unwrapCommand(commands.todoNoteDetails(id));
 export const todoNoteSummaries = () =>

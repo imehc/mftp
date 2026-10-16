@@ -71,14 +71,40 @@ export default function TodoDetailsDialog({
           {item ? (
             <>
               <div className="flex min-w-0 flex-col gap-2">
-                {item.category ? (
-                  <Badge
-                    variant="outline"
-                    className="h-auto min-h-5 max-w-full wrap-break-word whitespace-normal"
-                  >
-                    {item.category}
-                  </Badge>
-                ) : null}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {item.category ? (
+                    <Badge
+                      variant="outline"
+                      className="h-auto min-h-5 max-w-full wrap-break-word whitespace-normal"
+                    >
+                      {item.category}
+                    </Badge>
+                  ) : null}
+                  {item.abandoned ? (
+                    <Badge variant="outline">
+                      <Trans>已废弃</Trans>
+                    </Badge>
+                  ) : null}
+                  {item.priority ? (
+                    <Badge
+                      variant={
+                        item.priority === "high"
+                          ? "destructive"
+                          : item.priority === "medium"
+                            ? "default"
+                            : "secondary"
+                      }
+                    >
+                      {item.priority === "high" ? (
+                        <Trans>高</Trans>
+                      ) : item.priority === "medium" ? (
+                        <Trans>中</Trans>
+                      ) : (
+                        <Trans>低</Trans>
+                      )}
+                    </Badge>
+                  ) : null}
+                </div>
                 <h3 className="text-base leading-6 font-medium wrap-break-word">
                   {item.title}
                 </h3>
