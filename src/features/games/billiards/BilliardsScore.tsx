@@ -2,6 +2,7 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
 
 import { Badge } from "~/components/ui/badge";
+import { Spinner } from "~/components/ui/spinner";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import { ballDefinition } from "./ball-definitions";
@@ -123,13 +124,17 @@ export function SeatCell({
   seat,
   active,
   align,
+  thinking = false,
 }: {
   mode: BilliardsMode;
   state: BilliardsState;
   seat: number;
   active: boolean;
   align: "start" | "end";
+  /** 该座位是 AI 且正在思考时，在徽章处显示旋转指示。 */
+  thinking?: boolean;
 }) {
+  const { t } = useLingui();
   const tray = seatTray(state, seat);
   return (
     <div
@@ -142,6 +147,7 @@ export function SeatCell({
     >
       <Badge className="max-w-full" variant={active ? "secondary" : "outline"}>
         <span className="truncate">{seatName(mode, seat)}</span>
+        {thinking ? <Spinner aria-label={t`AI 思考中…`} /> : null}
       </Badge>
       <div className="flex min-w-0 items-center gap-1.5">
         <span className="text-muted-foreground text-xs">

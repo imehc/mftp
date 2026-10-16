@@ -1,10 +1,12 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronRightIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { AnimatedNumber } from "~/components/AnimatedNumber";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { FieldGroup } from "~/components/ui/field";
+import { Spinner } from "~/components/ui/spinner";
 
 import { foulLabel, FoulSummary } from "./BilliardsFoulFeedback";
 import { seatName } from "./BilliardsScore";
@@ -17,13 +19,17 @@ export function SnookerScore({
   state,
   mode,
   activeSeat,
+  aiThinking = false,
   target,
 }: {
   state: SnookerState;
   mode: BilliardsMode;
   activeSeat: number | null;
+  /** AI 正在思考时，在其座位徽章处显示旋转指示。 */
+  aiThinking?: boolean;
   target: ReactNode;
 }) {
+  const { t } = useLingui();
   const currentBreak = state.currentBreak;
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
@@ -41,10 +47,14 @@ export function SnookerScore({
             variant={activeSeat === seat ? "secondary" : "outline"}
           >
             <span className="truncate">{seatName(mode, seat)}</span>
+            {aiThinking && activeSeat === seat ? (
+              <Spinner aria-label={t`AI 思考中…`} />
+            ) : null}
           </Badge>
-          <span className="text-lg font-semibold tabular-nums">
-            {state.scores[seat]}
-          </span>
+          <AnimatedNumber
+            value={state.scores[seat]}
+            className="text-lg font-semibold"
+          />
         </div>
       ))}
       <div className="billiards-target col-start-2 row-start-1 flex min-w-0 items-center justify-center gap-2">

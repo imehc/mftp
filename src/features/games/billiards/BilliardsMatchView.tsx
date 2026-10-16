@@ -294,6 +294,7 @@ export function MatchView({
               state={state}
               mode={mode}
               activeSeat={snapshot.activeSeat}
+              aiThinking={aiThinking}
               target={
                 <SnookerTargetControl
                   state={state}
@@ -315,6 +316,7 @@ export function MatchView({
               state={state}
               mode={mode}
               activeSeat={snapshot.activeSeat}
+              aiThinking={aiThinking}
             />
           ) : (
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
@@ -324,6 +326,7 @@ export function MatchView({
                 seat={0}
                 active={snapshot.activeSeat === 0}
                 align="start"
+                thinking={aiThinking && snapshot.activeSeat === 0}
               />
               <div className="flex max-w-[50vw] flex-wrap items-center justify-center gap-1.5">
                 <Badge variant="outline">
@@ -342,6 +345,7 @@ export function MatchView({
                 seat={1}
                 active={snapshot.activeSeat === 1}
                 align="end"
+                thinking={aiThinking && snapshot.activeSeat === 1}
               />
             </div>
           )}

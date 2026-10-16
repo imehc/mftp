@@ -10,10 +10,13 @@ export function NineBallScore({
   state,
   mode,
   activeSeat,
+  aiThinking = false,
 }: {
   state: NineBallState;
   mode: BilliardsMode;
   activeSeat: number | null;
+  /** AI 正在思考时，在其座位徽章处显示旋转指示。 */
+  aiThinking?: boolean;
 }) {
   const targetId = lowestBall(state);
   return (
@@ -24,6 +27,7 @@ export function NineBallScore({
         seat={0}
         active={activeSeat === 0}
         align="start"
+        thinking={aiThinking && activeSeat === 0}
       />
       <div className="flex flex-col items-center gap-1">
         <span className="text-inherit">
@@ -41,6 +45,7 @@ export function NineBallScore({
         seat={1}
         active={activeSeat === 1}
         align="end"
+        thinking={aiThinking && activeSeat === 1}
       />
     </div>
   );
