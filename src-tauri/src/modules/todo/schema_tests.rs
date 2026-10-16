@@ -41,6 +41,6 @@ fn legacy_todo_migration_is_idempotent_and_reset_keeps_version_after_reopen() {
             |row| row.get(0),
         )
         .unwrap();
-    assert_eq!(version, "1");
+    assert_eq!(version, "2");
     std::fs::remove_dir_all(root).unwrap();
 }

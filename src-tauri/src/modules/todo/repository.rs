@@ -3,10 +3,10 @@ use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::storage::{bool_to_int, now_ms, Storage};
 use rusqlite::{params, OptionalExtension, Row};
 
-const SELECT_COLUMNS: &str =
+pub(super) const SELECT_COLUMNS: &str =
     "id, title, category, notes, due_date, completed, created_at, updated_at, due_at, completed_at";
 
-fn row_to_item(row: &Row) -> rusqlite::Result<TodoItem> {
+pub(super) fn row_to_item(row: &Row) -> rusqlite::Result<TodoItem> {
     let completed: i64 = row.get(5)?;
     Ok(TodoItem {
         id: row.get(0)?,
@@ -22,7 +22,7 @@ fn row_to_item(row: &Row) -> rusqlite::Result<TodoItem> {
     })
 }
 
-fn normalize_input(mut input: TodoItemInput) -> AppResult<TodoItemInput> {
+pub(super) fn normalize_input(mut input: TodoItemInput) -> AppResult<TodoItemInput> {
     input.title = input.title.trim().to_string();
     if input.title.is_empty() {
         return Err(AppError::custom(CustomErrorCode::TodoTitleRequired));
@@ -89,7 +89,7 @@ fn valid_date(value: &str) -> bool {
 
 #[derive(Clone)]
 pub(crate) struct TodoRepository {
-    storage: Storage,
+    pub(super) storage: Storage,
 }
 
 impl TodoRepository {
@@ -148,8 +148,23 @@ impl TodoRepository {
     }
 
     pub(crate) fn update(&self, id: &str, input: TodoItemInput) -> AppResult<TodoItem> {
+        let requested_notes = input.notes.clone();
         let input = normalize_input(input)?;
-        let conn = self.storage.conn()?;
+        let mut connection = self.storage.conn()?;
+        let conn =
+            connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        let rich_notes: Option<Option<String>> = conn.query_row(
+            "SELECT t.notes FROM todo_items t JOIN todo_notes n ON n.item_id=t.id WHERE t.id=?1",
+            [id], |row| row.get(0),
+        ).optional()?;
+        let notes = if let Some(notes) = rich_notes {
+            if requested_notes != notes {
+                return Err(AppError::custom(CustomErrorCode::TodoNoteConflict));
+            }
+            notes
+        } else {
+            input.notes
+        };
         let changed = conn.execute(
             r#"
             UPDATE todo_items SET
@@ -159,6 +174,7 @@ impl TodoRepository {
                 due_date = ?5,
                 completed = ?6,
                 updated_at = ?7,
+                revision = revision + 1,
                 due_at = ?8,
                 completed_at = CASE
                     WHEN ?6 = 0 THEN NULL
@@ -171,7 +187,7 @@ impl TodoRepository {
                 id,
                 input.title,
                 input.category,
-                input.notes,
+                notes,
                 input.due_date,
                 bool_to_int(input.completed),
                 now_ms(),
@@ -181,13 +197,38 @@ impl TodoRepository {
         if changed == 0 {
             return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));
         }
-        conn.query_row(
-            &format!("SELECT {SELECT_COLUMNS} FROM todo_items WHERE id = ?1"),
-            params![id],
+        let item = conn
+            .query_row(
+                &format!("SELECT {SELECT_COLUMNS} FROM todo_items WHERE id = ?1"),
+                params![id],
+                row_to_item,
+            )
+            .optional()?
+            .ok_or_else(|| AppError::custom(CustomErrorCode::TodoItemNotFound))?;
+        conn.commit()?;
+        Ok(item)
+    }
+
+    pub(crate) fn set_completed(&self, id: &str, completed: bool) -> AppResult<TodoItem> {
+        let mut connection = self.storage.conn()?;
+        let conn =
+            connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        let changed = conn.execute(
+            "UPDATE todo_items SET completed=?2, updated_at=?3, revision=revision+1,
+             completed_at=CASE WHEN ?2=0 THEN NULL WHEN completed=0 THEN ?3 ELSE completed_at END
+             WHERE id=?1",
+            params![id, bool_to_int(completed), now_ms()],
+        )?;
+        if changed == 0 {
+            return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));
+        }
+        let item = conn.query_row(
+            &format!("SELECT {SELECT_COLUMNS} FROM todo_items WHERE id=?1"),
+            [id],
             row_to_item,
-        )
-        .optional()?
-        .ok_or_else(|| AppError::custom(CustomErrorCode::TodoItemNotFound))
+        )?;
+        conn.commit()?;
+        Ok(item)
     }
 
     pub(crate) fn delete(&self, id: &str) -> AppResult<()> {

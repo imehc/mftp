@@ -15,6 +15,8 @@ use super::{now_ms, Storage};
 const KDF_M_COST: u32 = 19456;
 const KDF_T_COST: u32 = 2;
 const KDF_P_COST: u32 = 1;
+const MAX_BACKUP_JSON_BYTES: usize = 96_000_000;
+const MAX_BACKUP_PLAIN_BYTES: usize = 48_000_000;
 
 fn derive_key(password: &str, salt: &[u8], m: u32, t: u32, p: u32) -> AppResult<[u8; 32]> {
     let params = Params::new(m, t, p, Some(32)).map_err(|_| {
@@ -46,7 +48,7 @@ fn encrypt_envelope(plain: &Value, password: &str) -> AppResult<Value> {
         .map_err(|_| AppError::external("crypto:encrypt", "Encryption failed"))?;
     Ok(json!({
         "app": "mftp",
-        "format": 1,
+        "format": plain.get("format").and_then(Value::as_u64).unwrap_or(1),
         "encrypted": true,
         "kdf": {
             "algo": "argon2id",
@@ -105,6 +107,9 @@ pub(super) fn decrypt_envelope(doc: &Map<String, Value>, password: &str) -> AppR
     let plaintext = cipher
         .decrypt(&nonce, data.as_slice())
         .map_err(|_| AppError::custom(CustomErrorCode::AppDataDecryptFailed))?;
+    if plaintext.len() > MAX_BACKUP_PLAIN_BYTES {
+        return Err(AppError::custom(CustomErrorCode::AppDataTooLarge));
+    }
     // Decrypted content is untrusted input; report a safe diagnosis without
     // serde details that could echo plaintext tokens.
     serde_json::from_slice(&plaintext)
@@ -133,13 +138,27 @@ pub(super) fn section_from_key(key: &str) -> Option<ExportSection> {
 }
 
 pub(super) fn parse_document(raw: &str) -> AppResult<Map<String, Value>> {
+    if raw.len() > MAX_BACKUP_JSON_BYTES {
+        return Err(AppError::custom(CustomErrorCode::AppDataTooLarge));
+    }
     let value: Value =
         serde_json::from_str(raw).map_err(|_| AppError::custom(CustomErrorCode::AppDataNotJson))?;
     let obj = value
         .as_object()
         .filter(|obj| obj.get("app").and_then(Value::as_str) == Some("mftp"))
         .ok_or_else(|| AppError::custom(CustomErrorCode::AppDataNotMftpFile))?;
+    validate_format(obj)?;
     Ok(obj.clone())
+}
+
+pub(super) fn validate_format(doc: &Map<String, Value>) -> AppResult<()> {
+    if doc
+        .get("format")
+        .is_some_and(|format| !matches!(format.as_u64(), Some(1 | 2)))
+    {
+        return Err(AppError::custom(CustomErrorCode::AppDataFormatInvalid));
+    }
+    Ok(())
 }
 
 fn plain_sections(doc: &Map<String, Value>) -> Vec<ExportSection> {
@@ -168,9 +187,7 @@ impl Storage {
                 ExportSection::Hosts => json!(
                     crate::modules::hosts::repository::HostRepository::new(self.clone()).list()?
                 ),
-                ExportSection::Todo => json!(
-                    crate::modules::todo::repository::TodoRepository::new(self.clone()).list()?
-                ),
+                ExportSection::Todo => crate::modules::todo::note_backup::export(self)?,
                 ExportSection::Lan => json!(
                     crate::modules::lan_transfer::repository::LanRepository::new(self.clone())
                         .export()?
@@ -181,12 +198,21 @@ impl Storage {
             };
             data.insert(section_key(*section).to_string(), value);
         }
-        Ok(json!({
+        let format = if data.get("todo").is_some_and(Value::is_object) {
+            2
+        } else {
+            1
+        };
+        let result = json!({
             "app": "mftp",
-            "format": 1,
+            "format": format,
             "exportedAt": now_ms(),
             "sections": data,
-        }))
+        });
+        if serde_json::to_vec(&result)?.len() > MAX_BACKUP_PLAIN_BYTES {
+            return Err(AppError::custom(CustomErrorCode::AppDataTooLarge));
+        }
+        Ok(result)
     }
 
     /// Serialize the export, optionally encrypting it with a password.
@@ -200,7 +226,11 @@ impl Storage {
             Some(password) if !password.is_empty() => encrypt_envelope(&plain, password)?,
             _ => plain,
         };
-        serde_json::to_string_pretty(&doc).map_err(AppError::from)
+        let raw = serde_json::to_string_pretty(&doc).map_err(AppError::from)?;
+        if raw.len() > MAX_BACKUP_JSON_BYTES {
+            return Err(AppError::custom(CustomErrorCode::AppDataTooLarge));
+        }
+        Ok(raw)
     }
 
     /// Detect whether a file is an mftp export and if it is encrypted.

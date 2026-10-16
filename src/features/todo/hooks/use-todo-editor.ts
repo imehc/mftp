@@ -3,6 +3,11 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect } from "react";
 import { z } from "zod";
 
+import type {
+  TodoNoteDocument,
+  TodoNoteDraft,
+  TodoNoteSaveInput,
+} from "~/bindings";
 import type { TodoItem, TodoItemInput } from "~/types";
 
 import { localTimeKey, plannedDate, plannedTimestamp } from "../todo-utils";
@@ -10,7 +15,6 @@ import { localTimeKey, plannedDate, plannedTimestamp } from "../todo-utils";
 const emptyValues = {
   title: "",
   category: "",
-  notes: "",
   dueDate: "",
   dueTime: "",
   completed: false,
@@ -21,7 +25,6 @@ function toFormValues(item: TodoItem | null) {
   return {
     title: item.title,
     category: item.category ?? "",
-    notes: item.notes ?? "",
     dueDate: plannedDate(item) ?? "",
     dueTime: item.dueAt != null ? localTimeKey(new Date(item.dueAt)) : "",
     completed: item.completed,
@@ -30,17 +33,17 @@ function toFormValues(item: TodoItem | null) {
 
 /** 编辑草稿与校验不依赖桌面/移动布局，断点切换不重建表单。 */
 export function useTodoEditor({
-  open,
-  item,
+  draft,
+  canSubmit,
   onSubmit,
 }: {
-  open: boolean;
-  item: TodoItem | null;
-  onSubmit: (input: TodoItemInput) => Promise<void>;
+  draft: TodoNoteDraft;
+  canSubmit: () => boolean;
+  onSubmit: (input: TodoNoteSaveInput) => Promise<void>;
 }) {
   const { t } = useLingui();
   const form = useForm({
-    defaultValues: toFormValues(item),
+    defaultValues: { ...toFormValues(draft.item), document: draft.document },
     validators: {
       onSubmit: z
         .object({
@@ -49,7 +52,7 @@ export function useTodoEditor({
             .trim()
             .min(1, t`请输入待办标题`),
           category: z.string(),
-          notes: z.string(),
+          document: z.custom<TodoNoteDocument>(),
           dueDate: z.string(),
           dueTime: z.string(),
           completed: z.boolean(),
@@ -68,24 +71,25 @@ export function useTodoEditor({
         }),
     },
     onSubmit: async ({ value }) => {
+      if (!canSubmit()) return;
       const category = value.category.trim();
-      const notes = value.notes.trim();
-      await onSubmit({
+      const metadata: TodoItemInput = {
         title: value.title.trim(),
         category: category || null,
-        notes: notes || null,
+        notes: null,
         dueDate: value.dueDate || null,
         dueAt: value.dueTime
           ? plannedTimestamp(value.dueDate, value.dueTime)
           : null,
         completed: value.completed,
-      });
+      };
+      await onSubmit({ draftId: draft.id, metadata, document: value.document });
     },
   });
 
   useEffect(() => {
-    if (open) form.reset(toFormValues(item));
-  }, [form, item, open]);
+    form.reset({ ...toFormValues(draft.item), document: draft.document });
+  }, [form, draft]);
 
   return form;
 }

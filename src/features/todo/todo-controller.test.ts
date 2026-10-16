@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { TodoItem, TodoItemInput } from "~/types";
+import type { TodoNoteDetails, TodoNoteSaveInput } from "~/bindings";
+import type { TodoItem } from "~/types";
 
 import { createTodoController } from "./todo-controller";
 
@@ -19,14 +20,27 @@ function item(id = "a"): TodoItem {
   };
 }
 
-const input: TodoItemInput = {
-  title: "changed",
-  category: null,
-  notes: null,
-  dueDate: null,
-  dueAt: null,
-  completed: false,
+const input: TodoNoteSaveInput = {
+  draftId: "draft",
+  document: { version: 1, blocks: [] },
+  metadata: {
+    title: "changed",
+    category: null,
+    notes: null,
+    dueDate: null,
+    dueAt: null,
+    completed: false,
+  },
 };
+
+function saved(id = "a"): TodoNoteDetails {
+  return {
+    item: { ...item(id), ...input.metadata },
+    document: input.document,
+    revision: 1,
+  };
+}
+
 const failure = {
   kind: "external" as const,
   code: "test:write",
@@ -47,10 +61,11 @@ function deferred<T>() {
 async function setup() {
   const api = {
     list: vi.fn(async () => [item(), item("b")]),
-    create: vi.fn(async (_input: TodoItemInput) => item("new")),
-    update: vi.fn(async (id: string, value: TodoItemInput) => ({
+    save: vi.fn(async (_input: TodoNoteSaveInput) => saved()),
+    summaries: vi.fn(async () => []),
+    setCompleted: vi.fn(async (id: string, completed: boolean) => ({
       ...item(id),
-      ...value,
+      completed,
     })),
     remove: vi.fn(async (_id: string) => {}),
   };
@@ -62,16 +77,17 @@ async function setup() {
 describe("待办写入生命周期", () => {
   it("同步拦截同项保存与切换，同时允许不同项更新", async () => {
     const { api, controller, state } = await setup();
-    const pending = deferred<TodoItem>();
-    api.update.mockImplementationOnce(() => pending.promise);
+    const pending = deferred<TodoNoteDetails>();
+    api.save.mockImplementationOnce(() => pending.promise);
     controller.edit(item());
     const save = controller.submit(input);
     expect(await controller.submit(input)).toBeNull();
     expect(await controller.toggle(item())).toBeNull();
     expect(await controller.toggle(item("b"))).toEqual({ ok: true });
-    expect(api.update).toHaveBeenCalledTimes(2);
+    expect(api.save).toHaveBeenCalledTimes(1);
+    expect(api.setCompleted).toHaveBeenCalledTimes(1);
     expect(state().pendingIds.has("a")).toBe(true);
-    pending.resolve({ ...item(), ...input });
+    pending.resolve(saved());
     await save;
     expect(state().pendingIds.size).toBe(0);
     expect(state().saving).toBe(false);
@@ -79,15 +95,16 @@ describe("待办写入生命周期", () => {
 
   it("重复新建只发起一次且失败后可手动重试", async () => {
     const { api, controller, state } = await setup();
-    const pending = deferred<TodoItem>();
-    api.create.mockImplementationOnce(() => pending.promise);
+    const pending = deferred<TodoNoteDetails>();
+    api.save.mockImplementationOnce(() => pending.promise);
+    api.save.mockResolvedValueOnce(saved("new"));
     controller.edit(null);
     const save = controller.submit(input);
     expect(await controller.submit(input)).toBeNull();
     pending.reject(failure);
     expect(await save).toEqual({ ok: false, error: failure });
     expect(state().dialogOpen).toBe(true);
-    expect(api.create).toHaveBeenCalledTimes(1);
+    expect(api.save).toHaveBeenCalledTimes(1);
     await controller.submit(input);
     expect(state().dialogOpen).toBe(false);
     expect(state().items.some((entry) => entry.id === "new")).toBe(true);
@@ -126,13 +143,13 @@ describe("待办写入生命周期", () => {
 
   it("旧保存完成更新数据但不关闭后来打开的草稿", async () => {
     const { api, controller, state } = await setup();
-    const pending = deferred<TodoItem>();
-    api.update.mockImplementationOnce(() => pending.promise);
+    const pending = deferred<TodoNoteDetails>();
+    api.save.mockImplementationOnce(() => pending.promise);
     controller.edit(item());
     const save = controller.submit(input);
     controller.setDialogOpen(false);
     controller.edit(item("b"));
-    pending.resolve({ ...item(), ...input });
+    pending.resolve(saved());
     await save;
     expect(state().dialogOpen).toBe(true);
     expect(state().editing?.id).toBe("b");
@@ -144,7 +161,7 @@ describe("待办写入生命周期", () => {
   it("卸载后结果失效但请求退出前仍保留写锁", async () => {
     const { api, controller, state } = await setup();
     const pending = deferred<TodoItem>();
-    api.update.mockImplementationOnce(() => pending.promise);
+    api.setCompleted.mockImplementationOnce(() => pending.promise);
     const updating = controller.toggle(item());
     controller.stop();
     expect(state().pendingIds.has("a")).toBe(true);
@@ -161,10 +178,8 @@ describe("待办写入生命周期", () => {
     controller.edit(item());
     await controller.submit(input);
     await controller.toggle(item());
-    expect(api.update).toHaveBeenLastCalledWith("a", {
-      ...input,
-      completed: true,
-    });
+    expect(api.setCompleted).toHaveBeenLastCalledWith("a", true);
+    expect(api.save).toHaveBeenCalledTimes(1);
   });
 
   it("旧读取不能覆盖重试结果且写入期间不重新读取", async () => {
@@ -178,12 +193,23 @@ describe("待办写入生命周期", () => {
     await oldRead;
     expect(state().items.map((entry) => entry.id)).toEqual(["latest"]);
     const writing = deferred<TodoItem>();
-    api.update.mockImplementationOnce(() => writing.promise);
+    api.setCompleted.mockImplementationOnce(() => writing.promise);
     const toggle = controller.toggle(item("latest"));
     const readCount = api.list.mock.calls.length;
     await controller.load();
     expect(api.list).toHaveBeenCalledTimes(readCount);
     writing.resolve(item("latest"));
     await toggle;
+  });
+
+  it("首图摘要读取失败不将已落库的保存误报为失败", async () => {
+    const { api, controller, state } = await setup();
+    api.summaries.mockRejectedValueOnce(failure);
+    controller.edit(item());
+    expect(await controller.submit(input)).toEqual({ ok: true });
+    expect(state().dialogOpen).toBe(false);
+    expect(state().items[0].title).toBe("changed");
+    expect(state().summaryError).toEqual(failure);
+    expect(api.save).toHaveBeenCalledTimes(1);
   });
 });

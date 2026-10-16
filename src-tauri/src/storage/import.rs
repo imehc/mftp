@@ -9,7 +9,7 @@ use rusqlite::{params, Connection};
 use serde_json::Value;
 use std::collections::HashSet;
 
-use super::export::{decrypt_envelope, parse_document, section_from_key};
+use super::export::{decrypt_envelope, parse_document, section_from_key, validate_format};
 use super::{now_ms, Storage};
 use crate::modules::poetry::translation_store::{mode_to_db, source_to_db, validate_translation};
 
@@ -181,6 +181,10 @@ fn import_hosts(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult
 }
 
 fn import_todo(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<Counts> {
+    if value.is_object() {
+        let (inserted, updated) = crate::modules::todo::note_backup::import(conn, value, mode)?;
+        return Ok(Counts { inserted, updated });
+    }
     let items: Vec<TodoItem> =
         serde_json::from_value(value.clone()).map_err(|_| invalid_section("todo"))?;
     let mut counts = Counts {
@@ -188,6 +192,7 @@ fn import_todo(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<
         updated: 0,
     };
     if mode == ImportMode::Overwrite {
+        conn.execute("DELETE FROM todo_note_drafts", [])?;
         conn.execute("DELETE FROM todo_items", [])?;
     }
     for mut item in items {
@@ -202,8 +207,11 @@ fn import_todo(conn: &Connection, value: &Value, mode: ImportMode) -> AppResult<
             item.id = uuid::Uuid::new_v4().to_string();
         }
         if mode == ImportMode::Merge {
+            conn.execute("DELETE FROM todo_note_drafts WHERE item_id=?1", [&item.id])?;
+            conn.execute("DELETE FROM todo_notes WHERE item_id=?1", [&item.id])?;
+            conn.execute("DELETE FROM todo_note_images WHERE item_id=?1", [&item.id])?;
             let updated = conn.execute(
-                "UPDATE todo_items SET title=?2, category=?3, notes=?4, due_date=?5, completed=?6, updated_at=?7, due_at=?8, completed_at=?9 WHERE id=?1",
+                "UPDATE todo_items SET title=?2, category=?3, notes=?4, due_date=?5, completed=?6, updated_at=?7, due_at=?8, completed_at=?9, revision=revision+1 WHERE id=?1",
                 params![item.id, item.title, item.category, item.notes, item.due_date, item.completed as i64, now_ms(), item.due_at, item.completed_at.filter(|_| item.completed)],
             )?;
             if updated > 0 {
@@ -341,6 +349,16 @@ impl Storage {
             .get("sections")
             .and_then(Value::as_object)
             .ok_or_else(|| AppError::custom(CustomErrorCode::AppDataNoSections))?;
+        validate_format(
+            plain
+                .as_object()
+                .ok_or_else(|| AppError::custom(CustomErrorCode::AppDataFormatInvalid))?,
+        )?;
+        if sections.get("todo").is_some_and(Value::is_object)
+            && plain.get("format").and_then(Value::as_u64) != Some(2)
+        {
+            return Err(invalid_section("todo"));
+        }
 
         let mut conn = self.conn()?;
         let tx = conn.transaction()?;

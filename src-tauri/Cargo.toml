@@ -21,6 +21,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = ["test"] }
 zeroize = "1.9"
 tokio = { version = "1", features = ["test-util"] }
+png = "0.18"
 
 [dependencies]
 tauri-plugin-native-viewer = { path = "plugins/native-viewer" }
@@ -61,9 +62,12 @@ futures-util = "0.3"
 # Shared maintenance uses notifications/deadlines on Tauri's existing runtime;
 # BT-specific networking and file IO features remain platform-scoped below.
 tokio = { version = "1", features = ["sync", "time"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+tauri-plugin-clipboard-manager = "2.2.2"
 
 # Desktop-only plugins: updater and autostart have no mobile support.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+arboard = { version = "3.7", default-features = false, features = ["image-data"] }
 tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-autostart = "2.5.1"

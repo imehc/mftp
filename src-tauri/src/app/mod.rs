@@ -54,6 +54,7 @@ pub(crate) fn run() -> AppResult<()> {
         .plugin(tauri_plugin_opener::init())
         .plugin(crate::file_opener::init())
         .plugin(tauri_plugin_native_export::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init());

@@ -1,8 +1,10 @@
 use super::prepare;
 
 fn config(identifier: &str) -> tauri::Config {
-    let mut config = tauri::Config::default();
-    config.identifier = identifier.into();
+    let mut config = tauri::Config {
+        identifier: identifier.into(),
+        ..Default::default()
+    };
     config.app.windows.push(Default::default());
     config
 }

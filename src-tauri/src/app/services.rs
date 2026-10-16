@@ -39,6 +39,7 @@ pub struct AppServices {
     pub(crate) key_repository: KeyRepository,
     pub(crate) vault_repository: VaultRepository,
     pub(crate) todo_repository: TodoRepository,
+    pub(crate) todo_notes: Arc<crate::modules::todo::note_service::TodoNoteService>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<PoetryLibrary>,
     #[cfg(any(desktop, target_os = "android"))]
@@ -146,6 +147,9 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         key_repository: KeyRepository::new(storage.clone()),
         vault_repository: VaultRepository::new(storage.clone()),
         todo_repository: TodoRepository::new(storage.clone()),
+        todo_notes: Arc::new(crate::modules::todo::note_service::TodoNoteService::new(
+            TodoRepository::new(storage.clone()),
+        )),
         storage,
         manager,
         lan_transfer,

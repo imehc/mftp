@@ -128,6 +128,16 @@ export const commands = {
 	todoItemCreate: (input: TodoItemInput) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_create", { input })),
 	todoItemUpdate: (id: string, input: TodoItemInput) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_update", { id, input })),
 	todoItemDelete: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("todo_item_delete", { id })),
+	todoNoteDetails: (id: string) => typedError<TodoNoteDetails, AppError>(__TAURI_INVOKE("todo_note_details", { id })),
+	todoNoteSummaries: () => typedError<TodoNoteSummary[], AppError>(__TAURI_INVOKE("todo_note_summaries")),
+	todoNoteDraftBegin: (itemId: string | null) => typedError<TodoNoteDraft, AppError>(__TAURI_INVOKE("todo_note_draft_begin", { itemId })),
+	todoNoteDraftClose: (draftId: string) => typedError<null, AppError>(__TAURI_INVOKE("todo_note_draft_close", { draftId })),
+	todoNoteClipboardRead: (draftId: string, textOnly: boolean) => typedError<TodoNoteClipboard, AppError>(__TAURI_INVOKE("todo_note_clipboard_read", { draftId, textOnly })),
+	todoNoteImageImport: (draftId: string, dataBase64: string) => typedError<TodoNoteImageImport, AppError>(__TAURI_INVOKE("todo_note_image_import", { draftId, dataBase64 })),
+	todoNoteImageRead: (assetId: string, itemId: string | null, draftId: string | null, thumbnail: boolean) => typedError<TodoNoteImageData, AppError>(__TAURI_INVOKE("todo_note_image_read", { assetId, itemId, draftId, thumbnail })),
+	todoNoteImageCopy: (draftId: string, sourceItemId: string, assetId: string) => typedError<TodoNoteImageInfo, AppError>(__TAURI_INVOKE("todo_note_image_copy", { draftId, sourceItemId, assetId })),
+	todoNoteSave: (input: TodoNoteSaveInput) => typedError<TodoNoteDetails, AppError>(__TAURI_INVOKE("todo_note_save", { input })),
+	todoItemSetCompleted: (id: string, completed: boolean) => typedError<TodoItem, AppError>(__TAURI_INVOKE("todo_item_set_completed", { id, completed })),
 	/**
 	 *  Serialize the selected sections as a JSON document, optionally encrypted
 	 *  with a password (Argon2id + ChaCha20-Poly1305). The frontend handles the
@@ -662,7 +672,7 @@ export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" 
 
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
-export type CustomErrorCode = "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+export type CustomErrorCode = "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
 
 export type DiagnosticBodyEnd = "receiving" | "complete" | "protocolEnd" | "interrupted";
 
@@ -1359,6 +1369,61 @@ export type TodoItemInput = {
 	dueDate?: string | null,
 	dueAt?: number | null,
 	completed: boolean,
+};
+
+export type TodoNoteBlock = { type: "paragraph"; content: TodoNoteInline[] } | { type: "codeBlock"; text: string };
+
+export type TodoNoteClipboard = { type: "text"; text: string } | { type: "image"; image: TodoNoteImageInfo } | { type: "empty" };
+
+export type TodoNoteDetails = {
+	item: TodoItem,
+	document: TodoNoteDocument,
+	revision: number,
+};
+
+export type TodoNoteDocument = {
+	version: number,
+	blocks: TodoNoteBlock[],
+};
+
+export type TodoNoteDraft = {
+	id: string,
+	item: TodoItem | null,
+	document: TodoNoteDocument,
+	baseRevision: number | null,
+};
+
+export type TodoNoteImageData = {
+	image: TodoNoteImageInfo,
+	dataBase64: string,
+};
+
+export type TodoNoteImageImport = {
+	image: TodoNoteImageInfo,
+	compressed: boolean,
+};
+
+export type TodoNoteImageInfo = {
+	id: string,
+	mimeType: string,
+	width: number,
+	height: number,
+	byteLength: number,
+};
+
+export type TodoNoteInline = { type: "text"; text: string } | { type: "hardBreak" } | { type: "image"; assetId: string };
+
+export type TodoNoteSaveInput = {
+	draftId: string,
+	metadata: TodoItemInput,
+	document: TodoNoteDocument,
+};
+
+export type TodoNoteSummary = {
+	itemId: string,
+	revision: number,
+	imageCount: number,
+	firstImage: TodoNoteImageInfo | null,
 };
 
 export type TransferProgress = TransferProgress_Serialize | TransferProgress_Deserialize;

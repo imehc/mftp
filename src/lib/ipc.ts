@@ -1,14 +1,18 @@
 import { listen } from "@tauri-apps/api/event";
 
-import type { AppDataModule, ModelExportAction } from "~/bindings";
+import type {
+  AppDataModule,
+  ModelExportAction,
+  TodoNoteSaveInput,
+} from "~/bindings";
 import {
   commands,
   type PoetryTranslation,
   type PoetryTranslationMode,
   type PoetryTranslationStreamEvent,
 } from "~/bindings";
-import { toIpcError } from "~/lib/errors";
 import { poetryTranslationStreamEvent } from "~/lib/events";
+import { unwrapCommand, voidCommand } from "~/lib/ipc-result";
 import type { DirectoryTransferMode } from "~/store/settings";
 import type {
   BtControlAction,
@@ -24,30 +28,6 @@ import type {
   TodoItemInput,
   VaultEntryInput,
 } from "~/types";
-
-type CommandResult<T, E> =
-  { status: "ok"; data: T } | { status: "error"; error: E };
-
-const unwrapCommand = async <T, E>(
-  promise: Promise<CommandResult<T, E>>,
-): Promise<T> => {
-  try {
-    const result = await promise;
-    if (result.status === "ok") {
-      return result.data;
-    }
-    throw toIpcError(result.error);
-  } catch (error) {
-    // 同时收口命令返回的错误和原生 IPC 拒绝，重复转换保持原对象。
-    throw toIpcError(error);
-  }
-};
-
-const voidCommand = async <E>(
-  promise: Promise<CommandResult<null, E>>,
-): Promise<void> => {
-  await unwrapCommand(promise);
-};
 
 // ---- 模型资源与本地库 ----
 export const modelViewerOpen = (path: string) =>
@@ -373,6 +353,37 @@ export const todoItemUpdate = (id: string, input: TodoItemInput) =>
   unwrapCommand(commands.todoItemUpdate(id, input));
 export const todoItemDelete = (id: string) =>
   voidCommand(commands.todoItemDelete(id));
+export const todoItemSetCompleted = (id: string, completed: boolean) =>
+  unwrapCommand(commands.todoItemSetCompleted(id, completed));
+export const todoNoteDetails = (id: string) =>
+  unwrapCommand(commands.todoNoteDetails(id));
+export const todoNoteSummaries = () =>
+  unwrapCommand(commands.todoNoteSummaries());
+export const todoNoteDraftBegin = (itemId: string | null) =>
+  unwrapCommand(commands.todoNoteDraftBegin(itemId));
+export const todoNoteDraftClose = (draftId: string) =>
+  voidCommand(commands.todoNoteDraftClose(draftId));
+export const todoNoteClipboardRead = (draftId: string, textOnly: boolean) =>
+  unwrapCommand(commands.todoNoteClipboardRead(draftId, textOnly));
+
+export const todoNoteImageImport = (draftId: string, dataBase64: string) =>
+  unwrapCommand(commands.todoNoteImageImport(draftId, dataBase64));
+export const todoNoteImageRead = (
+  assetId: string,
+  itemId: string | null,
+  draftId: string | null,
+  thumbnail: boolean,
+) =>
+  unwrapCommand(
+    commands.todoNoteImageRead(assetId, itemId, draftId, thumbnail),
+  );
+export const todoNoteImageCopy = (
+  draftId: string,
+  sourceItemId: string,
+  assetId: string,
+) => unwrapCommand(commands.todoNoteImageCopy(draftId, sourceItemId, assetId));
+export const todoNoteSave = (input: TodoNoteSaveInput) =>
+  unwrapCommand(commands.todoNoteSave(input));
 
 // ---- 导出 / 导入 ----
 export const dataExport = (

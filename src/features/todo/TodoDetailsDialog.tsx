@@ -1,5 +1,8 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useEffect, useState } from "react";
 
+import type { TodoNoteDetails } from "~/bindings";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogClose, DialogTitle } from "~/components/ui/dialog";
@@ -9,8 +12,12 @@ import {
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
-import type { TodoItem } from "~/types";
+import { Spinner } from "~/components/ui/spinner";
+import { describeError, toIpcError } from "~/lib/errors";
+import { todoNoteDetails } from "~/lib/ipc";
+import type { AppError, TodoItem } from "~/types";
 
+import TodoNoteContent from "./notes/TodoNoteContent";
 import TodoTimestamps from "./TodoTimestamps";
 
 export default function TodoDetailsDialog({
@@ -20,10 +27,38 @@ export default function TodoDetailsDialog({
   item: TodoItem | null;
   onClose: () => void;
 }) {
+  const { t } = useLingui();
+  const [attempt, setAttempt] = useState(0);
+  const [state, setState] = useState<{
+    key: string;
+    details: TodoNoteDetails | null;
+    error: AppError | null;
+  }>({ key: "", details: null, error: null });
+  const id = item?.id;
+  const key = JSON.stringify([id, item?.updatedAt, attempt]);
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    void todoNoteDetails(id).then(
+      (details) => {
+        if (active) setState({ key, details, error: null });
+      },
+      (error: unknown) => {
+        if (active)
+          setState({ key, details: null, error: toIpcError(error).payload });
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [id, key]);
+  const details = state.key === key ? state.details : null;
+  const error = state.key === key ? state.error : null;
   return (
     <Dialog open={item !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogLayoutContent
-        className="ui-density-adaptive md:max-w-lg"
+        placement="responsive-page"
+        className="ui-density-adaptive md:max-w-xl"
         aria-describedby={undefined}
         showCloseButton={false}
       >
@@ -49,14 +84,30 @@ export default function TodoDetailsDialog({
                 </h3>
                 <TodoTimestamps item={item} details />
               </div>
-              {item.notes ? (
+              {error ? (
+                <Alert variant="destructive">
+                  <AlertDescription>{describeError(error, t)}</AlertDescription>
+                  <Button
+                    variant="outline"
+                    onClick={() => setAttempt((value) => value + 1)}
+                  >
+                    <Trans>重试</Trans>
+                  </Button>
+                </Alert>
+              ) : !details ? (
+                <div className="flex items-center gap-2 text-sm" role="status">
+                  <Spinner />
+                  <Trans>正在读取备注</Trans>
+                </div>
+              ) : details.document.blocks.length ? (
                 <section className="flex flex-col gap-1.5">
                   <h3 className="text-sm font-medium">
                     <Trans>备注</Trans>
                   </h3>
-                  <p className="text-muted-foreground text-sm wrap-break-word whitespace-pre-wrap">
-                    {item.notes}
-                  </p>
+                  <TodoNoteContent
+                    document={details.document}
+                    itemId={item.id}
+                  />
                 </section>
               ) : null}
             </>

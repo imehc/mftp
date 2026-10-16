@@ -1,18 +1,22 @@
 import { createStore } from "zustand/vanilla";
 
+import type { TodoNoteSaveInput, TodoNoteSummary } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import {
-  todoItemCreate,
   todoItemDelete,
+  todoItemSetCompleted,
   todoItemsList,
-  todoItemUpdate,
+  todoNoteSave,
+  todoNoteSummaries,
 } from "~/lib/ipc";
-import type { AppError, TodoItem, TodoItemInput } from "~/types";
+import type { AppError, TodoItem } from "~/types";
 
 import { sortTodoItems } from "./todo-utils";
 
 interface TodoState {
   items: TodoItem[];
+  summaries: TodoNoteSummary[];
+  summaryError: AppError | null;
   loading: boolean;
   loadError: AppError | null;
   editing: TodoItem | null;
@@ -27,8 +31,9 @@ type WriteResult = { ok: true } | { ok: false; error: AppError } | null;
 
 const defaultApi = {
   list: todoItemsList,
-  create: todoItemCreate,
-  update: todoItemUpdate,
+  save: todoNoteSave,
+  summaries: todoNoteSummaries,
+  setCompleted: todoItemSetCompleted,
   remove: todoItemDelete,
 };
 
@@ -36,6 +41,8 @@ const defaultApi = {
 export function createTodoController(api = defaultApi) {
   const store = createStore<TodoState>(() => ({
     items: [],
+    summaries: [],
+    summaryError: null,
     loading: true,
     loadError: null,
     editing: null,
@@ -58,9 +65,17 @@ export function createTodoController(api = defaultApi) {
     const life = lifetime;
     store.setState({ loading: true, loadError: null });
     try {
-      const items = await api.list();
+      const [items, summaries] = await Promise.all([
+        api.list(),
+        api.summaries(),
+      ]);
       if (active && lifetime === life && readVersion === run)
-        store.setState({ items: sortTodoItems(items), loading: false });
+        store.setState({
+          items: sortTodoItems(items),
+          summaries,
+          summaryError: null,
+          loading: false,
+        });
     } catch (error) {
       if (active && lifetime === life && readVersion === run)
         store.setState({
@@ -139,15 +154,13 @@ export function createTodoController(api = defaultApi) {
     }
   }
 
-  async function submit(input: TodoItemInput) {
+  async function submit(input: TodoNoteSaveInput) {
     const { editing, dialogOpen } = store.getState();
     if (!dialogOpen) return null;
     const version = editorVersion;
     const life = lifetime;
     return write(editing?.id ?? null, true, async () => {
-      const saved = editing
-        ? await api.update(editing.id, input)
-        : await api.create(input);
+      const { item: saved } = await api.save(input);
       if (!active || lifetime !== life) return;
       store.setState((state) => ({
         items: sortTodoItems(
@@ -155,9 +168,18 @@ export function createTodoController(api = defaultApi) {
             ? state.items.map((item) => (item.id === saved.id ? saved : item))
             : [...state.items, saved],
         ),
+        summaries: state.summaries.filter((entry) => entry.itemId !== saved.id),
       }));
       // 关闭后重新打开的草稿，即使目标相同，也属于新的编辑会话。
       if (editorVersion === version) setDialogOpen(false);
+      try {
+        const summaries = await api.summaries();
+        if (active && lifetime === life)
+          store.setState({ summaries, summaryError: null });
+      } catch (error) {
+        if (active && lifetime === life)
+          store.setState({ summaryError: toIpcError(error).payload });
+      }
     });
   }
 
@@ -168,14 +190,7 @@ export function createTodoController(api = defaultApi) {
     if (!current) return null;
     const life = lifetime;
     return write(current.id, false, async () => {
-      const saved = await api.update(current.id, {
-        title: current.title,
-        category: current.category,
-        notes: current.notes,
-        dueDate: current.dueDate,
-        dueAt: current.dueAt,
-        completed: !current.completed,
-      });
+      const saved = await api.setCompleted(current.id, !current.completed);
       if (!active || lifetime !== life) return;
       store.setState((state) => ({
         items: sortTodoItems(
@@ -196,6 +211,9 @@ export function createTodoController(api = defaultApi) {
       if (!active || lifetime !== life) return;
       store.setState((state) => ({
         items: state.items.filter((item) => item.id !== target.id),
+        summaries: state.summaries.filter(
+          (entry) => entry.itemId !== target.id,
+        ),
       }));
       if (deleteVersion === version)
         store.setState({ deleting: null, deleteError: null });

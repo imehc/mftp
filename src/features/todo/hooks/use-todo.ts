@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useStore } from "zustand";
 
+import type { TodoNoteSaveInput } from "~/bindings";
 import { describeError } from "~/lib/errors";
-import type { TodoItem, TodoItemInput } from "~/types";
+import type { TodoItem } from "~/types";
 
 import { createTodoController } from "../todo-controller";
 import {
@@ -51,7 +52,7 @@ export function useTodo() {
     matchesTodoQuery(item, query),
   );
 
-  async function handleSubmit(input: TodoItemInput) {
+  async function handleSubmit(input: TodoNoteSaveInput) {
     const result = await controller.submit(input);
     if (result?.ok)
       toast.success(
@@ -59,7 +60,7 @@ export function useTodo() {
       );
     else if (result)
       toast.error(t`保存待办失败`, {
-        description: describeError(result.error),
+        description: describeError(result.error, t),
       });
   }
 
@@ -67,7 +68,7 @@ export function useTodo() {
     const result = await controller.toggle(item);
     if (result && !result.ok)
       toast.error(t`更新待办失败`, {
-        description: describeError(result.error),
+        description: describeError(result.error, t),
       });
   }
 

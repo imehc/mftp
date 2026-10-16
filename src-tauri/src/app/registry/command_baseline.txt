@@ -119,6 +119,16 @@ common todo_items_list
 common todo_item_create
 common todo_item_update
 common todo_item_delete
+common todo_note_details
+common todo_note_summaries
+common todo_note_draft_begin
+common todo_note_draft_close
+common todo_note_clipboard_read
+common todo_note_image_import
+common todo_note_image_read
+common todo_note_image_copy
+common todo_note_save
+common todo_item_set_completed
 common data_export
 common data_inspect
 common data_import

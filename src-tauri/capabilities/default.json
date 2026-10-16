@@ -7,6 +7,8 @@
   ],
   "permissions": [
     "core:default",
+    "clipboard-manager:allow-read-image",
+    "clipboard-manager:allow-write-image",
     "opener:default",
     "dialog:default",
     "fs:allow-write-file",

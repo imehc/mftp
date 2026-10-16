@@ -87,13 +87,15 @@ impl Storage {
             )?,
             query_bytes(
                 &conn,
-                "SELECT COALESCE(SUM(
+                "SELECT (SELECT COALESCE(SUM(
                             LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(title, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(category, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(notes, '') AS BLOB)) +
                             LENGTH(CAST(COALESCE(due_date, '') AS BLOB))
-                        ), 0) FROM todo_items",
+                        ), 0) FROM todo_items) +
+                        (SELECT COALESCE(SUM(LENGTH(CAST(document AS BLOB))),0) FROM todo_notes) +
+                        (SELECT COALESCE(SUM(LENGTH(data)+LENGTH(thumbnail)),0) FROM todo_note_images)",
             )?,
             query_bytes(
                 &conn,

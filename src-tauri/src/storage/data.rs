@@ -28,7 +28,10 @@ impl Storage {
             AppDataModule::Hosts => {
                 tx.execute("DELETE FROM hosts", [])? + tx.execute("DELETE FROM ssh_keys", [])?
             }
-            AppDataModule::Todo => tx.execute("DELETE FROM todo_items", [])?,
+            AppDataModule::Todo => {
+                tx.execute("DELETE FROM todo_note_drafts", [])?;
+                tx.execute("DELETE FROM todo_items", [])?
+            }
             AppDataModule::ActivityLogs => tx.execute("DELETE FROM activity_logs", [])?,
             AppDataModule::Poetry => {
                 // The entry layer routes poetry clears to its own database;
@@ -85,7 +88,10 @@ impl Storage {
                 "ssh_keys" => tx.execute("DELETE FROM ssh_keys", [])?,
                 "activity_logs" => tx.execute("DELETE FROM activity_logs", [])?,
                 "vault_entries" => tx.execute("DELETE FROM vault_entries", [])?,
-                "todo_items" => tx.execute("DELETE FROM todo_items", [])?,
+                "todo_items" => {
+                    tx.execute("DELETE FROM todo_note_drafts", [])?;
+                    tx.execute("DELETE FROM todo_items", [])?
+                }
                 // Schema versions and retired-source markers describe the
                 // retained database, not user preferences. Clearing them can
                 // replay ALTER TABLE or reimport deleted legacy credentials.

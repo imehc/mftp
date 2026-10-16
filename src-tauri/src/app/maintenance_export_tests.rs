@@ -9,7 +9,7 @@ use crate::modules::bt::{ports::FileAccess, repository::BtRepository, BtManager}
 use crate::modules::game_room::GameRoomManager;
 use crate::modules::lan_transfer::{repository::LanRepository, LanTransferManager};
 use crate::modules::maintenance::export::{data_export, data_import, data_inspect};
-use crate::modules::todo::TodoRepository;
+use crate::modules::todo::{note_service::TodoNoteService, TodoRepository};
 use crate::modules::{poetry::sync::PoetryLibrary, ssh::Manager as SshManager};
 use crate::storage::Storage;
 use crate::{app::services::AppServices, error::AppResult};
@@ -79,6 +79,7 @@ impl Fixture {
             key_repository: crate::modules::keys::KeyRepository::new(storage.clone()),
             vault_repository: crate::modules::vault::VaultRepository::new(storage.clone()),
             todo_repository: crate::modules::todo::TodoRepository::new(storage.clone()),
+            todo_notes: Arc::new(TodoNoteService::new(TodoRepository::new(storage.clone()))),
             game_room: Arc::new(GameRoomManager::new(
                 Arc::new(|_, _| {}),
                 operations.clone(),

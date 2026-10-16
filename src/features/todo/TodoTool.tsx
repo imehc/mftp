@@ -34,15 +34,26 @@ import { describeError } from "~/lib/errors";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import { useTodo } from "./hooks/use-todo";
+import { TodoNoteImages } from "./notes/use-note-image";
 import { ALL_TODO_CATEGORIES, type TodoView } from "./todo-utils";
 import TodoItemDialog from "./TodoItemDialog";
 import TodoList from "./TodoList";
 
 export default function TodoTool() {
+  return (
+    <TodoNoteImages>
+      <TodoWorkspace />
+    </TodoNoteImages>
+  );
+}
+
+function TodoWorkspace() {
   const { t } = useLingui();
   const desktopActions = useDesktopLayout();
   const {
     items,
+    summaries,
+    summaryError,
     loading,
     loadError,
     retry,
@@ -160,12 +171,20 @@ export default function TodoTool() {
         </div>
       </div>
 
+      {summaryError ? (
+        <Alert variant="destructive">
+          <AlertDescription>{describeError(summaryError, t)}</AlertDescription>
+          <Button variant="outline" onClick={retry} disabled={saving}>
+            <Trans>重试</Trans>
+          </Button>
+        </Alert>
+      ) : null}
       {loadError ? (
         <Alert variant="destructive">
           <AlertTitle>
             <Trans>读取待办失败</Trans>
           </AlertTitle>
-          <AlertDescription>{describeError(loadError)}</AlertDescription>
+          <AlertDescription>{describeError(loadError, t)}</AlertDescription>
           <Button
             fullWidth
             variant="outline"
@@ -213,6 +232,7 @@ export default function TodoTool() {
       ) : (
         <TodoList
           items={filteredItems}
+          summaries={summaries}
           pendingIds={pendingIds}
           onToggle={(item) => void handleToggle(item)}
           onEdit={edit}
@@ -244,7 +264,9 @@ export default function TodoTool() {
           </AlertDialogHeader>
           {deleteError ? (
             <Alert variant="destructive">
-              <AlertDescription>{describeError(deleteError)}</AlertDescription>
+              <AlertDescription>
+                {describeError(deleteError, t)}
+              </AlertDescription>
             </Alert>
           ) : null}
           <AlertDialogFooter>

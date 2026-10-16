@@ -24,7 +24,9 @@ export const exportSections: ExportSectionMeta[] = [
   {
     id: "todo",
     title: <Trans>待办</Trans>,
-    description: <Trans>标题、分类、备注、日期和完成状态</Trans>,
+    description: (
+      <Trans>标题、分类、备注文本、图片、代码块、日期和完成状态</Trans>
+    ),
   },
   {
     id: "lan",
