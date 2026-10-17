@@ -65,13 +65,14 @@ tokio = { version = "1", features = ["sync", "time"] }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
 tauri-plugin-clipboard-manager = "2.2.2"
 
-# Desktop-only plugins: updater and autostart have no mobile support.
+# Desktop-only plugins: updater, autostart and window-state have no mobile support.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 arboard = { version = "3.7", default-features = false, features = ["image-data"] }
 tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-autostart = "2.5.1"
 keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native", "sync-secret-service", "crypto-rust"] }
+tauri-plugin-window-state = "2"
 # Library sync uses the GitHub tree/blob API on desktop and mobile. The desktop
 # tar.gz path remains a fallback, so reqwest is a shared direct dependency.
 

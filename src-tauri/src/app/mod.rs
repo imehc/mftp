@@ -60,6 +60,12 @@ pub(crate) fn run() -> AppResult<()> {
         .plugin(tauri_plugin_process::init());
     #[cfg(desktop)]
     let app = app
+        .plugin(
+            tauri_plugin_window_state::Builder::default()
+                .with_state_flags(tauri_plugin_window_state::StateFlags::SIZE)
+                .with_filter(|label| label == "main")
+                .build(),
+        )
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
