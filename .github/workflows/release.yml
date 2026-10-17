@@ -58,9 +58,10 @@ jobs:
             HEADER="Initial release"
           fi
 
+          # 发布说明与 latest.json 保留原始提交，筛选与前缀格式化由客户端展示层处理。
           NOTES="$(git log "$RANGE" --pretty=format:'- %s (%h)' --no-merges)"
           if [ -z "$NOTES" ]; then
-            NOTES="- No code changes since ${PREVIOUS_TAG}."
+            NOTES="- No additional release notes."
           fi
 
           {
@@ -334,7 +335,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate updater manifest
+      - name: Prepare and validate updater manifest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.release-info.outputs.version }}
@@ -346,13 +347,23 @@ jobs:
             --pattern latest.json \
             --dir /tmp/mftp-release \
             --clobber
+          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v${VERSION}" \
+            > /tmp/mftp-release/release.json
 
           node <<'NODE'
           const fs = require("fs");
 
+          const manifestPath = "/tmp/mftp-release/latest.json";
           const manifest = JSON.parse(
-            fs.readFileSync("/tmp/mftp-release/latest.json", "utf8"),
+            fs.readFileSync(manifestPath, "utf8"),
           );
+          const release = JSON.parse(
+            fs.readFileSync("/tmp/mftp-release/release.json", "utf8"),
+          );
+          const version = process.env.VERSION;
+          if (manifest.version !== version || release.tag_name !== `v${version}`) {
+            throw new Error("Updater manifest and release versions do not match");
+          }
           const platforms = manifest.platforms ?? {};
           const platformKeys = Object.keys(platforms);
           const required = [
@@ -396,8 +407,24 @@ jobs:
             process.exit(1);
           }
 
+          // Public updates must not consume GitHub's unauthenticated API quota.
+          // Resolve against this release's assets to preserve the signed artifact.
+          const downloadPrefix = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/`;
+          for (const [key, platform] of Object.entries(platforms)) {
+            const asset = release.assets.find(
+              (asset) => asset.url === platform.url || asset.browser_download_url === platform.url,
+            );
+            if (!asset || asset.size <= 0 || !asset.browser_download_url?.startsWith(downloadPrefix)) {
+              throw new Error(`Updater platform ${key} does not reference an asset in this release`);
+            }
+            platform.url = asset.browser_download_url;
+          }
+
+          fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
           console.log(`Validated updater platforms: ${platformKeys.sort().join(", ")}`);
           NODE
+
+          gh release upload "v${VERSION}" /tmp/mftp-release/latest.json --clobber
 
       - name: Publish draft release
         env:
