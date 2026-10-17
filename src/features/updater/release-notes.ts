@@ -16,20 +16,30 @@ export interface ReleaseNote {
   text: string;
 }
 
-/** 只转换展示格式，远端内容始终作为文本渲染，不执行 HTML 或链接。 */
+/** 整理更新条目，远端内容始终作为文本渲染，不执行 HTML 或链接。 */
 export function parseReleaseNotes(body: string): ReleaseNote[] {
   return body.split(/\r?\n/).flatMap((raw) => {
     const line = raw.trim();
     if (!line) return [];
     const heading = /^#{1,6}\s+/.test(line);
     const item = /^(?:[-*+]\s+|\d+[.)]\s+)/.test(line);
-    const text = line
+    const content = line
       .replace(/^#{1,6}\s+/, "")
       .replace(/^(?:[-*+]\s+|\d+[.)]\s+)/, "")
-      .replace(/^(?:feat|fix|perf)(?:\([^)]*\))?!?:\s*/i, "")
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 ($2)")
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/`([^`]+)`/g, "$1");
+    // 兼容已发布的带类型说明；普通段落中的冒号不作为提交前缀处理。
+    const prefix =
+      /^(feat|fix|perf|refactor|docs|test|build|ci|style|revert|chore)(?:\([^)]*\))?!?:\s*/i.exec(
+        content,
+      );
+    if (
+      prefix &&
+      !["feat", "fix", "refactor", "perf"].includes(prefix[1].toLowerCase())
+    )
+      return [];
+    const text = content.slice(prefix?.[0].length ?? 0);
     return [{ kind: heading ? "heading" : item ? "item" : "paragraph", text }];
   });
 }
