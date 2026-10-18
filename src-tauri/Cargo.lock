@@ -3480,6 +3480,7 @@ dependencies = [
  "png 0.18.1",
  "reqwest",
  "rusqlite",
+ "rustls-platform-verifier",
  "serde",
  "serde_json",
  "sha2 0.11.0",

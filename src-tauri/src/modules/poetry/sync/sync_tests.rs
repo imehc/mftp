@@ -60,3 +60,41 @@ async fn maintenance_and_shutdown_reject_jobs_without_claiming_the_slot() {
     assert!(!library.is_active());
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn panicked_worker_reports_failure_and_allows_a_new_job() {
+    let root = std::env::temp_dir().join(format!("mftp-poetry-panic-{}", uuid::Uuid::new_v4()));
+    let operations = Arc::new(Operations::default());
+    let library = Arc::new(PoetryLibrary::new(root.clone(), operations.clone()));
+    let (sender, receiver) = std::sync::mpsc::channel();
+    library
+        .spawn_job(
+            "poetry-panic-test",
+            "expected worker failure",
+            move |progress| sender.send(progress).unwrap(),
+            |_, _, _| panic!("simulated third-party IO failure"),
+        )
+        .unwrap();
+
+    let failed = receiver.recv_timeout(Duration::from_secs(5)).unwrap();
+    assert_eq!(failed.phase, "error");
+    assert_eq!(failed.error.unwrap().code, "task:panicked");
+    assert!(operations.wait_idle(Duration::from_secs(5)));
+    assert!(!library.is_active());
+
+    let (sender, receiver) = std::sync::mpsc::channel();
+    library
+        .spawn_job(
+            "poetry-recovery-test",
+            "unexpected recovery failure",
+            move |progress| sender.send(progress).unwrap(),
+            |_, _, _| Ok(()),
+        )
+        .unwrap();
+    let recovered = receiver.recv_timeout(Duration::from_secs(5)).unwrap();
+    assert_eq!(recovered.phase, "done");
+    assert!(recovered.error.is_none());
+    assert!(operations.wait_idle(Duration::from_secs(5)));
+    assert!(!library.is_active());
+    let _ = fs::remove_dir_all(root);
+}

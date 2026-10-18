@@ -14,6 +14,7 @@ class MainActivity : TauriActivity() {
   private var multicastLock: WifiManager.MulticastLock? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    NativeTls.initialize(applicationContext)
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     try {

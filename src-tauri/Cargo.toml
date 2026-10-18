@@ -95,6 +95,7 @@ tauri-plugin-native-speech = { path = "plugins/native-speech" }
 tauri-plugin-keystore = "=2.1.0-alpha.2"
 zeroize = "1.9"
 jni = "0.22"
+rustls-platform-verifier = "0.7"
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
 objc2 = "0.6"

@@ -283,7 +283,17 @@ impl PoetryLibrary {
             .name(thread_name.into())
             .spawn(move || {
                 let _lease = lease;
-                let result = job(&library, &progress, &cancelled);
+                // Third-party IO code can panic. Unwind its resources before
+                // releasing admission and always publish a terminal failure.
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    job(&library, &progress, &cancelled)
+                }))
+                .unwrap_or_else(|_| {
+                    Err(AppError::external(
+                        "task:panicked",
+                        "Poetry background task panicked",
+                    ))
+                });
                 library.release_slot();
                 Self::with_terminal_events(progress, result, error_log);
             });

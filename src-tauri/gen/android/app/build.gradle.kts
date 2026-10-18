@@ -1,4 +1,5 @@
 import java.util.Properties
+import groovy.json.JsonSlurper
 
 plugins {
     id("com.android.application")
@@ -20,6 +21,34 @@ val keystoreProperties = Properties().apply {
     }
 }
 val hasReleaseKeystore = keystoreProperties.containsKey("storeFile")
+
+// Cargo selects the matching Kotlin verifier artifact; no machine-specific
+// Cargo cache path or separately maintained Maven version is stored here.
+val rustlsVerifier = providers.exec {
+    workingDir(rootProject.projectDir)
+    commandLine(
+        "cargo", "metadata", "--format-version", "1", "--locked",
+        "--filter-platform", "aarch64-linux-android", "--manifest-path",
+        rootProject.file("../../Cargo.toml").absolutePath,
+    )
+}.standardOutput.asText.map { metadata ->
+    val packages = (JsonSlurper().parseText(metadata) as Map<*, *>)["packages"] as List<*>
+    val verifier = packages.map { it as Map<*, *> }
+        .single { it["name"] == "rustls-platform-verifier-android" }
+    Pair(file(verifier["manifest_path"] as String), verifier["version"] as String)
+}
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url = uri(rustlsVerifier.get().first.parentFile.resolve("maven"))
+                metadataSources { artifact() }
+            }
+        }
+        filter { includeModule("rustls", "rustls-platform-verifier") }
+    }
+}
 
 android {
     compileSdk = 36
@@ -82,6 +111,7 @@ rust {
 }
 
 dependencies {
+    implementation("rustls:rustls-platform-verifier:${rustlsVerifier.get().second}@aar")
     implementation("androidx.webkit:webkit:1.14.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.activity:activity-ktx:1.10.1")

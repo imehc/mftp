@@ -128,6 +128,8 @@ keytool -genkey -v -keystore ~/.keystores/mftp-release.jks \
 
 ## 平台差异
 
+Android 的 HTTPS 使用 `rustls-platform-verifier` 调用系统证书校验。`NativeTls` 在 `MainActivity.onCreate` 调用父类之前加载 Rust 主库并传入应用上下文，确保后台服务启动前完成初始化。Gradle 从 Cargo 锁定的 `rustls-platform-verifier-android` 包定位本地 Maven 组件，ProGuard 保留其 JNI 类；升级该依赖时需同时验证启动、HTTPS 请求和 release 混淆配置。
+
 Android 端与桌面端的功能差异（代码中已处理，无需手动关注）：
 
 - **更新器（updater）与开机自启（autostart）** 仅桌面可用：
