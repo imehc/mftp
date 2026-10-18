@@ -6,6 +6,7 @@ pub(crate) mod diagnostics;
 pub(crate) mod bt;
 
 pub(crate) mod poetry;
+pub(crate) mod speech;
 
 pub(crate) mod ssh;
 

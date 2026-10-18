@@ -3,8 +3,8 @@
 #[cfg(any(desktop, target_os = "android"))]
 use crate::modules::bt;
 use crate::modules::{
-    ai, diagnostics, game_room, hosts, keys, lan_transfer, maintenance, model_viewer, poetry, ssh,
-    todo, vault,
+    ai, diagnostics, game_room, hosts, keys, lan_transfer, maintenance, model_viewer, poetry,
+    speech, ssh, todo, vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -35,6 +35,10 @@ macro_rules! common_modules {
     ($($platform:tt)*) => {
         define_registry! {
             "core" => { commands: [], types: [error::CustomErrorCode] },
+            "speech" => {
+                commands: [speech::commands::speech_catalog, speech::commands::speech_snapshot, speech::commands::speech_start, speech::commands::speech_control, speech::commands::speech_stop],
+                types: [speech::model::SpeechSnapshot],
+            },
             "diagnostics" => { commands: [diagnostics::diagnostics_snapshot, diagnostics::diagnostics_clear], types: [] },
             "model_viewer" => {
                 commands: [

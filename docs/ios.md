@@ -75,6 +75,7 @@ pnpm tauri ios dev --open
   自动发现基本不可用。Info.plist 中的 `NSLocalNetworkUsageDescription` + `NSBonjourServices`
   保留,dev 模式连 Mac 上的 vite dev server 仍需要本地网络授权。
 - iOS 应用数据目录为沙盒私有目录,`fs:scope` 中的 `$HOME` 等桌面路径不适用(与 Android 相同)。
+- **古诗词系统朗读**与 macOS 共用 Apple `AVSpeechSynthesizer` adapter，音色来自设备安装的系统语音，使用真实 UTF-16 范围回调驱动逐行高亮。合成器在主线程创建、控制和释放；iOS 由合成器管理自身音频会话，不修改应用共用音频类别。切后台或发生音频中断时停止当前会话，回到前台不自动播放；不需要麦克风权限，不保证能使用 Siri 专用音色。
 
 ## 常见问题
 

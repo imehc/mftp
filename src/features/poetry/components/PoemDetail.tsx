@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { BookOpen, LoaderCircle, Music } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import type { PoetryTranslationMode } from "~/bindings";
 import { Badge } from "~/components/ui/badge";
@@ -16,11 +16,15 @@ import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
 
+import { usePoetrySpeech } from "../hooks/use-poetry-speech";
+import { usePoetrySpeechFollow } from "../hooks/use-poetry-speech-follow";
+import { createSpeechDocument } from "../speech-document";
 import {
   AnnotationSection,
   AuthorBioSheet,
   CollapsibleStrains,
 } from "./PoemAnnotations";
+import PoetrySpeech from "./PoetrySpeech";
 import PoetryTranslationSection from "./PoetryTranslationSection";
 import ReadingControlsDesktop from "./ReadingControls.desktop";
 import ReadingControlsMobile from "./ReadingControls.mobile";
@@ -55,10 +59,23 @@ export default function PoemDetail({
     initialTranslationMode ? "translation" : "original",
   );
   const [bio, setBio] = useState<AuthorBio | null>(null);
+  const [speechSettingsOpen, setSpeechSettingsOpen] = useState(false);
+  const readingRoot = useRef<HTMLElement>(null);
+  const readingViewport = useRef<HTMLDivElement>(null);
+  const speechText = createSpeechDocument(loading ? null : detail);
+  const speech = usePoetrySpeech(loading ? null : (detail?.uid ?? null));
+  usePoetrySpeechFollow(
+    readingRoot,
+    readingViewport,
+    speechText,
+    speech.snapshot,
+    speechSettingsOpen || Boolean(bio) || (narrow && view !== "original"),
+  );
   const [prevUid, setPrevUid] = useState(detail?.uid);
   if (prevUid !== detail?.uid) {
     setPrevUid(detail?.uid);
     setBio(null);
+    setSpeechSettingsOpen(false);
     setView(initialTranslationMode ? "translation" : "original");
   }
   if (loading)
@@ -102,25 +119,49 @@ export default function PoemDetail({
           settingsInHeader={settingsInHeader}
         />
       ) : null}
-      <div className="app-scroll-safe-end min-h-0 flex-1 overflow-y-auto px-4 md:px-6">
-        <article className="mx-auto flex w-full max-w-prose flex-col gap-6 py-8 md:py-10">
+      <div
+        ref={readingViewport}
+        className="app-scroll-safe-end relative min-h-0 flex-1 overflow-y-auto px-4 md:px-6"
+      >
+        <article
+          ref={readingRoot}
+          className="mx-auto flex w-full max-w-prose flex-col gap-6 py-8 md:py-10"
+        >
           <header className="font-poetry flex flex-col items-center gap-3 text-center">
-            <span
-              id={originalLabelId}
-              className="text-muted-foreground text-xs"
+            <div className="flex w-full flex-wrap items-center justify-between gap-2">
+              <span
+                id={originalLabelId}
+                className="text-muted-foreground text-xs"
+              >
+                {!narrow || view === "original" ? (
+                  <Trans>原文</Trans>
+                ) : (
+                  <Trans>译文</Trans>
+                )}
+              </span>
+              <PoetrySpeech
+                key={detail.uid}
+                speech={speech}
+                text={speechText}
+                onSettingsOpenChange={setSpeechSettingsOpen}
+              />
+            </div>
+            <h2
+              data-poetry-speech="title"
+              className="text-2xl font-semibold tracking-wide wrap-break-word"
             >
-              {!narrow || view === "original" ? (
-                <Trans>原文</Trans>
-              ) : (
-                <Trans>译文</Trans>
-              )}
-            </span>
-            <h2 className="text-2xl font-semibold tracking-wide wrap-break-word">
               {detail.title}
             </h2>
             <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
+              {detail.dynasty ? (
+                <>
+                  <span data-poetry-speech="dynasty">{detail.dynasty}</span>
+                  <span aria-hidden>·</span>
+                </>
+              ) : null}
               {detail.authorBio?.desc ? (
                 <button
+                  data-poetry-speech="author"
                   type="button"
                   className="hover:underline"
                   onClick={() => setBio(detail.authorBio ?? null)}
@@ -128,9 +169,8 @@ export default function PoemDetail({
                   {detail.author}
                 </button>
               ) : (
-                <span>{detail.author}</span>
+                <span data-poetry-speech="author">{detail.author}</span>
               )}
-              {detail.dynasty ? <span>· {detail.dynasty}</span> : null}
               {detail.rhythmic ? (
                 <Badge variant="outline">
                   <Music aria-hidden />
@@ -159,7 +199,9 @@ export default function PoemDetail({
               style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
             >
               {detail.body.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+                <p key={index} data-poetry-speech={`body-${index}`}>
+                  {paragraph}
+                </p>
               ))}
             </div>
             <div className="mt-6 flex flex-col gap-4">

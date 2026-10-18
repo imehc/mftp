@@ -4,6 +4,12 @@ import { msg } from "@lingui/core/macro";
 import type { CustomErrorCode } from "~/bindings";
 
 export const customErrorMessages = {
+  "speech:unavailable": msg`当前平台暂不支持系统朗读`,
+  "speech:input_invalid": msg`朗读内容过长或参数无效`,
+  "speech:voice_missing": msg`未找到可用的中文音色，请在系统设置中下载中文语音后重试`,
+  "speech:busy": msg`朗读操作尚未完成，请稍后重试`,
+  "speech:control_failed": msg`系统未能调整朗读状态，请重试`,
+  "speech:start_failed": msg`系统朗读未能开始，请换一个音色或检查中文语音是否已下载`,
   "model:source_invalid": msg`请选择有效的 GLB、glTF 或 FBX 模型文件`,
   "model:library_invalid": msg({
     message: "模型库数据无效或已达到容量限制",

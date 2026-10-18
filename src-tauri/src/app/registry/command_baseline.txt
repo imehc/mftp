@@ -1,4 +1,9 @@
 # Pre-modularity IPC names; intentional additions must update this baseline.
+common speech_catalog
+common speech_snapshot
+common speech_start
+common speech_control
+common speech_stop
 common diagnostics_snapshot
 common diagnostics_clear
 common model_system_poll

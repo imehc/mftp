@@ -1,0 +1,10 @@
+.tauri/
+android/.tauri/
+android/build/
+android/.gradle/
+android/.cxx/
+android/.externalNativeBuild/
+android/local.properties
+permissions/schemas/
+target/
+/Cargo.lock

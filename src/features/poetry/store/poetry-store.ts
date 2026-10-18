@@ -24,6 +24,10 @@ interface PoetryState {
   /** 详情面板的阅读偏好。 */
   fontSize: number;
   lineHeight: number;
+  speechVoiceId: string | null;
+  speechRate: number;
+  setSpeechVoiceId: (id: string) => void;
+  setSpeechRate: (rate: number) => void;
   setFontSize: (size: number) => void;
   setLineHeight: (height: number) => void;
 }
@@ -67,6 +71,10 @@ export const usePoetryStore = create<PoetryState>()(
 
       fontSize: 17,
       lineHeight: 1.9,
+      speechVoiceId: null,
+      speechRate: 0.9,
+      setSpeechVoiceId: (speechVoiceId) => set({ speechVoiceId }),
+      setSpeechRate: (speechRate) => set({ speechRate }),
       setFontSize: (fontSize) => set({ fontSize }),
       setLineHeight: (lineHeight) => set({ lineHeight }),
     }),
@@ -80,6 +88,8 @@ export const usePoetryStore = create<PoetryState>()(
         searchHistory: state.searchHistory,
         fontSize: state.fontSize,
         lineHeight: state.lineHeight,
+        speechVoiceId: state.speechVoiceId,
+        speechRate: state.speechRate,
       }),
     },
   ),

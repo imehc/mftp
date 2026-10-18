@@ -42,6 +42,7 @@ pub struct AppServices {
     pub(crate) todo_notes: Arc<crate::modules::todo::note_service::TodoNoteService>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<PoetryLibrary>,
+    pub(crate) speech: Arc<crate::modules::speech::SpeechService>,
     #[cfg(any(desktop, target_os = "android"))]
     pub bt: Arc<crate::modules::bt::BtManager>,
     pub(crate) executor: Executor,
@@ -155,6 +156,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         lan_transfer,
         game_room,
         poetry,
+        speech: Arc::new(crate::modules::speech::SpeechService::default()),
         ai_tasks: Arc::new(AiTaskManager::new(operations)),
         #[cfg(any(desktop, target_os = "android"))]
         bt,

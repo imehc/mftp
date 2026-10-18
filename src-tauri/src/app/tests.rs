@@ -197,6 +197,7 @@ fn export_cleanup_can_drain_while_new_operations_are_rejected() {
             "model_export_cancel",
             "model_export_close",
             "model_environment_abort",
+            "speech_stop",
         ] {
             assert!(get_ipc_response(&webview, request(cmd)).is_ok());
         }
@@ -206,6 +207,8 @@ fn export_cleanup_can_drain_while_new_operations_are_rejected() {
             "model_export_present",
             "model_environment_begin",
             "model_environment_clear",
+            "speech_start",
+            "speech_control",
         ] {
             assert!(get_ipc_response(&webview, request(cmd)).is_err());
         }

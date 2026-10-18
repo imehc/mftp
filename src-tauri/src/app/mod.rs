@@ -72,13 +72,17 @@ pub(crate) fn run() -> AppResult<()> {
         ))
         .plugin(tauri_plugin_updater::Builder::new().build());
     #[cfg(target_os = "android")]
-    let app = app.plugin(tauri_plugin_keystore::init());
+    let app = app
+        .plugin(tauri_plugin_keystore::init())
+        .plugin(tauri_plugin_native_speech::init());
 
     let app = app
         .setup(|app| {
             let services = services::install(app.handle())?;
             app.manage(services.lifecycle.clone());
             app.manage(services);
+            #[cfg(target_os = "android")]
+            crate::adapters::speech::install(app.handle());
             #[cfg(desktop)]
             if let Ok(cwd) = std::env::current_dir() {
                 crate::modules::model_viewer::system::enqueue_arguments(
@@ -108,6 +112,7 @@ fn guard_commands<R: tauri::Runtime>(
                 | "model_export_close"
                 | "model_environment_abort"
                 | "diagnostics_clear"
+                | "speech_stop"
         ) {
             return commands(invoke);
         }
@@ -140,12 +145,18 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
     state.ai_credentials.on_run_event(&event);
     match event {
         tauri::RunEvent::WindowEvent {
+            label,
+            event: tauri::WindowEvent::Focused(false),
+            ..
+        } if label == "main" => crate::adapters::speech::stop_all(app, &state.speech),
+        tauri::RunEvent::WindowEvent {
             event: tauri::WindowEvent::Destroyed,
             ..
         } => {
             // The activity panel is memory-only and global; a destroyed window
             // takes its last records with it.
             state.diagnostics.clear();
+            crate::adapters::speech::stop_all(app, &state.speech);
         }
         #[cfg(any(target_os = "macos", target_os = "ios"))]
         tauri::RunEvent::Opened { urls } => {
@@ -154,6 +165,7 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
             }
         }
         tauri::RunEvent::ExitRequested { api, code, .. } => {
+            crate::adapters::speech::stop_all(app, &state.speech);
             if state.lifecycle.is_finished() {
                 return;
             }
@@ -163,7 +175,10 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
             let resume_exit = (code != Some(tauri::RESTART_EXIT_CODE)).then_some(code.unwrap_or(0));
             shutdown(app, &state.lifecycle, resume_exit);
         }
-        tauri::RunEvent::Exit => shutdown(app, &state.lifecycle, None),
+        tauri::RunEvent::Exit => {
+            crate::adapters::speech::stop_all(app, &state.speech);
+            shutdown(app, &state.lifecycle, None);
+        }
         _ => {}
     }
 }

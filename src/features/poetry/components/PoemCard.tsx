@@ -45,7 +45,7 @@ function PoemCard({ poem, query, active, onSelect }: PoemCardProps) {
         className="text-muted-foreground block max-w-full truncate text-xs"
         title={poem.collectionName}
       >
-        {[poem.author, poem.dynasty].filter(Boolean).join(" · ")}
+        {[poem.dynasty, poem.author].filter(Boolean).join(" · ")}
       </span>
       <p className="text-muted-foreground line-clamp-1 text-xs leading-relaxed">
         <Highlight text={poem.excerpt} query={query} />

@@ -1,0 +1,16 @@
+::highlight(poetry-speaking) {
+  color: var(--primary);
+  background-color: color-mix(in oklch, var(--primary) 14%, transparent);
+}
+
+.poetry-speech-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.poetry-speech-line {
+  position: absolute;
+  border-radius: 0.25rem;
+  background-color: color-mix(in oklch, var(--primary) 14%, transparent);
+}

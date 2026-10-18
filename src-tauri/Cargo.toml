@@ -59,9 +59,9 @@ url = { version = "2", default-features = false }
 reqwest = { version = "0.13", default-features = false, features = ["blocking", "gzip", "rustls", "stream"] }
 eventsource-stream = "0.2.3"
 futures-util = "0.3"
-# Shared maintenance uses notifications/deadlines on Tauri's existing runtime;
+# Shared maintenance/AI use notifications, deadlines and select! on Tauri's runtime;
 # BT-specific networking and file IO features remain platform-scoped below.
-tokio = { version = "1", features = ["sync", "time"] }
+tokio = { version = "1", features = ["macros", "sync", "time"] }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
 tauri-plugin-clipboard-manager = "2.2.2"
 
@@ -87,8 +87,16 @@ mime_guess = "2"
 
 [target.'cfg(target_os = "ios")'.dependencies]
 keyring = { version = "3", default-features = false, features = ["apple-native"] }
+objc2-avf-audio = { version = "0.3", default-features = false, features = ["AVAudioSessionTypes"] }
+objc2-ui-kit = { version = "0.3", default-features = false, features = ["std", "UIApplication"] }
 
 [target.'cfg(target_os = "android")'.dependencies]
+tauri-plugin-native-speech = { path = "plugins/native-speech" }
 tauri-plugin-keystore = "=2.1.0-alpha.2"
 zeroize = "1.9"
 jni = "0.22"
+
+[target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
+objc2 = "0.6"
+objc2-avf-audio = { version = "0.3", default-features = false, features = ["std", "AVSpeechSynthesis"] }
+objc2-foundation = "0.3"

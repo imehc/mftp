@@ -84,6 +84,7 @@ impl Fixture {
                 Arc::new(|_, _| {}),
                 operations.clone(),
             )),
+            speech: Arc::new(crate::modules::speech::SpeechService::default()),
             poetry: Arc::new(PoetryLibrary::new(root.clone(), operations.clone())),
             bt: Arc::new(BtManager::new(
                 BtRepository::new(storage.clone()),
@@ -595,6 +596,5 @@ fn moved_room_handlers_keep_ipc_arguments_and_error_payloads() {
         .unwrap()
         .is_empty());
 }
-
 #[path = "ai_management_ipc_tests.rs"]
 mod ai_management;
