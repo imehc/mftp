@@ -13,6 +13,7 @@ export default function BottomNavigationMobile({
   const { t } = useLingui();
   return (
     <nav
+      data-slot="bottom-navigation"
       aria-label={t`应用主导航`}
       className="border-border bg-background flex shrink-0 gap-1 border-t px-2 pt-1.5 pb-[calc(0.375rem+var(--safe-bottom,0px))]"
     >

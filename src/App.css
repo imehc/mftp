@@ -479,3 +479,7 @@
   padding-bottom: 0.75rem;
   scroll-padding-bottom: 0.75rem;
 }
+
+:root[data-ime-visible="true"] [data-slot="bottom-navigation"] {
+  display: none;
+}

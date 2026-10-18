@@ -61,6 +61,7 @@ class WebViewInsets(
     val density = activity.resources.displayMetrics.density
     fun dp(px: Int) = px / density
     script = "(()=>{const r=document.documentElement;if(!r)return;" +
+      "r.dataset.imeVisible='$keyboardVisible';" +
       "r.style.setProperty('--safe-top','${dp(bars.top)}px');" +
       "r.style.setProperty('--safe-bottom','${dp(if (keyboardVisible) 0 else bottomInset)}px');" +
       "r.style.setProperty('--safe-left','${dp(bars.left)}px');" +
