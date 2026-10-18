@@ -87,7 +87,7 @@ export default function LibraryPage({
   onOpenPoem,
 }: LibraryPageProps) {
   const { t } = useLingui();
-  // 同一个 controller 和列表槽位跨断点存活，保留搜索草稿和滚动状态。
+  // 共用 controller 保留搜索草稿；列表重新挂载时恢复已保存的滚动位置。
   const narrow = !useDesktopLayout();
   const toggleCollection = usePoetryStore((s) => s.toggleCollection);
   const clearCollectionFilter = usePoetryStore((s) => s.clearCollectionFilter);
@@ -216,7 +216,7 @@ export default function LibraryPage({
     />
   );
   const listPane = (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {collectionsError ? (
         <PoetryReadError error={collectionsError} onRetry={retryCollections} />
       ) : searchError && isSearching ? (
@@ -305,30 +305,10 @@ export default function LibraryPage({
         }
       />
       {searchToolbar}
-      <Group
-        orientation={narrow ? "vertical" : "horizontal"}
-        className="min-h-0 flex-1 overflow-hidden"
-      >
-        <Panel
-          id="library-list"
-          defaultSize="30"
-          minSize="20"
-          className={narrow && search.poem ? "hidden" : ""}
-        >
-          {listPane}
-        </Panel>
-        <Separator
-          className={narrow ? "hidden" : "bg-border w-px shrink-0"}
-          aria-label={t`调整双栏宽度`}
-        />
-        <Panel
-          id="library-detail"
-          defaultSize="70"
-          minSize="40"
-          className={narrow && !search.poem ? "hidden" : ""}
-        >
-          <div className="flex h-full min-h-0 flex-col">
-            {narrow ? (
+      {narrow ? (
+        <div className="min-h-0 flex-1 overflow-hidden">
+          {search.poem ? (
+            <div className="flex h-full min-h-0 flex-col">
               <div className="flex shrink-0 items-center border-b px-2 py-1">
                 <Button
                   variant="ghost"
@@ -340,11 +320,29 @@ export default function LibraryPage({
                   <Trans>返回列表</Trans>
                 </Button>
               </div>
-            ) : null}
-            <div className="min-h-0 flex-1">{detailPane}</div>
-          </div>
-        </Panel>
-      </Group>
+              <div className="min-h-0 flex-1">{detailPane}</div>
+            </div>
+          ) : (
+            listPane
+          )}
+        </div>
+      ) : (
+        <Group
+          orientation="horizontal"
+          className="min-h-0 flex-1 overflow-hidden"
+        >
+          <Panel id="library-list" defaultSize="30" minSize="20">
+            {listPane}
+          </Panel>
+          <Separator
+            className="bg-border w-px shrink-0"
+            aria-label={t`调整双栏宽度`}
+          />
+          <Panel id="library-detail" defaultSize="70" minSize="40">
+            {detailPane}
+          </Panel>
+        </Group>
+      )}
     </main>
   );
 }
