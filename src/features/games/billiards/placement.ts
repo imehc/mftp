@@ -1,10 +1,10 @@
+import { insidePlayArea, overlapsAnyBall } from "./ball-geometry";
 import {
   AMERICAN_NINE,
   CHINESE_EIGHT,
   SNOOKER,
   type TableEquipment,
 } from "./equipment";
-import { insidePlayArea, overlapsAnyBall } from "./physics";
 import { insideD } from "./snooker-equipment";
 import type { BallState, BilliardsState } from "./types";
 

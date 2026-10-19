@@ -24,6 +24,8 @@ export interface LocalGameSession<State, Move, Presentation> {
   restored?: boolean;
   runner: MatchRunner<State, Move, Presentation>;
   local: LocalController<State, Move>;
+  /** 需要异步准备对局资源（如物理引擎）的实现提供该钩子；失败后可重试。 */
+  ready?(): Promise<void>;
   dispose?(): void;
 }
 

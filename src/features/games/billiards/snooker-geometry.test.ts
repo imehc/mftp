@@ -2,8 +2,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { createBilliardsAiStrategy } from "./ai";
 import { ballDefinition } from "./ball-definitions";
+import { insidePlayArea } from "./ball-geometry";
 import { SNOOKER } from "./equipment";
-import { ensurePhysicsReady, insidePlayArea, simulateShot } from "./physics";
+import { ensurePhysicsReady, simulateShot } from "./physics";
 import { legalCuePlacement } from "./placement";
 import { defaultAim } from "./render/default-aim";
 import { createSnookerState, reduceSnookerShot } from "./snooker";
@@ -234,7 +235,7 @@ describe("斯诺克真实物理与AI接入", () => {
       const initial = createSnookerState(reds);
       const aim = defaultAim(initial, SNOOKER);
       expect(aim?.targetId).toBeGreaterThanOrEqual(8);
-      const ai = createBilliardsAiStrategy(undefined, SNOOKER);
+      const ai = createBilliardsAiStrategy(simulateShot, SNOOKER);
       const move = await ai.chooseMove(
         initial,
         0,
@@ -254,7 +255,7 @@ describe("斯诺克真实物理与AI接入", () => {
   );
 
   it("AI先完成选彩、漏击警告和D区放置，不在决策中出杆", async () => {
-    const ai = createBilliardsAiStrategy(undefined, SNOOKER);
+    const ai = createBilliardsAiStrategy(simulateShot, SNOOKER);
     const signal = new AbortController().signal;
     const initial = {
       ...createSnookerState(6),

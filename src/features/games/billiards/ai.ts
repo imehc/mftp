@@ -20,7 +20,6 @@ import {
   type TableEquipment,
 } from "./equipment";
 import { reduceNineBallShot } from "./nine-ball";
-import { simulateShot } from "./physics";
 import { legalCuePlacement } from "./placement";
 import { defaultAim } from "./render/default-aim";
 import type { ShotSimulator } from "./simulation-client";
@@ -225,11 +224,9 @@ function chooseCuePlacement(
 }
 
 export function createBilliardsAiStrategy(
-  simulate: ShotSimulator | undefined = undefined,
+  simulate: ShotSimulator,
   equipment: TableEquipment = CHINESE_EIGHT,
 ): AiStrategy<BilliardsState, BilliardsMove> {
-  const simulateForTable: ShotSimulator =
-    simulate ?? ((balls, shot) => simulateShot(balls, shot, false, equipment));
   return {
     async chooseMove(state, seat, difficulty, signal) {
       throwIfAborted(signal);
@@ -362,7 +359,7 @@ export function createBilliardsAiStrategy(
           ),
           followDraw: 0,
         };
-        const sim = await simulateForTable(state.balls, move);
+        const sim = await simulate(state.balls, move);
         throwIfAborted(signal);
 
         let score = 0;

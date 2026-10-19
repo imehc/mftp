@@ -8,7 +8,6 @@
   "lazyChunks": [
     "vendor-three",
     "vendor-pixi",
-    "vendor-physics",
     "vendor-media",
     "vendor-xterm",
     "vendor-codemirror",

@@ -12,6 +12,7 @@ import type {
   MoveResolution,
   SeatIndex,
 } from "../engine/types";
+import { insidePlayArea, overlapsAnyBall } from "./ball-geometry";
 import { BALL_RADIUS, FOOT_SPOT_X, HEAD_SPOT_X } from "./constants";
 import {
   applyNineBallAction,
@@ -19,7 +20,6 @@ import {
   reduceNineBallShot,
   validateNineShot,
 } from "./nine-ball";
-import { insidePlayArea, overlapsAnyBall, simulateShot } from "./physics";
 import { equipmentForState, nearestLineSpot } from "./placement";
 import { createNineBallRack } from "./racks";
 import type { ShotSimulator } from "./simulation-client";
@@ -354,7 +354,7 @@ async function applyEightBallShot(
 
 export function createBilliardsGame(
   variant: BilliardsVariant,
-  simulate?: ShotSimulator,
+  simulate: ShotSimulator,
 ): GameDefinition<BilliardsState, BilliardsMove, BilliardsPresentation> {
   return {
     id: `billiards-${variant}`,
@@ -370,10 +370,6 @@ export function createBilliardsGame(
     winnerSeat: (state) => state.winnerSeat,
     isFinished: (state) => state.finished,
     applyMove: async (state, move, seat) => {
-      const simulateForState: ShotSimulator =
-        simulate ??
-        ((balls, shot) =>
-          simulateShot(balls, shot, false, equipmentForState(state)));
       if (state.finished) throw new Error("billiards: match already finished");
       if (
         seat !==
@@ -394,7 +390,7 @@ export function createBilliardsGame(
           };
         }
         validateSnookerShot(state, move);
-        const sim = await simulateForState(state.balls, move);
+        const sim = await simulate(state.balls, move);
         return {
           state: reduceSnookerShot(state, sim, move),
           presentation: { frames: sim.frames, events: sim.events },
@@ -409,7 +405,7 @@ export function createBilliardsGame(
           };
         }
         validateNineShot(state, move);
-        const sim = await simulateForState(state.balls, move);
+        const sim = await simulate(state.balls, move);
         return {
           state: reduceNineBallShot(state, sim, move.pushOut),
           presentation: { frames: sim.frames, events: sim.events },
@@ -422,8 +418,8 @@ export function createBilliardsGame(
         throw new Error("billiards: place the cue ball first");
       }
       return state.variant === "practice"
-        ? applyPracticeShot(state, move, simulateForState)
-        : applyEightBallShot(state, move, seat, simulateForState);
+        ? applyPracticeShot(state, move, simulate)
+        : applyEightBallShot(state, move, seat, simulate);
     },
   };
 }

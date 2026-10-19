@@ -1,13 +1,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { insidePlayArea, overlapsAnyBall } from "../ball-geometry";
 import { BALL_RADIUS, TABLE_H, TABLE_W } from "../constants";
 import { SNOOKER } from "../equipment";
-import {
-  ensurePhysicsReady,
-  insidePlayArea,
-  overlapsAnyBall,
-  simulateShot,
-} from "../physics";
+import { ensurePhysicsReady, simulateShot } from "../physics";
 import { createInitialState } from "../rules";
 import { createSnookerState } from "../snooker";
 import { targetBallIds } from "../targets";

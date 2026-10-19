@@ -396,31 +396,3 @@ export function simulateShot(
     world.free();
   }
 }
-
-export function overlapsAnyBall(
-  balls: readonly BallState[],
-  x: number,
-  y: number,
-  ignoreId?: number,
-  equipment: TableEquipment = CHINESE_EIGHT,
-): boolean {
-  return balls.some(
-    (b) =>
-      !b.potted &&
-      b.id !== ignoreId &&
-      Math.hypot(b.x - x, b.y - y) < equipment.ballRadius * 2 + 0.0001,
-  );
-}
-
-export function insidePlayArea(
-  x: number,
-  y: number,
-  equipment: TableEquipment = CHINESE_EIGHT,
-): boolean {
-  return (
-    Number.isFinite(x) &&
-    Number.isFinite(y) &&
-    Math.abs(x) <= equipment.tableWidth / 2 - equipment.ballRadius &&
-    Math.abs(y) <= equipment.tableHeight / 2 - equipment.ballRadius
-  );
-}

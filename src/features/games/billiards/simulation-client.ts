@@ -17,6 +17,12 @@ export interface SimulationRequest {
   shot: ShotParams;
 }
 
+/** ready 只等物理引擎初始化，不带球位与击球参数；失败后可重试。 */
+export interface SimulationReadyRequest {
+  id: number;
+  kind: "ready";
+}
+
 export type SimulationResponse =
   | { id: number; result: ShotSimResult | AimGuide | null }
   | { id: number; error: string };
@@ -84,6 +90,28 @@ export function createSimulationClient(
       }
     });
   return {
+    ready: () =>
+      new Promise<void>((resolve, reject) => {
+        if (disposed) {
+          reject(new DOMException("Disposed", "AbortError"));
+          return;
+        }
+        const id = nextId++;
+        pending.set(id, { resolve: () => resolve(), reject });
+        try {
+          worker.postMessage({
+            id,
+            kind: "ready",
+          } satisfies SimulationReadyRequest);
+        } catch (error) {
+          pending.delete(id);
+          reject(
+            error instanceof Error
+              ? error
+              : new Error("billiards: simulation request failed"),
+          );
+        }
+      }),
     shot: (balls: readonly BallState[], shot: ShotParams) =>
       request("shot", balls, shot) as Promise<ShotSimResult>,
     preview: (balls: readonly BallState[], shot: ShotParams) =>

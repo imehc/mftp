@@ -22,7 +22,6 @@ import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
 import { BilliardsRulesDialog } from "./BilliardsRulesDialog";
 import { BilliardsToaster } from "./BilliardsToaster";
-import { ensurePhysicsReady } from "./physics";
 import {
   prepareBilliardsAudio,
   setGameAudioVolume,
@@ -60,8 +59,12 @@ export default function BilliardsGame() {
     setGameAudioVolume(gamesVolume);
   }, [gamesVolume]);
   useEffect(() => {
+    if (mode === null) return;
     let cancelled = false;
-    void Promise.all([ensurePhysicsReady(), prepareBilliardsAudio()])
+    // 物理引擎只在模拟 worker 内初始化：先建会话，再等 worker 就绪；
+    // 主线程不再加载 rapier，失败时重试会重新向 worker 请求初始化。
+    const session = billiardsSessions.ensureSession();
+    void Promise.all([session?.ready?.(), prepareBilliardsAudio()])
       .then(() => {
         if (!cancelled) setPhysicsReady(true);
       })
@@ -71,8 +74,10 @@ export default function BilliardsGame() {
     return () => {
       cancelled = true;
     };
-  }, [attempt]);
+  }, [mode, attempt]);
   const rotate = useBilliardsOrientation(mode !== null, landscape);
+  // 只有进入对局才需要等引擎；未选模式时直接显示模式菜单。
+  const loading = !physicsReady && mode !== null;
   const headerProps = {
     active: mode !== null,
     finished: matchFinished,
@@ -89,7 +94,7 @@ export default function BilliardsGame() {
         data-landscape={landscape && mode !== null}
         className="billiards-game ui-density-adaptive bg-background text-foreground flex min-h-0 flex-1 flex-col overflow-hidden"
       >
-        {!physicsReady || mode === null ? (
+        {loading || mode === null ? (
           <>
             <BilliardsHeader
               {...headerProps}
@@ -105,7 +110,7 @@ export default function BilliardsGame() {
             />
           </>
         ) : null}
-        {!physicsReady ? (
+        {loading ? (
           <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
             {physicsError ? (
               <div className="flex flex-col items-center gap-3">

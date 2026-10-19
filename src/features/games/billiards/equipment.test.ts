@@ -1,8 +1,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { insidePlayArea } from "./ball-geometry";
 import { AMERICAN_NINE, CHINESE_EIGHT, EQUIPMENT, SNOOKER } from "./equipment";
 import { cushionSegments } from "./geometry";
-import { ensurePhysicsReady, insidePlayArea, simulateShot } from "./physics";
+import { ensurePhysicsReady, simulateShot } from "./physics";
 import {
   getPocketGeometries,
   pocketAt,

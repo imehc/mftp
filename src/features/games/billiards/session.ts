@@ -77,7 +77,12 @@ export const billiardsSessions = new GameSessionStore<
         hooks,
         checkpoint,
       );
-      return { runner, local, dispose: () => simulation.dispose() };
+      return {
+        runner,
+        local,
+        ready: simulation.ready,
+        dispose: () => simulation.dispose(),
+      };
     } catch (error) {
       simulation.dispose();
       throw error;
