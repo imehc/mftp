@@ -108,6 +108,11 @@ if (
 ) {
   try {
     const args = prepareTauriArgs(process.argv.slice(2));
+    if (args.some((arg) => arg === "dev" || arg === "build")) {
+      const { prepareTranslationEngine } =
+        await import("./prepare-translation-engine.mjs");
+      await prepareTranslationEngine();
+    }
     const { run } = await import("@tauri-apps/cli");
     await run(args, "pnpm tauri");
   } catch (error) {

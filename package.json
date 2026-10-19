@@ -22,6 +22,7 @@
     "platform:artifact": "node tests/checks/check-platform-artifact.mjs",
     "android:plugins:check": "node tests/checks/check-android-plugins.mjs",
     "routes:generate": "node scripts/generate-routes.mjs",
+    "translation:prepare": "node scripts/prepare-translation-engine.mjs",
     "bindings:generate": "cargo test --manifest-path src-tauri/Cargo.toml --locked --lib export_typescript_bindings",
     "version:check": "node scripts/version.mjs check",
     "version:bump": "node scripts/version.mjs bump",
