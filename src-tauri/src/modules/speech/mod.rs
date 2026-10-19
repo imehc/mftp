@@ -4,11 +4,18 @@ pub mod commands;
 pub mod model;
 
 use parking_lot::Mutex;
+
+#[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
 use tauri::Emitter;
 
 use crate::error::{AppError, AppResult, CustomErrorCode};
-use model::{SpeechPhase, SpeechRequest, SpeechSnapshot, SpeechTextRange, SpeechVoice};
+use model::{SpeechRequest, SpeechSnapshot};
+// Progress tracking and voice selection only exist where a native speech adapter does,
+// so their imports stay behind the same platforms as the items below.
+#[cfg(any(target_os = "macos", target_os = "ios", target_os = "android", test))]
+use model::{SpeechPhase, SpeechTextRange, SpeechVoice};
 
+#[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
 pub const SPEECH_EVENT: &str = "speech://state";
 
 #[derive(Default)]
@@ -21,6 +28,8 @@ impl SpeechService {
         self.snapshot.lock().clone()
     }
 
+    /// Seeded before native playback; only the native speech adapters call it.
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "android", test))]
     pub fn begin(&self, request: &SpeechRequest, voice: &SpeechVoice) -> SpeechSnapshot {
         let mut state = self.snapshot.lock();
         *state = SpeechSnapshot {
@@ -95,6 +104,7 @@ impl SpeechService {
         Some(state.clone())
     }
 
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
     pub fn notify(app: &tauri::AppHandle, snapshot: &SpeechSnapshot) {
         // Native callbacks may run on another thread. Publish only after releasing the lock.
         if let Err(error) = app.emit(SPEECH_EVENT, snapshot) {
@@ -105,6 +115,7 @@ impl SpeechService {
         }
     }
 
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
     pub fn fail(&self, session: &str, error: AppError) -> Option<SpeechSnapshot> {
         let mut state = self.snapshot.lock();
         if state.session_id.as_deref() != Some(session) {
@@ -166,6 +177,7 @@ pub fn validate(request: &SpeechRequest) -> AppResult<()> {
     Ok(())
 }
 
+#[cfg(any(target_os = "macos", target_os = "ios", target_os = "android", test))]
 pub fn select_voice<'a>(
     voices: &'a [SpeechVoice],
     preferred: Option<&str>,
