@@ -87,10 +87,10 @@ describe("启动偏好迁移与持久化", () => {
   it("工具访问更新统一页面记录，游戏访问不覆盖手动目标和模式", () => {
     store.getState().setStartupMode("manual");
     store.getState().setManualPage("library");
-    store.getState().setLastTool("formatter");
+    store.getState().setLastTool("translation");
     expect(store.getState()).toMatchObject({
-      lastPage: "formatter",
-      lastTool: "formatter",
+      lastPage: "translation",
+      lastTool: "translation",
     });
     store.getState().setLastPage("billiards");
     expect(store.getState()).toMatchObject({

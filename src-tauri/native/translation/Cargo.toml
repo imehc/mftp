@@ -1,0 +1,10 @@
+[package]
+name = "mftp-translation-engine"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[build-dependencies]
+cmake = "0.1.58"
+serde_json = "1"
+sha2 = "0.11"

@@ -246,6 +246,21 @@ impl DiagnosticRecorder {
         self.publish();
     }
 
+    /// Count intentionally unrecorded binary payloads without retaining their bytes.
+    /// Callers add an explicit protocol note explaining why capture was omitted.
+    pub(crate) fn response_omitted_bytes(&mut self, length: usize) {
+        if let Some(index) = self
+            .local
+            .details
+            .iter()
+            .position(|detail| matches!(detail, DiagnosticDetail::HttpResponse { .. }))
+        {
+            if let Some(body) = self.bodies.get_mut(index) {
+                body.received = body.received.saturating_add(length as u64);
+            }
+        }
+    }
+
     pub(crate) fn transport_error(&mut self, error: &dyn std::fmt::Display) {
         if self.local.details.len() >= DETAIL_LIMIT {
             return;

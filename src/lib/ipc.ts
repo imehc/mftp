@@ -1,6 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 
 export * from "./ipc/speech";
+export * from "./ipc/translation";
 
 import type {
   AppDataModule,

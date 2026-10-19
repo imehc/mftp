@@ -18,3 +18,5 @@ pub(crate) mod maintenance;
 pub(crate) mod model_viewer;
 pub(crate) mod todo;
 pub(crate) mod vault;
+
+pub(crate) mod translation;

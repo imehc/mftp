@@ -15,6 +15,7 @@ export const homeDescriptions: Record<ModuleId, ReactNode> = {
     </Trans>
   ),
   formatter: <Trans>整理与校验文本数据</Trans>,
+  translation: <Trans>在不同语言之间转换文本</Trans>,
   vault: <Trans>管理账号与密码</Trans>,
   todo: <Trans>记录任务与清单</Trans>,
   bt: <Trans>磁力链接与种子下载</Trans>,

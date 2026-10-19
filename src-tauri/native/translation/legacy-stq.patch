@@ -1,0 +1,84 @@
+--- a/ggml/include/gguf.h
++++ b/ggml/include/gguf.h
+@@ -74,6 +74,9 @@
+ 
+         // if not NULL, create a ggml_context and allocate the tensor data in it
+         struct ggml_context ** ctx;
++
++        // App opt-in for hash-verified legacy HY-MT2 STQ resources only.
++        bool legacy_stq1_0;
+     };
+ 
+     // callback to simulate or wrap a FILE pointer - read up to `len` bytes at `offset` into `output` and return the number of bytes read
+--- a/ggml/src/gguf.cpp
++++ b/ggml/src/gguf.cpp
+@@ -620,6 +620,22 @@
+         }
+     }
+ 
++    // The published HY-MT2 1.25-bit file predates upstream Q2_0 and uses its
++    // numeric slot for STQ. Never infer this override from an untrusted file.
++    if (params.legacy_stq1_0) {
++        const int64_t arch = gguf_find_key(ctx, "general.architecture");
++        const int64_t ftype = gguf_find_key(ctx, "general.file_type");
++        if (arch < 0 || ftype < 0 || gguf_get_kv_type(ctx, arch) != GGUF_TYPE_STRING ||
++            gguf_get_kv_type(ctx, ftype) != GGUF_TYPE_UINT32 ||
++            strcmp(gguf_get_val_str(ctx, arch), "hunyuan-dense") != 0 ||
++            gguf_get_val_u32(ctx, ftype) != 41) {
++            GGML_LOG_ERROR("%s: incompatible legacy STQ metadata\n", __func__);
++            gguf_free(ctx);
++            return nullptr;
++        }
++        gguf_set_val_u32(ctx, "general.file_type", 42);
++    }
++
+     // read the tensor info
+     for (int64_t i = 0; ok && i < n_tensors; ++i) {
+         struct gguf_tensor_info info;
+@@ -700,6 +716,9 @@
+         // tensor type
+         {
+             ok = ok && gr.read(info.t.type);
++            if (params.legacy_stq1_0 && info.t.type == GGML_TYPE_Q2_0) {
++                info.t.type = GGML_TYPE_STQ1_0;
++            }
+ 
+             // check that tensor type is within defined range
+             if (info.t.type < 0 || info.t.type >= GGML_TYPE_COUNT) {
+--- a/src/llama-model-loader.cpp
++++ b/src/llama-model-loader.cpp
+@@ -542,6 +542,10 @@
+         }
+     }
+ 
++    const auto legacy = kv_overrides.find("mftp.legacy_stq1_0");
++    const bool legacy_stq1_0 = legacy != kv_overrides.end() &&
++        legacy->second.tag == LLAMA_KV_OVERRIDE_TYPE_BOOL && legacy->second.val_bool;
++
+     tensor_buft_overrides = param_tensor_buft_overrides_p;
+ 
+     this->use_mmap      = load_mode == LLAMA_LOAD_MODE_MMAP || load_mode == LLAMA_LOAD_MODE_MMAP_MLOCK;
+@@ -553,6 +557,7 @@
+         struct gguf_init_params params = {
+             /*.no_alloc = */ true,
+             /*.ctx      = */ &ctx,
++            /*.legacy_stq1_0 = */ legacy_stq1_0,
+         };
+ 
+         metadata_ptr.reset(gguf_init_from_file(fname.c_str(), params));
+@@ -614,6 +619,7 @@
+                 struct gguf_init_params split_params = {
+                     /*.no_alloc = */ true,
+                     /*.ctx      = */ &ctx,
++            /*.legacy_stq1_0 = */ legacy_stq1_0,
+                 };
+                 gguf_context_ptr ctx_gguf { gguf_init_from_file(fname_split, split_params) };
+                 if (!ctx_gguf) {
+@@ -665,6 +671,7 @@
+         struct gguf_init_params params = {
+             /*.no_alloc = */ true,
+             /*.ctx      = */ &ctx,
++            /*.legacy_stq1_0 = */ legacy_stq1_0,
+         };
+ 
+         metadata_ptr.reset(gguf_init_from_file_ptr(file, params));

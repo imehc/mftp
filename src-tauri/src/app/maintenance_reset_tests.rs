@@ -151,8 +151,8 @@ async fn failed_checkpoint_keeps_completed_file_work_safe_to_resume() {
     std::fs::write(f.root.join("poetry.sqlite3"), b"fixture").unwrap();
     f.storage.conn().unwrap().execute_batch("CREATE TRIGGER reject_checkpoint BEFORE UPDATE ON app_reset_journal BEGIN SELECT RAISE(ABORT, 'injected'); END;").unwrap();
     let result = app_data_reset(f.state()).await.unwrap();
-    assert_eq!(result.progress.pending.len(), 3);
-    assert_eq!(result.failures.len(), 3);
+    assert_eq!(result.progress.pending.len(), 4);
+    assert_eq!(result.failures.len(), 4);
     assert!(!f.root.join("poetry.sqlite3").exists());
     f.storage
         .conn()

@@ -40,7 +40,7 @@ describe("启动页面决策", () => {
 
   it("工具、文库和全部小游戏都能指定或恢复", () => {
     for (const page of [
-      "formatter",
+      "translation",
       "library",
       "billiards",
       "gomoku",

@@ -39,7 +39,7 @@ it("小游戏挂载后记录页面，切换到其他游戏后更新记录", asyn
 });
 
 it("工具和文库挂载后接入同一页面记录，卸载不清空记录", async () => {
-  for (const tool of ["formatter", "library"] as const) {
+  for (const tool of ["translation", "library"] as const) {
     await act(async () => root.render(<Tool tool={tool} />));
     expect(store.getState().lastPage).toBe(tool);
   }

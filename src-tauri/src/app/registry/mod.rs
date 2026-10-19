@@ -6,7 +6,7 @@ use crate::modules::bt;
 use crate::modules::lan_transfer;
 use crate::modules::{
     ai, diagnostics, game_room, hosts, keys, maintenance, model_viewer, poetry, speech, ssh, todo,
-    vault,
+    translation, vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -37,6 +37,12 @@ macro_rules! common_modules {
     ($next:ident, $($platform:tt)*) => {
         $next! {
             "core" => { commands: [], types: [error::CustomErrorCode] },
+            "translation" => {
+                commands: [translation::commands::translation_snapshot, translation::commands::translation_select,
+                    translation::commands::translation_download, translation::commands::translation_remove,
+                    translation::commands::translation_run, translation::commands::translation_cancel],
+                types: [translation::model::TranslationOutput],
+            },
             "speech" => {
                 commands: [speech::commands::speech_catalog, speech::commands::speech_snapshot, speech::commands::speech_start, speech::commands::speech_control, speech::commands::speech_stop],
                 types: [speech::model::SpeechSnapshot],

@@ -96,6 +96,7 @@ pub enum AppDataResetStep {
     Poetry,
     Bt,
     Credentials,
+    Translation,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]

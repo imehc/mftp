@@ -1,3 +1,7 @@
+import { Channel } from "@tauri-apps/api/core";
+
+import type { TranslationOutput } from "~/bindings";
+
 /**
  * 与 Rust 后端共享的事件名。
  *
@@ -49,6 +53,13 @@ export const poetryTranslationStreamEvent = (requestId: string) =>
 
 /** BT 任务级事件（存到本地完成 / 失败）。载荷类型：`BtTaskEvent`。 */
 export const BT_TASK_EVENT = "bt://task-event";
+
+/** 离线翻译正文只通过发起窗口所属通道交付。 */
+export function translationOutputChannel(
+  onOutput: (output: TranslationOutput) => void,
+) {
+  return new Channel<TranslationOutput>(onOutput);
+}
 
 /** 桌面原生拖放的订阅入口；取消订阅由页面生命周期负责。 */
 export async function listenNativeFileDrop(

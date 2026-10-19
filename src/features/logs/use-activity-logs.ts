@@ -32,6 +32,7 @@ export function useActivityLogs() {
     vault: t`密码本`,
     hosts: t`主机`,
     poetry: t`诗词库`,
+    translation: t`离线翻译`,
     data: t`数据`,
     games: t`游戏`,
   };

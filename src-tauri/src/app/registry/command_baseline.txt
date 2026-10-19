@@ -1,4 +1,10 @@
 # Pre-modularity IPC names; intentional additions must update this baseline.
+common translation_snapshot
+common translation_select
+common translation_download
+common translation_remove
+common translation_run
+common translation_cancel
 common speech_catalog
 common speech_snapshot
 common speech_start

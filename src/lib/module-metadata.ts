@@ -29,6 +29,7 @@ export const modules = [
   { id: "media-compress", tool: "media-compress" },
   { id: "model-viewer", tool: "model-viewer" },
   { id: "formatter", tool: "formatter" },
+  { id: "translation", tool: "translation" },
   { id: "vault", tool: "vault" },
   { id: "todo", tool: "todo" },
   // iOS 不注册 BT 引擎；桌面端和 Android 使用独立本地 Session。

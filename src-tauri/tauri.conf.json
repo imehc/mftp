@@ -33,6 +33,9 @@
     "active": true,
     "targets": "all",
     "createUpdaterArtifacts": true,
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    },
     "iOS": {
       "developmentTeam": "Q4TGGJ5RKN"
     },
@@ -67,7 +70,10 @@
           "send"
         ]
       }
-    ]
+    ],
+    "resources": {
+      "native/translation/LLAMA-LICENSE": "licenses/llama.cpp.txt"
+    }
   },
   "plugins": {
     "updater": {

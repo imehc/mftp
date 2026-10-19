@@ -46,6 +46,7 @@ pub struct AppServices {
     pub(crate) todo_notes: Arc<crate::modules::todo::note_service::TodoNoteService>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<PoetryLibrary>,
+    pub(crate) translation: Arc<crate::modules::translation::TranslationService>,
     pub(crate) speech: Arc<crate::modules::speech::SpeechService>,
     #[cfg(any(desktop, target_os = "android"))]
     pub bt: Arc<crate::modules::bt::BtManager>,
@@ -114,6 +115,17 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         PoetryLibrary::cancel_sync,
         |library: &PoetryLibrary| Ok(library.is_active()),
     );
+    let translation = lifecycle.install(
+        participants::TRANSLATION,
+        Arc::new(crate::modules::translation::TranslationService::new(
+            crate::modules::translation::TranslationService::model_root(
+                &app.path().app_data_dir()?,
+            ),
+            operations.clone(),
+        )),
+        crate::modules::translation::TranslationService::shutdown,
+        |service: &crate::modules::translation::TranslationService| Ok(service.is_busy()),
+    );
     let executor = Executor::new(
         Arc::new(StorageActivityLog(storage.clone())),
         operations.clone(),
@@ -134,6 +146,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         });
     }
     let services = AppServices {
+        translation,
         diagnostics,
         model_inbox: app
             .state::<Arc<crate::modules::model_viewer::system::ModelOpenInbox>>()

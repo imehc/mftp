@@ -81,6 +81,10 @@ pub(super) async fn run_owned(
             let result = async {
                 let storage = state.storage.clone();
                 match step {
+                    AppDataResetStep::Translation => {
+                        let translation = state.translation.clone();
+                        run_blocking(move || translation.clear()).await?
+                    }
                     AppDataResetStep::Poetry => {
                         run_blocking(move || storage.clear_poetry_database()).await?
                     }

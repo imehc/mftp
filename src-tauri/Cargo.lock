@@ -3471,6 +3471,7 @@ dependencies = [
  "librqbit-core",
  "local-ip-address",
  "mdns-sd",
+ "mftp-translation-engine",
  "mime_guess",
  "objc2",
  "objc2-avf-audio",
@@ -3510,6 +3511,15 @@ dependencies = [
  "walkdir",
  "whoami",
  "zeroize",
+]
+
+[[package]]
+name = "mftp-translation-engine"
+version = "0.1.0"
+dependencies = [
+ "cmake",
+ "serde_json",
+ "sha2 0.11.0",
 ]
 
 [[package]]

@@ -22,6 +22,19 @@ macro_rules! custom_codes {
 }
 
 custom_codes! {
+    TranslationModelUnknown => ("translation:model_unknown", "Unknown translation model"),
+    TranslationInputInvalid => ("translation:input_invalid", "Invalid translation text or language"),
+    TranslationResourceInvalid => ("translation:resource_invalid", "Invalid translation model resource or catalog version"),
+    TranslationChecksum => ("translation:checksum", "Translation model SHA-256 mismatch"),
+    TranslationCancelled => ("translation:cancelled", "Translation operation cancelled"),
+    TranslationBusy => ("translation:busy", "Translation worker is still active"),
+    TranslationNotInstalled => ("translation:not_installed", "Translation model is not installed"),
+    TranslationEngine => ("translation:engine", "Native translation engine failed"),
+    TranslationInputLimit => ("translation:input_limit", "Input exceeds the translation token budget"),
+    TranslationOutputLimit => ("translation:output_limit", "Translation stopped at the output limit; result is incomplete"),
+    TranslationDownloadRange => ("translation:download_range", "Invalid model download range, length or validator"),
+    TranslationDownload => ("translation:download", "Translation model download failed"),
+    TranslationSpace => ("translation:space", "Insufficient disk space for translation model"),
     ModelSourceInvalid => ("model:source_invalid", "Invalid model source or read range"),
     ModelLibraryInvalid => ("model:library_invalid", "Invalid model library data or write range"),
     ModelLibraryMissing => ("model:library_missing", "Model library entry is unavailable"),

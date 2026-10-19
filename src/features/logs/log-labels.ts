@@ -52,6 +52,7 @@ const actionMessages: Record<string, MessageDescriptor> = {
   "games:create_room": msg`创建游戏房间`,
   "games:join_room": msg`加入游戏房间`,
   "games:leave_room": msg`离开游戏房间`,
+  "translation:model_download": msg`下载翻译模型`,
   "poetry:sync": msg`同步诗词库`,
   "poetry:import": msg`导入诗词库`,
   "poetry:cancel": msg`取消诗词同步`,

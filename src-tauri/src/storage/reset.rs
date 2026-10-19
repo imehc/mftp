@@ -88,6 +88,7 @@ impl Storage {
                 AppDataResetStep::Poetry,
                 AppDataResetStep::Bt,
                 AppDataResetStep::Credentials,
+                AppDataResetStep::Translation,
             ],
         };
         tx.execute(

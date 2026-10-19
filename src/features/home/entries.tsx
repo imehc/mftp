@@ -10,6 +10,7 @@ import {
   Crown,
   Grid3x3,
   KeyRound,
+  Languages,
   ListTodo,
   LockKeyhole,
   Magnet,
@@ -117,6 +118,16 @@ export const homeEntries: HomeEntry[] = [
     }),
     icon: Braces,
     title: <Trans>格式化</Trans>,
+  },
+  {
+    id: "translation",
+    category: "tools",
+    link: linkOptions({
+      to: "/tools/translation",
+      preload: "intent",
+    }),
+    icon: Languages,
+    title: <Trans>翻译</Trans>,
   },
   {
     id: "vault",

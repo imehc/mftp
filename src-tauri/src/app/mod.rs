@@ -138,13 +138,19 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
             label,
             event: tauri::WindowEvent::Focused(false),
             ..
-        } if label == "main" => crate::adapters::speech::stop_all(app, &state.speech),
+        } if label == "main" => {
+            crate::adapters::speech::stop_all(app, &state.speech);
+            #[cfg(mobile)]
+            state.translation.cancel_owner(&label);
+        }
         tauri::RunEvent::WindowEvent {
+            label,
             event: tauri::WindowEvent::Destroyed,
             ..
         } => {
             // The activity panel is memory-only and global; a destroyed window
             // takes its last records with it.
+            state.translation.cancel_owner(&label);
             state.diagnostics.clear();
             crate::adapters::speech::stop_all(app, &state.speech);
         }

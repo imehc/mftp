@@ -25,6 +25,7 @@ tokio = { version = "1", features = ["test-util"] }
 png = "0.18"
 
 [dependencies]
+mftp-translation-engine = { path = "native/translation" }
 tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"

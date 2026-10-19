@@ -55,6 +55,10 @@ impl Fixture {
         // Construct idle services without native keychain calls, sockets or engines.
         let executor = Executor::new(factory(storage.clone()), operations.clone());
         let state = AppServices {
+            translation: Arc::new(crate::modules::translation::TranslationService::new(
+                root.join("translation-models"),
+                operations.clone(),
+            )),
             diagnostics: Arc::new(crate::core::diagnostics::Diagnostics::default()),
             model_inbox: Arc::new(crate::modules::model_viewer::system::ModelOpenInbox::default()),
             model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),

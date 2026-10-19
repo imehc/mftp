@@ -1,5 +1,6 @@
 //! Pure single-byte-range parsing shared by the LAN and BT HTTP adapters.
 
+#[cfg(any(desktop, target_os = "android", test))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum RangeRequest {
     Absent,
@@ -8,6 +9,7 @@ pub(crate) enum RangeRequest {
     Invalid,
 }
 
+#[cfg(any(desktop, target_os = "android", test))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct ResolvedRange {
     pub start: u64,
@@ -15,6 +17,7 @@ pub(crate) struct ResolvedRange {
     pub partial: bool,
 }
 
+#[cfg(any(desktop, target_os = "android", test))]
 impl ResolvedRange {
     pub fn end(self) -> u64 {
         // Only nonempty partial responses use this value in Content-Range.
@@ -22,6 +25,7 @@ impl ResolvedRange {
     }
 }
 
+#[cfg(any(desktop, target_os = "android", test))]
 impl RangeRequest {
     pub fn resolve(self, total: u64) -> Option<ResolvedRange> {
         let (start, end) = match self {
@@ -48,6 +52,7 @@ impl RangeRequest {
     }
 }
 
+#[cfg(any(desktop, target_os = "android", test))]
 pub(crate) fn parse_request_range(request: &str) -> RangeRequest {
     let mut values = request
         .lines()
@@ -66,6 +71,7 @@ pub(crate) fn parse_request_range(request: &str) -> RangeRequest {
     parse_range(value).unwrap_or(RangeRequest::Invalid)
 }
 
+#[cfg(any(desktop, target_os = "android", test))]
 fn parse_range(value: &str) -> Option<RangeRequest> {
     let (unit, value) = value.trim().split_once('=')?;
     if !unit.eq_ignore_ascii_case("bytes") {
