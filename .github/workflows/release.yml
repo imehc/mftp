@@ -120,6 +120,9 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Prepare pinned translation engine source
+        run: pnpm translation:prepare
+
       - name: Check version consistency
         run: pnpm run version:check
 
@@ -188,6 +191,9 @@ jobs:
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Prepare pinned translation engine source
+        run: pnpm translation:prepare
 
       - name: Check version consistency
         run: pnpm run version:check
@@ -270,6 +276,9 @@ jobs:
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Prepare pinned translation engine source
+        run: pnpm translation:prepare
 
       - name: Write release keystore
         shell: bash
