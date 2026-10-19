@@ -67,10 +67,10 @@ jobs:
         run: pnpm translation:prepare
 
       - name: Check React version consistency
-        run: pnpm run react:check
+        run: pnpm run check:react
 
       - name: Check model offline resources
-        run: pnpm run model:offline-check
+        run: pnpm run check:model-offline
 
       - name: Check application version consistency
         run: pnpm run version:check
@@ -85,13 +85,13 @@ jobs:
         run: cargo clippy --manifest-path src-tauri/Cargo.toml --locked --lib -- -D warnings
 
       - name: Check platform packaging rules
-        run: pnpm run platform:check
+        run: pnpm run check:platform
 
       - name: Build frontend
         run: pnpm run build
 
       - name: Check build size and lazy preload budgets
-        run: pnpm run build:budget
+        run: pnpm run check:build-budget
 
       - name: Build other frontend targets
         run: |
@@ -206,7 +206,7 @@ jobs:
       - name: Assemble isolated Android plugin libraries
         env:
           TMPDIR: ${{ runner.temp }}
-        run: pnpm run android:plugins:check
+        run: pnpm run check:android-plugins
 
       - name: Preserve source and environment report
         if: always()
