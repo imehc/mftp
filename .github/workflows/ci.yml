@@ -4,12 +4,16 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    # 预算、体积这类阈值回归只有合进 main 才会暴露：PR 常卡在更早的步骤。
+    branches:
+      - main
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
