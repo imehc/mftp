@@ -313,7 +313,7 @@ msgstr "3D display interrupted"
 #. 本地 GLB/glTF 三维模型查看工具名称。
 #. 本地 GLB、glTF、FBX 三维模型查看工具名称。
 #. 本地 GLB、glTF、FBX 三维模型查看工具名称。
-#: src/features/home/entries.tsx:65
+#: src/features/home/entries.tsx:66
 #: src/features/model-viewer/ModelViewerPage.tsx:148
 #: src/features/model-viewer/ModelViewerPage.tsx:215
 msgid "3D 模型"
@@ -368,7 +368,7 @@ msgstr "The AI database is newer than this app. Please update the app."
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:104
 #: src/features/settings/SettingsOverview.tsx:36
-#: src/features/settings/SettingsPage.tsx:36
+#: src/features/settings/SettingsPage.tsx:38
 msgid "AI 服务"
 msgstr "AI Service"
 
@@ -491,7 +491,7 @@ msgid "BT"
 msgstr "BT"
 
 #: src/features/bt/BtTool.tsx:220
-#: src/features/home/entries.tsx:148
+#: src/features/home/entries.tsx:149
 #: src/lib/errors/messages.ts:269
 msgid "BT 下载"
 msgstr "BT Downloads"
@@ -987,7 +987,7 @@ msgid "中"
 msgstr "Medium"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:39
-#: src/features/home/entries.tsx:198
+#: src/features/home/entries.tsx:199
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -1080,7 +1080,7 @@ msgid "互换"
 msgstr "Swap"
 
 #: src/features/games/gomoku/GomokuGame.tsx:40
-#: src/features/home/entries.tsx:178
+#: src/features/home/entries.tsx:179
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -1595,7 +1595,7 @@ msgstr "All categories"
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
 
-#: src/features/home/HomePage.tsx:81
+#: src/features/home/HomePage.tsx:89
 msgid "全部工具"
 msgstr "All tools"
 
@@ -1650,7 +1650,7 @@ msgstr "Shared data buffers"
 msgid "关于"
 msgstr "About"
 
-#: src/features/settings/SettingsOverview.tsx:110
+#: src/features/settings/SettingsOverview.tsx:105
 msgid "关于与本地数据"
 msgstr "About and local data"
 
@@ -2141,6 +2141,12 @@ msgstr "Power"
 msgid "功能"
 msgstr "Features"
 
+#: src/features/settings/FeatureEntrySettings.tsx:158
+#: src/features/settings/SettingsOverview.tsx:42
+#: src/features/settings/SettingsPage.tsx:38
+msgid "功能入口"
+msgstr "Feature entries"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:186
 #: src/features/games/engine/online/OnlineLobby.tsx:374
 msgid "加入"
@@ -2168,7 +2174,7 @@ msgid "加密导出"
 msgstr "Encrypt export"
 
 #: src/features/crypto/CryptoTool.tsx:31
-#: src/features/home/entries.tsx:95
+#: src/features/home/entries.tsx:96
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -2416,7 +2422,7 @@ msgstr "2P"
 msgid "双人对战"
 msgstr "Two-Player Match"
 
-#: src/features/home/HomePage.tsx:58
+#: src/features/home/HomePage.tsx:66
 msgid "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 msgstr "Double-click or press ⌘/Ctrl + . to show or hide games"
 
@@ -2555,7 +2561,7 @@ msgstr "Morph target"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/features/home/entries.tsx:158
+#: src/features/home/entries.tsx:159
 #: src/features/poetry/LibraryPage.tsx:147
 #: src/features/poetry/LibraryPage.tsx:292
 #: src/features/poetry/PoemDetailPage.tsx:43
@@ -2606,7 +2612,7 @@ msgid "可选"
 msgstr "Optional"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:117
-#: src/features/home/entries.tsx:168
+#: src/features/home/entries.tsx:169
 msgid "台球"
 msgstr "Billiards"
 
@@ -2745,7 +2751,7 @@ msgstr "Start service"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
-#: src/features/settings/SettingsOverview.tsx:56
+#: src/features/settings/SettingsOverview.tsx:51
 msgid "启动页面"
 msgstr "Startup page"
 
@@ -2779,7 +2785,7 @@ msgid "围地对弈，探索棋局"
 msgstr "Build territory and explore the board"
 
 #: src/features/games/go/GoGame.tsx:40
-#: src/features/home/entries.tsx:188
+#: src/features/home/entries.tsx:189
 msgid "围棋"
 msgstr "Go"
 
@@ -2982,7 +2988,7 @@ msgstr "Invalid backup format: field {field} is missing or has an invalid value"
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "Could not decrypt the backup: the password is incorrect or the file is damaged"
 
-#: src/features/settings/SettingsOverview.tsx:77
+#: src/features/settings/SettingsOverview.tsx:72
 msgid "备份本机数据"
 msgstr "Back up local data"
 
@@ -3097,7 +3103,7 @@ msgstr "Failed"
 msgid "如果相关任务仍在运行，请先完成任务后再清理。"
 msgstr "Finish any related tasks before clearing this data."
 
-#: src/features/home/entries.tsx:108
+#: src/features/home/entries.tsx:109
 #: src/features/media-compress/MediaCompressTool.tsx:46
 msgid "媒体处理"
 msgstr "Media Tools"
@@ -3120,7 +3126,7 @@ msgstr "Font size"
 msgid "字节数未知"
 msgstr "Byte size unknown"
 
-#: src/features/settings/SettingsOverview.tsx:111
+#: src/features/settings/SettingsOverview.tsx:106
 msgid "存储、清理与项目帮助"
 msgstr "Storage, cleanup and project help"
 
@@ -3217,7 +3223,7 @@ msgstr "Vault"
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/about/use-about.ts:45
 #: src/features/export/sections.tsx:16
-#: src/features/home/entries.tsx:128
+#: src/features/home/entries.tsx:129
 #: src/features/logs/log-labels.ts:111
 #: src/features/logs/use-activity-logs.ts:32
 #: src/features/vault/VaultTool.tsx:49
@@ -3476,8 +3482,7 @@ msgstr "This returns to mode selection and discards the current match progress."
 msgid "小时"
 msgstr "Hour"
 
-#: src/features/home/entries.tsx:40
-#: src/features/settings/SettingsOverview.tsx:42
+#: src/features/home/entries.tsx:41
 msgid "小游戏"
 msgstr "Games"
 
@@ -3502,7 +3507,7 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:85
+#: src/features/home/entries.tsx:86
 #: src/features/lan-transfer/LanServiceCard.tsx:37
 #: src/features/lan-transfer/LanTransferTool.tsx:34
 #: src/lib/errors/messages.ts:278
@@ -3571,7 +3576,7 @@ msgid "展开执行日志"
 msgstr "Expand execution log"
 
 #. 三维查看器的自由相机、预览编辑与诊断工具。
-#: src/features/home/entries.tsx:38
+#: src/features/home/entries.tsx:39
 #: src/features/model-viewer/components/WorkspaceInspector.tsx:65
 msgid "工具"
 msgstr "Tools"
@@ -3627,7 +3632,7 @@ msgid "已允许访问"
 msgstr "Access allowed"
 
 #: src/features/settings/AutostartSetting.desktop.tsx:27
-#: src/features/settings/SettingsOverview.tsx:45
+#: src/features/settings/FeatureEntrySettings.tsx:183
 msgid "已关闭"
 msgstr "Off"
 
@@ -3768,7 +3773,7 @@ msgid "已废弃"
 msgstr "Abandoned"
 
 #: src/features/settings/AutostartSetting.desktop.tsx:25
-#: src/features/settings/SettingsOverview.tsx:45
+#: src/features/settings/FeatureEntrySettings.tsx:183
 msgid "已开启"
 msgstr "On"
 
@@ -3910,11 +3915,11 @@ msgstr "Draw"
 msgid "并排"
 msgstr "Row"
 
-#: src/features/settings/SettingsOverview.tsx:85
+#: src/features/settings/SettingsOverview.tsx:80
 msgid "应用"
 msgstr "Application"
 
-#: src/features/navigation/BottomNavigation.mobile.tsx:16
+#: src/features/navigation/BottomNavigation.mobile.tsx:17
 #: src/features/navigation/NavigationRail.desktop.tsx:23
 msgid "应用主导航"
 msgstr "Main navigation"
@@ -4215,7 +4220,7 @@ msgid "待办"
 msgstr "Todos"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/home/entries.tsx:138
+#: src/features/home/entries.tsx:139
 #: src/features/logs/log-labels.ts:106
 #: src/features/todo/TodoTool.tsx:94
 msgid "待办事项"
@@ -4293,11 +4298,11 @@ msgid "恢复上一杆前的球位，由犯规方重打，罚分保留。"
 msgstr "Restore the positions before the last shot and have the offender replay. Penalty points remain."
 
 #. 桌面启动设置开关，关闭后从首页启动
-#: src/features/settings/SettingsOverview.tsx:63
+#: src/features/settings/SettingsOverview.tsx:58
 msgid "恢复上次使用的工具"
 msgstr "Restore the last used tool"
 
-#: src/features/settings/SettingsOverview.tsx:59
+#: src/features/settings/SettingsOverview.tsx:54
 msgid "恢复上次工具"
 msgstr "Restore last tool"
 
@@ -4533,10 +4538,17 @@ msgstr "Deny access"
 msgid "拒绝访问申请"
 msgstr "Reject access request"
 
+#: src/features/settings/FeatureEntrySettings.tsx:71
+#: src/features/settings/FeatureEntrySettings.tsx:72
 #: src/features/ssh-sftp/components/Sidebar.tsx:106
 #: src/features/vault/VaultEntryCard.tsx:70
 msgid "拖动排序"
 msgstr "Drag to reorder"
+
+#. 设置页功能入口中的简短说明，介绍可拖动列表的用途。
+#: src/features/settings/FeatureEntrySettings.tsx:161
+msgid "拖动调整首页功能的显示顺序"
+msgstr "Drag to adjust the order of features on the home page"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:94
 #: src/features/media-compress/resize/ImageResizePanel.tsx:108
@@ -4577,6 +4589,8 @@ msgstr "Uses original model dimensions. Pick points again after pose changes."
 msgid "按比例"
 msgstr "By ratio"
 
+#. 键盘用户在功能入口拖拽排序时听到的操作说明
+#: src/features/settings/FeatureEntrySettings.tsx:103
 #: src/features/vault/VaultEntryList.tsx:55
 msgid "按空格开始排序，用方向键移动，再按空格确认，按 Escape 取消。"
 msgstr "Press Space to start sorting, use the arrow keys to move, press Space to confirm, or Escape to cancel."
@@ -4815,12 +4829,12 @@ msgstr "Discard unsaved changes?"
 msgid "数据"
 msgstr "Data"
 
-#: src/features/settings/SettingsOverview.tsx:73
+#: src/features/settings/SettingsOverview.tsx:68
 msgid "数据与运行"
 msgstr "Data and runtime"
 
 #: src/features/export/BackupPage.tsx:46
-#: src/features/settings/SettingsOverview.tsx:76
+#: src/features/settings/SettingsOverview.tsx:71
 msgid "数据导入与导出"
 msgstr "Import and export data"
 
@@ -4903,7 +4917,7 @@ msgstr "File preview"
 msgid "文学意译"
 msgstr "Literary"
 
-#: src/features/home/entries.tsx:39
+#: src/features/home/entries.tsx:40
 msgid "文库"
 msgstr "Library"
 
@@ -5146,6 +5160,14 @@ msgstr "Show or hide"
 #: src/features/model-viewer/components/ModelList.tsx:177
 msgid "显示或隐藏 {name}"
 msgstr "Show or hide {name}"
+
+#: src/features/settings/FeatureEntrySettings.tsx:180
+msgid "显示此分类"
+msgstr "Show this category"
+
+#: src/features/settings/FeatureEntrySettings.tsx:79
+msgid "显示此功能"
+msgstr "Show this feature"
 
 #. 暂停模型动画。
 #: src/features/bt/components/TaskRow.tsx:161
@@ -5698,7 +5720,7 @@ msgstr "View note images"
 msgid "查看完整发布说明"
 msgstr "View full release notes"
 
-#: src/features/settings/SettingsOverview.tsx:89
+#: src/features/settings/SettingsOverview.tsx:84
 msgid "查看操作和失败原因"
 msgstr "View operations and failure details"
 
@@ -5714,7 +5736,7 @@ msgstr "View log: {action}"
 
 #: src/features/settings/AppSettingsMenu.tsx:72
 #: src/features/settings/AppSettingsMenu.tsx:74
-#: src/features/settings/SettingsOverview.tsx:100
+#: src/features/settings/SettingsOverview.tsx:95
 msgid "查看更新"
 msgstr "View Update"
 
@@ -5820,7 +5842,7 @@ msgstr "Validate"
 
 #: src/features/formatter/FormatterActions.tsx:34
 #: src/features/formatter/FormatterTool.tsx:86
-#: src/features/home/entries.tsx:118
+#: src/features/home/entries.tsx:119
 msgid "格式化"
 msgstr "Formatter"
 
@@ -5841,7 +5863,7 @@ msgstr "Check whether file exists"
 
 #: src/features/settings/AppSettingsMenu.tsx:69
 #: src/features/settings/AppSettingsMenu.tsx:71
-#: src/features/settings/SettingsOverview.tsx:103
+#: src/features/settings/SettingsOverview.tsx:98
 #: src/features/updater/use-updater-label.ts:28
 msgid "检查更新"
 msgstr "Check for Updates"
@@ -6239,7 +6261,7 @@ msgid "正在校验更新…"
 msgstr "Verifying update…"
 
 #: src/features/settings/AppSettingsMenu.tsx:70
-#: src/features/settings/SettingsOverview.tsx:102
+#: src/features/settings/SettingsOverview.tsx:97
 msgid "正在检查"
 msgstr "Checking"
 
@@ -6539,7 +6561,7 @@ msgstr "Activity"
 
 #: src/features/about/use-about.ts:49
 #: src/features/logs/ActivityLogsPage.tsx:37
-#: src/features/settings/SettingsOverview.tsx:88
+#: src/features/settings/SettingsOverview.tsx:83
 msgid "活动日志"
 msgstr "Activity logs"
 
@@ -8071,10 +8093,10 @@ msgstr "Set as active"
 msgid "设备名"
 msgstr "Device Name"
 
-#: src/features/navigation/NavigationItems.tsx:38
+#: src/features/navigation/NavigationItems.tsx:46
 #: src/features/settings/AppSettingsMenu.tsx:89
 #: src/features/settings/AppSettingsMenu.tsx:101
-#: src/features/settings/SettingsPage.tsx:36
+#: src/features/settings/SettingsPage.tsx:38
 msgid "设置"
 msgstr "Settings"
 
@@ -8501,7 +8523,7 @@ msgstr "Reorder hosts"
 msgid "调整全文索引"
 msgstr "Configure full-text index"
 
-#: src/features/poetry/LibraryPage.tsx:322
+#: src/features/poetry/LibraryPage.tsx:339
 msgid "调整双栏宽度"
 msgstr "Resize columns"
 
@@ -8536,6 +8558,10 @@ msgstr "Adjust the filters or refresh and try again."
 #: src/features/vault/VaultTool.tsx:132
 msgid "调整顺序"
 msgstr "Reorder"
+
+#: src/features/settings/SettingsOverview.tsx:43
+msgid "调整首页功能的显示顺序"
+msgstr "Adjust the order of features on the home page"
 
 #. glTF 规范报告中的警告数量。
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:280
@@ -8708,7 +8734,7 @@ msgid "返回上级目录"
 msgstr "Parent folder"
 
 #: src/features/bt/components/TaskFilesPage.tsx:38
-#: src/features/poetry/LibraryPage.tsx:340
+#: src/features/poetry/LibraryPage.tsx:320
 msgid "返回列表"
 msgstr "Back to list"
 
@@ -8740,11 +8766,11 @@ msgstr "Return to portrait"
 #: src/features/about/AboutPage.tsx:62
 #: src/features/export/BackupPage.tsx:53
 #: src/features/logs/ActivityLogsPage.tsx:40
-#: src/features/settings/SettingsPage.tsx:42
+#: src/features/settings/SettingsPage.tsx:44
 msgid "返回设置"
 msgstr "Back to settings"
 
-#: src/features/settings/SettingsPage.tsx:61
+#: src/features/settings/SettingsPage.tsx:63
 msgid "返回诗词"
 msgstr "Back to poem"
 
@@ -9483,7 +9509,7 @@ msgid "预览备注图片"
 msgstr "Preview note image"
 
 #: src/components/ToolPageHeader.tsx:63
-#: src/features/settings/SettingsOverview.tsx:59
+#: src/features/settings/SettingsOverview.tsx:54
 msgid "首页"
 msgstr "Home"
 

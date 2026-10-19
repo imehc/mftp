@@ -4,7 +4,7 @@ import type { PoetryTranslationMode } from "~/bindings";
 import SettingsPage from "~/features/settings/SettingsPage";
 
 interface SettingsSearch {
-  panel?: "ai" | "data";
+  panel?: "ai" | "data" | "features";
   returnUid?: string;
   returnQ?: string;
   returnMode?: PoetryTranslationMode;
@@ -17,7 +17,9 @@ function SettingsRoute() {
 export const Route = createFileRoute("/settings")({
   validateSearch: (search: Record<string, unknown>): SettingsSearch => ({
     panel:
-      search.panel === "ai" || search.panel === "data"
+      search.panel === "ai" ||
+      search.panel === "data" ||
+      search.panel === "features"
         ? search.panel
         : undefined,
     returnUid:

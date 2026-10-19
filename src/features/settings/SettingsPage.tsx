@@ -10,13 +10,14 @@ import AiConfigurationSettings from "~/features/ai-configuration/AiConfiguration
 import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
 import BackupPage from "~/features/export/BackupPage";
 
+import FeatureEntrySettings from "./FeatureEntrySettings";
 import SettingsOverview from "./SettingsOverview";
 
 export default function SettingsPage({
   returnContext,
 }: {
   returnContext?: {
-    panel?: "ai" | "data";
+    panel?: "ai" | "data" | "features";
     returnUid?: string;
     returnQ?: string;
     returnMode?: PoetryTranslationMode;
@@ -25,6 +26,7 @@ export default function SettingsPage({
   const { t } = useLingui();
   const navigate = useNavigate();
   const ai = returnContext?.panel === "ai" || !!returnContext?.returnUid;
+  const features = returnContext?.panel === "features";
   if (returnContext?.panel === "data") return <BackupPage />;
   return (
     <main
@@ -33,9 +35,9 @@ export default function SettingsPage({
     >
       <ToolPageHeader
         showHome={false}
-        title={ai ? t`AI 服务` : t`设置`}
+        title={ai ? t`AI 服务` : features ? t`功能入口` : t`设置`}
         leading={
-          ai ? (
+          ai || features ? (
             <Button
               variant="ghost"
               size="icon-sm"
@@ -66,6 +68,10 @@ export default function SettingsPage({
       />
       {ai ? (
         <AiConfigurationSettings />
+      ) : features ? (
+        <AppPageContent bottomInset="scroll">
+          <FeatureEntrySettings />
+        </AppPageContent>
       ) : (
         <AppPageContent bottomInset="scroll">
           <SettingsOverview

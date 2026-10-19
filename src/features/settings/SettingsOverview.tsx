@@ -3,8 +3,8 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   Database,
   FileClock,
-  Gamepad2,
   Info,
+  LayoutGrid,
   PanelsTopLeft,
   RefreshCw,
   Sparkles,
@@ -37,19 +37,14 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
           description={t`连接与模型设置`}
           onClick={onAi}
         />
-        <SettingsControl
-          icon={Gamepad2}
-          title={t`小游戏`}
-          id="settings-games"
-          compact
-          description={settings.showGames ? t`已开启` : t`已关闭`}
-        >
-          <Switch
-            id="settings-games"
-            checked={settings.showGames}
-            onCheckedChange={settings.setShowGames}
-          />
-        </SettingsControl>
+        <SettingsEntry
+          icon={LayoutGrid}
+          title={t`功能入口`}
+          description={t`调整首页功能的显示顺序`}
+          onClick={() =>
+            void navigate({ to: "/settings", search: { panel: "features" } })
+          }
+        />
         {isDesktopPlatform() ? (
           <SettingsControl
             icon={PanelsTopLeft}

@@ -21,7 +21,11 @@ export default function ModuleNavigationFrame({
 }) {
   const wide = useDesktopLayout();
   const showGames = useSettingsStore((state) => state.showGames);
-  const items = navigationItems(showGames);
+  const hiddenCategories = useSettingsStore(
+    (state) => state.hiddenHomeCategories,
+  );
+  const visibility = useSettingsStore((state) => state.homeEntryVisibility);
+  const items = navigationItems(showGames, hiddenCategories, visibility);
   return (
     <div
       data-bottom-inset="scroll"

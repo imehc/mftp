@@ -22,6 +22,7 @@ function RootLayout() {
     select: (state) =>
       state.location.search.panel === "ai" ||
       state.location.search.panel === "data" ||
+      state.location.search.panel === "features" ||
       !!state.location.search.returnUid,
   });
   const homeCategory = useRouterState({

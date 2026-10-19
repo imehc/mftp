@@ -31,6 +31,7 @@ import {
   isIosPlatform,
   isMobilePlatform,
 } from "~/lib/platform";
+import type { HomeCategoryId, HomeEntryVisibility } from "~/store/settings";
 
 export type HomeCategory = "tools" | "library" | "games";
 
@@ -198,7 +199,7 @@ export const homeEntries: HomeEntry[] = [
     title: <Trans>中国象棋</Trans>,
   },
 ];
-const currentPlatform: HomePlatform = isAndroidPlatform()
+export const currentHomePlatform: HomePlatform = isAndroidPlatform()
   ? "android"
   : isIosPlatform()
     ? "ios"
@@ -207,10 +208,52 @@ const currentPlatform: HomePlatform = isAndroidPlatform()
       : "desktop";
 
 /** 当前平台可用的首页入口；平台能力来自模块元数据。 */
-export const availableHomeEntries: HomeEntry[] = homeEntries.filter((entry) => {
-  const module = moduleMetadata(entry.id);
-  return !module || moduleAvailableOn(module, currentPlatform);
-});
+export function homeEntriesForPlatform(platform: HomePlatform): HomeEntry[] {
+  return homeEntries.filter((entry) => {
+    const module = moduleMetadata(entry.id);
+    return module && moduleAvailableOn(module, platform);
+  });
+}
+
+export const availableHomeEntries = homeEntriesForPlatform(currentHomePlatform);
+
+/** 将持久化顺序与当前平台可用入口稳定合并，新增入口追加到默认顺序末尾。 */
+export function orderedHomeEntries(
+  category: HomeCategory,
+  saved: string[] = [],
+  entries: HomeEntry[] = availableHomeEntries,
+): HomeEntry[] {
+  const categoryEntries = entries.filter(
+    (entry) => entry.category === category,
+  );
+  const byId = new Map<string, HomeEntry>(
+    categoryEntries.map((entry) => [entry.id, entry]),
+  );
+  const ordered = saved.flatMap((id) => {
+    const entry = byId.get(id);
+    if (!entry) return [];
+    byId.delete(id);
+    return [entry];
+  });
+  return [...ordered, ...categoryEntries.filter((entry) => byId.has(entry.id))];
+}
+
+export function visibleHomeEntries(
+  category: HomeCategory,
+  visibility: HomeEntryVisibility = {},
+  entries: HomeEntry[] = availableHomeEntries,
+): HomeEntry[] {
+  return orderedHomeEntries(category, undefined, entries).filter(
+    (entry) => visibility[entry.id] !== false,
+  );
+}
+
+export function homeCategoryHasVisibleEntries(
+  category: HomeCategoryId,
+  visibility: HomeEntryVisibility = {},
+): boolean {
+  return visibleHomeEntries(category, visibility).length > 0;
+}
 
 /** 由「上次使用的工具」找到对应入口；未在当前平台提供时返回 undefined。 */
 export function getToolEntry(tool: ToolRoute): HomeEntry | undefined {

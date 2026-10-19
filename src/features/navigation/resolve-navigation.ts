@@ -36,7 +36,12 @@ export function resolveNavigation({
   if (path === "/library" || path.startsWith("/library/")) {
     return { active: "library", primary: path === "/library" && !selectedPoem };
   }
-  if (path === "/settings" || path === "/logs" || path === "/about") {
+  if (
+    path === "/settings" ||
+    path.startsWith("/settings/") ||
+    path === "/logs" ||
+    path === "/about"
+  ) {
     return {
       active: "settings",
       primary: path === "/settings" && !settingsDetail,

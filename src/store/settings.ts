@@ -24,6 +24,24 @@ const isToolRoute = (value: string): value is ToolRoute =>
 
 export type AppLocale = "system" | "zh-CN" | "en";
 
+export type HomeCategoryId = "tools" | "library" | "games";
+
+export type HomeEntryOrder = Partial<Record<HomeCategoryId, string[]>>;
+
+export type HomeEntryVisibility = Record<string, boolean>;
+
+function resolveHomeEntryOrder(value: unknown): HomeEntryOrder {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const source = value as Record<string, unknown>;
+  const result: HomeEntryOrder = {};
+  for (const category of ["tools", "library", "games"] as const) {
+    const order = source[category];
+    if (Array.isArray(order) && order.every((id) => typeof id === "string"))
+      result[category] = [...new Set(order)];
+  }
+  return result;
+}
+
 interface SettingsState {
   directoryTransferMode: DirectoryTransferMode;
   locale: AppLocale;
@@ -38,6 +56,9 @@ interface SettingsState {
   showGames: boolean;
   /** 游戏音效主音量，取值范围 0..1。 */
   gamesVolume: number;
+  homeEntryOrder: HomeEntryOrder;
+  homeEntryVisibility: HomeEntryVisibility;
+  hiddenHomeCategories: HomeCategoryId[];
   setDirectoryTransferMode: (mode: DirectoryTransferMode) => void;
   setLocale: (locale: AppLocale) => void;
   setSidebarSize: (size: number) => void;
@@ -49,6 +70,9 @@ interface SettingsState {
   setDisplaySize: (value: DisplaySize) => void;
   setShowGames: (show: boolean) => void;
   setGamesVolume: (volume: number) => void;
+  setHomeEntryOrder: (category: HomeCategoryId, order: string[]) => void;
+  setHomeEntryVisible: (id: string, visible: boolean) => void;
+  setHomeCategoryVisible: (category: HomeCategoryId, visible: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -65,6 +89,9 @@ export const useSettingsStore = create<SettingsState>()(
       displaySize: { mode: "system", scale: 1 },
       showGames: false,
       gamesVolume: 0.7,
+      homeEntryOrder: {},
+      homeEntryVisibility: {},
+      hiddenHomeCategories: ["games"],
       setDirectoryTransferMode: (mode) => set({ directoryTransferMode: mode }),
       setLocale: (locale) => set({ locale }),
       setSidebarSize: (size) => set({ sidebarSize: size }),
@@ -75,13 +102,34 @@ export const useSettingsStore = create<SettingsState>()(
       setFontPreset: (font) => set({ fontPreset: font }),
       setDisplaySize: (value) =>
         set({ displaySize: resolveDisplaySize(value) }),
-      setShowGames: (show) => set({ showGames: show }),
+      setShowGames: (show) =>
+        set((state) => ({
+          showGames: show,
+          hiddenHomeCategories: show
+            ? state.hiddenHomeCategories.filter((item) => item !== "games")
+            : [...new Set([...state.hiddenHomeCategories, "games" as const])],
+        })),
       setGamesVolume: (gamesVolume) => set({ gamesVolume }),
+      setHomeEntryOrder: (category, order) =>
+        set((state) => ({
+          homeEntryOrder: { ...state.homeEntryOrder, [category]: order },
+        })),
+      setHomeEntryVisible: (id, visible) =>
+        set((state) => ({
+          homeEntryVisibility: { ...state.homeEntryVisibility, [id]: visible },
+        })),
+      setHomeCategoryVisible: (category, visible) =>
+        set((state) => ({
+          hiddenHomeCategories: visible
+            ? state.hiddenHomeCategories.filter((item) => item !== category)
+            : [...new Set([...state.hiddenHomeCategories, category])],
+          ...(category === "games" ? { showGames: visible } : {}),
+        })),
     }),
     {
       name: "mftp-settings",
-      // v7：启动恢复开关；旧用户保留默认恢复行为。
-      version: 7,
+      // v8：功能入口排序与显隐；旧用户沿用原有入口顺序。
+      version: 8,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
@@ -105,6 +153,20 @@ export const useSettingsStore = create<SettingsState>()(
           colorTheme: resolveColorTheme(state.colorTheme),
           fontPreset: resolveFontPreset(state.fontPreset),
           displaySize: resolveDisplaySize(state.displaySize),
+          homeEntryOrder: resolveHomeEntryOrder(state.homeEntryOrder),
+          homeEntryVisibility:
+            state.homeEntryVisibility &&
+            typeof state.homeEntryVisibility === "object"
+              ? state.homeEntryVisibility
+              : {},
+          hiddenHomeCategories: Array.isArray(state.hiddenHomeCategories)
+            ? state.hiddenHomeCategories.filter(
+                (item): item is HomeCategoryId =>
+                  item === "tools" || item === "library" || item === "games",
+              )
+            : state.showGames === false
+              ? ["games"]
+              : [],
         } as SettingsState;
       },
     },

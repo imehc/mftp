@@ -13,6 +13,7 @@ import {
   availableHomeEntries,
   type HomeCategory,
   homeCategoryLabels,
+  orderedHomeEntries,
 } from "./entries";
 import { homeDescriptions } from "./home-descriptions";
 import HomeRecentActivity from "./HomeRecentActivity";
@@ -21,13 +22,20 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
   const { t } = useLingui();
   const navigate = useNavigate();
   const showGames = useSettingsStore((s) => s.showGames);
+  const homeEntryVisibility = useSettingsStore((s) => s.homeEntryVisibility);
+  const hiddenHomeCategories = useSettingsStore((s) => s.hiddenHomeCategories);
+  const homeEntryOrder = useSettingsStore((s) => s.homeEntryOrder);
   const setShowGames = useSettingsStore((s) => s.setShowGames);
   const setLastTool = useSettingsStore((s) => s.setLastTool);
   const selected =
     category === "games" && !showGames ? "tools" : (category ?? "tools");
-  const entries = availableHomeEntries.filter(
-    (entry) => entry.category === selected,
-  );
+  const entries = orderedHomeEntries(
+    selected,
+    homeEntryOrder[selected],
+    availableHomeEntries,
+  )
+    .filter((entry) => homeEntryVisibility[entry.id] !== false)
+    .filter(() => !hiddenHomeCategories.includes(selected));
   const lastTapAt = useRef(0);
   // 保留既有快捷入口；分类放在路由中，使导航选中态与页面一致。
   const toggleGames = useEffectEvent(() => {
