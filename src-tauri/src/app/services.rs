@@ -8,6 +8,7 @@ use crate::error::AppResult;
 use crate::modules::game_room::GameRoomManager;
 use crate::modules::hosts::HostRepository;
 use crate::modules::keys::KeyRepository;
+#[cfg(desktop)]
 use crate::modules::lan_transfer::{repository::LanRepository, LanTransferManager};
 use crate::modules::maintenance::participants;
 use crate::modules::todo::TodoRepository;
@@ -24,6 +25,7 @@ use crate::storage::Storage;
 pub struct AppServices {
     pub(crate) diagnostics: Arc<crate::core::diagnostics::Diagnostics>,
     pub(crate) model_inbox: Arc<crate::modules::model_viewer::system::ModelOpenInbox>,
+    #[cfg(mobile)]
     pub(crate) model_exports: Arc<crate::modules::model_viewer::ModelExportStore>,
     pub(crate) model_viewer: Arc<crate::modules::model_viewer::ModelViewerService>,
     pub(crate) model_library: crate::modules::model_viewer::ModelLibraryRepository,
@@ -33,7 +35,9 @@ pub struct AppServices {
     #[cfg(target_os = "android")]
     pub(crate) ai_credentials: Arc<AiKeychain>,
     pub manager: Arc<Manager>,
+    #[cfg(desktop)]
     pub lan_transfer: Arc<LanTransferManager>,
+    #[cfg(desktop)]
     pub(crate) lan_repository: LanRepository,
     pub(crate) host_repository: HostRepository,
     pub(crate) key_repository: KeyRepository,
@@ -81,6 +85,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         Manager::shutdown_all,
         |manager: &Manager| Ok(manager.is_busy()),
     );
+    #[cfg(desktop)]
     let lan_transfer = lifecycle.install(
         participants::LAN_TRANSFER,
         Arc::new(LanTransferManager::new(operations.clone())),
@@ -134,6 +139,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
             .state::<Arc<crate::modules::model_viewer::system::ModelOpenInbox>>()
             .inner()
             .clone(),
+        #[cfg(mobile)]
         model_exports: Arc::new(crate::modules::model_viewer::ModelExportStore::new(
             app.path().app_cache_dir()?.join("mftp-model-exports"),
         )),
@@ -143,6 +149,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         ai_configuration,
         #[cfg(target_os = "android")]
         ai_credentials,
+        #[cfg(desktop)]
         lan_repository: LanRepository::new(storage.clone()),
         host_repository: HostRepository::new(storage.clone()),
         key_repository: KeyRepository::new(storage.clone()),
@@ -153,6 +160,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         )),
         storage,
         manager,
+        #[cfg(desktop)]
         lan_transfer,
         game_room,
         poetry,
@@ -162,7 +170,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         bt,
         lifecycle: Arc::new(lifecycle),
     };
-    // LAN's mobile UI is not exposed; auto-start must not open mobile sockets.
+    // The LAN runtime and its listeners are desktop-only.
     #[cfg(desktop)]
     start_lan_if_configured(&services);
     Ok(services)

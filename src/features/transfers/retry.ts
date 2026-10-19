@@ -1,5 +1,4 @@
-import { useBtTasksStore } from "~/features/bt/tasks-store";
-import { router } from "~/router";
+import { retryBtSource } from "~/features/bt/integration";
 
 /**
  * 传输任务的重试意图。
@@ -21,8 +20,7 @@ export async function runTransferRetry(
   switch (intent.kind) {
     case "bt-add": {
       // 先登记意图再导航：BT 页挂载（或已在页面上）时消费一次。
-      useBtTasksStore.getState().requestAddSource(intent.magnet);
-      await router.navigate({ to: "/tools/bt" });
+      await retryBtSource(intent.magnet);
       return;
     }
     case "sftp-action":

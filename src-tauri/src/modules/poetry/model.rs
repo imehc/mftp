@@ -262,6 +262,7 @@ pub struct PoetryTranslation {
 /// Metadata and entries of a user-supplied, redistributable translation pack.
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct PoetryTranslationPack {
     pub format: String,
     pub version: u32,
@@ -275,6 +276,7 @@ pub struct PoetryTranslationPack {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct PoetryPackTranslationInput {
     pub poem_uid: String,
     #[serde(default)]

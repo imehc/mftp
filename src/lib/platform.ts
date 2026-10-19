@@ -5,16 +5,25 @@
  */
 import { redirect } from "@tanstack/react-router";
 
+const buildPlatform =
+  typeof __MFTP_PLATFORM__ === "undefined" ? "web" : __MFTP_PLATFORM__;
+
 export function isMobilePlatform(): boolean {
-  return /android|iphone|ipad/i.test(navigator.userAgent);
+  return buildPlatform === "web"
+    ? /android|iphone|ipad/i.test(navigator.userAgent)
+    : buildPlatform === "android" || buildPlatform === "ios";
 }
 
 export function isAndroidPlatform(): boolean {
-  return /android/i.test(navigator.userAgent);
+  return buildPlatform === "web"
+    ? /android/i.test(navigator.userAgent)
+    : buildPlatform === "android";
 }
 
 export function isIosPlatform(): boolean {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+  return buildPlatform === "web"
+    ? /iphone|ipad|ipod/i.test(navigator.userAgent)
+    : buildPlatform === "ios";
 }
 
 export function isDesktopPlatform(): boolean {

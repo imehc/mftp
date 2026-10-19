@@ -16,6 +16,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+serde_json = "1"
 
 [dev-dependencies]
 tauri = { version = "2", features = ["test"] }
@@ -24,8 +25,6 @@ tokio = { version = "1", features = ["test-util"] }
 png = "0.18"
 
 [dependencies]
-tauri-plugin-native-viewer = { path = "plugins/native-viewer" }
-tauri-plugin-native-export = { path = "plugins/native-export" }
 tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
@@ -101,3 +100,7 @@ rustls-platform-verifier = "0.7"
 objc2 = "0.6"
 objc2-avf-audio = { version = "0.3", default-features = false, features = ["std", "AVSpeechSynthesis"] }
 objc2-foundation = "0.3"
+
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+tauri-plugin-native-viewer = { path = "plugins/native-viewer" }
+tauri-plugin-native-export = { path = "plugins/native-export" }

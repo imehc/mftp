@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import ExecutionLogDock from "~/features/connection-diagnostics/ExecutionLogDock";
-import UpdaterStatusBar from "~/features/updater/UpdaterStatusBar";
+import { UpdaterStatusBar } from "~/features/updater/integration";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useSettingsStore } from "~/store/settings";
 

@@ -1,12 +1,13 @@
-use super::{
-    LanExportData, LanSharedDir, LanSharedDirInput, LanTransferSettings, LanTrustedDevice,
-    LanTrustedDeviceInput,
-};
+use super::{LanExportData, LanSharedDir, LanTransferSettings, LanTrustedDevice};
+#[cfg(any(desktop, test))]
+use super::{LanSharedDirInput, LanTrustedDeviceInput};
 use crate::error::AppResult;
 use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 
 use crate::models::ImportMode;
-use crate::storage::{now_ms, Storage};
+#[cfg(any(desktop, test))]
+use crate::storage::now_ms;
+use crate::storage::Storage;
 
 #[derive(Clone)]
 pub(crate) struct LanRepository {
@@ -50,6 +51,7 @@ impl LanRepository {
         Ok(settings)
     }
 
+    #[cfg(any(desktop, test))]
     pub(crate) fn save_settings(
         &self,
         settings: LanTransferSettings,
@@ -76,6 +78,7 @@ impl LanRepository {
         Ok(dirs)
     }
 
+    #[cfg(any(desktop, test))]
     pub(crate) fn add_shared_dir(&self, input: LanSharedDirInput) -> AppResult<LanSharedDir> {
         let dir = LanSharedDir {
             id: uuid::Uuid::new_v4().to_string(),
@@ -91,6 +94,7 @@ impl LanRepository {
         Ok(dir)
     }
 
+    #[cfg(any(desktop, test))]
     pub(crate) fn delete_shared_dir(&self, id: &str) -> AppResult<()> {
         let conn = self.storage.conn()?;
         conn.execute("DELETE FROM lan_shared_dirs WHERE id = ?1", params![id])?;
@@ -108,6 +112,7 @@ impl LanRepository {
         Ok(devices)
     }
 
+    #[cfg(any(desktop, test))]
     pub(crate) fn add_trusted_device(
         &self,
         input: LanTrustedDeviceInput,
@@ -126,6 +131,7 @@ impl LanRepository {
         Ok(device)
     }
 
+    #[cfg(any(desktop, test))]
     pub(crate) fn delete_trusted_device(&self, id: &str) -> AppResult<()> {
         let conn = self.storage.conn()?;
         conn.execute("DELETE FROM lan_trusted_devices WHERE id = ?1", params![id])?;

@@ -7,7 +7,7 @@ use tauri_specta::{BuilderConfiguration, LanguageExt};
 mod common_only {
     use super::super::*;
     // Exercise the exact iOS expansion on the host, without loading BT commands.
-    common_modules! {}
+    common_modules!(define_registry,);
 }
 
 #[test]
@@ -55,7 +55,14 @@ fn registered_commands_match_platform_baseline_without_duplicates() {
         .filter(|line| !line.starts_with('#'))
         .filter_map(|line| {
             let (platform, name) = line.split_once(' ')?;
-            (platform == "common" || cfg!(any(desktop, target_os = "android"))).then_some(name)
+            match platform {
+                "common" => true,
+                "desktop" => cfg!(desktop),
+                "desktop,android" => cfg!(any(desktop, target_os = "android")),
+                "mobile" => cfg!(mobile),
+                _ => panic!("unknown platform group: {platform}"),
+            }
+            .then_some(name)
         })
         .collect();
     assert_eq!(actual, expected);
@@ -211,5 +218,80 @@ fn grouped_catalog_preserves_the_handler_and_argument_extraction() {
         .deserialize::<serde_json::Value>()
         .unwrap();
         assert_eq!(result, expected);
+    }
+}
+
+#[cfg(desktop)]
+pub(crate) mod full_contract {
+    use super::super::*;
+    macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_bt, $($modules)*); }; }
+    macro_rules! full_bt { ($($modules:tt)*) => { bt_module!(full_mobile, $($modules)*); }; }
+    macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
+    common_modules!(full_lan,);
+
+    #[test]
+    fn full_developer_contract_covers_all_platforms() {
+        let names: Vec<_> = module_commands()
+            .into_iter()
+            .flat_map(|(_, commands)| commands)
+            .map(|path| path.rsplit("::").next().unwrap().trim())
+            .collect();
+        let expected: Vec<_> = include_str!("command_baseline.txt")
+            .lines()
+            .filter(|line| !line.starts_with('#'))
+            .filter_map(|line| line.split_once(' ').map(|(_, name)| name))
+            .collect();
+        assert_eq!(names, expected);
+    }
+}
+
+#[cfg(desktop)]
+mod mobile_catalogs {
+    use super::super::*;
+
+    mod ios {
+        use super::*;
+        macro_rules! finish { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
+        common_modules!(finish,);
+    }
+
+    mod android {
+        use super::*;
+        macro_rules! finish { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
+        macro_rules! add_bt { ($($modules:tt)*) => { bt_module!(finish, $($modules)*); }; }
+        common_modules!(add_bt,);
+    }
+
+    #[test]
+    fn mobile_command_compositions_match_their_baselines() {
+        for (android, groups, builder) in [
+            (false, ios::module_commands(), ios::specta_builder()),
+            (true, android::module_commands(), android::specta_builder()),
+        ] {
+            let actual: Vec<_> = groups
+                .into_iter()
+                .flat_map(|(_, commands)| commands)
+                .map(|path| path.rsplit("::").next().unwrap().trim())
+                .collect();
+            let expected: Vec<_> = include_str!("command_baseline.txt")
+                .lines()
+                .filter_map(|line| line.split_once(' '))
+                .filter(|(group, _)| {
+                    *group == "common"
+                        || *group == "mobile"
+                        || (android && *group == "desktop,android")
+                })
+                .map(|(_, name)| name)
+                .collect();
+            assert_eq!(actual, expected);
+            let captured = std::sync::Mutex::new(None);
+            builder
+                .export(super::Capture(&captured), std::path::Path::new("unused"))
+                .unwrap();
+            assert_eq!(
+                captured.into_inner().unwrap().unwrap().commands.len(),
+                expected.len()
+            );
+        }
     }
 }

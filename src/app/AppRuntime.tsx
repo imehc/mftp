@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { installBtRuntime } from "~/features/bt/runtime/btRuntime";
+import { installBtRuntime } from "~/features/bt/integration";
 import { installGameSessionRuntime } from "~/features/games/engine/session-registry";
 import { installModelSystemRuntime } from "~/features/model-viewer/system/inbox";
 import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";

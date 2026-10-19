@@ -4,8 +4,11 @@
 //! the database writer.
 
 use std::fs;
-use std::path::{Component, Path, PathBuf};
+#[cfg(any(desktop, test))]
+use std::path::Component;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
+#[cfg(any(desktop, test))]
 use std::sync::Arc;
 
 use serde_json::Value;
@@ -203,6 +206,7 @@ pub fn glob_match(pattern: &str, candidate: &str) -> bool {
     inner(pattern.as_bytes(), candidate.as_bytes())
 }
 
+#[cfg(any(desktop, test))]
 pub(super) fn extract_selected(
     archive_path: &Path,
     extract_root: &Path,
@@ -268,6 +272,7 @@ pub(super) fn extract_selected(
     Ok(())
 }
 
+#[cfg(any(desktop, test))]
 pub(super) fn run_local_import(
     library: &Arc<PoetryLibrary>,
     progress: &ProgressFn<'_>,

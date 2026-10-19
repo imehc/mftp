@@ -1,0 +1,42 @@
+{
+  "targets": ["macos", "windows", "linux", "android", "ios"],
+  "capabilities": {
+    "bt": {
+      "platforms": ["desktop", "android"],
+      "routes": ["tools/bt.tsx"],
+      "sources": ["src/features/bt/"]
+    },
+    "lan": {
+      "platforms": ["desktop"],
+      "routes": ["tools/lan-transfer.tsx"],
+      "sources": ["src/features/lan-transfer/"]
+    },
+    "desktopSettings": {
+      "platforms": ["desktop"],
+      "routes": [],
+      "sources": [
+        "src/features/updater/",
+        "src/store/updater.ts",
+        "src/lib/updater.ts",
+        "src/features/settings/AutostartSetting.desktop.tsx",
+        "src/features/settings/StartupPageSettings.tsx",
+        "src/features/settings/DesktopSettings.tsx"
+      ]
+    },
+    "poetryLocal": {
+      "platforms": ["desktop"],
+      "routes": [],
+      "sources": [
+        "src/features/poetry/components/PoetryLocalManagement.tsx",
+        "src/features/poetry/components/TranslationPackManager.tsx",
+        "src/features/poetry/hooks/use-poetry-local-data.ts"
+      ]
+    },
+    "mobileModel": {
+      "platforms": ["android", "ios"],
+      "routes": [],
+      "sources": ["src/features/model-viewer/export/native-export.ts"]
+    }
+  },
+  "resources": ["app-icon.png", "model-decoders/"]
+}

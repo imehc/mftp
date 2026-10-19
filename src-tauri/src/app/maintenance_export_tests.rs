@@ -57,9 +57,6 @@ impl Fixture {
         let state = AppServices {
             diagnostics: Arc::new(crate::core::diagnostics::Diagnostics::default()),
             model_inbox: Arc::new(crate::modules::model_viewer::system::ModelOpenInbox::default()),
-            model_exports: Arc::new(crate::modules::model_viewer::ModelExportStore::new(
-                std::env::temp_dir().join(format!("mftp-unused-exports-{}", uuid::Uuid::new_v4())),
-            )),
             model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),
             model_library: crate::modules::model_viewer::ModelLibraryRepository::new(
                 storage.clone(),

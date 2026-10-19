@@ -1,4 +1,5 @@
 import type { ModelAttachment } from "~/bindings";
+import { exportBlob } from "~/features/model-viewer/export/native-export";
 import { type IpcError, toIpcError } from "~/lib/errors";
 import {
   modelAttachmentAdd,
@@ -8,7 +9,6 @@ import {
 } from "~/lib/ipc";
 
 import { modelError } from "../domain/errors";
-import { exportBlob } from "../export/native-export";
 
 function hasControl(value: string, text = false) {
   for (const char of value) {

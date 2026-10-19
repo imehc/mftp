@@ -10,10 +10,13 @@ fn clear_only_waits_for_the_participant_that_owns_live_work() {
     );
     // LAN HTTP log rows are appended outside the Executor lease, so its
     // service must drain before the activity-log table is cleared.
+    #[cfg(desktop)]
     assert_eq!(
         participants_for(AppDataModule::ActivityLogs),
         [participants::LAN_TRANSFER]
     );
+    #[cfg(mobile)]
+    assert!(participants_for(AppDataModule::ActivityLogs).is_empty());
     for module in [AppDataModule::Vault, AppDataModule::Todo] {
         assert!(participants_for(module).is_empty(), "{module:?}");
     }

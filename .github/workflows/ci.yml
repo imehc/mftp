@@ -77,11 +77,21 @@ jobs:
       - name: Lint Rust library
         run: cargo clippy --manifest-path src-tauri/Cargo.toml --locked --lib -- -D warnings
 
+      - name: Check platform packaging rules
+        run: pnpm run platform:check
+
       - name: Build frontend
         run: pnpm run build
 
       - name: Check build size and lazy preload budgets
         run: pnpm run build:budget
+
+      - name: Build other frontend targets
+        run: |
+          pnpm build --platform macos
+          pnpm build --platform windows
+          pnpm build --platform android
+          pnpm build --platform ios
 
       - name: Run frontend tests
         run: pnpm test
@@ -133,6 +143,9 @@ jobs:
 
       # These build Rust/Swift adapters only; they do not launch a simulator
       # or validate the complete iOS application or native system behavior.
+      - name: Check iOS library
+        run: cargo check --manifest-path src-tauri/Cargo.toml --locked --lib --target aarch64-apple-ios-sim
+
       - name: Compile iOS export and viewer plugins
         run: >-
           cargo check --manifest-path src-tauri/Cargo.toml --locked

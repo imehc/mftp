@@ -9,12 +9,14 @@ import { AppRuntime } from "~/app/AppRuntime";
 import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import ResetBoundary from "~/features/about/ResetBoundary";
-import UpdaterDialog from "~/features/updater/UpdaterDialog";
+import {
+  checkForUpdateOnLaunch,
+  UpdaterDialog,
+} from "~/features/updater/integration";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
 import { applyStoredColorTheme } from "~/lib/color-theme";
 import { applyStoredDisplaySize } from "~/lib/display-size";
 import { applyStoredAppearance } from "~/lib/initial-appearance";
-import { checkForUpdateOnLaunch } from "~/lib/updater";
 
 import { router } from "./router";
 

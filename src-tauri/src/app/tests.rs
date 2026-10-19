@@ -199,7 +199,10 @@ fn export_cleanup_can_drain_while_new_operations_are_rejected() {
             "model_environment_abort",
             "speech_stop",
         ] {
-            assert!(get_ipc_response(&webview, request(cmd)).is_ok());
+            assert_eq!(
+                get_ipc_response(&webview, request(cmd)).is_ok(),
+                !cmd.starts_with("model_export_") || cfg!(mobile)
+            );
         }
         for cmd in [
             "model_export_begin",
@@ -215,7 +218,10 @@ fn export_cleanup_can_drain_while_new_operations_are_rejected() {
         drop(lease);
     });
     lifecycle.begin_shutdown();
-    assert!(get_ipc_response(&webview, request("model_export_close")).is_ok());
+    assert_eq!(
+        get_ipc_response(&webview, request("model_export_close")).is_ok(),
+        cfg!(mobile)
+    );
     assert!(get_ipc_response(&webview, request("model_environment_abort")).is_ok());
     assert!(get_ipc_response(&webview, request("model_export_present")).is_err());
 }

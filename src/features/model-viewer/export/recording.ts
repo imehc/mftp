@@ -1,9 +1,9 @@
 import type { AppError, ModelExportAction } from "~/bindings";
+import { exportBlob } from "~/features/model-viewer/export/native-export";
 
 import { modelError } from "../domain/errors";
 import { exportError } from "./errors";
 import { exportFileName } from "./file-name";
-import { exportBlob } from "./native-export";
 import {
   createRecordingEncoder,
   type RecordingEncoder,

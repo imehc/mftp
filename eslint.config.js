@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
+import { defineConfig, globalIgnores } from "eslint/config";
 import lingui from "eslint-plugin-lingui";
 import reactCompiler from "eslint-plugin-react-compiler";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -53,25 +54,24 @@ const paddingRules = [
   },
 ];
 
-export default tseslint.config(
-  {
-    ignores: [
-      "dist/**",
-      "dist-ssr/**",
-      // 固定版本的第三方 WASM 解码器分发文件，保持上游原始字节。
-      "public/model-decoders/**",
-      // 文档、设计片段和辅助验收产物不纳入 ESLint 检查。
-      "docs/**",
-      // Rust 管理的资源（如 lan_transfer 浏览器端）不属于前端代码
-      "src-tauri/**",
-      // 自动生成：真实来源是 Rust（specta）/ 路由配置 / .po 文件
-      "src/bindings.ts",
-      "src/routeTree.gen.ts",
-      "src/locales/**/messages.ts",
-    ],
-  },
+export default defineConfig(
+  globalIgnores([
+    "dist/**",
+    "dist-ssr/**",
+    ".tanstack/**",
+    // 固定版本的第三方 WASM 解码器分发文件，保持上游原始字节。
+    "public/model-decoders/**",
+    // 文档、设计片段和辅助验收产物不纳入 ESLint 检查。
+    "docs/**",
+    // Rust 管理的资源（如 lan_transfer 浏览器端）不属于前端代码
+    "src-tauri/**",
+    // 自动生成：真实来源是 Rust（specta）/ 路由配置 / .po 文件
+    "src/bindings.ts",
+    "src/routeTree.gen.ts",
+    "src/locales/**/messages.ts",
+  ]),
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
   {
     plugins: { "react-compiler": reactCompiler },

@@ -367,7 +367,7 @@ msgstr "AI 数据库版本高于当前应用版本，请升级应用"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:104
-#: src/features/settings/SettingsOverview.tsx:32
+#: src/features/settings/SettingsOverview.tsx:24
 #: src/features/settings/SettingsPage.tsx:38
 msgid "AI 服务"
 msgstr "AI 服务"
@@ -813,8 +813,8 @@ msgstr "下载 {entryName2}"
 
 #. SSH/SFTP 传输操作当前阶段
 #: src/features/bt/components/TaskRow.tsx:98
-#: src/features/settings/AppSettingsMenu.tsx:73
 #: src/features/transfers/phase-label.ts:21
+#: src/features/updater/integration.tsx:28
 #: src/store/transfers.ts:12
 msgid "下载中"
 msgstr "下载中"
@@ -832,7 +832,7 @@ msgstr "下载会话无法恢复，请重新添加任务"
 msgid "下载压缩包中"
 msgstr "下载压缩包中"
 
-#: src/features/poetry/LibraryManagePage.tsx:105
+#: src/features/poetry/LibraryManagePage.tsx:68
 msgid "下载后即可离线搜索和阅读。"
 msgstr "下载后即可离线搜索和阅读。"
 
@@ -1067,7 +1067,7 @@ msgstr "主目录"
 
 #. 应用配色主题选择
 #: src/features/settings/AppearanceSettings.tsx:46
-#: src/features/settings/AppSettingsMenu.tsx:185
+#: src/features/settings/AppSettingsMenu.tsx:150
 msgid "主题"
 msgstr "主题"
 
@@ -1197,7 +1197,7 @@ msgstr "从左侧列表选择一篇，或试试每日一诗。"
 msgid "从当前视角开始转动设备。触碰画布、打开面板或进入后台会停止控制。"
 msgstr "从当前视角开始转动设备。触碰画布、打开面板或进入后台会停止控制。"
 
-#: src/features/poetry/LibraryManagePage.tsx:125
+#: src/features/poetry/components/PoetryLocalManagement.tsx:58
 msgid "从本地 tar.gz 导入…"
 msgstr "从本地 tar.gz 导入…"
 
@@ -1646,11 +1646,11 @@ msgid "共用数据缓冲"
 msgstr "共用数据缓冲"
 
 #: src/features/about/AboutPage.tsx:59
-#: src/features/settings/AppSettingsMenu.tsx:111
+#: src/features/settings/AppSettingsMenu.tsx:88
 msgid "关于"
 msgstr "关于"
 
-#: src/features/settings/SettingsOverview.tsx:83
+#: src/features/settings/SettingsOverview.tsx:60
 msgid "关于与本地数据"
 msgstr "关于与本地数据"
 
@@ -1699,7 +1699,7 @@ msgstr "关闭可进一步减小体积"
 msgid "关闭后，本次修改不会保存。"
 msgstr "关闭后，本次修改不会保存。"
 
-#: src/features/poetry/LibraryManagePage.tsx:162
+#: src/features/poetry/components/PoetryLocalManagement.tsx:95
 msgid "关闭时正文搜索走 LIKE 兜底，较慢"
 msgstr "关闭时正文搜索走 LIKE 兜底，较慢"
 
@@ -1935,8 +1935,8 @@ msgstr "创建目录中"
 #: src/features/bt/components/TaskDialogs.tsx:85
 #: src/features/bt/components/TaskRow.tsx:235
 #: src/features/model-viewer/components/LibraryPanel.tsx:320
+#: src/features/poetry/components/PoetryLocalManagement.tsx:130
 #: src/features/poetry/components/PoetryTranslationSection.tsx:359
-#: src/features/poetry/LibraryManagePage.tsx:197
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:91
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:235
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:48
@@ -2137,12 +2137,12 @@ msgstr "剩余 {taskEtaValue}"
 msgid "力度"
 msgstr "力度"
 
-#: src/features/settings/SettingsOverview.tsx:29
+#: src/features/settings/SettingsOverview.tsx:21
 msgid "功能"
 msgstr "功能"
 
 #: src/features/settings/FeatureEntrySettings.tsx:158
-#: src/features/settings/SettingsOverview.tsx:38
+#: src/features/settings/SettingsOverview.tsx:30
 #: src/features/settings/SettingsPage.tsx:38
 msgid "功能入口"
 msgstr "功能入口"
@@ -2193,7 +2193,7 @@ msgstr "加载中"
 #: src/features/bt/components/PeersPanel.tsx:62
 #: src/features/poetry/components/CollectionManagement.tsx:125
 #: src/features/poetry/components/PoemList.tsx:192
-#: src/features/poetry/LibraryManagePage.tsx:146
+#: src/features/poetry/components/PoetryLocalManagement.tsx:79
 #: src/features/preview/PreviewScreen.tsx:80
 #: src/features/preview/PreviewSurface.tsx:139
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:203
@@ -2278,7 +2278,7 @@ msgstr "单杆 {currentBreak}"
 msgid "单次"
 msgstr "单次"
 
-#: src/features/poetry/LibraryManagePage.tsx:239
+#: src/features/poetry/LibraryManagePage.tsx:91
 msgid "卸载"
 msgstr "卸载"
 
@@ -2286,7 +2286,7 @@ msgstr "卸载"
 msgid "卸载 {name}"
 msgstr "卸载 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:229
+#: src/features/poetry/LibraryManagePage.tsx:81
 msgid "卸载合集"
 msgstr "卸载合集"
 
@@ -2471,7 +2471,7 @@ msgstr "发生未知错误，请重试"
 #: src/features/poetry/components/PoetryTranslationSection.tsx:326
 #: src/features/poetry/components/PoetryTranslationSection.tsx:354
 #: src/features/poetry/components/PoetryTranslationSection.tsx:374
-#: src/features/poetry/LibraryManagePage.tsx:237
+#: src/features/poetry/LibraryManagePage.tsx:89
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:337
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:88
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:221
@@ -2988,7 +2988,7 @@ msgstr "备份文件格式无效：缺少字段 {field} 或取值不正确"
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "备份文件解密失败：密码错误或文件已损坏"
 
-#: src/features/settings/SettingsOverview.tsx:50
+#: src/features/settings/SettingsOverview.tsx:42
 msgid "备份本机数据"
 msgstr "备份本机数据"
 
@@ -3077,7 +3077,7 @@ msgid "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请�
 msgstr "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请按完整路径逐项补选。"
 
 #: src/features/settings/AppearanceSettings.tsx:27
-#: src/features/settings/AppSettingsMenu.tsx:160
+#: src/features/settings/AppSettingsMenu.tsx:125
 msgid "外观"
 msgstr "外观"
 
@@ -3114,7 +3114,7 @@ msgstr "媒体处理模式"
 
 #. 应用界面字体选择
 #: src/features/settings/AppearanceSettings.tsx:62
-#: src/features/settings/AppSettingsMenu.tsx:228
+#: src/features/settings/AppSettingsMenu.tsx:193
 msgid "字体"
 msgstr "字体"
 
@@ -3126,7 +3126,7 @@ msgstr "字号"
 msgid "字节数未知"
 msgstr "字节数未知"
 
-#: src/features/settings/SettingsOverview.tsx:84
+#: src/features/settings/SettingsOverview.tsx:61
 msgid "存储、清理与项目帮助"
 msgstr "存储、清理与项目帮助"
 
@@ -3144,7 +3144,7 @@ msgstr "存储占用"
 msgid "安全模式"
 msgstr "安全模式"
 
-#: src/features/poetry/LibraryManagePage.tsx:206
+#: src/features/poetry/components/PoetryLocalManagement.tsx:139
 msgid "安装"
 msgstr "安装"
 
@@ -3435,7 +3435,7 @@ msgstr "导航"
 msgid "将军"
 msgstr "将军"
 
-#: src/features/poetry/LibraryManagePage.tsx:232
+#: src/features/poetry/LibraryManagePage.tsx:84
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 
@@ -3738,7 +3738,7 @@ msgstr "已存在同名附件，请先重命名文件或移除旧附件。"
 msgid "已安装"
 msgstr "已安装"
 
-#: src/features/poetry/LibraryManagePage.tsx:185
+#: src/features/poetry/components/PoetryLocalManagement.tsx:118
 msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "已安装 {toLocaleStringValue3} 条，约 14MB"
 
@@ -3871,7 +3871,7 @@ msgstr "已知分配估算"
 msgid "已移动 {name}"
 msgstr "已移动 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:161
+#: src/features/poetry/components/PoetryLocalManagement.tsx:94
 msgid "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 msgstr "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 
@@ -3915,7 +3915,7 @@ msgstr "平局"
 msgid "并排"
 msgstr "并排"
 
-#: src/features/settings/SettingsOverview.tsx:58
+#: src/features/settings/SettingsOverview.tsx:50
 msgid "应用"
 msgstr "应用"
 
@@ -3975,7 +3975,7 @@ msgstr "废弃"
 msgid "废弃时间"
 msgstr "废弃时间"
 
-#: src/features/poetry/LibraryManagePage.tsx:174
+#: src/features/poetry/components/PoetryLocalManagement.tsx:107
 msgid "开启"
 msgstr "开启"
 
@@ -4833,12 +4833,12 @@ msgstr "放弃未保存的修改？"
 msgid "数据"
 msgstr "数据"
 
-#: src/features/settings/SettingsOverview.tsx:46
+#: src/features/settings/SettingsOverview.tsx:38
 msgid "数据与运行"
 msgstr "数据与运行"
 
 #: src/features/export/BackupPage.tsx:46
-#: src/features/settings/SettingsOverview.tsx:49
+#: src/features/settings/SettingsOverview.tsx:41
 msgid "数据导入与导出"
 msgstr "数据导入与导出"
 
@@ -5098,7 +5098,7 @@ msgstr "无法转换该视频（{detail}）"
 msgid "无法锁定鼠标，可拖动画布转向。"
 msgstr "无法锁定鼠标，可拖动画布转向。"
 
-#: src/features/settings/AppSettingsMenu.tsx:114
+#: src/features/settings/AppSettingsMenu.tsx:91
 msgid "日志"
 msgstr "日志"
 
@@ -5294,7 +5294,7 @@ msgstr "暂时无法预览，文件可能尚未下载完整或编码不受支持
 msgid "暂时没有可用更新。"
 msgstr "暂时没有可用更新。"
 
-#: src/features/settings/AppSettingsMenu.tsx:107
+#: src/features/settings/AppSettingsMenu.tsx:84
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:136
 msgid "更多"
 msgstr "更多"
@@ -5481,7 +5481,7 @@ msgstr "未命名节点"
 msgid "未安排"
 msgstr "未安排"
 
-#: src/features/poetry/LibraryManagePage.tsx:186
+#: src/features/poetry/components/PoetryLocalManagement.tsx:119
 msgid "未安装；仅点击时下载，可随时删除"
 msgstr "未安装；仅点击时下载，可随时删除"
 
@@ -5728,7 +5728,7 @@ msgstr "查看备注图片"
 msgid "查看完整发布说明"
 msgstr "查看完整发布说明"
 
-#: src/features/settings/SettingsOverview.tsx:62
+#: src/features/settings/SettingsOverview.tsx:54
 msgid "查看操作和失败原因"
 msgstr "查看操作和失败原因"
 
@@ -5742,9 +5742,9 @@ msgstr "查看日志"
 msgid "查看日志：{action}"
 msgstr "查看日志：{action}"
 
-#: src/features/settings/AppSettingsMenu.tsx:72
-#: src/features/settings/AppSettingsMenu.tsx:74
-#: src/features/settings/SettingsOverview.tsx:73
+#: src/features/updater/integration.tsx:27
+#: src/features/updater/integration.tsx:29
+#: src/features/updater/integration.tsx:66
 msgid "查看更新"
 msgstr "查看更新"
 
@@ -5869,9 +5869,9 @@ msgstr "检查"
 msgid "检查文件是否存在"
 msgstr "检查文件是否存在"
 
-#: src/features/settings/AppSettingsMenu.tsx:69
-#: src/features/settings/AppSettingsMenu.tsx:71
-#: src/features/settings/SettingsOverview.tsx:76
+#: src/features/updater/integration.tsx:24
+#: src/features/updater/integration.tsx:26
+#: src/features/updater/integration.tsx:69
 #: src/features/updater/use-updater-label.ts:28
 msgid "检查更新"
 msgstr "检查更新"
@@ -6268,8 +6268,8 @@ msgstr "正在校验"
 msgid "正在校验更新…"
 msgstr "正在校验更新…"
 
-#: src/features/settings/AppSettingsMenu.tsx:70
-#: src/features/settings/SettingsOverview.tsx:75
+#: src/features/updater/integration.tsx:25
+#: src/features/updater/integration.tsx:68
 msgid "正在检查"
 msgstr "正在检查"
 
@@ -6390,8 +6390,8 @@ msgstr "正在连接更新源…"
 msgid "正文"
 msgstr "正文"
 
-#: src/features/poetry/LibraryManagePage.tsx:157
-#: src/features/poetry/LibraryManagePage.tsx:172
+#: src/features/poetry/components/PoetryLocalManagement.tsx:90
+#: src/features/poetry/components/PoetryLocalManagement.tsx:105
 msgid "正文全文索引"
 msgstr "正文全文索引"
 
@@ -6550,7 +6550,7 @@ msgstr "法线着色"
 msgid "注释"
 msgstr "注释"
 
-#: src/features/poetry/LibraryManagePage.tsx:181
+#: src/features/poetry/components/PoetryLocalManagement.tsx:114
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
 
@@ -6569,7 +6569,7 @@ msgstr "活动"
 
 #: src/features/about/use-about.ts:49
 #: src/features/logs/ActivityLogsPage.tsx:37
-#: src/features/settings/SettingsOverview.tsx:61
+#: src/features/settings/SettingsOverview.tsx:53
 msgid "活动日志"
 msgstr "活动日志"
 
@@ -6579,7 +6579,7 @@ msgstr "流式输出"
 
 #. 应用外观模式
 #: src/features/settings/AppearanceSettings.tsx:35
-#: src/features/settings/AppSettingsMenu.tsx:170
+#: src/features/settings/AppSettingsMenu.tsx:135
 msgid "浅色"
 msgstr "浅色"
 
@@ -6625,7 +6625,7 @@ msgstr "深度检查工具"
 
 #. 应用外观模式
 #: src/features/settings/AppearanceSettings.tsx:39
-#: src/features/settings/AppSettingsMenu.tsx:171
+#: src/features/settings/AppSettingsMenu.tsx:136
 msgid "深色"
 msgstr "深色"
 
@@ -7488,7 +7488,7 @@ msgstr "粘滞位"
 msgid "粘贴或输入 {languageLabel} 内容"
 msgstr "粘贴或输入 {languageLabel} 内容"
 
-#: src/features/settings/AppSettingsMenu.tsx:168
+#: src/features/settings/AppSettingsMenu.tsx:133
 msgid "系统"
 msgstr "系统"
 
@@ -8109,8 +8109,8 @@ msgid "设备名"
 msgstr "设备名"
 
 #: src/features/navigation/NavigationItems.tsx:46
-#: src/features/settings/AppSettingsMenu.tsx:89
-#: src/features/settings/AppSettingsMenu.tsx:101
+#: src/features/settings/AppSettingsMenu.tsx:66
+#: src/features/settings/AppSettingsMenu.tsx:78
 #: src/features/settings/SettingsPage.tsx:38
 msgid "设置"
 msgstr "设置"
@@ -8157,7 +8157,7 @@ msgstr "诊断"
 msgid "译文"
 msgstr "译文"
 
-#: src/features/poetry/LibraryManagePage.tsx:109
+#: src/features/poetry/components/PoetryLocalManagement.tsx:42
 msgid "译文与本地语料"
 msgstr "译文与本地语料"
 
@@ -8226,7 +8226,7 @@ msgstr "诗词库同步已取消"
 msgid "诗词数据库"
 msgstr "诗词数据库"
 
-#: src/features/poetry/LibraryManagePage.tsx:85
+#: src/features/poetry/LibraryManagePage.tsx:48
 msgid "诗词数据管理"
 msgstr "诗词数据管理"
 
@@ -8320,7 +8320,7 @@ msgstr "详情"
 
 #: src/features/formatter/FormatterTool.tsx:98
 #: src/features/settings/AppearanceSettings.tsx:79
-#: src/features/settings/AppSettingsMenu.tsx:142
+#: src/features/settings/AppSettingsMenu.tsx:107
 msgid "语言"
 msgstr "语言"
 
@@ -8574,7 +8574,7 @@ msgstr "调整筛选条件或刷新后再试。"
 msgid "调整顺序"
 msgstr "调整顺序"
 
-#: src/features/settings/SettingsOverview.tsx:39
+#: src/features/settings/SettingsOverview.tsx:31
 msgid "调整首页功能的显示顺序"
 msgstr "调整首页功能的显示顺序"
 
@@ -8632,7 +8632,7 @@ msgid "赏析"
 msgstr "赏析"
 
 #: src/features/settings/AppearanceSettings.tsx:55
-#: src/features/settings/AppSettingsMenu.tsx:218
+#: src/features/settings/AppSettingsMenu.tsx:183
 msgid "赛博朋克"
 msgstr "赛博朋克"
 
@@ -8642,7 +8642,7 @@ msgid "距离：{distance}"
 msgstr "距离：{distance}"
 
 #: src/features/settings/AppearanceSettings.tsx:69
-#: src/features/settings/AppSettingsMenu.tsx:238
+#: src/features/settings/AppSettingsMenu.tsx:203
 msgid "跟随主题"
 msgstr "跟随主题"
 
@@ -8753,8 +8753,8 @@ msgstr "返回上级目录"
 msgid "返回列表"
 msgstr "返回列表"
 
-#: src/features/poetry/LibraryManagePage.tsx:89
-#: src/features/poetry/LibraryManagePage.tsx:90
+#: src/features/poetry/LibraryManagePage.tsx:52
+#: src/features/poetry/LibraryManagePage.tsx:53
 #: src/features/poetry/PoemDetailPage.tsx:55
 #: src/features/poetry/PoemDetailPage.tsx:56
 msgid "返回古诗词"
@@ -8879,7 +8879,7 @@ msgstr "连接"
 msgid "连接 AI 服务超时"
 msgstr "连接 AI 服务超时"
 
-#: src/features/settings/SettingsOverview.tsx:33
+#: src/features/settings/SettingsOverview.tsx:25
 msgid "连接与模型设置"
 msgstr "连接与模型设置"
 
@@ -9223,7 +9223,7 @@ msgstr "采集数据…"
 msgid "重做"
 msgstr "重做"
 
-#: src/features/settings/AppSettingsMenu.tsx:75
+#: src/features/updater/integration.tsx:30
 msgid "重启中"
 msgstr "重启中"
 
@@ -9276,7 +9276,7 @@ msgstr "重新打开应用"
 msgid "重新打开应用后使用新的初始状态。"
 msgstr "重新打开应用后使用新的初始状态。"
 
-#: src/features/settings/AppSettingsMenu.tsx:76
+#: src/features/updater/integration.tsx:31
 #: src/features/updater/UpdaterDialog.tsx:147
 msgid "重新检查"
 msgstr "重新检查"
@@ -9322,8 +9322,8 @@ msgstr "重置状态已改变，请重新检查状态"
 #: src/features/logs/ActivityLogsPage.tsx:98
 #: src/features/poetry/components/CollectionManagement.tsx:115
 #: src/features/poetry/components/PoemList.tsx:203
+#: src/features/poetry/components/PoetryLocalManagement.tsx:74
 #: src/features/poetry/components/PoetryReadError.tsx:26
-#: src/features/poetry/LibraryManagePage.tsx:141
 #: src/features/preview/PreviewSurface.tsx:156
 #: src/features/settings/AutostartSetting.desktop.tsx:33
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:184
@@ -9507,7 +9507,7 @@ msgid "顶点数"
 msgstr "顶点数"
 
 #: src/features/about/AboutPage.tsx:202
-#: src/features/settings/AppSettingsMenu.tsx:120
+#: src/features/settings/AppSettingsMenu.tsx:97
 msgid "项目帮助"
 msgstr "项目帮助"
 
@@ -9606,7 +9606,7 @@ msgstr "黑胜"
 
 #: src/features/poetry/components/CollectionManagement.tsx:44
 #: src/features/settings/AppearanceSettings.tsx:53
-#: src/features/settings/AppSettingsMenu.tsx:216
+#: src/features/settings/AppSettingsMenu.tsx:181
 msgid "默认"
 msgstr "默认"
 

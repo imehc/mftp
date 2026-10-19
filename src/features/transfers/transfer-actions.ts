@@ -1,3 +1,4 @@
+import { controlBtTransfer } from "~/features/bt/transfer-control";
 import * as ipc from "~/lib/ipc";
 import { type TransferState, useTransfersStore } from "~/store/transfers";
 
@@ -32,7 +33,7 @@ export function createTransferActions() {
     markCancelling(id);
     try {
       if (id.startsWith("bt:")) {
-        await ipc.btControl(id.slice(3), "Cancel", false);
+        await controlBtTransfer(id.slice(3), "Cancel", false);
         finishTransfer(id, "cancelled");
       } else {
         await ipc.sftpCancelTransfer(id);
@@ -60,7 +61,7 @@ export function createTransferActions() {
     setControlPending(id, true);
     try {
       if (id.startsWith("bt:")) {
-        await ipc.btControl(
+        await controlBtTransfer(
           id.slice(3),
           transfer.paused ? "Resume" : "Pause",
           false,

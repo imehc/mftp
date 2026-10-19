@@ -2,15 +2,12 @@ import { useLingui as useLinguiRuntime } from "@lingui/react";
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { cn } from "cn";
 import {
   ExternalLink,
   Languages,
   Monitor,
   Moon,
   Palette,
-  RefreshCw,
-  RotateCcw,
   Settings,
   Sun,
   Type,
@@ -31,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import AiModelMenu from "~/features/ai-configuration/AiModelMenu";
+import { UpdateMenuItem } from "~/features/updater/integration";
 import { localeLabels, localeOptions } from "~/i18n/locales";
 import {
   type ColorTheme,
@@ -40,10 +38,7 @@ import {
   resolveColorTheme,
   resolveFontPreset,
 } from "~/lib/color-theme";
-import { isDesktopPlatform } from "~/lib/platform";
-import { checkForUpdateManually } from "~/lib/updater";
 import { type AppLocale, useSettingsStore } from "~/store/settings";
-import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 
 const themes = [
   { value: "system", icon: Monitor },
@@ -61,26 +56,8 @@ export default function AppSettingsMenu() {
   const setColorTheme = useSettingsStore((s) => s.setColorTheme);
   const fontPreset = useSettingsStore((s) => s.fontPreset);
   const setFontPreset = useSettingsStore((s) => s.setFontPreset);
-  const updaterStatus = useUpdaterStore((s) => s.status);
-  const checking = updaterStatus === "checking";
   const ThemeIcon =
     themes.find((item) => item.value === theme)?.icon ?? Monitor;
-  const updateLabels: Record<UpdaterStatus, string> = {
-    idle: t`检查更新`,
-    checking: t`正在检查`,
-    current: t`检查更新`,
-    available: t`查看更新`,
-    downloading: t`下载中`,
-    ready: t`查看更新`,
-    restarting: t`重启中`,
-    error: t`重新检查`,
-  };
-
-  function checkUpdate() {
-    // 等菜单关闭和焦点恢复后再打开根级更新弹窗。
-    setTimeout(() => void checkForUpdateManually(), 0);
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -121,19 +98,7 @@ export default function AppSettingsMenu() {
             </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
-        {isDesktopPlatform() ? (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={checkUpdate}>
-              {updaterStatus === "ready" ? (
-                <RotateCcw />
-              ) : (
-                <RefreshCw className={cn(checking && "animate-spin")} />
-              )}
-              {updateLabels[updaterStatus]}
-            </DropdownMenuItem>
-          </>
-        ) : null}
+        <UpdateMenuItem />
         <DropdownMenuSeparator />
         <AiModelMenu />
         <DropdownMenuSub>

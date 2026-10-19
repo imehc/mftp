@@ -1,13 +1,13 @@
+#[cfg(any(desktop, test))]
+use super::model::PoetryTranslationPack;
 use rusqlite::params;
 
 use super::db::PoetryDb;
-use super::model::{
-    PoetryPackTranslation, PoetryTranslationMode, PoetryTranslationPack,
-    PoetryTranslationPackSummary,
-};
+use super::model::{PoetryPackTranslation, PoetryTranslationMode, PoetryTranslationPackSummary};
 use crate::error::{AppError, AppResult, CustomErrorCode};
 
 impl PoetryDb {
+    #[cfg(any(desktop, test))]
     pub fn import_translation_pack(&self, pack: &PoetryTranslationPack) -> AppResult<i64> {
         validate_pack(pack)?;
         let conn = self.open()?;
@@ -92,6 +92,7 @@ impl PoetryDb {
     }
 }
 
+#[cfg(any(desktop, test))]
 fn mode_to_db(mode: PoetryTranslationMode) -> &'static str {
     match mode {
         PoetryTranslationMode::Literal => "literal",
@@ -107,6 +108,7 @@ fn mode_from_db(value: &str) -> AppResult<PoetryTranslationMode> {
     }
 }
 
+#[cfg(any(desktop, test))]
 fn validate_pack(pack: &PoetryTranslationPack) -> AppResult<()> {
     if pack.format != "mftp-poetry-translation-pack" || pack.version != 1 {
         return Err(AppError::custom(

@@ -1,3 +1,5 @@
+import platformManifest from "../../config/platform-capabilities.json";
+
 /**
  * 模块清单：首页入口、平台能力与「上次使用的工具」恢复的唯一来源。
  *
@@ -18,7 +20,11 @@ export interface ModuleMetadata {
 
 export const modules = [
   { id: "ssh-sftp", tool: "ssh-sftp" },
-  { id: "lan-transfer", tool: "lan-transfer", platforms: ["desktop"] },
+  {
+    id: "lan-transfer",
+    tool: "lan-transfer",
+    platforms: platformManifest.capabilities.lan.platforms as ModulePlatform[],
+  },
   { id: "crypto", tool: "crypto" },
   { id: "media-compress", tool: "media-compress" },
   { id: "model-viewer", tool: "model-viewer" },
@@ -26,7 +32,11 @@ export const modules = [
   { id: "vault", tool: "vault" },
   { id: "todo", tool: "todo" },
   // iOS 不注册 BT 引擎；桌面端和 Android 使用独立本地 Session。
-  { id: "bt", tool: "bt", platforms: ["desktop", "android"] },
+  {
+    id: "bt",
+    tool: "bt",
+    platforms: platformManifest.capabilities.bt.platforms as ModulePlatform[],
+  },
   { id: "library", tool: "library" },
   { id: "billiards", tool: null },
   { id: "gomoku", tool: null },

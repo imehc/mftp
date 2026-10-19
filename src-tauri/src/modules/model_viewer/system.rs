@@ -15,6 +15,7 @@ use tauri::State;
 #[derive(Default)]
 pub(crate) struct ModelOpenInbox(Mutex<(VecDeque<String>, bool)>);
 impl ModelOpenInbox {
+    #[cfg(any(desktop, target_os = "ios", test))]
     pub(crate) fn push(&self, value: String) {
         let mut queue = self.0.lock();
         if value.len() > 8192 || queue.0.len() >= 8 {

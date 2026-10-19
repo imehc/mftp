@@ -16,6 +16,7 @@ pub struct LanTransferSettings {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanTransferStatus {
     pub running: bool,
     pub host: Option<String>,
@@ -29,6 +30,7 @@ pub struct LanTransferStatus {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanConnectedDevice {
     pub id: String,
     pub ip: String,
@@ -41,6 +43,7 @@ pub struct LanConnectedDevice {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanAuthRequest {
     pub id: String,
     pub ip: String,
@@ -51,6 +54,7 @@ pub struct LanAuthRequest {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanNetworkAddress {
     pub interface_name: String,
     pub ip: String,
@@ -59,6 +63,7 @@ pub struct LanNetworkAddress {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanDiscoveredDevice {
     pub id: String,
     pub device_name: String,
@@ -71,6 +76,7 @@ pub struct LanDiscoveredDevice {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanTransferTask {
     pub id: String,
     pub direction: String,
@@ -97,6 +103,7 @@ pub struct LanSharedDir {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanSharedDirInput {
     pub name: String,
     pub path: String,
@@ -113,6 +120,7 @@ pub struct LanTrustedDevice {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(desktop, test))]
 pub struct LanTrustedDeviceInput {
     pub label: String,
     pub ip: String,

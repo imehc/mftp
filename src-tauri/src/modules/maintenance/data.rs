@@ -19,7 +19,10 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
         // operation lease (by design, see the error-handling plan), so a
         // running server could keep writing rows while they are cleared.
         // Every other log writer leases through the drained Executor.
+        #[cfg(desktop)]
         AppDataModule::ActivityLogs => &[participants::LAN_TRANSFER],
+        #[cfg(mobile)]
+        AppDataModule::ActivityLogs => &[],
         AppDataModule::Vault | AppDataModule::Todo => &[],
     }
 }

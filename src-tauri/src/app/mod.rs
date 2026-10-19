@@ -20,20 +20,7 @@ pub(crate) fn run() -> AppResult<()> {
     runtime_config::prepare(context.config_mut());
     cleanup::cleanup_stale_local_transfer_files(&context.config().identifier);
     let registry = registry::specta_builder();
-    // Bundled debug apps also run without a source tree. Export only in Tauri
-    // development mode; tests export explicitly for all host builds.
-    #[cfg(all(dev, desktop))]
-    registry
-        .export(
-            specta_typescript::Typescript::default(),
-            "../src/bindings.ts",
-        )
-        .map_err(|_| {
-            crate::error::AppError::external(
-                "bindings:export",
-                "Failed to export TypeScript bindings",
-            )
-        })?;
+    // Full developer bindings are exported by the host test catalog.
 
     let app = tauri::Builder::default().manage(Arc::new(
         crate::modules::model_viewer::system::ModelOpenInbox::default(),
@@ -50,14 +37,16 @@ pub(crate) fn run() -> AppResult<()> {
         }
     }));
     let app = app
-        .plugin(tauri_plugin_native_viewer::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(crate::file_opener::init())
-        .plugin(tauri_plugin_native_export::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init());
+    #[cfg(mobile)]
+    let app = app
+        .plugin(tauri_plugin_native_viewer::init())
+        .plugin(tauri_plugin_native_export::init());
     #[cfg(desktop)]
     let app = app
         .plugin(
@@ -108,12 +97,13 @@ fn guard_commands<R: tauri::Runtime>(
         // available while maintenance or shutdown is draining the native worker.
         if matches!(
             invoke.message.command(),
-            "model_export_cancel"
-                | "model_export_close"
-                | "model_environment_abort"
-                | "diagnostics_clear"
-                | "speech_stop"
-        ) {
+            "model_environment_abort" | "diagnostics_clear" | "speech_stop"
+        ) || (cfg!(mobile)
+            && matches!(
+                invoke.message.command(),
+                "model_export_cancel" | "model_export_close"
+            ))
+        {
             return commands(invoke);
         }
         let admission = invoke

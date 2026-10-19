@@ -1,28 +1,20 @@
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  Database,
-  FileClock,
-  Info,
-  LayoutGrid,
-  RefreshCw,
-  Sparkles,
-} from "lucide-react";
+import { Database, FileClock, Info, LayoutGrid, Sparkles } from "lucide-react";
 
-import { isDesktopPlatform } from "~/lib/platform";
-import { checkForUpdateManually } from "~/lib/updater";
-import { useUpdaterStore } from "~/store/updater";
+import {
+  DesktopAutostartSettings,
+  DesktopStartupSettings,
+} from "~/features/settings/DesktopSettings";
+import { UpdateSettingsEntry } from "~/features/updater/integration";
 
 import AppearanceSettings from "./AppearanceSettings";
-import AutostartSettingDesktop from "./AutostartSetting.desktop";
 import { SettingsEntry, SettingsGroup } from "./SettingsEntry";
-import StartupPageSettings from "./StartupPageSettings";
 import TransferSetting from "./TransferSetting";
 
 export default function SettingsOverview({ onAi }: { onAi: () => void }) {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const status = useUpdaterStore((state) => state.status);
   return (
     <div className="grid items-start gap-4 md:grid-cols-2">
       <AppearanceSettings />
@@ -41,7 +33,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
             void navigate({ to: "/settings", search: { panel: "features" } })
           }
         />
-        {isDesktopPlatform() ? <StartupPageSettings /> : null}
+        <DesktopStartupSettings />
       </SettingsGroup>
       <SettingsGroup title={t`数据与运行`}>
         <SettingsEntry
@@ -53,7 +45,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
           }
         />
         <TransferSetting />
-        {isDesktopPlatform() ? <AutostartSettingDesktop /> : null}
+        <DesktopAutostartSettings />
       </SettingsGroup>
       <SettingsGroup title={t`应用`}>
         <SettingsEntry
@@ -62,22 +54,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
           description={t`查看操作和失败原因`}
           onClick={() => void navigate({ to: "/logs" })}
         />
-        {isDesktopPlatform() ? (
-          <SettingsEntry
-            icon={RefreshCw}
-            title={
-              status === "ready" ||
-              status === "available" ||
-              status === "downloading" ||
-              status === "restarting"
-                ? t`查看更新`
-                : status === "checking"
-                  ? t`正在检查`
-                  : t`检查更新`
-            }
-            onClick={() => void checkForUpdateManually()}
-          />
-        ) : null}
+        <UpdateSettingsEntry />
         <SettingsEntry
           icon={Info}
           title={t`关于与本地数据`}

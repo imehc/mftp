@@ -3,11 +3,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 
+import { buildPlatform } from "../../scripts/platforms.mjs";
+
 const project = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
-const root = path.resolve(process.argv[2] ?? path.join(project, "dist"));
+const root = path.resolve(
+  process.argv[2] ?? path.join(project, "dist", buildPlatform()),
+);
 const budget = JSON.parse(
   fs.readFileSync(path.join(project, "tests/checks/build-budget.json"), "utf8"),
 );

@@ -7,7 +7,9 @@
 //! without an app handle.
 
 use std::fs;
-use std::path::{Path, PathBuf};
+#[cfg(any(desktop, test))]
+use std::path::Path;
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -37,6 +39,7 @@ use github::fetch_source_sha;
 use net::download_tarball;
 use net::run_network_sync;
 
+#[cfg(any(desktop, test))]
 use ingest::run_local_import;
 
 /// Event channel shared with the frontend (`src/lib/events.ts`).
@@ -345,6 +348,7 @@ impl PoetryLibrary {
         )
     }
 
+    #[cfg(any(desktop, test))]
     pub fn begin_local_import(
         self: &Arc<Self>,
         progress: impl Fn(PoetrySyncProgress) + Send + Sync + 'static,

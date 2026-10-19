@@ -2,9 +2,11 @@
 
 #[cfg(any(desktop, target_os = "android"))]
 use crate::modules::bt;
+#[cfg(desktop)]
+use crate::modules::lan_transfer;
 use crate::modules::{
-    ai, diagnostics, game_room, hosts, keys, lan_transfer, maintenance, model_viewer, poetry,
-    speech, ssh, todo, vault,
+    ai, diagnostics, game_room, hosts, keys, maintenance, model_viewer, poetry, speech, ssh, todo,
+    vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -32,8 +34,8 @@ macro_rules! define_registry {
 }
 
 macro_rules! common_modules {
-    ($($platform:tt)*) => {
-        define_registry! {
+    ($next:ident, $($platform:tt)*) => {
+        $next! {
             "core" => { commands: [], types: [error::CustomErrorCode] },
             "speech" => {
                 commands: [speech::commands::speech_catalog, speech::commands::speech_snapshot, speech::commands::speech_start, speech::commands::speech_control, speech::commands::speech_stop],
@@ -54,11 +56,6 @@ macro_rules! common_modules {
                     model_viewer::attachment_commands::model_attachment_add,
                     model_viewer::attachment_commands::model_attachment_read,
                     model_viewer::attachment_commands::model_attachment_delete,
-                    model_viewer::export_commands::model_export_begin,
-                    model_viewer::export_commands::model_export_write,
-                    model_viewer::export_commands::model_export_present,
-                    model_viewer::export_commands::model_export_cancel,
-                    model_viewer::export_commands::model_export_close,
                     model_viewer::commands::model_viewer_open,
                     model_viewer::commands::model_viewer_attach,
                     model_viewer::commands::model_viewer_size,
@@ -120,31 +117,6 @@ macro_rules! common_modules {
                     keys::commands::keys_list,
                     keys::commands::key_import,
                     keys::commands::key_delete,
-                ],
-                types: [],
-            },
-            "lan_transfer" => {
-                commands: [
-                    lan_transfer::commands::lan_transfer_settings,
-                    lan_transfer::commands::lan_transfer_save_settings,
-                    lan_transfer::commands::lan_transfer_status,
-                    lan_transfer::commands::lan_transfer_network_addresses,
-                    lan_transfer::commands::lan_transfer_discover_devices,
-                    lan_transfer::commands::lan_transfer_connected_devices,
-                    lan_transfer::commands::lan_transfer_pending_auth_requests,
-                    lan_transfer::commands::lan_transfer_approve_auth_request,
-                    lan_transfer::commands::lan_transfer_reject_auth_request,
-                    lan_transfer::commands::lan_transfer_disconnect_device,
-                    lan_transfer::commands::lan_transfer_tasks,
-                    lan_transfer::commands::lan_transfer_cancel_task,
-                    lan_transfer::commands::lan_transfer_start,
-                    lan_transfer::commands::lan_transfer_stop,
-                    lan_transfer::commands::lan_transfer_shared_dirs,
-                    lan_transfer::commands::lan_transfer_add_shared_dir,
-                    lan_transfer::commands::lan_transfer_delete_shared_dir,
-                    lan_transfer::commands::lan_transfer_trusted_devices,
-                    lan_transfer::commands::lan_transfer_add_trusted_device,
-                    lan_transfer::commands::lan_transfer_delete_trusted_device,
                 ],
                 types: [],
             },
@@ -288,10 +260,44 @@ macro_rules! common_modules {
     };
 }
 
-// Filter whole modules before collect_commands expands; cfg on an individual
-// command entry is not supported by the pinned Tauri/Specta macro versions.
+#[cfg(desktop)]
+macro_rules! lan_module {
+    ($next:ident, $($modules:tt)*) => {
+        $next! { $($modules)*
+            "lan_transfer" => {
+                commands: [
+                    lan_transfer::commands::lan_transfer_settings,
+                    lan_transfer::commands::lan_transfer_save_settings,
+                    lan_transfer::commands::lan_transfer_status,
+                    lan_transfer::commands::lan_transfer_network_addresses,
+                    lan_transfer::commands::lan_transfer_discover_devices,
+                    lan_transfer::commands::lan_transfer_connected_devices,
+                    lan_transfer::commands::lan_transfer_pending_auth_requests,
+                    lan_transfer::commands::lan_transfer_approve_auth_request,
+                    lan_transfer::commands::lan_transfer_reject_auth_request,
+                    lan_transfer::commands::lan_transfer_disconnect_device,
+                    lan_transfer::commands::lan_transfer_tasks,
+                    lan_transfer::commands::lan_transfer_cancel_task,
+                    lan_transfer::commands::lan_transfer_start,
+                    lan_transfer::commands::lan_transfer_stop,
+                    lan_transfer::commands::lan_transfer_shared_dirs,
+                    lan_transfer::commands::lan_transfer_add_shared_dir,
+                    lan_transfer::commands::lan_transfer_delete_shared_dir,
+                    lan_transfer::commands::lan_transfer_trusted_devices,
+                    lan_transfer::commands::lan_transfer_add_trusted_device,
+                    lan_transfer::commands::lan_transfer_delete_trusted_device,
+                ],
+                types: [],
+            },
+
+        }
+    };
+}
+
 #[cfg(any(desktop, target_os = "android"))]
-common_modules! {
+macro_rules! bt_module {
+    ($next:ident, $($modules:tt)*) => {
+        $next! { $($modules)*
     "bt" => {
         commands: [
             bt::commands::bt_probe,
@@ -311,10 +317,40 @@ common_modules! {
             bt::BtPeerInfo, bt::BtDhtStatus, bt::BtDhtState,
             bt::BtPlayability, bt::BtTaskEvent],
     },
+        }
+    };
 }
 
-#[cfg(all(mobile, not(target_os = "android")))]
-common_modules! {}
+#[cfg(any(mobile, test))]
+macro_rules! mobile_export_module {
+    ($next:ident, $($modules:tt)*) => {
+        $next! { $($modules)*
+"model_export" => { commands: [
+                    model_viewer::export_commands::model_export_begin,
+                    model_viewer::export_commands::model_export_write,
+                    model_viewer::export_commands::model_export_present,
+                    model_viewer::export_commands::model_export_cancel,
+                    model_viewer::export_commands::model_export_close,
+], types: [] },
+        }
+    };
+}
+
+// Filter complete command groups before Specta/Tauri expand the command list.
+#[cfg(desktop)]
+macro_rules! add_lan { ($($modules:tt)*) => { lan_module!(add_bt, $($modules)*); }; }
+#[cfg(mobile)]
+macro_rules! add_lan { ($($modules:tt)*) => { add_bt!($($modules)*); }; }
+#[cfg(any(desktop, target_os = "android"))]
+macro_rules! add_bt { ($($modules:tt)*) => { bt_module!(add_mobile, $($modules)*); }; }
+#[cfg(target_os = "ios")]
+macro_rules! add_bt { ($($modules:tt)*) => { add_mobile!($($modules)*); }; }
+#[cfg(mobile)]
+macro_rules! add_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
+#[cfg(desktop)]
+macro_rules! add_mobile { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
+
+common_modules!(add_lan,);
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
