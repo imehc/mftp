@@ -8,7 +8,13 @@ import {
   resolveFontPreset,
 } from "~/lib/color-theme";
 import { type DisplaySize, resolveDisplaySize } from "~/lib/display-size";
-import { TOOL_ROUTES, type ToolRoute } from "~/lib/module-metadata";
+import {
+  isModuleId,
+  moduleForTool,
+  type ModuleId,
+  TOOL_ROUTES,
+  type ToolRoute,
+} from "~/lib/module-metadata";
 
 export type DirectoryTransferMode = "archive" | "direct";
 
@@ -30,6 +36,8 @@ export type HomeEntryOrder = Partial<Record<HomeCategoryId, string[]>>;
 
 export type HomeEntryVisibility = Record<string, boolean>;
 
+export type StartupMode = "home" | "manual" | "last";
+
 function resolveHomeEntryOrder(value: unknown): HomeEntryOrder {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   const source = value as Record<string, unknown>;
@@ -48,6 +56,9 @@ interface SettingsState {
   sidebarSize: number;
   sidebarCollapsed: boolean;
   lastTool: ToolRoute | null;
+  lastPage: ModuleId | null;
+  startupMode: StartupMode;
+  manualPage: ModuleId | null;
   restoreLastTool: boolean;
   colorTheme: ColorTheme;
   fontPreset: FontPreset;
@@ -64,6 +75,9 @@ interface SettingsState {
   setSidebarSize: (size: number) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setLastTool: (tool: ToolRoute | null) => void;
+  setLastPage: (page: ModuleId | null) => void;
+  setStartupMode: (mode: StartupMode) => void;
+  setManualPage: (page: ModuleId | null) => void;
   setRestoreLastTool: (restore: boolean) => void;
   setColorTheme: (theme: ColorTheme) => void;
   setFontPreset: (font: FontPreset) => void;
@@ -83,6 +97,9 @@ export const useSettingsStore = create<SettingsState>()(
       sidebarSize: 20,
       sidebarCollapsed: false,
       lastTool: null,
+      lastPage: null,
+      startupMode: "last",
+      manualPage: null,
       restoreLastTool: true,
       colorTheme: "default",
       fontPreset: "theme",
@@ -96,8 +113,20 @@ export const useSettingsStore = create<SettingsState>()(
       setLocale: (locale) => set({ locale }),
       setSidebarSize: (size) => set({ sidebarSize: size }),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-      setLastTool: (tool) => set({ lastTool: tool }),
-      setRestoreLastTool: (restoreLastTool) => set({ restoreLastTool }),
+      setLastTool: (tool) =>
+        set({
+          lastTool: tool,
+          lastPage: tool ? (moduleForTool(tool)?.id ?? null) : null,
+        }),
+      setLastPage: (page) => set({ lastPage: page }),
+      setStartupMode: (startupMode) =>
+        set({ startupMode, restoreLastTool: startupMode === "last" }),
+      setManualPage: (manualPage) => set({ manualPage }),
+      setRestoreLastTool: (restoreLastTool) =>
+        set({
+          restoreLastTool,
+          startupMode: restoreLastTool ? "last" : "home",
+        }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
       setFontPreset: (font) => set({ fontPreset: font }),
       setDisplaySize: (value) =>
@@ -128,8 +157,8 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      // v8：功能入口排序与显隐；旧用户沿用原有入口顺序。
-      version: 8,
+      // v9：启动模式与页面记录覆盖小游戏；保留旧工具恢复偏好。
+      version: 9,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
@@ -146,6 +175,23 @@ export const useSettingsStore = create<SettingsState>()(
         return {
           ...state,
           lastTool,
+          lastPage:
+            "lastPage" in state
+              ? isModuleId(state.lastPage)
+                ? state.lastPage
+                : null
+              : lastTool
+                ? (moduleForTool(lastTool)?.id ?? null)
+                : null,
+          startupMode:
+            state.startupMode === "home" ||
+            state.startupMode === "manual" ||
+            state.startupMode === "last"
+              ? state.startupMode
+              : state.restoreLastTool === false
+                ? "home"
+                : "last",
+          manualPage: isModuleId(state.manualPage) ? state.manualPage : null,
           restoreLastTool:
             typeof state.restoreLastTool === "boolean"
               ? state.restoreLastTool

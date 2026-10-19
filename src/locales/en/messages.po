@@ -367,7 +367,7 @@ msgstr "The AI database is newer than this app. Please update the app."
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:104
-#: src/features/settings/SettingsOverview.tsx:36
+#: src/features/settings/SettingsOverview.tsx:32
 #: src/features/settings/SettingsPage.tsx:38
 msgid "AI 服务"
 msgstr "AI Service"
@@ -1595,7 +1595,7 @@ msgstr "All categories"
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
 
-#: src/features/home/HomePage.tsx:89
+#: src/features/home/HomePage.tsx:87
 msgid "全部工具"
 msgstr "All tools"
 
@@ -1650,7 +1650,7 @@ msgstr "Shared data buffers"
 msgid "关于"
 msgstr "About"
 
-#: src/features/settings/SettingsOverview.tsx:105
+#: src/features/settings/SettingsOverview.tsx:83
 msgid "关于与本地数据"
 msgstr "About and local data"
 
@@ -2137,12 +2137,12 @@ msgstr "Remaining {taskEtaValue}"
 msgid "力度"
 msgstr "Power"
 
-#: src/features/settings/SettingsOverview.tsx:33
+#: src/features/settings/SettingsOverview.tsx:29
 msgid "功能"
 msgstr "Features"
 
 #: src/features/settings/FeatureEntrySettings.tsx:158
-#: src/features/settings/SettingsOverview.tsx:42
+#: src/features/settings/SettingsOverview.tsx:38
 #: src/features/settings/SettingsPage.tsx:38
 msgid "功能入口"
 msgstr "Feature entries"
@@ -2422,7 +2422,7 @@ msgstr "2P"
 msgid "双人对战"
 msgstr "Two-Player Match"
 
-#: src/features/home/HomePage.tsx:66
+#: src/features/home/HomePage.tsx:64
 msgid "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 msgstr "Double-click or press ⌘/Ctrl + . to show or hide games"
 
@@ -2751,7 +2751,7 @@ msgstr "Start service"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
-#: src/features/settings/SettingsOverview.tsx:51
+#: src/features/settings/StartupPageSettings.tsx:42
 msgid "启动页面"
 msgstr "Startup page"
 
@@ -2988,7 +2988,7 @@ msgstr "Invalid backup format: field {field} is missing or has an invalid value"
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "Could not decrypt the backup: the password is incorrect or the file is damaged"
 
-#: src/features/settings/SettingsOverview.tsx:72
+#: src/features/settings/SettingsOverview.tsx:50
 msgid "备份本机数据"
 msgstr "Back up local data"
 
@@ -3126,7 +3126,7 @@ msgstr "Font size"
 msgid "字节数未知"
 msgstr "Byte size unknown"
 
-#: src/features/settings/SettingsOverview.tsx:106
+#: src/features/settings/SettingsOverview.tsx:84
 msgid "存储、清理与项目帮助"
 msgstr "Storage, cleanup and project help"
 
@@ -3915,7 +3915,7 @@ msgstr "Draw"
 msgid "并排"
 msgstr "Row"
 
-#: src/features/settings/SettingsOverview.tsx:80
+#: src/features/settings/SettingsOverview.tsx:58
 msgid "应用"
 msgstr "Application"
 
@@ -4138,6 +4138,10 @@ msgstr "This model has no editable PBR materials."
 msgid "当前比例：{percent}"
 msgstr "Current scale: {percent}"
 
+#: src/features/settings/StartupPageSettings.tsx:75
+msgid "当前没有可用页面，将进入首页。"
+msgstr "No pages are available. The app will open the home page."
+
 #: src/features/media-compress/video/use-video-compress.ts:120
 msgid "当前环境不支持 WebCodecs"
 msgstr "WebCodecs is not supported in this environment"
@@ -4297,14 +4301,10 @@ msgstr "Total (deduplicated)"
 msgid "恢复上一杆前的球位，由犯规方重打，罚分保留。"
 msgstr "Restore the positions before the last shot and have the offender replay. Penalty points remain."
 
-#. 桌面启动设置开关，关闭后从首页启动
-#: src/features/settings/SettingsOverview.tsx:58
-msgid "恢复上次使用的工具"
-msgstr "Restore the last used tool"
-
-#: src/features/settings/SettingsOverview.tsx:54
-msgid "恢复上次工具"
-msgstr "Restore last tool"
+#. 启动模式选项，恢复上次访问的工具、文库或小游戏页面
+#: src/features/settings/StartupPageSettings.tsx:59
+msgid "恢复上次页面"
+msgstr "Restore last page"
 
 #: src/features/todo/TodoRowActions.desktop.tsx:35
 #: src/features/todo/TodoRowActions.desktop.tsx:36
@@ -4396,6 +4396,10 @@ msgstr "The selected file is not valid JSON. Check the import file."
 #: src/lib/errors/messages.ts:44
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "The selected file is not a backup exported by this app"
+
+#: src/features/settings/StartupPageSettings.tsx:77
+msgid "所选页面已隐藏或当前平台不支持，将进入首页。"
+msgstr "The selected page is hidden or unavailable on this platform. The app will open the home page."
 
 #: src/features/games/billiards/notices.tsx:48
 msgid "手中球：可在全台放置母球"
@@ -4829,12 +4833,12 @@ msgstr "Discard unsaved changes?"
 msgid "数据"
 msgstr "Data"
 
-#: src/features/settings/SettingsOverview.tsx:68
+#: src/features/settings/SettingsOverview.tsx:46
 msgid "数据与运行"
 msgstr "Data and runtime"
 
 #: src/features/export/BackupPage.tsx:46
-#: src/features/settings/SettingsOverview.tsx:71
+#: src/features/settings/SettingsOverview.tsx:49
 msgid "数据导入与导出"
 msgstr "Import and export data"
 
@@ -5561,6 +5565,10 @@ msgstr "Not running"
 msgid "未选择"
 msgstr "Not selected"
 
+#: src/features/settings/StartupPageSettings.tsx:78
+msgid "未选择页面时将进入首页。"
+msgstr "If no page is selected, the app will open the home page."
+
 #: src/features/about/ResetBoundary.tsx:127
 msgid "本地偏好与启动设置"
 msgstr "Preferences and startup settings"
@@ -5720,7 +5728,7 @@ msgstr "View note images"
 msgid "查看完整发布说明"
 msgstr "View full release notes"
 
-#: src/features/settings/SettingsOverview.tsx:84
+#: src/features/settings/SettingsOverview.tsx:62
 msgid "查看操作和失败原因"
 msgstr "View operations and failure details"
 
@@ -5736,7 +5744,7 @@ msgstr "View log: {action}"
 
 #: src/features/settings/AppSettingsMenu.tsx:72
 #: src/features/settings/AppSettingsMenu.tsx:74
-#: src/features/settings/SettingsOverview.tsx:95
+#: src/features/settings/SettingsOverview.tsx:73
 msgid "查看更新"
 msgstr "View Update"
 
@@ -5863,7 +5871,7 @@ msgstr "Check whether file exists"
 
 #: src/features/settings/AppSettingsMenu.tsx:69
 #: src/features/settings/AppSettingsMenu.tsx:71
-#: src/features/settings/SettingsOverview.tsx:98
+#: src/features/settings/SettingsOverview.tsx:76
 #: src/features/updater/use-updater-label.ts:28
 msgid "检查更新"
 msgstr "Check for Updates"
@@ -6261,7 +6269,7 @@ msgid "正在校验更新…"
 msgstr "Verifying update…"
 
 #: src/features/settings/AppSettingsMenu.tsx:70
-#: src/features/settings/SettingsOverview.tsx:97
+#: src/features/settings/SettingsOverview.tsx:75
 msgid "正在检查"
 msgstr "Checking"
 
@@ -6561,7 +6569,7 @@ msgstr "Activity"
 
 #: src/features/about/use-about.ts:49
 #: src/features/logs/ActivityLogsPage.tsx:37
-#: src/features/settings/SettingsOverview.tsx:83
+#: src/features/settings/SettingsOverview.tsx:61
 msgid "活动日志"
 msgstr "Activity logs"
 
@@ -7889,6 +7897,13 @@ msgstr "Automatic"
 msgid "自发光"
 msgstr "Emissive"
 
+#. 启动模式选项，每次启动打开用户指定的功能页面
+#. 启动页面设置中，手动选择下次启动时打开的功能页面
+#: src/features/settings/StartupPageSettings.tsx:33
+#: src/features/settings/StartupPageSettings.tsx:52
+msgid "自定义页面"
+msgstr "Custom page"
+
 #. 斯诺克犯规后或同分黑球抽签后选择自己击球
 #: src/features/games/billiards/SnookerHud.tsx:153
 msgid "自己接打"
@@ -8559,7 +8574,7 @@ msgstr "Adjust the filters or refresh and try again."
 msgid "调整顺序"
 msgstr "Reorder"
 
-#: src/features/settings/SettingsOverview.tsx:43
+#: src/features/settings/SettingsOverview.tsx:39
 msgid "调整首页功能的显示顺序"
 msgstr "Adjust the order of features on the home page"
 
@@ -8864,7 +8879,7 @@ msgstr "Connect"
 msgid "连接 AI 服务超时"
 msgstr "The connection to the AI service timed out"
 
-#: src/features/settings/SettingsOverview.tsx:37
+#: src/features/settings/SettingsOverview.tsx:33
 msgid "连接与模型设置"
 msgstr "Connections and models"
 
@@ -9155,6 +9170,11 @@ msgstr "Choose an attachment"
 #: src/features/about/AboutPage.tsx:177
 msgid "选择需要清理的数据范围"
 msgstr "Choose the data to clear"
+
+#. 手动指定启动页面的下拉框占位文字
+#: src/features/settings/StartupPageSettings.tsx:95
+msgid "选择页面"
+msgstr "Select a page"
 
 #: src/features/ai-configuration/RowActions.desktop.tsx:20
 #: src/features/ai-configuration/RowActions.mobile.tsx:27
@@ -9509,7 +9529,7 @@ msgid "预览备注图片"
 msgstr "Preview note image"
 
 #: src/components/ToolPageHeader.tsx:63
-#: src/features/settings/SettingsOverview.tsx:54
+#: src/features/settings/StartupPageSettings.tsx:49
 msgid "首页"
 msgstr "Home"
 

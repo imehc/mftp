@@ -19,8 +19,12 @@ export function useStartupNavigation() {
       mobile: isMobilePlatform(),
       pathname: window.location.pathname,
       search: window.location.search,
-      restore: settings.restoreLastTool,
-      lastTool: settings.lastTool,
+      mode: settings.startupMode,
+      manualPage: settings.manualPage,
+      lastPage: settings.lastPage,
+      visibility: settings.homeEntryVisibility,
+      hiddenCategories: settings.hiddenHomeCategories,
+      showGames: settings.showGames,
     });
     if (entry) void navigate({ ...entry.link, replace: true });
   }, [navigate]);

@@ -6,7 +6,6 @@ import { useEffect, useEffectEvent, useRef } from "react";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import ActivityMenu from "~/features/transfers/ActivityMenu";
-import { toolRouteOf } from "~/lib/module-metadata";
 import { useSettingsStore } from "~/store/settings";
 
 import {
@@ -26,7 +25,6 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
   const hiddenHomeCategories = useSettingsStore((s) => s.hiddenHomeCategories);
   const homeEntryOrder = useSettingsStore((s) => s.homeEntryOrder);
   const setShowGames = useSettingsStore((s) => s.setShowGames);
-  const setLastTool = useSettingsStore((s) => s.setLastTool);
   const selected =
     category === "games" && !showGames ? "tools" : (category ?? "tools");
   const entries = orderedHomeEntries(
@@ -98,12 +96,10 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           {entries.map((entry) => {
             const Icon = entry.icon;
-            const tool = toolRouteOf(entry.id);
             return (
               <Link
                 key={entry.id}
                 {...entry.link}
-                onClick={() => (tool ? setLastTool(tool) : undefined)}
                 className="bg-card hover:bg-accent focus-visible:ring-ring flex min-h-20 min-w-0 items-center gap-3 rounded-xl border p-3 outline-none focus-visible:ring-2"
               >
                 <span className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">

@@ -5,27 +5,23 @@ import {
   FileClock,
   Info,
   LayoutGrid,
-  PanelsTopLeft,
   RefreshCw,
   Sparkles,
 } from "lucide-react";
 
-import { Switch } from "~/components/ui/switch";
 import { isDesktopPlatform } from "~/lib/platform";
 import { checkForUpdateManually } from "~/lib/updater";
-import { useSettingsStore } from "~/store/settings";
 import { useUpdaterStore } from "~/store/updater";
 
 import AppearanceSettings from "./AppearanceSettings";
 import AutostartSettingDesktop from "./AutostartSetting.desktop";
-import SettingsControl from "./SettingsControl";
 import { SettingsEntry, SettingsGroup } from "./SettingsEntry";
+import StartupPageSettings from "./StartupPageSettings";
 import TransferSetting from "./TransferSetting";
 
 export default function SettingsOverview({ onAi }: { onAi: () => void }) {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const settings = useSettingsStore();
   const status = useUpdaterStore((state) => state.status);
   return (
     <div className="grid items-start gap-4 md:grid-cols-2">
@@ -45,25 +41,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
             void navigate({ to: "/settings", search: { panel: "features" } })
           }
         />
-        {isDesktopPlatform() ? (
-          <SettingsControl
-            icon={PanelsTopLeft}
-            title={t`启动页面`}
-            id="settings-restore"
-            compact
-            description={settings.restoreLastTool ? t`恢复上次工具` : t`首页`}
-          >
-            <Switch
-              id="settings-restore"
-              aria-label={t({
-                message: "恢复上次使用的工具",
-                comment: "桌面启动设置开关，关闭后从首页启动",
-              })}
-              checked={settings.restoreLastTool}
-              onCheckedChange={settings.setRestoreLastTool}
-            />
-          </SettingsControl>
-        ) : null}
+        {isDesktopPlatform() ? <StartupPageSettings /> : null}
       </SettingsGroup>
       <SettingsGroup title={t`数据与运行`}>
         <SettingsEntry

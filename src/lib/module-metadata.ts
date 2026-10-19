@@ -36,6 +36,10 @@ export const modules = [
 
 export type ModuleId = (typeof modules)[number]["id"];
 
+export function isModuleId(value: unknown): value is ModuleId {
+  return modules.some((entry) => entry.id === value);
+}
+
 /** 可恢复工具路由；类型从清单推导，声明了 `tool` 的条目才会出现在这里。 */
 export type ToolRoute = Extract<
   (typeof modules)[number],
@@ -46,11 +50,11 @@ export const TOOL_ROUTES: readonly ToolRoute[] = modules
   .map((entry) => entry.tool)
   .filter((tool): tool is ToolRoute => tool !== null);
 
-export function moduleMetadata(id: string): ModuleMetadata | undefined {
+export function moduleMetadata(id: string) {
   return modules.find((entry) => entry.id === id);
 }
 
-export function moduleForTool(tool: string): ModuleMetadata | undefined {
+export function moduleForTool(tool: string) {
   return modules.find((entry) => entry.tool === tool);
 }
 
