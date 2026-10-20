@@ -32,6 +32,7 @@ src-tauri/target
 .claude/
 .codex/
 .tanstack/
+.workbuddy/
 
 src/locales/**/messages.ts
 
