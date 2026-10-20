@@ -34,7 +34,7 @@ msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# character} other {# characters}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:135
-#: src/features/games/billiards/BilliardsScore.tsx:155
+#: src/features/games/billiards/BilliardsScore.tsx:160
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
 
@@ -42,7 +42,7 @@ msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive
 msgid "{count, plural, one {# 篇} other {# 篇}}"
 msgstr "{count, plural, one {# poem} other {# poems}}"
 
-#: src/features/games/billiards/BilliardsScore.tsx:85
+#: src/features/games/billiards/BilliardsScore.tsx:90
 msgid "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{count, plural, one {# ball left} other {# balls left}}"
 
@@ -92,11 +92,11 @@ msgstr "{hours, plural, one {# hour} other {# hours}}"
 msgid "{hours, plural, one {# 小时前} other {# 小时前}}"
 msgstr "{hours, plural, one {# hour ago} other {# hours ago}}"
 
-#: src/features/games/billiards/BilliardsScore.tsx:34
+#: src/features/games/billiards/BilliardsScore.tsx:39
 msgid "{id} 号球，已进球"
 msgstr "Ball {id}, potted"
 
-#: src/features/games/billiards/BilliardsScore.tsx:35
+#: src/features/games/billiards/BilliardsScore.tsx:40
 msgid "{id} 号球，未进球"
 msgstr "Ball {id}, remaining"
 
@@ -212,7 +212,7 @@ msgid "{rounded, plural, one {# 秒} other {# 秒}}"
 msgstr "{rounded, plural, one {# second} other {# seconds}}"
 
 #. 对局结果；seatNameValue 是包含图标的黑棋或白棋名称。
-#: src/features/games/engine/black-white-labels.tsx:79
+#: src/features/games/engine/black-white-labels.tsx:83
 msgid "{seatNameValue} 获胜"
 msgstr "{seatNameValue} wins"
 
@@ -261,7 +261,7 @@ msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "Shot #"
 
-#: src/features/games/xiangqi/labels.tsx:85
+#: src/features/games/xiangqi/labels.tsx:89
 msgid "{sideNameValue} 获胜"
 msgstr "{sideNameValue} wins"
 
@@ -664,7 +664,7 @@ msgstr "Top Processes"
 msgid "XYZ 方向：点击坐标轴切换视角，双击适配模型。也可按 X、Y、Z，按住 Shift 查看反方向。"
 msgstr "XYZ orientation: click an axis to change the view, or double-click to fit the model. You can also press X, Y or Z; hold Shift for the opposite direction."
 
-#: src/features/games/xiangqi/labels.tsx:57
+#: src/features/games/xiangqi/labels.tsx:61
 msgid "三次重复局面"
 msgstr "Threefold repetition"
 
@@ -1323,11 +1323,11 @@ msgstr "Low load \\u00b7 Pixel ratio up to 1 \\u00b7 Up to 20 fps"
 msgid "作者"
 msgstr "Author"
 
-#: src/features/games/billiards/BilliardsScore.tsx:15
+#: src/features/games/billiards/BilliardsScore.tsx:17
 #: src/features/games/engine/black-white-labels.tsx:32
-#: src/features/games/engine/black-white-labels.tsx:40
+#: src/features/games/engine/black-white-labels.tsx:41
 #: src/features/games/xiangqi/labels.tsx:30
-#: src/features/games/xiangqi/labels.tsx:38
+#: src/features/games/xiangqi/labels.tsx:39
 msgid "你"
 msgstr "You"
 
@@ -1344,13 +1344,13 @@ msgstr "You play red"
 msgid "你执黑"
 msgstr "You play black"
 
-#: src/features/games/engine/black-white-labels.tsx:72
-#: src/features/games/xiangqi/labels.tsx:79
+#: src/features/games/engine/black-white-labels.tsx:76
+#: src/features/games/xiangqi/labels.tsx:83
 msgid "你赢了"
 msgstr "You win"
 
-#: src/features/games/engine/black-white-labels.tsx:74
-#: src/features/games/xiangqi/labels.tsx:81
+#: src/features/games/engine/black-white-labels.tsx:78
+#: src/features/games/xiangqi/labels.tsx:85
 msgid "你输了"
 msgstr "You lose"
 
@@ -1583,7 +1583,7 @@ msgstr "Fullscreen"
 msgid "全文索引"
 msgstr "Full-text index"
 
-#: src/features/games/billiards/BilliardsScore.tsx:163
+#: src/features/games/billiards/BilliardsScore.tsx:168
 msgid "全色球"
 msgstr "Solids"
 
@@ -2785,12 +2785,12 @@ msgstr "Enable motion control"
 msgid "命令"
 msgstr "Command"
 
-#: src/features/games/xiangqi/labels.tsx:70
-#: src/features/games/xiangqi/labels.tsx:90
+#: src/features/games/xiangqi/labels.tsx:74
+#: src/features/games/xiangqi/labels.tsx:94
 msgid "和棋"
 msgstr "Draw"
 
-#: src/features/games/xiangqi/labels.tsx:56
+#: src/features/games/xiangqi/labels.tsx:60
 msgid "困毙"
 msgstr "Stalemate"
 
@@ -3486,11 +3486,11 @@ msgstr "This deletes the address and its keys ({keyCount}) and models ({modelCou
 msgid "将删除此设备上该模块的全部记录，此操作无法撤销。其他模块数据、下载文件和共享目录中的文件会保留。"
 msgstr "All records for this module on this device will be permanently deleted. Other modules, downloaded files, and shared files will be kept."
 
-#: src/features/games/xiangqi/labels.tsx:54
+#: src/features/games/xiangqi/labels.tsx:58
 msgid "将帅被吃"
 msgstr "General captured"
 
-#: src/features/games/xiangqi/labels.tsx:55
+#: src/features/games/xiangqi/labels.tsx:59
 msgid "将死"
 msgstr "Checkmate"
 
@@ -3945,8 +3945,8 @@ msgstr "Selected {clipName}"
 msgid "平仄"
 msgstr "Tonal pattern"
 
-#: src/features/games/engine/black-white-labels.tsx:63
-#: src/features/games/engine/black-white-labels.tsx:86
+#: src/features/games/engine/black-white-labels.tsx:67
+#: src/features/games/engine/black-white-labels.tsx:90
 msgid "平局"
 msgstr "Draw"
 
@@ -5504,7 +5504,7 @@ msgstr "No key saved"
 msgid "未保存的文字和图片将被丢弃，已保存的备注不受影响。"
 msgstr "Unsaved text and images will be discarded. Your saved note will not be affected."
 
-#: src/features/games/billiards/BilliardsScore.tsx:167
+#: src/features/games/billiards/BilliardsScore.tsx:172
 msgid "未分组"
 msgstr "Open table"
 
@@ -7043,7 +7043,7 @@ msgstr "Status unavailable"
 msgid "玩家"
 msgstr "Player"
 
-#: src/features/games/billiards/BilliardsScore.tsx:16
+#: src/features/games/billiards/BilliardsScore.tsx:21
 msgid "玩家 1"
 msgstr "Player 1"
 
@@ -7051,7 +7051,7 @@ msgstr "Player 1"
 msgid "玩家 1 胜"
 msgstr "Player 1 wins"
 
-#: src/features/games/billiards/BilliardsScore.tsx:16
+#: src/features/games/billiards/BilliardsScore.tsx:21
 msgid "玩家 2"
 msgstr "Player 2"
 
@@ -7193,11 +7193,11 @@ msgstr "When empty, User from ~/.ssh/config is used first, then the current syst
 msgid "白名单"
 msgstr "Trusted Devices"
 
-#: src/features/games/engine/black-white-labels.tsx:50
+#: src/features/games/engine/black-white-labels.tsx:54
 msgid "白棋"
 msgstr "White"
 
-#: src/features/games/engine/black-white-labels.tsx:104
+#: src/features/games/engine/black-white-labels.tsx:108
 msgid "白棋胜"
 msgstr "White wins"
 
@@ -7694,7 +7694,7 @@ msgstr "System monitoring does not support {os} yet. Only Linux is supported."
 msgid "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
 msgstr "Alternate reds and colours, then clear the colours in order. Six-red includes the five-miss rule; ten-red follows the fifteen-red flow. The auto referee only calls a miss when a clear direct shot fails to hit the ball on; when fully snookered it calls a plain foul and does not judge effort."
 
-#: src/features/games/xiangqi/labels.tsx:43
+#: src/features/games/xiangqi/labels.tsx:47
 msgid "红方"
 msgstr "Red"
 
@@ -7707,7 +7707,7 @@ msgstr "Red"
 msgid "红球数"
 msgstr "Reds"
 
-#: src/features/games/xiangqi/labels.tsx:106
+#: src/features/games/xiangqi/labels.tsx:110
 msgid "红胜"
 msgstr "Red wins"
 
@@ -8051,10 +8051,10 @@ msgstr "Focus model"
 #. 棋类历史记录：本地玩家获胜。
 #. 棋类历史记录：本地玩家获胜。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:50
-#: src/features/games/engine/black-white-labels.tsx:89
-#: src/features/games/engine/black-white-labels.tsx:96
-#: src/features/games/xiangqi/labels.tsx:94
-#: src/features/games/xiangqi/labels.tsx:101
+#: src/features/games/engine/black-white-labels.tsx:93
+#: src/features/games/engine/black-white-labels.tsx:100
+#: src/features/games/xiangqi/labels.tsx:98
+#: src/features/games/xiangqi/labels.tsx:105
 msgid "胜"
 msgstr "Win"
 
@@ -8140,7 +8140,7 @@ msgstr "Node details"
 msgid "节能画质 · 像素比例上限 1.5 · 最高 30 帧/秒"
 msgstr "Power saving \\u00b7 Pixel ratio up to 1.5 \\u00b7 Up to 30 fps"
 
-#: src/features/games/billiards/BilliardsScore.tsx:165
+#: src/features/games/billiards/BilliardsScore.tsx:170
 msgid "花色球"
 msgstr "Stripes"
 
@@ -8781,10 +8781,10 @@ msgstr "Warnings"
 #. 棋类历史记录：本地玩家落败。
 #. 棋类历史记录：本地玩家落败。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:50
-#: src/features/games/engine/black-white-labels.tsx:91
-#: src/features/games/engine/black-white-labels.tsx:98
-#: src/features/games/xiangqi/labels.tsx:96
-#: src/features/games/xiangqi/labels.tsx:103
+#: src/features/games/engine/black-white-labels.tsx:95
+#: src/features/games/engine/black-white-labels.tsx:102
+#: src/features/games/xiangqi/labels.tsx:100
+#: src/features/games/xiangqi/labels.tsx:107
 msgid "负"
 msgstr "Loss"
 
@@ -9132,7 +9132,7 @@ msgstr "The connection is taking longer than usual. You can hide this window and
 msgid "连接设备"
 msgstr "Connected Devices"
 
-#: src/features/games/xiangqi/labels.tsx:58
+#: src/features/games/xiangqi/labels.tsx:62
 msgid "连续六十回合未吃子"
 msgstr "No capture for sixty rounds"
 
@@ -9805,15 +9805,15 @@ msgstr "Black {black} · White {white} + {KOMI} komi = {whiteWithKomi}"
 msgid "黑八已重置"
 msgstr "8-ball re-spotted"
 
-#: src/features/games/xiangqi/labels.tsx:48
+#: src/features/games/xiangqi/labels.tsx:52
 msgid "黑方"
 msgstr "Black"
 
-#: src/features/games/engine/black-white-labels.tsx:45
+#: src/features/games/engine/black-white-labels.tsx:49
 msgid "黑棋"
 msgstr "Black"
 
-#: src/features/games/engine/black-white-labels.tsx:102
+#: src/features/games/engine/black-white-labels.tsx:106
 msgid "黑棋胜"
 msgstr "Black wins"
 
@@ -9822,7 +9822,7 @@ msgstr "Black wins"
 msgid "黑球"
 msgstr "Black"
 
-#: src/features/games/xiangqi/labels.tsx:106
+#: src/features/games/xiangqi/labels.tsx:110
 msgid "黑胜"
 msgstr "Black wins"
 
