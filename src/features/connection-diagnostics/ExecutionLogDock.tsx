@@ -39,7 +39,7 @@ export default function ExecutionLogDock() {
       className="bg-background shrink-0 border-t pb-(--safe-bottom)"
       data-testid="execution-log-dock"
     >
-      <div className="app-page-width mx-auto w-full px-3 py-1 md:px-4">
+      <div className="app-page-width app-bottom-bar mx-auto w-full">
         <Popover
           open={open}
           onOpenChange={(next) => {

@@ -34,7 +34,7 @@ export default function UpdaterStatusBar() {
   const percent = transferring ? updaterPercent(downloaded, total) : null;
   return (
     <div
-      className="ui-density-adaptive border-border bg-muted/30 shrink-0 border-t px-3 py-1 md:px-4"
+      className="ui-density-adaptive app-bottom-bar border-border bg-muted/30 shrink-0 border-t"
       role="region"
       aria-label={t`更新状态`}
     >

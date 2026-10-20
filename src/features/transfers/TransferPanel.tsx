@@ -167,7 +167,7 @@ export default function TransferPanel({
   if (transfers.length === 0) return null;
   return (
     <div className="border-border bg-sidebar border-t">
-      <div className="flex items-center gap-1 pr-1">
+      <div className="app-bottom-bar flex items-center gap-1">
         <button
           type="button"
           className="text-muted-foreground hover:bg-sidebar-accent flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-xs"

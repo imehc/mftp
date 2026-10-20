@@ -43,6 +43,17 @@
   }
 }
 
+/* 应用底部状态条的统一高度：执行日志、更新提示、传输条与页面底栏都走这里，
+   32px 控件 + 上下各 4px = 40px；页面切换时底栏不会跳动。 */
+@utility app-bottom-bar {
+  min-height: 2.5rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+  @media (width >= theme(--breakpoint-md)) {
+    padding-inline: 1rem;
+  }
+}
+
 @theme inline {
   /* 保留 Tailwind 默认断点；移动 / PC 布局统一由 md（48rem）切换。 */
   --font-heading: var(--font-sans);
