@@ -2798,7 +2798,7 @@ msgstr "Start service"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
-#: src/features/settings/StartupPageSettings.tsx:42
+#: src/features/settings/StartupPageSettings.tsx:36
 msgid "启动页面"
 msgstr "Startup page"
 
@@ -4201,7 +4201,8 @@ msgstr "This model has no editable PBR materials."
 msgid "当前比例：{percent}"
 msgstr "Current scale: {percent}"
 
-#: src/features/settings/StartupPageSettings.tsx:75
+#: src/features/settings/StartupPageSettings.tsx:52
+#: src/features/settings/StartupPageSettings.tsx:118
 msgid "当前没有可用页面，将进入首页。"
 msgstr "No pages are available. The app will open the home page."
 
@@ -4369,7 +4370,7 @@ msgid "恢复上一杆前的球位，由犯规方重打，罚分保留。"
 msgstr "Restore the positions before the last shot and have the offender replay. Penalty points remain."
 
 #. 启动模式选项，恢复上次访问的工具、文库或小游戏页面
-#: src/features/settings/StartupPageSettings.tsx:59
+#: src/features/settings/StartupPageSettings.tsx:43
 msgid "恢复上次页面"
 msgstr "Restore last page"
 
@@ -4464,7 +4465,7 @@ msgstr "The selected file is not valid JSON. Check the import file."
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "The selected file is not a backup exported by this app"
 
-#: src/features/settings/StartupPageSettings.tsx:77
+#: src/features/settings/StartupPageSettings.tsx:54
 msgid "所选页面已隐藏或当前平台不支持，将进入首页。"
 msgstr "The selected page is hidden or unavailable on this platform. The app will open the home page."
 
@@ -5638,7 +5639,7 @@ msgstr "Not running"
 msgid "未选择"
 msgstr "Not selected"
 
-#: src/features/settings/StartupPageSettings.tsx:78
+#: src/features/settings/StartupPageSettings.tsx:55
 msgid "未选择页面时将进入首页。"
 msgstr "If no page is selected, the app will open the home page."
 
@@ -8065,9 +8066,7 @@ msgid "自发光"
 msgstr "Emissive"
 
 #. 启动模式选项，每次启动打开用户指定的功能页面
-#. 启动页面设置中，手动选择下次启动时打开的功能页面
-#: src/features/settings/StartupPageSettings.tsx:33
-#: src/features/settings/StartupPageSettings.tsx:52
+#: src/features/settings/StartupPageSettings.tsx:39
 msgid "自定义页面"
 msgstr "Custom page"
 
@@ -9379,11 +9378,6 @@ msgstr "Choose an attachment"
 msgid "选择需要清理的数据范围"
 msgstr "Choose the data to clear"
 
-#. 手动指定启动页面的下拉框占位文字
-#: src/features/settings/StartupPageSettings.tsx:95
-msgid "选择页面"
-msgstr "Select a page"
-
 #: src/features/ai-configuration/RowActions.desktop.tsx:20
 #: src/features/ai-configuration/RowActions.mobile.tsx:27
 msgid "选用"
@@ -9743,7 +9737,7 @@ msgid "预览备注图片"
 msgstr "Preview note image"
 
 #: src/components/ToolPageHeader.tsx:63
-#: src/features/settings/StartupPageSettings.tsx:49
+#: src/features/settings/StartupPageSettings.tsx:38
 msgid "首页"
 msgstr "Home"
 
