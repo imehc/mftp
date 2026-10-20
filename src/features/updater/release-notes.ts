@@ -16,11 +16,20 @@ export interface ReleaseNote {
   text: string;
 }
 
+// 远端发布说明的首行是版本范围标题（如 "Changes since v0.2.3"），
+// 弹窗只展示具体条目，完整标题留在发布页面。
+const RELEASE_RANGE_HEADER = /^(changes since\s+\S+|initial release)$/i;
+
 /** 整理更新条目，远端内容始终作为文本渲染，不执行 HTML 或链接。 */
 export function parseReleaseNotes(body: string): ReleaseNote[] {
+  let leading = true;
   return body.split(/\r?\n/).flatMap((raw) => {
     const line = raw.trim();
     if (!line) return [];
+    if (leading) {
+      leading = false;
+      if (RELEASE_RANGE_HEADER.test(line)) return [];
+    }
     const heading = /^#{1,6}\s+/.test(line);
     const item = /^(?:[-*+]\s+|\d+[.)]\s+)/.test(line);
     const content = line

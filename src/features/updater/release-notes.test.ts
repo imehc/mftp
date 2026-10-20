@@ -65,6 +65,29 @@ it("仅展示业务与样式类提交，隐藏其他提交类型并保留普通�
   ]);
 });
 
+it("版本范围标题不展示，只保留具体更新条目", () => {
+  expect(
+    parseReleaseNotes(
+      [
+        "Changes since v0.2.3",
+        "",
+        "- feat: 新增离线翻译 (1111111)",
+        "- fix: 修复上传失败 (2222222)",
+      ].join("\n"),
+    ).map((note) => note.text),
+  ).toEqual(["新增离线翻译 (1111111)", "修复上传失败 (2222222)"]);
+  expect(
+    parseReleaseNotes("Initial release\n\n- feat: 首个版本").map(
+      (note) => note.text,
+    ),
+  ).toEqual(["首个版本"]);
+  expect(
+    parseReleaseNotes("## 本次更新\n\n- feat: 保留自定义标题").map(
+      (note) => note.text,
+    ),
+  ).toEqual(["本次更新", "保留自定义标题"]);
+});
+
 it("HTML、外部链接和代码内容仅保留为展示文本", () => {
   const result = parseReleaseNotes(
     "- **重点**：`path`\n[链接](javascript:alert)\n<img src=x onerror=alert(1)>",
