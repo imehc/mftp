@@ -4,7 +4,9 @@
 
 use crate::error::{persistence, AppError, AppResult, CustomErrorCode};
 use crate::storage::Storage;
+use parking_lot::{MappedMutexGuard, Mutex, MutexGuard};
 use rusqlite::{params, Connection, OptionalExtension};
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub(crate) struct BtTaskRow {
@@ -80,16 +82,31 @@ fn query_all(
 #[derive(Clone)]
 pub(crate) struct BtRepository {
     storage: Storage,
+    // Stats poll this table every tick; reuse one connection instead of
+    // reopening the database file for each query.
+    cached: Arc<Mutex<Option<Connection>>>,
 }
 
 impl BtRepository {
     pub(crate) fn new(storage: Storage) -> Self {
-        Self { storage }
+        Self {
+            storage,
+            cached: Arc::default(),
+        }
+    }
+
+    fn conn(&self) -> AppResult<MappedMutexGuard<'_, Connection>> {
+        let mut cached = self.cached.lock();
+        let conn = match cached.take() {
+            Some(conn) => conn,
+            None => self.storage.conn()?,
+        };
+        Ok(MutexGuard::map(cached, |slot| slot.insert(conn)))
     }
 
     pub(super) fn finish_bt_download_only_migration(&self) -> AppResult<()> {
         const MIGRATION_KEY: &str = "bt_download_only_migrated_v1";
-        let mut conn = self.storage.conn()?;
+        let mut conn = self.conn()?;
         let done: Option<String> = conn
             .query_row(
                 "SELECT value FROM app_meta WHERE key = ?1",
@@ -123,7 +140,7 @@ impl BtRepository {
     }
 
     pub(super) fn has_active_bt_tasks(&self) -> AppResult<bool> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         let active: i64 = conn.query_row(
             "SELECT COUNT(*) FROM bt_tasks WHERE status IN ('active', 'packaging')",
             [],
@@ -133,7 +150,7 @@ impl BtRepository {
     }
 
     pub(super) fn upsert_bt_task(&self, task: &BtTaskRow) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         let error_payload = task.error.as_ref().map(persistence::encode).transpose()?;
         let total_bytes = task
             .total_bytes
@@ -182,7 +199,7 @@ impl BtRepository {
     }
 
     pub(super) fn list_bt_tasks(&self) -> AppResult<Vec<BtTaskRow>> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         query_all(
             &conn,
             &format!("SELECT {COLS} FROM bt_tasks ORDER BY created_at DESC"),
@@ -193,14 +210,14 @@ impl BtRepository {
     pub(super) fn progress_states(
         &self,
     ) -> AppResult<std::collections::HashMap<String, (String, String)>> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         let mut statement = conn.prepare("SELECT info_hash, package_mode, status FROM bt_tasks")?;
         let rows = statement.query_map([], |row| Ok((row.get(0)?, (row.get(1)?, row.get(2)?))))?;
         Ok(rows.collect::<Result<_, _>>()?)
     }
 
     pub(super) fn get_bt_task(&self, info_hash: &str) -> AppResult<Option<BtTaskRow>> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         let mut stmt =
             conn.prepare(&format!("SELECT {COLS} FROM bt_tasks WHERE info_hash = ?1"))?;
         stmt.query_row(params![info_hash], row_from)
@@ -209,7 +226,7 @@ impl BtRepository {
     }
 
     pub(super) fn delete_bt_task(&self, info_hash: &str) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         conn.execute(
             "DELETE FROM bt_tasks WHERE info_hash = ?1",
             params![info_hash],
@@ -218,7 +235,7 @@ impl BtRepository {
     }
 
     pub(super) fn delete_bt_access(&self, info_hash: &str) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         conn.execute(
             "DELETE FROM bt_cache_access WHERE info_hash = ?1",
             params![info_hash],
@@ -233,7 +250,7 @@ impl BtRepository {
         output_path: Option<&str>,
         error: Option<&AppError>,
     ) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         let error_payload = error.map(persistence::encode).transpose()?;
         conn.execute(
             "UPDATE bt_tasks
@@ -256,7 +273,7 @@ impl BtRepository {
         info_hash: &str,
         export_path: &str,
     ) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         conn.execute(
             "UPDATE bt_tasks SET export_path = ?2 WHERE info_hash = ?1",
             params![info_hash, export_path],
@@ -265,7 +282,7 @@ impl BtRepository {
     }
 
     pub(super) fn mark_bt_task_cancelled(&self, info_hash: &str) -> AppResult<()> {
-        let mut conn = self.storage.conn()?;
+        let mut conn = self.conn()?;
         let transaction = conn.transaction()?;
         transaction.execute(
             "DELETE FROM bt_cache_access WHERE info_hash = ?1",
@@ -296,7 +313,7 @@ impl BtRepository {
         total_bytes: Option<u64>,
         output_path: Option<&str>,
     ) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         let total_bytes = total_bytes
             .map(i64::try_from)
             .transpose()
@@ -317,7 +334,7 @@ impl BtRepository {
     /// finalize job for each so the finished file reaches the user's folder
     /// even when the download completed with the app closed.
     pub(super) fn list_bt_direct_downloads(&self) -> AppResult<Vec<BtTaskRow>> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         query_all(
             &conn,
             &format!(
@@ -330,7 +347,7 @@ impl BtRepository {
     }
 
     pub(super) fn list_bt_archive_tasks(&self) -> AppResult<Vec<BtTaskRow>> {
-        let conn = self.storage.conn()?;
+        let conn = self.conn()?;
         query_all(
             &conn,
             &format!(

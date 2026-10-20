@@ -1,8 +1,9 @@
 use crate::error::persistence;
 use crate::error::{AppError, AppResult};
 use crate::models::ActivityLog;
+use parking_lot::Mutex;
 use rusqlite::{params, Connection, OptionalExtension};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::helpers::column_exists;
 use super::{now_ms, Storage};
@@ -155,11 +156,20 @@ fn append_traced_log(
         Some(error) => Some(persistence::encode(error)?),
         None => None,
     };
-    let conn = rusqlite::Connection::open(db_path)?;
+    // LAN requests log on every access; reuse one connection per database
+    // instead of reopening the file. SQLite serializes writers anyway.
+    static CACHED: Mutex<Option<(PathBuf, Connection)>> = Mutex::new(None);
+    let mut cached = CACHED.lock();
+    let conn = match cached.take() {
+        Some((path, conn)) if path == db_path => conn,
+        _ => Connection::open(db_path)?,
+    };
     conn.execute(
         "INSERT INTO activity_logs(id,created_at,source,ip,request_type,result,detail,error_payload,operation_id) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9)",
         params![uuid::Uuid::new_v4().to_string(), now_ms(), source, address, action, result, detail, error_payload, operation_id],
     )?;
+    // A failed write drops the connection so the next call reopens it.
+    *cached = Some((db_path.to_path_buf(), conn));
     Ok(())
 }
 
