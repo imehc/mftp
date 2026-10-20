@@ -34,21 +34,28 @@ jobs:
       - name: Generate release notes
         id: release-info
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="$(node -p "require('./package.json').version")"
 
-          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+          # A tag may exist while its draft release is still unpublished after a
+          # failed publish. Only a published release means this version is done.
+          PUBLISHED="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v${VERSION}" \
+            --jq '.draft == false' 2>/dev/null || true)"
+          if [ "$PUBLISHED" = "true" ]; then
             {
               echo "version=${VERSION}"
               echo "should_release=false"
               echo "release_body<<EOF"
-              echo "Version v${VERSION} already exists. Release build skipped."
+              echo "Version v${VERSION} has already been released. Release build skipped."
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          PREVIOUS_TAG="$(git tag --list 'v[0-9]*' --sort=-v:refname | head -n 1 || true)"
+          PREVIOUS_TAG="$(git tag --list 'v[0-9]*' --sort=-v:refname \
+            | grep -vx "v${VERSION}" | head -n 1 || true)"
 
           if [ -n "$PREVIOUS_TAG" ]; then
             RANGE="${PREVIOUS_TAG}..HEAD"
@@ -93,9 +100,11 @@ jobs:
           TAG="v${VERSION}"
           # A failed earlier run may have left a draft for this version. Reuse it
           # so retried builds replace assets instead of creating a second draft.
+          # Draft releases created before the tag exists use an untagged-*
+          # placeholder, so match the release name as well as the tag.
           # Capture first: piping into head could SIGPIPE gh under pipefail.
           IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases" --paginate \
-            --jq ".[] | select(.draft and .tag_name == \"${TAG}\") | .id")"
+            --jq "sort_by(.created_at) | reverse | .[] | select(.draft) | select(.tag_name == \"${TAG}\" or .name == \"mftp ${TAG}\") | .id")"
           ID="$(printf '%s\n' "$IDS" | head -n 1)"
           if [ -n "$ID" ]; then
             gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/${ID}" \
@@ -354,16 +363,30 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft-release.outputs.release_id }}
           VERSION: ${{ needs.release-info.outputs.version }}
         run: |
+          set -euo pipefail
           APK="src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk"
           if [ ! -f "$APK" ]; then
             echo "Expected signed APK not found at $APK"
             ls -R src-tauri/gen/android/app/build/outputs/apk || true
             exit 1
           fi
-          cp "$APK" "mftp_${VERSION}_arm64-v8a.apk"
-          gh release upload "v${VERSION}" "mftp_${VERSION}_arm64-v8a.apk" --clobber
+          NAME="mftp_${VERSION}_arm64-v8a.apk"
+          cp "$APK" "$NAME"
+          # Draft releases have no resolvable tag yet, so address the release by
+          # id and delete an existing asset to keep retries idempotent.
+          # Capture first: piping gh into head could SIGPIPE under pipefail.
+          ASSET_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" --paginate \
+            --jq ".[] | select(.name == \"${NAME}\") | .id")"
+          ASSET_ID="$(printf '%s\n' "$ASSET_IDS" | head -n 1)"
+          if [ -n "$ASSET_ID" ]; then
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" --silent
+          fi
+          gh api -X POST \
+            "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${NAME}" \
+            -H "Content-Type: application/octet-stream" --input "$NAME" --silent
 
   publish:
     name: Publish release
@@ -383,16 +406,23 @@ jobs:
       - name: Prepare and validate updater manifest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft-release.outputs.release_id }}
           VERSION: ${{ needs.release-info.outputs.version }}
         run: |
           set -euo pipefail
 
           mkdir -p /tmp/mftp-release
-          gh release download "v${VERSION}" \
-            --pattern latest.json \
-            --dir /tmp/mftp-release \
-            --clobber
-          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v${VERSION}" \
+          # The draft has no tag yet, so fetch its assets and metadata by id.
+          ASSET_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" --paginate \
+            --jq '.[] | select(.name == "latest.json") | .id')"
+          ASSET_ID="$(printf '%s\n' "$ASSET_IDS" | head -n 1)"
+          if [ -z "$ASSET_ID" ]; then
+            echo "latest.json is missing from the draft release"
+            exit 1
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" \
+            -H "Accept: application/octet-stream" > /tmp/mftp-release/latest.json
+          gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}" \
             > /tmp/mftp-release/release.json
 
           node <<'NODE'
@@ -406,7 +436,11 @@ jobs:
             fs.readFileSync("/tmp/mftp-release/release.json", "utf8"),
           );
           const version = process.env.VERSION;
-          if (manifest.version !== version || release.tag_name !== `v${version}`) {
+          if (
+            manifest.version !== version ||
+            release.name !== `mftp v${version}` ||
+            !release.draft
+          ) {
             throw new Error("Updater manifest and release versions do not match");
           }
           const platforms = manifest.platforms ?? {};
@@ -457,23 +491,51 @@ jobs:
           const downloadPrefix = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/`;
           for (const [key, platform] of Object.entries(platforms)) {
             const asset = release.assets.find(
-              (asset) => asset.url === platform.url || asset.browser_download_url === platform.url,
+              (asset) =>
+                asset.url === platform.url ||
+                asset.browser_download_url === platform.url ||
+                platform.url.endsWith(`/${asset.name}`),
             );
-            if (!asset || asset.size <= 0 || !asset.browser_download_url?.startsWith(downloadPrefix)) {
+            if (!asset || asset.size <= 0) {
               throw new Error(`Updater platform ${key} does not reference an asset in this release`);
             }
-            platform.url = asset.browser_download_url;
+            // Draft assets use an untagged placeholder URL; publish with the
+            // final version tag so clients download from the stable path.
+            platform.url = `${downloadPrefix}${encodeURIComponent(asset.name)}`;
           }
 
           fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
           console.log(`Validated updater platforms: ${platformKeys.sort().join(", ")}`);
           NODE
 
-          gh release upload "v${VERSION}" /tmp/mftp-release/latest.json --clobber
+          ASSET_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" --paginate \
+            --jq '.[] | select(.name == "latest.json") | .id')"
+          ASSET_ID="$(printf '%s\n' "$ASSET_IDS" | head -n 1)"
+          if [ -n "$ASSET_ID" ]; then
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" --silent
+          fi
+          gh api -X POST \
+            "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=latest.json" \
+            -H "Content-Type: application/json" --input /tmp/mftp-release/latest.json --silent
 
       - name: Publish draft release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft-release.outputs.release_id }}
           VERSION: ${{ needs.release-info.outputs.version }}
         run: |
-          gh release edit "v${VERSION}" --draft=false
+          set -euo pipefail
+          TAG="v${VERSION}"
+          # Drafts listed before publication carry an untagged placeholder.
+          # Create the real tag and set it while publishing so the public
+          # release and its asset URLs use the version tag.
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/git/refs/tags/${TAG}" \
+              -f sha="$GITHUB_SHA" -F force=true --silent
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+              -f ref="refs/tags/${TAG}" -f sha="$GITHUB_SHA" --silent
+          fi
+          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}" \
+            -f tag_name="$TAG" -F draft=false --silent
+          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq '.tag_name'
