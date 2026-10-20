@@ -1,21 +1,25 @@
 use super::runtime::complete;
 use crate::error::AppResult;
 pub(crate) use crate::modules::ai::completion::AiTextRequest;
-use crate::modules::ai::completion::{AiCompletionRequest, AiStreamEventPayload};
+use crate::modules::ai::completion::{AiCompletionRequest, AiControlMessage, AiStreamEventPayload};
 use crate::modules::ai::AiConnectionConfig;
+use tokio::sync::mpsc::Receiver;
 
-/// Compatibility facade: poetry receives final text only, never reasoning events.
+/// Compatibility facade: poetry receives final text only, never reasoning
+/// events. The caller's control channel lets a user-initiated cancel stop the
+/// provider stream instead of only muting the UI.
 pub async fn generate_text(
     config: &AiConnectionConfig,
     api_key: &str,
     request: &AiTextRequest,
+    control: Option<&mut Receiver<AiControlMessage>>,
     mut on_delta: impl FnMut(String) + Send,
 ) -> AppResult<String> {
     let result = complete(
         config,
         api_key,
         &AiCompletionRequest::text(request, config.streaming_enabled),
-        None,
+        control,
         |event| {
             if config.streaming_enabled {
                 if let AiStreamEventPayload::TextDelta { text, .. } = event.payload {
@@ -30,6 +34,17 @@ pub async fn generate_text(
     } else {
         result.text.trim().to_string()
     })
+}
+
+/// Test-only convenience for call sites that do not exercise cancellation.
+#[cfg(test)]
+pub async fn generate_text_without_control(
+    config: &AiConnectionConfig,
+    api_key: &str,
+    request: &AiTextRequest,
+    on_delta: impl FnMut(String) + Send,
+) -> AppResult<String> {
+    generate_text(config, api_key, request, None, on_delta).await
 }
 
 #[cfg(test)]

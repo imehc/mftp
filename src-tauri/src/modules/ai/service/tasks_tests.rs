@@ -62,3 +62,37 @@ fn stream_event_accepts_only_uuid_request_ids() {
     );
     assert!(poetry_translation_stream_event("../other-event").is_err());
 }
+
+#[tokio::test]
+async fn cancel_reaches_the_registered_control_channel() {
+    let manager = Arc::new(AiTaskManager::new(Arc::new(Operations::default())));
+    let id = "67d497e8-4ed9-4e49-b03e-bfd738654501";
+    let mut control = manager.control(id).unwrap();
+    assert!(manager.cancel(id));
+    assert!(matches!(
+        control.receiver().recv().await,
+        Some(AiControlMessage::Cancel)
+    ));
+}
+
+#[test]
+fn cancel_is_a_harmless_miss_once_the_session_is_dropped() {
+    let manager = Arc::new(AiTaskManager::new(Arc::new(Operations::default())));
+    let id = "67d497e8-4ed9-4e49-b03e-bfd738654501";
+    let control = manager.control(id).unwrap();
+    drop(control);
+    assert!(!manager.cancel(id));
+}
+
+#[test]
+fn duplicate_control_registration_is_rejected_and_released_on_drop() {
+    let manager = Arc::new(AiTaskManager::new(Arc::new(Operations::default())));
+    let id = "67d497e8-4ed9-4e49-b03e-bfd738654501";
+    let control = manager.control(id).unwrap();
+    assert_eq!(
+        manager.control(id).err().unwrap().code,
+        "ai:task_already_running"
+    );
+    drop(control);
+    assert!(manager.control(id).is_ok());
+}

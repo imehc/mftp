@@ -176,7 +176,7 @@ async fn all_protocols_use_selected_wire_format_for_plain_and_streaming_requests
                 200,
             );
             let mut deltas = String::new();
-            let result = generate_text(
+            let result = generate_text_without_control(
                 &config(url, protocol, streaming),
                 "fake-key",
                 &request(),
@@ -243,7 +243,7 @@ async fn errors_disconnects_and_limits_do_not_publish_success() {
             let (url, worker) = server(body, status);
             let mut request = request();
             request.output_limit_bytes = limit;
-            let error = generate_text(
+            let error = generate_text_without_control(
                 &config(url, protocol, streaming),
                 "fake-key",
                 &request,
@@ -304,7 +304,7 @@ async fn cancelling_each_protocol_closes_the_stream_without_replaying() {
             while socket.read(&mut request).unwrap() > 0 {}
         });
         let task = tokio::spawn(async move {
-            generate_text(&config(url, protocol, true), "fake-key", &request(), |_| {}).await
+            generate_text_without_control(&config(url, protocol, true), "fake-key", &request(), |_| {}).await
         });
         arrived.await.unwrap();
         task.abort();

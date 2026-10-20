@@ -204,6 +204,11 @@ export const commands = {
 	listPoetryPackTranslations: (uid: string) => typedError<PoetryPackTranslation[], AppError>(__TAURI_INVOKE("list_poetry_pack_translations", { uid })),
 	listPoetryTranslations: (uid: string) => typedError<PoetryTranslation[], AppError>(__TAURI_INVOKE("list_poetry_translations", { uid })),
 	generatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, requestId: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("generate_poetry_translation", { uid, mode, requestId })),
+	/**
+	 *  Stops an in-flight generation. The provider stream ends with `ai:cancelled`
+	 *  and nothing is persisted, so the poem keeps its previous translation.
+	 */
+	cancelPoetryTranslation: (requestId: string) => typedError<null, AppError>(__TAURI_INVOKE("cancel_poetry_translation", { requestId })),
 	updatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, content: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("update_poetry_translation", { uid, mode, content })),
 	deletePoetryTranslation: (uid: string, mode: PoetryTranslationMode) => typedError<null, AppError>(__TAURI_INVOKE("delete_poetry_translation", { uid, mode })),
 	lanTransferSettings: () => typedError<LanTransferSettings, AppError>(__TAURI_INVOKE("lan_transfer_settings")),

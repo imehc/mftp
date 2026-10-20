@@ -148,6 +148,7 @@ common poetry_translation_pack_delete
 common list_poetry_pack_translations
 common list_poetry_translations
 common generate_poetry_translation
+common cancel_poetry_translation
 common update_poetry_translation
 common delete_poetry_translation
 desktop lan_transfer_settings

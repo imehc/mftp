@@ -71,11 +71,27 @@ pub async fn generate_poetry_translation(
         tasks,
         uid,
         mode,
+        &request_id,
         move |delta| {
             let _ = app.emit(&event_name, PoetryTranslationStreamEvent { delta });
         },
     )
     .await
+}
+
+/// Stops an in-flight generation. The provider stream ends with `ai:cancelled`
+/// and nothing is persisted, so the poem keeps its previous translation.
+#[tauri::command]
+#[specta::specta]
+pub fn cancel_poetry_translation(
+    state: State<'_, AppServices>,
+    request_id: String,
+) -> AppResult<()> {
+    // Reject malformed ids the same way the stream event does; anything else
+    // (already finished, never started) is a harmless miss.
+    let _ = poetry_translation_stream_event(&request_id)?;
+    state.ai_tasks.cancel(&request_id);
+    Ok(())
 }
 
 #[tauri::command]

@@ -16,7 +16,7 @@ async fn http_errors_do_not_expose_any_provider_fields_in_either_request_mode() 
     ] {
         for streaming in [false, true] {
             let (url, worker) = server(body.clone(), 401);
-            let error = generate_text(
+            let error = generate_text_without_control(
                 &config(url, protocol, streaming),
                 "fake-key",
                 &request(),
@@ -116,7 +116,7 @@ async fn incomplete_stream_preserves_text_counters_without_including_partial_out
             ).to_string(),
         };
         let (url, worker) = server(body, 200);
-        let error = generate_text(&config(url, protocol, true), "fake-key", &request(), |_| {})
+        let error = generate_text_without_control(&config(url, protocol, true), "fake-key", &request(), |_| {})
             .await
             .unwrap_err();
         assert_eq!(error.code, "ai:provider_incomplete");
@@ -173,7 +173,7 @@ async fn streaming_size_errors_survive_the_eventsource_transport_wrapper() {
     // No Content-Length: exercise the limit inside the SSE byte stream.
     let body = "data: {\"type\":\"ping\"}\n\n".repeat(RESPONSE_LIMIT_BYTES / 10);
     let (url, worker) = server_with_length(body, 200, false);
-    let error = generate_text(
+    let error = generate_text_without_control(
         &config(url, AiProtocol::Responses, true),
         "fake-key",
         &request(),

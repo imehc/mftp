@@ -9,7 +9,7 @@ import type {
   PoetryTranslationMode,
 } from "~/bindings";
 import { hasAiRequestSelection } from "~/features/ai-configuration/request-readiness";
-import { toIpcError } from "~/lib/errors";
+import { describeError, toIpcError } from "~/lib/errors";
 import {
   aiConfigurationGet,
   poetryPackTranslationsList,
@@ -37,7 +37,6 @@ export function usePoetryTranslations(
   const [generating, setGenerating] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<AppError | null>(null);
   const [editing, setEditing] = useState<PoetryTranslation | null>(null);
   const [editContent, setEditContent] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
@@ -45,12 +44,20 @@ export function usePoetryTranslations(
   const [regenerateOpen, setRegenerateOpen] = useState(false);
   const [configurationMissing, setConfigurationMissing] = useState(false);
   const mountedRef = useRef(true);
-  // 只解除流式订阅；后端请求（若已开始）不由前端取消。
+  // 离开页面只解除流式订阅；用户显式取消才打断后端请求。
   const detachGenerationRef = useRef<(() => void) | null>(null);
+  const cancelGenerationRef = useRef<(() => Promise<void>) | null>(null);
+  // 取消与「完成」可能同时发生：先点取消的一方决定结果不被采用。
+  const cancelRequestedRef = useRef(false);
   const current = translations.find((item) => item.mode === mode) ?? null;
   const currentPackTranslations = packTranslations.filter(
     (item) => item.mode === mode,
   );
+
+  /** 失败统一走 toast：页面里不再常驻错误条，避免把后端原文堆在正文中。 */
+  function reportError(payload: AppError) {
+    toast.error(t`操作失败`, { description: describeError(payload, t) });
+  }
 
   useEffect(() => {
     mountedRef.current = true;
@@ -99,9 +106,9 @@ export function usePoetryTranslations(
   async function generate() {
     if (actionPending.current || loading || readError) return;
     actionPending.current = true;
+    cancelRequestedRef.current = false;
     setGenerating(true);
     setStreamingContent("");
-    setError(null);
     setConfigurationMissing(false);
     try {
       const configuration = await aiConfigurationGet();
@@ -114,21 +121,42 @@ export function usePoetryTranslations(
         setStreamingContent((content) => content + delta),
       );
       detachGenerationRef.current = generation.detach;
+      cancelGenerationRef.current = generation.cancel;
       const translation = await generation.promise;
       // 已离开页面或已解除订阅时不采用结果。
-      if (!mountedRef.current || !translation) return;
+      if (!mountedRef.current || !translation || cancelRequestedRef.current) {
+        return;
+      }
       replaceTranslation(translation);
       toast.success(t`已生成`);
     } catch (nextError) {
-      if (mountedRef.current) setError(toIpcError(nextError).payload);
+      const payload = toIpcError(nextError).payload;
+      // 用户主动取消：不是失败，不弹错误，也不写库。
+      if (payload.code === "ai:cancelled") {
+        if (mountedRef.current) toast(t`已取消生成`);
+      } else if (mountedRef.current) {
+        reportError(payload);
+      }
     } finally {
       actionPending.current = false;
+      cancelGenerationRef.current = null;
       if (mountedRef.current) {
         setStreamingContent("");
         setGenerating(false);
       }
       detachGenerationRef.current = null;
     }
+  }
+
+  /** 用户点「取消生成」：中断后端请求，留下原有译文。 */
+  function cancelGeneration() {
+    const cancel = cancelGenerationRef.current;
+    if (!cancel) return;
+    cancelGenerationRef.current = null;
+    cancelRequestedRef.current = true;
+    void cancel().catch(() => {
+      // 请求已经结束（取消只是迟到），无需额外提示。
+    });
   }
 
   function startEdit() {
@@ -141,7 +169,6 @@ export function usePoetryTranslations(
     if (!editing || !editContent.trim() || actionPending.current) return;
     actionPending.current = true;
     setSavingEdit(true);
-    setError(null);
     try {
       const translation = await poetryTranslationUpdate(
         uid,
@@ -153,7 +180,7 @@ export function usePoetryTranslations(
       setEditing(null);
       toast.success(t`已保存`);
     } catch (nextError) {
-      if (mountedRef.current) setError(toIpcError(nextError).payload);
+      if (mountedRef.current) reportError(toIpcError(nextError).payload);
     } finally {
       actionPending.current = false;
       if (mountedRef.current) setSavingEdit(false);
@@ -164,7 +191,6 @@ export function usePoetryTranslations(
     if (!current || actionPending.current) return;
     actionPending.current = true;
     setDeleting(true);
-    setError(null);
     try {
       await poetryTranslationDelete(uid, current.mode);
       if (!mountedRef.current) return;
@@ -173,7 +199,7 @@ export function usePoetryTranslations(
       );
       toast.success(t`已删除`);
     } catch (nextError) {
-      if (mountedRef.current) setError(toIpcError(nextError).payload);
+      if (mountedRef.current) reportError(toIpcError(nextError).payload);
     } finally {
       actionPending.current = false;
       if (mountedRef.current) setDeleting(false);
@@ -196,8 +222,6 @@ export function usePoetryTranslations(
     generating,
     streamingContent,
     deleting,
-    error,
-    setError,
     editing,
     setEditing,
     editContent,
@@ -210,6 +234,7 @@ export function usePoetryTranslations(
     configurationMissing,
     setConfigurationMissing,
     generate,
+    cancelGeneration,
     startEdit,
     saveEdit,
     remove,

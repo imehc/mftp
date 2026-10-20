@@ -17,8 +17,8 @@ pub use model::{AiConnectionConfig, AiProtocol};
 pub(crate) use ports::AiCredentials;
 pub(crate) use repository::AiRepository;
 pub(crate) use service::{
-    generate_text, poetry_translation_stream_event, AiConfigurationService, AiTaskManager,
-    AiTextRequest,
+    generate_text, poetry_translation_stream_event, AiConfigurationService, AiControlSession,
+    AiTaskManager, AiTextRequest,
 };
 
 pub(crate) mod configuration;

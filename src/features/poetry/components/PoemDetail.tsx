@@ -243,17 +243,7 @@ export default function PoemDetail({
               tabIndex: undefined,
             })}
           >
-            {!narrow ? (
-              <div className="mb-4 flex flex-col gap-4">
-                <Separator />
-                <h3
-                  id={translationLabelId}
-                  className="text-muted-foreground text-sm font-medium"
-                >
-                  <Trans>译文</Trans>
-                </h3>
-              </div>
-            ) : null}
+            {!narrow ? <Separator className="mb-4" /> : null}
             <PoetryTranslationSection
               key={detail.uid}
               uid={detail.uid}
@@ -261,6 +251,7 @@ export default function PoemDetail({
               referenceTranslation={annotation?.translation}
               initialMode={initialTranslationMode}
               onModeChange={onTranslationModeChange}
+              labelId={narrow ? undefined : translationLabelId}
             />
           </TabsContent>
           {!narrow ? (

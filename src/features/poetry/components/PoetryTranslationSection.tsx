@@ -31,7 +31,6 @@ import {
 } from "~/components/ui/dialog-layout";
 import { Textarea } from "~/components/ui/textarea";
 import { ToggleGroupItem } from "~/components/ui/toggle-group";
-import { describeError } from "~/lib/errors";
 
 import { usePoetryTranslations } from "../hooks/use-poetry-translations";
 import PoetryReadError from "./PoetryReadError";
@@ -43,6 +42,8 @@ interface Props {
   referenceTranslation?: string;
   initialMode?: PoetryTranslationMode;
   onModeChange?: (mode: PoetryTranslationMode) => void;
+  /** 桌面端由详情页提供「译文」标题 id；窄屏由阅读区顶部的译文标签承担同一语义。 */
+  labelId?: string;
 }
 
 export default function PoetryTranslationSection({
@@ -52,6 +53,7 @@ export default function PoetryTranslationSection({
   referenceTranslation,
   initialMode = "literal",
   onModeChange,
+  labelId,
 }: Props) {
   const { t } = useLingui();
   const {
@@ -65,8 +67,6 @@ export default function PoetryTranslationSection({
     generating,
     streamingContent,
     deleting,
-    error,
-    setError,
     editing,
     setEditing,
     editContent,
@@ -79,23 +79,55 @@ export default function PoetryTranslationSection({
     configurationMissing,
     setConfigurationMissing,
     generate,
+    cancelGeneration,
     startEdit,
     saveEdit,
     remove,
     requestGeneration,
   } = usePoetryTranslations(uid, initialMode);
+  // 有注释包/开放译文兜底时，生成按钮退居次要位置，不再占据空状态的重心。
+  const hasFallback =
+    Boolean(referenceTranslation?.trim()) || currentPackTranslations.length > 0;
   return (
     <section className="flex flex-col gap-4 font-sans text-sm">
+      {/* 标题行只放标题与模式切换；生成/取消/重新生成都跟着译文内容走。 */}
+      <div className="flex flex-wrap items-center gap-2">
+        {labelId ? (
+          <h3
+            id={labelId}
+            className="text-muted-foreground mr-auto text-sm font-medium"
+          >
+            <Trans>译文</Trans>
+          </h3>
+        ) : null}
+        <div className="ml-auto w-44 max-w-full shrink-0">
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            value={mode}
+            disabled={generating || savingEdit || deleting}
+            aria-label={t`译文模式`}
+            onValueChange={(value) => {
+              if (value) {
+                const nextMode = value as PoetryTranslationMode;
+                setMode(nextMode);
+                onModeChange?.(nextMode);
+                setConfigurationMissing(false);
+              }
+            }}
+          >
+            <ToggleGroupItem value="literal">
+              <Trans>白话直译</Trans>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="literary">
+              <Trans>文学意译</Trans>
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      </div>
+
       {readError ? (
         <PoetryReadError error={readError} onRetry={retryRead} />
-      ) : null}
-      {error ? (
-        <Alert variant="destructive">
-          <AlertTitle>{t`操作失败`}</AlertTitle>
-          <AlertDescription className="wrap-break-word">
-            {describeError(error)}
-          </AlertDescription>
-        </Alert>
       ) : null}
 
       {configurationMissing ? (
@@ -115,97 +147,133 @@ export default function PoetryTranslationSection({
         </Alert>
       ) : null}
 
-      {referenceTranslation?.trim() && !current && !generating ? (
-        <div className="flex flex-col gap-2">
-          <Badge variant="outline">
-            <Trans>注释包译文</Trans>
-          </Badge>
-          <p
-            className="font-poetry whitespace-pre-line"
-            style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
-          >
-            {referenceTranslation}
-          </p>
-        </div>
-      ) : null}
-
       {loading ? (
-        <div className="text-muted-foreground flex min-h-20 items-center justify-center">
+        <div className="text-muted-foreground flex min-h-28 items-center justify-center">
           <LoaderCircle className="size-4 animate-spin" aria-hidden />
         </div>
-      ) : current || generating ? (
-        <div className="flex flex-col gap-2">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            {generating ? (
-              <Badge variant="outline">
-                <LoaderCircle
-                  data-icon="inline-start"
-                  className="animate-spin"
-                />
+      ) : generating ? (
+        // 生成中只有这一个指示器；它本身就是要取消的按钮，hover/focus 时文字换成取消。
+        <div
+          className={
+            streamingContent
+              ? "flex flex-col gap-2"
+              : "flex min-h-28 flex-col items-center justify-center gap-3"
+          }
+        >
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="group text-muted-foreground hover:text-foreground"
+            aria-label={t`正在生成，点击取消`}
+            title={t`正在生成，点击取消`}
+            onClick={cancelGeneration}
+          >
+            <LoaderCircle
+              data-icon="inline-start"
+              className="size-3.5 animate-spin"
+              aria-hidden
+            />
+            {/* 两个文案叠在同一格：宽度取较长的一个，hover 时只换字不跳宽。 */}
+            <span className="grid">
+              <span className="col-start-1 row-start-1 group-hover:invisible group-focus-visible:invisible">
                 <Trans>正在生成</Trans>
-              </Badge>
-            ) : current ? (
-              <>
-                <Badge
-                  variant={current.source === "user" ? "secondary" : "outline"}
-                >
-                  {current.source === "user" ? t`人工修订` : t`AI 生成`}
-                </Badge>
-                <span
-                  className="text-muted-foreground max-w-full truncate text-xs"
-                  title={current.model}
-                >
-                  {current.model}
-                </span>
-                <div className="ml-auto flex shrink-0 items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-xs"
-                    disabled={deleting}
-                    aria-label={t`编辑译文`}
-                    title={t`编辑译文`}
-                    onClick={startEdit}
-                  >
-                    <Pencil />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-xs"
-                    disabled={deleting}
-                    aria-label={t`删除译文`}
-                    title={t`删除译文`}
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 />
-                  </Button>
-                </div>
-              </>
-            ) : null}
-          </div>
-          {generating && !streamingContent ? (
-            <div className="text-muted-foreground flex min-h-20 items-center justify-center">
-              <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            </div>
-          ) : (
+              </span>
+              <span className="invisible col-start-1 row-start-1 group-hover:visible group-focus-visible:visible">
+                <Trans>取消生成</Trans>
+              </span>
+            </span>
+          </Button>
+          {streamingContent ? (
             <p
               className="font-poetry whitespace-pre-line"
               style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
             >
-              {generating ? streamingContent : current?.content}
+              {streamingContent}
             </p>
-          )}
+          ) : null}
+        </div>
+      ) : current ? (
+        <div className="flex flex-col gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Badge
+              variant={current.source === "user" ? "secondary" : "outline"}
+            >
+              {current.source === "user" ? t`人工修订` : t`AI 生成`}
+            </Badge>
+            <span
+              className="text-muted-foreground max-w-full truncate text-xs"
+              title={current.model}
+            >
+              {current.model}
+            </span>
+            <div className="ml-auto flex shrink-0 items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                disabled={deleting}
+                aria-label={t`编辑译文`}
+                title={t`编辑译文`}
+                onClick={startEdit}
+              >
+                <Pencil />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                disabled={deleting || savingEdit}
+                aria-label={t`重新生成`}
+                title={t`重新生成`}
+                onClick={requestGeneration}
+              >
+                <RefreshCw />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                disabled={deleting}
+                aria-label={t`删除译文`}
+                title={t`删除译文`}
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          </div>
+          <p
+            className="font-poetry whitespace-pre-line"
+            style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
+          >
+            {current.content}
+          </p>
         </div>
       ) : (
-        <div className="flex flex-col items-start gap-2">
-          {!readError &&
-          !referenceTranslation?.trim() &&
-          currentPackTranslations.length === 0 ? (
+        // 没有译文时，生成按钮就停在这里——原来放加载圈的位置。
+        <div
+          className={
+            hasFallback
+              ? "flex"
+              : "flex min-h-28 flex-col items-center justify-center gap-2"
+          }
+        >
+          {!readError && !hasFallback ? (
             <p className="text-muted-foreground text-xs">
               <Trans>暂无译文</Trans>
             </p>
           ) : null}
+          <Button
+            type="button"
+            variant={hasFallback ? "outline" : "default"}
+            size="sm"
+            disabled={deleting || savingEdit || !!readError}
+            onClick={requestGeneration}
+          >
+            <Sparkles data-icon="inline-start" />
+            <Trans>生成</Trans>
+          </Button>
         </div>
       )}
 
@@ -233,51 +301,7 @@ export default function PoetryTranslationSection({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          value={mode}
-          disabled={generating || savingEdit || deleting}
-          aria-label={t`译文模式`}
-          onValueChange={(value) => {
-            if (value) {
-              const nextMode = value as PoetryTranslationMode;
-              setMode(nextMode);
-              onModeChange?.(nextMode);
-              setError(null);
-              setConfigurationMissing(false);
-            }
-          }}
-        >
-          <ToggleGroupItem value="literal">
-            <Trans>白话直译</Trans>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="literary">
-            <Trans>文学意译</Trans>
-          </ToggleGroupItem>
-        </ToggleGroup>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={
-            generating || deleting || savingEdit || loading || !!readError
-          }
-          onClick={requestGeneration}
-        >
-          {generating ? (
-            <LoaderCircle data-icon="inline-start" className="animate-spin" />
-          ) : current ? (
-            <RefreshCw data-icon="inline-start" />
-          ) : (
-            <Sparkles data-icon="inline-start" />
-          )}
-          {current ? <Trans>重新生成</Trans> : <Trans>生成</Trans>}
-        </Button>
-      </div>
-
-      {referenceTranslation?.trim() && (current || generating) ? (
+      {referenceTranslation?.trim() ? (
         <div className="flex flex-col gap-2">
           <Badge variant="outline">
             <Trans>注释包译文</Trans>
@@ -303,11 +327,6 @@ export default function PoetryTranslationSection({
             <DialogTitle>{t`编辑译文`}</DialogTitle>
           </DialogLayoutHeader>
           <DialogLayoutBody>
-            {error ? (
-              <p role="alert" className="text-destructive mb-3 text-sm">
-                {describeError(error)}
-              </p>
-            ) : null}
             <Textarea
               value={editContent}
               disabled={savingEdit}

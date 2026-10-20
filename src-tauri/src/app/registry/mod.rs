@@ -256,6 +256,7 @@ macro_rules! common_modules {
                     poetry::commands::list_poetry_pack_translations,
                     poetry::commands::list_poetry_translations,
                     poetry::commands::generate_poetry_translation,
+                    poetry::commands::cancel_poetry_translation,
                     poetry::commands::update_poetry_translation,
                     poetry::commands::delete_poetry_translation,
                 ],

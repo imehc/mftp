@@ -11,7 +11,8 @@ use serde_json::Value;
 use crate::core::execution::run_blocking;
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::modules::ai::{
-    generate_text, AiConfigurationService, AiCredentials, AiTaskManager, AiTextRequest,
+    generate_text, AiConfigurationService, AiControlSession, AiCredentials, AiTaskManager,
+    AiTextRequest,
 };
 use crate::modules::poetry::db::PoetryDb;
 use crate::modules::poetry::model::{PoemDetail, PoetryTranslation, PoetryTranslationMode};
@@ -85,6 +86,7 @@ pub(crate) async fn generate_poetry_translation<
     ai_tasks: Arc<AiTaskManager>,
     uid: String,
     mode: PoetryTranslationMode,
+    request_id: &str,
     emit_delta: F,
 ) -> AppResult<PoetryTranslation> {
     let (poem, fingerprint) = run_blocking(move || {
@@ -101,12 +103,22 @@ pub(crate) async fn generate_poetry_translation<
     // Same-poem deduplication guard: released when this future completes or
     // is dropped, mirroring the pre-modularization behavior.
     let _task = ai_tasks.begin(task_key)?;
+    // The user can cancel this request while it streams; both guards release
+    // with the future, and a late cancel falls through as a no-op.
+    let mut control: AiControlSession = ai_tasks.control(request_id)?;
     // Retain admission between configuration capture and network dispatch so
     // reset cannot finish while a pre-reset snapshot is waiting to start.
     let snapshot = configuration.request_snapshot().await?;
     let config = snapshot.config;
     let api_key = snapshot.api_key;
-    let output = generate_text(&config, &api_key, &request, emit_delta).await?;
+    let output = generate_text(
+        &config,
+        &api_key,
+        &request,
+        Some(control.receiver()),
+        emit_delta,
+    )
+    .await?;
     let content = parse_translation_output(&output)?;
     let model = config.model;
     run_blocking(move || {

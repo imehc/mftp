@@ -462,12 +462,16 @@ export interface PoetryGenerationHandle {
    */
   promise: Promise<PoetryTranslation | null>;
   /**
-   * 停止接收流式增量。
+   * 停止接收流式增量，但不打断后端任务。
    *
-   * 这不是「取消后端任务」：请求一旦开始，后端会继续执行并自行释放任务锁。
-   * 真正的取消需要后端提供契约，前端不得用按钮文案假装已经取消。
+   * 离开页面时用它即可：请求会自行完成并保存，只是不再回显。
    */
   detach: () => void;
+  /**
+   * 真正取消后端生成：请求以 `ai:cancelled` 结束，不落库。
+   * 只有用户明确点「取消生成」时才调用它。
+   */
+  cancel: () => Promise<void>;
 }
 
 export const poetryTranslationGenerate = (
@@ -507,6 +511,11 @@ export const poetryTranslationGenerate = (
     detach: () => {
       detached = true;
       cleanup();
+    },
+    cancel: () => {
+      detached = true;
+      cleanup();
+      return voidCommand(commands.cancelPoetryTranslation(requestId));
     },
   };
 };
