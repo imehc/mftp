@@ -4,7 +4,7 @@
 use jni::{
     objects::JClass,
     sys::{jboolean, JNI_TRUE},
-    JNIEnv,
+    EnvUnowned,
 };
 use parking_lot::Mutex;
 use std::sync::{Arc, Weak};
@@ -31,7 +31,7 @@ pub(super) fn register(cache: &Arc<CachedCredentials<AndroidKeychain>>) {
 
 #[no_mangle]
 pub extern "system" fn Java_com_imehc_mftp_AiCredentialLifecycle_setForeground(
-    _env: JNIEnv<'_>,
+    _env: EnvUnowned<'_>,
     _class: JClass<'_>,
     foreground: jboolean,
 ) {

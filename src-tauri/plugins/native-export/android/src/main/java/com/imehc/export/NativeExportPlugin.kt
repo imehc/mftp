@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
 import androidx.activity.result.ActivityResult
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import app.tauri.annotation.ActivityCallback
 import app.tauri.annotation.Command
@@ -136,7 +137,7 @@ class NativeExportPlugin(private val activity: Activity) : Plugin(activity) {
         } catch (_: Exception) { invoke.reject("Native export cancellation failed") }
     }
 
-    override fun onDestroy() {
+    override fun onDestroy(activity: AppCompatActivity) {
         val job = pending
         if (job != null && !job.writing) complete(job, "cancelled")
         // An already-started copy keeps its invocation until the actual worker exits.
