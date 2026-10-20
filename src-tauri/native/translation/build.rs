@@ -7,7 +7,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let spec: serde_json::Value =
         serde_json::from_slice(&std::fs::read(root.join("engine.json"))?)?;
     let revision = spec["revision"].as_str().ok_or("Missing engine revision")?;
-    let patch = Sha256::digest(std::fs::read(root.join("legacy-stq.patch"))?);
+    // Match prepare-translation-engine.mjs: Windows checkouts may store the
+    // patch with CRLF while the extracted source uses LF.
+    let patch = std::fs::read_to_string(root.join("legacy-stq.patch"))?.replace("\r\n", "\n");
+    let patch = Sha256::digest(patch.as_bytes());
     let patch = patch
         .iter()
         .map(|byte| format!("{byte:02x}"))

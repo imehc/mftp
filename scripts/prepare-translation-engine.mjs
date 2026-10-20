@@ -89,8 +89,13 @@ export async function prepareTranslationEngine() {
       ["-xzf", archive, "--strip-components=1", "-C", temporary],
       cache,
     );
-    run("git", ["apply", "--check", "-"], temporary, patch);
-    run("git", ["apply", "-"], temporary, patch);
+    run(
+      "git",
+      ["-c", "core.autocrlf=false", "apply", "--check", "-"],
+      temporary,
+      patch,
+    );
+    run("git", ["-c", "core.autocrlf=false", "apply", "-"], temporary, patch);
     await writeFile(join(temporary, ".mftp-version"), signature);
     // 仅替换本脚本管理的开发源码缓存，不接触运行时模型和用户数据。
     await rm(destination, { force: true, recursive: true });
