@@ -76,6 +76,14 @@ struct PoetryTranslationInput<'a> {
     notes: Vec<&'a str>,
 }
 
+/// Identifies which stored poem to translate, in which mode, under which
+/// request id. Kept together so the generation entry point stays readable.
+pub(crate) struct PoetryTranslationJob {
+    pub uid: String,
+    pub mode: PoetryTranslationMode,
+    pub request_id: String,
+}
+
 pub(crate) async fn generate_poetry_translation<
     C: AiCredentials + 'static,
     F: FnMut(String) + Send,
@@ -84,11 +92,14 @@ pub(crate) async fn generate_poetry_translation<
     storage: Storage,
     configuration: &Arc<AiConfigurationService<C>>,
     ai_tasks: Arc<AiTaskManager>,
-    uid: String,
-    mode: PoetryTranslationMode,
-    request_id: &str,
+    job: PoetryTranslationJob,
     emit_delta: F,
 ) -> AppResult<PoetryTranslation> {
+    let PoetryTranslationJob {
+        uid,
+        mode,
+        request_id,
+    } = job;
     let (poem, fingerprint) = run_blocking(move || {
         let poem = db.poem_detail(&uid)?;
         let fingerprint = body_fingerprint(&poem.body);
@@ -105,7 +116,7 @@ pub(crate) async fn generate_poetry_translation<
     let _task = ai_tasks.begin(task_key)?;
     // The user can cancel this request while it streams; both guards release
     // with the future, and a late cancel falls through as a no-op.
-    let mut control: AiControlSession = ai_tasks.control(request_id)?;
+    let mut control: AiControlSession = ai_tasks.control(&request_id)?;
     // Retain admission between configuration capture and network dispatch so
     // reset cannot finish while a pre-reset snapshot is waiting to start.
     let snapshot = configuration.request_snapshot().await?;

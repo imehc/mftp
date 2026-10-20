@@ -11,7 +11,8 @@ use crate::modules::poetry::model::{
     PoetryPackTranslation, PoetryTranslation, PoetryTranslationMode, PoetryTranslationStreamEvent,
 };
 use crate::modules::poetry::service::{
-    self as translation_service, POETRY_TRANSLATION_LANGUAGE, POETRY_TRANSLATION_PROMPT_VERSION,
+    self as translation_service, PoetryTranslationJob, POETRY_TRANSLATION_LANGUAGE,
+    POETRY_TRANSLATION_PROMPT_VERSION,
 };
 use crate::modules::poetry::text::body_fingerprint;
 use crate::modules::poetry::translation_store;
@@ -69,9 +70,11 @@ pub async fn generate_poetry_translation(
         storage,
         &state.ai_configuration,
         tasks,
-        uid,
-        mode,
-        &request_id,
+        PoetryTranslationJob {
+            uid,
+            mode,
+            request_id,
+        },
         move |delta| {
             let _ = app.emit(&event_name, PoetryTranslationStreamEvent { delta });
         },
