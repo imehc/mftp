@@ -224,10 +224,13 @@ pub(super) fn extract_selected(
         .iter()
         .filter_map(|id| catalog.collection(id))
         .map(|spec| {
-            (
-                spec.id.as_str(),
-                spec.paths.iter().map(String::as_str).collect(),
-            )
+            let mut patterns: Vec<&str> = spec.paths.iter().map(String::as_str).collect();
+            // The author-bio file is part of the collection too; without it a
+            // tarball fallback would import poems with no author profiles.
+            if let Some(authors) = &spec.authors_path {
+                patterns.push(authors.as_str());
+            }
+            (spec.id.as_str(), patterns)
         })
         .collect();
 

@@ -4,7 +4,6 @@ fn blob(path: &str, size: u64) -> TreeEntry {
     TreeEntry {
         path: path.into(),
         kind: "blob".into(),
-        sha: "0".repeat(40),
         size,
     }
 }
@@ -13,7 +12,6 @@ fn tree_dir(path: &str) -> TreeEntry {
     TreeEntry {
         path: path.into(),
         kind: "tree".into(),
-        sha: "0".repeat(40),
         size: 0,
     }
 }
@@ -120,8 +118,8 @@ fn blob_fetch_pulls_only_the_requested_files() {
             last_total.store(total, Ordering::SeqCst);
         }
     };
-    let fetched = fetch_needed_blobs(&progress, spec, &catalog, &ids, &root, &cancelled).unwrap();
-    assert!(fetched, "budget should cover two blobs");
+    let fetched = fetch_needed_blobs(&progress, spec, &catalog, &ids, &root, &cancelled);
+    assert!(fetched.is_ok(), "file channel should fetch two files");
 
     let nantang = root.join("五代诗词/nantang/poetrys.json");
     let nalan = root.join("纳兰性德/纳兰性德诗集.json");

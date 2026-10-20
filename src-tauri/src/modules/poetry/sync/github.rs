@@ -1,9 +1,14 @@
-//! GitHub API access for the download channels: the blocking client, the
-//! commit sha of a source, the repository tree listing, the blob fetches that
-//! let a collection be pulled without its whole source tarball, and the
+//! GitHub access for the download channels: the blocking client, the commit
+//! sha of a source, the repository tree listing, the per-file fetches that let
+//! a collection be pulled without its whole source tarball, and the
 //! `downloading` progress event both channels report with.
 //!
-//! The same file-level GitHub channel is used by desktop and mobile builds.
+//! Files are fetched from `raw.githubusercontent.com` rather than the blob
+//! API: the API allows 60 unauthenticated requests per hour, which cannot
+//! cover a single large collection (全宋诗 needs 255 files) and forced every
+//! such sync back to the whole tarball.
+//!
+//! The same file-level channel is used by desktop and mobile builds.
 
 use std::fs;
 use std::path::Path;
@@ -93,12 +98,13 @@ fn api_client() -> AppResult<reqwest::blocking::Client> {
 const BLOB_WORKERS: usize = 6;
 
 /// A file entry from the git tree API. `size` is absent for directories.
+/// The entry `sha` is unused now that files come from `raw.githubusercontent`
+/// by path; serde simply ignores it.
 #[derive(serde::Deserialize)]
 struct TreeEntry {
     path: String,
     #[serde(rename = "type")]
     kind: String,
-    sha: String,
     #[serde(default)]
     size: u64,
 }
@@ -127,26 +133,6 @@ fn fetch_source_tree(repo: &str, branch: &str) -> AppResult<Vec<TreeEntry>> {
     }
     Ok(response.tree)
 }
-
-/// Unauthenticated API calls are capped at 60/hour. Returns `None` when the
-/// budget cannot be read, so callers can choose whether to fall back.
-fn core_requests_remaining(client: &reqwest::blocking::Client) -> Option<u64> {
-    let value: Value = client
-        .get("https://api.github.com/rate_limit")
-        .send()
-        .ok()?
-        .json()
-        .ok()?;
-    value
-        .get("resources")?
-        .get("core")?
-        .get("remaining")?
-        .as_u64()
-}
-
-/// Requests kept aside for the commit sha lookup, the sync check and a retry,
-/// so a blob run never strands the quota at zero.
-const RATE_HEADROOM: u64 = 10;
 
 /// Blobs a collection needs, in a stable order so progress is monotonic.
 fn needed_blobs<'a>(
@@ -197,17 +183,20 @@ fn write_blob(extract_dir: &Path, entry: &TreeEntry, bytes: &[u8]) -> AppResult<
         .map_err(|error| AppError::from(error).context(format!("write {}", entry.path)))
 }
 
-/// Fetch one blob with a single retry, mirroring the tarball's tolerance for
-/// transient blips.
+/// Fetch one file with a single retry, mirroring the tarball's tolerance for
+/// transient blips. `raw.githubusercontent.com` serves the bytes directly and
+/// is not metered by the 60/hour API quota, so a large collection no longer
+/// runs out of requests halfway.
 fn fetch_blob(
     client: &reqwest::blocking::Client,
     repo: &str,
+    branch: &str,
     entry: &TreeEntry,
     cancelled: &AtomicBool,
 ) -> AppResult<Vec<u8>> {
     let url = format!(
-        "https://api.github.com/repos/{repo}/git/blobs/{}",
-        entry.sha
+        "https://raw.githubusercontent.com/{repo}/{branch}/{}",
+        entry.path
     );
     let mut last_error = None;
     for attempt in 0..2 {
@@ -217,13 +206,7 @@ fn fetch_blob(
         if attempt > 0 {
             std::thread::sleep(std::time::Duration::from_secs(2));
         }
-        match client
-            .get(&url)
-            // Ask for the file itself rather than a base64 envelope.
-            .header("Accept", "application/vnd.github.raw")
-            .send()
-            .and_then(|response| response.error_for_status())
-        {
+        match client.get(&url).send().and_then(|response| response.error_for_status()) {
             Ok(response) => match response.bytes() {
                 Ok(bytes) => return Ok(bytes.to_vec()),
                 Err(error) => {
@@ -236,12 +219,10 @@ fn fetch_blob(
         }
     }
     Err(last_error
-        .unwrap_or_else(|| AppError::external("http:request", "All blob download attempts failed")))
+        .unwrap_or_else(|| AppError::external("http:request", "All file download attempts failed")))
 }
 
-/// Fetch every blob the requested collections need into `extract_dir`.
-///
-/// Returns `Ok(false)` when the request budget is too small for the file set.
+/// Fetch every file the requested collections need into `extract_dir`.
 pub(super) fn fetch_needed_blobs(
     progress: &ProgressFn<'_>,
     spec: &SourceSpec,
@@ -249,7 +230,7 @@ pub(super) fn fetch_needed_blobs(
     ids: &[String],
     extract_dir: &Path,
     cancelled: &AtomicBool,
-) -> AppResult<bool> {
+) -> AppResult<()> {
     let tree = fetch_source_tree(&spec.repo, &spec.branch)?;
     let needed = needed_blobs(&tree, catalog, ids);
     if needed.is_empty() {
@@ -257,14 +238,6 @@ pub(super) fn fetch_needed_blobs(
     }
 
     let client = api_client()?;
-    // One call per blob plus the tree we already spent. A run that runs out
-    // midway is wasted work, so require the whole set up front.
-    let needed_requests = needed.len() as u64 + 1;
-    match core_requests_remaining(&client) {
-        Some(remaining) if needed_requests + RATE_HEADROOM <= remaining => {}
-        _ => return Ok(false),
-    }
-
     let total: u64 = needed.iter().map(|entry| entry.size).sum();
     progress(download_progress(0, Some(total)));
     let next = AtomicUsize::new(0);
@@ -281,7 +254,7 @@ pub(super) fn fetch_needed_blobs(
                 let Some(entry) = needed.get(next.fetch_add(1, Ordering::SeqCst)) else {
                     return;
                 };
-                let result = fetch_blob(&client, &spec.repo, entry, cancelled)
+                let result = fetch_blob(&client, &spec.repo, &spec.branch, entry, cancelled)
                     .and_then(|bytes| write_blob(extract_dir, entry, &bytes).map(|()| bytes.len()));
                 match result {
                     Ok(length) => {
@@ -309,7 +282,7 @@ pub(super) fn fetch_needed_blobs(
     {
         return Err(error);
     }
-    Ok(true)
+    Ok(())
 }
 
 #[cfg(test)]

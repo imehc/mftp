@@ -1,6 +1,6 @@
 //! Poetry sync orchestration: pull only the catalog files needed by each
-//! collection through the GitHub tree/blob API, with a desktop-only tarball
-//! fallback when the API budget is insufficient.
+//! collection through the GitHub tree listing plus per-file downloads, with a
+//! desktop-only tarball fallback when the file channel fails.
 
 use std::fs;
 #[cfg(desktop)]
@@ -84,12 +84,7 @@ fn download_and_import_blobs(
         let extract_dir = tmp.join(format!("extract-{source_id}"));
         let _ = fs::remove_dir_all(&extract_dir);
         fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
-        match fetch_needed_blobs(progress, spec, catalog, ids, &extract_dir, cancelled)? {
-            true => {}
-            false => {
-                return Err(AppError::custom(CustomErrorCode::PoetryApiBudgetTooSmall));
-            }
-        }
+        fetch_needed_blobs(progress, spec, catalog, ids, &extract_dir, cancelled)?;
         let sha = resolve_source_sha(catalog, source_id);
         import_extracted_dir(
             library,
@@ -124,19 +119,17 @@ fn download_and_import(
         let _ = fs::remove_dir_all(&extract_dir);
         fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
 
-        // Pull only the blobs the selected collections need. Any failure or a
-        // request budget too small for the file set falls back to the whole
-        // tarball, so behaviour never degrades below the previous release.
+        // Pull only the files the selected collections need. Any failure falls
+        // back to the whole tarball, so behaviour never degrades below the
+        // previous release.
         let blobs = fetch_needed_blobs(progress, spec, catalog, ids, &extract_dir, cancelled);
-        if !matches!(blobs, Ok(true)) {
+        if let Err(error) = &blobs {
             if cancelled.load(Ordering::SeqCst) {
                 return Err(AppError::custom(CustomErrorCode::PoetrySyncCancelled));
             }
-            if let Err(error) = &blobs {
-                eprintln!("poetry blob fetch fell back to tarball: {}", error.message);
-            }
-            // A partial blob run may have left files behind; the tarball
-            // extractor expects an empty root.
+            eprintln!("poetry file fetch fell back to tarball: {}", error.message);
+            // A partial run may have left files behind; the tarball extractor
+            // expects an empty root.
             let _ = fs::remove_dir_all(&extract_dir);
             fs::create_dir_all(&extract_dir).map_err(AppError::from)?;
             let archive_path = tmp.join(format!("{source_id}.tar.gz"));
