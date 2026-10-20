@@ -384,8 +384,10 @@ jobs:
           if [ -n "$ASSET_ID" ]; then
             gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" --silent
           fi
+          # Release assets must be uploaded to uploads.github.com; the
+          # api.github.com path returns 404 for the POST.
           gh api -X POST \
-            "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${NAME}" \
+            "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${NAME}" \
             -H "Content-Type: application/octet-stream" --input "$NAME" --silent
 
   publish:
@@ -515,7 +517,7 @@ jobs:
             gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" --silent
           fi
           gh api -X POST \
-            "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=latest.json" \
+            "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=latest.json" \
             -H "Content-Type: application/json" --input /tmp/mftp-release/latest.json --silent
 
       - name: Publish draft release
