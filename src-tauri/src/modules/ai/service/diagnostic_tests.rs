@@ -116,9 +116,14 @@ async fn incomplete_stream_preserves_text_counters_without_including_partial_out
             ).to_string(),
         };
         let (url, worker) = server(body, 200);
-        let error = generate_text_without_control(&config(url, protocol, true), "fake-key", &request(), |_| {})
-            .await
-            .unwrap_err();
+        let error = generate_text_without_control(
+            &config(url, protocol, true),
+            "fake-key",
+            &request(),
+            |_| {},
+        )
+        .await
+        .unwrap_err();
         assert_eq!(error.code, "ai:provider_incomplete");
         assert_eq!(error.args["phase"], "text");
         assert_eq!(error.args["receivedTextBytes"], "15");

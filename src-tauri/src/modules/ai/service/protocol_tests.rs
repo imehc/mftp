@@ -304,7 +304,13 @@ async fn cancelling_each_protocol_closes_the_stream_without_replaying() {
             while socket.read(&mut request).unwrap() > 0 {}
         });
         let task = tokio::spawn(async move {
-            generate_text_without_control(&config(url, protocol, true), "fake-key", &request(), |_| {}).await
+            generate_text_without_control(
+                &config(url, protocol, true),
+                "fake-key",
+                &request(),
+                |_| {},
+            )
+            .await
         });
         arrived.await.unwrap();
         task.abort();

@@ -206,7 +206,11 @@ fn fetch_blob(
         if attempt > 0 {
             std::thread::sleep(std::time::Duration::from_secs(2));
         }
-        match client.get(&url).send().and_then(|response| response.error_for_status()) {
+        match client
+            .get(&url)
+            .send()
+            .and_then(|response| response.error_for_status())
+        {
             Ok(response) => match response.bytes() {
                 Ok(bytes) => return Ok(bytes.to_vec()),
                 Err(error) => {
