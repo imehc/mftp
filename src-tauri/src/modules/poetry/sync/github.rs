@@ -7,8 +7,7 @@
 
 use std::fs;
 use std::path::Path;
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use serde_json::Value;
 
@@ -74,14 +73,24 @@ pub(super) fn resolve_source_sha(catalog: &Catalog, source_id: &str) -> String {
     })
 }
 
+/// One pooled client for every GitHub API call, so lookups and blob downloads
+/// reuse TLS connections instead of handshaking per request.
 fn api_client() -> AppResult<reqwest::blocking::Client> {
-    reqwest::blocking::Client::builder()
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    if let Some(client) = CLIENT.get() {
+        return Ok(client.clone());
+    }
+    let client = reqwest::blocking::Client::builder()
         .connect_timeout(std::time::Duration::from_secs(15))
         .timeout(std::time::Duration::from_secs(60))
         .user_agent("mftp-library-sync")
         .build()
-        .map_err(AppError::from)
+        .map_err(AppError::from)?;
+    Ok(CLIENT.get_or_init(|| client).clone())
 }
+
+/// Concurrent blob downloads; small enough to stay polite to the API.
+const BLOB_WORKERS: usize = 6;
 
 /// A file entry from the git tree API. `size` is absent for directories.
 #[derive(serde::Deserialize)]
@@ -258,12 +267,47 @@ pub(super) fn fetch_needed_blobs(
 
     let total: u64 = needed.iter().map(|entry| entry.size).sum();
     progress(download_progress(0, Some(total)));
-    let mut done: u64 = 0;
-    for entry in &needed {
-        let bytes = fetch_blob(&client, &spec.repo, entry, cancelled)?;
-        write_blob(extract_dir, entry, &bytes)?;
-        done += bytes.len() as u64;
-        progress(download_progress(done, Some(total)));
+    let next = AtomicUsize::new(0);
+    let done = std::sync::Mutex::new(0u64);
+    // Set on the first failure so the other workers stop picking up blobs.
+    let failed = AtomicBool::new(false);
+    let errors = std::sync::Mutex::new(Vec::new());
+    std::thread::scope(|scope| {
+        for _ in 0..BLOB_WORKERS.min(needed.len()) {
+            scope.spawn(|| loop {
+                if failed.load(Ordering::SeqCst) {
+                    return;
+                }
+                let Some(entry) = needed.get(next.fetch_add(1, Ordering::SeqCst)) else {
+                    return;
+                };
+                let result = fetch_blob(&client, &spec.repo, entry, cancelled)
+                    .and_then(|bytes| write_blob(extract_dir, entry, &bytes).map(|()| bytes.len()));
+                match result {
+                    Ok(length) => {
+                        // Report under the lock so progress never moves backwards.
+                        let mut done = done.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+                        *done += length as u64;
+                        progress(download_progress(*done, Some(total)));
+                    }
+                    Err(error) => {
+                        failed.store(true, Ordering::SeqCst);
+                        if let Ok(mut errors) = errors.lock() {
+                            errors.push(error);
+                        }
+                        return;
+                    }
+                }
+            });
+        }
+    });
+    if let Some(error) = errors
+        .into_inner()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .into_iter()
+        .next()
+    {
+        return Err(error);
     }
     Ok(true)
 }

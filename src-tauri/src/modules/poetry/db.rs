@@ -133,12 +133,14 @@ impl PoetryDb {
         }
         let total: i64 = conn.query_row("SELECT COUNT(*) FROM poems", [], |r| r.get(0))?;
         on_progress(0, total);
+        // One transaction instead of one autocommit per row; dropping it on
+        // error rolls the partial index back.
+        let tx = conn.unchecked_transaction()?;
         // Stream row-by-row on one connection: the read cursor scans `poems`
         // while inserts only touch the FTS table, which SQLite allows.
-        let mut select = conn.prepare("SELECT rowid, body FROM poems ORDER BY rowid")?;
+        let mut select = tx.prepare("SELECT rowid, body FROM poems ORDER BY rowid")?;
         let mut rows = select.query([])?;
-        let mut insert =
-            conn.prepare("INSERT INTO poems_body_fts(rowid, tokens) VALUES(?1, ?2)")?;
+        let mut insert = tx.prepare("INSERT INTO poems_body_fts(rowid, tokens) VALUES(?1, ?2)")?;
         let mut done: i64 = 0;
         while let Some(row) = rows.next()? {
             let rowid: i64 = row.get(0)?;
@@ -156,6 +158,7 @@ impl PoetryDb {
         drop(rows);
         drop(select);
         drop(insert);
+        tx.commit()?;
         self.meta_set(META_BODY_INDEX_ENABLED, "1")?;
         on_progress(total, total);
         Ok(())

@@ -510,6 +510,20 @@ fn import_annotation_jsonl(
     }
 
     let conn = library.db().open()?;
+    // One transaction instead of one autocommit per row. Cancelling or failing
+    // drops it and rolls back; the upsert makes a rerun idempotent.
+    let tx = conn.unchecked_transaction()?;
+    let mut upsert = tx.prepare(
+        r#"
+        INSERT INTO annotations(match_key, title, writer, remark, translation, appreciation, audio_url)
+        VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7)
+        ON CONFLICT(match_key) DO UPDATE SET
+            remark = excluded.remark,
+            translation = excluded.translation,
+            appreciation = excluded.appreciation,
+            audio_url = excluded.audio_url
+        "#,
+    )?;
     let mut imported: u32 = 0;
     for (file, _lines) in &per_file {
         let raw = fs::read_to_string(file)
@@ -545,26 +559,15 @@ fn import_annotation_jsonl(
             };
             let writer_name = value.get("writer").and_then(Value::as_str).unwrap_or("");
             let key = text::annotation_key(&text::normalize(title), &text::normalize(writer_name));
-            conn.execute(
-                r#"
-                INSERT INTO annotations(match_key, title, writer, remark, translation, appreciation, audio_url)
-                VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7)
-                ON CONFLICT(match_key) DO UPDATE SET
-                    remark = excluded.remark,
-                    translation = excluded.translation,
-                    appreciation = excluded.appreciation,
-                    audio_url = excluded.audio_url
-                "#,
-                rusqlite::params![
-                    key,
-                    title.trim(),
-                    writer_name.trim(),
-                    remark,
-                    translation,
-                    appreciation,
-                    field("audioUrl"),
-                ],
-            )?;
+            upsert.execute(rusqlite::params![
+                key,
+                title.trim(),
+                writer_name.trim(),
+                remark,
+                translation,
+                appreciation,
+                field("audioUrl"),
+            ])?;
             imported += 1;
             if imported.is_multiple_of(500) {
                 progress(PoetrySyncProgress {
@@ -579,6 +582,8 @@ fn import_annotation_jsonl(
             }
         }
     }
+    drop(upsert);
+    tx.commit()?;
     Ok(())
 }
 
