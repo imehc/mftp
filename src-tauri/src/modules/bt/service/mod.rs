@@ -252,15 +252,7 @@ impl BtManager {
                 AddTorrent::from_bytes(bytes),
             )
         } else if source.starts_with("http://") || source.starts_with("https://") {
-            let response = reqwest::get(source)
-                .await
-                .map_err(|error| AppError::from(error).context("Download torrent file"))?
-                .error_for_status()
-                .map_err(|error| AppError::from(error).context("Download torrent file"))?;
-            let bytes = response
-                .bytes()
-                .await
-                .map_err(|error| AppError::from(error).context("Read torrent file body"))?;
+            let bytes = download_torrent_file(source).await?;
             (
                 Some(trackers::inspect_torrent_bytes(&bytes)?),
                 AddTorrent::from_bytes(bytes),
@@ -408,6 +400,52 @@ fn same_dir(a: &Path, b: &Path) -> bool {
         (Ok(a), Ok(b)) => a == b,
         _ => a == b,
     }
+}
+
+/// Real .torrent files are at most a few MiB; anything larger is not a torrent.
+const TORRENT_FILE_LIMIT: usize = 16 * 1024 * 1024;
+
+/// Fetches a remote .torrent with bounded time and size, reusing one pooled client.
+async fn download_torrent_file(source: &str) -> AppResult<Vec<u8>> {
+    static CLIENT: std::sync::OnceLock<reqwest::Client> = std::sync::OnceLock::new();
+    let client = match CLIENT.get() {
+        Some(client) => client,
+        None => {
+            let client = reqwest::Client::builder()
+                .connect_timeout(Duration::from_secs(15))
+                .timeout(Duration::from_secs(60))
+                .build()
+                .map_err(|error| AppError::from(error).context("Download torrent file"))?;
+            CLIENT.get_or_init(|| client)
+        }
+    };
+    let mut response = client
+        .get(source)
+        .send()
+        .await
+        .and_then(reqwest::Response::error_for_status)
+        .map_err(|error| AppError::from(error).context("Download torrent file"))?;
+    let too_large = || {
+        AppError::custom(CustomErrorCode::BtSourceUnsupported).context("Torrent file is too large")
+    };
+    if response
+        .content_length()
+        .is_some_and(|length| length > TORRENT_FILE_LIMIT as u64)
+    {
+        return Err(too_large());
+    }
+    let mut bytes = Vec::new();
+    while let Some(chunk) = response
+        .chunk()
+        .await
+        .map_err(|error| AppError::from(error).context("Read torrent file body"))?
+    {
+        if bytes.len() + chunk.len() > TORRENT_FILE_LIMIT {
+            return Err(too_large());
+        }
+        bytes.extend_from_slice(&chunk);
+    }
+    Ok(bytes)
 }
 
 fn find_handle(session: &Session, hash: &Id20) -> AppResult<Option<TorrentHandle>> {

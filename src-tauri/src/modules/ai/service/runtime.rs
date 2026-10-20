@@ -93,6 +93,25 @@ pub(super) async fn complete_logged(
     }
 }
 
+/// Reuses one client per connect timeout so later requests keep pooled TCP/TLS connections.
+fn shared_client(connection_ms: u32) -> AppResult<reqwest::Client> {
+    static CLIENTS: std::sync::OnceLock<
+        parking_lot::Mutex<std::collections::HashMap<u32, reqwest::Client>>,
+    > = std::sync::OnceLock::new();
+    let mut clients = CLIENTS.get_or_init(Default::default).lock();
+    if let Some(client) = clients.get(&connection_ms) {
+        return Ok(client.clone());
+    }
+    let client = reqwest::Client::builder()
+        .connect_timeout(Duration::from_millis(connection_ms.into()))
+        .redirect(reqwest::redirect::Policy::none())
+        .retry(reqwest::retry::never())
+        .user_agent("mftp-ai/1")
+        .build()?;
+    clients.insert(connection_ms, client.clone());
+    Ok(client)
+}
+
 async fn execute(
     config: &AiConnectionConfig,
     api_key: &str,
@@ -105,13 +124,7 @@ async fn execute(
     if body.len() > 128 * 1024 {
         return Err(AppError::custom(CustomErrorCode::AiRequestTooLarge));
     }
-    let client = reqwest::Client::builder()
-        .connect_timeout(Duration::from_millis(request.timeout.connection_ms.into()))
-        .redirect(reqwest::redirect::Policy::none())
-        .retry(reqwest::retry::never())
-        .pool_max_idle_per_host(0)
-        .user_agent("mftp-ai/1")
-        .build()?;
+    let client = shared_client(request.timeout.connection_ms)?;
     let outbound = client
         .post(protocol_endpoint(&config.base_url, config.protocol))
         .headers(protocol::headers(config.protocol, api_key)?)
