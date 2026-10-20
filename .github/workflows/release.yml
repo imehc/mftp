@@ -74,73 +74,93 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-  test:
-    name: Test and build
+  draft-release:
+    name: Prepare draft release
     needs: release-info
     if: needs.release-info.outputs.should_release == 'true'
     runs-on: ubuntu-22.04
+    outputs:
+      release_id: ${{ steps.draft.outputs.release_id }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Install Linux dependencies
+      - name: Create or reuse draft release
+        id: draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.release-info.outputs.version }}
+          RELEASE_BODY: ${{ needs.release-info.outputs.release_body }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            curl \
-            file \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            libssl-dev \
-            libwebkit2gtk-4.1-dev \
-            libxdo-dev \
-            patchelf \
-            wget
+          set -euo pipefail
+          TAG="v${VERSION}"
+          # A failed earlier run may have left a draft for this version. Reuse it
+          # so retried builds replace assets instead of creating a second draft.
+          # Capture first: piping into head could SIGPIPE gh under pipefail.
+          IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases" --paginate \
+            --jq ".[] | select(.draft and .tag_name == \"${TAG}\") | .id")"
+          ID="$(printf '%s\n' "$IDS" | head -n 1)"
+          if [ -n "$ID" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/${ID}" \
+              -f target_commitish="$GITHUB_SHA" -f body="$RELEASE_BODY" --silent
+          else
+            ID="$(gh api -X POST "repos/${GITHUB_REPOSITORY}/releases" \
+              -f tag_name="$TAG" -f name="mftp ${TAG}" -f body="$RELEASE_BODY" \
+              -f target_commitish="$GITHUB_SHA" -F draft=true -F prerelease=false \
+              --jq .id)"
+          fi
+          echo "release_id=${ID}" >> "$GITHUB_OUTPUT"
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          run_install: false
+  ci:
+    name: Wait for CI
+    needs: release-info
+    if: needs.release-info.outputs.should_release == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      # CI already runs the full checks on every push to main; reuse its result
+      # instead of testing the same commit again.
+      - name: Wait for CI on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          RUN_ID=""
+          for _ in $(seq 1 30); do
+            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml \
+              --commit "$GITHUB_SHA" --event push --limit 1 \
+              --json databaseId --jq '.[0].databaseId // empty')"
+            [ -n "$RUN_ID" ] && break
+            sleep 10
+          done
+          if [ -z "$RUN_ID" ]; then
+            echo "No CI run found for ${GITHUB_SHA}."
+            exit 1
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}"
+          echo "Waiting for ${RUN_URL}"
+          if ! gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status --interval 30 >/dev/null; then
+            echo "CI did not succeed: ${RUN_URL}"
+            exit 1
+          fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: ./src-tauri -> target
-
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Prepare pinned translation engine source
-        run: pnpm translation:prepare
-
-      - name: Check version consistency
-        run: pnpm run version:check
-
-      - name: Check React version consistency
-        run: pnpm run check:react
-
-      - name: Build frontend
-        run: pnpm run build
-
-      - name: Run Rust tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      # A code failure invalidates every platform build; stop them early.
+      - name: Cancel release run
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run cancel "${{ github.run_id }}" --repo "$GITHUB_REPOSITORY"
 
   build:
     name: Build ${{ matrix.platform }}
-    needs: [release-info, test]
+    # Runs alongside CI; publish waits for both, so the draft stays private
+    # if CI fails.
+    needs: [release-info, draft-release]
     if: needs.release-info.outputs.should_release == 'true'
     runs-on: ${{ matrix.platform }}
     strategy:
+      # A platform failure keeps the others running so their assets and caches
+      # survive; "Re-run failed jobs" then rebuilds only the failed platform.
       fail-fast: false
       matrix:
         include:
@@ -192,6 +212,12 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache translation engine source
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/translation-source
+          key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
+
       - name: Prepare pinned translation engine source
         run: pnpm translation:prepare
 
@@ -215,18 +241,15 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: v__VERSION__
-          releaseName: mftp v__VERSION__
-          releaseBody: ${{ needs.release-info.outputs.release_body }}
-          releaseDraft: true
-          prerelease: false
+          releaseId: ${{ needs.draft-release.outputs.release_id }}
           args: ${{ matrix.args }}
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
 
   android:
     name: Build Android arm64-v8a
-    needs: [release-info, test, build]
+    # Uploads to the draft created up front, so it no longer waits for desktop.
+    needs: [release-info, draft-release]
     if: needs.release-info.outputs.should_release == 'true'
     runs-on: ubuntu-22.04
     steps:
@@ -249,6 +272,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+          cache: gradle
+          cache-dependency-path: |
+            src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties
+            src-tauri/gen/android/*.gradle.kts
+            src-tauri/plugins/*/android/build.gradle.kts
+            src-tauri/Cargo.lock
 
       - name: Setup Android SDK and NDK
         shell: bash
@@ -276,6 +305,12 @@ jobs:
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Cache translation engine source
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/translation-source
+          key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
 
       - name: Prepare pinned translation engine source
         run: pnpm translation:prepare
@@ -332,7 +367,8 @@ jobs:
 
   publish:
     name: Publish release
-    needs: [release-info, build, android]
+    # CI gates publication only; builds already ran in parallel with it.
+    needs: [release-info, draft-release, ci, build, android]
     if: needs.release-info.outputs.should_release == 'true'
     runs-on: ubuntu-22.04
     steps:

@@ -16,9 +16,67 @@ concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# CI builds only need line info for panics; full debug info slows linking and
+# bloats the Rust cache. Local dev builds keep their defaults.
+env:
+  CARGO_PROFILE_DEV_DEBUG: line-tables-only
+  CARGO_PROFILE_TEST_DEBUG: line-tables-only
+
 jobs:
-  check:
-    name: Test and build
+  frontend:
+    name: Frontend checks and build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check React version consistency
+        run: pnpm run check:react
+
+      - name: Check model offline resources
+        run: pnpm run check:model-offline
+
+      - name: Check application version consistency
+        run: pnpm run version:check
+
+      - name: Lint frontend
+        run: pnpm run lint
+
+      - name: Check platform packaging rules
+        run: pnpm run check:platform
+
+      - name: Build frontend
+        run: pnpm run build
+
+      - name: Check build size and lazy preload budgets
+        run: pnpm run check:build-budget
+
+      - name: Build other frontend targets
+        run: |
+          pnpm build --platform macos
+          pnpm build --platform windows
+          pnpm build --platform android
+          pnpm build --platform ios
+
+      - name: Run frontend tests
+        run: pnpm test
+
+  rust:
+    name: Rust checks and tests
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -59,49 +117,30 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: ./src-tauri -> target
+          # PRs restore main's cache but never evict it with their own.
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache translation engine source
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/translation-source
+          key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
+
       - name: Prepare pinned translation engine source
         run: pnpm translation:prepare
-
-      - name: Check React version consistency
-        run: pnpm run check:react
-
-      - name: Check model offline resources
-        run: pnpm run check:model-offline
-
-      - name: Check application version consistency
-        run: pnpm run version:check
-
-      - name: Lint frontend
-        run: pnpm run lint
 
       - name: Check Rust formatting
         run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
 
-      - name: Lint Rust library
-        run: cargo clippy --manifest-path src-tauri/Cargo.toml --locked --lib -- -D warnings
-
-      - name: Check platform packaging rules
-        run: pnpm run check:platform
-
+      # Tauri embeds the frontend at compile time, so dist must exist first.
       - name: Build frontend
         run: pnpm run build
 
-      - name: Check build size and lazy preload budgets
-        run: pnpm run check:build-budget
-
-      - name: Build other frontend targets
-        run: |
-          pnpm build --platform macos
-          pnpm build --platform windows
-          pnpm build --platform android
-          pnpm build --platform ios
-
-      - name: Run frontend tests
-        run: pnpm test
+      - name: Lint Rust library
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --locked --lib -- -D warnings
 
       - name: Run Rust tests
         run: cargo test --manifest-path src-tauri/Cargo.toml --locked
@@ -138,9 +177,16 @@ jobs:
         with:
           workspaces: ./src-tauri -> target
           key: apple-check
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Cache translation engine source
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/translation-source
+          key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
 
       - name: Prepare pinned translation engine source
         run: pnpm translation:prepare
