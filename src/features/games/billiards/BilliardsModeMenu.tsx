@@ -31,7 +31,7 @@ function historyModeLabel(payload: BilliardsHistoryPayload) {
   if (payload.mode === "hotseat") return <Trans>双人</Trans>;
   return (
     <span>
-      <Trans>人机</Trans>
+      <Trans>电脑</Trans>
       {" · "}
       {payload.difficulty === "easy" ? (
         <Trans>简单</Trans>
@@ -129,7 +129,7 @@ export function BilliardsModeMenu({
       <div className="grid gap-3 md:grid-cols-2">
         <section className="flex flex-col gap-3 rounded-xl border p-4">
           <h2 className="text-sm font-semibold">
-            <Trans>人机对战</Trans>
+            <Trans>电脑对战</Trans>
           </h2>
           <GameSelect
             label={<Trans>难度</Trans>}
@@ -147,7 +147,7 @@ export function BilliardsModeMenu({
             onChange={(value) => setPlayerBreaks(value === "me")}
             options={[
               { value: "me", label: t`我先开球` },
-              { value: "ai", label: t`AI 先开球` },
+              { value: "ai", label: t`电脑先开球` },
             ]}
           />
           <Button

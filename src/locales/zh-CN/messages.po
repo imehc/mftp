@@ -334,10 +334,6 @@ msgstr "3D 模型画布"
 msgid "9 号球已复位"
 msgstr "9 号球已复位"
 
-#: src/features/games/billiards/BilliardsModeMenu.tsx:150
-msgid "AI 先开球"
-msgstr "AI 先开球"
-
 #: src/lib/errors/ai-provider.ts:22
 msgid "AI 响应未完整结束，请重新请求"
 msgstr "AI 响应未完整结束，请重新请求"
@@ -358,14 +354,6 @@ msgstr "AI 已完成响应，但没有返回可用正文"
 #: src/lib/errors/ai-provider.ts:24
 msgid "AI 已达到输出或推理预算上限，结果不完整"
 msgstr "AI 已达到输出或推理预算上限，结果不完整"
-
-#: src/features/games/billiards/BilliardsScore.tsx:150
-#: src/features/games/billiards/SnookerHud.tsx:51
-#: src/features/games/go/GoMatch.tsx:203
-#: src/features/games/gomoku/GomokuMatch.tsx:174
-#: src/features/games/xiangqi/XiangqiMatch.tsx:184
-msgid "AI 思考中…"
-msgstr "AI 思考中…"
 
 #: src/lib/errors/messages.ts:222
 msgid "AI 数据库版本高于当前应用版本，请升级应用"
@@ -1134,18 +1122,6 @@ msgstr "交换 {formatBytesValue} / {formatBytesValue2}"
 #: src/features/poetry/components/PoetryTranslationSection.tsx:152
 msgid "人工修订"
 msgstr "人工修订"
-
-#. 棋类对局模式：玩家对战 AI。
-#: src/features/games/billiards/BilliardsModeMenu.tsx:34
-#: src/features/games/engine/BoardMatchLayout.tsx:51
-#: src/features/games/engine/history-labels.tsx:19
-msgid "人机"
-msgstr "人机"
-
-#: src/features/games/billiards/BilliardsModeMenu.tsx:132
-#: src/features/games/engine/BoardModeMenu.tsx:84
-msgid "人机对战"
-msgstr "人机对战"
 
 #: src/features/lan-transfer/labels.ts:7
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:83
@@ -7158,6 +7134,32 @@ msgstr "由对方击球"
 #: src/features/logs/log-labels.ts:83
 msgid "申请访问权限"
 msgstr "申请访问权限"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:34
+#: src/features/games/billiards/BilliardsScore.tsx:19
+#: src/features/games/engine/black-white-labels.tsx:43
+#: src/features/games/engine/BoardMatchLayout.tsx:51
+#: src/features/games/engine/history-labels.tsx:19
+#: src/features/games/xiangqi/labels.tsx:41
+msgid "电脑"
+msgstr "电脑"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:150
+msgid "电脑先开球"
+msgstr "电脑先开球"
+
+#: src/features/games/billiards/BilliardsModeMenu.tsx:132
+#: src/features/games/engine/BoardModeMenu.tsx:84
+msgid "电脑对战"
+msgstr "电脑对战"
+
+#: src/features/games/billiards/BilliardsScore.tsx:155
+#: src/features/games/billiards/SnookerHud.tsx:51
+#: src/features/games/go/GoMatch.tsx:203
+#: src/features/games/gomoku/GomokuMatch.tsx:174
+#: src/features/games/xiangqi/XiangqiMatch.tsx:184
+msgid "电脑思考中…"
+msgstr "电脑思考中…"
 
 #: src/features/model-viewer/components/ViewerHelp.tsx:69
 msgid "画布聚焦后，可用方向键旋转、Shift 加方向键平移、加减键缩放、Home 适配视图。坐标轴聚焦后，可按 X、Y、Z 切换方向，Shift 切换反方向。"

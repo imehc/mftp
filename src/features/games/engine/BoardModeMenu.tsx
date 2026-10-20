@@ -81,7 +81,7 @@ export function BoardModeMenu<P extends { moves: number }>({
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <section className="flex min-w-0 flex-col gap-3 rounded-xl border p-4">
           <h2 className="text-sm font-semibold">
-            <Trans>人机对战</Trans>
+            <Trans>电脑对战</Trans>
           </h2>
           <GameSelect
             label={<Trans>难度</Trans>}

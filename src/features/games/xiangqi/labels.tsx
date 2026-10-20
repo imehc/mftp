@@ -35,7 +35,7 @@ export function sideName(
     );
   }
   if (mode.kind === "ai") {
-    return side === mode.localSeat ? <Trans>你</Trans> : "AI";
+    return side === mode.localSeat ? <Trans>你</Trans> : <Trans>电脑</Trans>;
   }
   return side === 0 ? (
     <span className="text-chess-red inline-flex items-center gap-1">

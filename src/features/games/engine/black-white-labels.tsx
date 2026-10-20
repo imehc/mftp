@@ -37,7 +37,7 @@ export function seatName(
     );
   }
   if (mode.kind === "ai") {
-    return seat === mode.localSeat ? <Trans>你</Trans> : "AI";
+    return seat === mode.localSeat ? <Trans>你</Trans> : <Trans>电脑</Trans>;
   }
   return seat === 0 ? (
     <span className="inline-flex items-center gap-1">

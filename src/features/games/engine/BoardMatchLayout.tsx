@@ -48,7 +48,7 @@ export function BoardMatchLayout({
           <div className="text-muted-foreground mt-1 text-xs">
             {mode.kind === "ai" ? (
               <>
-                <Trans>人机</Trans> ·{" "}
+                <Trans>电脑</Trans> ·{" "}
                 {mode.difficulty === "easy" ? (
                   <Trans>简单</Trans>
                 ) : mode.difficulty === "hard" ? (

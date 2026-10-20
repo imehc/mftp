@@ -48,7 +48,7 @@ export function SnookerScore({
           >
             <span className="truncate">{seatName(mode, seat)}</span>
             {aiThinking && activeSeat === seat ? (
-              <Spinner aria-label={t`AI 思考中…`} />
+              <Spinner aria-label={t`电脑思考中…`} />
             ) : null}
           </Badge>
           <AnimatedNumber

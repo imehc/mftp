@@ -12,7 +12,8 @@ import { useSnookerBallName } from "./SnookerBall";
 import type { BilliardsMode, BilliardsState } from "./types";
 
 export function seatName(mode: BilliardsMode, seat: number) {
-  if (mode.kind === "ai") return seat === 0 ? <Trans>你</Trans> : "AI";
+  if (mode.kind === "ai")
+    return seat === 0 ? <Trans>你</Trans> : <Trans>电脑</Trans>;
   return seat === 0 ? <Trans>玩家 1</Trans> : <Trans>玩家 2</Trans>;
 }
 
@@ -147,7 +148,7 @@ export function SeatCell({
     >
       <Badge className="max-w-full" variant={active ? "secondary" : "outline"}>
         <span className="truncate">{seatName(mode, seat)}</span>
-        {thinking ? <Spinner aria-label={t`AI 思考中…`} /> : null}
+        {thinking ? <Spinner aria-label={t`电脑思考中…`} /> : null}
       </Badge>
       <div className="flex min-w-0 items-center gap-1.5">
         <span className="text-muted-foreground text-xs">

@@ -57,17 +57,17 @@ function foulState(shooter: number): SnookerState {
 }
 
 describe("斯诺克犯规说明身份", () => {
-  it("对方犯规时明确显示 AI 犯规，由你选择接打", () => {
+  it("对方犯规时明确显示 电脑 犯规，由你选择接打", () => {
     const text = rendered(
       <SnookerActions state={foulState(1)} mode={ai} enabled onMove={noop} />,
     );
-    expect(text).toContain("AI 犯规，你 获得 4 分。");
-    expect(text).toContain("由 你 选择接打，或要求 AI 从留下位置重打。");
+    expect(text).toContain("电脑 犯规，你 获得 4 分。");
+    expect(text).toContain("由 你 选择接打，或要求 电脑 从留下位置重打。");
     expect(text).not.toContain("你 · 犯规");
     expect(text).not.toContain("对手获罚分");
   });
 
-  it("自己犯规时明确罚分加给 AI，同屏双人使用玩家编号", () => {
+  it("自己犯规时明确罚分加给 电脑，同屏双人使用玩家编号", () => {
     const state = foulState(0);
     expect(
       rendered(
@@ -78,7 +78,7 @@ describe("斯诺克犯规说明身份", () => {
           onMove={noop}
         />,
       ),
-    ).toContain("你 犯规，AI 获得 4 分。");
+    ).toContain("你 犯规，电脑 获得 4 分。");
     expect(
       rendered(
         <SnookerActions
@@ -102,8 +102,8 @@ describe("斯诺克犯规说明身份", () => {
       );
       expect(text).toContain(
         warning === "three-miss"
-          ? "AI 可整球直击却连续两次漏击"
-          : "AI 已原位连续漏击四次。第五次后 你 可能获得全台手中球。",
+          ? "电脑 可整球直击却连续两次漏击"
+          : "电脑 已原位连续漏击四次。第五次后 你 可能获得全台手中球。",
       );
     },
   );
@@ -115,7 +115,7 @@ describe("斯诺克犯规说明身份", () => {
       rendered(
         <SnookerActions state={state} mode={ai} enabled onMove={noop} />,
       ),
-    ).toContain("本杆判为漏击。由 你 选择接打、要求 AI 从留下位置重打");
+    ).toContain("本杆判为漏击。由 你 选择接打、要求 电脑 从留下位置重打");
   });
 
   it("同分黑球明确显示抽签者，不将抽签者说成犯规者", () => {
@@ -126,7 +126,7 @@ describe("斯诺克犯规说明身份", () => {
     const text = rendered(
       <SnookerActions state={state} mode={ai} enabled onMove={noop} />,
     );
-    expect(text).toContain("AI 犯规，你 获得 4 分。");
+    expect(text).toContain("电脑 犯规，你 获得 4 分。");
     expect(text).toContain("你 抽签获选，决定谁先打");
   });
 
@@ -151,9 +151,9 @@ describe("斯诺克犯规说明身份", () => {
       <SnookerActions state={foulState(1)} mode={ai} enabled onMove={noop} />,
       "en",
     );
-    expect(text).toContain("Foul by AI. 4 points awarded to You.");
+    expect(text).toContain("Foul by Computer. 4 points awarded to You.");
     expect(text).toContain(
-      "Decision for You: play next or ask AI to play from the position left.",
+      "Decision for You: play next or ask Computer to play from the position left.",
     );
     expect(text).not.toContain("[object Object]");
   });
@@ -163,16 +163,16 @@ describe("九球操作说明身份", () => {
   it.each([
     [
       { kind: "illegal-break", seat: 0, shooter: 1 },
-      "AI 未达到三球开球要求。由 你 选择接受桌面或交回 AI",
+      "电脑 未达到三球开球要求。由 你 选择接受桌面或交回 电脑",
     ],
     [
       { kind: "push-out", seat: 0, shooter: 1 },
-      "AI 推杆结束。由 你 选择接打，或交回 AI。",
+      "电脑 推杆结束。由 你 选择接打，或交回 电脑。",
     ],
-    [{ kind: "warning", seat: 1 }, "AI 已连续两次犯规"],
+    [{ kind: "warning", seat: 1 }, "电脑 已连续两次犯规"],
     [
       { kind: "stalemate", seat: 0, proposer: 1 },
-      "AI 提议僵持重摆，由 你 决定是否接受。",
+      "电脑 提议僵持重摆，由 你 决定是否接受。",
     ],
   ] satisfies [NineBallDecision, string][])(
     "决策 %o 正确区分事件发起人与操作人",

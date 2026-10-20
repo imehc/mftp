@@ -181,7 +181,7 @@ export function XiangqiMatchView({
             ) : null}
             {aiThinking ? (
               <Badge variant="outline">
-                <Trans>AI 思考中…</Trans>
+                <Trans>电脑思考中…</Trans>
               </Badge>
             ) : null}
             {online &&

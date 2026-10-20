@@ -57,7 +57,7 @@ function foulState(): SnookerState {
 }
 
 describe("台面状态消息映射", () => {
-  it("无异常状态时不产生消息，AI 思考不占消息位", () => {
+  it("无异常状态时不产生消息，电脑思考不占消息位", () => {
     expect(billiardsNotices(createSnookerState(15), ai, false)).toEqual([]);
   });
 

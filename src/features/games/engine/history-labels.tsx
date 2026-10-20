@@ -16,7 +16,7 @@ export function historyModeLabel(payload: HistoryMode) {
     );
   return (
     <span>
-      <Trans comment="棋类对局模式：玩家对战 AI。">人机</Trans>
+      <Trans>电脑</Trans>
       {" · "}
       {payload.difficulty === "easy" ? (
         <Trans>简单</Trans>
