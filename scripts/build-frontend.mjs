@@ -39,7 +39,7 @@ while (true) {
   }
 }
 try {
-  run(["run", "compile"]);
+  run(["run", "i18n:compile"]);
   run(["run", "routes:generate"]);
   run(["exec", "tsc", "-p", "tsconfig.node.json", "--noEmit"]);
   run(["exec", "tsc", "--noEmit"]);
