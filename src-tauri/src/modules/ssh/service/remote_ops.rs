@@ -10,6 +10,9 @@ use ssh2::{FileStat, RenameFlags};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+/// `stat` returns immediately; a stalled server must not hold the file-info request.
+const BIRTH_TIME_TIMEOUT_MS: u32 = 5_000;
+
 // SFTP v3 NO_SUCH_FILE and v4 NO_SUCH_PATH indicate absence. Permission,
 // authentication and other failures must not authorize a truncating create.
 pub(super) fn remote_file_size(result: Result<FileStat, ssh2::Error>) -> AppResult<Option<u64>> {
@@ -27,7 +30,8 @@ impl Manager {
     pub(super) fn sftp_birth_time(&self, session_id: &str, path: &str) -> Option<u64> {
         let path = shell_quote(path);
         let cmd = format!("(stat -c %W -- {path} 2>/dev/null || stat -f %B {path} 2>/dev/null)");
-        let Ok((0, stdout, _)) = self.exec(session_id, &cmd) else {
+        // Best-effort metadata: reuse the cached session; stderr is discarded remotely.
+        let Ok((0, stdout)) = self.exec_cached(session_id, &cmd, BIRTH_TIME_TIMEOUT_MS) else {
             return None;
         };
         parse_remote_birth_time(&stdout)
@@ -225,25 +229,45 @@ impl Manager {
         plan: &mut DownloadPlan,
     ) -> AppResult<()> {
         let stat = self.sftp_lstat_retry(session_id, remote)?;
+        self.collect_download_stat(session_id, remote, local, stat, plan)
+    }
+
+    fn collect_download_stat(
+        &self,
+        session_id: &str,
+        remote: &str,
+        local: PathBuf,
+        stat: FileStat,
+        plan: &mut DownloadPlan,
+    ) -> AppResult<()> {
         if stat.is_dir() {
             plan.entries.push(DownloadEntry {
                 remote: remote.to_string(),
                 local: local.clone(),
                 kind: DownloadEntryKind::Directory,
             });
-            for (path, _) in self.sftp_readdir_retry(session_id, remote)? {
+            // READDIR attributes are lstat-like (OpenSSH), so reuse them instead
+            // of one extra round trip per child.
+            for (path, child) in self.sftp_readdir_retry(session_id, remote)? {
                 let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
                     continue;
                 };
                 if name.is_empty() || name == "." || name == ".." {
                     continue;
                 }
-                self.collect_download_entry(
-                    session_id,
-                    &join_remote(remote, name),
-                    local.join(name),
-                    plan,
-                )?;
+                let child_remote = join_remote(remote, name);
+                if child.perm.is_some() {
+                    self.collect_download_stat(
+                        session_id,
+                        &child_remote,
+                        local.join(name),
+                        child,
+                        plan,
+                    )?;
+                } else {
+                    // Servers may omit attributes; fall back to an explicit lstat.
+                    self.collect_download_entry(session_id, &child_remote, local.join(name), plan)?;
+                }
             }
         } else if stat.file_type().is_symlink() {
             let target = self.sftp_readlink_retry(session_id, remote)?;

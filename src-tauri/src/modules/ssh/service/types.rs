@@ -61,10 +61,15 @@ pub(super) struct SftpConn {
     pub(super) session: Session,
 }
 
+pub(super) type CachedConn = Mutex<Option<Arc<Mutex<SftpConn>>>>;
+
 #[derive(Default)]
 pub(super) struct SftpSlot {
     // One initialization per slot; reset/disconnect detach it without waiting on IO.
-    pub(super) connection: Mutex<Option<Arc<Mutex<SftpConn>>>>,
+    pub(super) connection: CachedConn,
+    // Transfers hold their lock for a whole file; a separate connection keeps
+    // browsing responsive meanwhile.
+    pub(super) transfer: CachedConn,
 }
 
 pub(super) struct TransferFlag {

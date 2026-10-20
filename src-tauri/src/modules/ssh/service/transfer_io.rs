@@ -6,7 +6,9 @@ use std::time::{Duration, Instant};
 
 const SFTP_WRITE_STALL_TIMEOUT: Duration = Duration::from_secs(5);
 const SFTP_TRANSFER_KEEPALIVE: Duration = Duration::from_secs(5);
-pub(super) const SFTP_TRANSFER_BUFFER_SIZE: usize = 64 * 1024;
+// libssh2 pipelines SFTP requests up to the buffer size, so throughput is
+// roughly buffer / RTT; 256 KiB keeps high-latency links from stalling.
+pub(super) const SFTP_TRANSFER_BUFFER_SIZE: usize = 256 * 1024;
 
 #[derive(Debug)]
 pub(super) enum SftpWriteOutcome {
@@ -48,7 +50,7 @@ pub(super) fn copy_download(
     mut progress: impl FnMut(usize),
     mut keepalive: impl FnMut(),
 ) -> AttemptResult<TransferIoOutcome> {
-    let mut buffer = [0; SFTP_TRANSFER_BUFFER_SIZE];
+    let mut buffer = vec![0; SFTP_TRANSFER_BUFFER_SIZE];
     let mut last_keepalive = Instant::now();
     loop {
         if let Some(transfer) = transfer {
@@ -83,7 +85,7 @@ pub(super) fn copy_upload(
     mut progress: impl FnMut(usize),
     mut keepalive: impl FnMut(),
 ) -> AttemptResult<TransferIoOutcome> {
-    let mut buffer = [0; SFTP_TRANSFER_BUFFER_SIZE];
+    let mut buffer = vec![0; SFTP_TRANSFER_BUFFER_SIZE];
     loop {
         if let Some(transfer) = transfer {
             if transfer.io_paused().map_err(AttemptError::local)? {

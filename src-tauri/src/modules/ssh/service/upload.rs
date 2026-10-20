@@ -41,7 +41,7 @@ impl Manager {
         let mut last_emit = Instant::now();
         run_transfer(
             transfer,
-            || self.sftp_conn(session_id),
+            || self.transfer_conn(session_id),
             |connection| {
                 let conn = connection.lock();
                 // Cached exec channels may have disabled the timeout. Restore

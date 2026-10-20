@@ -119,23 +119,35 @@ impl Manager {
     /// afterwards for other callers. Only transport failures invalidate the
     /// cached connection; remote command and permission errors keep it.
     fn exec_monitor(&self, session_id: &str, script: &str) -> AppResult<String> {
+        let (code, stdout) = self.exec_cached(session_id, script, MONITOR_EXEC_TIMEOUT_MS)?;
+        if code != 0 {
+            return Err(AppError::ssh_remote_exit(code, &stdout));
+        }
+        Ok(stdout)
+    }
+
+    /// Run a short, read-only command on a new channel of the cached SFTP
+    /// session instead of opening a fresh SSH connection. Only stdout is read,
+    /// so callers must keep stderr small or redirect it.
+    pub(super) fn exec_cached(
+        &self,
+        session_id: &str,
+        command: &str,
+        timeout_ms: u32,
+    ) -> AppResult<(i32, String)> {
         let conn_arc = self.sftp_conn(session_id)?;
         let result = {
             let conn = conn_arc.lock();
             conn.session.set_blocking(true);
             let previous_timeout = conn.session.timeout();
-            conn.session.set_timeout(MONITOR_EXEC_TIMEOUT_MS);
-            let result: AppResult<String> = (|| {
+            conn.session.set_timeout(timeout_ms);
+            let result: AppResult<(i32, String)> = (|| {
                 let mut channel = conn.session.channel_session()?;
-                channel.exec(script)?;
+                channel.exec(command)?;
                 let mut stdout = String::new();
                 channel.read_to_string(&mut stdout)?;
                 channel.wait_close()?;
-                let code = channel.exit_status()?;
-                if code != 0 {
-                    return Err(AppError::ssh_remote_exit(code, &stdout));
-                }
-                Ok(stdout)
+                Ok((channel.exit_status()?, stdout))
             })();
             conn.session.set_timeout(previous_timeout);
             result

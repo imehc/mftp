@@ -1,11 +1,25 @@
 use super::auth::connect;
-use super::types::{AuthMaterial, Manager, SftpConn, SftpSlot};
+use super::types::{AuthMaterial, CachedConn, Manager, SftpConn, SftpSlot};
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use parking_lot::Mutex;
 use std::sync::Arc;
 
 impl Manager {
     pub(super) fn sftp_conn(&self, session_id: &str) -> AppResult<Arc<Mutex<SftpConn>>> {
+        self.slot_conn(session_id, |slot| &slot.connection)
+    }
+
+    /// File transfers use their own connection so browsing is not blocked
+    /// behind a long upload or download.
+    pub(super) fn transfer_conn(&self, session_id: &str) -> AppResult<Arc<Mutex<SftpConn>>> {
+        self.slot_conn(session_id, |slot| &slot.transfer)
+    }
+
+    fn slot_conn(
+        &self,
+        session_id: &str,
+        select: fn(&SftpSlot) -> &CachedConn,
+    ) -> AppResult<Arc<Mutex<SftpConn>>> {
         let material = self.material(session_id)?;
         let slot = {
             let auth = self.auth.lock();
@@ -18,7 +32,7 @@ impl Manager {
         };
         // Serialize initialization only within this session. Disconnect/reset
         // detach the slot without waiting on a network call or connection lock.
-        let mut cached = slot.connection.lock();
+        let mut cached = select(&slot).lock();
         self.with_current_slot(session_id, &material, &slot, || ())?;
         if let Some(connection) = cached.as_ref() {
             return Ok(connection.clone());
@@ -67,12 +81,14 @@ impl Manager {
     ) {
         let slot = self.sftp.lock().get(session_id).cloned();
         if let Some(slot) = slot {
-            let mut cached = slot.connection.lock();
-            if cached
-                .as_ref()
-                .is_some_and(|current| Arc::ptr_eq(current, conn))
-            {
-                *cached = None;
+            for entry in [&slot.connection, &slot.transfer] {
+                let mut cached = entry.lock();
+                if cached
+                    .as_ref()
+                    .is_some_and(|current| Arc::ptr_eq(current, conn))
+                {
+                    *cached = None;
+                }
             }
         }
     }
