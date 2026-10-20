@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useEffectEvent, useRef } from "react";
@@ -81,18 +81,6 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
         trailing={<ActivityMenu />}
       />
       <AppPageContent bottomInset="scroll">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold">
-            {selected === "tools" ? (
-              <Trans>全部工具</Trans>
-            ) : (
-              homeCategoryLabels[selected]
-            )}
-          </h2>
-          <span className="text-muted-foreground text-xs">
-            {entries.length}
-          </span>
-        </div>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           {entries.map((entry) => {
             const Icon = entry.icon;

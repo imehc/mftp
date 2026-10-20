@@ -1609,10 +1609,6 @@ msgstr "All categories"
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
 
-#: src/features/home/HomePage.tsx:87
-msgid "全部工具"
-msgstr "All tools"
-
 #: src/features/logs/LogFilters.tsx:95
 msgid "全部时间"
 msgstr "All Time"
