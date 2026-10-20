@@ -44,7 +44,7 @@ try {
   run(["exec", "tsc", "-p", "tsconfig.node.json", "--noEmit"]);
   run(["exec", "tsc", "--noEmit"]);
   run(["exec", "vite", "build"]);
-  run(["run", "platform:artifact", target]);
+  run(["run", "check:platform-artifact", target]);
 } finally {
   rmSync(lock, { recursive: true });
 }

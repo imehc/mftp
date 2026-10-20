@@ -148,22 +148,22 @@ Android 端与桌面端的功能差异（代码中已处理，无需手动关注
 
 ## 原生插件独立编译检查
 
-`pnpm android:plugins:check` 编译 `native-export`、`native-viewer`、`native-speech` 三个 Android library，生成 AAR，并运行语音分句和恢复队列的 JVM 单元测试；不会生成完整 MFTP APK、启动 Gradle 安装任务或连接设备。用于本地和 PR CI 的 Kotlin/资源编译门槛，不代替 Android Rust 主库、整包或原生功能验收。
+`pnpm check:android-plugins` 编译 `native-export`、`native-viewer`、`native-speech` 三个 Android library，生成 AAR，并运行语音分句和恢复队列的 JVM 单元测试；不会生成完整 MFTP APK、启动 Gradle 安装任务或连接设备。用于本地和 PR CI 的 Kotlin/资源编译门槛，不代替 Android Rust 主库、整包或原生功能验收。
 
 环境：Node.js 22、pnpm、Cargo、JDK 17–24，以及 Android SDK `platforms;android-36`、`build-tools;36.0.0`。显式配置 `JAVA_HOME` 和 `ANDROID_HOME`（或 `ANDROID_SDK_ROOT`）。不需要 NDK，也不需要先启动应用。
 
 ```bash
 # 首次允许 Cargo/Gradle 下载锁定依赖；复用仓库的 Gradle wrapper 和依赖版本
-pnpm android:plugins:check
+pnpm check:android-plugins
 
 # 依赖已经缓存后，在全新的临时工程中离线重新编译
-pnpm android:plugins:check --offline
+pnpm check:android-plugins --offline
 
 # 仅验证环境并生成隔离工程/源码摘要，不执行 Gradle
-pnpm android:plugins:check --offline --prepare-only
+pnpm check:android-plugins --offline --prepare-only
 
 # 本机只安装了其他兼容 Build Tools 时可显式选择，实际版本会写进报告
-MFTP_ANDROID_BUILD_TOOLS=37.0.0 pnpm android:plugins:check --offline
+MFTP_ANDROID_BUILD_TOOLS=37.0.0 pnpm check:android-plugins --offline
 ```
 
 脚本通过 `cargo metadata --locked --filter-platform aarch64-linux-android` 定位当前应用实际解析到的 Tauri API，避免从任意缓存目录挑选版本。Cargo 锁文件更新后，离线模式可能提示依赖未缓存，应先正常运行一次。
@@ -176,4 +176,4 @@ PR 的 `Android plugins (compile only)` job 调用相同入口，使用 JDK 17 �
 
 `public/app-icon.png` 为原图。Android 自适应图标的前景画布为 108dp，常见启动器只显示中央约 72dp；直接铺满原图会裁掉留白，让图案显得过大。
 
-执行 `pnpm icons:android`，通过 Tauri 图标生成器将原图居中放入 72dp 区域，并生成五种密度的前景 PNG。该脚本只更新 Android 自适应前景，保留 macOS、iOS 和旧式 Android 图标。重新运行全平台图标生成或 Android init 后，也应运行此命令恢复安全留白。实际遮罩和动效由系统启动器决定。
+执行 `pnpm android:icons`，通过 Tauri 图标生成器将原图居中放入 72dp 区域，并生成五种密度的前景 PNG。该脚本只更新 Android 自适应前景，保留 macOS、iOS 和旧式 Android 图标。重新运行全平台图标生成或 Android init 后，也应运行此命令恢复安全留白。实际遮罩和动效由系统启动器决定。
