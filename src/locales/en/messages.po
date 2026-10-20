@@ -2719,7 +2719,7 @@ msgstr "Sync poetry library"
 msgid "同网段 MFTP 客户端，点击可直接打开访问地址"
 msgstr "MFTP clients on the same subnet. Click to open the access URL."
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:110
+#: src/features/ai-configuration/AiEditorDialog.tsx:111
 #: src/features/lan-transfer/LanShareDialog.tsx:94
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:311
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:312
@@ -3273,7 +3273,7 @@ msgstr "Password entry"
 msgid "密钥"
 msgstr "Key"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:180
+#: src/features/ai-configuration/AiEditorDialog.tsx:181
 msgid "密钥值"
 msgstr "Key value"
 
@@ -4385,7 +4385,7 @@ msgstr "I break"
 msgid "我的服务器"
 msgstr "My server"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:153
+#: src/features/ai-configuration/AiEditorDialog.tsx:154
 msgid "我确认将密钥和生成请求发送到新的服务地址。"
 msgstr "I confirm that keys and generation requests will be sent to the new service address."
 
@@ -5456,7 +5456,7 @@ msgstr "Replace with"
 msgid "有朗诵"
 msgstr "Audio available"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:128
+#: src/features/ai-configuration/AiEditorDialog.tsx:129
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:22
 msgid "服务地址"
 msgstr "Service URL"
@@ -5872,7 +5872,7 @@ msgid "标准错误（stderr）"
 msgstr "Standard error (stderr)"
 
 #. AI 密钥的可复用名称，不是密钥值
-#: src/features/ai-configuration/AiEditorDialog.tsx:165
+#: src/features/ai-configuration/AiEditorDialog.tsx:166
 #: src/features/ai-configuration/ProviderDetails.tsx:201
 msgid "标签"
 msgstr "Label"
@@ -6761,17 +6761,17 @@ msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
 #: src/features/ai-configuration/AiConfigurationSettings.tsx:149
-#: src/features/ai-configuration/AiEditorDialog.tsx:60
+#: src/features/ai-configuration/AiEditorDialog.tsx:61
 #: src/features/ai-configuration/ProviderNavigation.mobile.tsx:54
 msgid "添加地址"
 msgstr "Add address"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:65
+#: src/features/ai-configuration/AiEditorDialog.tsx:66
 #: src/features/ai-configuration/ProviderDetails.tsx:192
 msgid "添加密钥"
 msgstr "Add key"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:68
+#: src/features/ai-configuration/AiEditorDialog.tsx:69
 #: src/features/ai-configuration/ProviderDetails.tsx:192
 msgid "添加模型"
 msgstr "Add model"
@@ -7908,12 +7908,12 @@ msgstr "Edit"
 msgid "编辑主机"
 msgstr "Edit Host"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:61
+#: src/features/ai-configuration/AiEditorDialog.tsx:62
 #: src/features/ai-configuration/ProviderDetails.tsx:101
 msgid "编辑地址"
 msgstr "Edit address"
 
-#: src/features/ai-configuration/AiEditorDialog.tsx:64
+#: src/features/ai-configuration/AiEditorDialog.tsx:65
 msgid "编辑密钥"
 msgstr "Edit key"
 
@@ -7927,7 +7927,7 @@ msgstr "Edit Todo"
 
 #. 编辑本地模型库的名称、分组和收藏状态。
 #. 编辑本地模型库的名称、分组和收藏状态。
-#: src/features/ai-configuration/AiEditorDialog.tsx:67
+#: src/features/ai-configuration/AiEditorDialog.tsx:68
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:58
 #: src/features/model-viewer/components/LibraryList.tsx:208
 msgid "编辑模型"

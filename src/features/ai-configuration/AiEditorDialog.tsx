@@ -29,6 +29,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 import { describeError } from "~/lib/errors";
 
 import { AiProtocolField } from "./AiProtocolField";
@@ -179,10 +180,9 @@ export default function AiEditorDialog({
                         <FieldLabel htmlFor="ai-key-secret">
                           <Trans>密钥值</Trans>
                         </FieldLabel>
-                        <Input
+                        <PasswordInput
                           ref={bindSecret}
                           id="ai-key-secret"
-                          type="password"
                           autoComplete="new-password"
                           autoCapitalize="none"
                           spellCheck={false}
