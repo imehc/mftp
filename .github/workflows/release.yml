@@ -222,7 +222,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Cache translation engine source
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: src-tauri/target/translation-source
           key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
@@ -316,7 +316,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Cache translation engine source
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: src-tauri/target/translation-source
           key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}

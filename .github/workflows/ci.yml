@@ -124,7 +124,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Cache translation engine source
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: src-tauri/target/translation-source
           key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
@@ -183,7 +183,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Cache translation engine source
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: src-tauri/target/translation-source
           key: translation-source-${{ runner.os }}-${{ hashFiles('src-tauri/native/translation/engine.json', 'src-tauri/native/translation/legacy-stq.patch') }}
@@ -227,7 +227,7 @@ jobs:
           node-version: 22
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -256,7 +256,7 @@ jobs:
 
       - name: Preserve source and environment report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-plugin-check-report
           path: ${{ runner.temp }}/mftp-android-plugins-*/check-report.json
