@@ -3,6 +3,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- mDNS discovery for LAN game rooms needs multicast reception. -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- The multicast permission implies a required Wi-Fi feature; LAN discovery
+         is optional, so declare it explicitly as not required. -->
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
 
     <!-- AndroidTV support -->
     <uses-feature android:name="android.software.leanback" android:required="false" />

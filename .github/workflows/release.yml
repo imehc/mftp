@@ -375,6 +375,60 @@ jobs:
           export PATH="$SHIM_DIR:$TOOLCHAIN_BIN:$PATH"
           pnpm tauri android build --target aarch64 --split-per-abi --apk
 
+      - name: Verify 16 KB page alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk"
+          TOOLCHAIN_BIN="$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          UNPACKED="$RUNNER_TEMP/apk-native-libs"
+          rm -rf "$UNPACKED"
+          mkdir -p "$UNPACKED"
+          unzip -q -o "$APK" 'lib/*/*.so' -d "$UNPACKED"
+          # Android 15+ devices with 16 KB pages reject libraries whose LOAD
+          # segments are only 4 KB aligned, and the install fails as an invalid
+          # package. The alignment comes from src-tauri/build.rs, which is easy
+          # to lose when the toolchain or linker flags change.
+          shopt -s nullglob
+          count=0
+          for so in "$UNPACKED"/lib/*/*.so; do
+            count=$((count + 1))
+            while read -r align; do
+              if (( 16#${align#0x} < 16384 )); then
+                echo "::error file=${APK}::$(basename "$so") LOAD segment align ${align} is below 16 KB"
+                exit 1
+              fi
+            done < <("$TOOLCHAIN_BIN/llvm-readelf" -lW "$so" | awk '$1 == "LOAD" { print $NF }')
+            echo "$(basename "$so"): LOAD segments are 16 KB aligned"
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "::error file=${APK}::No native libraries found in the release APK"
+            exit 1
+          fi
+
+      - name: Verify libc stays dynamically linked
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk"
+          TOOLCHAIN_BIN="$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          UNPACKED="$RUNNER_TEMP/apk-native-libs"
+          # The NDK ship libc.a next to the versioned directory that holds
+          # libc.so. Putting that unversioned directory first on the link search
+          # path makes -lc resolve to the static Bionic, which brings a private
+          # __libc_shared_globals with a null auxv into our library; Rust's
+          # compiler-builtins constructor then dereferences it at load time and
+          # the process dies with SIGSEGV before any app code runs. Keeping
+          # getauxval an undefined dynamic symbol proves libc stayed shared.
+          shopt -s nullglob
+          for so in "$UNPACKED"/lib/*/*.so; do
+            if ! "$TOOLCHAIN_BIN/llvm-nm" -D --undefined-only "$so" | grep -qw getauxval; then
+              echo "::error file=${APK}::$(basename "$so") links Bionic statically (getauxval is not a dynamic import)"
+              exit 1
+            fi
+            echo "$(basename "$so"): getauxval imported from libc.so"
+          done
+
       - name: Upload APK to release
         shell: bash
         env:

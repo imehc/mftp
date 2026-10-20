@@ -87,13 +87,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             "x86"
         };
+        let api_level = "28";
         build
             .define(
                 "CMAKE_TOOLCHAIN_FILE",
                 PathBuf::from(&ndk).join("build/cmake/android.toolchain.cmake"),
             )
             .define("ANDROID_ABI", abi)
-            .define("ANDROID_PLATFORM", "android-28")
+            .define("ANDROID_PLATFORM", format!("android-{api_level}"))
             .define("ANDROID_STL", "c++_static");
         let host = std::env::var("HOST")?;
         let prebuilt = if host.contains("apple") {
@@ -110,7 +111,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             target.as_str()
         };
-        println!("cargo:rustc-link-search=native={}/toolchains/llvm/prebuilt/{prebuilt}/sysroot/usr/lib/{triple}", ndk);
+        // The versioned directory must come first: the unversioned one only
+        // ships libc.a (no libc.so), so a bare `-L <sysroot>/<triple>` makes
+        // the linker resolve -lc to the static Bionic. That pulls a private
+        // __libc_shared_globals into our .so whose auxv is null, and gets
+        // called from compiler-builtins' init_have_lse_atomics at load time,
+        // crashing the process before any app code runs.
+        println!("cargo:rustc-link-search=native={ndk}/toolchains/llvm/prebuilt/{prebuilt}/sysroot/usr/lib/{triple}/{api_level}");
+        println!("cargo:rustc-link-search=native={ndk}/toolchains/llvm/prebuilt/{prebuilt}/sysroot/usr/lib/{triple}");
     }
     let output = build.build();
     println!("cargo:rustc-link-search=native={}/lib", output.display());

@@ -73,6 +73,8 @@ adb install -r \
 
 使用 `adb install` 可以获得比手机文件管理器更准确的安装错误码。当前应用的 `minSdk` 为 28、`targetSdk` 为 36，支持 Android 9 及以上系统，包括 Android 16。
 
+release APK 只包含 `arm64-v8a`，32 位 ARM 设备和 x86 模拟器会报 `INSTALL_FAILED_NO_MATCHING_ABIS`；需要覆盖这些设备时构建 universal 包。
+
 如果返回 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`，说明手机中已安装相同包名但签名不同的版本，常见情况是先前安装过 debug APK。Android 不允许使用 release 签名覆盖 debug 签名，需要先卸载旧版本：
 
 ```bash
@@ -130,6 +132,14 @@ keytool -genkey -v -keystore ~/.keystores/mftp-release.jks \
 
 Android 的 HTTPS 使用 `rustls-platform-verifier` 调用系统证书校验。`NativeTls` 在 `MainActivity.onCreate` 调用父类之前加载 Rust 主库并传入应用上下文，确保后台服务启动前完成初始化。Gradle 从 Cargo 锁定的 `rustls-platform-verifier-android` 包定位本地 Maven 组件，ProGuard 保留其 JNI 类；升级该依赖时需同时验证启动、HTTPS 请求和 release 混淆配置。
 
+Android 15 起部分设备使用 16 KB 内存页，原生库必须按 16 KB 对齐链接，否则安装时被判为无效包（`INSTALL_FAILED_INVALID_APK`）。`src-tauri/build.rs` 在 `CARGO_CFG_TARGET_OS = android` 时输出 `cargo:rustc-link-arg=-Wl,-z,max-page-size=16384`：NDK r27 默认仍是 4 KB，r28 才改为 16 KB，显式声明不依赖 NDK 版本。
+
+不要改用 `.cargo/config.toml` 的 `rustflags`：环境变量 `RUSTFLAGS` 会整体替换配置里的 rustflags 而不是合并，一旦构建链或本地环境设了它，对齐会静默退回 4 KB —— 实测设置 `RUSTFLAGS="-C debuginfo=0"` 后 config 方案产出 `p_align=0x1000`，而 build script 方案仍为 `0x4000`。`release.yml` 的 android job 在打包后校验 APK 内每个 `.so` 的 LOAD 段对齐，低于 16 KB 直接失败，作为最终门禁。
+
+`AndroidManifest.xml` 把 `android.hardware.wifi` 显式声明为非必需：`CHANGE_WIFI_MULTICAST_STATE` 会隐式推导出必需的 Wi-Fi 特性，而局域网发现只是可选能力。
+
+`native/translation/build.rs` 把 NDK sysroot 加入链接搜索路径时，必须让带 API 级别的目录（`sysroot/usr/lib/<triple>/28`，含 `libc.so`）排在不带级别的目录（`sysroot/usr/lib/<triple>`，只有 `libc.a`）之前。顺序反了，`-lc` 会解析成静态 Bionic，`libmftp_lib.so` 里会带入一份私有的 `__libc_shared_globals`（`auxv` 为空）；Rust `compiler-builtins` 的 `init_have_lse_atomics` 在 `System.loadLibrary` 阶段调用 `getauxval` 时解引用空指针，进程在进入任何应用代码前就 SIGSEGV（tombstone 为 `getauxval+28` / `init_have_lse_atomics+12`，只有 2 帧）。`release.yml` 的 `Verify libc stays dynamically linked` 步骤要求 `getauxval` 仍是 `.dynsym` 里的未定义符号，静态 libc 回归会直接失败。
+
 Android 端与桌面端的功能差异（代码中已处理，无需手动关注）：
 
 - **更新器（updater）与开机自启（autostart）** 仅桌面可用：
@@ -142,7 +152,8 @@ Android 端与桌面端的功能差异（代码中已处理，无需手动关注
 
 - **`Blocking waiting for file lock`**：有另一个 cargo/gradle 构建在跑（包括 IDE 里的），等它结束或杀掉即可。
 - **`aarch64-linux-android-ranlib: command not found`**：没有通过 `scripts/android.sh` 运行。请始终使用 `pnpm android:dev` / `pnpm android:build`。
-- **release APK 装不上**：先确认文件不是 `*-unsigned.apk`，再用 `adb install -r <apk-path>` 获取准确错误码。`INSTALL_FAILED_UPDATE_INCOMPATIBLE` 表示已安装版本的签名不同，需要卸载旧版本或改用原签名 key 构建。
+- **release APK 装不上**：先确认文件不是 `*-unsigned.apk`，再用 `adb install -r <apk-path>` 获取准确错误码。`INSTALL_FAILED_UPDATE_INCOMPATIBLE` 表示已安装版本的签名不同，需要卸载旧版本或改用原签名 key 构建。手机安装器把这类失败统一显示为“安装包无效或不兼容”，与 ABI、`minSdk`、签名、对齐都无关的文案，必须靠 `adb install`/`logcat` 区分。
+- **安装成功但一启动就闪退**：`adb logcat` 里看到 `SIGSEGV` 且只有 `getauxval` / `init_have_lse_atomics` 两帧，说明原生库静态链接了 Bionic，见上文 sysroot 链接顺序说明。
 - **`zsh: command not found: adb`**：将 `$HOME/Library/Android/sdk/platform-tools` 加入 `PATH`，或使用 `/Users/<you>/Library/Android/sdk/platform-tools/adb` 绝对路径执行。
 - Gradle 输出中的 deprecation 警告来自 Tauri 生成的模板，可忽略。
 

@@ -1,9 +1,25 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    align_android_native_library();
     tauri_build::build();
     if !tauri_build::is_dev() {
         verify_frontend_target()?;
     }
     Ok(())
+}
+
+/// Android 15+ devices can use 16 KB memory pages and reject a 4 KB-aligned
+/// native library at install time (INSTALL_FAILED_INVALID_APK). NDK r27 still
+/// links 4 KB by default, so the page size has to be requested explicitly.
+///
+/// Emitting the flag from this build script instead of `.cargo/config.toml`
+/// keeps it attached to the crate that produces the mobile libraries, and it
+/// cannot be dropped by a `RUSTFLAGS` override: environment flags replace
+/// config-level rustflags wholesale rather than merging with them.
+fn align_android_native_library() {
+    if std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default() != "android" {
+        return;
+    }
+    println!("cargo:rustc-link-arg=-Wl,-z,max-page-size=16384");
 }
 
 fn verify_frontend_target() -> Result<(), Box<dyn std::error::Error>> {
