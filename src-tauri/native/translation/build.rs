@@ -1,6 +1,22 @@
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
+/// Rust's canonicalize returns verbatim `\\?\` paths on Windows. CMake and
+/// MSVC reject those when compiling llama.cpp, so hand them a normal path.
+fn cmake_source_path(path: PathBuf) -> PathBuf {
+    #[cfg(windows)]
+    {
+        let text = path.to_string_lossy();
+        if let Some(rest) = text.strip_prefix(r"\\?\UNC\") {
+            return PathBuf::from(format!(r"\\{rest}"));
+        }
+        if let Some(rest) = text.strip_prefix(r"\\?\") {
+            return PathBuf::from(rest);
+        }
+    }
+    path
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let root = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR")?);
     let source = root.join("../../target/translation-source/llama.cpp");
@@ -39,9 +55,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-env-changed=ANDROID_NDK_HOME");
     println!("cargo:rerun-if-env-changed=NDK_HOME");
     let mut build = cmake::Config::new(&root);
-    build
-        .profile("Release")
-        .define("MFTP_LLAMA_SOURCE", source.canonicalize()?);
+    build.profile("Release").define(
+        "MFTP_LLAMA_SOURCE",
+        cmake_source_path(source.canonicalize()?),
+    );
     if target == "aarch64-apple-darwin" || target == "aarch64-apple-ios-sim" {
         // Every Apple Silicon Mac (M1+) has dotprod and fp16 vector arithmetic.
         build.define("GGML_CPU_ARM_ARCH", "armv8.2-a+dotprod+fp16");
