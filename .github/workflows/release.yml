@@ -57,16 +57,30 @@ jobs:
           PREVIOUS_TAG="$(git tag --list 'v[0-9]*' --sort=-v:refname \
             | grep -vx "v${VERSION}" | head -n 1 || true)"
 
+          # 发布说明只覆盖版本号提交之前的改动；版本号之后的提交属于发布流水线，
+          # 不是本次版本的内容。找不到版本号提交时退回 HEAD。
+          VERSION_COMMITS="$(git log --reverse --format=%H \
+            -S"\"version\": \"${VERSION}\"" -- package.json || true)"
+          VERSION_COMMIT="${VERSION_COMMITS%%$'\n'*}"
+          if [ -n "$VERSION_COMMIT" ] \
+            && git merge-base --is-ancestor "$VERSION_COMMIT" HEAD; then
+            RANGE_END="$VERSION_COMMIT"
+          else
+            RANGE_END="HEAD"
+          fi
+
           if [ -n "$PREVIOUS_TAG" ]; then
-            RANGE="${PREVIOUS_TAG}..HEAD"
+            RANGE="${PREVIOUS_TAG}..${RANGE_END}"
             HEADER="Changes since ${PREVIOUS_TAG}"
           else
-            RANGE="HEAD"
+            RANGE="${RANGE_END}"
             HEADER="Initial release"
           fi
 
           # 发布说明与 latest.json 保留原始提交，筛选与前缀格式化由客户端展示层处理。
-          NOTES="$(git log "$RANGE" --pretty=format:'- %s (%h)' --no-merges)"
+          # 只保留 feat/fix/refactor/perf/style/revert 提交，其余类型不进入发布说明。
+          NOTES="$(git log "$RANGE" --pretty=format:'- %s (%h)' --no-merges \
+            --extended-regexp --grep='^(feat|fix|refactor|perf|style|revert)[(:!]')"
           if [ -z "$NOTES" ]; then
             NOTES="- No additional release notes."
           fi
@@ -251,6 +265,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           releaseId: ${{ needs.draft-release.outputs.release_id }}
+          # latest.json 的 notes 取自该输入，缺失时更新弹窗会没有说明文字。
+          releaseBody: ${{ needs.release-info.outputs.release_body }}
           args: ${{ matrix.args }}
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
@@ -444,6 +460,13 @@ jobs:
             !release.draft
           ) {
             throw new Error("Updater manifest and release versions do not match");
+          }
+
+          // The update dialog shows the notes from the manifest; keep them equal to
+          // the release description so both pages describe the same changes.
+          manifest.notes = (release.body ?? "").trim();
+          if (!manifest.notes) {
+            throw new Error("Release description is empty");
           }
           const platforms = manifest.platforms ?? {};
           const platformKeys = Object.keys(platforms);

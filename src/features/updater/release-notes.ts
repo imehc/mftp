@@ -36,7 +36,9 @@ export function parseReleaseNotes(body: string): ReleaseNote[] {
       );
     if (
       prefix &&
-      !["feat", "fix", "refactor", "perf"].includes(prefix[1].toLowerCase())
+      !["feat", "fix", "refactor", "perf", "style", "revert"].includes(
+        prefix[1].toLowerCase(),
+      )
     )
       return [];
     const text = content.slice(prefix?.[0].length ?? 0);
