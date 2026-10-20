@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { describeError, toIpcError } from "~/lib/errors";
+import { describeError, hasCustomCode, toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import type { AppError, PoetryCollectionStatus } from "~/types";
 
@@ -62,10 +62,18 @@ export function usePoetryCollectionsManage() {
   }, []);
 
   // 页面只消费共享运行期进度；离页不会停止同步。终态行为由两端共用。
+  // 挂载时已存在的终态属于上一次任务：只播报本次挂载期间新到达的终态，否则
+  // 每次进入页面都会重播一遍旧的「同步失败」。
+  const handledTerminalAt = useRef(progress.updatedAt);
   useEffect(() => {
     if (progress.phase !== "done" && progress.phase !== "error") return;
+    if (progress.updatedAt <= handledTerminalAt.current) return;
+    handledTerminalAt.current = progress.updatedAt;
     if (progress.phase === "done")
       toast.success(t`同步完成`, { id: "poetry-sync" });
+    // 主动取消不是失败：按信息提示处理，避免底部出现红色「同步失败」。
+    else if (hasCustomCode(progress.error, "poetry:sync_cancelled"))
+      toast.info(t`已取消同步`, { id: "poetry-sync" });
     else
       toast.error(t`同步失败`, {
         id: "poetry-sync",

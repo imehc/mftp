@@ -46,7 +46,7 @@ msgstr "{count, plural, one {# 篇} other {# 篇}}"
 msgid "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 
-#: src/features/poetry/components/CollectionManagement.tsx:239
+#: src/features/poetry/components/CollectionManagement.tsx:280
 msgid "{count, plural, one {已选择 # 个合集} other {已选择 # 个合集}}"
 msgstr "{count, plural, one {已选择 # 个合集} other {已选择 # 个合集}}"
 
@@ -850,7 +850,8 @@ msgstr "下载录屏"
 msgid "下载截图"
 msgstr "下载截图"
 
-#: src/features/poetry/components/CollectionManagement.tsx:255
+#: src/features/poetry/components/CollectionManagement.tsx:297
+#: src/features/poetry/components/CollectionManagement.tsx:298
 msgid "下载所选"
 msgstr "下载所选"
 
@@ -1681,6 +1682,8 @@ msgstr "关联纹理"
 #: src/features/bt/components/AddTorrentDialog.tsx:363
 #: src/features/model-viewer/components/LibraryPanel.tsx:356
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
+#: src/features/poetry/components/CollectionManagement.tsx:268
+#: src/features/poetry/components/CollectionManagement.tsx:269
 #: src/features/ssh-sftp/components/Sidebar.tsx:365
 #: src/features/ssh-sftp/components/Sidebar.tsx:379
 #: src/features/todo/TodoDetailsDialog.tsx:145
@@ -2288,7 +2291,7 @@ msgstr "单杆 {currentBreak}"
 msgid "单次"
 msgstr "单次"
 
-#: src/features/poetry/LibraryManagePage.tsx:91
+#: src/features/poetry/LibraryManagePage.tsx:92
 msgid "卸载"
 msgstr "卸载"
 
@@ -2296,7 +2299,7 @@ msgstr "卸载"
 msgid "卸载 {name}"
 msgstr "卸载 {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:81
+#: src/features/poetry/LibraryManagePage.tsx:82
 msgid "卸载合集"
 msgstr "卸载合集"
 
@@ -2486,10 +2489,10 @@ msgstr "发生未知错误，请重试"
 #: src/features/logs/LogDialogs.tsx:155
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:310
-#: src/features/poetry/components/PoetryTranslationSection.tsx:326
-#: src/features/poetry/components/PoetryTranslationSection.tsx:354
-#: src/features/poetry/components/PoetryTranslationSection.tsx:374
-#: src/features/poetry/LibraryManagePage.tsx:89
+#: src/features/poetry/components/PoetryTranslationSection.tsx:345
+#: src/features/poetry/components/PoetryTranslationSection.tsx:373
+#: src/features/poetry/components/PoetryTranslationSection.tsx:393
+#: src/features/poetry/LibraryManagePage.tsx:90
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:337
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:88
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:221
@@ -2519,7 +2522,7 @@ msgstr "取消传输"
 msgid "取消传输任务"
 msgstr "取消传输任务"
 
-#: src/features/poetry/components/CollectionManagement.tsx:194
+#: src/features/poetry/components/CollectionManagement.tsx:261
 msgid "取消同步"
 msgstr "取消同步"
 
@@ -2694,12 +2697,12 @@ msgstr "同时传输数不能小于 1"
 msgid "同时传输数必须是整数"
 msgstr "同时传输数必须是整数"
 
-#: src/features/poetry/components/CollectionManagement.tsx:185
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:70
+#: src/features/poetry/components/CollectionManagement.tsx:177
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:78
 msgid "同步失败"
 msgstr "同步失败"
 
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:68
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:73
 msgid "同步完成"
 msgstr "同步完成"
 
@@ -2707,10 +2710,6 @@ msgstr "同步完成"
 #: src/features/logs/log-labels.ts:56
 msgid "同步诗词库"
 msgstr "同步诗词库"
-
-#: src/features/poetry/components/CollectionManagement.tsx:212
-msgid "同步进度"
-msgstr "同步进度"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:34
 msgid "同网段 MFTP 客户端，点击可直接打开访问地址"
@@ -3463,7 +3462,7 @@ msgstr "导航"
 msgid "将军"
 msgstr "将军"
 
-#: src/features/poetry/LibraryManagePage.tsx:84
+#: src/features/poetry/LibraryManagePage.tsx:85
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 
@@ -3514,7 +3513,7 @@ msgstr "小时"
 msgid "小游戏"
 msgstr "小游戏"
 
-#: src/features/poetry/components/CollectionManagement.tsx:145
+#: src/features/poetry/components/CollectionManagement.tsx:144
 msgid "尚未安装合集"
 msgstr "尚未安装合集"
 
@@ -3678,7 +3677,7 @@ msgstr "已关闭开机自启"
 msgid "已删除"
 msgstr "已删除"
 
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:130
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:138
 msgid "已删除 {itemName}"
 msgstr "已删除 {itemName}"
 
@@ -3731,6 +3730,10 @@ msgstr "已取消任务"
 msgid "已取消压缩"
 msgstr "已取消压缩"
 
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:76
+msgid "已取消同步"
+msgstr "已取消同步"
+
 #: src/features/model-viewer/components/ScreenshotExport.tsx:50
 msgid "已取消截图导出。"
 msgstr "已取消截图导出。"
@@ -3762,7 +3765,7 @@ msgstr "已复制到系统下载目录"
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "已存在同名附件，请先重命名文件或移除旧附件。"
 
-#: src/features/poetry/components/CollectionManagement.tsx:139
+#: src/features/poetry/components/CollectionManagement.tsx:138
 #: src/features/translation/ModelManager.tsx:238
 msgid "已安装"
 msgstr "已安装"
@@ -4792,16 +4795,16 @@ msgstr "操作信息已截断"
 
 #. 执行日志中的失败终态
 #: src/features/connection-diagnostics/ExecutionLogLine.tsx:17
-#: src/features/poetry/components/PoetryTranslationSection.tsx:94
 #: src/features/poetry/components/TranslationPackManager.tsx:63
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:108
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:119
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:133
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:116
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:127
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:141
 #: src/features/poetry/hooks/use-poetry-library.ts:183
 #: src/features/poetry/hooks/use-poetry-local-data.ts:102
 #: src/features/poetry/hooks/use-poetry-local-data.ts:121
 #: src/features/poetry/hooks/use-poetry-local-data.ts:132
 #: src/features/poetry/hooks/use-poetry-local-data.ts:142
+#: src/features/poetry/hooks/use-poetry-translations.ts:59
 msgid "操作失败"
 msgstr "操作失败"
 
@@ -6135,7 +6138,7 @@ msgstr "横屏游玩"
 msgid "正则"
 msgstr "正则"
 
-#: src/features/poetry/components/CollectionManagement.tsx:165
+#: src/features/poetry/components/CollectionManagement.tsx:183
 msgid "正在下载"
 msgstr "正在下载"
 
@@ -6230,11 +6233,11 @@ msgstr "正在取消"
 msgid "正在取消并释放资源"
 msgstr "正在取消并释放资源"
 
-#: src/features/poetry/components/CollectionManagement.tsx:175
+#: src/features/poetry/components/CollectionManagement.tsx:184
 msgid "正在同步"
 msgstr "正在同步"
 
-#: src/features/poetry/components/CollectionManagement.tsx:160
+#: src/features/poetry/components/CollectionManagement.tsx:175
 msgid "正在启动"
 msgstr "正在启动"
 
@@ -6263,7 +6266,7 @@ msgstr "正在处理附件…"
 msgid "正在安装并重启…"
 msgstr "正在安装并重启…"
 
-#: src/features/poetry/components/CollectionManagement.tsx:164
+#: src/features/poetry/components/CollectionManagement.tsx:181
 msgid "正在导入"
 msgstr "正在导入"
 
@@ -6335,7 +6338,7 @@ msgstr "正在整理文件"
 msgid "正在更新"
 msgstr "正在更新"
 
-#: src/features/poetry/components/CollectionManagement.tsx:162
+#: src/features/poetry/components/CollectionManagement.tsx:179
 msgid "正在校验"
 msgstr "正在校验"
 
@@ -7544,7 +7547,7 @@ msgid "等待监控数据"
 msgstr "等待监控数据"
 
 #: src/features/about/AboutPage.tsx:167
-#: src/features/poetry/components/CollectionManagement.tsx:158
+#: src/features/poetry/components/CollectionManagement.tsx:173
 msgid "等待确认"
 msgstr "等待确认"
 
@@ -8526,7 +8529,7 @@ msgstr "请先保存 API Key"
 msgid "请先停止{participant}，稍后再清理数据"
 msgstr "请先停止{participant}，稍后再清理数据"
 
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:100
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:108
 #: src/features/poetry/hooks/use-poetry-local-data.ts:91
 msgid "请先选择合集"
 msgstr "请先选择合集"

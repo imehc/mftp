@@ -18,7 +18,7 @@ import { Button } from "~/components/ui/button";
 import PoetryLocalManagement from "~/features/poetry/components/PoetryLocalManagement";
 
 import {
-  CollectionDownloadFooter,
+  CollectionFooter,
   CollectionGroups,
 } from "./components/CollectionManagement";
 import { usePoetryCollectionsManage } from "./hooks/use-poetry-collections-manage";
@@ -70,7 +70,8 @@ export default function LibraryManagePage({
         <CollectionGroups controller={controller} />
         <PoetryLocalManagement controller={controller} />
       </AppPageContent>
-      <CollectionDownloadFooter controller={controller} />
+      {/* 下载入口与同步进度共用一条底栏，固定在滚动区外。 */}
+      <CollectionFooter controller={controller} />
 
       <AlertDialog
         open={pendingDelete !== null}

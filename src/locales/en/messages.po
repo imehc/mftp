@@ -46,7 +46,7 @@ msgstr "{count, plural, one {# poem} other {# poems}}"
 msgid "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{count, plural, one {# ball left} other {# balls left}}"
 
-#: src/features/poetry/components/CollectionManagement.tsx:239
+#: src/features/poetry/components/CollectionManagement.tsx:280
 msgid "{count, plural, one {已选择 # 个合集} other {已选择 # 个合集}}"
 msgstr "{count, plural, one {# collection selected} other {# collections selected}}"
 
@@ -850,7 +850,8 @@ msgstr "Download recording"
 msgid "下载截图"
 msgstr "Download screenshot"
 
-#: src/features/poetry/components/CollectionManagement.tsx:255
+#: src/features/poetry/components/CollectionManagement.tsx:297
+#: src/features/poetry/components/CollectionManagement.tsx:298
 msgid "下载所选"
 msgstr "Download selected"
 
@@ -1681,6 +1682,8 @@ msgstr "Linked textures"
 #: src/features/bt/components/AddTorrentDialog.tsx:363
 #: src/features/model-viewer/components/LibraryPanel.tsx:356
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
+#: src/features/poetry/components/CollectionManagement.tsx:268
+#: src/features/poetry/components/CollectionManagement.tsx:269
 #: src/features/ssh-sftp/components/Sidebar.tsx:365
 #: src/features/ssh-sftp/components/Sidebar.tsx:379
 #: src/features/todo/TodoDetailsDialog.tsx:145
@@ -2288,7 +2291,7 @@ msgstr "Break {currentBreak}"
 msgid "单次"
 msgstr "Once"
 
-#: src/features/poetry/LibraryManagePage.tsx:91
+#: src/features/poetry/LibraryManagePage.tsx:92
 msgid "卸载"
 msgstr "Uninstall"
 
@@ -2296,7 +2299,7 @@ msgstr "Uninstall"
 msgid "卸载 {name}"
 msgstr "Uninstall {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:81
+#: src/features/poetry/LibraryManagePage.tsx:82
 msgid "卸载合集"
 msgstr "Uninstall collection"
 
@@ -2486,10 +2489,10 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/logs/LogDialogs.tsx:155
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:310
-#: src/features/poetry/components/PoetryTranslationSection.tsx:326
-#: src/features/poetry/components/PoetryTranslationSection.tsx:354
-#: src/features/poetry/components/PoetryTranslationSection.tsx:374
-#: src/features/poetry/LibraryManagePage.tsx:89
+#: src/features/poetry/components/PoetryTranslationSection.tsx:345
+#: src/features/poetry/components/PoetryTranslationSection.tsx:373
+#: src/features/poetry/components/PoetryTranslationSection.tsx:393
+#: src/features/poetry/LibraryManagePage.tsx:90
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:337
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:88
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:221
@@ -2519,7 +2522,7 @@ msgstr "Cancel transfer"
 msgid "取消传输任务"
 msgstr "Cancel transfer task"
 
-#: src/features/poetry/components/CollectionManagement.tsx:194
+#: src/features/poetry/components/CollectionManagement.tsx:261
 msgid "取消同步"
 msgstr "Cancel sync"
 
@@ -2694,12 +2697,12 @@ msgstr "Concurrent transfer limit must be at least 1"
 msgid "同时传输数必须是整数"
 msgstr "Concurrent transfer limit must be an integer"
 
-#: src/features/poetry/components/CollectionManagement.tsx:185
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:70
+#: src/features/poetry/components/CollectionManagement.tsx:177
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:78
 msgid "同步失败"
 msgstr "Sync failed"
 
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:68
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:73
 msgid "同步完成"
 msgstr "Sync complete"
 
@@ -2707,10 +2710,6 @@ msgstr "Sync complete"
 #: src/features/logs/log-labels.ts:56
 msgid "同步诗词库"
 msgstr "Sync poetry library"
-
-#: src/features/poetry/components/CollectionManagement.tsx:212
-msgid "同步进度"
-msgstr "Sync progress"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:34
 msgid "同网段 MFTP 客户端，点击可直接打开访问地址"
@@ -3463,7 +3462,7 @@ msgstr "Navigation"
 msgid "将军"
 msgstr "Check"
 
-#: src/features/poetry/LibraryManagePage.tsx:84
+#: src/features/poetry/LibraryManagePage.tsx:85
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "This will delete all local data of \"{pendingDeleteName}\" ({toLocaleStringValue4} entries). This action cannot be undone."
 
@@ -3514,7 +3513,7 @@ msgstr "Hour"
 msgid "小游戏"
 msgstr "Games"
 
-#: src/features/poetry/components/CollectionManagement.tsx:145
+#: src/features/poetry/components/CollectionManagement.tsx:144
 msgid "尚未安装合集"
 msgstr "No collections installed"
 
@@ -3678,7 +3677,7 @@ msgstr "Launch at Login disabled"
 msgid "已删除"
 msgstr "Deleted"
 
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:130
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:138
 msgid "已删除 {itemName}"
 msgstr "Deleted {itemName}"
 
@@ -3731,6 +3730,10 @@ msgstr "Task cancelled"
 msgid "已取消压缩"
 msgstr "Compression cancelled"
 
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:76
+msgid "已取消同步"
+msgstr "Sync cancelled"
+
 #: src/features/model-viewer/components/ScreenshotExport.tsx:50
 msgid "已取消截图导出。"
 msgstr "Screenshot export cancelled."
@@ -3762,7 +3765,7 @@ msgstr "Copied to the system Downloads folder"
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "An attachment with this name already exists. Rename the file or remove the old attachment first."
 
-#: src/features/poetry/components/CollectionManagement.tsx:139
+#: src/features/poetry/components/CollectionManagement.tsx:138
 #: src/features/translation/ModelManager.tsx:238
 msgid "已安装"
 msgstr "Installed"
@@ -4792,16 +4795,16 @@ msgstr "Operation information truncated"
 
 #. 执行日志中的失败终态
 #: src/features/connection-diagnostics/ExecutionLogLine.tsx:17
-#: src/features/poetry/components/PoetryTranslationSection.tsx:94
 #: src/features/poetry/components/TranslationPackManager.tsx:63
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:108
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:119
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:133
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:116
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:127
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:141
 #: src/features/poetry/hooks/use-poetry-library.ts:183
 #: src/features/poetry/hooks/use-poetry-local-data.ts:102
 #: src/features/poetry/hooks/use-poetry-local-data.ts:121
 #: src/features/poetry/hooks/use-poetry-local-data.ts:132
 #: src/features/poetry/hooks/use-poetry-local-data.ts:142
+#: src/features/poetry/hooks/use-poetry-translations.ts:59
 msgid "操作失败"
 msgstr "Operation failed"
 
@@ -6135,7 +6138,7 @@ msgstr "Play in landscape"
 msgid "正则"
 msgstr "Regexp"
 
-#: src/features/poetry/components/CollectionManagement.tsx:165
+#: src/features/poetry/components/CollectionManagement.tsx:183
 msgid "正在下载"
 msgstr "Downloading"
 
@@ -6230,11 +6233,11 @@ msgstr "Cancelling"
 msgid "正在取消并释放资源"
 msgstr "Cancelling and releasing resources"
 
-#: src/features/poetry/components/CollectionManagement.tsx:175
+#: src/features/poetry/components/CollectionManagement.tsx:184
 msgid "正在同步"
 msgstr "Syncing"
 
-#: src/features/poetry/components/CollectionManagement.tsx:160
+#: src/features/poetry/components/CollectionManagement.tsx:175
 msgid "正在启动"
 msgstr "Starting"
 
@@ -6263,7 +6266,7 @@ msgstr "Processing attachment…"
 msgid "正在安装并重启…"
 msgstr "Installing and restarting…"
 
-#: src/features/poetry/components/CollectionManagement.tsx:164
+#: src/features/poetry/components/CollectionManagement.tsx:181
 msgid "正在导入"
 msgstr "Importing"
 
@@ -6335,7 +6338,7 @@ msgstr "Preparing files"
 msgid "正在更新"
 msgstr "Updating"
 
-#: src/features/poetry/components/CollectionManagement.tsx:162
+#: src/features/poetry/components/CollectionManagement.tsx:179
 msgid "正在校验"
 msgstr "Verifying"
 
@@ -7544,7 +7547,7 @@ msgid "等待监控数据"
 msgstr "Waiting for monitor data"
 
 #: src/features/about/AboutPage.tsx:167
-#: src/features/poetry/components/CollectionManagement.tsx:158
+#: src/features/poetry/components/CollectionManagement.tsx:173
 msgid "等待确认"
 msgstr "Awaiting confirmation"
 
@@ -8526,7 +8529,7 @@ msgstr "Save an API key first"
 msgid "请先停止{participant}，稍后再清理数据"
 msgstr "Stop {participant} before clearing data"
 
-#: src/features/poetry/hooks/use-poetry-collections-manage.ts:100
+#: src/features/poetry/hooks/use-poetry-collections-manage.ts:108
 #: src/features/poetry/hooks/use-poetry-local-data.ts:91
 msgid "请先选择合集"
 msgstr "Select collections first"
