@@ -67,6 +67,7 @@ pub struct GameRoomManager {
     operations: Arc<Operations>,
     in_flight: Arc<Operations>,
     discovery_stop: Arc<StopSignal>,
+    browser: crate::core::mdns_browser::MdnsBrowser,
 }
 
 impl GameRoomManager {
@@ -78,6 +79,7 @@ impl GameRoomManager {
             operations,
             in_flight: Arc::new(Operations::default()),
             discovery_stop: Arc::new(StopSignal::default()),
+            browser: crate::core::mdns_browser::MdnsBrowser::new(discovery::SERVICE_TYPE),
         }
     }
 
@@ -192,7 +194,12 @@ impl GameRoomManager {
     pub fn discover(&self, game_id: &str) -> AppResult<Vec<GameRoomSummary>> {
         let (_shared, _domain) = self.admission()?;
         let own_room = self.runtime.lock().as_ref().map(|r| r.room_id.clone());
-        discovery::discover_rooms(game_id, own_room.as_deref(), &self.discovery_stop)
+        discovery::discover_rooms(
+            &self.browser,
+            game_id,
+            own_room.as_deref(),
+            &self.discovery_stop,
+        )
     }
 
     pub(crate) fn shutdown(&self) {
@@ -202,6 +209,7 @@ impl GameRoomManager {
         // Discovery and an already-admitted connect/handshake may still be in
         // progress. No callback completion is reported until those callers exit.
         self.in_flight.wait_until_idle();
+        self.browser.shutdown();
     }
 }
 

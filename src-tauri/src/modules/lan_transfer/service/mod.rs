@@ -56,6 +56,7 @@ pub struct LanTransferManager {
     lifecycle: Mutex<()>,
     closed: AtomicBool,
     operations: Arc<Operations>,
+    browser: crate::core::mdns_browser::MdnsBrowser,
 }
 
 impl LanTransferManager {
@@ -65,6 +66,7 @@ impl LanTransferManager {
             lifecycle: Mutex::new(()),
             closed: AtomicBool::new(false),
             operations,
+            browser: crate::core::mdns_browser::MdnsBrowser::new(discovery::SERVICE_TYPE),
         }
     }
 
@@ -178,7 +180,7 @@ impl LanTransferManager {
     ) -> AppResult<Vec<crate::modules::lan_transfer::LanDiscoveredDevice>> {
         // The discovery probe is independent of the advertised HTTP runtime.
         let _lease = self.operations.begin()?;
-        Ok(discovery::discover(self.status()))
+        Ok(discovery::discover(&self.browser, self.status()))
     }
 
     pub fn cancel_task(&self, id: &str) {

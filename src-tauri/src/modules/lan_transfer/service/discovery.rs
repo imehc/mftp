@@ -1,12 +1,13 @@
+use crate::core::mdns_browser::MdnsBrowser;
 use crate::modules::lan_transfer::{LanDiscoveredDevice, LanTransferStatus};
-use mdns_sd::{ResolvedService, ServiceDaemon, ServiceEvent, ServiceInfo};
+use mdns_sd::{ResolvedService, ServiceDaemon, ServiceInfo};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-const SERVICE_TYPE: &str = "_mftp._tcp.local.";
+pub(super) const SERVICE_TYPE: &str = "_mftp._tcp.local.";
 
 pub(super) fn run_responder(
     stop: Arc<AtomicBool>,
@@ -51,26 +52,15 @@ pub(super) fn run_responder(
     stop_daemon(&daemon);
 }
 
-pub fn discover(status: LanTransferStatus) -> Vec<LanDiscoveredDevice> {
+pub fn discover(browser: &MdnsBrowser, status: LanTransferStatus) -> Vec<LanDiscoveredDevice> {
     let mut devices = HashMap::<String, LanDiscoveredDevice>::new();
-    let Ok(daemon) = ServiceDaemon::new() else {
-        return own_device(status).into_iter().collect();
-    };
-    if let Ok(receiver) = daemon.browse(SERVICE_TYPE) {
-        let started = std::time::Instant::now();
-        while started.elapsed() < Duration::from_millis(1200) {
-            match receiver.recv_timeout(Duration::from_millis(180)) {
-                Ok(ServiceEvent::ServiceResolved(info)) => {
-                    if let Some(device) = device_from_service(&info) {
-                        devices.insert(device.id.clone(), device);
-                    }
-                }
-                Ok(_) => {}
-                Err(_) => {}
-            }
+    // The first request after a (re)start waits the old 1.2 s window; later ones
+    // read the cache that the long-lived browse keeps current.
+    for info in browser.snapshot(Duration::from_millis(1200), || false) {
+        if let Some(device) = device_from_service(&info) {
+            devices.insert(device.id.clone(), device);
         }
     }
-    stop_daemon(&daemon);
 
     if let Some(device) = own_device(status) {
         devices.insert(device.id.clone(), device);

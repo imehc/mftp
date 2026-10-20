@@ -179,6 +179,7 @@ impl LanTransferManager {
 
     pub(crate) fn shutdown(&self) {
         self.closed.store(true, Ordering::SeqCst);
+        self.browser.shutdown();
         self.stop();
     }
 }

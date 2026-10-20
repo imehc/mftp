@@ -7,7 +7,7 @@
 //! connect works. `discover_rooms` runs both and merges the results.
 
 use local_ip_address::list_afinet_netifas;
-use mdns_sd::{ServiceDaemon, ServiceEvent, ServiceInfo};
+use mdns_sd::{ServiceDaemon, ServiceInfo};
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::io::BufReader;
@@ -20,9 +20,10 @@ use super::super::GameRoomSummary;
 
 use super::framing::{encode, read_message, write_frame, HANDSHAKE_FRAME_LIMIT};
 use super::{runtime::StopSignal, wire::WireMsg};
+use crate::core::mdns_browser::MdnsBrowser;
 use crate::error::{AppError, AppResult, CustomErrorCode};
 
-const SERVICE_TYPE: &str = "_mftp-room._tcp.local.";
+pub(super) const SERVICE_TYPE: &str = "_mftp-room._tcp.local.";
 /// Rooms bind the first free port in [BASE_PORT, BASE_PORT+PORT_SPAN) so
 /// peers can discover them by TCP probe.
 pub(super) const BASE_PORT: u16 = 27183;
@@ -49,6 +50,7 @@ pub(super) fn bind_room_listener() -> std::io::Result<TcpListener> {
 
 /// Browse mDNS and sweep the LAN concurrently; merge on room id.
 pub(super) fn discover_rooms(
+    browser: &MdnsBrowser,
     game_id: &str,
     exclude_room: Option<&str>,
     stop: &StopSignal,
@@ -58,44 +60,36 @@ pub(super) fn discover_rooms(
             .name("room-sweep".into())
             .spawn_scoped(scope, || sweep_lan(game_id, stop))?;
         let mut rooms = HashMap::<String, GameRoomSummary>::new();
-        if let Ok(daemon) = ServiceDaemon::new() {
-            let _shutdown = MdnsShutdown(&daemon);
-            if let Ok(receiver) = daemon.browse(SERVICE_TYPE) {
-                let started = Instant::now();
-                while started.elapsed() < DISCOVER_WINDOW && !stop.is_stopped() {
-                    if let Ok(ServiceEvent::ServiceResolved(info)) =
-                        receiver.recv_timeout(Duration::from_millis(180))
-                    {
-                        let prop = |key: &str| info.get_property_val_str(key).map(str::to_string);
-                        let (Some(room_id), Some(room_game)) = (prop("id"), prop("game")) else {
-                            continue;
-                        };
-                        if room_game != game_id {
-                            continue;
-                        }
-                        let Some(ip) = prop("ip").or_else(|| {
-                            info.get_addresses_v4()
-                                .into_iter()
-                                .next()
-                                .map(|ip| ip.to_string())
-                        }) else {
-                            continue;
-                        };
-                        rooms.insert(
-                            room_id.clone(),
-                            GameRoomSummary {
-                                room_id,
-                                game_id: room_game,
-                                room_name: present(prop("name")),
-                                host_name: present(prop("host")),
-                                ip,
-                                port: info.get_port(),
-                                has_code: prop("code").as_deref() == Some("1"),
-                            },
-                        );
-                    }
-                }
+        // The long-lived browse waits the old window only after a (re)start;
+        // later lobby polls read its cache while the sweep runs.
+        for info in browser.snapshot(DISCOVER_WINDOW, || stop.is_stopped()) {
+            let prop = |key: &str| info.get_property_val_str(key).map(str::to_string);
+            let (Some(room_id), Some(room_game)) = (prop("id"), prop("game")) else {
+                continue;
+            };
+            if room_game != game_id {
+                continue;
             }
+            let Some(ip) = prop("ip").or_else(|| {
+                info.get_addresses_v4()
+                    .into_iter()
+                    .next()
+                    .map(|ip| ip.to_string())
+            }) else {
+                continue;
+            };
+            rooms.insert(
+                room_id.clone(),
+                GameRoomSummary {
+                    room_id,
+                    game_id: room_game,
+                    room_name: present(prop("name")),
+                    host_name: present(prop("host")),
+                    ip,
+                    port: info.get_port(),
+                    has_code: prop("code").as_deref() == Some("1"),
+                },
+            );
         }
         let swept = sweep
             .join()
