@@ -64,6 +64,7 @@ futures-util = "0.3"
 tokio = { version = "1", features = ["macros", "sync", "time"] }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
 tauri-plugin-clipboard-manager = "2.2.2"
+zeroize = "1.9"
 
 # Desktop-only plugins: updater, autostart and window-state have no mobile support.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
@@ -93,7 +94,6 @@ objc2-ui-kit = { version = "0.3", default-features = false, features = ["std", "
 [target.'cfg(target_os = "android")'.dependencies]
 tauri-plugin-native-speech = { path = "plugins/native-speech" }
 tauri-plugin-keystore = "=2.1.0-alpha.2"
-zeroize = "1.9"
 jni = "0.22"
 rustls-platform-verifier = "0.7"
 

@@ -2,6 +2,7 @@
 //! `AiCredentials` port. This is the only place the keychain backend (macOS /
 //! Windows keyring, Android keystore plugin) meets the AppHandle.
 
+#[cfg(target_os = "android")]
 use std::future::Future;
 #[cfg(not(target_os = "android"))]
 use std::sync::Arc;
@@ -14,7 +15,6 @@ use crate::modules::ai::AiCredentials;
 #[cfg(target_os = "android")]
 #[path = "ai_android.rs"]
 mod android;
-#[cfg(any(target_os = "android", test))]
 #[path = "ai_cache.rs"]
 mod cache;
 #[cfg(target_os = "android")]
@@ -26,20 +26,46 @@ const API_KEY_LIMIT: usize = 16_384;
 #[derive(Clone)]
 pub(crate) struct AiKeychain {
     #[cfg(not(target_os = "android"))]
-    service: String,
+    native: NativeKeychain,
+    /// Installed apps reuse a read key briefly instead of hitting the keychain
+    /// per request. Tests that share one store across instances bypass it.
     #[cfg(not(target_os = "android"))]
-    builder: Arc<keyring::CredentialBuilder>,
+    cache: Option<Arc<cache::CachedCredentials<NativeKeychain>>>,
     #[cfg(target_os = "android")]
     credentials: std::sync::Arc<cache::CachedCredentials<android::AndroidKeychain>>,
+}
+
+/// Direct OS keychain access (macOS / Windows / Linux secret service / iOS).
+#[cfg(not(target_os = "android"))]
+#[derive(Clone)]
+struct NativeKeychain {
+    service: String,
+    builder: Arc<keyring::CredentialBuilder>,
+}
+
+#[cfg(not(target_os = "android"))]
+impl NativeKeychain {
+    fn entry(&self, reference: &str) -> AppResult<keyring::Entry> {
+        // Instance-local builders let tests use memory without changing the
+        // process-global keyring backend or touching the OS credential store.
+        self.builder
+            .build(None, &self.service, reference)
+            .map(keyring::Entry::new_with_credential)
+            .map_err(|error| credential_error("open", error))
+    }
 }
 
 impl AiKeychain {
     #[cfg(not(target_os = "android"))]
     pub(crate) fn install<R: tauri::Runtime>(app: &AppHandle<R>) -> Self {
-        Self::with_builder(
+        let mut keychain = Self::with_builder(
             &app.config().identifier,
             Arc::from(keyring::default::default_credential_builder()),
-        )
+        );
+        keychain.cache = Some(Arc::new(cache::CachedCredentials::new(
+            keychain.native.clone(),
+        )));
+        keychain
     }
 
     #[cfg(target_os = "android")]
@@ -57,19 +83,12 @@ impl AiKeychain {
         // Production retains com.imehc.mftp.ai, including the legacy default
         // account. Alternate builds never probe or fall back to that service.
         Self {
-            service: format!("{identifier}.ai"),
-            builder,
+            native: NativeKeychain {
+                service: format!("{identifier}.ai"),
+                builder,
+            },
+            cache: None,
         }
-    }
-
-    #[cfg(not(target_os = "android"))]
-    fn entry(&self, reference: &str) -> AppResult<keyring::Entry> {
-        // Instance-local builders let tests use memory without changing the
-        // process-global keyring backend or touching the OS credential store.
-        self.builder
-            .build(None, &self.service, reference)
-            .map(keyring::Entry::new_with_credential)
-            .map_err(|error| credential_error("open", error))
     }
 
     #[cfg(all(test, desktop))]
@@ -136,27 +155,57 @@ fn join_blocking<T: Send + 'static>(
     }
 }
 
+#[cfg(not(target_os = "android"))]
+impl AiCredentials for NativeKeychain {
+    async fn save(&self, reference: String, api_key: String) -> AppResult<()> {
+        let native = self.clone();
+        join_blocking(
+            tauri::async_runtime::spawn_blocking(move || {
+                native
+                    .entry(&reference)?
+                    .set_password(&api_key)
+                    .map_err(|error| credential_error("write", error))
+            })
+            .await,
+        )
+    }
+
+    async fn read(&self, reference: String) -> AppResult<Option<String>> {
+        let native = self.clone();
+        join_blocking(
+            tauri::async_runtime::spawn_blocking(move || {
+                match native.entry(&reference)?.get_password() {
+                    Ok(value) => Ok(Some(value)),
+                    Err(keyring::Error::NoEntry) => Ok(None),
+                    Err(error) => Err(credential_error("read", error)),
+                }
+            })
+            .await,
+        )
+    }
+
+    async fn clear(&self, reference: String) -> AppResult<()> {
+        let native = self.clone();
+        join_blocking(
+            tauri::async_runtime::spawn_blocking(move || {
+                match native.entry(&reference)?.delete_credential() {
+                    Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
+                    Err(error) => Err(credential_error("delete from", error)),
+                }
+            })
+            .await,
+        )
+    }
+}
+
 impl AiCredentials for AiKeychain {
     #[cfg(not(target_os = "android"))]
-    fn save(
-        &self,
-        reference: String,
-        api_key: String,
-    ) -> impl Future<Output = AppResult<()>> + Send {
-        let prepared = validate_api_key(api_key);
-        let credentials = self.clone();
-        async move {
-            let api_key = prepared?;
-            let reference = validate_reference(reference)?;
-            join_blocking(
-                tauri::async_runtime::spawn_blocking(move || {
-                    credentials
-                        .entry(&reference)?
-                        .set_password(&api_key)
-                        .map_err(|error| credential_error("write", error))
-                })
-                .await,
-            )
+    async fn save(&self, reference: String, api_key: String) -> AppResult<()> {
+        let api_key = validate_api_key(api_key)?;
+        let reference = validate_reference(reference)?;
+        match &self.cache {
+            Some(cache) => cache.save(reference, api_key).await,
+            None => self.native.save(reference, api_key).await,
         }
     }
 
@@ -176,17 +225,10 @@ impl AiCredentials for AiKeychain {
     #[cfg(not(target_os = "android"))]
     async fn read(&self, reference: String) -> AppResult<Option<String>> {
         let reference = validate_reference(reference)?;
-        let credentials = self.clone();
-        join_blocking(
-            tauri::async_runtime::spawn_blocking(move || {
-                match credentials.entry(&reference)?.get_password() {
-                    Ok(value) => Ok(Some(value)),
-                    Err(keyring::Error::NoEntry) => Ok(None),
-                    Err(error) => Err(credential_error("read", error)),
-                }
-            })
-            .await,
-        )
+        match &self.cache {
+            Some(cache) => cache.read(reference).await,
+            None => self.native.read(reference).await,
+        }
     }
 
     #[cfg(target_os = "android")]
@@ -197,16 +239,10 @@ impl AiCredentials for AiKeychain {
     #[cfg(not(target_os = "android"))]
     async fn clear(&self, reference: String) -> AppResult<()> {
         let reference = validate_reference(reference)?;
-        let credentials = self.clone();
-        join_blocking(
-            tauri::async_runtime::spawn_blocking(move || {
-                match credentials.entry(&reference)?.delete_credential() {
-                    Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
-                    Err(error) => Err(credential_error("delete from", error)),
-                }
-            })
-            .await,
-        )
+        match &self.cache {
+            Some(cache) => cache.clear(reference).await,
+            None => self.native.clear(reference).await,
+        }
     }
 
     #[cfg(target_os = "android")]

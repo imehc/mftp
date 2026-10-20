@@ -33,7 +33,7 @@ fn installation_uses_final_tauri_identifier_and_preserves_production_service() {
         let app = tauri::test::mock_builder().build(context).unwrap();
         // Constructing the builder performs no native read, write or authentication.
         let credentials = AiKeychain::install(app.handle());
-        assert_eq!(credentials.service, format!("{identifier}.ai"));
+        assert_eq!(credentials.native.service, format!("{identifier}.ai"));
     }
 }
 
@@ -248,7 +248,7 @@ async fn native_migration_scenario_also_runs_with_memory_backend() {
 async fn ordinary_fixtures_keep_private_memory_stores() {
     let first = AiKeychain::in_memory();
     let second = AiKeychain::in_memory();
-    assert_ne!(first.service, second.service);
+    assert_ne!(first.native.service, second.native.service);
     first.save("default".into(), "first".into()).await.unwrap();
     assert!(second.read("default".into()).await.unwrap().is_none());
     super::tests::native::verify_roundtrip(&first, |_| {})

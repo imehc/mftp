@@ -1,4 +1,4 @@
-//! Android-only short-lived plaintext reuse. No serialization or debug output.
+//! Short-lived plaintext reuse of keychain reads. No serialization or debug output.
 
 use std::{sync::Arc, time::Duration};
 
@@ -79,6 +79,8 @@ impl<C: AiCredentials> CachedCredentials<C> {
         }
     }
 
+    // Only Android has a background state that must drop reused plaintext.
+    #[cfg(any(target_os = "android", test))]
     pub(super) fn set_foreground(&self, foreground: bool) {
         let mut state = self.state.lock();
         state.foreground = foreground;
