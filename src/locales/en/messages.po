@@ -38,7 +38,7 @@ msgstr "{characterCount, plural, one {# character} other {# characters}}"
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
 
-#: src/features/poetry/components/CollectionManagement.tsx:52
+#: src/features/poetry/components/CollectionManagement.tsx:54
 msgid "{count, plural, one {# 篇} other {# 篇}}"
 msgstr "{count, plural, one {# poem} other {# poems}}"
 
@@ -59,7 +59,7 @@ msgstr "{days, plural, one {# day {hours} hr} other {# days {hours} hr}}"
 msgid "{decisionSeat} 已连续两次犯规，再次连续犯规将判负。"
 msgstr "Consecutive fouls by {decisionSeat}: two. Another consecutive foul will lose the rack."
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:25
+#: src/features/lan-transfer/LanConnectedDevices.tsx:31
 msgid "{deviceCount, plural, one {# 设备} other {# 设备}}"
 msgstr "{deviceCount, plural, one {# device} other {# devices}}"
 
@@ -92,11 +92,11 @@ msgstr "Ball {id}, potted"
 msgid "{id} 号球，未进球"
 msgstr "Ball {id}, remaining"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:196
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:129
 msgid "{importedKeyCount, plural, one {已导入 # 个密钥} other {已导入 # 个密钥}}"
 msgstr "{importedKeyCount, plural, one {# key imported} other {# keys imported}}"
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:148
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:146
 msgid "{incomingLabel}名称"
 msgstr "{incomingLabel} Name"
 
@@ -176,7 +176,7 @@ msgstr "{penalty, plural, one {Foul penalty for this shot: # point} other {Foul 
 
 #. 斯诺克瞄准时首个将碰到的目标球的实际分值
 #. 球桌中央选球区域，球体下方仅显示实际分值
-#: src/features/games/billiards/BilliardsMatchView.tsx:384
+#: src/features/games/billiards/BilliardsMatchView.tsx:399
 #: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
 msgid "{points} 分"
 msgstr "{points} pts"
@@ -191,7 +191,7 @@ msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgstr "{redCount, plural, one {# red left} other {# reds left}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:80
-#: src/features/games/billiards/BilliardsMatchView.tsx:274
+#: src/features/games/billiards/BilliardsMatchView.tsx:289
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {# ball remaining} other {# balls remaining}}"
 
@@ -214,11 +214,11 @@ msgstr "{seconds, plural, one {# second} other {# seconds}}"
 msgid "{seconds, plural, one {# 秒前} other {# 秒前}}"
 msgstr "{seconds, plural, one {# second ago} other {# seconds ago}}"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:31
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:39
 msgid "{sharesCount, plural, one {# 个目录，目录变更需重启服务后完整生效} other {# 个目录，目录变更需重启服务后完整生效}}"
 msgstr "{sharesCount, plural, one {# directory; restart the service to fully apply directory changes} other {# directories; restart the service to fully apply directory changes}}"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:39
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:47
 msgid "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 msgstr "{sharesCount, plural, one {# directory} other {# directories}}"
 
@@ -236,7 +236,7 @@ msgstr "The break by {shooter} did not meet the three-ball requirement. Decision
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# shot} other {# shots}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:253
+#: src/features/games/billiards/BilliardsMatchView.tsx:268
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {# shot total} other {# shots total}}"
 
@@ -244,8 +244,8 @@ msgstr "{shotCount, plural, one {# shot total} other {# shots total}}"
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:265
-#: src/features/games/billiards/BilliardsMatchView.tsx:332
+#: src/features/games/billiards/BilliardsMatchView.tsx:280
+#: src/features/games/billiards/BilliardsMatchView.tsx:347
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "Shot #"
 
@@ -262,7 +262,7 @@ msgstr "{spaces, plural, one {# space} other {# spaces}}"
 msgid "{statusLanguage} 格式有效"
 msgstr "Valid {statusLanguage}"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:80
+#: src/features/lan-transfer/LanTransferActivity.tsx:86
 msgid "{taskCount, plural, one {# 任务} other {# 任务}}"
 msgstr "{taskCount, plural, one {# task} other {# tasks}}"
 
@@ -284,11 +284,11 @@ msgstr "{undoPlies, plural, one {Undo # move. Accept?} other {Undo # moves. Acce
 msgid "{value} 的私钥口令"
 msgstr "Private key passphrase for {value}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:247
+#: src/features/games/billiards/BilliardsMatchView.tsx:262
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} wins"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:315
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:323
 msgid "/var/www（留空则用主目录）"
 msgstr "/var/www (leave empty to use home directory)"
 
@@ -398,7 +398,7 @@ msgstr "Invalid AI streaming request ID"
 msgid "AI 生成"
 msgstr "AI generated"
 
-#: src/features/export/sections.tsx:39
+#: src/features/export/sections.tsx:53
 msgid "AI 生成及人工修订的诗词译文，不包含 API Key"
 msgstr "AI-generated and manually revised poetry translations, excluding API Keys"
 
@@ -410,7 +410,7 @@ msgstr "Failed to save the AI translation"
 msgid "AI 设置未保存，且密钥回滚失败"
 msgstr "AI settings were not saved, and restoring the previous key failed"
 
-#: src/features/export/sections.tsx:38
+#: src/features/export/sections.tsx:52
 #: src/lib/errors/messages.ts:293
 msgid "AI 译文"
 msgstr "AI Translation"
@@ -464,7 +464,7 @@ msgstr "The API key is empty or too long"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:218
+#: src/features/bt/BtTool.tsx:220
 #: src/features/home/entries.tsx:160
 #: src/lib/errors/messages.ts:283
 msgid "BT 下载"
@@ -547,7 +547,7 @@ msgstr "HDR · Up to 2048 × 1024 / 32 MiB"
 msgid "IP"
 msgstr "IP"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:327
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:333
 msgid "IP 地址"
 msgstr "IP address"
 
@@ -605,7 +605,7 @@ msgstr "The SFTP write stalled. Please try again."
 msgid "SSH / SFTP"
 msgstr "SSH / SFTP"
 
-#: src/features/export/sections.tsx:22
+#: src/features/export/sections.tsx:33
 msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP host connection profiles"
 
@@ -674,9 +674,9 @@ msgstr "Use Up/Down to navigate and Left/Right to expand or collapse. Select a n
 msgid "上个月"
 msgstr "Previous month"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:36
+#: src/features/lan-transfer/LanTransferActivity.tsx:39
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:291
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:61
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:97
 msgid "上传"
 msgstr "Upload"
 
@@ -699,14 +699,14 @@ msgstr "Uploading archive"
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:39
 #: src/features/logs/log-labels.ts:77
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:71
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:107
 msgid "上传文件"
 msgstr "Upload File"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:40
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:393
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:75
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:401
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:111
 msgid "上传文件夹"
 msgstr "Upload Folder"
 
@@ -758,7 +758,7 @@ msgid "上游文件清单过大被截断，无法安全同步"
 msgstr "The upstream file list was truncated because it is too large. It cannot be synced safely."
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:148
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:89
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:125
 msgid "上级目录"
 msgstr "Parent Directory"
 
@@ -770,10 +770,10 @@ msgstr "Next"
 msgid "下个月"
 msgstr "Next month"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:37
+#: src/features/lan-transfer/LanTransferActivity.tsx:40
 #: src/features/media-compress/components/CompressResultCard.tsx:81
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:285
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:69
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:73
 #: src/features/translation/ModelManager.tsx:135
 msgid "下载"
 msgstr "Download"
@@ -787,7 +787,7 @@ msgid "下载 {entryName2}"
 msgstr "Download {entryName2}"
 
 #. SSH/SFTP 传输操作当前阶段
-#: src/features/bt/components/TaskRow.tsx:98
+#: src/features/bt/components/TaskRow.tsx:99
 #: src/features/transfers/phase-label.ts:21
 #: src/features/updater/integration.tsx:48
 #: src/store/transfers.ts:12
@@ -815,8 +815,8 @@ msgstr "Download collections to search and read offline."
 msgid "下载响应的范围、长度或版本不匹配，请重新下载"
 msgstr "The download range, size, or version did not match. Download the model again."
 
-#: src/features/bt/components/AddTorrentDialog.tsx:352
-#: src/features/bt/components/TaskFilesPage.tsx:76
+#: src/features/bt/components/AddTorrentDialog.tsx:371
+#: src/features/bt/components/TaskFilesPage.tsx:81
 msgid "下载完成后可复制到系统下载目录或其他位置"
 msgstr "After downloading, copy files to the system Downloads folder or another location."
 
@@ -830,9 +830,9 @@ msgstr "Download recording"
 msgid "下载截图"
 msgstr "Download screenshot"
 
-#: src/features/poetry/components/CollectionManagement.tsx:168
-#: src/features/poetry/components/CollectionManagement.tsx:169
+#: src/features/poetry/components/CollectionManagement.tsx:173
 #: src/features/poetry/components/CollectionManagement.tsx:174
+#: src/features/poetry/components/CollectionManagement.tsx:179
 msgid "下载所选"
 msgstr "Download selected"
 
@@ -850,7 +850,7 @@ msgstr "The downloaded file does not exist"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:41
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:405
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:414
 msgid "下载文件夹"
 msgstr "Download Folder"
 
@@ -873,7 +873,7 @@ msgstr "Download root"
 msgid "下载翻译模型"
 msgstr "Download translation model"
 
-#: src/features/bt/components/TaskRow.tsx:128
+#: src/features/bt/components/TaskRow.tsx:129
 #: src/features/updater/UpdaterActivity.tsx:93
 #: src/features/updater/UpdaterProgress.tsx:46
 msgid "下载进度"
@@ -959,12 +959,12 @@ msgstr "Discard save"
 msgid "丢弃对局存档？"
 msgstr "Discard this saved game?"
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:82
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:202
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:83
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:193
 msgid "两个名称不能相同。"
 msgstr "The two names cannot be the same."
 
-#: src/features/export/ExportPanel.tsx:108
+#: src/features/export/ExportPanel.tsx:101
 msgid "两次输入的密码不一致"
 msgstr "Passwords do not match"
 
@@ -989,7 +989,7 @@ msgstr "Chinese Chess"
 msgid "中国象棋房间"
 msgstr "Chinese chess room"
 
-#: src/features/games/xiangqi/XiangqiStage.tsx:543
+#: src/features/games/xiangqi/XiangqiStage.tsx:549
 msgid "中国象棋棋盘"
 msgstr "Chinese chess board"
 
@@ -1027,11 +1027,11 @@ msgstr "Preview material"
 msgid "为每个地址保存密钥和模型，切换时恢复各自的选择。"
 msgstr "Save keys and models for each address. Switching restores its selections."
 
-#: src/features/about/AboutPage.tsx:115
+#: src/features/about/AboutPage.tsx:113
 msgid "主数据库"
 msgstr "Main database"
 
-#: src/features/export/sections.tsx:21
+#: src/features/export/sections.tsx:32
 #: src/features/logs/use-activity-logs.ts:33
 #: src/features/ssh-sftp/components/Sidebar.tsx:356
 #: src/lib/errors/messages.ts:290
@@ -1059,7 +1059,7 @@ msgid "主机操作"
 msgstr "Host actions"
 
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:139
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:98
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:134
 msgid "主目录"
 msgstr "Home Directory"
 
@@ -1110,8 +1110,8 @@ msgid "人工修订"
 msgstr "Manually revised"
 
 #: src/features/lan-transfer/labels.ts:7
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:83
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:445
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:84
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
 msgid "仅上传"
 msgstr "Upload Only"
 
@@ -1218,7 +1218,15 @@ msgstr "The task does not exist or has not been initialized. Please try again la
 msgid "任务中没有可导出的文件"
 msgstr "The task contains no files to export"
 
-#: src/features/bt/components/TaskDialogs.tsx:79
+#: src/features/bt/components/TaskDialogs.tsx:108
+msgid "任务会停止，已下载的临时文件将被删除，任务记录仍会保留。"
+msgstr "The task will stop, downloaded temporary files will be deleted, and the task record will remain."
+
+#: src/features/lan-transfer/LanTransferActivity.tsx:192
+msgid "任务会立即停止，之后需要重新发起。"
+msgstr "The task stops immediately and must be restarted afterward."
+
+#: src/features/bt/components/TaskDialogs.tsx:86
 msgid "任务及应用内下载文件将被删除，操作无法恢复。"
 msgstr "The task and its downloaded files in the app will be permanently deleted."
 
@@ -1230,7 +1238,7 @@ msgstr "The task is not finished and cannot be saved yet"
 msgid "任务已完成，无法取消"
 msgstr "The task is complete and cannot be canceled"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:232
+#: src/features/bt/components/AddTorrentDialog.tsx:236
 msgid "任务已添加，可在传输面板查看进度"
 msgstr "Task added. Check progress in the transfer panel"
 
@@ -1242,7 +1250,7 @@ msgstr "The task has already been saved"
 msgid "任务未运行"
 msgstr "The task is not running"
 
-#: src/features/bt/BtTool.tsx:238
+#: src/features/bt/BtTool.tsx:245
 msgid "任务状态通知暂不可用"
 msgstr "Task status notifications are unavailable"
 
@@ -1279,11 +1287,11 @@ msgstr "Failed transfers stay here so you can retry or check the cause."
 msgid "传输已取消"
 msgstr "Transfer canceled"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:77
+#: src/features/lan-transfer/LanTransferActivity.tsx:83
 msgid "传输活动"
 msgstr "Transfer activity"
 
-#: src/features/export/sections.tsx:34
+#: src/features/export/sections.tsx:47
 msgid "传输设置、共享目录和信任设备"
 msgstr "Transfer settings, shared folders, and trusted devices"
 
@@ -1291,7 +1299,7 @@ msgstr "Transfer settings, shared folders, and trusted devices"
 msgid "传输进行中，暂不可修改。"
 msgstr "A transfer is in progress and cannot be changed right now."
 
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:117
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:123
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:75
 msgid "位置"
 msgstr "Location"
@@ -1372,16 +1380,16 @@ msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、�
 msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win. Includes the three-ball break requirement, push-out decisions and three consecutive fouls."
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:519
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:531
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
 #: src/features/poetry/components/PoetryTranslationSection.tsx:358
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:345
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:349
 #: src/features/todo/TodoItemDialog.tsx:338
 #: src/features/vault/VaultEntryDialog.tsx:251
 msgid "保存"
 msgstr "Save"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:345
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:349
 msgid "保存中…"
 msgstr "Saving..."
 
@@ -1417,7 +1425,7 @@ msgstr "Failed to save todo"
 msgid "保存截图"
 msgstr "Save screenshot"
 
-#: src/features/export/ExportPanel.tsx:48
+#: src/features/export/ExportPanel.tsx:43
 msgid "保护备份"
 msgstr "Protect backup"
 
@@ -1462,7 +1470,7 @@ msgstr "Modified Time"
 msgid "修改模型库条目信息"
 msgstr "Edit model library details"
 
-#: src/features/bt/components/TaskRow.tsx:96
+#: src/features/bt/components/TaskRow.tsx:97
 #: src/store/transfers.ts:13
 msgid "做种中"
 msgstr "Seeding"
@@ -1477,6 +1485,10 @@ msgstr "Pass"
 #: src/features/translation/TranslationTool.tsx:249
 msgid "停止"
 msgstr "Stop"
+
+#: src/features/lan-transfer/LanTransferTool.tsx:193
+msgid "停止后，进行中的传输会被中断，已连接设备会断开。"
+msgstr "Stopping the service interrupts transfers in progress and disconnects connected devices."
 
 #: src/features/media-compress/MediaProcessingGuard.tsx:107
 msgid "停止处理"
@@ -1504,7 +1516,9 @@ msgstr "Stop the current process?"
 msgid "停止录屏"
 msgstr "Stop recording"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:54
+#: src/features/lan-transfer/LanTransferTool.tsx:57
+#: src/features/lan-transfer/LanTransferTool.tsx:191
+#: src/features/lan-transfer/LanTransferTool.tsx:195
 msgid "停止服务"
 msgstr "Stop service"
 
@@ -1527,7 +1541,7 @@ msgstr "Stop motion control"
 msgid "像素格式"
 msgstr "Pixel format"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:92
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:93
 msgid "允许"
 msgstr "Allow"
 
@@ -1577,7 +1591,7 @@ msgstr "Solids"
 msgid "全部"
 msgstr "All"
 
-#: src/features/bt/BtTool.tsx:285
+#: src/features/bt/BtTool.tsx:292
 msgid "全部任务"
 msgstr "All tasks"
 
@@ -1590,7 +1604,7 @@ msgstr "All priorities"
 msgid "全部分类"
 msgstr "All categories"
 
-#: src/features/poetry/components/CollectionManagement.tsx:134
+#: src/features/poetry/components/CollectionManagement.tsx:139
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
 
@@ -1620,7 +1634,7 @@ msgid "共 {count} 条译文"
 msgstr "{count} translations"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:27
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:35
 #: src/features/lan-transfer/LanShareDialog.tsx:101
 #: src/features/logs/log-labels.ts:143
 msgid "共享目录"
@@ -1640,7 +1654,7 @@ msgstr "The shared folder does not exist or cannot be accessed. Check the sharin
 msgid "共用数据缓冲"
 msgstr "Shared data buffers"
 
-#: src/features/about/AboutPage.tsx:59
+#: src/features/about/AboutPage.tsx:56
 #: src/features/settings/AppSettingsMenu.tsx:88
 msgid "关于"
 msgstr "About"
@@ -1660,11 +1674,11 @@ msgid "关联纹理"
 msgstr "Linked textures"
 
 #: src/components/ui/dialog-layout.tsx:62
-#: src/components/ui/dialog.tsx:112
-#: src/components/ui/dialog.tsx:154
+#: src/components/ui/dialog.tsx:115
+#: src/components/ui/dialog.tsx:157
 #: src/components/ui/sheet.tsx:88
 #: src/features/activity/ActivityCenter.tsx:75
-#: src/features/bt/components/AddTorrentDialog.tsx:363
+#: src/features/bt/components/AddTorrentDialog.tsx:382
 #: src/features/model-viewer/components/LibraryPanel.tsx:356
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
 #: src/features/ssh-sftp/components/Sidebar.tsx:365
@@ -1757,8 +1771,8 @@ msgstr "Content truncated"
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:480
-#: src/features/games/engine/GameResultBar.tsx:83
+#: src/features/games/billiards/BilliardsMatchView.tsx:495
+#: src/features/games/engine/GameResultBar.tsx:84
 msgid "再来一局"
 msgstr "One more game"
 
@@ -1896,7 +1910,7 @@ msgstr "List directory"
 msgid "刚刚"
 msgstr "Just now"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:377
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:383
 msgid "创建"
 msgstr "Create"
 
@@ -1933,15 +1947,18 @@ msgstr "Creating directory"
 #: src/features/ai-configuration/RowActions.desktop.tsx:39
 #: src/features/ai-configuration/RowActions.desktop.tsx:40
 #: src/features/ai-configuration/RowActions.mobile.tsx:57
-#: src/features/bt/components/TaskDialogs.tsx:85
-#: src/features/bt/components/TaskRow.tsx:235
+#: src/features/bt/components/TaskDialogs.tsx:92
+#: src/features/bt/components/TaskRow.tsx:240
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:115
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:549
 #: src/features/model-viewer/components/LibraryPanel.tsx:320
 #: src/features/poetry/components/PoetryLocalManagement.tsx:130
 #: src/features/poetry/components/PoetryTranslationSection.tsx:378
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:91
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:235
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:168
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:291
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:48
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:77
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:81
 #: src/features/ssh-sftp/components/Sidebar.tsx:536
 #: src/features/todo/TodoTool.tsx:334
 #: src/features/vault/VaultEntryCard.tsx:101
@@ -1950,7 +1967,7 @@ msgid "删除"
 msgstr "Delete"
 
 #: src/features/poetry/components/SearchBar.tsx:176
-#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:334
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:345
 msgid "删除 {name}"
 msgstr "Delete {name}"
 
@@ -1958,7 +1975,7 @@ msgstr "Delete {name}"
 msgid "删除 {packName}"
 msgstr "Delete {packName}"
 
-#: src/features/bt/components/TaskDialogs.tsx:76
+#: src/features/bt/components/TaskDialogs.tsx:83
 msgid "删除 {pendingDeleteLabel}"
 msgstr "Delete {pendingDeleteLabel}"
 
@@ -1979,8 +1996,9 @@ msgid "删除信任设备"
 msgstr "Remove trusted device"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:77
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:78
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:85
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:86
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:101
 #: src/features/logs/log-labels.ts:73
 msgid "删除共享目录"
 msgstr "Remove shared folder"
@@ -2003,9 +2021,17 @@ msgstr "Deletion cannot be undone. Choose a replacement from the same address wh
 msgid "删除密码条目"
 msgstr "Delete password entry"
 
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:273
+msgid "删除密钥"
+msgstr "Delete Key"
+
 #: src/features/ai-configuration/AiDeleteDialog.tsx:54
 msgid "删除密钥？"
 msgstr "Delete key?"
+
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:276
+msgid "删除密钥“{pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。"
+msgstr "Delete key “{pendingLabel}”? Hosts using this key will no longer connect and the key must be imported again."
 
 #: src/lib/errors/messages.ts:206
 msgid "删除当前密钥或模型前，请选择此地址下的其他项作为替代"
@@ -2015,7 +2041,7 @@ msgstr "Before deleting the current key or model, select another one under this 
 #: src/features/logs/log-labels.ts:14
 #: src/features/todo/TodoRowActions.desktop.tsx:45
 #: src/features/todo/TodoRowActions.desktop.tsx:46
-#: src/features/todo/TodoRowActions.mobile.tsx:60
+#: src/features/todo/TodoRowActions.mobile.tsx:59
 msgid "删除待办"
 msgstr "Delete todo"
 
@@ -2063,8 +2089,9 @@ msgstr "Delete model?"
 msgid "删除注释库"
 msgstr "Delete annotation library"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:377
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:378
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:386
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:387
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:540
 msgid "删除白名单"
 msgstr "Remove from allowlist"
 
@@ -2094,12 +2121,12 @@ msgstr "Delete this log?"
 #: src/features/bt/components/FileBrowserPanel.tsx:159
 #: src/features/bt/components/FileBrowserPanel.tsx:160
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:47
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:128
-#: src/features/lan-transfer/LanTransferTool.tsx:62
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:129
+#: src/features/lan-transfer/LanTransferTool.tsx:65
 #: src/features/logs/ActivityLogsPage.tsx:52
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:122
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:157
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:113
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:146
 msgid "刷新"
 msgstr "Refresh"
 
@@ -2111,7 +2138,7 @@ msgstr "Refresh AI configuration"
 msgid "刷新房间"
 msgstr "Refresh rooms"
 
-#: src/features/about/AboutPage.tsx:72
+#: src/features/about/AboutPage.tsx:69
 msgid "刷新状态"
 msgstr "Refresh status"
 
@@ -2129,7 +2156,7 @@ msgstr "Refresh voices"
 msgid "剩余 {metricsEta}"
 msgstr "Remaining {metricsEta}"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:162
+#: src/features/lan-transfer/LanTransferActivity.tsx:168
 msgid "剩余 {taskEtaValue}"
 msgstr "Remaining {taskEtaValue}"
 
@@ -2170,7 +2197,7 @@ msgstr "Joining the game room was rejected"
 msgid "加密备份将在导入时解密，当前无法预览数据范围。"
 msgstr "Encrypted backups are decrypted during import. Their contents cannot be previewed yet."
 
-#: src/features/export/ExportPanel.tsx:67
+#: src/features/export/ExportPanel.tsx:47
 msgid "加密导出"
 msgstr "Encrypt export"
 
@@ -2184,21 +2211,21 @@ msgstr "Encode / Decode"
 msgid "加载 HDR 环境"
 msgstr "Load HDR environment"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:39
-#: src/features/lan-transfer/LanTransferTool.tsx:163
+#: src/features/lan-transfer/LanTransferTool.tsx:42
+#: src/features/lan-transfer/LanTransferTool.tsx:166
 msgid "加载中"
 msgstr "Loading"
 
-#: src/features/bt/BtTool.tsx:263
+#: src/features/bt/BtTool.tsx:270
 #: src/features/bt/components/FileBrowserPanel.tsx:190
 #: src/features/bt/components/PeersPanel.tsx:62
-#: src/features/poetry/components/CollectionManagement.tsx:125
+#: src/features/poetry/components/CollectionManagement.tsx:130
 #: src/features/poetry/components/PoemList.tsx:192
 #: src/features/poetry/components/PoetryLocalManagement.tsx:79
 #: src/features/preview/PreviewScreen.tsx:81
 #: src/features/preview/PreviewSurface.tsx:139
-#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:203
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:274
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:207
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:280
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:318
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:323
 msgid "加载中…"
@@ -2230,7 +2257,7 @@ msgid "动画数据"
 msgstr "Animation data"
 
 #. 拖动或用方向键、Home、End 定位动画。
-#: src/features/model-viewer/components/AnimationBar.tsx:278
+#: src/features/model-viewer/components/AnimationBar.tsx:277
 msgid "动画时间轴（秒）"
 msgstr "Animation timeline (seconds)"
 
@@ -2264,6 +2291,10 @@ msgstr "hex"
 msgid "十红球变体"
 msgstr "Ten-red variant"
 
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:76
+msgid "升序"
+msgstr "Ascending"
+
 #. SSH/SFTP 实际 SDK 调用记录，不是网络抓包
 #: src/features/connection-diagnostics/ExecutionLogDetails.tsx:21
 msgid "协议调用（库边界）"
@@ -2283,7 +2314,7 @@ msgstr "Once"
 msgid "卸载"
 msgstr "Uninstall"
 
-#: src/features/poetry/components/CollectionManagement.tsx:73
+#: src/features/poetry/components/CollectionManagement.tsx:78
 msgid "卸载 {name}"
 msgstr "Uninstall {name}"
 
@@ -2456,13 +2487,13 @@ msgstr "New version available"
 msgid "发生未知错误，请重试"
 msgstr "An unknown error occurred. Please try again."
 
-#: src/components/ui/prompt-dialog.tsx:107
+#: src/components/ui/prompt-dialog.tsx:114
 #: src/features/about/DataManagementDialogs.tsx:158
 #: src/features/ai-configuration/AiDeleteDialog.tsx:123
 #: src/features/ai-configuration/AiEditorDialog.tsx:289
-#: src/features/bt/components/AddTorrentDialog.tsx:363
-#: src/features/bt/components/TaskDialogs.tsx:83
-#: src/features/bt/components/TaskRow.tsx:226
+#: src/features/bt/components/AddTorrentDialog.tsx:382
+#: src/features/bt/components/TaskDialogs.tsx:90
+#: src/features/bt/components/TaskRow.tsx:231
 #: src/features/export/BackupPage.tsx:111
 #: src/features/export/BackupPage.tsx:151
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:48
@@ -2472,8 +2503,9 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/games/engine/GameHeaderControls.tsx:105
 #: src/features/games/engine/GameSessionNotice.tsx:105
 #: src/features/games/engine/online/OnlineLobby.tsx:368
-#: src/features/lan-transfer/LanShareDialog.tsx:143
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:511
+#: src/features/lan-transfer/LanConfirmDialog.tsx:41
+#: src/features/lan-transfer/LanShareDialog.tsx:153
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:523
 #: src/features/logs/LogDialogs.tsx:155
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:310
@@ -2481,12 +2513,13 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/poetry/components/PoetryTranslationSection.tsx:373
 #: src/features/poetry/components/PoetryTranslationSection.tsx:393
 #: src/features/poetry/LibraryManagePage.tsx:108
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:337
-#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:88
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:221
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:341
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:91
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:281
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:219
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:45
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:136
-#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:239
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:142
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:243
 #: src/features/ssh-sftp/components/Sidebar.tsx:533
 #: src/features/todo/TodoItemDialog.tsx:96
 #: src/features/todo/TodoItemDialog.tsx:327
@@ -2498,9 +2531,23 @@ msgstr "An unknown error occurred. Please try again."
 msgid "取消"
 msgstr "Cancel"
 
+#: src/features/bt/components/TaskDialogs.tsx:105
+msgid "取消 {pendingCancelLabel}"
+msgstr "Cancel {pendingCancelLabel}"
+
+#: src/features/lan-transfer/LanTransferActivity.tsx:190
+msgid "取消“{pendingName}”的传输？"
+msgstr "Cancel the transfer of “{pendingName}”?"
+
+#: src/features/bt/components/TaskDialogs.tsx:116
+msgid "取消任务"
+msgstr "Cancel Task"
+
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/lan-transfer/LanTransferActivity.tsx:131
-#: src/features/lan-transfer/LanTransferActivity.tsx:132
+#: src/features/lan-transfer/LanTransferActivity.tsx:137
+#: src/features/lan-transfer/LanTransferActivity.tsx:138
+#: src/features/lan-transfer/LanTransferActivity.tsx:187
+#: src/features/lan-transfer/LanTransferActivity.tsx:196
 #: src/features/logs/log-labels.ts:42
 msgid "取消传输"
 msgstr "Cancel transfer"
@@ -2571,7 +2618,7 @@ msgstr "Morph weight"
 msgid "变形目标"
 msgstr "Morph target"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:229
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:162
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
@@ -2595,12 +2642,12 @@ msgid "只能在桌面应用中检查更新"
 msgstr "Updates can only be checked in the desktop app"
 
 #: src/features/lan-transfer/labels.ts:6
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:77
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:439
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:78
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:446
 msgid "只读"
 msgstr "Read Only"
 
-#: src/features/poetry/components/CollectionManagement.tsx:128
+#: src/features/poetry/components/CollectionManagement.tsx:133
 msgid "可下载合集"
 msgstr "Available collections"
 
@@ -2621,7 +2668,7 @@ msgstr "Available {formatBytesValue}"
 msgid "可能朝内的壳体"
 msgstr "Possibly inward shells"
 
-#: src/features/poetry/components/CollectionManagement.tsx:45
+#: src/features/poetry/components/CollectionManagement.tsx:47
 msgid "可选"
 msgstr "Optional"
 
@@ -2643,7 +2690,7 @@ msgstr "Points remaining on the table: {remainingPoints}"
 msgid "合并：相同记录更新，其余插入"
 msgstr "Merge: update matching records and insert the rest"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:404
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:411
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "Devices on the same LAN can access directly. Use only on trusted networks, and limit access with the default permission."
 
@@ -2672,8 +2719,7 @@ msgstr "Once accepted, colors swap and a new game starts immediately."
 msgid "同意重摆"
 msgstr "Accept re-rack"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:460
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:463
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:467
 msgid "同时传输数"
 msgstr "Concurrent Transfers"
 
@@ -2709,30 +2755,33 @@ msgstr "MFTP clients on the same subnet. Click to open the access URL."
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:111
 #: src/features/lan-transfer/LanShareDialog.tsx:94
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:311
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:312
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:316
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:317
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:85
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:100
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:122
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:101
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:187
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:72
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:228
 msgid "名称"
 msgstr "Name"
 
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:48
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:52
 msgid "名称不能为空"
 msgstr "Name is required"
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:68
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:75
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:204
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:69
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:76
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:195
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:78
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:81
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:305
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:320
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:139
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:221
 msgid "名称不能为空，且不能包含斜杠"
 msgstr "Name is required and cannot contain slashes"
 
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:49
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:53
 msgid "名称不能包含斜杠"
 msgstr "Name cannot contain slashes"
 
@@ -2753,7 +2802,7 @@ msgstr "No"
 msgid "启动局域网传输"
 msgstr "Start LAN transfer"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:54
+#: src/features/lan-transfer/LanTransferTool.tsx:57
 msgid "启动服务"
 msgstr "Start service"
 
@@ -2908,7 +2957,7 @@ msgid "在线"
 msgstr "Online"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:311
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:129
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:131
 msgid "地址"
 msgstr "Address"
 
@@ -2967,7 +3016,7 @@ msgstr "Result preview"
 msgid "备份内容"
 msgstr "Backup contents"
 
-#: src/features/export/ExportPanel.tsx:74
+#: src/features/export/ExportPanel.tsx:67
 #: src/features/export/ImportPanel.tsx:74
 msgid "备份密码"
 msgstr "Backup password"
@@ -3044,7 +3093,7 @@ msgid "备注首图"
 msgstr "First note image"
 
 #: src/components/CopyButton.tsx:51
-#: src/features/bt/components/TaskDialogs.tsx:61
+#: src/features/bt/components/TaskDialogs.tsx:68
 msgid "复制"
 msgstr "Copy"
 
@@ -3052,10 +3101,15 @@ msgstr "Copy"
 msgid "复制代码"
 msgstr "Copy code"
 
-#: src/features/bt/components/TaskFilesPage.tsx:72
-#: src/features/bt/components/TaskRow.tsx:216
+#: src/features/bt/components/TaskFilesPage.tsx:76
+#: src/features/bt/components/TaskRow.tsx:220
 msgid "复制到用户目录"
 msgstr "Copy to a folder"
+
+#: src/features/bt/components/TaskFilesPage.tsx:74
+#: src/features/bt/components/TaskRow.tsx:218
+msgid "复制到系统下载目录"
+msgstr "Copy to system Downloads"
 
 #: src/features/todo/notes/TodoNoteImage.tsx:171
 msgid "复制图片"
@@ -3107,7 +3161,7 @@ msgstr "Size"
 
 #: src/features/activity/TransferActivity.tsx:72
 #: src/features/home/HomeRecentActivity.tsx:21
-#: src/features/lan-transfer/LanTransferActivity.tsx:30
+#: src/features/lan-transfer/LanTransferActivity.tsx:33
 #: src/features/logs/use-activity-logs.ts:41
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:39
 #: src/store/transfers.ts:189
@@ -3150,7 +3204,7 @@ msgstr "Storage, cleanup and project help"
 msgid "存储与缓存"
 msgstr "Storage and cache"
 
-#: src/features/about/AboutPage.tsx:113
+#: src/features/about/AboutPage.tsx:110
 msgid "存储占用"
 msgstr "Storage usage"
 
@@ -3158,8 +3212,8 @@ msgstr "Storage usage"
 msgid "存储空间不足，请清理空间后重试"
 msgstr "Not enough storage space. Free up space and try again."
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:256
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:259
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:261
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:264
 msgid "安全模式"
 msgstr "Security Mode"
 
@@ -3178,7 +3232,7 @@ msgstr "Install annotation library"
 
 #. SSH/SFTP 传输操作当前阶段
 #: src/features/export/BackupPage.tsx:102
-#: src/features/lan-transfer/LanTransferActivity.tsx:29
+#: src/features/lan-transfer/LanTransferActivity.tsx:32
 #: src/features/media-compress/image/ImageCompressPanel.tsx:185
 #: src/features/media-compress/video/use-video-compress.ts:191
 #: src/features/transfers/phase-label.ts:23
@@ -3232,8 +3286,8 @@ msgstr "Width"
 msgid "宽高与原图比例不同时，图片会被拉伸变形"
 msgstr "If the aspect ratio differs from the original, the image will be stretched"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:221
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:238
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:225
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:242
 #: src/features/vault/VaultEntryCard.tsx:134
 #: src/features/vault/VaultEntryDialog.tsx:209
 msgid "密码"
@@ -3245,7 +3299,7 @@ msgstr "Vault"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/about/use-about.ts:45
-#: src/features/export/sections.tsx:16
+#: src/features/export/sections.tsx:26
 #: src/features/home/entries.tsx:140
 #: src/features/logs/log-labels.ts:112
 #: src/features/logs/use-activity-logs.ts:32
@@ -3260,8 +3314,8 @@ msgstr "Password entry"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:161
 #: src/features/ai-configuration/ProviderDetails.tsx:176
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:224
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:258
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:228
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:262
 msgid "密钥"
 msgstr "Key"
 
@@ -3273,7 +3327,7 @@ msgstr "Key value"
 msgid "密钥标签须为 1–80 个字符，且不能包含控制字符"
 msgstr "Key labels must contain 1–80 characters and no control characters."
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:110
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:123
 #: src/features/ssh-sftp/components/Sidebar.tsx:387
 #: src/features/ssh-sftp/components/Sidebar.tsx:394
 msgid "密钥管理"
@@ -3291,7 +3345,7 @@ msgstr "This saved game is damaged or uses an incompatible version and cannot be
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "The game has not been saved successfully. Please retry. The latest progress may be lost if the app exits unexpectedly."
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:249
+#: src/features/games/billiards/BilliardsMatchView.tsx:264
 msgid "对局结束"
 msgstr "Match over"
 
@@ -3350,7 +3404,7 @@ msgstr "Import"
 msgid "导入 SSH 密钥"
 msgstr "Import SSH key"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:189
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:260
 msgid "导入中…"
 msgstr "Importing..."
 
@@ -3372,7 +3426,7 @@ msgstr "Import failed"
 msgid "导入完成"
 msgstr "Import complete"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:189
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:260
 msgid "导入密钥"
 msgstr "Import Key"
 
@@ -3398,7 +3452,7 @@ msgstr "Import mode"
 msgid "导入的模型自动保存在此设备。"
 msgstr "Imported models are saved automatically on this device."
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:214
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:147
 msgid "导入私钥后可在主机中选用。"
 msgstr "Import a private key to use it with hosts."
 
@@ -3425,7 +3479,7 @@ msgstr "Export"
 msgid "导出下载文件"
 msgstr "Export downloaded files"
 
-#: src/features/export/ExportPanel.tsx:117
+#: src/features/export/ExportPanel.tsx:110
 msgid "导出为明文 JSON 文件，请妥善保管。"
 msgstr "Exports a plaintext JSON file; keep it safe."
 
@@ -3509,7 +3563,7 @@ msgstr "Hour"
 msgid "小游戏"
 msgstr "Games"
 
-#: src/features/poetry/components/CollectionManagement.tsx:144
+#: src/features/poetry/components/CollectionManagement.tsx:149
 msgid "尚未安装合集"
 msgstr "No collections installed"
 
@@ -3525,14 +3579,14 @@ msgstr "AI service is not configured"
 msgid "尺寸模式"
 msgstr "Size mode"
 
-#: src/features/export/sections.tsx:33
+#: src/features/export/sections.tsx:46
 #: src/features/logs/use-activity-logs.ts:27
 msgid "局域网"
 msgstr "LAN"
 
 #: src/features/home/entries.tsx:87
 #: src/features/lan-transfer/LanServiceCard.tsx:37
-#: src/features/lan-transfer/LanTransferTool.tsx:34
+#: src/features/lan-transfer/LanTransferTool.tsx:37
 #: src/lib/errors/messages.ts:292
 msgid "局域网传输"
 msgstr "LAN Transfer"
@@ -3555,13 +3609,13 @@ msgid "局域网传输服务"
 msgstr "LAN transfer service"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:119
-#: src/features/lan-transfer/LanTransferTool.tsx:72
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:123
+#: src/features/lan-transfer/LanTransferTool.tsx:75
 #: src/features/logs/log-labels.ts:135
 msgid "局域网传输设置"
 msgstr "LAN Transfer Settings"
 
-#: src/features/about/AboutPage.tsx:143
+#: src/features/about/AboutPage.tsx:147
 #: src/lib/errors/messages.ts:281
 msgid "局域网服务"
 msgstr "LAN service"
@@ -3642,7 +3696,7 @@ msgstr "Saved keys are never shown. Enter a new value to replace one."
 msgid "已保存配置"
 msgstr "Settings saved"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:44
+#: src/features/lan-transfer/LanTransferTool.tsx:47
 msgid "已停止"
 msgstr "Stopped"
 
@@ -3660,7 +3714,7 @@ msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
 #. 待办删除成功的提示
-#: src/features/bt/BtTool.tsx:191
+#: src/features/bt/BtTool.tsx:193
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
 #: src/features/poetry/hooks/use-poetry-translations.ts:200
@@ -3673,8 +3727,8 @@ msgstr "Deleted"
 msgid "已删除 {itemName}"
 msgstr "Deleted {itemName}"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:94
-#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:341
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:107
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:352
 msgid "已删除 {name}"
 msgstr "Deleted {name}"
 
@@ -3704,9 +3758,9 @@ msgid "已发起截图下载，请在浏览器中查看。"
 msgstr "Screenshot download started. Check your browser."
 
 #. 模型导入任务已退出。
-#: src/features/bt/components/TaskRow.tsx:82
+#: src/features/bt/components/TaskRow.tsx:83
 #: src/features/home/HomeRecentActivity.tsx:22
-#: src/features/lan-transfer/LanTransferActivity.tsx:31
+#: src/features/lan-transfer/LanTransferActivity.tsx:34
 #: src/features/logs/use-activity-logs.ts:42
 #: src/features/model-viewer/components/ModelList.tsx:45
 #: src/store/transfers.ts:188
@@ -3744,16 +3798,16 @@ msgid "已处理 {completed}"
 msgstr "Processed {completed}"
 
 #: src/components/CopyButton.tsx:52
-#: src/features/bt/components/TaskDialogs.tsx:62
+#: src/features/bt/components/TaskDialogs.tsx:69
 #: src/features/todo/notes/TodoNoteImage.tsx:171
 msgid "已复制"
 msgstr "Copied"
 
-#: src/features/bt/BtTool.tsx:176
+#: src/features/bt/BtTool.tsx:178
 msgid "已复制到用户目录"
 msgstr "Copied to your folder"
 
-#: src/features/bt/BtTool.tsx:160
+#: src/features/bt/BtTool.tsx:162
 msgid "已复制到系统下载目录"
 msgstr "Copied to the system Downloads folder"
 
@@ -3761,7 +3815,7 @@ msgstr "Copied to the system Downloads folder"
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "An attachment with this name already exists. Rename the file or remove the old attachment first."
 
-#: src/features/poetry/components/CollectionManagement.tsx:138
+#: src/features/poetry/components/CollectionManagement.tsx:143
 #: src/features/translation/ModelManager.tsx:280
 msgid "已安装"
 msgstr "Installed"
@@ -3771,7 +3825,7 @@ msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 
 #: src/features/about/ResetBoundary.tsx:131
-#: src/features/bt/components/TaskRow.tsx:88
+#: src/features/bt/components/TaskRow.tsx:89
 #: src/features/home/HomeRecentActivity.tsx:20
 #: src/features/todo/TodoTool.tsx:152
 msgid "已完成"
@@ -3781,7 +3835,7 @@ msgstr "Completed"
 msgid "已导入 {packCount} 个译文包"
 msgstr "{packCount} translation packs imported"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:63
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:76
 msgid "已导入密钥 {trimValue}"
 msgstr "Imported key {trimValue}"
 
@@ -3851,7 +3905,7 @@ msgstr "Disconnected from {hostLabel}"
 msgid "已断开设备"
 msgstr "Device disconnected"
 
-#: src/features/bt/components/TaskRow.tsx:94
+#: src/features/bt/components/TaskRow.tsx:95
 #: src/store/transfers.ts:14
 #: src/store/transfers.ts:254
 msgid "已暂停"
@@ -3956,7 +4010,7 @@ msgstr "Main navigation"
 msgid "应用内部数据"
 msgstr "App data"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:495
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:507
 msgid "应用启动后自动开启服务"
 msgstr "Start service automatically when the app launches"
 
@@ -4011,7 +4065,7 @@ msgstr "On"
 msgid "开始上传或下载后，进度会显示在这里。"
 msgstr "Start an upload or download to see progress here."
 
-#: src/features/bt/components/AddTorrentDialog.tsx:378
+#: src/features/bt/components/AddTorrentDialog.tsx:397
 msgid "开始下载"
 msgstr "Start download"
 
@@ -4035,12 +4089,12 @@ msgid "开始对局"
 msgstr "Start match"
 
 #. Security mode that allows LAN access without authentication
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:283
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:288
 msgctxt "LAN security mode"
 msgid "开放"
 msgstr "Open"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:401
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:408
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
@@ -4084,7 +4138,7 @@ msgstr "The current AI service address has changed. Reopen the model menu."
 msgid "当前 WebView 不支持音频转码"
 msgstr "Audio transcoding is not supported in this WebView"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:200
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:205
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
@@ -4221,7 +4275,7 @@ msgstr "Video compression is unavailable on this device"
 msgid "当前设备未提供方向传感器，可继续手动操作。"
 msgstr "No orientation sensor is available on this device. Manual controls remain available."
 
-#: src/features/lan-transfer/LanTransferTool.tsx:110
+#: src/features/lan-transfer/LanTransferTool.tsx:113
 msgid "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured address {bindHost} is not on an available network interface. The access URL may not work."
 
@@ -4256,7 +4310,7 @@ msgid "往返"
 msgstr "Ping-pong"
 
 #: src/features/about/use-about.ts:47
-#: src/features/export/sections.tsx:26
+#: src/features/export/sections.tsx:38
 #: src/features/logs/use-activity-logs.ts:31
 #: src/lib/errors/messages.ts:291
 msgid "待办"
@@ -4278,7 +4332,7 @@ msgid "待办截止日期需使用 YYYY-MM-DD 格式"
 msgstr "The task due date must use YYYY-MM-DD format"
 
 #. 待办列表行的更多操作菜单
-#: src/features/todo/TodoRowActions.mobile.tsx:40
+#: src/features/todo/TodoRowActions.mobile.tsx:39
 msgid "待办操作"
 msgstr "Task actions"
 
@@ -4307,7 +4361,7 @@ msgstr "Task details"
 msgid "待处理"
 msgstr "Pending"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:112
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:113
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
@@ -4325,12 +4379,12 @@ msgstr "Loop mode"
 msgid "德语"
 msgstr "German"
 
-#: src/features/about/AboutPage.tsx:127
+#: src/features/about/AboutPage.tsx:128
 msgid "总占用"
 msgstr "Total usage"
 
 #. 当前动画片段总时长，duration 是本地化秒数。
-#: src/features/model-viewer/components/AnimationBar.tsx:327
+#: src/features/model-viewer/components/AnimationBar.tsx:325
 msgid "总时长 {duration} 秒"
 msgstr "Duration: {duration} seconds"
 
@@ -4351,11 +4405,11 @@ msgstr "Restore last page"
 
 #: src/features/todo/TodoRowActions.desktop.tsx:35
 #: src/features/todo/TodoRowActions.desktop.tsx:36
-#: src/features/todo/TodoRowActions.mobile.tsx:56
+#: src/features/todo/TodoRowActions.mobile.tsx:55
 msgid "恢复待办"
 msgstr "Restore todo"
 
-#: src/features/about/AboutPage.tsx:184
+#: src/features/about/AboutPage.tsx:189
 msgid "恢复首次打开状态"
 msgstr "Restore the initial state"
 
@@ -4373,7 +4427,7 @@ msgstr "Success"
 msgid "我先开球"
 msgstr "I break"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:107
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:108
 msgid "我的服务器"
 msgstr "My server"
 
@@ -4456,11 +4510,11 @@ msgstr "Ball in hand: drag the cue ball within the D"
 msgid "打包中"
 msgstr "Packaging"
 
-#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:195
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:199
 msgid "打开"
 msgstr "Open"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:318
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:326
 msgid "打开 SFTP 时进入此目录；若不存在则回退到主目录，再退到根目录。"
 msgstr "Open this directory when starting SFTP. If it does not exist, fall back to the home directory, then the root directory."
 
@@ -4483,7 +4537,7 @@ msgstr "Open the host list to choose or create a host"
 msgid "打开已有项"
 msgstr "Open existing item"
 
-#: src/features/bt/components/TaskRow.tsx:182
+#: src/features/bt/components/TaskRow.tsx:183
 msgid "打开文件或目录"
 msgstr "Open file or folder"
 
@@ -4575,8 +4629,8 @@ msgstr "Decline"
 msgid "拒绝清理非 BT 自有目录"
 msgstr "Cannot clear a folder that is not owned by the torrent module"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:162
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:163
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:164
 msgid "拒绝访问"
 msgstr "Deny access"
 
@@ -4623,7 +4677,7 @@ msgstr "By size"
 msgid "按当前场景的唯一几何体、材质和纹理对象统计，实例另列。顶点与三角面按完整几何体计算，不随可见性或绘制范围变化；线和点不计入三角面。"
 msgstr "Counts use unique geometry, material and texture objects in the current scene. Instances are listed separately. Vertex and triangle counts include entire geometries regardless of visibility or draw range; lines and points are excluded from triangles."
 
-#: src/features/about/AboutPage.tsx:176
+#: src/features/about/AboutPage.tsx:181
 #: src/features/about/DataManagementDialogs.tsx:47
 msgid "按模块清理"
 msgstr "Clear by module"
@@ -4654,6 +4708,10 @@ msgstr "Captured through protocol end"
 msgid "换个关键词试试"
 msgstr "Try a different keyword"
 
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:65
+msgid "排序"
+msgstr "Sort"
+
 #: src/features/vault/VaultEntryList.tsx:65
 msgid "排序操作结束"
 msgstr "Reordering ended"
@@ -4668,8 +4726,8 @@ msgstr "Accept table"
 msgid "接口格式"
 msgstr "API format"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:228
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:232
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:233
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:237
 msgid "接收目录"
 msgstr "Receive Directory"
 
@@ -4677,8 +4735,8 @@ msgstr "Receive Directory"
 msgid "推杆"
 msgstr "Follow"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:211
-#: src/features/poetry/components/CollectionManagement.tsx:42
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:216
+#: src/features/poetry/components/CollectionManagement.tsx:44
 #: src/features/translation/ModelManager.tsx:275
 msgid "推荐"
 msgstr "Recommended"
@@ -4834,7 +4892,8 @@ msgstr "Supports GLB, glTF and FBX. Models with external resources also need the
 msgid "支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多 16 项、合计 32 MiB。"
 msgstr "Supports UTF-8 text, Markdown (1 MiB), and PDF (8 MiB). Up to 16 attachments and 32 MiB per model."
 
-#: src/features/bt/components/AddTorrentDialog.tsx:262
+#: src/features/bt/components/AddTorrentDialog.tsx:266
+#: src/features/bt/components/AddTorrentDialog.tsx:294
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "Supports magnet links and local .torrent files"
 
@@ -4848,7 +4907,7 @@ msgstr "Favorite"
 msgid "收起"
 msgstr "Hide"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:119
+#: src/features/lan-transfer/LanTransferTool.tsx:122
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
@@ -4891,7 +4950,7 @@ msgstr "Data Management"
 msgid "整理与校验文本数据"
 msgstr "Format and validate text data"
 
-#: src/features/bt/components/TaskFilesPage.tsx:49
+#: src/features/bt/components/TaskFilesPage.tsx:50
 #: src/features/bt/components/TorrentFileList.tsx:50
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:80
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:334
@@ -4903,7 +4962,7 @@ msgstr "File"
 msgid "文件不属于此下载任务"
 msgstr "The file does not belong to this download task"
 
-#: src/features/about/AboutPage.tsx:137
+#: src/features/about/AboutPage.tsx:140
 msgid "文件传输"
 msgstr "File transfer"
 
@@ -4913,13 +4972,13 @@ msgid "文件传输校验失败：实际大小为 {actual} 字节，预期为 {e
 msgstr "Transfer verification failed: received {actual} bytes, expected {expected} bytes"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:39
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:70
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:74
 msgid "文件信息"
 msgstr "File information"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:437
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:447
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:77
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:107
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:112
 msgid "文件夹"
 msgstr "Folder"
 
@@ -4927,8 +4986,8 @@ msgstr "Folder"
 msgid "文件夹传输"
 msgstr "Folder Transfer"
 
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:89
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:376
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:90
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:382
 msgid "文件夹名称"
 msgstr "Folder Name"
 
@@ -4969,14 +5028,20 @@ msgstr "Library"
 msgid "文本"
 msgstr "Text"
 
+#: src/features/lan-transfer/LanConnectedDevices.tsx:85
+msgid "断开与“{pendingName}”的连接？"
+msgstr "Disconnect from “{pendingName}”?"
+
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:68
 msgid "断开设备连接"
 msgstr "Disconnect device"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/lan-transfer/LanConnectedDevices.tsx:61
-#: src/features/lan-transfer/LanConnectedDevices.tsx:62
+#: src/features/lan-transfer/LanConnectedDevices.tsx:67
+#: src/features/lan-transfer/LanConnectedDevices.tsx:68
+#: src/features/lan-transfer/LanConnectedDevices.tsx:82
+#: src/features/lan-transfer/LanConnectedDevices.tsx:96
 #: src/features/logs/log-labels.ts:27
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
 msgid "断开连接"
@@ -5012,13 +5077,13 @@ msgstr "Add password entry"
 msgid "新增待办"
 msgstr "Add task"
 
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:55
-#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:67
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:91
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:103
 #: src/features/todo/TodoTool.tsx:111
 msgid "新建"
 msgstr "New"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:89
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:90
 #: src/features/ssh-sftp/components/Sidebar.tsx:402
 #: src/features/ssh-sftp/components/Sidebar.tsx:412
 msgid "新建主机"
@@ -5033,7 +5098,7 @@ msgstr "New Todo"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:35
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:375
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:381
 msgid "新建文件夹"
 msgstr "New Folder"
 
@@ -5048,7 +5113,7 @@ msgstr "New Account"
 msgid "无匹配结果"
 msgstr "No Matches"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:229
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:162
 msgid "无口令"
 msgstr "No Passphrase"
 
@@ -5110,7 +5175,7 @@ msgstr "Could not get the local username. Enter the SSH username manually."
 msgid "无法识别远端操作系统"
 msgstr "Could not identify the remote operating system"
 
-#: src/features/bt/BtTool.tsx:236
+#: src/features/bt/BtTool.tsx:243
 msgid "无法读取下载任务"
 msgstr "Unable to load downloads"
 
@@ -5168,7 +5233,7 @@ msgid "时间"
 msgstr "Time"
 
 #. 可输入的模型动画时间，单位秒。
-#: src/features/model-viewer/components/AnimationBar.tsx:293
+#: src/features/model-viewer/components/AnimationBar.tsx:292
 msgid "时间（秒）"
 msgstr "Time (seconds)"
 
@@ -5218,7 +5283,7 @@ msgid "显示此功能"
 msgstr "Show this feature"
 
 #. 暂停模型动画。
-#: src/features/bt/components/TaskRow.tsx:161
+#: src/features/bt/components/TaskRow.tsx:162
 #: src/features/model-viewer/components/AnimationBar.tsx:192
 #: src/features/preview/MediaPlayer.tsx:145
 #: src/features/preview/MediaPlayer.tsx:146
@@ -5242,11 +5307,11 @@ msgstr "Pause reading"
 msgid "暂停记录"
 msgstr "Pause recording"
 
-#: src/features/bt/BtTool.tsx:273
+#: src/features/bt/BtTool.tsx:280
 msgid "暂无下载任务"
 msgstr "No download tasks yet"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:91
+#: src/features/lan-transfer/LanTransferActivity.tsx:97
 msgid "暂无任务"
 msgstr "No tasks"
 
@@ -5258,7 +5323,7 @@ msgstr "No recent transfers"
 msgid "暂无作者小传。"
 msgstr "No author biography yet."
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:57
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:65
 msgid "暂无共享目录"
 msgstr "No shared folders"
 
@@ -5266,15 +5331,15 @@ msgstr "No shared folders"
 msgid "暂无发现设备"
 msgstr "No discovered devices"
 
-#: src/features/bt/components/TaskRow.tsx:98
+#: src/features/bt/components/TaskRow.tsx:99
 msgid "暂无可用节点"
 msgstr "No peers yet"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:211
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:144
 msgid "暂无密钥"
 msgstr "No keys"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:291
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:299
 msgid "暂无密钥，请先在密钥管理中导入。"
 msgstr "No keys yet. Import one in Key Manager first."
 
@@ -5286,7 +5351,7 @@ msgstr "No games played yet"
 msgid "暂无待办"
 msgstr "No todos"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:134
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:135
 msgid "暂无待授权请求"
 msgstr "No pending authorization requests"
 
@@ -5303,11 +5368,11 @@ msgstr "No data"
 msgid "暂无日志"
 msgstr "No logs"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:358
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:367
 msgid "暂无白名单"
 msgstr "No trusted devices"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:36
+#: src/features/lan-transfer/LanConnectedDevices.tsx:42
 msgid "暂无设备"
 msgstr "No devices"
 
@@ -5340,7 +5405,7 @@ msgid "暂时没有可用更新。"
 msgstr "No updates are available at the moment."
 
 #: src/features/settings/AppSettingsMenu.tsx:84
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:136
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:141
 msgid "更多"
 msgstr "More"
 
@@ -5349,7 +5414,7 @@ msgid "更多 AI 设置"
 msgstr "More AI settings"
 
 #: src/features/ai-configuration/RowActions.mobile.tsx:37
-#: src/features/bt/components/TaskRow.tsx:193
+#: src/features/bt/components/TaskRow.tsx:194
 #: src/features/formatter/FormatterActions.tsx:42
 #: src/features/formatter/FormatterActions.tsx:43
 #: src/features/games/engine/GameActionsMenu.tsx:39
@@ -5359,7 +5424,7 @@ msgid "更多操作"
 msgstr "More actions"
 
 #: src/features/ssh-sftp/components/sftp/SftpActions.mobile.tsx:29
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:137
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:142
 msgid "更多文件操作"
 msgstr "More file actions"
 
@@ -5453,7 +5518,11 @@ msgstr "Service stopped"
 msgid "服务已启动"
 msgstr "Service started"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:503
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:110
+msgid "服务正在运行，目录变更需重启服务后完整生效。"
+msgstr "The service is running; restart it for directory changes to take full effect."
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:515
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "The service is running. Stop it before changing port, receive directory, security mode, or permissions. Auto start can be saved directly."
 
@@ -5496,7 +5565,7 @@ msgstr "Open table"
 msgid "未发现房间，可输入地址加入"
 msgstr "No rooms found. Enter an address to join."
 
-#: src/features/about/AboutPage.tsx:150
+#: src/features/about/AboutPage.tsx:154
 msgid "未启动"
 msgstr "Stopped"
 
@@ -5594,15 +5663,15 @@ msgstr "Orientation sensor permission was not granted. Manual controls remain av
 msgid "未记录"
 msgstr "Not recorded"
 
-#: src/features/bt/components/TaskRow.tsx:100
+#: src/features/bt/components/TaskRow.tsx:101
 msgid "未运行"
 msgstr "Not running"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:141
 #: src/features/ai-configuration/ProviderDetails.tsx:149
-#: src/features/lan-transfer/LanShareDialog.tsx:122
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:235
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:152
+#: src/features/lan-transfer/LanShareDialog.tsx:127
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:240
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:218
 msgid "未选择"
 msgstr "Not selected"
 
@@ -5618,15 +5687,15 @@ msgstr "No driver model configured,"
 msgid "本地偏好与启动设置"
 msgstr "Preferences and startup settings"
 
-#: src/features/about/AboutPage.tsx:173
+#: src/features/about/AboutPage.tsx:178
 msgid "本地数据"
 msgstr "Local data"
 
-#: src/features/about/AboutPage.tsx:93
+#: src/features/about/AboutPage.tsx:90
 msgid "本地文件与数据工具"
 msgstr "Local file and data tools"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:407
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:416
 msgid "本地文件夹名称"
 msgstr "Local Folder Name"
 
@@ -5638,7 +5707,7 @@ msgstr "The local model failed to run. Check the model or try a smaller one."
 msgid "本地源路径不是文件夹"
 msgstr "The local source path is not a folder"
 
-#: src/features/lan-transfer/LanShareDialog.tsx:115
+#: src/features/lan-transfer/LanShareDialog.tsx:120
 msgid "本地目录"
 msgstr "Local Directory"
 
@@ -5813,7 +5882,7 @@ msgstr "View activity logs"
 msgid "查看游戏规则"
 msgstr "View game rules"
 
-#: src/features/bt/components/TaskRow.tsx:201
+#: src/features/bt/components/TaskRow.tsx:202
 msgid "查看节点明细"
 msgstr "View peer details"
 
@@ -5822,8 +5891,8 @@ msgstr "View peer details"
 msgid "查看详情"
 msgstr "View details"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:259
-#: src/features/bt/components/TaskRow.tsx:210
+#: src/features/bt/components/AddTorrentDialog.tsx:263
+#: src/features/bt/components/TaskRow.tsx:211
 msgid "查看资源信息"
 msgstr "View resource details"
 
@@ -5858,7 +5927,7 @@ msgstr "Mark as completed"
 
 #: src/features/todo/TodoRowActions.desktop.tsx:35
 #: src/features/todo/TodoRowActions.desktop.tsx:36
-#: src/features/todo/TodoRowActions.mobile.tsx:56
+#: src/features/todo/TodoRowActions.mobile.tsx:55
 msgid "标记为已废弃"
 msgstr "Mark as abandoned"
 
@@ -5876,11 +5945,11 @@ msgstr "Title"
 msgid "标题、作者、正文"
 msgstr "Title Author Text"
 
-#: src/features/export/sections.tsx:28
+#: src/features/export/sections.tsx:40
 msgid "标题、分类、备注文本、图片、代码块、日期和完成状态"
 msgstr "Title, category, note text, images, code blocks, dates, and completion status"
 
-#: src/features/export/sections.tsx:17
+#: src/features/export/sections.tsx:27
 msgid "标题、网址、账号、密码、分类、备注"
 msgstr "Title, URL, username, password, category, notes"
 
@@ -5933,7 +6002,7 @@ msgstr "Board Size"
 msgid "棕球"
 msgstr "Brown"
 
-#: src/features/games/xiangqi/XiangqiStage.tsx:541
+#: src/features/games/xiangqi/XiangqiStage.tsx:547
 msgid "楚 河"
 msgstr "楚 河"
 
@@ -6166,8 +6235,8 @@ msgstr "Preparing video encoder…"
 msgid "正在准备朗读"
 msgstr "Preparing to read"
 
-#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:331
-#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:332
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:342
+#: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:343
 msgid "正在删除 {name}…"
 msgstr "Deleting {name}…"
 
@@ -6321,7 +6390,7 @@ msgstr "Receiving response"
 msgid "正在搜索…"
 msgstr "Searching…"
 
-#: src/features/bt/components/TaskRow.tsx:86
+#: src/features/bt/components/TaskRow.tsx:87
 msgid "正在整理文件"
 msgstr "Preparing files"
 
@@ -6358,6 +6427,10 @@ msgstr "Checking reset status"
 msgid "正在检索…"
 msgstr "Searching…"
 
+#: src/features/bt/components/AddTorrentDialog.tsx:338
+msgid "正在添加下载，完成后将自动关闭。"
+msgstr "Adding the download. The dialog closes automatically when it finishes."
+
 #: src/features/about/DataManagementDialogs.tsx:168
 msgid "正在清理…"
 msgstr "Clearing…"
@@ -6387,7 +6460,7 @@ msgstr "Finishing recording…"
 msgid "正在移动 {name}…"
 msgstr "Moving {name}…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:314
+#: src/features/bt/components/AddTorrentDialog.tsx:333
 msgid "正在获取资源信息…"
 msgstr "Fetching resource info…"
 
@@ -6447,6 +6520,10 @@ msgstr "Reading model resources"
 #: src/features/about/ResetBoundary.tsx:78
 msgid "正在读取此设备的重置记录。"
 msgstr "Reading the reset record on this device."
+
+#: src/features/lan-transfer/LanConnectedDevices.tsx:91
+msgid "正在进行的操作会被中断。"
+msgstr "Operations in progress will be interrupted."
 
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:43
 msgid "正在连接 {sessionTitle}…"
@@ -6513,7 +6590,7 @@ msgstr "This model has no animations."
 msgid "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 msgstr "This model has reached its attachment limit: 16 files or 32 MiB in total."
 
-#: src/features/model-viewer/components/AnimationBar.tsx:334
+#: src/features/model-viewer/components/AnimationBar.tsx:332
 msgid "此片段时长为零，仅显示静态姿态。"
 msgstr "This clip has zero duration and shows a static pose."
 
@@ -6562,7 +6639,7 @@ msgstr "Daily poem"
 msgid "每秒最多记录一次，保留最近 120 个样本；后台停止记录。虚线表示提醒阈值。"
 msgstr "Records at most once per second and keeps the latest 120 samples. Recording stops in the background. The dashed line marks the threshold."
 
-#: src/features/games/xiangqi/XiangqiStage.tsx:542
+#: src/features/games/xiangqi/XiangqiStage.tsx:548
 msgid "汉 界"
 msgstr "汉 界"
 
@@ -6586,7 +6663,7 @@ msgstr "No file to preview. Return to the source and open it again."
 msgid "没有失败的任务"
 msgstr "No failed tasks"
 
-#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:212
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:216
 msgid "没有子文件夹"
 msgstr "No child folders"
 
@@ -6718,7 +6795,7 @@ msgstr "Browse shared files"
 msgid "浏览器无法导出 {mimeType}"
 msgstr "The browser cannot export {mimeType}"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:115
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:116
 msgid "浏览器访问申请、弹窗确认和白名单回落请求"
 msgstr "Browser access requests, confirmation prompts, and trusted-device fallback requests"
 
@@ -6738,11 +6815,11 @@ msgid "深色"
 msgstr "Dark"
 
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:32
-#: src/features/bt/BtTool.tsx:224
-#: src/features/bt/BtTool.tsx:278
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:51
-#: src/features/lan-transfer/LanShareDialog.tsx:151
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:350
+#: src/features/bt/BtTool.tsx:226
+#: src/features/bt/BtTool.tsx:285
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:59
+#: src/features/lan-transfer/LanShareDialog.tsx:161
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:359
 msgid "添加"
 msgstr "Add"
 
@@ -6750,7 +6827,7 @@ msgstr "Add"
 msgid "添加 AI 服务地址"
 msgstr "Add an AI service address"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:259
+#: src/features/bt/components/AddTorrentDialog.tsx:263
 msgid "添加下载"
 msgstr "Add download"
 
@@ -6759,7 +6836,7 @@ msgstr "Add download"
 msgid "添加下载任务"
 msgstr "Add download task"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:236
+#: src/features/bt/components/AddTorrentDialog.tsx:240
 msgid "添加下载任务失败"
 msgstr "Failed to add download task"
 
@@ -6802,7 +6879,7 @@ msgstr "Add attachment"
 msgid "清台"
 msgstr "Cleared"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:245
+#: src/features/games/billiards/BilliardsMatchView.tsx:260
 msgid "清台完成！"
 msgstr "Table cleared!"
 
@@ -6843,7 +6920,7 @@ msgstr "Scope"
 msgid "清空"
 msgstr "Clear"
 
-#: src/features/about/AboutPage.tsx:183
+#: src/features/about/AboutPage.tsx:188
 msgid "清空所有数据"
 msgstr "Clear all data"
 
@@ -7042,11 +7119,11 @@ msgstr "Foul decision"
 msgid "状态"
 msgstr "State"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:41
+#: src/features/lan-transfer/LanTransferTool.tsx:44
 msgid "状态不可用"
 msgstr "Status unavailable"
 
-#: src/features/about/AboutPage.tsx:146
+#: src/features/about/AboutPage.tsx:150
 msgid "状态读取失败"
 msgstr "Status unavailable"
 
@@ -7117,7 +7194,7 @@ msgstr "User"
 msgid "用户 {pctValue} · 系统 {pctValue2} · 空闲 {pctValue3}"
 msgstr "User {pctValue} · System {pctValue2} · Idle {pctValue3}"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:181
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:185
 msgid "用户名"
 msgstr "Username"
 
@@ -7190,7 +7267,7 @@ msgstr "Computer is thinking..."
 msgid "画布聚焦后，可用方向键旋转、Shift 加方向键平移、加减键缩放、Home 适配视图。坐标轴聚焦后，可按 X、Y、Z 切换方向，Shift 切换反方向。"
 msgstr "With the canvas focused, use arrow keys to rotate, Shift + arrows to pan, plus/minus to zoom, and Home to fit the view. With the axes focused, press X, Y or Z to choose a direction; hold Shift for the opposite direction."
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:188
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:192
 msgid "留空则使用 SSH 配置或本机用户"
 msgstr "Leave empty to use SSH config or local user"
 
@@ -7198,12 +7275,12 @@ msgstr "Leave empty to use SSH config or local user"
 msgid "留空则保留现有密钥"
 msgstr "Leave blank to keep the current key"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:195
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:199
 msgid "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
 msgstr "When empty, User from ~/.ssh/config is used first, then the current system user."
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:280
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:300
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:285
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:305
 msgid "白名单"
 msgstr "Trusted Devices"
 
@@ -7253,7 +7330,7 @@ msgstr "Target width"
 msgid "目标尺寸需在 1–10000 像素之间"
 msgstr "Target size must be between 1 and 10000 pixels"
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:124
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:122
 msgid "目标已存在同名项目"
 msgstr "An Item With This Name Already Exists"
 
@@ -7278,7 +7355,7 @@ msgstr "Direct"
 msgid "相同的 AI 任务正在执行中"
 msgstr "The same AI task is already running"
 
-#: src/components/ui/prompt-dialog.tsx:109
+#: src/components/ui/prompt-dialog.tsx:116
 #: src/features/todo/TodoSchedulePicker.tsx:149
 msgid "确定"
 msgstr "OK"
@@ -7291,7 +7368,11 @@ msgstr "Delete \"{value}\"?"
 msgid "确定删除主机 “{value}”？此操作不可撤销。"
 msgstr "Delete host \"{value}\"? This action cannot be undone."
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:242
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:104
+msgid "确定删除共享目录“{pendingName}”？"
+msgstr "Delete shared directory “{pendingName}”?"
+
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:240
 msgid "确认"
 msgstr "Confirm"
 
@@ -7304,11 +7385,11 @@ msgstr "Delete"
 msgid "确认删除？"
 msgstr "Delete?"
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:205
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:203
 msgid "确认后会按上面的名称继续。"
 msgstr "After confirmation, the operation will continue with the names above."
 
-#: src/features/export/ExportPanel.tsx:90
+#: src/features/export/ExportPanel.tsx:83
 msgid "确认密码"
 msgstr "Confirm password"
 
@@ -7320,7 +7401,7 @@ msgstr "Import backup"
 msgid "确认清理"
 msgstr "Confirm clear"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:277
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:282
 msgid "确认码"
 msgstr "Confirmation Code"
 
@@ -7340,10 +7421,10 @@ msgstr "Acknowledge warning"
 msgid "确认远端解压结果"
 msgstr "Confirming remote extraction"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:269
-#: src/features/bt/components/AddTorrentDialog.tsx:280
-#: src/features/bt/components/TaskDialogs.tsx:52
-#: src/features/bt/components/TaskRow.tsx:205
+#: src/features/bt/components/AddTorrentDialog.tsx:275
+#: src/features/bt/components/AddTorrentDialog.tsx:291
+#: src/features/bt/components/TaskDialogs.tsx:59
+#: src/features/bt/components/TaskRow.tsx:206
 msgid "磁力链接"
 msgstr "Magnet link"
 
@@ -7415,9 +7496,8 @@ msgstr "Offline translation"
 msgid "离线翻译模型"
 msgstr "Offline translation models"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:77
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:145
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:150
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:90
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:211
 msgid "私钥文件"
 msgstr "Private Key File"
 
@@ -7425,7 +7505,7 @@ msgstr "Private Key File"
 msgid "种类"
 msgstr "Kind"
 
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:74
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:78
 msgid "移动"
 msgstr "Move"
 
@@ -7466,9 +7546,17 @@ msgstr "Remove"
 msgid "移除 {name}"
 msgstr "Remove {name}"
 
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:543
+msgid "移除“{pendingLabel}”？"
+msgstr "Remove “{pendingLabel}”?"
+
 #: src/features/translation/ModelManager.tsx:316
 msgid "移除「{modelName}」模型，之后可重新下载。"
 msgstr "Remove the “{modelName}” model. You can download it again later."
+
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:545
+msgid "移除后，该设备将不再自动获得访问权限。"
+msgstr "After removal, this device will no longer be granted access automatically."
 
 #. 移除查看器模型及资源，不删除源文件。
 #: src/features/model-viewer/components/ModelList.tsx:223
@@ -7501,18 +7589,18 @@ msgstr "Restart later"
 msgid "空正文"
 msgstr "Empty body"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:283
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:289
 msgid "空目录"
 msgstr "Empty Directory"
 
-#: src/features/about/AboutPage.tsx:134
-#: src/features/about/AboutPage.tsx:138
-#: src/features/about/AboutPage.tsx:167
+#: src/features/about/AboutPage.tsx:136
+#: src/features/about/AboutPage.tsx:141
+#: src/features/about/AboutPage.tsx:172
 msgid "空闲"
 msgstr "Idle"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:146
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:156
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:150
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:159
 msgid "端口"
 msgstr "Port"
 
@@ -7546,7 +7634,7 @@ msgstr "Syntax error near line {resultLine}, column {resultColumn}"
 msgid "等待对手加入…"
 msgstr "Waiting for an opponent..."
 
-#: src/features/games/engine/GameResultBar.tsx:81
+#: src/features/games/engine/GameResultBar.tsx:82
 msgid "等待对方…"
 msgstr "Waiting for opponent..."
 
@@ -7575,7 +7663,7 @@ msgstr "Waiting for body"
 msgid "等待监控数据"
 msgstr "Waiting for monitor data"
 
-#: src/features/about/AboutPage.tsx:167
+#: src/features/about/AboutPage.tsx:172
 #: src/features/poetry/components/PoetrySyncStatus.tsx:44
 msgid "等待确认"
 msgstr "Awaiting confirmation"
@@ -7788,12 +7876,12 @@ msgstr "Terminal session"
 msgid "终端输入数据格式无效"
 msgstr "Invalid terminal input format"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:181
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:190
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:186
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:195
 msgid "绑定 IP"
 msgstr "Bind IP"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:107
+#: src/features/lan-transfer/LanTransferTool.tsx:110
 msgid "绑定 IP 不可用"
 msgstr "Bind IP Unavailable"
 
@@ -7833,9 +7921,9 @@ msgstr "Winding conflicts"
 msgid "绘制实例数"
 msgstr "Draw instances"
 
-#: src/features/bt/components/TaskRow.tsx:161
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:396
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:408
+#: src/features/bt/components/TaskRow.tsx:162
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:404
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:417
 #: src/features/transfers/TransferItem.tsx:73
 #: src/features/translation/ModelManager.tsx:128
 msgid "继续"
@@ -7921,7 +8009,7 @@ msgstr "Encoding failed"
 msgid "编辑"
 msgstr "Edit"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:89
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:90
 msgid "编辑主机"
 msgstr "Edit Host"
 
@@ -7938,7 +8026,7 @@ msgstr "Edit key"
 #: src/features/todo/TodoItemDialog.tsx:147
 #: src/features/todo/TodoRowActions.desktop.tsx:25
 #: src/features/todo/TodoRowActions.desktop.tsx:26
-#: src/features/todo/TodoRowActions.mobile.tsx:52
+#: src/features/todo/TodoRowActions.mobile.tsx:51
 msgid "编辑待办"
 msgstr "Edit Todo"
 
@@ -8042,7 +8130,7 @@ msgstr "Translation input"
 msgid "翻译输出"
 msgstr "Translation output"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:163
+#: src/features/lan-transfer/LanTransferActivity.tsx:169
 msgid "耗时 {taskEtaValue2}"
 msgstr "Elapsed {taskEtaValue2}"
 
@@ -8085,8 +8173,8 @@ msgstr "Auto"
 msgid "自动旋转"
 msgstr "Auto-rotate"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:191
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:196
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:201
 msgid "自动选择"
 msgstr "Automatic"
 
@@ -8134,8 +8222,8 @@ msgstr "Free movement: WASD to move, Q/E for down/up, Shift to accelerate, drag 
 msgid "至少保留一项"
 msgstr "Keep at least one item"
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:89
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:200
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:90
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:191
 msgid "至少修改其中一个名称。"
 msgstr "Change at least one name."
 
@@ -8165,14 +8253,12 @@ msgstr "Stripes"
 msgid "英语"
 msgstr "English"
 
-#: src/features/bt/components/TaskRow.tsx:92
+#: src/features/bt/components/TaskRow.tsx:93
 #: src/store/transfers.ts:11
 msgid "获取资源信息…"
 msgstr "Fetching metadata…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:115
-#: src/features/bt/components/AddTorrentDialog.tsx:146
-#: src/features/bt/components/AddTorrentDialog.tsx:319
+#: src/features/bt/components/AddTorrentDialog.tsx:150
 msgid "获取资源信息失败"
 msgstr "Failed to fetch resource info"
 
@@ -8228,9 +8314,9 @@ msgstr "Overwrite existing data?"
 msgid "规则操作"
 msgstr "Rule actions"
 
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:75
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:139
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:72
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:76
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:145
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:76
 msgid "解压"
 msgstr "Extract"
 
@@ -8243,7 +8329,7 @@ msgstr "Extracted Folder"
 msgid "解压文件"
 msgstr "Extract archive"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:306
+#: src/features/bt/components/AddTorrentDialog.tsx:325
 msgid "解析"
 msgstr "Parse"
 
@@ -8251,7 +8337,7 @@ msgstr "Parse"
 msgid "解析中"
 msgstr "Demuxing"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:325
+#: src/features/bt/components/AddTorrentDialog.tsx:344
 msgid "解析结果"
 msgstr "Parsed files"
 
@@ -8282,7 +8368,7 @@ msgstr "Scheduled for"
 msgid "计算包围盒尺寸"
 msgstr "Measure bounds"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:208
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:212
 msgid "认证方式"
 msgstr "Authentication"
 
@@ -8304,7 +8390,7 @@ msgstr "Keep track of tasks and lists"
 msgid "设为当前"
 msgstr "Set as active"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:128
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:132
 msgid "设备名"
 msgstr "Device Name"
 
@@ -8332,7 +8418,7 @@ msgstr "Access LAN service"
 msgid "访问时间"
 msgstr "Accessed Time"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:69
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:70
 msgid "访问权限"
 msgstr "Access permission"
 
@@ -8403,7 +8489,7 @@ msgstr "The poem is too large to translate with AI"
 msgid "诗词列表"
 msgstr "Poem list"
 
-#: src/features/about/AboutPage.tsx:165
+#: src/features/about/AboutPage.tsx:170
 msgid "诗词同步"
 msgstr "Poetry sync"
 
@@ -8430,7 +8516,7 @@ msgstr "Poetry sync"
 msgid "诗词库同步已取消"
 msgstr "Poetry library sync canceled"
 
-#: src/features/about/AboutPage.tsx:119
+#: src/features/about/AboutPage.tsx:118
 msgid "诗词数据库"
 msgstr "Poetry database"
 
@@ -8492,9 +8578,13 @@ msgstr "This module's data is not in the main database. Clear it from the module
 msgid "该模型不存在或不属于此 AI 服务地址"
 msgstr "This model does not exist or belongs to a different AI service address."
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:179
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:250
 msgid "该私钥有口令保护（连接时输入）"
 msgstr "This private key is passphrase-protected (enter it when connecting)."
+
+#: src/features/lan-transfer/LanConnectedDevices.tsx:87
+msgid "该设备需要重新连接才能继续访问。"
+msgstr "The device must reconnect to continue accessing this share."
 
 #: src/lib/errors/messages.ts:268
 msgid "该诗词没有可翻译的正文"
@@ -8504,7 +8594,7 @@ msgstr "This poem has no content to translate"
 msgid "该资源已下载完成；如需重新下载，请先删除现有任务"
 msgstr "This resource has been downloaded. Delete the existing task before downloading it again."
 
-#: src/features/bt/components/AddTorrentDialog.tsx:357
+#: src/features/bt/components/AddTorrentDialog.tsx:376
 msgid "该资源已在下载列表中，不能重复添加"
 msgstr "This torrent is already in the download list and cannot be added again"
 
@@ -8592,7 +8682,7 @@ msgstr "The AI model name is empty or too long"
 msgid "请填写必填字段"
 msgstr "Complete the required fields"
 
-#: src/features/export/ExportPanel.tsx:112
+#: src/features/export/ExportPanel.tsx:105
 msgid "请妥善保管密码，导入时需要使用。"
 msgstr "Keep this password safe. You will need it to import the backup."
 
@@ -8630,7 +8720,7 @@ msgstr "Enter an IP address"
 msgid "请输入共享目录名称"
 msgstr "Enter a shared folder name"
 
-#: src/components/ui/prompt-dialog.tsx:48
+#: src/components/ui/prompt-dialog.tsx:53
 #: src/features/vault/VaultEntryDialog.tsx:81
 msgid "请输入内容"
 msgstr "Enter content"
@@ -8685,8 +8775,8 @@ msgid "请选择静态 PNG、JPEG 或 WebP 图片"
 msgstr "Please choose a static PNG, JPEG, or WebP image"
 
 #: src/features/lan-transfer/labels.ts:8
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:80
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:442
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:81
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:449
 msgid "读写"
 msgstr "Read/Write"
 
@@ -8715,8 +8805,8 @@ msgstr "Reading"
 msgid "读取信息"
 msgstr "Reading metadata"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:83
-#: src/features/poetry/components/CollectionManagement.tsx:103
+#: src/features/lan-transfer/LanTransferTool.tsx:86
+#: src/features/poetry/components/CollectionManagement.tsx:108
 #: src/features/poetry/components/PoetryReadError.tsx:20
 msgid "读取失败"
 msgstr "Failed to load"
@@ -8881,8 +8971,8 @@ msgstr "Go to line"
 msgid "轨道查看"
 msgstr "Orbit"
 
-#: src/features/bt/BtTool.tsx:163
-#: src/features/bt/BtTool.tsx:179
+#: src/features/bt/BtTool.tsx:165
+#: src/features/bt/BtTool.tsx:181
 msgid "转存失败"
 msgstr "Failed to save"
 
@@ -8958,13 +9048,13 @@ msgstr "Output settings"
 msgid "运行 {formatUptimeValue}"
 msgstr "Uptime {formatUptimeValue}"
 
-#: src/features/about/AboutPage.tsx:149
-#: src/features/about/AboutPage.tsx:167
-#: src/features/lan-transfer/LanTransferTool.tsx:43
+#: src/features/about/AboutPage.tsx:153
+#: src/features/about/AboutPage.tsx:172
+#: src/features/lan-transfer/LanTransferTool.tsx:46
 msgid "运行中"
 msgstr "Running"
 
-#: src/features/about/AboutPage.tsx:131
+#: src/features/about/AboutPage.tsx:132
 msgid "运行状态"
 msgstr "Runtime status"
 
@@ -8973,6 +9063,7 @@ msgid "近 7 天"
 msgstr "Last 7 Days"
 
 #: src/features/activity/ActivityPage.tsx:32
+#: src/features/bt/components/TaskDialogs.tsx:114
 msgid "返回"
 msgstr "Back"
 
@@ -8981,7 +9072,7 @@ msgstr "Back"
 msgid "返回上级目录"
 msgstr "Parent folder"
 
-#: src/features/bt/components/TaskFilesPage.tsx:38
+#: src/features/bt/components/TaskFilesPage.tsx:39
 #: src/features/poetry/LibraryPage.tsx:317
 msgid "返回列表"
 msgstr "Back to list"
@@ -9011,7 +9102,7 @@ msgstr "Back to modes"
 msgid "返回竖屏"
 msgstr "Return to portrait"
 
-#: src/features/about/AboutPage.tsx:62
+#: src/features/about/AboutPage.tsx:59
 #: src/features/export/BackupPage.tsx:53
 #: src/features/logs/ActivityLogsPage.tsx:40
 #: src/features/settings/SettingsPage.tsx:44
@@ -9022,14 +9113,14 @@ msgstr "Back to settings"
 msgid "返回诗词"
 msgstr "Back to poem"
 
-#: src/features/games/engine/GameResultBar.tsx:93
+#: src/features/games/engine/GameResultBar.tsx:95
 #: src/features/games/engine/online/OnlineMatchDialogs.tsx:101
 msgid "返回选择"
 msgstr "Back to Menu"
 
 #: src/components/ToolPageHeader.tsx:54
 #: src/components/ToolPageHeader.tsx:54
-#: src/features/bt/BtTool.tsx:212
+#: src/features/bt/BtTool.tsx:214
 #: src/features/games/billiards/BilliardsHeader.tsx:62
 #: src/features/games/engine/BoardGameHeader.tsx:61
 #: src/features/ssh-sftp/SshSftpTool.tsx:214
@@ -9068,7 +9159,7 @@ msgstr "Progress {completed} / {total}"
 
 #: src/features/activity/TransferActivity.tsx:68
 #: src/features/home/HomeRecentActivity.tsx:19
-#: src/features/lan-transfer/LanTransferActivity.tsx:28
+#: src/features/lan-transfer/LanTransferActivity.tsx:31
 #: src/features/todo/TodoTool.tsx:144
 msgid "进行中"
 msgstr "In Progress"
@@ -9084,15 +9175,15 @@ msgstr "Deleting remotely"
 msgid "远端已存在 “{existingName}”，请重新命名"
 msgstr "Remote item “{existingName}” already exists. Choose a different name."
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:127
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:125
 msgid "远端已存在 “{name}”。修改要继续操作的名称，或先重命名远端已有项目。"
 msgstr "“{name}” already exists remotely. Rename the item to continue, or rename the existing remote item first."
 
-#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:169
+#: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:168
 msgid "远端已有名称"
 msgstr "Existing Remote Name"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:395
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:403
 msgid "远端文件夹名称"
 msgstr "Remote Folder Name"
 
@@ -9105,10 +9196,10 @@ msgstr "Extracting remotely"
 msgid "远端连接在终端打开前已关闭"
 msgstr "Remote connection closed before the terminal opened"
 
-#: src/features/bt/components/TaskFilesPage.tsx:52
+#: src/features/bt/components/TaskFilesPage.tsx:53
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:55
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
-#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:91
+#: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:94
 msgid "连接"
 msgstr "Connect"
 
@@ -9157,7 +9248,7 @@ msgstr "Connection view"
 msgid "连接耗时较长，仍在等待响应。可以收起窗口，稍后查看进度。"
 msgstr "The connection is taking longer than usual. You can hide this window and check progress later."
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:22
+#: src/features/lan-transfer/LanConnectedDevices.tsx:28
 msgid "连接设备"
 msgstr "Connected Devices"
 
@@ -9174,7 +9265,7 @@ msgid "连续渲染后显示采样数据。"
 msgstr "Samples appear after continuous rendering."
 
 #: src/features/games/billiards/BilliardsHeader.tsx:144
-#: src/features/games/billiards/BilliardsMatchView.tsx:488
+#: src/features/games/billiards/BilliardsMatchView.tsx:503
 #: src/features/games/engine/BoardGameHeader.tsx:96
 #: src/features/games/engine/GameHeaderControls.tsx:108
 msgid "退出"
@@ -9224,10 +9315,10 @@ msgstr "Pick center point"
 msgid "选彩"
 msgstr "Nominate colour"
 
-#: src/features/lan-transfer/LanShareDialog.tsx:132
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:245
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:158
-#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:128
+#: src/features/lan-transfer/LanShareDialog.tsx:140
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:250
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:227
+#: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:134
 msgid "选择"
 msgstr "Choose"
 
@@ -9289,11 +9380,11 @@ msgstr "Estimated size appears after choosing an image"
 msgid "选择备份文件"
 msgstr "Choose backup file"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:269
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:277
 msgid "选择密钥…"
 msgstr "Select key..."
 
-#: src/features/export/ExportPanel.tsx:23
+#: src/features/export/ExportPanel.tsx:25
 msgid "选择导出数据"
 msgstr "Select data to export"
 
@@ -9305,7 +9396,7 @@ msgstr "Select size mode"
 msgid "选择已保存的候选"
 msgstr "Choose a saved value"
 
-#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:242
+#: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:246
 msgid "选择当前文件夹"
 msgstr "Select Current Folder"
 
@@ -9352,11 +9443,11 @@ msgstr "Choose video"
 msgid "选择视频后显示预估体积"
 msgstr "Estimated size appears after choosing a video"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:76
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:89
 msgid "选择私钥文件"
 msgstr "Select Private Key File"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:290
+#: src/features/bt/components/AddTorrentDialog.tsx:309
 msgid "选择种子文件"
 msgstr "Select torrent file"
 
@@ -9416,7 +9507,7 @@ msgstr "Select connection"
 msgid "选择附件"
 msgstr "Choose an attachment"
 
-#: src/features/about/AboutPage.tsx:177
+#: src/features/about/AboutPage.tsx:182
 msgid "选择需要清理的数据范围"
 msgstr "Choose the data to clear"
 
@@ -9479,9 +9570,9 @@ msgstr "Could not restart. Try again or reopen the app manually."
 msgid "重启并更新"
 msgstr "Restart and Update"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:383
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:385
-#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:75
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:390
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:392
+#: src/features/ssh-sftp/components/sftp/SftpRow.tsx:79
 msgid "重命名"
 msgstr "Rename"
 
@@ -9555,24 +9646,24 @@ msgstr "The reset has changed. Check its status again."
 #. 重新读取桌面开机自启状态
 #. 重新读取诗词合集列表
 #. 重新连接传输进度事件监听
-#: src/features/about/AboutPage.tsx:108
+#: src/features/about/AboutPage.tsx:105
 #: src/features/about/DataManagementDialogs.tsx:61
 #: src/features/activity/TransferActivity.tsx:56
-#: src/features/bt/BtTool.tsx:254
+#: src/features/bt/BtTool.tsx:261
 #: src/features/bt/components/FileBrowserPanel.tsx:203
-#: src/features/bt/components/TaskRow.tsx:172
+#: src/features/bt/components/TaskRow.tsx:173
 #: src/features/games/billiards/BilliardsGame.tsx:124
 #: src/features/games/engine/GameSessionNotice.tsx:74
-#: src/features/lan-transfer/LanTransferTool.tsx:95
+#: src/features/lan-transfer/LanTransferTool.tsx:98
 #: src/features/logs/ActivityLogsPage.tsx:98
-#: src/features/poetry/components/CollectionManagement.tsx:115
+#: src/features/poetry/components/CollectionManagement.tsx:120
 #: src/features/poetry/components/PoemList.tsx:203
 #: src/features/poetry/components/PoetryLocalManagement.tsx:74
 #: src/features/poetry/components/PoetryReadError.tsx:26
 #: src/features/preview/PreviewSurface.tsx:156
 #: src/features/settings/AutostartSetting.desktop.tsx:33
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:184
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:262
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:268
 #: src/features/ssh-sftp/components/Sidebar.tsx:441
 #: src/features/todo/notes/NoteEditorNodes.tsx:97
 #: src/features/todo/notes/TodoNoteImage.tsx:115
@@ -9640,7 +9731,7 @@ msgid "锁定鼠标"
 msgstr "Lock pointer"
 
 #. glTF 规范报告中的错误数量。
-#: src/features/bt/components/TaskRow.tsx:84
+#: src/features/bt/components/TaskRow.tsx:85
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:276
 #: src/store/transfers.ts:15
 msgid "错误"
@@ -9686,6 +9777,10 @@ msgstr "Nearby Rooms"
 msgid "附近设备"
 msgstr "Nearby devices"
 
+#: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:76
+msgid "降序"
+msgstr "Descending"
+
 #: src/components/ui/password-input.tsx:15
 #: src/features/vault/VaultEntryCard.tsx:150
 msgid "隐藏密码"
@@ -9700,7 +9795,7 @@ msgstr "Random"
 msgid "难度"
 msgstr "Difficulty"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:281
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:289
 msgid "需口令"
 msgstr "Passphrase required"
 
@@ -9755,7 +9850,7 @@ msgstr "Audio"
 msgid "顶点数"
 msgstr "Vertices"
 
-#: src/features/about/AboutPage.tsx:202
+#: src/features/about/AboutPage.tsx:207
 #: src/features/settings/AppSettingsMenu.tsx:97
 msgid "项目帮助"
 msgstr "Project help"
@@ -9853,18 +9948,18 @@ msgstr "Black"
 msgid "黑胜"
 msgstr "Black wins"
 
-#: src/features/poetry/components/CollectionManagement.tsx:44
+#: src/features/poetry/components/CollectionManagement.tsx:46
 #: src/features/settings/AppearanceSettings.tsx:53
 #: src/features/settings/AppSettingsMenu.tsx:181
 msgid "默认"
 msgstr "Default"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:417
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:433
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:424
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:440
 msgid "默认权限"
 msgstr "Default Permission"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:308
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:316
 msgid "默认目录"
 msgstr "Default Directory"
 
