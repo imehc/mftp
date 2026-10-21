@@ -31,7 +31,7 @@ export default function FileInfoDialog({
     <Dialog open={!!info} onOpenChange={onOpenChange}>
       <DialogLayoutContent
         placement="responsive-sheet"
-        className="ui-density-adaptive md:max-w-lg"
+        className="md:max-w-lg"
         showCloseButton={false}
       >
         <DialogLayoutHeader showCloseButton>

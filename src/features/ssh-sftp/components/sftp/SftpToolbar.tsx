@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowUp,
+  ArrowUpDown,
   File,
   FolderPlus,
   FolderUp,
@@ -17,6 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import {
+  sftpColumnLabel,
+  type SortKey,
+  type SortState,
+} from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 
 export default function SftpToolbar({
   target,
@@ -29,6 +35,8 @@ export default function SftpToolbar({
   onCreate,
   onUpload,
   onUploadDir,
+  sort,
+  onSort,
 }: {
   target?: HTMLElement | null;
   cwd: string | null;
@@ -40,10 +48,38 @@ export default function SftpToolbar({
   onCreate: () => void;
   onUpload: () => void;
   onUploadDir: () => void;
+  sort: SortState;
+  onSort: (key: SortKey) => void;
 }) {
   const { t } = useLingui();
+  const sortKeys: SortKey[] = ["name", "mtime", "type", "size"];
   const actions = (
     <div className="flex items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            density="adaptive"
+            className="md:hidden"
+            aria-label={t`排序`}
+          >
+            <ArrowUpDown />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="ui-density-adaptive">
+          {sortKeys.map((key) => (
+            <DropdownMenuItem key={key} onSelect={() => onSort(key)}>
+              <span className="flex-1">{sftpColumnLabel(key)}</span>
+              {sort.key === key ? (
+                <span className="text-muted-foreground text-xs">
+                  {sort.direction === "asc" ? t`升序` : t`降序`}
+                </span>
+              ) : null}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button
         variant="outline"
         density="adaptive"
@@ -101,10 +137,7 @@ export default function SftpToolbar({
         >
           <Home />
         </Button>
-        <span
-          className="min-w-0 flex-1 truncate font-mono text-xs"
-          title={cwd ?? undefined}
-        >
+        <span className="min-w-0 flex-1 font-mono text-xs break-all">
           {cwd ?? "…"}
         </span>
         <Button

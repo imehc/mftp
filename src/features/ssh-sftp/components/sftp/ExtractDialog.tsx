@@ -14,8 +14,12 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
-import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
-import { FieldDescription } from "~/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import type { ExtractState } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { firstFormError } from "~/lib/form-errors";
@@ -66,10 +70,7 @@ export default function ExtractDialog({
         !open && !directoryPickerOpen && setExtractTarget(null)
       }
     >
-      <DialogContent
-        showCloseButton={false}
-        className="ui-density-adaptive md:max-w-lg"
-      >
+      <DialogContent showCloseButton={false} className="md:max-w-lg">
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>解压</Trans>
@@ -79,7 +80,7 @@ export default function ExtractDialog({
           </DialogDescription>
         </DialogLayoutHeader>
         {extractTarget ? (
-          <FieldGroup className="gap-3">
+          <FieldGroup>
             <form.Field name="outName">
               {(field) => {
                 const error = firstFormError(field.state.meta.errors);
@@ -104,9 +105,14 @@ export default function ExtractDialog({
                         );
                       }}
                       aria-invalid={!!error}
+                      aria-describedby={
+                        error ? "extract-folder-name-error" : undefined
+                      }
                     />
                     {error ? (
-                      <FieldDescription>{error}</FieldDescription>
+                      <FieldError id="extract-folder-name-error">
+                        {error}
+                      </FieldError>
                     ) : null}
                   </Field>
                 );

@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Field, FieldDescription, FieldLabel } from "~/components/ui/field";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import { PasswordInput } from "~/components/ui/password-input";
 import { firstFormError } from "~/lib/form-errors";
 import type { Host } from "~/types";
@@ -77,8 +77,11 @@ export default function PassphrasePrompt({ host, onClose, onSubmit }: Props) {
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={t`请输入口令`}
                     aria-invalid={!!error}
+                    aria-describedby={error ? "passphrase-error" : undefined}
                   />
-                  {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  {error ? (
+                    <FieldError id="passphrase-error">{error}</FieldError>
+                  ) : null}
                 </Field>
               );
             }}

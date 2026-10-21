@@ -15,6 +15,7 @@ import {
 import {
   Field as UiField,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
@@ -81,7 +82,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent
         placement="responsive-page"
-        className="ui-density-adaptive md:max-w-md"
+        className="md:max-w-md"
         showCloseButton={false}
         aria-describedby={undefined}
       >
@@ -90,7 +91,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
         </DialogLayoutHeader>
 
         <DialogLayoutBody className="pr-1">
-          <FieldGroup density="compact">
+          <FieldGroup>
             <form.Field name="label">
               {(field) => {
                 const error = firstFormError(field.state.meta.errors);
@@ -110,9 +111,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                       autoComplete="off"
                       spellCheck={false}
                       aria-invalid={!!error}
+                      aria-describedby={error ? "host-label-error" : undefined}
                     />
                     {error ? (
-                      <FieldDescription>{error}</FieldDescription>
+                      <FieldError id="host-label-error">{error}</FieldError>
                     ) : null}
                   </UiField>
                 );
@@ -139,9 +141,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                         autoComplete="off"
                         spellCheck={false}
                         aria-invalid={!!error}
+                        aria-describedby={error ? "host-addr-error" : undefined}
                       />
                       {error ? (
-                        <FieldDescription>{error}</FieldDescription>
+                        <FieldError id="host-addr-error">{error}</FieldError>
                       ) : null}
                     </UiField>
                   );
@@ -164,9 +167,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                           field.handleChange(Number(e.target.value) || 22)
                         }
                         aria-invalid={!!error}
+                        aria-describedby={error ? "host-port-error" : undefined}
                       />
                       {error ? (
-                        <FieldDescription>{error}</FieldDescription>
+                        <FieldError id="host-port-error">{error}</FieldError>
                       ) : null}
                     </UiField>
                   );
@@ -254,7 +258,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                       const error = firstFormError(field.state.meta.errors);
                       return (
                         <UiField data-invalid={!!error}>
-                          <FieldLabel>
+                          <FieldLabel htmlFor="host-key">
                             <Trans>密钥</Trans>
                           </FieldLabel>
                           <Select
@@ -263,12 +267,16 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                             disabled={missingKeys}
                           >
                             <SelectTrigger
+                              id="host-key"
                               className="w-full"
                               aria-invalid={!!error}
+                              aria-describedby={
+                                error ? "host-key-error" : undefined
+                              }
                             >
                               <SelectValue placeholder={t`选择密钥…`} />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="ui-density-adaptive">
                               <SelectGroup>
                                 {keys.map((k) => (
                                   <SelectItem key={k.id} value={k.id}>
@@ -291,7 +299,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                               <Trans>暂无密钥，请先在密钥管理中导入。</Trans>
                             </FieldDescription>
                           ) : error ? (
-                            <FieldDescription>{error}</FieldDescription>
+                            <FieldError id="host-key-error">{error}</FieldError>
                           ) : null}
                         </UiField>
                       );
@@ -324,11 +332,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
               )}
             </form.Field>
 
-            {submitError ? (
-              <FieldDescription className="text-destructive">
-                {submitError}
-              </FieldDescription>
-            ) : null}
+            {submitError ? <FieldError>{submitError}</FieldError> : null}
           </FieldGroup>
         </DialogLayoutBody>
 

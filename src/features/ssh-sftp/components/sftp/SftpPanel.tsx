@@ -51,6 +51,7 @@ import {
   sftpHeaderHeight,
   type SortKey,
   type SortState,
+  validPlainName,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import SftpRow from "~/features/ssh-sftp/components/sftp/SftpRow";
 import { useSftpNavigation } from "~/features/ssh-sftp/components/sftp/useSftpNavigation";
@@ -72,6 +73,9 @@ interface Props {
 
 export default function SftpPanel({ session, toolbarTarget }: Props) {
   const { t } = useLingui();
+  // 目录名规则与上传/下载共用，放在表单层以便错误就近展示。
+  const validateName = (value: string) =>
+    validPlainName(value) ? null : t`名称不能为空，且不能包含斜杠`;
   const sessionId = session.id;
   const compact = !useDesktopLayout();
   // 宽屏平板同样是触摸输入：行高按输入方式而不是屏宽决定。
@@ -239,6 +243,8 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         onCreate={() => setPrompt({ kind: "mkdir" })}
         onUpload={onUpload}
         onUploadDir={onUploadDir}
+        sort={sort}
+        onSort={toggleSort}
       />
 
       {busy ? (
@@ -375,6 +381,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         title={t`新建文件夹`}
         placeholder={t`文件夹名称`}
         confirmText={t`创建`}
+        validate={validateName}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={doMkdir}
       />
@@ -383,6 +390,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         title={t`重命名`}
         initialValue={prompt?.kind === "rename" ? prompt.entry.name : ""}
         confirmText={t`重命名`}
+        validate={validateName}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>
           prompt?.kind === "rename" && doRename(prompt.entry, name)
@@ -394,6 +402,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         initialValue={prompt?.kind === "uploadDir" ? prompt.initialName : ""}
         placeholder={t`远端文件夹名称`}
         confirmText={t`继续`}
+        validate={validateName}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>
           prompt?.kind === "uploadDir" &&
@@ -406,6 +415,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         initialValue={prompt?.kind === "downloadDir" ? prompt.initialName : ""}
         placeholder={t`本地文件夹名称`}
         confirmText={t`继续`}
+        validate={validateName}
         onOpenChange={(o) => !o && setPrompt(null)}
         onConfirm={(name) =>
           prompt?.kind === "downloadDir" &&

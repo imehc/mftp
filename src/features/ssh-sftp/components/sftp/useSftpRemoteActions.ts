@@ -299,9 +299,15 @@ export function useSftpRemoteActions({
 
   async function doMkdir(name: string) {
     if (!cwd) return;
+    const trimmed = name.trim();
+    // 表单层已校验；此处兜底防止其他入口绕开名称规则。
+    if (!validPlainName(trimmed)) {
+      toast.error(t`名称不能为空，且不能包含斜杠`);
+      return;
+    }
     setPrompt(null);
     try {
-      await ipc.sftpMkdir(sessionId, joinPath(cwd, name));
+      await ipc.sftpMkdir(sessionId, joinPath(cwd, trimmed));
       await load(cwd);
     } catch (e) {
       toast.error(describeError(e));
@@ -309,13 +315,18 @@ export function useSftpRemoteActions({
   }
 
   async function doRename(entry: SftpEntry, name: string) {
-    if (!cwd || name === entry.name) {
+    const trimmed = name.trim();
+    if (!validPlainName(trimmed)) {
+      toast.error(t`名称不能为空，且不能包含斜杠`);
+      return;
+    }
+    if (!cwd || trimmed === entry.name) {
       setPrompt(null);
       return;
     }
     setPrompt(null);
     try {
-      await ipc.sftpRename(sessionId, entry.path, joinPath(cwd, name));
+      await ipc.sftpRename(sessionId, entry.path, joinPath(cwd, trimmed));
       await load(cwd);
     } catch (e) {
       toast.error(describeError(e));

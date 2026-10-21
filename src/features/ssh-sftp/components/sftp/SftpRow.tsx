@@ -31,6 +31,7 @@ import {
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import { useMediaQuery } from "~/lib/use-media-query";
 import type { SftpEntry } from "~/types";
 
 import type { SftpAction } from "./sftp-actions";
@@ -63,6 +64,9 @@ const SftpRow = function SftpRow({
 }: RowProps) {
   const { t } = useLingui();
   const compact = !useDesktopLayout();
+  const coarsePointer = useMediaQuery("(pointer: coarse)");
+  // 与虚拟列表估算使用同一口径：宽度和指针能力任一命中都算触控密度。
+  const touchDensity = compact || coarsePointer;
   const canExtract = !entry.isDir && isArchive(entry.name);
   const [menuOpen, setMenuOpen] = useState(false);
   const actions: SftpAction[] = [
@@ -83,7 +87,8 @@ const SftpRow = function SftpRow({
   return (
     <div
       className={cn(
-        "group border-border/40 hover:bg-muted/50 grid grid-cols-(--sftp-list-columns) items-center border-b px-3 py-1.5 text-sm max-md:min-h-16 max-md:grid-cols-[minmax(0,1fr)_auto]",
+        "group border-border/40 hover:bg-muted/50 grid grid-cols-(--sftp-list-columns) items-center border-b px-3 py-1.5 text-sm max-md:grid-cols-[minmax(0,1fr)_auto]",
+        touchDensity && "min-h-14",
         menuOpen && "bg-muted/50",
       )}
     >

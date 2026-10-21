@@ -27,7 +27,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { FieldDescription } from "~/components/ui/field";
+import { FieldError } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
   isSameOrChildPath,
@@ -123,7 +123,7 @@ export default function RemoteDirectoryPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent
         placement="responsive-page"
-        className="ui-density-adaptive md:max-w-xl"
+        className="md:max-w-xl"
         showCloseButton={false}
         aria-describedby={undefined}
       >
@@ -174,6 +174,7 @@ export default function RemoteDirectoryPicker({
                   return (
                     <div className="min-w-0 flex-1">
                       <Input
+                        id="remote-dir-path"
                         className="font-mono text-xs"
                         value={field.state.value}
                         onBlur={field.handleBlur}
@@ -181,11 +182,14 @@ export default function RemoteDirectoryPicker({
                           field.handleChange(event.target.value)
                         }
                         aria-invalid={!!error}
+                        aria-describedby={
+                          error ? "remote-dir-path-error" : undefined
+                        }
                       />
                       {error ? (
-                        <FieldDescription className="text-destructive">
+                        <FieldError id="remote-dir-path-error">
                           {error}
-                        </FieldDescription>
+                        </FieldError>
                       ) : null}
                     </div>
                   );

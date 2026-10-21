@@ -45,6 +45,7 @@ export default function SftpActionsMobile({
               key={label}
               fullWidth
               variant="ghost"
+              density="adaptive"
               className={
                 destructive
                   ? "text-destructive mt-2 justify-start border-t"

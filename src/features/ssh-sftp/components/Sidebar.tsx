@@ -102,7 +102,7 @@ function SortableHostRow({
     >
       <button
         type="button"
-        className="text-muted-foreground hover:bg-sidebar-accent absolute top-1/2 left-0 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md pointer-coarse:min-h-[max(44px,2.75rem)] pointer-coarse:w-11"
+        className="text-muted-foreground hover:bg-sidebar-accent absolute top-1/2 left-0 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md before:absolute before:inset-0 before:content-[''] pointer-coarse:before:-inset-x-3 pointer-coarse:before:-inset-y-2"
         aria-label={t`拖动排序`}
         {...attributes}
         {...listeners}

@@ -4,6 +4,16 @@ import { KeyRound, Trash2, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Dialog, DialogTitle } from "~/components/ui/dialog";
@@ -21,7 +31,7 @@ import {
 } from "~/components/ui/empty";
 import {
   Field as UiField,
-  FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
@@ -34,6 +44,7 @@ import { describeError } from "~/lib/errors";
 import { baseName, pickFilePathNative } from "~/lib/files";
 import { firstFormError } from "~/lib/form-errors";
 import { useHostsStore } from "~/store/hosts";
+import type { SshKey } from "~/types";
 
 interface Props {
   open: boolean;
@@ -46,6 +57,8 @@ export default function KeyManager({ open, onOpenChange }: Props) {
   const importKey = useHostsStore((s) => s.importKey);
   const deleteKey = useHostsStore((s) => s.deleteKey);
   const [busy, setBusy] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<SshKey | null>(null);
+  const pendingLabel = pendingDelete?.label ?? "";
   const form = useForm({
     defaultValues: emptyKeyImportFormValues,
     validators: {
@@ -101,7 +114,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogLayoutContent
         placement="responsive-page"
-        className="ui-density-adaptive md:max-w-lg"
+        className="md:max-w-lg"
         showCloseButton={false}
         aria-describedby={undefined}
       >
@@ -111,87 +124,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
           </DialogTitle>
         </DialogLayoutHeader>
         <DialogLayoutBody className="flex flex-col gap-4">
-          <div className="border-border rounded-lg border p-3">
-            <FieldGroup density="compact">
-              <form.Field name="label">
-                {(field) => {
-                  const error = firstFormError(field.state.meta.errors);
-                  return (
-                    <UiField data-invalid={!!error}>
-                      <FieldLabel htmlFor="key-label">
-                        <Trans>名称</Trans>
-                      </FieldLabel>
-                      <Input
-                        id="key-label"
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="id_ed25519"
-                        aria-invalid={!!error}
-                      />
-                      {error ? (
-                        <FieldDescription>{error}</FieldDescription>
-                      ) : null}
-                    </UiField>
-                  );
-                }}
-              </form.Field>
-              <form.Field name="sourcePath">
-                {(field) => {
-                  const error = firstFormError(field.state.meta.errors);
-                  return (
-                    <UiField data-invalid={!!error}>
-                      <FieldLabel>
-                        <Trans>私钥文件</Trans>
-                      </FieldLabel>
-                      <div className="flex gap-2">
-                        <Input
-                          readOnly
-                          aria-label={t`私钥文件`}
-                          value={field.state.value}
-                          placeholder={t`未选择`}
-                          className="flex-1"
-                          aria-invalid={!!error}
-                        />
-                        <Button variant="outline" onClick={pickFile}>
-                          <Upload data-icon="inline-start" />{" "}
-                          <Trans>选择</Trans>
-                        </Button>
-                      </div>
-                      {error ? (
-                        <FieldDescription>{error}</FieldDescription>
-                      ) : null}
-                    </UiField>
-                  );
-                }}
-              </form.Field>
-              <form.Field name="hasPassphrase">
-                {(field) => (
-                  <UiField orientation="horizontal">
-                    <Checkbox
-                      id="key-has-passphrase"
-                      checked={field.state.value}
-                      onCheckedChange={(checked) =>
-                        field.handleChange(checked === true)
-                      }
-                    />
-                    <FieldLabel htmlFor="key-has-passphrase">
-                      <Trans>该私钥有口令保护（连接时输入）</Trans>
-                    </FieldLabel>
-                  </UiField>
-                )}
-              </form.Field>
-              <Button
-                fullWidth
-                onClick={() => void form.handleSubmit()}
-                disabled={busy}
-              >
-                {busy ? t`导入中…` : t`导入密钥`}
-              </Button>
-            </FieldGroup>
-          </div>
-
-          <div className="order-first flex flex-col gap-1 rounded-lg border p-3">
+          <div className="flex flex-col gap-1 rounded-lg border p-3">
             <p className="text-muted-foreground text-xs font-medium">
               <Plural
                 value={{
@@ -233,7 +166,7 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                       variant="ghost"
                       size="icon-sm"
                       aria-label={t`删除`}
-                      onClick={() => remove(k.id, k.label)}
+                      onClick={() => setPendingDelete(k)}
                     >
                       <Trash2 className="text-destructive" />
                     </Button>
@@ -242,8 +175,124 @@ export default function KeyManager({ open, onOpenChange }: Props) {
               </ul>
             )}
           </div>
+
+          <div className="border-border rounded-lg border p-3">
+            <FieldGroup>
+              <form.Field name="label">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <UiField data-invalid={!!error}>
+                      <FieldLabel htmlFor="key-label">
+                        <Trans>名称</Trans>
+                      </FieldLabel>
+                      <Input
+                        id="key-label"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="id_ed25519"
+                        aria-invalid={!!error}
+                        aria-describedby={error ? "key-label-error" : undefined}
+                      />
+                      {error ? (
+                        <FieldError id="key-label-error">{error}</FieldError>
+                      ) : null}
+                    </UiField>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="sourcePath">
+                {(field) => {
+                  const error = firstFormError(field.state.meta.errors);
+                  return (
+                    <UiField data-invalid={!!error}>
+                      <FieldLabel htmlFor="key-source-path">
+                        <Trans>私钥文件</Trans>
+                      </FieldLabel>
+                      <div className="flex gap-2">
+                        <Input
+                          id="key-source-path"
+                          readOnly
+                          value={field.state.value}
+                          placeholder={t`未选择`}
+                          className="flex-1"
+                          aria-invalid={!!error}
+                          aria-describedby={
+                            error ? "key-source-path-error" : undefined
+                          }
+                        />
+                        <Button variant="outline" onClick={pickFile}>
+                          <Upload data-icon="inline-start" />{" "}
+                          <Trans>选择</Trans>
+                        </Button>
+                      </div>
+                      {error ? (
+                        <FieldError id="key-source-path-error">
+                          {error}
+                        </FieldError>
+                      ) : null}
+                    </UiField>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="hasPassphrase">
+                {(field) => (
+                  <UiField orientation="horizontal">
+                    <Checkbox
+                      id="key-has-passphrase"
+                      checked={field.state.value}
+                      onCheckedChange={(checked) =>
+                        field.handleChange(checked === true)
+                      }
+                    />
+                    <FieldLabel htmlFor="key-has-passphrase">
+                      <Trans>该私钥有口令保护（连接时输入）</Trans>
+                    </FieldLabel>
+                  </UiField>
+                )}
+              </form.Field>
+              <Button
+                fullWidth
+                onClick={() => void form.handleSubmit()}
+                disabled={busy}
+              >
+                {busy ? t`导入中…` : t`导入密钥`}
+              </Button>
+            </FieldGroup>
+          </div>
         </DialogLayoutBody>
       </DialogLayoutContent>
+      <AlertDialog
+        open={pendingDelete !== null}
+        onOpenChange={(nextOpen) => !nextOpen && setPendingDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Trans>删除密钥</Trans>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t`删除密钥“${pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              <Trans>取消</Trans>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                if (pendingDelete) {
+                  void remove(pendingDelete.id, pendingDelete.label);
+                }
+              }}
+            >
+              <Trans>删除</Trans>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

@@ -163,9 +163,9 @@ export default function SystemMonitorPanel({ session }: Props) {
       </div>
 
       {error ? (
-        <div className="border-border bg-destructive/10 text-destructive flex items-center gap-2 border-b px-3 py-1.5 text-xs">
-          <TriangleAlert className="size-3.5 shrink-0" />
-          <span className="min-w-0 flex-1 truncate">
+        <div className="border-border bg-destructive/10 text-destructive flex items-start gap-2 border-b px-3 py-1.5 text-xs">
+          <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
+          <span className="min-w-0 flex-1 wrap-break-word">
             {describeError(error)}
             {ready ? (
               <span className="ml-2">

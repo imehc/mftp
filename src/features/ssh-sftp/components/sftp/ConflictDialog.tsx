@@ -15,6 +15,7 @@ import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
@@ -115,10 +116,7 @@ export default function ConflictDialog({
   }, [form, open, name, initialIncomingName, initialExistingName]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="ui-density-adaptive max-w-md"
-      >
+      <DialogContent showCloseButton={false} className="max-w-md">
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>目标已存在同名项目</Trans>
@@ -154,6 +152,7 @@ export default function ConflictDialog({
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={!!error}
+                      aria-describedby="conflict-name-note"
                     />
                   </Field>
                 );
@@ -174,6 +173,7 @@ export default function ConflictDialog({
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={!!error}
+                      aria-describedby="conflict-name-note"
                     />
                     <form.Subscribe selector={(state) => state.values}>
                       {(values) => {
@@ -187,22 +187,20 @@ export default function ConflictDialog({
                           incomingName === name && existingName === name;
                         const duplicated =
                           incomingName !== "" && incomingName === existingName;
-                        const invalid =
-                          incomingInvalid ||
-                          existingInvalid ||
-                          unchanged ||
-                          duplicated;
-                        return (
-                          <FieldDescription
-                            className={invalid ? "text-destructive" : ""}
-                          >
-                            {unchanged
-                              ? t`至少修改其中一个名称。`
-                              : duplicated
-                                ? t`两个名称不能相同。`
-                                : incomingInvalid || existingInvalid
-                                  ? t`名称不能为空，且不能包含斜杠`
-                                  : t`确认后会按上面的名称继续。`}
+                        const message = unchanged
+                          ? t`至少修改其中一个名称。`
+                          : duplicated
+                            ? t`两个名称不能相同。`
+                            : incomingInvalid || existingInvalid
+                              ? t`名称不能为空，且不能包含斜杠`
+                              : null;
+                        return message ? (
+                          <FieldError id="conflict-name-note">
+                            {message}
+                          </FieldError>
+                        ) : (
+                          <FieldDescription id="conflict-name-note">
+                            <Trans>确认后会按上面的名称继续。</Trans>
                           </FieldDescription>
                         );
                       }}
