@@ -77,7 +77,7 @@ function ToggleGroupItem({
           size: context.size || size,
         }),
         (context.variant || variant) === "segmented" &&
-          "relative isolate h-10 min-w-[max(44px,2.75rem)] bg-transparent shadow-none hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:shadow-none",
+          "relative isolate h-10 bg-transparent shadow-none hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:shadow-none",
         className,
       )}
       {...props}

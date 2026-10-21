@@ -40,11 +40,9 @@ export default function LogRowMobile({
           <Trans>详情</Trans>
         </Button>
       </div>
-      {detail ? (
-        <p className="text-muted-foreground line-clamp-2 text-xs wrap-break-word">
-          {detail}
-        </p>
-      ) : null}
+      <p className="text-muted-foreground line-clamp-2 text-xs wrap-break-word">
+        {detail || "—"}
+      </p>
     </article>
   );
 }

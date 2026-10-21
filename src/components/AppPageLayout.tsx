@@ -15,6 +15,7 @@ interface Props {
   contentDensity?: "standard" | "compact";
   // 未显式指定时，内容自行滚动默认把底部安全区交给内部滚动容器。
   bottomInset?: "page" | "scroll";
+  // 只处理内容区布局；默认间距用 contentDensity，不在这里重写 gap。
   contentClassName?: string;
 }
 

@@ -117,7 +117,7 @@ export default function UpdaterDialog() {
               </AlertDescription>
             </Alert>
           ) : null}
-          <DialogLayoutFooter className="max-md:[&>button]:h-auto max-md:[&>button]:min-h-8 max-md:[&>button]:py-1.5 max-md:[&>button]:whitespace-normal">
+          <DialogLayoutFooter className="max-md:[&>button]:h-auto max-md:[&>button]:py-1.5 max-md:[&>button]:whitespace-normal">
             <Button variant="outline" onClick={closeUpdaterDialog}>
               {status === "current"
                 ? t`完成`

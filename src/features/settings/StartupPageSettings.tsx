@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Check, ChevronDown, PanelsTopLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,20 +84,21 @@ export default function StartupPageSettings() {
         }}
       >
         <DropdownMenuTrigger asChild>
-          <button
+          <Button
             type="button"
+            variant="outline"
             id="settings-startup-mode"
             aria-label={title}
-            className="border-input focus-visible:border-ring focus-visible:ring-ring/50 dark:bg-input/30 dark:hover:bg-input/50 flex min-h-8 w-40 max-w-full items-center justify-between gap-1.5 rounded-lg border bg-transparent py-1 pr-2 pl-2.5 text-left text-sm whitespace-normal transition-colors outline-none select-none focus-visible:ring-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            className="h-auto min-h-8 w-40 max-w-full justify-between py-1 pr-2 pl-2.5 text-left text-sm font-normal whitespace-normal"
           >
             <span className="min-w-0 wrap-break-word">{triggerLabel}</span>
             <ChevronDown aria-hidden className="text-muted-foreground size-4" />
-          </button>
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
           collisionPadding={8}
-          className="min-w-40"
+          className="ui-density-adaptive min-w-40"
         >
           <DropdownMenuItem onSelect={() => settings.setStartupMode("home")}>
             <span className="flex-1 whitespace-nowrap">{modeLabels.home}</span>
@@ -112,7 +114,7 @@ export default function StartupPageSettings() {
               </span>
               {settings.startupMode === "manual" ? <Check aria-hidden /> : null}
             </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="max-h-80 min-w-40 overflow-y-auto">
+            <DropdownMenuSubContent className="ui-density-adaptive max-h-80 min-w-40 overflow-y-auto">
               {pages.length === 0 ? (
                 <DropdownMenuLabel>
                   {t`当前没有可用页面，将进入首页。`}

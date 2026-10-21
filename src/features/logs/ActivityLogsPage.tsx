@@ -68,6 +68,7 @@ export default function ActivityLogsPage() {
               <DropdownMenuContent align="end" className="ui-density-adaptive">
                 <DropdownMenuGroup>
                   <DropdownMenuItem
+                    variant="destructive"
                     disabled={c.busy}
                     onSelect={() => c.setDeleting("all")}
                   >

@@ -49,6 +49,7 @@ export default function RowActionsMobile(props: RowActionsProps) {
               <Trans>编辑</Trans>
             </DropdownMenuItem>
             <DropdownMenuItem
+              variant="destructive"
               disabled={!props.canDelete}
               onSelect={props.onDelete}
             >

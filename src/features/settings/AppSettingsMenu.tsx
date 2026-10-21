@@ -70,7 +70,7 @@ export default function AppSettingsMenu() {
         align="end"
         collisionPadding={8}
         sticky="always"
-        className="min-w-48"
+        className="ui-density-adaptive min-w-48"
       >
         <DropdownMenuItem asChild>
           <Link to="/settings">
@@ -83,7 +83,7 @@ export default function AppSettingsMenu() {
             <ExternalLink />
             {t`更多`}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-40 whitespace-nowrap">
+          <DropdownMenuSubContent className="ui-density-adaptive min-w-40 whitespace-nowrap">
             <DropdownMenuItem asChild>
               <Link to="/about">{t`关于`}</Link>
             </DropdownMenuItem>
@@ -106,7 +106,7 @@ export default function AppSettingsMenu() {
             <Languages />
             {t`语言`}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
+          <DropdownMenuSubContent className="ui-density-adaptive min-w-36 whitespace-nowrap">
             <DropdownMenuRadioGroup
               value={locale}
               onValueChange={(value) => setLocale(value as AppLocale)}
@@ -124,7 +124,7 @@ export default function AppSettingsMenu() {
             <ThemeIcon />
             {t`外观`}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-36 whitespace-nowrap">
+          <DropdownMenuSubContent className="ui-density-adaptive min-w-36 whitespace-nowrap">
             <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
               {themes.map((item) => {
                 const Icon = item.icon;
@@ -149,7 +149,7 @@ export default function AppSettingsMenu() {
             <Palette />
             {t`主题`}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="max-h-80 min-w-52 overflow-y-auto whitespace-nowrap">
+          <DropdownMenuSubContent className="ui-density-adaptive max-h-80 min-w-52 overflow-y-auto whitespace-nowrap">
             <DropdownMenuRadioGroup
               value={resolveColorTheme(colorTheme)}
               onValueChange={(value) => setColorTheme(value as ColorTheme)}
@@ -192,7 +192,7 @@ export default function AppSettingsMenu() {
             <Type />
             {t`字体`}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-40 whitespace-nowrap">
+          <DropdownMenuSubContent className="ui-density-adaptive min-w-40 whitespace-nowrap">
             <DropdownMenuRadioGroup
               value={resolveFontPreset(fontPreset)}
               onValueChange={(value) => setFontPreset(value as FontPreset)}
