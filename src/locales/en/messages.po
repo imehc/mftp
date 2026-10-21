@@ -160,7 +160,7 @@ msgstr "Four consecutive misses by {offender} from the restored position. After 
 msgid "{offender} 犯规。"
 msgstr "Foul by {offender}."
 
-#: src/features/lan-transfer/LanServiceCard.tsx:74
+#: src/features/lan-transfer/LanServiceCard.tsx:77
 msgid "{onlineConnections} 个在线连接"
 msgstr "{onlineConnections} active connections"
 
@@ -547,8 +547,8 @@ msgstr "HDR · Up to 2048 × 1024 / 32 MiB"
 msgid "IP"
 msgstr "IP"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:338
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:347
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:342
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:351
 msgid "IP 地址"
 msgstr "IP address"
 
@@ -1112,7 +1112,7 @@ msgstr "Manually revised"
 
 #: src/features/lan-transfer/labels.ts:7
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:84
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:471
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:475
 msgid "仅上传"
 msgstr "Upload Only"
 
@@ -1297,8 +1297,8 @@ msgid "传输设置、共享目录和信任设备"
 msgstr "Transfer settings, shared folders, and trusted devices"
 
 #: src/features/lan-transfer/LanTransferActivity.tsx:145
-#: src/features/transfers/TransferItem.tsx:126
-#: src/features/transfers/TransferItem.tsx:130
+#: src/features/transfers/TransferItem.tsx:128
+#: src/features/transfers/TransferItem.tsx:132
 msgid "传输进度"
 msgstr "Transfer progress"
 
@@ -1387,7 +1387,7 @@ msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、�
 msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win. Includes the three-ball break requirement, push-out decisions and three consecutive fouls."
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:550
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:554
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
 #: src/features/poetry/components/PoetryTranslationSection.tsx:358
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:349
@@ -1493,7 +1493,7 @@ msgstr "Pass"
 msgid "停止"
 msgstr "Stop"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:193
+#: src/features/lan-transfer/LanTransferTool.tsx:183
 msgid "停止后，进行中的传输会被中断，已连接设备会断开。"
 msgstr "Stopping the service interrupts transfers in progress and disconnects connected devices."
 
@@ -1523,9 +1523,9 @@ msgstr "Stop the current process?"
 msgid "停止录屏"
 msgstr "Stop recording"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:57
-#: src/features/lan-transfer/LanTransferTool.tsx:191
-#: src/features/lan-transfer/LanTransferTool.tsx:195
+#: src/features/lan-transfer/LanTransferTool.tsx:47
+#: src/features/lan-transfer/LanTransferTool.tsx:181
+#: src/features/lan-transfer/LanTransferTool.tsx:185
 msgid "停止服务"
 msgstr "Stop service"
 
@@ -1957,7 +1957,7 @@ msgstr "Creating directory"
 #: src/features/bt/components/TaskDialogs.tsx:92
 #: src/features/bt/components/TaskRow.tsx:233
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:120
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:568
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:572
 #: src/features/model-viewer/components/LibraryPanel.tsx:320
 #: src/features/poetry/components/PoetryLocalManagement.tsx:130
 #: src/features/poetry/components/PoetryTranslationSection.tsx:378
@@ -2096,9 +2096,9 @@ msgstr "Delete model?"
 msgid "删除注释库"
 msgstr "Delete annotation library"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:405
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:406
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:559
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:409
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:410
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:563
 msgid "删除白名单"
 msgstr "Remove from allowlist"
 
@@ -2131,7 +2131,7 @@ msgstr "Delete this log?"
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:43
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:123
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:124
-#: src/features/lan-transfer/LanTransferTool.tsx:65
+#: src/features/lan-transfer/LanTransferTool.tsx:55
 #: src/features/logs/ActivityLogsPage.tsx:52
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:122
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:123
@@ -2162,7 +2162,7 @@ msgstr "Refresh interval"
 msgid "刷新音色"
 msgstr "Refresh voices"
 
-#: src/features/transfers/TransferItem.tsx:121
+#: src/features/transfers/TransferItem.tsx:123
 msgid "剩余 {metricsEta}"
 msgstr "Remaining {metricsEta}"
 
@@ -2224,8 +2224,7 @@ msgstr "Load HDR environment"
 #: src/features/bt/BtTool.tsx:282
 #: src/features/bt/components/FileBrowserPanel.tsx:193
 #: src/features/bt/components/PeersPanel.tsx:77
-#: src/features/lan-transfer/LanTransferTool.tsx:42
-#: src/features/lan-transfer/LanTransferTool.tsx:166
+#: src/features/lan-transfer/LanTransferTool.tsx:156
 msgid "加载中"
 msgstr "Loading"
 
@@ -2518,7 +2517,7 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/games/engine/online/OnlineLobby.tsx:368
 #: src/features/lan-transfer/LanConfirmDialog.tsx:41
 #: src/features/lan-transfer/LanShareDialog.tsx:153
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:542
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:546
 #: src/features/logs/LogDialogs.tsx:155
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:310
@@ -2537,8 +2536,8 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/todo/TodoItemDialog.tsx:96
 #: src/features/todo/TodoItemDialog.tsx:327
 #: src/features/todo/TodoTool.tsx:327
-#: src/features/transfers/TransferItem.tsx:79
-#: src/features/transfers/TransferItem.tsx:80
+#: src/features/transfers/TransferItem.tsx:81
+#: src/features/transfers/TransferItem.tsx:82
 #: src/features/translation/ModelManager.tsx:321
 #: src/features/vault/VaultEntryDialog.tsx:242
 #: src/features/vault/VaultTool.tsx:205
@@ -2657,7 +2656,7 @@ msgstr "Updates can only be checked in the desktop app"
 
 #: src/features/lan-transfer/labels.ts:6
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:78
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:465
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:469
 msgid "只读"
 msgstr "Read Only"
 
@@ -2708,7 +2707,7 @@ msgstr "Points remaining on the table: {remainingPoints}"
 msgid "合并：相同记录更新，其余插入"
 msgstr "Merge: update matching records and insert the rest"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:430
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:434
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "Devices on the same LAN can access directly. Use only on trusted networks, and limit access with the default permission."
 
@@ -2737,7 +2736,7 @@ msgstr "Once accepted, colors swap and a new game starts immediately."
 msgid "同意重摆"
 msgstr "Accept re-rack"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:486
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:490
 msgid "同时传输数"
 msgstr "Concurrent Transfers"
 
@@ -2773,9 +2772,9 @@ msgstr "MFTP clients on the same subnet. Click to open the access URL."
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:111
 #: src/features/lan-transfer/LanShareDialog.tsx:94
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:317
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:326
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:327
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:321
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:330
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:331
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:85
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:101
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:187
@@ -2821,11 +2820,11 @@ msgstr "No"
 msgid "启动局域网传输"
 msgstr "Start LAN transfer"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:57
+#: src/features/lan-transfer/LanTransferTool.tsx:47
 msgid "启动服务"
 msgstr "Start service"
 
-#: src/features/lan-transfer/LanServiceCard.tsx:40
+#: src/features/lan-transfer/LanServiceCard.tsx:43
 msgid "启动服务后显示浏览器访问地址"
 msgstr "Start the service to show the browser access URL"
 
@@ -3135,7 +3134,7 @@ msgid "复制图片"
 msgstr "Copy image"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:114
-#: src/features/lan-transfer/LanServiceCard.tsx:50
+#: src/features/lan-transfer/LanServiceCard.tsx:53
 msgid "复制地址"
 msgstr "Copy address"
 
@@ -3231,8 +3230,8 @@ msgstr "Storage usage"
 msgid "存储空间不足，请清理空间后重试"
 msgstr "Not enough storage space. Free up space and try again."
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:266
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:269
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:270
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:273
 msgid "安全模式"
 msgstr "Security Mode"
 
@@ -3604,8 +3603,8 @@ msgid "局域网"
 msgstr "LAN"
 
 #: src/features/home/entries.tsx:87
-#: src/features/lan-transfer/LanServiceCard.tsx:37
-#: src/features/lan-transfer/LanTransferTool.tsx:37
+#: src/features/lan-transfer/LanServiceCard.tsx:40
+#: src/features/lan-transfer/LanTransferTool.tsx:36
 #: src/lib/errors/messages.ts:292
 msgid "局域网传输"
 msgstr "LAN Transfer"
@@ -3628,8 +3627,8 @@ msgid "局域网传输服务"
 msgstr "LAN transfer service"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:124
-#: src/features/lan-transfer/LanTransferTool.tsx:75
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:128
+#: src/features/lan-transfer/LanTransferTool.tsx:65
 #: src/features/logs/log-labels.ts:135
 msgid "局域网传输设置"
 msgstr "LAN Transfer Settings"
@@ -3715,7 +3714,7 @@ msgstr "Saved keys are never shown. Enter a new value to replace one."
 msgid "已保存配置"
 msgstr "Settings saved"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:47
+#: src/features/lan-transfer/LanServiceCard.tsx:32
 msgid "已停止"
 msgstr "Stopped"
 
@@ -4029,7 +4028,7 @@ msgstr "Main navigation"
 msgid "应用内部数据"
 msgstr "App data"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:526
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:530
 msgid "应用启动后自动开启服务"
 msgstr "Start service automatically when the app launches"
 
@@ -4108,12 +4107,12 @@ msgid "开始对局"
 msgstr "Start match"
 
 #. Security mode that allows LAN access without authentication
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:293
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:297
 msgctxt "LAN security mode"
 msgid "开放"
 msgstr "Open"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:427
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:431
 msgid "开放模式会跳过确认码"
 msgstr "Open mode skips confirmation codes"
 
@@ -4157,7 +4156,7 @@ msgstr "The current AI service address has changed. Reopen the model menu."
 msgid "当前 WebView 不支持音频转码"
 msgstr "Audio transcoding is not supported in this WebView"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:210
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:214
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
@@ -4294,7 +4293,7 @@ msgstr "Video compression is unavailable on this device"
 msgid "当前设备未提供方向传感器，可继续手动操作。"
 msgstr "No orientation sensor is available on this device. Manual controls remain available."
 
-#: src/features/lan-transfer/LanTransferTool.tsx:113
+#: src/features/lan-transfer/LanTransferTool.tsx:103
 msgid "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured address {bindHost} is not on an available network interface. The access URL may not work."
 
@@ -4616,8 +4615,8 @@ msgstr "Scanning"
 msgid "扫描文件中"
 msgstr "Scanning files"
 
-#: src/features/lan-transfer/LanServiceCard.tsx:56
-#: src/features/lan-transfer/LanServiceCard.tsx:85
+#: src/features/lan-transfer/LanServiceCard.tsx:59
+#: src/features/lan-transfer/LanServiceCard.tsx:88
 msgid "扫码访问"
 msgstr "Scan to Access"
 
@@ -4745,8 +4744,8 @@ msgstr "Accept table"
 msgid "接口格式"
 msgstr "API format"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:238
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:242
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:246
 msgid "接收目录"
 msgstr "Receive Directory"
 
@@ -4754,7 +4753,7 @@ msgstr "Receive Directory"
 msgid "推杆"
 msgstr "Follow"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:221
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:225
 #: src/features/poetry/components/CollectionManagement.tsx:44
 #: src/features/translation/ModelManager.tsx:275
 msgid "推荐"
@@ -4926,7 +4925,7 @@ msgstr "Favorite"
 msgid "收起"
 msgstr "Hide"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:122
+#: src/features/lan-transfer/LanTransferTool.tsx:112
 msgid "改为自动选择"
 msgstr "Use Automatic Selection"
 
@@ -5311,8 +5310,8 @@ msgstr "Show this feature"
 #: src/features/model-viewer/components/AnimationBar.tsx:192
 #: src/features/preview/MediaPlayer.tsx:145
 #: src/features/preview/MediaPlayer.tsx:146
-#: src/features/transfers/TransferItem.tsx:63
 #: src/features/transfers/TransferItem.tsx:64
+#: src/features/transfers/TransferItem.tsx:65
 #: src/features/translation/ModelManager.tsx:105
 msgid "暂停"
 msgstr "Pause"
@@ -5389,7 +5388,7 @@ msgstr "No data"
 msgid "暂无日志"
 msgstr "No logs"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:384
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:388
 msgid "暂无白名单"
 msgstr "No trusted devices"
 
@@ -5543,7 +5542,7 @@ msgstr "Service started"
 msgid "服务正在运行，目录变更需重启服务后完整生效。"
 msgstr "The service is running; restart it for directory changes to take full effect."
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:534
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:538
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "The service is running. Stop it before changing port, receive directory, security mode, or permissions. Auto start can be saved directly."
 
@@ -5691,7 +5690,7 @@ msgstr "Not running"
 #: src/features/ai-configuration/ProviderDetails.tsx:141
 #: src/features/ai-configuration/ProviderDetails.tsx:149
 #: src/features/lan-transfer/LanShareDialog.tsx:127
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:245
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:249
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:218
 msgid "未选择"
 msgstr "Not selected"
@@ -6747,30 +6746,30 @@ msgstr "Annotation packages can only be downloaded on desktop"
 msgid "注释包译文"
 msgstr "Annotation Pack Translation"
 
-#: src/features/activity/ActivityEntry.tsx:35
-#: src/features/activity/ActivityEntry.tsx:74
+#: src/features/activity/ActivityEntry.tsx:34
+#: src/features/activity/ActivityEntry.tsx:73
 #: src/features/activity/ActivityPage.tsx:26
 #: src/features/activity/ActivityPanel.tsx:78
 msgid "活动"
 msgstr "Activity"
 
-#: src/features/activity/ActivityEntry.tsx:28
+#: src/features/activity/ActivityEntry.tsx:27
 msgid "活动，{failed} 个任务失败"
 msgstr "Activity, {failed, plural, one {# failed task} other {# failed tasks}}"
 
-#: src/features/activity/ActivityEntry.tsx:26
+#: src/features/activity/ActivityEntry.tsx:25
 msgid "活动，{failed} 个任务失败，{running} 个任务进行中"
 msgstr "Activity, {failed, plural, one {# failed task} other {# failed tasks}}, {running, plural, one {# task} other {# tasks}} running"
 
-#: src/features/activity/ActivityEntry.tsx:30
+#: src/features/activity/ActivityEntry.tsx:29
 msgid "活动，{running} 个任务进行中"
 msgstr "Activity, {running, plural, one {# task} other {# tasks}} running"
 
-#: src/features/activity/ActivityEntry.tsx:32
+#: src/features/activity/ActivityEntry.tsx:31
 msgid "活动，有可用更新"
 msgstr "Activity, update available"
 
-#: src/features/activity/ActivityEntry.tsx:34
+#: src/features/activity/ActivityEntry.tsx:33
 msgid "活动，有外部服务调用"
 msgstr "Activity, external service activity"
 
@@ -6841,7 +6840,7 @@ msgstr "Dark"
 #: src/features/bt/BtTool.tsx:298
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:60
 #: src/features/lan-transfer/LanShareDialog.tsx:161
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:374
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:378
 msgid "添加"
 msgstr "Add"
 
@@ -7141,10 +7140,6 @@ msgstr "Foul decision"
 msgid "状态"
 msgstr "State"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:44
-msgid "状态不可用"
-msgstr "Status unavailable"
-
 #: src/features/about/AboutPage.tsx:150
 msgid "状态读取失败"
 msgstr "Status unavailable"
@@ -7301,8 +7296,8 @@ msgstr "Leave blank to keep the current key"
 msgid "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
 msgstr "When empty, User from ~/.ssh/config is used first, then the current system user."
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:290
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:310
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:294
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:314
 msgid "白名单"
 msgstr "Trusted Devices"
 
@@ -7423,7 +7418,7 @@ msgstr "Import backup"
 msgid "确认清理"
 msgstr "Confirm clear"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:287
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:291
 msgid "确认码"
 msgstr "Confirmation Code"
 
@@ -7572,7 +7567,7 @@ msgstr "Remove"
 msgid "移除 {name}"
 msgstr "Remove {name}"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:562
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:566
 msgid "移除“{pendingLabel}”？"
 msgstr "Remove “{pendingLabel}”?"
 
@@ -7580,7 +7575,7 @@ msgstr "Remove “{pendingLabel}”?"
 msgid "移除「{modelName}」模型，之后可重新下载。"
 msgstr "Remove the “{modelName}” model. You can download it again later."
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:564
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:568
 msgid "移除后，该设备将不再自动获得访问权限。"
 msgstr "After removal, this device will no longer be granted access automatically."
 
@@ -7625,7 +7620,7 @@ msgstr "Empty Directory"
 msgid "空闲"
 msgstr "Idle"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:151
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:155
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:159
 msgid "端口"
 msgstr "Port"
@@ -7902,12 +7897,12 @@ msgstr "Terminal session"
 msgid "终端输入数据格式无效"
 msgstr "Invalid terminal input format"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:187
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:198
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:191
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:202
 msgid "绑定 IP"
 msgstr "Bind IP"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:110
+#: src/features/lan-transfer/LanTransferTool.tsx:100
 msgid "绑定 IP 不可用"
 msgstr "Bind IP Unavailable"
 
@@ -7950,8 +7945,8 @@ msgstr "Draw instances"
 #: src/features/bt/components/TaskRow.tsx:155
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:408
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:421
-#: src/features/transfers/TransferItem.tsx:63
 #: src/features/transfers/TransferItem.tsx:64
+#: src/features/transfers/TransferItem.tsx:65
 #: src/features/translation/ModelManager.tsx:128
 msgid "继续"
 msgstr "Continue"
@@ -8200,8 +8195,8 @@ msgstr "Auto"
 msgid "自动旋转"
 msgstr "Auto-rotate"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:201
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:206
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:205
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:210
 msgid "自动选择"
 msgstr "Automatic"
 
@@ -8417,7 +8412,7 @@ msgstr "Keep track of tasks and lists"
 msgid "设为当前"
 msgstr "Set as active"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:133
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:137
 msgid "设备名"
 msgstr "Device Name"
 
@@ -8803,7 +8798,7 @@ msgstr "Please choose a static PNG, JPEG, or WebP image"
 
 #: src/features/lan-transfer/labels.ts:8
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:81
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:468
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:472
 msgid "读写"
 msgstr "Read/Write"
 
@@ -8832,7 +8827,7 @@ msgstr "Reading"
 msgid "读取信息"
 msgstr "Reading metadata"
 
-#: src/features/lan-transfer/LanTransferTool.tsx:86
+#: src/features/lan-transfer/LanTransferTool.tsx:76
 #: src/features/poetry/components/CollectionManagement.tsx:108
 #: src/features/poetry/components/PoetryReadError.tsx:20
 msgid "读取失败"
@@ -9077,7 +9072,7 @@ msgstr "Uptime {formatUptimeValue}"
 
 #: src/features/about/AboutPage.tsx:153
 #: src/features/about/AboutPage.tsx:172
-#: src/features/lan-transfer/LanTransferTool.tsx:46
+#: src/features/lan-transfer/LanServiceCard.tsx:32
 msgid "运行中"
 msgstr "Running"
 
@@ -9263,7 +9258,7 @@ msgstr "Connection Failed"
 msgid "连接已关闭"
 msgstr "Connection closed"
 
-#: src/features/lan-transfer/LanServiceCard.tsx:67
+#: src/features/lan-transfer/LanServiceCard.tsx:70
 msgid "连接确认码"
 msgstr "Connection code"
 
@@ -9343,7 +9338,7 @@ msgid "选彩"
 msgstr "Nominate colour"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:140
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:255
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:259
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:227
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:134
 msgid "选择"
@@ -9684,7 +9679,7 @@ msgstr "The reset has changed. Check its status again."
 #: src/features/bt/components/TaskRow.tsx:166
 #: src/features/games/billiards/BilliardsGame.tsx:124
 #: src/features/games/engine/GameSessionNotice.tsx:74
-#: src/features/lan-transfer/LanTransferTool.tsx:98
+#: src/features/lan-transfer/LanTransferTool.tsx:88
 #: src/features/logs/ActivityLogsPage.tsx:99
 #: src/features/poetry/components/CollectionManagement.tsx:120
 #: src/features/poetry/components/PoemList.tsx:203
@@ -9702,8 +9697,8 @@ msgstr "The reset has changed. Check its status again."
 #: src/features/todo/TodoItemDialog.tsx:84
 #: src/features/todo/TodoTool.tsx:224
 #: src/features/todo/TodoTool.tsx:240
-#: src/features/transfers/TransferItem.tsx:96
-#: src/features/transfers/TransferItem.tsx:105
+#: src/features/transfers/TransferItem.tsx:98
+#: src/features/transfers/TransferItem.tsx:107
 #: src/features/translation/ModelManager.tsx:120
 #: src/features/translation/ModelManager.tsx:213
 #: src/features/vault/VaultTool.tsx:150
@@ -9990,8 +9985,8 @@ msgstr "Black wins"
 msgid "默认"
 msgstr "Default"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:443
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:459
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:447
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:463
 msgid "默认权限"
 msgstr "Default Permission"
 
