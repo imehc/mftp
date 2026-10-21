@@ -19,6 +19,7 @@
     "check:model-offline": "node tests/checks/check-model-offline.mjs",
     "check:build-budget": "node tests/checks/check-build-budget.mjs",
     "check:platform": "node --test tests/checks/platform-packaging.test.mjs",
+    "check:form-errors": "node --test tests/checks/form-error-semantics.test.mjs",
     "check:platform-artifact": "node tests/checks/check-platform-artifact.mjs",
     "check:android-plugins": "node tests/checks/check-android-plugins.mjs",
     "routes:generate": "node scripts/generate-routes.mjs",

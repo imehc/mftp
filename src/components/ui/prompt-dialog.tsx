@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { z } from "zod";
 
 import { Button } from "~/components/ui/button";
@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
-import { Field, FieldDescription } from "~/components/ui/field";
+import { Field, FieldError } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { firstFormError } from "~/lib/form-errors";
 
@@ -21,6 +21,8 @@ interface Props {
   placeholder?: string;
   initialValue?: string;
   confirmText?: string;
+  /** 返回错误文案；null 表示通过。用于把名称规则放到表单层就近提示。 */
+  validate?: (value: string) => string | null;
   onOpenChange: (open: boolean) => void;
   onConfirm: (value: string) => void;
 }
@@ -32,10 +34,13 @@ export default function PromptDialog({
   placeholder,
   initialValue = "",
   confirmText,
+  validate,
   onOpenChange,
   onConfirm,
 }: Props) {
   const { t } = useLingui();
+  const inputId = useId();
+  const errorId = `${inputId}-error`;
   const form = useForm({
     defaultValues: {
       value: initialValue,
@@ -45,7 +50,11 @@ export default function PromptDialog({
         value: z
           .string()
           .trim()
-          .min(1, t`请输入内容`),
+          .min(1, t`请输入内容`)
+          .superRefine((value, ctx) => {
+            const message = validate?.(value);
+            if (message) ctx.addIssue({ code: "custom", message });
+          }),
       }),
     },
     onSubmit: ({ value }) => {
@@ -81,6 +90,7 @@ export default function PromptDialog({
               return (
                 <Field data-invalid={!!error}>
                   <Input
+                    id={inputId}
                     autoFocus
                     aria-label={placeholder ?? title}
                     value={field.state.value}
@@ -88,12 +98,9 @@ export default function PromptDialog({
                     placeholder={placeholder}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={!!error}
+                    aria-describedby={error ? errorId : undefined}
                   />
-                  {error ? (
-                    <FieldDescription className="text-destructive">
-                      {error}
-                    </FieldDescription>
-                  ) : null}
+                  {error ? <FieldError id={errorId}>{error}</FieldError> : null}
                 </Field>
               );
             }}

@@ -19,12 +19,12 @@ function DialogLayoutContent({
   className,
   adaptiveDensity = true,
   ...props
-}: React.ComponentProps<typeof DialogContent> & { adaptiveDensity?: boolean }) {
+}: React.ComponentProps<typeof DialogContent>) {
   return (
     <DialogContent
+      adaptiveDensity={adaptiveDensity}
       className={cn(
         "grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden",
-        adaptiveDensity && "ui-density-adaptive",
         className,
       )}
       {...props}

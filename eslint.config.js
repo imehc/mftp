@@ -63,6 +63,8 @@ export default defineConfig(
     "public/model-decoders/**",
     // 文档、设计片段和辅助验收产物不纳入 ESLint 检查。
     "docs/**",
+    // Agent skills 由 `pnpm skills:sync` 安装，属于本地工具，不纳入项目检查。
+    ".agents/**",
     // Rust 管理的资源（如 lan_transfer 浏览器端）不属于前端代码
     "src-tauri/**",
     // 自动生成：真实来源是 Rust（specta）/ 路由配置 / .po 文件

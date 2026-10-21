@@ -50,6 +50,9 @@ jobs:
       - name: Check model offline resources
         run: pnpm run check:model-offline
 
+      - name: Check form error semantics
+        run: pnpm run check:form-errors
+
       - name: Check application version consistency
         run: pnpm run version:check
 

@@ -13,7 +13,7 @@ interface Props {
   scroll?: "page" | "content";
   adaptiveDensity?: boolean;
   contentDensity?: "standard" | "compact";
-  // 内容自行滚动时，滚动容器须使用 app-scroll-safe-end 承接底部安全区。
+  // 未显式指定时，内容自行滚动默认把底部安全区交给内部滚动容器。
   bottomInset?: "page" | "scroll";
   contentClassName?: string;
 }
@@ -27,12 +27,13 @@ export default function AppPageLayout({
   scroll = "page",
   adaptiveDensity = true,
   contentDensity = "standard",
-  bottomInset = "page",
+  bottomInset,
   contentClassName,
 }: Props) {
+  const inset = bottomInset ?? (scroll === "content" ? "scroll" : "page");
   return (
     <main
-      data-bottom-inset={bottomInset}
+      data-bottom-inset={inset}
       className={cn(
         "bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden",
         adaptiveDensity && "ui-density-adaptive",
@@ -47,7 +48,7 @@ export default function AppPageLayout({
         width={width}
         scroll={scroll}
         density={contentDensity}
-        bottomInset={bottomInset}
+        bottomInset={inset}
         className={contentClassName}
       >
         {children}

@@ -321,20 +321,24 @@ html[data-font="geist"] {
   --font-sans-token: "Geist Variable", Geist, sans-serif;
   --font-mono-token:
     "Geist Mono Variable", "Geist Mono", ui-monospace, monospace;
+  --font-poetry-token: var(--font-sans-token);
 }
 
 html[data-font="outfit"] {
   --font-sans-token: "Outfit Variable", Outfit, sans-serif;
   --font-mono-token: "Fira Code", ui-monospace, monospace;
+  --font-poetry-token: var(--font-sans-token);
 }
 
 html[data-font="jakarta"] {
   --font-sans-token:
     "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
   --font-mono-token: "IBM Plex Mono", ui-monospace, monospace;
+  --font-poetry-token: var(--font-sans-token);
 }
 
 html[data-font="montserrat"] {
   --font-sans-token: "Montserrat Variable", Montserrat, sans-serif;
   --font-mono-token: "Space Mono", ui-monospace, monospace;
+  --font-poetry-token: var(--font-sans-token);
 }

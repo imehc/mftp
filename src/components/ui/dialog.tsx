@@ -53,12 +53,14 @@ function DialogContent({
   placement = "center",
   focusMode = false,
   animate = true,
+  adaptiveDensity = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
   placement?: "center" | "responsive-sheet" | "responsive-page";
   focusMode?: boolean;
   animate?: boolean;
+  adaptiveDensity?: boolean;
 }) {
   return (
     <DialogPortal>
@@ -95,6 +97,7 @@ function DialogContent({
               "max-md:rounded-b-none max-md:pb-[calc(1rem+var(--safe-bottom,0px))]",
             placement === "responsive-page" &&
               "max-md:h-full max-md:rounded-none",
+            adaptiveDensity && "ui-density-adaptive",
             className,
           )}
           {...props}
