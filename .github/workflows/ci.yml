@@ -53,6 +53,9 @@ jobs:
       - name: Check form error semantics
         run: pnpm run check:form-errors
 
+      - name: Check UI guardrails
+        run: pnpm run check:ui-guards
+
       - name: Check application version consistency
         run: pnpm run version:check
 
