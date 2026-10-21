@@ -98,6 +98,9 @@ export class ModelViewerRuntime {
       .getContext()
       .getExtension("WEBGL_lose_context");
     this.controls = new OrbitControls(this.camera, canvas);
+    // OrbitControls 默认把画布 touch-action 设为 none，会连页面纵向滚动一起吞掉。
+    // 改为 pan-y：纵向单指滑动交还页面滚动，横向旋转与双指缩放仍由控件处理。
+    canvas.style.touchAction = "pan-y";
     this.tools = new InspectionTools(
       canvas,
       this.camera,

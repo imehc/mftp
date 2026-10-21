@@ -358,7 +358,7 @@ export default function ModelViewerPage() {
       >
         <div
           data-wide={wide}
-          data-sidebar={state.items.length > 0}
+          data-sidebar={!!state.model}
           className="model-workspace-grid grid min-w-0 flex-1 gap-3"
         >
           {session.runtime ? (

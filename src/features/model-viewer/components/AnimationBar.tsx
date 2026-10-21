@@ -274,7 +274,6 @@ export function AnimationBar({
             step={Math.min(0.01, state.duration / 1000 || 0.01)}
             value={[state.time]}
             disabled={disabled || !state.duration}
-            className="min-h-11"
             aria-label={t({
               message: "动画时间轴（秒）",
               comment: "拖动或用方向键、Home、End 定位动画。",
@@ -302,7 +301,6 @@ export function AnimationBar({
                 max={state.duration}
                 step="0.01"
                 disabled={disabled || !state.duration}
-                className="min-h-11 md:min-h-8"
                 value={draft ?? state.time.toFixed(2)}
                 onFocus={(event) => {
                   setDraft(state.time.toFixed(2));

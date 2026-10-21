@@ -74,7 +74,6 @@ export function InspectionRange({
       <Slider
         id={id}
         aria-label={label}
-        className="min-h-11"
         value={[value]}
         min={min}
         max={max}
