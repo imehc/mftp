@@ -123,7 +123,7 @@ function TransferList({
     <div
       ref={scroller}
       role="list"
-      className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+      className="app-scroll-safe-end min-h-0 flex-1 overflow-y-auto overscroll-contain"
     >
       <div
         className="relative w-full"

@@ -17,7 +17,7 @@ export default function ActivityPage() {
   const [tab, setTab] = useState<ActivityTab>("tasks");
   return (
     <main
-      data-bottom-inset="page"
+      data-bottom-inset="scroll"
       className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
     >
       <ToolPageHeader
@@ -39,7 +39,12 @@ export default function ActivityPage() {
           </Button>
         }
       />
-      <AppPageContent width="full" scroll="content" density="compact">
+      <AppPageContent
+        width="full"
+        scroll="content"
+        density="compact"
+        bottomInset="scroll"
+      >
         <ActivityCenter mode="page" tab={tab} onTabChange={setTab} />
       </AppPageContent>
     </main>
