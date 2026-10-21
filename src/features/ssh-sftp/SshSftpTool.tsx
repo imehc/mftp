@@ -12,7 +12,6 @@ import SftpPanel from "~/features/ssh-sftp/components/sftp/SftpPanel";
 import Sidebar from "~/features/ssh-sftp/components/Sidebar";
 import TabBar from "~/features/ssh-sftp/components/terminal/TabBar";
 import Terminal from "~/features/ssh-sftp/components/terminal/Terminal";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
 import { useHostsStore } from "~/store/hosts";
 import { useSessionsStore } from "~/store/sessions";
 import { useSettingsStore } from "~/store/settings";
@@ -218,17 +217,14 @@ export default function SshSftpTool() {
           </Button>
         }
         trailing={
-          <div className="flex items-center gap-1">
-            <ActivityMenu />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setDrawerOpen(true)}
-              aria-label={t`打开主机列表`}
-            >
-              <PanelLeft />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setDrawerOpen(true)}
+            aria-label={t`打开主机列表`}
+          >
+            <PanelLeft />
+          </Button>
         }
       />
       <Group

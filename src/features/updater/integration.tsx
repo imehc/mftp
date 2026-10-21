@@ -13,8 +13,28 @@ import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 import { checkForUpdateManually } from "./controller";
 
 export { checkForUpdateOnLaunch } from "./controller";
+export { default as UpdaterActivity } from "./UpdaterActivity";
 export { default as UpdaterDialog } from "./UpdaterDialog";
-export { default as UpdaterStatusBar } from "./UpdaterStatusBar";
+
+export interface UpdaterActivitySummary {
+  running: boolean;
+  pending: boolean;
+  error: boolean;
+}
+
+/** 活动中心只读取更新状态；移动端别名会把这里替换为空状态。 */
+export function useUpdaterActivitySummary(): UpdaterActivitySummary {
+  const status = useUpdaterStore((state) => state.status);
+  const failed = useUpdaterStore((state) => state.error !== null);
+  return {
+    running:
+      status === "checking" ||
+      status === "downloading" ||
+      status === "restarting",
+    pending: !failed && (status === "available" || status === "ready"),
+    error: failed,
+  };
+}
 
 /** 平台构建入口；普通浏览器开发仍按实际平台隐藏桌面能力。 */
 export function UpdateMenuItem() {

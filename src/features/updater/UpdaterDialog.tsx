@@ -52,9 +52,11 @@ export default function UpdaterDialog() {
         className="grid-cols-[minmax(0,1fr)] md:max-w-lg"
         showCloseButton={false}
         onOpenAutoFocus={() => {
+          // WebKit 点击按钮不一定移动焦点；body 不是可恢复的触发器。
+          const active = document.activeElement;
           opener.current =
-            document.activeElement instanceof HTMLElement
-              ? document.activeElement
+            active instanceof HTMLElement && active !== document.body
+              ? active
               : null;
         }}
         onCloseAutoFocus={(event) => {

@@ -114,6 +114,7 @@ export function BilliardsHeader({
         <ToolPageHeader
           variant="compact"
           showHome={false}
+          showActivity={false}
           title={<Trans>台球</Trans>}
           leading={back}
           trailing={

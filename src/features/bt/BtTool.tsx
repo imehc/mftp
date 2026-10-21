@@ -19,7 +19,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { isMobilePlatform } from "~/lib/platform";
@@ -205,7 +204,6 @@ export default function BtTool() {
         <ToolPageHeader
           variant="standard"
           showHome={false}
-          status={<ActivityMenu />}
           leading={
             <Button variant="ghost" size="icon-sm" asChild>
               <Link

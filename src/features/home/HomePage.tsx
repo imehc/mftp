@@ -5,7 +5,6 @@ import { useEffect, useEffectEvent, useRef } from "react";
 
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
 import { useSettingsStore } from "~/store/settings";
 
 import {
@@ -78,7 +77,6 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
             {homeCategoryLabels[selected]}
           </span>
         }
-        trailing={<ActivityMenu />}
       />
       <AppPageContent bottomInset="scroll">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">

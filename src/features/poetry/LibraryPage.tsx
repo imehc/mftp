@@ -27,7 +27,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import ActivityMenu from "~/features/transfers/ActivityMenu";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { PoemSummary } from "~/types";
@@ -142,7 +141,6 @@ export default function LibraryPage({
     return (
       <main className="bg-background text-foreground flex h-full flex-col">
         <ToolPageHeader
-          status={<ActivityMenu />}
           showHome={false}
           title={<Trans>古诗词</Trans>}
           trailing={manageLink}
@@ -287,7 +285,6 @@ export default function LibraryPage({
       className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col"
     >
       <ToolPageHeader
-        status={<ActivityMenu />}
         showHome={false}
         title={<Trans>古诗词</Trans>}
         trailing={

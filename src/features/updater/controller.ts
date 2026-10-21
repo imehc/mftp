@@ -66,11 +66,6 @@ export function openUpdaterDialog() {
   setUpdaterState({ dialogOpen: true });
 }
 
-export function dismissUpdaterBanner() {
-  // 隐藏展示不影响更新任务及错误；状态留在内存中，跨页面仍保持关闭。
-  setUpdaterState({ bannerDismissed: true });
-}
-
 export function closeUpdaterDialog() {
   if (useUpdaterStore.getState().status === "current") resetUpdaterState();
   else setUpdaterState({ dialogOpen: false });
@@ -93,7 +88,6 @@ export function checkForUpdateManually() {
     toast.error(translate(msg`只能在桌面应用中检查更新`));
     return Promise.resolve();
   }
-  setUpdaterState({ bannerDismissed: false });
   openUpdaterDialog();
   if (checkTask) return checkTask;
   if (downloadTask) return downloadTask;

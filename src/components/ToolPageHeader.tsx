@@ -5,6 +5,7 @@ import { ArrowLeft, Home } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "~/components/ui/button";
+import ActivityEntry from "~/features/activity/ActivityEntry";
 import { TOUCH_TARGET_CHILDREN_CLASS, TOUCH_TARGET_CLASS } from "~/lib/touch";
 
 interface ToolPageHeaderProps {
@@ -15,6 +16,7 @@ interface ToolPageHeaderProps {
   leading?: ReactNode;
   children?: ReactNode;
   showHome?: boolean;
+  showActivity?: boolean;
   status?: ReactNode;
 }
 
@@ -26,6 +28,7 @@ export function ToolPageHeader({
   leading,
   children,
   showHome = true,
+  showActivity = true,
   status,
 }: ToolPageHeaderProps) {
   const { t } = useLingui();
@@ -88,10 +91,11 @@ export function ToolPageHeader({
         </div>
         {children}
       </div>
-      {trailing || status ? (
+      {trailing || status || showActivity ? (
         <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2">
           {trailing}
           {status}
+          {showActivity ? <ActivityEntry variant="header" /> : null}
         </div>
       ) : null}
     </header>

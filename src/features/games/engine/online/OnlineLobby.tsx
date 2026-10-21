@@ -54,6 +54,7 @@ export function OnlineLobby<M>({
       <ToolPageHeader
         variant="compact"
         showHome={false}
+        showActivity={false}
         title={c.hosting?.roomName || <Trans>联机对局</Trans>}
         leading={
           <Button

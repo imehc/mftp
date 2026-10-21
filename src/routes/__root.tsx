@@ -4,7 +4,8 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 
-import ExecutionLogDock from "~/features/connection-diagnostics/ExecutionLogDock";
+import ActivityPanel from "~/features/activity/ActivityPanel";
+import { ActivityProvider } from "~/features/activity/ActivityProvider";
 import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
 import { resolveNavigation } from "~/features/navigation/resolve-navigation";
 import { useStartupNavigation } from "~/features/navigation/use-startup-navigation";
@@ -37,24 +38,25 @@ function RootLayout() {
     settingsDetail,
   });
   return (
-    <div className="app-shell">
-      {navigation ? (
-        <ModuleNavigationFrame
-          active={navigation.active}
-          primary={navigation.primary}
-        >
-          <Outlet />
-        </ModuleNavigationFrame>
-      ) : (
-        <div className="flex h-full min-h-0 flex-col">
-          <div className="min-h-0 min-w-0 flex-1">
+    <ActivityProvider pathname={pathname}>
+      <div className="app-shell">
+        {navigation ? (
+          <ModuleNavigationFrame
+            active={navigation.active}
+            primary={navigation.primary}
+          >
             <Outlet />
+          </ModuleNavigationFrame>
+        ) : (
+          <div className="flex h-full min-h-0 flex-col">
+            <div className="min-h-0 min-w-0 flex-1">
+              <Outlet />
+            </div>
           </div>
-          {/* 无导航框架的页面同样要能看到外部服务活动面板。 */}
-          <ExecutionLogDock />
-        </div>
-      )}
-    </div>
+        )}
+        <ActivityPanel />
+      </div>
+    </ActivityProvider>
   );
 }
 

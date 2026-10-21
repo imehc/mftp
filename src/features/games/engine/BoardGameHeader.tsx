@@ -41,6 +41,7 @@ export function BoardGameHeader({
       <ToolPageHeader
         variant="compact"
         showHome={false}
+        showActivity={false}
         title={title}
         leading={
           active ? (

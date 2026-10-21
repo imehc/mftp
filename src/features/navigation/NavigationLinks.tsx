@@ -22,7 +22,7 @@ export default function NavigationLinks({
         variant={item.id === active ? "secondary" : "ghost"}
         className={
           desktop
-            ? "h-14.5 w-full flex-col gap-1 px-1 text-xs last:mt-auto"
+            ? "h-14.5 w-full flex-col gap-1 px-1 text-xs"
             : "h-13.5 min-w-0 flex-1 flex-col gap-1 px-1 text-xs"
         }
       >

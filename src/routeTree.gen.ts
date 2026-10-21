@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivityRoute = ActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogsRoute = LogsRouteImport.update({
@@ -158,6 +164,7 @@ const ToolsVideoCompressRoute = ToolsVideoCompressRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/activity': typeof ActivityRoute
   '/logs': typeof LogsRoute
   '/preview': typeof PreviewRoute
   '/settings': typeof SettingsRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/activity': typeof ActivityRoute
   '/logs': typeof LogsRoute
   '/preview': typeof PreviewRoute
   '/settings': typeof SettingsRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/activity': typeof ActivityRoute
   '/logs': typeof LogsRoute
   '/preview': typeof PreviewRoute
   '/settings': typeof SettingsRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/activity'
     | '/logs'
     | '/preview'
     | '/settings'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/activity'
     | '/logs'
     | '/preview'
     | '/settings'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/activity'
     | '/logs'
     | '/preview'
     | '/settings'
@@ -318,6 +330,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ActivityRoute: typeof ActivityRoute
   LogsRoute: typeof LogsRoute
   PreviewRoute: typeof PreviewRoute
   SettingsRoute: typeof SettingsRoute
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activity': {
+      id: '/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof ActivityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logs': {
@@ -518,6 +538,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ActivityRoute: ActivityRoute,
   LogsRoute: LogsRoute,
   PreviewRoute: PreviewRoute,
   SettingsRoute: SettingsRoute,

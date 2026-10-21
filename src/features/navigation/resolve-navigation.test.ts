@@ -76,5 +76,10 @@ describe("导航框架与页面层级", () => {
       resolveNavigation({ ...context, pathname: "/library-other" }),
     ).toBeNull();
     expect(resolveNavigation({ ...context, pathname: "/unknown" })).toBeNull();
+    // 活动页是全屏页面，不能获得默认导航框架和移动底栏。
+    expect(resolveNavigation({ ...context, pathname: "/activity" })).toBeNull();
+    expect(
+      resolveNavigation({ ...context, pathname: "/activity/" }),
+    ).toBeNull();
   });
 });

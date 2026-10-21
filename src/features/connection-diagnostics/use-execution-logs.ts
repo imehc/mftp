@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { AppError, DiagnosticOperation } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
+import { diagnosticsClear } from "~/lib/ipc";
 
 import { openExecutionLogSession } from "./execution-log-session";
 
@@ -22,7 +23,12 @@ export function useExecutionLogs() {
     operations,
     discarded,
     error,
-    clear: () => setOperations([]),
+    clear: () => {
+      setOperations([]);
+      setDiscarded(0);
+      // 丢弃本批记录，不取消仍在执行的外部操作。
+      void diagnosticsClear().catch(() => {});
+    },
     recordFailure: (cause: unknown) => setError(toIpcError(cause).payload),
   };
 }

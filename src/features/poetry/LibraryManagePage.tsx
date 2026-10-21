@@ -18,9 +18,10 @@ import { Button } from "~/components/ui/button";
 import PoetryLocalManagement from "~/features/poetry/components/PoetryLocalManagement";
 
 import {
-  CollectionFooter,
+  CollectionDownloadButton,
   CollectionGroups,
 } from "./components/CollectionManagement";
+import PoetrySyncStatus from "./components/PoetrySyncStatus";
 import { usePoetryCollectionsManage } from "./hooks/use-poetry-collections-manage";
 
 export default function LibraryManagePage({
@@ -61,17 +62,34 @@ export default function LibraryManagePage({
             </Link>
           </Button>
         }
+        trailing={
+          <CollectionDownloadButton
+            count={controller.selectedPendingIds.length}
+            disabled={
+              controller.busy ||
+              controller.loading ||
+              !!controller.error ||
+              controller.selectedPendingIds.length === 0
+            }
+            onDownload={() => void controller.startSync()}
+          />
+        }
       />
 
       <AppPageContent bottomInset="scroll">
+        <PoetrySyncStatus
+          progress={controller.progress}
+          collections={controller.collections}
+          starting={controller.starting}
+          className="sticky top-0 z-10"
+          onCancel={controller.cancelSync}
+        />
         <p className="text-muted-foreground text-sm">
           <Trans>下载后即可离线搜索和阅读。</Trans>
         </p>
         <CollectionGroups controller={controller} />
         <PoetryLocalManagement controller={controller} />
       </AppPageContent>
-      {/* 下载入口与同步进度共用一条底栏，固定在滚动区外。 */}
-      <CollectionFooter controller={controller} />
 
       <AlertDialog
         open={pendingDelete !== null}

@@ -48,6 +48,7 @@ export default function PreviewScreen({
       <ToolPageHeader
         variant="compact"
         showHome={false}
+        showActivity={false}
         title={name || t`文件预览`}
         leading={
           <Button

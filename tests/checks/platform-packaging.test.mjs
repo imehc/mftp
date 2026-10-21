@@ -50,7 +50,7 @@ test("五个目标的路由和源模块矩阵与原生配置一致", () => {
     assert.equal(
       sourceIncluded(
         target,
-        "src/features/transfers/TransferPanel.desktop.tsx",
+        "src/features/navigation/NavigationRail.desktop.tsx",
       ),
       true,
     );
