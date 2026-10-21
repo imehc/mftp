@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Lock } from "lucide-react";
 
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -8,6 +9,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { PasswordInput } from "~/components/ui/password-input";
+import SettingsControl from "~/features/settings/SettingsControl";
 import { SettingsGroup } from "~/features/settings/SettingsEntry";
 
 import type { BackupController } from "./use-backup";
@@ -21,52 +23,43 @@ export default function ExportPanel({
   return (
     <div className="flex flex-col gap-3">
       <SettingsGroup title={<Trans>选择导出数据</Trans>}>
-        <FieldGroup density="compact">
-          {c.available.map((s) => (
-            <Field key={s.id} orientation="horizontal">
-              <Checkbox
-                id={`backup-section-${s.id}`}
-                checked={c.selected.has(s.id)}
-                disabled={c.busy}
-                onCheckedChange={() => c.toggle(s.id)}
-              />
-              <FieldLabel
-                htmlFor={`backup-section-${s.id}`}
-                className="min-h-11 cursor-pointer py-2"
-              >
-                <span className="min-w-0">
-                  <span className="block">{s.title}</span>
-                  <span className="text-muted-foreground block text-xs font-normal">
-                    {s.description}
-                  </span>
-                </span>
-              </FieldLabel>
-            </Field>
-          ))}
-        </FieldGroup>
+        {c.available.map((s) => (
+          <SettingsControl
+            key={s.id}
+            id={`backup-section-${s.id}`}
+            icon={s.icon}
+            title={s.title}
+            description={s.description}
+          >
+            <Checkbox
+              id={`backup-section-${s.id}`}
+              checked={c.selected.has(s.id)}
+              disabled={c.busy}
+              onCheckedChange={() => c.toggle(s.id)}
+            />
+          </SettingsControl>
+        ))}
       </SettingsGroup>
       <SettingsGroup title={<Trans>保护备份</Trans>}>
+        <SettingsControl
+          id="backup-encrypted"
+          icon={Lock}
+          title={<Trans>加密导出</Trans>}
+        >
+          <Checkbox
+            id="backup-encrypted"
+            checked={c.encrypted}
+            disabled={c.busy}
+            onCheckedChange={(checked) => {
+              c.setEncrypted(checked === true);
+              if (checked !== true) {
+                c.setPassword("");
+                c.setConfirmPassword("");
+              }
+            }}
+          />
+        </SettingsControl>
         <FieldGroup>
-          <Field orientation="horizontal">
-            <Checkbox
-              id="backup-encrypted"
-              checked={c.encrypted}
-              disabled={c.busy}
-              onCheckedChange={(checked) => {
-                c.setEncrypted(checked === true);
-                if (checked !== true) {
-                  c.setPassword("");
-                  c.setConfirmPassword("");
-                }
-              }}
-            />
-            <FieldLabel
-              htmlFor="backup-encrypted"
-              className="min-h-11 cursor-pointer"
-            >
-              <Trans>加密导出</Trans>
-            </FieldLabel>
-          </Field>
           {c.encrypted ? (
             <>
               <Field>

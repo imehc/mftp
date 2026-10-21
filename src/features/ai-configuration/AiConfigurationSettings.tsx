@@ -53,7 +53,7 @@ export default function AiConfigurationSettings() {
   const wide = useDesktopLayout();
   return (
     <>
-      <AppPageContent bottomInset="page">
+      <AppPageContent bottomInset="scroll">
         <section
           className="flex min-w-0 flex-col gap-3"
           aria-busy={busy || loading}

@@ -3,21 +3,27 @@ import { Link } from "@tanstack/react-router";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import {
   ArrowLeft,
+  ArrowLeftRight,
+  BookOpen,
   Database,
   ExternalLink,
+  Gauge,
+  HardDrive,
   RefreshCw,
+  Terminal,
   Trash2,
+  Wifi,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import {
   SettingsEntry,
   SettingsGroup,
+  SettingsInfoRow,
 } from "~/features/settings/SettingsEntry";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
@@ -27,15 +33,6 @@ import { useTransfersStore } from "~/store/transfers";
 
 import DataManagementDialogs from "./DataManagementDialogs";
 import { useAbout } from "./use-about";
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex min-h-10 items-center justify-between gap-3 border-b py-2 last:border-0">
-      <span className="min-w-0 text-sm">{label}</span>
-      <Badge variant="secondary">{value}</Badge>
-    </div>
-  );
-}
 
 export default function AboutPage() {
   const { t } = useLingui();
@@ -111,36 +108,43 @@ export default function AboutPage() {
         ) : null}
         <div className="grid shrink-0 gap-4 md:grid-cols-2">
           <SettingsGroup title={<Trans>存储占用</Trans>}>
-            <InfoRow
-              label={t`主数据库`}
+            <SettingsInfoRow
+              icon={Database}
+              title={t`主数据库`}
               value={c.usage ? formatBytes(c.usage.mainDatabaseBytes) : "—"}
             />
-            <InfoRow
-              label={t`诗词数据库`}
+            <SettingsInfoRow
+              icon={BookOpen}
+              title={t`诗词数据库`}
               value={c.usage ? formatBytes(c.usage.poetryDatabaseBytes) : "—"}
             />
-            <InfoRow
-              label={t`应用内部数据`}
+            <SettingsInfoRow
+              icon={HardDrive}
+              title={t`应用内部数据`}
               value={c.usage ? formatBytes(c.usage.btInternalBytes) : "—"}
             />
-            <InfoRow
-              label={t`总占用`}
+            <SettingsInfoRow
+              icon={Gauge}
+              title={t`总占用`}
               value={c.usage ? formatBytes(c.usage.totalBytes) : "—"}
             />
           </SettingsGroup>
           <SettingsGroup title={<Trans>运行状态</Trans>}>
-            <InfoRow
-              label="SSH / SFTP"
+            <SettingsInfoRow
+              icon={Terminal}
+              title="SSH / SFTP"
               value={activeSessions ? String(activeSessions) : t`空闲`}
             />
-            <InfoRow
-              label={t`文件传输`}
+            <SettingsInfoRow
+              icon={ArrowLeftRight}
+              title={t`文件传输`}
               value={activeTransfers ? String(activeTransfers) : t`空闲`}
             />
             {isDesktopPlatform() ? (
               <>
-                <InfoRow
-                  label={t`局域网服务`}
+                <SettingsInfoRow
+                  icon={Wifi}
+                  title={t`局域网服务`}
                   value={
                     c.lanError
                       ? t`状态读取失败`
@@ -161,8 +165,9 @@ export default function AboutPage() {
                 ) : null}
               </>
             ) : null}
-            <InfoRow
-              label={t`诗词同步`}
+            <SettingsInfoRow
+              icon={RefreshCw}
+              title={t`诗词同步`}
               value={
                 sync.stale ? t`等待确认` : sync.active ? t`运行中` : t`空闲`
               }

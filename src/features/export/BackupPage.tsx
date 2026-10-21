@@ -72,7 +72,7 @@ export default function BackupPage() {
             </TabsTrigger>
           </TabsList>
         </div>
-        <AppPageContent>
+        <AppPageContent bottomInset="scroll">
           {c.error ? (
             <Alert variant="destructive">
               <AlertDescription>{describeError(c.error)}</AlertDescription>
