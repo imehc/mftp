@@ -20,7 +20,6 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 import { describeError, toIpcError } from "~/lib/errors";
 
-import { isModelManagementError } from "./error-scope";
 import { ModelManager } from "./ModelManager";
 import { useTranslation } from "./use-translation";
 
@@ -80,10 +79,9 @@ export default function TranslationTool() {
     const key = `${kind}:${code}:${message}`;
     if (notifiedError.current === key) return;
     notifiedError.current = key;
-    // 模型管理弹窗打开时下载/安装错误已在弹窗内展示，不再叠加提示。
-    if (modelManagerOpen && isModelManagementError(error)) return;
+    // 模型管理弹窗不再就地渲染错误，提示统一走这里。
     toast.error(describeError(error, t));
-  }, [error, modelManagerOpen, t]);
+  }, [error, t]);
 
   function swapLanguages() {
     setSourceLanguage(targetLanguage === "auto" ? "zh-CN" : targetLanguage);
@@ -124,13 +122,11 @@ export default function TranslationTool() {
       bottomInset="scroll"
       contentDensity="compact"
       actions={
-        <div className="flex w-[calc(100vw-1.5rem)] max-w-full items-center justify-end gap-2 sm:w-auto">
-          <ModelManager
-            controller={controller}
-            open={modelManagerOpen}
-            onOpenChange={setModelManagerOpen}
-          />
-        </div>
+        <ModelManager
+          controller={controller}
+          open={modelManagerOpen}
+          onOpenChange={setModelManagerOpen}
+        />
       }
     >
       <div className="border-border bg-card grid grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)] items-center gap-2 rounded-xl border p-2 sm:grid-cols-[minmax(12rem,1fr)_2.5rem_minmax(12rem,1fr)] sm:gap-3 sm:px-4">

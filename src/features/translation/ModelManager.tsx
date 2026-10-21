@@ -1,16 +1,21 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Download,
+  LoaderCircle,
   Pause,
   Play,
   RefreshCw,
   Settings2,
   Trash2,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 
-import type { TranslationModel } from "~/bindings";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import type {
+  TranslationModel,
+  TranslationPhase,
+  TranslationTask,
+} from "~/bindings";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,11 +48,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 import { isModelManagementError } from "./error-scope";
 import type { useTranslation } from "./use-translation";
+
+/** 下载完成后的收尾阶段，直接以按钮文案呈现，不再单独提供停止入口。 */
+function installPhaseLabel(phase: TranslationPhase): ReactNode {
+  switch (phase) {
+    case "verifying":
+      return <Trans>校验中</Trans>;
+    case "stopping":
+      return <Trans>正在停止…</Trans>;
+    default:
+      return <Trans>准备中</Trans>;
+  }
+}
+
+interface ModelAction {
+  icon: ReactNode;
+  label: ReactNode;
+  disabled: boolean;
+  onClick?: () => void;
+}
 
 export function ModelManager({
   controller,
@@ -59,15 +83,59 @@ export function ModelManager({
   onOpenChange?: (open: boolean) => void;
 }) {
   const { t } = useLingui();
+  const desktopActions = useDesktopLayout();
   const [removing, setRemoving] = useState<TranslationModel | null>(null);
   const [lastDownloadId, setLastDownloadId] = useState<string | null>(null);
   const { snapshot, busy, error } = controller;
   const modelName = removing?.name ?? "";
-  const downloadError = error != null && isModelManagementError(error);
+  const installError = error != null && isModelManagementError(error);
 
   function startDownload(modelId: string) {
     setLastDownloadId(modelId);
     void controller.download(modelId);
+  }
+
+  function actionFor(
+    model: TranslationModel,
+    task: TranslationTask | null,
+  ): ModelAction {
+    if (task?.phase === "downloading") {
+      return {
+        icon: <Pause />,
+        label: <Trans>暂停</Trans>,
+        disabled: controller.stopping,
+        onClick: () => void controller.stop(),
+      };
+    }
+    if (task) {
+      return {
+        icon: <LoaderCircle className="animate-spin" />,
+        label: installPhaseLabel(task.phase),
+        disabled: true,
+      };
+    }
+    if (installError && lastDownloadId === model.id) {
+      return {
+        icon: <RefreshCw />,
+        label: <Trans>重试</Trans>,
+        disabled: busy,
+        onClick: () => startDownload(model.id),
+      };
+    }
+    if (model.downloadedBytes > 0) {
+      return {
+        icon: <Play />,
+        label: <Trans>继续</Trans>,
+        disabled: busy,
+        onClick: () => startDownload(model.id),
+      };
+    }
+    return {
+      icon: <Download />,
+      label: <Trans>下载</Trans>,
+      disabled: busy,
+      onClick: () => startDownload(model.id),
+    };
   }
 
   return (
@@ -76,16 +144,14 @@ export function ModelManager({
         <DialogTrigger asChild>
           <Button
             variant="ghost"
-            size="sm"
+            size={desktopActions ? "sm" : "icon-sm"}
             density="adaptive"
             aria-label={t`管理模型`}
             title={t`管理模型`}
             className="shrink-0"
           >
             <Settings2 />
-            <span className="hidden sm:inline">
-              <Trans>管理模型</Trans>
-            </span>
+            {desktopActions ? <Trans>管理模型</Trans> : null}
           </Button>
         </DialogTrigger>
         <DialogLayoutContent
@@ -129,28 +195,24 @@ export function ModelManager({
               </Select>
             </div>
             {error != null && !snapshot && (
-              <Alert variant="destructive">
-                <div className="flex items-start justify-between gap-3">
-                  <AlertDescription>{describeError(error, t)}</AlertDescription>
-                  {!busy && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      density="adaptive"
-                      className="shrink-0"
-                      onClick={() => void controller.refresh(true)}
-                    >
-                      <RefreshCw />
-                      <Trans>重试</Trans>
-                    </Button>
-                  )}
-                </div>
-              </Alert>
-            )}
-            {error != null && snapshot && !downloadError && (
-              <Alert variant="destructive">
-                <AlertDescription>{describeError(error, t)}</AlertDescription>
-              </Alert>
+              <div
+                className="border-border flex flex-col items-center gap-3 rounded-xl border p-6 text-center"
+                role="status"
+              >
+                <p className="text-muted-foreground text-sm">
+                  <Trans>模型列表加载失败</Trans>
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  density="adaptive"
+                  disabled={busy}
+                  onClick={() => void controller.refresh(true)}
+                >
+                  <RefreshCw />
+                  <Trans>重试</Trans>
+                </Button>
+              </div>
             )}
             {snapshot?.models.map((model) => {
               const task =
@@ -165,7 +227,7 @@ export function ModelManager({
                 Math.floor((progressBytes / model.bytes) * 100),
               );
               const hasPartialDownload = !model.installed && progressBytes > 0;
-              const failed = downloadError && lastDownloadId === model.id;
+              const action = actionFor(model, task);
               return (
                 <section
                   key={model.id}
@@ -184,31 +246,11 @@ export function ModelManager({
                       <Button
                         size="sm"
                         density="adaptive"
-                        disabled={(busy && !downloading) || controller.stopping}
-                        onClick={() =>
-                          downloading
-                            ? void controller.stop()
-                            : startDownload(model.id)
-                        }
+                        disabled={action.disabled}
+                        onClick={action.onClick}
                       >
-                        {downloading ? (
-                          <Pause />
-                        ) : failed ? (
-                          <RefreshCw />
-                        ) : model.downloadedBytes > 0 ? (
-                          <Play />
-                        ) : (
-                          <Download />
-                        )}
-                        {downloading ? (
-                          <Trans>暂停</Trans>
-                        ) : failed ? (
-                          <Trans>重试</Trans>
-                        ) : model.downloadedBytes > 0 ? (
-                          <Trans>继续</Trans>
-                        ) : (
-                          <Trans>下载</Trans>
-                        )}
+                        {action.icon}
+                        {action.label}
                       </Button>
                     )}
                     {model.installed && (
@@ -239,16 +281,6 @@ export function ModelManager({
                       </Badge>
                     )}
                   </div>
-                  {error != null &&
-                    downloadError &&
-                    lastDownloadId === model.id && (
-                      <p
-                        className="text-destructive col-span-full text-xs"
-                        role="alert"
-                      >
-                        {describeError(error, t)}
-                      </p>
-                    )}
                   {(downloading || hasPartialDownload) && (
                     <div className="col-span-full flex flex-col gap-1.5">
                       <div className="text-muted-foreground flex justify-between gap-3 text-xs tabular-nums">
@@ -266,19 +298,6 @@ export function ModelManager({
                 </section>
               );
             })}
-            {busy && snapshot?.task?.phase !== "downloading" && (
-              <Button
-                variant="outline"
-                disabled={controller.stopping}
-                onClick={() => void controller.stop()}
-              >
-                {controller.stopping ? (
-                  <Trans>正在停止…</Trans>
-                ) : (
-                  <Trans>停止当前任务</Trans>
-                )}
-              </Button>
-            )}
           </DialogLayoutBody>
         </DialogLayoutContent>
       </Dialog>
