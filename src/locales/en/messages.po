@@ -19,8 +19,8 @@ msgstr ""
 #. placeholder {0}: output.length
 #. placeholder {0}: value.length
 #: src/features/crypto/CryptoTextPanel.tsx:30
-#: src/features/translation/TranslationTool.tsx:217
-#: src/features/translation/TranslationTool.tsx:274
+#: src/features/translation/TranslationTool.tsx:213
+#: src/features/translation/TranslationTool.tsx:270
 msgid "{0, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{0, plural, one {# character} other {# characters}}"
 
@@ -34,7 +34,7 @@ msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# character} other {# characters}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:135
-#: src/features/games/billiards/BilliardsScore.tsx:160
+#: src/features/games/billiards/BilliardsScore.tsx:156
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
 
@@ -42,13 +42,9 @@ msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive
 msgid "{count, plural, one {# 篇} other {# 篇}}"
 msgstr "{count, plural, one {# poem} other {# poems}}"
 
-#: src/features/games/billiards/BilliardsScore.tsx:90
+#: src/features/games/billiards/BilliardsScore.tsx:86
 msgid "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{count, plural, one {# ball left} other {# balls left}}"
-
-#: src/features/poetry/components/CollectionManagement.tsx:280
-msgid "{count, plural, one {已选择 # 个合集} other {已选择 # 个合集}}"
-msgstr "{count, plural, one {# collection selected} other {# collections selected}}"
 
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:204
 msgid "{cpuCoreCount, plural, one {# 核} other {# 核}}"
@@ -66,10 +62,6 @@ msgstr "Consecutive fouls by {decisionSeat}: two. Another consecutive foul will 
 #: src/features/lan-transfer/LanConnectedDevices.tsx:25
 msgid "{deviceCount, plural, one {# 设备} other {# 设备}}"
 msgstr "{deviceCount, plural, one {# device} other {# devices}}"
-
-#: src/features/transfers/TransferPanel.tsx:93
-msgid "{finishedTransferCount, plural, one {清除 # 个已完成任务} other {清除 # 个已完成任务}}"
-msgstr "{finishedTransferCount, plural, one {Clear # completed task} other {Clear # completed tasks}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:127
 msgid "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
@@ -92,11 +84,11 @@ msgstr "{hours, plural, one {# hour} other {# hours}}"
 msgid "{hours, plural, one {# 小时前} other {# 小时前}}"
 msgstr "{hours, plural, one {# hour ago} other {# hours ago}}"
 
-#: src/features/games/billiards/BilliardsScore.tsx:39
+#: src/features/games/billiards/BilliardsScore.tsx:35
 msgid "{id} 号球，已进球"
 msgstr "Ball {id}, potted"
 
-#: src/features/games/billiards/BilliardsScore.tsx:40
+#: src/features/games/billiards/BilliardsScore.tsx:36
 msgid "{id} 号球，未进球"
 msgstr "Ball {id}, remaining"
 
@@ -172,10 +164,6 @@ msgstr "Foul by {offender}."
 msgid "{onlineConnections} 个在线连接"
 msgstr "{onlineConnections} active connections"
 
-#: src/features/transfers/TransferPanel.tsx:59
-msgid "{pausedTransferCount, plural, one {# 个已暂停} other {# 个已暂停}}"
-msgstr "{pausedTransferCount, plural, one {# transfer paused} other {# transfers paused}}"
-
 #. 斯诺克判罚；offender 是犯规者，beneficiary 是获分者，罚分加给获分者而非扣除犯规者分数
 #: src/features/games/billiards/BilliardsFoulFeedback.tsx:19
 msgid "{penalty, plural, one {{offender} 犯规，{beneficiary} 获得 # 分。} other {{offender} 犯规，{beneficiary} 获得 # 分。}}"
@@ -212,7 +200,7 @@ msgid "{rounded, plural, one {# 秒} other {# 秒}}"
 msgstr "{rounded, plural, one {# second} other {# seconds}}"
 
 #. 对局结果；seatNameValue 是包含图标的黑棋或白棋名称。
-#: src/features/games/engine/black-white-labels.tsx:83
+#: src/features/games/engine/black-white-labels.tsx:79
 msgid "{seatNameValue} 获胜"
 msgstr "{seatNameValue} wins"
 
@@ -261,7 +249,7 @@ msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "Shot #"
 
-#: src/features/games/xiangqi/labels.tsx:89
+#: src/features/games/xiangqi/labels.tsx:85
 msgid "{sideNameValue} 获胜"
 msgstr "{sideNameValue} wins"
 
@@ -287,14 +275,6 @@ msgstr "{title} cleared"
 #: src/features/about/use-about.ts:150
 msgid "{title}已清理，释放 {freed}"
 msgstr "{title} cleared, freed {freed}"
-
-#: src/features/transfers/TransferPanel.tsx:71
-msgid "{transferringCount, plural, one {# 个进行中 · {pausedTransferCount} 个已暂停} other {# 个进行中 · {pausedTransferCount} 个已暂停}}"
-msgstr "{transferringCount, plural, one {# transfer in progress · {pausedTransferCount} paused} other {# transfers in progress · {pausedTransferCount} paused}}"
-
-#: src/features/transfers/TransferPanel.tsx:82
-msgid "{transferringCount, plural, one {# 个进行中} other {# 个进行中}}"
-msgstr "{transferringCount, plural, one {# transfer in progress} other {# transfers in progress}}"
 
 #: src/features/games/engine/online/OnlineMatchDialogs.tsx:52
 msgid "{undoPlies, plural, one {将撤销 # 手棋，是否同意？} other {将撤销 # 手棋，是否同意？}}"
@@ -484,7 +464,7 @@ msgstr "The API key is empty or too long"
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:220
+#: src/features/bt/BtTool.tsx:218
 #: src/features/home/entries.tsx:160
 #: src/lib/errors/messages.ts:283
 msgid "BT 下载"
@@ -571,11 +551,11 @@ msgstr "IP"
 msgid "IP 地址"
 msgstr "IP address"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:316
+#: src/features/games/engine/online/OnlineLobby.tsx:317
 msgid "IP:端口 直连"
 msgstr "IP:port direct"
 
-#: src/features/updater/UpdaterDialog.tsx:83
+#: src/features/updater/UpdaterDialog.tsx:85
 msgid "MFTP 应用更新"
 msgstr "MFTP updates"
 
@@ -621,7 +601,7 @@ msgstr "SFTP session"
 msgid "SFTP 写入长时间没有进展，请重试"
 msgstr "The SFTP write stalled. Please try again."
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:211
+#: src/features/ssh-sftp/SshSftpTool.tsx:210
 msgid "SSH / SFTP"
 msgstr "SSH / SFTP"
 
@@ -664,7 +644,7 @@ msgstr "Top Processes"
 msgid "XYZ 方向：点击坐标轴切换视角，双击适配模型。也可按 X、Y、Z，按住 Shift 查看反方向。"
 msgstr "XYZ orientation: click an axis to change the view, or double-click to fit the model. You can also press X, Y or Z; hold Shift for the opposite direction."
 
-#: src/features/games/xiangqi/labels.tsx:61
+#: src/features/games/xiangqi/labels.tsx:57
 msgid "三次重复局面"
 msgstr "Threefold repetition"
 
@@ -794,7 +774,7 @@ msgstr "Next month"
 #: src/features/media-compress/components/CompressResultCard.tsx:81
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:285
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:69
-#: src/features/translation/ModelManager.tsx:210
+#: src/features/translation/ModelManager.tsx:135
 msgid "下载"
 msgstr "Download"
 
@@ -809,7 +789,7 @@ msgstr "Download {entryName2}"
 #. SSH/SFTP 传输操作当前阶段
 #: src/features/bt/components/TaskRow.tsx:98
 #: src/features/transfers/phase-label.ts:21
-#: src/features/updater/integration.tsx:28
+#: src/features/updater/integration.tsx:48
 #: src/store/transfers.ts:12
 msgid "下载中"
 msgstr "Downloading"
@@ -827,7 +807,7 @@ msgstr "The download session could not be restored. Please add the task again."
 msgid "下载压缩包中"
 msgstr "Downloading archive"
 
-#: src/features/poetry/LibraryManagePage.tsx:68
+#: src/features/poetry/LibraryManagePage.tsx:88
 msgid "下载后即可离线搜索和阅读。"
 msgstr "Download collections to search and read offline."
 
@@ -850,8 +830,9 @@ msgstr "Download recording"
 msgid "下载截图"
 msgstr "Download screenshot"
 
-#: src/features/poetry/components/CollectionManagement.tsx:297
-#: src/features/poetry/components/CollectionManagement.tsx:298
+#: src/features/poetry/components/CollectionManagement.tsx:168
+#: src/features/poetry/components/CollectionManagement.tsx:169
+#: src/features/poetry/components/CollectionManagement.tsx:174
 msgid "下载所选"
 msgstr "Download selected"
 
@@ -878,7 +859,7 @@ msgstr "Download Folder"
 msgid "下载文件夹中"
 msgstr "Downloading folder"
 
-#: src/features/updater/UpdaterDialog.tsx:133
+#: src/features/updater/UpdaterDialog.tsx:135
 msgid "下载更新"
 msgstr "Download Update"
 
@@ -893,8 +874,8 @@ msgid "下载翻译模型"
 msgstr "Download translation model"
 
 #: src/features/bt/components/TaskRow.tsx:128
+#: src/features/updater/UpdaterActivity.tsx:93
 #: src/features/updater/UpdaterProgress.tsx:46
-#: src/features/updater/UpdaterStatusBar.tsx:92
 msgid "下载进度"
 msgstr "Download progress"
 
@@ -959,6 +940,10 @@ msgstr "Not applicable"
 msgid "不透明度"
 msgstr "Opacity"
 
+#: src/features/activity/ExecutionLogActivity.tsx:34
+msgid "与外部服务交互后，可以在这里查看实时执行日志。"
+msgstr "After interacting with external services, real-time execution logs appear here."
+
 #: src/features/games/engine/online/useOnlineMatch.ts:64
 msgid "与对方的连接已断开。"
 msgstr "Connection to the opponent was lost."
@@ -1013,7 +998,7 @@ msgstr "Chinese chess board"
 msgid "中式八球"
 msgstr "Chinese eight-ball"
 
-#: src/features/translation/TranslationTool.tsx:35
+#: src/features/translation/TranslationTool.tsx:34
 msgid "中文（简体）"
 msgstr "Chinese (Simplified)"
 
@@ -1061,7 +1046,7 @@ msgstr "Host"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:110
-#: src/features/ssh-sftp/SshSftpTool.tsx:332
+#: src/features/ssh-sftp/SshSftpTool.tsx:328
 msgid "主机列表"
 msgstr "Host list"
 
@@ -1092,8 +1077,8 @@ msgstr "You can also drop a model file here"
 msgid "互换"
 msgstr "Swap"
 
-#: src/features/translation/TranslationTool.tsx:170
-#: src/features/translation/TranslationTool.tsx:171
+#: src/features/translation/TranslationTool.tsx:166
+#: src/features/translation/TranslationTool.tsx:167
 msgid "互换语言"
 msgstr "Swap languages"
 
@@ -1183,7 +1168,7 @@ msgstr "Only thumbnails are cleared. Models are kept, and database space is reus
 msgid "仅用于提示，不代表设备内存上限。"
 msgstr "A reminder only; this is not the device memory limit."
 
-#: src/features/games/engine/online/OnlineLobby.tsx:276
+#: src/features/games/engine/online/OnlineLobby.tsx:277
 msgid "仅限同一局域网内联机"
 msgstr "Online play works within the same LAN only"
 
@@ -1221,6 +1206,10 @@ msgstr "Code block"
 msgid "以下保留验证器的原始诊断、代码和文件位置。"
 msgstr "Original validator diagnostics, codes and file locations follow."
 
+#: src/features/activity/ActivityCenter.tsx:37
+msgid "任务"
+msgstr "Tasks"
+
 #: src/lib/errors/messages.ts:145
 msgid "任务不存在或尚未初始化，请稍后重试"
 msgstr "The task does not exist or has not been initialized. Please try again later."
@@ -1253,12 +1242,11 @@ msgstr "The task has already been saved"
 msgid "任务未运行"
 msgstr "The task is not running"
 
-#: src/features/bt/BtTool.tsx:240
+#: src/features/bt/BtTool.tsx:238
 msgid "任务状态通知暂不可用"
 msgstr "Task status notifications are unavailable"
 
-#: src/features/transfers/ActivityMenu.tsx:115
-#: src/features/transfers/TransferPanel.tsx:228
+#: src/features/activity/TransferActivity.tsx:45
 msgid "任务进度同步暂不可用"
 msgstr "Task progress sync is unavailable"
 
@@ -1267,10 +1255,6 @@ msgstr "Task progress sync is unavailable"
 #: src/features/todo/TodoTool.tsx:169
 msgid "优先级"
 msgstr "Priority"
-
-#: src/features/transfers/TransferPanel.tsx:189
-msgid "传输"
-msgstr "Transfers"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
@@ -1286,6 +1270,10 @@ msgstr "The transfer has not started or has already ended"
 #: src/features/connection-diagnostics/ExecutionLogDetails.tsx:39
 msgid "传输原始错误"
 msgstr "Original transport error"
+
+#: src/features/activity/TransferActivity.tsx:169
+msgid "传输失败后会保留在这里，便于重试或查看原因。"
+msgstr "Failed transfers stay here so you can retry or check the cause."
 
 #: src/lib/errors/messages.ts:163
 msgid "传输已取消"
@@ -1323,11 +1311,11 @@ msgstr "Low load \\u00b7 Pixel ratio up to 1 \\u00b7 Up to 20 fps"
 msgid "作者"
 msgstr "Author"
 
-#: src/features/games/billiards/BilliardsScore.tsx:17
+#: src/features/games/billiards/BilliardsScore.tsx:16
 #: src/features/games/engine/black-white-labels.tsx:32
-#: src/features/games/engine/black-white-labels.tsx:41
+#: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/xiangqi/labels.tsx:30
-#: src/features/games/xiangqi/labels.tsx:39
+#: src/features/games/xiangqi/labels.tsx:38
 msgid "你"
 msgstr "You"
 
@@ -1344,13 +1332,13 @@ msgstr "You play red"
 msgid "你执黑"
 msgstr "You play black"
 
-#: src/features/games/engine/black-white-labels.tsx:76
-#: src/features/games/xiangqi/labels.tsx:83
+#: src/features/games/engine/black-white-labels.tsx:72
+#: src/features/games/xiangqi/labels.tsx:79
 msgid "你赢了"
 msgstr "You win"
 
-#: src/features/games/engine/black-white-labels.tsx:78
-#: src/features/games/xiangqi/labels.tsx:85
+#: src/features/games/engine/black-white-labels.tsx:74
+#: src/features/games/xiangqi/labels.tsx:81
 msgid "你输了"
 msgstr "You lose"
 
@@ -1486,7 +1474,7 @@ msgstr "Pass"
 
 #. 停止模型动画并回到片段起点。
 #: src/features/model-viewer/components/AnimationBar.tsx:213
-#: src/features/translation/TranslationTool.tsx:253
+#: src/features/translation/TranslationTool.tsx:249
 msgid "停止"
 msgstr "Stop"
 
@@ -1506,10 +1494,6 @@ msgstr "Stop LAN transfer"
 #: src/features/media-compress/MediaProcessingGuard.tsx:76
 msgid "停止并离开"
 msgstr "Stop and leave"
-
-#: src/features/translation/ModelManager.tsx:278
-msgid "停止当前任务"
-msgstr "Stop current task"
 
 #: src/features/media-compress/MediaProcessingGuard.tsx:96
 msgid "停止当前处理？"
@@ -1547,7 +1531,7 @@ msgstr "Pixel format"
 msgid "允许"
 msgstr "Allow"
 
-#: src/features/translation/ModelManager.tsx:100
+#: src/features/translation/ModelManager.tsx:166
 msgid "先下载所选模型，安装后即可在本机离线翻译。"
 msgstr "Download the selected model first. Once installed, it can translate offline on this device."
 
@@ -1583,17 +1567,17 @@ msgstr "Fullscreen"
 msgid "全文索引"
 msgstr "Full-text index"
 
-#: src/features/games/billiards/BilliardsScore.tsx:168
+#: src/features/games/billiards/BilliardsScore.tsx:164
 msgid "全色球"
 msgstr "Solids"
 
 #: src/features/formatter/use-formatter.ts:59
 #: src/features/poetry/components/SearchBar.tsx:39
-#: src/features/poetry/LibraryPage.tsx:193
+#: src/features/poetry/LibraryPage.tsx:191
 msgid "全部"
 msgstr "All"
 
-#: src/features/bt/BtTool.tsx:287
+#: src/features/bt/BtTool.tsx:285
 msgid "全部任务"
 msgstr "All tasks"
 
@@ -1679,15 +1663,13 @@ msgstr "Linked textures"
 #: src/components/ui/dialog.tsx:112
 #: src/components/ui/dialog.tsx:154
 #: src/components/ui/sheet.tsx:88
+#: src/features/activity/ActivityCenter.tsx:75
 #: src/features/bt/components/AddTorrentDialog.tsx:363
 #: src/features/model-viewer/components/LibraryPanel.tsx:356
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
-#: src/features/poetry/components/CollectionManagement.tsx:268
-#: src/features/poetry/components/CollectionManagement.tsx:269
 #: src/features/ssh-sftp/components/Sidebar.tsx:365
 #: src/features/ssh-sftp/components/Sidebar.tsx:379
 #: src/features/todo/TodoDetailsDialog.tsx:145
-#: src/features/transfers/ActivityMenu.tsx:89
 msgid "关闭"
 msgstr "Close"
 
@@ -1708,6 +1690,11 @@ msgstr "Off"
 msgid "关闭可进一步减小体积"
 msgstr "Turn off to further reduce size"
 
+#: src/features/poetry/components/PoetrySyncStatus.tsx:146
+#: src/features/poetry/components/PoetrySyncStatus.tsx:147
+msgid "关闭同步失败提示"
+msgstr "Dismiss sync failure"
+
 #: src/features/vault/VaultEntryDialog.tsx:265
 msgid "关闭后，本次修改不会保存。"
 msgstr "Your changes will not be saved if you close."
@@ -1716,14 +1703,14 @@ msgstr "Your changes will not be saved if you close."
 msgid "关闭时正文搜索走 LIKE 兜底，较慢"
 msgstr "When off, body search falls back to LIKE and is slower"
 
-#. 隐藏底部更新状态行，不取消更新任务
-#: src/features/updater/UpdaterStatusBar.tsx:83
-msgid "关闭更新提示"
-msgstr "Dismiss update notification"
+#: src/features/activity/ActivityPanel.tsx:85
+#: src/features/activity/ActivityPanel.tsx:86
+msgid "关闭活动面板"
+msgstr "Close activity panel"
 
-#: src/features/transfers/ActivityMenu.tsx:77
-msgid "关闭活动面板不会取消传输。"
-msgstr "Closing this panel does not cancel transfers."
+#: src/features/activity/ActivityCenter.tsx:56
+msgid "关闭活动面板会丢弃本次执行日志，但不会取消正在运行的任务。"
+msgstr "Closing the activity panel discards this session's execution logs, but does not cancel running tasks."
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:72
 msgid "关闭连接"
@@ -1817,6 +1804,7 @@ msgstr "Write and execute"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:185
 #: src/features/media-compress/video/use-video-compress.ts:196
+#: src/features/translation/ModelManager.tsx:65
 #: src/store/transfers.ts:336
 msgid "准备中"
 msgstr "Preparing"
@@ -1922,8 +1910,8 @@ msgstr "Created"
 msgid "创建或加入房间"
 msgstr "Create or join a room"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:214
-#: src/features/games/engine/online/OnlineLobby.tsx:254
+#: src/features/games/engine/online/OnlineLobby.tsx:215
+#: src/features/games/engine/online/OnlineLobby.tsx:255
 msgid "创建房间"
 msgstr "Create Room"
 
@@ -2119,7 +2107,7 @@ msgstr "Refresh"
 msgid "刷新 AI 配置"
 msgstr "Refresh AI configuration"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:84
+#: src/features/games/engine/online/OnlineLobby.tsx:85
 msgid "刷新房间"
 msgstr "Refresh rooms"
 
@@ -2160,12 +2148,12 @@ msgstr "Features"
 msgid "功能入口"
 msgstr "Feature entries"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:186
-#: src/features/games/engine/online/OnlineLobby.tsx:374
+#: src/features/games/engine/online/OnlineLobby.tsx:187
+#: src/features/games/engine/online/OnlineLobby.tsx:375
 msgid "加入"
 msgstr "Join"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:293
+#: src/features/games/engine/online/OnlineLobby.tsx:294
 msgid "加入房间"
 msgstr "Join room"
 
@@ -2201,13 +2189,13 @@ msgstr "Load HDR environment"
 msgid "加载中"
 msgstr "Loading"
 
-#: src/features/bt/BtTool.tsx:265
+#: src/features/bt/BtTool.tsx:263
 #: src/features/bt/components/FileBrowserPanel.tsx:190
 #: src/features/bt/components/PeersPanel.tsx:62
 #: src/features/poetry/components/CollectionManagement.tsx:125
 #: src/features/poetry/components/PoemList.tsx:192
 #: src/features/poetry/components/PoetryLocalManagement.tsx:79
-#: src/features/preview/PreviewScreen.tsx:80
+#: src/features/preview/PreviewScreen.tsx:81
 #: src/features/preview/PreviewSurface.tsx:139
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:203
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:274
@@ -2291,7 +2279,7 @@ msgstr "Break {currentBreak}"
 msgid "单次"
 msgstr "Once"
 
-#: src/features/poetry/LibraryManagePage.tsx:92
+#: src/features/poetry/LibraryManagePage.tsx:110
 msgid "卸载"
 msgstr "Uninstall"
 
@@ -2299,7 +2287,7 @@ msgstr "Uninstall"
 msgid "卸载 {name}"
 msgstr "Uninstall {name}"
 
-#: src/features/poetry/LibraryManagePage.tsx:82
+#: src/features/poetry/LibraryManagePage.tsx:100
 msgid "卸载合集"
 msgstr "Uninstall collection"
 
@@ -2417,7 +2405,7 @@ msgstr "Original"
 msgid "原文超出模型上下文限制，请缩短文本后重试"
 msgstr "The input exceeds the model context limit. Shorten the text and try again."
 
-#: src/features/translation/TranslationTool.tsx:342
+#: src/features/translation/TranslationTool.tsx:338
 msgid "去下载"
 msgstr "Download it"
 
@@ -2443,7 +2431,7 @@ msgstr "2P"
 msgid "双人对战"
 msgstr "Two-Player Match"
 
-#: src/features/home/HomePage.tsx:64
+#: src/features/home/HomePage.tsx:63
 msgid "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 msgstr "Double-click or press ⌘/Ctrl + . to show or hide games"
 
@@ -2478,12 +2466,12 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/export/BackupPage.tsx:111
 #: src/features/export/BackupPage.tsx:151
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:48
-#: src/features/games/billiards/BilliardsHeader.tsx:140
-#: src/features/games/engine/BoardGameHeader.tsx:92
+#: src/features/games/billiards/BilliardsHeader.tsx:141
+#: src/features/games/engine/BoardGameHeader.tsx:93
 #: src/features/games/engine/GameHeaderControls.tsx:77
 #: src/features/games/engine/GameHeaderControls.tsx:105
 #: src/features/games/engine/GameSessionNotice.tsx:105
-#: src/features/games/engine/online/OnlineLobby.tsx:367
+#: src/features/games/engine/online/OnlineLobby.tsx:368
 #: src/features/lan-transfer/LanShareDialog.tsx:143
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:511
 #: src/features/logs/LogDialogs.tsx:155
@@ -2492,7 +2480,7 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/poetry/components/PoetryTranslationSection.tsx:345
 #: src/features/poetry/components/PoetryTranslationSection.tsx:373
 #: src/features/poetry/components/PoetryTranslationSection.tsx:393
-#: src/features/poetry/LibraryManagePage.tsx:90
+#: src/features/poetry/LibraryManagePage.tsx:108
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:337
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:88
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:221
@@ -2504,7 +2492,7 @@ msgstr "An unknown error occurred. Please try again."
 #: src/features/todo/TodoItemDialog.tsx:327
 #: src/features/todo/TodoTool.tsx:327
 #: src/features/transfers/TransferItem.tsx:88
-#: src/features/translation/ModelManager.tsx:302
+#: src/features/translation/ModelManager.tsx:321
 #: src/features/vault/VaultEntryDialog.tsx:242
 #: src/features/vault/VaultTool.tsx:205
 msgid "取消"
@@ -2522,7 +2510,7 @@ msgstr "Cancel transfer"
 msgid "取消传输任务"
 msgstr "Cancel transfer task"
 
-#: src/features/poetry/components/CollectionManagement.tsx:261
+#: src/features/poetry/components/PoetrySyncStatus.tsx:139
 msgid "取消同步"
 msgstr "Cancel sync"
 
@@ -2554,7 +2542,7 @@ msgstr "Cancel inspection"
 msgid "取消生成"
 msgstr "Cancel generation"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:78
+#: src/features/games/engine/online/OnlineLobby.tsx:79
 msgid "取消等待"
 msgstr "Stop waiting"
 
@@ -2563,8 +2551,8 @@ msgstr "Stop waiting"
 msgid "取消诗词同步"
 msgstr "Cancel poetry sync"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:272
-#: src/features/games/engine/online/OnlineLobby.tsx:367
+#: src/features/games/engine/online/OnlineLobby.tsx:273
+#: src/features/games/engine/online/OnlineLobby.tsx:368
 msgid "取消连接"
 msgstr "Cancel connection"
 
@@ -2588,13 +2576,13 @@ msgid "口令保护"
 msgstr "Passphrase Protected"
 
 #: src/features/home/entries.tsx:170
-#: src/features/poetry/LibraryPage.tsx:147
-#: src/features/poetry/LibraryPage.tsx:292
+#: src/features/poetry/LibraryPage.tsx:145
+#: src/features/poetry/LibraryPage.tsx:289
 #: src/features/poetry/PoemDetailPage.tsx:43
 msgid "古诗词"
 msgstr "Classical Poetry"
 
-#: src/features/poetry/LibraryPage.tsx:156
+#: src/features/poetry/LibraryPage.tsx:154
 msgid "古诗词语料还没有下载"
 msgstr "Poetry corpus not downloaded yet"
 
@@ -2602,7 +2590,7 @@ msgstr "Poetry corpus not downloaded yet"
 msgid "另一个系统导出尚未结束，请先完成或关闭系统面板。"
 msgstr "Another system export is in progress. Complete or close the system dialog first."
 
-#: src/features/updater/controller.ts:93
+#: src/features/updater/controller.ts:88
 msgid "只能在桌面应用中检查更新"
 msgstr "Updates can only be checked in the desktop app"
 
@@ -2637,7 +2625,7 @@ msgstr "Possibly inward shells"
 msgid "可选"
 msgstr "Optional"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:117
+#: src/features/games/billiards/BilliardsHeader.tsx:118
 #: src/features/home/entries.tsx:180
 msgid "台球"
 msgstr "Billiards"
@@ -2701,7 +2689,7 @@ msgstr "Concurrent transfer limit must be at least 1"
 msgid "同时传输数必须是整数"
 msgstr "Concurrent transfer limit must be an integer"
 
-#: src/features/poetry/components/CollectionManagement.tsx:177
+#: src/features/poetry/components/PoetrySyncStatus.tsx:48
 #: src/features/poetry/hooks/use-poetry-collections-manage.ts:78
 msgid "同步失败"
 msgstr "Sync failed"
@@ -2785,12 +2773,12 @@ msgstr "Enable motion control"
 msgid "命令"
 msgstr "Command"
 
-#: src/features/games/xiangqi/labels.tsx:74
-#: src/features/games/xiangqi/labels.tsx:94
+#: src/features/games/xiangqi/labels.tsx:70
+#: src/features/games/xiangqi/labels.tsx:90
 msgid "和棋"
 msgstr "Draw"
 
-#: src/features/games/xiangqi/labels.tsx:60
+#: src/features/games/xiangqi/labels.tsx:56
 msgid "困毙"
 msgstr "Stalemate"
 
@@ -2902,7 +2890,7 @@ msgstr "Pick two points on the same model."
 msgid "在局域网共享文件"
 msgstr "Share files on your local network"
 
-#: src/features/poetry/LibraryPage.tsx:159
+#: src/features/poetry/LibraryPage.tsx:157
 msgid "在数据管理页勾选合集并下载，即可离线浏览。"
 msgstr "Select collections in Data Management and download them to browse offline."
 
@@ -2919,12 +2907,12 @@ msgstr "Remember the scene environment on this device and restore it next time y
 msgid "在线"
 msgstr "Online"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:310
+#: src/features/games/engine/online/OnlineLobby.tsx:311
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:129
 msgid "地址"
 msgstr "Address"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:327
+#: src/features/games/engine/online/OnlineLobby.tsx:328
 msgid "地址格式应为 IP:端口"
 msgstr "Address must be in IP:port form"
 
@@ -3073,7 +3061,7 @@ msgstr "Copy to a folder"
 msgid "复制图片"
 msgstr "Copy image"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:113
+#: src/features/games/engine/online/OnlineLobby.tsx:114
 #: src/features/lan-transfer/LanServiceCard.tsx:50
 msgid "复制地址"
 msgstr "Copy address"
@@ -3086,12 +3074,12 @@ msgstr "Copy failed"
 msgid "复制密码"
 msgstr "Copy password"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:131
+#: src/features/games/engine/online/OnlineLobby.tsx:132
 msgid "复制房间码"
 msgstr "Copy room code"
 
 #: src/features/crypto/CryptoTool.tsx:124
-#: src/features/translation/TranslationTool.tsx:300
+#: src/features/translation/TranslationTool.tsx:296
 msgid "复制结果"
 msgstr "Copy result"
 
@@ -3117,11 +3105,11 @@ msgstr "Appearance and language"
 msgid "大小"
 msgstr "Size"
 
+#: src/features/activity/TransferActivity.tsx:72
 #: src/features/home/HomeRecentActivity.tsx:21
 #: src/features/lan-transfer/LanTransferActivity.tsx:30
 #: src/features/logs/use-activity-logs.ts:41
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:39
-#: src/features/transfers/ActivityMenu.tsx:132
 #: src/store/transfers.ts:189
 msgid "失败"
 msgstr "Failed"
@@ -3194,7 +3182,7 @@ msgstr "Install annotation library"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:185
 #: src/features/media-compress/video/use-video-compress.ts:191
 #: src/features/transfers/phase-label.ts:23
-#: src/features/updater/UpdaterDialog.tsx:121
+#: src/features/updater/UpdaterDialog.tsx:123
 #: src/features/vault/VaultTool.tsx:63
 #: src/store/transfers.ts:133
 #: src/store/transfers.ts:186
@@ -3206,6 +3194,10 @@ msgstr "Completed"
 msgctxt "timestamp label"
 msgid "完成"
 msgstr "Done"
+
+#: src/features/activity/TransferActivity.tsx:174
+msgid "完成或取消的任务会出现在这里。"
+msgstr "Completed or canceled tasks appear here."
 
 #. 结束三维模型的拖动摆放。
 #: src/features/model-viewer/components/CanvasControls.tsx:175
@@ -3466,7 +3458,7 @@ msgstr "Navigation"
 msgid "将军"
 msgstr "Check"
 
-#: src/features/poetry/LibraryManagePage.tsx:85
+#: src/features/poetry/LibraryManagePage.tsx:103
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
 msgstr "This will delete all local data of \"{pendingDeleteName}\" ({toLocaleStringValue4} entries). This action cannot be undone."
 
@@ -3486,11 +3478,11 @@ msgstr "This deletes the address and its keys ({keyCount}) and models ({modelCou
 msgid "将删除此设备上该模块的全部记录，此操作无法撤销。其他模块数据、下载文件和共享目录中的文件会保留。"
 msgstr "All records for this module on this device will be permanently deleted. Other modules, downloaded files, and shared files will be kept."
 
-#: src/features/games/xiangqi/labels.tsx:58
+#: src/features/games/xiangqi/labels.tsx:54
 msgid "将帅被吃"
 msgstr "General captured"
 
-#: src/features/games/xiangqi/labels.tsx:59
+#: src/features/games/xiangqi/labels.tsx:55
 msgid "将死"
 msgstr "Checkmate"
 
@@ -3502,8 +3494,8 @@ msgstr "Write result back to input and switch mode"
 msgid "将覆盖当前人工修订。"
 msgstr "This will overwrite the current manual revision."
 
-#: src/features/games/billiards/BilliardsHeader.tsx:135
-#: src/features/games/engine/BoardGameHeader.tsx:87
+#: src/features/games/billiards/BilliardsHeader.tsx:136
+#: src/features/games/engine/BoardGameHeader.tsx:88
 #: src/features/games/engine/GameHeaderControls.tsx:100
 msgid "将返回模式选择，当前对局的进度将会丢失。"
 msgstr "This returns to mode selection and discards the current match progress."
@@ -3602,10 +3594,6 @@ msgstr "Expand or collapse {name}"
 msgid "展开或收起动画控制"
 msgstr "Expand or collapse animation controls"
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:60
-msgid "展开执行日志"
-msgstr "Expand execution log"
-
 #. 三维查看器的自由相机、预览编辑与诊断工具。
 #: src/features/home/entries.tsx:40
 #: src/features/model-viewer/components/WorkspaceInspector.tsx:65
@@ -3672,7 +3660,7 @@ msgid "已关闭开机自启"
 msgstr "Launch at Login disabled"
 
 #. 待办删除成功的提示
-#: src/features/bt/BtTool.tsx:192
+#: src/features/bt/BtTool.tsx:191
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
 #: src/features/poetry/hooks/use-poetry-translations.ts:200
@@ -3761,11 +3749,11 @@ msgstr "Processed {completed}"
 msgid "已复制"
 msgstr "Copied"
 
-#: src/features/bt/BtTool.tsx:177
+#: src/features/bt/BtTool.tsx:176
 msgid "已复制到用户目录"
 msgstr "Copied to your folder"
 
-#: src/features/bt/BtTool.tsx:161
+#: src/features/bt/BtTool.tsx:160
 msgid "已复制到系统下载目录"
 msgstr "Copied to the system Downloads folder"
 
@@ -3774,7 +3762,7 @@ msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "An attachment with this name already exists. Rename the file or remove the old attachment first."
 
 #: src/features/poetry/components/CollectionManagement.tsx:138
-#: src/features/translation/ModelManager.tsx:238
+#: src/features/translation/ModelManager.tsx:280
 msgid "已安装"
 msgstr "Installed"
 
@@ -3915,7 +3903,7 @@ msgstr "Moved {name}"
 msgid "已索引 {toLocaleStringValue2} 篇，搜索亚毫秒返回"
 msgstr "Indexed {toLocaleStringValue2} entries, sub-millisecond search"
 
-#: src/features/transfers/ActivityMenu.tsx:136
+#: src/features/activity/TransferActivity.tsx:76
 msgid "已结束"
 msgstr "Finished"
 
@@ -3945,8 +3933,8 @@ msgstr "Selected {clipName}"
 msgid "平仄"
 msgstr "Tonal pattern"
 
-#: src/features/games/engine/black-white-labels.tsx:67
-#: src/features/games/engine/black-white-labels.tsx:90
+#: src/features/games/engine/black-white-labels.tsx:63
+#: src/features/games/engine/black-white-labels.tsx:86
 msgid "平局"
 msgstr "Draw"
 
@@ -3960,7 +3948,7 @@ msgid "应用"
 msgstr "Application"
 
 #: src/features/navigation/BottomNavigation.mobile.tsx:17
-#: src/features/navigation/NavigationRail.desktop.tsx:23
+#: src/features/navigation/NavigationRail.desktop.tsx:27
 msgid "应用主导航"
 msgstr "Main navigation"
 
@@ -4018,6 +4006,10 @@ msgstr "Abandoned at"
 #: src/features/poetry/components/PoetryLocalManagement.tsx:107
 msgid "开启"
 msgstr "On"
+
+#: src/features/activity/TransferActivity.tsx:163
+msgid "开始上传或下载后，进度会显示在这里。"
+msgstr "Start an upload or download to see progress here."
 
 #: src/features/bt/components/AddTorrentDialog.tsx:378
 msgid "开始下载"
@@ -4166,8 +4158,8 @@ msgstr "Showing the previous sample"
 #. 选中模型包含共享引用的已知分配估算。
 #: src/features/ai-configuration/ProviderDetails.tsx:146
 #: src/features/model-viewer/components/MemoryPanel.tsx:88
-#: src/features/translation/ModelManager.tsx:106
-#: src/features/translation/ModelManager.tsx:116
+#: src/features/translation/ModelManager.tsx:172
+#: src/features/translation/ModelManager.tsx:182
 msgid "当前模型"
 msgstr "Current model"
 
@@ -4329,7 +4321,7 @@ msgstr "Score {score}"
 msgid "循环模式"
 msgstr "Loop mode"
 
-#: src/features/translation/TranslationTool.tsx:40
+#: src/features/translation/TranslationTool.tsx:39
 msgid "德语"
 msgstr "German"
 
@@ -4402,15 +4394,15 @@ msgstr "Could not save the screenshot. Check the destination and available space
 msgid "截图已保存。"
 msgstr "Screenshot saved."
 
-#: src/features/games/engine/online/OnlineLobby.tsx:166
+#: src/features/games/engine/online/OnlineLobby.tsx:167
 msgid "房间"
 msgstr "Room"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:235
+#: src/features/games/engine/online/OnlineLobby.tsx:236
 msgid "房间名（可选）"
 msgstr "Room name (optional)"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:229
+#: src/features/games/engine/online/OnlineLobby.tsx:230
 msgid "房间名称"
 msgstr "Room name"
 
@@ -4418,12 +4410,12 @@ msgstr "Room name"
 msgid "房间的游戏类型不匹配"
 msgstr "The room uses a different game type"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:122
-#: src/features/games/engine/online/OnlineLobby.tsx:344
+#: src/features/games/engine/online/OnlineLobby.tsx:123
+#: src/features/games/engine/online/OnlineLobby.tsx:345
 msgid "房间码"
 msgstr "Room code"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:240
+#: src/features/games/engine/online/OnlineLobby.tsx:241
 msgid "房间码（可选）"
 msgstr "Room code (optional)"
 
@@ -4477,12 +4469,12 @@ msgid "打开一个 3D 模型"
 msgstr "Open a 3D model"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:63
-#: src/features/ssh-sftp/SshSftpTool.tsx:77
-#: src/features/ssh-sftp/SshSftpTool.tsx:227
+#: src/features/ssh-sftp/SshSftpTool.tsx:76
+#: src/features/ssh-sftp/SshSftpTool.tsx:224
 msgid "打开主机列表"
 msgstr "Open host list"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:74
+#: src/features/ssh-sftp/SshSftpTool.tsx:73
 msgid "打开主机列表，选择已有主机或新建主机"
 msgstr "Open the host list to choose or create a host"
 
@@ -4516,7 +4508,7 @@ msgstr "Open URL"
 msgid "执行"
 msgstr "Execute"
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:97
+#: src/features/activity/ActivityCenter.tsx:41
 msgid "执行日志"
 msgstr "Execution log"
 
@@ -4524,7 +4516,7 @@ msgstr "Execution log"
 msgid "执行日志已关闭或达到容量上限，请重新进入页面。"
 msgstr "The execution log is closed or at capacity. Reopen this page."
 
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:76
+#: src/features/activity/ExecutionLogActivity.tsx:60
 msgid "执行日志暂不可用"
 msgstr "Execution log unavailable"
 
@@ -4618,8 +4610,8 @@ msgstr "Drop a video here, or choose a file"
 msgid "持续慢帧或系统热状态升高时自动降级，稳定后逐步恢复。耗时来自应用采样，不代表 GPU 时间或设备温度。"
 msgstr "Quality decreases automatically during sustained slow frames or elevated system thermal status, then gradually recovers when stable. Timings are sampled by the app and do not represent GPU time or device temperature."
 
-#: src/features/poetry/LibraryPage.tsx:177
-#: src/features/poetry/LibraryPage.tsx:178
+#: src/features/poetry/LibraryPage.tsx:175
+#: src/features/poetry/LibraryPage.tsx:176
 msgid "按合集筛选"
 msgstr "Filter by collection"
 
@@ -4687,7 +4679,7 @@ msgstr "Follow"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:211
 #: src/features/poetry/components/CollectionManagement.tsx:42
-#: src/features/translation/ModelManager.tsx:233
+#: src/features/translation/ModelManager.tsx:275
 msgid "推荐"
 msgstr "Recommended"
 
@@ -4802,6 +4794,7 @@ msgid "操作信息已截断"
 msgstr "Operation information truncated"
 
 #. 执行日志中的失败终态
+#: src/features/activity/PoetrySyncActivity.tsx:20
 #: src/features/connection-diagnostics/ExecutionLogLine.tsx:17
 #: src/features/poetry/components/TranslationPackManager.tsx:63
 #: src/features/poetry/hooks/use-poetry-collections-manage.ts:116
@@ -4851,14 +4844,9 @@ msgid "收藏"
 msgstr "Favorite"
 
 #. 关闭更新弹窗并继续后台任务，不取消下载
-#: src/features/updater/UpdaterDialog.tsx:125
+#: src/features/updater/UpdaterDialog.tsx:127
 msgid "收起"
 msgstr "Hide"
-
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:60
-#: src/features/connection-diagnostics/ExecutionLogDock.tsx:103
-msgid "收起执行日志"
-msgstr "Collapse execution log"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:119
 msgid "改为自动选择"
@@ -4894,8 +4882,8 @@ msgstr "Data and runtime"
 msgid "数据导入与导出"
 msgstr "Import and export data"
 
+#: src/features/poetry/LibraryPage.tsx:131
 #: src/features/poetry/LibraryPage.tsx:132
-#: src/features/poetry/LibraryPage.tsx:133
 msgid "数据管理"
 msgstr "Data Management"
 
@@ -4965,7 +4953,7 @@ msgstr "The selection contains invalid or padding files"
 msgid "文件选择包含重复项"
 msgstr "The file selection contains duplicates"
 
-#: src/features/preview/PreviewScreen.tsx:51
+#: src/features/preview/PreviewScreen.tsx:52
 msgid "文件预览"
 msgstr "File preview"
 
@@ -5122,7 +5110,7 @@ msgstr "Could not get the local username. Enter the SSH username manually."
 msgid "无法识别远端操作系统"
 msgstr "Could not identify the remote operating system"
 
-#: src/features/bt/BtTool.tsx:238
+#: src/features/bt/BtTool.tsx:236
 msgid "无法读取下载任务"
 msgstr "Unable to load downloads"
 
@@ -5166,7 +5154,7 @@ msgstr "Logs cleared"
 msgid "日志详情"
 msgstr "Log details"
 
-#: src/features/translation/TranslationTool.tsx:37
+#: src/features/translation/TranslationTool.tsx:36
 msgid "日语"
 msgstr "Japanese"
 
@@ -5188,8 +5176,8 @@ msgstr "Time (seconds)"
 msgid "是"
 msgstr "Yes"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:218
-#: src/features/games/engine/online/OnlineLobby.tsx:333
+#: src/features/games/engine/online/OnlineLobby.tsx:219
+#: src/features/games/engine/online/OnlineLobby.tsx:334
 msgid "昵称"
 msgstr "Nickname"
 
@@ -5235,7 +5223,7 @@ msgstr "Show this feature"
 #: src/features/preview/MediaPlayer.tsx:145
 #: src/features/preview/MediaPlayer.tsx:146
 #: src/features/transfers/TransferItem.tsx:73
-#: src/features/translation/ModelManager.tsx:204
+#: src/features/translation/ModelManager.tsx:105
 msgid "暂停"
 msgstr "Pause"
 
@@ -5254,7 +5242,7 @@ msgstr "Pause reading"
 msgid "暂停记录"
 msgstr "Pause recording"
 
-#: src/features/bt/BtTool.tsx:275
+#: src/features/bt/BtTool.tsx:273
 msgid "暂无下载任务"
 msgstr "No download tasks yet"
 
@@ -5302,6 +5290,10 @@ msgstr "No todos"
 msgid "暂无待授权请求"
 msgstr "No pending authorization requests"
 
+#: src/features/activity/ExecutionLogActivity.tsx:31
+msgid "暂无执行记录"
+msgstr "No execution records yet"
+
 #: src/features/ssh-sftp/components/monitor/MonitorCharts.tsx:163
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:32
 msgid "暂无数据"
@@ -5310,10 +5302,6 @@ msgstr "No data"
 #: src/features/logs/ActivityLogsPage.tsx:118
 msgid "暂无日志"
 msgstr "No logs"
-
-#: src/features/transfers/ActivityMenu.tsx:147
-msgid "暂无此类任务"
-msgstr "No tasks in this category"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:358
 msgid "暂无白名单"
@@ -5347,7 +5335,7 @@ msgstr "Unable to finish the reset"
 msgid "暂时无法预览，文件可能尚未下载完整或编码不受支持"
 msgstr "Preview unavailable. The file may be incomplete or its codec unsupported."
 
-#: src/features/updater/UpdaterDialog.tsx:95
+#: src/features/updater/UpdaterDialog.tsx:97
 msgid "暂时没有可用更新。"
 msgstr "No updates are available at the moment."
 
@@ -5400,7 +5388,7 @@ msgstr "Updated at {updatedLabel}"
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
-#: src/features/updater/UpdaterDialog.tsx:108
+#: src/features/updater/UpdaterDialog.tsx:110
 msgid "更新包已准备好，重启时安装。请先保存正在进行的工作。"
 msgstr "The update is ready to install when you restart. Save your work first."
 
@@ -5413,7 +5401,7 @@ msgstr "Update password entry"
 msgid "更新已准备好"
 msgstr "Update ready"
 
-#: src/features/updater/UpdaterDialog.tsx:107
+#: src/features/updater/UpdaterDialog.tsx:109
 msgid "更新已安装，重启应用后生效。"
 msgstr "The update is installed. Restart the app to apply it."
 
@@ -5431,10 +5419,6 @@ msgstr "Failed to update todo"
 #: src/features/updater/use-updater-label.ts:26
 msgid "更新未完成"
 msgstr "Update incomplete"
-
-#: src/features/updater/UpdaterStatusBar.tsx:39
-msgid "更新状态"
-msgstr "Update status"
 
 #: src/features/updater/UpdaterReleaseNotes.tsx:58
 msgid "更新说明较长，请前往发布页面查看完整内容。"
@@ -5504,11 +5488,11 @@ msgstr "No key saved"
 msgid "未保存的文字和图片将被丢弃，已保存的备注不受影响。"
 msgstr "Unsaved text and images will be discarded. Your saved note will not be affected."
 
-#: src/features/games/billiards/BilliardsScore.tsx:172
+#: src/features/games/billiards/BilliardsScore.tsx:168
 msgid "未分组"
 msgstr "Open table"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:152
+#: src/features/games/engine/online/OnlineLobby.tsx:153
 msgid "未发现房间，可输入地址加入"
 msgstr "No rooms found. Enter an address to join."
 
@@ -5626,7 +5610,7 @@ msgstr "Not selected"
 msgid "未选择页面时将进入首页。"
 msgstr "If no page is selected, the app will open the home page."
 
-#: src/features/translation/TranslationTool.tsx:334
+#: src/features/translation/TranslationTool.tsx:330
 msgid "未配置驱动模型，"
 msgstr "No driver model configured,"
 
@@ -5762,10 +5746,6 @@ msgstr "View"
 msgid "查看下载文件信息"
 msgstr "View download file details"
 
-#: src/features/transfers/ActivityMenu.tsx:69
-msgid "查看传输任务的进度和结果"
-msgstr "View transfer progress and results"
-
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:79
 msgid "查看共享目录"
@@ -5798,7 +5778,6 @@ msgid "查看操作和失败原因"
 msgstr "View operations and failure details"
 
 #: src/features/home/HomeRecentActivity.tsx:32
-#: src/features/transfers/ActivityMenu.tsx:84
 msgid "查看日志"
 msgstr "View logs"
 
@@ -5807,9 +5786,9 @@ msgstr "View logs"
 msgid "查看日志：{action}"
 msgstr "View log: {action}"
 
-#: src/features/updater/integration.tsx:27
-#: src/features/updater/integration.tsx:29
-#: src/features/updater/integration.tsx:66
+#: src/features/updater/integration.tsx:47
+#: src/features/updater/integration.tsx:49
+#: src/features/updater/integration.tsx:86
 msgid "查看更新"
 msgstr "View Update"
 
@@ -5825,13 +5804,9 @@ msgstr "View a model"
 msgid "查看模型统计、场景节点及材质纹理。"
 msgstr "Inspect model statistics, scene nodes, materials and textures."
 
-#: src/features/transfers/ActivityMenu.tsx:39
-msgid "查看活动"
-msgstr "View activity"
-
-#: src/features/transfers/ActivityMenu.tsx:39
-msgid "查看活动，{failures} 个任务失败"
-msgstr "View activity, {failures} failed tasks"
+#: src/features/activity/ActivityCenter.tsx:70
+msgid "查看活动日志"
+msgstr "View activity logs"
 
 #. 台球开局页标题栏图标，打开当前所选玩法的规则说明
 #: src/features/games/billiards/BilliardsRulesDialog.tsx:21
@@ -5913,6 +5888,10 @@ msgstr "Title, URL, username, password, category, notes"
 msgid "校验"
 msgstr "Validate"
 
+#: src/features/translation/ModelManager.tsx:61
+msgid "校验中"
+msgstr "Verifying"
+
 #: src/features/formatter/FormatterActions.tsx:34
 #: src/features/formatter/FormatterTool.tsx:86
 #: src/features/home/entries.tsx:120
@@ -5934,9 +5913,9 @@ msgstr "Inspect"
 msgid "检查文件是否存在"
 msgstr "Check whether file exists"
 
-#: src/features/updater/integration.tsx:24
-#: src/features/updater/integration.tsx:26
-#: src/features/updater/integration.tsx:69
+#: src/features/updater/integration.tsx:44
+#: src/features/updater/integration.tsx:46
+#: src/features/updater/integration.tsx:89
 #: src/features/updater/use-updater-label.ts:28
 msgid "检查更新"
 msgstr "Check for Updates"
@@ -5974,7 +5953,7 @@ msgstr "Model"
 msgid "模型下载失败，请检查网络后重试"
 msgstr "The model download failed. Check your connection and try again."
 
-#: src/features/translation/ModelManager.tsx:262
+#: src/features/translation/ModelManager.tsx:294
 msgid "模型下载进度"
 msgstr "Model download progress"
 
@@ -6002,6 +5981,10 @@ msgstr "Model information"
 #: src/features/model-viewer/components/MemoryPanel.tsx:28
 msgid "模型内存估算已达到提醒阈值"
 msgstr "Estimated model memory reached the threshold"
+
+#: src/features/translation/ModelManager.tsx:203
+msgid "模型列表加载失败"
+msgstr "Couldn't load the model list"
 
 #. 三维查看器的动画控制区域名称。
 #: src/features/model-viewer/components/AnimationBar.tsx:70
@@ -6146,7 +6129,7 @@ msgstr "Play in landscape"
 msgid "正则"
 msgstr "Regexp"
 
-#: src/features/poetry/components/CollectionManagement.tsx:183
+#: src/features/poetry/components/PoetrySyncStatus.tsx:54
 msgid "正在下载"
 msgstr "Downloading"
 
@@ -6162,8 +6145,8 @@ msgstr "Saving"
 msgid "正在保存环境…"
 msgstr "Saving environment…"
 
-#: src/features/translation/ModelManager.tsx:276
-#: src/features/translation/TranslationTool.tsx:253
+#: src/features/translation/ModelManager.tsx:63
+#: src/features/translation/TranslationTool.tsx:249
 msgid "正在停止…"
 msgstr "Stopping…"
 
@@ -6215,7 +6198,7 @@ msgstr "Loading physics engine..."
 msgid "正在加载环境…"
 msgstr "Loading environment…"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:121
+#: src/features/ssh-sftp/SshSftpTool.tsx:120
 msgid "正在加载系统监控…"
 msgstr "Loading system monitor…"
 
@@ -6241,11 +6224,11 @@ msgstr "Cancelling"
 msgid "正在取消并释放资源"
 msgstr "Cancelling and releasing resources"
 
-#: src/features/poetry/components/CollectionManagement.tsx:184
+#: src/features/poetry/components/PoetrySyncStatus.tsx:55
 msgid "正在同步"
 msgstr "Syncing"
 
-#: src/features/poetry/components/CollectionManagement.tsx:175
+#: src/features/poetry/components/PoetrySyncStatus.tsx:46
 msgid "正在启动"
 msgstr "Starting"
 
@@ -6274,7 +6257,7 @@ msgstr "Processing attachment…"
 msgid "正在安装并重启…"
 msgstr "Installing and restarting…"
 
-#: src/features/poetry/components/CollectionManagement.tsx:181
+#: src/features/poetry/components/PoetrySyncStatus.tsx:52
 msgid "正在导入"
 msgstr "Importing"
 
@@ -6334,7 +6317,7 @@ msgstr "Executing"
 msgid "正在接收响应"
 msgstr "Receiving response"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:150
+#: src/features/games/engine/online/OnlineLobby.tsx:151
 msgid "正在搜索…"
 msgstr "Searching…"
 
@@ -6346,7 +6329,7 @@ msgstr "Preparing files"
 msgid "正在更新"
 msgstr "Updating"
 
-#: src/features/poetry/components/CollectionManagement.tsx:179
+#: src/features/poetry/components/PoetrySyncStatus.tsx:50
 msgid "正在校验"
 msgstr "Verifying"
 
@@ -6354,8 +6337,8 @@ msgstr "Verifying"
 msgid "正在校验更新…"
 msgstr "Verifying update…"
 
-#: src/features/updater/integration.tsx:25
-#: src/features/updater/integration.tsx:68
+#: src/features/updater/integration.tsx:45
+#: src/features/updater/integration.tsx:88
 msgid "正在检查"
 msgstr "Checking"
 
@@ -6371,7 +6354,7 @@ msgstr "Checking for updates..."
 msgid "正在检查重置状态"
 msgstr "Checking reset status"
 
-#: src/features/poetry/LibraryPage.tsx:228
+#: src/features/poetry/LibraryPage.tsx:226
 msgid "正在检索…"
 msgstr "Searching…"
 
@@ -6599,12 +6582,16 @@ msgstr "No Chinese voices available"
 msgid "没有可预览的文件，请返回来源重新打开"
 msgstr "No file to preview. Return to the source and open it again."
 
+#: src/features/activity/TransferActivity.tsx:167
+msgid "没有失败的任务"
+msgstr "No failed tasks"
+
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:212
 msgid "没有子文件夹"
 msgstr "No child folders"
 
 #: src/features/poetry/components/PoemList.tsx:209
-#: src/features/poetry/LibraryPage.tsx:242
+#: src/features/poetry/LibraryPage.tsx:240
 #: src/features/poetry/PoemDetailPage.tsx:72
 msgid "没有找到作品"
 msgstr "No poems found"
@@ -6612,6 +6599,10 @@ msgstr "No poems found"
 #: src/features/todo/TodoTool.tsx:256
 msgid "没有找到相关待办"
 msgstr "No matching tasks"
+
+#: src/features/activity/TransferActivity.tsx:162
+msgid "没有正在传输的任务"
+msgstr "No active transfers"
 
 #: src/features/todo/TodoTool.tsx:271
 msgid "没有进行中的待办"
@@ -6636,7 +6627,7 @@ msgstr "Opposing normals"
 msgid "法线着色"
 msgstr "Normal shading"
 
-#: src/features/translation/TranslationTool.tsx:39
+#: src/features/translation/TranslationTool.tsx:38
 msgid "法语"
 msgstr "French"
 
@@ -6657,9 +6648,32 @@ msgstr "Annotation packages can only be downloaded on desktop"
 msgid "注释包译文"
 msgstr "Annotation Pack Translation"
 
-#: src/features/transfers/ActivityMenu.tsx:66
+#: src/features/activity/ActivityEntry.tsx:35
+#: src/features/activity/ActivityEntry.tsx:74
+#: src/features/activity/ActivityPage.tsx:26
+#: src/features/activity/ActivityPanel.tsx:78
 msgid "活动"
 msgstr "Activity"
+
+#: src/features/activity/ActivityEntry.tsx:28
+msgid "活动，{failed} 个任务失败"
+msgstr "Activity, {failed, plural, one {# failed task} other {# failed tasks}}"
+
+#: src/features/activity/ActivityEntry.tsx:26
+msgid "活动，{failed} 个任务失败，{running} 个任务进行中"
+msgstr "Activity, {failed, plural, one {# failed task} other {# failed tasks}}, {running, plural, one {# task} other {# tasks}} running"
+
+#: src/features/activity/ActivityEntry.tsx:30
+msgid "活动，{running} 个任务进行中"
+msgstr "Activity, {running, plural, one {# task} other {# tasks}} running"
+
+#: src/features/activity/ActivityEntry.tsx:32
+msgid "活动，有可用更新"
+msgstr "Activity, update available"
+
+#: src/features/activity/ActivityEntry.tsx:34
+msgid "活动，有外部服务调用"
+msgstr "Activity, external service activity"
 
 #: src/features/about/use-about.ts:49
 #: src/features/logs/ActivityLogsPage.tsx:37
@@ -6724,8 +6738,8 @@ msgid "深色"
 msgstr "Dark"
 
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:32
-#: src/features/bt/BtTool.tsx:226
-#: src/features/bt/BtTool.tsx:280
+#: src/features/bt/BtTool.tsx:224
+#: src/features/bt/BtTool.tsx:278
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:51
 #: src/features/lan-transfer/LanShareDialog.tsx:151
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:350
@@ -6825,7 +6839,7 @@ msgstr "Scope"
 #: src/features/games/engine/BoardModeMenu.tsx:163
 #: src/features/media-compress/components/CompressDropzone.tsx:122
 #: src/features/poetry/components/SearchBar.tsx:149
-#: src/features/translation/TranslationTool.tsx:243
+#: src/features/translation/TranslationTool.tsx:239
 msgid "清空"
 msgstr "Clear"
 
@@ -6846,9 +6860,9 @@ msgstr "Clear search"
 msgid "清空日志"
 msgstr "Clear Logs"
 
-#: src/features/transfers/TransferPanel.tsx:215
-msgid "清除 {finishedTransferCount}"
-msgstr "Clear {finishedTransferCount}"
+#: src/features/activity/TransferActivity.tsx:89
+msgid "清除已结束"
+msgstr "Clear finished"
 
 #. 丢弃本次录屏的内存副本，不删除已经保存的文件。
 #. 丢弃本次录屏的内存副本，不删除已经保存的文件。
@@ -6934,7 +6948,7 @@ msgstr "Source file size is not memory usage."
 msgid "源视频没有音轨"
 msgstr "Source video has no audio track"
 
-#: src/features/translation/TranslationTool.tsx:139
+#: src/features/translation/TranslationTool.tsx:135
 msgid "源语言"
 msgstr "Source language"
 
@@ -6965,7 +6979,7 @@ msgid "片段 {number}"
 msgstr "Clip {number}"
 
 #. 更新对话框版本对比，version 是可用版本，currentVersion 是正在运行的版本
-#: src/features/updater/UpdaterDialog.tsx:79
+#: src/features/updater/UpdaterDialog.tsx:81
 msgid "版本 {version} · 当前 {currentVersion}"
 msgstr "Version {version} · Current {currentVersion}"
 
@@ -7036,14 +7050,14 @@ msgstr "Status unavailable"
 msgid "状态读取失败"
 msgstr "Status unavailable"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:176
-#: src/features/games/engine/online/OnlineLobby.tsx:224
-#: src/features/games/engine/online/OnlineLobby.tsx:339
+#: src/features/games/engine/online/OnlineLobby.tsx:177
+#: src/features/games/engine/online/OnlineLobby.tsx:225
+#: src/features/games/engine/online/OnlineLobby.tsx:340
 #: src/features/games/engine/online/use-online-lobby.ts:44
 msgid "玩家"
 msgstr "Player"
 
-#: src/features/games/billiards/BilliardsScore.tsx:21
+#: src/features/games/billiards/BilliardsScore.tsx:17
 msgid "玩家 1"
 msgstr "Player 1"
 
@@ -7051,7 +7065,7 @@ msgstr "Player 1"
 msgid "玩家 1 胜"
 msgstr "Player 1 wins"
 
-#: src/features/games/billiards/BilliardsScore.tsx:21
+#: src/features/games/billiards/BilliardsScore.tsx:17
 msgid "玩家 2"
 msgstr "Player 2"
 
@@ -7132,7 +7146,7 @@ msgid "由 {player} 选择接打，或要求 {offender} 从留下位置重打。
 msgstr "Decision for {player}: play next or ask {offender} to play from the position left."
 
 #. 翻译区域下方的模型来源说明；链接文字是当前所选模型名称
-#: src/features/translation/TranslationTool.tsx:307
+#: src/features/translation/TranslationTool.tsx:303
 msgid "由 <0>{modelName}<1/></0> 驱动"
 msgstr "Powered by <0>{modelName}<1/></0>"
 
@@ -7147,11 +7161,11 @@ msgid "申请访问权限"
 msgstr "Request access"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:34
-#: src/features/games/billiards/BilliardsScore.tsx:19
-#: src/features/games/engine/black-white-labels.tsx:43
+#: src/features/games/billiards/BilliardsScore.tsx:16
+#: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/engine/BoardMatchLayout.tsx:51
 #: src/features/games/engine/history-labels.tsx:19
-#: src/features/games/xiangqi/labels.tsx:41
+#: src/features/games/xiangqi/labels.tsx:38
 msgid "电脑"
 msgstr "Computer"
 
@@ -7164,7 +7178,7 @@ msgstr "Computer breaks"
 msgid "电脑对战"
 msgstr "Computer Match"
 
-#: src/features/games/billiards/BilliardsScore.tsx:155
+#: src/features/games/billiards/BilliardsScore.tsx:151
 #: src/features/games/billiards/SnookerHud.tsx:51
 #: src/features/games/go/GoMatch.tsx:203
 #: src/features/games/gomoku/GomokuMatch.tsx:174
@@ -7193,11 +7207,11 @@ msgstr "When empty, User from ~/.ssh/config is used first, then the current syst
 msgid "白名单"
 msgstr "Trusted Devices"
 
-#: src/features/games/engine/black-white-labels.tsx:54
+#: src/features/games/engine/black-white-labels.tsx:50
 msgid "白棋"
 msgstr "White"
 
-#: src/features/games/engine/black-white-labels.tsx:108
+#: src/features/games/engine/black-white-labels.tsx:104
 msgid "白棋胜"
 msgstr "White wins"
 
@@ -7247,7 +7261,7 @@ msgstr "An Item With This Name Already Exists"
 msgid "目标文件正在上传，请稍后重试"
 msgstr "The destination file is being uploaded. Try again later."
 
-#: src/features/translation/TranslationTool.tsx:205
+#: src/features/translation/TranslationTool.tsx:201
 msgid "目标语言"
 msgstr "Target language"
 
@@ -7374,6 +7388,10 @@ msgstr "Video files"
 msgid "离开会停止当前媒体处理，原文件会保留。"
 msgstr "Leaving stops the current media process. The original file will be kept."
 
+#: src/features/activity/ActivityCenter.tsx:60
+msgid "离开活动页会丢弃本次执行日志，但不会取消正在运行的任务。"
+msgstr "Leaving the activity page discards this session's execution logs, but does not cancel running tasks."
+
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:54
 msgid "离开游戏房间"
@@ -7393,7 +7411,7 @@ msgid "离线翻译"
 msgstr "Offline translation"
 
 #: src/features/about/ResetBoundary.tsx:44
-#: src/features/translation/ModelManager.tsx:97
+#: src/features/translation/ModelManager.tsx:163
 msgid "离线翻译模型"
 msgstr "Offline translation models"
 
@@ -7438,8 +7456,8 @@ msgstr "Movement speed"
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:190
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:260
 #: src/features/model-viewer/components/NavigationPanel.tsx:148
-#: src/features/translation/ModelManager.tsx:223
-#: src/features/translation/ModelManager.tsx:310
+#: src/features/translation/ModelManager.tsx:265
+#: src/features/translation/ModelManager.tsx:329
 msgid "移除"
 msgstr "Remove"
 
@@ -7448,13 +7466,13 @@ msgstr "Remove"
 msgid "移除 {name}"
 msgstr "Remove {name}"
 
-#: src/features/translation/ModelManager.tsx:297
+#: src/features/translation/ModelManager.tsx:316
 msgid "移除「{modelName}」模型，之后可重新下载。"
 msgstr "Remove the “{modelName}” model. You can download it again later."
 
 #. 移除查看器模型及资源，不删除源文件。
 #: src/features/model-viewer/components/ModelList.tsx:223
-#: src/features/translation/ModelManager.tsx:294
+#: src/features/translation/ModelManager.tsx:313
 msgid "移除模型"
 msgstr "Remove model"
 
@@ -7471,11 +7489,11 @@ msgstr "Remove view {name}"
 msgid "移除转义"
 msgstr "Unescape"
 
-#: src/features/updater/UpdaterDialog.tsx:129
+#: src/features/updater/UpdaterDialog.tsx:131
 msgid "稍后"
 msgstr "Later"
 
-#: src/features/updater/UpdaterDialog.tsx:123
+#: src/features/updater/UpdaterDialog.tsx:125
 msgid "稍后重启"
 msgstr "Restart later"
 
@@ -7490,7 +7508,6 @@ msgstr "Empty Directory"
 #: src/features/about/AboutPage.tsx:134
 #: src/features/about/AboutPage.tsx:138
 #: src/features/about/AboutPage.tsx:167
-#: src/features/transfers/TransferPanel.tsx:57
 msgid "空闲"
 msgstr "Idle"
 
@@ -7525,7 +7542,7 @@ msgstr "Paragraph {paragraph} / {paragraphCount}"
 msgid "第 {resultLine} 行第 {resultColumn} 列附近有语法错误"
 msgstr "Syntax error near line {resultLine}, column {resultColumn}"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:103
+#: src/features/games/engine/online/OnlineLobby.tsx:104
 msgid "等待对手加入…"
 msgstr "Waiting for an opponent..."
 
@@ -7559,12 +7576,12 @@ msgid "等待监控数据"
 msgstr "Waiting for monitor data"
 
 #: src/features/about/AboutPage.tsx:167
-#: src/features/poetry/components/CollectionManagement.tsx:173
+#: src/features/poetry/components/PoetrySyncStatus.tsx:44
 msgid "等待确认"
 msgstr "Awaiting confirmation"
 
 #. 更新包已准备好，等待用户确认安装并重启
-#: src/features/updater/UpdaterStatusBar.tsx:61
+#: src/features/updater/UpdaterActivity.tsx:38
 msgid "等待重启"
 msgstr "Restart pending"
 
@@ -7603,9 +7620,9 @@ msgstr "Manage AI configuration"
 msgid "管理下载任务"
 msgstr "Manage download task"
 
-#: src/features/translation/ModelManager.tsx:81
-#: src/features/translation/ModelManager.tsx:82
-#: src/features/translation/ModelManager.tsx:87
+#: src/features/translation/ModelManager.tsx:149
+#: src/features/translation/ModelManager.tsx:150
+#: src/features/translation/ModelManager.tsx:154
 msgid "管理模型"
 msgstr "Manage models"
 
@@ -7694,7 +7711,7 @@ msgstr "System monitoring does not support {os} yet. Only Linux is supported."
 msgid "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
 msgstr "Alternate reds and colours, then clear the colours in order. Six-red includes the five-miss rule; ten-red follows the fifteen-red flow. The auto referee only calls a miss when a clear direct shot fails to hit the ball on; when fully snookered it calls a plain foul and does not judge effort."
 
-#: src/features/games/xiangqi/labels.tsx:47
+#: src/features/games/xiangqi/labels.tsx:43
 msgid "红方"
 msgstr "Red"
 
@@ -7707,7 +7724,7 @@ msgstr "Red"
 msgid "红球数"
 msgstr "Reds"
 
-#: src/features/games/xiangqi/labels.tsx:110
+#: src/features/games/xiangqi/labels.tsx:106
 msgid "红胜"
 msgstr "Red wins"
 
@@ -7820,7 +7837,7 @@ msgstr "Draw instances"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:396
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:408
 #: src/features/transfers/TransferItem.tsx:73
-#: src/features/translation/ModelManager.tsx:208
+#: src/features/translation/ModelManager.tsx:128
 msgid "继续"
 msgstr "Continue"
 
@@ -8000,8 +8017,8 @@ msgid "美式九球"
 msgstr "American nine-ball"
 
 #: src/features/home/entries.tsx:130
-#: src/features/translation/TranslationTool.tsx:122
-#: src/features/translation/TranslationTool.tsx:262
+#: src/features/translation/TranslationTool.tsx:120
+#: src/features/translation/TranslationTool.tsx:258
 msgid "翻译"
 msgstr "Translate"
 
@@ -8017,11 +8034,11 @@ msgstr "The translation cannot be empty"
 msgid "翻译内容过长"
 msgstr "The translation is too long"
 
-#: src/features/translation/TranslationTool.tsx:231
+#: src/features/translation/TranslationTool.tsx:227
 msgid "翻译输入"
 msgstr "Translation input"
 
-#: src/features/translation/TranslationTool.tsx:286
+#: src/features/translation/TranslationTool.tsx:282
 msgid "翻译输出"
 msgstr "Translation output"
 
@@ -8034,7 +8051,7 @@ msgstr "Elapsed {taskEtaValue2}"
 msgid "联机"
 msgstr "Online"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:57
+#: src/features/games/engine/online/OnlineLobby.tsx:58
 msgid "联机对局"
 msgstr "Online game"
 
@@ -8051,15 +8068,15 @@ msgstr "Focus model"
 #. 棋类历史记录：本地玩家获胜。
 #. 棋类历史记录：本地玩家获胜。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:50
-#: src/features/games/engine/black-white-labels.tsx:93
-#: src/features/games/engine/black-white-labels.tsx:100
-#: src/features/games/xiangqi/labels.tsx:98
-#: src/features/games/xiangqi/labels.tsx:105
+#: src/features/games/engine/black-white-labels.tsx:89
+#: src/features/games/engine/black-white-labels.tsx:96
+#: src/features/games/xiangqi/labels.tsx:94
+#: src/features/games/xiangqi/labels.tsx:101
 msgid "胜"
 msgstr "Win"
 
 #. 源语言不指定，由离线翻译模型理解原文
-#: src/features/translation/TranslationTool.tsx:30
+#: src/features/translation/TranslationTool.tsx:29
 msgid "自动"
 msgstr "Auto"
 
@@ -8140,11 +8157,11 @@ msgstr "Node details"
 msgid "节能画质 · 像素比例上限 1.5 · 最高 30 帧/秒"
 msgstr "Power saving \\u00b7 Pixel ratio up to 1.5 \\u00b7 Up to 30 fps"
 
-#: src/features/games/billiards/BilliardsScore.tsx:170
+#: src/features/games/billiards/BilliardsScore.tsx:166
 msgid "花色球"
 msgstr "Stripes"
 
-#: src/features/translation/TranslationTool.tsx:36
+#: src/features/translation/TranslationTool.tsx:35
 msgid "英语"
 msgstr "English"
 
@@ -8390,6 +8407,10 @@ msgstr "Poem list"
 msgid "诗词同步"
 msgstr "Poetry sync"
 
+#: src/features/poetry/components/PoetrySyncStatus.tsx:158
+msgid "诗词同步进度"
+msgstr "Poetry sync progress"
+
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/about/use-about.ts:48
 #: src/features/logs/log-labels.ts:131
@@ -8413,7 +8434,7 @@ msgstr "Poetry library sync canceled"
 msgid "诗词数据库"
 msgstr "Poetry database"
 
-#: src/features/poetry/LibraryManagePage.tsx:48
+#: src/features/poetry/LibraryManagePage.tsx:49
 msgid "诗词数据管理"
 msgstr "Poetry data management"
 
@@ -8733,7 +8754,7 @@ msgstr "Reorder hosts"
 msgid "调整全文索引"
 msgstr "Configure full-text index"
 
-#: src/features/poetry/LibraryPage.tsx:339
+#: src/features/poetry/LibraryPage.tsx:336
 msgid "调整双栏宽度"
 msgstr "Resize columns"
 
@@ -8746,7 +8767,7 @@ msgstr "Reorder password entries"
 msgid "调整尺寸"
 msgstr "Resize"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:294
+#: src/features/ssh-sftp/SshSftpTool.tsx:290
 msgid "调整左侧面板宽度"
 msgstr "Resize left panel"
 
@@ -8781,10 +8802,10 @@ msgstr "Warnings"
 #. 棋类历史记录：本地玩家落败。
 #. 棋类历史记录：本地玩家落败。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:50
-#: src/features/games/engine/black-white-labels.tsx:95
-#: src/features/games/engine/black-white-labels.tsx:102
-#: src/features/games/xiangqi/labels.tsx:100
-#: src/features/games/xiangqi/labels.tsx:107
+#: src/features/games/engine/black-white-labels.tsx:91
+#: src/features/games/engine/black-white-labels.tsx:98
+#: src/features/games/xiangqi/labels.tsx:96
+#: src/features/games/xiangqi/labels.tsx:103
 msgid "负"
 msgstr "Loss"
 
@@ -8860,8 +8881,8 @@ msgstr "Go to line"
 msgid "轨道查看"
 msgstr "Orbit"
 
-#: src/features/bt/BtTool.tsx:164
-#: src/features/bt/BtTool.tsx:180
+#: src/features/bt/BtTool.tsx:163
+#: src/features/bt/BtTool.tsx:179
 msgid "转存失败"
 msgstr "Failed to save"
 
@@ -8875,7 +8896,7 @@ msgid "轮到 {sideNameValue}"
 msgstr "{sideNameValue}'s turn"
 
 #: src/features/crypto/CryptoTool.tsx:80
-#: src/features/translation/TranslationTool.tsx:214
+#: src/features/translation/TranslationTool.tsx:210
 msgid "输入"
 msgstr "Input"
 
@@ -8883,7 +8904,7 @@ msgstr "Input"
 msgid "输入 API Key"
 msgstr "Enter API Key"
 
-#: src/features/translation/TranslationTool.tsx:291
+#: src/features/translation/TranslationTool.tsx:287
 msgid "输入、语言或模型已更改，请重新翻译。"
 msgstr "The text, language, or model has changed. Translate again."
 
@@ -8891,7 +8912,7 @@ msgstr "The text, language, or model has changed. Translate again."
 msgid "输入内容后自动校验"
 msgstr "Content is validated as you type"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:199
+#: src/features/games/engine/online/OnlineLobby.tsx:200
 msgid "输入地址"
 msgstr "Enter address"
 
@@ -8903,7 +8924,7 @@ msgstr "Enter Key Passphrase"
 msgid "输入要编码的文本"
 msgstr "Enter text to encode"
 
-#: src/features/translation/TranslationTool.tsx:230
+#: src/features/translation/TranslationTool.tsx:226
 msgid "输入要翻译的文本"
 msgstr "Enter text to translate"
 
@@ -8911,7 +8932,7 @@ msgstr "Enter text to translate"
 msgid "输入要解码的内容"
 msgstr "Enter content to decode"
 
-#: src/features/translation/TranslationTool.tsx:271
+#: src/features/translation/TranslationTool.tsx:267
 msgid "输出"
 msgstr "Output"
 
@@ -8951,18 +8972,22 @@ msgstr "Runtime status"
 msgid "近 7 天"
 msgstr "Last 7 Days"
 
+#: src/features/activity/ActivityPage.tsx:32
+msgid "返回"
+msgstr "Back"
+
 #: src/features/bt/components/FileBrowserPanel.tsx:124
 #: src/features/bt/components/FileBrowserPanel.tsx:125
 msgid "返回上级目录"
 msgstr "Parent folder"
 
 #: src/features/bt/components/TaskFilesPage.tsx:38
-#: src/features/poetry/LibraryPage.tsx:320
+#: src/features/poetry/LibraryPage.tsx:317
 msgid "返回列表"
 msgstr "Back to list"
 
-#: src/features/poetry/LibraryManagePage.tsx:52
 #: src/features/poetry/LibraryManagePage.tsx:53
+#: src/features/poetry/LibraryManagePage.tsx:54
 #: src/features/poetry/PoemDetailPage.tsx:55
 #: src/features/poetry/PoemDetailPage.tsx:56
 msgid "返回古诗词"
@@ -8972,13 +8997,13 @@ msgstr "Back to Classical Poetry"
 msgid "返回应用"
 msgstr "Return to app"
 
-#: src/features/preview/PreviewScreen.tsx:57
+#: src/features/preview/PreviewScreen.tsx:58
 msgid "返回来源"
 msgstr "Return to source"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:55
-#: src/features/games/engine/BoardGameHeader.tsx:50
-#: src/features/games/engine/online/OnlineLobby.tsx:62
+#: src/features/games/engine/BoardGameHeader.tsx:51
+#: src/features/games/engine/online/OnlineLobby.tsx:63
 msgid "返回模式选择"
 msgstr "Back to modes"
 
@@ -9002,12 +9027,12 @@ msgstr "Back to poem"
 msgid "返回选择"
 msgstr "Back to Menu"
 
-#: src/components/ToolPageHeader.tsx:51
-#: src/components/ToolPageHeader.tsx:51
-#: src/features/bt/BtTool.tsx:214
+#: src/components/ToolPageHeader.tsx:54
+#: src/components/ToolPageHeader.tsx:54
+#: src/features/bt/BtTool.tsx:212
 #: src/features/games/billiards/BilliardsHeader.tsx:62
-#: src/features/games/engine/BoardGameHeader.tsx:60
-#: src/features/ssh-sftp/SshSftpTool.tsx:215
+#: src/features/games/engine/BoardGameHeader.tsx:61
+#: src/features/ssh-sftp/SshSftpTool.tsx:214
 msgid "返回首页"
 msgstr "Back to Home"
 
@@ -9028,7 +9053,11 @@ msgstr "No completed todos yet"
 msgid "还没有已废弃的待办"
 msgstr "No abandoned todos yet"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:71
+#: src/features/activity/TransferActivity.tsx:173
+msgid "还没有已结束的任务"
+msgstr "No finished tasks yet"
+
+#: src/features/ssh-sftp/SshSftpTool.tsx:70
 msgid "还没有打开的连接"
 msgstr "No open connections yet"
 
@@ -9037,10 +9066,10 @@ msgstr "No open connections yet"
 msgid "进度 {completed} / {total}"
 msgstr "Progress {completed} / {total}"
 
+#: src/features/activity/TransferActivity.tsx:68
 #: src/features/home/HomeRecentActivity.tsx:19
 #: src/features/lan-transfer/LanTransferActivity.tsx:28
 #: src/features/todo/TodoTool.tsx:144
-#: src/features/transfers/ActivityMenu.tsx:128
 msgid "进行中"
 msgstr "In Progress"
 
@@ -9095,7 +9124,7 @@ msgstr "Connections and models"
 msgid "连接中"
 msgstr "Connecting"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:374
+#: src/features/games/engine/online/OnlineLobby.tsx:375
 msgid "连接中…"
 msgstr "Connecting…"
 
@@ -9132,7 +9161,7 @@ msgstr "The connection is taking longer than usual. You can hide this window and
 msgid "连接设备"
 msgstr "Connected Devices"
 
-#: src/features/games/xiangqi/labels.tsx:62
+#: src/features/games/xiangqi/labels.tsx:58
 msgid "连续六十回合未吃子"
 msgstr "No capture for sixty rounds"
 
@@ -9144,9 +9173,9 @@ msgstr "Repeated failures, refresh paused"
 msgid "连续渲染后显示采样数据。"
 msgstr "Samples appear after continuous rendering."
 
-#: src/features/games/billiards/BilliardsHeader.tsx:143
+#: src/features/games/billiards/BilliardsHeader.tsx:144
 #: src/features/games/billiards/BilliardsMatchView.tsx:488
-#: src/features/games/engine/BoardGameHeader.tsx:95
+#: src/features/games/engine/BoardGameHeader.tsx:96
 #: src/features/games/engine/GameHeaderControls.tsx:108
 msgid "退出"
 msgstr "Exit"
@@ -9165,8 +9194,8 @@ msgstr "Exit signal: {exitSignal}"
 msgid "退出对局"
 msgstr "Exit Match"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:132
-#: src/features/games/engine/BoardGameHeader.tsx:84
+#: src/features/games/billiards/BilliardsHeader.tsx:133
+#: src/features/games/engine/BoardGameHeader.tsx:85
 #: src/features/games/engine/GameHeaderControls.tsx:97
 msgid "退出当前对局？"
 msgstr "Exit the current match?"
@@ -9301,7 +9330,7 @@ msgstr "Choose a service address"
 msgid "选择模型"
 msgstr "Choose model"
 
-#: src/features/translation/TranslationTool.tsx:149
+#: src/features/translation/TranslationTool.tsx:145
 msgid "选择源语言"
 msgstr "Choose source language"
 
@@ -9310,7 +9339,7 @@ msgstr "Choose source language"
 msgid "选择目标球"
 msgstr "Choose target ball"
 
-#: src/features/translation/TranslationTool.tsx:186
+#: src/features/translation/TranslationTool.tsx:182
 msgid "选择目标语言"
 msgstr "Choose target language"
 
@@ -9351,7 +9380,7 @@ msgstr "Select scale"
 msgid "选择缩进"
 msgstr "Select indent"
 
-#: src/features/translation/ModelManager.tsx:118
+#: src/features/translation/ModelManager.tsx:184
 msgid "选择翻译模型"
 msgstr "Choose a translation model"
 
@@ -9438,7 +9467,7 @@ msgstr "Collecting…"
 msgid "重做"
 msgstr "Redo"
 
-#: src/features/updater/integration.tsx:30
+#: src/features/updater/integration.tsx:50
 msgid "重启中"
 msgstr "Restarting"
 
@@ -9446,7 +9475,7 @@ msgstr "Restarting"
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "Could not restart. Try again or reopen the app manually."
 
-#: src/features/updater/UpdaterDialog.tsx:142
+#: src/features/updater/UpdaterDialog.tsx:144
 msgid "重启并更新"
 msgstr "Restart and Update"
 
@@ -9491,8 +9520,8 @@ msgstr "Reopen application"
 msgid "重新打开应用后使用新的初始状态。"
 msgstr "Reopen the app to start with fresh settings."
 
-#: src/features/updater/integration.tsx:31
-#: src/features/updater/UpdaterDialog.tsx:147
+#: src/features/updater/integration.tsx:51
+#: src/features/updater/UpdaterDialog.tsx:149
 msgid "重新检查"
 msgstr "Check Again"
 
@@ -9526,10 +9555,10 @@ msgstr "The reset has changed. Check its status again."
 #. 重新读取桌面开机自启状态
 #. 重新读取诗词合集列表
 #. 重新连接传输进度事件监听
-#. 重新连接传输进度事件监听
 #: src/features/about/AboutPage.tsx:108
 #: src/features/about/DataManagementDialogs.tsx:61
-#: src/features/bt/BtTool.tsx:256
+#: src/features/activity/TransferActivity.tsx:56
+#: src/features/bt/BtTool.tsx:254
 #: src/features/bt/components/FileBrowserPanel.tsx:203
 #: src/features/bt/components/TaskRow.tsx:172
 #: src/features/games/billiards/BilliardsGame.tsx:124
@@ -9551,12 +9580,10 @@ msgstr "The reset has changed. Check its status again."
 #: src/features/todo/TodoItemDialog.tsx:84
 #: src/features/todo/TodoTool.tsx:224
 #: src/features/todo/TodoTool.tsx:240
-#: src/features/transfers/ActivityMenu.tsx:120
 #: src/features/transfers/TransferItem.tsx:104
 #: src/features/transfers/TransferItem.tsx:113
-#: src/features/transfers/TransferPanel.tsx:237
-#: src/features/translation/ModelManager.tsx:144
-#: src/features/translation/ModelManager.tsx:206
+#: src/features/translation/ModelManager.tsx:120
+#: src/features/translation/ModelManager.tsx:213
 #: src/features/vault/VaultTool.tsx:150
 msgid "重试"
 msgstr "Retry"
@@ -9566,7 +9593,7 @@ msgstr "Retry"
 msgid "重试保存"
 msgstr "Retry saving"
 
-#: src/features/updater/UpdaterDialog.tsx:141
+#: src/features/updater/UpdaterDialog.tsx:143
 msgid "重试安装"
 msgstr "Retry installation"
 
@@ -9580,7 +9607,7 @@ msgstr "Retry display"
 msgid "重试环境存储"
 msgstr "Retry environment storage"
 
-#: src/features/updater/UpdaterDialog.tsx:140
+#: src/features/updater/UpdaterDialog.tsx:142
 msgid "重试重启"
 msgstr "Retry restart"
 
@@ -9651,7 +9678,7 @@ msgstr "Attachment copy saved."
 msgid "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 msgstr "Invalid attachment. Choose UTF-8 text or Markdown (up to 1 MiB), or PDF (up to 8 MiB)."
 
-#: src/features/games/engine/online/OnlineLobby.tsx:141
+#: src/features/games/engine/online/OnlineLobby.tsx:142
 msgid "附近的房间"
 msgstr "Nearby Rooms"
 
@@ -9664,7 +9691,7 @@ msgstr "Nearby devices"
 msgid "隐藏密码"
 msgstr "Hide password"
 
-#: src/features/poetry/LibraryPage.tsx:299
+#: src/features/poetry/LibraryPage.tsx:296
 msgid "随机"
 msgstr "Random"
 
@@ -9677,7 +9704,7 @@ msgstr "Difficulty"
 msgid "需口令"
 msgstr "Passphrase required"
 
-#: src/features/games/engine/online/OnlineLobby.tsx:171
+#: src/features/games/engine/online/OnlineLobby.tsx:172
 msgid "需要房间码"
 msgstr "Room code required"
 
@@ -9702,7 +9729,7 @@ msgstr "Inactive address"
 msgid "非流形边"
 msgstr "Non-manifold edges"
 
-#: src/features/translation/TranslationTool.tsx:38
+#: src/features/translation/TranslationTool.tsx:37
 msgid "韩语"
 msgstr "Korean"
 
@@ -9750,7 +9777,7 @@ msgstr "Preview"
 msgid "预览备注图片"
 msgstr "Preview note image"
 
-#: src/components/ToolPageHeader.tsx:63
+#: src/components/ToolPageHeader.tsx:66
 #: src/features/settings/StartupPageSettings.tsx:38
 msgid "首页"
 msgstr "Home"
@@ -9805,15 +9832,15 @@ msgstr "Black {black} · White {white} + {KOMI} komi = {whiteWithKomi}"
 msgid "黑八已重置"
 msgstr "8-ball re-spotted"
 
-#: src/features/games/xiangqi/labels.tsx:52
+#: src/features/games/xiangqi/labels.tsx:48
 msgid "黑方"
 msgstr "Black"
 
-#: src/features/games/engine/black-white-labels.tsx:49
+#: src/features/games/engine/black-white-labels.tsx:45
 msgid "黑棋"
 msgstr "Black"
 
-#: src/features/games/engine/black-white-labels.tsx:106
+#: src/features/games/engine/black-white-labels.tsx:102
 msgid "黑棋胜"
 msgstr "Black wins"
 
@@ -9822,7 +9849,7 @@ msgstr "Black wins"
 msgid "黑球"
 msgstr "Black"
 
-#: src/features/games/xiangqi/labels.tsx:110
+#: src/features/games/xiangqi/labels.tsx:106
 msgid "黑胜"
 msgstr "Black wins"
 
