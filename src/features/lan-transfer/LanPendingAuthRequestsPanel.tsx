@@ -117,66 +117,62 @@ export default function LanPendingAuthRequestsPanel({
           </p>
         </div>
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon-sm"
+          density="adaptive"
+          title={t`刷新`}
+          aria-label={t`刷新`}
           onClick={refresh}
           disabled={refreshing}
         >
           <RefreshCw
             className={refreshing ? "animate-spin" : undefined}
-            data-icon="inline-start"
+            aria-hidden
           />
-          <Trans>刷新</Trans>
         </Button>
       </div>
       <div className="p-2">
-        {sorted.length === 0 ? (
-          <div className="border-border text-muted-foreground flex min-h-24 items-center justify-center rounded-md border border-dashed text-xs">
-            <Trans>暂无待授权请求</Trans>
-          </div>
-        ) : (
-          <div className="grid gap-1.5">
-            {sorted.map((request) => {
-              return (
-                <div
-                  key={request.id}
-                  className="border-border grid gap-2 rounded-md border px-2.5 py-2"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex min-w-0 items-center gap-1.5">
-                        <Shield className="text-muted-foreground size-3.5 shrink-0" />
-                        <span className="truncate text-sm font-medium">
-                          {request.deviceName}
-                        </span>
-                        <Badge variant="outline">
-                          {lanPermissionLabel(request.accessType)}
-                        </Badge>
-                      </div>
-                      <div className="text-muted-foreground mt-0.5 truncate text-xs">
-                        {request.ip} · {formatRelativeTime(request.requestedAt)}
-                      </div>
+        <div className="grid gap-1.5">
+          {sorted.map((request) => {
+            return (
+              <div
+                key={request.id}
+                className="border-border grid gap-2 rounded-md border px-2.5 py-2"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <Shield className="text-muted-foreground size-3.5 shrink-0" />
+                      <span className="truncate text-sm font-medium">
+                        {request.deviceName}
+                      </span>
+                      <Badge variant="outline">
+                        {lanPermissionLabel(request.accessType)}
+                      </Badge>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      title={t`拒绝访问`}
-                      aria-label={t`拒绝访问`}
-                      className={TOUCH_TARGET_CLASS}
-                      onClick={() => void reject(request.id)}
-                    >
-                      <ShieldOff className="text-destructive" />
-                    </Button>
+                    <div className="text-muted-foreground mt-0.5 truncate text-xs">
+                      {request.ip} · {formatRelativeTime(request.requestedAt)}
+                    </div>
                   </div>
-                  <LanAuthRequestPermissionForm
-                    request={request}
-                    approve={approve}
-                  />
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    title={t`拒绝访问`}
+                    aria-label={t`拒绝访问`}
+                    className={TOUCH_TARGET_CLASS}
+                    onClick={() => void reject(request.id)}
+                  >
+                    <ShieldOff className="text-destructive" />
+                  </Button>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <LanAuthRequestPermissionForm
+                  request={request}
+                  approve={approve}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

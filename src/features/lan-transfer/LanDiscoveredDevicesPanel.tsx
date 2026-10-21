@@ -3,6 +3,7 @@ import { ExternalLink, MonitorSmartphone, RefreshCw } from "lucide-react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { describeError } from "~/lib/errors";
 import { formatRelativeTime } from "~/lib/relative-time";
 import type { AppError, LanDiscoveredDevice } from "~/types";
@@ -35,31 +36,37 @@ export default function LanDiscoveredDevicesPanel({
           </p>
         </div>
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon-sm"
+          density="adaptive"
+          title={t`刷新`}
+          aria-label={t`刷新`}
           onClick={refresh}
           disabled={discovering}
         >
           <RefreshCw
             className={discovering ? "animate-spin" : undefined}
-            data-icon="inline-start"
+            aria-hidden
           />
-          <Trans>刷新</Trans>
         </Button>
       </div>
       <div className="p-2">
         {error ? (
           <p
-            role="status"
+            role="alert"
             className="text-destructive px-2 py-3 text-xs wrap-anywhere"
           >
-            {describeError(error)}
+            {describeError(error, t)}
           </p>
         ) : null}
         {devices.length === 0 && !error ? (
-          <div className="border-border text-muted-foreground flex min-h-16 items-center justify-center rounded-md border border-dashed text-xs">
-            <Trans>暂无发现设备</Trans>
-          </div>
+          <Empty className="min-h-16 gap-0 border border-dashed p-3">
+            <EmptyHeader>
+              <EmptyTitle className="text-muted-foreground text-xs font-normal">
+                <Trans>暂无发现设备</Trans>
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className="grid gap-1.5">
             {devices.map((device) => (
@@ -86,6 +93,11 @@ export default function LanDiscoveredDevicesPanel({
                       justNowThresholdMs: 10_000,
                     })}
                   </div>
+                  {!device.online ? (
+                    <div className="text-muted-foreground mt-0.5 text-xs">
+                      <Trans>离线，无法打开</Trans>
+                    </div>
+                  ) : null}
                 </div>
                 <ExternalLink className="text-muted-foreground size-3.5" />
               </button>

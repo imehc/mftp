@@ -15,6 +15,7 @@ import {
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import {
   Field as UiField,
   FieldError,
@@ -192,7 +193,11 @@ export default function LanTransferSettingsDialog({
                       }
                       disabled={running}
                     >
-                      <SelectTrigger wrapValue aria-label={t`绑定 IP`}>
+                      <SelectTrigger
+                        wrapValue
+                        aria-label={t`绑定 IP`}
+                        className="w-full"
+                      >
                         <SelectValue placeholder={t`自动选择`} />
                       </SelectTrigger>
                       <SelectContent className="ui-density-adaptive">
@@ -304,25 +309,34 @@ export default function LanTransferSettingsDialog({
                     <div className="mb-2 text-sm font-medium">
                       <Trans>白名单</Trans>
                     </div>
-                    <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_9.375rem_auto]">
+                    <FieldGroup className="grid gap-2 md:grid-cols-[minmax(0,1fr)_9.375rem_auto] md:items-start">
                       <trustedForm.Field name="label">
                         {(field) => (
-                          <Input
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(event) =>
-                              field.handleChange(event.target.value)
-                            }
-                            aria-label={t`名称`}
-                            placeholder={t`名称`}
-                          />
+                          <UiField>
+                            <FieldLabel htmlFor="lan-trusted-label">
+                              <Trans>名称</Trans>
+                            </FieldLabel>
+                            <Input
+                              id="lan-trusted-label"
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
+                              aria-label={t`名称`}
+                              placeholder={t`名称`}
+                            />
+                          </UiField>
                         )}
                       </trustedForm.Field>
                       <trustedForm.Field name="ip">
                         {(field) => {
                           const error = firstFormError(field.state.meta.errors);
                           return (
-                            <div>
+                            <UiField data-invalid={!!error}>
+                              <FieldLabel htmlFor="lan-trusted-ip">
+                                <Trans>IP 地址</Trans>
+                              </FieldLabel>
                               <Input
                                 id="lan-trusted-ip"
                                 value={field.state.value}
@@ -342,7 +356,7 @@ export default function LanTransferSettingsDialog({
                                   {error}
                                 </FieldError>
                               ) : null}
-                            </div>
+                            </UiField>
                           );
                         }}
                       </trustedForm.Field>
@@ -353,6 +367,7 @@ export default function LanTransferSettingsDialog({
                           <Button
                             type="button"
                             variant="outline"
+                            className="md:self-end"
                             onClick={() => void trustedForm.handleSubmit()}
                             disabled={isSubmitting}
                           >
@@ -360,12 +375,16 @@ export default function LanTransferSettingsDialog({
                           </Button>
                         )}
                       </trustedForm.Subscribe>
-                    </div>
+                    </FieldGroup>
                     <div className="mt-2 flex max-h-36 flex-col gap-1 overflow-auto">
                       {trustedDevices.length === 0 ? (
-                        <div className="border-border text-muted-foreground rounded-md border border-dashed px-2 py-4 text-center text-xs">
-                          <Trans>暂无白名单</Trans>
-                        </div>
+                        <Empty className="min-h-16 gap-0 border border-dashed p-3">
+                          <EmptyHeader>
+                            <EmptyTitle className="text-muted-foreground text-xs font-normal">
+                              <Trans>暂无白名单</Trans>
+                            </EmptyTitle>
+                          </EmptyHeader>
+                        </Empty>
                       ) : (
                         trustedDevices.map((device) => (
                           <div

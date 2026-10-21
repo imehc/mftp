@@ -3,6 +3,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type { LanSharedDir } from "~/types";
 
@@ -61,9 +62,13 @@ export default function LanSharedDirsSection({
         </div>
         <div className="p-2">
           {shares.length === 0 ? (
-            <div className="border-border text-muted-foreground flex min-h-36 items-center justify-center rounded-md border border-dashed text-xs">
-              <Trans>暂无共享目录</Trans>
-            </div>
+            <Empty className="min-h-36 gap-0 border border-dashed p-3">
+              <EmptyHeader>
+                <EmptyTitle className="text-muted-foreground text-xs font-normal">
+                  <Trans>暂无共享目录</Trans>
+                </EmptyTitle>
+              </EmptyHeader>
+            </Empty>
           ) : (
             <div className="grid gap-1.5">
               {shares.map((share) => (

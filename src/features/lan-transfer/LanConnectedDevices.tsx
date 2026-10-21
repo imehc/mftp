@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type { LanConnectedDevice } from "~/types";
 
@@ -38,9 +39,13 @@ export default function LanConnectedDevices({
           </Badge>
         </div>
         {devices.length === 0 ? (
-          <div className="border-border text-muted-foreground flex min-h-20 items-center justify-center rounded-md border border-dashed text-xs">
-            <Trans>暂无设备</Trans>
-          </div>
+          <Empty className="min-h-20 gap-0 border border-dashed p-3">
+            <EmptyHeader>
+              <EmptyTitle className="text-muted-foreground text-xs font-normal">
+                <Trans>暂无设备</Trans>
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className="flex max-h-44 flex-col gap-1 overflow-auto">
             {devices.map((device) => (

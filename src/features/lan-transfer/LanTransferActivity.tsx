@@ -6,26 +6,16 @@ import { useRef, useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
+import { Progress } from "~/components/ui/progress";
 import { translate } from "~/i18n/translate";
 import { describeError } from "~/lib/errors";
-import { formatBytes } from "~/lib/format";
+import { formatBytes, formatDuration } from "~/lib/format";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type { LanTransferTask } from "~/types";
 
 import LanConfirmDialog from "./LanConfirmDialog";
-
-function formatDuration(ms: number) {
-  if (!Number.isFinite(ms) || ms <= 0) return "-";
-  const seconds = Math.ceil(ms / 1000);
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  const restSeconds = seconds % 60;
-  if (minutes < 60) return `${minutes}m ${restSeconds}s`;
-  const hours = Math.floor(minutes / 60);
-  const restMinutes = minutes % 60;
-  return `${hours}h ${restMinutes}m`;
-}
 
 function taskStatusLabel(value: string) {
   if (value === "running") return translate(msg`进行中`);
@@ -49,11 +39,11 @@ function taskSpeed(task: LanTransferTask) {
 
 function taskEta(task: LanTransferTask) {
   if (task.status !== "running") {
-    return formatDuration(task.updatedAt - task.startedAt);
+    return formatDuration((task.updatedAt - task.startedAt) / 1000);
   }
   const speed = taskSpeed(task);
-  if (speed <= 0 || task.total <= task.transferred) return "-";
-  return formatDuration(((task.total - task.transferred) / speed) * 1000);
+  if (speed <= 0 || task.total <= task.transferred) return "--";
+  return formatDuration((task.total - task.transferred) / speed);
 }
 
 export default function LanTransferActivity({
@@ -93,9 +83,13 @@ export default function LanTransferActivity({
           </Badge>
         </div>
         {tasks.length === 0 ? (
-          <div className="border-border text-muted-foreground flex min-h-20 items-center justify-center rounded-md border border-dashed text-xs">
-            <Trans>暂无任务</Trans>
-          </div>
+          <Empty className="min-h-20 gap-0 border border-dashed p-3">
+            <EmptyHeader>
+              <EmptyTitle className="text-muted-foreground text-xs font-normal">
+                <Trans>暂无任务</Trans>
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div ref={scroller} className="max-h-80 overflow-auto">
             <div
@@ -110,10 +104,9 @@ export default function LanTransferActivity({
                         100,
                         Math.round((task.transferred / task.total) * 100),
                       )
-                    : 0;
+                    : null;
                 const speed = taskSpeed(task);
                 const taskEtaValue = taskEta(task);
-                const taskEtaValue2 = taskEta(task);
                 return (
                   <div
                     key={task.id}
@@ -144,14 +137,13 @@ export default function LanTransferActivity({
                         ) : null}
                       </div>
                     </div>
-                    <div className="bg-muted mt-1 h-1.5 overflow-hidden rounded-full">
-                      <div
-                        className="bg-primary h-full"
-                        style={{
-                          width: `${percent}%`,
-                        }}
-                      />
-                    </div>
+                    <Progress
+                      className={
+                        percent === null ? "mt-1 animate-pulse" : "mt-1"
+                      }
+                      value={percent ?? undefined}
+                      aria-label={t`传输进度`}
+                    />
                     <div className="text-muted-foreground mt-1 flex items-center justify-between gap-2 text-xs">
                       <span>{task.ip}</span>
                       <span className="shrink-0 tabular-nums">
@@ -166,12 +158,15 @@ export default function LanTransferActivity({
                       <span className="shrink-0 tabular-nums">
                         {task.status === "running"
                           ? t`剩余 ${taskEtaValue}`
-                          : t`耗时 ${taskEtaValue2}`}
+                          : t`耗时 ${taskEtaValue}`}
                       </span>
                     </div>
                     {task.error ? (
-                      <p className="text-destructive mt-1 text-xs wrap-anywhere">
-                        {describeError(task.error)}
+                      <p
+                        role="alert"
+                        className="text-destructive mt-1 text-xs wrap-anywhere"
+                      >
+                        {describeError(task.error, t)}
                       </p>
                     ) : null}
                   </div>
