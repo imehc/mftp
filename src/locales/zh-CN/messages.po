@@ -46,11 +46,11 @@ msgstr "{count, plural, one {# 篇} other {# 篇}}"
 msgid "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{count, plural, one {剩余 # 球} other {剩余 # 球}}"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:204
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:209
 msgid "{cpuCoreCount, plural, one {# 核} other {# 核}}"
 msgstr "{cpuCoreCount, plural, one {# 核} other {# 核}}"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:342
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:347
 msgid "{days, plural, one {# 天 {hours} 小时} other {# 天 {hours} 小时}}"
 msgstr "{days, plural, one {# 天 {hours} 小时} other {# 天 {hours} 小时}}"
 
@@ -59,7 +59,7 @@ msgstr "{days, plural, one {# 天 {hours} 小时} other {# 天 {hours} 小时}}"
 msgid "{decisionSeat} 已连续两次犯规，再次连续犯规将判负。"
 msgstr "{decisionSeat} 已连续两次犯规，再次连续犯规将判负。"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:31
+#: src/features/lan-transfer/LanConnectedDevices.tsx:32
 msgid "{deviceCount, plural, one {# 设备} other {# 设备}}"
 msgstr "{deviceCount, plural, one {# 设备} other {# 设备}}"
 
@@ -67,15 +67,15 @@ msgstr "{deviceCount, plural, one {# 设备} other {# 设备}}"
 msgid "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
 msgstr "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:355
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:360
 msgid "{hours, plural, one {# 小时 {minutes} 分钟} other {# 小时 {minutes} 分钟}}"
 msgstr "{hours, plural, one {# 小时 {minutes} 分钟} other {# 小时 {minutes} 分钟}}"
 
-#: src/features/transfers/transfer-metrics.ts:65
+#: src/lib/format.ts:60
 msgid "{hours, plural, one {# 小时 {remainingMinutes} 分} other {# 小时 {remainingMinutes} 分}}"
 msgstr "{hours, plural, one {# 小时 {remainingMinutes} 分} other {# 小时 {remainingMinutes} 分}}"
 
-#: src/features/transfers/transfer-metrics.ts:79
+#: src/lib/format.ts:74
 msgid "{hours, plural, one {# 小时} other {# 小时}}"
 msgstr "{hours, plural, one {# 小时} other {# 小时}}"
 
@@ -108,15 +108,15 @@ msgstr "{languageLabel2} 格式有效"
 msgid "{lineCount, plural, one {# 行} other {# 行}}"
 msgstr "{lineCount, plural, one {# 行} other {# 行}}"
 
-#: src/features/transfers/transfer-metrics.ts:34
+#: src/lib/format.ts:29
 msgid "{minutes, plural, one {# 分 {remainingSeconds} 秒} other {# 分 {remainingSeconds} 秒}}"
 msgstr "{minutes, plural, one {# 分 {remainingSeconds} 秒} other {# 分 {remainingSeconds} 秒}}"
 
-#: src/features/transfers/transfer-metrics.ts:48
+#: src/lib/format.ts:43
 msgid "{minutes, plural, one {# 分} other {# 分}}"
 msgstr "{minutes, plural, one {# 分} other {# 分}}"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:367
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:372
 msgid "{minutes, plural, one {# 分钟} other {# 分钟}}"
 msgstr "{minutes, plural, one {# 分钟} other {# 分钟}}"
 
@@ -195,7 +195,7 @@ msgstr "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 
-#: src/features/transfers/transfer-metrics.ts:16
+#: src/lib/format.ts:11
 msgid "{rounded, plural, one {# 秒} other {# 秒}}"
 msgstr "{rounded, plural, one {# 秒} other {# 秒}}"
 
@@ -214,11 +214,11 @@ msgstr "{seconds, plural, one {# 秒} other {# 秒}}"
 msgid "{seconds, plural, one {# 秒前} other {# 秒前}}"
 msgstr "{seconds, plural, one {# 秒前} other {# 秒前}}"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:39
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:40
 msgid "{sharesCount, plural, one {# 个目录，目录变更需重启服务后完整生效} other {# 个目录，目录变更需重启服务后完整生效}}"
 msgstr "{sharesCount, plural, one {# 个目录，目录变更需重启服务后完整生效} other {# 个目录，目录变更需重启服务后完整生效}}"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:47
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:48
 msgid "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 msgstr "{sharesCount, plural, one {# 个目录} other {# 个目录}}"
 
@@ -262,7 +262,7 @@ msgstr "{spaces, plural, one {# 空格} other {# 空格}}"
 msgid "{statusLanguage} 格式有效"
 msgstr "{statusLanguage} 格式有效"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:86
+#: src/features/lan-transfer/LanTransferActivity.tsx:76
 msgid "{taskCount, plural, one {# 任务} other {# 任务}}"
 msgstr "{taskCount, plural, one {# 任务} other {# 任务}}"
 
@@ -460,11 +460,11 @@ msgstr "Anthropic Messages"
 msgid "API Key 为空或过长"
 msgstr "API Key 为空或过长"
 
-#: src/features/transfers/TransferItem.tsx:65
+#: src/features/transfers/TransferItem.tsx:55
 msgid "BT"
 msgstr "BT"
 
-#: src/features/bt/BtTool.tsx:220
+#: src/features/bt/BtTool.tsx:222
 #: src/features/home/entries.tsx:160
 #: src/lib/errors/messages.ts:283
 msgid "BT 下载"
@@ -497,7 +497,7 @@ msgid "Chat Completions"
 msgstr "Chat Completions"
 
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:167
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:230
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:235
 msgid "CPU"
 msgstr "CPU"
 
@@ -543,11 +543,12 @@ msgstr "GPU 分配估算"
 msgid "HDR · 最大 2048 × 1024 / 32 MiB"
 msgstr "HDR · 最大 2048 × 1024 / 32 MiB"
 
-#: src/features/bt/components/PeersPanel.tsx:73
+#: src/features/bt/components/PeersPanel.tsx:93
 msgid "IP"
 msgstr "IP"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:333
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:338
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:347
 msgid "IP 地址"
 msgstr "IP 地址"
 
@@ -674,8 +675,8 @@ msgstr "上下键移动，左右键展开或收起；选择节点可查看关联
 msgid "上个月"
 msgstr "上个月"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:39
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:291
+#: src/features/lan-transfer/LanTransferActivity.tsx:29
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:296
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:97
 msgid "上传"
 msgstr "上传"
@@ -705,7 +706,7 @@ msgstr "上传文件"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:40
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:401
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:405
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:111
 msgid "上传文件夹"
 msgstr "上传文件夹"
@@ -770,9 +771,9 @@ msgstr "下一个"
 msgid "下个月"
 msgstr "下个月"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:40
+#: src/features/lan-transfer/LanTransferActivity.tsx:30
 #: src/features/media-compress/components/CompressResultCard.tsx:81
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:285
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:290
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:73
 #: src/features/translation/ModelManager.tsx:135
 msgid "下载"
@@ -787,7 +788,7 @@ msgid "下载 {entryName2}"
 msgstr "下载 {entryName2}"
 
 #. SSH/SFTP 传输操作当前阶段
-#: src/features/bt/components/TaskRow.tsx:99
+#: src/features/bt/components/TaskRow.tsx:100
 #: src/features/transfers/phase-label.ts:21
 #: src/features/updater/integration.tsx:48
 #: src/store/transfers.ts:12
@@ -815,8 +816,8 @@ msgstr "下载后即可离线搜索和阅读。"
 msgid "下载响应的范围、长度或版本不匹配，请重新下载"
 msgstr "下载响应的范围、长度或版本不匹配，请重新下载"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:371
-#: src/features/bt/components/TaskFilesPage.tsx:81
+#: src/features/bt/components/AddTorrentDialog.tsx:377
+#: src/features/bt/components/TaskFilesPage.tsx:80
 msgid "下载完成后可复制到系统下载目录或其他位置"
 msgstr "下载完成后可复制到系统下载目录或其他位置"
 
@@ -838,7 +839,7 @@ msgstr "下载所选"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/bt/components/FileBrowserPanel.tsx:136
+#: src/features/bt/components/FileBrowserPanel.tsx:140
 #: src/features/logs/log-labels.ts:38
 #: src/features/logs/log-labels.ts:76
 msgid "下载文件"
@@ -850,7 +851,7 @@ msgstr "下载文件不存在"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:41
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:414
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:418
 msgid "下载文件夹"
 msgstr "下载文件夹"
 
@@ -863,8 +864,8 @@ msgstr "下载文件夹中"
 msgid "下载更新"
 msgstr "下载更新"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:148
-#: src/features/bt/components/FileBrowserPanel.tsx:149
+#: src/features/bt/components/FileBrowserPanel.tsx:152
+#: src/features/bt/components/FileBrowserPanel.tsx:153
 msgid "下载根目录"
 msgstr "下载根目录"
 
@@ -873,7 +874,7 @@ msgstr "下载根目录"
 msgid "下载翻译模型"
 msgstr "下载翻译模型"
 
-#: src/features/bt/components/TaskRow.tsx:129
+#: src/features/bt/components/TaskRow.tsx:130
 #: src/features/updater/UpdaterActivity.tsx:93
 #: src/features/updater/UpdaterProgress.tsx:46
 msgid "下载进度"
@@ -1033,7 +1034,7 @@ msgstr "主数据库"
 
 #: src/features/export/sections.tsx:32
 #: src/features/logs/use-activity-logs.ts:33
-#: src/features/ssh-sftp/components/Sidebar.tsx:356
+#: src/features/ssh-sftp/components/Sidebar.tsx:358
 #: src/lib/errors/messages.ts:290
 msgid "主机"
 msgstr "主机"
@@ -1046,7 +1047,7 @@ msgstr "主机"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:110
-#: src/features/ssh-sftp/SshSftpTool.tsx:328
+#: src/features/ssh-sftp/SshSftpTool.tsx:324
 msgid "主机列表"
 msgstr "主机列表"
 
@@ -1101,7 +1102,7 @@ msgstr "交互模式"
 msgid "交回对方"
 msgstr "交回对方"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:261
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:266
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "交换 {formatBytesValue} / {formatBytesValue2}"
 
@@ -1111,7 +1112,7 @@ msgstr "人工修订"
 
 #: src/features/lan-transfer/labels.ts:7
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:84
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:452
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:471
 msgid "仅上传"
 msgstr "仅上传"
 
@@ -1222,7 +1223,7 @@ msgstr "任务中没有可导出的文件"
 msgid "任务会停止，已下载的临时文件将被删除，任务记录仍会保留。"
 msgstr "任务会停止，已下载的临时文件将被删除，任务记录仍会保留。"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:192
+#: src/features/lan-transfer/LanTransferActivity.tsx:187
 msgid "任务会立即停止，之后需要重新发起。"
 msgstr "任务会立即停止，之后需要重新发起。"
 
@@ -1238,7 +1239,7 @@ msgstr "任务尚未完成，无法转存"
 msgid "任务已完成，无法取消"
 msgstr "任务已完成，无法取消"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:236
+#: src/features/bt/components/AddTorrentDialog.tsx:239
 msgid "任务已添加，可在传输面板查看进度"
 msgstr "任务已添加，可在传输面板查看进度"
 
@@ -1250,7 +1251,7 @@ msgstr "任务已经转存"
 msgid "任务未运行"
 msgstr "任务未运行"
 
-#: src/features/bt/BtTool.tsx:245
+#: src/features/bt/BtTool.tsx:261
 msgid "任务状态通知暂不可用"
 msgstr "任务状态通知暂不可用"
 
@@ -1279,7 +1280,7 @@ msgstr "传输任务尚未开始或已结束"
 msgid "传输原始错误"
 msgstr "传输原始错误"
 
-#: src/features/activity/TransferActivity.tsx:169
+#: src/features/activity/TransferActivity.tsx:168
 msgid "传输失败后会保留在这里，便于重试或查看原因。"
 msgstr "传输失败后会保留在这里，便于重试或查看原因。"
 
@@ -1287,13 +1288,19 @@ msgstr "传输失败后会保留在这里，便于重试或查看原因。"
 msgid "传输已取消"
 msgstr "传输已取消"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:83
+#: src/features/lan-transfer/LanTransferActivity.tsx:73
 msgid "传输活动"
 msgstr "传输活动"
 
 #: src/features/export/sections.tsx:47
 msgid "传输设置、共享目录和信任设备"
 msgstr "传输设置、共享目录和信任设备"
+
+#: src/features/lan-transfer/LanTransferActivity.tsx:145
+#: src/features/transfers/TransferItem.tsx:126
+#: src/features/transfers/TransferItem.tsx:130
+msgid "传输进度"
+msgstr "传输进度"
 
 #: src/features/settings/TransferSetting.tsx:23
 msgid "传输进行中，暂不可修改。"
@@ -1366,12 +1373,12 @@ msgstr "使用最新版本继续编辑"
 msgid "使用最新版本重新确认"
 msgstr "使用最新版本重新确认"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:179
-#: src/features/bt/components/FileBrowserPanel.tsx:257
+#: src/features/bt/components/FileBrowserPanel.tsx:183
+#: src/features/bt/components/FileBrowserPanel.tsx:282
 msgid "使用系统应用打开"
 msgstr "使用系统应用打开"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:258
+#: src/features/bt/components/FileBrowserPanel.tsx:283
 msgid "使用系统应用打开 {entryName}"
 msgstr "使用系统应用打开 {entryName}"
 
@@ -1380,7 +1387,7 @@ msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、�
 msgstr "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:531
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:550
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
 #: src/features/poetry/components/PoetryTranslationSection.tsx:358
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:349
@@ -1470,7 +1477,7 @@ msgstr "修改时间"
 msgid "修改模型库条目信息"
 msgstr "修改模型库条目信息"
 
-#: src/features/bt/components/TaskRow.tsx:97
+#: src/features/bt/components/TaskRow.tsx:98
 #: src/store/transfers.ts:13
 msgid "做种中"
 msgstr "做种中"
@@ -1591,7 +1598,7 @@ msgstr "全色球"
 msgid "全部"
 msgstr "全部"
 
-#: src/features/bt/BtTool.tsx:292
+#: src/features/bt/BtTool.tsx:305
 msgid "全部任务"
 msgstr "全部任务"
 
@@ -1634,7 +1641,7 @@ msgid "共 {count} 条译文"
 msgstr "共 {count} 条译文"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:35
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:36
 #: src/features/lan-transfer/LanShareDialog.tsx:101
 #: src/features/logs/log-labels.ts:143
 msgid "共享目录"
@@ -1678,11 +1685,11 @@ msgstr "关联纹理"
 #: src/components/ui/dialog.tsx:157
 #: src/components/ui/sheet.tsx:88
 #: src/features/activity/ActivityCenter.tsx:75
-#: src/features/bt/components/AddTorrentDialog.tsx:382
+#: src/features/bt/components/AddTorrentDialog.tsx:388
 #: src/features/model-viewer/components/LibraryPanel.tsx:356
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
-#: src/features/ssh-sftp/components/Sidebar.tsx:365
-#: src/features/ssh-sftp/components/Sidebar.tsx:379
+#: src/features/ssh-sftp/components/Sidebar.tsx:367
+#: src/features/ssh-sftp/components/Sidebar.tsx:381
 #: src/features/todo/TodoDetailsDialog.tsx:145
 msgid "关闭"
 msgstr "关闭"
@@ -1695,7 +1702,7 @@ msgid "关闭"
 msgstr "关闭"
 
 #. Option that turns automatic monitor refresh off
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:150
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:151
 msgctxt "state"
 msgid "关闭"
 msgstr "关闭"
@@ -1742,7 +1749,7 @@ msgstr "其他用户"
 #. 模型内存估算和历史曲线标签。
 #: src/features/model-viewer/components/WorkspaceInspector.tsx:62
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:170
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:250
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:255
 msgid "内存"
 msgstr "内存"
 
@@ -1807,7 +1814,7 @@ msgstr "最长 60 秒 · 黑色背景 · 无音频 · 不含工具面板"
 msgid "最高单杆 {highestBreak}"
 msgstr "最高单杆 {highestBreak}"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:311
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:316
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:114
 msgid "写入"
 msgstr "写入"
@@ -1819,7 +1826,7 @@ msgstr "写入、执行"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:185
 #: src/features/media-compress/video/use-video-compress.ts:196
 #: src/features/translation/ModelManager.tsx:65
-#: src/store/transfers.ts:336
+#: src/store/transfers.ts:333
 msgid "准备中"
 msgstr "准备中"
 
@@ -1910,7 +1917,7 @@ msgstr "列出目录"
 msgid "刚刚"
 msgstr "刚刚"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:383
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:387
 msgid "创建"
 msgstr "创建"
 
@@ -1946,11 +1953,11 @@ msgstr "创建目录中"
 
 #: src/features/ai-configuration/RowActions.desktop.tsx:39
 #: src/features/ai-configuration/RowActions.desktop.tsx:40
-#: src/features/ai-configuration/RowActions.mobile.tsx:57
+#: src/features/ai-configuration/RowActions.mobile.tsx:58
 #: src/features/bt/components/TaskDialogs.tsx:92
-#: src/features/bt/components/TaskRow.tsx:240
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:115
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:549
+#: src/features/bt/components/TaskRow.tsx:233
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:120
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:568
 #: src/features/model-viewer/components/LibraryPanel.tsx:320
 #: src/features/poetry/components/PoetryLocalManagement.tsx:130
 #: src/features/poetry/components/PoetryTranslationSection.tsx:378
@@ -1959,7 +1966,7 @@ msgstr "创建目录中"
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:291
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:48
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:81
-#: src/features/ssh-sftp/components/Sidebar.tsx:536
+#: src/features/ssh-sftp/components/Sidebar.tsx:545
 #: src/features/todo/TodoTool.tsx:334
 #: src/features/vault/VaultEntryCard.tsx:101
 #: src/features/vault/VaultTool.tsx:214
@@ -1986,7 +1993,7 @@ msgstr "删除 SSH 密钥"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:17
-#: src/features/ssh-sftp/components/Sidebar.tsx:525
+#: src/features/ssh-sftp/components/Sidebar.tsx:534
 msgid "删除主机"
 msgstr "删除主机"
 
@@ -1996,9 +2003,9 @@ msgid "删除信任设备"
 msgstr "删除信任设备"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:85
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:86
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:101
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:90
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:91
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:106
 #: src/features/logs/log-labels.ts:73
 msgid "删除共享目录"
 msgstr "删除共享目录"
@@ -2089,9 +2096,9 @@ msgstr "删除模型？"
 msgid "删除注释库"
 msgstr "删除注释库"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:386
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:387
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:540
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:405
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:406
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:559
 msgid "删除白名单"
 msgstr "删除白名单"
 
@@ -2118,13 +2125,16 @@ msgstr "删除该账号？"
 msgid "删除这条日志？"
 msgstr "删除这条日志？"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:159
-#: src/features/bt/components/FileBrowserPanel.tsx:160
-#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:47
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:129
+#: src/features/bt/components/FileBrowserPanel.tsx:163
+#: src/features/bt/components/FileBrowserPanel.tsx:164
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:42
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:43
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:123
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:124
 #: src/features/lan-transfer/LanTransferTool.tsx:65
 #: src/features/logs/ActivityLogsPage.tsx:52
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:122
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:123
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:157
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:146
 msgid "刷新"
@@ -2142,8 +2152,8 @@ msgstr "刷新房间"
 msgid "刷新状态"
 msgstr "刷新状态"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:133
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:143
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:134
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:144
 msgid "刷新间隔"
 msgstr "刷新间隔"
 
@@ -2152,11 +2162,11 @@ msgstr "刷新间隔"
 msgid "刷新音色"
 msgstr "刷新音色"
 
-#: src/features/transfers/TransferItem.tsx:124
+#: src/features/transfers/TransferItem.tsx:121
 msgid "剩余 {metricsEta}"
 msgstr "剩余 {metricsEta}"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:168
+#: src/features/lan-transfer/LanTransferActivity.tsx:160
 msgid "剩余 {taskEtaValue}"
 msgstr "剩余 {taskEtaValue}"
 
@@ -2211,21 +2221,24 @@ msgstr "加解密"
 msgid "加载 HDR 环境"
 msgstr "加载 HDR 环境"
 
+#: src/features/bt/BtTool.tsx:282
+#: src/features/bt/components/FileBrowserPanel.tsx:193
+#: src/features/bt/components/PeersPanel.tsx:77
 #: src/features/lan-transfer/LanTransferTool.tsx:42
 #: src/features/lan-transfer/LanTransferTool.tsx:166
 msgid "加载中"
 msgstr "加载中"
 
-#: src/features/bt/BtTool.tsx:270
-#: src/features/bt/components/FileBrowserPanel.tsx:190
-#: src/features/bt/components/PeersPanel.tsx:62
+#: src/features/bt/BtTool.tsx:283
+#: src/features/bt/components/FileBrowserPanel.tsx:194
+#: src/features/bt/components/PeersPanel.tsx:78
 #: src/features/poetry/components/CollectionManagement.tsx:130
 #: src/features/poetry/components/PoemList.tsx:192
 #: src/features/poetry/components/PoetryLocalManagement.tsx:79
 #: src/features/preview/PreviewScreen.tsx:81
 #: src/features/preview/PreviewSurface.tsx:139
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:207
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:280
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:281
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:318
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:323
 msgid "加载中…"
@@ -2462,7 +2475,7 @@ msgstr "双人"
 msgid "双人对战"
 msgstr "双人对战"
 
-#: src/features/home/HomePage.tsx:63
+#: src/features/home/HomePage.tsx:71
 msgid "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 msgstr "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
 
@@ -2491,9 +2504,9 @@ msgstr "发生未知错误，请重试"
 #: src/features/about/DataManagementDialogs.tsx:158
 #: src/features/ai-configuration/AiDeleteDialog.tsx:123
 #: src/features/ai-configuration/AiEditorDialog.tsx:289
-#: src/features/bt/components/AddTorrentDialog.tsx:382
+#: src/features/bt/components/AddTorrentDialog.tsx:388
 #: src/features/bt/components/TaskDialogs.tsx:90
-#: src/features/bt/components/TaskRow.tsx:231
+#: src/features/bt/components/TaskRow.tsx:224
 #: src/features/export/BackupPage.tsx:111
 #: src/features/export/BackupPage.tsx:151
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:48
@@ -2505,7 +2518,7 @@ msgstr "发生未知错误，请重试"
 #: src/features/games/engine/online/OnlineLobby.tsx:368
 #: src/features/lan-transfer/LanConfirmDialog.tsx:41
 #: src/features/lan-transfer/LanShareDialog.tsx:153
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:523
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:542
 #: src/features/logs/LogDialogs.tsx:155
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:310
@@ -2520,11 +2533,12 @@ msgstr "发生未知错误，请重试"
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:45
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:142
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:243
-#: src/features/ssh-sftp/components/Sidebar.tsx:533
+#: src/features/ssh-sftp/components/Sidebar.tsx:542
 #: src/features/todo/TodoItemDialog.tsx:96
 #: src/features/todo/TodoItemDialog.tsx:327
 #: src/features/todo/TodoTool.tsx:327
-#: src/features/transfers/TransferItem.tsx:88
+#: src/features/transfers/TransferItem.tsx:79
+#: src/features/transfers/TransferItem.tsx:80
 #: src/features/translation/ModelManager.tsx:321
 #: src/features/vault/VaultEntryDialog.tsx:242
 #: src/features/vault/VaultTool.tsx:205
@@ -2535,7 +2549,7 @@ msgstr "取消"
 msgid "取消 {pendingCancelLabel}"
 msgstr "取消 {pendingCancelLabel}"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:190
+#: src/features/lan-transfer/LanTransferActivity.tsx:185
 msgid "取消“{pendingName}”的传输？"
 msgstr "取消“{pendingName}”的传输？"
 
@@ -2544,10 +2558,10 @@ msgid "取消任务"
 msgstr "取消任务"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/lan-transfer/LanTransferActivity.tsx:137
-#: src/features/lan-transfer/LanTransferActivity.tsx:138
-#: src/features/lan-transfer/LanTransferActivity.tsx:187
-#: src/features/lan-transfer/LanTransferActivity.tsx:196
+#: src/features/lan-transfer/LanTransferActivity.tsx:130
+#: src/features/lan-transfer/LanTransferActivity.tsx:131
+#: src/features/lan-transfer/LanTransferActivity.tsx:182
+#: src/features/lan-transfer/LanTransferActivity.tsx:191
 #: src/features/logs/log-labels.ts:42
 msgid "取消传输"
 msgstr "取消传输"
@@ -2643,13 +2657,17 @@ msgstr "只能在桌面应用中检查更新"
 
 #: src/features/lan-transfer/labels.ts:6
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:78
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:446
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:465
 msgid "只读"
 msgstr "只读"
 
 #: src/features/poetry/components/CollectionManagement.tsx:133
 msgid "可下载合集"
 msgstr "可下载合集"
+
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:293
+msgid "可以上传文件或新建文件夹"
+msgstr "可以上传文件或新建文件夹"
 
 #: src/features/model-viewer/components/MemoryPanel.tsx:31
 msgid "可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。"
@@ -2690,7 +2708,7 @@ msgstr "台面余分 {remainingPoints}"
 msgid "合并：相同记录更新，其余插入"
 msgstr "合并：相同记录更新，其余插入"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:411
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:430
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 
@@ -2719,7 +2737,7 @@ msgstr "同意后双方交换先后手，立即开始新对局。"
 msgid "同意重摆"
 msgstr "同意重摆"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:467
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:486
 msgid "同时传输数"
 msgstr "同时传输数"
 
@@ -2749,14 +2767,15 @@ msgstr "同步完成"
 msgid "同步诗词库"
 msgstr "同步诗词库"
 
-#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:34
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:35
 msgid "同网段 MFTP 客户端，点击可直接打开访问地址"
 msgstr "同网段 MFTP 客户端，点击可直接打开访问地址"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:111
 #: src/features/lan-transfer/LanShareDialog.tsx:94
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:316
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:317
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:326
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:327
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:85
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:101
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:187
@@ -2772,7 +2791,7 @@ msgstr "名称不能为空"
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:69
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:76
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:195
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:78
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:79
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:81
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:305
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:320
@@ -2810,7 +2829,7 @@ msgstr "启动服务"
 msgid "启动服务后显示浏览器访问地址"
 msgstr "启动服务后显示浏览器访问地址"
 
-#: src/features/settings/StartupPageSettings.tsx:36
+#: src/features/settings/StartupPageSettings.tsx:37
 msgid "启动页面"
 msgstr "启动页面"
 
@@ -2868,7 +2887,7 @@ msgstr "固定尺寸"
 msgid "固定高度"
 msgstr "固定高度"
 
-#: src/features/bt/components/TorrentFileList.tsx:48
+#: src/features/bt/components/TorrentFileList.tsx:55
 msgid "图片"
 msgstr "图片"
 
@@ -2952,7 +2971,7 @@ msgstr "在本地查看 GLB、glTF 与 FBX 三维模型"
 msgid "在此设备记住场景环境，下次进入查看器时恢复。"
 msgstr "在此设备记住场景环境，下次进入查看器时恢复。"
 
-#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:80
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:87
 msgid "在线"
 msgstr "在线"
 
@@ -3101,13 +3120,13 @@ msgstr "复制"
 msgid "复制代码"
 msgstr "复制代码"
 
-#: src/features/bt/components/TaskFilesPage.tsx:76
-#: src/features/bt/components/TaskRow.tsx:220
+#: src/features/bt/components/TaskFilesPage.tsx:75
+#: src/features/bt/components/TaskRow.tsx:213
 msgid "复制到用户目录"
 msgstr "复制到用户目录"
 
-#: src/features/bt/components/TaskFilesPage.tsx:74
-#: src/features/bt/components/TaskRow.tsx:218
+#: src/features/bt/components/TaskFilesPage.tsx:73
+#: src/features/bt/components/TaskRow.tsx:211
 msgid "复制到系统下载目录"
 msgstr "复制到系统下载目录"
 
@@ -3161,7 +3180,7 @@ msgstr "大小"
 
 #: src/features/activity/TransferActivity.tsx:72
 #: src/features/home/HomeRecentActivity.tsx:21
-#: src/features/lan-transfer/LanTransferActivity.tsx:33
+#: src/features/lan-transfer/LanTransferActivity.tsx:23
 #: src/features/logs/use-activity-logs.ts:41
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:39
 #: src/store/transfers.ts:189
@@ -3212,8 +3231,8 @@ msgstr "存储占用"
 msgid "存储空间不足，请清理空间后重试"
 msgstr "存储空间不足，请清理空间后重试"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:261
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:264
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:266
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:269
 msgid "安全模式"
 msgstr "安全模式"
 
@@ -3232,7 +3251,7 @@ msgstr "安装注释库"
 
 #. SSH/SFTP 传输操作当前阶段
 #: src/features/export/BackupPage.tsx:102
-#: src/features/lan-transfer/LanTransferActivity.tsx:32
+#: src/features/lan-transfer/LanTransferActivity.tsx:22
 #: src/features/media-compress/image/ImageCompressPanel.tsx:185
 #: src/features/media-compress/video/use-video-compress.ts:191
 #: src/features/transfers/phase-label.ts:23
@@ -3249,7 +3268,7 @@ msgctxt "timestamp label"
 msgid "完成"
 msgstr "完成"
 
-#: src/features/activity/TransferActivity.tsx:174
+#: src/features/activity/TransferActivity.tsx:173
 msgid "完成或取消的任务会出现在这里。"
 msgstr "完成或取消的任务会出现在这里。"
 
@@ -3274,7 +3293,7 @@ msgstr "实际执行命令"
 msgid "实际请求"
 msgstr "实际请求"
 
-#: src/features/bt/components/PeersPanel.tsx:76
+#: src/features/bt/components/PeersPanel.tsx:96
 msgid "客户端"
 msgstr "客户端"
 
@@ -3328,8 +3347,8 @@ msgid "密钥标签须为 1–80 个字符，且不能包含控制字符"
 msgstr "密钥标签须为 1–80 个字符，且不能包含控制字符"
 
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:123
-#: src/features/ssh-sftp/components/Sidebar.tsx:387
-#: src/features/ssh-sftp/components/Sidebar.tsx:394
+#: src/features/ssh-sftp/components/Sidebar.tsx:389
+#: src/features/ssh-sftp/components/Sidebar.tsx:396
 msgid "密钥管理"
 msgstr "密钥管理"
 
@@ -3609,7 +3628,7 @@ msgid "局域网传输服务"
 msgstr "局域网传输服务"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:123
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:124
 #: src/features/lan-transfer/LanTransferTool.tsx:75
 #: src/features/logs/log-labels.ts:135
 msgid "局域网传输设置"
@@ -3633,8 +3652,8 @@ msgstr "局域网请求头超出大小限制"
 msgid "局域网请求无效或不完整"
 msgstr "局域网请求无效或不完整"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:365
-#: src/features/ssh-sftp/components/Sidebar.tsx:379
+#: src/features/ssh-sftp/components/Sidebar.tsx:367
+#: src/features/ssh-sftp/components/Sidebar.tsx:381
 msgid "展开侧边栏"
 msgstr "展开侧边栏"
 
@@ -3654,7 +3673,7 @@ msgstr "展开或收起动画控制"
 msgid "工具"
 msgstr "工具"
 
-#: src/features/bt/components/PeersPanel.tsx:82
+#: src/features/bt/components/PeersPanel.tsx:102
 msgid "已上传"
 msgstr "已上传"
 
@@ -3714,7 +3733,7 @@ msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
 
 #. 待办删除成功的提示
-#: src/features/bt/BtTool.tsx:193
+#: src/features/bt/BtTool.tsx:195
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
 #: src/features/poetry/hooks/use-poetry-translations.ts:200
@@ -3732,7 +3751,7 @@ msgstr "已删除 {itemName}"
 msgid "已删除 {name}"
 msgstr "已删除 {name}"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:236
+#: src/features/ssh-sftp/components/Sidebar.tsx:238
 msgid "已删除主机 {name}"
 msgstr "已删除主机 {name}"
 
@@ -3758,9 +3777,9 @@ msgid "已发起截图下载，请在浏览器中查看。"
 msgstr "已发起截图下载，请在浏览器中查看。"
 
 #. 模型导入任务已退出。
-#: src/features/bt/components/TaskRow.tsx:83
+#: src/features/bt/components/TaskRow.tsx:84
 #: src/features/home/HomeRecentActivity.tsx:22
-#: src/features/lan-transfer/LanTransferActivity.tsx:34
+#: src/features/lan-transfer/LanTransferActivity.tsx:24
 #: src/features/logs/use-activity-logs.ts:42
 #: src/features/model-viewer/components/ModelList.tsx:45
 #: src/store/transfers.ts:188
@@ -3803,11 +3822,11 @@ msgstr "已处理 {completed}"
 msgid "已复制"
 msgstr "已复制"
 
-#: src/features/bt/BtTool.tsx:178
+#: src/features/bt/BtTool.tsx:180
 msgid "已复制到用户目录"
 msgstr "已复制到用户目录"
 
-#: src/features/bt/BtTool.tsx:162
+#: src/features/bt/BtTool.tsx:164
 msgid "已复制到系统下载目录"
 msgstr "已复制到系统下载目录"
 
@@ -3825,7 +3844,7 @@ msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "已安装 {toLocaleStringValue3} 条，约 14MB"
 
 #: src/features/about/ResetBoundary.tsx:131
-#: src/features/bt/components/TaskRow.tsx:89
+#: src/features/bt/components/TaskRow.tsx:90
 #: src/features/home/HomeRecentActivity.tsx:20
 #: src/features/todo/TodoTool.tsx:152
 msgid "已完成"
@@ -3881,7 +3900,7 @@ msgstr "已拒绝访问"
 msgid "已捕获 {captured} / 已读取 {received} 字节"
 msgstr "已捕获 {captured} / 已读取 {received} 字节"
 
-#: src/features/bt/components/PeersPanel.tsx:79
+#: src/features/bt/components/PeersPanel.tsx:99
 msgid "已接收"
 msgstr "已接收"
 
@@ -3897,7 +3916,7 @@ msgstr "已改为自动绑定，重启服务后生效"
 msgid "已断开"
 msgstr "已断开"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:219
+#: src/features/ssh-sftp/components/Sidebar.tsx:221
 msgid "已断开 {hostLabel}"
 msgstr "已断开 {hostLabel}"
 
@@ -3905,9 +3924,9 @@ msgstr "已断开 {hostLabel}"
 msgid "已断开设备"
 msgstr "已断开设备"
 
-#: src/features/bt/components/TaskRow.tsx:95
+#: src/features/bt/components/TaskRow.tsx:96
 #: src/store/transfers.ts:14
-#: src/store/transfers.ts:254
+#: src/store/transfers.ts:251
 msgid "已暂停"
 msgstr "已暂停"
 
@@ -3970,7 +3989,7 @@ msgstr "已解压到 {outName}"
 msgid "已连接"
 msgstr "已连接"
 
-#: src/features/bt/components/TorrentFileList.tsx:76
+#: src/features/bt/components/TorrentFileList.tsx:83
 msgid "已选 {selectedSize} / {filesLength}"
 msgstr "已选 {selectedSize} / {filesLength}"
 
@@ -4010,7 +4029,7 @@ msgstr "应用主导航"
 msgid "应用内部数据"
 msgstr "应用内部数据"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:507
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:526
 msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
 
@@ -4061,11 +4080,11 @@ msgstr "废弃时间"
 msgid "开启"
 msgstr "开启"
 
-#: src/features/activity/TransferActivity.tsx:163
+#: src/features/activity/TransferActivity.tsx:162
 msgid "开始上传或下载后，进度会显示在这里。"
 msgstr "开始上传或下载后，进度会显示在这里。"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:397
+#: src/features/bt/components/AddTorrentDialog.tsx:403
 msgid "开始下载"
 msgstr "开始下载"
 
@@ -4089,12 +4108,12 @@ msgid "开始对局"
 msgstr "开始对局"
 
 #. Security mode that allows LAN access without authentication
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:288
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:293
 msgctxt "LAN security mode"
 msgid "开放"
 msgstr "开放"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:408
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:427
 msgid "开放模式会跳过确认码"
 msgstr "开放模式会跳过确认码"
 
@@ -4138,7 +4157,7 @@ msgstr "当前 AI 服务地址已变更，请重新打开模型菜单"
 msgid "当前 WebView 不支持音频转码"
 msgstr "当前 WebView 不支持音频转码"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:205
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:210
 msgid "当前不可用"
 msgstr "当前不可用"
 
@@ -4205,7 +4224,7 @@ msgstr "当前操作尚未完成，请稍后重试清理数据"
 msgid "当前文件读取进度"
 msgstr "当前文件读取进度"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:172
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:176
 msgid "当前显示上次采样"
 msgstr "当前显示上次采样"
 
@@ -4230,8 +4249,8 @@ msgstr "当前模型没有可编辑的 PBR 材质。"
 msgid "当前比例：{percent}"
 msgstr "当前比例：{percent}"
 
-#: src/features/settings/StartupPageSettings.tsx:52
-#: src/features/settings/StartupPageSettings.tsx:118
+#: src/features/settings/StartupPageSettings.tsx:53
+#: src/features/settings/StartupPageSettings.tsx:120
 msgid "当前没有可用页面，将进入首页。"
 msgstr "当前没有可用页面，将进入首页。"
 
@@ -4399,7 +4418,7 @@ msgid "恢复上一杆前的球位，由犯规方重打，罚分保留。"
 msgstr "恢复上一杆前的球位，由犯规方重打，罚分保留。"
 
 #. 启动模式选项，恢复上次访问的工具、文库或小游戏页面
-#: src/features/settings/StartupPageSettings.tsx:43
+#: src/features/settings/StartupPageSettings.tsx:44
 msgid "恢复上次页面"
 msgstr "恢复上次页面"
 
@@ -4494,7 +4513,7 @@ msgstr "所选文件不是有效的 JSON，请检查导入文件"
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "所选文件不是本应用导出的备份文件"
 
-#: src/features/settings/StartupPageSettings.tsx:54
+#: src/features/settings/StartupPageSettings.tsx:55
 msgid "所选页面已隐藏或当前平台不支持，将进入首页。"
 msgstr "所选页面已隐藏或当前平台不支持，将进入首页。"
 
@@ -4537,7 +4556,7 @@ msgstr "打开主机列表，选择已有主机或新建主机"
 msgid "打开已有项"
 msgstr "打开已有项"
 
-#: src/features/bt/components/TaskRow.tsx:183
+#: src/features/bt/components/TaskRow.tsx:176
 msgid "打开文件或目录"
 msgstr "打开文件或目录"
 
@@ -4550,7 +4569,7 @@ msgstr "打开的备注过多，请先关闭其他编辑窗口"
 msgid "打开终端"
 msgstr "打开终端"
 
-#: src/features/ssh-sftp/runtime/terminalRuntime.ts:201
+#: src/features/ssh-sftp/runtime/terminalRuntime.ts:218
 msgid "打开终端失败：{failure}"
 msgstr "打开终端失败：{failure}"
 
@@ -4607,8 +4626,8 @@ msgstr "扫码访问"
 msgid "批准访问申请"
 msgstr "批准访问申请"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:365
-#: src/features/ssh-sftp/components/Sidebar.tsx:379
+#: src/features/ssh-sftp/components/Sidebar.tsx:367
+#: src/features/ssh-sftp/components/Sidebar.tsx:381
 msgid "折叠侧边栏"
 msgstr "折叠侧边栏"
 
@@ -4629,8 +4648,8 @@ msgstr "拒绝"
 msgid "拒绝清理非 BT 自有目录"
 msgstr "拒绝清理非 BT 自有目录"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:163
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:164
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:160
+#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:161
 msgid "拒绝访问"
 msgstr "拒绝访问"
 
@@ -4641,7 +4660,7 @@ msgstr "拒绝访问申请"
 
 #: src/features/settings/FeatureEntrySettings.tsx:71
 #: src/features/settings/FeatureEntrySettings.tsx:72
-#: src/features/ssh-sftp/components/Sidebar.tsx:106
+#: src/features/ssh-sftp/components/Sidebar.tsx:108
 #: src/features/vault/VaultEntryCard.tsx:70
 msgid "拖动排序"
 msgstr "拖动排序"
@@ -4704,7 +4723,7 @@ msgstr "按纯文本展示，不加载文档中的链接或图片。"
 msgid "捕获至协议结束事件"
 msgstr "捕获至协议结束事件"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:465
+#: src/features/ssh-sftp/components/Sidebar.tsx:474
 msgid "换个关键词试试"
 msgstr "换个关键词试试"
 
@@ -4726,8 +4745,8 @@ msgstr "接受桌面"
 msgid "接口格式"
 msgstr "接口格式"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:233
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:237
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:238
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:242
 msgid "接收目录"
 msgstr "接收目录"
 
@@ -4735,7 +4754,7 @@ msgstr "接收目录"
 msgid "推杆"
 msgstr "推杆"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:216
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:221
 #: src/features/poetry/components/CollectionManagement.tsx:44
 #: src/features/translation/ModelManager.tsx:275
 msgid "推荐"
@@ -4767,11 +4786,11 @@ msgstr "插入图片"
 msgid "搜索"
 msgstr "搜索"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:422
+#: src/features/ssh-sftp/components/Sidebar.tsx:424
 msgid "搜索…"
 msgstr "搜索…"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:423
+#: src/features/ssh-sftp/components/Sidebar.tsx:425
 msgid "搜索主机"
 msgstr "搜索主机"
 
@@ -4892,8 +4911,8 @@ msgstr "支持 GLB、glTF 和 FBX。模型包含外置资源时，需同时提�
 msgid "支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多 16 项、合计 32 MiB。"
 msgstr "支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多 16 项、合计 32 MiB。"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:266
-#: src/features/bt/components/AddTorrentDialog.tsx:294
+#: src/features/bt/components/AddTorrentDialog.tsx:271
+#: src/features/bt/components/AddTorrentDialog.tsx:299
 msgid "支持磁力链接与本地 .torrent 文件"
 msgstr "支持磁力链接与本地 .torrent 文件"
 
@@ -4950,8 +4969,8 @@ msgstr "数据管理"
 msgid "整理与校验文本数据"
 msgstr "整理与校验文本数据"
 
-#: src/features/bt/components/TaskFilesPage.tsx:50
-#: src/features/bt/components/TorrentFileList.tsx:50
+#: src/features/bt/components/TaskFilesPage.tsx:49
+#: src/features/bt/components/TorrentFileList.tsx:57
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:80
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:334
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:99
@@ -4976,7 +4995,7 @@ msgstr "文件传输校验失败：实际大小为 {actual} 字节，预期为 {
 msgid "文件信息"
 msgstr "文件信息"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:447
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:451
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:77
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:112
 msgid "文件夹"
@@ -4987,7 +5006,7 @@ msgid "文件夹传输"
 msgstr "文件夹传输"
 
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:90
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:382
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:386
 msgid "文件夹名称"
 msgstr "文件夹名称"
 
@@ -5024,11 +5043,11 @@ msgstr "文学意译"
 msgid "文库"
 msgstr "文库"
 
-#: src/features/bt/components/TorrentFileList.tsx:49
+#: src/features/bt/components/TorrentFileList.tsx:56
 msgid "文本"
 msgstr "文本"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:85
+#: src/features/lan-transfer/LanConnectedDevices.tsx:90
 msgid "断开与“{pendingName}”的连接？"
 msgstr "断开与“{pendingName}”的连接？"
 
@@ -5038,10 +5057,10 @@ msgid "断开设备连接"
 msgstr "断开设备连接"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/lan-transfer/LanConnectedDevices.tsx:67
-#: src/features/lan-transfer/LanConnectedDevices.tsx:68
-#: src/features/lan-transfer/LanConnectedDevices.tsx:82
-#: src/features/lan-transfer/LanConnectedDevices.tsx:96
+#: src/features/lan-transfer/LanConnectedDevices.tsx:72
+#: src/features/lan-transfer/LanConnectedDevices.tsx:73
+#: src/features/lan-transfer/LanConnectedDevices.tsx:87
+#: src/features/lan-transfer/LanConnectedDevices.tsx:101
 #: src/features/logs/log-labels.ts:27
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
 msgid "断开连接"
@@ -5084,8 +5103,8 @@ msgid "新建"
 msgstr "新建"
 
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:90
-#: src/features/ssh-sftp/components/Sidebar.tsx:402
-#: src/features/ssh-sftp/components/Sidebar.tsx:412
+#: src/features/ssh-sftp/components/Sidebar.tsx:404
+#: src/features/ssh-sftp/components/Sidebar.tsx:414
 msgid "新建主机"
 msgstr "新建主机"
 
@@ -5098,7 +5117,7 @@ msgstr "新建待办"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:35
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:381
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:385
 msgid "新建文件夹"
 msgstr "新建文件夹"
 
@@ -5107,8 +5126,8 @@ msgstr "新建文件夹"
 msgid "新建账号"
 msgstr "新建账号"
 
-#: src/features/logs/ActivityLogsPage.tsx:116
-#: src/features/ssh-sftp/components/Sidebar.tsx:460
+#: src/features/logs/ActivityLogsPage.tsx:117
+#: src/features/ssh-sftp/components/Sidebar.tsx:469
 #: src/features/vault/VaultTool.tsx:165
 msgid "无匹配结果"
 msgstr "无匹配结果"
@@ -5130,7 +5149,7 @@ msgstr "无效的 IP 地址：{ip}"
 msgid "无权限"
 msgstr "无权限"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:94
+#: src/features/bt/components/FileBrowserPanel.tsx:93
 msgid "无法使用系统应用打开"
 msgstr "无法使用系统应用打开"
 
@@ -5175,7 +5194,7 @@ msgstr "无法获取本地用户名，请手动填写 SSH 用户名"
 msgid "无法识别远端操作系统"
 msgstr "无法识别远端操作系统"
 
-#: src/features/bt/BtTool.tsx:243
+#: src/features/bt/BtTool.tsx:244
 msgid "无法读取下载任务"
 msgstr "无法读取下载任务"
 
@@ -5264,6 +5283,11 @@ msgstr "显示大小"
 msgid "显示密码"
 msgstr "显示密码"
 
+#: src/features/home/HomePage.tsx:93
+#: src/features/home/HomePage.tsx:94
+msgid "显示小游戏"
+msgstr "显示小游戏"
+
 #. 模型可见性操作。
 #: src/features/model-viewer/components/ModelList.tsx:181
 msgid "显示或隐藏"
@@ -5283,11 +5307,12 @@ msgid "显示此功能"
 msgstr "显示此功能"
 
 #. 暂停模型动画。
-#: src/features/bt/components/TaskRow.tsx:162
+#: src/features/bt/components/TaskRow.tsx:155
 #: src/features/model-viewer/components/AnimationBar.tsx:192
 #: src/features/preview/MediaPlayer.tsx:145
 #: src/features/preview/MediaPlayer.tsx:146
-#: src/features/transfers/TransferItem.tsx:73
+#: src/features/transfers/TransferItem.tsx:63
+#: src/features/transfers/TransferItem.tsx:64
 #: src/features/translation/ModelManager.tsx:105
 msgid "暂停"
 msgstr "暂停"
@@ -5307,11 +5332,11 @@ msgstr "暂停朗读"
 msgid "暂停记录"
 msgstr "暂停记录"
 
-#: src/features/bt/BtTool.tsx:280
+#: src/features/bt/BtTool.tsx:293
 msgid "暂无下载任务"
 msgstr "暂无下载任务"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:97
+#: src/features/lan-transfer/LanTransferActivity.tsx:89
 msgid "暂无任务"
 msgstr "暂无任务"
 
@@ -5323,15 +5348,15 @@ msgstr "暂无传输活动"
 msgid "暂无作者小传。"
 msgstr "暂无作者小传。"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:65
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:68
 msgid "暂无共享目录"
 msgstr "暂无共享目录"
 
-#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:61
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:66
 msgid "暂无发现设备"
 msgstr "暂无发现设备"
 
-#: src/features/bt/components/TaskRow.tsx:99
+#: src/features/bt/components/TaskRow.tsx:100
 msgid "暂无可用节点"
 msgstr "暂无可用节点"
 
@@ -5351,10 +5376,6 @@ msgstr "暂无对局记录"
 msgid "暂无待办"
 msgstr "暂无待办"
 
-#: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:135
-msgid "暂无待授权请求"
-msgstr "暂无待授权请求"
-
 #: src/features/activity/ExecutionLogActivity.tsx:31
 msgid "暂无执行记录"
 msgstr "暂无执行记录"
@@ -5364,15 +5385,15 @@ msgstr "暂无执行记录"
 msgid "暂无数据"
 msgstr "暂无数据"
 
-#: src/features/logs/ActivityLogsPage.tsx:118
+#: src/features/logs/ActivityLogsPage.tsx:119
 msgid "暂无日志"
 msgstr "暂无日志"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:367
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:384
 msgid "暂无白名单"
 msgstr "暂无白名单"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:42
+#: src/features/lan-transfer/LanConnectedDevices.tsx:45
 msgid "暂无设备"
 msgstr "暂无设备"
 
@@ -5384,7 +5405,7 @@ msgstr "暂无译文"
 msgid "暂无账号"
 msgstr "暂无账号"
 
-#: src/features/bt/components/PeersPanel.tsx:66
+#: src/features/bt/components/PeersPanel.tsx:84
 msgid "暂无连接的节点"
 msgstr "暂无连接的节点"
 
@@ -5414,7 +5435,7 @@ msgid "更多 AI 设置"
 msgstr "更多 AI 设置"
 
 #: src/features/ai-configuration/RowActions.mobile.tsx:37
-#: src/features/bt/components/TaskRow.tsx:194
+#: src/features/bt/components/TaskRow.tsx:187
 #: src/features/formatter/FormatterActions.tsx:42
 #: src/features/formatter/FormatterActions.tsx:43
 #: src/features/games/engine/GameActionsMenu.tsx:39
@@ -5445,7 +5466,7 @@ msgstr "更新下载或校验失败，请重新检查更新。"
 msgid "更新主机"
 msgstr "更新主机"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:129
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:130
 msgid "更新于 {updatedLabel}"
 msgstr "更新于 {updatedLabel}"
 
@@ -5518,11 +5539,11 @@ msgstr "服务已停止"
 msgid "服务已启动"
 msgstr "服务已启动"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:110
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:115
 msgid "服务正在运行，目录变更需重启服务后完整生效。"
 msgstr "服务正在运行，目录变更需重启服务后完整生效。"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:515
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:534
 msgid "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 msgstr "服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。"
 
@@ -5663,19 +5684,19 @@ msgstr "未获得方向传感器权限，可继续手动操作。"
 msgid "未记录"
 msgstr "未记录"
 
-#: src/features/bt/components/TaskRow.tsx:101
+#: src/features/bt/components/TaskRow.tsx:102
 msgid "未运行"
 msgstr "未运行"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:141
 #: src/features/ai-configuration/ProviderDetails.tsx:149
 #: src/features/lan-transfer/LanShareDialog.tsx:127
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:240
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:245
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:218
 msgid "未选择"
 msgstr "未选择"
 
-#: src/features/settings/StartupPageSettings.tsx:55
+#: src/features/settings/StartupPageSettings.tsx:56
 msgid "未选择页面时将进入首页。"
 msgstr "未选择页面时将进入首页。"
 
@@ -5695,7 +5716,7 @@ msgstr "本地数据"
 msgid "本地文件与数据工具"
 msgstr "本地文件与数据工具"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:416
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:420
 msgid "本地文件夹名称"
 msgstr "本地文件夹名称"
 
@@ -5882,7 +5903,7 @@ msgstr "查看活动日志"
 msgid "查看游戏规则"
 msgstr "查看游戏规则"
 
-#: src/features/bt/components/TaskRow.tsx:202
+#: src/features/bt/components/TaskRow.tsx:195
 msgid "查看节点明细"
 msgstr "查看节点明细"
 
@@ -5891,8 +5912,8 @@ msgstr "查看节点明细"
 msgid "查看详情"
 msgstr "查看详情"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:263
-#: src/features/bt/components/TaskRow.tsx:211
+#: src/features/bt/components/AddTorrentDialog.tsx:268
+#: src/features/bt/components/TaskRow.tsx:204
 msgid "查看资源信息"
 msgstr "查看资源信息"
 
@@ -6247,7 +6268,8 @@ msgstr "正在刷新…"
 #: src/features/ai-configuration/AiConfigurationSettings.tsx:119
 #: src/features/ai-configuration/AiModelMenu.desktop.tsx:45
 #: src/features/ai-configuration/AiModelMenu.mobile.tsx:50
-#: src/features/ssh-sftp/components/Sidebar.tsx:446
+#: src/features/ssh-sftp/components/Sidebar.tsx:454
+#: src/features/ssh-sftp/components/Sidebar.tsx:455
 msgid "正在加载"
 msgstr "正在加载"
 
@@ -6255,7 +6277,7 @@ msgstr "正在加载"
 msgid "正在加载处理工具…"
 msgstr "正在加载处理工具…"
 
-#: src/features/logs/ActivityLogsPage.tsx:104
+#: src/features/logs/ActivityLogsPage.tsx:105
 msgid "正在加载日志…"
 msgstr "正在加载日志…"
 
@@ -6373,7 +6395,7 @@ msgstr "正在打开主目录…"
 msgid "正在打开文件夹…"
 msgstr "正在打开文件夹…"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:72
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:73
 msgid "正在打开终端…"
 msgstr "正在打开终端…"
 
@@ -6390,7 +6412,7 @@ msgstr "正在接收响应"
 msgid "正在搜索…"
 msgstr "正在搜索…"
 
-#: src/features/bt/components/TaskRow.tsx:87
+#: src/features/bt/components/TaskRow.tsx:88
 msgid "正在整理文件"
 msgstr "正在整理文件"
 
@@ -6427,7 +6449,7 @@ msgstr "正在检查重置状态"
 msgid "正在检索…"
 msgstr "正在检索…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:338
+#: src/features/bt/components/AddTorrentDialog.tsx:343
 msgid "正在添加下载，完成后将自动关闭。"
 msgstr "正在添加下载，完成后将自动关闭。"
 
@@ -6460,7 +6482,7 @@ msgstr "正在生成录屏…"
 msgid "正在移动 {name}…"
 msgstr "正在移动 {name}…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:333
+#: src/features/bt/components/AddTorrentDialog.tsx:338
 msgid "正在获取资源信息…"
 msgstr "正在获取资源信息…"
 
@@ -6521,11 +6543,11 @@ msgstr "正在读取模型资源"
 msgid "正在读取此设备的重置记录。"
 msgstr "正在读取此设备的重置记录。"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:91
+#: src/features/lan-transfer/LanConnectedDevices.tsx:96
 msgid "正在进行的操作会被中断。"
 msgstr "正在进行的操作会被中断。"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:43
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:44
 msgid "正在连接 {sessionTitle}…"
 msgstr "正在连接 {sessionTitle}…"
 
@@ -6607,7 +6629,7 @@ msgstr "此节点未引用材质"
 msgid "母球"
 msgstr "母球"
 
-#: src/features/bt/components/PeersPanel.tsx:115
+#: src/features/bt/components/PeersPanel.tsx:135
 msgid "每 2 秒刷新 · IP 已脱敏"
 msgstr "每 2 秒刷新 · IP 已脱敏"
 
@@ -6659,7 +6681,7 @@ msgstr "没有可用的中文音色"
 msgid "没有可预览的文件，请返回来源重新打开"
 msgstr "没有可预览的文件，请返回来源重新打开"
 
-#: src/features/activity/TransferActivity.tsx:167
+#: src/features/activity/TransferActivity.tsx:166
 msgid "没有失败的任务"
 msgstr "没有失败的任务"
 
@@ -6677,7 +6699,7 @@ msgstr "没有找到作品"
 msgid "没有找到相关待办"
 msgstr "没有找到相关待办"
 
-#: src/features/activity/TransferActivity.tsx:162
+#: src/features/activity/TransferActivity.tsx:161
 msgid "没有正在传输的任务"
 msgstr "没有正在传输的任务"
 
@@ -6815,11 +6837,11 @@ msgid "深色"
 msgstr "深色"
 
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:32
-#: src/features/bt/BtTool.tsx:226
-#: src/features/bt/BtTool.tsx:285
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:59
+#: src/features/bt/BtTool.tsx:228
+#: src/features/bt/BtTool.tsx:298
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:60
 #: src/features/lan-transfer/LanShareDialog.tsx:161
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:359
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:374
 msgid "添加"
 msgstr "添加"
 
@@ -6827,7 +6849,7 @@ msgstr "添加"
 msgid "添加 AI 服务地址"
 msgstr "添加 AI 服务地址"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:263
+#: src/features/bt/components/AddTorrentDialog.tsx:268
 msgid "添加下载"
 msgstr "添加下载"
 
@@ -6836,7 +6858,7 @@ msgstr "添加下载"
 msgid "添加下载任务"
 msgstr "添加下载任务"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:240
+#: src/features/bt/components/AddTorrentDialog.tsx:243
 msgid "添加下载任务失败"
 msgstr "添加下载任务失败"
 
@@ -6932,7 +6954,7 @@ msgstr "清空所有数据？"
 msgid "清空搜索"
 msgstr "清空搜索"
 
-#: src/features/logs/ActivityLogsPage.tsx:75
+#: src/features/logs/ActivityLogsPage.tsx:76
 #: src/features/logs/LogDialogs.tsx:140
 msgid "清空日志"
 msgstr "清空日志"
@@ -7041,7 +7063,7 @@ msgstr "点击“新建”保存第一条账号密码"
 msgid "点击“新建”添加第一条待办"
 msgstr "点击“新建”添加第一条待办"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:464
+#: src/features/ssh-sftp/components/Sidebar.tsx:473
 msgid "点击右上角 + 新建主机"
 msgstr "点击右上角 + 新建主机"
 
@@ -7115,7 +7137,7 @@ msgstr "犯规处理"
 msgid "犯规待处理"
 msgstr "犯规待处理"
 
-#: src/features/bt/components/PeersPanel.tsx:85
+#: src/features/bt/components/PeersPanel.tsx:105
 msgid "状态"
 msgstr "状态"
 
@@ -7190,7 +7212,7 @@ msgstr "生成请求会发送到你配置的第三方服务，可能产生服务
 msgid "用户"
 msgstr "用户"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:235
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:240
 msgid "用户 {pctValue} · 系统 {pctValue2} · 空闲 {pctValue3}"
 msgstr "用户 {pctValue} · 系统 {pctValue2} · 空闲 {pctValue3}"
 
@@ -7279,8 +7301,8 @@ msgstr "留空则保留现有密钥"
 msgid "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
 msgstr "留空时优先使用 ~/.ssh/config 的 User，其次使用当前系统用户。"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:285
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:305
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:290
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:310
 msgid "白名单"
 msgstr "白名单"
 
@@ -7304,7 +7326,7 @@ msgstr "监控"
 msgid "监控采集超时"
 msgstr "监控采集超时"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:213
+#: src/features/bt/components/FileBrowserPanel.tsx:238
 msgid "目录中暂无文件"
 msgstr "目录中暂无文件"
 
@@ -7364,11 +7386,11 @@ msgstr "确定"
 msgid "确定删除 “{value}”？"
 msgstr "确定删除 “{value}”？"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:528
+#: src/features/ssh-sftp/components/Sidebar.tsx:537
 msgid "确定删除主机 “{value}”？此操作不可撤销。"
 msgstr "确定删除主机 “{value}”？此操作不可撤销。"
 
-#: src/features/lan-transfer/LanSharedDirsSection.tsx:104
+#: src/features/lan-transfer/LanSharedDirsSection.tsx:109
 msgid "确定删除共享目录“{pendingName}”？"
 msgstr "确定删除共享目录“{pendingName}”？"
 
@@ -7401,7 +7423,7 @@ msgstr "确认导入"
 msgid "确认清理"
 msgstr "确认清理"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:282
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:287
 msgid "确认码"
 msgstr "确认码"
 
@@ -7421,10 +7443,10 @@ msgstr "确认警告"
 msgid "确认远端解压结果"
 msgstr "确认远端解压结果"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:275
-#: src/features/bt/components/AddTorrentDialog.tsx:291
+#: src/features/bt/components/AddTorrentDialog.tsx:280
+#: src/features/bt/components/AddTorrentDialog.tsx:296
 #: src/features/bt/components/TaskDialogs.tsx:59
-#: src/features/bt/components/TaskRow.tsx:206
+#: src/features/bt/components/TaskRow.tsx:199
 msgid "磁力链接"
 msgstr "磁力链接"
 
@@ -7436,7 +7458,7 @@ msgstr "磁力链接与种子下载"
 msgid "磁盘"
 msgstr "磁盘"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:299
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:304
 msgid "磁盘 I/O"
 msgstr "磁盘 I/O"
 
@@ -7453,7 +7475,7 @@ msgstr "视角仅在本次会话保留。"
 msgid "视角名称"
 msgstr "视角名称"
 
-#: src/features/bt/components/TorrentFileList.tsx:46
+#: src/features/bt/components/TorrentFileList.tsx:53
 msgid "视频"
 msgstr "视频"
 
@@ -7478,9 +7500,13 @@ msgstr "离开活动页会丢弃本次执行日志，但不会取消正在运行
 msgid "离开游戏房间"
 msgstr "离开游戏房间"
 
-#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:80
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:87
 msgid "离线"
 msgstr "离线"
+
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:98
+msgid "离线，无法打开"
+msgstr "离线，无法打开"
 
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:241
 msgid "离线检查原始文件；部分扩展可能不受支持。"
@@ -7546,7 +7572,7 @@ msgstr "移除"
 msgid "移除 {name}"
 msgstr "移除 {name}"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:543
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:562
 msgid "移除“{pendingLabel}”？"
 msgstr "移除“{pendingLabel}”？"
 
@@ -7554,7 +7580,7 @@ msgstr "移除“{pendingLabel}”？"
 msgid "移除「{modelName}」模型，之后可重新下载。"
 msgstr "移除「{modelName}」模型，之后可重新下载。"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:545
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:564
 msgid "移除后，该设备将不再自动获得访问权限。"
 msgstr "移除后，该设备将不再自动获得访问权限。"
 
@@ -7589,7 +7615,7 @@ msgstr "稍后重启"
 msgid "空正文"
 msgstr "空正文"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:289
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:290
 msgid "空目录"
 msgstr "空目录"
 
@@ -7599,7 +7625,7 @@ msgstr "空目录"
 msgid "空闲"
 msgstr "空闲"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:150
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:151
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:159
 msgid "端口"
 msgstr "端口"
@@ -7659,7 +7685,7 @@ msgstr "等待导入"
 msgid "等待接收正文"
 msgstr "等待接收正文"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:327
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:332
 msgid "等待监控数据"
 msgstr "等待监控数据"
 
@@ -7876,8 +7902,8 @@ msgstr "终端会话"
 msgid "终端输入数据格式无效"
 msgstr "终端输入数据格式无效"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:186
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:195
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:187
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:198
 msgid "绑定 IP"
 msgstr "绑定 IP"
 
@@ -7921,10 +7947,11 @@ msgstr "绕序冲突"
 msgid "绘制实例数"
 msgstr "绘制实例数"
 
-#: src/features/bt/components/TaskRow.tsx:162
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:404
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:417
-#: src/features/transfers/TransferItem.tsx:73
+#: src/features/bt/components/TaskRow.tsx:155
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:408
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:421
+#: src/features/transfers/TransferItem.tsx:63
+#: src/features/transfers/TransferItem.tsx:64
 #: src/features/translation/ModelManager.tsx:128
 msgid "继续"
 msgstr "继续"
@@ -7934,7 +7961,7 @@ msgstr "继续"
 msgid "继续传输"
 msgstr "继续传输"
 
-#: src/store/transfers.ts:263
+#: src/store/transfers.ts:260
 msgid "继续传输中"
 msgstr "继续传输中"
 
@@ -8089,7 +8116,7 @@ msgstr "网格"
 msgid "网格实例"
 msgstr "网格实例"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:279
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:284
 msgid "网络"
 msgstr "网络"
 
@@ -8130,9 +8157,9 @@ msgstr "翻译输入"
 msgid "翻译输出"
 msgstr "翻译输出"
 
-#: src/features/lan-transfer/LanTransferActivity.tsx:169
-msgid "耗时 {taskEtaValue2}"
-msgstr "耗时 {taskEtaValue2}"
+#: src/features/lan-transfer/LanTransferActivity.tsx:161
+msgid "耗时 {taskEtaValue}"
+msgstr "耗时 {taskEtaValue}"
 
 #. 棋类对局模式：通过网络与另一位玩家对战。
 #: src/features/games/engine/history-labels.tsx:15
@@ -8173,8 +8200,8 @@ msgstr "自动"
 msgid "自动旋转"
 msgstr "自动旋转"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:196
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:201
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:206
 msgid "自动选择"
 msgstr "自动选择"
 
@@ -8184,7 +8211,7 @@ msgid "自发光"
 msgstr "自发光"
 
 #. 启动模式选项，每次启动打开用户指定的功能页面
-#: src/features/settings/StartupPageSettings.tsx:39
+#: src/features/settings/StartupPageSettings.tsx:40
 msgid "自定义页面"
 msgstr "自定义页面"
 
@@ -8218,7 +8245,7 @@ msgid "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转�
 msgstr "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转向，Esc 退出。触屏可点按摇杆方向移动，或拖动摇杆连续移动，并使用升降按钮。"
 
 #: src/features/ai-configuration/RowActions.desktop.tsx:40
-#: src/features/ai-configuration/RowActions.mobile.tsx:59
+#: src/features/ai-configuration/RowActions.mobile.tsx:60
 msgid "至少保留一项"
 msgstr "至少保留一项"
 
@@ -8253,12 +8280,12 @@ msgstr "花色球"
 msgid "英语"
 msgstr "英语"
 
-#: src/features/bt/components/TaskRow.tsx:93
+#: src/features/bt/components/TaskRow.tsx:94
 #: src/store/transfers.ts:11
 msgid "获取资源信息…"
 msgstr "获取资源信息…"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:150
+#: src/features/bt/components/AddTorrentDialog.tsx:153
 msgid "获取资源信息失败"
 msgstr "获取资源信息失败"
 
@@ -8329,7 +8356,7 @@ msgstr "解压出的文件夹"
 msgid "解压文件"
 msgstr "解压文件"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:325
+#: src/features/bt/components/AddTorrentDialog.tsx:330
 msgid "解析"
 msgstr "解析"
 
@@ -8337,7 +8364,7 @@ msgstr "解析"
 msgid "解析中"
 msgstr "解析中"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:344
+#: src/features/bt/components/AddTorrentDialog.tsx:349
 msgid "解析结果"
 msgstr "解析结果"
 
@@ -8390,7 +8417,7 @@ msgstr "记录任务与清单"
 msgid "设为当前"
 msgstr "设为当前"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:132
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:133
 msgid "设备名"
 msgstr "设备名"
 
@@ -8566,7 +8593,7 @@ msgstr "该文件夹及其全部内容将被永久删除。"
 msgid "该格式不支持预览"
 msgstr "该格式不支持预览"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:279
+#: src/features/bt/components/FileBrowserPanel.tsx:304
 msgid "该格式不支持预览，可使用系统应用打开"
 msgstr "该格式不支持预览，可使用系统应用打开"
 
@@ -8582,7 +8609,7 @@ msgstr "该模型不存在或不属于此 AI 服务地址"
 msgid "该私钥有口令保护（连接时输入）"
 msgstr "该私钥有口令保护（连接时输入）"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:87
+#: src/features/lan-transfer/LanConnectedDevices.tsx:92
 msgid "该设备需要重新连接才能继续访问。"
 msgstr "该设备需要重新连接才能继续访问。"
 
@@ -8594,7 +8621,7 @@ msgstr "该诗词没有可翻译的正文"
 msgid "该资源已下载完成；如需重新下载，请先删除现有任务"
 msgstr "该资源已下载完成；如需重新下载，请先删除现有任务"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:376
+#: src/features/bt/components/AddTorrentDialog.tsx:382
 msgid "该资源已在下载列表中，不能重复添加"
 msgstr "该资源已在下载列表中，不能重复添加"
 
@@ -8776,11 +8803,11 @@ msgstr "请选择静态 PNG、JPEG 或 WebP 图片"
 
 #: src/features/lan-transfer/labels.ts:8
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:81
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:449
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:468
 msgid "读写"
 msgstr "读写"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:305
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:310
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:118
 msgid "读取"
 msgstr "读取"
@@ -8872,7 +8899,7 @@ msgstr "调整搜索内容或分类后重试"
 msgid "调整母球"
 msgstr "调整母球"
 
-#: src/features/logs/ActivityLogsPage.tsx:122
+#: src/features/logs/ActivityLogsPage.tsx:123
 msgid "调整筛选条件或刷新后再试。"
 msgstr "调整筛选条件或刷新后再试。"
 
@@ -8899,7 +8926,7 @@ msgstr "警告"
 msgid "负"
 msgstr "负"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:220
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:225
 msgid "负载 {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 msgstr "负载 {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 
@@ -8916,7 +8943,7 @@ msgstr "资源中没有可下载的文件"
 msgid "资源信息未就绪，请先解析"
 msgstr "资源信息未就绪，请先解析"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:284
+#: src/features/bt/components/FileBrowserPanel.tsx:311
 msgid "资源尚未下载完成，缺失分片可能导致预览中断。暂停任务会保持暂停。"
 msgstr "资源尚未下载完成，缺失分片可能导致预览中断。暂停任务会保持暂停。"
 
@@ -8971,8 +8998,8 @@ msgstr "跳转到行"
 msgid "轨道查看"
 msgstr "轨道查看"
 
-#: src/features/bt/BtTool.tsx:165
-#: src/features/bt/BtTool.tsx:181
+#: src/features/bt/BtTool.tsx:167
+#: src/features/bt/BtTool.tsx:183
 msgid "转存失败"
 msgstr "转存失败"
 
@@ -9044,7 +9071,7 @@ msgstr "输出格式"
 msgid "输出设置"
 msgstr "输出设置"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:215
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:220
 msgid "运行 {formatUptimeValue}"
 msgstr "运行 {formatUptimeValue}"
 
@@ -9067,12 +9094,12 @@ msgstr "近 7 天"
 msgid "返回"
 msgstr "返回"
 
-#: src/features/bt/components/FileBrowserPanel.tsx:124
-#: src/features/bt/components/FileBrowserPanel.tsx:125
+#: src/features/bt/components/FileBrowserPanel.tsx:130
+#: src/features/bt/components/FileBrowserPanel.tsx:131
 msgid "返回上级目录"
 msgstr "返回上级目录"
 
-#: src/features/bt/components/TaskFilesPage.tsx:39
+#: src/features/bt/components/TaskFilesPage.tsx:38
 #: src/features/poetry/LibraryPage.tsx:317
 msgid "返回列表"
 msgstr "返回列表"
@@ -9120,7 +9147,7 @@ msgstr "返回选择"
 
 #: src/components/ToolPageHeader.tsx:54
 #: src/components/ToolPageHeader.tsx:54
-#: src/features/bt/BtTool.tsx:214
+#: src/features/bt/BtTool.tsx:216
 #: src/features/games/billiards/BilliardsHeader.tsx:62
 #: src/features/games/engine/BoardGameHeader.tsx:61
 #: src/features/ssh-sftp/SshSftpTool.tsx:214
@@ -9132,7 +9159,7 @@ msgstr "返回首页"
 msgid "还原模型预览"
 msgstr "还原模型预览"
 
-#: src/features/ssh-sftp/components/Sidebar.tsx:460
+#: src/features/ssh-sftp/components/Sidebar.tsx:469
 msgid "还没有主机"
 msgstr "还没有主机"
 
@@ -9144,7 +9171,7 @@ msgstr "还没有已完成的待办"
 msgid "还没有已废弃的待办"
 msgstr "还没有已废弃的待办"
 
-#: src/features/activity/TransferActivity.tsx:173
+#: src/features/activity/TransferActivity.tsx:172
 msgid "还没有已结束的任务"
 msgstr "还没有已结束的任务"
 
@@ -9159,7 +9186,7 @@ msgstr "进度 {completed} / {total}"
 
 #: src/features/activity/TransferActivity.tsx:68
 #: src/features/home/HomeRecentActivity.tsx:19
-#: src/features/lan-transfer/LanTransferActivity.tsx:31
+#: src/features/lan-transfer/LanTransferActivity.tsx:21
 #: src/features/todo/TodoTool.tsx:144
 msgid "进行中"
 msgstr "进行中"
@@ -9183,7 +9210,7 @@ msgstr "远端已存在 “{name}”。修改要继续操作的名称，或先�
 msgid "远端已有名称"
 msgstr "远端已有名称"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:403
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:407
 msgid "远端文件夹名称"
 msgstr "远端文件夹名称"
 
@@ -9196,7 +9223,7 @@ msgstr "远端解压中"
 msgid "远端连接在终端打开前已关闭"
 msgstr "远端连接在终端打开前已关闭"
 
-#: src/features/bt/components/TaskFilesPage.tsx:53
+#: src/features/bt/components/TaskFilesPage.tsx:52
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:55
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:94
@@ -9228,11 +9255,11 @@ msgstr "连接主机"
 msgid "连接主机，管理远端文件"
 msgstr "连接主机，管理远端文件"
 
-#: src/features/ssh-sftp/components/terminal/Terminal.tsx:56
+#: src/features/ssh-sftp/components/terminal/Terminal.tsx:57
 msgid "连接失败"
 msgstr "连接失败"
 
-#: src/features/ssh-sftp/runtime/terminalRuntime.ts:153
+#: src/features/ssh-sftp/runtime/terminalRuntime.ts:170
 msgid "连接已关闭"
 msgstr "连接已关闭"
 
@@ -9248,7 +9275,7 @@ msgstr "连接视图"
 msgid "连接耗时较长，仍在等待响应。可以收起窗口，稍后查看进度。"
 msgstr "连接耗时较长，仍在等待响应。可以收起窗口，稍后查看进度。"
 
-#: src/features/lan-transfer/LanConnectedDevices.tsx:28
+#: src/features/lan-transfer/LanConnectedDevices.tsx:29
 msgid "连接设备"
 msgstr "连接设备"
 
@@ -9256,7 +9283,7 @@ msgstr "连接设备"
 msgid "连续六十回合未吃子"
 msgstr "连续六十回合未吃子"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:178
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:182
 msgid "连续失败，已暂停刷新"
 msgstr "连续失败，已暂停刷新"
 
@@ -9316,7 +9343,7 @@ msgid "选彩"
 msgstr "选彩"
 
 #: src/features/lan-transfer/LanShareDialog.tsx:140
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:250
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:255
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:227
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:134
 msgid "选择"
@@ -9447,7 +9474,7 @@ msgstr "选择视频后显示预估体积"
 msgid "选择私钥文件"
 msgstr "选择私钥文件"
 
-#: src/features/bt/components/AddTorrentDialog.tsx:309
+#: src/features/bt/components/AddTorrentDialog.tsx:314
 msgid "选择种子文件"
 msgstr "选择种子文件"
 
@@ -9549,7 +9576,7 @@ msgstr "配置已更新，草稿已保留。请核对最新配置后再保存。
 msgid "采样帧间隔 {frameMs} ms · 渲染提交耗时 {workMs} ms"
 msgstr "采样帧间隔 {frameMs} ms · 渲染提交耗时 {workMs} ms"
 
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:129
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:130
 msgid "采集数据…"
 msgstr "采集数据…"
 
@@ -9570,8 +9597,8 @@ msgstr "重启失败，请重试或手动重新打开应用。"
 msgid "重启并更新"
 msgstr "重启并更新"
 
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:390
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:392
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:394
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:396
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:79
 msgid "重命名"
 msgstr "重命名"
@@ -9641,7 +9668,8 @@ msgid "重置状态已改变，请重新检查状态"
 msgstr "重置状态已改变，请重新检查状态"
 
 #. 待办列表读取失败后重新加载
-#. 重新读取 BT 下载任务；通知监听失败时也会重新连接监听
+#. 重新建立 BT 任务状态事件监听
+#. 重新读取 BT 下载任务
 #. 重新读取失败的诗词内容
 #. 重新读取桌面开机自启状态
 #. 重新读取诗词合集列表
@@ -9649,30 +9677,33 @@ msgstr "重置状态已改变，请重新检查状态"
 #: src/features/about/AboutPage.tsx:105
 #: src/features/about/DataManagementDialogs.tsx:61
 #: src/features/activity/TransferActivity.tsx:56
-#: src/features/bt/BtTool.tsx:261
-#: src/features/bt/components/FileBrowserPanel.tsx:203
-#: src/features/bt/components/TaskRow.tsx:173
+#: src/features/bt/BtTool.tsx:253
+#: src/features/bt/BtTool.tsx:272
+#: src/features/bt/components/FileBrowserPanel.tsx:206
+#: src/features/bt/components/FileBrowserPanel.tsx:223
+#: src/features/bt/components/TaskRow.tsx:166
 #: src/features/games/billiards/BilliardsGame.tsx:124
 #: src/features/games/engine/GameSessionNotice.tsx:74
 #: src/features/lan-transfer/LanTransferTool.tsx:98
-#: src/features/logs/ActivityLogsPage.tsx:98
+#: src/features/logs/ActivityLogsPage.tsx:99
 #: src/features/poetry/components/CollectionManagement.tsx:120
 #: src/features/poetry/components/PoemList.tsx:203
 #: src/features/poetry/components/PoetryLocalManagement.tsx:74
 #: src/features/poetry/components/PoetryReadError.tsx:26
 #: src/features/preview/PreviewSurface.tsx:156
 #: src/features/settings/AutostartSetting.desktop.tsx:33
-#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:184
-#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:268
-#: src/features/ssh-sftp/components/Sidebar.tsx:441
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:188
+#: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:189
+#: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:269
+#: src/features/ssh-sftp/components/Sidebar.tsx:445
 #: src/features/todo/notes/NoteEditorNodes.tsx:97
 #: src/features/todo/notes/TodoNoteImage.tsx:115
 #: src/features/todo/TodoDetailsDialog.tsx:120
 #: src/features/todo/TodoItemDialog.tsx:84
 #: src/features/todo/TodoTool.tsx:224
 #: src/features/todo/TodoTool.tsx:240
-#: src/features/transfers/TransferItem.tsx:104
-#: src/features/transfers/TransferItem.tsx:113
+#: src/features/transfers/TransferItem.tsx:96
+#: src/features/transfers/TransferItem.tsx:105
 #: src/features/translation/ModelManager.tsx:120
 #: src/features/translation/ModelManager.tsx:213
 #: src/features/vault/VaultTool.tsx:150
@@ -9731,7 +9762,7 @@ msgid "锁定鼠标"
 msgstr "锁定鼠标"
 
 #. glTF 规范报告中的错误数量。
-#: src/features/bt/components/TaskRow.tsx:85
+#: src/features/bt/components/TaskRow.tsx:86
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:276
 #: src/store/transfers.ts:15
 msgid "错误"
@@ -9773,7 +9804,7 @@ msgstr "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），�
 msgid "附近的房间"
 msgstr "附近的房间"
 
-#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:31
+#: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:32
 msgid "附近设备"
 msgstr "附近设备"
 
@@ -9785,6 +9816,11 @@ msgstr "降序"
 #: src/features/vault/VaultEntryCard.tsx:150
 msgid "隐藏密码"
 msgstr "隐藏密码"
+
+#: src/features/home/HomePage.tsx:93
+#: src/features/home/HomePage.tsx:94
+msgid "隐藏小游戏"
+msgstr "隐藏小游戏"
 
 #: src/features/poetry/LibraryPage.tsx:296
 msgid "随机"
@@ -9841,7 +9877,7 @@ msgstr "音色和语速将在下次朗读时使用。试听会替换当前朗读
 msgid "音量"
 msgstr "音量"
 
-#: src/features/bt/components/TorrentFileList.tsx:47
+#: src/features/bt/components/TorrentFileList.tsx:54
 msgid "音频"
 msgstr "音频"
 
@@ -9873,7 +9909,7 @@ msgid "预览备注图片"
 msgstr "预览备注图片"
 
 #: src/components/ToolPageHeader.tsx:66
-#: src/features/settings/StartupPageSettings.tsx:38
+#: src/features/settings/StartupPageSettings.tsx:39
 msgid "首页"
 msgstr "首页"
 
@@ -9954,8 +9990,8 @@ msgstr "黑胜"
 msgid "默认"
 msgstr "默认"
 
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:424
-#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:440
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:443
+#: src/features/lan-transfer/LanTransferSettingsDialog.tsx:459
 msgid "默认权限"
 msgstr "默认权限"
 
