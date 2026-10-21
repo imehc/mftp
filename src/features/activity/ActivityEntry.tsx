@@ -4,7 +4,6 @@ import { cn } from "cn";
 import { Activity } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
-import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 
 import type { ActivitySummary } from "./activity-summary";
 import { ACTIVITY_PANEL_ID, useActivityPanel } from "./ActivityProvider";
@@ -39,7 +38,7 @@ export default function ActivityEntry({
         data-activity-entry="header"
         variant="ghost"
         size="icon-sm"
-        className={cn(TOUCH_TARGET_CLASS, "relative shrink-0 md:hidden")}
+        className="relative shrink-0 md:hidden"
         aria-label={label}
         title={label}
         onClick={() => void navigate({ to: "/activity" })}

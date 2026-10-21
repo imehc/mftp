@@ -59,7 +59,8 @@ export default function TransferItem({
           <div className="flex shrink-0 items-center gap-0.5">
             <Button
               variant="ghost"
-              size="icon-xs"
+              size="icon-sm"
+              density="adaptive"
               title={transfer.paused ? t`继续` : t`暂停`}
               aria-label={transfer.paused ? t`继续` : t`暂停`}
               onClick={() => onTogglePause(transfer)}
@@ -75,7 +76,8 @@ export default function TransferItem({
             </Button>
             <Button
               variant="ghost"
-              size="icon-xs"
+              size="icon-sm"
+              density="adaptive"
               title={t`取消`}
               aria-label={t`取消`}
               onClick={() => onCancel()}

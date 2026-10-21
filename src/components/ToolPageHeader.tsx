@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 
 import { Button } from "~/components/ui/button";
 import ActivityEntry from "~/features/activity/ActivityEntry";
-import { TOUCH_TARGET_CHILDREN_CLASS, TOUCH_TARGET_CLASS } from "~/lib/touch";
+import { TOUCH_TARGET_CHILDREN_CLASS } from "~/lib/touch";
 
 interface ToolPageHeaderProps {
   title: ReactNode;
@@ -48,7 +48,7 @@ export function ToolPageHeader({
           <Button
             variant="ghost"
             size={variant === "compact" ? "xs" : "icon-sm"}
-            className={cn(TOUCH_TARGET_CLASS, "shrink-0")}
+            className="shrink-0"
             asChild
           >
             <Link to="/" aria-label={t`返回首页`} title={t`返回首页`}>
