@@ -16,6 +16,8 @@ import {
 } from "pixi.js";
 import { useEffect, useRef } from "react";
 
+import { prefersReducedMotion } from "~/lib/motion";
+
 import type { SeatIndex } from "../engine/types";
 import {
   getBoardTexture,
@@ -166,7 +168,7 @@ function createScene(
     sprite.position.set(lineAt(index % n), lineAt(Math.floor(index / n)));
     stoneLayer.addChild(sprite);
     stones.set(index, sprite);
-    if (animate) {
+    if (animate && !prefersReducedMotion()) {
       const target = sprite.scale.x;
       sprite.scale.set(target * 0.55);
       gsap.to(sprite.scale, {
@@ -180,7 +182,7 @@ function createScene(
 
   function removeStone(index: number, sprite: Sprite, animate: boolean): void {
     stones.delete(index);
-    if (!animate) {
+    if (!animate || prefersReducedMotion()) {
       gsap.killTweensOf(sprite.scale);
       sprite.destroy();
       return;

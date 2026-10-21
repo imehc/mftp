@@ -45,17 +45,22 @@
 .billiards-game[data-landscape="true"] {
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr) 7rem;
-  grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+  /* 第一行留给存档/保存失败提示；无提示时高度为 0。 */
+  grid-template-rows: auto auto minmax(0, 1fr) minmax(0, 1fr);
   padding-bottom: var(--safe-bottom, 0px);
+}
+.billiards-game[data-landscape="true"] .billiards-session-notice {
+  grid-column: 1 / -1;
+  grid-row: 1;
 }
 .billiards-game[data-landscape="true"] .billiards-landscape-nav {
   grid-column: 1;
-  grid-row: 1;
+  grid-row: 2;
   flex-wrap: wrap;
 }
 .billiards-game[data-landscape="true"] .billiards-score {
   grid-column: 1;
-  grid-row: 2 / -1;
+  grid-row: 3 / -1;
   max-width: 7rem;
   height: 100%;
   flex-direction: column;
@@ -78,12 +83,12 @@
 }
 .billiards-game[data-landscape="true"] .billiards-stage {
   grid-column: 2;
-  grid-row: 1 / -1;
+  grid-row: 2 / -1;
   height: 100%;
 }
 .billiards-game[data-landscape="true"] .billiards-actions {
   grid-column: 3;
-  grid-row: 1 / -1;
+  grid-row: 2 / -1;
   height: 100%;
   max-height: 100%;
 }

@@ -22,6 +22,8 @@ import {
 } from "pixi.js";
 import { useEffect, useRef } from "react";
 
+import { prefersReducedMotion } from "~/lib/motion";
+
 import type { SeatIndex } from "../engine/types";
 import {
   BOARD_TEXTURE_SCALE,
@@ -156,7 +158,7 @@ function createScene(
     sprite.position.set(lineAt(index % N), lineAt(Math.floor(index / N)));
     stoneLayer.addChild(sprite);
     stones.set(index, sprite);
-    if (animate) {
+    if (animate && !prefersReducedMotion()) {
       const target = sprite.scale.x;
       sprite.scale.set(target * 0.55);
       gsap.to(sprite.scale, {
@@ -180,17 +182,19 @@ function createScene(
       if (!winAnimated) {
         winAnimated = true;
         // 闪烁数次后以实心结束；结果条会等它放完。
-        gsap.fromTo(
-          winLayer,
-          { alpha: 0.1 },
-          {
-            alpha: 1,
-            duration: 0.26,
-            repeat: 4,
-            yoyo: true,
-            ease: "power1.inOut",
-          },
-        );
+        if (!prefersReducedMotion()) {
+          gsap.fromTo(
+            winLayer,
+            { alpha: 0.1 },
+            {
+              alpha: 1,
+              duration: 0.26,
+              repeat: 4,
+              yoyo: true,
+              ease: "power1.inOut",
+            },
+          );
+        }
       }
     } else {
       winAnimated = false;

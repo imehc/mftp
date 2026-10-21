@@ -72,6 +72,7 @@ export function GameResultBar({
           >
             <Button
               size="sm"
+              density="adaptive"
               className="flex-1 md:min-w-28"
               disabled={rematchWaiting}
               onClick={onRematch}
@@ -86,6 +87,7 @@ export function GameResultBar({
             <Button
               size="sm"
               variant="outline"
+              density="adaptive"
               className="flex-1 md:min-w-28"
               onClick={onExit}
             >

@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { describeError, toIpcError } from "~/lib/errors";
+import { toIpcError } from "~/lib/errors";
 import type { AppError } from "~/types";
 
 import type { LocalGameSession } from "../engine/game-session-store";
@@ -62,25 +61,19 @@ export function BilliardsMatch({
       </>
     );
   return (
-    <>
-      {error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{describeError(error)}</AlertDescription>
-        </Alert>
-      ) : null}
-      <MatchView
-        mode={mode}
-        headerProps={headerProps}
-        session={session}
-        stageRef={stageRef}
-        onRematch={onRematch}
-        onExit={onExit}
-        onFinishedChange={onFinishedChange}
-        onStageError={(cause) => {
-          session.runner.pause();
-          setError(toIpcError(cause).payload);
-        }}
-      />
-    </>
+    <MatchView
+      mode={mode}
+      headerProps={headerProps}
+      session={session}
+      stageRef={stageRef}
+      onRematch={onRematch}
+      onExit={onExit}
+      onFinishedChange={onFinishedChange}
+      stageError={error}
+      onStageError={(cause) => {
+        session.runner.pause();
+        setError(toIpcError(cause).payload);
+      }}
+    />
   );
 }

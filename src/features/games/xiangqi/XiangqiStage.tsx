@@ -13,6 +13,8 @@ import {
 } from "pixi.js";
 import { useEffect, useRef, useState } from "react";
 
+import { prefersReducedMotion } from "~/lib/motion";
+
 import { boardCoordinate } from "./rules";
 import {
   BOARD_SURFACE_HEIGHT,
@@ -307,7 +309,7 @@ function createScene(
     const position = displayCoordinate(index, state.flipped);
     container.position.set(position.x, position.y);
     pieceLayer.addChild(container);
-    if (animate) {
+    if (animate && !prefersReducedMotion()) {
       container.scale.set(0.58);
       gsap.to(container.scale, {
         x: 1,
@@ -384,12 +386,16 @@ function createScene(
           color: 0xc8322c,
           alpha: 1,
         });
-        gsap.to(checkLayer, {
-          alpha: 0.28,
-          duration: 0.48,
-          repeat: -1,
-          yoyo: true,
-        });
+        if (prefersReducedMotion()) {
+          checkLayer.alpha = 1;
+        } else {
+          gsap.to(checkLayer, {
+            alpha: 0.28,
+            duration: 0.48,
+            repeat: -1,
+            yoyo: true,
+          });
+        }
       }
     }
   }

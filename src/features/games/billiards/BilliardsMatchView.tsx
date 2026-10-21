@@ -2,9 +2,12 @@
 import { Plural, Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { describeError } from "~/lib/errors";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
+import type { AppError } from "~/types";
 
 import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGamesHistoryStore } from "../engine/history";
@@ -49,6 +52,7 @@ export function MatchView({
   onExit,
   onFinishedChange,
   onStageError,
+  stageError,
   headerProps,
 }: {
   mode: BilliardsMode;
@@ -60,6 +64,8 @@ export function MatchView({
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
   onStageError: (error: unknown) => void;
+  /** 渲染阶段错误；与存档提示同处标题栏下方的内容区。 */
+  stageError: AppError | null;
   headerProps: BilliardsHeaderProps;
 }) {
   const desktop = useDesktopLayout();
@@ -235,8 +241,17 @@ export function MatchView({
           if (submitRule({ type: "concede" })) openPanel(null);
         }}
       />
-      <div className="billiards-score shrink-0 text-xs">
+      <div className="billiards-session-notice flex shrink-0 flex-col">
         <GameSessionNotice store={billiardsSessions} />
+        {stageError ? (
+          <div className="p-3">
+            <Alert variant="destructive">
+              <AlertDescription>{describeError(stageError)}</AlertDescription>
+            </Alert>
+          </div>
+        ) : null}
+      </div>
+      <div className="billiards-score shrink-0 text-xs">
         <div className="billiards-summary mx-auto w-full max-w-6xl min-w-0 px-3 md:px-4">
           {state.finished ? (
             <div className="flex flex-wrap items-center justify-center gap-1.5">
