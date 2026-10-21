@@ -31,6 +31,7 @@ import {
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { Alert, AlertAction, AlertDescription } from "~/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +51,7 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Input } from "~/components/ui/input";
+import { Spinner } from "~/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
@@ -431,20 +433,27 @@ export default function Sidebar({
         )}
       >
         {loadError ? (
-          <div role="alert" className="space-y-2 p-2 text-sm">
-            <p>{describeError(loadError)}</p>
-            <Button
-              variant="outline"
-              fullWidth
-              onClick={() => void retryLoad().catch(() => undefined)}
-            >
-              <Trans>重试</Trans>
-            </Button>
-          </div>
+          <Alert variant="destructive" className="m-2">
+            <AlertDescription>{describeError(loadError, t)}</AlertDescription>
+            <AlertAction>
+              <Button
+                variant="outline"
+                size="sm"
+                density="adaptive"
+                onClick={() => void retryLoad().catch(() => undefined)}
+              >
+                <Trans>重试</Trans>
+              </Button>
+            </AlertAction>
+          </Alert>
         ) : loading ? (
-          <p role="status" className="p-3 text-sm">
+          <div
+            role="status"
+            className="text-muted-foreground flex items-center justify-center gap-2 p-4 text-sm"
+          >
+            <Spinner aria-label={t`正在加载`} />
             <Trans>正在加载</Trans>
-          </p>
+          </div>
         ) : filtered.length === 0 ? (
           collapsed ? (
             <div className="text-muted-foreground flex justify-center py-4">

@@ -16,7 +16,7 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="border-border bg-card flex flex-col gap-2 rounded-lg border p-3">
+    <section className="border-border bg-card flex flex-col gap-2 rounded-xl border p-3">
       <div className="flex items-center gap-1.5 text-sm font-medium">
         {icon}
         <span className="min-w-0 truncate">{title}</span>

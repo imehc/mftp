@@ -41,6 +41,7 @@ interface TerminalEntry {
   /** 当前挂载点；为 null 表示不在页面上，此时不做 fit / resize。 */
   mountedAt: HTMLElement | null;
   observer: ResizeObserver;
+  themeObserver: MutationObserver;
   stopFontSize: () => void;
   listeners: Set<OpeningListener>;
   subscriptions: Subscription[];
@@ -82,6 +83,21 @@ function hostEl(): HTMLDivElement {
   return offscreenHost;
 }
 
+function terminalColor(name: string, fallback: string): string {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+}
+
+/** xterm 画布与容器共用主题 token；主题切换时由 MutationObserver 重新读取。 */
+function terminalTheme() {
+  return {
+    background: terminalColor("--terminal-bg", "#0a0a0a"),
+    foreground: terminalColor("--terminal-fg", "#e5e5e5"),
+  };
+}
+
 function emitOpening(entry: TerminalEntry): void {
   for (const listener of entry.listeners) listener(entry.opening);
 }
@@ -110,6 +126,7 @@ function disposeEntry(sessionId: string, entry: TerminalEntry): void {
   entry.disposed = true;
   entries.delete(sessionId);
   entry.observer.disconnect();
+  entry.themeObserver.disconnect();
   entry.stopFontSize();
   entry.onData.dispose();
   disposeSubscriptions(entry.subscriptions);
@@ -223,10 +240,7 @@ function createEntry(sessionId: string): TerminalEntry | null {
       'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
     fontSize: 13,
     cursorBlink: true,
-    theme: {
-      background: "#0a0a0a",
-      foreground: "#e5e5e5",
-    },
+    theme: terminalTheme(),
     scrollback: 10_000,
   });
   const fit = new FitAddon();
@@ -236,12 +250,20 @@ function createEntry(sessionId: string): TerminalEntry | null {
   const observer = new ResizeObserver(() => {
     handleResize(entry, sessionId);
   });
+  const themeObserver = new MutationObserver(() => {
+    term.options.theme = terminalTheme();
+  });
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class", "style", "data-theme"],
+  });
   const entry: TerminalEntry = {
     term,
     fit,
     slot,
     mountedAt: null,
     observer,
+    themeObserver,
     stopFontSize: () => {},
     listeners: new Set(),
     subscriptions: [],

@@ -123,7 +123,7 @@ export function TimeSeriesCard({
     setRenderedPoints(points.length);
   const animationActive = renderedPoints >= 2 && !prefersReducedMotion();
   return (
-    <section className="border-border bg-card flex flex-col gap-2 rounded-lg border p-3">
+    <section className="border-border bg-card flex flex-col gap-2 rounded-xl border p-3">
       <div className="flex items-start justify-between gap-2">
         <span className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
           {icon}

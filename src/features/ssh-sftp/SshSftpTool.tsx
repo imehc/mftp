@@ -318,11 +318,7 @@ export default function SshSftpTool() {
           }}
           side="left"
           showCloseButton={false}
-          className="ui-density-adaptive w-full max-w-full gap-0 p-0 md:max-w-md"
-          style={{
-            paddingTop: "var(--safe-top, 0px)",
-            paddingLeft: "var(--safe-left, 0px)",
-          }}
+          className="ui-density-adaptive w-full max-w-full gap-0 md:max-w-md"
         >
           <SheetTitle className="sr-only">
             <Trans>主机列表</Trans>

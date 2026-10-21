@@ -120,6 +120,7 @@ export default function SystemMonitorPanel({ session }: Props) {
           variant="ghost"
           size="icon-sm"
           title={t`刷新`}
+          aria-label={t`刷新`}
           onClick={() => void refresh()}
           disabled={loading}
         >
@@ -163,10 +164,13 @@ export default function SystemMonitorPanel({ session }: Props) {
       </div>
 
       {error ? (
-        <div className="border-border bg-destructive/10 text-destructive flex items-start gap-2 border-b px-3 py-1.5 text-xs">
+        <div
+          role="alert"
+          className="border-border bg-destructive/10 text-destructive flex items-start gap-2 border-b px-3 py-1.5 text-xs"
+        >
           <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
           <span className="min-w-0 flex-1 wrap-break-word">
-            {describeError(error)}
+            {describeError(error, t)}
             {ready ? (
               <span className="ml-2">
                 <Trans>当前显示上次采样</Trans>
@@ -182,6 +186,7 @@ export default function SystemMonitorPanel({ session }: Props) {
             variant="ghost"
             size="icon-xs"
             title={t`重试`}
+            aria-label={t`重试`}
             onClick={retry}
             disabled={loading}
           >

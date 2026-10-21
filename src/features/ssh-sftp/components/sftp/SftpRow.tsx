@@ -137,7 +137,7 @@ const SftpRow = function SftpRow({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon-xs"
+                  size="icon-sm"
                   title={t`更多`}
                   aria-label={t`更多文件操作`}
                   className={TOUCH_TARGET_CLASS}

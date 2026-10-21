@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Plus, X } from "lucide-react";
+import { PanelLeft, X } from "lucide-react";
 import { type Ref, useState } from "react";
 import { toast } from "sonner";
 
@@ -63,7 +63,7 @@ export default function TabBar({
           aria-label={t`打开主机列表`}
           onClick={onHosts}
         >
-          <Plus />
+          <PanelLeft />
         </Button>
         <Button
           variant="ghost"

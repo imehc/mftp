@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -288,6 +289,9 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
               <EmptyTitle>
                 <Trans>空目录</Trans>
               </EmptyTitle>
+              <EmptyDescription>
+                <Trans>可以上传文件或新建文件夹</Trans>
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (

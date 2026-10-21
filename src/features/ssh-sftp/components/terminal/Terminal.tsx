@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { LoaderCircle, TriangleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -24,6 +24,7 @@ interface Props {
  * 因此切页/重挂载不会重建终端，也不会漏掉离开期间的输出。
  */
 export default function Terminal({ session }: Props) {
+  const { t } = useLingui();
   const containerRef = useRef<HTMLDivElement>(null);
   const [shellOpening, setShellOpening] = useState(false);
   const hasBackendSession = !session.id.startsWith("tab-");
@@ -56,14 +57,14 @@ export default function Terminal({ session }: Props) {
             <Trans>连接失败</Trans>
           </EmptyTitle>
           <EmptyDescription className="wrap-break-word">
-            {session.error ? describeError(session.error) : null}
+            {session.error ? describeError(session.error, t) : null}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
     );
   }
   return (
-    <div className="relative h-full w-full bg-[#0a0a0a]">
+    <div className="bg-terminal relative h-full w-full">
       <div ref={containerRef} className="h-full w-full p-1" />
       {session.status === "connecting" || shellOpening ? (
         <div className="bg-background/70 absolute inset-0 flex items-center justify-center backdrop-blur-[1px]">
