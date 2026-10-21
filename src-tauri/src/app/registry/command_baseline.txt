@@ -151,6 +151,7 @@ common generate_poetry_translation
 common cancel_poetry_translation
 common update_poetry_translation
 common delete_poetry_translation
+common filesystem_allow_path
 desktop lan_transfer_settings
 desktop lan_transfer_save_settings
 desktop lan_transfer_status

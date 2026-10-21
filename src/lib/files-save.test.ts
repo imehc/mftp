@@ -7,9 +7,13 @@ const { save, writeFile, stat } = vi.hoisted(() => ({
   writeFile: vi.fn(),
   stat: vi.fn(),
 }));
+const { filesystemAllowPath } = vi.hoisted(() => ({
+  filesystemAllowPath: vi.fn(),
+}));
 vi.mock("@tauri-apps/plugin-dialog", () => ({ save }));
 vi.mock("@tauri-apps/plugin-fs", () => ({ writeFile, stat }));
 vi.mock("~/lib/platform", () => ({ isMobilePlatform: () => false }));
+vi.mock("~/lib/ipc", () => ({ filesystemAllowPath }));
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -54,6 +58,10 @@ it("读取字节期间取消不会写入", async () => {
 
 it("只写入用户选择的目标，写入失败直接向上抛出且不重试", async () => {
   expect(await downloadBlob(blob, "test.png")).toBe(3);
+  expect(filesystemAllowPath).toHaveBeenCalledWith("/isolated/screenshot.png");
+  expect(filesystemAllowPath.mock.invocationCallOrder[0]).toBeLessThan(
+    writeFile.mock.invocationCallOrder[0],
+  );
   expect(writeFile).toHaveBeenCalledWith(
     "/isolated/screenshot.png",
     new Uint8Array([112, 110, 103]),

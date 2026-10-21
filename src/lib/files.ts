@@ -26,6 +26,18 @@ export function stripExtension(fileName: string): string {
   return idx > 0 ? fileName.slice(0, idx) : fileName;
 }
 
+/**
+ * 让 fs 插件在本次会话内放行刚选中的路径。
+ *
+ * 静态 `fs:scope` 只覆盖主目录下的四个常用位置；外接盘、网络卷、临时目录
+ * 同样是用户显式选择的，但需要运行时授权，否则写入会以 forbidden path 拒绝。
+ * 授权只针对这一个路径，且不落盘、随进程结束失效。
+ */
+async function allowPickedPath(path: string): Promise<void> {
+  const { filesystemAllowPath } = await import("~/lib/ipc");
+  await filesystemAllowPath(path);
+}
+
 /** 浏览器兜底：用 <a download>（普通浏览器可用，WebView 里未必）。 */
 function downloadBlobInBrowser(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
@@ -68,7 +80,9 @@ export async function downloadBlob(
   }
 
   const bytes = new Uint8Array(await blob.arrayBuffer());
-  // 对话框或字节转换期间离开页面时不再写入；已开始的写入必须等待完成。
+  // 对话框、字节转换或授权期间离开页面时不再写入；已开始的写入必须等待完成。
+  if (signal?.aborted) return false;
+  await allowPickedPath(target);
   if (signal?.aborted) return false;
   await writeFile(target, bytes);
 
@@ -130,6 +144,7 @@ export async function pickFilePathNative(
   });
   if (typeof selected !== "string" || !selected) return false;
 
+  await allowPickedPath(selected);
   return selected;
 }
 
@@ -146,11 +161,13 @@ export async function pickFilePathsNative(
     title: options.title,
     filters: nativeFileFilters(options),
   });
-  return Array.isArray(selected)
+  const paths = Array.isArray(selected)
     ? selected
     : typeof selected === "string"
       ? [selected]
       : [];
+  await Promise.all(paths.map((path) => allowPickedPath(path)));
+  return paths;
 }
 
 /** 读取小文件为浏览器 File；大文件交给后端时使用路径入口，避免整包载入前端内存。 */

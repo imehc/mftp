@@ -5,8 +5,8 @@ use crate::modules::bt;
 #[cfg(desktop)]
 use crate::modules::lan_transfer;
 use crate::modules::{
-    ai, diagnostics, game_room, hosts, keys, maintenance, model_viewer, poetry, speech, ssh, todo,
-    translation, vault,
+    ai, diagnostics, filesystem, game_room, hosts, keys, maintenance, model_viewer, poetry, speech,
+    ssh, todo, translation, vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -261,6 +261,10 @@ macro_rules! common_modules {
                     poetry::commands::delete_poetry_translation,
                 ],
                 types: [poetry::model::PoetrySyncProgress, poetry::model::PoetryTranslationStreamEvent],
+            },
+            "filesystem" => {
+                commands: [filesystem::filesystem_allow_path],
+                types: [],
             },
             $($platform)*
         }

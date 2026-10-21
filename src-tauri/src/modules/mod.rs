@@ -2,6 +2,7 @@
 
 pub(crate) mod ai;
 pub(crate) mod diagnostics;
+pub(crate) mod filesystem;
 
 pub(crate) mod bt;
 

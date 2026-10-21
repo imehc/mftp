@@ -3,8 +3,12 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { pickFilePathNative, pickFilePathsNative } from "./files";
 
 const { open } = vi.hoisted(() => ({ open: vi.fn() }));
+const { filesystemAllowPath } = vi.hoisted(() => ({
+  filesystemAllowPath: vi.fn(),
+}));
 vi.mock("@tauri-apps/plugin-dialog", () => ({ open }));
 vi.mock("~/lib/platform", () => ({ isMobilePlatform: () => false }));
+vi.mock("~/lib/ipc", () => ({ filesystemAllowPath }));
 
 beforeEach(() => {
   vi.stubGlobal("window", { __TAURI_INTERNALS__: {} });
@@ -34,4 +38,5 @@ it("指定后缀时保留原生过滤与文件选择结果", async () => {
       filters: [{ name: "模型", extensions: ["glb", "gltf", "fbx"] }],
     }),
   );
+  expect(filesystemAllowPath).toHaveBeenCalledWith("/tmp/paint.png");
 });

@@ -1,5 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 
+export * from "./ipc/filesystem";
 export * from "./ipc/speech";
 export * from "./ipc/translation";
 
