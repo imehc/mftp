@@ -141,7 +141,6 @@ function TransferList({
               style={{ transform: `translateY(${row.start}px)` }}
             >
               <TransferItem
-                spacious
                 transfer={item}
                 onCancel={() => void actions.cancelTransfer(item)}
                 onTogglePause={actions.togglePause}

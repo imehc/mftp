@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { cn } from "cn";
 import {
   CheckCircle2,
   LoaderCircle,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
+import { Progress } from "~/components/ui/progress";
 import { describeError } from "~/lib/errors";
 import type { TransferState } from "~/store/transfers";
 
@@ -20,18 +20,13 @@ export default function TransferItem({
   onCancel,
   onTogglePause,
   onRetry,
-  spacious = false,
 }: {
   transfer: TransferState;
-  spacious?: boolean;
   onCancel: () => void;
   onTogglePause: (transfer: TransferState) => void;
   onRetry: (transfer: TransferState) => void;
 }) {
   const { t } = useLingui();
-  const total = transfer.total ?? 0;
-  const progress =
-    total > 0 ? Math.min(100, (transfer.transferred / total) * 100) : null;
   const metrics = transferMetrics(transfer);
   const statusIcon =
     transfer.status === "success" ? (
@@ -47,12 +42,7 @@ export default function TransferItem({
     );
   const metricsEta = metrics.eta;
   return (
-    <div
-      className={cn(
-        "border-border bg-background flex flex-col gap-1 rounded-md border px-2 py-2 text-xs",
-        spacious && "gap-2 rounded-xl p-3 text-sm",
-      )}
-    >
+    <div className="border-border bg-background flex flex-col gap-2 rounded-xl border p-3 text-sm">
       {/* 用 flex 而不是固定网格：BT 行会在标签旁追加来源 / 模式徽标，
           多余的网格子项会被换到单独一行。 */}
       <div className="flex items-center gap-2">
@@ -71,6 +61,7 @@ export default function TransferItem({
               variant="ghost"
               size="icon-xs"
               title={transfer.paused ? t`继续` : t`暂停`}
+              aria-label={transfer.paused ? t`继续` : t`暂停`}
               onClick={() => onTogglePause(transfer)}
               disabled={transfer.controlPending || transfer.cancelling}
             >
@@ -86,6 +77,7 @@ export default function TransferItem({
               variant="ghost"
               size="icon-xs"
               title={t`取消`}
+              aria-label={t`取消`}
               onClick={() => onCancel()}
               disabled={transfer.cancelling || transfer.controlPending}
             >
@@ -114,6 +106,11 @@ export default function TransferItem({
           </Button>
         ) : null}
       </div>
+      {transfer.controlError || transfer.error ? (
+        <p role="alert" className="text-destructive text-xs wrap-break-word">
+          {describeError(transfer.controlError ?? transfer.error, t)}
+        </p>
+      ) : null}
       <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs tabular-nums">
         <span className="text-foreground font-medium">{transfer.phase}</span>
         {metrics.percent !== null ? <span>{metrics.percent}%</span> : null}
@@ -125,24 +122,14 @@ export default function TransferItem({
           </span>
         ) : null}
       </div>
-      {progress !== null ? (
-        <div className="bg-muted h-1.5 overflow-hidden rounded-full">
-          <div
-            className="bg-primary h-full rounded-full transition-[width]"
-            style={{
-              width: `${progress}%`,
-            }}
-          />
-        </div>
+      {metrics.percent !== null ? (
+        <Progress value={metrics.percent} aria-label={t`传输进度`} />
       ) : transfer.status === "running" && !transfer.paused ? (
-        <div className="bg-muted h-1.5 overflow-hidden rounded-full">
-          <div className="bg-primary/70 animate-in slide-in-from-left-full h-full w-1/3 rounded-full duration-700" />
-        </div>
-      ) : null}
-      {transfer.error || transfer.controlError ? (
-        <div className="text-destructive wrap-break-word">
-          {describeError(transfer.error ?? transfer.controlError)}
-        </div>
+        <Progress
+          value={undefined}
+          aria-label={t`传输进度`}
+          className="animate-pulse"
+        />
       ) : null}
     </div>
   );

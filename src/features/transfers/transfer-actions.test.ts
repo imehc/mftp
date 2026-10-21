@@ -52,10 +52,12 @@ test("操作失败恢复待处理状态并保留完整错误", async () => {
   };
   vi.mocked(ipc.sftpCancelTransfer).mockRejectedValue(error);
   useTransfersStore.getState().start("sftp", "test");
+  const originalPhase = useTransfersStore.getState().transfers[0].phase;
   await createTransferActions().cancelTransfer(
     useTransfersStore.getState().transfers[0],
   );
   expect(useTransfersStore.getState().transfers[0].cancelling).toBe(false);
+  expect(useTransfersStore.getState().transfers[0].phase).toBe(originalPhase);
   expect(useTransfersStore.getState().transfers[0].controlError).toEqual(error);
 });
 

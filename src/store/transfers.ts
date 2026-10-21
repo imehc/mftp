@@ -215,7 +215,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
               ...item,
               phase: translate(msg`正在取消`),
               cancelling: true,
-              cancellingPhase: item.source === "bt" ? item.phase : undefined,
+              cancellingPhase: item.phase,
               paused: false,
               pausedPhase: undefined,
               speed: null,
@@ -231,10 +231,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         item.id === id
           ? {
               ...item,
-              phase:
-                item.source === "bt" && item.cancellingPhase
-                  ? item.cancellingPhase
-                  : item.phase,
+              phase: item.cancellingPhase ?? item.phase,
               cancelling: false,
               cancellingPhase: undefined,
             }
