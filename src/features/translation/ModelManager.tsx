@@ -156,7 +156,7 @@ export function ModelManager({
         </DialogTrigger>
         <DialogLayoutContent
           placement="responsive-sheet"
-          className="sm:max-w-xl"
+          className="md:max-w-xl"
         >
           <DialogLayoutHeader>
             <DialogTitle>

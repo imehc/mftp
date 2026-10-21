@@ -198,7 +198,7 @@ export default function PoetrySpeech({
           </Tooltip>
           <DialogLayoutContent
             placement="responsive-sheet"
-            className="sm:max-w-sm"
+            className="md:max-w-sm"
           >
             <DialogLayoutHeader>
               <DialogTitle>{settingsLabel}</DialogTitle>

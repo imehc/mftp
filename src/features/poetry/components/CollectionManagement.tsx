@@ -1,4 +1,5 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "cn";
 import { Download, LoaderCircle, Trash2 } from "lucide-react";
 import { type ReactNode } from "react";
 
@@ -6,6 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type { PoetryCollectionStatus } from "~/types";
 
 import type { usePoetryCollectionsManage } from "../hooks/use-poetry-collections-manage";
@@ -60,8 +62,11 @@ function CollectionRow({
       </span>
     </>
   );
-  const rowClass =
-    "flex min-h-11 items-center gap-3 rounded-lg px-2 py-1.5 md:min-h-9";
+  // 行内容保持桌面比例，窄屏与粗指针由共享触控类扩大可点区域。
+  const rowClass = cn(
+    "flex min-h-9 items-center gap-3 rounded-lg px-2 py-1.5",
+    TOUCH_TARGET_CLASS,
+  );
   return item.installed ? (
     <div className={rowClass}>
       {contents}
@@ -77,7 +82,7 @@ function CollectionRow({
       </Button>
     </div>
   ) : (
-    <label className={`${rowClass} hover:bg-accent/50 cursor-pointer`}>
+    <label className={cn(rowClass, "hover:bg-accent/50 cursor-pointer")}>
       <Checkbox
         checked={controller.selected.has(item.id)}
         disabled={controller.busy || controller.loading || !!controller.error}

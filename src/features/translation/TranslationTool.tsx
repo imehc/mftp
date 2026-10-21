@@ -129,9 +129,9 @@ export default function TranslationTool() {
         />
       }
     >
-      <div className="border-border bg-card grid grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)] items-center gap-2 rounded-xl border p-2 sm:grid-cols-[minmax(12rem,1fr)_2.5rem_minmax(12rem,1fr)] sm:gap-3 sm:px-4">
+      <div className="border-border bg-card grid grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)] items-center gap-2 rounded-xl border p-2 md:grid-cols-[minmax(12rem,1fr)_2.5rem_minmax(12rem,1fr)] md:gap-3 md:px-4">
         <div className="flex min-w-0 items-center justify-end gap-2">
-          <span className="text-muted-foreground hidden text-xs sm:inline">
+          <span className="text-muted-foreground hidden text-xs md:inline">
             <Trans>源语言</Trans>
           </span>
           <Select
@@ -197,7 +197,7 @@ export default function TranslationTool() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <span className="text-muted-foreground hidden text-xs sm:inline">
+          <span className="text-muted-foreground hidden text-xs md:inline">
             <Trans>目标语言</Trans>
           </span>
         </div>
