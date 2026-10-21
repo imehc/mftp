@@ -5,6 +5,7 @@ import { ArrowLeft, Magnet, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import {
   Alert,
@@ -73,6 +74,7 @@ export default function BtTool() {
   const [dialogReadOnly, setDialogReadOnly] = useState(false);
   const [magnetTask, setMagnetTask] = useState<BtTaskInfo | null>(null);
   const [pendingDelete, setPendingDelete] = useState<BtTaskInfo | null>(null);
+  const [pendingCancel, setPendingCancel] = useState<BtTaskInfo | null>(null);
   const finishTransfer = useTransfersStore((s) => s.finish);
   const tasks = useBtTasksStore((s) => s.tasks);
   const setTasks = useBtTasksStore((s) => s.setTasks);
@@ -228,7 +230,12 @@ export default function BtTool() {
             </Button>
           }
         />
-        <div className="app-page-gutter app-page-width mx-auto flex min-h-0 w-full flex-1 flex-col gap-3">
+        <AppPageContent
+          scroll="content"
+          density="compact"
+          bottomInset="scroll"
+          className="min-h-0 flex-1"
+        >
           {loadError || subscriptionError ? (
             <Alert variant="destructive">
               <AlertTitle>
@@ -297,8 +304,13 @@ export default function BtTool() {
                   onOpenParsed: openParsed,
                   onRetry: (item) => openPrefilled(magnetOf(item)),
                   onPeers: (item) => openFiles(item, "peers"),
-                  onControl: (item, action) =>
-                    void runAction(item.infoHash, () => control(item, action)),
+                  onControl: (item, action) => {
+                    if (action === "Cancel") setPendingCancel(item);
+                    else
+                      void runAction(item.infoHash, () =>
+                        control(item, action),
+                      );
+                  },
                   onMagnet: setMagnetTask,
                   onExport: (item) =>
                     void runAction(item.infoHash, () => exportTask(item)),
@@ -308,11 +320,11 @@ export default function BtTool() {
               />
             </>
           ) : null}
-        </div>
+        </AppPageContent>
       </div>
       {filesTask ? (
         <TaskFilesPage
-          key={filesTask.infoHash}
+          key={`${filesTask.infoHash}:${filesTab}`}
           task={
             tasks.find((task) => task.infoHash === filesTask.infoHash) ??
             filesTask
@@ -350,6 +362,14 @@ export default function BtTool() {
         onConfirmDelete={() => {
           if (pendingDelete)
             void runAction(pendingDelete.infoHash, confirmDelete);
+        }}
+        pendingCancelLabel={pendingCancel?.label ?? null}
+        onCloseCancel={() => setPendingCancel(null)}
+        onConfirmCancel={() => {
+          if (pendingCancel)
+            void runAction(pendingCancel.infoHash, () =>
+              control(pendingCancel, "Cancel"),
+            );
         }}
       />
     </div>

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { isMobilePlatform } from "~/lib/platform";
 import type { BtTaskInfo } from "~/types";
 
 import FileBrowserPanel from "./FileBrowserPanel";
@@ -69,7 +70,11 @@ export default function TaskFilesPage({
         {task.status === "Completed" && !task.exported ? (
           <Button fullWidth disabled={busy} onClick={onExport}>
             <Send data-icon="inline-start" />
-            <Trans>复制到用户目录</Trans>
+            {isMobilePlatform() ? (
+              <Trans>复制到系统下载目录</Trans>
+            ) : (
+              <Trans>复制到用户目录</Trans>
+            )}
           </Button>
         ) : (
           <p className="text-muted-foreground text-xs">

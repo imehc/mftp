@@ -13,7 +13,13 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
-import { Label } from "~/components/ui/label";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
 import { Textarea } from "~/components/ui/textarea";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
@@ -73,7 +79,7 @@ export default function AddTorrentDialog({
   const [starting, setStarting] = useState(false);
   // 仅在带 initialSource 时有意义：失败时回到输入步骤，
   // 这样磁力链接可被重新解析，而不是一直转圈。
-  const [probeFailed, setProbeFailed] = useState(false);
+  const [probeError, setProbeError] = useState<string | null>(null);
 
   const reset = () => {
     setSource("");
@@ -81,7 +87,7 @@ export default function AddTorrentDialog({
     setProbe(null);
     setSelected(new Set());
     setStarting(false);
-    setProbeFailed(false);
+    setProbeError(null);
   };
 
   const close = () => {
@@ -104,17 +110,15 @@ export default function AddTorrentDialog({
       setSelected(new Set(result.files.map((f) => f.index)));
     };
 
-    setProbeFailed(false);
+    setProbeError(null);
     setProbing(true);
     try {
       const result = await ipc.btProbe(trimmed);
       if (generation === requests.current.generation) apply(result);
     } catch (error) {
       if (generation !== requests.current.generation) return;
-      setProbeFailed(true);
-      toast.error(t`获取资源信息失败`, {
-        description: describeError(error),
-      });
+      // 解析失败属于当前输入框的问题，只保留就近的内联错误并带上原因。
+      setProbeError(describeError(error));
     } finally {
       if (generation === requests.current.generation) {
         requests.current.probing = false;
@@ -254,7 +258,7 @@ export default function AddTorrentDialog({
         showCloseButton={false}
         className="ui-density-adaptive flex max-h-full min-h-0 flex-col overflow-hidden md:max-w-120"
       >
-        <DialogLayoutHeader showCloseButton>
+        <DialogLayoutHeader showCloseButton={!starting}>
           <DialogTitle>
             {readOnly ? <Trans>查看资源信息</Trans> : <Trans>添加下载</Trans>}
           </DialogTitle>
@@ -265,20 +269,35 @@ export default function AddTorrentDialog({
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
           {!readOnly ? (
             <div className="flex flex-col gap-3">
-              <Label htmlFor="bt-source">
-                <Trans>磁力链接</Trans>
-              </Label>
-              <Textarea
-                id="bt-source"
-                rows={3}
-                value={source}
-                disabled={probing || starting}
-                onChange={(event) => {
-                  setSource(event.target.value);
-                  setProbe(null);
-                }}
-                placeholder={t`磁力链接`}
-              />
+              <FieldGroup>
+                <Field data-invalid={!!probeError}>
+                  <FieldLabel htmlFor="bt-source">
+                    <Trans>磁力链接</Trans>
+                  </FieldLabel>
+                  <Textarea
+                    id="bt-source"
+                    rows={3}
+                    value={source}
+                    disabled={probing || starting}
+                    aria-invalid={!!probeError}
+                    aria-describedby={
+                      probeError ? "bt-source-error" : "bt-source-description"
+                    }
+                    onChange={(event) => {
+                      setSource(event.target.value);
+                      setProbe(null);
+                      setProbeError(null);
+                    }}
+                    placeholder={t`磁力链接`}
+                  />
+                  <FieldDescription id="bt-source-description">
+                    <Trans>支持磁力链接与本地 .torrent 文件</Trans>
+                  </FieldDescription>
+                  {probeError ? (
+                    <FieldError id="bt-source-error">{probeError}</FieldError>
+                  ) : null}
+                </Field>
+              </FieldGroup>
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
@@ -314,9 +333,9 @@ export default function AddTorrentDialog({
               <Trans>正在获取资源信息…</Trans>
             </p>
           ) : null}
-          {probeFailed ? (
-            <p role="alert" className="text-destructive text-sm">
-              <Trans>获取资源信息失败</Trans>
+          {starting ? (
+            <p role="status" className="text-muted-foreground text-sm">
+              <Trans>正在添加下载，完成后将自动关闭。</Trans>
             </p>
           ) : null}
           {probe ? (

@@ -29,15 +29,22 @@ interface TaskDialogsProps {
   pendingDeleteLabel: string | null;
   onCloseDelete: () => void;
   onConfirmDelete: () => void;
+  /** 待确认取消的标题；null 表示不显示。 */
+  pendingCancelLabel: string | null;
+  onCloseCancel: () => void;
+  onConfirmCancel: () => void;
 }
 
-/** 任务列表用到的磁力链接与删除确认弹窗。 */
+/** 任务列表用到的磁力链接、删除与取消确认弹窗。 */
 export default function TaskDialogs({
   magnetText,
   onCloseMagnet,
   pendingDeleteLabel,
   onCloseDelete,
   onConfirmDelete,
+  pendingCancelLabel,
+  onCloseCancel,
+  onConfirmCancel,
 }: TaskDialogsProps) {
   const { t } = useLingui();
   return (
@@ -83,6 +90,30 @@ export default function TaskDialogs({
             <AlertDialogCancel>{t`取消`}</AlertDialogCancel>
             <AlertDialogAction onClick={onConfirmDelete}>
               {t`删除`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={pendingCancelLabel !== null}
+        onOpenChange={(open) => !open && onCloseCancel()}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingCancelLabel ? t`取消 ${pendingCancelLabel}` : ""}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <Trans>
+                任务会停止，已下载的临时文件将被删除，任务记录仍会保留。
+              </Trans>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t`返回`}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={onConfirmCancel}>
+              {t`取消任务`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

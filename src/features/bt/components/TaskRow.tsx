@@ -23,6 +23,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import { isMobilePlatform } from "~/lib/platform";
 import { useTransfersStore } from "~/store/transfers";
 import type { BtTaskInfo } from "~/types";
 
@@ -213,7 +214,11 @@ export default function TaskRow({
             {task.status === "Completed" && !task.exported ? (
               <DropdownMenuItem disabled={busy} onSelect={() => onExport(task)}>
                 <Send />
-                <Trans>复制到用户目录</Trans>
+                {isMobilePlatform() ? (
+                  <Trans>复制到系统下载目录</Trans>
+                ) : (
+                  <Trans>复制到用户目录</Trans>
+                )}
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuSeparator />
