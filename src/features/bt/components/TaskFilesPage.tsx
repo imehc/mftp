@@ -29,7 +29,6 @@ export default function TaskFilesPage({
   return (
     <div className="ui-density-adaptive flex h-full min-h-0 flex-col">
       <ToolPageHeader
-        variant="compact"
         title={task.label}
         showHome={false}
         leading={
@@ -60,13 +59,13 @@ export default function TaskFilesPage({
           hidden={tab !== "files"}
           className="min-h-0 flex-1 p-3"
         >
-          <FileBrowserPanel task={task} onClose={onClose} />
+          <FileBrowserPanel task={task} />
         </TabsContent>
         <TabsContent value="peers" className="min-h-0 flex-1 p-3">
           <PeersPanel infoHash={task.infoHash} />
         </TabsContent>
       </Tabs>
-      <footer className="shrink-0 border-t px-3 pt-2 pb-[calc(0.5rem+var(--safe-bottom,0px))]">
+      <footer className="shrink-0 border-t px-3 pt-2 pb-[max(0.75rem,var(--safe-bottom,0px))]">
         {task.status === "Completed" && !task.exported ? (
           <Button fullWidth disabled={busy} onClick={onExport}>
             <Send data-icon="inline-start" />

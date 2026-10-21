@@ -1,13 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
-  ArrowLeft,
+  ArrowUp,
   ExternalLink,
   File,
   Folder,
   Home,
-  LoaderCircle,
-  RotateCcw,
+  RefreshCw,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +18,7 @@ import type {
   BtTaskInfo,
 } from "~/bindings";
 import { Button } from "~/components/ui/button";
+import { Spinner } from "~/components/ui/spinner";
 import PreviewSurface from "~/features/preview/PreviewSurface";
 import { describeError, toIpcError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
@@ -26,13 +26,7 @@ import * as ipc from "~/lib/ipc";
 import { previewKind } from "~/lib/preview-kind";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
 
-export default function FileBrowserPanel({
-  task,
-  onClose,
-}: {
-  task: BtTaskInfo;
-  onClose: () => void;
-}) {
+export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
   const { t } = useLingui();
   const [path, setPath] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
@@ -42,6 +36,7 @@ export default function FileBrowserPanel({
   const [error, setError] = useState<AppError | null>(null);
   const [opening, setOpening] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
+  const listingTask = useRef<string | null>(null);
   const entries = listing?.entries ?? [];
   const virtualizer = useVirtualizer({
     count: entries.length,
@@ -58,7 +53,11 @@ export default function FileBrowserPanel({
       setLoading(true);
       setError(null);
       setUrl(null);
-      setListing(null);
+      // 目录切换时保留旧列表作为加载背景；只有切换到另一个任务才清空。
+      if (listingTask.current !== task.infoHash) {
+        listingTask.current = task.infoHash;
+        setListing(null);
+      }
       try {
         const result = await ipc.btBrowseFiles(task.infoHash, path);
         if (cancelled) return;
@@ -92,7 +91,7 @@ export default function FileBrowserPanel({
       await ipc.btOpenFile(task.infoHash, entry.path);
     } catch (cause) {
       toast.error(t`无法使用系统应用打开`, {
-        description: describeError(cause),
+        description: describeError(cause, t),
       });
     } finally {
       setOpening(false);
@@ -101,7 +100,14 @@ export default function FileBrowserPanel({
 
   const current = listing?.current;
 
+  const reload = () => {
+    // 文件预览没有可保留的列表，重新加载时回到整块加载态。
+    if (listing && !listing.current.isDir) setListing(null);
+    setRevision((value) => value + 1);
+  };
+
   const navigate = (next: string) => {
+    if (listing && !listing.current.isDir) setListing(null);
     setPath(next);
     scroller.current?.scrollTo(0, 0);
   };
@@ -123,11 +129,9 @@ export default function FileBrowserPanel({
               disabled={loading}
               title={t`返回上级目录`}
               aria-label={t`返回上级目录`}
-              onClick={() =>
-                (current?.path ?? path) ? navigate(parent) : onClose()
-              }
+              onClick={() => navigate(parent)}
             >
-              <ArrowLeft />
+              <ArrowUp />
             </Button>
           </>
         ) : null}
@@ -158,9 +162,9 @@ export default function FileBrowserPanel({
           disabled={loading}
           title={t`刷新`}
           aria-label={t`刷新`}
-          onClick={() => setRevision((value) => value + 1)}
+          onClick={reload}
         >
-          <RotateCcw />
+          <RefreshCw className={loading ? "animate-spin" : undefined} />
         </Button>
       </div>
 
@@ -181,103 +185,126 @@ export default function FileBrowserPanel({
         </div>
       ) : null}
 
-      {loading ? (
+      {loading && !listing ? (
         <div
           className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm"
           role="status"
         >
-          <LoaderCircle className="size-4 animate-spin" />
+          <Spinner aria-label={t`加载中`} />
           <Trans>加载中…</Trans>
         </div>
-      ) : error ? (
+      ) : error && !listing ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-sm">
-          <p role="alert" className="text-destructive text-center">
-            {describeError(error)}
-          </p>
-          <Button
-            variant="outline"
-            density="adaptive"
-            onClick={() => setRevision((value) => value + 1)}
+          <p
+            role="alert"
+            className="text-destructive text-center wrap-anywhere"
           >
-            <RotateCcw />
+            {describeError(error, t)}
+          </p>
+          <Button variant="outline" density="adaptive" onClick={reload}>
+            <RefreshCw />
             <Trans>重试</Trans>
           </Button>
         </div>
-      ) : current?.isDir ? (
-        <div
-          ref={scroller}
-          className="border-border min-h-0 flex-1 overflow-auto rounded-lg border"
-        >
-          {entries.length === 0 ? (
-            <p className="text-muted-foreground p-6 text-center text-sm">
-              <Trans>目录中暂无文件</Trans>
-            </p>
-          ) : (
+      ) : (
+        <>
+          {error ? (
             <div
-              className="relative w-full"
-              style={{ height: virtualizer.getTotalSize() }}
+              role="alert"
+              className="border-destructive/30 bg-destructive/5 text-destructive flex items-center gap-2 rounded-lg border px-2 py-1.5 text-xs"
             >
-              {virtualizer.getVirtualItems().map((item) => {
-                const entry = entries[item.index];
-                const entryName = entry.name;
-                return (
-                  <div
-                    key={entry.path}
-                    data-index={item.index}
-                    ref={virtualizer.measureElement}
-                    className="hover:bg-accent absolute top-0 left-0 flex min-h-[max(44px,2.75rem)] w-full items-center gap-2 px-2"
-                    style={{
-                      transform: `translateY(${item.start}px)`,
-                    }}
-                  >
-                    <button
-                      type="button"
-                      className="focus-visible:ring-ring flex min-h-[max(44px,2.75rem)] min-w-0 flex-1 items-center gap-2 rounded-md text-left text-sm focus-visible:ring-2 focus-visible:outline-none"
-                      title={entry.name}
-                      onClick={() => navigate(entry.path)}
-                    >
-                      {entry.isDir ? (
-                        <Folder className="text-primary size-4 shrink-0" />
-                      ) : (
-                        <File className="text-muted-foreground size-4 shrink-0" />
-                      )}
-                      <span className="truncate">{entry.name}</span>
-                      {!entry.isDir ? (
-                        <span className="text-muted-foreground ml-auto shrink-0 text-xs tabular-nums">
-                          {formatBytes(entry.size)}
-                        </span>
-                      ) : null}
-                    </button>
-                    {!entry.isDir ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        density="adaptive"
-                        disabled={opening}
-                        title={t`使用系统应用打开`}
-                        aria-label={t`使用系统应用打开 ${entryName}`}
-                        onClick={() => void openExternal(entry)}
+              <span className="min-w-0 flex-1 wrap-anywhere">
+                {describeError(error, t)}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                density="adaptive"
+                aria-label={t`重试`}
+                onClick={reload}
+              >
+                <RefreshCw />
+              </Button>
+            </div>
+          ) : null}
+          {current?.isDir ? (
+            <div
+              ref={scroller}
+              aria-busy={loading}
+              className={`border-border min-h-0 flex-1 overflow-auto rounded-lg border ${loading ? "opacity-60" : ""}`}
+            >
+              {entries.length === 0 ? (
+                <p className="text-muted-foreground p-6 text-center text-sm">
+                  <Trans>目录中暂无文件</Trans>
+                </p>
+              ) : (
+                <div
+                  className="relative w-full"
+                  style={{ height: virtualizer.getTotalSize() }}
+                >
+                  {virtualizer.getVirtualItems().map((item) => {
+                    const entry = entries[item.index];
+                    const entryName = entry.name;
+                    return (
+                      <div
+                        key={entry.path}
+                        data-index={item.index}
+                        ref={virtualizer.measureElement}
+                        className="hover:bg-accent absolute top-0 left-0 flex min-h-[max(44px,2.75rem)] w-full items-center gap-2 px-2"
+                        style={{
+                          transform: `translateY(${item.start}px)`,
+                        }}
                       >
-                        <ExternalLink />
-                      </Button>
-                    ) : null}
-                  </div>
-                );
-              })}
+                        <button
+                          type="button"
+                          className="focus-visible:ring-ring flex min-h-[max(44px,2.75rem)] min-w-0 flex-1 items-center gap-2 rounded-md text-left text-sm focus-visible:ring-2 focus-visible:outline-none"
+                          title={entry.name}
+                          onClick={() => navigate(entry.path)}
+                        >
+                          {entry.isDir ? (
+                            <Folder className="text-primary size-4 shrink-0" />
+                          ) : (
+                            <File className="text-muted-foreground size-4 shrink-0" />
+                          )}
+                          <span className="truncate">{entry.name}</span>
+                          {!entry.isDir ? (
+                            <span className="text-muted-foreground ml-auto shrink-0 text-xs tabular-nums">
+                              {formatBytes(entry.size)}
+                            </span>
+                          ) : null}
+                        </button>
+                        {!entry.isDir ? (
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            density="adaptive"
+                            disabled={opening}
+                            title={t`使用系统应用打开`}
+                            aria-label={t`使用系统应用打开 ${entryName}`}
+                            onClick={() => void openExternal(entry)}
+                          >
+                            <ExternalLink />
+                          </Button>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : current && url ? (
+            <PreviewSurface
+              key={url}
+              url={url}
+              name={current.name}
+              kind={previewKind(current.name)}
+            />
+          ) : (
+            <div className="text-muted-foreground border-border flex flex-1 items-center justify-center rounded-lg border p-4 text-center text-sm">
+              <Trans>该格式不支持预览，可使用系统应用打开</Trans>
             </div>
           )}
-        </div>
-      ) : current && url ? (
-        <PreviewSurface
-          key={url}
-          url={url}
-          name={current.name}
-          kind={previewKind(current.name)}
-        />
-      ) : (
-        <div className="text-muted-foreground border-border flex flex-1 items-center justify-center rounded-lg border p-4 text-center text-sm">
-          <Trans>该格式不支持预览，可使用系统应用打开</Trans>
-        </div>
+        </>
       )}
       {task.status !== "Completed" ? (
         <p className="text-muted-foreground text-xs">

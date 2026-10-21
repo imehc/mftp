@@ -13,6 +13,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
@@ -20,6 +21,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
+import { Spinner } from "~/components/ui/spinner";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { isMobilePlatform } from "~/lib/platform";
@@ -236,39 +238,50 @@ export default function BtTool() {
           bottomInset="scroll"
           className="min-h-0 flex-1"
         >
-          {loadError || subscriptionError ? (
+          {loadError ? (
             <Alert variant="destructive">
               <AlertTitle>
-                {loadError ? (
-                  <Trans>无法读取下载任务</Trans>
-                ) : (
-                  <Trans>任务状态通知暂不可用</Trans>
-                )}
+                <Trans>无法读取下载任务</Trans>
+              </AlertTitle>
+              <AlertDescription>{describeError(loadError, t)}</AlertDescription>
+              <AlertAction>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => void refresh()}
+                >
+                  <Trans comment="重新读取 BT 下载任务">重试</Trans>
+                </Button>
+              </AlertAction>
+            </Alert>
+          ) : null}
+          {subscriptionError ? (
+            <Alert variant="destructive">
+              <AlertTitle>
+                <Trans>任务状态通知暂不可用</Trans>
               </AlertTitle>
               <AlertDescription>
-                {describeError(loadError ?? subscriptionError)}
+                {describeError(subscriptionError, t)}
               </AlertDescription>
               <AlertAction>
                 <Button
                   variant="outline"
                   size="xs"
-                  onClick={() => {
-                    // 重新建立事件监听；读取本来就会在期间自愈。
-                    if (subscriptionError) retryBtSubscription();
-                    void refresh();
-                  }}
+                  onClick={retryBtSubscription}
                 >
-                  <Trans comment="重新读取 BT 下载任务；通知监听失败时也会重新连接监听">
-                    重试
-                  </Trans>
+                  <Trans comment="重新建立 BT 任务状态事件监听">重试</Trans>
                 </Button>
               </AlertAction>
             </Alert>
           ) : null}
           {loading ? (
-            <p role="status" className="text-muted-foreground text-sm">
+            <div
+              role="status"
+              className="text-muted-foreground flex items-center gap-2 text-sm"
+            >
+              <Spinner aria-label={t`加载中`} />
               <Trans>加载中…</Trans>
-            </p>
+            </div>
           ) : null}
           {tasks.length === 0 && !loading && !loadError ? (
             <Empty className="border border-dashed">
@@ -291,9 +304,9 @@ export default function BtTool() {
                 <h2 className="font-semibold">
                   <Trans>全部任务</Trans>
                 </h2>
-                <span className="text-muted-foreground tabular-nums">
+                <Badge variant="outline" className="tabular-nums">
                   {tasks.length}
-                </span>
+                </Badge>
               </div>
               <TaskList
                 tasks={tasks}

@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { Progress } from "~/components/ui/progress";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import { isMobilePlatform } from "~/lib/platform";
@@ -124,19 +125,11 @@ export default function TaskRow({
             <span className="font-semibold">{percent}%</span>
           ) : null}
         </div>
-        <div
-          role="progressbar"
+        <Progress
+          value={percent ?? undefined}
           aria-label={t`下载进度`}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent ?? undefined}
-          className="bg-muted h-1 overflow-hidden rounded-full"
-        >
-          <div
-            className="bg-primary h-full rounded-full"
-            style={{ width: `${percent ?? 0}%` }}
-          />
-        </div>
+          className={percent === null ? "animate-pulse" : undefined}
+        />
         {task.error ? (
           <p className="text-destructive text-xs wrap-break-word">
             {describeError(task.error)}

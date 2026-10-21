@@ -5,14 +5,13 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
+import { Dialog, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
+  DialogLayoutBody,
+  DialogLayoutContent,
+  DialogLayoutFooter,
+  DialogLayoutHeader,
+} from "~/components/ui/dialog-layout";
 import {
   Field,
   FieldDescription,
@@ -26,7 +25,11 @@ import { formatBytes } from "~/lib/format";
 import * as ipc from "~/lib/ipc";
 import type { BtProbeResult, BtTaskInfo } from "~/types";
 
-import TorrentFileList from "./TorrentFileList";
+import TorrentFileList, {
+  BT_FILE_LIST_OVERHEAD,
+  BT_FILE_ROW_HEIGHT_PX,
+  BT_FILE_ROW_HEIGHT_REM,
+} from "./TorrentFileList";
 
 export interface AddTorrentDialogProps {
   open: boolean;
@@ -238,13 +241,15 @@ export default function AddTorrentDialog({
       close();
     } catch (error) {
       toast.error(t`添加下载任务失败`, {
-        description: describeError(error),
+        description: describeError(error, t),
       });
     } finally {
       requests.current.starting = false;
       setStarting(false);
     }
   };
+
+  const visibleFileRows = probe ? Math.min(probe.files.length, 6) : 0;
 
   return (
     <Dialog
@@ -253,10 +258,10 @@ export default function AddTorrentDialog({
         if (!value) close();
       }}
     >
-      <DialogContent
+      <DialogLayoutContent
         placement="responsive-page"
         showCloseButton={false}
-        className="ui-density-adaptive flex max-h-full min-h-0 flex-col overflow-hidden md:max-w-120"
+        className="max-h-full md:max-w-120"
       >
         <DialogLayoutHeader showCloseButton={!starting}>
           <DialogTitle>
@@ -266,7 +271,7 @@ export default function AddTorrentDialog({
             <Trans>支持磁力链接与本地 .torrent 文件</Trans>
           </DialogDescription>
         </DialogLayoutHeader>
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+        <DialogLayoutBody className="flex flex-col gap-4">
           {!readOnly ? (
             <div className="flex flex-col gap-3">
               <FieldGroup>
@@ -354,7 +359,8 @@ export default function AddTorrentDialog({
               <div
                 className="min-h-0"
                 style={{
-                  height: `${Math.min(probe.files.length, 6) * 2.75 + 2.5}rem`,
+                  // 不用 calc 乘法：分别按 px/rem 展开后取较大值，兼容旧 WebView。
+                  height: `max(calc(${visibleFileRows * BT_FILE_ROW_HEIGHT_PX}px + ${BT_FILE_LIST_OVERHEAD}), calc(${visibleFileRows * BT_FILE_ROW_HEIGHT_REM}rem + ${BT_FILE_LIST_OVERHEAD}))`,
                 }}
               >
                 <TorrentFileList
@@ -376,8 +382,8 @@ export default function AddTorrentDialog({
               <Trans>该资源已在下载列表中，不能重复添加</Trans>
             </p>
           ) : null}
-        </div>
-        <DialogFooter className="shrink-0">
+        </DialogLayoutBody>
+        <DialogLayoutFooter className="shrink-0">
           <Button variant="outline" disabled={starting} onClick={close}>
             {readOnly ? <Trans>关闭</Trans> : <Trans>取消</Trans>}
           </Button>
@@ -397,8 +403,8 @@ export default function AddTorrentDialog({
               <Trans>开始下载</Trans>
             </Button>
           ) : null}
-        </DialogFooter>
-      </DialogContent>
+        </DialogLayoutFooter>
+      </DialogLayoutContent>
     </Dialog>
   );
 }

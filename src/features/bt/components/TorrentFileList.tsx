@@ -24,6 +24,13 @@ const KIND_ICONS = {
   other: FileIcon,
 } as const;
 
+/** 行高与 AddTorrentDialog 的容器高度共用，避免两处魔数漂移。 */
+export const BT_FILE_ROW_HEIGHT = "max(44px, 2.75rem)";
+export const BT_FILE_ROW_HEIGHT_PX = 44;
+export const BT_FILE_ROW_HEIGHT_REM = 2.75;
+export const BT_FILE_LIST_OVERHEAD = "2.5rem";
+export const BT_FILE_ROW_ESTIMATE_PX = 44;
+
 /** 预览入口：时序媒体直接播放，其余用查看器。 */
 export interface TorrentFileListProps {
   files: BtFileMeta[];
@@ -54,7 +61,7 @@ const TorrentFileList = function TorrentFileList({
   const virtualizer = useVirtualizer({
     count: files.length,
     getScrollElement: () => viewportRef.current,
-    estimateSize: () => 44,
+    estimateSize: () => BT_FILE_ROW_ESTIMATE_PX,
     overscan: 10,
   });
   useVirtualizerFontSize(virtualizer);
@@ -96,7 +103,7 @@ const TorrentFileList = function TorrentFileList({
                 data-index={row.index}
                 ref={virtualizer.measureElement}
                 className={cn(
-                  "hover:bg-sidebar-accent flex min-h-[max(44px,2.75rem)] w-full items-center gap-2 rounded-md pr-1 text-left text-xs",
+                  "hover:bg-sidebar-accent flex w-full items-center gap-2 rounded-md pr-1 text-left text-xs",
                   checked && "bg-sidebar-accent/60",
                 )}
                 style={{
@@ -104,10 +111,14 @@ const TorrentFileList = function TorrentFileList({
                   top: 0,
                   left: 0,
                   width: "100%",
+                  minHeight: BT_FILE_ROW_HEIGHT,
                   transform: `translateY(${row.start}px)`,
                 }}
               >
-                <label className="flex min-h-[max(44px,2.75rem)] min-w-0 flex-1 items-center gap-2 py-2 pl-2">
+                <label
+                  className="flex min-w-0 flex-1 items-center gap-2 py-2 pl-2"
+                  style={{ minHeight: BT_FILE_ROW_HEIGHT }}
+                >
                   <Checkbox
                     checked={checked}
                     disabled={readOnly}
