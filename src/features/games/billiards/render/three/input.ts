@@ -42,6 +42,8 @@ export function createTableInput(
     handlers.cancel();
   };
 
+  // 手势归属由 BilliardsStage 外层 touch-none 承担；这里只过滤鼠标非主键，
+  // 触摸由 pointer capture 独占，避免拖杆时页面滚动。
   const down = (e: PointerEvent) => {
     unlockAudio();
     if (
