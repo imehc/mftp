@@ -10,7 +10,6 @@ import { useState } from "react";
 
 import AppPageLayout from "~/components/AppPageLayout";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { describeError } from "~/lib/errors";
 
@@ -37,18 +36,9 @@ export default function LanTransferTool() {
       title={<Trans>局域网传输</Trans>}
       actions={
         <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
-          <Badge variant={lan.running ? "secondary" : "outline"}>
-            {lan.loading
-              ? t`加载中`
-              : lan.coreError
-                ? t`状态不可用`
-                : lan.running
-                  ? t`运行中`
-                  : t`已停止`}
-          </Badge>
           <Button
             density="adaptive"
-            variant="outline"
+            variant={lan.running ? "destructive" : "default"}
             size="sm"
             disabled={lan.busy || lan.loading || !!lan.coreError}
             onClick={lan.running ? () => setStopOpen(true) : lan.start}

@@ -118,7 +118,11 @@ export default function LanTransferSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent className="max-w-lg" showCloseButton={false}>
+      <DialogLayoutContent
+        placement="responsive-page"
+        className="max-w-lg"
+        showCloseButton={false}
+      >
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>局域网传输设置</Trans>

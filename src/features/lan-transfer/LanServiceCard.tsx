@@ -24,10 +24,13 @@ export default function LanServiceCard({
   const [qrOpen, setQrOpen] = useState(false);
   return (
     <section className="border-border bg-card rounded-xl border p-3">
-      <header className="mb-3">
+      <header className="mb-3 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold">
           <Trans>本机服务</Trans>
         </h2>
+        <Badge variant={status?.running ? "secondary" : "outline"}>
+          {status?.running ? t`运行中` : t`已停止`}
+        </Badge>
       </header>
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
