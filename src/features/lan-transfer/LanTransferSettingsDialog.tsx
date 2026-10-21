@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
 import { FolderOpen, ShieldAlert, Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import ToggleGroup from "~/components/FixedToggleGroup";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -17,7 +17,7 @@ import {
 } from "~/components/ui/dialog-layout";
 import {
   Field as UiField,
-  FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
@@ -38,12 +38,15 @@ import {
   lanTrustedDeviceFormValuesToInput,
 } from "~/features/lan-transfer/lanTransferForms.schema";
 import { firstFormError } from "~/lib/form-errors";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type {
   LanNetworkAddress,
   LanTransferSettings,
   LanTrustedDevice,
   LanTrustedDeviceInput,
 } from "~/types";
+
+import LanConfirmDialog from "./LanConfirmDialog";
 
 interface LanTransferSettingsDialogProps {
   open: boolean;
@@ -78,6 +81,10 @@ export default function LanTransferSettingsDialog({
   saveSettings,
 }: LanTransferSettingsDialogProps) {
   const { t } = useLingui();
+  const [pendingTrusted, setPendingTrusted] = useState<LanTrustedDevice | null>(
+    null,
+  );
+  const pendingLabel = pendingTrusted?.label ?? "";
   const form = useForm({
     defaultValues: settings,
     validators: {
@@ -110,10 +117,7 @@ export default function LanTransferSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent
-        className="ui-density-adaptive max-w-lg"
-        showCloseButton={false}
-      >
+      <DialogLayoutContent className="max-w-lg" showCloseButton={false}>
         <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>局域网传输设置</Trans>
@@ -158,9 +162,10 @@ export default function LanTransferSettingsDialog({
                         field.handleChange(Number(event.target.value))
                       }
                       aria-invalid={!!error}
+                      aria-describedby={error ? "lan-port-error" : undefined}
                     />
                     {error ? (
-                      <FieldDescription>{error}</FieldDescription>
+                      <FieldError id="lan-port-error">{error}</FieldError>
                     ) : null}
                   </UiField>
                 );
@@ -190,7 +195,7 @@ export default function LanTransferSettingsDialog({
                       <SelectTrigger wrapValue aria-label={t`绑定 IP`}>
                         <SelectValue placeholder={t`自动选择`} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="ui-density-adaptive">
                         <SelectGroup>
                           <SelectItem value="auto">
                             <Trans>自动选择</Trans>
@@ -319,6 +324,7 @@ export default function LanTransferSettingsDialog({
                           return (
                             <div>
                               <Input
+                                id="lan-trusted-ip"
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
                                 onChange={(event) =>
@@ -327,11 +333,14 @@ export default function LanTransferSettingsDialog({
                                 aria-label={t`IP 地址`}
                                 placeholder="192.168.1.10"
                                 aria-invalid={!!error}
+                                aria-describedby={
+                                  error ? "lan-trusted-ip-error" : undefined
+                                }
                               />
                               {error ? (
-                                <FieldDescription className="text-destructive">
+                                <FieldError id="lan-trusted-ip-error">
                                   {error}
-                                </FieldDescription>
+                                </FieldError>
                               ) : null}
                             </div>
                           );
@@ -376,10 +385,8 @@ export default function LanTransferSettingsDialog({
                               size="icon-xs"
                               title={t`删除白名单`}
                               aria-label={t`删除白名单`}
-                              className="max-md:min-h-11 max-md:min-w-11"
-                              onClick={() =>
-                                void deleteTrustedDevice(device.id)
-                              }
+                              className={TOUCH_TARGET_CLASS}
+                              onClick={() => setPendingTrusted(device)}
                             >
                               <Trash2 className="text-destructive" />
                             </Button>
@@ -433,7 +440,7 @@ export default function LanTransferSettingsDialog({
                     <SelectTrigger aria-label={t`默认权限`} className="w-full">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="ui-density-adaptive">
                       <SelectGroup>
                         <SelectItem value="readOnly">
                           <Trans>只读</Trans>
@@ -456,11 +463,11 @@ export default function LanTransferSettingsDialog({
                 const error = firstFormError(field.state.meta.errors);
                 return (
                   <UiField data-invalid={!!error}>
-                    <FieldLabel>
+                    <FieldLabel htmlFor="lan-max-concurrent">
                       <Trans>同时传输数</Trans>
                     </FieldLabel>
                     <Input
-                      aria-label={t`同时传输数`}
+                      id="lan-max-concurrent"
                       type="number"
                       min={1}
                       max={16}
@@ -472,9 +479,14 @@ export default function LanTransferSettingsDialog({
                       disabled={running}
                       className="max-w-32"
                       aria-invalid={!!error}
+                      aria-describedby={
+                        error ? "lan-max-concurrent-error" : undefined
+                      }
                     />
                     {error ? (
-                      <FieldDescription>{error}</FieldDescription>
+                      <FieldError id="lan-max-concurrent-error">
+                        {error}
+                      </FieldError>
                     ) : null}
                   </UiField>
                 );
@@ -522,6 +534,23 @@ export default function LanTransferSettingsDialog({
           </form.Subscribe>
         </DialogLayoutFooter>
       </DialogLayoutContent>
+      <LanConfirmDialog
+        open={pendingTrusted !== null}
+        onOpenChange={(nextOpen) => !nextOpen && setPendingTrusted(null)}
+        title={t`删除白名单`}
+        description={
+          <>
+            {t`移除“${pendingLabel}”？`}
+            <span className="mt-2 block">
+              <Trans>移除后，该设备将不再自动获得访问权限。</Trans>
+            </span>
+          </>
+        }
+        confirmLabel={t`删除`}
+        onConfirm={() => {
+          if (pendingTrusted) void deleteTrustedDevice(pendingTrusted.id);
+        }}
+      />
     </Dialog>
   );
 }

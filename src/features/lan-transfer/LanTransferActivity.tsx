@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { XCircle } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -10,7 +10,10 @@ import { translate } from "~/i18n/translate";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type { LanTransferTask } from "~/types";
+
+import LanConfirmDialog from "./LanConfirmDialog";
 
 function formatDuration(ms: number) {
   if (!Number.isFinite(ms) || ms <= 0) return "-";
@@ -61,6 +64,8 @@ export default function LanTransferActivity({
   cancelTask: (id: string) => void;
 }) {
   const { t } = useLingui();
+  const [pending, setPending] = useState<LanTransferTask | null>(null);
+  const pendingName = pending?.fileName ?? "";
   const scroller = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: tasks.length,
@@ -71,109 +76,128 @@ export default function LanTransferActivity({
   });
   useVirtualizerFontSize(virtualizer);
   return (
-    <section className="border-border bg-card shrink-0 rounded-xl border p-3">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold">
-          <Trans>传输活动</Trans>
-        </h2>
-        <Badge variant="outline">
-          <Plural
-            value={{
-              taskCount: tasks.length,
-            }}
-            one="# 任务"
-            other="# 任务"
-          />
-        </Badge>
-      </div>
-      {tasks.length === 0 ? (
-        <div className="border-border text-muted-foreground flex min-h-20 items-center justify-center rounded-md border border-dashed text-xs">
-          <Trans>暂无任务</Trans>
+    <>
+      <section className="border-border bg-card shrink-0 rounded-xl border p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">
+            <Trans>传输活动</Trans>
+          </h2>
+          <Badge variant="outline">
+            <Plural
+              value={{
+                taskCount: tasks.length,
+              }}
+              one="# 任务"
+              other="# 任务"
+            />
+          </Badge>
         </div>
-      ) : (
-        <div ref={scroller} className="max-h-80 overflow-auto">
-          <div
-            className="relative w-full"
-            style={{ height: virtualizer.getTotalSize() }}
-          >
-            {virtualizer.getVirtualItems().map((row) => {
-              const task = tasks[row.index];
-              const percent =
-                task.total > 0
-                  ? Math.min(
-                      100,
-                      Math.round((task.transferred / task.total) * 100),
-                    )
-                  : 0;
-              const speed = taskSpeed(task);
-              const taskEtaValue = taskEta(task);
-              const taskEtaValue2 = taskEta(task);
-              return (
-                <div
-                  key={task.id}
-                  data-index={row.index}
-                  ref={virtualizer.measureElement}
-                  style={{ transform: `translateY(${row.start}px)` }}
-                  className="border-border absolute top-0 left-0 w-full border-b px-1 py-3"
-                >
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <span className="truncate font-medium">
-                      {taskDirectionLabel(task.direction)} · {task.fileName}
-                    </span>
-                    <div className="flex shrink-0 items-center gap-1">
-                      <span className="text-muted-foreground">
-                        {taskStatusLabel(task.status)}
-                      </span>
-                      {task.status === "running" ? (
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          title={t`取消传输`}
-                          aria-label={t`取消传输`}
-                          className="max-md:min-h-11 max-md:min-w-11"
-                          onClick={() => void cancelTask(task.id)}
-                        >
-                          <XCircle className="text-destructive" />
-                        </Button>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="bg-muted mt-1 h-1.5 overflow-hidden rounded-full">
-                    <div
-                      className="bg-primary h-full"
-                      style={{
-                        width: `${percent}%`,
-                      }}
-                    />
-                  </div>
-                  <div className="text-muted-foreground mt-1 flex items-center justify-between gap-2 text-xs">
-                    <span>{task.ip}</span>
-                    <span className="shrink-0 tabular-nums">
-                      {formatBytes(task.transferred)} /{" "}
-                      {formatBytes(task.total)}
-                    </span>
-                  </div>
-                  <div className="text-muted-foreground mt-0.5 flex items-center justify-between gap-2 text-xs">
-                    <span className="tabular-nums">
-                      {speed > 0 ? `${formatBytes(speed)}/s` : "-"}
-                    </span>
-                    <span className="shrink-0 tabular-nums">
-                      {task.status === "running"
-                        ? t`剩余 ${taskEtaValue}`
-                        : t`耗时 ${taskEtaValue2}`}
-                    </span>
-                  </div>
-                  {task.error ? (
-                    <p className="text-destructive mt-1 text-xs wrap-anywhere">
-                      {describeError(task.error)}
-                    </p>
-                  ) : null}
-                </div>
-              );
-            })}
+        {tasks.length === 0 ? (
+          <div className="border-border text-muted-foreground flex min-h-20 items-center justify-center rounded-md border border-dashed text-xs">
+            <Trans>暂无任务</Trans>
           </div>
-        </div>
-      )}
-    </section>
+        ) : (
+          <div ref={scroller} className="max-h-80 overflow-auto">
+            <div
+              className="relative w-full"
+              style={{ height: virtualizer.getTotalSize() }}
+            >
+              {virtualizer.getVirtualItems().map((row) => {
+                const task = tasks[row.index];
+                const percent =
+                  task.total > 0
+                    ? Math.min(
+                        100,
+                        Math.round((task.transferred / task.total) * 100),
+                      )
+                    : 0;
+                const speed = taskSpeed(task);
+                const taskEtaValue = taskEta(task);
+                const taskEtaValue2 = taskEta(task);
+                return (
+                  <div
+                    key={task.id}
+                    data-index={row.index}
+                    ref={virtualizer.measureElement}
+                    style={{ transform: `translateY(${row.start}px)` }}
+                    className="border-border absolute top-0 left-0 w-full border-b px-1 py-3"
+                  >
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <span className="truncate font-medium">
+                        {taskDirectionLabel(task.direction)} · {task.fileName}
+                      </span>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <span className="text-muted-foreground">
+                          {taskStatusLabel(task.status)}
+                        </span>
+                        {task.status === "running" ? (
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            title={t`取消传输`}
+                            aria-label={t`取消传输`}
+                            className={TOUCH_TARGET_CLASS}
+                            onClick={() => setPending(task)}
+                          >
+                            <XCircle className="text-destructive" />
+                          </Button>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="bg-muted mt-1 h-1.5 overflow-hidden rounded-full">
+                      <div
+                        className="bg-primary h-full"
+                        style={{
+                          width: `${percent}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="text-muted-foreground mt-1 flex items-center justify-between gap-2 text-xs">
+                      <span>{task.ip}</span>
+                      <span className="shrink-0 tabular-nums">
+                        {formatBytes(task.transferred)} /{" "}
+                        {formatBytes(task.total)}
+                      </span>
+                    </div>
+                    <div className="text-muted-foreground mt-0.5 flex items-center justify-between gap-2 text-xs">
+                      <span className="tabular-nums">
+                        {speed > 0 ? `${formatBytes(speed)}/s` : "-"}
+                      </span>
+                      <span className="shrink-0 tabular-nums">
+                        {task.status === "running"
+                          ? t`剩余 ${taskEtaValue}`
+                          : t`耗时 ${taskEtaValue2}`}
+                      </span>
+                    </div>
+                    {task.error ? (
+                      <p className="text-destructive mt-1 text-xs wrap-anywhere">
+                        {describeError(task.error)}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </section>
+      <LanConfirmDialog
+        open={pending !== null}
+        onOpenChange={(open) => !open && setPending(null)}
+        title={t`取消传输`}
+        description={
+          <>
+            {t`取消“${pendingName}”的传输？`}
+            <span className="mt-2 block">
+              <Trans>任务会立即停止，之后需要重新发起。</Trans>
+            </span>
+          </>
+        }
+        confirmLabel={t`取消传输`}
+        onConfirm={() => {
+          if (pending) void cancelTask(pending.id);
+        }}
+      />
+    </>
   );
 }

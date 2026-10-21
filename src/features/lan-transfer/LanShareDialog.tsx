@@ -14,7 +14,7 @@ import {
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import {
   Field as UiField,
-  FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
@@ -100,8 +100,13 @@ export default function LanShareDialog({
                     onChange={(event) => field.handleChange(event.target.value)}
                     placeholder={t`共享目录`}
                     aria-invalid={!!error}
+                    aria-describedby={
+                      error ? "lan-share-name-error" : undefined
+                    }
                   />
-                  {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  {error ? (
+                    <FieldError id="lan-share-name-error">{error}</FieldError>
+                  ) : null}
                 </UiField>
               );
             }}
@@ -122,6 +127,9 @@ export default function LanShareDialog({
                       placeholder={t`未选择`}
                       className="flex-1"
                       aria-invalid={!!error}
+                      aria-describedby={
+                        error ? "lan-share-path-error" : undefined
+                      }
                     />
                     <Button
                       type="button"
@@ -132,7 +140,9 @@ export default function LanShareDialog({
                       <Trans>选择</Trans>
                     </Button>
                   </div>
-                  {error ? <FieldDescription>{error}</FieldDescription> : null}
+                  {error ? (
+                    <FieldError id="lan-share-path-error">{error}</FieldError>
+                  ) : null}
                 </UiField>
               );
             }}

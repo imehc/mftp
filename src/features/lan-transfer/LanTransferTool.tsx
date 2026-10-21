@@ -6,6 +6,7 @@ import {
   Settings,
   ShieldAlert,
 } from "lucide-react";
+import { useState } from "react";
 
 import AppPageLayout from "~/components/AppPageLayout";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -13,6 +14,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { describeError } from "~/lib/errors";
 
+import LanConfirmDialog from "./LanConfirmDialog";
 import LanConnectedDevices from "./LanConnectedDevices";
 import LanDiscoveredDevicesPanel from "./LanDiscoveredDevicesPanel";
 import LanPendingAuthRequestsPanel from "./LanPendingAuthRequestsPanel";
@@ -26,6 +28,7 @@ import { useLanTransfer } from "./use-lan-transfer";
 export default function LanTransferTool() {
   const { t } = useLingui();
   const lan = useLanTransfer();
+  const [stopOpen, setStopOpen] = useState(false);
   const bindHost = lan.settings.bindHost;
   return (
     <AppPageLayout
@@ -48,7 +51,7 @@ export default function LanTransferTool() {
             variant="outline"
             size="sm"
             disabled={lan.busy || lan.loading || !!lan.coreError}
-            onClick={lan.running ? lan.stop : lan.start}
+            onClick={lan.running ? () => setStopOpen(true) : lan.start}
           >
             {lan.busy ? <LoaderCircle className="animate-spin" /> : <Power />}
             {lan.running ? t`停止服务` : t`启动服务`}
@@ -181,6 +184,16 @@ export default function LanTransferTool() {
         busy={lan.busy}
         onOpenChange={lan.setShareOpen}
         onAdd={lan.addShare}
+      />
+      <LanConfirmDialog
+        open={stopOpen}
+        onOpenChange={setStopOpen}
+        title={t`停止服务`}
+        description={
+          <Trans>停止后，进行中的传输会被中断，已连接设备会断开。</Trans>
+        }
+        confirmLabel={t`停止服务`}
+        onConfirm={() => void lan.stop()}
       />
     </AppPageLayout>
   );

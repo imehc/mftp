@@ -15,6 +15,7 @@ import {
 } from "~/components/ui/select";
 import { lanPermissionLabel } from "~/features/lan-transfer/labels";
 import { formatRelativeTime } from "~/lib/relative-time";
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import type { LanAuthRequest } from "~/types";
 
 interface Props {
@@ -71,7 +72,7 @@ function LanAuthRequestPermissionForm({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="ui-density-adaptive">
               <SelectGroup>
                 <SelectItem value="readOnly">
                   <Trans>只读</Trans>
@@ -161,7 +162,7 @@ export default function LanPendingAuthRequestsPanel({
                       size="icon-xs"
                       title={t`拒绝访问`}
                       aria-label={t`拒绝访问`}
-                      className="max-md:min-h-11 max-md:min-w-11"
+                      className={TOUCH_TARGET_CLASS}
                       onClick={() => void reject(request.id)}
                     >
                       <ShieldOff className="text-destructive" />
