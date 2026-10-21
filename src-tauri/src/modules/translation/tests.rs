@@ -279,3 +279,29 @@ fn installed_models_switch_and_translate_without_network() {
     service.clear().unwrap();
     fs::create_dir(&fixture.0).unwrap();
 }
+
+#[test]
+fn publish_moves_a_new_artifact_into_place() {
+    let fixture = Fixture::new();
+    let partial = fixture.0.join("model.part");
+    let destination = fixture.0.join("model.gguf");
+    fs::write(&partial, b"weights").unwrap();
+
+    assert!(files::publish(&partial, &destination).unwrap());
+    assert_eq!(fs::read(&destination).unwrap(), b"weights");
+    assert!(!partial.exists());
+}
+
+#[test]
+fn publish_reports_an_existing_artifact_without_replacing_it() {
+    let fixture = Fixture::new();
+    let partial = fixture.0.join("model.part");
+    let destination = fixture.0.join("model.gguf");
+    fs::write(&partial, b"partial").unwrap();
+    fs::write(&destination, b"installed").unwrap();
+
+    // 目标已存在时不上报“已发布”，由调用方校验既有文件而不是覆盖它。
+    assert!(!files::publish(&partial, &destination).unwrap());
+    assert_eq!(fs::read(&destination).unwrap(), b"installed");
+    assert!(!partial.exists());
+}

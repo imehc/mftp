@@ -7,7 +7,7 @@ use reqwest::{
     StatusCode,
 };
 use std::{
-    fs::{self, File, OpenOptions},
+    fs::{self, OpenOptions},
     io::{Read, Write},
     path::Path,
     time::Duration,
@@ -288,12 +288,15 @@ pub(super) fn install(
     worker.progress(TranslationPhase::Verifying, model.bytes);
     files::verify(&partial, model, &worker.cancel)?;
     files::cancelled(&worker.cancel)?;
-    // A hard link publishes without overwriting a pre-existing installed artifact.
-    fs::hard_link(&partial, &destination)?;
-    fs::remove_file(&partial)?;
+    let published = files::publish(&partial, &destination)?;
     if etag_path.exists() {
         fs::remove_file(etag_path)?;
     }
-    File::open(&destination)?.sync_all()?;
-    files::mark_verified(&destination)
+    if published {
+        files::mark_verified(&destination)
+    } else {
+        // A concurrent run published the same content first; check it rather
+        // than trusting a file this worker never wrote.
+        files::verify_once(&destination, model, &worker.cancel)
+    }
 }

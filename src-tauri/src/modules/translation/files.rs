@@ -110,6 +110,35 @@ pub(super) fn verified_path(path: &Path) -> PathBuf {
     path.with_extension("verified")
 }
 
+/// Publishes a fully written, verified partial download as the installed model.
+///
+/// A hard link publishes without clobbering an artifact another run already
+/// installed, but some Android devices deny `link()` inside app-private storage
+/// and report `EACCES`. Renaming inside the same directory is the portable
+/// fallback: it is atomic, and the content digest in the file name means both
+/// paths would refer to identical bytes anyway.
+///
+/// Returns `false` when the destination was already published, so the caller
+/// verifies the existing artifact instead of trusting it.
+pub(super) fn publish(partial: &Path, destination: &Path) -> AppResult<bool> {
+    match fs::hard_link(partial, destination) {
+        Ok(()) => {
+            fs::remove_file(partial)?;
+            Ok(true)
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+            // The same digest is already installed; the partial copy is redundant.
+            fs::remove_file(partial)?;
+            Ok(false)
+        }
+        Err(_) => {
+            fs::rename(partial, destination)
+                .map_err(|error| AppError::from(error).context("publish translation model"))?;
+            Ok(true)
+        }
+    }
+}
+
 fn stamp(path: &Path) -> AppResult<String> {
     let metadata = fs::symlink_metadata(path)?;
     let modified = metadata
