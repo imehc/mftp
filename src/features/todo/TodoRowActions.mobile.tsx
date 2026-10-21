@@ -18,7 +18,6 @@ import {
 
 import type { TodoRowActionsProps } from "./todo-row-actions";
 
-/** 卡片右上角的次级操作不参与正文行高，仍保留独立的 24px 点击区。 */
 export default function TodoRowActionsMobile({
   disabled,
   abandoned,
@@ -33,9 +32,9 @@ export default function TodoRowActionsMobile({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon-sm"
+          density="adaptive"
           className="bg-card/40 hover:bg-card/70"
-          style={{ minWidth: 24, minHeight: 24 }}
           disabled={disabled}
           aria-label={t({
             message: "待办操作",
