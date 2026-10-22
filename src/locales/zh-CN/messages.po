@@ -29,6 +29,11 @@ msgstr "{0, plural, one {# 个字符} other {# 个字符}}"
 msgid "{ballName}，{points} 分"
 msgstr "{ballName}，{points} 分"
 
+#. 运行状态：正在运行的下载任务数量
+#: src/features/about/AboutPage.tsx:165
+msgid "{btTasks} 个进行中"
+msgstr "{btTasks} 个进行中"
+
 #: src/features/formatter/FormatterTool.tsx:171
 msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# 个字符} other {# 个字符}}"
@@ -262,7 +267,7 @@ msgstr "{spaces, plural, one {# 空格} other {# 空格}}"
 msgid "{statusLanguage} 格式有效"
 msgstr "{statusLanguage} 格式有效"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:137
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:141
 msgid "{target} · 主目录 {home} · 耗时 {latency} 毫秒"
 msgstr "{target} · 主目录 {home} · 耗时 {latency} 毫秒"
 
@@ -271,12 +276,12 @@ msgid "{taskCount, plural, one {# 任务} other {# 任务}}"
 msgstr "{taskCount, plural, one {# 任务} other {# 任务}}"
 
 #. 模块清理成功但容量统计不可用，title 是模块名
-#: src/features/about/use-about.ts:188
+#: src/features/about/use-about.ts:201
 msgid "{title}已清理"
 msgstr "{title}已清理"
 
 #. 清理某模块成功，title 是模块名，freed 是释放的数据大小
-#: src/features/about/use-about.ts:199
+#: src/features/about/use-about.ts:212
 msgid "{title}已清理，释放 {freed}"
 msgstr "{title}已清理，释放 {freed}"
 
@@ -471,7 +476,7 @@ msgid "BT 下载"
 msgstr "BT 下载"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:125
+#: src/features/logs/log-labels.ts:126
 msgid "BT 下载任务"
 msgstr "BT 下载任务"
 
@@ -530,7 +535,7 @@ msgstr "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
 msgid "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 msgstr "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 
-#: src/features/about/use-about.ts:225
+#: src/features/about/use-about.ts:238
 msgid "Git Commit"
 msgstr "Git Commit"
 
@@ -564,7 +569,7 @@ msgstr "IP:端口 直连"
 msgid "MFTP 应用更新"
 msgstr "MFTP 应用更新"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:127
+#: src/features/media-compress/video/VideoCompressPanel.tsx:129
 msgid "MP4 · MOV · M4V，文件不会上传"
 msgstr "MP4 · MOV · M4V，文件不会上传"
 
@@ -614,7 +619,7 @@ msgid "rsync 暂不可用"
 msgstr "rsync 暂不可用"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:123
+#: src/features/logs/log-labels.ts:124
 msgid "SFTP 会话"
 msgstr "SFTP 会话"
 
@@ -622,7 +627,7 @@ msgstr "SFTP 会话"
 msgid "SFTP 写入长时间没有进展，请重试"
 msgstr "SFTP 写入长时间没有进展，请重试"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:206
+#: src/features/ssh-sftp/SshSftpTool.tsx:208
 msgid "SSH / SFTP"
 msgstr "SSH / SFTP"
 
@@ -631,7 +636,7 @@ msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP 主机连接配置"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:117
+#: src/features/logs/log-labels.ts:118
 msgid "SSH 会话"
 msgstr "SSH 会话"
 
@@ -656,7 +661,7 @@ msgstr "SSH 终端已关闭"
 msgid "SSH 连接"
 msgstr "SSH 连接"
 
-#: src/features/about/use-about.ts:228
+#: src/features/about/use-about.ts:241
 msgid "Tauri 版本"
 msgstr "Tauri 版本"
 
@@ -832,6 +837,10 @@ msgstr "下载 {entryName2}"
 msgid "下载中"
 msgstr "下载中"
 
+#: src/features/about/AboutPage.tsx:160
+msgid "下载任务"
+msgstr "下载任务"
+
 #: src/lib/errors/messages.ts:124
 msgid "下载任务不存在"
 msgstr "下载任务不存在"
@@ -865,8 +874,8 @@ msgstr "下载截图"
 msgid "下载所选"
 msgstr "下载所选"
 
-#: src/features/about/use-about.ts:61
-#: src/features/about/use-about.ts:93
+#: src/features/about/use-about.ts:65
+#: src/features/about/use-about.ts:97
 msgid "下载数据"
 msgstr "下载数据"
 
@@ -923,7 +932,7 @@ msgstr "下降"
 msgid "不代表设备内存上限。"
 msgstr "不代表设备内存上限。"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:389
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:393
 msgid "不会保存，仅在测试连接时使用"
 msgstr "不会保存，仅在测试连接时使用"
 
@@ -1024,7 +1033,7 @@ msgstr "中"
 msgid "中国象棋"
 msgstr "中国象棋"
 
-#: src/features/logs/log-labels.ts:213
+#: src/features/logs/log-labels.ts:214
 msgid "中国象棋房间"
 msgstr "中国象棋房间"
 
@@ -1067,7 +1076,7 @@ msgstr "临时导出空间已满，请稍后重试。系统分享文件会保留
 msgid "临时材质"
 msgstr "临时材质"
 
-#: src/features/about/use-about.ts:78
+#: src/features/about/use-about.ts:82
 msgid "主数据库"
 msgstr "主数据库"
 
@@ -1090,11 +1099,11 @@ msgstr "主机"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:111
-#: src/features/ssh-sftp/SshSftpTool.tsx:320
+#: src/features/ssh-sftp/SshSftpTool.tsx:322
 msgid "主机列表"
 msgstr "主机列表"
 
-#: src/features/about/use-about.ts:56
+#: src/features/about/use-about.ts:60
 msgid "主机和密钥"
 msgstr "主机和密钥"
 
@@ -1131,7 +1140,7 @@ msgstr "互换语言"
 msgid "五子棋"
 msgstr "五子棋"
 
-#: src/features/logs/log-labels.ts:212
+#: src/features/logs/log-labels.ts:213
 msgid "五子棋房间"
 msgstr "五子棋房间"
 
@@ -1320,7 +1329,7 @@ msgstr "任务未运行"
 msgid "任务状态通知暂不可用"
 msgstr "任务状态通知暂不可用"
 
-#: src/features/activity/TransferActivity.tsx:42
+#: src/features/activity/TransferActivity.tsx:38
 msgid "任务进度同步暂不可用"
 msgstr "任务进度同步暂不可用"
 
@@ -1332,8 +1341,8 @@ msgstr "优先级"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:122
-#: src/features/logs/log-labels.ts:143
+#: src/features/logs/log-labels.ts:123
+#: src/features/logs/log-labels.ts:144
 msgid "传输任务"
 msgstr "传输任务"
 
@@ -1453,13 +1462,13 @@ msgstr "依次首碰最低号球，合法进 9 号获胜。采用三球开球、
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:554
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
 #: src/features/poetry/components/PoetryTranslationSection.tsx:360
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:455
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:458
 #: src/features/todo/TodoItemDialog.tsx:338
 #: src/features/vault/VaultEntryDialog.tsx:251
 msgid "保存"
 msgstr "保存"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:455
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:458
 msgid "保存中…"
 msgstr "保存中…"
 
@@ -1509,12 +1518,12 @@ msgstr "保留"
 msgid "保留的源数据"
 msgstr "保留的源数据"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:218
+#: src/features/media-compress/video/VideoCompressPanel.tsx:220
 msgid "保留音频"
 msgstr "保留音频"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:149
+#: src/features/logs/log-labels.ts:150
 msgid "信任设备"
 msgstr "信任设备"
 
@@ -1655,7 +1664,7 @@ msgid "全屏"
 msgstr "全屏"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:133
+#: src/features/logs/log-labels.ts:134
 msgid "全文索引"
 msgstr "全文索引"
 
@@ -1719,7 +1728,7 @@ msgstr "共 {count} 条译文"
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:36
 #: src/features/lan-transfer/LanShareDialog.tsx:101
-#: src/features/logs/log-labels.ts:146
+#: src/features/logs/log-labels.ts:147
 msgid "共享目录"
 msgstr "共享目录"
 
@@ -1737,7 +1746,7 @@ msgstr "共享目录不存在或无法访问，请检查共享设置"
 msgid "共用数据缓冲"
 msgstr "共用数据缓冲"
 
-#: src/features/about/AboutPage.tsx:55
+#: src/features/about/AboutPage.tsx:51
 #: src/features/settings/AppSettingsMenu.tsx:88
 msgid "关于"
 msgstr "关于"
@@ -1782,7 +1791,7 @@ msgctxt "state"
 msgid "关闭"
 msgstr "关闭"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:226
+#: src/features/media-compress/video/VideoCompressPanel.tsx:228
 msgid "关闭可进一步减小体积"
 msgstr "关闭可进一步减小体积"
 
@@ -2030,7 +2039,7 @@ msgstr "创建目录中"
 #: src/features/settings/TransferSetting.tsx:56
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:91
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:166
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:289
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:291
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:48
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:81
 #: src/features/ssh-sftp/components/Sidebar.tsx:543
@@ -2097,7 +2106,7 @@ msgstr "删除后无法撤销。删除当前项时，需要选择同地址下的
 msgid "删除密码条目"
 msgstr "删除密码条目"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:271
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:273
 msgid "删除密钥"
 msgstr "删除密钥"
 
@@ -2105,7 +2114,7 @@ msgstr "删除密钥"
 msgid "删除密钥？"
 msgstr "删除密钥？"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:274
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:276
 msgid "删除密钥“{pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。"
 msgstr "删除密钥“{pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。"
 
@@ -2139,7 +2148,7 @@ msgstr "删除文件夹"
 msgid "删除日志"
 msgstr "删除日志"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:128
+#: src/features/ai-configuration/ProviderDetails.tsx:130
 msgid "删除服务地址"
 msgstr "删除服务地址"
 
@@ -2201,7 +2210,7 @@ msgstr "删除这条日志？"
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:120
 #: src/features/lan-transfer/LanPendingAuthRequestsPanel.tsx:121
 #: src/features/lan-transfer/LanTransferTool.tsx:55
-#: src/features/logs/ActivityLogsPage.tsx:64
+#: src/features/logs/ActivityLogsPage.tsx:60
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:122
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:123
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:157
@@ -2217,7 +2226,7 @@ msgstr "刷新 AI 配置"
 msgid "刷新房间"
 msgstr "刷新房间"
 
-#: src/features/about/AboutPage.tsx:79
+#: src/features/about/AboutPage.tsx:75
 msgid "刷新状态"
 msgstr "刷新状态"
 
@@ -2359,7 +2368,7 @@ msgstr "动画片段"
 msgid "区分大小写"
 msgstr "区分大小写"
 
-#: src/features/about/use-about.ts:222
+#: src/features/about/use-about.ts:235
 msgid "区域"
 msgstr "区域"
 
@@ -2421,7 +2430,7 @@ msgstr "历史数值"
 #. 持久保存的操作摘要列表页面标题，区别于运行期日志
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:122
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:122
-#: src/features/logs/ActivityLogsPage.tsx:39
+#: src/features/logs/ActivityLogsPage.tsx:35
 #: src/features/settings/SettingsOverview.tsx:53
 msgid "历史日志"
 msgstr "历史日志"
@@ -2514,7 +2523,7 @@ msgstr "原图预览"
 msgid "原始值"
 msgstr "原始值"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:188
+#: src/features/media-compress/video/VideoCompressPanel.tsx:190
 msgid "原始分辨率"
 msgstr "原始分辨率"
 
@@ -2619,15 +2628,15 @@ msgstr "发送中"
 #: src/features/poetry/components/PoetryTranslationSection.tsx:375
 #: src/features/poetry/components/PoetryTranslationSection.tsx:395
 #: src/features/poetry/LibraryManagePage.tsx:105
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:447
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:450
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:91
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:279
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:281
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:211
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:45
 #: src/features/ssh-sftp/components/sftp/ExtractDialog.tsx:142
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:243
 #: src/features/ssh-sftp/components/Sidebar.tsx:540
-#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:217
+#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:215
 #: src/features/todo/TodoItemDialog.tsx:96
 #: src/features/todo/TodoItemDialog.tsx:327
 #: src/features/todo/TodoTool.tsx:318
@@ -2872,7 +2881,7 @@ msgstr "同网段设备"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:330
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:331
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:85
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:167
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:171
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:185
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:72
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:228
@@ -2994,7 +3003,7 @@ msgid "图片单边超过 8192 像素限制，请先缩小后再添加"
 msgstr "图片单边超过 8192 像素限制，请先缩小后再添加"
 
 #: src/features/media-compress/components/CompressModeTabs.tsx:36
-#: src/features/media-compress/video/VideoCompressPanel.tsx:81
+#: src/features/media-compress/video/VideoCompressPanel.tsx:83
 msgid "图片压缩"
 msgstr "图片压缩"
 
@@ -3070,7 +3079,7 @@ msgid "在远端服务器上执行对应命令。"
 msgstr "在远端服务器上执行对应命令。"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:311
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:196
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:200
 msgid "地址"
 msgstr "地址"
 
@@ -3267,7 +3276,7 @@ msgstr "复制房间码"
 msgid "复制日志"
 msgstr "复制日志"
 
-#: src/features/about/AboutPage.tsx:69
+#: src/features/about/AboutPage.tsx:65
 msgid "复制环境信息"
 msgstr "复制环境信息"
 
@@ -3345,7 +3354,7 @@ msgstr "字号"
 msgid "字节数未知"
 msgstr "字节数未知"
 
-#: src/features/about/AboutPage.tsx:131
+#: src/features/about/AboutPage.tsx:127
 msgid "存储"
 msgstr "存储"
 
@@ -3451,8 +3460,8 @@ msgstr "宽度"
 msgid "宽高比例不同会拉伸变形"
 msgstr "宽高比例不同会拉伸变形"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:285
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:302
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:289
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:306
 #: src/features/vault/VaultEntryCard.tsx:134
 #: src/features/vault/VaultEntryDialog.tsx:209
 msgid "密码"
@@ -3463,7 +3472,7 @@ msgid "密码库"
 msgstr "密码库"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/about/use-about.ts:55
+#: src/features/about/use-about.ts:59
 #: src/features/export/sections.tsx:26
 #: src/features/home/entries.tsx:140
 #: src/features/logs/log-labels.ts:113
@@ -3477,10 +3486,10 @@ msgstr "密码本"
 msgid "密码条目"
 msgstr "密码条目"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:161
-#: src/features/ai-configuration/ProviderDetails.tsx:176
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:288
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:325
+#: src/features/ai-configuration/ProviderDetails.tsx:163
+#: src/features/ai-configuration/ProviderDetails.tsx:178
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:292
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:329
 msgid "密钥"
 msgstr "密钥"
 
@@ -3489,11 +3498,11 @@ msgid "密钥值"
 msgstr "密钥值"
 
 #. 主机表单中仅用于测试连接的密钥口令
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:378
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:382
 msgid "密钥口令（仅用于测试）"
 msgstr "密钥口令（仅用于测试）"
 
-#: src/features/about/use-about.ts:97
+#: src/features/about/use-about.ts:101
 msgid "密钥文件"
 msgstr "密钥文件"
 
@@ -3580,7 +3589,7 @@ msgstr "导入"
 msgid "导入 SSH 密钥"
 msgstr "导入 SSH 密钥"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:258
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:260
 msgid "导入中…"
 msgstr "导入中…"
 
@@ -3602,7 +3611,7 @@ msgstr "导入失败"
 msgid "导入完成"
 msgstr "导入完成"
 
-#: src/features/ssh-sftp/components/keys/KeyManager.tsx:258
+#: src/features/ssh-sftp/components/keys/KeyManager.tsx:260
 msgid "导入密钥"
 msgstr "导入密钥"
 
@@ -3749,6 +3758,10 @@ msgstr "尚未选择作品"
 msgid "尚未配置 AI 服务"
 msgstr "尚未配置 AI 服务"
 
+#: src/features/about/use-about.ts:275
+msgid "就绪"
+msgstr "就绪"
+
 #: src/features/media-compress/resize/ImageResizePanel.tsx:186
 msgid "尺寸模式"
 msgstr "尺寸模式"
@@ -3779,14 +3792,14 @@ msgid "局域网传输意外结束，请重试"
 msgstr "局域网传输意外结束，请重试"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:152
+#: src/features/logs/log-labels.ts:153
 msgid "局域网传输服务"
 msgstr "局域网传输服务"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:128
 #: src/features/lan-transfer/LanTransferTool.tsx:65
-#: src/features/logs/log-labels.ts:138
+#: src/features/logs/log-labels.ts:139
 msgid "局域网传输设置"
 msgstr "局域网传输设置"
 
@@ -3794,7 +3807,7 @@ msgstr "局域网传输设置"
 msgid "局域网共享文件"
 msgstr "局域网共享文件"
 
-#: src/features/about/AboutPage.tsx:162
+#: src/features/about/AboutPage.tsx:179
 #: src/lib/errors/messages.ts:301
 msgid "局域网服务"
 msgstr "局域网服务"
@@ -3850,7 +3863,7 @@ msgstr "已下载 {downloadedSize}"
 msgid "已保存"
 msgstr "已保存"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:271
+#: src/features/ai-configuration/ProviderDetails.tsx:273
 msgid "已保存 · 未验证"
 msgstr "已保存 · 未验证"
 
@@ -4181,7 +4194,7 @@ msgid "应用启动后自动开启服务"
 msgstr "应用启动后自动开启服务"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:127
+#: src/features/logs/log-labels.ts:128
 msgid "应用数据"
 msgstr "应用数据"
 
@@ -4193,7 +4206,7 @@ msgstr "应用正在清理数据，请稍后重试"
 msgid "应用正在退出，无法执行此操作"
 msgstr "应用正在退出，无法执行此操作"
 
-#: src/features/about/use-about.ts:218
+#: src/features/about/use-about.ts:231
 msgid "应用版本"
 msgstr "应用版本"
 
@@ -4246,11 +4259,11 @@ msgid "开始两点测量"
 msgstr "开始两点测量"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:188
-#: src/features/media-compress/video/VideoCompressPanel.tsx:252
+#: src/features/media-compress/video/VideoCompressPanel.tsx:254
 msgid "开始压缩"
 msgstr "开始压缩"
 
-#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:228
+#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:226
 msgid "开始同步"
 msgstr "开始同步"
 
@@ -4299,8 +4312,8 @@ msgstr "开机自启"
 msgid "开球母球须在头线后，可调整至出杆。"
 msgstr "开球母球须在头线后，可调整至出杆。"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:224
-#: src/features/ai-configuration/ProviderDetails.tsx:265
+#: src/features/ai-configuration/ProviderDetails.tsx:226
+#: src/features/ai-configuration/ProviderDetails.tsx:267
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:57
 #: src/features/ai-configuration/ProviderNavigation.mobile.tsx:42
 msgid "当前"
@@ -4310,7 +4323,7 @@ msgstr "当前"
 msgid "当前 AI 服务地址已变更，请重新打开模型菜单"
 msgstr "当前 AI 服务地址已变更，请重新打开模型菜单"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:224
+#: src/features/media-compress/video/VideoCompressPanel.tsx:226
 msgid "当前 WebView 不支持音频转码"
 msgstr "当前 WebView 不支持音频转码"
 
@@ -4344,7 +4357,7 @@ msgstr "当前匹配"
 msgid "当前地址"
 msgstr "当前地址"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:138
+#: src/features/ai-configuration/ProviderDetails.tsx:140
 msgid "当前密钥"
 msgstr "当前密钥"
 
@@ -4394,7 +4407,7 @@ msgid "当前显示上次采样"
 msgstr "当前显示上次采样"
 
 #. 选中模型包含共享引用的已知分配估算。
-#: src/features/ai-configuration/ProviderDetails.tsx:146
+#: src/features/ai-configuration/ProviderDetails.tsx:148
 #: src/features/model-viewer/components/MemoryPanel.tsx:90
 #: src/features/translation/ModelManager.tsx:174
 #: src/features/translation/ModelManager.tsx:184
@@ -4499,7 +4512,7 @@ msgstr "录屏超过 64 MiB 上限，请缩短录制时间后重试。"
 msgid "往返"
 msgstr "往返"
 
-#: src/features/about/use-about.ts:57
+#: src/features/about/use-about.ts:61
 #: src/features/export/sections.tsx:38
 #: src/features/logs/use-activity-logs.ts:31
 #: src/lib/errors/messages.ts:311
@@ -4569,7 +4582,7 @@ msgstr "循环模式"
 msgid "德语"
 msgstr "德语"
 
-#: src/features/about/AboutPage.tsx:134
+#: src/features/about/AboutPage.tsx:130
 msgid "总占用"
 msgstr "总占用"
 
@@ -4599,7 +4612,7 @@ msgstr "恢复上次页面"
 msgid "恢复待办"
 msgstr "恢复待办"
 
-#: src/features/about/AboutPage.tsx:142
+#: src/features/about/AboutPage.tsx:138
 msgid "恢复首次打开状态"
 msgstr "恢复首次打开状态"
 
@@ -4712,8 +4725,8 @@ msgid "打开一个 3D 模型"
 msgstr "打开一个 3D 模型"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:63
-#: src/features/ssh-sftp/SshSftpTool.tsx:72
-#: src/features/ssh-sftp/SshSftpTool.tsx:220
+#: src/features/ssh-sftp/SshSftpTool.tsx:74
+#: src/features/ssh-sftp/SshSftpTool.tsx:222
 msgid "打开主机列表"
 msgstr "打开主机列表"
 
@@ -4825,7 +4838,7 @@ msgstr "拖动排序"
 msgid "拖放图片到此处，或选择文件"
 msgstr "拖放图片到此处，或选择文件"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:123
+#: src/features/media-compress/video/VideoCompressPanel.tsx:125
 msgid "拖放视频到此处，或选择文件"
 msgstr "拖放视频到此处，或选择文件"
 
@@ -4992,7 +5005,7 @@ msgstr "播放进度"
 msgid "播放速度"
 msgstr "播放速度"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:205
+#: src/features/ai-configuration/ProviderDetails.tsx:207
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:78
 #: src/features/games/billiards/BilliardsRuleControl.tsx:60
 #: src/features/logs/LogDialogs.tsx:114
@@ -5032,7 +5045,7 @@ msgstr "操作帮助"
 msgid "操作标识"
 msgstr "操作标识"
 
-#: src/features/about/use-about.ts:220
+#: src/features/about/use-about.ts:233
 msgid "操作系统"
 msgstr "操作系统"
 
@@ -5115,7 +5128,7 @@ msgstr "文件"
 msgid "文件不属于此下载任务"
 msgstr "文件不属于此下载任务"
 
-#: src/features/about/AboutPage.tsx:155
+#: src/features/about/AboutPage.tsx:154
 #: src/features/settings/TransferSetting.tsx:39
 msgid "文件传输"
 msgstr "文件传输"
@@ -5238,7 +5251,7 @@ msgstr "新增待办"
 msgid "新建"
 msgstr "新建"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:156
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:160
 #: src/features/ssh-sftp/components/Sidebar.tsx:404
 #: src/features/ssh-sftp/components/Sidebar.tsx:414
 msgid "新建主机"
@@ -5262,7 +5275,7 @@ msgstr "新建文件夹"
 msgid "新建账号"
 msgstr "新建账号"
 
-#: src/features/logs/ActivityLogsPage.tsx:129
+#: src/features/logs/ActivityLogsPage.tsx:125
 #: src/features/ssh-sftp/components/Sidebar.tsx:469
 #: src/features/vault/VaultTool.tsx:165
 msgid "无匹配结果"
@@ -5513,7 +5526,7 @@ msgid "暂无主机"
 msgstr "暂无主机"
 
 #. 活动页传输中筛选的空状态
-#: src/features/activity/TransferActivity.tsx:127
+#: src/features/activity/TransferActivity.tsx:123
 #: src/features/lan-transfer/LanTransferActivity.tsx:89
 msgid "暂无任务"
 msgstr "暂无任务"
@@ -5539,7 +5552,7 @@ msgid "暂无可用节点"
 msgstr "暂无可用节点"
 
 #. 活动页失败筛选的空状态
-#: src/features/activity/TransferActivity.tsx:131
+#: src/features/activity/TransferActivity.tsx:127
 msgid "暂无失败任务"
 msgstr "暂无失败任务"
 
@@ -5547,7 +5560,7 @@ msgstr "暂无失败任务"
 msgid "暂无密钥"
 msgstr "暂无密钥"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:367
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:371
 msgid "暂无密钥，请先导入"
 msgstr "暂无密钥，请先导入"
 
@@ -5561,7 +5574,7 @@ msgid "暂无已下载语料"
 msgstr "暂无已下载语料"
 
 #. 活动页已结束筛选的空状态
-#: src/features/activity/TransferActivity.tsx:135
+#: src/features/activity/TransferActivity.tsx:131
 msgid "暂无已结束任务"
 msgstr "暂无已结束任务"
 
@@ -5576,7 +5589,7 @@ msgstr "暂无数据"
 
 #. 活动日志页签的空状态标题
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:123
-#: src/features/logs/ActivityLogsPage.tsx:131
+#: src/features/logs/ActivityLogsPage.tsx:127
 msgid "暂无日志"
 msgstr "暂无日志"
 
@@ -5636,7 +5649,7 @@ msgstr "更多 AI 设置"
 #: src/features/formatter/FormatterActions.tsx:42
 #: src/features/formatter/FormatterActions.tsx:43
 #: src/features/games/engine/GameActionsMenu.tsx:39
-#: src/features/logs/ActivityLogsPage.tsx:75
+#: src/features/logs/ActivityLogsPage.tsx:71
 #: src/features/vault/VaultEntryCard.tsx:81
 msgid "更多操作"
 msgstr "更多操作"
@@ -5654,7 +5667,7 @@ msgstr "更小"
 msgid "更换"
 msgstr "更换"
 
-#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:207
+#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:205
 msgid "更改过多，预览不完整，执行仍处理全部"
 msgstr "更改过多，预览不完整，执行仍处理全部"
 
@@ -5774,7 +5787,7 @@ msgstr "朗读设置"
 msgid "未下载完成，预览可能中断。"
 msgstr "未下载完成，预览可能中断。"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:273
+#: src/features/ai-configuration/ProviderDetails.tsx:275
 msgid "未保存密钥"
 msgstr "未保存密钥"
 
@@ -5790,7 +5803,7 @@ msgstr "未分组"
 msgid "未发现房间，可输入地址加入"
 msgstr "未发现房间，可输入地址加入"
 
-#: src/features/about/AboutPage.tsx:169
+#: src/features/about/AboutPage.tsx:186
 msgid "未启动"
 msgstr "未启动"
 
@@ -5815,6 +5828,10 @@ msgstr "未命名节点"
 #: src/features/todo/TodoList.tsx:94
 msgid "未安排"
 msgstr "未安排"
+
+#: src/features/about/use-about.ts:275
+msgid "未安装"
+msgstr "未安装"
 
 #: src/features/poetry/components/PoetryLocalManagement.tsx:119
 msgid "未安装；仅点击时下载，可随时删除"
@@ -5910,8 +5927,8 @@ msgstr "未记录废弃时间"
 msgid "未运行"
 msgstr "未运行"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:141
-#: src/features/ai-configuration/ProviderDetails.tsx:149
+#: src/features/ai-configuration/ProviderDetails.tsx:143
+#: src/features/ai-configuration/ProviderDetails.tsx:151
 #: src/features/lan-transfer/LanShareDialog.tsx:127
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:249
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:216
@@ -5940,7 +5957,7 @@ msgstr "未验证"
 msgid "本地偏好与启动设置"
 msgstr "本地偏好与启动设置"
 
-#: src/features/about/AboutPage.tsx:98
+#: src/features/about/AboutPage.tsx:94
 msgid "本地文件与数据工具"
 msgstr "本地文件与数据工具"
 
@@ -6071,11 +6088,11 @@ msgstr "来源"
 msgid "松开以打开模型"
 msgstr "松开以打开模型"
 
-#: src/features/about/use-about.ts:224
+#: src/features/about/use-about.ts:237
 msgid "构建日期"
 msgstr "构建日期"
 
-#: src/features/about/use-about.ts:223
+#: src/features/about/use-about.ts:236
 msgid "构建编号"
 msgstr "构建编号"
 
@@ -6176,7 +6193,7 @@ msgstr "标准画质 · 像素比例上限 2"
 
 #. AI 密钥的可复用名称，不是密钥值
 #: src/features/ai-configuration/AiEditorDialog.tsx:166
-#: src/features/ai-configuration/ProviderDetails.tsx:201
+#: src/features/ai-configuration/ProviderDetails.tsx:203
 msgid "标签"
 msgstr "标签"
 
@@ -6280,8 +6297,8 @@ msgstr "楚 河"
 
 #. 三维查看器的多模型列表标签。
 #: src/features/ai-configuration/AiEditorDialog.tsx:210
-#: src/features/ai-configuration/ProviderDetails.tsx:157
-#: src/features/ai-configuration/ProviderDetails.tsx:176
+#: src/features/ai-configuration/ProviderDetails.tsx:159
+#: src/features/ai-configuration/ProviderDetails.tsx:178
 #: src/features/model-viewer/components/WorkspaceInspector.tsx:51
 msgid "模型"
 msgstr "模型"
@@ -6337,7 +6354,7 @@ msgstr "模型动画"
 msgid "模型包含网络地址或不安全路径，已阻止读取"
 msgstr "模型包含网络地址或不安全路径，已阻止读取"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:199
+#: src/features/ai-configuration/ProviderDetails.tsx:201
 msgid "模型名称 / ID"
 msgstr "模型名称 / ID"
 
@@ -6529,7 +6546,7 @@ msgstr "正在加载"
 msgid "正在加载处理工具…"
 msgstr "正在加载处理工具…"
 
-#: src/features/logs/ActivityLogsPage.tsx:117
+#: src/features/logs/ActivityLogsPage.tsx:113
 msgid "正在加载日志…"
 msgstr "正在加载日志…"
 
@@ -6541,7 +6558,7 @@ msgstr "正在加载物理引擎…"
 msgid "正在加载环境…"
 msgstr "正在加载环境…"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:116
+#: src/features/ssh-sftp/SshSftpTool.tsx:118
 msgid "正在加载系统监控…"
 msgstr "正在加载系统监控…"
 
@@ -7011,7 +7028,7 @@ msgstr "活动，有操作失败"
 msgid "活动，有操作进行中"
 msgstr "活动，有操作进行中"
 
-#: src/features/about/use-about.ts:59
+#: src/features/about/use-about.ts:63
 msgid "活动日志"
 msgstr "活动日志"
 
@@ -7035,7 +7052,7 @@ msgstr "测试 AI 服务"
 msgid "测试 AI 流式服务"
 msgstr "测试 AI 流式服务"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:444
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:447
 msgid "测试中…"
 msgstr "测试中…"
 
@@ -7044,11 +7061,11 @@ msgstr "测试中…"
 msgid "测试主机连接"
 msgstr "测试主机连接"
 
-#: src/features/ai-configuration/ProviderDetails.tsx:120
+#: src/features/ai-configuration/ProviderDetails.tsx:122
 msgid "测试服务"
 msgstr "测试服务"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:444
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:447
 msgid "测试连接"
 msgstr "测试连接"
 
@@ -7120,12 +7137,12 @@ msgid "添加地址"
 msgstr "添加地址"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:66
-#: src/features/ai-configuration/ProviderDetails.tsx:192
+#: src/features/ai-configuration/ProviderDetails.tsx:194
 msgid "添加密钥"
 msgstr "添加密钥"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:69
-#: src/features/ai-configuration/ProviderDetails.tsx:192
+#: src/features/ai-configuration/ProviderDetails.tsx:194
 msgid "添加模型"
 msgstr "添加模型"
 
@@ -7193,7 +7210,7 @@ msgstr "清空当前日志"
 msgid "清空当前日志？"
 msgstr "清空当前日志？"
 
-#: src/features/about/AboutPage.tsx:141
+#: src/features/about/AboutPage.tsx:137
 msgid "清空所有数据"
 msgstr "清空所有数据"
 
@@ -7205,7 +7222,7 @@ msgstr "清空所有数据？"
 msgid "清空搜索"
 msgstr "清空搜索"
 
-#: src/features/logs/ActivityLogsPage.tsx:88
+#: src/features/logs/ActivityLogsPage.tsx:84
 #: src/features/logs/LogDialogs.tsx:191
 msgid "清空日志"
 msgstr "清空日志"
@@ -7246,7 +7263,7 @@ msgid "游戏"
 msgstr "游戏"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:129
+#: src/features/logs/log-labels.ts:130
 #: src/lib/errors/messages.ts:302
 msgid "游戏房间"
 msgstr "游戏房间"
@@ -7301,7 +7318,7 @@ msgstr "源文件 {sourceSize}"
 msgid "源文件大小不等于内存占用。"
 msgstr "源文件大小不等于内存占用。"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:222
+#: src/features/media-compress/video/VideoCompressPanel.tsx:224
 msgid "源视频没有音轨"
 msgstr "源视频没有音轨"
 
@@ -7395,7 +7412,7 @@ msgstr "犯规待处理"
 msgid "状态"
 msgstr "状态"
 
-#: src/features/about/AboutPage.tsx:165
+#: src/features/about/AboutPage.tsx:182
 msgid "状态读取失败"
 msgstr "状态读取失败"
 
@@ -7427,11 +7444,11 @@ msgstr "玩家 2 胜"
 msgid "玩法"
 msgstr "玩法"
 
-#: src/features/about/AboutPage.tsx:118
+#: src/features/about/AboutPage.tsx:114
 msgid "环境信息"
 msgstr "环境信息"
 
-#: src/features/about/use-about.ts:239
+#: src/features/about/use-about.ts:252
 msgid "环境信息已复制"
 msgstr "环境信息已复制"
 
@@ -7470,7 +7487,7 @@ msgstr "用户"
 msgid "用户 {pctValue} · 系统 {pctValue2} · 空闲 {pctValue3}"
 msgstr "用户 {pctValue} · 系统 {pctValue2} · 空闲 {pctValue3}"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:247
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:251
 msgid "用户名"
 msgstr "用户名"
 
@@ -7548,12 +7565,12 @@ msgid "留空则保留现有密钥"
 msgstr "留空则保留现有密钥"
 
 #. 主机表单用户名为空时的实际回退顺序
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:260
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:264
 msgid "留空则用 SSH 配置或系统用户"
 msgstr "留空则用 SSH 配置或系统用户"
 
 #. 默认目录为空或不存在时的回退行为
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:414
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:418
 msgid "留空或目录不存在时使用主目录"
 msgstr "留空或目录不存在时使用主目录"
 
@@ -7764,7 +7781,7 @@ msgstr "视频"
 msgid "视频压缩"
 msgstr "视频压缩"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:111
+#: src/features/media-compress/video/VideoCompressPanel.tsx:113
 msgid "视频文件"
 msgstr "视频文件"
 
@@ -7893,13 +7910,14 @@ msgid "空目录"
 msgstr "空目录"
 
 #: src/features/about/AboutPage.tsx:151
-#: src/features/about/AboutPage.tsx:156
-#: src/features/about/AboutPage.tsx:187
+#: src/features/about/AboutPage.tsx:155
+#: src/features/about/AboutPage.tsx:169
+#: src/features/about/AboutPage.tsx:194
 msgid "空闲"
 msgstr "空闲"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:155
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:223
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:227
 msgid "端口"
 msgstr "端口"
 
@@ -7965,7 +7983,7 @@ msgstr "等待导入"
 msgid "等待监控数据"
 msgstr "等待监控数据"
 
-#: src/features/about/AboutPage.tsx:187
+#: src/features/about/AboutPage.tsx:194
 #: src/features/poetry/components/PoetrySyncStatus.tsx:44
 msgid "等待确认"
 msgstr "等待确认"
@@ -8070,7 +8088,7 @@ msgstr "系统朗读未能开始，请换一个音色或检查中文语音是否
 msgid "系统未能调整朗读状态，请重试"
 msgstr "系统未能调整朗读状态，请重试"
 
-#: src/features/about/use-about.ts:221
+#: src/features/about/use-about.ts:234
 msgid "系统架构"
 msgstr "系统架构"
 
@@ -8297,8 +8315,8 @@ msgstr "缓冲中…"
 msgid "缓存上限"
 msgstr "缓存上限"
 
-#: src/features/about/use-about.ts:62
-#: src/features/about/use-about.ts:100
+#: src/features/about/use-about.ts:66
+#: src/features/about/use-about.ts:104
 msgid "缓存与临时"
 msgstr "缓存与临时"
 
@@ -8321,12 +8339,12 @@ msgstr "编码失败"
 msgid "编辑"
 msgstr "编辑"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:156
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:160
 msgid "编辑主机"
 msgstr "编辑主机"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:62
-#: src/features/ai-configuration/ProviderDetails.tsx:101
+#: src/features/ai-configuration/ProviderDetails.tsx:103
 msgid "编辑地址"
 msgstr "编辑地址"
 
@@ -8422,6 +8440,10 @@ msgstr "美式九球"
 msgid "翻译"
 msgstr "翻译"
 
+#: src/features/about/use-about.ts:271
+msgid "翻译中"
+msgstr "翻译中"
+
 #: src/lib/errors/messages.ts:252
 msgid "翻译任务已取消"
 msgstr "翻译任务已取消"
@@ -8434,8 +8456,12 @@ msgstr "翻译内容不能为空"
 msgid "翻译内容过长"
 msgstr "翻译内容过长"
 
-#: src/features/about/use-about.ts:60
-#: src/features/about/use-about.ts:87
+#: src/features/about/AboutPage.tsx:174
+msgid "翻译引擎"
+msgstr "翻译引擎"
+
+#: src/features/about/use-about.ts:64
+#: src/features/about/use-about.ts:91
 msgid "翻译模型"
 msgstr "翻译模型"
 
@@ -8686,7 +8712,7 @@ msgstr "计划时间"
 msgid "计算包围盒尺寸"
 msgstr "计算包围盒尺寸"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:272
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:276
 msgid "认证方式"
 msgstr "认证方式"
 
@@ -8737,12 +8763,12 @@ msgid "访问权限"
 msgstr "访问权限"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:141
+#: src/features/logs/log-labels.ts:142
 msgid "访问申请"
 msgstr "访问申请"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:154
+#: src/features/logs/log-labels.ts:155
 msgid "访问设备"
 msgstr "访问设备"
 
@@ -8766,7 +8792,7 @@ msgid "译文内容"
 msgstr "译文内容"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:131
+#: src/features/logs/log-labels.ts:132
 msgid "译文包"
 msgstr "译文包"
 
@@ -8803,7 +8829,7 @@ msgstr "诗词内容过大，无法发起 AI 翻译"
 msgid "诗词列表"
 msgstr "诗词列表"
 
-#: src/features/about/AboutPage.tsx:185
+#: src/features/about/AboutPage.tsx:192
 msgid "诗词同步"
 msgstr "诗词同步"
 
@@ -8812,8 +8838,8 @@ msgid "诗词同步进度"
 msgstr "诗词同步进度"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/about/use-about.ts:58
-#: src/features/logs/log-labels.ts:134
+#: src/features/about/use-about.ts:62
+#: src/features/logs/log-labels.ts:135
 #: src/features/logs/log-source.ts:17
 #: src/features/logs/use-activity-logs.ts:34
 msgid "诗词库"
@@ -8831,7 +8857,7 @@ msgstr "诗词库同步"
 msgid "诗词库同步已取消"
 msgstr "诗词库同步已取消"
 
-#: src/features/about/use-about.ts:81
+#: src/features/about/use-about.ts:85
 msgid "诗词数据库"
 msgstr "诗词数据库"
 
@@ -8840,7 +8866,7 @@ msgid "诗词数据管理"
 msgstr "诗词数据管理"
 
 #. 活动日志对象：诗词的本地注释与赏析数据
-#: src/features/logs/log-labels.ts:204
+#: src/features/logs/log-labels.ts:205
 msgid "诗词注释库"
 msgstr "诗词注释库"
 
@@ -8853,7 +8879,7 @@ msgid "诗词目录配置无效"
 msgstr "诗词目录配置无效"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:132
+#: src/features/logs/log-labels.ts:133
 msgid "诗词集"
 msgstr "诗词集"
 
@@ -9064,7 +9090,7 @@ msgstr "请输入口令"
 msgid "请输入密钥值"
 msgstr "请输入密钥值"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:119
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:123
 msgid "请输入密钥口令后再测试"
 msgstr "请输入密钥口令后再测试"
 
@@ -9195,7 +9221,7 @@ msgstr "调整密码条目顺序"
 msgid "调整尺寸"
 msgstr "调整尺寸"
 
-#: src/features/ssh-sftp/SshSftpTool.tsx:286
+#: src/features/ssh-sftp/SshSftpTool.tsx:288
 msgid "调整左侧面板宽度"
 msgstr "调整左侧面板宽度"
 
@@ -9361,7 +9387,7 @@ msgstr "输出"
 msgid "输出 {targetWidth} × {targetHeight} px"
 msgstr "输出 {targetWidth} × {targetHeight} px"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:162
+#: src/features/media-compress/video/VideoCompressPanel.tsx:164
 msgid "输出分辨率"
 msgstr "输出分辨率"
 
@@ -9371,7 +9397,7 @@ msgstr "输出格式"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:123
 #: src/features/media-compress/resize/ImageResizePanel.tsx:137
-#: src/features/media-compress/video/VideoCompressPanel.tsx:157
+#: src/features/media-compress/video/VideoCompressPanel.tsx:159
 msgid "输出设置"
 msgstr "输出设置"
 
@@ -9379,13 +9405,13 @@ msgstr "输出设置"
 msgid "运行 {formatUptimeValue}"
 msgstr "运行 {formatUptimeValue}"
 
-#: src/features/about/AboutPage.tsx:168
-#: src/features/about/AboutPage.tsx:187
+#: src/features/about/AboutPage.tsx:185
+#: src/features/about/AboutPage.tsx:194
 #: src/features/lan-transfer/LanServiceCard.tsx:32
 msgid "运行中"
 msgstr "运行中"
 
-#: src/features/about/use-about.ts:219
+#: src/features/about/use-about.ts:232
 msgid "运行模式"
 msgstr "运行模式"
 
@@ -9399,7 +9425,7 @@ msgstr "近 7 天"
 
 #: src/features/activity/ActivityPage.tsx:96
 #: src/features/bt/components/TaskDialogs.tsx:114
-#: src/features/logs/ActivityLogsPage.tsx:48
+#: src/features/logs/ActivityLogsPage.tsx:44
 msgid "返回"
 msgstr "返回"
 
@@ -9443,7 +9469,7 @@ msgstr "返回模式选择"
 msgid "返回竖屏"
 msgstr "返回竖屏"
 
-#: src/features/about/AboutPage.tsx:58
+#: src/features/about/AboutPage.tsx:54
 #: src/features/export/BackupPage.tsx:53
 #: src/features/settings/SettingsPage.tsx:44
 msgid "返回设置"
@@ -9463,7 +9489,7 @@ msgstr "返回选择"
 #: src/features/bt/BtTool.tsx:216
 #: src/features/games/billiards/BilliardsHeader.tsx:62
 #: src/features/games/engine/BoardGameHeader.tsx:61
-#: src/features/ssh-sftp/SshSftpTool.tsx:210
+#: src/features/ssh-sftp/SshSftpTool.tsx:212
 msgid "返回首页"
 msgstr "返回首页"
 
@@ -9567,7 +9593,7 @@ msgstr "连接中…"
 msgid "连接主机"
 msgstr "连接主机"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:141
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:145
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:57
 msgid "连接失败"
 msgstr "连接失败"
@@ -9576,7 +9602,7 @@ msgstr "连接失败"
 msgid "连接已关闭"
 msgstr "连接已关闭"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:136
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:140
 msgid "连接成功"
 msgstr "连接成功"
 
@@ -9663,7 +9689,7 @@ msgstr "选彩"
 msgid "选择"
 msgstr "选择"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:120
+#: src/features/media-compress/video/VideoCompressPanel.tsx:122
 msgid "选择一个视频"
 msgstr "选择一个视频"
 
@@ -9690,7 +9716,7 @@ msgid "选择共享目录"
 msgstr "选择共享目录"
 
 #: src/features/media-compress/image/ImageCompressPanel.tsx:164
-#: src/features/media-compress/video/VideoCompressPanel.tsx:205
+#: src/features/media-compress/video/VideoCompressPanel.tsx:207
 msgid "选择压缩程度"
 msgstr "选择压缩程度"
 
@@ -9756,8 +9782,8 @@ msgstr "选择目标球"
 msgid "选择目标语言"
 msgstr "选择目标语言"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:110
-#: src/features/media-compress/video/VideoCompressPanel.tsx:128
+#: src/features/media-compress/video/VideoCompressPanel.tsx:112
+#: src/features/media-compress/video/VideoCompressPanel.tsx:130
 msgid "选择视频"
 msgstr "选择视频"
 
@@ -9809,7 +9835,7 @@ msgstr "选择语言"
 msgid "选择起点"
 msgstr "选择起点"
 
-#: src/features/media-compress/video/VideoCompressPanel.tsx:181
+#: src/features/media-compress/video/VideoCompressPanel.tsx:183
 msgid "选择输出分辨率"
 msgstr "选择输出分辨率"
 
@@ -9937,7 +9963,7 @@ msgstr "重新生成"
 msgid "重新读取"
 msgstr "重新读取"
 
-#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:221
+#: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:219
 msgid "重新预览"
 msgstr "重新预览"
 
@@ -9962,9 +9988,9 @@ msgstr "重置状态已改变，请重新检查状态"
 #. 重新读取桌面开机自启状态
 #. 重新读取诗词合集列表
 #. 重新连接传输进度事件监听
-#: src/features/about/AboutPage.tsx:113
+#: src/features/about/AboutPage.tsx:109
 #: src/features/about/DataManagementDialogs.tsx:91
-#: src/features/activity/TransferActivity.tsx:53
+#: src/features/activity/TransferActivity.tsx:49
 #: src/features/bt/BtTool.tsx:253
 #: src/features/bt/BtTool.tsx:272
 #: src/features/bt/components/FileBrowserPanel.tsx:206
@@ -9973,7 +9999,7 @@ msgstr "重置状态已改变，请重新检查状态"
 #: src/features/games/billiards/BilliardsGame.tsx:124
 #: src/features/games/engine/GameSessionNotice.tsx:74
 #: src/features/lan-transfer/LanTransferTool.tsx:88
-#: src/features/logs/ActivityLogsPage.tsx:111
+#: src/features/logs/ActivityLogsPage.tsx:107
 #: src/features/poetry/components/CollectionManagement.tsx:120
 #: src/features/poetry/components/PoemList.tsx:203
 #: src/features/poetry/components/PoetryLocalManagement.tsx:74
@@ -10124,7 +10150,7 @@ msgstr "难度"
 msgid "需停止服务后修改。"
 msgstr "需停止服务后修改。"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:357
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:361
 msgid "需口令"
 msgstr "需口令"
 
@@ -10184,7 +10210,6 @@ msgstr "音频"
 msgid "顶点数"
 msgstr "顶点数"
 
-#: src/features/about/AboutPage.tsx:204
 #: src/features/settings/AppSettingsMenu.tsx:97
 msgid "项目帮助"
 msgstr "项目帮助"
@@ -10293,7 +10318,7 @@ msgstr "默认"
 msgid "默认权限"
 msgstr "默认权限"
 
-#: src/features/ssh-sftp/components/hosts/HostForm.tsx:405
+#: src/features/ssh-sftp/components/hosts/HostForm.tsx:409
 msgid "默认目录"
 msgstr "默认目录"
 
