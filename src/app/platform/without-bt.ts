@@ -9,3 +9,8 @@ export function installBtRuntime() {
 export async function retryBtSource(_magnet: string) {
   await router.navigate({ to: "/" });
 }
+
+/** 平台没有下载引擎，跨页面状态位恒不可用。 */
+export function useBtRunningTaskCount(): number | null {
+  return null;
+}

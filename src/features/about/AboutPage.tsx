@@ -5,7 +5,7 @@ import { ArrowLeft, Copy, Gauge, RefreshCw, Trash2 } from "lucide-react";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import { useBtTasksStore } from "~/features/bt/tasks-store";
+import { useBtRunningTaskCount } from "~/features/bt/integration";
 import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import {
   SettingsEntry,
@@ -34,13 +34,7 @@ export default function AboutPage() {
     (s) => s.status === "running",
   ).length;
   // 任务快照由模块运行期维护；未加载完成时返回 null，页面显示占位符而不是「空闲」。
-  const btTasks = useBtTasksStore((state) =>
-    state.loading
-      ? null
-      : state.tasks.filter(
-          (task) => task.status === "Active" || task.status === "Packaging",
-        ).length,
-  );
+  const btTasks = useBtRunningTaskCount();
   return (
     <main
       data-bottom-inset="scroll"
