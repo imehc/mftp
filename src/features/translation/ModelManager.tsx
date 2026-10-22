@@ -163,7 +163,9 @@ export function ModelManager({
               <Trans>离线翻译模型</Trans>
             </DialogTitle>
             <DialogDescription>
-              <Trans>先下载所选模型，安装后即可在本机离线翻译。</Trans>
+              <Trans comment="离线翻译模型弹窗：下载并安装后才能离线使用">
+                安装后即可离线翻译。
+              </Trans>
             </DialogDescription>
           </DialogLayoutHeader>
           <DialogLayoutBody className="flex flex-col gap-3">

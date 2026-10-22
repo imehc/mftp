@@ -14,7 +14,6 @@ import {
 import { DialogLayoutHeader } from "~/components/ui/dialog-layout";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -122,10 +121,7 @@ export default function ConflictDialog({
             <Trans>目标已存在同名项目</Trans>
           </DialogTitle>
           <DialogDescription>
-            <Trans>
-              远端已存在 “{name}
-              ”。修改要继续操作的名称，或先重命名远端已有项目。
-            </Trans>
+            <Trans>远端已存在 “{name}”</Trans>
           </DialogDescription>
         </DialogLayoutHeader>
 
@@ -198,11 +194,7 @@ export default function ConflictDialog({
                           <FieldError id="conflict-name-note">
                             {message}
                           </FieldError>
-                        ) : (
-                          <FieldDescription id="conflict-name-note">
-                            <Trans>确认后会按上面的名称继续。</Trans>
-                          </FieldDescription>
-                        );
+                        ) : null;
                       }}
                     </form.Subscribe>
                   </Field>

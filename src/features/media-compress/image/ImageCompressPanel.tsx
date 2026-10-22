@@ -95,7 +95,7 @@ export default function ImageCompressPanel() {
             </span>
           </>
         }
-        description={<Trans>PNG · JPG · WebP，默认保持原格式输出</Trans>}
+        description={<Trans>PNG · JPG · WebP</Trans>}
         pickLabel={<Trans>选择图片</Trans>}
         footer={
           file ? (
@@ -178,7 +178,6 @@ export default function ImageCompressPanel() {
             estimatedMin={estimate?.estimatedMin}
             estimatedMax={estimate?.estimatedMax}
             ratio={estimate?.ratio}
-            emptyHint={<Trans>选择图片后显示预估体积</Trans>}
             showProgress={progress > 0}
             progress={progress}
             progressLabel={

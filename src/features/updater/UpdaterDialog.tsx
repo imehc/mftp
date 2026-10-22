@@ -92,11 +92,6 @@ export default function UpdaterDialog() {
           ) : status === "error" ? (
             <UpdaterReleaseNotes body="" truncated={false} />
           ) : null}
-          {status === "current" ? (
-            <p className="text-muted-foreground text-sm">
-              <Trans>暂时没有可用更新。</Trans>
-            </p>
-          ) : null}
         </DialogLayoutBody>
         <div className="flex flex-col gap-4">
           {version && (busy || status === "ready" || error) ? (

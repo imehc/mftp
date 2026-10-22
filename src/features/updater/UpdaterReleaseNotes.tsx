@@ -48,14 +48,10 @@ export default function UpdaterReleaseNotes({
             ),
           )}
         </div>
-      ) : (
-        <p className="text-muted-foreground text-sm">
-          <Trans>查看发布页面了解更新内容。</Trans>
-        </p>
-      )}
+      ) : null}
       {truncated ? (
         <p className="text-muted-foreground text-xs">
-          <Trans>更新说明较长，请前往发布页面查看完整内容。</Trans>
+          <Trans comment="发布说明被长度限制截断">说明已截断</Trans>
         </p>
       ) : null}
       <Button

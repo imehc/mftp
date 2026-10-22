@@ -84,9 +84,6 @@ export default function LibraryManagePage({
           className="sticky top-0 z-10"
           onCancel={controller.cancelSync}
         />
-        <p className="text-muted-foreground text-sm">
-          <Trans>下载后即可离线搜索和阅读。</Trans>
-        </p>
         <CollectionGroups controller={controller} />
         <PoetryLocalManagement controller={controller} />
       </AppPageContent>

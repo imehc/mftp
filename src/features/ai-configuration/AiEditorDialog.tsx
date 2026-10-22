@@ -235,8 +235,8 @@ export default function AiEditorDialog({
                   {form.existing ? (
                     <Field>
                       <FieldDescription role="status">
-                        <Trans>
-                          此地址下已存在相同的标签或模型，可以打开已有项进行编辑。
+                        <Trans comment="AI 服务地址下已有同名标签或模型">
+                          已存在相同的标签或模型。
                         </Trans>
                       </FieldDescription>
                       <Button

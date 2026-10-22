@@ -74,7 +74,9 @@ export default function VideoCompressPanel() {
           <Trans>当前设备不支持视频压缩</Trans>
         </h2>
         <p className="text-muted-foreground text-sm">
-          <Trans>当前环境缺少所需的视频编码能力，可以继续使用图片压缩。</Trans>
+          <Trans comment="WebView 缺少视频编码能力">
+            当前环境缺少视频编码能力。
+          </Trans>
         </p>
         <Button asChild density="adaptive" className="max-md:w-full">
           <Link to="/tools/media-compress" search={{ mode: "image" }} replace>
@@ -234,7 +236,6 @@ export default function VideoCompressPanel() {
             estimatedBytes={estimate?.estimatedBytes}
             estimatedMin={estimate?.estimatedMin}
             estimatedMax={estimate?.estimatedMax}
-            emptyHint={<Trans>选择视频后显示预估体积</Trans>}
             extraBadges={
               estimate ? (
                 <Badge variant="outline">

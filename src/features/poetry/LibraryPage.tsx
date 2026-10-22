@@ -151,10 +151,14 @@ export default function LibraryPage({
               <BookMarked />
             </EmptyMedia>
             <EmptyTitle>
-              <Trans>古诗词语料还没有下载</Trans>
+              <Trans comment="诗词库在未下载任何语料合集时的空状态">
+                暂无已下载语料
+              </Trans>
             </EmptyTitle>
             <EmptyDescription>
-              <Trans>在数据管理页勾选合集并下载，即可离线浏览。</Trans>
+              <Trans comment="指向标题栏的数据管理入口">
+                在数据管理页下载合集。
+              </Trans>
             </EmptyDescription>
           </EmptyHeader>
         </Empty>

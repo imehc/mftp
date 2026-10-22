@@ -3,12 +3,7 @@ import { Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
   DialogLayoutContent,
@@ -80,8 +75,8 @@ function ModelInformation({ inspection }: { inspection: ModelInspection }) {
         ))}
       </dl>
       <p className="text-muted-foreground text-xs leading-relaxed">
-        <Trans>
-          按当前场景的唯一几何体、材质和纹理对象统计，实例另列。顶点与三角面按完整几何体计算，不随可见性或绘制范围变化；线和点不计入三角面。
+        <Trans comment="模型统计口径：按唯一对象计数，实例与面数另算">
+          统计按唯一对象，实例另列；面数按完整几何体计算。
         </Trans>
       </p>
       <p className="text-muted-foreground text-xs">
@@ -256,9 +251,6 @@ export function ModelInspector({
                 <DialogTitle>
                   <Trans comment="三维模型检查浮层标题。">模型详情</Trans>
                 </DialogTitle>
-                <DialogDescription>
-                  <Trans>查看模型统计、场景节点及材质纹理。</Trans>
-                </DialogDescription>
               </div>
             </DialogLayoutHeader>
             <DialogLayoutBody className="-m-1 min-w-0 p-1">

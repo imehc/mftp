@@ -91,8 +91,8 @@ export default function PoetryLocalManagement({ controller }: Props) {
               </p>
               <p className="text-muted-foreground mt-0.5 truncate text-xs">
                 {bodyIndex?.enabled
-                  ? t`已索引 ${toLocaleStringValue2} 篇，搜索亚毫秒返回`
-                  : t`关闭时正文搜索走 LIKE 兜底，较慢`}
+                  ? t`已索引 ${toLocaleStringValue2} 篇`
+                  : t`关闭时正文搜索较慢`}
               </p>
             </div>
             <label className="text-muted-foreground flex shrink-0 items-center gap-2 text-xs">

@@ -32,7 +32,9 @@ export default function LanDiscoveredDevicesPanel({
             <Trans>附近设备</Trans>
           </h2>
           <p className="text-muted-foreground truncate text-xs">
-            <Trans>同网段 MFTP 客户端，点击可直接打开访问地址</Trans>
+            <Trans comment="附近设备面板副标题，仅同网段的 MFTP 客户端会被发现">
+              同网段设备
+            </Trans>
           </p>
         </div>
         <Button

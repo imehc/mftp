@@ -20,12 +20,7 @@ import {
   DialogLayoutContent,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "~/components/ui/empty";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
@@ -101,7 +96,9 @@ export function LibraryPanel({
                 <Trans comment="本机保存的三维模型集合。">模型库</Trans>
               </DialogTitle>
               <DialogDescription>
-                <Trans>导入的模型自动保存在此设备。</Trans>
+                <Trans comment="模型库中的文件只保存在本机">
+                  模型保存在此设备。
+                </Trans>
               </DialogDescription>
             </div>
           </DialogLayoutHeader>
@@ -152,9 +149,6 @@ export function LibraryPanel({
                   <EmptyTitle>
                     <Trans>模型库为空</Trans>
                   </EmptyTitle>
-                  <EmptyDescription>
-                    <Trans>导入模型后可在这里重新打开。</Trans>
-                  </EmptyDescription>
                 </EmptyHeader>
               </Empty>
             ) : catalog ? (

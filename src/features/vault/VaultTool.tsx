@@ -167,13 +167,11 @@ export default function VaultTool() {
                 <Trans>暂无账号</Trans>
               )}
             </EmptyTitle>
-            <EmptyDescription>
-              {c.entries.length ? (
+            {c.entries.length ? (
+              <EmptyDescription>
                 <Trans>调整搜索内容或分类后重试</Trans>
-              ) : (
-                <Trans>点击“新建”保存第一条账号密码</Trans>
-              )}
-            </EmptyDescription>
+              </EmptyDescription>
+            ) : null}
           </EmptyHeader>
         </Empty>
       )}

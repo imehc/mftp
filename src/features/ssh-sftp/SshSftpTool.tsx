@@ -32,7 +32,6 @@ import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -67,11 +66,10 @@ function Workspace({ onHosts }: { onHosts: () => void }) {
                 <TerminalSquare />
               </EmptyMedia>
               <EmptyTitle>
-                <Trans>还没有打开的连接</Trans>
+                <Trans comment="SSH/SFTP 工具在无打开会话时的空状态标题">
+                  暂无连接
+                </Trans>
               </EmptyTitle>
-              <EmptyDescription>
-                <Trans>打开主机列表，选择已有主机或新建主机</Trans>
-              </EmptyDescription>
               <Button variant="outline" onClick={onHosts}>
                 <Trans>打开主机列表</Trans>
               </Button>

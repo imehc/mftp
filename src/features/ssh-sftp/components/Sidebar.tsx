@@ -466,12 +466,10 @@ export default function Sidebar({
                   <Server />
                 </EmptyMedia>
                 <EmptyTitle>
-                  {hosts.length === 0 ? t`还没有主机` : t`无匹配结果`}
+                  {hosts.length === 0 ? t`暂无主机` : t`无匹配结果`}
                 </EmptyTitle>
                 <EmptyDescription>
-                  {hosts.length === 0
-                    ? t`点击右上角 + 新建主机`
-                    : t`换个关键词试试`}
+                  {hosts.length === 0 ? t`点右上角 + 新建` : t`换个关键词试试`}
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>

@@ -24,7 +24,6 @@ import {
 } from "~/components/ui/dialog-layout";
 import {
   Empty,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -125,15 +124,17 @@ export default function KeyManager({ open, onOpenChange }: Props) {
         </DialogLayoutHeader>
         <DialogLayoutBody className="flex flex-col gap-4">
           <div className="flex flex-col gap-1 rounded-lg border p-3">
-            <p className="text-muted-foreground text-xs font-medium">
-              <Plural
-                value={{
-                  importedKeyCount: keys.length,
-                }}
-                one="已导入 # 个密钥"
-                other="已导入 # 个密钥"
-              />
-            </p>
+            {keys.length ? (
+              <p className="text-muted-foreground text-xs font-medium">
+                <Plural
+                  value={{
+                    importedKeyCount: keys.length,
+                  }}
+                  one="已导入 # 个密钥"
+                  other="已导入 # 个密钥"
+                />
+              </p>
+            ) : null}
             {keys.length === 0 ? (
               <Empty className="py-6">
                 <EmptyHeader>
@@ -143,9 +144,6 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                   <EmptyTitle>
                     <Trans>暂无密钥</Trans>
                   </EmptyTitle>
-                  <EmptyDescription>
-                    <Trans>导入私钥后可在主机中选用。</Trans>
-                  </EmptyDescription>
                 </EmptyHeader>
               </Empty>
             ) : (
@@ -247,7 +245,9 @@ export default function KeyManager({ open, onOpenChange }: Props) {
                       }
                     />
                     <FieldLabel htmlFor="key-has-passphrase">
-                      <Trans>该私钥有口令保护（连接时输入）</Trans>
+                      <Trans comment="导入密钥表单：勾选表示该私钥需要口令">
+                        该私钥有口令
+                      </Trans>
                     </FieldLabel>
                   </UiField>
                 )}

@@ -85,7 +85,9 @@ export default function ProviderDetails({
       {provider.requiresAddressRepair ? (
         <Alert>
           <AlertDescription>
-            <Trans>此服务地址需要修复，请先编辑地址。</Trans>
+            <Trans comment="AI 服务地址处于需要修复的状态">
+              服务地址需要修复。
+            </Trans>
           </AlertDescription>
         </Alert>
       ) : null}

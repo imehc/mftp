@@ -49,8 +49,8 @@ export default function UpdaterProgress() {
       ) : null}
       {status === "downloading" && phase === "connecting" && slow ? (
         <p className="text-muted-foreground text-xs">
-          <Trans>
-            连接耗时较长，仍在等待响应。可以收起窗口，稍后查看进度。
+          <Trans comment="更新源响应慢，仍在等待">
+            连接较慢，仍在等待响应。
           </Trans>
         </p>
       ) : null}

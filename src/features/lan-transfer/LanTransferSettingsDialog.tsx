@@ -535,8 +535,8 @@ export default function LanTransferSettingsDialog({
           </FieldGroup>
           {running ? (
             <p className="text-muted-foreground mt-3 text-xs">
-              <Trans>
-                服务运行中，端口、接收目录、安全模式和权限需停止后修改；自动启动可直接保存。
+              <Trans comment="服务运行时受限字段需要停止服务才能改">
+                需停止服务后修改。
               </Trans>
             </p>
           ) : null}

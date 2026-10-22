@@ -201,7 +201,7 @@ export default function FormatterTool() {
             role="status"
             className={`min-w-0 text-xs ${c.isDocValid ? "text-muted-foreground" : "text-destructive"}`}
           >
-            {c.status ?? <Trans>输入内容后自动校验</Trans>}
+            {c.status}
           </p>
           <CopyButton
             variant="ghost"

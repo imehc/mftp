@@ -102,6 +102,7 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           {entries.map((entry) => {
             const Icon = entry.icon;
+            const description = homeDescriptions[entry.id];
             return (
               <Link
                 key={entry.id}
@@ -115,9 +116,11 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
                   <span className="block text-sm font-medium">
                     {entry.title}
                   </span>
-                  <span className="text-muted-foreground mt-1 block text-xs">
-                    {homeDescriptions[entry.id]}
-                  </span>
+                  {description ? (
+                    <span className="text-muted-foreground mt-1 block text-xs">
+                      {description}
+                    </span>
+                  ) : null}
                 </span>
                 <ChevronRight
                   aria-hidden

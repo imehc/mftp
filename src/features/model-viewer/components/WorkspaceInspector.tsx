@@ -3,12 +3,7 @@ import { Layers } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { Dialog, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import {
   DialogLayoutBody,
   DialogLayoutContent,
@@ -83,7 +78,7 @@ export function WorkspaceInspector({
           />
         ) : (
           <p className="text-muted-foreground text-sm">
-            <Trans>选择一个已加载模型以查看详情。</Trans>
+            <Trans comment="检查标签页在没有选中模型时的状态">未选择模型</Trans>
           </p>
         )}
       </TabsContent>
@@ -127,9 +122,6 @@ export function WorkspaceInspector({
                     模型与检查
                   </Trans>
                 </DialogTitle>
-                <DialogDescription>
-                  <Trans>管理模型、调整位置并检查资源。</Trans>
-                </DialogDescription>
               </div>
             </DialogLayoutHeader>
             <DialogLayoutBody className="-m-1 min-w-0 p-1">

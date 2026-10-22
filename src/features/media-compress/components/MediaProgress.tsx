@@ -41,7 +41,7 @@ export default function MediaProgress({
         </div>
       ) : null}
       <p className="text-muted-foreground text-xs">
-        <Trans>处理期间请保持应用打开。取消后将停止当前处理。</Trans>
+        <Trans comment="媒体处理进行中，关闭应用会中断处理">请勿关闭应用</Trans>
       </p>
       <div className="flex justify-end max-md:[&>button]:w-full">
         <MediaCancelButton onConfirm={onCancel} />

@@ -9,7 +9,7 @@ interface CompressEstimateBarProps {
   estimatedMin?: number | null;
   estimatedMax?: number | null;
   ratio?: number | null;
-  emptyHint: ReactNode;
+  emptyHint?: ReactNode;
   extraBadges?: ReactNode;
   progress?: number;
   showProgress?: boolean;
@@ -64,9 +64,9 @@ export function CompressEstimateBar({
                 </span>
               ) : null}
             </>
-          ) : (
+          ) : emptyHint ? (
             <span>{emptyHint}</span>
-          )}
+          ) : null}
         </div>
         <div className="flex items-center justify-end gap-2 max-md:w-full max-md:[&>button]:flex-1">
           {secondaryAction}

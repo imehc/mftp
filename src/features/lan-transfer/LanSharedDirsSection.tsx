@@ -41,8 +41,8 @@ export default function LanSharedDirsSection({
                   value={{
                     sharesCount,
                   }}
-                  one="# 个目录，目录变更需重启服务后完整生效"
-                  other="# 个目录，目录变更需重启服务后完整生效"
+                  one="# 个目录，需重启服务生效"
+                  other="# 个目录，需重启服务生效"
                 />
               ) : (
                 <Plural
@@ -112,7 +112,9 @@ export default function LanSharedDirsSection({
             </span>
             {running ? (
               <span className="mt-2 block">
-                <Trans>服务正在运行，目录变更需重启服务后完整生效。</Trans>
+                <Trans comment="服务运行时删除共享目录的生效条件">
+                  需重启服务生效。
+                </Trans>
               </span>
             ) : null}
           </>

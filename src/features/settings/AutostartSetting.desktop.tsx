@@ -18,15 +18,7 @@ export default function AutostartSettingDesktop() {
       id="settings-autostart"
       compact
       error={!!error}
-      description={
-        error ? (
-          describeError(error)
-        ) : enabled ? (
-          <Trans>已开启</Trans>
-        ) : (
-          <Trans>已关闭</Trans>
-        )
-      }
+      description={error ? describeError(error) : undefined}
     >
       {error ? (
         <Button variant="outline" onClick={retry}>

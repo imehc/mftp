@@ -76,9 +76,6 @@ export default function ProviderNavigationDesktop({
           </button>
         ))}
       </div>
-      <p className="text-muted-foreground text-xs leading-relaxed">
-        <Trans>切换当前地址时，恢复各自的密钥与模型选择。</Trans>
-      </p>
     </nav>
   );
 }

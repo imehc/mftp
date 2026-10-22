@@ -145,7 +145,7 @@ export function DiagnosticsPanel({
           </dl>
         ) : null}
         <p className="text-muted-foreground text-xs">
-          <Trans>按模型原始尺寸测量。姿态变化后需重新选点。</Trans>
+          <Trans comment="两点测量使用源模型坐标">姿态变化后需重新选点。</Trans>
         </p>
       </FieldGroup>
       <FieldGroup density="compact">
@@ -217,8 +217,8 @@ export function DiagnosticsPanel({
               ))}
             </dl>
             <p className="text-muted-foreground text-xs">
-              <Trans>
-                开放网格无法确定内外。朝内壳体与法线不一致仅为检查提示，特殊美术法线可能是有意设置。退化三角形不参与边统计。
+              <Trans comment="网格拓扑检查结果的解读口径">
+                开放网格无法确定内外，法线不一致仅为提示；退化三角形不计入边统计。
               </Trans>
             </p>
           </>
@@ -295,9 +295,6 @@ export function DiagnosticsPanel({
               <Trans>报告超过 200 条，以下结果已截断。</Trans>
             </p>
           ) : null}
-          <p className="text-muted-foreground">
-            <Trans>以下保留验证器的原始诊断、代码和文件位置。</Trans>
-          </p>
           <ol className="flex min-w-0 flex-col gap-3">
             {state.validation.issues.messages.map((issue, i) => (
               <li className="min-w-0 wrap-anywhere" key={i}>

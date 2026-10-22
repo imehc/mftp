@@ -68,7 +68,7 @@ export function SceneTree({
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <p id={`${treeId}-help`} className="text-muted-foreground text-xs">
-        <Trans>上下键移动，左右键展开或收起；选择节点可查看关联材质。</Trans>
+        <Trans comment="场景树键盘操作说明">上下键移动，左右键展开收起。</Trans>
       </p>
       <div
         ref={viewport}

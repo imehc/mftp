@@ -301,15 +301,15 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
             />
           ) : (
             <div className="text-muted-foreground border-border flex flex-1 items-center justify-center rounded-lg border p-4 text-center text-sm">
-              <Trans>该格式不支持预览，可使用系统应用打开</Trans>
+              <Trans comment="无法内联预览的文件格式">该格式不支持预览</Trans>
             </div>
           )}
         </>
       )}
       {task.status !== "Completed" ? (
         <p className="text-muted-foreground text-xs">
-          <Trans>
-            资源尚未下载完成，缺失分片可能导致预览中断。暂停任务会保持暂停。
+          <Trans comment="资源未下载完时预览可能因缺失分片中断">
+            未下载完成，预览可能中断。
           </Trans>
         </p>
       ) : null}

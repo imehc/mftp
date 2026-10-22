@@ -85,7 +85,7 @@ export function BoardGameHeader({
               <Trans>退出当前对局？</Trans>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              <Trans>将返回模式选择，当前对局的进度将会丢失。</Trans>
+              <Trans>当前对局的进度将会丢失。</Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

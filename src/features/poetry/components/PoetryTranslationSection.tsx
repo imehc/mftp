@@ -134,7 +134,9 @@ export default function PoetryTranslationSection({
         <Alert>
           <AlertTitle>{t`尚未配置 AI 服务`}</AlertTitle>
           <AlertDescription className="flex flex-wrap items-center gap-2">
-            <Trans>请先配置服务地址、模型和 API Key，再生成译文。</Trans>
+            <Trans comment="未配置 AI 服务时无法生成译文">
+              请先配置 AI 服务。
+            </Trans>
             <Button variant="outline" size="sm" asChild>
               <Link
                 to="/settings"

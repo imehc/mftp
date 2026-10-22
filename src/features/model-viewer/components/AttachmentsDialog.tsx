@@ -208,7 +208,7 @@ export function AttachmentsDialog({
                 ) : (
                   <>
                     <p className="text-muted-foreground text-sm">
-                      <Trans>按纯文本展示，不加载文档中的链接或图片。</Trans>
+                      <Trans comment="附件正文渲染方式">按纯文本展示。</Trans>
                     </p>
                     <pre
                       tabIndex={0}

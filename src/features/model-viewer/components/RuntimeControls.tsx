@@ -97,15 +97,11 @@ export function RuntimeControls({
                 采样帧间隔 {frameMs} ms · 渲染提交耗时 {workMs} ms
               </Trans>
             </p>
-          ) : (
-            <p>
-              <Trans>连续渲染后显示采样数据。</Trans>
-            </p>
-          )}
+          ) : null}
           <p className="text-xs">
-            <Trans>
-              持续慢帧或系统热状态升高时自动降级，稳定后逐步恢复。耗时来自应用采样，不代表
-              GPU 时间或设备温度。
+            <Trans comment="画质自动降级策略与耗时数据的来源">
+              慢帧或热状态升高时自动降级，稳定后恢复；耗时来自应用采样，不代表
+              GPU 时间。
             </Trans>
           </p>
         </div>

@@ -88,7 +88,9 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
         </p>
         {isTauriRuntime() ? (
           <p className="text-muted-foreground text-xs">
-            <Trans>在此设备记住场景环境，下次进入查看器时恢复。</Trans>
+            <Trans comment="HDR 环境写入本机存储，跨会话恢复">
+              本机记住场景环境。
+            </Trans>
           </p>
         ) : null}
         {environment.saving ? (
@@ -253,7 +255,7 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
           </Trans>
         </Button>
         <p className="text-muted-foreground text-xs">
-          <Trans>仅影响预览，切换模型时还原。</Trans>
+          <Trans comment="材质与显示调整不会写入模型文件">仅影响预览。</Trans>
         </p>
       </FieldGroup>
     </FieldGroup>

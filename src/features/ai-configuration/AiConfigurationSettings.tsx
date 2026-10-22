@@ -7,7 +7,6 @@ import { Button } from "~/components/ui/button";
 import {
   Empty,
   EmptyContent,
-  EmptyDescription,
   EmptyHeader,
   EmptyTitle,
 } from "~/components/ui/empty";
@@ -131,13 +130,10 @@ export default function AiConfigurationSettings() {
             <Empty>
               <EmptyHeader>
                 <EmptyTitle>
-                  <Trans>添加 AI 服务地址</Trans>
-                </EmptyTitle>
-                <EmptyDescription>
-                  <Trans>
-                    为每个地址保存密钥和模型，切换时恢复各自的选择。
+                  <Trans comment="AI 配置页无服务地址时的空状态标题">
+                    暂无服务地址
                   </Trans>
-                </EmptyDescription>
+                </EmptyTitle>
               </EmptyHeader>
               <EmptyContent>
                 <Button

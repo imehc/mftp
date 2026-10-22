@@ -65,8 +65,8 @@ export default function TaskFilesPage({
           <PeersPanel infoHash={task.infoHash} />
         </TabsContent>
       </Tabs>
-      <footer className="shrink-0 border-t px-3 pt-2 pb-[max(0.75rem,var(--safe-bottom,0px))]">
-        {task.status === "Completed" && !task.exported ? (
+      {task.status === "Completed" && !task.exported ? (
+        <footer className="shrink-0 border-t px-3 pt-2 pb-[max(0.75rem,var(--safe-bottom,0px))]">
           <Button fullWidth disabled={busy} onClick={onExport}>
             <Send data-icon="inline-start" />
             {isMobilePlatform() ? (
@@ -75,12 +75,8 @@ export default function TaskFilesPage({
               <Trans>复制到用户目录</Trans>
             )}
           </Button>
-        ) : (
-          <p className="text-muted-foreground text-xs">
-            <Trans>下载完成后可复制到系统下载目录或其他位置</Trans>
-          </p>
-        )}
-      </footer>
+        </footer>
+      ) : null}
     </div>
   );
 }

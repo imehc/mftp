@@ -28,7 +28,9 @@ export function MemoryWarning({ memory }: { memory: MemoryHistory }) {
         <Trans>模型内存估算已达到提醒阈值</Trans>
       </AlertTitle>
       <AlertDescription>
-        <Trans>可以移除不需要的模型以释放资源。此阈值不是设备剩余内存。</Trans>
+        <Trans comment="内存阈值提醒：阈值不等于设备可用内存">
+          此阈值不是设备剩余内存。
+        </Trans>
       </AlertDescription>
     </Alert>
   );
@@ -105,13 +107,15 @@ export function MemoryPanel({
         ))}
       </dl>
       <p className="text-muted-foreground text-xs leading-relaxed">
-        <Trans>
-          逐模型值包含共享引用，总计去重；隐藏模型仍占用内存。源数据字节量单列，不等于常驻内存。未计入临时预览、环境与诊断任务、材质对象、场景节点、着色器、驱动缓存与进程开销。
+        <Trans comment="内存估算口径说明，避免把逐模型相加当作总占用">
+          逐模型值含共享引用，总计已去重；源数据不等于常驻内存，隐藏模型仍占内存。
         </Trans>
       </p>
       {state.total.unknown > 0 ? (
         <p className="text-muted-foreground text-xs">
-          <Trans>部分纹理、变形目标或动画分配无法估算，当前合计不完整。</Trans>
+          <Trans comment="存在无法估算的分配时，合计只是已知部分">
+            部分分配无法估算，合计不完整。
+          </Trans>
         </p>
       ) : null}
       <Field>
@@ -137,7 +141,9 @@ export function MemoryPanel({
           }}
         />
         <FieldDescription>
-          <Trans>仅用于提示，不代表设备内存上限。</Trans>
+          <Trans comment="提醒阈值只是提示线，不是设备内存上限">
+            不代表设备内存上限。
+          </Trans>
         </FieldDescription>
       </Field>
       <div className="flex flex-wrap items-center justify-between gap-2">

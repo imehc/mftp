@@ -59,11 +59,7 @@ export default function ImportPanel({
               ))
             )}
           </div>
-        ) : (
-          <p className="text-muted-foreground mt-3 text-xs">
-            <Trans>选择后查看数据范围，再确认导入。</Trans>
-          </p>
-        )}
+        ) : null}
       </SettingsGroup>
       {c.file && !c.report ? (
         <SettingsGroup title={<Trans>导入选项</Trans>}>

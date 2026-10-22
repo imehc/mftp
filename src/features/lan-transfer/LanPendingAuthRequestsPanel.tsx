@@ -112,9 +112,6 @@ export default function LanPendingAuthRequestsPanel({
           <h2 className="truncate text-sm font-semibold">
             <Trans>待授权请求</Trans>
           </h2>
-          <p className="text-muted-foreground truncate text-xs">
-            <Trans>浏览器访问申请、弹窗确认和白名单回落请求</Trans>
-          </p>
         </div>
         <Button
           variant="ghost"

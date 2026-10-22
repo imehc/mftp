@@ -95,7 +95,9 @@ export default function PoemDetail({
             <Trans>尚未选择作品</Trans>
           </EmptyTitle>
           <EmptyDescription>
-            <Trans>从左侧列表选择一篇，或试试每日一诗。</Trans>
+            <Trans comment="诗词详情页未选中作品时的引导，列表在左侧">
+              从左侧选择
+            </Trans>
           </EmptyDescription>
         </EmptyHeader>
       </Empty>

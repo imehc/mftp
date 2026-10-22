@@ -340,7 +340,7 @@ export default function AddTorrentDialog({
           ) : null}
           {starting ? (
             <p role="status" className="text-muted-foreground text-sm">
-              <Trans>正在添加下载，完成后将自动关闭。</Trans>
+              <Trans>正在添加下载…</Trans>
             </p>
           ) : null}
           {probe ? (
@@ -374,7 +374,9 @@ export default function AddTorrentDialog({
           ) : null}
           {probe && !readOnly ? (
             <p className="text-muted-foreground text-xs">
-              <Trans>下载完成后可复制到系统下载目录或其他位置</Trans>
+              <Trans comment="下载完成后可把文件复制出应用沙盒">
+                完成后可复制到其他目录
+              </Trans>
             </p>
           ) : null}
           {duplicateTask ? (

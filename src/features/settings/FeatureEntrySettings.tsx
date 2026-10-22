@@ -157,11 +157,6 @@ export default function FeatureEntrySettings() {
           <h2 className="text-sm font-semibold">
             <Trans>功能入口</Trans>
           </h2>
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            <Trans comment="设置页功能入口中的简短说明，介绍可拖动列表的用途。">
-              拖动调整首页功能的显示顺序
-            </Trans>
-          </p>
         </div>
       </div>
       <Tabs
@@ -180,7 +175,6 @@ export default function FeatureEntrySettings() {
           title={t`显示此分类`}
           id="settings-feature-category"
           compact
-          description={categoryVisible ? t`已开启` : t`已关闭`}
         >
           <Switch
             id="settings-feature-category"

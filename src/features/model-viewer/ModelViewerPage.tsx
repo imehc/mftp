@@ -477,9 +477,8 @@ export default function ModelViewerPage() {
                     <Trans>打开一个 3D 模型</Trans>
                   </EmptyTitle>
                   <EmptyDescription>
-                    <Trans>
-                      支持 GLB、glTF 和
-                      FBX。模型包含外置资源时，需同时提供依赖文件。
+                    <Trans comment="3D 查看器支持的模型文件格式">
+                      支持 GLB · glTF · FBX
                     </Trans>
                   </EmptyDescription>
                 </EmptyHeader>

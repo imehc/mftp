@@ -254,7 +254,9 @@ export default function ImageResizePanel() {
               </div>
               {dimensionMode === "exact" ? (
                 <p className="text-muted-foreground mt-2 text-xs">
-                  <Trans>宽高与原图比例不同时，图片会被拉伸变形</Trans>
+                  <Trans comment="固定宽高与原图比例不同时的后果">
+                    宽高比例不同会拉伸变形
+                  </Trans>
                 </p>
               ) : null}
             </div>
@@ -277,15 +279,11 @@ export default function ImageResizePanel() {
                     </span>
                   ) : null}
                 </>
-              ) : (
+              ) : meta ? (
                 <span>
-                  {meta ? (
-                    <Trans>请输入有效的目标尺寸</Trans>
-                  ) : (
-                    <Trans>选择图片后显示输出尺寸</Trans>
-                  )}
+                  <Trans>请输入有效的目标尺寸</Trans>
                 </span>
-              )}
+              ) : null}
             </div>
             <div className="flex gap-2 max-md:w-full max-md:[&>button]:flex-1">
               <Button

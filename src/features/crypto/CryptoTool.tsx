@@ -101,7 +101,6 @@ export default function CryptoTool() {
           id="crypto-output"
           label={<Trans>结果</Trans>}
           value={crypto.output}
-          placeholder={t`结果会实时显示在这里`}
           actions={
             <>
               <Button

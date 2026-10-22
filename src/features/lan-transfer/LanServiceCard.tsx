@@ -39,9 +39,11 @@ export default function LanServiceCard({
             <p className="truncate text-sm font-medium">
               {settings.deviceName || t`局域网传输`}
             </p>
-            <p className="text-muted-foreground text-xs break-all">
-              {status?.url || t`启动服务后显示浏览器访问地址`}
-            </p>
+            {status?.url ? (
+              <p className="text-muted-foreground text-xs break-all">
+                {status.url}
+              </p>
+            ) : null}
           </div>
           <div className="flex items-center gap-2">
             <CopyButton

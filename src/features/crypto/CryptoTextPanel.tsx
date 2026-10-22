@@ -16,7 +16,7 @@ export default function CryptoTextPanel({
   label: ReactNode;
   value: string;
   onChange?: (value: string) => void;
-  placeholder: string;
+  placeholder?: string;
   actions: ReactNode;
   error?: string | null;
 }) {

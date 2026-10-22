@@ -133,7 +133,6 @@ export function SnookerActions({
               <SnookerRuleChoice
                 disabled={!enabled}
                 onClick={() => choose("acknowledge")}
-                description={<Trans>已了解本次警告，继续处理球局。</Trans>}
               >
                 <Trans comment="斯诺克漏击判负或六红球五次规则的赛前警告确认">
                   确认警告
@@ -244,7 +243,7 @@ function SnookerRuleChoice({
   onClick,
 }: {
   children: ReactNode;
-  description: ReactNode;
+  description?: ReactNode;
   disabled: boolean;
   onClick(): void;
 }) {
@@ -258,9 +257,11 @@ function SnookerRuleChoice({
     >
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-sm font-medium">{children}</span>
-        <span className="text-muted-foreground text-xs leading-relaxed">
-          {description}
-        </span>
+        {description ? (
+          <span className="text-muted-foreground text-xs leading-relaxed">
+            {description}
+          </span>
+        ) : null}
       </span>
       <ChevronRightIcon
         aria-hidden="true"
