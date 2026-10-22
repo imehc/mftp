@@ -78,7 +78,12 @@ pub async fn app_data_clear(
                 let _ssh_maintenance = ssh_maintenance;
                 let before = storage.app_data_usage();
                 translation.clear()?;
-                Ok(storage.data_clear_result(AppDataModule::TranslationModels, 0, before, Vec::new()))
+                Ok(storage.data_clear_result(
+                    AppDataModule::TranslationModels,
+                    0,
+                    before,
+                    Vec::new(),
+                ))
             })
             .await?
         }
