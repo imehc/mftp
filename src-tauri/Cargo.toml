@@ -28,6 +28,7 @@ png = "0.18"
 mftp-translation-engine = { path = "native/translation" }
 tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-opener = "2"
+tauri-plugin-os = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 serde = { version = "1", features = ["derive"] }

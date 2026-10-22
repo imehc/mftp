@@ -10,6 +10,8 @@
     "clipboard-manager:allow-read-image",
     "clipboard-manager:allow-write-image",
     "opener:default",
+    "os:default",
+    "clipboard-manager:allow-write-text",
     "dialog:default",
     "fs:allow-write-file",
     "fs:allow-read-file",
