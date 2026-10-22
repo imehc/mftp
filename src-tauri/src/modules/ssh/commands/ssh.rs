@@ -2,34 +2,76 @@ use crate::app::services::AppServices;
 use crate::core::activity::OperationContext;
 use crate::core::execution::run_blocking;
 use crate::error::{AppError, AppResult, CustomErrorCode};
-use crate::modules::hosts::model::{AuthType, HostInput};
+use crate::modules::hosts::model::{AuthType, Host, HostInput};
 use crate::modules::keys::KeyRepository;
 use crate::modules::ssh::{auth_method, test_connection, SshConnectionTest, SystemStats};
 use crate::modules::ssh::{resolve_auth_material, AuthMaterial};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use tauri::{AppHandle, State};
 
+/// 连接目标与认证来源。已存主机连接与未保存主机测试共用，
+/// 避免逐个传递主机与凭据字段形成超长参数列表。
+struct ConnectionRequest {
+    host: String,
+    port: u16,
+    username: String,
+    auth_type: AuthType,
+    password: Option<String>,
+    key_id: Option<String>,
+    passphrase: Option<String>,
+}
+
+impl From<&Host> for ConnectionRequest {
+    fn from(host: &Host) -> Self {
+        Self {
+            host: host.host.clone(),
+            port: host.port,
+            username: host.username.clone(),
+            auth_type: host.auth_type.clone(),
+            password: host.password.clone(),
+            key_id: host.key_id.clone(),
+            passphrase: None,
+        }
+    }
+}
+
+impl From<&HostInput> for ConnectionRequest {
+    fn from(input: &HostInput) -> Self {
+        Self {
+            host: input.host.trim().to_string(),
+            port: input.port,
+            username: input.username.trim().to_string(),
+            auth_type: input.auth_type.clone(),
+            password: input.password.clone(),
+            key_id: input.key_id.clone(),
+            passphrase: None,
+        }
+    }
+}
+
+impl ConnectionRequest {
+    /// Passphrase 由前端按次会话传入，不属于主机记录或表单，单独补足。
+    fn with_passphrase(mut self, passphrase: Option<String>) -> Self {
+        self.passphrase = passphrase;
+        self
+    }
+}
+
 fn build_auth(
     key_repository: &KeyRepository,
-    host: &str,
-    port: u16,
-    username: &str,
-    auth_type: &AuthType,
-    password: Option<&str>,
-    key_id: Option<&str>,
-    passphrase: Option<String>,
+    request: &ConnectionRequest,
 ) -> AppResult<AuthMaterial> {
     let method = auth_method(
-        auth_type,
-        password,
-        key_id,
+        &request.auth_type,
+        request.password.as_deref(),
+        request.key_id.as_deref(),
         |id| key_repository.private_key(id),
-        passphrase,
+        request.passphrase.clone(),
     )?;
     resolve_auth_material(AuthMaterial {
-        host: host.to_string(),
-        port,
-        username: username.to_string(),
+        host: request.host.clone(),
+        port: request.port,
+        username: request.username.clone(),
         method,
         identity_files: Vec::new(),
     })
@@ -53,16 +95,8 @@ pub async fn ssh_connect(
     let key_repository = state.key_repository.clone();
     let manager = state.manager.clone();
     super::blocking(&state, context, None, move || {
-        let mat = build_auth(
-            &key_repository,
-            &host.host,
-            host.port,
-            &host.username,
-            &host.auth_type,
-            host.password.as_deref(),
-            host.key_id.as_deref(),
-            passphrase,
-        )?;
+        let request = ConnectionRequest::from(&host).with_passphrase(passphrase);
+        let mat = build_auth(&key_repository, &request)?;
         let session_id = uuid::Uuid::new_v4().to_string();
         manager.register(&session_id, mat);
         Ok(session_id)
@@ -88,16 +122,8 @@ pub async fn ssh_test_connection(
     .with_detail(input.label.trim().to_string());
     let key_repository = state.key_repository.clone();
     super::blocking(&state, context, None, move || {
-        let mat = build_auth(
-            &key_repository,
-            input.host.trim(),
-            input.port,
-            input.username.trim(),
-            &input.auth_type,
-            input.password.as_deref(),
-            input.key_id.as_deref(),
-            passphrase,
-        )?;
+        let request = ConnectionRequest::from(&input).with_passphrase(passphrase);
+        let mat = build_auth(&key_repository, &request)?;
         test_connection(&mat)
     })
     .await
