@@ -9,12 +9,13 @@ import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { TodoItem } from "~/types";
 
-import { buildTodoListRows, formatTodoDate } from "./todo-utils";
+import { buildTodoListRows, formatTodoDate, type TodoView } from "./todo-utils";
 import TodoDetailsDialog from "./TodoDetailsDialog";
 import TodoRow from "./TodoRow";
 
 interface TodoListProps {
   items: TodoItem[];
+  view: TodoView;
   summaries: TodoNoteSummary[];
   pendingIds: Set<string>;
   onToggle: (item: TodoItem) => void;
@@ -25,6 +26,7 @@ interface TodoListProps {
 
 export default function TodoList({
   items,
+  view,
   summaries,
   pendingIds,
   onToggle,
@@ -37,7 +39,7 @@ export default function TodoList({
   const parentRef = useRef<HTMLDivElement>(null);
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const detailsItem = items.find((item) => item.id === detailsId) ?? null;
-  const rows = buildTodoListRows(items);
+  const rows = buildTodoListRows(items, view);
   const summaryById = new Map(
     summaries.map((summary) => [summary.itemId, summary]),
   );
@@ -78,8 +80,16 @@ export default function TodoList({
                   <div className="text-muted-foreground flex h-8 items-center gap-2 px-1.5 text-xs font-medium">
                     <CalendarDays className="size-3.5" />
                     <span>
-                      {row.dueDate ? (
-                        formatTodoDate(row.dueDate, i18n.locale)
+                      {row.date ? (
+                        formatTodoDate(row.date, i18n.locale)
+                      ) : view === "completed" ? (
+                        <Trans comment="已完成待办缺少完成时间时单独成组">
+                          未记录完成时间
+                        </Trans>
+                      ) : view === "abandoned" ? (
+                        <Trans comment="已废弃待办缺少废弃时间时单独成组">
+                          未记录废弃时间
+                        </Trans>
                       ) : (
                         <Trans>未安排</Trans>
                       )}

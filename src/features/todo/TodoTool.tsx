@@ -254,34 +254,25 @@ function TodoWorkspace() {
             <EmptyTitle>
               {query.trim() ? (
                 <Trans>没有找到相关待办</Trans>
-              ) : (
+              ) : items.length === 0 ? (
                 <Trans>暂无待办</Trans>
+              ) : (
+                <Trans comment="待办在分类、优先级或状态筛选下无结果">
+                  当前筛选暂无待办
+                </Trans>
               )}
             </EmptyTitle>
-            <EmptyDescription>
-              {query.trim() ? (
+            {query.trim() ? (
+              <EmptyDescription>
                 <Trans>试试其他关键词或清除筛选</Trans>
-              ) : items.length === 0 ? (
-                <Trans>点击“新建”添加第一条待办</Trans>
-              ) : category !== ALL_TODO_CATEGORIES ? (
-                <Trans>当前分类没有待办</Trans>
-              ) : priority !== ALL_TODO_PRIORITIES ? (
-                <Trans>当前优先级没有待办</Trans>
-              ) : view === "active" ? (
-                <Trans>没有进行中的待办</Trans>
-              ) : view === "overdue" ? (
-                <Trans>没有逾期未完成的待办</Trans>
-              ) : view === "completed" ? (
-                <Trans>还没有已完成的待办</Trans>
-              ) : (
-                <Trans>还没有已废弃的待办</Trans>
-              )}
-            </EmptyDescription>
+              </EmptyDescription>
+            ) : null}
           </EmptyHeader>
         </Empty>
       ) : (
         <TodoList
           items={filteredItems}
+          view={view}
           summaries={summaries}
           pendingIds={pendingIds}
           onToggle={(item) => void handleToggle(item)}

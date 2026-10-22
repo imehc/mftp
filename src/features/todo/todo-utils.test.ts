@@ -14,6 +14,7 @@ import {
   plannedDate,
   plannedTimestamp,
   sortTodoItems,
+  type TodoListRow,
   todoView,
 } from "./todo-utils";
 
@@ -57,21 +58,21 @@ describe("待办计划时间", () => {
       item({ id: "date-only", dueDate: "2026-10-01" }),
       item({ id: "unscheduled" }),
     ];
-    const rows = buildTodoListRows(tasks);
+    const rows = buildTodoListRows(tasks, "active");
     expect(rows.filter((row) => row.kind === "header")).toEqual([
       {
         kind: "header",
         key: "header-2026-10-01",
-        dueDate: "2026-10-01",
+        date: "2026-10-01",
         count: 3,
       },
       {
         kind: "header",
         key: "header-2026-10-02",
-        dueDate: "2026-10-02",
+        date: "2026-10-02",
         count: 1,
       },
-      { kind: "header", key: "header-unscheduled", dueDate: null, count: 1 },
+      { kind: "header", key: "header-unscheduled", date: null, count: 1 },
     ]);
     expect(
       rows.flatMap((row) => (row.kind === "item" ? [row.item.id] : [])),
@@ -162,10 +163,10 @@ describe("待办计划时间", () => {
       "early",
       "late",
     ]);
-    const rows = buildTodoListRows([late, early]);
+    const rows = buildTodoListRows([late, early], "active");
     expect(rows[0]).toMatchObject({
       kind: "header",
-      dueDate: "2026-10-01",
+      date: "2026-10-01",
       count: 2,
     });
   });
@@ -316,5 +317,124 @@ describe("优先级筛选与已废弃视图", () => {
     ];
     const groups = groupTodoItems(tasks, now, "工作", "high");
     expect(groups.active.map((entry) => entry.id)).toEqual(["work-high"]);
+  });
+});
+
+describe("已完成与已废弃按发生时间排序", () => {
+  const ids = (rows: TodoListRow[]) =>
+    rows.flatMap((row) => (row.kind === "item" ? [row.item.id] : []));
+  const headers = (rows: TodoListRow[]) =>
+    rows.flatMap((row) => (row.kind === "header" ? [row] : []));
+
+  it("已完成按完成时间倒序，表头是完成日期", () => {
+    vi.stubEnv("TZ", "Asia/Shanghai");
+    const at = (date: string, time: string) => plannedTimestamp(date, time)!;
+    const tasks = [
+      item({
+        id: "older",
+        completed: true,
+        dueDate: "2026-10-05",
+        completedAt: at("2026-10-01", "09:00"),
+      }),
+      item({
+        id: "newer",
+        completed: true,
+        dueDate: "2026-10-01",
+        completedAt: at("2026-10-03", "10:00"),
+      }),
+      item({
+        id: "middle",
+        completed: true,
+        completedAt: at("2026-10-03", "08:00"),
+      }),
+    ];
+    const rows = buildTodoListRows(tasks, "completed");
+    expect(headers(rows)).toEqual([
+      {
+        kind: "header",
+        key: "header-closure-2026-10-03",
+        date: "2026-10-03",
+        count: 2,
+      },
+      {
+        kind: "header",
+        key: "header-closure-2026-10-01",
+        date: "2026-10-01",
+        count: 1,
+      },
+    ]);
+    expect(ids(rows)).toEqual(["newer", "middle", "older"]);
+  });
+
+  it("没有完成时间的已完成待办排在最后，组内沿用计划日期排序", () => {
+    vi.stubEnv("TZ", "Asia/Shanghai");
+    const tasks = [
+      item({ id: "untracked-later", completed: true, dueDate: "2026-10-09" }),
+      item({
+        id: "tracked",
+        completed: true,
+        completedAt: plannedTimestamp("2026-09-01", "08:00")!,
+      }),
+      item({ id: "untracked-earlier", completed: true, dueDate: "2026-10-02" }),
+    ];
+    const rows = buildTodoListRows(tasks, "completed");
+    expect(ids(rows)).toEqual([
+      "tracked",
+      "untracked-earlier",
+      "untracked-later",
+    ]);
+    expect(headers(rows).at(-1)).toEqual({
+      kind: "header",
+      key: "header-closure-untracked",
+      date: null,
+      count: 2,
+    });
+  });
+
+  it("已废弃按废弃时间倒序，同时带完成时间时以废弃时间为准", () => {
+    vi.stubEnv("TZ", "Asia/Shanghai");
+    const at = (date: string, time: string) => plannedTimestamp(date, time)!;
+    const tasks = [
+      item({
+        id: "old",
+        abandoned: true,
+        abandonedAt: at("2026-10-01", "09:00"),
+      }),
+      item({
+        id: "both",
+        completed: true,
+        abandoned: true,
+        completedAt: at("2026-10-09", "09:00"),
+        abandonedAt: at("2026-10-02", "09:00"),
+      }),
+      item({
+        id: "new",
+        abandoned: true,
+        abandonedAt: at("2026-10-04", "09:00"),
+      }),
+    ];
+    const rows = buildTodoListRows(tasks, "abandoned");
+    expect(ids(rows)).toEqual(["new", "both", "old"]);
+    expect(headers(rows).map((row) => row.date)).toEqual([
+      "2026-10-04",
+      "2026-10-02",
+      "2026-10-01",
+    ]);
+  });
+
+  it("进行中与逾期视图不受完成时间影响，仍按计划日期分组", () => {
+    vi.stubEnv("TZ", "Asia/Shanghai");
+    const tasks = [
+      item({ id: "later", dueDate: "2026-10-05" }),
+      item({ id: "earlier", dueDate: "2026-10-01" }),
+    ];
+    expect(ids(buildTodoListRows(tasks, "active"))).toEqual([
+      "earlier",
+      "later",
+    ]);
+    expect(ids(buildTodoListRows(tasks, "overdue"))).toEqual([
+      "earlier",
+      "later",
+    ]);
   });
 });

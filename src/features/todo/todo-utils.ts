@@ -119,31 +119,77 @@ export function sortTodoItems(items: TodoItem[]): TodoItem[] {
   });
 }
 
+/** 已完成取完成时间，已废弃取废弃时间；旧数据没有记录时返回 null。 */
+export function todoClosureTime(item: TodoItem): number | null {
+  if (item.abandoned) return item.abandonedAt ?? null;
+  if (item.completed) return item.completedAt ?? null;
+  return null;
+}
+
+/** 按完成/废弃时间倒序；没有记录时间的条目沿用计划日期排序并排在最后。 */
+export function sortTodoItemsByClosure(items: TodoItem[]): TodoItem[] {
+  const timed: { item: TodoItem; time: number }[] = [];
+  const untimed: TodoItem[] = [];
+  for (const item of items) {
+    const time = todoClosureTime(item);
+    if (time == null) untimed.push(item);
+    else timed.push({ item, time });
+  }
+  timed.sort(
+    (left, right) =>
+      right.time - left.time || right.item.updatedAt - left.item.updatedAt,
+  );
+  return [...timed.map((entry) => entry.item), ...sortTodoItems(untimed)];
+}
+
 export type TodoListRow =
-  | { kind: "header"; key: string; dueDate: string | null; count: number }
+  | { kind: "header"; key: string; date: string | null; count: number }
   | { kind: "item"; key: string; item: TodoItem };
 
-export function buildTodoListRows(items: TodoItem[]): TodoListRow[] {
+function groupRows(
+  items: TodoItem[],
+  dateOf: (item: TodoItem) => string | null,
+  keyOf: (date: string | null) => string,
+): TodoListRow[] {
   const rows: TodoListRow[] = [];
   let currentDate: string | null | undefined;
   let headerIndex = -1;
-  for (const item of sortTodoItems(items)) {
-    const dueDate = plannedDate(item);
-    if (dueDate !== currentDate) {
-      currentDate = dueDate;
+  for (const item of items) {
+    const date = dateOf(item);
+    if (date !== currentDate) {
+      currentDate = date;
       headerIndex = rows.length;
-      rows.push({
-        kind: "header",
-        key: `header-${dueDate ?? "unscheduled"}`,
-        dueDate,
-        count: 0,
-      });
+      rows.push({ kind: "header", key: keyOf(date), date, count: 0 });
     }
     const header = rows[headerIndex];
     if (header?.kind === "header") header.count += 1;
     rows.push({ kind: "item", key: item.id, item });
   }
   return rows;
+}
+
+/**
+ * 已完成/已废弃按完成、废弃时间倒序分组，分组轴是发生日期；
+ * 其余视图仍按计划日期分组，组内保持计划时间排序。
+ */
+export function buildTodoListRows(
+  items: TodoItem[],
+  view: TodoView,
+): TodoListRow[] {
+  if (view === "completed" || view === "abandoned")
+    return groupRows(
+      sortTodoItemsByClosure(items),
+      (item) => {
+        const time = todoClosureTime(item);
+        return time == null ? null : localDateKey(new Date(time));
+      },
+      (date) => `header-closure-${date ?? "untracked"}`,
+    );
+  return groupRows(
+    sortTodoItems(items),
+    plannedDate,
+    (date) => `header-${date ?? "unscheduled"}`,
+  );
 }
 
 export function formatTodoDate(
