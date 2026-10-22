@@ -8,6 +8,7 @@ import { describeError } from "~/lib/errors";
 import type { TodoItem } from "~/types";
 
 import { createTodoController } from "../todo-controller";
+import { startTodoLiveSync } from "../todo-live-sync";
 import {
   ALL_TODO_CATEGORIES,
   ALL_TODO_PRIORITIES,
@@ -30,10 +31,7 @@ export function useTodo() {
     useState<TodoPriorityFilter>(ALL_TODO_PRIORITIES);
   const [view, setView] = useState<TodoView>("active");
   const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    void controller.start();
-    return () => controller.stop();
-  }, [controller]);
+  useEffect(() => startTodoLiveSync(controller), [controller]);
 
   useEffect(() => {
     const refresh = () => setNow(Date.now());

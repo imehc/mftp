@@ -72,6 +72,28 @@ impl TodoNoteService {
         draft_id: &str,
         data_base64: &str,
     ) -> AppResult<TodoNoteImageImport> {
+        self.import_image_typed(draft_id, data_base64, None)
+    }
+
+    pub(crate) fn import_image_typed(
+        &self,
+        draft_id: &str,
+        data_base64: &str,
+        mime_type: Option<&str>,
+    ) -> AppResult<TodoNoteImageImport> {
+        self.import_image_cancellable(draft_id, data_base64, mime_type, || false)
+    }
+
+    pub(crate) fn import_image_cancellable(
+        &self,
+        draft_id: &str,
+        data_base64: &str,
+        mime_type: Option<&str>,
+        external_cancelled: impl Fn() -> bool,
+    ) -> AppResult<TodoNoteImageImport> {
+        if external_cancelled() {
+            return Err(AppError::custom(CustomErrorCode::TodoNoteCancelled));
+        }
         if data_base64.len() > MAX_INPUT_BYTES.div_ceil(3) * 4 {
             return Err(AppError::custom(CustomErrorCode::TodoNoteImageLimit));
         }
@@ -88,9 +110,18 @@ impl TodoNoteService {
         let bytes = STANDARD
             .decode(data_base64)
             .map_err(|_| AppError::custom(CustomErrorCode::TodoNoteImageInvalid))?;
-        let prepared = prepare_note_image(&bytes, || cancelled.load(Ordering::Acquire))
-            .map_err(image_error)?;
-        if cancelled.load(Ordering::Acquire) {
+        if let Some(mime_type) = mime_type {
+            let format = image::guess_format(&bytes)
+                .map_err(|_| AppError::custom(CustomErrorCode::TodoNoteImageUnsupported))?;
+            if format.to_mime_type() != mime_type {
+                return Err(AppError::custom(CustomErrorCode::TodoNoteImageInvalid));
+            }
+        }
+        let prepared = prepare_note_image(&bytes, || {
+            cancelled.load(Ordering::Acquire) || external_cancelled()
+        })
+        .map_err(image_error)?;
+        if cancelled.load(Ordering::Acquire) || external_cancelled() {
             return Err(AppError::custom(CustomErrorCode::TodoNoteCancelled));
         }
         self.repository.store_draft_image(draft_id, prepared)

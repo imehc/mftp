@@ -94,11 +94,32 @@ fn valid_date(value: &str) -> bool {
 #[derive(Clone)]
 pub(crate) struct TodoRepository {
     pub(super) storage: Storage,
+    changed: Option<std::sync::Arc<dyn Fn(super::events::TodoChanged) + Send + Sync>>,
 }
 
 impl TodoRepository {
+    #[cfg(test)]
     pub(crate) fn new(storage: Storage) -> Self {
-        Self { storage }
+        Self {
+            storage,
+            changed: None,
+        }
+    }
+
+    pub(crate) fn with_listener(
+        storage: Storage,
+        changed: std::sync::Arc<dyn Fn(super::events::TodoChanged) + Send + Sync>,
+    ) -> Self {
+        Self {
+            storage,
+            changed: Some(changed),
+        }
+    }
+
+    pub(super) fn notify_changed(&self, id: &str) {
+        if let Some(changed) = &self.changed {
+            changed(super::events::TodoChanged { item_id: id.into() });
+        }
     }
 
     pub(crate) fn list(&self) -> AppResult<Vec<TodoItem>> {
@@ -152,6 +173,7 @@ impl TodoRepository {
                 item.priority.map(TodoPriority::as_str),
             ],
         )?;
+        self.notify_changed(&item.id);
         Ok(item)
     }
 
@@ -181,6 +203,8 @@ impl TodoRepository {
                 notes = ?4,
                 due_date = ?5,
                 completed = ?6,
+                abandoned = CASE WHEN ?6 = 1 THEN 0 ELSE abandoned END,
+                abandoned_at = CASE WHEN ?6 = 1 THEN NULL ELSE abandoned_at END,
                 updated_at = ?7,
                 revision = revision + 1,
                 due_at = ?8,
@@ -216,46 +240,42 @@ impl TodoRepository {
             .optional()?
             .ok_or_else(|| AppError::custom(CustomErrorCode::TodoItemNotFound))?;
         conn.commit()?;
+        self.notify_changed(id);
         Ok(item)
     }
 
     pub(crate) fn set_completed(&self, id: &str, completed: bool) -> AppResult<TodoItem> {
-        let mut connection = self.storage.conn()?;
-        let conn =
-            connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
-        // Completing clears any abandoned state; both are mutually exclusive.
-        let changed = conn.execute(
-            "UPDATE todo_items SET completed=?2, updated_at=?3, revision=revision+1,
-             completed_at=CASE WHEN ?2=0 THEN NULL WHEN completed=0 THEN ?3 ELSE completed_at END,
-             abandoned=CASE WHEN ?2=1 THEN 0 ELSE abandoned END,
-             abandoned_at=CASE WHEN ?2=1 THEN NULL ELSE abandoned_at END
-             WHERE id=?1",
-            params![id, bool_to_int(completed), now_ms()],
-        )?;
-        if changed == 0 {
-            return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));
-        }
-        let item = conn.query_row(
-            &format!("SELECT {SELECT_COLUMNS} FROM todo_items WHERE id=?1"),
-            [id],
-            row_to_item,
-        )?;
-        conn.commit()?;
-        Ok(item)
+        self.set_state(id, completed, false, None)
     }
 
     pub(crate) fn set_abandoned(&self, id: &str, abandoned: bool) -> AppResult<TodoItem> {
+        self.set_state(id, abandoned, true, None)
+    }
+
+    pub(super) fn set_state(
+        &self,
+        id: &str,
+        value: bool,
+        abandoned: bool,
+        revision: Option<i64>,
+    ) -> AppResult<TodoItem> {
         let mut connection = self.storage.conn()?;
         let conn =
             connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
-        // Abandoning clears any completed state; both are mutually exclusive.
+        check_expected_revision(&conn, id, revision)?;
+        let (column, timestamp, other, other_timestamp) = if abandoned {
+            ("abandoned", "abandoned_at", "completed", "completed_at")
+        } else {
+            ("completed", "completed_at", "abandoned", "abandoned_at")
+        };
         let changed = conn.execute(
-            "UPDATE todo_items SET abandoned=?2, updated_at=?3, revision=revision+1,
-             abandoned_at=CASE WHEN ?2=0 THEN NULL WHEN abandoned=0 THEN ?3 ELSE abandoned_at END,
-             completed=CASE WHEN ?2=1 THEN 0 ELSE completed END,
-             completed_at=CASE WHEN ?2=1 THEN NULL ELSE completed_at END
-             WHERE id=?1",
-            params![id, bool_to_int(abandoned), now_ms()],
+            &format!(
+                "UPDATE todo_items SET {column}=?2,updated_at=?3,revision=revision+1,
+             {timestamp}=CASE WHEN ?2=0 THEN NULL WHEN {column}=0 THEN ?3 ELSE {timestamp} END,
+             {other}=CASE WHEN ?2=1 THEN 0 ELSE {other} END,
+             {other_timestamp}=CASE WHEN ?2=1 THEN NULL ELSE {other_timestamp} END WHERE id=?1"
+            ),
+            params![id, bool_to_int(value), now_ms()],
         )?;
         if changed == 0 {
             return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));
@@ -266,17 +286,46 @@ impl TodoRepository {
             row_to_item,
         )?;
         conn.commit()?;
+        self.notify_changed(id);
         Ok(item)
     }
 
     pub(crate) fn delete(&self, id: &str) -> AppResult<()> {
-        let conn = self.storage.conn()?;
+        self.delete_at_revision(id, None)
+    }
+
+    pub(super) fn delete_at_revision(&self, id: &str, revision: Option<i64>) -> AppResult<()> {
+        let mut connection = self.storage.conn()?;
+        let conn =
+            connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        check_expected_revision(&conn, id, revision)?;
         let changed = conn.execute("DELETE FROM todo_items WHERE id = ?1", params![id])?;
         if changed == 0 {
             return Err(AppError::custom(CustomErrorCode::TodoItemNotFound));
         }
+        conn.commit()?;
+        self.notify_changed(id);
         Ok(())
     }
+}
+
+pub(super) fn check_expected_revision(
+    connection: &rusqlite::Connection,
+    id: &str,
+    revision: Option<i64>,
+) -> AppResult<()> {
+    if let Some(expected) = revision {
+        let actual: Option<i64> = connection
+            .query_row("SELECT revision FROM todo_items WHERE id=?1", [id], |row| {
+                row.get(0)
+            })
+            .optional()?;
+        let actual = actual.ok_or_else(|| AppError::custom(CustomErrorCode::TodoItemNotFound))?;
+        if actual != expected || expected < 0 {
+            return Err(AppError::custom(CustomErrorCode::TodoNoteConflict));
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]

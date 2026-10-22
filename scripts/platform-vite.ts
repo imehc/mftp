@@ -16,6 +16,9 @@ const slash = (value: string) => value.replaceAll("\\", "/");
 export function platformAliases(target: string | null) {
   const replacements: Record<string, string> = {};
   if (!target) return replacements;
+  if (!supports(target, "mcp"))
+    replacements["~/features/mcp/integration"] =
+      "src/app/platform/without-mcp.tsx";
   if (!supports(target, "desktopSettings")) {
     replacements["~/features/updater/integration"] =
       "src/app/platform/without-updater.tsx";

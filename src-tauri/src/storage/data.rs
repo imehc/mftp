@@ -104,6 +104,14 @@ impl Storage {
             "app_meta",
         ];
         let mut changed = crate::modules::bt::schema::reset(tx)?;
+        #[cfg(desktop)]
+        {
+            changed += tx.execute("DELETE FROM mcp_credentials", [])?;
+            tx.execute(
+                "UPDATE mcp_settings SET port=?1 WHERE id=1",
+                [crate::modules::mcp::repository::DEFAULT_PORT],
+            )?;
+        }
         changed += crate::modules::lan_transfer::schema::reset(tx)?;
         changed += crate::modules::ai::schema::reset(tx)?;
         changed += crate::modules::model_viewer::schema::reset(tx)?;
@@ -124,7 +132,8 @@ impl Storage {
                     "DELETE FROM app_meta WHERE key NOT IN (
                         'legacy_json_migrated', 'ai_schema_version', 'todo_schema_version',
                         'bt_error_payload_schema_version', 'bt_download_only_migrated_v1',
-                        'model_viewer_schema_version', 'activity_diagnostics_schema_version'
+                        'model_viewer_schema_version', 'activity_diagnostics_schema_version',
+                        'mcp_schema_version'
                     )",
                     [],
                 )?,

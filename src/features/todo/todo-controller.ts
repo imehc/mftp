@@ -59,31 +59,66 @@ export function createTodoController(api = defaultApi) {
   let readVersion = 0;
   let editorVersion = 0;
   let deleteVersion = 0;
+  let externalPending = false;
+  let reads = 0;
+
+  function externalChanged() {
+    if (!active) return;
+    externalPending = true;
+    flushExternalChanges();
+  }
+
+  function flushExternalChanges() {
+    const state = store.getState();
+    if (
+      !active ||
+      !externalPending ||
+      reads ||
+      state.saving ||
+      state.pendingIds.size
+    )
+      return;
+    externalPending = false;
+    void read(true);
+  }
 
   async function load() {
+    return read(false);
+  }
+
+  async function read(background: boolean) {
     const state = store.getState();
     if (!active || state.saving || state.pendingIds.size) return;
     const run = ++readVersion;
     const life = lifetime;
-    store.setState({ loading: true, loadError: null });
+    reads++;
+    if (!background) store.setState({ loading: true, loadError: null });
     try {
-      const [items, summaries] = await Promise.all([
+      const [items, summaries] = await Promise.allSettled([
         api.list(),
         api.summaries(),
       ]);
+      if (items.status === "rejected") throw items.reason;
+      if (summaries.status === "rejected") throw summaries.reason;
       if (active && lifetime === life && readVersion === run)
         store.setState({
-          items: sortTodoItems(items),
-          summaries,
+          items: sortTodoItems(items.value),
+          summaries: summaries.value,
           summaryError: null,
+          loadError: null,
           loading: false,
         });
+      else if (background && active && lifetime === life)
+        externalPending = true;
     } catch (error) {
       if (active && lifetime === life && readVersion === run)
         store.setState({
           loadError: toIpcError(error).payload,
           loading: false,
         });
+    } finally {
+      reads--;
+      flushExternalChanges();
     }
   }
 
@@ -153,6 +188,7 @@ export function createTodoController(api = defaultApi) {
         if (id) pendingIds.delete(id);
         return { pendingIds, ...(saving ? { saving: false } : {}) };
       });
+      flushExternalChanges();
     }
   }
 
@@ -252,6 +288,7 @@ export function createTodoController(api = defaultApi) {
   return {
     store,
     load,
+    externalChanged,
     edit,
     setDialogOpen,
     setDeleting,
@@ -267,6 +304,7 @@ export function createTodoController(api = defaultApi) {
       active = false;
       lifetime++;
       readVersion++;
+      externalPending = false;
     },
   };
 }

@@ -135,17 +135,22 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
 
 function DialogFooter({
   className,
+  surface = "muted",
   showCloseButton = false,
   children,
   ...props
 }: React.ComponentProps<"div"> & {
+  surface?: "muted" | "plain";
   showCloseButton?: boolean;
 }) {
   return (
     <div
       data-slot="dialog-footer"
       className={cn(
-        "bg-muted/50 -mx-4 -mb-4 flex flex-row gap-2 rounded-b-xl border-t p-4 md:justify-end max-md:[&>button]:min-w-0 max-md:[&>button]:flex-1",
+        "flex flex-row gap-2 border-t md:justify-end max-md:[&>button]:min-w-0 max-md:[&>button]:flex-1",
+        surface === "muted"
+          ? "bg-muted/50 -mx-4 -mb-4 rounded-b-xl p-4"
+          : "pt-4",
         className,
       )}
       {...props}

@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+#[cfg(desktop)]
+use rmcp::schemars;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -12,6 +14,7 @@ pub(super) const MAX_NOTE_IMAGES: usize = 10;
 pub(super) const MAX_DRAFTS: i64 = 8;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
 pub enum TodoNoteInline {
     Text {
@@ -25,6 +28,7 @@ pub enum TodoNoteInline {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
 pub enum TodoNoteBlock {
     Paragraph { content: Vec<TodoNoteInline> },
@@ -32,6 +36,7 @@ pub enum TodoNoteBlock {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct TodoNoteDocument {
     pub version: u32,
@@ -139,6 +144,7 @@ impl TodoNoteDocument {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoNoteImageInfo {
     pub id: String,
@@ -149,6 +155,7 @@ pub struct TodoNoteImageInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoNoteImageData {
     pub image: TodoNoteImageInfo,
@@ -156,6 +163,7 @@ pub struct TodoNoteImageData {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoNoteImageImport {
     pub image: TodoNoteImageInfo,
@@ -163,6 +171,7 @@ pub struct TodoNoteImageImport {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoNoteSummary {
     pub item_id: String,
@@ -172,6 +181,7 @@ pub struct TodoNoteSummary {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoNoteDetails {
     pub item: TodoItem,
@@ -180,6 +190,7 @@ pub struct TodoNoteDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoNoteDraft {
     pub id: String,
@@ -189,6 +200,7 @@ pub struct TodoNoteDraft {
 }
 
 #[derive(Debug, Clone, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct TodoNoteSaveInput {
     pub draft_id: String,

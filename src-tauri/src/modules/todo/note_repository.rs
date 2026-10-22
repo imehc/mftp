@@ -177,6 +177,8 @@ impl TodoRepository {
             Some(id) => {
                 let changed = tx.execute("UPDATE todo_items SET title=?2, category=?3, notes=?4, due_date=?5, due_at=?6,
                     completed=?7, completed_at=CASE WHEN ?7=0 THEN NULL WHEN completed=0 THEN ?8 ELSE completed_at END,
+                    abandoned=CASE WHEN ?7=1 THEN 0 ELSE abandoned END,
+                    abandoned_at=CASE WHEN ?7=1 THEN NULL ELSE abandoned_at END,
                     priority=?10, updated_at=?8, revision=revision+1 WHERE id=?1 AND revision=?9",
                     params![id, metadata.title, metadata.category, metadata.notes, metadata.due_date, metadata.due_at, bool_to_int(metadata.completed), now, base_revision, metadata.priority.map(TodoPriority::as_str)])?;
                 if changed != 1 {
@@ -227,6 +229,7 @@ impl TodoRepository {
         )?;
         let details = details_in(&tx, &id)?;
         tx.commit()?;
+        self.notify_changed(&details.item.id);
         Ok(details)
     }
 }

@@ -54,6 +54,28 @@ impl Fixture {
         let operations = Arc::new(Operations::with_reset_gate(storage.reset_gate()));
         // Construct idle services without native keychain calls, sockets or engines.
         let executor = Executor::new(factory(storage.clone()), operations.clone());
+        let todo_repository = TodoRepository::new(storage.clone());
+        let todo_notes = Arc::new(TodoNoteService::new(todo_repository.clone()));
+        let mut lifecycle = Lifecycle::new(operations.clone());
+        let mcp = lifecycle.install(
+            crate::modules::maintenance::participants::MCP,
+            crate::modules::mcp::runtime::McpRuntime::new(
+                crate::app::registry::mcp::build(crate::modules::todo::mcp::TodoContext::new(
+                    todo_repository.clone(),
+                    todo_notes.clone(),
+                    executor.clone(),
+                ))
+                .unwrap(),
+            ),
+            crate::modules::mcp::runtime::McpRuntime::shutdown,
+            crate::modules::mcp::runtime::McpRuntime::busy,
+        );
+        mcp.attach(
+            storage.clone(),
+            Arc::new(crate::core::diagnostics::Diagnostics::default()),
+            executor.clone(),
+        )
+        .unwrap();
         let state = AppServices {
             translation: Arc::new(crate::modules::translation::TranslationService::new(
                 root.join("translation-models"),
@@ -79,8 +101,9 @@ impl Fixture {
             host_repository: crate::modules::hosts::HostRepository::new(storage.clone()),
             key_repository: crate::modules::keys::KeyRepository::new(storage.clone()),
             vault_repository: crate::modules::vault::VaultRepository::new(storage.clone()),
-            todo_repository: crate::modules::todo::TodoRepository::new(storage.clone()),
-            todo_notes: Arc::new(TodoNoteService::new(TodoRepository::new(storage.clone()))),
+            todo_repository,
+            todo_notes,
+            mcp,
             game_room: Arc::new(GameRoomManager::new(
                 Arc::new(|_, _| {}),
                 operations.clone(),
@@ -94,7 +117,7 @@ impl Fixture {
                 Arc::new(UnusedFiles),
             )),
             executor,
-            lifecycle: Arc::new(Lifecycle::new(operations.clone())),
+            lifecycle: Arc::new(lifecycle),
         };
         let app = tauri::test::mock_builder()
             .manage(state)

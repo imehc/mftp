@@ -1,8 +1,11 @@
+#[cfg(desktop)]
+use rmcp::schemars;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 /// Optional todo priority; absence means none was chosen.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub enum TodoPriority {
     High,
@@ -32,6 +35,7 @@ impl TodoPriority {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoItem {
     pub id: String,
@@ -62,6 +66,7 @@ pub struct TodoItem {
 
 /// Payload for creating/updating a todo item (id/timestamps managed by backend).
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[cfg_attr(desktop, derive(rmcp::schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TodoItemInput {
     pub title: String,

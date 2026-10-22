@@ -32,6 +32,11 @@ export const modules = [
   { id: "translation", tool: "translation" },
   { id: "vault", tool: "vault" },
   { id: "todo", tool: "todo" },
+  {
+    id: "mcp",
+    tool: null,
+    platforms: platformManifest.capabilities.mcp.platforms as ModulePlatform[],
+  },
   // iOS 不注册 BT 引擎；桌面端和 Android 使用独立本地 Session。
   {
     id: "bt",

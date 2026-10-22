@@ -30,7 +30,11 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
         AppDataModule::Downloads => &[participants::BT],
         #[cfg(not(any(desktop, target_os = "android")))]
         AppDataModule::Downloads => &[],
-        AppDataModule::Vault | AppDataModule::Todo | AppDataModule::Cache => &[],
+        #[cfg(desktop)]
+        AppDataModule::Todo => &[participants::MCP],
+        #[cfg(mobile)]
+        AppDataModule::Todo => &[],
+        AppDataModule::Vault | AppDataModule::Cache => &[],
     }
 }
 

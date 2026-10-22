@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { TodoNoteDetails, TodoNoteSaveInput } from "~/bindings";
+import type {
+  TodoNoteDetails,
+  TodoNoteSaveInput,
+  TodoNoteSummary,
+} from "~/bindings";
 import type { TodoItem } from "~/types";
 
 import { createTodoController } from "./todo-controller";
@@ -65,7 +69,7 @@ async function setup() {
   const api = {
     list: vi.fn(async () => [item(), item("b")]),
     save: vi.fn(async (_input: TodoNoteSaveInput) => saved()),
-    summaries: vi.fn(async () => []),
+    summaries: vi.fn(async (): Promise<TodoNoteSummary[]> => []),
     setCompleted: vi.fn(async (id: string, completed: boolean) => ({
       ...item(id),
       completed,
@@ -85,6 +89,111 @@ async function setup() {
 }
 
 describe("待办写入生命周期", () => {
+  it("外部通知刷新列表与图片摘要但不关闭或替换正在编辑的草稿", async () => {
+    const { api, controller, state } = await setup();
+    const editing = state().items[0];
+    controller.edit(editing);
+    api.list.mockResolvedValueOnce([
+      { ...item(), title: "MCP 更新后的标题" },
+      item("b"),
+    ]);
+    api.summaries.mockResolvedValueOnce([
+      { itemId: "a", revision: 2, imageCount: 0, firstImage: null },
+    ]);
+    controller.externalChanged();
+    expect(state().loading).toBe(false);
+    await vi.waitFor(() =>
+      expect(state().items.find((entry) => entry.id === "a")?.title).toBe(
+        "MCP 更新后的标题",
+      ),
+    );
+    expect(state().summaries[0].revision).toBe(2);
+    expect(state().dialogOpen).toBe(true);
+    expect(state().editing).toBe(editing);
+  });
+
+  it("读取中的连续外部通知合并为一次补读且不会堆叠请求", async () => {
+    const { api, controller, state } = await setup();
+    const pending = deferred<TodoItem[]>();
+    api.list.mockImplementationOnce(() => pending.promise);
+    controller.externalChanged();
+    for (let index = 0; index < 8; index++) controller.externalChanged();
+    expect(api.list).toHaveBeenCalledTimes(2);
+    api.list.mockResolvedValueOnce([{ ...item(), title: "最新外部更新" }]);
+    pending.resolve([item("old")]);
+    await vi.waitFor(() => expect(state().items[0].title).toBe("最新外部更新"));
+    expect(api.list).toHaveBeenCalledTimes(3);
+    expect(state().loading).toBe(false);
+  });
+
+  it("本地写入期间外部更新延后到真实请求退出后重读", async () => {
+    const { api, controller, state } = await setup();
+    const pending = deferred<TodoItem>();
+    api.setCompleted.mockImplementationOnce(() => pending.promise);
+    const updating = controller.toggle(item());
+    controller.externalChanged();
+    controller.externalChanged();
+    expect(api.list).toHaveBeenCalledTimes(1);
+    api.list.mockResolvedValueOnce([
+      { ...item(), title: "外部改名", completed: true },
+    ]);
+    pending.resolve({ ...item(), completed: true });
+    await updating;
+    await vi.waitFor(() => expect(state().items[0].title).toBe("外部改名"));
+    expect(api.list).toHaveBeenCalledTimes(2);
+    expect(state().pendingIds.size).toBe(0);
+  });
+
+  it("页面停止后外部通知和迟到读取不更新状态", async () => {
+    const { api, controller, state } = await setup();
+    const pending = deferred<TodoItem[]>();
+    api.list.mockImplementationOnce(() => pending.promise);
+    controller.externalChanged();
+    controller.stop();
+    controller.externalChanged();
+    pending.resolve([item("late")]);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(state().items.map((entry) => entry.id)).toEqual(["a", "b"]);
+    expect(api.list).toHaveBeenCalledTimes(2);
+  });
+
+  it("摘要读取失败仍等到列表退出再处理排队外部更新", async () => {
+    const { api, controller, state } = await setup();
+    const pending = deferred<TodoItem[]>();
+    api.list.mockImplementationOnce(() => pending.promise);
+    api.summaries.mockRejectedValueOnce(failure);
+    controller.externalChanged();
+    controller.externalChanged();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(api.list).toHaveBeenCalledTimes(2);
+    api.list.mockResolvedValueOnce([{ ...item(), title: "失败后新的更新" }]);
+    pending.resolve([item()]);
+    await vi.waitFor(() =>
+      expect(state().items[0].title).toBe("失败后新的更新"),
+    );
+    expect(api.list).toHaveBeenCalledTimes(3);
+    expect(state().loadError).toBeNull();
+  });
+
+  it("重新挂载时旧读取退出仍能释放排队的外部补读", async () => {
+    const { api, controller, state } = await setup();
+    const old = deferred<TodoItem[]>();
+    api.list.mockImplementationOnce(() => old.promise);
+    controller.externalChanged();
+    controller.stop();
+    await controller.start();
+    api.list.mockResolvedValueOnce([{ ...item(), title: "新页面收到更新" }]);
+    controller.externalChanged();
+    expect(api.list).toHaveBeenCalledTimes(3);
+    old.resolve([item("old-page")]);
+    await vi.waitFor(() =>
+      expect(state().items[0].title).toBe("新页面收到更新"),
+    );
+    expect(api.list).toHaveBeenCalledTimes(4);
+  });
+
   it("同步拦截同项保存与切换，同时允许不同项更新", async () => {
     const { api, controller, state } = await setup();
     const pending = deferred<TodoNoteDetails>();

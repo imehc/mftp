@@ -7,6 +7,7 @@ export * from "./ipc/translation";
 
 import type {
   AppDataModule,
+  McpCredentialInput,
   ModelExportAction,
   TodoNoteSaveInput,
 } from "~/bindings";
@@ -30,6 +31,22 @@ import type {
   TodoItemInput,
   VaultEntryInput,
 } from "~/types";
+
+export const mcpModuleCatalog = () =>
+  unwrapCommand(commands.mcpModuleCatalog());
+export const mcpSnapshot = () => unwrapCommand(commands.mcpSnapshot());
+export const mcpConfigure = (port: number) =>
+  voidCommand(commands.mcpConfigure(port));
+export const mcpStart = () => voidCommand(commands.mcpStart());
+export const mcpStop = () => voidCommand(commands.mcpStop());
+export const mcpCredentialCreate = (input: McpCredentialInput) =>
+  unwrapCommand(commands.mcpCredentialCreate(input));
+export const mcpCredentialUpdate = (id: string, input: McpCredentialInput) =>
+  voidCommand(commands.mcpCredentialUpdate(id, input));
+export const mcpCredentialRotate = (id: string, input: McpCredentialInput) =>
+  unwrapCommand(commands.mcpCredentialRotate(id, input));
+export const mcpCredentialRevoke = (id: string) =>
+  voidCommand(commands.mcpCredentialRevoke(id));
 
 // ---- 模型资源与本地库 ----
 export const modelViewerOpen = (path: string) =>

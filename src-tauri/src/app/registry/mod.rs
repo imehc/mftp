@@ -1,5 +1,8 @@
 //! Compile-time module catalog. The command paths are collected exactly once.
 
+#[cfg(desktop)]
+pub(crate) mod mcp;
+
 #[cfg(any(desktop, target_os = "android"))]
 use crate::modules::bt;
 #[cfg(desktop)]
@@ -216,7 +219,7 @@ macro_rules! common_modules {
                     todo::note_commands::todo_item_set_completed,
                     todo::note_commands::todo_item_set_abandoned,
                 ],
-                types: [],
+                types: [todo::events::TodoChanged],
             },
             "export" => {
                 commands: [
@@ -371,9 +374,30 @@ macro_rules! rsync_module {
 }
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
-macro_rules! add_rsync { ($($modules:tt)*) => { rsync_module!(add_lan, $($modules)*); }; }
+macro_rules! add_rsync { ($($modules:tt)*) => { rsync_module!(add_mcp, $($modules)*); }; }
 #[cfg(not(any(target_os = "macos", target_os = "linux")))]
-macro_rules! add_rsync { ($($modules:tt)*) => { add_lan!($($modules)*); }; }
+macro_rules! add_rsync { ($($modules:tt)*) => { add_mcp!($($modules)*); }; }
+
+#[cfg(desktop)]
+macro_rules! mcp_module {
+    ($next:ident, $($modules:tt)*) => {
+        $next! { $($modules)*
+            "mcp" => {
+                commands: [crate::modules::mcp::commands::mcp_module_catalog,
+                    crate::modules::mcp::commands::mcp_snapshot, crate::modules::mcp::commands::mcp_configure,
+                    crate::modules::mcp::commands::mcp_start, crate::modules::mcp::commands::mcp_stop,
+                    crate::modules::mcp::commands::mcp_credential_create, crate::modules::mcp::commands::mcp_credential_update,
+                    crate::modules::mcp::commands::mcp_credential_rotate, crate::modules::mcp::commands::mcp_credential_revoke],
+                types: [],
+            },
+        }
+    };
+}
+
+#[cfg(desktop)]
+macro_rules! add_mcp { ($($modules:tt)*) => { mcp_module!(add_lan, $($modules)*); }; }
+#[cfg(mobile)]
+macro_rules! add_mcp { ($($modules:tt)*) => { add_lan!($($modules)*); }; }
 
 // Filter complete command groups before Specta/Tauri expand the command list.
 #[cfg(desktop)]

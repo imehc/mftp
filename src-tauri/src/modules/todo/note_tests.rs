@@ -14,7 +14,7 @@ use super::TodoRepository;
 use crate::models::AppDataModule;
 use crate::storage::Storage;
 
-pub(super) static TEST_LOCK: Mutex<()> = Mutex::new(());
+pub(crate) static TEST_LOCK: Mutex<()> = Mutex::new(());
 
 pub(super) struct Fixture {
     pub(super) root: PathBuf,

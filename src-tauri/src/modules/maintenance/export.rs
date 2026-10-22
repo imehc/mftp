@@ -45,10 +45,24 @@ pub async fn data_import(
     mode: ImportMode,
 ) -> AppResult<ImportReport> {
     let storage = state.storage.clone();
+    #[cfg(desktop)]
+    let lifecycle = state.lifecycle.clone();
+    #[cfg(desktop)]
+    let mcp = state.mcp.clone();
     state
         .executor
         .blocking(OperationContext::new("data", "import", ""), move || {
-            storage.import_document(&raw, password.as_deref(), mode)
+            #[cfg(desktop)]
+            lifecycle.ensure_no_busy(&[super::participants::MCP])?;
+            #[cfg(desktop)]
+            {
+                mcp.server()?
+                    .while_stopped(|| storage.import_document(&raw, password.as_deref(), mode))
+            }
+            #[cfg(mobile)]
+            {
+                storage.import_document(&raw, password.as_deref(), mode)
+            }
         })
         .await
 }

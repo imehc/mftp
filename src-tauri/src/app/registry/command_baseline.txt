@@ -157,6 +157,15 @@ macos,linux rsync_local_status
 macos,linux rsync_capabilities
 macos,linux rsync_preview
 macos,linux rsync_transfer
+desktop mcp_module_catalog
+desktop mcp_snapshot
+desktop mcp_configure
+desktop mcp_start
+desktop mcp_stop
+desktop mcp_credential_create
+desktop mcp_credential_update
+desktop mcp_credential_rotate
+desktop mcp_credential_revoke
 desktop lan_transfer_settings
 desktop lan_transfer_save_settings
 desktop lan_transfer_status

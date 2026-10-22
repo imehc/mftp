@@ -1,6 +1,11 @@
 {
   "targets": ["macos", "windows", "linux", "android", "ios"],
   "capabilities": {
+    "mcp": {
+      "platforms": ["desktop"],
+      "routes": [],
+      "sources": ["src/features/mcp/"]
+    },
     "bt": {
       "platforms": ["desktop", "android"],
       "routes": ["tools/bt.tsx"],

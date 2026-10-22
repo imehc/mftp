@@ -222,6 +222,15 @@ export const commands = {
 	rsyncCapabilities: (sessionId: string, refresh: boolean) => typedError<RsyncCapabilities, AppError>(__TAURI_INVOKE("rsync_capabilities", { sessionId, refresh })),
 	rsyncPreview: (sessionId: string, direction: RsyncDirection, localDir: string, remoteDir: string, deleteExtraneous: boolean) => typedError<RsyncPreview, AppError>(__TAURI_INVOKE("rsync_preview", { sessionId, direction, localDir, remoteDir, deleteExtraneous })),
 	rsyncTransfer: (sessionId: string, token: string, direction: RsyncDirection, localDir: string, remoteDir: string, deleteExtraneous: boolean, transferId: string | null) => typedError<RsyncTransferResult, AppError>(__TAURI_INVOKE("rsync_transfer", { sessionId, token, direction, localDir, remoteDir, deleteExtraneous, transferId })),
+	mcpModuleCatalog: () => typedError<McpModuleInfo[], AppError>(__TAURI_INVOKE("mcp_module_catalog")),
+	mcpSnapshot: () => typedError<McpSnapshot, AppError>(__TAURI_INVOKE("mcp_snapshot")),
+	mcpConfigure: (port: number) => typedError<null, AppError>(__TAURI_INVOKE("mcp_configure", { port })),
+	mcpStart: () => typedError<null, AppError>(__TAURI_INVOKE("mcp_start")),
+	mcpStop: () => typedError<null, AppError>(__TAURI_INVOKE("mcp_stop")),
+	mcpCredentialCreate: (input: McpCredentialInput) => typedError<McpIssuedCredential, AppError>(__TAURI_INVOKE("mcp_credential_create", { input })),
+	mcpCredentialUpdate: (id: string, input: McpCredentialInput) => typedError<null, AppError>(__TAURI_INVOKE("mcp_credential_update", { id, input })),
+	mcpCredentialRotate: (id: string, input: McpCredentialInput) => typedError<McpIssuedCredential, AppError>(__TAURI_INVOKE("mcp_credential_rotate", { id, input })),
+	mcpCredentialRevoke: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("mcp_credential_revoke", { id })),
 	lanTransferSettings: () => typedError<LanTransferSettings, AppError>(__TAURI_INVOKE("lan_transfer_settings")),
 	lanTransferSaveSettings: (settings: LanTransferSettings) => typedError<LanTransferSettings, AppError>(__TAURI_INVOKE("lan_transfer_save_settings", { settings })),
 	lanTransferStatus: () => typedError<LanTransferStatus, AppError>(__TAURI_INVOKE("lan_transfer_status")),
@@ -707,7 +716,7 @@ export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" 
 
 export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
 
-export type CustomErrorCode = "translation:model_unknown" | "translation:input_invalid" | "translation:resource_invalid" | "translation:checksum" | "translation:cancelled" | "translation:busy" | "translation:not_installed" | "translation:engine" | "translation:input_limit" | "translation:output_limit" | "translation:download_range" | "translation:download" | "translation:space" | "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "rsync:local_missing" | "rsync:local_unsupported" | "rsync:remote_missing" | "rsync:remote_unsupported" | "rsync:probe_failed" | "rsync:probe_timeout" | "rsync:remote_command_rejected" | "rsync:bridge_failed" | "rsync:bridge_timeout" | "rsync:local_exit" | "rsync:remote_exit" | "rsync:target_invalid" | "rsync:preview_expired" | "rsync:preview_mismatch" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "speech:unavailable" | "speech:input_invalid" | "speech:voice_missing" | "speech:busy" | "speech:control_failed" | "speech:start_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+export type CustomErrorCode = "mcp:registration_invalid" | "mcp:unauthorized" | "mcp:configuration_invalid" | "mcp:busy" | "mcp:transport" | "translation:model_unknown" | "translation:input_invalid" | "translation:resource_invalid" | "translation:checksum" | "translation:cancelled" | "translation:busy" | "translation:not_installed" | "translation:engine" | "translation:input_limit" | "translation:output_limit" | "translation:download_range" | "translation:download" | "translation:space" | "model:source_invalid" | "model:library_invalid" | "model:library_missing" | "model:library_version" | "model:resource_too_large" | "model:unsafe_path" | "model:session_limit" | "model:session_closed" | "model:resource_missing" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "rsync:local_missing" | "rsync:local_unsupported" | "rsync:remote_missing" | "rsync:remote_unsupported" | "rsync:probe_failed" | "rsync:probe_timeout" | "rsync:remote_command_rejected" | "rsync:bridge_failed" | "rsync:bridge_timeout" | "rsync:local_exit" | "rsync:remote_exit" | "rsync:target_invalid" | "rsync:preview_expired" | "rsync:preview_mismatch" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "speech:unavailable" | "speech:input_invalid" | "speech:voice_missing" | "speech:busy" | "speech:control_failed" | "speech:start_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
 
 export type DiagnosticBodyEnd = "receiving" | "complete" | "protocolEnd" | "interrupted";
 
@@ -967,6 +976,45 @@ export type LanTrustedDeviceInput = {
 	ip: string,
 };
 
+export type McpCredential = {
+	id: string,
+	name: string,
+	grants: { [key in string]: ModuleGrant },
+	createdAt: number,
+};
+
+export type McpCredentialInput = {
+	name: string,
+	grants: { [key in string]: ModuleGrant },
+};
+
+export type McpIssuedCredential = {
+	credential: McpCredential,
+	token: string,
+};
+
+export type McpModuleInfo = {
+	id: string,
+	title: string,
+	tools: McpToolInfo[],
+};
+
+export type McpPermission = "read" | "write" | "delete";
+
+export type McpSnapshot = {
+	running: boolean,
+	stopping: boolean,
+	port: number,
+	endpoint: string | null,
+	credentials: McpCredential[],
+};
+
+export type McpToolInfo = {
+	name: string,
+	description: string,
+	permission: McpPermission,
+};
+
 export type ModelAttachment = {
 	id: string,
 	name: string,
@@ -1085,6 +1133,12 @@ export type ModelViewState = {
 	normals: boolean,
 	shadows: boolean,
 	autoRotate: boolean,
+};
+
+export type ModuleGrant = {
+	read: boolean,
+	write: boolean,
+	delete: boolean,
 };
 
 export type PoemAnnotation = {
@@ -1492,6 +1546,10 @@ export type SystemStats = {
 	network: SystemNetworkRate[],
 	diskIo: SystemDiskIoRate[],
 	topProcesses: SystemProcess[],
+};
+
+export type TodoChanged = {
+	itemId: string,
 };
 
 export type TodoItem = {

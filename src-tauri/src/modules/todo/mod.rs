@@ -1,4 +1,9 @@
 pub(crate) mod commands;
+pub(crate) mod events;
+#[cfg(desktop)]
+pub(crate) mod mcp;
+#[cfg(desktop)]
+mod mcp_repository;
 pub(crate) mod model;
 pub(crate) mod repository;
 pub(crate) mod schema;
@@ -14,7 +19,7 @@ pub(crate) mod note_service;
 pub(crate) use repository::TodoRepository;
 
 #[cfg(test)]
-mod note_tests;
+pub(crate) mod note_tests;
 
 #[cfg(test)]
 mod note_backup_tests;

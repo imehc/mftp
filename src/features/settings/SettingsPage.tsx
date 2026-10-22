@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import AiConfigurationSettings from "~/features/ai-configuration/AiConfigurationSettings";
 import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
 import BackupPage from "~/features/export/BackupPage";
+import { McpSettingsPanel } from "~/features/mcp/integration";
 
 import FeatureEntrySettings from "./FeatureEntrySettings";
 import SettingsOverview from "./SettingsOverview";
@@ -17,7 +18,7 @@ export default function SettingsPage({
   returnContext,
 }: {
   returnContext?: {
-    panel?: "ai" | "data" | "features";
+    panel?: "ai" | "data" | "features" | "mcp";
     returnUid?: string;
     returnQ?: string;
     returnMode?: PoetryTranslationMode;
@@ -27,6 +28,7 @@ export default function SettingsPage({
   const navigate = useNavigate();
   const ai = returnContext?.panel === "ai" || !!returnContext?.returnUid;
   const features = returnContext?.panel === "features";
+  const mcp = returnContext?.panel === "mcp";
   if (returnContext?.panel === "data") return <BackupPage />;
   return (
     <main
@@ -35,9 +37,11 @@ export default function SettingsPage({
     >
       <ToolPageHeader
         showHome={false}
-        title={ai ? t`AI 服务` : features ? t`功能入口` : t`设置`}
+        title={
+          mcp ? t`MCP 服务` : ai ? t`AI 服务` : features ? t`功能入口` : t`设置`
+        }
         leading={
-          ai || features ? (
+          ai || features || mcp ? (
             <Button
               variant="ghost"
               size="icon-sm"
@@ -66,7 +70,9 @@ export default function SettingsPage({
           </div>
         }
       />
-      {ai ? (
+      {mcp ? (
+        <McpSettingsPanel />
+      ) : ai ? (
         <AiConfigurationSettings />
       ) : features ? (
         <AppPageContent bottomInset="scroll">

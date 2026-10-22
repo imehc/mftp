@@ -44,6 +44,8 @@ pub struct AppServices {
     pub(crate) vault_repository: VaultRepository,
     pub(crate) todo_repository: TodoRepository,
     pub(crate) todo_notes: Arc<crate::modules::todo::note_service::TodoNoteService>,
+    #[cfg(desktop)]
+    pub(crate) mcp: Arc<crate::modules::mcp::runtime::McpRuntime>,
     pub game_room: Arc<GameRoomManager>,
     pub poetry: Arc<PoetryLibrary>,
     pub(crate) translation: Arc<crate::modules::translation::TranslationService>,
@@ -130,6 +132,35 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         Arc::new(StorageActivityLog(storage.clone())),
         operations.clone(),
     );
+    let todo_repository = TodoRepository::with_listener(storage.clone(), {
+        let app = app.clone();
+        Arc::new(move |change| {
+            if let Err(error) = app.emit(crate::modules::todo::events::CHANGED_EVENT, change) {
+                eprintln!(
+                    "Todo change event delivery failed: {}",
+                    crate::error::AppError::from(error).code
+                );
+            }
+        })
+    });
+    let todo_notes = Arc::new(crate::modules::todo::note_service::TodoNoteService::new(
+        todo_repository.clone(),
+    ));
+    #[cfg(desktop)]
+    let mcp = lifecycle.install(
+        participants::MCP,
+        crate::modules::mcp::runtime::McpRuntime::new(crate::app::registry::mcp::build(
+            crate::modules::todo::mcp::TodoContext::new(
+                todo_repository.clone(),
+                todo_notes.clone(),
+                executor.clone(),
+            ),
+        )?),
+        crate::modules::mcp::runtime::McpRuntime::shutdown,
+        crate::modules::mcp::runtime::McpRuntime::busy,
+    );
+    #[cfg(desktop)]
+    mcp.attach(storage.clone(), diagnostics.clone(), executor.clone())?;
     let ai_credentials = Arc::new(AiKeychain::install(app));
     let ai_configuration = AiConfigurationService::new(
         AiRepository::new(storage.clone()),
@@ -167,10 +198,10 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         host_repository: HostRepository::new(storage.clone()),
         key_repository: KeyRepository::new(storage.clone()),
         vault_repository: VaultRepository::new(storage.clone()),
-        todo_repository: TodoRepository::new(storage.clone()),
-        todo_notes: Arc::new(crate::modules::todo::note_service::TodoNoteService::new(
-            TodoRepository::new(storage.clone()),
-        )),
+        todo_repository,
+        todo_notes,
+        #[cfg(desktop)]
+        mcp,
         storage,
         manager,
         #[cfg(desktop)]

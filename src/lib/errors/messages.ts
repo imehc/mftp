@@ -61,6 +61,15 @@ export const customErrorMessages = {
   "hosts:auth_type_invalid": msg`该主机存储的认证方式无效，请重新编辑并保存`,
   "keys:key_not_found": msg`未找到该 SSH 密钥，可能已被删除`,
   "todo:title_required": msg`待办标题不能为空`,
+  "mcp:registration_invalid": msg({
+    message: "MCP 工具注册失败，请检查模块配置",
+    comment:
+      "应用内部 MCP 模块或工具登记无效；不是用户填写外部模型连接地址失败。",
+  }),
+  "mcp:unauthorized": msg`MCP 授权已撤销或不可用，请检查连接凭据`,
+  "mcp:configuration_invalid": msg`MCP 端口、授权名称或模块权限无效`,
+  "mcp:busy": msg`请先停止 MCP 服务并等待任务完成`,
+  "mcp:transport": msg`MCP 服务连接失败，请检查端口和执行日志`,
   "todo:due_time_invalid": msg`待办计划时间无效`,
   "todo:due_date_invalid": msg`待办截止日期需使用 YYYY-MM-DD 格式`,
   "todo:item_not_found": msg`未找到该待办事项，可能已被删除`,
@@ -301,6 +310,11 @@ export const dataBusyParticipantNames: Record<string, MessageDescriptor> = {
   lan_transfer: msg`局域网服务`,
   game_room: msg`游戏房间`,
   bt: msg`BT 下载`,
+  mcp: msg({
+    message: "MCP 服务",
+    comment:
+      "本地数据维护被 MCP 工具的编辑草稿或在途操作阻止时显示的任务名称。",
+  }),
 };
 
 // appdata:section_invalid 的 section 参数是备份文件的稳定英文节名

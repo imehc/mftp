@@ -387,6 +387,8 @@ impl Storage {
                 updated: counts.updated,
             });
         }
+        #[cfg(desktop)]
+        tx.execute("DELETE FROM mcp_credentials", [])?;
         tx.commit()?;
         Ok(report)
     }

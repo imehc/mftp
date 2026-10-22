@@ -10,6 +10,8 @@ use crate::error::{AppError, CustomErrorCode};
 
 pub(crate) const TRANSLATION: &str = "translation";
 pub(crate) const SSH: &str = "ssh";
+#[cfg(desktop)]
+pub(crate) const MCP: &str = "mcp";
 #[cfg(any(desktop, test))]
 pub(crate) const LAN_TRANSFER: &str = "lan_transfer";
 pub(crate) const GAME_ROOM: &str = "game_room";

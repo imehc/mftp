@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { Database, FileClock, Info, LayoutGrid, Sparkles } from "lucide-react";
 
+import { McpSettingsEntry } from "~/features/mcp/integration";
 import {
   DesktopAutostartSettings,
   DesktopStartupSettings,
@@ -34,6 +35,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
           }
         />
         <DesktopStartupSettings />
+        <McpSettingsEntry />
       </SettingsGroup>
       <SettingsGroup title={t`数据与运行`}>
         <SettingsEntry

@@ -211,6 +211,47 @@ impl DiagnosticRecorder {
         self.publish();
     }
 
+    pub(crate) fn request_start(
+        &mut self,
+        method: &str,
+        url: &str,
+        headers: Vec<(String, Vec<u8>)>,
+    ) {
+        self.http_request(method, url, headers, &[]);
+        if let Some(index) = self
+            .local
+            .details
+            .iter()
+            .position(|detail| matches!(detail, DiagnosticDetail::HttpRequest { .. }))
+        {
+            self.bodies[index].end = DiagnosticBodyEnd::Receiving;
+            self.publish();
+        }
+    }
+
+    pub(crate) fn request_bytes(&mut self, bytes: &[u8]) {
+        if let Some(index) = self
+            .local
+            .details
+            .iter()
+            .position(|detail| matches!(detail, DiagnosticDetail::HttpRequest { .. }))
+        {
+            self.bodies[index].append(bytes);
+        }
+    }
+
+    pub(crate) fn request_end(&mut self, end: DiagnosticBodyEnd) {
+        if let Some(index) = self
+            .local
+            .details
+            .iter()
+            .position(|detail| matches!(detail, DiagnosticDetail::HttpRequest { .. }))
+        {
+            self.bodies[index].end = end;
+            self.publish();
+        }
+    }
+
     pub(crate) fn response_bytes(&mut self, bytes: &[u8]) {
         if self.scope.upgrade().is_none() {
             self.bodies.clear();

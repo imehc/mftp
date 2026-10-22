@@ -229,10 +229,11 @@ pub(crate) mod full_contract {
     macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_bt, $($modules)*); }; }
     macro_rules! full_bt { ($($modules:tt)*) => { bt_module!(full_mobile, $($modules)*); }; }
     macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
+    macro_rules! full_mcp { ($($modules:tt)*) => { mcp_module!(full_lan, $($modules)*); }; }
     #[cfg(any(target_os = "macos", target_os = "linux"))]
-    macro_rules! full_rsync { ($($modules:tt)*) => { rsync_module!(full_lan, $($modules)*); }; }
+    macro_rules! full_rsync { ($($modules:tt)*) => { rsync_module!(full_mcp, $($modules)*); }; }
     #[cfg(not(any(target_os = "macos", target_os = "linux")))]
-    macro_rules! full_rsync { ($($modules:tt)*) => { full_lan!($($modules)*); }; }
+    macro_rules! full_rsync { ($($modules:tt)*) => { full_mcp!($($modules)*); }; }
     common_modules!(full_rsync,);
 
     #[test]

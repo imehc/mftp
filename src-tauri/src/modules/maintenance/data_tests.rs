@@ -17,9 +17,11 @@ fn clear_only_waits_for_the_participant_that_owns_live_work() {
     );
     #[cfg(mobile)]
     assert!(participants_for(AppDataModule::ActivityLogs).is_empty());
-    for module in [AppDataModule::Vault, AppDataModule::Todo] {
-        assert!(participants_for(module).is_empty(), "{module:?}");
-    }
+    #[cfg(desktop)]
+    assert_eq!(participants_for(AppDataModule::Todo), [participants::MCP]);
+    #[cfg(mobile)]
+    assert!(participants_for(AppDataModule::Todo).is_empty());
+    assert!(participants_for(AppDataModule::Vault).is_empty());
 }
 
 // The reset participant list is now derived from the single Lifecycle

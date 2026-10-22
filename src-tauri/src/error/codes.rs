@@ -22,6 +22,11 @@ macro_rules! custom_codes {
 }
 
 custom_codes! {
+    McpRegistrationInvalid => ("mcp:registration_invalid", "Invalid MCP module or tool registration"),
+    McpUnauthorized => ("mcp:unauthorized", "MCP credential is missing, revoked or unavailable"),
+    McpConfigurationInvalid => ("mcp:configuration_invalid", "Invalid MCP service configuration or permission"),
+    McpBusy => ("mcp:busy", "MCP service is running or stopping"),
+    McpTransport => ("mcp:transport", "MCP HTTP transport failed"),
     TranslationModelUnknown => ("translation:model_unknown", "Unknown translation model"),
     TranslationInputInvalid => ("translation:input_invalid", "Invalid translation text or language"),
     TranslationResourceInvalid => ("translation:resource_invalid", "Invalid translation model resource or catalog version"),

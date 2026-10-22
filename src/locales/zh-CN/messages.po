@@ -30,13 +30,18 @@ msgid "{ballName}，{points} 分"
 msgstr "{ballName}，{points} 分"
 
 #. 运行状态：正在运行的下载任务数量
-#: src/features/about/AboutPage.tsx:165
+#: src/features/about/AboutPage.tsx:159
 msgid "{btTasks} 个进行中"
 msgstr "{btTasks} 个进行中"
 
 #: src/features/formatter/FormatterTool.tsx:171
 msgid "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{characterCount, plural, one {# 个字符} other {# 个字符}}"
+
+#. 客户端授权总数，不是模块工具数量
+#: src/features/mcp/McpCredentialsTable.tsx:51
+msgid "{clientCount} 个客户端"
+msgstr "{clientCount} 个客户端"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:135
 #: src/features/games/billiards/BilliardsScore.tsx:156
@@ -328,7 +333,7 @@ msgid "AI 密钥"
 msgstr "AI 密钥"
 
 #. AI 凭据认证期间应用退到后台或密钥被修改，需回到前台重新操作。
-#: src/lib/errors/messages.ts:232
+#: src/lib/errors/messages.ts:241
 msgid "AI 密钥认证已失效，请返回应用后重试"
 msgstr "AI 密钥认证已失效，请返回应用后重试"
 
@@ -340,18 +345,18 @@ msgstr "AI 已完成响应，但没有返回可用正文"
 msgid "AI 已达到输出或推理预算上限，结果不完整"
 msgstr "AI 已达到输出或推理预算上限，结果不完整"
 
-#: src/lib/errors/messages.ts:242
+#: src/lib/errors/messages.ts:251
 msgid "AI 数据库版本高于当前应用版本，请升级应用"
 msgstr "AI 数据库版本高于当前应用版本，请升级应用"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:106
-#: src/features/settings/SettingsOverview.tsx:24
-#: src/features/settings/SettingsPage.tsx:38
+#: src/features/settings/SettingsOverview.tsx:25
+#: src/features/settings/SettingsPage.tsx:40
 msgid "AI 服务"
 msgstr "AI 服务"
 
-#: src/lib/errors/messages.ts:221
+#: src/lib/errors/messages.ts:230
 msgid "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 msgstr "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 
@@ -359,7 +364,7 @@ msgstr "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 msgid "AI 服务地址"
 msgstr "AI 服务地址"
 
-#: src/lib/errors/messages.ts:227
+#: src/lib/errors/messages.ts:236
 msgid "AI 服务地址无效"
 msgstr "AI 服务地址无效"
 
@@ -376,7 +381,7 @@ msgstr "AI 服务未能完成本次请求"
 msgid "AI 服务返回 HTTP 错误，请检查服务配置"
 msgstr "AI 服务返回 HTTP 错误，请检查服务配置"
 
-#: src/lib/errors/messages.ts:240
+#: src/lib/errors/messages.ts:249
 msgid "AI 服务返回内容超出大小限制"
 msgstr "AI 服务返回内容超出大小限制"
 
@@ -395,7 +400,7 @@ msgstr "AI 服务长时间未报告生成进展，本次请求已停止"
 msgid "AI 模型"
 msgstr "AI 模型"
 
-#: src/lib/errors/messages.ts:237
+#: src/lib/errors/messages.ts:246
 msgid "AI 流式请求标识无效"
 msgstr "AI 流式请求标识无效"
 
@@ -407,20 +412,20 @@ msgstr "AI 生成"
 msgid "AI 生成及人工修订的诗词译文，不包含 API Key"
 msgstr "AI 生成及人工修订的诗词译文，不包含 API Key"
 
-#: src/lib/errors/messages.ts:247
+#: src/lib/errors/messages.ts:256
 msgid "AI 翻译保存失败"
 msgstr "AI 翻译保存失败"
 
-#: src/lib/errors/messages.ts:236
+#: src/lib/errors/messages.ts:245
 msgid "AI 设置未保存，且密钥回滚失败"
 msgstr "AI 设置未保存，且密钥回滚失败"
 
 #: src/features/export/sections.tsx:52
-#: src/lib/errors/messages.ts:313
+#: src/lib/errors/messages.ts:327
 msgid "AI 译文"
 msgstr "AI 译文"
 
-#: src/lib/errors/messages.ts:239
+#: src/lib/errors/messages.ts:248
 msgid "AI 请求内容超出大小限制"
 msgstr "AI 请求内容超出大小限制"
 
@@ -436,7 +441,7 @@ msgstr "AI 请求已达到等待上限"
 msgid "AI 请求策略与当前服务不兼容"
 msgstr "AI 请求策略与当前服务不兼容"
 
-#: src/lib/errors/messages.ts:241
+#: src/lib/errors/messages.ts:250
 msgid "AI 输出内容超出大小限制"
 msgstr "AI 输出内容超出大小限制"
 
@@ -448,11 +453,11 @@ msgstr "AI 返回内容不符合要求的格式"
 msgid "AI 返回的数据不符合所选协议"
 msgstr "AI 返回的数据不符合所选协议"
 
-#: src/lib/errors/messages.ts:290
+#: src/lib/errors/messages.ts:299
 msgid "AI 返回的译文格式无效"
 msgstr "AI 返回的译文格式无效"
 
-#: src/lib/errors/messages.ts:211
+#: src/lib/errors/messages.ts:220
 msgid "AI 配置已更新，请重新加载后重试"
 msgstr "AI 配置已更新，请重新加载后重试"
 
@@ -461,7 +466,7 @@ msgstr "AI 配置已更新，请重新加载后重试"
 msgid "Anthropic Messages"
 msgstr "Anthropic Messages"
 
-#: src/lib/errors/messages.ts:231
+#: src/lib/errors/messages.ts:240
 msgid "API Key 为空或过长"
 msgstr "API Key 为空或过长"
 
@@ -471,7 +476,7 @@ msgstr "BT"
 
 #: src/features/bt/BtTool.tsx:222
 #: src/features/home/entries.tsx:160
-#: src/lib/errors/messages.ts:303
+#: src/lib/errors/messages.ts:312
 msgid "BT 下载"
 msgstr "BT 下载"
 
@@ -480,11 +485,11 @@ msgstr "BT 下载"
 msgid "BT 下载任务"
 msgstr "BT 下载任务"
 
-#: src/lib/errors/messages.ts:128
+#: src/lib/errors/messages.ts:137
 msgid "BT 任务已取消"
 msgstr "BT 任务已取消"
 
-#: src/lib/errors/messages.ts:133
+#: src/lib/errors/messages.ts:142
 msgid "BT 任务文件大小超出可保存范围"
 msgstr "BT 任务文件大小超出可保存范围"
 
@@ -492,7 +497,7 @@ msgstr "BT 任务文件大小超出可保存范围"
 msgid "BT 内部数据"
 msgstr "BT 内部数据"
 
-#: src/lib/errors/messages.ts:126
+#: src/lib/errors/messages.ts:135
 msgid "BT 预览服务尚未就绪"
 msgstr "BT 预览服务尚未就绪"
 
@@ -523,15 +528,15 @@ msgstr "FBX 仅在当前会话预览，不保存到模型库。支持 PNG、JPEG
 msgid "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
 msgstr "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
 
-#: src/lib/errors/messages.ts:348
+#: src/lib/errors/messages.ts:362
 msgid "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
 msgstr "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
 
-#: src/lib/errors/messages.ts:347
+#: src/lib/errors/messages.ts:361
 msgid "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
 msgstr "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
 
-#: src/lib/errors/messages.ts:346
+#: src/lib/errors/messages.ts:360
 msgid "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 msgstr "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 
@@ -539,7 +544,7 @@ msgstr "FBX 超过处理上限或解析超时，请简化模型或贴图后重�
 msgid "Git Commit"
 msgstr "Git Commit"
 
-#: src/lib/errors/messages.ts:285
+#: src/lib/errors/messages.ts:294
 msgid "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
 msgstr "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
 
@@ -564,6 +569,39 @@ msgstr "IP 地址"
 #: src/features/games/engine/online/OnlineLobby.tsx:317
 msgid "IP:端口 直连"
 msgstr "IP:端口 直连"
+
+#: src/features/mcp/McpCredentialsTable.tsx:68
+msgid "MCP 客户端授权列表"
+msgstr "MCP 客户端授权列表"
+
+#. 应用内部 MCP 模块或工具登记无效；不是用户填写外部模型连接地址失败。
+#: src/lib/errors/messages.ts:64
+msgid "MCP 工具注册失败，请检查模块配置"
+msgstr "MCP 工具注册失败，请检查模块配置"
+
+#: src/lib/errors/messages.ts:69
+msgid "MCP 授权已撤销或不可用，请检查连接凭据"
+msgstr "MCP 授权已撤销或不可用，请检查连接凭据"
+
+#. 本地数据维护被 MCP 工具的编辑草稿或在途操作阻止时显示的任务名称。
+#: src/features/mcp/integration.tsx:17
+#: src/features/settings/SettingsPage.tsx:40
+#: src/lib/errors/messages.ts:313
+msgid "MCP 服务"
+msgstr "MCP 服务"
+
+#: src/features/mcp/McpHelpDialog.tsx:23
+#: src/features/mcp/McpServiceBar.tsx:157
+msgid "MCP 服务帮助"
+msgstr "MCP 服务帮助"
+
+#: src/lib/errors/messages.ts:72
+msgid "MCP 服务连接失败，请检查端口和执行日志"
+msgstr "MCP 服务连接失败，请检查端口和执行日志"
+
+#: src/lib/errors/messages.ts:70
+msgid "MCP 端口、授权名称或模块权限无效"
+msgstr "MCP 端口、授权名称或模块权限无效"
 
 #: src/features/updater/UpdaterDialog.tsx:85
 msgid "MFTP 应用更新"
@@ -602,11 +640,11 @@ msgstr "PNG 为无损格式，压缩程度影响有限"
 msgid "Responses"
 msgstr "Responses"
 
-#: src/lib/errors/messages.ts:198
+#: src/lib/errors/messages.ts:207
 msgid "rsync 传输桥接失败，请重试"
 msgstr "rsync 传输桥接失败，请重试"
 
-#: src/lib/errors/messages.ts:199
+#: src/lib/errors/messages.ts:208
 msgid "rsync 传输桥接超时，请重试"
 msgstr "rsync 传输桥接超时，请重试"
 
@@ -623,7 +661,7 @@ msgstr "rsync 暂不可用"
 msgid "SFTP 会话"
 msgstr "SFTP 会话"
 
-#: src/lib/errors/messages.ts:184
+#: src/lib/errors/messages.ts:193
 msgid "SFTP 写入长时间没有进展，请重试"
 msgstr "SFTP 写入长时间没有进展，请重试"
 
@@ -640,7 +678,7 @@ msgstr "SSH / SFTP 主机连接配置"
 msgid "SSH 会话"
 msgstr "SSH 会话"
 
-#: src/lib/errors/messages.ts:154
+#: src/lib/errors/messages.ts:163
 msgid "SSH 会话不存在，请重新连接"
 msgstr "SSH 会话不存在，请重新连接"
 
@@ -649,15 +687,15 @@ msgstr "SSH 会话不存在，请重新连接"
 msgid "SSH 密钥"
 msgstr "SSH 密钥"
 
-#: src/lib/errors/messages.ts:155
+#: src/lib/errors/messages.ts:164
 msgid "SSH 终端尚未打开"
 msgstr "SSH 终端尚未打开"
 
-#: src/lib/errors/messages.ts:156
+#: src/lib/errors/messages.ts:165
 msgid "SSH 终端已关闭"
 msgstr "SSH 终端已关闭"
 
-#: src/lib/errors/messages.ts:298
+#: src/lib/errors/messages.ts:307
 msgid "SSH 连接"
 msgstr "SSH 连接"
 
@@ -754,11 +792,11 @@ msgstr "上传文件夹"
 msgid "上传文件夹中"
 msgstr "上传文件夹中"
 
-#: src/lib/errors/messages.ts:96
+#: src/lib/errors/messages.ts:105
 msgid "上传文件的相对路径无效"
 msgstr "上传文件的相对路径无效"
 
-#: src/lib/errors/messages.ts:176
+#: src/lib/errors/messages.ts:185
 msgid "上传校验失败，远端临时文件不存在"
 msgstr "上传校验失败，远端临时文件不存在"
 
@@ -766,11 +804,11 @@ msgstr "上传校验失败，远端临时文件不存在"
 msgid "上传的文件夹"
 msgstr "上传的文件夹"
 
-#: src/lib/errors/messages.ts:99
+#: src/lib/errors/messages.ts:108
 msgid "上传目标不是普通文件或文件夹"
 msgstr "上传目标不是普通文件或文件夹"
 
-#: src/lib/errors/messages.ts:95
+#: src/lib/errors/messages.ts:104
 msgid "上传长度、分片范围或冲突处理方式无效"
 msgstr "上传长度、分片范围或冲突处理方式无效"
 
@@ -779,20 +817,20 @@ msgstr "上传长度、分片范围或冲突处理方式无效"
 msgid "上升"
 msgstr "上升"
 
-#: src/lib/errors/messages.ts:284
+#: src/lib/errors/messages.ts:293
 msgid "上游接口返回数据缺少必要字段"
 msgstr "上游接口返回数据缺少必要字段"
 
-#: src/lib/errors/messages.ts:278
+#: src/lib/errors/messages.ts:287
 msgid "上游文件清单中没有匹配的文件"
 msgstr "上游文件清单中没有匹配的文件"
 
 #. 清单路径可能越过下载目录；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:279
+#: src/lib/errors/messages.ts:288
 msgid "上游文件清单包含不安全路径：{path}"
 msgstr "上游文件清单包含不安全路径：{path}"
 
-#: src/lib/errors/messages.ts:277
+#: src/lib/errors/messages.ts:286
 msgid "上游文件清单过大被截断，无法安全同步"
 msgstr "上游文件清单过大被截断，无法安全同步"
 
@@ -837,15 +875,15 @@ msgstr "下载 {entryName2}"
 msgid "下载中"
 msgstr "下载中"
 
-#: src/features/about/AboutPage.tsx:160
+#: src/features/about/AboutPage.tsx:154
 msgid "下载任务"
 msgstr "下载任务"
 
-#: src/lib/errors/messages.ts:124
+#: src/lib/errors/messages.ts:133
 msgid "下载任务不存在"
 msgstr "下载任务不存在"
 
-#: src/lib/errors/messages.ts:132
+#: src/lib/errors/messages.ts:141
 msgid "下载会话无法恢复，请重新添加任务"
 msgstr "下载会话无法恢复，请重新添加任务"
 
@@ -854,7 +892,7 @@ msgstr "下载会话无法恢复，请重新添加任务"
 msgid "下载压缩包中"
 msgstr "下载压缩包中"
 
-#: src/lib/errors/messages.ts:258
+#: src/lib/errors/messages.ts:267
 msgid "下载响应的范围、长度或版本不匹配，请重新下载"
 msgstr "下载响应的范围、长度或版本不匹配，请重新下载"
 
@@ -887,7 +925,7 @@ msgstr "下载数据"
 msgid "下载文件"
 msgstr "下载文件"
 
-#: src/lib/errors/messages.ts:125
+#: src/lib/errors/messages.ts:134
 msgid "下载文件不存在"
 msgstr "下载文件不存在"
 
@@ -952,19 +990,19 @@ msgid "不指定时间"
 msgstr "不指定时间"
 
 #. SFTP 错误；path 是文件路径，特殊文件指设备、套接字等非普通文件。
-#: src/lib/errors/messages.ts:165
+#: src/lib/errors/messages.ts:174
 msgid "不支持传输特殊文件：{path}"
 msgstr "不支持传输特殊文件：{path}"
 
-#: src/lib/errors/messages.ts:248
+#: src/lib/errors/messages.ts:257
 msgid "不支持此翻译模型，请选择列表中的模型"
 msgstr "不支持此翻译模型，请选择列表中的模型"
 
-#: src/lib/errors/messages.ts:179
+#: src/lib/errors/messages.ts:188
 msgid "不支持的压缩包格式"
 msgstr "不支持的压缩包格式"
 
-#: src/lib/errors/messages.ts:286
+#: src/lib/errors/messages.ts:295
 msgid "不支持的译文包格式"
 msgstr "不支持的译文包格式"
 
@@ -972,7 +1010,7 @@ msgstr "不支持的译文包格式"
 msgid "不缓存"
 msgstr "不缓存"
 
-#: src/lib/errors/messages.ts:169
+#: src/lib/errors/messages.ts:178
 msgid "不能删除根目录或受保护的路径"
 msgstr "不能删除根目录或受保护的路径"
 
@@ -1067,7 +1105,7 @@ msgstr "中杆"
 msgid "中等"
 msgstr "中等"
 
-#: src/lib/errors/messages.ts:325
+#: src/lib/errors/messages.ts:339
 msgid "临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。"
 msgstr "临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。"
 
@@ -1087,7 +1125,7 @@ msgstr "主数据库和密钥文件包含正在使用的记录，请在对应模
 #: src/features/export/sections.tsx:32
 #: src/features/logs/use-activity-logs.ts:33
 #: src/features/ssh-sftp/components/Sidebar.tsx:358
-#: src/lib/errors/messages.ts:310
+#: src/lib/errors/messages.ts:324
 msgid "主机"
 msgstr "主机"
 
@@ -1168,6 +1206,10 @@ msgstr "人工修订"
 msgid "仅上传"
 msgstr "仅上传"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:173
+msgid "仅交给可信的本机 MCP 客户端。共享凭据等于共享数据访问权限。"
+msgstr "仅交给可信的本机 MCP 客户端。共享凭据等于共享数据访问权限。"
+
 #. 当前运行期日志达到容量上限时的短提示
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:59
 msgid "仅保留最近记录"
@@ -1202,7 +1244,7 @@ msgstr "仅支持 MP4、MOV、M4V 格式"
 msgid "仅支持 PNG、JPG、WebP 格式"
 msgstr "仅支持 PNG、JPG、WebP 格式"
 
-#: src/lib/errors/messages.ts:151
+#: src/lib/errors/messages.ts:160
 msgid "仅支持磁力链接或 .torrent 文件路径"
 msgstr "仅支持磁力链接或 .torrent 文件路径"
 
@@ -1280,11 +1322,11 @@ msgstr "代码块"
 msgid "任务"
 msgstr "任务"
 
-#: src/lib/errors/messages.ts:145
+#: src/lib/errors/messages.ts:154
 msgid "任务不存在或尚未初始化，请稍后重试"
 msgstr "任务不存在或尚未初始化，请稍后重试"
 
-#: src/lib/errors/messages.ts:129
+#: src/lib/errors/messages.ts:138
 msgid "任务中没有可导出的文件"
 msgstr "任务中没有可导出的文件"
 
@@ -1300,11 +1342,11 @@ msgstr "任务会立即停止，之后需要重新发起。"
 msgid "任务及应用内下载文件将被删除，操作无法恢复。"
 msgstr "任务及应用内下载文件将被删除，操作无法恢复。"
 
-#: src/lib/errors/messages.ts:134
+#: src/lib/errors/messages.ts:143
 msgid "任务尚未完成，无法转存"
 msgstr "任务尚未完成，无法转存"
 
-#: src/lib/errors/messages.ts:146
+#: src/lib/errors/messages.ts:155
 msgid "任务已完成，无法取消"
 msgstr "任务已完成，无法取消"
 
@@ -1312,7 +1354,7 @@ msgstr "任务已完成，无法取消"
 msgid "任务已添加，可在传输面板查看进度"
 msgstr "任务已添加，可在传输面板查看进度"
 
-#: src/lib/errors/messages.ts:135
+#: src/lib/errors/messages.ts:144
 msgid "任务已经转存"
 msgstr "任务已经转存"
 
@@ -1321,7 +1363,7 @@ msgstr "任务已经转存"
 msgid "任务操作"
 msgstr "任务操作"
 
-#: src/lib/errors/messages.ts:147
+#: src/lib/errors/messages.ts:156
 msgid "任务未运行"
 msgstr "任务未运行"
 
@@ -1346,7 +1388,7 @@ msgstr "优先级"
 msgid "传输任务"
 msgstr "传输任务"
 
-#: src/lib/errors/messages.ts:161
+#: src/lib/errors/messages.ts:170
 msgid "传输任务尚未开始或已结束"
 msgstr "传输任务尚未开始或已结束"
 
@@ -1356,7 +1398,7 @@ msgstr "传输任务尚未开始或已结束"
 msgid "传输原始错误"
 msgstr "传输原始错误"
 
-#: src/lib/errors/messages.ts:163
+#: src/lib/errors/messages.ts:172
 msgid "传输已取消"
 msgstr "传输已取消"
 
@@ -1454,6 +1496,10 @@ msgstr "使用系统应用打开"
 msgid "使用系统应用打开 {entryName}"
 msgstr "使用系统应用打开 {entryName}"
 
+#: src/features/mcp/McpHelpDialog.tsx:26
+msgid "供可信的本机客户端调用应用模块。"
+msgstr "供可信的本机客户端调用应用模块。"
+
 #: src/features/games/billiards/BilliardsRulesDialog.tsx:65
 msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
 msgstr "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
@@ -1485,6 +1531,18 @@ msgstr "保存到"
 msgid "保存副本"
 msgstr "保存副本"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:110
+msgid "保存后，所选权限统一适用于全部模块，包括后续新增模块。"
+msgstr "保存后，所选权限统一适用于全部模块，包括后续新增模块。"
+
+#: src/features/mcp/McpCredentialEditor.tsx:180
+msgid "保存后，此客户端的旧请求会失效，未完成的操作会被中断。"
+msgstr "保存后，此客户端的旧请求会失效，未完成的操作会被中断。"
+
+#: src/features/todo/mcp-presentation.ts:22
+msgid "保存完整图文"
+msgstr "保存完整图文"
+
 #. 保存当前三维相机位置，仅当前会话有效。
 #: src/features/model-viewer/components/NavigationPanel.tsx:122
 msgid "保存当前视角"
@@ -1495,7 +1553,7 @@ msgstr "保存当前视角"
 msgid "保存录屏"
 msgstr "保存录屏"
 
-#: src/features/todo/hooks/use-todo.ts:67
+#: src/features/todo/hooks/use-todo.ts:72
 msgid "保存待办失败"
 msgstr "保存待办失败"
 
@@ -1503,6 +1561,18 @@ msgstr "保存待办失败"
 #: src/features/model-viewer/components/ScreenshotExport.tsx:58
 msgid "保存截图"
 msgstr "保存截图"
+
+#: src/features/mcp/McpCredentialEditor.tsx:198
+msgid "保存权限"
+msgstr "保存权限"
+
+#: src/features/mcp/McpServiceBar.tsx:118
+msgid "保存端口"
+msgstr "保存端口"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:155
+msgid "保存连接凭据"
+msgstr "保存连接凭据"
 
 #: src/features/export/ExportPanel.tsx:43
 msgid "保护备份"
@@ -1542,6 +1612,14 @@ msgstr "信息与场景"
 msgid "信息与建议"
 msgstr "信息与建议"
 
+#: src/features/todo/mcp-presentation.ts:12
+msgid "修改待办信息"
+msgstr "修改待办信息"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:97
+msgid "修改授权权限？"
+msgstr "修改授权权限？"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:229
 msgid "修改日期"
 msgstr "修改日期"
@@ -1569,6 +1647,10 @@ msgstr "停一手"
 #: src/features/translation/TranslationTool.tsx:249
 msgid "停止"
 msgstr "停止"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:51
+msgid "停止 MCP 服务？"
+msgstr "停止 MCP 服务？"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:183
 msgid "停止后，进行中的传输会被中断，已连接设备会断开。"
@@ -1603,8 +1685,14 @@ msgstr "停止录屏"
 #: src/features/lan-transfer/LanTransferTool.tsx:47
 #: src/features/lan-transfer/LanTransferTool.tsx:181
 #: src/features/lan-transfer/LanTransferTool.tsx:185
+#: src/features/mcp/McpCredentialDialogs.tsx:64
+#: src/features/mcp/McpServiceBar.tsx:142
 msgid "停止服务"
 msgstr "停止服务"
+
+#: src/features/mcp/McpHelpDialog.tsx:66
+msgid "停止服务会断开客户端并中断未完成的操作。请求和响应可在活动页的执行日志中查看；连接失败时检查端口、凭据和执行日志。"
+msgstr "停止服务会断开客户端并中断未完成的操作。请求和响应可在活动页的执行日志中查看；连接失败时检查端口、凭据和执行日志。"
 
 #. 结束当前诗词朗读或音色试听
 #: src/features/poetry/components/PoetrySpeech.tsx:97
@@ -1707,6 +1795,10 @@ msgstr "全部替换"
 msgid "全部来源"
 msgstr "全部来源"
 
+#: src/features/mcp/McpModuleFilter.tsx:31
+msgid "全部模块"
+msgstr "全部模块"
+
 #: src/features/logs/LogFilters.tsx:89
 msgid "全部结果"
 msgstr "全部结果"
@@ -1733,11 +1825,11 @@ msgid "共享目录"
 msgstr "共享目录"
 
 #. 局域网浏览/下载引用了不存在的共享；share 是共享目录标识。
-#: src/lib/errors/messages.ts:101
+#: src/lib/errors/messages.ts:110
 msgid "共享目录不存在或已被移除：{share}"
 msgstr "共享目录不存在或已被移除：{share}"
 
-#: src/lib/errors/messages.ts:109
+#: src/lib/errors/messages.ts:118
 msgid "共享目录不存在或无法访问，请检查共享设置"
 msgstr "共享目录不存在或无法访问，请检查共享设置"
 
@@ -1746,12 +1838,12 @@ msgstr "共享目录不存在或无法访问，请检查共享设置"
 msgid "共用数据缓冲"
 msgstr "共用数据缓冲"
 
-#: src/features/about/AboutPage.tsx:51
+#: src/features/about/AboutPage.tsx:45
 #: src/features/settings/AppSettingsMenu.tsx:88
 msgid "关于"
 msgstr "关于"
 
-#: src/features/settings/SettingsOverview.tsx:60
+#: src/features/settings/SettingsOverview.tsx:62
 msgid "关于与本地数据"
 msgstr "关于与本地数据"
 
@@ -1767,7 +1859,7 @@ msgstr "关联纹理"
 
 #: src/components/ui/dialog-layout.tsx:62
 #: src/components/ui/dialog.tsx:115
-#: src/components/ui/dialog.tsx:157
+#: src/components/ui/dialog.tsx:162
 #: src/components/ui/sheet.tsx:88
 #: src/features/bt/components/AddTorrentDialog.tsx:390
 #: src/features/model-viewer/components/LibraryPanel.tsx:350
@@ -1807,6 +1899,10 @@ msgstr "关闭后，本次修改不会保存。"
 #: src/features/poetry/components/PoetryLocalManagement.tsx:95
 msgid "关闭时正文搜索较慢"
 msgstr "关闭时正文搜索较慢"
+
+#: src/features/todo/mcp-presentation.ts:24
+msgid "关闭编辑草稿"
+msgstr "关闭编辑草稿"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:72
 msgid "关闭连接"
@@ -1863,9 +1959,13 @@ msgstr "再来一局"
 msgid "最低目标"
 msgstr "最低目标"
 
-#: src/lib/errors/messages.ts:215
+#: src/lib/errors/messages.ts:224
 msgid "最多保存 5 个 AI 服务地址"
 msgstr "最多保存 5 个 AI 服务地址"
+
+#: src/features/mcp/McpCredentialsTable.tsx:60
+msgid "最多授权 16 个客户端"
+msgstr "最多授权 16 个客户端"
 
 #: src/features/media-compress/resize/ImageResizePanel.tsx:238
 msgid "最大边长"
@@ -1894,6 +1994,10 @@ msgstr "最长 60 秒 · 黑色背景 · 无音频 · 不含工具面板"
 msgid "最高单杆 {highestBreak}"
 msgstr "最高单杆 {highestBreak}"
 
+#. MCP 全部模块的新建和编辑权限，不包含删除，复选框与授权表头共用
+#. MCP 全部模块的新建和编辑权限，不包含删除，复选框与授权表头共用
+#: src/features/mcp/McpCredentialEditor.tsx:69
+#: src/features/mcp/McpCredentialsTable.tsx:111
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:316
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:114
 msgid "写入"
@@ -1902,6 +2006,10 @@ msgstr "写入"
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:116
 msgid "写入、执行"
 msgstr "写入、执行"
+
+#: src/features/mcp/McpCredentialEditor.tsx:168
+msgid "写入需允许读取，删除需允许写入。"
+msgstr "写入需允许读取，删除需允许写入。"
 
 #. 日志操作准备阶段的短状态
 #: src/features/connection-diagnostics/ExecutionLogStatus.tsx:52
@@ -1930,6 +2038,10 @@ msgstr "几何体数"
 #: src/features/model-viewer/components/MemoryPanel.tsx:274
 msgid "几何数据"
 msgstr "几何数据"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:158
+msgid "凭据只显示这一次。关闭后无法找回，只能重新生成。"
+msgstr "凭据只显示这一次。关闭后无法找回，只能重新生成。"
 
 #: src/features/connection-diagnostics/execution-log-stream.ts:33
 #: src/features/connection-diagnostics/execution-log-stream.ts:63
@@ -2025,6 +2137,9 @@ msgstr "创建游戏房间"
 msgid "创建目录中"
 msgstr "创建目录中"
 
+#. MCP 全部模块的删除权限，必须单独勾选，复选框与授权表头共用
+#. MCP 全部模块的删除权限，必须单独勾选，复选框与授权表头共用
+#. MCP 工具所需的独立删除权限
 #. 增量同步删除策略：删除目标多余文件（--delete）
 #: src/features/ai-configuration/RowActions.desktop.tsx:39
 #: src/features/ai-configuration/RowActions.desktop.tsx:40
@@ -2033,6 +2148,9 @@ msgstr "创建目录中"
 #: src/features/bt/components/TaskRow.tsx:233
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:122
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:572
+#: src/features/mcp/McpCredentialEditor.tsx:78
+#: src/features/mcp/McpCredentialsTable.tsx:120
+#: src/features/mcp/McpToolsTable.tsx:171
 #: src/features/model-viewer/components/LibraryPanel.tsx:314
 #: src/features/poetry/components/PoetryLocalManagement.tsx:130
 #: src/features/poetry/components/PoetryTranslationSection.tsx:380
@@ -2118,7 +2236,7 @@ msgstr "删除密钥？"
 msgid "删除密钥“{pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。"
 msgstr "删除密钥“{pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。"
 
-#: src/lib/errors/messages.ts:226
+#: src/lib/errors/messages.ts:235
 msgid "删除当前密钥或模型前，请选择此地址下的其他项作为替代"
 msgstr "删除当前密钥或模型前，请选择此地址下的其他项作为替代"
 
@@ -2133,6 +2251,10 @@ msgstr "删除待办"
 #: src/features/todo/TodoTool.tsx:301
 msgid "删除待办？"
 msgstr "删除待办？"
+
+#: src/features/todo/mcp-presentation.ts:15
+msgid "删除待办及图片"
+msgstr "删除待办及图片"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:38
@@ -2222,11 +2344,15 @@ msgstr "刷新"
 msgid "刷新 AI 配置"
 msgstr "刷新 AI 配置"
 
+#: src/features/mcp/McpServiceBar.tsx:149
+msgid "刷新 MCP 状态"
+msgstr "刷新 MCP 状态"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:85
 msgid "刷新房间"
 msgstr "刷新房间"
 
-#: src/features/about/AboutPage.tsx:75
+#: src/features/about/AboutPage.tsx:69
 msgid "刷新状态"
 msgstr "刷新状态"
 
@@ -2253,13 +2379,13 @@ msgstr "剩余 {taskEtaValue}"
 msgid "力度"
 msgstr "力度"
 
-#: src/features/settings/SettingsOverview.tsx:21
+#: src/features/settings/SettingsOverview.tsx:22
 msgid "功能"
 msgstr "功能"
 
 #: src/features/settings/FeatureEntrySettings.tsx:158
-#: src/features/settings/SettingsOverview.tsx:30
-#: src/features/settings/SettingsPage.tsx:38
+#: src/features/settings/SettingsOverview.tsx:31
+#: src/features/settings/SettingsPage.tsx:40
 msgid "功能入口"
 msgstr "功能入口"
 
@@ -2277,7 +2403,7 @@ msgstr "加入房间"
 msgid "加入游戏房间"
 msgstr "加入游戏房间"
 
-#: src/lib/errors/messages.ts:86
+#: src/lib/errors/messages.ts:95
 msgid "加入游戏房间被拒绝"
 msgstr "加入游戏房间被拒绝"
 
@@ -2431,7 +2557,7 @@ msgstr "历史数值"
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:122
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:122
 #: src/features/logs/ActivityLogsPage.tsx:35
-#: src/features/settings/SettingsOverview.tsx:53
+#: src/features/settings/SettingsOverview.tsx:55
 msgid "历史日志"
 msgstr "历史日志"
 
@@ -2454,20 +2580,20 @@ msgstr "压缩中"
 msgid "压缩包"
 msgstr "压缩包"
 
-#: src/lib/errors/messages.ts:283
+#: src/lib/errors/messages.ts:292
 msgid "压缩包包含不安全路径"
 msgstr "压缩包包含不安全路径"
 
 #. 解压被拒绝；path 是压缩包内可能越过目标目录的路径。
-#: src/lib/errors/messages.ts:180
+#: src/lib/errors/messages.ts:189
 msgid "压缩包包含不安全路径：{path}"
 msgstr "压缩包包含不安全路径：{path}"
 
-#: src/lib/errors/messages.ts:131
+#: src/lib/errors/messages.ts:140
 msgid "压缩包目标文件已存在，请重试"
 msgstr "压缩包目标文件已存在，请重试"
 
-#: src/lib/errors/messages.ts:130
+#: src/lib/errors/messages.ts:139
 msgid "压缩包路径无效"
 msgstr "压缩包路径无效"
 
@@ -2540,7 +2666,7 @@ msgstr "原始字节（十六进制）"
 msgid "原文"
 msgstr "原文"
 
-#: src/lib/errors/messages.ts:256
+#: src/lib/errors/messages.ts:265
 msgid "原文超出模型上下文限制，请缩短文本后重试"
 msgstr "原文超出模型上下文限制，请缩短文本后重试"
 
@@ -2591,7 +2717,7 @@ msgstr "发现上次的对局存档，是否继续？"
 msgid "发现新版本"
 msgstr "发现新版本"
 
-#: src/lib/errors/messages.ts:293
+#: src/lib/errors/messages.ts:302
 msgid "发生未知错误，请重试"
 msgstr "发生未知错误，请重试"
 
@@ -2622,6 +2748,9 @@ msgstr "发送中"
 #: src/features/lan-transfer/LanShareDialog.tsx:153
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:546
 #: src/features/logs/LogDialogs.tsx:208
+#: src/features/mcp/McpCredentialDialogs.tsx:61
+#: src/features/mcp/McpCredentialDialogs.tsx:118
+#: src/features/mcp/McpCredentialEditor.tsx:195
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:304
 #: src/features/poetry/components/PoetryTranslationSection.tsx:347
@@ -2693,7 +2822,7 @@ msgstr "取消处理"
 msgid "取消导入"
 msgstr "取消导入"
 
-#: src/lib/errors/messages.ts:140
+#: src/lib/errors/messages.ts:149
 msgid "取消打包超时，请稍后重试"
 msgstr "取消打包超时，请稍后重试"
 
@@ -2746,7 +2875,7 @@ msgstr "口令保护"
 msgid "古诗词"
 msgstr "古诗词"
 
-#: src/lib/errors/messages.ts:326
+#: src/lib/errors/messages.ts:340
 msgid "另一个系统导出尚未结束，请先完成或关闭系统面板。"
 msgstr "另一个系统导出尚未结束，请先完成或关闭系统面板。"
 
@@ -2771,6 +2900,10 @@ msgstr "可以重试恢复图形显示，或返回其他工具。"
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:101
 msgid "可用 {formatBytesValue}"
 msgstr "可用 {formatBytesValue}"
+
+#: src/features/mcp/McpToolsTable.tsx:43
+msgid "可用工具"
+msgstr "可用工具"
 
 #. 封闭且绕序一致、但有向体积为负的连通壳体数。
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:94
@@ -2853,7 +2986,7 @@ msgstr "同步失败"
 msgid "同步完成"
 msgstr "同步完成"
 
-#: src/lib/errors/messages.ts:202
+#: src/lib/errors/messages.ts:211
 msgid "同步目标无效：{path}"
 msgstr "同步目标无效：{path}"
 
@@ -2862,11 +2995,11 @@ msgstr "同步目标无效：{path}"
 msgid "同步诗词库"
 msgstr "同步诗词库"
 
-#: src/lib/errors/messages.ts:204
+#: src/lib/errors/messages.ts:213
 msgid "同步选项已变化，请重新预览"
 msgstr "同步选项已变化，请重新预览"
 
-#: src/lib/errors/messages.ts:203
+#: src/lib/errors/messages.ts:212
 msgid "同步预览已过期，请重新预览"
 msgstr "同步预览已过期，请重新预览"
 
@@ -2875,11 +3008,13 @@ msgstr "同步预览已过期，请重新预览"
 msgid "同网段设备"
 msgstr "同网段设备"
 
+#. MCP 工具的可读名称，而非协议调用名
 #: src/features/ai-configuration/AiEditorDialog.tsx:111
 #: src/features/lan-transfer/LanShareDialog.tsx:94
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:321
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:330
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:331
+#: src/features/mcp/McpToolsTable.tsx:98
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:85
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:171
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:185
@@ -2930,6 +3065,7 @@ msgid "启动局域网传输"
 msgstr "启动局域网传输"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:47
+#: src/features/mcp/McpServiceBar.tsx:142
 msgid "启动服务"
 msgstr "启动服务"
 
@@ -2998,7 +3134,7 @@ msgstr "固定高度"
 msgid "图片"
 msgstr "图片"
 
-#: src/lib/errors/messages.ts:75
+#: src/lib/errors/messages.ts:84
 msgid "图片单边超过 8192 像素限制，请先缩小后再添加"
 msgstr "图片单边超过 8192 像素限制，请先缩小后再添加"
 
@@ -3011,11 +3147,11 @@ msgstr "图片压缩"
 msgid "图片备注"
 msgstr "图片备注"
 
-#: src/lib/errors/messages.ts:73
+#: src/lib/errors/messages.ts:82
 msgid "图片大小、像素或数量超过限制"
 msgstr "图片大小、像素或数量超过限制"
 
-#: src/lib/errors/messages.ts:79
+#: src/lib/errors/messages.ts:88
 msgid "图片导入已取消"
 msgstr "图片导入已取消"
 
@@ -3023,7 +3159,7 @@ msgstr "图片导入已取消"
 msgid "图片导入已取消，请移除后重新插入。"
 msgstr "图片导入已取消，请移除后重新插入。"
 
-#: src/lib/errors/messages.ts:77
+#: src/lib/errors/messages.ts:86
 msgid "图片损坏或无法处理，请重新选择"
 msgstr "图片损坏或无法处理，请重新选择"
 
@@ -3036,11 +3172,11 @@ msgstr "图片操作失败"
 msgid "图片文件"
 msgstr "图片文件"
 
-#: src/lib/errors/messages.ts:72
+#: src/lib/errors/messages.ts:81
 msgid "图片正在处理，请稍后再试"
 msgstr "图片正在处理，请稍后再试"
 
-#: src/lib/errors/messages.ts:74
+#: src/lib/errors/messages.ts:83
 msgid "图片超过 1200 万像素限制，请先缩小后再添加"
 msgstr "图片超过 1200 万像素限制，请先缩小后再添加"
 
@@ -3152,7 +3288,7 @@ msgstr "备份内容"
 msgid "备份密码"
 msgstr "备份密码"
 
-#: src/lib/errors/messages.ts:80
+#: src/lib/errors/messages.ts:89
 msgid "备份数据超过当前支持的大小，请减少导出内容"
 msgstr "备份数据超过当前支持的大小，请减少导出内容"
 
@@ -3182,7 +3318,7 @@ msgstr "备份文件格式无效：缺少字段 {field} 或取值不正确"
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "备份文件解密失败：密码错误或文件已损坏"
 
-#: src/features/settings/SettingsOverview.tsx:42
+#: src/features/settings/SettingsOverview.tsx:44
 msgid "备份本机数据"
 msgstr "备份本机数据"
 
@@ -3193,7 +3329,7 @@ msgstr "备份本机数据"
 msgid "备注"
 msgstr "备注"
 
-#: src/lib/errors/messages.ts:67
+#: src/lib/errors/messages.ts:76
 msgid "备注内容无效或超过限制"
 msgstr "备注内容无效或超过限制"
 
@@ -3203,7 +3339,7 @@ msgstr "备注内容无效或超过限制"
 msgid "备注图片"
 msgstr "备注图片"
 
-#: src/lib/errors/messages.ts:78
+#: src/lib/errors/messages.ts:87
 msgid "备注图片不可用，请重新插入"
 msgstr "备注图片不可用，请重新插入"
 
@@ -3211,11 +3347,11 @@ msgstr "备注图片不可用，请重新插入"
 msgid "备注插入工具"
 msgstr "备注插入工具"
 
-#: src/lib/errors/messages.ts:68
+#: src/lib/errors/messages.ts:77
 msgid "备注版本暂不支持，请更新应用"
 msgstr "备注版本暂不支持，请更新应用"
 
-#: src/lib/errors/messages.ts:70
+#: src/lib/errors/messages.ts:79
 msgid "备注编辑会话已关闭，请重新打开"
 msgstr "备注编辑会话已关闭，请重新打开"
 
@@ -3232,6 +3368,10 @@ msgstr "复制"
 msgid "复制代码"
 msgstr "复制代码"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:181
+msgid "复制凭据"
+msgstr "复制凭据"
+
 #: src/features/bt/components/TaskFilesPage.tsx:75
 #: src/features/bt/components/TaskRow.tsx:213
 msgid "复制到用户目录"
@@ -3242,9 +3382,17 @@ msgstr "复制到用户目录"
 msgid "复制到系统下载目录"
 msgstr "复制到系统下载目录"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:188
+msgid "复制含凭据的配置"
+msgstr "复制含凭据的配置"
+
 #: src/features/todo/notes/TodoNoteImage.tsx:171
 msgid "复制图片"
 msgstr "复制图片"
+
+#: src/features/todo/mcp-presentation.ts:20
+msgid "复制图片到草稿"
+msgstr "复制图片到草稿"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:114
 #: src/features/lan-transfer/LanServiceCard.tsx:55
@@ -3276,7 +3424,7 @@ msgstr "复制房间码"
 msgid "复制日志"
 msgstr "复制日志"
 
-#: src/features/about/AboutPage.tsx:65
+#: src/features/about/AboutPage.tsx:59
 msgid "复制环境信息"
 msgstr "复制环境信息"
 
@@ -3285,9 +3433,18 @@ msgstr "复制环境信息"
 msgid "复制结果"
 msgstr "复制结果"
 
+#. 复制 MCP 工具协议调用名，name 是工具名
+#: src/features/mcp/McpToolsTable.tsx:157
+msgid "复制调用名 {name}"
+msgstr "复制调用名 {name}"
+
 #: src/features/vault/VaultEntryCard.tsx:127
 msgid "复制账号"
 msgstr "复制账号"
+
+#: src/features/mcp/McpServiceBar.tsx:129
+msgid "复制连接配置模板"
+msgstr "复制连接配置模板"
 
 #: src/features/model-viewer/components/ViewerHelp.tsx:75
 msgid "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请按完整路径逐项补选。"
@@ -3354,11 +3511,11 @@ msgstr "字号"
 msgid "字节数未知"
 msgstr "字节数未知"
 
-#: src/features/about/AboutPage.tsx:127
+#: src/features/about/AboutPage.tsx:121
 msgid "存储"
 msgstr "存储"
 
-#: src/features/settings/SettingsOverview.tsx:61
+#: src/features/settings/SettingsOverview.tsx:63
 msgid "存储、清理与项目帮助"
 msgstr "存储、清理与项目帮助"
 
@@ -3371,7 +3528,7 @@ msgstr "存储与缓存"
 msgid "存储明细"
 msgstr "存储明细"
 
-#: src/lib/errors/messages.ts:260
+#: src/lib/errors/messages.ts:269
 msgid "存储空间不足，请清理空间后重试"
 msgstr "存储空间不足，请清理空间后重试"
 
@@ -3393,7 +3550,7 @@ msgstr "安装后即可离线翻译。"
 msgid "安装命令已复制"
 msgstr "安装命令已复制"
 
-#: src/lib/errors/messages.ts:337
+#: src/lib/errors/messages.ts:351
 msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "安装未完成，可重试安装或稍后再试。"
 
@@ -3451,6 +3608,10 @@ msgstr "实际请求"
 msgid "客户端"
 msgstr "客户端"
 
+#: src/features/mcp/McpCredentialsTable.tsx:49
+msgid "客户端授权"
+msgstr "客户端授权"
+
 #: src/features/media-compress/resize/ImageResizePanel.tsx:220
 msgid "宽度"
 msgstr "宽度"
@@ -3467,7 +3628,7 @@ msgstr "宽高比例不同会拉伸变形"
 msgid "密码"
 msgstr "密码"
 
-#: src/lib/errors/messages.ts:309
+#: src/lib/errors/messages.ts:323
 msgid "密码库"
 msgstr "密码库"
 
@@ -3506,7 +3667,7 @@ msgstr "密钥口令（仅用于测试）"
 msgid "密钥文件"
 msgstr "密钥文件"
 
-#: src/lib/errors/messages.ts:222
+#: src/lib/errors/messages.ts:231
 msgid "密钥标签须为 1–80 个字符，且不能包含控制字符"
 msgstr "密钥标签须为 1–80 个字符，且不能包含控制字符"
 
@@ -3520,11 +3681,11 @@ msgstr "密钥管理"
 msgid "对局中断"
 msgstr "对局中断"
 
-#: src/lib/errors/messages.ts:321
+#: src/lib/errors/messages.ts:335
 msgid "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
 msgstr "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
 
-#: src/lib/errors/messages.ts:322
+#: src/lib/errors/messages.ts:336
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 
@@ -3601,6 +3762,10 @@ msgstr "导入会追加模型。隐藏保留资源，移除不会删除源文件
 msgid "导入前请核对数据范围，覆盖模式会删除对应模块中的现有记录。"
 msgstr "导入前请核对数据范围，覆盖模式会删除对应模块中的现有记录。"
 
+#: src/features/todo/mcp-presentation.ts:18
+msgid "导入图片"
+msgstr "导入图片"
+
 #. 单个三维模型导入失败状态。
 #: src/features/model-viewer/components/ModelList.tsx:43
 #: src/features/poetry/components/TranslationPackManager.tsx:47
@@ -3665,7 +3830,7 @@ msgstr "导出应用数据"
 msgid "导出所选数据"
 msgstr "导出所选数据"
 
-#: src/lib/errors/messages.ts:324
+#: src/lib/errors/messages.ts:338
 msgid "导出文件无效或超过 64 MiB，请重新生成。"
 msgstr "导出文件无效或超过 64 MiB，请重新生成。"
 
@@ -3750,6 +3915,14 @@ msgstr "小游戏"
 msgid "尚未安装合集"
 msgstr "尚未安装合集"
 
+#: src/features/mcp/McpCredentialsTable.tsx:227
+msgid "尚未授权客户端，添加授权后可连接服务。"
+msgstr "尚未授权客户端，添加授权后可连接服务。"
+
+#: src/features/mcp/McpToolsTable.tsx:216
+msgid "尚未注册工具"
+msgstr "尚未注册工具"
+
 #: src/features/poetry/components/PoemDetail.tsx:95
 msgid "尚未选择作品"
 msgstr "尚未选择作品"
@@ -3775,19 +3948,19 @@ msgstr "局域网"
 #: src/features/home/entries.tsx:87
 #: src/features/lan-transfer/LanServiceCard.tsx:40
 #: src/features/lan-transfer/LanTransferTool.tsx:36
-#: src/lib/errors/messages.ts:312
+#: src/lib/errors/messages.ts:326
 msgid "局域网传输"
 msgstr "局域网传输"
 
-#: src/lib/errors/messages.ts:92
+#: src/lib/errors/messages.ts:101
 msgid "局域网传输任务已达并发上限，请稍后重试"
 msgstr "局域网传输任务已达并发上限，请稍后重试"
 
-#: src/lib/errors/messages.ts:90
+#: src/lib/errors/messages.ts:99
 msgid "局域网传输已取消"
 msgstr "局域网传输已取消"
 
-#: src/lib/errors/messages.ts:91
+#: src/lib/errors/messages.ts:100
 msgid "局域网传输意外结束，请重试"
 msgstr "局域网传输意外结束，请重试"
 
@@ -3807,8 +3980,8 @@ msgstr "局域网传输设置"
 msgid "局域网共享文件"
 msgstr "局域网共享文件"
 
-#: src/features/about/AboutPage.tsx:179
-#: src/lib/errors/messages.ts:301
+#: src/features/about/AboutPage.tsx:173
+#: src/lib/errors/messages.ts:310
 msgid "局域网服务"
 msgstr "局域网服务"
 
@@ -3817,11 +3990,11 @@ msgstr "局域网服务"
 msgid "局域网联机"
 msgstr "局域网联机"
 
-#: src/lib/errors/messages.ts:94
+#: src/lib/errors/messages.ts:103
 msgid "局域网请求头超出大小限制"
 msgstr "局域网请求头超出大小限制"
 
-#: src/lib/errors/messages.ts:93
+#: src/lib/errors/messages.ts:102
 msgid "局域网请求无效或不完整"
 msgstr "局域网请求无效或不完整"
 
@@ -3846,6 +4019,14 @@ msgstr "展开或收起动画控制"
 msgid "工具"
 msgstr "工具"
 
+#: src/features/mcp/McpToolsTable.tsx:81
+msgid "工具信息"
+msgstr "工具信息"
+
+#: src/features/mcp/McpToolsTable.tsx:200
+msgid "工具目录暂不可用，请重新读取设置。"
+msgstr "工具目录暂不可用，请重新读取设置。"
+
 #: src/features/bt/components/PeersPanel.tsx:102
 msgid "已上传"
 msgstr "已上传"
@@ -3858,7 +4039,7 @@ msgstr "已下载 {downloadedSize}"
 #. 待办新增或编辑保存成功的提示
 #: src/features/media-compress/components/CompressResultCard.tsx:43
 #: src/features/poetry/hooks/use-poetry-translations.ts:181
-#: src/features/todo/hooks/use-todo.ts:64
+#: src/features/todo/hooks/use-todo.ts:69
 #: src/features/vault/use-vault.ts:96
 msgid "已保存"
 msgstr "已保存"
@@ -3872,7 +4053,7 @@ msgstr "已保存 · 未验证"
 msgid "已保存模型"
 msgstr "已保存模型"
 
-#: src/lib/errors/messages.ts:243
+#: src/lib/errors/messages.ts:252
 msgid "已保存的 AI 翻译记录无效"
 msgstr "已保存的 AI 翻译记录无效"
 
@@ -3892,6 +4073,10 @@ msgstr "已停止"
 msgid "已允许访问"
 msgstr "已允许访问"
 
+#: src/features/mcp/McpServiceBar.tsx:64
+msgid "已关闭"
+msgstr "已关闭"
+
 #: src/features/settings/hooks/use-autostart.ts:40
 msgid "已关闭开机自启"
 msgstr "已关闭开机自启"
@@ -3901,7 +4086,7 @@ msgstr "已关闭开机自启"
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
 #: src/features/poetry/hooks/use-poetry-translations.ts:200
-#: src/features/todo/hooks/use-todo.ts:91
+#: src/features/todo/hooks/use-todo.ts:96
 #: src/features/vault/use-vault.ts:108
 msgid "已删除"
 msgstr "已删除"
@@ -3994,7 +4179,7 @@ msgstr "已复制到用户目录"
 msgid "已复制到系统下载目录"
 msgstr "已复制到系统下载目录"
 
-#: src/lib/errors/messages.ts:342
+#: src/lib/errors/messages.ts:356
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "已存在同名附件，请先重命名文件或移除旧附件。"
 
@@ -4064,6 +4249,11 @@ msgstr "已拒绝访问"
 msgid "已捕获 {captured} / 已读取 {received} 字节"
 msgstr "已捕获 {captured} / 已读取 {received} 字节"
 
+#. MCP 授权表中勾号的无障碍说明，表示此项权限已开启
+#: src/features/mcp/McpCredentialsTable.tsx:154
+msgid "已授权"
+msgstr "已授权"
+
 #: src/features/bt/components/PeersPanel.tsx:99
 msgid "已接收"
 msgstr "已接收"
@@ -4104,7 +4294,7 @@ msgstr "已替换 $ 处匹配"
 msgid "已替换第 $ 行的匹配"
 msgstr "已替换第 $ 行的匹配"
 
-#: src/lib/errors/messages.ts:261
+#: src/lib/errors/messages.ts:270
 msgid "已有诗词库同步任务在运行，请稍后重试"
 msgstr "已有诗词库同步任务在运行，请稍后重试"
 
@@ -4180,7 +4370,7 @@ msgstr "平局"
 msgid "并排"
 msgstr "并排"
 
-#: src/features/settings/SettingsOverview.tsx:50
+#: src/features/settings/SettingsOverview.tsx:52
 msgid "应用"
 msgstr "应用"
 
@@ -4319,7 +4509,7 @@ msgstr "开球母球须在头线后，可调整至出杆。"
 msgid "当前"
 msgstr "当前"
 
-#: src/lib/errors/messages.ts:210
+#: src/lib/errors/messages.ts:219
 msgid "当前 AI 服务地址已变更，请重新打开模型菜单"
 msgstr "当前 AI 服务地址已变更，请重新打开模型菜单"
 
@@ -4331,15 +4521,15 @@ msgstr "当前 WebView 不支持音频转码"
 msgid "当前不可用"
 msgstr "当前不可用"
 
-#: src/lib/errors/messages.ts:87
+#: src/lib/errors/messages.ts:96
 msgid "当前不在游戏房间中"
 msgstr "当前不在游戏房间中"
 
-#: src/lib/errors/messages.ts:253
+#: src/lib/errors/messages.ts:262
 msgid "当前任务尚未退出，请停止后再试"
 msgstr "当前任务尚未退出，请停止后再试"
 
-#: src/lib/errors/messages.ts:162
+#: src/lib/errors/messages.ts:171
 msgid "当前传输阶段无法暂停"
 msgstr "当前传输阶段无法暂停"
 
@@ -4377,7 +4567,7 @@ msgstr "当前已是最新版本"
 msgid "当前平台不支持 rsync，请选择压缩包或直连。"
 msgstr "当前平台不支持 rsync，请选择压缩包或直连。"
 
-#: src/lib/errors/messages.ts:178
+#: src/lib/errors/messages.ts:187
 msgid "当前平台不支持创建本地符号链接"
 msgstr "当前平台不支持创建本地符号链接"
 
@@ -4452,7 +4642,7 @@ msgstr "当前环境不支持导出 AVIF"
 msgid "当前环境不支持导出 AVIF，请改用 WebP 或 JPG"
 msgstr "当前环境不支持导出 AVIF，请改用 WebP 或 JPG"
 
-#: src/lib/errors/messages.ts:329
+#: src/lib/errors/messages.ts:343
 msgid "当前环境不支持录屏编码，可改用截图。"
 msgstr "当前环境不支持录屏编码，可改用截图。"
 
@@ -4487,7 +4677,7 @@ msgstr "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可
 msgid "录制视口"
 msgstr "录制视口"
 
-#: src/lib/errors/messages.ts:332
+#: src/lib/errors/messages.ts:346
 msgid "录屏保存失败，请检查保存位置和可用空间后重试。"
 msgstr "录屏保存失败，请检查保存位置和可用空间后重试。"
 
@@ -4499,11 +4689,11 @@ msgstr "录屏已保存。"
 msgid "录屏已生成。保存前请留在此页面。"
 msgstr "录屏已生成。保存前请留在此页面。"
 
-#: src/lib/errors/messages.ts:330
+#: src/lib/errors/messages.ts:344
 msgid "录屏未完成，请恢复模型显示后重试。"
 msgstr "录屏未完成，请恢复模型显示后重试。"
 
-#: src/lib/errors/messages.ts:331
+#: src/lib/errors/messages.ts:345
 msgid "录屏超过 64 MiB 上限，请缩短录制时间后重试。"
 msgstr "录屏超过 64 MiB 上限，请缩短录制时间后重试。"
 
@@ -4515,22 +4705,24 @@ msgstr "往返"
 #: src/features/about/use-about.ts:61
 #: src/features/export/sections.tsx:38
 #: src/features/logs/use-activity-logs.ts:31
-#: src/lib/errors/messages.ts:311
+#: src/lib/errors/messages.ts:325
 msgid "待办"
 msgstr "待办"
 
+#. MCP 工具目录和授权矩阵中的模块名称
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/home/entries.tsx:150
 #: src/features/logs/log-labels.ts:108
+#: src/features/todo/mcp-presentation.ts:4
 #: src/features/todo/TodoTool.tsx:94
 msgid "待办事项"
 msgstr "待办事项"
 
-#: src/lib/errors/messages.ts:69
+#: src/lib/errors/messages.ts:78
 msgid "待办已被更新，请重新打开后编辑"
 msgstr "待办已被更新，请重新打开后编辑"
 
-#: src/lib/errors/messages.ts:65
+#: src/lib/errors/messages.ts:74
 msgid "待办截止日期需使用 YYYY-MM-DD 格式"
 msgstr "待办截止日期需使用 YYYY-MM-DD 格式"
 
@@ -4548,7 +4740,7 @@ msgstr "待办标题不能为空"
 msgid "待办状态"
 msgstr "待办状态"
 
-#: src/lib/errors/messages.ts:64
+#: src/lib/errors/messages.ts:73
 msgid "待办计划时间无效"
 msgstr "待办计划时间无效"
 
@@ -4582,7 +4774,7 @@ msgstr "循环模式"
 msgid "德语"
 msgstr "德语"
 
-#: src/features/about/AboutPage.tsx:130
+#: src/features/about/AboutPage.tsx:124
 msgid "总占用"
 msgstr "总占用"
 
@@ -4612,7 +4804,7 @@ msgstr "恢复上次页面"
 msgid "恢复待办"
 msgstr "恢复待办"
 
-#: src/features/about/AboutPage.tsx:138
+#: src/features/about/AboutPage.tsx:132
 msgid "恢复首次打开状态"
 msgstr "恢复首次打开状态"
 
@@ -4636,6 +4828,10 @@ msgstr "成功"
 msgid "我先开球"
 msgstr "我先开球"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:195
+msgid "我已保存"
+msgstr "我已保存"
+
 #: src/features/ai-configuration/AiEditorDialog.tsx:154
 msgid "我确认将密钥和生成请求发送到新的服务地址。"
 msgstr "我确认将密钥和生成请求发送到新的服务地址。"
@@ -4645,7 +4841,7 @@ msgstr "我确认将密钥和生成请求发送到新的服务地址。"
 msgid "截图与录屏"
 msgstr "截图与录屏"
 
-#: src/lib/errors/messages.ts:334
+#: src/lib/errors/messages.ts:348
 msgid "截图保存失败，请检查保存位置和可用空间后重试。"
 msgstr "截图保存失败，请检查保存位置和可用空间后重试。"
 
@@ -4665,7 +4861,7 @@ msgstr "房间名（可选）"
 msgid "房间名称"
 msgstr "房间名称"
 
-#: src/lib/errors/messages.ts:85
+#: src/lib/errors/messages.ts:94
 msgid "房间的游戏类型不匹配"
 msgstr "房间的游戏类型不匹配"
 
@@ -4687,6 +4883,10 @@ msgstr "所在行"
 msgid "所有历史日志都会被删除，且无法恢复。运行期日志和正在执行的任务不受影响。"
 msgstr "所有历史日志都会被删除，且无法恢复。运行期日志和正在执行的任务不受影响。"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:54
+msgid "所有客户端将断开，未完成的操作会被中断。已保存的数据不会删除。"
+msgstr "所有客户端将断开，未完成的操作会被中断。已保存的数据不会删除。"
+
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:88
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:130
 msgid "所有者"
@@ -4703,6 +4903,10 @@ msgstr "所选文件不是本应用导出的备份文件"
 #: src/features/settings/StartupPageSettings.tsx:55
 msgid "所选页面已隐藏或当前平台不支持，将进入首页。"
 msgstr "所选页面已隐藏或当前平台不支持，将进入首页。"
+
+#: src/features/mcp/McpToolsTable.tsx:114
+msgid "所需权限"
+msgstr "所需权限"
 
 #: src/features/games/billiards/notices.tsx:48
 msgid "手中球：可在全台放置母球"
@@ -4739,7 +4943,7 @@ msgstr "打开已有项"
 msgid "打开文件或目录"
 msgstr "打开文件或目录"
 
-#: src/lib/errors/messages.ts:71
+#: src/lib/errors/messages.ts:80
 msgid "打开的备注过多，请先关闭其他编辑窗口"
 msgstr "打开的备注过多，请先关闭其他编辑窗口"
 
@@ -4751,6 +4955,10 @@ msgstr "打开终端"
 #: src/features/ssh-sftp/runtime/terminalRuntime.ts:218
 msgid "打开终端失败：{failure}"
 msgstr "打开终端失败：{failure}"
+
+#: src/features/todo/mcp-presentation.ts:16
+msgid "打开编辑草稿"
+msgstr "打开编辑草稿"
 
 #: src/features/vault/VaultEntryCard.tsx:97
 msgid "打开网址"
@@ -4812,7 +5020,7 @@ msgstr "拉杆"
 msgid "拒绝"
 msgstr "拒绝"
 
-#: src/lib/errors/messages.ts:148
+#: src/lib/errors/messages.ts:157
 msgid "拒绝清理非 BT 自有目录"
 msgstr "拒绝清理非 BT 自有目录"
 
@@ -4851,6 +5059,10 @@ msgstr "按合集筛选"
 msgid "按尺寸"
 msgstr "按尺寸"
 
+#: src/features/mcp/McpToolsTable.tsx:62
+msgid "按模块分组的 MCP 工具目录"
+msgstr "按模块分组的 MCP 工具目录"
+
 #: src/features/media-compress/resize/ResizeControls.tsx:77
 msgid "按比例"
 msgstr "按比例"
@@ -4873,6 +5085,25 @@ msgstr "捕获至协议结束事件"
 #: src/features/ssh-sftp/components/Sidebar.tsx:472
 msgid "换个关键词试试"
 msgstr "换个关键词试试"
+
+#. MCP 授权记录名称，用来区分外部客户端，不是密钥本身
+#. MCP 授权记录名称，用来区分外部客户端，不是密钥本身
+#: src/features/mcp/McpCredentialEditor.tsx:118
+#: src/features/mcp/McpCredentialsTable.tsx:76
+msgid "授权名称"
+msgstr "授权名称"
+
+#: src/features/mcp/integration.tsx:18
+msgid "授权本机模型访问应用模块"
+msgstr "授权本机模型访问应用模块"
+
+#: src/features/mcp/McpHelpDialog.tsx:53
+msgid "授权管理"
+msgstr "授权管理"
+
+#: src/features/mcp/McpCredentialsTable.tsx:228
+msgid "授权记录暂不可用，请重新读取设置。"
+msgstr "授权记录暂不可用，请重新读取设置。"
 
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:65
 msgid "排序"
@@ -4955,6 +5186,14 @@ msgstr "搜索历史"
 msgid "搜索名称或分组"
 msgstr "搜索名称或分组"
 
+#: src/features/mcp/McpToolsTable.tsx:57
+msgid "搜索名称或调用名称"
+msgstr "搜索名称或调用名称"
+
+#: src/features/mcp/McpToolsTable.tsx:56
+msgid "搜索工具名称或调用名称"
+msgstr "搜索工具名称或调用名称"
+
 #: src/features/todo/TodoTool.tsx:124
 #: src/features/todo/TodoTool.tsx:125
 msgid "搜索待办"
@@ -4989,6 +5228,15 @@ msgstr "摆放模型"
 msgid "撤销"
 msgstr "撤销"
 
+#: src/features/mcp/McpCredentialDialogs.tsx:125
+#: src/features/mcp/McpCredentialsTable.tsx:212
+msgid "撤销授权"
+msgstr "撤销授权"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:98
+msgid "撤销授权？"
+msgstr "撤销授权？"
+
 #. 播放模型动画。
 #: src/features/model-viewer/components/AnimationBar.tsx:194
 #: src/features/preview/MediaPlayer.tsx:145
@@ -5005,11 +5253,13 @@ msgstr "播放进度"
 msgid "播放速度"
 msgstr "播放速度"
 
+#. 客户端授权表的行操作列
 #: src/features/ai-configuration/ProviderDetails.tsx:207
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:78
 #: src/features/games/billiards/BilliardsRuleControl.tsx:60
 #: src/features/logs/LogDialogs.tsx:114
 #: src/features/logs/LogList.tsx:44
+#: src/features/mcp/McpCredentialsTable.tsx:93
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:232
 msgid "操作"
 msgstr "操作"
@@ -5098,12 +5348,12 @@ msgstr "放弃未保存的修改？"
 msgid "数据"
 msgstr "数据"
 
-#: src/features/settings/SettingsOverview.tsx:38
+#: src/features/settings/SettingsOverview.tsx:40
 msgid "数据与运行"
 msgstr "数据与运行"
 
 #: src/features/export/BackupPage.tsx:46
-#: src/features/settings/SettingsOverview.tsx:41
+#: src/features/settings/SettingsOverview.tsx:43
 msgid "数据导入与导出"
 msgstr "数据导入与导出"
 
@@ -5124,17 +5374,17 @@ msgstr "整理与校验文本"
 msgid "文件"
 msgstr "文件"
 
-#: src/lib/errors/messages.ts:123
+#: src/lib/errors/messages.ts:132
 msgid "文件不属于此下载任务"
 msgstr "文件不属于此下载任务"
 
-#: src/features/about/AboutPage.tsx:154
+#: src/features/about/AboutPage.tsx:148
 #: src/features/settings/TransferSetting.tsx:39
 msgid "文件传输"
 msgstr "文件传输"
 
 #. SFTP 上传或下载校验；actual 为目标文件字节数，expected 为源文件字节数。
-#: src/lib/errors/messages.ts:170
+#: src/lib/errors/messages.ts:179
 msgid "文件传输校验失败：实际大小为 {actual} 字节，预期为 {expected} 字节"
 msgstr "文件传输校验失败：实际大小为 {actual} 字节，预期为 {expected} 字节"
 
@@ -5167,11 +5417,11 @@ msgstr "文件已在该位置"
 msgid "文件载荷未采集"
 msgstr "文件载荷未采集"
 
-#: src/lib/errors/messages.ts:138
+#: src/lib/errors/messages.ts:147
 msgid "文件选择包含无效或填充文件"
 msgstr "文件选择包含无效或填充文件"
 
-#: src/lib/errors/messages.ts:137
+#: src/lib/errors/messages.ts:146
 msgid "文件选择包含重复项"
 msgstr "文件选择包含重复项"
 
@@ -5270,6 +5520,10 @@ msgstr "新建待办"
 msgid "新建文件夹"
 msgstr "新建文件夹"
 
+#: src/features/todo/mcp-presentation.ts:11
+msgid "新建文字待办"
+msgstr "新建文字待办"
+
 #: src/features/vault/VaultEntryDialog.tsx:191
 #: src/features/vault/VaultTool.tsx:70
 msgid "新建账号"
@@ -5285,12 +5539,12 @@ msgstr "无匹配结果"
 msgid "无口令"
 msgstr "无口令"
 
-#: src/lib/errors/messages.ts:127
+#: src/lib/errors/messages.ts:136
 msgid "无效的 BT 任务标识"
 msgstr "无效的 BT 任务标识"
 
 #. 局域网绑定或可信设备校验；ip 是用户输入的地址。
-#: src/lib/errors/messages.ts:110
+#: src/lib/errors/messages.ts:119
 msgid "无效的 IP 地址：{ip}"
 msgstr "无效的 IP 地址：{ip}"
 
@@ -5307,15 +5561,15 @@ msgstr "无法使用系统应用打开"
 msgid "无法创建画布上下文"
 msgstr "无法创建画布上下文"
 
-#: src/lib/errors/messages.ts:353
+#: src/lib/errors/messages.ts:367
 msgid "无法初始化 3D 显示，请重试或检查设备的图形支持"
 msgstr "无法初始化 3D 显示，请重试或检查设备的图形支持"
 
-#: src/lib/errors/messages.ts:323
+#: src/lib/errors/messages.ts:337
 msgid "无法删除对局存档，请重试。"
 msgstr "无法删除对局存档，请重试。"
 
-#: src/lib/errors/messages.ts:343
+#: src/lib/errors/messages.ts:357
 msgid "无法打开系统转交的模型。请选择有效 GLB 文件并重新打开；导入缓存上限为 512 MiB。"
 msgstr "无法打开系统转交的模型。请选择有效 GLB 文件并重新打开；导入缓存上限为 512 MiB。"
 
@@ -5327,12 +5581,12 @@ msgstr "无法播放，请重试或使用系统应用打开"
 msgid "无法显示 3D 内容"
 msgstr "无法显示 3D 内容"
 
-#: src/lib/errors/messages.ts:335
+#: src/lib/errors/messages.ts:349
 msgid "无法检查更新，请稍后重试或查看发布页面。"
 msgstr "无法检查更新，请稍后重试或查看发布页面。"
 
 #. rsync 能力探测失败；side 是“本机/远端”，detail 是诊断信息。
-#: src/lib/errors/messages.ts:189
+#: src/lib/errors/messages.ts:198
 msgid "无法检测{side}的 rsync：{detail}"
 msgstr "无法检测{side}的 rsync：{detail}"
 
@@ -5340,15 +5594,15 @@ msgstr "无法检测{side}的 rsync：{detail}"
 msgid "无法生成同步预览"
 msgstr "无法生成同步预览"
 
-#: src/lib/errors/messages.ts:333
+#: src/lib/errors/messages.ts:347
 msgid "无法生成截图，请恢复模型显示后重试。"
 msgstr "无法生成截图，请恢复模型显示后重试。"
 
-#: src/lib/errors/messages.ts:160
+#: src/lib/errors/messages.ts:169
 msgid "无法获取本地用户名，请手动填写 SSH 用户名"
 msgstr "无法获取本地用户名，请手动填写 SSH 用户名"
 
-#: src/lib/errors/messages.ts:205
+#: src/lib/errors/messages.ts:214
 msgid "无法识别远端操作系统"
 msgstr "无法识别远端操作系统"
 
@@ -5356,7 +5610,7 @@ msgstr "无法识别远端操作系统"
 msgid "无法读取下载任务"
 msgstr "无法读取下载任务"
 
-#: src/lib/errors/messages.ts:320
+#: src/lib/errors/messages.ts:334
 msgid "无法读取对局存档，请重试。原存档未被删除。"
 msgstr "无法读取对局存档，请重试。原存档未被删除。"
 
@@ -5420,6 +5674,10 @@ msgstr "日志详情操作"
 #: src/features/translation/TranslationTool.tsx:36
 msgid "日语"
 msgstr "日语"
+
+#: src/features/mcp/McpCredentialsTable.tsx:140
+msgid "旧版授权（需更新）"
+msgstr "旧版授权（需更新）"
 
 #. 内存采样的时间列。
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:72
@@ -5676,7 +5934,7 @@ msgstr "更改过多，预览不完整，执行仍处理全部"
 msgid "更新"
 msgstr "更新"
 
-#: src/lib/errors/messages.ts:336
+#: src/lib/errors/messages.ts:350
 msgid "更新下载或校验失败，请重新检查更新。"
 msgstr "更新下载或校验失败，请重新检查更新。"
 
@@ -5689,7 +5947,7 @@ msgstr "更新主机"
 msgid "更新于 {updatedLabel}"
 msgstr "更新于 {updatedLabel}"
 
-#: src/lib/errors/messages.ts:339
+#: src/lib/errors/messages.ts:353
 msgid "更新信息已失效，请重新检查更新"
 msgstr "更新信息已失效，请重新检查更新"
 
@@ -5715,8 +5973,8 @@ msgstr "更新已安装，重启应用后生效。"
 msgid "更新待办"
 msgstr "更新待办"
 
-#: src/features/todo/hooks/use-todo.ts:75
-#: src/features/todo/hooks/use-todo.ts:83
+#: src/features/todo/hooks/use-todo.ts:80
+#: src/features/todo/hooks/use-todo.ts:88
 msgid "更新待办失败"
 msgstr "更新待办失败"
 
@@ -5741,6 +5999,10 @@ msgstr "替换为"
 msgid "有朗诵"
 msgstr "有朗诵"
 
+#: src/features/mcp/McpHelpDialog.tsx:46
+msgid "服务只监听本机回环地址，云端模型不能直接访问。重启应用后需手动启动。客户端权限统一适用于全部模块，删除权限需单独开启。"
+msgstr "服务只监听本机回环地址，云端模型不能直接访问。重启应用后需手动启动。客户端权限统一适用于全部模块，删除权限需单独开启。"
+
 #: src/features/ai-configuration/AiEditorDialog.tsx:129
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:22
 msgid "服务地址"
@@ -5758,6 +6020,10 @@ msgstr "服务已停止"
 #: src/features/lan-transfer/use-lan-transfer.ts:189
 msgid "服务已启动"
 msgstr "服务已启动"
+
+#: src/features/mcp/McpHelpDialog.tsx:63
+msgid "服务生命周期"
+msgstr "服务生命周期"
 
 #: src/lib/errors/messages.ts:8
 msgid "朗读内容过长或参数无效"
@@ -5803,7 +6069,7 @@ msgstr "未分组"
 msgid "未发现房间，可输入地址加入"
 msgstr "未发现房间，可输入地址加入"
 
-#: src/features/about/AboutPage.tsx:186
+#: src/features/about/AboutPage.tsx:180
 msgid "未启动"
 msgstr "未启动"
 
@@ -5845,7 +6111,7 @@ msgstr "未完成"
 msgid "未找到 rsync"
 msgstr "未找到 rsync"
 
-#: src/lib/errors/messages.ts:159
+#: src/lib/errors/messages.ts:168
 msgid "未找到可用的 SSH 代理或本地私钥"
 msgstr "未找到可用的 SSH 代理或本地私钥"
 
@@ -5853,15 +6119,15 @@ msgstr "未找到可用的 SSH 代理或本地私钥"
 msgid "未找到可用的中文音色，请在系统设置中下载中文语音后重试"
 msgstr "未找到可用的中文音色，请在系统设置中下载中文语音后重试"
 
-#: src/lib/errors/messages.ts:185
+#: src/lib/errors/messages.ts:194
 msgid "未找到本机的 rsync，请安装后重新检测"
 msgstr "未找到本机的 rsync，请安装后重新检测"
 
-#: src/lib/errors/messages.ts:212
+#: src/lib/errors/messages.ts:221
 msgid "未找到该 AI 服务地址，可能已被删除"
 msgstr "未找到该 AI 服务地址，可能已被删除"
 
-#: src/lib/errors/messages.ts:246
+#: src/lib/errors/messages.ts:255
 msgid "未找到该 AI 翻译"
 msgstr "未找到该 AI 翻译"
 
@@ -5877,14 +6143,19 @@ msgstr "未找到该主机，可能已被删除"
 msgid "未找到该密码条目，可能已被删除"
 msgstr "未找到该密码条目，可能已被删除"
 
-#: src/lib/errors/messages.ts:66
+#: src/lib/errors/messages.ts:75
 msgid "未找到该待办事项，可能已被删除"
 msgstr "未找到该待办事项，可能已被删除"
 
 #. 诗词详情读取失败；uid 是诗词唯一标识。
-#: src/lib/errors/messages.ts:263
+#: src/lib/errors/messages.ts:272
 msgid "未找到该诗词：{uid}"
 msgstr "未找到该诗词：{uid}"
+
+#. MCP 授权表中横线的无障碍说明，表示此项权限未开启
+#: src/features/mcp/McpCredentialsTable.tsx:159
+msgid "未授权"
+msgstr "未授权"
 
 #: src/features/model-viewer/components/MemoryPanel.tsx:104
 #: src/features/model-viewer/components/MemoryPanel.tsx:339
@@ -5898,7 +6169,7 @@ msgid "未知"
 msgstr "未知"
 
 #. 同步请求引用了目录中不存在的数据来源；sourceId 是数据来源标识。
-#: src/lib/errors/messages.ts:272
+#: src/lib/errors/messages.ts:281
 msgid "未知的诗词数据来源：{sourceId}"
 msgstr "未知的诗词数据来源：{sourceId}"
 
@@ -5957,7 +6228,7 @@ msgstr "未验证"
 msgid "本地偏好与启动设置"
 msgstr "本地偏好与启动设置"
 
-#: src/features/about/AboutPage.tsx:94
+#: src/features/about/AboutPage.tsx:88
 msgid "本地文件与数据工具"
 msgstr "本地文件与数据工具"
 
@@ -5965,11 +6236,11 @@ msgstr "本地文件与数据工具"
 msgid "本地文件夹名称"
 msgstr "本地文件夹名称"
 
-#: src/lib/errors/messages.ts:255
+#: src/lib/errors/messages.ts:264
 msgid "本地模型运行失败，请检查模型或尝试更小的模型"
 msgstr "本地模型运行失败，请检查模型或尝试更小的模型"
 
-#: src/lib/errors/messages.ts:164
+#: src/lib/errors/messages.ts:173
 msgid "本地源路径不是文件夹"
 msgstr "本地源路径不是文件夹"
 
@@ -5977,7 +6248,7 @@ msgstr "本地源路径不是文件夹"
 msgid "本地目录"
 msgstr "本地目录"
 
-#: src/lib/errors/messages.ts:177
+#: src/lib/errors/messages.ts:186
 msgid "本地目标已是文件夹，无法覆盖"
 msgstr "本地目标已是文件夹，无法覆盖"
 
@@ -5997,15 +6268,16 @@ msgstr "本局将结束，对手获胜并保存当前比分。"
 msgid "本机"
 msgstr "本机"
 
-#: src/lib/errors/messages.ts:200
+#: src/lib/errors/messages.ts:209
 msgid "本机 rsync 异常结束（退出码 {exitCode}）"
 msgstr "本机 rsync 异常结束（退出码 {exitCode}）"
 
-#: src/lib/errors/messages.ts:186
+#: src/lib/errors/messages.ts:195
 msgid "本机 rsync 版本不受支持，需要 3.1 或更高版本"
 msgstr "本机 rsync 版本不受支持，需要 3.1 或更高版本"
 
 #: src/features/lan-transfer/LanServiceCard.tsx:29
+#: src/features/mcp/McpServiceBar.tsx:77
 msgid "本机服务"
 msgstr "本机服务"
 
@@ -6025,7 +6297,7 @@ msgstr "本杆判为漏击。由 {player} 选择接打、要求 {offender} 从�
 msgid "本杆推杆"
 msgstr "本杆推杆"
 
-#: src/lib/errors/messages.ts:350
+#: src/lib/errors/messages.ts:364
 msgid "本次导入的资源超过 512 MiB，请选择较小的模型"
 msgstr "本次导入的资源超过 512 MiB，请选择较小的模型"
 
@@ -6041,9 +6313,17 @@ msgstr "本次更新"
 msgid "本次输入的内容将被清除。"
 msgstr "本次输入的内容将被清除。"
 
+#. MCP 授权表与编辑弹窗的权限组标题
+#. MCP 授权表与编辑弹窗的权限组标题
+#: src/features/mcp/McpCredentialEditor.tsx:133
+#: src/features/mcp/McpCredentialsTable.tsx:86
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:83
 msgid "权限"
 msgstr "权限"
+
+#: src/features/mcp/McpCredentialsTable.tsx:152
+msgid "权限不一致，需更新授权"
+msgstr "权限不一致，需更新授权"
 
 #: src/features/games/billiards/BilliardsControls.tsx:72
 #: src/features/games/billiards/BilliardsControls.tsx:94
@@ -6134,7 +6414,7 @@ msgstr "查看备注图片"
 msgid "查看完整发布说明"
 msgstr "查看完整发布说明"
 
-#: src/features/settings/SettingsOverview.tsx:54
+#: src/features/settings/SettingsOverview.tsx:56
 msgid "查看操作和失败原因"
 msgstr "查看操作和失败原因"
 
@@ -6187,6 +6467,10 @@ msgstr "查看资源信息"
 msgid "查看选项"
 msgstr "查看选项"
 
+#: src/features/todo/mcp-presentation.ts:9
+msgid "查询待办列表"
+msgstr "查询待办列表"
+
 #: src/features/model-viewer/components/RuntimeControls.tsx:74
 msgid "标准画质 · 像素比例上限 2"
 msgstr "标准画质 · 像素比例上限 2"
@@ -6237,6 +6521,10 @@ msgstr "校验"
 msgid "校验中"
 msgstr "校验中"
 
+#: src/features/todo/mcp-presentation.ts:23
+msgid "核实保存结果"
+msgstr "核实保存结果"
+
 #: src/features/formatter/FormatterActions.tsx:34
 #: src/features/formatter/FormatterTool.tsx:86
 #: src/features/home/entries.tsx:120
@@ -6270,7 +6558,7 @@ msgid "检查状态"
 msgstr "检查状态"
 
 #. rsync 能力探测超时；side 是“本机/远端”。
-#: src/lib/errors/messages.ts:193
+#: src/lib/errors/messages.ts:202
 msgid "检测{side}的 rsync 超时，请重试"
 msgstr "检测{side}的 rsync 超时，请重试"
 
@@ -6295,6 +6583,11 @@ msgstr "棕球"
 msgid "楚 河"
 msgstr "楚 河"
 
+#. MCP 工具目录第一列，工具所属业务模块
+#: src/features/mcp/McpToolsTable.tsx:71
+msgid "模块"
+msgstr "模块"
+
 #. 三维查看器的多模型列表标签。
 #: src/features/ai-configuration/AiEditorDialog.tsx:210
 #: src/features/ai-configuration/ProviderDetails.tsx:159
@@ -6303,7 +6596,7 @@ msgstr "楚 河"
 msgid "模型"
 msgstr "模型"
 
-#: src/lib/errors/messages.ts:259
+#: src/lib/errors/messages.ts:268
 msgid "模型下载失败，请检查网络后重试"
 msgstr "模型下载失败，请检查网络后重试"
 
@@ -6350,7 +6643,7 @@ msgstr "模型列表加载失败"
 msgid "模型动画"
 msgstr "模型动画"
 
-#: src/lib/errors/messages.ts:349
+#: src/lib/errors/messages.ts:363
 msgid "模型包含网络地址或不安全路径，已阻止读取"
 msgstr "模型包含网络地址或不安全路径，已阻止读取"
 
@@ -6421,19 +6714,19 @@ msgstr "模型引用了不安全的资源路径，已阻止读取"
 msgid "模型操作"
 msgstr "模型操作"
 
-#: src/lib/errors/messages.ts:250
+#: src/lib/errors/messages.ts:259
 msgid "模型文件或安装记录无效，请移除后重新下载"
 msgstr "模型文件或安装记录无效，请移除后重新下载"
 
-#: src/lib/errors/messages.ts:223
+#: src/lib/errors/messages.ts:232
 msgid "模型显示名称不能超过 80 个字符或包含控制字符"
 msgstr "模型显示名称不能超过 80 个字符或包含控制字符"
 
-#: src/lib/errors/messages.ts:251
+#: src/lib/errors/messages.ts:260
 msgid "模型校验失败，请移除未完成的下载后重试"
 msgstr "模型校验失败，请移除未完成的下载后重试"
 
-#: src/lib/errors/messages.ts:344
+#: src/lib/errors/messages.ts:358
 msgid "模型格式无效或文件已损坏，请检查后重新选择"
 msgstr "模型格式无效或文件已损坏，请检查后重新选择"
 
@@ -6448,7 +6741,7 @@ msgstr "模型检查面板"
 msgid "模型缺少依赖文件，请补充选择"
 msgstr "模型缺少依赖文件，请补充选择"
 
-#: src/lib/errors/messages.ts:352
+#: src/lib/errors/messages.ts:366
 msgid "模型解析失败，请检查模型与依赖文件是否完整"
 msgstr "模型解析失败，请检查模型与依赖文件是否完整"
 
@@ -6465,7 +6758,7 @@ msgstr "模型资源"
 msgid "模型资源过大，请选择较小的模型"
 msgstr "模型资源过大，请选择较小的模型"
 
-#: src/lib/errors/messages.ts:351
+#: src/lib/errors/messages.ts:365
 msgid "模型超过检查上限，请选择较小的模型。"
 msgstr "模型超过检查上限，请选择较小的模型。"
 
@@ -6503,6 +6796,10 @@ msgstr "正在保存"
 #: src/features/model-viewer/components/PreviewPanel.tsx:98
 msgid "正在保存环境…"
 msgstr "正在保存环境…"
+
+#: src/features/mcp/McpServiceBar.tsx:61
+msgid "正在停止"
+msgstr "正在停止"
 
 #: src/features/translation/ModelManager.tsx:63
 #: src/features/translation/TranslationTool.tsx:249
@@ -6584,6 +6881,7 @@ msgstr "正在取消并释放资源"
 msgid "正在同步"
 msgstr "正在同步"
 
+#: src/features/mcp/McpServiceBar.tsx:59
 #: src/features/poetry/components/PoetrySyncStatus.tsx:46
 msgid "正在启动"
 msgstr "正在启动"
@@ -6766,6 +7064,7 @@ msgid "正在试听"
 msgstr "正在试听"
 
 #. 模型文件读取状态。
+#: src/features/mcp/McpServiceBar.tsx:55
 #: src/features/model-viewer/components/ModelList.tsx:35
 msgid "正在读取"
 msgstr "正在读取"
@@ -6833,11 +7132,11 @@ msgstr "正文未保留"
 msgid "正文索引已更新"
 msgstr "正文索引已更新"
 
-#: src/lib/errors/messages.ts:219
+#: src/lib/errors/messages.ts:228
 msgid "此 AI 服务地址下已存在相同的密钥标签"
 msgstr "此 AI 服务地址下已存在相同的密钥标签"
 
-#: src/lib/errors/messages.ts:220
+#: src/lib/errors/messages.ts:229
 msgid "此 AI 服务地址下已存在相同的模型 ID"
 msgstr "此 AI 服务地址下已存在相同的模型 ID"
 
@@ -6848,6 +7147,10 @@ msgstr "此场景没有材质"
 #: src/features/model-viewer/components/ResourceDetails.tsx:250
 msgid "此场景没有纹理"
 msgstr "此场景没有纹理"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:104
+msgid "此客户端的旧请求将失效，未完成的操作会被中断。已保存的数据不会删除。"
+msgstr "此客户端的旧请求将失效，未完成的操作会被中断。已保存的数据不会删除。"
 
 #: src/features/games/engine/GameSessionNotice.tsx:100
 msgid "此操作会删除该游戏的存档，无法继续上次的对局。"
@@ -6861,7 +7164,7 @@ msgstr "此材质未引用纹理"
 msgid "此模型不包含动画"
 msgstr "此模型不包含动画"
 
-#: src/lib/errors/messages.ts:341
+#: src/lib/errors/messages.ts:355
 msgid "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 msgstr "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 
@@ -6877,6 +7180,10 @@ msgstr "此纹理暂无法生成缩略图"
 msgid "此节点未引用材质"
 msgstr "此节点未引用材质"
 
+#: src/features/mcp/McpCredentialEditor.tsx:173
+msgid "此记录使用旧版授权。保存后将改为全部模块授权，当前默认只读。"
+msgstr "此记录使用旧版授权。保存后将改为全部模块授权，当前默认只读。"
+
 #. 内存阈值提醒：阈值不等于设备可用内存
 #: src/features/model-viewer/components/MemoryPanel.tsx:31
 msgid "此阈值不是设备剩余内存。"
@@ -6891,21 +7198,25 @@ msgstr "母球"
 msgid "每 2 秒刷新 · IP 已脱敏"
 msgstr "每 2 秒刷新 · IP 已脱敏"
 
-#: src/lib/errors/messages.ts:217
+#: src/lib/errors/messages.ts:226
 msgid "每个 AI 服务地址最多保存 10 个模型"
 msgstr "每个 AI 服务地址最多保存 10 个模型"
 
-#: src/lib/errors/messages.ts:216
+#: src/lib/errors/messages.ts:225
 msgid "每个 AI 服务地址最多保存 5 把密钥"
 msgstr "每个 AI 服务地址最多保存 5 把密钥"
 
-#: src/lib/errors/messages.ts:224
+#: src/lib/errors/messages.ts:233
 msgid "每个 AI 服务地址至少保留一个密钥条目"
 msgstr "每个 AI 服务地址至少保留一个密钥条目"
 
-#: src/lib/errors/messages.ts:225
+#: src/lib/errors/messages.ts:234
 msgid "每个 AI 服务地址至少保留一个模型"
 msgstr "每个 AI 服务地址至少保留一个模型"
+
+#: src/features/mcp/McpHelpDialog.tsx:56
+msgid "每个客户端分别勾选读取、写入和删除权限，统一适用于全部模块，包括后续新增模块。凭据只在生成时显示一次，遗失后需重新生成。撤销或重新生成会使旧凭据失效。"
+msgstr "每个客户端分别勾选读取、写入和删除权限，统一适用于全部模块，包括后续新增模块。凭据只在生成时显示一次，遗失后需重新生成。撤销或重新生成会使旧凭据失效。"
 
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:186
 msgid "每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10 万三角形、1000 个实例；分析会暂停当前模型动画。"
@@ -6922,6 +7233,10 @@ msgstr "每秒最多记录一次，保留最近 120 个样本；后台停止记�
 #: src/features/games/xiangqi/XiangqiStage.tsx:548
 msgid "汉 界"
 msgstr "汉 界"
+
+#: src/features/mcp/McpToolsTable.tsx:203
+msgid "没有匹配的工具"
+msgstr "没有匹配的工具"
 
 #: src/features/model-viewer/components/LibraryList.tsx:252
 msgid "没有匹配的模型"
@@ -6986,7 +7301,7 @@ msgstr "注释"
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
 
-#: src/lib/errors/messages.ts:269
+#: src/lib/errors/messages.ts:278
 msgid "注释包下载仅支持桌面端"
 msgstr "注释包下载仅支持桌面端"
 
@@ -7136,10 +7451,19 @@ msgstr "添加共享目录"
 msgid "添加地址"
 msgstr "添加地址"
 
+#: src/features/mcp/McpHelpDialog.tsx:35
+msgid "添加客户端授权并保存一次性凭据，再启动服务。将连接配置中的占位符替换为凭据。客户端需支持 Streamable HTTP 和 Bearer 认证。"
+msgstr "添加客户端授权并保存一次性凭据，再启动服务。将连接配置中的占位符替换为凭据。客户端需支持 Streamable HTTP 和 Bearer 认证。"
+
 #: src/features/ai-configuration/AiEditorDialog.tsx:66
 #: src/features/ai-configuration/ProviderDetails.tsx:194
 msgid "添加密钥"
 msgstr "添加密钥"
+
+#: src/features/mcp/McpCredentialEditor.tsx:99
+#: src/features/mcp/McpCredentialsTable.tsx:64
+msgid "添加授权"
+msgstr "添加授权"
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:69
 #: src/features/ai-configuration/ProviderDetails.tsx:194
@@ -7210,7 +7534,7 @@ msgstr "清空当前日志"
 msgid "清空当前日志？"
 msgstr "清空当前日志？"
 
-#: src/features/about/AboutPage.tsx:137
+#: src/features/about/AboutPage.tsx:131
 msgid "清空所有数据"
 msgstr "清空所有数据"
 
@@ -7249,6 +7573,10 @@ msgstr "清除本次录屏"
 msgid "清除环境"
 msgstr "清除环境"
 
+#: src/features/mcp/McpToolsTable.tsx:212
+msgid "清除筛选"
+msgstr "清除筛选"
+
 #: src/features/todo/TodoSchedulePicker.tsx:139
 msgid "清除计划"
 msgstr "清除计划"
@@ -7264,31 +7592,31 @@ msgstr "游戏"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:130
-#: src/lib/errors/messages.ts:302
+#: src/lib/errors/messages.ts:311
 msgid "游戏房间"
 msgstr "游戏房间"
 
-#: src/lib/errors/messages.ts:88
+#: src/lib/errors/messages.ts:97
 msgid "游戏房间中的对方尚未连接"
 msgstr "游戏房间中的对方尚未连接"
 
-#: src/lib/errors/messages.ts:82
+#: src/lib/errors/messages.ts:91
 msgid "游戏房间响应异常，请重新加入"
 msgstr "游戏房间响应异常，请重新加入"
 
-#: src/lib/errors/messages.ts:81
+#: src/lib/errors/messages.ts:90
 msgid "游戏房间地址格式不正确"
 msgstr "游戏房间地址格式不正确"
 
-#: src/lib/errors/messages.ts:84
+#: src/lib/errors/messages.ts:93
 msgid "游戏房间已满"
 msgstr "游戏房间已满"
 
-#: src/lib/errors/messages.ts:89
+#: src/lib/errors/messages.ts:98
 msgid "游戏房间数据过大，请缩短房间信息或减少发送内容"
 msgstr "游戏房间数据过大，请缩短房间信息或减少发送内容"
 
-#: src/lib/errors/messages.ts:83
+#: src/lib/errors/messages.ts:92
 msgid "游戏房间码不正确"
 msgstr "游戏房间码不正确"
 
@@ -7412,7 +7740,11 @@ msgstr "犯规待处理"
 msgid "状态"
 msgstr "状态"
 
-#: src/features/about/AboutPage.tsx:182
+#: src/features/mcp/McpServiceBar.tsx:57
+msgid "状态不可用"
+msgstr "状态不可用"
+
+#: src/features/about/AboutPage.tsx:176
 msgid "状态读取失败"
 msgstr "状态读取失败"
 
@@ -7444,7 +7776,7 @@ msgstr "玩家 2 胜"
 msgid "玩法"
 msgstr "玩法"
 
-#: src/features/about/AboutPage.tsx:114
+#: src/features/about/AboutPage.tsx:108
 msgid "环境信息"
 msgstr "环境信息"
 
@@ -7467,13 +7799,17 @@ msgid "环形"
 msgstr "环形"
 
 #. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
-#: src/lib/errors/messages.ts:355
+#: src/lib/errors/messages.ts:369
 msgid "球桌显示已中断，请重开对局。"
 msgstr "球桌显示已中断，请重开对局。"
 
 #: src/features/poetry/components/PoetryTranslationSection.tsx:277
 msgid "生成"
 msgstr "生成"
+
+#: src/features/mcp/McpCredentialEditor.tsx:198
+msgid "生成凭据"
+msgstr "生成凭据"
 
 #: src/features/ai-configuration/AiWorkspaceMenu.tsx:47
 msgid "生成请求会发送到你配置的第三方服务，可能产生服务费用。"
@@ -7591,6 +7927,10 @@ msgstr "白棋胜"
 msgid "白话直译"
 msgstr "白话直译"
 
+#: src/features/mcp/McpServiceBar.tsx:108
+msgid "监听端口，范围 1024 至 65535"
+msgstr "监听端口，范围 1024 至 65535"
+
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:105
 msgid "监控"
 msgstr "监控"
@@ -7603,7 +7943,7 @@ msgstr "监控采集超时"
 msgid "目录中暂无文件"
 msgstr "目录中暂无文件"
 
-#: src/lib/errors/messages.ts:276
+#: src/lib/errors/messages.ts:285
 msgid "目录中缺少所需的诗词数据来源"
 msgstr "目录中缺少所需的诗词数据来源"
 
@@ -7646,7 +7986,7 @@ msgstr "目标已存在同名项目"
 msgid "目标已是最新"
 msgstr "目标已是最新"
 
-#: src/lib/errors/messages.ts:98
+#: src/lib/errors/messages.ts:107
 msgid "目标文件正在上传，请稍后重试"
 msgstr "目标文件正在上传，请稍后重试"
 
@@ -7663,9 +8003,14 @@ msgstr "目标高度"
 msgid "直连"
 msgstr "直连"
 
-#: src/lib/errors/messages.ts:238
+#: src/lib/errors/messages.ts:247
 msgid "相同的 AI 任务正在执行中"
 msgstr "相同的 AI 任务正在执行中"
+
+#. 关闭 MCP 使用帮助弹窗
+#: src/features/mcp/McpHelpDialog.tsx:74
+msgid "知道了"
+msgstr "知道了"
 
 #: src/components/ui/prompt-dialog.tsx:116
 #: src/features/todo/TodoSchedulePicker.tsx:149
@@ -7687,6 +8032,10 @@ msgstr "确定删除共享目录“{pendingName}”？"
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:232
 msgid "确认"
 msgstr "确认"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:125
+msgid "确认修改"
+msgstr "确认修改"
 
 #: src/features/ai-configuration/AiDeleteDialog.tsx:135
 #: src/features/logs/LogDialogs.tsx:217
@@ -7760,7 +8109,7 @@ msgstr "磁盘"
 msgid "磁盘 I/O"
 msgstr "磁盘 I/O"
 
-#: src/lib/errors/messages.ts:100
+#: src/lib/errors/messages.ts:109
 msgid "磁盘空间不足，无法保存上传内容"
 msgstr "磁盘空间不足，无法保存上传内容"
 
@@ -7807,7 +8156,7 @@ msgid "离线检查原始文件；部分扩展可能不受支持。"
 msgstr "离线检查原始文件；部分扩展可能不受支持。"
 
 #: src/features/logs/use-activity-logs.ts:35
-#: src/lib/errors/messages.ts:300
+#: src/lib/errors/messages.ts:309
 msgid "离线翻译"
 msgstr "离线翻译"
 
@@ -7838,11 +8187,11 @@ msgstr "移动到第 {position} 项"
 msgid "移动摇杆"
 msgstr "移动摇杆"
 
-#: src/lib/errors/messages.ts:267
+#: src/lib/errors/messages.ts:276
 msgid "移动端不支持从本地导入诗词库"
 msgstr "移动端不支持从本地导入诗词库"
 
-#: src/lib/errors/messages.ts:268
+#: src/lib/errors/messages.ts:277
 msgid "移动端不支持导入本地译文包"
 msgstr "移动端不支持导入本地译文包"
 
@@ -7893,6 +8242,10 @@ msgstr "移除此附件？"
 msgid "移除视角 {name}"
 msgstr "移除视角 {name}"
 
+#: src/features/todo/mcp-presentation.ts:21
+msgid "移除草稿图片"
+msgstr "移除草稿图片"
+
 #: src/features/formatter/FormatterActions.tsx:93
 msgid "移除转义"
 msgstr "移除转义"
@@ -7909,20 +8262,22 @@ msgstr "稍后重启"
 msgid "空目录"
 msgstr "空目录"
 
-#: src/features/about/AboutPage.tsx:151
-#: src/features/about/AboutPage.tsx:155
-#: src/features/about/AboutPage.tsx:169
-#: src/features/about/AboutPage.tsx:194
+#: src/features/about/AboutPage.tsx:145
+#: src/features/about/AboutPage.tsx:149
+#: src/features/about/AboutPage.tsx:163
+#: src/features/about/AboutPage.tsx:188
 msgid "空闲"
 msgstr "空闲"
 
+#. MCP HTTP 服务监听端口
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:155
+#: src/features/mcp/McpServiceBar.tsx:94
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:227
 msgid "端口"
 msgstr "端口"
 
 #. 局域网服务启动失败；startPort/endPort 是尝试的端口范围。
-#: src/lib/errors/messages.ts:118
+#: src/lib/errors/messages.ts:127
 msgid "端口 {startPort}-{endPort} 范围内没有可用端口，请更换起始端口后重试"
 msgstr "端口 {startPort}-{endPort} 范围内没有可用端口，请更换起始端口后重试"
 
@@ -7983,7 +8338,7 @@ msgstr "等待导入"
 msgid "等待监控数据"
 msgstr "等待监控数据"
 
-#: src/features/about/AboutPage.tsx:194
+#: src/features/about/AboutPage.tsx:188
 #: src/features/poetry/components/PoetrySyncStatus.tsx:44
 msgid "等待确认"
 msgstr "等待确认"
@@ -7992,6 +8347,10 @@ msgstr "等待确认"
 #: src/features/updater/UpdaterActivity.tsx:38
 msgid "等待重启"
 msgstr "等待重启"
+
+#: src/features/mcp/McpModuleFilter.tsx:26
+msgid "筛选 MCP 模块"
+msgstr "筛选 MCP 模块"
 
 #. 活动任务页的状态筛选控件
 #: src/features/activity/TransferActivityToolbar.tsx:75
@@ -8034,6 +8393,11 @@ msgstr "管理 AI 配置"
 msgid "管理下载任务"
 msgstr "管理下载任务"
 
+#. 客户端授权表的行菜单名称，name 是客户端授权名称
+#: src/features/mcp/McpCredentialsTable.tsx:185
+msgid "管理授权 {name}"
+msgstr "管理授权 {name}"
+
 #: src/features/translation/ModelManager.tsx:149
 #: src/features/translation/ModelManager.tsx:150
 #: src/features/translation/ModelManager.tsx:154
@@ -8072,11 +8436,11 @@ msgstr "粘贴或输入 {languageLabel} 内容"
 msgid "系统"
 msgstr "系统"
 
-#: src/lib/errors/messages.ts:328
+#: src/lib/errors/messages.ts:342
 msgid "系统分享仅在移动应用中可用。"
 msgstr "系统分享仅在移动应用中可用。"
 
-#: src/lib/errors/messages.ts:327
+#: src/lib/errors/messages.ts:341
 msgid "系统导出未完成，请检查目标位置或分享应用后重试。"
 msgstr "系统导出未完成，请检查目标位置或分享应用后重试。"
 
@@ -8113,7 +8477,7 @@ msgid "系统热状态：较高"
 msgstr "系统热状态：较高"
 
 #. SSH 系统监控错误；os 是远端操作系统名称。
-#: src/lib/errors/messages.ts:206
+#: src/lib/errors/messages.ts:215
 msgid "系统监控暂不支持 {os}，仅支持 Linux"
 msgstr "系统监控暂不支持 {os}，仅支持 Linux"
 
@@ -8194,7 +8558,7 @@ msgstr "终端与远端文件"
 msgid "终端会话"
 msgstr "终端会话"
 
-#: src/lib/errors/messages.ts:158
+#: src/lib/errors/messages.ts:167
 msgid "终端输入数据格式无效"
 msgstr "终端输入数据格式无效"
 
@@ -8208,7 +8572,7 @@ msgid "绑定 IP 不可用"
 msgstr "绑定 IP 不可用"
 
 #. 局域网服务绑定校验；ip 是被拒绝的绑定地址。
-#: src/lib/errors/messages.ts:114
+#: src/lib/errors/messages.ts:123
 msgid "绑定 IP 不是局域网地址：{ip}"
 msgstr "绑定 IP 不是局域网地址：{ip}"
 
@@ -8298,7 +8662,7 @@ msgstr "继续编辑"
 msgid "继续记录"
 msgstr "继续记录"
 
-#: src/lib/errors/messages.ts:97
+#: src/lib/errors/messages.ts:106
 msgid "续传位置与目标文件大小不一致，请刷新后重试"
 msgstr "续传位置与目标文件大小不一致，请刷新后重试"
 
@@ -8332,8 +8696,10 @@ msgstr "编码中"
 msgid "编码失败"
 msgstr "编码失败"
 
+#. MCP 工具需要读取、新建和编辑权限，不包含删除
 #: src/features/ai-configuration/RowActions.desktop.tsx:29
 #: src/features/ai-configuration/RowActions.mobile.tsx:49
+#: src/features/mcp/McpToolsTable.tsx:176
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:87
 #: src/features/vault/VaultEntryCard.tsx:188
 msgid "编辑"
@@ -8359,6 +8725,14 @@ msgstr "编辑密钥"
 #: src/features/todo/TodoRowActions.mobile.tsx:51
 msgid "编辑待办"
 msgstr "编辑待办"
+
+#: src/features/mcp/McpCredentialEditor.tsx:99
+msgid "编辑授权"
+msgstr "编辑授权"
+
+#: src/features/mcp/McpCredentialsTable.tsx:196
+msgid "编辑权限"
+msgstr "编辑权限"
 
 #. 编辑本地模型库的名称、分组和收藏状态。
 #. 编辑本地模型库的名称、分组和收藏状态。
@@ -8444,19 +8818,19 @@ msgstr "翻译"
 msgid "翻译中"
 msgstr "翻译中"
 
-#: src/lib/errors/messages.ts:252
+#: src/lib/errors/messages.ts:261
 msgid "翻译任务已取消"
 msgstr "翻译任务已取消"
 
-#: src/lib/errors/messages.ts:244
+#: src/lib/errors/messages.ts:253
 msgid "翻译内容不能为空"
 msgstr "翻译内容不能为空"
 
-#: src/lib/errors/messages.ts:245
+#: src/lib/errors/messages.ts:254
 msgid "翻译内容过长"
 msgstr "翻译内容过长"
 
-#: src/features/about/AboutPage.tsx:174
+#: src/features/about/AboutPage.tsx:168
 msgid "翻译引擎"
 msgstr "翻译引擎"
 
@@ -8575,7 +8949,7 @@ msgstr "至少保留一项"
 msgid "至少修改其中一个名称。"
 msgstr "至少修改其中一个名称。"
 
-#: src/lib/errors/messages.ts:136
+#: src/lib/errors/messages.ts:145
 msgid "至少选择一个文件"
 msgstr "至少选择一个文件"
 
@@ -8610,7 +8984,7 @@ msgstr "获取资源信息…"
 msgid "获取资源信息失败"
 msgstr "获取资源信息失败"
 
-#: src/lib/errors/messages.ts:152
+#: src/lib/errors/messages.ts:161
 msgid "获取资源信息超时，请检查网络或稍后重试"
 msgstr "获取资源信息超时，请检查网络或稍后重试"
 
@@ -8737,9 +9111,17 @@ msgstr "设备名"
 #: src/features/navigation/NavigationItems.tsx:46
 #: src/features/settings/AppSettingsMenu.tsx:66
 #: src/features/settings/AppSettingsMenu.tsx:78
-#: src/features/settings/SettingsPage.tsx:38
+#: src/features/settings/SettingsPage.tsx:40
 msgid "设置"
 msgstr "设置"
+
+#: src/features/todo/mcp-presentation.ts:13
+msgid "设置完成状态"
+msgstr "设置完成状态"
+
+#: src/features/todo/mcp-presentation.ts:14
+msgid "设置放弃状态"
+msgstr "设置放弃状态"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:102
 msgid "设置用户 ID"
@@ -8748,6 +9130,10 @@ msgstr "设置用户 ID"
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:103
 msgid "设置用户组 ID"
 msgstr "设置用户组 ID"
+
+#: src/features/mcp/McpHelpDialog.tsx:43
+msgid "访问与权限"
+msgstr "访问与权限"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:82
@@ -8796,7 +9182,7 @@ msgstr "译文内容"
 msgid "译文包"
 msgstr "译文包"
 
-#: src/lib/errors/messages.ts:287
+#: src/lib/errors/messages.ts:296
 msgid "译文包内容无效"
 msgstr "译文包内容无效"
 
@@ -8808,7 +9194,7 @@ msgstr "译文包已导入"
 msgid "译文模式"
 msgstr "译文模式"
 
-#: src/lib/errors/messages.ts:257
+#: src/lib/errors/messages.ts:266
 msgid "译文达到输出上限，当前结果不完整，请分段翻译"
 msgstr "译文达到输出上限，当前结果不完整，请分段翻译"
 
@@ -8821,7 +9207,7 @@ msgstr "试听音色"
 msgid "试试其他关键词或清除筛选"
 msgstr "试试其他关键词或清除筛选"
 
-#: src/lib/errors/messages.ts:289
+#: src/lib/errors/messages.ts:298
 msgid "诗词内容过大，无法发起 AI 翻译"
 msgstr "诗词内容过大，无法发起 AI 翻译"
 
@@ -8829,7 +9215,7 @@ msgstr "诗词内容过大，无法发起 AI 翻译"
 msgid "诗词列表"
 msgstr "诗词列表"
 
-#: src/features/about/AboutPage.tsx:192
+#: src/features/about/AboutPage.tsx:186
 msgid "诗词同步"
 msgstr "诗词同步"
 
@@ -8849,11 +9235,11 @@ msgstr "诗词库"
 msgid "诗词库与临时文件"
 msgstr "诗词库与临时文件"
 
-#: src/lib/errors/messages.ts:299
+#: src/lib/errors/messages.ts:308
 msgid "诗词库同步"
 msgstr "诗词库同步"
 
-#: src/lib/errors/messages.ts:262
+#: src/lib/errors/messages.ts:271
 msgid "诗词库同步已取消"
 msgstr "诗词库同步已取消"
 
@@ -8870,11 +9256,11 @@ msgstr "诗词数据管理"
 msgid "诗词注释库"
 msgstr "诗词注释库"
 
-#: src/lib/errors/messages.ts:271
+#: src/lib/errors/messages.ts:280
 msgid "诗词源文件解析失败"
 msgstr "诗词源文件解析失败"
 
-#: src/lib/errors/messages.ts:270
+#: src/lib/errors/messages.ts:279
 msgid "诗词目录配置无效"
 msgstr "诗词目录配置无效"
 
@@ -8883,7 +9269,7 @@ msgstr "诗词目录配置无效"
 msgid "诗词集"
 msgstr "诗词集"
 
-#: src/lib/errors/messages.ts:218
+#: src/lib/errors/messages.ts:227
 msgid "该 AI 服务地址已存在"
 msgstr "该 AI 服务地址已存在"
 
@@ -8895,7 +9281,7 @@ msgstr "该主机存储的认证方式无效，请重新编辑并保存"
 msgid "该备份文件已加密，请输入密码"
 msgstr "该备份文件已加密，请输入密码"
 
-#: src/lib/errors/messages.ts:213
+#: src/lib/errors/messages.ts:222
 msgid "该密钥不存在或不属于此 AI 服务地址"
 msgstr "该密钥不存在或不属于此 AI 服务地址"
 
@@ -8913,7 +9299,7 @@ msgstr "该格式不支持预览"
 msgid "该模块数据不在主数据库中，请通过对应功能入口清理"
 msgstr "该模块数据不在主数据库中，请通过对应功能入口清理"
 
-#: src/lib/errors/messages.ts:214
+#: src/lib/errors/messages.ts:223
 msgid "该模型不存在或不属于此 AI 服务地址"
 msgstr "该模型不存在或不属于此 AI 服务地址"
 
@@ -8931,11 +9317,11 @@ msgstr "该记录已不再保留"
 msgid "该设备需要重新连接才能继续访问。"
 msgstr "该设备需要重新连接才能继续访问。"
 
-#: src/lib/errors/messages.ts:288
+#: src/lib/errors/messages.ts:297
 msgid "该诗词没有可翻译的正文"
 msgstr "该诗词没有可翻译的正文"
 
-#: src/lib/errors/messages.ts:141
+#: src/lib/errors/messages.ts:150
 msgid "该资源已下载完成；如需重新下载，请先删除现有任务"
 msgstr "该资源已下载完成；如需重新下载，请先删除现有任务"
 
@@ -8943,15 +9329,15 @@ msgstr "该资源已下载完成；如需重新下载，请先删除现有任务
 msgid "该资源已在下载列表中，不能重复添加"
 msgstr "该资源已在下载列表中，不能重复添加"
 
-#: src/lib/errors/messages.ts:143
+#: src/lib/errors/messages.ts:152
 msgid "该资源已有下载任务，不能用新的文件选择覆盖"
 msgstr "该资源已有下载任务，不能用新的文件选择覆盖"
 
-#: src/lib/errors/messages.ts:144
+#: src/lib/errors/messages.ts:153
 msgid "该资源已有任务，不能重复添加"
 msgstr "该资源已有任务，不能重复添加"
 
-#: src/lib/errors/messages.ts:142
+#: src/lib/errors/messages.ts:151
 msgid "该资源正在处理，不能重复添加"
 msgstr "该资源正在处理，不能重复添加"
 
@@ -8979,21 +9365,25 @@ msgstr "说明已截断"
 msgid "请为下列路径选择对应文件。文件名相同但目录不同时，请确认每一项。"
 msgstr "请为下列路径选择对应文件。文件名相同但目录不同时，请确认每一项。"
 
-#: src/lib/errors/messages.ts:157
+#: src/lib/errors/messages.ts:166
 msgid "请为主机选择认证密钥"
 msgstr "请为主机选择认证密钥"
 
-#: src/lib/errors/messages.ts:254
+#: src/lib/errors/messages.ts:263
 msgid "请先下载翻译模型"
 msgstr "请先下载翻译模型"
 
-#: src/lib/errors/messages.ts:229
+#: src/lib/errors/messages.ts:238
 msgid "请先保存 AI 服务地址和模型"
 msgstr "请先保存 AI 服务地址和模型"
 
-#: src/lib/errors/messages.ts:230
+#: src/lib/errors/messages.ts:239
 msgid "请先保存 API Key"
 msgstr "请先保存 API Key"
+
+#: src/lib/errors/messages.ts:71
+msgid "请先停止 MCP 服务并等待任务完成"
+msgstr "请先停止 MCP 服务并等待任务完成"
 
 #. 数据清理被在途任务阻止；participant 已由前端本地化为任务名称。
 #: src/lib/errors/messages.ts:38
@@ -9028,7 +9418,7 @@ msgstr "请勿关闭应用"
 msgid "请在系统设置的辅助功能中下载中文语音，再刷新音色列表。"
 msgstr "请在系统设置的辅助功能中下载中文语音，再刷新音色列表。"
 
-#: src/lib/errors/messages.ts:228
+#: src/lib/errors/messages.ts:237
 msgid "请填写 AI 模型名称，或名称过长"
 msgstr "请填写 AI 模型名称，或名称过长"
 
@@ -9060,7 +9450,7 @@ msgid "请求"
 msgstr "请求"
 
 #. 局域网共享路径校验被拒；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:105
+#: src/lib/errors/messages.ts:114
 msgid "请求路径无效或超出共享目录：{path}"
 msgstr "请求路径无效或超出共享目录：{path}"
 
@@ -9098,7 +9488,7 @@ msgstr "请输入密钥口令后再测试"
 msgid "请输入待办标题"
 msgstr "请输入待办标题"
 
-#: src/lib/errors/messages.ts:249
+#: src/lib/errors/messages.ts:258
 msgid "请输入有效文本并选择支持的语言"
 msgstr "请输入有效文本并选择支持的语言"
 
@@ -9110,7 +9500,7 @@ msgstr "请输入有效的目标尺寸"
 msgid "请输入路径"
 msgstr "请输入路径"
 
-#: src/lib/errors/messages.ts:345
+#: src/lib/errors/messages.ts:359
 msgid "请选择一个 GLB、glTF 或 FBX 模型文件"
 msgstr "请选择一个 GLB、glTF 或 FBX 模型文件"
 
@@ -9134,7 +9524,7 @@ msgstr "请选择有效的 GLB、glTF 或 FBX 模型文件"
 msgid "请选择有效的计划日期和时间"
 msgstr "请选择有效的计划日期和时间"
 
-#: src/lib/errors/messages.ts:76
+#: src/lib/errors/messages.ts:85
 msgid "请选择静态 PNG、JPEG 或 WebP 图片"
 msgstr "请选择静态 PNG、JPEG 或 WebP 图片"
 
@@ -9144,6 +9534,12 @@ msgstr "请选择静态 PNG、JPEG 或 WebP 图片"
 msgid "读写"
 msgstr "读写"
 
+#. MCP 全部模块的读取权限，复选框与授权表头共用
+#. MCP 全部模块的读取权限，复选框与授权表头共用
+#. MCP 工具仅需要读取权限
+#: src/features/mcp/McpCredentialEditor.tsx:61
+#: src/features/mcp/McpCredentialsTable.tsx:102
+#: src/features/mcp/McpToolsTable.tsx:181
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:310
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:118
 msgid "读取"
@@ -9169,11 +9565,19 @@ msgstr "读取中"
 msgid "读取信息"
 msgstr "读取信息"
 
+#: src/features/todo/mcp-presentation.ts:19
+msgid "读取图片"
+msgstr "读取图片"
+
 #: src/features/lan-transfer/LanTransferTool.tsx:76
 #: src/features/poetry/components/CollectionManagement.tsx:108
 #: src/features/poetry/components/PoetryReadError.tsx:20
 msgid "读取失败"
 msgstr "读取失败"
+
+#: src/features/todo/mcp-presentation.ts:10
+msgid "读取完整图文"
+msgstr "读取完整图文"
 
 #: src/features/todo/TodoTool.tsx:231
 msgid "读取待办失败"
@@ -9197,6 +9601,10 @@ msgstr "读取登录目录"
 #: src/features/logs/log-labels.ts:30
 msgid "读取系统监控"
 msgstr "读取系统监控"
+
+#: src/features/todo/mcp-presentation.ts:17
+msgid "读取编辑草稿"
+msgstr "读取编辑草稿"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:18
@@ -9240,9 +9648,17 @@ msgstr "调整母球"
 msgid "调整顺序"
 msgstr "调整顺序"
 
-#: src/features/settings/SettingsOverview.tsx:31
+#: src/features/settings/SettingsOverview.tsx:32
 msgid "调整首页功能的显示顺序"
 msgstr "调整首页功能的显示顺序"
+
+#: src/features/mcp/McpToolsTable.tsx:106
+msgid "调用名称"
+msgstr "调用名称"
+
+#: src/features/mcp/McpToolsTable.tsx:88
+msgid "调用要求"
+msgstr "调用要求"
 
 #. glTF 规范报告中的警告数量。
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:280
@@ -9268,11 +9684,11 @@ msgstr "负载 {toFixedValue} / {toFixedValue2} / {toFixedValue3}"
 msgid "账号"
 msgstr "账号"
 
-#: src/lib/errors/messages.ts:150
+#: src/lib/errors/messages.ts:159
 msgid "资源中没有可下载的文件"
 msgstr "资源中没有可下载的文件"
 
-#: src/lib/errors/messages.ts:149
+#: src/lib/errors/messages.ts:158
 msgid "资源信息未就绪，请先解析"
 msgstr "资源信息未就绪，请先解析"
 
@@ -9281,11 +9697,11 @@ msgstr "资源信息未就绪，请先解析"
 msgid "资源明细"
 msgstr "资源明细"
 
-#: src/lib/errors/messages.ts:139
+#: src/lib/errors/messages.ts:148
 msgid "资源标识与解析结果不一致，请重试"
 msgstr "资源标识与解析结果不一致，请重试"
 
-#: src/lib/errors/messages.ts:153
+#: src/lib/errors/messages.ts:162
 msgid "资源解析结果异常，请重试"
 msgstr "资源解析结果异常，请重试"
 
@@ -9405,9 +9821,10 @@ msgstr "输出设置"
 msgid "运行 {formatUptimeValue}"
 msgstr "运行 {formatUptimeValue}"
 
-#: src/features/about/AboutPage.tsx:185
-#: src/features/about/AboutPage.tsx:194
+#: src/features/about/AboutPage.tsx:179
+#: src/features/about/AboutPage.tsx:188
 #: src/features/lan-transfer/LanServiceCard.tsx:32
+#: src/features/mcp/McpServiceBar.tsx:63
 msgid "运行中"
 msgstr "运行中"
 
@@ -9415,7 +9832,7 @@ msgstr "运行中"
 msgid "运行模式"
 msgstr "运行模式"
 
-#: src/features/about/AboutPage.tsx:147
+#: src/features/about/AboutPage.tsx:141
 msgid "运行状态"
 msgstr "运行状态"
 
@@ -9469,13 +9886,13 @@ msgstr "返回模式选择"
 msgid "返回竖屏"
 msgstr "返回竖屏"
 
-#: src/features/about/AboutPage.tsx:54
+#: src/features/about/AboutPage.tsx:48
 #: src/features/export/BackupPage.tsx:53
-#: src/features/settings/SettingsPage.tsx:44
+#: src/features/settings/SettingsPage.tsx:46
 msgid "返回设置"
 msgstr "返回设置"
 
-#: src/features/settings/SettingsPage.tsx:63
+#: src/features/settings/SettingsPage.tsx:65
 msgid "返回诗词"
 msgstr "返回诗词"
 
@@ -9517,11 +9934,11 @@ msgstr "进行中"
 msgid "远端"
 msgstr "远端"
 
-#: src/lib/errors/messages.ts:201
+#: src/lib/errors/messages.ts:210
 msgid "远端 rsync 异常结束（退出码 {exitCode}）"
 msgstr "远端 rsync 异常结束（退出码 {exitCode}）"
 
-#: src/lib/errors/messages.ts:188
+#: src/lib/errors/messages.ts:197
 msgid "远端 rsync 版本不受支持，需要 3.1 或更高版本"
 msgstr "远端 rsync 版本不受支持，需要 3.1 或更高版本"
 
@@ -9544,7 +9961,7 @@ msgstr "远端已存在 “{name}”"
 msgid "远端已有名称"
 msgstr "远端已有名称"
 
-#: src/lib/errors/messages.ts:197
+#: src/lib/errors/messages.ts:206
 msgid "远端拒绝了 rsync 命令，请检查服务器设置"
 msgstr "远端拒绝了 rsync 命令，请检查服务器设置"
 
@@ -9552,7 +9969,7 @@ msgstr "远端拒绝了 rsync 命令，请检查服务器设置"
 msgid "远端文件夹名称"
 msgstr "远端文件夹名称"
 
-#: src/lib/errors/messages.ts:187
+#: src/lib/errors/messages.ts:196
 msgid "远端服务器未安装 rsync，请安装后重新检测"
 msgstr "远端服务器未安装 rsync，请安装后重新检测"
 
@@ -9561,7 +9978,7 @@ msgstr "远端服务器未安装 rsync，请安装后重新检测"
 msgid "远端解压中"
 msgstr "远端解压中"
 
-#: src/lib/errors/messages.ts:354
+#: src/lib/errors/messages.ts:368
 msgid "远端连接在终端打开前已关闭"
 msgstr "远端连接在终端打开前已关闭"
 
@@ -9576,7 +9993,7 @@ msgstr "连接"
 msgid "连接 AI 服务超时"
 msgstr "连接 AI 服务超时"
 
-#: src/features/settings/SettingsOverview.tsx:25
+#: src/features/settings/SettingsOverview.tsx:26
 msgid "连接与模型设置"
 msgstr "连接与模型设置"
 
@@ -9593,6 +10010,11 @@ msgstr "连接中…"
 msgid "连接主机"
 msgstr "连接主机"
 
+#. MCP Bearer token，只在生成时展示
+#: src/features/mcp/McpCredentialDialogs.tsx:163
+msgid "连接凭据"
+msgstr "连接凭据"
+
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:145
 #: src/features/ssh-sftp/components/terminal/Terminal.tsx:57
 msgid "连接失败"
@@ -9605,6 +10027,10 @@ msgstr "连接已关闭"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:140
 msgid "连接成功"
 msgstr "连接成功"
+
+#: src/features/mcp/McpHelpDialog.tsx:32
+msgid "连接服务"
+msgstr "连接服务"
 
 #: src/features/lan-transfer/LanServiceCard.tsx:72
 msgid "连接确认码"
@@ -9899,7 +10325,7 @@ msgstr "重做"
 msgid "重启中"
 msgstr "重启中"
 
-#: src/lib/errors/messages.ts:338
+#: src/lib/errors/messages.ts:352
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "重启失败，请重试或手动重新打开应用。"
 
@@ -9959,9 +10385,21 @@ msgstr "重新检测"
 msgid "重新生成"
 msgstr "重新生成"
 
+#: src/features/mcp/McpCredentialsTable.tsx:203
+msgid "重新生成凭据"
+msgstr "重新生成凭据"
+
+#: src/features/mcp/McpCredentialDialogs.tsx:95
+msgid "重新生成凭据？"
+msgstr "重新生成凭据？"
+
 #: src/features/preview/PreviewSurface.tsx:119
 msgid "重新读取"
 msgstr "重新读取"
+
+#: src/features/mcp/McpServiceBar.tsx:149
+msgid "重新读取 MCP 设置"
+msgstr "重新读取 MCP 设置"
 
 #: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:219
 msgid "重新预览"
@@ -9988,7 +10426,7 @@ msgstr "重置状态已改变，请重新检查状态"
 #. 重新读取桌面开机自启状态
 #. 重新读取诗词合集列表
 #. 重新连接传输进度事件监听
-#: src/features/about/AboutPage.tsx:109
+#: src/features/about/AboutPage.tsx:103
 #: src/features/about/DataManagementDialogs.tsx:91
 #: src/features/activity/TransferActivity.tsx:49
 #: src/features/bt/BtTool.tsx:253
@@ -10110,7 +10548,7 @@ msgstr "阴影"
 msgid "附件副本已保存。"
 msgstr "附件副本已保存。"
 
-#: src/lib/errors/messages.ts:340
+#: src/lib/errors/messages.ts:354
 msgid "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 msgstr "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 

@@ -102,6 +102,8 @@ impl Storage {
         crate::modules::todo::schema::init(&mut conn)?;
         crate::modules::ai::schema::init(&mut conn)?;
         crate::modules::model_viewer::schema::init(&mut conn)?;
+        #[cfg(desktop)]
+        crate::modules::mcp::repository::init(&mut conn)?;
         Ok(())
     }
 
