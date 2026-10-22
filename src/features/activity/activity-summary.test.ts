@@ -10,7 +10,7 @@ const idle: ActivitySummaryInput = {
   transferFailed: 0,
   poetrySync: { active: false, phase: null },
   updater: { running: false, pending: false, error: false },
-  latestLogStatus: null,
+  logStatuses: [],
 };
 
 function summary(overrides: Partial<ActivitySummaryInput>) {
@@ -24,7 +24,7 @@ describe("活动摘要", () => {
       transferFailed: 2,
       poetrySync: { active: true, phase: "downloading" },
       updater: { running: true, pending: true, error: true },
-      latestLogStatus: "running",
+      logStatuses: ["running"],
     });
 
     expect(result).toMatchObject({
@@ -86,25 +86,27 @@ describe("活动摘要", () => {
 
   it.each(["running", "failed", "interrupted"] as const)(
     "执行日志状态 %s 视为活动",
-    (latestLogStatus) => {
-      const result = summary({ latestLogStatus });
+    (status) => {
+      const result = summary({ logStatuses: [status] });
 
       expect(result).toMatchObject({
         logsActive: true,
-        tone: "logs",
+        tone: status === "running" ? "running" : "error",
         count: null,
+        kind: "logs",
+        destination: "logs",
       });
     },
   );
 
   it("已完成或未验证的日志不显示活动圆点", () => {
-    for (const latestLogStatus of ["passed", "unverified"] as const) {
-      expect(summary({ latestLogStatus }).tone).toBeNull();
+    for (const status of ["passed", "unverified"] as const) {
+      expect(summary({ logStatuses: [status] }).tone).toBeNull();
     }
   });
 
   it("全部空闲时不显示徽标", () => {
-    expect(summary({ latestLogStatus: "passed" })).toMatchObject({
+    expect(summary({ logStatuses: ["passed"] })).toMatchObject({
       failed: 0,
       running: 0,
       updatePending: false,
@@ -112,5 +114,25 @@ describe("活动摘要", () => {
       tone: null,
       count: null,
     });
+  });
+
+  it("较早的失败不被后续成功覆盖，优先进入日志", () => {
+    expect(
+      summary({ transferRunning: 1, logStatuses: ["failed", "passed"] }),
+    ).toMatchObject({
+      tone: "error",
+      count: null,
+      kind: "mixed",
+      destination: "logs",
+    });
+  });
+
+  it.each([
+    [{ transferRunning: 1 }, "transfer"],
+    [{ poetrySync: { active: true, phase: "importing" } }, "sync"],
+    [{ updater: { running: false, pending: true, error: false } }, "update"],
+    [{}, "idle"],
+  ] as const)("单一任务类型映射为 %s 对应的图标类型 %s", (overrides, kind) => {
+    expect(summary(overrides).kind).toBe(kind);
   });
 });

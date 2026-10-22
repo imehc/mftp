@@ -76,10 +76,14 @@ describe("导航框架与页面层级", () => {
       resolveNavigation({ ...context, pathname: "/library-other" }),
     ).toBeNull();
     expect(resolveNavigation({ ...context, pathname: "/unknown" })).toBeNull();
-    // 活动页是全屏页面，不能获得默认导航框架和移动底栏。
-    expect(resolveNavigation({ ...context, pathname: "/activity" })).toBeNull();
-    expect(
-      resolveNavigation({ ...context, pathname: "/activity/" }),
-    ).toBeNull();
+  });
+
+  it("活动页保留桌面导航归属但不显示移动底栏", () => {
+    for (const pathname of ["/activity", "/activity/"]) {
+      expect(resolveNavigation({ ...context, pathname })).toEqual({
+        active: "activity",
+        primary: false,
+      });
+    }
   });
 });

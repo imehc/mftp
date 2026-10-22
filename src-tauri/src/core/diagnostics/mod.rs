@@ -74,7 +74,7 @@ impl Diagnostics {
         }
     }
 
-    /// Discard every record, as when the panel is closed by hand. A worker that
+    /// Discard every record on explicit clear, main-window destruction or exit. A worker that
     /// is still running keeps its recorder but stops being retained; the next
     /// operation to begin is recorded normally.
     pub(crate) fn clear(&self) {

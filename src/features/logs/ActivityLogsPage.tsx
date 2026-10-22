@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
+import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Ellipsis, RefreshCw, Trash2 } from "lucide-react";
 
 import { ToolPageHeader } from "~/components/ToolPageHeader";
@@ -11,12 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "~/components/ui/empty";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { describeError } from "~/lib/errors";
 
 import LogDialogs from "./LogDialogs";
@@ -26,6 +21,8 @@ import { useActivityLogs } from "./use-activity-logs";
 
 export default function ActivityLogsPage() {
   const { t } = useLingui();
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
   const c = useActivityLogs();
   return (
     <main
@@ -34,12 +31,23 @@ export default function ActivityLogsPage() {
     >
       <ToolPageHeader
         showHome={false}
-        title={<Trans>活动日志</Trans>}
+        title={
+          <Trans comment="持久保存的操作摘要列表页面标题，区别于运行期日志">
+            历史日志
+          </Trans>
+        }
         leading={
-          <Button variant="ghost" size="icon-sm" density="adaptive" asChild>
-            <Link to="/settings" aria-label={t`返回设置`}>
-              <ArrowLeft />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            density="adaptive"
+            aria-label={t`返回`}
+            onClick={() => {
+              if (canGoBack) router.history.back();
+              else void router.navigate({ to: "/settings" });
+            }}
+          >
+            <ArrowLeft />
           </Button>
         }
         trailing={
@@ -88,7 +96,7 @@ export default function ActivityLogsPage() {
             role="status"
             className="text-destructive flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2 text-sm"
           >
-            <span>{describeError(c.error)}</span>
+            <span>{describeError(c.error, t)}</span>
             <Button
               variant="outline"
               size="sm"
@@ -119,9 +127,6 @@ export default function ActivityLogsPage() {
                   <Trans>暂无日志</Trans>
                 )}
               </EmptyTitle>
-              <EmptyDescription>
-                <Trans>调整筛选条件或刷新后再试。</Trans>
-              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         )}

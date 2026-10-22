@@ -1,6 +1,9 @@
 import type { DiagnosticStatus } from "~/bindings";
 
-export type ActivityBadgeTone = "error" | "running" | "attention" | "logs";
+export type ActivityBadgeTone = "error" | "running" | "attention";
+
+export type ActivityKind =
+  "transfer" | "sync" | "update" | "logs" | "mixed" | "idle";
 
 export interface ActivitySummary {
   failed: number;
@@ -9,6 +12,8 @@ export interface ActivitySummary {
   logsActive: boolean;
   tone: ActivityBadgeTone | null;
   count: number | null;
+  kind: ActivityKind;
+  destination: "tasks" | "logs" | null;
 }
 
 export interface ActivitySummaryInput {
@@ -25,12 +30,11 @@ export interface ActivitySummaryInput {
     pending: boolean;
     error: boolean;
   };
-  latestLogStatus: DiagnosticStatus | null;
+  logStatuses: readonly DiagnosticStatus[];
 }
 
 // 执行日志只用于弱提示，避免高频外部调用把活动徽标变成噪声。
-const ACTIVE_LOG_STATUSES = new Set<DiagnosticStatus>([
-  "running",
+const FAILED_LOG_STATUSES = new Set<DiagnosticStatus>([
   "failed",
   "interrupted",
 ]);
@@ -44,7 +48,7 @@ export function summarizeActivity({
   transferFailed,
   poetrySync,
   updater,
-  latestLogStatus,
+  logStatuses,
 }: ActivitySummaryInput): ActivitySummary {
   const failed =
     transferFailed +
@@ -52,24 +56,52 @@ export function summarizeActivity({
     (updater.error ? 1 : 0);
   const running =
     transferRunning + (poetrySync.active ? 1 : 0) + (updater.running ? 1 : 0);
-  const logsActive =
-    latestLogStatus !== null && ACTIVE_LOG_STATUSES.has(latestLogStatus);
+  const logFailed = logStatuses.some((status) =>
+    FAILED_LOG_STATUSES.has(status),
+  );
+  const logRunning = logStatuses.includes("running");
+  const logsActive = logFailed || logRunning;
+  const kinds: ActivityKind[] = [];
+  if (transferRunning > 0 || transferFailed > 0) kinds.push("transfer");
+  if (
+    poetrySync.active ||
+    (poetrySync.phase === "error" && !poetrySync.cancelled)
+  )
+    kinds.push("sync");
+  if (updater.running || updater.pending || updater.error) kinds.push("update");
+  if (logsActive) kinds.push("logs");
   const tone: ActivityBadgeTone | null =
-    failed > 0
+    failed > 0 || logFailed
       ? "error"
-      : running > 0
+      : running > 0 || logRunning
         ? "running"
         : updater.pending
           ? "attention"
-          : logsActive
-            ? "logs"
-            : null;
+          : null;
   return {
     failed,
     running,
     updatePending: updater.pending,
     logsActive,
     tone,
-    count: tone === "error" ? failed : tone === "running" ? running : null,
+    count:
+      tone === "error" && failed > 0
+        ? failed
+        : tone === "running" && running > 0
+          ? running
+          : null,
+    kind: kinds.length > 1 ? "mixed" : (kinds[0] ?? "idle"),
+    destination:
+      failed > 0
+        ? "tasks"
+        : logFailed
+          ? "logs"
+          : running > 0
+            ? "tasks"
+            : logRunning
+              ? "logs"
+              : updater.pending
+                ? "tasks"
+                : null,
   };
 }

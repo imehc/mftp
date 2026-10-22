@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
 
-import type { NavigationItem } from "./NavigationItems";
+import type { NavigationItem, NavigationSection } from "./NavigationItems";
 
 export default function NavigationLinks({
   items,
@@ -10,7 +10,7 @@ export default function NavigationLinks({
   desktop = false,
 }: {
   items: NavigationItem[];
-  active: NavigationItem["id"];
+  active: NavigationSection;
   desktop?: boolean;
 }) {
   return items.map((item) => {

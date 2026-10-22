@@ -4,7 +4,6 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 
-import ActivityPanel from "~/features/activity/ActivityPanel";
 import { ActivityProvider } from "~/features/activity/ActivityProvider";
 import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
 import { resolveNavigation } from "~/features/navigation/resolve-navigation";
@@ -38,7 +37,7 @@ function RootLayout() {
     settingsDetail,
   });
   return (
-    <ActivityProvider pathname={pathname}>
+    <ActivityProvider>
       <div className="app-shell">
         {navigation ? (
           <ModuleNavigationFrame
@@ -48,13 +47,12 @@ function RootLayout() {
             <Outlet />
           </ModuleNavigationFrame>
         ) : (
-          <div className="flex h-full min-h-0 flex-col">
+          <div className="bg-background flex h-full min-h-0 flex-col">
             <div className="min-h-0 min-w-0 flex-1">
               <Outlet />
             </div>
           </div>
         )}
-        <ActivityPanel />
       </div>
     </ActivityProvider>
   );

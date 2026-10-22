@@ -50,7 +50,7 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
       <SettingsGroup title={t`应用`}>
         <SettingsEntry
           icon={FileClock}
-          title={t`活动日志`}
+          title={t`历史日志`}
           description={t`查看操作和失败原因`}
           onClick={() => void navigate({ to: "/logs" })}
         />

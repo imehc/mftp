@@ -49,6 +49,18 @@ afterEach(() => {
 });
 
 describe("应用级执行日志订阅", () => {
+  it("手动刷新与推送共用游标，不等待兜底轮询", async () => {
+    vi.useFakeTimers();
+    const { port } = portWith(async () => snapshot);
+    const session = openExecutionLogSession(vi.fn(), vi.fn(), port);
+    await vi.advanceTimersByTimeAsync(0);
+    session.refresh();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(port.snapshot).toHaveBeenLastCalledWith(1);
+    expect(port.snapshot).toHaveBeenCalledTimes(2);
+    session.close();
+  });
+
   it("挂载即读取一次，随后由事件推送驱动", async () => {
     vi.useFakeTimers();
     const { port, push } = portWith(async () => snapshot);

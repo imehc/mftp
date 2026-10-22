@@ -80,6 +80,7 @@ export function openExecutionLogSession(
   scheduleFallback();
 
   return {
+    refresh: () => void read(),
     close() {
       if (closed) return;
       closed = true;

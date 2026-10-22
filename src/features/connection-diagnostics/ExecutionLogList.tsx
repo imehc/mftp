@@ -1,145 +1,144 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ArrowDown, ChevronDown } from "lucide-react";
-import { Collapsible } from "radix-ui";
-import { useLayoutEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { useLayoutEffect, useRef } from "react";
 
-import type { DiagnosticOperation } from "~/bindings";
 import { Button } from "~/components/ui/button";
+import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
+import { useActivityViewStore } from "~/features/activity/activity-view-store";
 import { describeError } from "~/lib/errors";
 
-import ExecutionLogDetails from "./ExecutionLogDetails";
-import ExecutionLogLine from "./ExecutionLogLine";
-import ExecutionLogProgress from "./ExecutionLogProgress";
+import { executionLogIsFailed } from "./execution-log-content";
+import { EXECUTION_LOG_COLUMNS } from "./execution-log-layout";
+import ExecutionLogRow from "./ExecutionLogRow";
 import type { ExecutionLogs } from "./use-execution-logs";
 
-export default function ExecutionLogList({
-  logs,
-  label,
-}: {
-  logs: ExecutionLogs;
-  label: (operation: DiagnosticOperation) => string;
-}) {
+export default function ExecutionLogList({ logs }: { logs: ExecutionLogs }) {
   const { t } = useLingui();
   const scroll = useRef<HTMLDivElement>(null);
-  const [following, setFollowing] = useState(true);
+  const filter = useActivityViewStore((state) => state.filter);
+  const following = useActivityViewStore((state) => state.following);
+  const saveScroll = useActivityViewStore((state) => state.saveScroll);
+  const operations =
+    filter === "failed"
+      ? logs.operations.filter(executionLogIsFailed)
+      : logs.operations;
   useLayoutEffect(() => {
-    // 只在用户仍跟随最新记录时滚到底部；查看历史不被异步结果打断。
     const element = scroll.current;
-    if (!following || !element) return;
+    if (!element) return;
+    element.scrollTop = useActivityViewStore.getState().scrollTop;
+    const focusedOperation = useActivityViewStore.getState().focusedOperation;
+    if (focusedOperation) {
+      const row = Array.from(
+        element.querySelectorAll<HTMLAnchorElement>("[data-operation]"),
+      ).find((item) => item.dataset.operation === focusedOperation);
+      (row ?? element).focus({ preventScroll: true });
+    }
+  }, [filter]);
+  useLayoutEffect(() => {
+    const element = scroll.current;
+    if (!element || !following) return;
 
     const follow = () => {
       element.scrollTop = element.scrollHeight;
     };
 
     follow();
-    // Popover 定位后才确定可用高度，初次布局的滚动值可能被后续测量重置。
     const resize = new ResizeObserver(follow);
     resize.observe(element);
     return () => resize.disconnect();
   }, [logs.operations, following]);
   return (
     <>
+      {logs.error ? (
+        <p role="alert" className="text-destructive text-sm break-words">
+          {describeError(logs.error, t)}
+        </p>
+      ) : null}
+      {logs.discarded ? (
+        <p className="text-muted-foreground text-xs">
+          <Trans comment="当前运行期日志达到容量上限时的短提示">
+            仅保留最近记录
+          </Trans>
+        </p>
+      ) : null}
+      <div
+        aria-hidden
+        className={cn(
+          "text-muted-foreground hidden shrink-0 gap-3 border-b pb-2 text-xs md:grid",
+          EXECUTION_LOG_COLUMNS,
+        )}
+      >
+        <span>
+          <Trans>时间</Trans>
+        </span>
+        <span>
+          <Trans>来源</Trans>
+        </span>
+        <span>
+          <Trans>操作</Trans>
+        </span>
+        <span>
+          <Trans>对象</Trans>
+        </span>
+        <span className="min-w-24 text-right">
+          <Trans>结果</Trans>
+        </span>
+      </div>
       <div
         ref={scroll}
         role="region"
-        aria-label={t`执行日志记录`}
+        aria-label={t({
+          comment: "运行期日志摘要列表的无障碍名称",
+          message: "日志记录",
+        })}
         tabIndex={0}
-        className="focus-visible:ring-ring flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-1 outline-none focus-visible:ring-2"
+        className="app-scroll-safe-end focus-visible:ring-ring flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain outline-none focus-visible:ring-2"
         onScroll={(event) => {
           const element = event.currentTarget;
-          setFollowing(
+          saveScroll(
+            element.scrollTop,
             element.scrollHeight - element.scrollTop - element.clientHeight <
               24,
           );
         }}
       >
-        {logs.error ? (
-          <p className="text-destructive text-sm">
-            {describeError(logs.error, t)}
+        {logs.loading ? (
+          <p
+            role="status"
+            className="text-muted-foreground py-8 text-center text-sm"
+          >
+            <Trans>加载中…</Trans>
           </p>
+        ) : operations.length ? (
+          operations.map((operation) => (
+            <ExecutionLogRow key={operation.id} operation={operation} />
+          ))
+        ) : !logs.error ? (
+          <Empty className="flex-1">
+            <EmptyHeader>
+              <EmptyTitle>
+                {filter === "failed" ? (
+                  <Trans comment="日志只看失败筛选的空状态">没有失败记录</Trans>
+                ) : (
+                  <Trans comment="活动日志页签的空状态标题">暂无日志</Trans>
+                )}
+              </EmptyTitle>
+            </EmptyHeader>
+            {filter === "failed" ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                density="adaptive"
+                onClick={() => useActivityViewStore.getState().setFilter("all")}
+              >
+                <Trans comment="失败日志筛选无结果时恢复全部记录">
+                  显示全部
+                </Trans>
+              </Button>
+            ) : null}
+          </Empty>
         ) : null}
-        {logs.discarded ? (
-          <p className="text-muted-foreground text-xs">
-            <Trans>部分操作因记录上限未保留，最多显示 20 次操作。</Trans>
-          </p>
-        ) : null}
-        {logs.operations.map((entry) => {
-          const correlationId = entry.correlationId;
-          return (
-            <article
-              key={entry.id}
-              className="flex shrink-0 flex-col gap-2 rounded-xl border p-3"
-            >
-              <h3 className="text-sm font-medium">
-                <ExecutionLogLine operation={entry} label={label(entry)} />
-              </h3>
-              <p className="text-muted-foreground text-xs break-all">
-                {entry.id}
-              </p>
-              {entry.correlationId ? (
-                <p className="text-muted-foreground text-xs break-all">
-                  <Trans comment="连接日志中关联传输任务的 ID，不代表任务已完成">
-                    关联传输：{correlationId}
-                  </Trans>
-                </p>
-              ) : null}
-              {entry.discardedDetails > 0 ? (
-                <p className="text-muted-foreground text-xs">
-                  <Trans>部分命令详情超出记录上限。</Trans>
-                </p>
-              ) : null}
-              {entry.metadataTruncated || entry.redacted ? (
-                <p className="text-muted-foreground text-xs">
-                  {entry.metadataTruncated ? (
-                    <Trans>操作信息已截断</Trans>
-                  ) : null}
-                  {entry.metadataTruncated && entry.redacted ? " · " : null}
-                  {entry.redacted ? <Trans>凭据已脱敏</Trans> : null}
-                </p>
-              ) : null}
-              {entry.progress ? (
-                <ExecutionLogProgress progress={entry.progress} />
-              ) : null}
-              {entry.error ? (
-                <p className="text-destructive text-sm">
-                  {describeError(entry.error, t)}
-                </p>
-              ) : null}
-              <Collapsible.Root className="flex min-w-0 flex-col gap-2">
-                <Collapsible.Trigger asChild>
-                  <Button
-                    density="adaptive"
-                    variant="ghost"
-                    size="sm"
-                    className="w-fit"
-                  >
-                    <ChevronDown data-icon="inline-start" aria-hidden="true" />
-                    <Trans>执行详情</Trans>
-                  </Button>
-                </Collapsible.Trigger>
-                <Collapsible.Content>
-                  <ExecutionLogDetails
-                    details={entry.details}
-                    trace={entry.trace}
-                  />
-                </Collapsible.Content>
-              </Collapsible.Root>
-            </article>
-          );
-        })}
       </div>
-      {!following ? (
-        <Button
-          density="adaptive"
-          size="sm"
-          variant="outline"
-          className="self-center"
-          onClick={() => setFollowing(true)}
-        >
-          <ArrowDown data-icon="inline-start" aria-hidden="true" />
-          <Trans>查看最新记录</Trans>
-        </Button>
-      ) : null}
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 
-import type { NavigationItem } from "./NavigationItems";
+import type { NavigationItem, NavigationSection } from "./NavigationItems";
 import NavigationLinks from "./NavigationLinks";
 
 export default function BottomNavigationMobile({
@@ -8,7 +8,7 @@ export default function BottomNavigationMobile({
   active,
 }: {
   items: NavigationItem[];
-  active: NavigationItem["id"];
+  active: NavigationSection;
 }) {
   const { t } = useLingui();
   return (

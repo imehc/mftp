@@ -149,10 +149,10 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
             event: tauri::WindowEvent::Destroyed,
             ..
         } => {
-            // The activity panel is memory-only and global; a destroyed window
-            // takes its last records with it.
             state.translation.cancel_owner(&label);
-            state.diagnostics.clear();
+            if label == "main" {
+                state.diagnostics.clear();
+            }
             crate::adapters::speech::stop_all(app, &state.speech);
         }
         #[cfg(any(target_os = "macos", target_os = "ios"))]
@@ -162,6 +162,7 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
             }
         }
         tauri::RunEvent::ExitRequested { api, code, .. } => {
+            state.diagnostics.clear();
             crate::adapters::speech::stop_all(app, &state.speech);
             if state.lifecycle.is_finished() {
                 return;
@@ -173,6 +174,7 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
             shutdown(app, &state.lifecycle, resume_exit);
         }
         tauri::RunEvent::Exit => {
+            state.diagnostics.clear();
             crate::adapters::speech::stop_all(app, &state.speech);
             shutdown(app, &state.lifecycle, None);
         }

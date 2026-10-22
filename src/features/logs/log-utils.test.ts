@@ -3,7 +3,7 @@ import { beforeEach, expect, it } from "vitest";
 
 import type { ActivityLog } from "~/types";
 
-import { filterLogs, logDetail } from "./log-utils";
+import { filterLogs, hasLogDetail, logDetail } from "./log-utils";
 
 const now = 10 * 24 * 60 * 60 * 1000;
 const row: ActivityLog = {
@@ -59,4 +59,12 @@ it("近七天保留边界日志且不影响全部时间", () => {
     boundary,
     old,
   ]);
+});
+
+it("历史摘要的内部标识和空白不构成详情，结构化错误仍可阅读", () => {
+  expect(hasLogDetail({ ...row, detail: "  \n ", error: null })).toBe(false);
+  expect(hasLogDetail({ ...row, detail: "actual output", error: null })).toBe(
+    true,
+  );
+  expect(hasLogDetail({ ...row, detail: null })).toBe(true);
 });

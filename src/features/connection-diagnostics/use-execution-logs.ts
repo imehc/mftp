@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { AppError, DiagnosticOperation } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
@@ -11,23 +11,38 @@ export function useExecutionLogs() {
   const [operations, setOperations] = useState<DiagnosticOperation[]>([]);
   const [discarded, setDiscarded] = useState(0);
   const [error, setError] = useState<AppError | null>(null);
+  const [loading, setLoading] = useState(true);
+  const sessionRef = useRef<ReturnType<typeof openExecutionLogSession> | null>(
+    null,
+  );
   useEffect(() => {
-    const session = openExecutionLogSession((snapshot) => {
-      if (snapshot.operations !== null) setOperations(snapshot.operations);
-      setDiscarded(snapshot.discarded);
-    }, setError);
-    return session.close;
+    const session = openExecutionLogSession(
+      (snapshot) => {
+        if (snapshot.operations !== null) setOperations(snapshot.operations);
+        setDiscarded(snapshot.discarded);
+        setLoading(false);
+      },
+      (cause) => {
+        setError(cause);
+        setLoading(false);
+      },
+    );
+    sessionRef.current = session;
+    return () => {
+      sessionRef.current = null;
+      session.close();
+    };
   }, []);
 
   return {
     operations,
     discarded,
     error,
-    clear: () => {
-      setOperations([]);
-      setDiscarded(0);
+    loading,
+    clear: async () => {
+      await diagnosticsClear();
+      sessionRef.current?.refresh();
       // 丢弃本批记录，不取消仍在执行的外部操作。
-      void diagnosticsClear().catch(() => {});
     },
     recordFailure: (cause: unknown) => setError(toIpcError(cause).payload),
   };

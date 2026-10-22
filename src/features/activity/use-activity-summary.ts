@@ -28,6 +28,6 @@ export function useActivitySummary() {
       cancelled: hasCustomCode(syncError, "poetry:sync_cancelled"),
     },
     updater,
-    latestLogStatus: logs.operations.at(-1)?.status ?? null,
+    logStatuses: logs.operations.map((operation) => operation.status),
   });
 }

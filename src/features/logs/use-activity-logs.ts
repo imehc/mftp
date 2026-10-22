@@ -100,6 +100,8 @@ export function useActivityLogs() {
       if (target === "all") await ipc.activityLogsClear();
       else await ipc.activityLogDelete(target.id);
       if (!mounted.current) return;
+      generation.current++;
+      setLoading(false);
       setLogs((previous) =>
         target === "all" ? [] : previous.filter((x) => x.id !== target.id),
       );
@@ -107,7 +109,7 @@ export function useActivityLogs() {
       setDeleting(null);
       toast.success(target === "all" ? t`日志已清空` : t`日志已删除`);
     } catch (cause) {
-      if (mounted.current) toast.error(describeError(cause));
+      if (mounted.current) toast.error(describeError(cause, t));
     } finally {
       writing.current = false;
       if (mounted.current) setBusy(false);

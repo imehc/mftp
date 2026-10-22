@@ -358,6 +358,11 @@
     background: var(--muted);
     pointer-events: none;
   }
+  [data-slot="tabs-list"][data-density="adaptive"][data-variant="line"]::before,
+  [data-slot="tabs-list"][data-density="adaptive"][data-variant="line"]
+    > [data-slot="tabs-trigger"]::before {
+    display: none;
+  }
   [data-slot="tabs-list"][data-density="adaptive"]
     > [data-slot="tabs-trigger"] {
     position: relative;

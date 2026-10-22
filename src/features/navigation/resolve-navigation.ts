@@ -1,4 +1,4 @@
-import type { NavigationItem } from "./NavigationItems";
+import type { NavigationSection } from "./NavigationItems";
 
 interface NavigationContext {
   pathname: string;
@@ -9,7 +9,7 @@ interface NavigationContext {
 }
 
 interface NavigationPresentation {
-  active: NavigationItem["id"];
+  active: NavigationSection;
   primary: boolean;
 }
 
@@ -22,6 +22,7 @@ export function resolveNavigation({
   settingsDetail,
 }: NavigationContext): NavigationPresentation | null {
   const path = pathname.replace(/\/+$/, "") || "/";
+  if (path === "/activity") return { active: "activity", primary: false };
   if (path === "/") {
     return {
       active:

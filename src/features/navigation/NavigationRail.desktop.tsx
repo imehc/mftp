@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 
 import ActivityEntry from "~/features/activity/ActivityEntry";
 
-import type { NavigationItem } from "./NavigationItems";
+import type { NavigationItem, NavigationSection } from "./NavigationItems";
 import NavigationLinks from "./NavigationLinks";
 
 export default function NavigationRailDesktop({
@@ -10,7 +10,7 @@ export default function NavigationRailDesktop({
   active,
 }: {
   items: NavigationItem[];
-  active: NavigationItem["id"];
+  active: NavigationSection;
 }) {
   const { t } = useLingui();
   const primary = items.filter((item) => item.id !== "settings");

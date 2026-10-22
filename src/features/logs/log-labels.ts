@@ -23,6 +23,7 @@ const actionMessages: Record<string, MessageDescriptor> = {
   "vault:delete": msg`删除密码条目`,
   "vault:reorder": msg`调整密码条目顺序`,
   "ssh:connect": msg`连接主机`,
+  "ssh:test_connection": msg`测试主机连接`,
   "ssh:open_shell": msg`打开终端`,
   "ssh:disconnect": msg`断开连接`,
   "ssh:shell_lifetime": msg`终端会话`,
@@ -111,7 +112,10 @@ function objectKind(log: ActivityLog): MessageDescriptor | null {
     case "vault":
       return log.requestType === "reorder" ? msg`密码本` : msg`密码条目`;
     case "ssh":
-      return log.requestType === "connect" ? hostObject : msg`SSH 会话`;
+      return log.requestType === "connect" ||
+        log.requestType === "test_connection"
+        ? hostObject
+        : msg`SSH 会话`;
     case "sftp":
       return ["cancel_transfer", "pause_transfer", "resume_transfer"].includes(
         log.requestType,
@@ -174,7 +178,7 @@ function shortIdentifier(value: string): string {
   return opaque.test(value) ? `${value.slice(0, 8)}…` : value;
 }
 
-export function logObject(log: ActivityLog): string {
+export function logObject(log: ActivityLog, localize = translate): string {
   // 历史失败日志的 detail 可能是错误诊断，不能把它当作文件名或主机名。
   const detail = log.detail?.trim();
   const hasMetadata =
@@ -197,7 +201,7 @@ export function logObject(log: ActivityLog): string {
   }
 
   if (log.source === "poetry" && log.ip === "annotations") {
-    return translate(
+    return localize(
       msg({
         comment: "活动日志对象：诗词的本地注释与赏析数据",
         message: "诗词注释库",
@@ -206,12 +210,12 @@ export function logObject(log: ActivityLog): string {
   }
   if (log.source === "games" && log.requestType === "create_room") {
     const game = log.ip.replace(/\/online-v\d+$/, "");
-    if (game === "gomoku") return translate(msg`五子棋房间`);
-    if (game === "xiangqi") return translate(msg`中国象棋房间`);
+    if (game === "gomoku") return localize(msg`五子棋房间`);
+    if (game === "xiangqi") return localize(msg`中国象棋房间`);
   }
 
   const kind = objectKind(log);
   if (!kind) return log.ip || "—";
-  const label = translate(kind);
+  const label = localize(kind);
   return log.ip ? `${label} · ${shortIdentifier(log.ip)}` : label;
 }

@@ -1,15 +1,20 @@
+import { translate } from "~/i18n/translate";
 import { describeError } from "~/lib/errors";
 import type { ActivityLog } from "~/types";
 
 import { logAction, logObject } from "./log-labels";
 
 // 历史错误的 message 与 detail 通常相同；缺失 detail 时仍须显示原始诊断。
-export function logDetail(log: ActivityLog): string {
+export function logDetail(log: ActivityLog, localize = translate): string {
   const detail = log.detail || "";
-  const error = log.error ? describeError(log.error) : "";
+  const error = log.error ? describeError(log.error, localize) : "";
   return [detail, error && error !== detail ? error : ""]
     .filter(Boolean)
     .join(" · ");
+}
+
+export function hasLogDetail(log: ActivityLog): boolean {
+  return Boolean(log.detail?.trim() || log.error);
 }
 
 export function filterLogs(

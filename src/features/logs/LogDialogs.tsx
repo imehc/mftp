@@ -1,4 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Ellipsis } from "lucide-react";
+import { useState } from "react";
 
 import {
   AlertDialog,
@@ -18,6 +20,13 @@ import {
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 
 import { logAction, logObject } from "./log-labels";
 import { logDetail } from "./log-utils";
@@ -28,14 +37,18 @@ export default function LogDialogs({
 }: {
   controller: ActivityLogsController;
 }) {
-  const { i18n } = useLingui();
+  const { t, i18n } = useLingui();
+  const [metadata, setMetadata] = useState(false);
   const row = c.selected;
   return (
     <>
       <Dialog
         open={!!row}
         onOpenChange={(open) => {
-          if (!open && !c.busy) c.setSelected(null);
+          if (!open && !c.busy) {
+            c.setSelected(null);
+            setMetadata(false);
+          }
         }}
       >
         <DialogLayoutContent
@@ -43,9 +56,41 @@ export default function LogDialogs({
           showCloseButton={false}
         >
           <DialogLayoutHeader showCloseButton>
-            <DialogTitle>
-              <Trans>日志详情</Trans>
-            </DialogTitle>
+            <div className="flex min-w-0 items-center justify-between gap-2">
+              <DialogTitle>
+                <Trans>日志详情</Trans>
+              </DialogTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    density="adaptive"
+                    aria-label={t({
+                      comment: "历史日志详情的按需元信息菜单",
+                      message: "日志详情操作",
+                    })}
+                  >
+                    <Ellipsis />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="ui-density-adaptive"
+                >
+                  <DropdownMenuGroup>
+                    <DropdownMenuCheckboxItem
+                      checked={metadata}
+                      onCheckedChange={setMetadata}
+                    >
+                      <Trans comment="历史日志详情菜单，按需显示内部标识和原始对象">
+                        元信息
+                      </Trans>
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <DialogDescription className="sr-only">
               {row ? new Date(row.createdAt).toLocaleString(i18n.locale) : null}
             </DialogDescription>
@@ -68,11 +113,11 @@ export default function LogDialogs({
                 <dt className="text-muted-foreground">
                   <Trans>操作</Trans>
                 </dt>
-                <dd className="wrap-break-word">{logAction(row)}</dd>
+                <dd className="wrap-break-word">{logAction(row, t)}</dd>
                 <dt className="text-muted-foreground">
                   <Trans>对象</Trans>
                 </dt>
-                <dd className="break-all">{logObject(row)}</dd>
+                <dd className="break-all">{logObject(row, t)}</dd>
                 <dt className="text-muted-foreground">
                   <Trans>结果</Trans>
                 </dt>
@@ -81,36 +126,42 @@ export default function LogDialogs({
                   <Trans>详情</Trans>
                 </dt>
                 <dd className="wrap-break-word whitespace-pre-wrap">
-                  {logDetail(row) || "—"}
+                  {logDetail(row, t)}
                 </dd>
-                <dt className="text-muted-foreground">
-                  <Trans comment="日志详情：后端保存的原始操作代码，用于排查问题">
-                    操作标识
-                  </Trans>
-                </dt>
-                <dd className="font-mono text-xs break-all">
-                  {row.requestType}
-                </dd>
-                {row.operationId ? (
+                {metadata ? (
                   <>
                     <dt className="text-muted-foreground">
-                      <Trans comment="用于关联持久操作摘要与内存执行详情的同一次操作身份">
-                        执行记录 ID
+                      <Trans comment="日志详情：后端保存的原始操作代码，用于排查问题">
+                        操作标识
                       </Trans>
                     </dt>
                     <dd className="font-mono text-xs break-all">
-                      {row.operationId}
+                      {row.requestType}
                     </dd>
-                  </>
-                ) : null}
-                {row.ip ? (
-                  <>
-                    <dt className="text-muted-foreground">
-                      <Trans comment="日志详情：后端保存的完整对象 ID、地址或路径">
-                        对象原值
-                      </Trans>
-                    </dt>
-                    <dd className="font-mono text-xs break-all">{row.ip}</dd>
+                    {row.operationId ? (
+                      <>
+                        <dt className="text-muted-foreground">
+                          <Trans comment="用于关联持久操作摘要与内存执行详情的同一次操作身份">
+                            执行记录 ID
+                          </Trans>
+                        </dt>
+                        <dd className="font-mono text-xs break-all">
+                          {row.operationId}
+                        </dd>
+                      </>
+                    ) : null}
+                    {row.ip ? (
+                      <>
+                        <dt className="text-muted-foreground">
+                          <Trans comment="日志详情：后端保存的完整对象 ID、地址或路径">
+                            对象原值
+                          </Trans>
+                        </dt>
+                        <dd className="font-mono text-xs break-all">
+                          {row.ip}
+                        </dd>
+                      </>
+                    ) : null}
                   </>
                 ) : null}
               </dl>
@@ -144,7 +195,9 @@ export default function LogDialogs({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {c.deleting === "all" ? (
-                <Trans>所有日志记录都会被删除，且无法恢复。</Trans>
+                <Trans comment="清空范围仅限 SQLite 持久操作摘要，不删除运行期协议详情或终止任务">
+                  所有历史日志都会被删除，且无法恢复。运行期日志和正在执行的任务不受影响。
+                </Trans>
               ) : (
                 <Trans>删除后无法恢复。</Trans>
               )}

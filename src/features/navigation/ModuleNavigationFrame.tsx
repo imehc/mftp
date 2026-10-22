@@ -4,7 +4,7 @@ import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useSettingsStore } from "~/store/settings";
 
 import BottomNavigationMobile from "./BottomNavigation.mobile";
-import { type NavigationItem, navigationItems } from "./NavigationItems";
+import { navigationItems, type NavigationSection } from "./NavigationItems";
 import NavigationRailDesktop from "./NavigationRail.desktop";
 
 /** 展示框架不拥有页面状态；换导航布局时 children 保持在同一挂载位置。 */
@@ -14,7 +14,7 @@ export default function ModuleNavigationFrame({
   primary,
 }: {
   children: ReactNode;
-  active: NavigationItem["id"];
+  active: NavigationSection;
   primary: boolean;
 }) {
   const wide = useDesktopLayout();

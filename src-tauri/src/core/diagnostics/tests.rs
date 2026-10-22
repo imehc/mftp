@@ -22,6 +22,51 @@ fn clearing_discards_records_and_late_workers_cannot_restore_them() {
 }
 
 #[test]
+fn clearing_diagnostics_preserves_workers_and_persistent_activity_history() {
+    let root = std::env::temp_dir().join(format!("diagnostics-lifecycle-{}", uuid::Uuid::new_v4()));
+    let storage = crate::storage::Storage::new(root.clone()).unwrap();
+    storage
+        .record_traced_result(
+            "http",
+            "https://example.test",
+            "get",
+            None,
+            None,
+            "operation-1",
+        )
+        .unwrap();
+    let operations = std::sync::Arc::new(crate::core::operations::Operations::default());
+    let permit = operations.begin().unwrap();
+    let hub = Diagnostics::default();
+    let mut worker = hub.begin("http", "get", "https://example.test").unwrap();
+    let before = hub.snapshot(0);
+
+    hub.clear();
+    let after = hub.snapshot(before.cursor);
+    assert!(after.cursor > before.cursor);
+    assert!(after.operations.unwrap().is_empty());
+    assert_eq!(after.discarded, 0);
+    assert!(!operations.is_closed());
+    assert!(!operations.wait_idle(std::time::Duration::ZERO));
+    worker.finish(None);
+    assert!(hub.snapshot(0).operations.unwrap().is_empty());
+    assert_eq!(storage.list_activity_logs(10, None, None).unwrap().len(), 1);
+
+    let mut next = hub
+        .begin("http", "get", "https://example.test/next")
+        .unwrap();
+    next.finish(None);
+    assert_eq!(
+        hub.snapshot(0).operations.unwrap()[0].status,
+        DiagnosticStatus::Passed
+    );
+    drop(permit);
+    assert!(operations.wait_idle(std::time::Duration::ZERO));
+    drop(storage);
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn final_results_survive_reader_contention_and_history_is_bounded() {
     let hub = Diagnostics::default();
     let mut worker = hub.begin("ai", "test", "model").unwrap();

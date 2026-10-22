@@ -51,3 +51,5 @@ export function navigationItems(
 }
 
 export type NavigationItem = ReturnType<typeof navigationItems>[number];
+
+export type NavigationSection = NavigationItem["id"] | "activity";
