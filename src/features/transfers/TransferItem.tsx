@@ -57,23 +57,25 @@ export default function TransferItem({
         ) : null}
         {transfer.status === "running" && transfer.cancellable !== false ? (
           <div className="flex shrink-0 items-center gap-0.5">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              density="adaptive"
-              title={transfer.paused ? t`继续` : t`暂停`}
-              aria-label={transfer.paused ? t`继续` : t`暂停`}
-              onClick={() => onTogglePause(transfer)}
-              disabled={transfer.controlPending || transfer.cancelling}
-            >
-              {transfer.controlPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : transfer.paused ? (
-                <Play />
-              ) : (
-                <Pause />
-              )}
-            </Button>
+            {transfer.pausable !== false ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                density="adaptive"
+                title={transfer.paused ? t`继续` : t`暂停`}
+                aria-label={transfer.paused ? t`继续` : t`暂停`}
+                onClick={() => onTogglePause(transfer)}
+                disabled={transfer.controlPending || transfer.cancelling}
+              >
+                {transfer.controlPending ? (
+                  <LoaderCircle className="animate-spin" />
+                ) : transfer.paused ? (
+                  <Play />
+                ) : (
+                  <Pause />
+                )}
+              </Button>
+            ) : null}
             <Button
               variant="ghost"
               size="icon-sm"

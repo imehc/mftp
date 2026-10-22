@@ -142,6 +142,8 @@ impl Manager {
                 .retain(|_, owner| owner != session_id);
             self.sftp.lock().remove(session_id);
             self.clear_monitor_cache(session_id);
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
+            self.rsync.forget(session_id);
             self.shells.lock().get(session_id).cloned()
         };
         if let Some(shell) = shell {

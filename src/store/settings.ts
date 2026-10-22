@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import type { DirectoryTransferMode as SftpDirectoryTransferMode } from "~/bindings";
 import {
   type ColorTheme,
   type FontPreset,
@@ -16,7 +17,8 @@ import {
   type ToolRoute,
 } from "~/lib/module-metadata";
 
-export type DirectoryTransferMode = "archive" | "direct";
+/** 目录传输偏好包含后端 sftp 命令不接受的 rsync，调用 IPC 前必须显式分支。 */
+export type DirectoryTransferMode = SftpDirectoryTransferMode | "rsync";
 
 /**
  * 工具路由的唯一权威来源是 `~/lib/module-metadata`。`migrate` 依据
@@ -52,6 +54,8 @@ function resolveHomeEntryOrder(value: unknown): HomeEntryOrder {
 
 interface SettingsState {
   directoryTransferMode: DirectoryTransferMode;
+  /** rsync 专属：删除目标目录中源目录不存在的文件。 */
+  rsyncDeleteExtraneous: boolean;
   locale: AppLocale;
   sidebarSize: number;
   sidebarCollapsed: boolean;
@@ -71,6 +75,7 @@ interface SettingsState {
   homeEntryVisibility: HomeEntryVisibility;
   hiddenHomeCategories: HomeCategoryId[];
   setDirectoryTransferMode: (mode: DirectoryTransferMode) => void;
+  setRsyncDeleteExtraneous: (value: boolean) => void;
   setLocale: (locale: AppLocale) => void;
   setSidebarSize: (size: number) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
@@ -93,6 +98,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       directoryTransferMode: "archive",
+      rsyncDeleteExtraneous: false,
       locale: "system",
       sidebarSize: 20,
       sidebarCollapsed: false,
@@ -110,6 +116,8 @@ export const useSettingsStore = create<SettingsState>()(
       homeEntryVisibility: {},
       hiddenHomeCategories: ["games"],
       setDirectoryTransferMode: (mode) => set({ directoryTransferMode: mode }),
+      setRsyncDeleteExtraneous: (rsyncDeleteExtraneous) =>
+        set({ rsyncDeleteExtraneous }),
       setLocale: (locale) => set({ locale }),
       setSidebarSize: (size) => set({ sidebarSize: size }),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
@@ -157,8 +165,8 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "mftp-settings",
-      // v9：启动模式与页面记录覆盖小游戏；保留旧工具恢复偏好。
-      version: 9,
+      // v10：增加 rsync 目录同步方式与删除策略。
+      version: 10,
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
@@ -174,6 +182,16 @@ export const useSettingsStore = create<SettingsState>()(
               : null;
         return {
           ...state,
+          directoryTransferMode:
+            state.directoryTransferMode === "archive" ||
+            state.directoryTransferMode === "direct" ||
+            state.directoryTransferMode === "rsync"
+              ? state.directoryTransferMode
+              : "archive",
+          rsyncDeleteExtraneous:
+            typeof state.rsyncDeleteExtraneous === "boolean"
+              ? state.rsyncDeleteExtraneous
+              : false,
           lastTool,
           lastPage:
             "lastPage" in state

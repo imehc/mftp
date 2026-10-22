@@ -56,3 +56,26 @@ test("五个目标的路由和源模块矩阵与原生配置一致", () => {
     );
   }
 });
+
+test("rsync 能力只随 macOS/Linux 产物提供", () => {
+  for (const target of platformManifest.targets) {
+    const expected = target === "macos" || target === "linux";
+    assert.equal(supports(target, "rsync"), expected);
+    assert.equal(
+      sourceIncluded(target, "src/features/ssh-sftp/rsync/integration.tsx"),
+      expected,
+    );
+    assert.equal(
+      sourceIncluded(target, "src/app/platform/without-rsync.tsx"),
+      true,
+    );
+  }
+  // SFTP 面板是共享入口，任何目标都保留；仅替换 rsync 装配模块。
+  assert.equal(
+    sourceIncluded(
+      "android",
+      "src/features/ssh-sftp/components/sftp/SftpPanel.tsx",
+    ),
+    true,
+  );
+});

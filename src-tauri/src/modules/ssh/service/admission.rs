@@ -52,6 +52,8 @@ impl Manager {
         self.auth.lock().clear();
         self.sftp.lock().clear();
         self.monitor.lock().clear();
+        #[cfg(any(target_os = "macos", target_os = "linux"))]
+        self.rsync.clear();
         self.transfers.lock().clear();
         self.logs.transfers.lock().clear();
         let _ = self.cleanup_local_temps();

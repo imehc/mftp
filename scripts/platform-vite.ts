@@ -22,6 +22,9 @@ export function platformAliases(target: string | null) {
     replacements["~/features/settings/DesktopSettings"] =
       "src/app/platform/without-desktop-settings.tsx";
   }
+  if (!supports(target, "rsync"))
+    replacements["~/features/ssh-sftp/rsync/integration"] =
+      "src/app/platform/without-rsync.tsx";
   if (!supports(target, "poetryLocal"))
     replacements["~/features/poetry/components/PoetryLocalManagement"] =
       "src/app/platform/without-poetry-local.tsx";

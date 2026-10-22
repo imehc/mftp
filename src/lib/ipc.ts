@@ -1,6 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 
 export * from "./ipc/filesystem";
+export * from "./ipc/lan-transfer";
 export * from "./ipc/speech";
 export * from "./ipc/translation";
 
@@ -11,21 +12,18 @@ import type {
 } from "~/bindings";
 import {
   commands,
+  type DirectoryTransferMode,
   type PoetryTranslation,
   type PoetryTranslationMode,
   type PoetryTranslationStreamEvent,
 } from "~/bindings";
 import { poetryTranslationStreamEvent } from "~/lib/events";
 import { unwrapCommand, voidCommand } from "~/lib/ipc-result";
-import type { DirectoryTransferMode } from "~/store/settings";
 import type {
   BtControlAction,
   ExportSection,
   HostInput,
   ImportMode,
-  LanSharedDirInput,
-  LanTransferSettings,
-  LanTrustedDeviceInput,
   PoetryAuthorsRequest,
   PoetryBrowseRequest,
   PoetrySearchRequest,
@@ -150,46 +148,6 @@ export const keyImport = (
 ) => unwrapCommand(commands.keyImport(label, sourcePath, hasPassphrase));
 export const keyDelete = (id: string) => voidCommand(commands.keyDelete(id));
 
-// ---- 局域网传输 ----
-export const lanTransferSettings = () =>
-  unwrapCommand(commands.lanTransferSettings());
-export const lanTransferSaveSettings = (settings: LanTransferSettings) =>
-  unwrapCommand(commands.lanTransferSaveSettings(settings));
-export const lanTransferStatus = () =>
-  unwrapCommand(commands.lanTransferStatus());
-export const lanTransferNetworkAddresses = () =>
-  unwrapCommand(commands.lanTransferNetworkAddresses());
-export const lanTransferDiscoverDevices = () =>
-  unwrapCommand(commands.lanTransferDiscoverDevices());
-export const lanTransferConnectedDevices = () =>
-  unwrapCommand(commands.lanTransferConnectedDevices());
-export const lanTransferPendingAuthRequests = () =>
-  unwrapCommand(commands.lanTransferPendingAuthRequests());
-export const lanTransferApproveAuthRequest = (id: string, permission: string) =>
-  unwrapCommand(commands.lanTransferApproveAuthRequest(id, permission));
-export const lanTransferRejectAuthRequest = (id: string) =>
-  unwrapCommand(commands.lanTransferRejectAuthRequest(id));
-export const lanTransferDisconnectDevice = (id: string) =>
-  voidCommand(commands.lanTransferDisconnectDevice(id));
-export const lanTransferTasks = () =>
-  unwrapCommand(commands.lanTransferTasks());
-export const lanTransferCancelTask = (id: string) =>
-  voidCommand(commands.lanTransferCancelTask(id));
-export const lanTransferStart = () =>
-  unwrapCommand(commands.lanTransferStart());
-export const lanTransferStop = () => unwrapCommand(commands.lanTransferStop());
-export const lanTransferSharedDirs = () =>
-  unwrapCommand(commands.lanTransferSharedDirs());
-export const lanTransferAddSharedDir = (input: LanSharedDirInput) =>
-  unwrapCommand(commands.lanTransferAddSharedDir(input));
-export const lanTransferDeleteSharedDir = (id: string) =>
-  voidCommand(commands.lanTransferDeleteSharedDir(id));
-export const lanTransferTrustedDevices = () =>
-  unwrapCommand(commands.lanTransferTrustedDevices());
-export const lanTransferAddTrustedDevice = (input: LanTrustedDeviceInput) =>
-  unwrapCommand(commands.lanTransferAddTrustedDevice(input));
-export const lanTransferDeleteTrustedDevice = (id: string) =>
-  voidCommand(commands.lanTransferDeleteTrustedDevice(id));
 export const activityLogs = (
   limit?: number,
   source?: string,
@@ -228,6 +186,10 @@ export const gameRoomLeave = (instanceId: string) =>
 // ---- SSH 命令 ----
 export const sshConnect = (hostId: string, passphrase?: string) =>
   unwrapCommand(commands.sshConnect(hostId, passphrase ?? null));
+
+/** 用表单中的未保存配置测试连接，不注册会话、不写入主机。 */
+export const sshTestConnection = (input: HostInput, passphrase?: string) =>
+  unwrapCommand(commands.sshTestConnection(input, passphrase ?? null));
 
 export const sshOpenShell = (sessionId: string, cols: number, rows: number) =>
   voidCommand(commands.sshOpenShell(sessionId, cols, rows));
@@ -334,6 +296,46 @@ export const sftpExtract = (
       remoteArchive,
       remoteParent,
       outName ?? null,
+    ),
+  );
+
+// ---- rsync 目录同步 ----
+export const rsyncCapabilities = (sessionId: string, refresh: boolean) =>
+  unwrapCommand(commands.rsyncCapabilities(sessionId, refresh));
+export const rsyncPreview = (
+  sessionId: string,
+  direction: Parameters<typeof commands.rsyncPreview>[1],
+  localDir: string,
+  remoteDir: string,
+  deleteExtraneous: boolean,
+) =>
+  unwrapCommand(
+    commands.rsyncPreview(
+      sessionId,
+      direction,
+      localDir,
+      remoteDir,
+      deleteExtraneous,
+    ),
+  );
+export const rsyncTransfer = (
+  sessionId: string,
+  token: string,
+  direction: Parameters<typeof commands.rsyncTransfer>[2],
+  localDir: string,
+  remoteDir: string,
+  deleteExtraneous: boolean,
+  transferId?: string,
+) =>
+  unwrapCommand(
+    commands.rsyncTransfer(
+      sessionId,
+      token,
+      direction,
+      localDir,
+      remoteDir,
+      deleteExtraneous,
+      transferId ?? null,
     ),
   );
 

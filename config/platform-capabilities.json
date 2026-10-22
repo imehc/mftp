@@ -23,6 +23,11 @@
         "src/features/settings/DesktopSettings.tsx"
       ]
     },
+    "rsync": {
+      "platforms": ["macos", "linux"],
+      "routes": [],
+      "sources": ["src/features/ssh-sftp/rsync/"]
+    },
     "poetryLocal": {
       "platforms": ["desktop"],
       "routes": [],

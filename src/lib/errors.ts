@@ -114,6 +114,10 @@ function resolveValues(
     const name = appDataSectionNames[args.section];
     if (name) return { ...args, section: localize(name) };
   }
+  if (code === "rsync:probe_failed" || code === "rsync:probe_timeout") {
+    if (args.side === "local") return { ...args, side: localize(msg`本机`) };
+    if (args.side === "remote") return { ...args, side: localize(msg`远端`) };
+  }
   return args;
 }
 

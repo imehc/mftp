@@ -33,6 +33,8 @@ export interface TransferState {
   cancelling?: boolean;
   cancellingPhase?: string;
   cancellable?: boolean;
+  /** rsync 首版只支持取消；false 时任务面板不提供暂停。 */
+  pausable?: boolean;
   paused?: boolean;
   pausedPhase?: string;
   controlPending?: boolean;
@@ -54,6 +56,7 @@ interface TransfersState {
     label: string,
     options?: {
       cancellable?: boolean;
+      pausable?: boolean;
       retry?: TransferRetryIntent;
       source?: "sftp" | "bt";
     },
@@ -337,6 +340,7 @@ function createTransfer(
     updatedAt: performance.now(),
     status: "running",
     cancellable: options?.cancellable ?? true,
+    pausable: options?.pausable ?? true,
     paused: false,
     controlPending: false,
     controlError: undefined,

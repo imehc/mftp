@@ -53,7 +53,8 @@ export function createTransferActions() {
     if (
       transfer.status !== "running" ||
       transfer.controlPending ||
-      transfer.cancelling
+      transfer.cancelling ||
+      transfer.pausable === false
     )
       return;
     const { id } = transfer;

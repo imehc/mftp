@@ -30,6 +30,11 @@ export function isDesktopPlatform(): boolean {
   return !isMobilePlatform();
 }
 
+/** rsync 首版仅随 macOS/Linux 产物提供；开发态 web 视为可用。 */
+export function rsyncSupportedPlatform(): boolean {
+  return !["windows", "android", "ios"].includes(buildPlatform);
+}
+
 /**
  * 仅桌面端工具的路由守卫（`beforeLoad`）：在移动端重定向回首页，
  * 避免通过 URL 或残留的“上次工具”状态访问到被隐藏的入口。

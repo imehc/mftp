@@ -1,6 +1,10 @@
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+mod rsync;
 mod sftp;
 mod ssh;
 
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+pub use rsync::*;
 pub use sftp::*;
 pub use ssh::*;
 

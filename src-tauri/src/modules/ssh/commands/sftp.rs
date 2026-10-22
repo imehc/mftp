@@ -199,7 +199,7 @@ pub async fn sftp_upload_dir(
     local_dir: String,
     remote_parent: String,
     remote_name: String,
-    transfer_mode: Option<String>,
+    transfer_mode: Option<DirectoryTransferMode>,
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let events = crate::adapters::ssh::event_sink(&app);
@@ -215,7 +215,7 @@ pub async fn sftp_upload_dir(
                 parent: &remote_parent,
                 name: &remote_name,
             },
-            DirectoryTransferMode::parse(transfer_mode.as_deref()),
+            DirectoryTransferMode::from_option(transfer_mode),
             Some(&events),
             transfer_id.as_deref(),
         )
@@ -231,7 +231,7 @@ pub async fn sftp_download_dir(
     session_id: String,
     remote_dir: String,
     local_dir: String,
-    transfer_mode: Option<String>,
+    transfer_mode: Option<DirectoryTransferMode>,
     transfer_id: Option<String>,
 ) -> AppResult<()> {
     let events = crate::adapters::ssh::event_sink(&app);
@@ -244,7 +244,7 @@ pub async fn sftp_download_dir(
             &session_id,
             &remote_dir,
             &local_dir,
-            DirectoryTransferMode::parse(transfer_mode.as_deref()),
+            DirectoryTransferMode::from_option(transfer_mode),
             Some(&events),
             transfer_id.as_deref(),
         )

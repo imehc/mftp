@@ -68,6 +68,7 @@ common activity_logs
 common activity_logs_clear
 common activity_log_delete
 common ssh_connect
+common ssh_test_connection
 common ssh_open_shell
 common ssh_write
 common ssh_resize
@@ -152,6 +153,10 @@ common cancel_poetry_translation
 common update_poetry_translation
 common delete_poetry_translation
 common filesystem_allow_path
+macos,linux rsync_local_status
+macos,linux rsync_capabilities
+macos,linux rsync_preview
+macos,linux rsync_transfer
 desktop lan_transfer_settings
 desktop lan_transfer_save_settings
 desktop lan_transfer_status

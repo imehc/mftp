@@ -1,4 +1,4 @@
-use super::{AuthMaterial, AuthMethod, Manager};
+use super::types::{AuthMaterial, AuthMethod, Manager};
 use std::{path::PathBuf, sync::Arc};
 
 pub(super) struct Fixture {

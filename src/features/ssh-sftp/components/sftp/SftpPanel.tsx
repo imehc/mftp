@@ -22,7 +22,6 @@ import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -58,6 +57,7 @@ import SftpRow from "~/features/ssh-sftp/components/sftp/SftpRow";
 import { useSftpNavigation } from "~/features/ssh-sftp/components/sftp/useSftpNavigation";
 import { useSftpRemoteActions } from "~/features/ssh-sftp/components/sftp/useSftpRemoteActions";
 import { useSftpTransferActions } from "~/features/ssh-sftp/components/sftp/useSftpTransferActions";
+import { useRsyncIntegration } from "~/features/ssh-sftp/rsync/integration";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
@@ -86,6 +86,12 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
   const userResizedColumnsRef = useRef(false);
   const { cwd, entries, loading, loadingAction, loadError, load, goHome } =
     useSftpNavigation(session);
+  const rsync = useRsyncIntegration({
+    sessionId,
+    onUploaded: async () => {
+      if (cwd) await load(cwd);
+    },
+  });
   const [busy, setBusy] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({
     key: "name",
@@ -109,6 +115,7 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
     load,
     setPrompt,
     setConflict,
+    rsync,
   });
   const {
     extractTarget,
@@ -248,6 +255,8 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         onSort={toggleSort}
       />
 
+      {rsync.notice}
+
       {busy ? (
         <div className="border-border bg-muted/50 text-muted-foreground flex items-center gap-2 border-b px-3 py-1.5 text-xs">
           <RefreshCw className="size-3 animate-spin" />
@@ -289,9 +298,6 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
               <EmptyTitle>
                 <Trans>空目录</Trans>
               </EmptyTitle>
-              <EmptyDescription>
-                <Trans>可以上传文件或新建文件夹</Trans>
-              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
@@ -467,6 +473,8 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         onConfirm={confirmDelete}
       />
+
+      {rsync.dialog}
     </div>
   );
 }

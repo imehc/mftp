@@ -10,21 +10,24 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "lowercase")]
 pub enum DirectoryTransferMode {
     Archive,
     Direct,
 }
 
 impl DirectoryTransferMode {
-    pub fn parse(value: Option<&str>) -> Self {
-        match value {
-            Some("direct") => Self::Direct,
-            Some("archive") | None => Self::Archive,
-            Some(_) => Self::Archive,
-        }
+    /// Missing values keep the historical archive default; unknown strings are
+    /// rejected by deserialization instead of silently running archive.
+    pub fn from_option(value: Option<Self>) -> Self {
+        value.unwrap_or(Self::Archive)
     }
 }
+
+#[cfg(test)]
+#[path = "types_tests.rs"]
+mod tests;
 
 /// How the backend should authenticate a session. Captured at connect time so
 /// the shell and SFTP channels (separate TCP sessions) can each (re)connect.
@@ -193,4 +196,6 @@ pub struct Manager {
     /// poll compute rates against the previous poll instead of sleeping
     /// between two snapshots inside every call. Cleared on disconnect.
     pub(super) monitor: Mutex<HashMap<String, MonitorSample>>,
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    pub(super) rsync: super::rsync::RsyncState,
 }

@@ -59,6 +59,8 @@ fn registered_commands_match_platform_baseline_without_duplicates() {
                 "common" => true,
                 "desktop" => cfg!(desktop),
                 "desktop,android" => cfg!(any(desktop, target_os = "android")),
+                "macos,linux" => cfg!(any(target_os = "macos", target_os = "linux")),
+                "macos,windows" => cfg!(any(target_os = "macos", target_os = "windows")),
                 "mobile" => cfg!(mobile),
                 _ => panic!("unknown platform group: {platform}"),
             }
@@ -227,7 +229,11 @@ pub(crate) mod full_contract {
     macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_bt, $($modules)*); }; }
     macro_rules! full_bt { ($($modules:tt)*) => { bt_module!(full_mobile, $($modules)*); }; }
     macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
-    common_modules!(full_lan,);
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    macro_rules! full_rsync { ($($modules:tt)*) => { rsync_module!(full_lan, $($modules)*); }; }
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    macro_rules! full_rsync { ($($modules:tt)*) => { full_lan!($($modules)*); }; }
+    common_modules!(full_rsync,);
 
     #[test]
     fn full_developer_contract_covers_all_platforms() {
@@ -239,7 +245,11 @@ pub(crate) mod full_contract {
         let expected: Vec<_> = include_str!("command_baseline.txt")
             .lines()
             .filter(|line| !line.starts_with('#'))
-            .filter_map(|line| line.split_once(' ').map(|(_, name)| name))
+            .filter_map(|line| line.split_once(' '))
+            .filter(|(platform, _)| {
+                *platform != "macos,linux" || cfg!(any(target_os = "macos", target_os = "linux"))
+            })
+            .map(|(_, name)| name)
             .collect();
         assert_eq!(names, expected);
     }

@@ -1,6 +1,7 @@
 use super::diagnostics::{call, unit};
 use super::types::{AuthMaterial, AuthMethod};
 use crate::error::{AppError, AppResult, CustomErrorCode};
+use crate::modules::hosts::model::AuthType;
 use serde_json::json;
 use ssh2::{ErrorCode, Session};
 use std::env;
@@ -12,6 +13,33 @@ use std::time::Duration;
 pub(super) const SSH_OPERATION_TIMEOUT_MS: u32 = 30_000;
 const SSH_CONNECT_TIMEOUT_SECS: u64 = 12;
 const SFTP_KEEPALIVE_INTERVAL_SECS: u32 = 15;
+
+/// Map stored host credentials to an auth method. The private key is resolved
+/// lazily, so password hosts never read the key store and a key host without a
+/// selected key fails before any lookup.
+pub(crate) fn auth_method(
+    auth_type: &AuthType,
+    password: Option<&str>,
+    key_id: Option<&str>,
+    private_key: impl FnOnce(&str) -> AppResult<String>,
+    passphrase: Option<String>,
+) -> AppResult<AuthMethod> {
+    match auth_type {
+        AuthType::Password => Ok(AuthMethod::Password(
+            password
+                .filter(|value| !value.is_empty())
+                .map(str::to_string),
+        )),
+        AuthType::Key => {
+            let key_id =
+                key_id.ok_or_else(|| AppError::custom(CustomErrorCode::SshKeyNotSelected))?;
+            Ok(AuthMethod::Key {
+                private_key: private_key(key_id)?,
+                passphrase,
+            })
+        }
+    }
+}
 
 /// Open + authenticate a blocking ssh2 session.
 pub(super) fn connect(mat: &AuthMaterial) -> AppResult<Session> {
@@ -340,3 +368,7 @@ fn local_identity_candidates(configured: &[PathBuf]) -> Vec<PathBuf> {
     }
     paths
 }
+
+#[cfg(test)]
+#[path = "auth_tests.rs"]
+mod tests;

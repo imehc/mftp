@@ -1,6 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { LoaderCircle, PlugZap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import ToggleGroup from "~/components/FixedToggleGroup";
 import { Badge } from "~/components/ui/badge";
@@ -32,11 +34,13 @@ import {
 import { ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
   createHostFormSchema,
+  createHostTestSchema,
   hostFormValuesToInput,
   hostToFormValues,
 } from "~/features/ssh-sftp/components/hosts/HostForm.schema";
 import { describeError } from "~/lib/errors";
 import { firstFormError } from "~/lib/form-errors";
+import * as ipc from "~/lib/ipc";
 import { useHostsStore } from "~/store/hosts";
 import type { Host } from "~/types";
 
@@ -53,6 +57,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
   const createHost = useHostsStore((s) => s.createHost);
   const updateHost = useHostsStore((s) => s.updateHost);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
+  // 口令不进入表单状态与保存载荷，只在测试连接时读取。
+  const passphraseRef = useRef<HTMLInputElement>(null);
+  const testRequest = useRef(0);
   const form = useForm({
     defaultValues: hostToFormValues(null),
     validators: {
@@ -66,7 +74,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
         else await createHost(payload);
         onOpenChange(false);
       } catch (e) {
-        setSubmitError(describeError(e));
+        setSubmitError(describeError(e, t));
       }
     },
   });
@@ -74,12 +82,74 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
     if (!open) return;
     // 用微任务延后，使表单重置发生在 effect 函数体之外。
     queueMicrotask(() => {
-      form.reset(hostToFormValues(host));
+      // 保留空默认值：否则 useForm 每次重渲染都会把未触碰的表单重置回空值。
+      form.reset(hostToFormValues(host), { keepDefaultValues: true });
+      if (passphraseRef.current) passphraseRef.current.value = "";
       setSubmitError(null);
     });
   }, [form, host, open]);
+  useEffect(() => {
+    // 字段变化后旧结果不再对应当前配置，直接清除并作废进行中的请求。
+    const subscription = form.store.subscribe(() => {
+      testRequest.current += 1;
+      setIsTesting(false);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
+  function handleOpenChange(next: boolean) {
+    if (!next) {
+      testRequest.current += 1;
+      setIsTesting(false);
+      if (passphraseRef.current) passphraseRef.current.value = "";
+    }
+    onOpenChange(next);
+  }
+
+  async function testConnection() {
+    const values = form.state.values;
+    const validation = createHostTestSchema(t).safeParse(values);
+    if (!validation.success) {
+      toast.error(validation.error.issues[0]?.message ?? t`请填写必填字段`);
+      return;
+    }
+    const selectedKey = keys.find((key) => key.id === values.keyId);
+    const passphrase = passphraseRef.current?.value ?? "";
+    if (
+      values.authType === "key" &&
+      selectedKey?.hasPassphrase &&
+      !passphrase
+    ) {
+      toast.error(t`请输入密钥口令后再测试`);
+      return;
+    }
+    const request = ++testRequest.current;
+    setIsTesting(true);
+    try {
+      const result = await ipc.sshTestConnection(
+        hostFormValuesToInput(values),
+        values.authType === "key" && passphrase ? passphrase : undefined,
+      );
+      if (testRequest.current !== request) return;
+      const username = result.username;
+      const target = username
+        ? `${username}@${result.host}:${result.port}`
+        : `${result.host}:${result.port}`;
+      const home = result.home;
+      const latency = result.latencyMs;
+      toast.success(t`连接成功`, {
+        description: t`${target} · 主目录 ${home} · 耗时 ${latency} 毫秒`,
+      });
+    } catch (error) {
+      if (testRequest.current !== request) return;
+      toast.error(t`连接失败`, { description: describeError(error, t) });
+    } finally {
+      if (testRequest.current === request) setIsTesting(false);
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogLayoutContent
         placement="responsive-page"
         className="md:max-w-md"
@@ -105,7 +175,6 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder={t`我的服务器`}
                       autoCapitalize="off"
                       autoCorrect="off"
                       autoComplete="off"
@@ -135,7 +204,6 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="example.com"
                         autoCapitalize="off"
                         autoCorrect="off"
                         autoComplete="off"
@@ -163,9 +231,7 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                         type="number"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value) || 22)
-                        }
+                        onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={!!error}
                         aria-describedby={error ? "host-port-error" : undefined}
                       />
@@ -189,16 +255,14 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder={t`留空则使用 SSH 配置或本机用户`}
                     autoCapitalize="off"
                     autoCorrect="off"
                     autoComplete="off"
                     spellCheck={false}
                   />
                   <FieldDescription>
-                    <Trans>
-                      留空时优先使用 ~/.ssh/config 的
-                      User，其次使用当前系统用户。
+                    <Trans comment="主机表单用户名为空时的实际回退顺序">
+                      留空则用 SSH 配置或系统用户
                     </Trans>
                   </FieldDescription>
                 </UiField>
@@ -246,7 +310,6 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                           value={field.state.value ?? ""}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="••••••••"
                         />
                       </UiField>
                     )}
@@ -256,52 +319,82 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     {(field) => {
                       const missingKeys = keys.length === 0;
                       const error = firstFormError(field.state.meta.errors);
+                      const selectedKey = keys.find(
+                        (key) => key.id === field.state.value,
+                      );
                       return (
-                        <UiField data-invalid={!!error}>
-                          <FieldLabel htmlFor="host-key">
-                            <Trans>密钥</Trans>
-                          </FieldLabel>
-                          <Select
-                            value={field.state.value ?? ""}
-                            onValueChange={(v) => field.handleChange(v || null)}
-                            disabled={missingKeys}
-                          >
-                            <SelectTrigger
-                              id="host-key"
-                              className="w-full"
-                              aria-invalid={!!error}
-                              aria-describedby={
-                                error ? "host-key-error" : undefined
-                              }
+                        <>
+                          <UiField data-invalid={!!error}>
+                            <FieldLabel htmlFor="host-key">
+                              <Trans>密钥</Trans>
+                            </FieldLabel>
+                            <Select
+                              value={field.state.value ?? ""}
+                              onValueChange={(v) => {
+                                field.handleChange(v || null);
+                                // 换用其它密钥后旧口令不再适用。
+                                if (passphraseRef.current)
+                                  passphraseRef.current.value = "";
+                              }}
+                              disabled={missingKeys}
                             >
-                              <SelectValue placeholder={t`选择密钥…`} />
-                            </SelectTrigger>
-                            <SelectContent className="ui-density-adaptive">
-                              <SelectGroup>
-                                {keys.map((k) => (
-                                  <SelectItem key={k.id} value={k.id}>
-                                    {k.label}
-                                    {k.hasPassphrase ? (
-                                      <Badge
-                                        variant="secondary"
-                                        className="ml-1.5"
-                                      >
-                                        <Trans>需口令</Trans>
-                                      </Badge>
-                                    ) : null}
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                          {missingKeys ? (
-                            <FieldDescription>
-                              <Trans>暂无密钥，请先在密钥管理中导入。</Trans>
-                            </FieldDescription>
-                          ) : error ? (
-                            <FieldError id="host-key-error">{error}</FieldError>
+                              <SelectTrigger
+                                id="host-key"
+                                className="w-full"
+                                aria-invalid={!!error}
+                                aria-describedby={
+                                  error ? "host-key-error" : undefined
+                                }
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="ui-density-adaptive">
+                                <SelectGroup>
+                                  {keys.map((k) => (
+                                    <SelectItem key={k.id} value={k.id}>
+                                      {k.label}
+                                      {k.hasPassphrase ? (
+                                        <Badge
+                                          variant="secondary"
+                                          className="ml-1.5"
+                                        >
+                                          <Trans>需口令</Trans>
+                                        </Badge>
+                                      ) : null}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            {missingKeys ? (
+                              <FieldDescription>
+                                <Trans>暂无密钥，请先导入</Trans>
+                              </FieldDescription>
+                            ) : error ? (
+                              <FieldError id="host-key-error">
+                                {error}
+                              </FieldError>
+                            ) : null}
+                          </UiField>
+                          {selectedKey?.hasPassphrase ? (
+                            <UiField>
+                              <FieldLabel htmlFor="host-key-passphrase">
+                                <Trans comment="主机表单中仅用于测试连接的密钥口令">
+                                  密钥口令（仅用于测试）
+                                </Trans>
+                              </FieldLabel>
+                              <PasswordInput
+                                id="host-key-passphrase"
+                                ref={passphraseRef}
+                                autoComplete="off"
+                                aria-describedby="host-key-passphrase-desc"
+                              />
+                              <FieldDescription id="host-key-passphrase-desc">
+                                <Trans>不会保存，仅在测试连接时使用</Trans>
+                              </FieldDescription>
+                            </UiField>
                           ) : null}
-                        </UiField>
+                        </>
                       );
                     }}
                   </form.Field>
@@ -320,12 +413,10 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder={t`/var/www（留空则用主目录）`}
                   />
                   <FieldDescription>
-                    <Trans>
-                      打开 SFTP
-                      时进入此目录；若不存在则回退到主目录，再退到根目录。
+                    <Trans comment="默认目录为空或不存在时的回退行为">
+                      留空或目录不存在时使用主目录
                     </Trans>
                   </FieldDescription>
                 </UiField>
@@ -337,7 +428,25 @@ export default function HostForm({ open, onOpenChange, host }: Props) {
         </DialogLayoutBody>
 
         <DialogLayoutFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            className="md:mr-auto"
+            onClick={() => void testConnection()}
+            disabled={isTesting}
+          >
+            {isTesting ? (
+              <LoaderCircle
+                data-icon="inline-start"
+                className="animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <PlugZap data-icon="inline-start" aria-hidden="true" />
+            )}
+            {isTesting ? t`测试中…` : t`测试连接`}
+          </Button>
+          <Button variant="ghost" onClick={() => handleOpenChange(false)}>
             <Trans>取消</Trans>
           </Button>
           <form.Subscribe selector={(state) => state.isSubmitting}>

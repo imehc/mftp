@@ -6,6 +6,7 @@ import {
 import { toast } from "sonner";
 
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
+import type { RsyncIntegration } from "~/features/ssh-sftp/components/sftp/rsync-contract";
 import {
   type ConflictState,
   joinLocalPath,
@@ -28,6 +29,7 @@ interface UseSftpTransferActionsOptions {
   load: (path: string, action?: LoadingAction) => Promise<void>;
   setPrompt: (value: PromptState) => void;
   setConflict: (value: ConflictState) => void;
+  rsync: RsyncIntegration;
 }
 
 interface UploadDirOptions {
@@ -41,6 +43,7 @@ export function useSftpTransferActions({
   load,
   setPrompt,
   setConflict,
+  rsync,
 }: UseSftpTransferActionsOptions) {
   const { t } = useLingui();
   const startTransfer = useTransfersStore((state) => state.start);
@@ -48,6 +51,13 @@ export function useSftpTransferActions({
   const directoryTransferMode = useSettingsStore(
     (state) => state.directoryTransferMode,
   );
+  const rsyncUnsupported = t`当前平台不支持 rsync，请选择压缩包或直连。`;
+
+  function rsyncReady(): boolean {
+    if (rsync.supported) return true;
+    toast.error(rsyncUnsupported);
+    return false;
+  }
 
   async function onUpload() {
     if (!cwd) return;
@@ -126,6 +136,22 @@ export function useSftpTransferActions({
   }
 
   async function onDownloadDir(entry: SftpEntry) {
+    if (directoryTransferMode === "rsync") {
+      if (!rsyncReady()) return;
+      const parent = await openDialog({
+        multiple: false,
+        directory: true,
+        title: t`选择保存位置`,
+      });
+      if (typeof parent !== "string") return;
+      await rsync.startPreview({
+        direction: "download",
+        localDir: joinLocalPath(parent, entry.name),
+        remoteDir: entry.path,
+        displayName: entry.name,
+      });
+      return;
+    }
     setPrompt({
       kind: "downloadDir",
       entry,
@@ -134,6 +160,7 @@ export function useSftpTransferActions({
   }
 
   async function downloadDirWithName(entry: SftpEntry, folderName: string) {
+    if (directoryTransferMode === "rsync") return;
     const trimmedName = folderName.trim();
     if (!validPlainName(trimmedName)) {
       toast.error(t`名称不能为空，且不能包含斜杠`);
@@ -185,6 +212,7 @@ export function useSftpTransferActions({
 
   async function onUploadDir() {
     if (!cwd) return;
+    if (directoryTransferMode === "rsync" && !rsyncReady()) return;
     const selected = await openDialog({
       multiple: false,
       directory: true,
@@ -192,6 +220,15 @@ export function useSftpTransferActions({
     });
     if (typeof selected !== "string") return;
     const name = baseName(selected);
+    if (directoryTransferMode === "rsync") {
+      await rsync.startPreview({
+        direction: "upload",
+        localDir: selected,
+        remoteDir: joinPath(cwd, name),
+        displayName: name,
+      });
+      return;
+    }
     await prepareUploadDir(selected, name);
   }
 
@@ -323,7 +360,7 @@ export function useSftpTransferActions({
     remoteName: string,
     options?: UploadDirOptions,
   ) {
-    if (!cwd) return;
+    if (!cwd || directoryTransferMode === "rsync") return;
     const transferId = nextTransferId();
     const transferMode = directoryTransferMode;
     const remoteParent = cwd;

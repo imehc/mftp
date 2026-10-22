@@ -78,6 +78,8 @@ impl Manager {
             local_temps: Mutex::new(remaining),
             local_temp_journal,
             monitor: Mutex::new(HashMap::new()),
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
+            rsync: Default::default(),
         };
         let _ = manager.persist_local_temp_journal(&manager.local_temps.lock());
         manager

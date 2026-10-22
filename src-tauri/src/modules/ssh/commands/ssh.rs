@@ -2,39 +2,34 @@ use crate::app::services::AppServices;
 use crate::core::activity::OperationContext;
 use crate::core::execution::run_blocking;
 use crate::error::{AppError, AppResult, CustomErrorCode};
-use crate::modules::hosts::model::{AuthType, Host};
+use crate::modules::hosts::model::{AuthType, HostInput};
 use crate::modules::keys::KeyRepository;
-use crate::modules::ssh::SystemStats;
-use crate::modules::ssh::{resolve_auth_material, AuthMaterial, AuthMethod};
+use crate::modules::ssh::{auth_method, test_connection, SshConnectionTest, SystemStats};
+use crate::modules::ssh::{resolve_auth_material, AuthMaterial};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use tauri::{AppHandle, State};
 
 fn build_auth(
     key_repository: &KeyRepository,
-    host: &Host,
+    host: &str,
+    port: u16,
+    username: &str,
+    auth_type: &AuthType,
+    password: Option<&str>,
+    key_id: Option<&str>,
     passphrase: Option<String>,
 ) -> AppResult<AuthMaterial> {
-    let method = match host.auth_type {
-        AuthType::Password => {
-            let pw = host.password.clone().filter(|value| !value.is_empty());
-            AuthMethod::Password(pw)
-        }
-        AuthType::Key => {
-            let key_id = host
-                .key_id
-                .clone()
-                .ok_or_else(|| AppError::custom(CustomErrorCode::SshKeyNotSelected))?;
-            let private_key = key_repository.private_key(&key_id)?;
-            AuthMethod::Key {
-                private_key,
-                passphrase,
-            }
-        }
-    };
+    let method = auth_method(
+        auth_type,
+        password,
+        key_id,
+        |id| key_repository.private_key(id),
+        passphrase,
+    )?;
     resolve_auth_material(AuthMaterial {
-        host: host.host.clone(),
-        port: host.port,
-        username: host.username.clone(),
+        host: host.to_string(),
+        port,
+        username: username.to_string(),
         method,
         identity_files: Vec::new(),
     })
@@ -58,10 +53,52 @@ pub async fn ssh_connect(
     let key_repository = state.key_repository.clone();
     let manager = state.manager.clone();
     super::blocking(&state, context, None, move || {
-        let mat = build_auth(&key_repository, &host, passphrase)?;
+        let mat = build_auth(
+            &key_repository,
+            &host.host,
+            host.port,
+            &host.username,
+            &host.auth_type,
+            host.password.as_deref(),
+            host.key_id.as_deref(),
+            passphrase,
+        )?;
         let session_id = uuid::Uuid::new_v4().to_string();
         manager.register(&session_id, mat);
         Ok(session_id)
+    })
+    .await
+}
+
+/// Test an unsaved host configuration without touching stored data or session
+/// state. Resolution, authentication and the SFTP check all run on the shared
+/// blocking pipeline so the form gets the same failures a real connection would.
+#[tauri::command]
+#[specta::specta]
+pub async fn ssh_test_connection(
+    state: State<'_, AppServices>,
+    input: HostInput,
+    passphrase: Option<String>,
+) -> AppResult<SshConnectionTest> {
+    let context = OperationContext::new(
+        "ssh",
+        "test_connection",
+        format!("{}:{}", input.host.trim(), input.port),
+    )
+    .with_detail(input.label.trim().to_string());
+    let key_repository = state.key_repository.clone();
+    super::blocking(&state, context, None, move || {
+        let mat = build_auth(
+            &key_repository,
+            input.host.trim(),
+            input.port,
+            input.username.trim(),
+            &input.auth_type,
+            input.password.as_deref(),
+            input.key_id.as_deref(),
+            passphrase,
+        )?;
+        test_connection(&mat)
     })
     .await
 }

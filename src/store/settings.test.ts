@@ -73,7 +73,7 @@ describe("启动偏好迁移与持久化", () => {
     store.getState().setManualPage("xiangqi");
     store.getState().setLastPage("go");
     const saved = localStorage.getItem("mftp-settings")!;
-    expect(JSON.parse(saved).version).toBe(9);
+    expect(JSON.parse(saved).version).toBe(10);
     store.setState({ startupMode: "home", manualPage: null, lastPage: null });
     localStorage.setItem("mftp-settings", saved);
     await store.persist.rehydrate();
@@ -116,6 +116,65 @@ describe("启动偏好迁移与持久化", () => {
     expect(store.getState()).toMatchObject({
       showGames: true,
       hiddenHomeCategories: ["tools"],
+    });
+  });
+});
+
+describe("rsync 目录同步偏好迁移与持久化", () => {
+  it("保留有效的同步方式与删除策略", async () => {
+    expect(
+      await migrate({
+        directoryTransferMode: "rsync",
+        rsyncDeleteExtraneous: true,
+      }),
+    ).toMatchObject({
+      directoryTransferMode: "rsync",
+      rsyncDeleteExtraneous: true,
+    });
+    expect(
+      await migrate({
+        directoryTransferMode: "direct",
+        rsyncDeleteExtraneous: false,
+      }),
+    ).toMatchObject({
+      directoryTransferMode: "direct",
+      rsyncDeleteExtraneous: false,
+    });
+  });
+
+  it("缺失或无效值恢复为压缩包并保留多余文件", async () => {
+    expect(
+      await migrate({
+        directoryTransferMode: "removed",
+        rsyncDeleteExtraneous: "yes",
+      }),
+    ).toMatchObject({
+      directoryTransferMode: "archive",
+      rsyncDeleteExtraneous: false,
+    });
+    expect(await migrate({})).toMatchObject({
+      directoryTransferMode: "archive",
+      rsyncDeleteExtraneous: false,
+    });
+  });
+
+  it("切换同步方式不重置删除策略，重新读取后仍恢复", async () => {
+    store.getState().setRsyncDeleteExtraneous(true);
+    store.getState().setDirectoryTransferMode("rsync");
+    store.getState().setDirectoryTransferMode("direct");
+    expect(store.getState().rsyncDeleteExtraneous).toBe(true);
+    store.getState().setDirectoryTransferMode("rsync");
+    const saved = localStorage.getItem("mftp-settings")!;
+    expect(JSON.parse(saved).version).toBe(10);
+    store.setState({
+      directoryTransferMode: "archive",
+      rsyncDeleteExtraneous: false,
+    });
+    localStorage.setItem("mftp-settings", saved);
+    await store.persist.rehydrate();
+    expect(store.getState()).toMatchObject({
+      directoryTransferMode: "rsync",
+      rsyncDeleteExtraneous: true,
     });
   });
 });

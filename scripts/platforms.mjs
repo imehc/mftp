@@ -39,7 +39,12 @@ export function platformGroup(target) {
 export function supports(target, capability) {
   const spec = platformManifest.capabilities[capability];
   if (!spec) throw new Error(`Unknown capability: ${capability}`);
-  return !target || spec.platforms.includes(platformGroup(target));
+  // 精确平台优先；仍兼容历史分组（desktop/android/ios/mobile）。
+  return (
+    !target ||
+    spec.platforms.includes(target) ||
+    spec.platforms.includes(platformGroup(target))
+  );
 }
 
 export function excludedSources(target) {

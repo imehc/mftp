@@ -137,13 +137,19 @@ macro_rules! common_modules {
             "ssh" => {
                 commands: [
                     ssh::commands::ssh_connect,
+                    ssh::commands::ssh_test_connection,
                     ssh::commands::ssh_open_shell,
                     ssh::commands::ssh_write,
                     ssh::commands::ssh_resize,
                     ssh::commands::ssh_disconnect,
                     ssh::commands::ssh_system_stats,
                 ],
-                types: [],
+                types: [
+                    ssh::RsyncStatus,
+                    ssh::RsyncToolStatus,
+                    ssh::RsyncCapabilities,
+                    ssh::RsyncDirection,
+                ],
             },
             "sftp" => {
                 commands: [
@@ -347,6 +353,28 @@ macro_rules! mobile_export_module {
     };
 }
 
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+macro_rules! rsync_module {
+    ($next:ident, $($modules:tt)*) => {
+        $next! { $($modules)*
+            "rsync" => {
+                commands: [
+                    ssh::commands::rsync_local_status,
+                    ssh::commands::rsync_capabilities,
+                    ssh::commands::rsync_preview,
+                    ssh::commands::rsync_transfer,
+                ],
+                types: [],
+            },
+        }
+    };
+}
+
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+macro_rules! add_rsync { ($($modules:tt)*) => { rsync_module!(add_lan, $($modules)*); }; }
+#[cfg(not(any(target_os = "macos", target_os = "linux")))]
+macro_rules! add_rsync { ($($modules:tt)*) => { add_lan!($($modules)*); }; }
+
 // Filter complete command groups before Specta/Tauri expand the command list.
 #[cfg(desktop)]
 macro_rules! add_lan { ($($modules:tt)*) => { lan_module!(add_bt, $($modules)*); }; }
@@ -361,7 +389,7 @@ macro_rules! add_mobile { ($($modules:tt)*) => { mobile_export_module!(define_re
 #[cfg(desktop)]
 macro_rules! add_mobile { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
 
-common_modules!(add_lan,);
+common_modules!(add_rsync,);
 
 #[cfg(test)]
 pub(crate) mod tests;

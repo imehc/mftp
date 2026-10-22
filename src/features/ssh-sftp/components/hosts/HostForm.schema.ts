@@ -1,28 +1,63 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { z } from "zod";
 
 import type { Host, HostInput } from "~/types";
 
-type TranslateTag = (
-  literals: TemplateStringsArray,
-  ...placeholders: unknown[]
-) => string;
+const messages = {
+  labelRequired: msg`名称为必填项`,
+  hostRequired: msg`地址为必填项`,
+  portRequired: msg`端口为必填项`,
+  portInteger: msg`端口必须是整数`,
+  portMin: msg`端口不能小于 1`,
+  portMax: msg`端口不能大于 65535`,
+  keyRequired: msg`请选择一个密钥，或先在密钥管理中导入`,
+};
 
-export function createHostFormSchema(t: TranslateTag) {
+type TranslateMessage = (message: MessageDescriptor) => string;
+
+// 校验消息用 msg 描述符 + 运行时 t，不能在普通函数里把 t 当标签模板调用；
+// 那样拿不到翻译，Zod 会退回英文默认文案。
+function requiredText(t: TranslateMessage, message: MessageDescriptor) {
+  return z.string().superRefine((value, ctx) => {
+    if (!value.trim()) {
+      ctx.addIssue({ code: "custom", message: t(message) });
+    }
+  });
+}
+
+function hostField(t: TranslateMessage) {
+  return requiredText(t, messages.hostRequired);
+}
+
+function portField(t: TranslateMessage) {
+  return z.string().superRefine((raw, ctx) => {
+    const value = raw.trim();
+    // 输入框保留字符串，允许用户清空后重新输入；保存和测试前再转换。
+    if (!value) {
+      ctx.addIssue({ code: "custom", message: t(messages.portRequired) });
+      return;
+    }
+    if (!/^\d+$/.test(value)) {
+      ctx.addIssue({ code: "custom", message: t(messages.portInteger) });
+      return;
+    }
+    const port = Number(value);
+    if (port < 1) {
+      ctx.addIssue({ code: "custom", message: t(messages.portMin) });
+    } else if (port > 65535) {
+      ctx.addIssue({ code: "custom", message: t(messages.portMax) });
+    }
+  });
+}
+
+/** 保存校验：名称、地址、端口、认证方式与密钥都必须可用。 */
+export function createHostFormSchema(t: TranslateMessage) {
   return z
     .object({
-      label: z
-        .string()
-        .trim()
-        .min(1, t`名称为必填项`),
-      host: z
-        .string()
-        .trim()
-        .min(1, t`地址为必填项`),
-      port: z
-        .number()
-        .int(t`端口必须是整数`)
-        .min(1, t`端口不能小于 1`)
-        .max(65535, t`端口不能大于 65535`),
+      label: requiredText(t, messages.labelRequired),
+      host: hostField(t),
+      port: portField(t),
       username: z.string(),
       authType: z.enum(["password", "key"]),
       password: z.string().nullable(),
@@ -34,29 +69,41 @@ export function createHostFormSchema(t: TranslateTag) {
         ctx.addIssue({
           code: "custom",
           path: ["keyId"],
-          message: t`请选择一个密钥，或先在密钥管理中导入`,
+          message: t(messages.keyRequired),
         });
       }
     });
 }
 
-export const hostFormSchema = createHostFormSchema(((
-  literals,
-  ...placeholders
-) =>
-  String.raw(
-    {
-      raw: literals,
-    },
-    ...placeholders,
-  )) as TranslateTag);
+/**
+ * 测试连接只校验实际发往服务器的字段：名称等仅用于本地保存的必填项不参与，
+ * 其余规则与保存保持一致，避免测试通过后保存才失败。
+ */
+export function createHostTestSchema(t: TranslateMessage) {
+  return z
+    .object({
+      host: hostField(t),
+      port: portField(t),
+      authType: z.enum(["password", "key"]),
+      keyId: z.string().nullable(),
+    })
+    .superRefine((value, ctx) => {
+      if (value.authType === "key" && !value.keyId) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["keyId"],
+          message: t(messages.keyRequired),
+        });
+      }
+    });
+}
 
-export type HostFormValues = z.infer<typeof hostFormSchema>;
+export type HostFormValues = z.infer<ReturnType<typeof createHostFormSchema>>;
 
 export const emptyHostFormValues: HostFormValues = {
   label: "",
   host: "",
-  port: 22,
+  port: "22",
   username: "",
   authType: "password",
   password: "",
@@ -69,7 +116,7 @@ export function hostToFormValues(host: Host | null): HostFormValues {
   return {
     label: host.label,
     host: host.host,
-    port: host.port,
+    port: String(host.port),
     username: host.username,
     authType: host.authType,
     password: host.password ?? "",
@@ -84,6 +131,7 @@ export function hostFormValuesToInput(values: HostFormValues): HostInput {
     ...values,
     label: values.label.trim(),
     host: values.host.trim(),
+    port: Number(values.port),
     username: values.username.trim(),
     password: values.authType === "password" ? values.password : null,
     keyId: values.authType === "key" ? values.keyId : null,

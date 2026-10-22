@@ -33,6 +33,104 @@ pub struct SftpFileInfo {
     pub gid: Option<u32>,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum RsyncStatus {
+    Available,
+    Missing,
+    Unsupported,
+    Failed,
+    Timeout,
+}
+
+/// One side's rsync capability. A failed probe is reported as data so the
+/// caller can keep the SSH session usable and offer a re-check.
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RsyncToolStatus {
+    pub status: RsyncStatus,
+    #[serde(default)]
+    pub path: Option<String>,
+    #[serde(default)]
+    pub version: Option<String>,
+    #[serde(default)]
+    pub protocol: Option<u32>,
+    #[serde(default)]
+    pub message: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RsyncCapabilities {
+    pub local: RsyncToolStatus,
+    pub remote: RsyncToolStatus,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum RsyncDirection {
+    Upload,
+    Download,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum RsyncChangeKind {
+    Added,
+    Updated,
+    Deleted,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RsyncPreviewItem {
+    pub kind: RsyncChangeKind,
+    /// Path relative to the sync root, with symlink targets removed.
+    pub path: String,
+    pub is_dir: bool,
+}
+
+/// Dry-run result that must be confirmed before the matching transfer runs.
+/// The token is single-use and expires; the stored operation snapshot is
+/// validated against the execution request.
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RsyncPreview {
+    pub token: String,
+    pub direction: RsyncDirection,
+    pub local_dir: String,
+    pub remote_dir: String,
+    pub delete_extraneous: bool,
+    pub added: u32,
+    pub updated: u32,
+    pub deleted: u32,
+    pub items: Vec<RsyncPreviewItem>,
+    pub truncated: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RsyncTransferResult {
+    pub exit_code: i32,
+    /// Logical file bytes reported by rsync's progress2 output.
+    pub transferred_bytes: u64,
+    /// Raw protocol bytes exchanged over the SSH channel.
+    pub network_bytes: u64,
+    pub changed_items: u32,
+}
+
+/// Result of testing an unsaved host configuration. The target is the resolved
+/// address after SSH config fallbacks, and `home` is the SFTP login directory.
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SshConnectionTest {
+    pub host: String,
+    pub port: u16,
+    pub username: String,
+    pub home: String,
+    pub latency_ms: u32,
+}
+
 /// CPU usage percentages computed over a ~1s measurement window.
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
