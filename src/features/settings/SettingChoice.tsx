@@ -23,6 +23,7 @@ export default function SettingChoice({
   segmented = false,
   disabled,
   description,
+  error = false,
 }: {
   id: string;
   icon: LucideIcon;
@@ -33,6 +34,7 @@ export default function SettingChoice({
   segmented?: boolean;
   disabled?: boolean;
   description?: ReactNode;
+  error?: boolean;
 }) {
   const Choice = segmented ? FixedSelect : Select;
   return (
@@ -41,6 +43,7 @@ export default function SettingChoice({
       icon={icon}
       title={title}
       description={description}
+      error={error}
     >
       <Choice
         value={value}

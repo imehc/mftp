@@ -1,8 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
-import { Check, ChevronDown, PanelsTopLeft } from "lucide-react";
+import { Check, PanelsTopLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +20,7 @@ import {
 import { startupPages } from "~/features/navigation/startup";
 import { type StartupMode, useSettingsStore } from "~/store/settings";
 
+import SettingMenuTrigger from "./SettingMenuTrigger";
 import SettingsControl from "./SettingsControl";
 
 export default function StartupPageSettings() {
@@ -84,16 +84,11 @@ export default function StartupPageSettings() {
         }}
       >
         <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
+          <SettingMenuTrigger
             id="settings-startup-mode"
+            label={triggerLabel}
             aria-label={title}
-            className="h-auto min-h-8 w-40 max-w-full justify-between py-1 pr-2 pl-2.5 text-left text-sm font-normal whitespace-normal"
-          >
-            <span className="min-w-0 wrap-break-word">{triggerLabel}</span>
-            <ChevronDown aria-hidden className="text-muted-foreground size-4" />
-          </Button>
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
