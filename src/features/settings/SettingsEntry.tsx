@@ -67,12 +67,19 @@ export function SettingsInfoRow({
 export function SettingsGroup({
   title,
   children,
+  className,
 }: {
   title: ReactNode;
   children: ReactNode;
+  className?: string;
 }) {
   return (
-    <section className="bg-card @container/settings min-w-0 rounded-xl border p-3">
+    <section
+      className={cn(
+        "bg-card @container/settings min-w-0 rounded-xl border p-3",
+        className,
+      )}
+    >
       <h2 className="mb-2 text-sm font-semibold">{title}</h2>
       {children}
     </section>

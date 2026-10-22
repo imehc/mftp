@@ -73,17 +73,13 @@ export default function ResetBoundary({ children }: { children: ReactNode }) {
                       ? t`应用重置尚未完成`
                       : t`暂时无法完成重置`}
             </EmptyTitle>
-            <EmptyDescription>
-              {phase === "checking"
-                ? t`正在读取此设备的重置记录。`
-                : phase === "running"
-                  ? t`请稍候，清理结果将保存在此设备上。`
-                  : finished
-                    ? t`重新打开应用后使用新的初始状态。`
-                    : progress
-                      ? t`应用记录已清空。继续清理剩余内容后即可重新使用应用；下载和共享目录中的文件会保留。`
-                      : t`请检查重置状态后再继续，避免重复清理。`}
-            </EmptyDescription>
+            {busy || finished ? null : (
+              <EmptyDescription>
+                {progress
+                  ? t`应用记录已清空。继续清理剩余内容后即可重新使用应用；下载和共享目录中的文件会保留。`
+                  : t`请检查重置状态后再继续，避免重复清理。`}
+              </EmptyDescription>
+            )}
           </EmptyHeader>
           <EmptyContent>
             {progress ? (

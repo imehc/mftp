@@ -54,6 +54,9 @@ pub enum AppDataModule {
     Todo,
     Poetry,
     ActivityLogs,
+    TranslationModels,
+    Downloads,
+    Cache,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -65,7 +68,14 @@ pub struct AppDataUsage {
     pub main_database_bytes: u64,
     pub poetry_database_bytes: u64,
     pub activity_logs_bytes: u64,
-    pub bt_internal_bytes: u64,
+    /// Downloaded translation models, including partial downloads.
+    pub translation_model_bytes: u64,
+    /// BT working data and tombstones left by a failed cleanup.
+    pub download_bytes: u64,
+    /// Private keys persisted as files outside the main database.
+    pub keys_bytes: u64,
+    /// Everything else under the data directory: temp files and caches.
+    pub cache_bytes: u64,
     pub total_bytes: u64,
 }
 

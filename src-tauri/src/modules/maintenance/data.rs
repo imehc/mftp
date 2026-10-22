@@ -23,7 +23,14 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
         AppDataModule::ActivityLogs => &[participants::LAN_TRANSFER],
         #[cfg(mobile)]
         AppDataModule::ActivityLogs => &[],
-        AppDataModule::Vault | AppDataModule::Todo => &[],
+        AppDataModule::TranslationModels => &[participants::TRANSLATION],
+        // A live download engine keeps file handles inside the data directory;
+        // clearing while it runs would race the detach below.
+        #[cfg(any(desktop, target_os = "android"))]
+        AppDataModule::Downloads => &[participants::BT],
+        #[cfg(not(any(desktop, target_os = "android")))]
+        AppDataModule::Downloads => &[],
+        AppDataModule::Vault | AppDataModule::Todo | AppDataModule::Cache => &[],
     }
 }
 
@@ -61,6 +68,37 @@ pub async fn app_data_clear(
                 let before = storage.app_data_usage();
                 let count = storage.clear_data_module(module)?;
                 Ok(storage.data_clear_result(module, count, before, Vec::new()))
+            })
+            .await?
+        }
+        AppDataModule::TranslationModels => {
+            let translation = state.translation.clone();
+            run_blocking(move || {
+                let _maintenance = maintenance;
+                let _ssh_maintenance = ssh_maintenance;
+                let before = storage.app_data_usage();
+                translation.clear()?;
+                Ok(storage.data_clear_result(AppDataModule::TranslationModels, 0, before, Vec::new()))
+            })
+            .await?
+        }
+        AppDataModule::Downloads => {
+            run_blocking(move || {
+                let _maintenance = maintenance;
+                let _ssh_maintenance = ssh_maintenance;
+                let before = storage.app_data_usage();
+                storage.remove_bt_internal_data()?;
+                Ok(storage.data_clear_result(AppDataModule::Downloads, 0, before, Vec::new()))
+            })
+            .await?
+        }
+        AppDataModule::Cache => {
+            run_blocking(move || {
+                let _maintenance = maintenance;
+                let _ssh_maintenance = ssh_maintenance;
+                let before = storage.app_data_usage();
+                let count = storage.clear_cache()?;
+                Ok(storage.data_clear_result(AppDataModule::Cache, count, before, Vec::new()))
             })
             .await?
         }

@@ -47,7 +47,21 @@ impl Storage {
         let poetry = self.root.join("poetry.sqlite3");
         let main_database_bytes = file_family_size(&self.db_path)?;
         let poetry_database_bytes = file_family_size(&poetry)?;
-        let bt_internal_bytes = self.bt_internal_bytes()?;
+        let download_bytes = self.download_bytes()?;
+        let translation_model_bytes = self.translation_model_bytes()?;
+        let keys_bytes = dir_size(&self.root.join("keys"))?;
+        // 「总占用」是应用数据目录的真实占用，包含模型、缓存等不可按模块清理的内容；
+        // 只累加可清理的数据库会明显小于用户看到的磁盘占用。
+        let total_bytes = dir_size(&self.root)?;
+        // Unclassified leftovers are reported as cache so the rows always add up
+        // to the measured directory size instead of leaving a silent gap.
+        let cache_bytes = total_bytes.saturating_sub(
+            main_database_bytes
+                + poetry_database_bytes
+                + translation_model_bytes
+                + download_bytes
+                + keys_bytes,
+        );
         // Usage reads must never create a missing database or apply migrations.
         let conn = Connection::open_with_flags(&self.db_path, OpenFlags::SQLITE_OPEN_READ_ONLY)?;
         let (vault_bytes, hosts_bytes, todo_bytes, activity_logs_bytes) = (
@@ -118,12 +132,22 @@ impl Storage {
             main_database_bytes,
             poetry_database_bytes,
             activity_logs_bytes,
-            bt_internal_bytes,
-            total_bytes: main_database_bytes + poetry_database_bytes + bt_internal_bytes,
+            translation_model_bytes,
+            download_bytes,
+            keys_bytes,
+            cache_bytes,
+            total_bytes,
         })
     }
 
-    fn bt_internal_bytes(&self) -> AppResult<u64> {
+    /// Android keeps translation models under `no_backup`; desktops use the
+    /// data directory directly, so both locations are measured.
+    fn translation_model_bytes(&self) -> AppResult<u64> {
+        Ok(dir_size(&self.root.join("translation-models"))?
+            + dir_size(&self.root.join("no_backup").join("translation-models"))?)
+    }
+
+    fn download_bytes(&self) -> AppResult<u64> {
         let mut bytes = dir_size(&self.root.join("bt"))?;
         for entry in fs::read_dir(&self.root)? {
             let entry = entry?;

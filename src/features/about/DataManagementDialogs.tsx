@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import type { ReactNode } from "react";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
@@ -20,8 +21,29 @@ import {
 } from "~/components/ui/dialog-layout";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import type { AppDataModule } from "~/types";
 
-import { type AboutController, DATA_MODULES } from "./use-about";
+import type { AboutController } from "./use-about";
+
+/** 文件类模块没有记录数，确认文案要说清代价与保留范围。 */
+function targetDescription(
+  target: AppDataModule | "all",
+  fileDescriptions: Partial<Record<AppDataModule, string>>,
+) {
+  if (target === "all")
+    return (
+      <Trans>
+        将删除所有应用内数据、缓存、日志和设置，并恢复首次打开状态。下载目录和共享目录中的文件会保留。
+      </Trans>
+    );
+  const file = fileDescriptions[target];
+  if (file) return file;
+  return (
+    <Trans>
+      将删除此设备上该模块的全部记录，此操作无法撤销。其他模块数据、下载文件和共享目录中的文件会保留。
+    </Trans>
+  );
+}
 
 export default function DataManagementDialogs({
   controller: c,
@@ -30,6 +52,14 @@ export default function DataManagementDialogs({
 }) {
   const { t } = useLingui();
   const title = c.target && c.target !== "all" ? c.moduleTitles[c.target] : "";
+  const fileDescriptions = {
+    translationModels: t`将删除已下载的翻译模型，之后需要重新下载。`,
+    downloads: t`将清理下载任务的引擎数据与缓存，下载目录中的文件会保留。`,
+    cache: t`将删除诗词同步产生的临时文件，不影响已导入的诗词数据。`,
+  };
+  const description: ReactNode = c.target
+    ? targetDescription(c.target, fileDescriptions)
+    : null;
   return (
     <>
       <Dialog
@@ -44,7 +74,7 @@ export default function DataManagementDialogs({
         >
           <DialogLayoutHeader showCloseButton>
             <DialogTitle>
-              <Trans>按模块清理</Trans>
+              <Trans>存储明细</Trans>
             </DialogTitle>
           </DialogLayoutHeader>
           <DialogLayoutBody>
@@ -64,43 +94,40 @@ export default function DataManagementDialogs({
               </Alert>
             ) : null}
             <div className="divide-y">
-              {DATA_MODULES.map((module) => ({
-                module,
-                label: c.moduleTitles[module],
-              })).map(({ module, label }) => (
+              {c.storageRows.map(({ key, label, bytes, module }) => (
                 <div
-                  key={module}
+                  key={key}
                   className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">
-                      {c.moduleTitles[module]}
-                    </p>
+                    <p className="text-sm font-medium">{label}</p>
                     <p className="text-muted-foreground text-xs tabular-nums">
-                      {c.moduleBytes ? formatBytes(c.moduleBytes[module]) : "—"}
+                      {bytes === null ? "—" : formatBytes(bytes)}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    density="adaptive"
-                    disabled={
-                      c.busy ||
-                      c.loading ||
-                      !!c.error ||
-                      !c.moduleBytes?.[module]
-                    }
-                    onClick={() => c.selectTarget(module)}
-                    aria-label={t({
-                      comment: "数据清理列表按钮，label 是模块名",
-                      message: `清理${label}`,
-                    })}
-                  >
-                    <Trans>清理</Trans>
-                  </Button>
+                  {module ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      density="adaptive"
+                      disabled={c.busy || c.loading || !!c.error || !bytes}
+                      onClick={() => c.selectTarget(module ?? null)}
+                      aria-label={t({
+                        message: `清理${label}`,
+                        comment: "存储明细行的清理按钮，label 是分类名",
+                      })}
+                    >
+                      <Trans>清理</Trans>
+                    </Button>
+                  ) : null}
                 </div>
               ))}
             </div>
+            <p className="text-muted-foreground text-xs">
+              <Trans>
+                主数据库和密钥文件包含正在使用的记录，请在对应模块内清理。
+              </Trans>
+            </p>
           </DialogLayoutBody>
         </DialogLayoutContent>
       </Dialog>
@@ -113,26 +140,9 @@ export default function DataManagementDialogs({
         <AlertDialogContent className="ui-density-adaptive md:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {c.target === "all" ? (
-                <Trans>清空所有数据？</Trans>
-              ) : (
-                t({
-                  comment: "不可撤销的模块数据清理确认标题，title 是模块名",
-                  message: `清理${title}？`,
-                })
-              )}
+              {c.target === "all" ? t`清空所有数据？` : t`清理${title}？`}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {c.target === "all" ? (
-                <Trans>
-                  将删除所有应用内数据、缓存、日志和设置，并恢复首次打开状态。下载目录和共享目录中的文件会保留。
-                </Trans>
-              ) : (
-                <Trans>
-                  将删除此设备上该模块的全部记录，此操作无法撤销。其他模块数据、下载文件和共享目录中的文件会保留。
-                </Trans>
-              )}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{description}</AlertDialogDescription>
           </AlertDialogHeader>
           {c.target && c.target !== "all" ? (
             <div className="flex items-center justify-between gap-3 text-sm">

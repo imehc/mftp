@@ -1,37 +1,24 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
-import { openUrl } from "@tauri-apps/plugin-opener";
-import {
-  ArrowLeft,
-  ArrowLeftRight,
-  BookOpen,
-  Database,
-  ExternalLink,
-  Gauge,
-  HardDrive,
-  RefreshCw,
-  Terminal,
-  Trash2,
-  Wifi,
-} from "lucide-react";
-import { toast } from "sonner";
+import { ArrowLeft, Copy, Gauge, RefreshCw, Trash2 } from "lucide-react";
 
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
+import { useBtTasksStore } from "~/features/bt/tasks-store";
 import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import {
   SettingsEntry,
   SettingsGroup,
-  SettingsInfoRow,
 } from "~/features/settings/SettingsEntry";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
-import { isDesktopPlatform } from "~/lib/platform";
+import { isDesktopPlatform, isIosPlatform } from "~/lib/platform";
 import { useSessionsStore } from "~/store/sessions";
 import { useTransfersStore } from "~/store/transfers";
 
 import DataManagementDialogs from "./DataManagementDialogs";
+import { EnvironmentField } from "./EnvironmentField";
 import { useAbout } from "./use-about";
 
 export default function AboutPage() {
@@ -46,6 +33,14 @@ export default function AboutPage() {
   const activeTransfers = transfers.filter(
     (s) => s.status === "running",
   ).length;
+  // 任务快照由模块运行期维护；未加载完成时返回 null，页面显示占位符而不是「空闲」。
+  const btTasks = useBtTasksStore((state) =>
+    state.loading
+      ? null
+      : state.tasks.filter(
+          (task) => task.status === "Active" || task.status === "Packaging",
+        ).length,
+  );
   return (
     <main
       data-bottom-inset="scroll"
@@ -62,16 +57,28 @@ export default function AboutPage() {
           </Button>
         }
         trailing={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            density="adaptive"
-            aria-label={t`刷新状态`}
-            disabled={c.loading || c.busy}
-            onClick={() => void c.reload()}
-          >
-            <RefreshCw className={c.loading ? "animate-spin" : undefined} />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              density="adaptive"
+              aria-label={t`复制环境信息`}
+              disabled={!c.environment}
+              onClick={() => void c.copyEnvironmentInfo()}
+            >
+              <Copy />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              density="adaptive"
+              aria-label={t`刷新状态`}
+              disabled={c.loading || c.busy}
+              onClick={() => void c.reload()}
+            >
+              <RefreshCw className={c.loading ? "animate-spin" : undefined} />
+            </Button>
+          </div>
         }
       />
       <AppPageContent bottomInset="scroll">
@@ -83,9 +90,6 @@ export default function AboutPage() {
             M
           </div>
           <h1 className="text-lg font-semibold">MFTP</h1>
-          <p className="text-muted-foreground text-xs tabular-nums">
-            {c.version}
-          </p>
           <p className="text-muted-foreground text-xs">
             <Trans>本地文件与数据工具</Trans>
           </p>
@@ -106,81 +110,26 @@ export default function AboutPage() {
             </Button>
           </div>
         ) : null}
-        <div className="grid shrink-0 gap-4 md:grid-cols-2">
-          <SettingsGroup title={<Trans>存储占用</Trans>}>
-            <SettingsInfoRow
-              icon={Database}
-              title={t`主数据库`}
-              value={c.usage ? formatBytes(c.usage.mainDatabaseBytes) : "—"}
-            />
-            <SettingsInfoRow
-              icon={BookOpen}
-              title={t`诗词数据库`}
-              value={c.usage ? formatBytes(c.usage.poetryDatabaseBytes) : "—"}
-            />
-            <SettingsInfoRow
-              icon={HardDrive}
-              title={t`应用内部数据`}
-              value={c.usage ? formatBytes(c.usage.btInternalBytes) : "—"}
-            />
-            <SettingsInfoRow
-              icon={Gauge}
-              title={t`总占用`}
-              value={c.usage ? formatBytes(c.usage.totalBytes) : "—"}
-            />
-          </SettingsGroup>
-          <SettingsGroup title={<Trans>运行状态</Trans>}>
-            <SettingsInfoRow
-              icon={Terminal}
-              title="SSH / SFTP"
-              value={activeSessions ? String(activeSessions) : t`空闲`}
-            />
-            <SettingsInfoRow
-              icon={ArrowLeftRight}
-              title={t`文件传输`}
-              value={activeTransfers ? String(activeTransfers) : t`空闲`}
-            />
-            {isDesktopPlatform() ? (
-              <>
-                <SettingsInfoRow
-                  icon={Wifi}
-                  title={t`局域网服务`}
-                  value={
-                    c.lanError
-                      ? t`状态读取失败`
-                      : c.lan
-                        ? c.lan.running
-                          ? t`运行中`
-                          : t`未启动`
-                        : "—"
-                  }
+        <div className="shrink-0">
+          <SettingsGroup title={<Trans>环境信息</Trans>}>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 p-1 md:grid-cols-3">
+              {c.environmentFields.map((field) => (
+                <EnvironmentField
+                  key={field.label}
+                  label={field.label}
+                  value={field.value}
                 />
-                {c.lanError ? (
-                  <p
-                    role="status"
-                    className="text-destructive text-xs wrap-break-word"
-                  >
-                    {describeError(c.lanError)}
-                  </p>
-                ) : null}
-              </>
-            ) : null}
-            <SettingsInfoRow
-              icon={RefreshCw}
-              title={t`诗词同步`}
-              value={
-                sync.stale ? t`等待确认` : sync.active ? t`运行中` : t`空闲`
-              }
-            />
+              ))}
+            </dl>
           </SettingsGroup>
         </div>
-        <div className="shrink-0">
-          <SettingsGroup title={<Trans>本地数据</Trans>}>
+        <div className="grid shrink-0 items-stretch gap-4 md:grid-cols-2">
+          <SettingsGroup title={<Trans>存储</Trans>} className="h-full">
             <SettingsEntry
-              icon={Database}
-              title={<Trans>按模块清理</Trans>}
-              description={<Trans>选择需要清理的数据范围</Trans>}
-              disabled={c.busy}
+              icon={Gauge}
+              title={t`总占用`}
+              description={c.usage ? formatBytes(c.usage.totalBytes) : "—"}
+              disabled={c.loading || c.busy}
               onClick={() => c.setModulesOpen(true)}
             />
             <SettingsEntry
@@ -191,21 +140,70 @@ export default function AboutPage() {
               onClick={() => c.selectTarget("all")}
             />
           </SettingsGroup>
-        </div>
-        <div className="shrink-0">
-          <Button
-            variant="outline"
-            size="sm"
-            density="adaptive"
-            onClick={() =>
-              void openUrl("https://github.com/imehc/mftp").catch((error) =>
-                toast.error(describeError(error)),
-              )
-            }
-          >
-            <ExternalLink data-icon="inline-start" />
-            <Trans>项目帮助</Trans>
-          </Button>
+          {/*
+            运行状态项多但每项只有一个状态词，按两列规格单元格排布，
+            与「存储」两行卡片的高度保持一致，也避免单项独占一整行。
+          */}
+          <SettingsGroup title={<Trans>运行状态</Trans>} className="h-full">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 p-1">
+              <EnvironmentField
+                label="SSH / SFTP"
+                value={activeSessions ? String(activeSessions) : t`空闲`}
+              />
+              <EnvironmentField
+                label={t`文件传输`}
+                value={activeTransfers ? String(activeTransfers) : t`空闲`}
+              />
+              {/* iOS 不提供本地下载引擎，状态位会一直读不到。 */}
+              {isIosPlatform() ? null : (
+                <EnvironmentField
+                  label={t`下载任务`}
+                  value={
+                    btTasks === null
+                      ? "—"
+                      : btTasks
+                        ? t({
+                            message: `${btTasks} 个进行中`,
+                            comment: "运行状态：正在运行的下载任务数量",
+                          })
+                        : t`空闲`
+                  }
+                />
+              )}
+              <EnvironmentField
+                label={t`翻译引擎`}
+                value={c.translationStatus ?? "—"}
+              />
+              {isDesktopPlatform() ? (
+                <EnvironmentField
+                  label={t`局域网服务`}
+                  value={
+                    c.lanError
+                      ? t`状态读取失败`
+                      : c.lan
+                        ? c.lan.running
+                          ? t`运行中`
+                          : t`未启动`
+                        : "—"
+                  }
+                />
+              ) : null}
+              <EnvironmentField
+                label={t`诗词同步`}
+                value={
+                  sync.stale ? t`等待确认` : sync.active ? t`运行中` : t`空闲`
+                }
+              />
+            </dl>
+            {c.lanError ? (
+              <p
+                role="status"
+                className="text-destructive px-1 text-xs wrap-break-word"
+              >
+                {describeError(c.lanError)}
+              </p>
+            ) : null}
+          </SettingsGroup>
         </div>
       </AppPageContent>
       <DataManagementDialogs controller={c} />

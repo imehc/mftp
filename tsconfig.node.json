@@ -14,6 +14,7 @@
   "include": [
     "vite.config.ts",
     "vitest.config.ts",
+    "scripts/build-info.mjs",
     "scripts/platform-vite.ts",
     "scripts/platforms.mjs"
   ]

@@ -30,9 +30,22 @@ fn empty_data_and_absent_optional_files_are_measured_as_zero() {
     assert_eq!(usage.todo_bytes, 0);
     assert_eq!(usage.activity_logs_bytes, 0);
     assert_eq!(usage.poetry_database_bytes, 0);
-    assert_eq!(usage.bt_internal_bytes, 0);
+    assert_eq!(usage.download_bytes, 0);
+    assert_eq!(usage.translation_model_bytes, 0);
+    assert_eq!(usage.keys_bytes, 0);
+    // 各项相加必须等于测到的目录占用，不允许出现无法解释的差额。
+    assert_eq!(
+        usage.total_bytes,
+        usage.main_database_bytes
+            + usage.poetry_database_bytes
+            + usage.translation_model_bytes
+            + usage.download_bytes
+            + usage.keys_bytes
+            + usage.cache_bytes
+    );
     assert!(usage.main_database_bytes > 0);
-    assert_eq!(usage.total_bytes, usage.main_database_bytes);
+    // 总占用统计整个数据目录，至少覆盖主数据库及其侧写文件。
+    assert!(usage.total_bytes >= usage.main_database_bytes);
 }
 
 #[test]

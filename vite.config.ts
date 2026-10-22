@@ -7,6 +7,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+import { readBuildInfo } from "./scripts/build-info.mjs";
 import {
   platformAliases,
   platformBuildPlugin,
@@ -20,8 +21,15 @@ const devHost = host || "127.0.0.1";
 // https://vite.dev/config/
 export default defineConfig(({ command, isPreview }) => {
   const target = command === "build" || isPreview ? buildPlatform() : null;
+  // 关于页展示的构建快照；dev server 也注入，保证本地调试不是一片占位符。
+  const buildInfo = readBuildInfo({
+    mode: command === "build" ? "Release" : "Debug",
+  });
   return {
-    define: { __MFTP_PLATFORM__: JSON.stringify(target ?? "web") },
+    define: {
+      __MFTP_PLATFORM__: JSON.stringify(target ?? "web"),
+      __MFTP_BUILD_INFO__: JSON.stringify(buildInfo),
+    },
     plugins: [
       platformBuildPlugin(target),
       tanstackRouter({

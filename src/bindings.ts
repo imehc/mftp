@@ -529,7 +529,7 @@ export type AppDataClearResult = {
 	preserved: string[],
 };
 
-export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs";
+export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs" | "translationModels" | "downloads" | "cache";
 
 export type AppDataResetFailure = {
 	step: AppDataResetStep,
@@ -560,7 +560,14 @@ export type AppDataUsage = {
 	mainDatabaseBytes: number,
 	poetryDatabaseBytes: number,
 	activityLogsBytes: number,
-	btInternalBytes: number,
+	// Downloaded translation models, including partial downloads.
+	translationModelBytes: number,
+	// BT working data and tombstones left by a failed cleanup.
+	downloadBytes: number,
+	// Private keys persisted as files outside the main database.
+	keysBytes: number,
+	// Everything else under the data directory: temp files and caches.
+	cacheBytes: number,
 	totalBytes: number,
 };
 

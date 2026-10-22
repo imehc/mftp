@@ -21,6 +21,16 @@ fn detach_bt_directory(path: &Path, tombstone: &Path) -> AppResult<bool> {
 
 impl Storage {
     pub fn clear_data_module(&self, module: AppDataModule) -> AppResult<u32> {
+        // File-backed modules are routed by the command layer; reaching here
+        // means a caller bypassed that routing.
+        if matches!(
+            module,
+            AppDataModule::TranslationModels | AppDataModule::Downloads | AppDataModule::Cache
+        ) {
+            return Err(AppError::custom(
+                CustomErrorCode::AppDataModuleSeparateStore,
+            ));
+        }
         let mut conn = self.conn()?;
         let tx = conn.transaction()?;
         let changed = match module {
@@ -33,9 +43,13 @@ impl Storage {
                 tx.execute("DELETE FROM todo_items", [])?
             }
             AppDataModule::ActivityLogs => tx.execute("DELETE FROM activity_logs", [])?,
-            AppDataModule::Poetry => {
-                // The entry layer routes poetry clears to its own database;
-                // reaching here means a caller bypassed that routing.
+            AppDataModule::Poetry
+            | AppDataModule::TranslationModels
+            | AppDataModule::Downloads
+            | AppDataModule::Cache => {
+                // The entry layer routes poetry clears to its own database and
+                // file-backed modules to filesystem deletes; reaching here means
+                // a caller bypassed that routing.
                 return Err(AppError::custom(
                     CustomErrorCode::AppDataModuleSeparateStore,
                 ));
@@ -43,6 +57,17 @@ impl Storage {
         };
         tx.commit()?;
         Ok(changed as u32)
+    }
+
+    /// Extraction leftovers only. Databases, models and downloads are never
+    /// touched so a cache clear cannot cost the user a re-download.
+    pub fn clear_cache(&self) -> AppResult<u32> {
+        let temp = self.root.join("poetry-tmp");
+        if !temp.try_exists()? {
+            return Ok(0);
+        }
+        fs::remove_dir_all(temp)?;
+        Ok(1)
     }
 
     pub fn clear_poetry_database(&self) -> AppResult<()> {
