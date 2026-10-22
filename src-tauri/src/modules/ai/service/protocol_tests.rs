@@ -301,7 +301,9 @@ async fn cancelling_each_protocol_closes_the_stream_without_replaying() {
             socket.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\n").unwrap();
             ready.send(()).unwrap();
             // Drain any remaining request bytes; a dropped future must close the socket.
-            while socket.read(&mut request).unwrap() > 0 {}
+            // The client may abort with ECONNRESET instead of a clean EOF; both mean
+            // the socket is closed, so read errors also end the drain loop.
+            while matches!(socket.read(&mut request), Ok(n) if n > 0) {}
         });
         let task = tokio::spawn(async move {
             generate_text_without_control(
