@@ -155,13 +155,22 @@ export default function PoetryTranslationSection({
         </div>
       ) : generating ? (
         // 生成中只有这一个指示器；它本身就是要取消的按钮，hover/focus 时文字换成取消。
+        // 已有正文时指示器跟在正文之后，阅读视线不被打断。
         <div
           className={
             streamingContent
-              ? "flex flex-col gap-2"
+              ? "flex flex-col items-start gap-2"
               : "flex min-h-28 flex-col items-center justify-center gap-3"
           }
         >
+          {streamingContent ? (
+            <p
+              className="font-poetry whitespace-pre-line"
+              style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
+            >
+              {streamingContent}
+            </p>
+          ) : null}
           <Button
             type="button"
             variant="outline"
@@ -186,14 +195,6 @@ export default function PoetryTranslationSection({
               </span>
             </span>
           </Button>
-          {streamingContent ? (
-            <p
-              className="font-poetry whitespace-pre-line"
-              style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
-            >
-              {streamingContent}
-            </p>
-          ) : null}
         </div>
       ) : current ? (
         <div className="flex flex-col gap-2">

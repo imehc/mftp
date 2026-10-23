@@ -72,6 +72,26 @@ impl Default for AiTimeoutPolicy {
     }
 }
 
+impl AiTimeoutPolicy {
+    /// A connection test only proves that the endpoint, credential and model
+    /// answer. It stops at the first protocol event, so generation-length
+    /// budgets would only make an unreachable address wait minutes to fail.
+    pub fn probe() -> Self {
+        Self {
+            connection_ms: 3_000,
+            response_headers_ms: 8_000,
+            first_event_ms: 10_000,
+            transport_idle_ms: 10_000,
+            reasoning_progress_ms: 10_000,
+            text_progress_ms: 10_000,
+            unobserved_progress_ms: 10_000,
+            soft_wait_ms: 5_000,
+            hard_deadline_ms: 15_000,
+            max_deadline_ms: 15_000,
+        }
+    }
+}
+
 pub struct AiCompletionRequest<'a> {
     pub text: &'a AiTextRequest,
     pub streaming: bool,
@@ -80,6 +100,10 @@ pub struct AiCompletionRequest<'a> {
     pub show_reasoning: bool,
     pub reasoning_limit_bytes: usize,
     pub timeout: AiTimeoutPolicy,
+    /// Connection tests only need proof that the provider started answering.
+    /// Set, the stream ends at the first accepted protocol event instead of
+    /// requiring the protocol's completion event.
+    pub stop_at_first_event: bool,
 }
 
 impl<'a> AiCompletionRequest<'a> {
@@ -92,6 +116,7 @@ impl<'a> AiCompletionRequest<'a> {
             show_reasoning: false,
             reasoning_limit_bytes: 64 * 1024,
             timeout: AiTimeoutPolicy::default(),
+            stop_at_first_event: false,
         }
     }
 

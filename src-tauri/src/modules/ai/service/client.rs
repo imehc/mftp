@@ -1,4 +1,5 @@
-use super::runtime::complete;
+use super::runtime::complete_logged;
+use crate::core::diagnostics::DiagnosticRecorder;
 use crate::error::AppResult;
 pub(crate) use crate::modules::ai::completion::AiTextRequest;
 use crate::modules::ai::completion::{AiCompletionRequest, AiControlMessage, AiStreamEventPayload};
@@ -7,15 +8,18 @@ use tokio::sync::mpsc::Receiver;
 
 /// Compatibility facade: poetry receives final text only, never reasoning
 /// events. The caller's control channel lets a user-initiated cancel stop the
-/// provider stream instead of only muting the UI.
+/// provider stream instead of only muting the UI. The recorder is the same
+/// execution log the connection test writes, so a generation that fails on
+/// protocol data shows the bytes that were actually received.
 pub async fn generate_text(
     config: &AiConnectionConfig,
     api_key: &str,
     request: &AiTextRequest,
     control: Option<&mut Receiver<AiControlMessage>>,
+    log: Option<&mut DiagnosticRecorder>,
     mut on_delta: impl FnMut(String) + Send,
 ) -> AppResult<String> {
-    let result = complete(
+    let result = complete_logged(
         config,
         api_key,
         &AiCompletionRequest::text(request, config.streaming_enabled),
@@ -27,6 +31,7 @@ pub async fn generate_text(
                 }
             }
         },
+        log,
     )
     .await?;
     Ok(if config.streaming_enabled {
@@ -44,7 +49,7 @@ pub async fn generate_text_without_control(
     request: &AiTextRequest,
     on_delta: impl FnMut(String) + Send,
 ) -> AppResult<String> {
-    generate_text(config, api_key, request, None, on_delta).await
+    generate_text(config, api_key, request, None, None, on_delta).await
 }
 
 #[cfg(test)]

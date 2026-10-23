@@ -33,6 +33,14 @@ pub enum AiProviderErrorCode {
     Protocol,
     #[serde(rename = "ai:provider_status")]
     Status,
+    #[serde(rename = "ai:provider_auth_rejected")]
+    AuthRejected,
+    #[serde(rename = "ai:provider_endpoint_not_found")]
+    EndpointNotFound,
+    #[serde(rename = "ai:provider_request_rejected")]
+    RequestRejected,
+    #[serde(rename = "ai:provider_rate_limited")]
+    RateLimited,
     #[serde(rename = "ai:provider_failed")]
     Failed,
 }
@@ -105,6 +113,22 @@ impl AiProviderErrorCode {
             Self::Status => (
                 "ai:provider_status",
                 "AI provider returned an unsuccessful HTTP status",
+            ),
+            Self::AuthRejected => (
+                "ai:provider_auth_rejected",
+                "AI provider rejected the API key",
+            ),
+            Self::EndpointNotFound => (
+                "ai:provider_endpoint_not_found",
+                "AI provider has no endpoint at the configured address",
+            ),
+            Self::RequestRejected => (
+                "ai:provider_request_rejected",
+                "AI provider rejected the request parameters",
+            ),
+            Self::RateLimited => (
+                "ai:provider_rate_limited",
+                "AI provider rate limited the request",
             ),
             Self::Failed => (
                 "ai:provider_failed",

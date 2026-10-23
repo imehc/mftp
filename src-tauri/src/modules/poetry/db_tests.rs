@@ -134,3 +134,32 @@ fn delete_missing_collection_returns_false() {
     let (_dir, db) = temp_db("delete-missing");
     assert!(!db.delete_collection("nope").unwrap());
 }
+
+#[test]
+fn schema_batch_is_skipped_once_stamped_and_rebuilds_for_any_other_version() {
+    let (_dir, db) = temp_db("schema-version");
+    let conn = db.open().expect("first open");
+    let stamped: i64 = conn
+        .pragma_query_value(None, "user_version", |row| row.get(0))
+        .unwrap();
+    assert_eq!(stamped, SCHEMA_VERSION);
+    // A stamped database skips the batch, so a dropped table stays dropped.
+    conn.execute_batch("DROP TABLE collections").unwrap();
+    drop(conn);
+    let conn = db.open().expect("stamped open");
+    assert!(conn
+        .query_row("SELECT COUNT(*) FROM collections", [], |r| r
+            .get::<_, i64>(0))
+        .is_err());
+    // Any other version rebuilds: a replaced or downloaded database carries
+    // its own marker, and bumping SCHEMA_VERSION re-runs the batch.
+    conn.pragma_update(None, "user_version", 0).unwrap();
+    drop(conn);
+    let conn = db.open().expect("rebuild open");
+    assert_eq!(
+        conn.query_row("SELECT COUNT(*) FROM collections", [], |r| r
+            .get::<_, i64>(0))
+            .unwrap(),
+        0
+    );
+}

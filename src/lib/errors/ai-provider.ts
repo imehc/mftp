@@ -24,5 +24,12 @@ export const aiProviderErrorMessages = {
   "ai:provider_limit_reached": msg`AI 已达到输出或推理预算上限，结果不完整`,
   "ai:provider_protocol": msg`AI 返回的数据不符合所选协议`,
   "ai:provider_status": msg`AI 服务返回 HTTP 错误，请检查服务配置`,
+  "ai:provider_auth_rejected": msg`AI 服务拒绝了该密钥`,
+  "ai:provider_endpoint_not_found": msg({
+    message: "AI 服务地址不存在该接口，请检查地址与协议",
+    comment: "404；自建网关常见于地址少了 /v1。",
+  }),
+  "ai:provider_request_rejected": msg`AI 服务拒绝了请求参数，请检查模型与协议`,
+  "ai:provider_rate_limited": msg`AI 服务已限流，请稍后再试`,
   "ai:provider_failed": msg`AI 服务未能完成本次请求`,
 } satisfies Record<AiProviderErrorCode, MessageDescriptor>;

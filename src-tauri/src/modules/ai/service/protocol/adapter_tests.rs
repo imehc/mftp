@@ -101,6 +101,42 @@ fn responses_summaries_and_multiple_text_blocks_stay_separate() {
 }
 
 #[test]
+fn responses_reasoning_text_parts_are_reasoning_not_answer_text() {
+    let (mut adapter, mut output, events) = harness(
+        AiProtocol::Responses,
+        AiReasoningPolicy::ProviderDefault,
+        true,
+        4096,
+    );
+    // A reasoning item streams its own content parts, parallel to the summary
+    // channel: part type `reasoning_text` with `response.reasoning_text.*`.
+    event(&mut adapter, &mut output, json!({"type":"response.output_item.added","output_index":0,"item":{"type":"reasoning","summary":[],"content":[]}})).unwrap();
+    event(&mut adapter, &mut output, json!({"type":"response.content_part.added","output_index":0,"content_index":0,"part":{"type":"reasoning_text","text":""}})).unwrap();
+    event(&mut adapter, &mut output, json!({"type":"response.reasoning_text.delta","output_index":0,"content_index":0,"delta":"thinking"})).unwrap();
+    event(&mut adapter, &mut output, json!({"type":"response.content_part.done","output_index":0,"content_index":0,"part":{"type":"reasoning_text","text":"thinking"}})).unwrap();
+    event(&mut adapter, &mut output, json!({"type":"response.output_text.delta","output_index":1,"content_index":0,"delta":"answer"})).unwrap();
+    // The final snapshot keeps the reasoning item at its own output index, so
+    // the message index must match the one the text deltas streamed under.
+    let response = json!({"status":"completed","output":[
+        {"type":"reasoning","summary":[],"content":[{"type":"reasoning_text","text":"thinking"}]},
+        {"type":"message","content":[{"type":"output_text","text":"answer"}]}
+    ]});
+    assert!(matches!(
+        event(
+            &mut adapter,
+            &mut output,
+            json!({"type":"response.completed","response":response})
+        )
+        .unwrap(),
+        EventStatus::Completed
+    ));
+    let result = output.result().unwrap();
+    assert_eq!(result.text, "answer");
+    assert_eq!(visible(&events, true), "thinking");
+    assert_eq!(visible(&events, false), "answer");
+}
+
+#[test]
 fn responses_done_sentinel_and_contradictory_completion_cannot_publish_success() {
     for value in [
         json!({"type":"response.completed"}),

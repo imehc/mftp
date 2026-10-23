@@ -143,17 +143,25 @@ impl<C: AiCredentials + 'static> AiConfigurationService<C> {
                     &snapshot.config,
                     &snapshot.api_key,
                     mode,
-                    crate::modules::ai::completion::AiTimeoutPolicy::default(),
+                    crate::modules::ai::completion::AiTimeoutPolicy::probe(),
                     log.as_mut(),
                 )
                 .await)
             }
             .await;
             if lease.is_ok() {
-            service.executor.record_outcome(activity, match &result { Ok(report) => report.error.clone(), Err(error) => Some(error.clone()) }).await;
+                service
+                    .executor
+                    .record_outcome(
+                        activity,
+                        match &result {
+                            Ok(report) => report.error.clone(),
+                            Err(error) => Some(error.clone()),
+                        },
+                    )
+                    .await;
             }
             if let Some(log) = log.as_mut() {
-                if result.as_ref().is_ok_and(|report| report.streaming == crate::modules::ai::configuration::testing::AiProviderTestStatus::Unverified) { log.unverified(); }
                 log.finish(match &result {
                     Ok(report) => report.error.as_ref(),
                     Err(error) => Some(error),

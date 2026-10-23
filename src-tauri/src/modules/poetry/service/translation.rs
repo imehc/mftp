@@ -93,6 +93,7 @@ pub(crate) async fn generate_poetry_translation<
     configuration: &Arc<AiConfigurationService<C>>,
     ai_tasks: Arc<AiTaskManager>,
     job: PoetryTranslationJob,
+    mut log: Option<crate::core::diagnostics::DiagnosticRecorder>,
     emit_delta: F,
 ) -> AppResult<PoetryTranslation> {
     let PoetryTranslationJob {
@@ -122,15 +123,26 @@ pub(crate) async fn generate_poetry_translation<
     let snapshot = configuration.request_snapshot().await?;
     let config = snapshot.config;
     let api_key = snapshot.api_key;
+    if let Some(log) = log.as_mut() {
+        log.add_secret(&api_key);
+        log.target(&config.model);
+    }
     let output = generate_text(
         &config,
         &api_key,
         &request,
         Some(control.receiver()),
+        log.as_mut(),
         emit_delta,
     )
-    .await?;
-    let content = parse_translation_output(&output)?;
+    .await;
+    // The recorder outlives the request so a protocol failure keeps the bytes
+    // that were actually received; dropping it unfinished would mark the
+    // operation interrupted instead of failed.
+    if let Some(log) = log.as_mut() {
+        log.finish(output.as_ref().err());
+    }
+    let content = parse_translation_output(&output?)?;
     let model = config.model;
     run_blocking(move || {
         translation_store::upsert(

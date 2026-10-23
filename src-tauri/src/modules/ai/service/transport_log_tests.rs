@@ -49,11 +49,14 @@ async fn every_protocol_records_actual_request_and_unmodified_received_bytes() {
                 panic!("response missing")
             };
             assert_eq!(*status, 200);
-            assert!(body.text.contains("真实结果"));
             if streaming {
+                // The probe stops at the first accepted event, so the log keeps
+                // an unmodified prefix of the wire bytes, not the whole body.
+                assert!(!body.text.is_empty());
                 assert!(original.starts_with(&body.text));
-                assert_eq!(body.end, DiagnosticBodyEnd::ProtocolEnd);
+                assert_eq!(body.end, DiagnosticBodyEnd::Interrupted);
             } else {
+                assert!(body.text.contains("真实结果"));
                 assert_eq!(body.text, original);
                 assert_eq!(body.end, DiagnosticBodyEnd::Complete);
             }
@@ -81,7 +84,7 @@ async fn original_http_error_remains_visible_except_credentials_and_keeps_app_er
     log.finish(report.error.as_ref());
     server.join().unwrap();
     let operation = hub.snapshot(0).operations.unwrap().remove(0);
-    assert_eq!(operation.error.unwrap().code, "ai:provider_status");
+    assert_eq!(operation.error.unwrap().code, "ai:provider_auth_rejected");
     let DiagnosticDetail::HttpResponse { body, .. } = &operation.details[1] else {
         panic!("response missing")
     };
@@ -184,8 +187,13 @@ async fn stalled_error_body_respects_deadline_and_cannot_replace_original_status
     tokio::task::spawn_blocking(move || server.join().unwrap())
         .await
         .unwrap();
-    assert_eq!(report.error.as_ref().unwrap().code, "ai:provider_status");
-    assert_eq!(report.error.unwrap().args["status"], "429");
+    // A rate limit proves the endpoint, credential and model were accepted,
+    // so the probe reports reachable while the body stays truncated in the log.
+    assert!(report.error.is_none(), "{report:?}");
+    assert_eq!(
+        report.non_streaming,
+        crate::modules::ai::configuration::testing::AiProviderTestStatus::Passed
+    );
     let operation = hub.snapshot(0).operations.unwrap().remove(0);
     let DiagnosticDetail::HttpResponse { body, .. } = &operation.details[1] else {
         panic!("response missing")

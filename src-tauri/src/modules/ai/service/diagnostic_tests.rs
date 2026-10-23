@@ -24,7 +24,7 @@ async fn http_errors_do_not_expose_any_provider_fields_in_either_request_mode() 
             )
             .await
             .unwrap_err();
-            assert_eq!(error.code, "ai:provider_status");
+            assert_eq!(error.code, "ai:provider_auth_rejected");
             assert_eq!(error.args["protocol"], protocol.as_str());
             assert_eq!(error.args["status"], "401");
             assert_eq!(error.args["phase"], "waiting");
@@ -38,7 +38,7 @@ async fn http_errors_do_not_expose_any_provider_fields_in_either_request_mode() 
             .await
             .error
             .unwrap();
-        assert_eq!(error.code, "ai:provider_status");
+        assert_eq!(error.code, "ai:provider_auth_rejected");
         assert!(!serde_json::to_string(&error).unwrap().contains("private-"));
         worker.join().unwrap();
     }

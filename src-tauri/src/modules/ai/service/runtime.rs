@@ -19,6 +19,8 @@ use tokio::sync::mpsc::Receiver;
 
 pub(super) const RESPONSE_LIMIT_BYTES: usize = 1024 * 1024;
 
+/// Test-only entry point: production calls always record diagnostics.
+#[cfg(test)]
 pub(crate) async fn complete(
     config: &AiConnectionConfig,
     api_key: &str,
@@ -104,6 +106,9 @@ fn shared_client(connection_ms: u32) -> AppResult<reqwest::Client> {
     }
     let client = reqwest::Client::builder()
         .connect_timeout(Duration::from_millis(connection_ms.into()))
+        // Reading a poem between two generations easily exceeds reqwest's
+        // 90 s default, which would cost a fresh DNS/TCP/TLS handshake.
+        .pool_idle_timeout(Duration::from_secs(300))
         .redirect(reqwest::redirect::Policy::none())
         .retry(reqwest::retry::never())
         .user_agent("mftp-ai/1")
@@ -221,6 +226,7 @@ async fn execute(
     if request.streaming {
         let mut events = bytes.eventsource();
         let mut completed = false;
+        let mut stopped_early = false;
         while let Some(event) = context.wait(async { Ok(events.next().await) }).await? {
             let event = event.map_err(|error| match error {
                 EventStreamError::Transport(error) => error,
@@ -228,20 +234,31 @@ async fn execute(
                     AiProviderErrorCode::Protocol.error()
                 }
             })?;
-            if matches!(
-                adapter.event(&event.event, &event.data, &mut output)?,
-                EventStatus::Completed
-            ) {
+            let status = adapter.event(&event.event, &event.data, &mut output)?;
+            if matches!(status, EventStatus::Completed) {
                 completed = true;
                 break;
             }
+            // Dropping the stream here cancels the request: the provider has
+            // already proven it accepted the endpoint, credential and model.
+            if request.stop_at_first_event && !matches!(status, EventStatus::Ignored) {
+                stopped_early = true;
+                break;
+            }
         }
-        if !completed {
+        if !completed && !stopped_early {
             return Err(AiProviderErrorCode::Incomplete.error());
         }
         drop(events);
         if let Some(log) = log.as_deref_mut() {
-            log.response_end(DiagnosticBodyEnd::ProtocolEnd);
+            log.response_end(if stopped_early {
+                DiagnosticBodyEnd::Interrupted
+            } else {
+                DiagnosticBodyEnd::ProtocolEnd
+            });
+        }
+        if stopped_early {
+            return Ok(output.partial());
         }
     } else {
         let mut body = Vec::new();
@@ -311,8 +328,15 @@ fn transport_error(error: reqwest::Error) -> AppError {
     }
 }
 
+/// Classify the statuses a user can act on. Everything else stays `Status`,
+/// which carries the code without claiming a cause.
 pub(super) fn provider_error(status: u16) -> AppError {
-    AiProviderErrorCode::Status
-        .error()
-        .with_arg("status", status)
+    let code = match status {
+        400 | 422 => AiProviderErrorCode::RequestRejected,
+        401 | 403 => AiProviderErrorCode::AuthRejected,
+        404 => AiProviderErrorCode::EndpointNotFound,
+        429 => AiProviderErrorCode::RateLimited,
+        _ => AiProviderErrorCode::Status,
+    };
+    code.error().with_arg("status", status)
 }

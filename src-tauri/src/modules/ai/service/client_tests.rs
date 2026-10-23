@@ -23,8 +23,18 @@ fn rejects_incomplete_or_empty_responses() {
 
 #[test]
 fn provider_errors_expose_only_the_http_status() {
-    let error = provider_error(401);
-    assert_eq!(error.code, "ai:provider_status");
-    assert_eq!(error.args["status"], "401");
-    assert_eq!(error.args.len(), 1);
+    for (status, code) in [
+        (400, "ai:provider_request_rejected"),
+        (401, "ai:provider_auth_rejected"),
+        (403, "ai:provider_auth_rejected"),
+        (404, "ai:provider_endpoint_not_found"),
+        (422, "ai:provider_request_rejected"),
+        (429, "ai:provider_rate_limited"),
+        (500, "ai:provider_status"),
+    ] {
+        let error = provider_error(status);
+        assert_eq!(error.code, code);
+        assert_eq!(error.args["status"], status.to_string());
+        assert_eq!(error.args.len(), 1);
+    }
 }

@@ -42,7 +42,14 @@ impl PoetryDb {
         let conn = Connection::open(&self.path)?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
         conn.pragma_update(None, "synchronous", "NORMAL")?;
-        conn.execute_batch(SCHEMA_SQL)?;
+        // Reads sit on the poem-detail path, so re-running the schema batch on
+        // every open is pure latency. The marker lives in the database file
+        // itself, so a deleted, replaced or downloaded database still rebuilds.
+        let version: i64 = conn.pragma_query_value(None, "user_version", |row| row.get(0))?;
+        if version != SCHEMA_VERSION {
+            conn.execute_batch(SCHEMA_SQL)?;
+            conn.pragma_update(None, "user_version", SCHEMA_VERSION)?;
+        }
         Ok(conn)
     }
 
@@ -308,6 +315,10 @@ pub(crate) fn tier_to_db(tier: PoetryTier) -> &'static str {
         PoetryTier::OptIn => "optIn",
     }
 }
+
+/// Bump whenever SCHEMA_SQL changes so existing databases re-run the batch.
+/// Every statement below is `IF NOT EXISTS`, so re-running stays idempotent.
+const SCHEMA_VERSION: i64 = 1;
 
 const SCHEMA_SQL: &str = r#"
 CREATE TABLE IF NOT EXISTS meta (

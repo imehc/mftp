@@ -191,6 +191,17 @@ impl<'a> AiOutput<'a> {
         }
     }
 
+    /// A probe that stops at the first protocol event has no finished text to
+    /// validate. Reachability is its only claim, so neither the nonempty text
+    /// rule nor the output policy applies.
+    pub(crate) fn partial(self) -> AiCompletionResult {
+        AiCompletionResult {
+            text: self.text.into_values().collect::<String>(),
+            usage: self.usage,
+            diagnostics: self.observation.snapshot(),
+        }
+    }
+
     pub(crate) fn result(self) -> AppResult<AiCompletionResult> {
         let text = self.text.into_values().collect::<String>();
         if text.trim().is_empty() {

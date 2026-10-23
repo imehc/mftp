@@ -260,7 +260,8 @@ async fn independent_streaming_probe_holds_maintenance_until_its_worker_exits() 
     let (_, auth, body) = probe.captured().await;
     assert_eq!(auth, "Bearer private-secret-streaming");
     assert_eq!(body["stream"], true);
-    assert_eq!(body["max_output_tokens"], 4096);
+    // Responses rejects any budget below 16, which is all a probe asks for.
+    assert_eq!(body["max_output_tokens"], 16);
     waiter.abort();
     assert!(f
         .service

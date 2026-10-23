@@ -55,8 +55,7 @@ async fn probes_use_each_wire_contract_and_only_validate_the_requested_mode() {
             );
             let diagnostics = report.diagnostics.as_ref().unwrap();
             assert_eq!(diagnostics.first_event_ms.is_some(), streaming);
-            assert_eq!(diagnostics.stream_text_delta_count > 0, streaming);
-            assert_eq!(diagnostics.hard_deadline_ms, 300_000);
+            assert_eq!(diagnostics.hard_deadline_ms, 15_000);
             assert!(!report.reasoning.phase_observed);
             let serialized = serde_json::to_string(&report).unwrap();
             assert!(!serialized.contains("收到") && !serialized.contains("fake-key"));
@@ -70,7 +69,15 @@ async fn probes_use_each_wire_contract_and_only_validate_the_requested_mode() {
                 AiProtocol::ChatCompletions => "max_completion_tokens",
                 AiProtocol::AnthropicMessages => "max_tokens",
             };
-            assert_eq!(body[budget], 4096);
+            // The smallest budget each protocol accepts; Responses rejects < 16.
+            assert_eq!(
+                body[budget],
+                if protocol == AiProtocol::Responses {
+                    16
+                } else {
+                    1
+                }
+            );
             let input = match protocol {
                 AiProtocol::Responses => &body["input"],
                 AiProtocol::ChatCompletions => &body["messages"][1]["content"],
@@ -90,7 +97,11 @@ async fn failures_preserve_reachability_without_echoing_provider_output() {
     for protocol in PROTOCOLS {
         for mode in MODES {
             for (body, status, code) in [
-                ("private-error-body".into(), 401, "ai:provider_status"),
+                (
+                    "private-error-body".into(),
+                    401,
+                    "ai:provider_auth_rejected",
+                ),
                 (
                     if mode == AiProviderTestMode::Streaming {
                         "data: private-invalid-json\n\n".into()
@@ -118,6 +129,8 @@ async fn failures_preserve_reachability_without_echoing_provider_output() {
                 worker.join().unwrap();
             }
         }
+        // A stream cut after its first event still proves the endpoint,
+        // credential and model were accepted, which is the whole claim.
         let body = stream(protocol).split("\n\n").next().unwrap().to_string() + "\n\n";
         let (url, worker) = server(body, 200);
         let report = test_connection(
@@ -126,14 +139,14 @@ async fn failures_preserve_reachability_without_echoing_provider_output() {
             AiProviderTestMode::Streaming,
         )
         .await;
-        assert_eq!(report.streaming, AiProviderTestStatus::Failed);
-        assert_eq!(report.error.unwrap().code, "ai:provider_incomplete");
+        assert_eq!(report.streaming, AiProviderTestStatus::Passed);
+        assert!(report.error.is_none(), "{report:?}");
         worker.join().unwrap();
     }
 }
 
 #[tokio::test]
-async fn final_snapshot_without_real_deltas_does_not_certify_incremental_streaming() {
+async fn a_final_snapshot_without_incremental_deltas_still_proves_reachability() {
     let body = format!(
         "data: {}\n\n",
         json!({"type":"response.completed","response":serde_json::from_str::<Value>(&reply(AiProtocol::Responses)).unwrap()})
@@ -146,7 +159,7 @@ async fn final_snapshot_without_real_deltas_does_not_certify_incremental_streami
     )
     .await;
     assert!(report.error.is_none());
-    assert_eq!(report.streaming, AiProviderTestStatus::Unverified);
+    assert_eq!(report.streaming, AiProviderTestStatus::Passed);
     assert_eq!(report.diagnostics.unwrap().stream_text_delta_count, 0);
     worker.join().unwrap();
 }

@@ -147,12 +147,23 @@ impl Responses {
             }
             "response.content_part.added" | "response.content_part.done" => {
                 let part = value.get("part").ok_or_else(invalid)?;
-                if part.get("type").and_then(Value::as_str) != Some("output_text") {
-                    return Err(invalid());
-                }
+                let done = kind.ends_with(".done");
                 let block = block(value, "content_index")?;
-                if kind.ends_with(".done") {
-                    output.text_done(block, text(part, "text")?)?;
+                match part.get("type").and_then(Value::as_str) {
+                    Some("output_text") => {
+                        if done {
+                            output.text_done(block, text(part, "text")?)?;
+                        }
+                    }
+                    // A reasoning item carries its own text parts, parallel to
+                    // the summary channel. They are reasoning, never answer text.
+                    Some("reasoning_text") => output.reasoning(
+                        block,
+                        AiReasoningKind::VisibleThinking,
+                        text(part, "text")?,
+                        done,
+                    ),
+                    _ => return Err(invalid()),
                 }
             }
             "response.output_text.delta" => {
@@ -160,6 +171,15 @@ impl Responses {
             }
             "response.output_text.done" => {
                 output.text_done(block(value, "content_index")?, text(value, "text")?)?
+            }
+            "response.reasoning_text.delta" | "response.reasoning_text.done" => {
+                let done = kind.ends_with(".done");
+                output.reasoning(
+                    block(value, "content_index")?,
+                    AiReasoningKind::VisibleThinking,
+                    text(value, if done { "text" } else { "delta" })?,
+                    done,
+                );
             }
             "response.reasoning_summary_text.delta" | "response.reasoning_summary_text.done" => {
                 let done = kind.ends_with(".done");

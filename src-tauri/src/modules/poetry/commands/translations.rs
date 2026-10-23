@@ -65,6 +65,9 @@ pub async fn generate_poetry_translation(
     let db = state.poetry.db();
     let storage = state.storage.clone();
     let tasks = state.ai_tasks.clone();
+    // Same execution log as the connection test: the protocol boundary is ours,
+    // so a generation must show what was sent and what came back.
+    let log = state.diagnostics.begin("ai", "poetry_translation", &uid);
     translation_service::generate_poetry_translation(
         db,
         storage,
@@ -75,6 +78,7 @@ pub async fn generate_poetry_translation(
             mode,
             request_id,
         },
+        log,
         move |delta| {
             let _ = app.emit(&event_name, PoetryTranslationStreamEvent { delta });
         },

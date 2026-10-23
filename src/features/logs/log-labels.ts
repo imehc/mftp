@@ -9,6 +9,7 @@ import type { ActivityLog } from "~/types";
 const actionMessages: Record<string, MessageDescriptor> = {
   "ai:ai_provider_test": msg`测试 AI 服务`,
   "ai:ai_provider_test_streaming": msg`测试 AI 流式服务`,
+  "ai:poetry_translation": msg`生成诗词译文`,
   "todo:create": msg`新增待办`,
   "todo:update": msg`更新待办`,
   "todo:delete": msg`删除待办`,

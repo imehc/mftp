@@ -7,7 +7,7 @@ use crate::modules::ai::{
     configuration::testing::{
         AiProviderTestMode, AiProviderTestReport, AiProviderTestStatus, AiTestReasoningEvidence,
     },
-    AiConnectionConfig,
+    AiConnectionConfig, AiProtocol,
 };
 
 #[cfg(test)]
@@ -16,7 +16,7 @@ pub(super) async fn test_connection(
     api_key: &str,
     mode: AiProviderTestMode,
 ) -> AiProviderTestReport {
-    run_probe(config, api_key, mode, AiTimeoutPolicy::default()).await
+    run_probe(config, api_key, mode, AiTimeoutPolicy::probe()).await
 }
 
 #[cfg(test)]
@@ -39,16 +39,24 @@ pub(super) async fn run_probe_logged(
     let text = AiTextRequest {
         instructions: "Return a short plain-text answer.".into(),
         input: "Briefly confirm that you can respond.".into(),
-        // Reasoning may consume the same budget as the final answer. Do not
-        // force low effort or disable the provider's configured default.
-        max_output_tokens: 4096,
-        output_limit_bytes: 64 * 1024,
+        // The smallest budget each protocol accepts: Responses rejects any
+        // value below 16. A clipped answer still proves reachability, so the
+        // probe treats a reached budget as success instead of paying for a
+        // full generation.
+        max_output_tokens: if config.protocol == AiProtocol::Responses {
+            16
+        } else {
+            1
+        },
+        output_limit_bytes: 4 * 1024,
     };
-    let mut request = AiCompletionRequest::text(&text, mode == AiProviderTestMode::Streaming);
+    let streaming = mode == AiProviderTestMode::Streaming;
+    let mut request = AiCompletionRequest::text(&text, streaming);
     request.timeout = AiTimeoutPolicy {
         max_deadline_ms: timeout.hard_deadline_ms,
         ..timeout
     };
+    request.stop_at_first_event = streaming;
     let mut diagnostics = None;
     let mut reasoning = AiTestReasoningEvidence::default();
     let mut usage = AiUsage::default();
@@ -91,7 +99,21 @@ pub(super) async fn run_probe_logged(
         reasoning.public_content_observed = value.received_reasoning_bytes > 0;
     }
     reasoning.reasoning_tokens = usage.reasoning_tokens;
-    let status = if result.is_ok() {
+    // The probe asks for the smallest budget each protocol accepts, so a
+    // reached budget, a clipped answer or an empty one all still prove the
+    // endpoint, credential and model were accepted. A rate limit proves the
+    // same. Only transport, status and protocol failures mean unreachable.
+    let reachable = result.is_ok()
+        || result.as_ref().is_err_and(|error| {
+            matches!(
+                error.code.as_str(),
+                "ai:provider_rate_limited"
+                    | "ai:provider_limit_reached"
+                    | "ai:provider_incomplete"
+                    | "ai:provider_no_text"
+            )
+        });
+    let status = if reachable {
         AiProviderTestStatus::Passed
     } else {
         AiProviderTestStatus::Failed
@@ -109,16 +131,10 @@ pub(super) async fn run_probe_logged(
         } else {
             AiProviderTestStatus::NotTested
         },
+        // Stopping at the first accepted event is the verdict: a reasoning
+        // model that spends its whole budget thinking still answered.
         streaming: if mode == AiProviderTestMode::Streaming {
-            if result.is_ok()
-                && diagnostics
-                    .as_ref()
-                    .is_none_or(|value| value.stream_text_delta_count == 0)
-            {
-                AiProviderTestStatus::Unverified
-            } else {
-                status
-            }
+            status
         } else {
             AiProviderTestStatus::NotTested
         },
@@ -126,6 +142,7 @@ pub(super) async fn run_probe_logged(
         usage,
         elapsed_ms,
         diagnostics,
-        error: result.err(),
+        // A reachable verdict must not also report an operation failure.
+        error: if reachable { None } else { result.err() },
     }
 }

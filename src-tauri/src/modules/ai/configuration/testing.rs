@@ -16,10 +16,11 @@ pub enum AiProviderTestMode {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
+/// A probe stops at the first accepted protocol event, so there is no
+/// "reached the provider but produced nothing" verdict left to report.
 pub enum AiProviderTestStatus {
     NotTested,
     Passed,
-    Unverified,
     Failed,
 }
 
