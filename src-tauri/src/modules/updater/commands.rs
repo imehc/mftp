@@ -37,7 +37,7 @@ pub async fn android_update_check(
     #[cfg(not(target_os = "android"))]
     {
         let _ = (app, state);
-        return unsupported();
+        unsupported()
     }
 
     #[cfg(target_os = "android")]
@@ -62,7 +62,7 @@ pub async fn android_update_download(
             app,
             state,
         );
-        return unsupported();
+        unsupported()
     }
 
     #[cfg(target_os = "android")]
@@ -85,7 +85,7 @@ pub async fn android_update_discard(app: AppHandle, path: String) -> AppResult<(
     #[cfg(not(target_os = "android"))]
     {
         let _ = (app, path);
-        return unsupported();
+        unsupported()
     }
 
     #[cfg(target_os = "android")]
@@ -102,7 +102,7 @@ pub async fn android_update_install(
     #[cfg(not(target_os = "android"))]
     {
         let _ = (app, path, expected_version_code);
-        return unsupported();
+        unsupported()
     }
 
     #[cfg(target_os = "android")]
@@ -115,7 +115,7 @@ pub async fn android_update_open_install_settings(app: AppHandle) -> AppResult<(
     #[cfg(not(target_os = "android"))]
     {
         let _ = app;
-        return unsupported();
+        unsupported()
     }
 
     #[cfg(target_os = "android")]
