@@ -19,7 +19,10 @@ export function platformAliases(target: string | null) {
   if (!supports(target, "mcp"))
     replacements["~/features/mcp/integration"] =
       "src/app/platform/without-mcp.tsx";
-  if (!supports(target, "desktopSettings")) {
+  if (target === "android") {
+    replacements["~/features/updater/controller"] =
+      "src/features/updater/mobile-controller.ts";
+  } else if (!supports(target, "desktopSettings")) {
     replacements["~/features/updater/integration"] =
       "src/app/platform/without-updater.tsx";
     replacements["~/features/settings/DesktopSettings"] =

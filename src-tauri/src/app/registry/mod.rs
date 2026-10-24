@@ -9,7 +9,7 @@ use crate::modules::bt;
 use crate::modules::lan_transfer;
 use crate::modules::{
     ai, diagnostics, filesystem, game_room, hosts, keys, maintenance, model_viewer, poetry, speech,
-    ssh, todo, translation, vault,
+    ssh, todo, translation, updater, vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -274,6 +274,23 @@ macro_rules! common_modules {
             "filesystem" => {
                 commands: [filesystem::filesystem_allow_path],
                 types: [],
+            },
+            "updater" => {
+                commands: [
+                    updater::android_update_check,
+                    updater::android_update_download,
+                    updater::android_update_cancel,
+                    updater::android_update_discard,
+                    updater::android_update_install,
+                    updater::android_update_open_install_settings,
+                ],
+                types: [
+                    updater::AndroidUpdateInfo,
+                    updater::AndroidUpdateDownload,
+                    updater::AndroidUpdateInstall,
+                    updater::AndroidUpdateProgress,
+                    updater::AndroidUpdateDownloadInput,
+                ],
             },
             $($platform)*
         }

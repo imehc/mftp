@@ -7,12 +7,11 @@ import {
   DropdownMenuSeparator,
 } from "~/components/ui/dropdown-menu";
 import { SettingsEntry } from "~/features/settings/SettingsEntry";
-import { isDesktopPlatform } from "~/lib/platform";
+import { checkForUpdateManually } from "~/features/updater/controller";
+import { isUpdaterPlatform } from "~/lib/platform";
 import { type UpdaterStatus, useUpdaterStore } from "~/store/updater";
 
-import { checkForUpdateManually } from "./controller";
-
-export { checkForUpdateOnLaunch } from "./controller";
+export { checkForUpdateOnLaunch } from "~/features/updater/controller";
 export { default as UpdaterActivity } from "./UpdaterActivity";
 export { default as UpdaterDialog } from "./UpdaterDialog";
 
@@ -50,7 +49,7 @@ export function UpdateMenuItem() {
     restarting: t`重启中`,
     error: t`重新检查`,
   };
-  if (!isDesktopPlatform()) return null;
+  if (!isUpdaterPlatform()) return null;
   return (
     <>
       <DropdownMenuSeparator />
@@ -74,7 +73,7 @@ export function UpdateMenuItem() {
 export function UpdateSettingsEntry() {
   const { t } = useLingui();
   const status = useUpdaterStore((state) => state.status);
-  if (!isDesktopPlatform()) return null;
+  if (!isUpdaterPlatform()) return null;
   return (
     <SettingsEntry
       icon={RefreshCw}

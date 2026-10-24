@@ -153,6 +153,12 @@ common cancel_poetry_translation
 common update_poetry_translation
 common delete_poetry_translation
 common filesystem_allow_path
+common android_update_check
+common android_update_download
+common android_update_cancel
+common android_update_discard
+common android_update_install
+common android_update_open_install_settings
 macos,linux rsync_local_status
 macos,linux rsync_capabilities
 macos,linux rsync_preview

@@ -23,3 +23,4 @@ pub(crate) mod todo;
 pub(crate) mod vault;
 
 pub(crate) mod translation;
+pub(crate) mod updater;

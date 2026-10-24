@@ -51,3 +51,12 @@ export function btAvailableGuard(): void {
     throw redirect({ to: "/" });
   }
 }
+
+export function isUpdaterPlatform(): boolean {
+  return (
+    isDesktopPlatform() ||
+    (isAndroidPlatform() &&
+      typeof window !== "undefined" &&
+      "__TAURI_INTERNALS__" in window)
+  );
+}

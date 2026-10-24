@@ -12,16 +12,16 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 import { Separator } from "~/components/ui/separator";
-import { describeError } from "~/lib/errors";
-import { isDesktopPlatform } from "~/lib/platform";
-import { useUpdaterStore } from "~/store/updater";
-
 import {
   checkForUpdateManually,
   closeUpdaterDialog,
   restartToApplyUpdate,
   startUpdateDownload,
-} from "./controller";
+} from "~/features/updater/controller";
+import { describeError } from "~/lib/errors";
+import { isUpdaterPlatform } from "~/lib/platform";
+import { useUpdaterStore } from "~/store/updater";
+
 import UpdaterProgress from "./UpdaterProgress";
 import UpdaterReleaseNotes from "./UpdaterReleaseNotes";
 import { useUpdaterLabel } from "./use-updater-label";
@@ -38,7 +38,7 @@ export default function UpdaterDialog() {
   const error = useUpdaterStore((state) => state.error);
   const installed = useUpdaterStore((state) => state.installed);
   const opener = useRef<HTMLElement | null>(null);
-  if (!isDesktopPlatform()) return null;
+  if (!isUpdaterPlatform()) return null;
   const busy = ["checking", "downloading", "restarting"].includes(status);
   const title = status === "downloading" ? t`正在更新` : label;
   return (

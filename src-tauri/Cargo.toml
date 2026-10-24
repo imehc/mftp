@@ -29,7 +29,7 @@ rmcp = { version = "=3.6.0", default-features = false, features = ["server", "cl
 
 [dependencies]
 mftp-translation-engine = { path = "native/translation" }
-tauri = { version = "2", features = ["protocol-asset"] }
+tauri = { version = "2", features = ["protocol-asset", "image-png"] }
 tauri-plugin-opener = "2"
 tauri-plugin-os = "2"
 tauri-plugin-dialog = "2"
@@ -103,6 +103,7 @@ objc2-ui-kit = { version = "0.3", default-features = false, features = ["std", "
 
 [target.'cfg(target_os = "android")'.dependencies]
 tauri-plugin-native-speech = { path = "plugins/native-speech" }
+tauri-plugin-android-updater = { path = "plugins/android-updater" }
 tauri-plugin-keystore = "=2.1.0-alpha.2"
 jni = "0.22"
 rustls-platform-verifier = "0.7"

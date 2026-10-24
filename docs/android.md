@@ -142,10 +142,11 @@ Android 15 起部分设备使用 16 KB 内存页，原生库必须按 16 KB 对�
 
 Android 端与桌面端的功能差异（代码中已处理，无需手动关注）：
 
-- **更新器（updater）与开机自启（autostart）** 仅桌面可用：
-  - Rust 侧：`Cargo.toml` 中列在 `[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]`，`lib.rs` 中用 `#[cfg(desktop)]` 注册。
-  - 权限：`src-tauri/capabilities/desktop.json` 仅对桌面平台生效。
-  - 前端：`src/lib/platform.ts` 提供 `isDesktopPlatform()`，设置菜单在移动端隐藏相关入口，Android 更新走应用商店/手动安装 APK。
+- **桌面更新器与 Android 更新器分开实现**：桌面使用 `tauri-plugin-updater`；Android 使用仓库内 `src-tauri/plugins/android-updater` 和 `android.json` 清单，下载后交给系统安装器。Android 不能静默安装，首次使用可能需要在系统设置中允许本应用安装未知来源。
+  - Android 更新只接受同包名、递增 `versionCode`、HTTPS 地址、大小和 SHA-256 均匹配的 APK。
+  - 下载取消、网络失败或摘要不匹配会删除临时文件；下载完成后取消安装会保留已校验 APK，再次安装不重复下载。
+  - 如果检查到更高版本，旧版本的待安装 APK 会被丢弃并重新下载最新版本；安装成功后才删除当前 APK 并启动新版本。
+  - Rust 侧命令与 Android 原生插件均纳入共享活动日志；APK 内容不会写入日志。
 - Android 上应用数据目录为应用私有目录，`fs:scope` 中的 `$HOME` 等桌面路径不适用。
 
 ## 常见问题
@@ -185,6 +186,8 @@ PR 的 `Android plugins (compile only)` job 调用相同入口，使用 JDK 17 �
 
 ## 启动图标
 
-`public/app-icon.png` 为原图。Android 自适应图标的前景画布为 108dp，常见启动器只显示中央约 72dp；直接铺满原图会裁掉留白，让图案显得过大。
+`public/app-light-icon.png` 和 `public/app-dark-icon.png` 分别生成默认与 `night` 系统图标资源，应用信息页与桌面入口统一引用 `ic_launcher`。原生图标不受应用内主题控制；应用内导航、关于页和 favicon 仍按应用外观切换。
 
-执行 `pnpm android:icons`，通过 Tauri 图标生成器将原图居中放入 72dp 区域，并生成五种密度的前景 PNG。该脚本只更新 Android 自适应前景，保留 macOS、iOS 和旧式 Android 图标。重新运行全平台图标生成或 Android init 后，也应运行此命令恢复安全留白。实际遮罩和动效由系统启动器决定。
+执行 `pnpm android:icons`，生成五种密度的默认/夜间 PNG 和 adaptive XML；前景用原生 `inset` 每侧留白 16.666667%，不缩放或改写用户提供的原图。重新运行全平台图标生成或 Android init 后，也应运行此命令恢复资源。
+
+为保留已有安装的组件身份，LightLauncher/DarkLauncher 两个 alias 均保留，但都引用同一个系统图标，不再运行时切换入口；升级沿用已有组件的启用状态，新安装只默认启用 LightLauncher。具体遮罩及系统外观变化后是否立即刷新受 Launcher 缓存影响；不保证所有启动器实时换图，也不自动清缓存或重启启动器。

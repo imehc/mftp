@@ -218,6 +218,12 @@ export const commands = {
 	updatePoetryTranslation: (uid: string, mode: PoetryTranslationMode, content: string) => typedError<PoetryTranslation, AppError>(__TAURI_INVOKE("update_poetry_translation", { uid, mode, content })),
 	deletePoetryTranslation: (uid: string, mode: PoetryTranslationMode) => typedError<null, AppError>(__TAURI_INVOKE("delete_poetry_translation", { uid, mode })),
 	filesystemAllowPath: (path: string) => __TAURI_INVOKE<void>("filesystem_allow_path", { path }),
+	androidUpdateCheck: () => typedError<AndroidUpdateInfo, AppError>(__TAURI_INVOKE("android_update_check")),
+	androidUpdateDownload: (input: AndroidUpdateDownloadInput) => typedError<AndroidUpdateDownload, AppError>(__TAURI_INVOKE("android_update_download", { input })),
+	androidUpdateCancel: () => typedError<null, AppError>(__TAURI_INVOKE("android_update_cancel")),
+	androidUpdateDiscard: (path: string) => typedError<null, AppError>(__TAURI_INVOKE("android_update_discard", { path })),
+	androidUpdateInstall: (path: string, expectedVersionCode: number) => typedError<AndroidUpdateInstall, AppError>(__TAURI_INVOKE("android_update_install", { path, expectedVersionCode })),
+	androidUpdateOpenInstallSettings: () => typedError<null, AppError>(__TAURI_INVOKE("android_update_open_install_settings")),
 	rsyncLocalStatus: (refresh: boolean) => typedError<RsyncToolStatus, AppError>(__TAURI_INVOKE("rsync_local_status", { refresh })),
 	rsyncCapabilities: (sessionId: string, refresh: boolean) => typedError<RsyncCapabilities, AppError>(__TAURI_INVOKE("rsync_capabilities", { sessionId, refresh })),
 	rsyncPreview: (sessionId: string, direction: RsyncDirection, localDir: string, remoteDir: string, deleteExtraneous: boolean) => typedError<RsyncPreview, AppError>(__TAURI_INVOKE("rsync_preview", { sessionId, direction, localDir, remoteDir, deleteExtraneous })),
@@ -432,7 +438,7 @@ export type AiProviderDeleteInput = {
 };
 
 // Stable external error codes shared by all AI protocols.
-export type AiProviderErrorCode = "ai:request_policy_invalid" | "ai:cancelled" | "ai:output_invalid" | "ai:provider_timeout" | "ai:provider_connection_timeout" | "ai:provider_first_event_timeout" | "ai:provider_stream_idle" | "ai:provider_progress_timeout" | "ai:provider_incomplete" | "ai:provider_no_text" | "ai:provider_limit_reached" | "ai:provider_protocol" | "ai:provider_status" | "ai:provider_failed";
+export type AiProviderErrorCode = "ai:request_policy_invalid" | "ai:cancelled" | "ai:output_invalid" | "ai:provider_timeout" | "ai:provider_connection_timeout" | "ai:provider_first_event_timeout" | "ai:provider_stream_idle" | "ai:provider_progress_timeout" | "ai:provider_incomplete" | "ai:provider_no_text" | "ai:provider_limit_reached" | "ai:provider_protocol" | "ai:provider_status" | "ai:provider_auth_rejected" | "ai:provider_endpoint_not_found" | "ai:provider_request_rejected" | "ai:provider_rate_limited" | "ai:provider_failed";
 
 export type AiProviderSelectionInput = {
 	expectedRevision: number,
@@ -467,7 +473,11 @@ export type AiProviderTestReport = {
 	error: AppError | null,
 };
 
-export type AiProviderTestStatus = "notTested" | "passed" | "unverified" | "failed";
+/**
+ *  A probe stops at the first accepted protocol event, so there is no
+ *  "reached the provider but produced nothing" verdict left to report.
+ */
+export type AiProviderTestStatus = "notTested" | "passed" | "failed";
 
 export type AiProviderUpdateInput = {
 	expectedRevision: number,
@@ -528,6 +538,46 @@ export type AiUsage = {
 	inputTokens: number | null,
 	outputTokens: number | null,
 	reasoningTokens: number | null,
+};
+
+export type AndroidUpdateDownload = {
+	path: string,
+	downloaded: number,
+	total: number,
+	versionCode: number,
+};
+
+/**
+ *  Kept outside the platform module so the IPC contract, and therefore the
+ *  generated TypeScript bindings, stay identical on every target.
+ */
+export type AndroidUpdateDownloadInput = {
+	url: string,
+	size: number,
+	sha256: string,
+	versionCode: number,
+};
+
+export type AndroidUpdateInfo = {
+	available: boolean,
+	currentVersion: string,
+	currentVersionCode: number,
+	version: string,
+	versionCode: number,
+	url: string,
+	size: number,
+	sha256: string,
+	notes: string,
+};
+
+export type AndroidUpdateInstall = {
+	outcome: string,
+};
+
+export type AndroidUpdateProgress = {
+	phase: string,
+	downloaded: number,
+	total: number,
 };
 
 export type AppDataClearResult = {

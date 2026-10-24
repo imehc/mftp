@@ -7,11 +7,11 @@ import {
 } from "lucide-react";
 
 import { Progress } from "~/components/ui/progress";
+import { openUpdaterDialog } from "~/features/updater/controller";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import { useUpdaterStore } from "~/store/updater";
 
-import { openUpdaterDialog } from "./controller";
 import { updaterPercent } from "./UpdaterProgress";
 import { useUpdaterLabel } from "./use-updater-label";
 

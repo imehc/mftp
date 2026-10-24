@@ -65,6 +65,8 @@ pub(crate) fn run() -> AppResult<()> {
     let app = app
         .plugin(tauri_plugin_keystore::init())
         .plugin(tauri_plugin_native_speech::init());
+    #[cfg(target_os = "android")]
+    let app = app.plugin(tauri_plugin_android_updater::init());
 
     let app = app
         .setup(|app| {

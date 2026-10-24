@@ -3495,6 +3495,7 @@ dependencies = [
  "tar",
  "tauri",
  "tauri-build",
+ "tauri-plugin-android-updater",
  "tauri-plugin-autostart",
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-dialog",
@@ -6078,6 +6079,7 @@ dependencies = [
  "heck 0.5.0",
  "http",
  "http-range",
+ "image",
  "jni 0.21.1",
  "libc",
  "log",
@@ -6189,6 +6191,16 @@ dependencies = [
  "serde_json",
  "tauri-utils",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-plugin-android-updater"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
 ]
 
 [[package]]

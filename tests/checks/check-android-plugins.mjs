@@ -12,7 +12,12 @@ const project = path.resolve(
 const options = new Set(process.argv.slice(2));
 const offline = options.has("--offline");
 const prepareOnly = options.has("--prepare-only");
-const plugins = ["native-export", "native-viewer", "native-speech"];
+const plugins = [
+  "android-updater",
+  "native-export",
+  "native-viewer",
+  "native-speech",
+];
 const excluded = new Set(["build", ".gradle", ".git", ".DS_Store"]);
 let fixture;
 let report;
@@ -174,7 +179,7 @@ subprojects {
     path.join(fixture, "settings.gradle.kts"),
     `pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
 rootProject.name = "mftp-android-plugin-check"
-include(":tauri-android", ":native-export", ":native-viewer", ":native-speech")
+include(":tauri-android", ${plugins.map((name) => JSON.stringify(`:${name}`)).join(", ")})
 `,
   );
   // local.properties 使用 Java properties 转义，不将 SDK 路径注入 Gradle 代码。

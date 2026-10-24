@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <application>
+        <provider
+            android:name="com.imehc.androidupdater.AndroidUpdateFileProvider"
+            android:authorities="${applicationId}.mftp-android-updater"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/mftp_android_update_paths" />
+        </provider>
+    </application>
+</manifest>

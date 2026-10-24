@@ -17,7 +17,7 @@
       "sources": ["src/features/lan-transfer/"]
     },
     "desktopSettings": {
-      "platforms": ["desktop"],
+      "platforms": ["desktop", "android"],
       "routes": [],
       "sources": [
         "src/features/updater/",
@@ -48,5 +48,5 @@
       "sources": ["src/features/model-viewer/export/native-export.ts"]
     }
   },
-  "resources": ["app-icon.png", "model-decoders/"]
+  "resources": ["app-light-icon.png", "app-dark-icon.png", "model-decoders/"]
 }

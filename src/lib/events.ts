@@ -46,6 +46,7 @@ export const SPEECH_STATE = "speech://state";
  * 事件本身不携带记录内容。游标仍是权威信号，事件只是提示。
  */
 export const ACTIVITY_PANEL = "diagnostics://activity";
+export const ANDROID_UPDATER_PROGRESS = "android-updater://progress";
 export const TODO_CHANGED = "todo://changed";
 
 /** 单次诗词译文生成的流式增量。载荷类型：`PoetryTranslationStreamEvent`。 */
