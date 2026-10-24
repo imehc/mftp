@@ -30,7 +30,7 @@ msgid "{ballName}，{points} 分"
 msgstr "{ballName}, {points} pts"
 
 #. 运行状态：正在运行的下载任务数量
-#: src/features/about/AboutPage.tsx:159
+#: src/features/about/AboutPage.tsx:155
 msgid "{btTasks} 个进行中"
 msgstr "{btTasks} running"
 
@@ -350,9 +350,9 @@ msgid "AI 数据库版本高于当前应用版本，请升级应用"
 msgstr "The AI database is newer than this app. Please update the app."
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:106
+#: src/features/logs/log-labels.ts:107
 #: src/features/settings/SettingsOverview.tsx:25
-#: src/features/settings/SettingsPage.tsx:40
+#: src/features/settings/SettingsPage.tsx:41
 msgid "AI 服务"
 msgstr "AI Service"
 
@@ -364,16 +364,33 @@ msgstr "AI service names must contain 1–80 characters and no control character
 msgid "AI 服务地址"
 msgstr "AI service addresses"
 
+#. 404；自建网关常见于地址少了 /v1。
+#: src/lib/errors/ai-provider.ts:28
+msgid "AI 服务地址不存在该接口，请检查地址与协议"
+msgstr "The AI service address has no such endpoint. Check the address and protocol."
+
 #: src/lib/errors/messages.ts:236
 msgid "AI 服务地址无效"
 msgstr "Invalid AI service address"
+
+#: src/lib/errors/ai-provider.ts:33
+msgid "AI 服务已限流，请稍后再试"
+msgstr "The AI service is rate limited. Try again shortly."
+
+#: src/lib/errors/ai-provider.ts:27
+msgid "AI 服务拒绝了该密钥"
+msgstr "The AI service rejected this API key."
+
+#: src/lib/errors/ai-provider.ts:32
+msgid "AI 服务拒绝了请求参数，请检查模型与协议"
+msgstr "The AI service rejected the request parameters. Check the model and protocol."
 
 #. 等待首个有效协议事件超时，并非等待首个正文字符。
 #: src/lib/errors/ai-provider.ts:13
 msgid "AI 服务未在规定时间内开始响应"
 msgstr "The AI service did not start responding in time"
 
-#: src/lib/errors/ai-provider.ts:27
+#: src/lib/errors/ai-provider.ts:34
 msgid "AI 服务未能完成本次请求"
 msgstr "The AI service could not complete this request"
 
@@ -404,7 +421,7 @@ msgstr "AI models"
 msgid "AI 流式请求标识无效"
 msgstr "Invalid AI streaming request ID"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:204
+#: src/features/poetry/components/PoetryTranslationSection.tsx:205
 msgid "AI 生成"
 msgstr "AI generated"
 
@@ -481,7 +498,7 @@ msgid "BT 下载"
 msgstr "BT Downloads"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:126
+#: src/features/logs/log-labels.ts:127
 msgid "BT 下载任务"
 msgstr "BT download task"
 
@@ -585,7 +602,7 @@ msgstr "MCP authorization was revoked or is unavailable. Check your credential."
 
 #. 本地数据维护被 MCP 工具的编辑草稿或在途操作阻止时显示的任务名称。
 #: src/features/mcp/integration.tsx:17
-#: src/features/settings/SettingsPage.tsx:40
+#: src/features/settings/SettingsPage.tsx:41
 #: src/lib/errors/messages.ts:313
 msgid "MCP 服务"
 msgstr "MCP service"
@@ -657,7 +674,7 @@ msgid "rsync 暂不可用"
 msgstr "rsync is unavailable"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:124
+#: src/features/logs/log-labels.ts:125
 msgid "SFTP 会话"
 msgstr "SFTP session"
 
@@ -674,7 +691,7 @@ msgid "SSH / SFTP 主机连接配置"
 msgstr "SSH / SFTP host connection profiles"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:118
+#: src/features/logs/log-labels.ts:119
 msgid "SSH 会话"
 msgstr "SSH session"
 
@@ -683,7 +700,7 @@ msgid "SSH 会话不存在，请重新连接"
 msgstr "The SSH session no longer exists. Please reconnect."
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:110
+#: src/features/logs/log-labels.ts:111
 msgid "SSH 密钥"
 msgstr "SSH key"
 
@@ -774,14 +791,14 @@ msgstr "Uploading archive"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:40
-#: src/features/logs/log-labels.ts:78
+#: src/features/logs/log-labels.ts:41
+#: src/features/logs/log-labels.ts:79
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:107
 msgid "上传文件"
 msgstr "Upload File"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:41
+#: src/features/logs/log-labels.ts:42
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:411
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:111
 msgid "上传文件夹"
@@ -870,12 +887,12 @@ msgstr "Download {entryName2}"
 #. SSH/SFTP 传输操作当前阶段
 #: src/features/bt/components/TaskRow.tsx:100
 #: src/features/transfers/phase-label.ts:21
-#: src/features/updater/integration.tsx:48
+#: src/features/updater/integration.tsx:47
 #: src/store/transfers.ts:12
 msgid "下载中"
 msgstr "Downloading"
 
-#: src/features/about/AboutPage.tsx:154
+#: src/features/about/AboutPage.tsx:150
 msgid "下载任务"
 msgstr "Downloads"
 
@@ -920,8 +937,8 @@ msgstr "Downloads"
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/bt/components/FileBrowserPanel.tsx:140
-#: src/features/logs/log-labels.ts:39
-#: src/features/logs/log-labels.ts:77
+#: src/features/logs/log-labels.ts:40
+#: src/features/logs/log-labels.ts:78
 msgid "下载文件"
 msgstr "Downloaded files"
 
@@ -930,7 +947,7 @@ msgid "下载文件不存在"
 msgstr "The downloaded file does not exist"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:42
+#: src/features/logs/log-labels.ts:43
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:424
 msgid "下载文件夹"
 msgstr "Download Folder"
@@ -950,7 +967,7 @@ msgid "下载根目录"
 msgstr "Download root"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:56
+#: src/features/logs/log-labels.ts:57
 msgid "下载翻译模型"
 msgstr "Download translation model"
 
@@ -1071,7 +1088,7 @@ msgstr "Medium"
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
-#: src/features/logs/log-labels.ts:214
+#: src/features/logs/log-labels.ts:215
 msgid "中国象棋房间"
 msgstr "Chinese chess room"
 
@@ -1130,13 +1147,13 @@ msgid "主机"
 msgstr "Hosts"
 
 #. 活动日志中的单台主机，区别于导航里的主机列表
-#: src/features/logs/log-labels.ts:97
+#: src/features/logs/log-labels.ts:98
 msgctxt "单个对象"
 msgid "主机"
 msgstr "Host"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:111
+#: src/features/logs/log-labels.ts:112
 #: src/features/ssh-sftp/SshSftpTool.tsx:322
 msgid "主机列表"
 msgstr "Host list"
@@ -1155,8 +1172,8 @@ msgid "主目录"
 msgstr "Home Directory"
 
 #. 应用配色主题选择
-#: src/features/settings/AppearanceSettings.tsx:46
-#: src/features/settings/AppSettingsMenu.tsx:150
+#: src/features/settings/AppearanceSettings.tsx:47
+#: src/features/settings/AppSettingsMenu.tsx:152
 msgid "主题"
 msgstr "Theme"
 
@@ -1178,7 +1195,7 @@ msgstr "Swap languages"
 msgid "五子棋"
 msgstr "Gomoku"
 
-#: src/features/logs/log-labels.ts:213
+#: src/features/logs/log-labels.ts:214
 msgid "五子棋房间"
 msgstr "Gomoku room"
 
@@ -1196,7 +1213,7 @@ msgstr "Pass back"
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "Swapped {formatBytesValue} / {formatBytesValue2}"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:204
+#: src/features/poetry/components/PoetryTranslationSection.tsx:205
 msgid "人工修订"
 msgstr "Manually revised"
 
@@ -1211,7 +1228,7 @@ msgid "仅交给可信的本机 MCP 客户端。共享凭据等于共享数据�
 msgstr "Only share this with trusted local MCP clients. Sharing a credential grants the same data access."
 
 #. 当前运行期日志达到容量上限时的短提示
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:59
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:79
 msgid "仅保留最近记录"
 msgstr "Only recent records retained"
 
@@ -1383,8 +1400,8 @@ msgstr "Priority"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:123
-#: src/features/logs/log-labels.ts:144
+#: src/features/logs/log-labels.ts:124
+#: src/features/logs/log-labels.ts:145
 msgid "传输任务"
 msgstr "Transfer task"
 
@@ -1507,7 +1524,7 @@ msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:554
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
-#: src/features/poetry/components/PoetryTranslationSection.tsx:360
+#: src/features/poetry/components/PoetryTranslationSection.tsx:361
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:458
 #: src/features/todo/TodoItemDialog.tsx:338
 #: src/features/vault/VaultEntryDialog.tsx:251
@@ -1519,7 +1536,7 @@ msgid "保存中…"
 msgstr "Saving..."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:66
+#: src/features/logs/log-labels.ts:67
 msgid "保存传输设置"
 msgstr "Save transfer settings"
 
@@ -1553,7 +1570,7 @@ msgstr "Save current view"
 msgid "保存录屏"
 msgstr "Save recording"
 
-#: src/features/todo/hooks/use-todo.ts:72
+#: src/features/todo/hooks/use-todo.ts:65
 msgid "保存待办失败"
 msgstr "Failed to save todo"
 
@@ -1593,7 +1610,7 @@ msgid "保留音频"
 msgstr "Keep audio"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:150
+#: src/features/logs/log-labels.ts:151
 msgid "信任设备"
 msgstr "Trusted device"
 
@@ -1665,7 +1682,7 @@ msgid "停止处理并离开？"
 msgstr "Stop processing and leave?"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:72
+#: src/features/logs/log-labels.ts:73
 msgid "停止局域网传输"
 msgstr "Stop LAN transfer"
 
@@ -1707,6 +1724,10 @@ msgstr "Stop preview"
 #: src/features/model-viewer/components/RuntimeControls.tsx:44
 msgid "停止陀螺仪控制"
 msgstr "Stop motion control"
+
+#: src/features/settings/font-options.ts:15
+msgid "像素字体"
+msgstr "Pixel font"
 
 #. 解码后模型纹理的像素格式，不是源文件扩展名。
 #: src/features/model-viewer/components/ResourceDetails.tsx:63
@@ -1752,7 +1773,7 @@ msgid "全屏"
 msgstr "Fullscreen"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:134
+#: src/features/logs/log-labels.ts:135
 msgid "全文索引"
 msgstr "Full-text index"
 
@@ -1820,7 +1841,7 @@ msgstr "{count} translations"
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:36
 #: src/features/lan-transfer/LanShareDialog.tsx:101
-#: src/features/logs/log-labels.ts:147
+#: src/features/logs/log-labels.ts:148
 msgid "共享目录"
 msgstr "Shared Folders"
 
@@ -1838,8 +1859,8 @@ msgstr "The shared folder does not exist or cannot be accessed. Check the sharin
 msgid "共用数据缓冲"
 msgstr "Shared data buffers"
 
-#: src/features/about/AboutPage.tsx:45
-#: src/features/settings/AppSettingsMenu.tsx:88
+#: src/features/about/AboutPage.tsx:46
+#: src/features/settings/AppSettingsMenu.tsx:90
 msgid "关于"
 msgstr "About"
 
@@ -1975,14 +1996,10 @@ msgstr "Longest side"
 msgid "最小边长"
 msgstr "Shortest side"
 
-#. 跳到运行期日志列表末尾并恢复跟随
+#. 跳到运行期日志列表顶部并恢复跟随
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:113
 msgid "最新"
 msgstr "Latest"
-
-#: src/features/home/HomeRecentActivity.tsx:28
-msgid "最近活动"
-msgstr "Recent activity"
 
 #: src/features/model-viewer/components/CaptureToolbar.tsx:88
 #: src/features/model-viewer/components/RecordingExport.tsx:230
@@ -2095,7 +2112,7 @@ msgid "分钟"
 msgstr "Minute"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:33
+#: src/features/logs/log-labels.ts:34
 msgid "列出目录"
 msgstr "List directory"
 
@@ -2128,7 +2145,7 @@ msgid "创建时间"
 msgstr "Created Time"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:53
+#: src/features/logs/log-labels.ts:54
 msgid "创建游戏房间"
 msgstr "Create game room"
 
@@ -2153,7 +2170,7 @@ msgstr "Creating directory"
 #: src/features/mcp/McpToolsTable.tsx:171
 #: src/features/model-viewer/components/LibraryPanel.tsx:314
 #: src/features/poetry/components/PoetryLocalManagement.tsx:130
-#: src/features/poetry/components/PoetryTranslationSection.tsx:380
+#: src/features/poetry/components/PoetryTranslationSection.tsx:381
 #: src/features/settings/TransferSetting.tsx:56
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:91
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:166
@@ -2183,18 +2200,18 @@ msgid "删除 {pendingDeleteLabel}"
 msgstr "Delete {pendingDeleteLabel}"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:20
+#: src/features/logs/log-labels.ts:21
 msgid "删除 SSH 密钥"
 msgstr "Delete SSH key"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:17
+#: src/features/logs/log-labels.ts:18
 #: src/features/ssh-sftp/components/Sidebar.tsx:532
 msgid "删除主机"
 msgstr "Delete Host"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:76
+#: src/features/logs/log-labels.ts:77
 msgid "删除信任设备"
 msgstr "Remove trusted device"
 
@@ -2202,11 +2219,11 @@ msgstr "Remove trusted device"
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:90
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:91
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:106
-#: src/features/logs/log-labels.ts:74
+#: src/features/logs/log-labels.ts:75
 msgid "删除共享目录"
 msgstr "Remove shared folder"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:371
+#: src/features/poetry/components/PoetryTranslationSection.tsx:372
 msgid "删除后可重新生成，不影响原文和注释。"
 msgstr "You can generate it again later. The original text and annotations are unaffected."
 
@@ -2220,7 +2237,7 @@ msgid "删除后无法撤销。删除当前项时，需要选择同地址下的�
 msgstr "Deletion cannot be undone. Choose a replacement from the same address when deleting the current item."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:23
+#: src/features/logs/log-labels.ts:24
 msgid "删除密码条目"
 msgstr "Delete password entry"
 
@@ -2241,7 +2258,7 @@ msgid "删除当前密钥或模型前，请选择此地址下的其他项作为�
 msgstr "Before deleting the current key or model, select another one under this address to replace it."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:14
+#: src/features/logs/log-labels.ts:15
 #: src/features/todo/TodoRowActions.desktop.tsx:45
 #: src/features/todo/TodoRowActions.desktop.tsx:46
 #: src/features/todo/TodoRowActions.mobile.tsx:59
@@ -2257,7 +2274,7 @@ msgid "删除待办及图片"
 msgstr "Delete task and images"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:38
+#: src/features/logs/log-labels.ts:39
 #: src/features/ssh-sftp/components/sftp/DeleteConfirmDialog.tsx:33
 msgid "删除文件"
 msgstr "Delete File"
@@ -2292,7 +2309,7 @@ msgid "删除模型？"
 msgstr "Delete model?"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:63
+#: src/features/logs/log-labels.ts:64
 msgid "删除注释库"
 msgstr "Delete annotation library"
 
@@ -2302,18 +2319,18 @@ msgstr "Delete annotation library"
 msgid "删除白名单"
 msgstr "Remove from allowlist"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:240
 #: src/features/poetry/components/PoetryTranslationSection.tsx:241
+#: src/features/poetry/components/PoetryTranslationSection.tsx:242
 msgid "删除译文"
 msgstr "Delete translation"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:65
+#: src/features/logs/log-labels.ts:66
 msgid "删除译文包"
 msgstr "Delete translation pack"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:60
+#: src/features/logs/log-labels.ts:61
 msgid "删除诗词集"
 msgstr "Delete poetry collection"
 
@@ -2352,7 +2369,7 @@ msgstr "Refresh MCP status"
 msgid "刷新房间"
 msgstr "Refresh rooms"
 
-#: src/features/about/AboutPage.tsx:69
+#: src/features/about/AboutPage.tsx:70
 msgid "刷新状态"
 msgstr "Refresh status"
 
@@ -2385,7 +2402,7 @@ msgstr "Features"
 
 #: src/features/settings/FeatureEntrySettings.tsx:158
 #: src/features/settings/SettingsOverview.tsx:31
-#: src/features/settings/SettingsPage.tsx:40
+#: src/features/settings/SettingsPage.tsx:41
 msgid "功能入口"
 msgstr "Feature entries"
 
@@ -2399,7 +2416,7 @@ msgid "加入房间"
 msgstr "Join room"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:54
+#: src/features/logs/log-labels.ts:55
 msgid "加入游戏房间"
 msgstr "Join game room"
 
@@ -2435,7 +2452,7 @@ msgstr "Loading"
 #: src/features/bt/BtTool.tsx:283
 #: src/features/bt/components/FileBrowserPanel.tsx:194
 #: src/features/bt/components/PeersPanel.tsx:78
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:110
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:126
 #: src/features/poetry/components/CollectionManagement.tsx:130
 #: src/features/poetry/components/PoemList.tsx:192
 #: src/features/poetry/components/PoetryLocalManagement.tsx:79
@@ -2753,9 +2770,9 @@ msgstr "Sending"
 #: src/features/mcp/McpCredentialEditor.tsx:195
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:304
-#: src/features/poetry/components/PoetryTranslationSection.tsx:347
-#: src/features/poetry/components/PoetryTranslationSection.tsx:375
-#: src/features/poetry/components/PoetryTranslationSection.tsx:395
+#: src/features/poetry/components/PoetryTranslationSection.tsx:348
+#: src/features/poetry/components/PoetryTranslationSection.tsx:376
+#: src/features/poetry/components/PoetryTranslationSection.tsx:396
 #: src/features/poetry/LibraryManagePage.tsx:105
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:450
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:91
@@ -2794,12 +2811,12 @@ msgstr "Cancel Task"
 #: src/features/lan-transfer/LanTransferActivity.tsx:131
 #: src/features/lan-transfer/LanTransferActivity.tsx:182
 #: src/features/lan-transfer/LanTransferActivity.tsx:191
-#: src/features/logs/log-labels.ts:43
+#: src/features/logs/log-labels.ts:44
 msgid "取消传输"
 msgstr "Cancel transfer"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:70
+#: src/features/logs/log-labels.ts:71
 msgid "取消传输任务"
 msgstr "Cancel transfer task"
 
@@ -2831,7 +2848,7 @@ msgstr "Canceling the archive operation timed out. Please try again later."
 msgid "取消检查"
 msgstr "Cancel inspection"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:185
+#: src/features/poetry/components/PoetryTranslationSection.tsx:194
 msgid "取消生成"
 msgstr "Cancel generation"
 
@@ -2840,7 +2857,7 @@ msgid "取消等待"
 msgstr "Stop waiting"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:59
+#: src/features/logs/log-labels.ts:60
 msgid "取消诗词同步"
 msgstr "Cancel poetry sync"
 
@@ -2991,7 +3008,7 @@ msgid "同步目标无效：{path}"
 msgstr "Invalid sync target: {path}"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:57
+#: src/features/logs/log-labels.ts:58
 msgid "同步诗词库"
 msgstr "Sync poetry library"
 
@@ -3060,7 +3077,7 @@ msgid "否"
 msgstr "No"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:71
+#: src/features/logs/log-labels.ts:72
 msgid "启动局域网传输"
 msgstr "Start LAN transfer"
 
@@ -3424,7 +3441,7 @@ msgstr "Copy room code"
 msgid "复制日志"
 msgstr "Copy log"
 
-#: src/features/about/AboutPage.tsx:59
+#: src/features/about/AboutPage.tsx:60
 msgid "复制环境信息"
 msgstr "Copy environment info"
 
@@ -3450,12 +3467,12 @@ msgstr "Copy connection config template"
 msgid "外置 glTF 需要对应的 bin 和纹理文件。缺少资源时，请按完整路径逐项补选。"
 msgstr "External glTF resources require matching bin and texture files. Select each missing file using its full relative path."
 
-#: src/features/settings/AppearanceSettings.tsx:27
-#: src/features/settings/AppSettingsMenu.tsx:125
+#: src/features/settings/AppearanceSettings.tsx:28
+#: src/features/settings/AppSettingsMenu.tsx:127
 msgid "外观"
 msgstr "Appearance"
 
-#: src/features/settings/AppearanceSettings.tsx:23
+#: src/features/settings/AppearanceSettings.tsx:24
 msgid "外观与语言"
 msgstr "Appearance and language"
 
@@ -3466,7 +3483,6 @@ msgstr "Size"
 
 #: src/features/activity/TransferActivityToolbar.tsx:56
 #: src/features/connection-diagnostics/ExecutionLogStatus.tsx:40
-#: src/features/home/HomeRecentActivity.tsx:21
 #: src/features/lan-transfer/LanTransferActivity.tsx:23
 #: src/features/logs/use-activity-logs.ts:41
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:39
@@ -3497,9 +3513,9 @@ msgstr "Media Tools"
 msgid "媒体处理模式"
 msgstr "Media processing mode"
 
-#. 应用界面字体选择
-#: src/features/settings/AppearanceSettings.tsx:62
-#: src/features/settings/AppSettingsMenu.tsx:193
+#. 应用界面字体选择（中文字体）
+#: src/features/settings/AppearanceSettings.tsx:63
+#: src/features/settings/AppSettingsMenu.tsx:195
 msgid "字体"
 msgstr "Font"
 
@@ -3511,7 +3527,7 @@ msgstr "Font size"
 msgid "字节数未知"
 msgstr "Byte size unknown"
 
-#: src/features/about/AboutPage.tsx:121
+#: src/features/about/AboutPage.tsx:117
 msgid "存储"
 msgstr "Storage"
 
@@ -3555,7 +3571,7 @@ msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "Installation did not finish. Retry the installation or try again later."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:62
+#: src/features/logs/log-labels.ts:63
 msgid "安装注释库"
 msgstr "Install annotation library"
 
@@ -3636,14 +3652,14 @@ msgstr "Vault"
 #: src/features/about/use-about.ts:59
 #: src/features/export/sections.tsx:26
 #: src/features/home/entries.tsx:140
-#: src/features/logs/log-labels.ts:113
+#: src/features/logs/log-labels.ts:114
 #: src/features/logs/use-activity-logs.ts:32
 #: src/features/vault/VaultTool.tsx:49
 msgid "密码本"
 msgstr "Passwords"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:113
+#: src/features/logs/log-labels.ts:114
 msgid "密码条目"
 msgstr "Password entry"
 
@@ -3729,7 +3745,7 @@ msgid "对方长时间未回应协商，对局已结束。"
 msgstr "The other player did not respond in time. The game has ended."
 
 #: src/features/connection-diagnostics/ExecutionLogDetailView.tsx:194
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:81
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:101
 #: src/features/logs/LogDialogs.tsx:118
 #: src/features/logs/LogList.tsx:47
 msgid "对象"
@@ -3746,7 +3762,7 @@ msgid "导入"
 msgstr "Import"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:19
+#: src/features/logs/log-labels.ts:20
 msgid "导入 SSH 密钥"
 msgstr "Import SSH key"
 
@@ -3781,7 +3797,7 @@ msgid "导入密钥"
 msgstr "Import Key"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:52
+#: src/features/logs/log-labels.ts:53
 msgid "导入应用数据"
 msgstr "Import app data"
 
@@ -3795,12 +3811,12 @@ msgid "导入模式"
 msgstr "Import mode"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:64
+#: src/features/logs/log-labels.ts:65
 msgid "导入译文包"
 msgstr "Import translation pack"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:58
+#: src/features/logs/log-labels.ts:59
 msgid "导入诗词库"
 msgstr "Import poetry library"
 
@@ -3813,7 +3829,7 @@ msgid "导出"
 msgstr "Export"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:49
+#: src/features/logs/log-labels.ts:50
 msgid "导出下载文件"
 msgstr "Export downloaded files"
 
@@ -3822,7 +3838,7 @@ msgid "导出为明文 JSON 文件，请妥善保管。"
 msgstr "Exports a plaintext JSON file; keep it safe."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:51
+#: src/features/logs/log-labels.ts:52
 msgid "导出应用数据"
 msgstr "Export app data"
 
@@ -3898,7 +3914,7 @@ msgstr "Download engine data and cache are cleared; files in the download folder
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:391
+#: src/features/poetry/components/PoetryTranslationSection.tsx:392
 msgid "将覆盖当前人工修订。"
 msgstr "This will overwrite the current manual revision."
 
@@ -3965,14 +3981,14 @@ msgid "局域网传输意外结束，请重试"
 msgstr "The LAN transfer ended unexpectedly. Please try again."
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:153
+#: src/features/logs/log-labels.ts:154
 msgid "局域网传输服务"
 msgstr "LAN transfer service"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:128
 #: src/features/lan-transfer/LanTransferTool.tsx:65
-#: src/features/logs/log-labels.ts:139
+#: src/features/logs/log-labels.ts:140
 msgid "局域网传输设置"
 msgstr "LAN Transfer Settings"
 
@@ -3980,7 +3996,7 @@ msgstr "LAN Transfer Settings"
 msgid "局域网共享文件"
 msgstr "Share files over the LAN"
 
-#: src/features/about/AboutPage.tsx:173
+#: src/features/about/AboutPage.tsx:169
 #: src/lib/errors/messages.ts:310
 msgid "局域网服务"
 msgstr "LAN service"
@@ -4039,7 +4055,7 @@ msgstr "Downloaded {downloadedSize}"
 #. 待办新增或编辑保存成功的提示
 #: src/features/media-compress/components/CompressResultCard.tsx:43
 #: src/features/poetry/hooks/use-poetry-translations.ts:181
-#: src/features/todo/hooks/use-todo.ts:69
+#: src/features/todo/hooks/use-todo.ts:62
 #: src/features/vault/use-vault.ts:96
 msgid "已保存"
 msgstr "Saved"
@@ -4086,7 +4102,7 @@ msgstr "Launch at Login disabled"
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
 #: src/features/poetry/hooks/use-poetry-translations.ts:200
-#: src/features/todo/hooks/use-todo.ts:96
+#: src/features/todo/hooks/use-todo.ts:89
 #: src/features/vault/use-vault.ts:108
 msgid "已删除"
 msgstr "Deleted"
@@ -4127,7 +4143,6 @@ msgstr "Screenshot download started. Check your browser."
 
 #. 模型导入任务已退出。
 #: src/features/bt/components/TaskRow.tsx:84
-#: src/features/home/HomeRecentActivity.tsx:22
 #: src/features/lan-transfer/LanTransferActivity.tsx:24
 #: src/features/logs/use-activity-logs.ts:42
 #: src/features/model-viewer/components/ModelList.tsx:45
@@ -4199,7 +4214,6 @@ msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 
 #: src/features/about/ResetBoundary.tsx:127
 #: src/features/bt/components/TaskRow.tsx:90
-#: src/features/home/HomeRecentActivity.tsx:20
 #: src/features/todo/TodoTool.tsx:152
 msgid "已完成"
 msgstr "Completed"
@@ -4375,7 +4389,7 @@ msgid "应用"
 msgstr "Application"
 
 #: src/features/navigation/BottomNavigation.mobile.tsx:17
-#: src/features/navigation/NavigationRail.desktop.tsx:27
+#: src/features/navigation/NavigationRail.desktop.tsx:23
 msgid "应用主导航"
 msgstr "Main navigation"
 
@@ -4384,7 +4398,7 @@ msgid "应用启动后自动开启服务"
 msgstr "Start service automatically when the app launches"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:128
+#: src/features/logs/log-labels.ts:129
 msgid "应用数据"
 msgstr "App data"
 
@@ -4481,7 +4495,7 @@ msgstr "Open mode skips confirmation codes"
 msgid "开放网格无法确定内外，法线不一致仅为提示；退化三角形不计入边统计。"
 msgstr "Open meshes have no inside or outside, and inconsistent normals are only a hint. Degenerate triangles are excluded from edge counts."
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:285
+#: src/features/poetry/components/PoetryTranslationSection.tsx:286
 msgid "开放译文"
 msgstr "Open translation"
 
@@ -4712,7 +4726,7 @@ msgstr "Todos"
 #. MCP 工具目录和授权矩阵中的模块名称
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/home/entries.tsx:150
-#: src/features/logs/log-labels.ts:108
+#: src/features/logs/log-labels.ts:109
 #: src/features/todo/mcp-presentation.ts:4
 #: src/features/todo/TodoTool.tsx:94
 msgid "待办事项"
@@ -4774,7 +4788,7 @@ msgstr "Loop mode"
 msgid "德语"
 msgstr "German"
 
-#: src/features/about/AboutPage.tsx:124
+#: src/features/about/AboutPage.tsx:120
 msgid "总占用"
 msgstr "Total usage"
 
@@ -4804,7 +4818,7 @@ msgstr "Restore last page"
 msgid "恢复待办"
 msgstr "Restore todo"
 
-#: src/features/about/AboutPage.tsx:132
+#: src/features/about/AboutPage.tsx:128
 msgid "恢复首次打开状态"
 msgstr "Restore the initial state"
 
@@ -4948,7 +4962,7 @@ msgid "打开的备注过多，请先关闭其他编辑窗口"
 msgstr "Too many notes are open. Please close another editor first"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:27
+#: src/features/logs/log-labels.ts:28
 msgid "打开终端"
 msgstr "Open terminal"
 
@@ -4998,7 +5012,7 @@ msgid "扫码访问"
 msgstr "Scan to Access"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:67
+#: src/features/logs/log-labels.ts:68
 msgid "批准访问申请"
 msgstr "Approve access request"
 
@@ -5030,7 +5044,7 @@ msgid "拒绝访问"
 msgstr "Deny access"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:68
+#: src/features/logs/log-labels.ts:69
 msgid "拒绝访问申请"
 msgstr "Reject access request"
 
@@ -5255,7 +5269,7 @@ msgstr "Speed"
 
 #. 客户端授权表的行操作列
 #: src/features/ai-configuration/ProviderDetails.tsx:207
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:78
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:98
 #: src/features/games/billiards/BilliardsRuleControl.tsx:60
 #: src/features/logs/LogDialogs.tsx:114
 #: src/features/logs/LogList.tsx:44
@@ -5378,7 +5392,7 @@ msgstr "File"
 msgid "文件不属于此下载任务"
 msgstr "The file does not belong to this download task"
 
-#: src/features/about/AboutPage.tsx:148
+#: src/features/about/AboutPage.tsx:144
 #: src/features/settings/TransferSetting.tsx:39
 msgid "文件传输"
 msgstr "File transfer"
@@ -5446,7 +5460,7 @@ msgid "断开与“{pendingName}”的连接？"
 msgstr "Disconnect from “{pendingName}”?"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:69
+#: src/features/logs/log-labels.ts:70
 msgid "断开设备连接"
 msgstr "Disconnect device"
 
@@ -5455,7 +5469,7 @@ msgstr "Disconnect device"
 #: src/features/lan-transfer/LanConnectedDevices.tsx:73
 #: src/features/lan-transfer/LanConnectedDevices.tsx:87
 #: src/features/lan-transfer/LanConnectedDevices.tsx:101
-#: src/features/logs/log-labels.ts:28
+#: src/features/logs/log-labels.ts:29
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:83
 msgid "断开连接"
 msgstr "Disconnect"
@@ -5481,17 +5495,17 @@ msgid "新增：全部作为新记录插入"
 msgstr "Append: insert all records as new"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:15
+#: src/features/logs/log-labels.ts:16
 msgid "新增主机"
 msgstr "Add host"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:21
+#: src/features/logs/log-labels.ts:22
 msgid "新增密码条目"
 msgstr "Add password entry"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:12
+#: src/features/logs/log-labels.ts:13
 msgid "新增待办"
 msgstr "Add task"
 
@@ -5515,7 +5529,7 @@ msgid "新建待办"
 msgstr "New Todo"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:36
+#: src/features/logs/log-labels.ts:37
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:391
 msgid "新建文件夹"
 msgstr "New Folder"
@@ -5636,7 +5650,7 @@ msgstr "Pointer lock is unavailable. Drag the canvas to look around."
 
 #. 活动中心页签，展示当前运行期的日志而非持久历史
 #: src/features/activity/ActivityCenter.tsx:37
-#: src/features/settings/AppSettingsMenu.tsx:91
+#: src/features/settings/AppSettingsMenu.tsx:93
 msgid "日志"
 msgstr "Logs"
 
@@ -5654,7 +5668,7 @@ msgid "日志操作"
 msgstr "Log actions"
 
 #. 运行期日志摘要列表的无障碍名称
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:90
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:110
 msgid "日志记录"
 msgstr "Log records"
 
@@ -5680,7 +5694,7 @@ msgid "旧版授权（需更新）"
 msgstr "Legacy authorization (update required)"
 
 #. 内存采样的时间列。
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:72
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:92
 #: src/features/logs/LogDialogs.tsx:102
 #: src/features/logs/LogFilters.tsx:92
 #: src/features/logs/LogList.tsx:38
@@ -5704,7 +5718,7 @@ msgid "昵称"
 msgstr "Nickname"
 
 #. 失败日志筛选无结果时恢复全部记录
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:134
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:150
 msgid "显示全部"
 msgstr "Show all"
 
@@ -5725,11 +5739,6 @@ msgstr "Display size"
 #: src/features/vault/VaultEntryCard.tsx:150
 msgid "显示密码"
 msgstr "Show password"
-
-#: src/features/home/HomePage.tsx:93
-#: src/features/home/HomePage.tsx:94
-msgid "显示小游戏"
-msgstr "Show games"
 
 #. 模型可见性操作。
 #: src/features/model-viewer/components/ModelList.tsx:181
@@ -5761,7 +5770,7 @@ msgid "暂停"
 msgstr "Pause"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:44
+#: src/features/logs/log-labels.ts:45
 msgid "暂停传输"
 msgstr "Pause transfer"
 
@@ -5788,10 +5797,6 @@ msgstr "No hosts"
 #: src/features/lan-transfer/LanTransferActivity.tsx:89
 msgid "暂无任务"
 msgstr "No tasks"
-
-#: src/features/home/HomeRecentActivity.tsx:67
-msgid "暂无传输活动"
-msgstr "No recent transfers"
 
 #: src/features/poetry/components/PoemAnnotations.tsx:86
 msgid "暂无作者小传。"
@@ -5846,7 +5851,7 @@ msgid "暂无数据"
 msgstr "No data"
 
 #. 活动日志页签的空状态标题
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:123
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:139
 #: src/features/logs/ActivityLogsPage.tsx:127
 msgid "暂无日志"
 msgstr "No logs"
@@ -5864,7 +5869,7 @@ msgstr "No trusted devices"
 msgid "暂无设备"
 msgstr "No devices"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:266
+#: src/features/poetry/components/PoetryTranslationSection.tsx:267
 msgid "暂无译文"
 msgstr "No translation"
 
@@ -5893,7 +5898,7 @@ msgstr "Unable to finish the reset"
 msgid "暂时无法预览，文件可能尚未下载完整或编码不受支持"
 msgstr "Preview unavailable. The file may be incomplete or its codec unsupported."
 
-#: src/features/settings/AppSettingsMenu.tsx:84
+#: src/features/settings/AppSettingsMenu.tsx:86
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:141
 msgid "更多"
 msgstr "More"
@@ -5939,7 +5944,7 @@ msgid "更新下载或校验失败，请重新检查更新。"
 msgstr "The update could not be downloaded or verified. Check for updates again."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:16
+#: src/features/logs/log-labels.ts:17
 msgid "更新主机"
 msgstr "Update host"
 
@@ -5956,7 +5961,7 @@ msgid "更新包已准备好，重启时安装。请先保存正在进行的工�
 msgstr "The update is ready to install when you restart. Save your work first."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:22
+#: src/features/logs/log-labels.ts:23
 msgid "更新密码条目"
 msgstr "Update password entry"
 
@@ -5969,12 +5974,12 @@ msgid "更新已安装，重启应用后生效。"
 msgstr "The update is installed. Restart the app to apply it."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:13
+#: src/features/logs/log-labels.ts:14
 msgid "更新待办"
 msgstr "Update task"
 
-#: src/features/todo/hooks/use-todo.ts:80
-#: src/features/todo/hooks/use-todo.ts:88
+#: src/features/todo/hooks/use-todo.ts:73
+#: src/features/todo/hooks/use-todo.ts:81
 msgid "更新待办失败"
 msgstr "Failed to update todo"
 
@@ -6069,7 +6074,7 @@ msgstr "Open table"
 msgid "未发现房间，可输入地址加入"
 msgstr "No rooms found. Enter an address to join."
 
-#: src/features/about/AboutPage.tsx:180
+#: src/features/about/AboutPage.tsx:176
 msgid "未启动"
 msgstr "Stopped"
 
@@ -6228,7 +6233,7 @@ msgstr "Unverified"
 msgid "本地偏好与启动设置"
 msgstr "Preferences and startup settings"
 
-#: src/features/about/AboutPage.tsx:88
+#: src/features/about/AboutPage.tsx:84
 msgid "本地文件与数据工具"
 msgstr "Local file and data tools"
 
@@ -6357,7 +6362,7 @@ msgstr "Material objects"
 msgid "材质数"
 msgstr "Materials"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:75
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:95
 #: src/features/logs/LogDialogs.tsx:108
 #: src/features/logs/LogFilters.tsx:80
 #: src/features/logs/LogList.tsx:41
@@ -6391,12 +6396,12 @@ msgid "查看 GLB · glTF · FBX 模型"
 msgstr "View GLB · glTF · FBX models"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:79
+#: src/features/logs/log-labels.ts:80
 msgid "查看下载文件信息"
 msgstr "View download file details"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:80
+#: src/features/logs/log-labels.ts:81
 msgid "查看共享目录"
 msgstr "View shared directories"
 
@@ -6418,10 +6423,6 @@ msgstr "View full release notes"
 msgid "查看操作和失败原因"
 msgstr "View operations and failure details"
 
-#: src/features/home/HomeRecentActivity.tsx:32
-msgid "查看日志"
-msgstr "View logs"
-
 #. 历史日志行：只有实际摘要正文或应用错误才打开详情
 #. 运行期日志列表行，进入该操作的实际详情
 #: src/features/connection-diagnostics/ExecutionLogRow.tsx:75
@@ -6429,9 +6430,9 @@ msgstr "View logs"
 msgid "查看日志：{action}"
 msgstr "View log: {action}"
 
-#: src/features/updater/integration.tsx:47
-#: src/features/updater/integration.tsx:49
-#: src/features/updater/integration.tsx:86
+#: src/features/updater/integration.tsx:46
+#: src/features/updater/integration.tsx:48
+#: src/features/updater/integration.tsx:85
 msgid "查看更新"
 msgstr "View Update"
 
@@ -6542,13 +6543,13 @@ msgid "检查"
 msgstr "Inspect"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:35
+#: src/features/logs/log-labels.ts:36
 msgid "检查文件是否存在"
 msgstr "Check whether file exists"
 
-#: src/features/updater/integration.tsx:44
-#: src/features/updater/integration.tsx:46
-#: src/features/updater/integration.tsx:89
+#: src/features/updater/integration.tsx:43
+#: src/features/updater/integration.tsx:45
+#: src/features/updater/integration.tsx:88
 #: src/features/updater/use-updater-label.ts:28
 msgid "检查更新"
 msgstr "Check for Updates"
@@ -6982,8 +6983,8 @@ msgstr "Verifying"
 msgid "正在校验更新…"
 msgstr "Verifying update…"
 
-#: src/features/updater/integration.tsx:45
-#: src/features/updater/integration.tsx:88
+#: src/features/updater/integration.tsx:44
+#: src/features/updater/integration.tsx:87
 msgid "正在检查"
 msgstr "Checking"
 
@@ -7019,12 +7020,12 @@ msgstr "Clearing…"
 msgid "正在清理应用数据"
 msgstr "Clearing app data"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:182
+#: src/features/poetry/components/PoetryTranslationSection.tsx:191
 msgid "正在生成"
 msgstr "Generating"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:170
-#: src/features/poetry/components/PoetryTranslationSection.tsx:171
+#: src/features/poetry/components/PoetryTranslationSection.tsx:179
+#: src/features/poetry/components/PoetryTranslationSection.tsx:180
 msgid "正在生成，点击取消"
 msgstr "Generating, click to cancel"
 
@@ -7255,7 +7256,7 @@ msgid "没有可预览的文件，请返回来源重新打开"
 msgstr "No file to preview. Return to the source and open it again."
 
 #. 日志只看失败筛选的空状态
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:121
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:137
 msgid "没有失败记录"
 msgstr "No failed records"
 
@@ -7305,7 +7306,7 @@ msgstr "Annotation pack (translations & analysis)"
 msgid "注释包下载仅支持桌面端"
 msgstr "Annotation packages can only be downloaded on desktop"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:309
+#: src/features/poetry/components/PoetryTranslationSection.tsx:310
 msgid "注释包译文"
 msgstr "Annotation Pack Translation"
 
@@ -7352,8 +7353,8 @@ msgid "流式输出"
 msgstr "Streaming output"
 
 #. 应用外观模式
-#: src/features/settings/AppearanceSettings.tsx:35
-#: src/features/settings/AppSettingsMenu.tsx:135
+#: src/features/settings/AppearanceSettings.tsx:36
+#: src/features/settings/AppSettingsMenu.tsx:137
 msgid "浅色"
 msgstr "Light"
 
@@ -7372,9 +7373,13 @@ msgid "测试中…"
 msgstr "Testing…"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:26
+#: src/features/logs/log-labels.ts:27
 msgid "测试主机连接"
 msgstr "Test host connection"
+
+#: src/features/ai-configuration/hooks/use-provider-tests.ts:41
+msgid "测试失败"
+msgstr "Test failed"
 
 #: src/features/ai-configuration/ProviderDetails.tsx:122
 msgid "测试服务"
@@ -7384,12 +7389,16 @@ msgstr "Test service"
 msgid "测试连接"
 msgstr "Test connection"
 
+#: src/features/ai-configuration/hooks/use-provider-tests.ts:45
+msgid "测试通过"
+msgstr "Test passed"
+
 #: src/features/model-viewer/components/ViewerHelp.tsx:99
 msgid "测量时点击同一模型的两个表面点；也可用方向键调整视角，按 Enter 选取画布中心点。"
 msgstr "Pick two surface points on the same model. You can also adjust the view with arrow keys and press Enter to pick the center point."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:81
+#: src/features/logs/log-labels.ts:82
 msgid "浏览共享文件"
 msgstr "Browse shared files"
 
@@ -7407,8 +7416,8 @@ msgid "深度检查工具"
 msgstr "Inspection tools"
 
 #. 应用外观模式
-#: src/features/settings/AppearanceSettings.tsx:39
-#: src/features/settings/AppSettingsMenu.tsx:136
+#: src/features/settings/AppearanceSettings.tsx:40
+#: src/features/settings/AppSettingsMenu.tsx:138
 msgid "深色"
 msgstr "Dark"
 
@@ -7426,7 +7435,7 @@ msgid "添加下载"
 msgstr "Add download"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:48
+#: src/features/logs/log-labels.ts:49
 msgid "添加下载任务"
 msgstr "Add download task"
 
@@ -7435,13 +7444,13 @@ msgid "添加下载任务失败"
 msgstr "Failed to add download task"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:75
+#: src/features/logs/log-labels.ts:76
 msgid "添加信任设备"
 msgstr "Add trusted device"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/lan-transfer/LanShareDialog.tsx:84
-#: src/features/logs/log-labels.ts:73
+#: src/features/logs/log-labels.ts:74
 msgid "添加共享目录"
 msgstr "Add Shared Folder"
 
@@ -7534,7 +7543,7 @@ msgstr "Clear current logs"
 msgid "清空当前日志？"
 msgstr "Clear current logs?"
 
-#: src/features/about/AboutPage.tsx:131
+#: src/features/about/AboutPage.tsx:127
 msgid "清空所有数据"
 msgstr "Clear all data"
 
@@ -7591,7 +7600,7 @@ msgid "游戏"
 msgstr "Games"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:130
+#: src/features/logs/log-labels.ts:131
 #: src/lib/errors/messages.ts:311
 msgid "游戏房间"
 msgstr "Game room"
@@ -7744,7 +7753,7 @@ msgstr "State"
 msgid "状态不可用"
 msgstr "Status unavailable"
 
-#: src/features/about/AboutPage.tsx:176
+#: src/features/about/AboutPage.tsx:172
 msgid "状态读取失败"
 msgstr "Status unavailable"
 
@@ -7776,7 +7785,7 @@ msgstr "Player 2 wins"
 msgid "玩法"
 msgstr "Discipline"
 
-#: src/features/about/AboutPage.tsx:108
+#: src/features/about/AboutPage.tsx:104
 msgid "环境信息"
 msgstr "Environment"
 
@@ -7803,13 +7812,18 @@ msgstr "Ring"
 msgid "球桌显示已中断，请重开对局。"
 msgstr "The table display was interrupted. Restart the match to continue."
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:277
+#: src/features/poetry/components/PoetryTranslationSection.tsx:278
 msgid "生成"
 msgstr "Generate"
 
 #: src/features/mcp/McpCredentialEditor.tsx:198
 msgid "生成凭据"
 msgstr "Generate credential"
+
+#. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
+#: src/features/logs/log-labels.ts:12
+msgid "生成诗词译文"
+msgstr "Generate poem translation"
 
 #: src/features/ai-configuration/AiWorkspaceMenu.tsx:47
 msgid "生成请求会发送到你配置的第三方服务，可能产生服务费用。"
@@ -7862,7 +7876,7 @@ msgid "由对方击球"
 msgstr "Opponent to play"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:84
+#: src/features/logs/log-labels.ts:85
 msgid "申请访问权限"
 msgstr "Request access"
 
@@ -8042,7 +8056,7 @@ msgstr "Confirm change"
 msgid "确认删除"
 msgstr "Delete"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:369
+#: src/features/poetry/components/PoetryTranslationSection.tsx:370
 msgid "确认删除？"
 msgstr "Delete?"
 
@@ -8139,7 +8153,7 @@ msgid "离开会停止当前媒体处理，原文件会保留。"
 msgstr "Leaving stops the current media process. The original file will be kept."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:55
+#: src/features/logs/log-labels.ts:56
 msgid "离开游戏房间"
 msgstr "Leave game room"
 
@@ -8262,12 +8276,16 @@ msgstr "Restart later"
 msgid "空目录"
 msgstr "Empty Directory"
 
+#: src/features/about/AboutPage.tsx:141
 #: src/features/about/AboutPage.tsx:145
-#: src/features/about/AboutPage.tsx:149
-#: src/features/about/AboutPage.tsx:163
-#: src/features/about/AboutPage.tsx:188
+#: src/features/about/AboutPage.tsx:159
+#: src/features/about/AboutPage.tsx:184
 msgid "空闲"
 msgstr "Idle"
+
+#: src/features/settings/font-options.ts:13
+msgid "站酷快乐体"
+msgstr "ZCOOL KuaiLe"
 
 #. MCP HTTP 服务监听端口
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:155
@@ -8338,7 +8356,7 @@ msgstr "Queued"
 msgid "等待监控数据"
 msgstr "Waiting for monitor data"
 
-#: src/features/about/AboutPage.tsx:188
+#: src/features/about/AboutPage.tsx:184
 #: src/features/poetry/components/PoetrySyncStatus.tsx:44
 msgid "等待确认"
 msgstr "Awaiting confirmation"
@@ -8389,7 +8407,7 @@ msgid "管理 AI 配置"
 msgstr "Manage AI configuration"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:50
+#: src/features/logs/log-labels.ts:51
 msgid "管理下载任务"
 msgstr "Manage download task"
 
@@ -8432,7 +8450,7 @@ msgstr "Sticky bit"
 msgid "粘贴或输入 {languageLabel} 内容"
 msgstr "Paste or type {languageLabel} content"
 
-#: src/features/settings/AppSettingsMenu.tsx:133
+#: src/features/settings/AppSettingsMenu.tsx:135
 msgid "系统"
 msgstr "System"
 
@@ -8480,6 +8498,10 @@ msgstr "System thermal status: serious"
 #: src/lib/errors/messages.ts:215
 msgid "系统监控暂不支持 {os}，仅支持 Linux"
 msgstr "System monitoring does not support {os} yet. Only Linux is supported."
+
+#: src/features/settings/font-options.ts:11
+msgid "系统默认"
+msgstr "System default"
 
 #: src/features/games/billiards/BilliardsRulesDialog.tsx:55
 msgid "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
@@ -8554,7 +8576,7 @@ msgid "终端与远端文件"
 msgstr "Terminal and remote files"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:29
+#: src/features/logs/log-labels.ts:30
 msgid "终端会话"
 msgstr "Terminal session"
 
@@ -8586,7 +8608,7 @@ msgstr "Done"
 msgid "结束本局"
 msgstr "End frame"
 
-#: src/features/connection-diagnostics/ExecutionLogList.tsx:84
+#: src/features/connection-diagnostics/ExecutionLogList.tsx:104
 #: src/features/crypto/CryptoTool.tsx:102
 #: src/features/logs/LogDialogs.tsx:122
 #: src/features/logs/LogFilters.tsx:86
@@ -8619,7 +8641,7 @@ msgid "继续"
 msgstr "Continue"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:45
+#: src/features/logs/log-labels.ts:46
 msgid "继续传输"
 msgstr "Resume transfer"
 
@@ -8742,9 +8764,9 @@ msgstr "Edit permissions"
 msgid "编辑模型"
 msgstr "Edit model"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:218
 #: src/features/poetry/components/PoetryTranslationSection.tsx:219
-#: src/features/poetry/components/PoetryTranslationSection.tsx:329
+#: src/features/poetry/components/PoetryTranslationSection.tsx:220
+#: src/features/poetry/components/PoetryTranslationSection.tsx:330
 msgid "编辑译文"
 msgstr "Edit translation"
 
@@ -8830,7 +8852,7 @@ msgstr "The translation cannot be empty"
 msgid "翻译内容过长"
 msgstr "The translation is too long"
 
-#: src/features/about/AboutPage.tsx:168
+#: src/features/about/AboutPage.tsx:164
 msgid "翻译引擎"
 msgstr "Translation engine"
 
@@ -9019,7 +9041,7 @@ msgstr "Folder to Move"
 msgid "覆盖：替换备份涉及的模块数据"
 msgstr "Overwrite: replace data in the included modules"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:389
+#: src/features/poetry/components/PoetryTranslationSection.tsx:390
 msgid "覆盖人工修订？"
 msgstr "Overwrite manual revisions?"
 
@@ -9043,7 +9065,7 @@ msgid "解压出的文件夹"
 msgstr "Extracted Folder"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:47
+#: src/features/logs/log-labels.ts:48
 msgid "解压文件"
 msgstr "Extract archive"
 
@@ -9060,7 +9082,7 @@ msgid "解析结果"
 msgstr "Parsed files"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:32
+#: src/features/logs/log-labels.ts:33
 msgid "解析起始目录"
 msgstr "Resolve start directory"
 
@@ -9109,9 +9131,9 @@ msgid "设备名"
 msgstr "Device Name"
 
 #: src/features/navigation/NavigationItems.tsx:46
-#: src/features/settings/AppSettingsMenu.tsx:66
-#: src/features/settings/AppSettingsMenu.tsx:78
-#: src/features/settings/SettingsPage.tsx:40
+#: src/features/settings/AppSettingsMenu.tsx:68
+#: src/features/settings/AppSettingsMenu.tsx:80
+#: src/features/settings/SettingsPage.tsx:41
 msgid "设置"
 msgstr "Settings"
 
@@ -9136,7 +9158,7 @@ msgid "访问与权限"
 msgstr "Access and permissions"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:82
+#: src/features/logs/log-labels.ts:83
 msgid "访问局域网服务"
 msgstr "Access LAN service"
 
@@ -9149,12 +9171,12 @@ msgid "访问权限"
 msgstr "Access permission"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:142
+#: src/features/logs/log-labels.ts:143
 msgid "访问申请"
 msgstr "Access request"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:155
+#: src/features/logs/log-labels.ts:156
 msgid "访问设备"
 msgstr "Accessing device"
 
@@ -9173,12 +9195,12 @@ msgstr "Translation"
 msgid "译文与本地语料"
 msgstr "Translations and local data"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:336
+#: src/features/poetry/components/PoetryTranslationSection.tsx:337
 msgid "译文内容"
 msgstr "Translation content"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:132
+#: src/features/logs/log-labels.ts:133
 msgid "译文包"
 msgstr "Translation pack"
 
@@ -9215,7 +9237,7 @@ msgstr "The poem is too large to translate with AI"
 msgid "诗词列表"
 msgstr "Poem list"
 
-#: src/features/about/AboutPage.tsx:186
+#: src/features/about/AboutPage.tsx:182
 msgid "诗词同步"
 msgstr "Poetry sync"
 
@@ -9225,7 +9247,7 @@ msgstr "Poetry sync progress"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/about/use-about.ts:62
-#: src/features/logs/log-labels.ts:135
+#: src/features/logs/log-labels.ts:136
 #: src/features/logs/log-source.ts:17
 #: src/features/logs/use-activity-logs.ts:34
 msgid "诗词库"
@@ -9252,7 +9274,7 @@ msgid "诗词数据管理"
 msgstr "Poetry data management"
 
 #. 活动日志对象：诗词的本地注释与赏析数据
-#: src/features/logs/log-labels.ts:205
+#: src/features/logs/log-labels.ts:206
 msgid "诗词注释库"
 msgstr "Poetry annotation library"
 
@@ -9265,7 +9287,7 @@ msgid "诗词目录配置无效"
 msgstr "Invalid poetry folder configuration"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/logs/log-labels.ts:133
+#: src/features/logs/log-labels.ts:134
 msgid "诗词集"
 msgstr "Poetry collection"
 
@@ -9346,8 +9368,8 @@ msgid "详情"
 msgstr "Details"
 
 #: src/features/formatter/FormatterTool.tsx:98
-#: src/features/settings/AppearanceSettings.tsx:79
-#: src/features/settings/AppSettingsMenu.tsx:107
+#: src/features/settings/AppearanceSettings.tsx:75
+#: src/features/settings/AppSettingsMenu.tsx:109
 msgid "语言"
 msgstr "Language"
 
@@ -9584,7 +9606,7 @@ msgid "读取待办失败"
 msgstr "Failed to load todos"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:34
+#: src/features/logs/log-labels.ts:35
 msgid "读取文件信息"
 msgstr "Read file information"
 
@@ -9593,12 +9615,12 @@ msgid "读取未完成"
 msgstr "Read incomplete"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:31
+#: src/features/logs/log-labels.ts:32
 msgid "读取登录目录"
 msgstr "Read login directory"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:30
+#: src/features/logs/log-labels.ts:31
 msgid "读取系统监控"
 msgstr "Read system metrics"
 
@@ -9607,12 +9629,12 @@ msgid "读取编辑草稿"
 msgstr "Read editing draft"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:18
+#: src/features/logs/log-labels.ts:19
 msgid "调整主机顺序"
 msgstr "Reorder hosts"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:61
+#: src/features/logs/log-labels.ts:62
 msgid "调整全文索引"
 msgstr "Configure full-text index"
 
@@ -9621,7 +9643,7 @@ msgid "调整双栏宽度"
 msgstr "Resize columns"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:24
+#: src/features/logs/log-labels.ts:25
 msgid "调整密码条目顺序"
 msgstr "Reorder password entries"
 
@@ -9709,8 +9731,8 @@ msgstr "The parsed resource result is invalid. Please try again."
 msgid "赏析"
 msgstr "Appreciation"
 
-#: src/features/settings/AppearanceSettings.tsx:55
-#: src/features/settings/AppSettingsMenu.tsx:183
+#: src/features/settings/AppearanceSettings.tsx:56
+#: src/features/settings/AppSettingsMenu.tsx:185
 msgid "赛博朋克"
 msgstr "Cyberpunk"
 
@@ -9719,17 +9741,12 @@ msgstr "Cyberpunk"
 msgid "距离：{distance}"
 msgstr "Distance: {distance}"
 
-#: src/features/settings/AppearanceSettings.tsx:69
-#: src/features/settings/AppSettingsMenu.tsx:203
-msgid "跟随主题"
-msgstr "Match Theme"
-
 #. 日志菜单选项，持续滚动到新记录
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:168
 msgid "跟随最新"
 msgstr "Follow latest"
 
-#: src/features/settings/AppearanceSettings.tsx:32
+#: src/features/settings/AppearanceSettings.tsx:33
 #: src/features/settings/DisplaySizeSettings.tsx:46
 #: src/i18n/locales.ts:7
 msgid "跟随系统"
@@ -9821,8 +9838,8 @@ msgstr "Output settings"
 msgid "运行 {formatUptimeValue}"
 msgstr "Uptime {formatUptimeValue}"
 
-#: src/features/about/AboutPage.tsx:179
-#: src/features/about/AboutPage.tsx:188
+#: src/features/about/AboutPage.tsx:175
+#: src/features/about/AboutPage.tsx:184
 #: src/features/lan-transfer/LanServiceCard.tsx:32
 #: src/features/mcp/McpServiceBar.tsx:63
 msgid "运行中"
@@ -9832,7 +9849,7 @@ msgstr "Running"
 msgid "运行模式"
 msgstr "Build mode"
 
-#: src/features/about/AboutPage.tsx:141
+#: src/features/about/AboutPage.tsx:137
 msgid "运行状态"
 msgstr "Runtime status"
 
@@ -9886,13 +9903,13 @@ msgstr "Back to modes"
 msgid "返回竖屏"
 msgstr "Return to portrait"
 
-#: src/features/about/AboutPage.tsx:48
+#: src/features/about/AboutPage.tsx:49
 #: src/features/export/BackupPage.tsx:53
-#: src/features/settings/SettingsPage.tsx:46
+#: src/features/settings/SettingsPage.tsx:48
 msgid "返回设置"
 msgstr "Back to settings"
 
-#: src/features/settings/SettingsPage.tsx:65
+#: src/features/settings/SettingsPage.tsx:67
 msgid "返回诗词"
 msgstr "Back to poem"
 
@@ -9921,7 +9938,6 @@ msgid "进度 {completed} / {total}"
 msgstr "Progress {completed} / {total}"
 
 #: src/features/activity/TransferActivityToolbar.tsx:51
-#: src/features/home/HomeRecentActivity.tsx:19
 #: src/features/lan-transfer/LanTransferActivity.tsx:21
 #: src/features/todo/TodoTool.tsx:144
 msgid "进行中"
@@ -10006,7 +10022,7 @@ msgid "连接中…"
 msgstr "Connecting…"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:25
+#: src/features/logs/log-labels.ts:26
 msgid "连接主机"
 msgstr "Connect to host"
 
@@ -10321,7 +10337,7 @@ msgstr "Collecting…"
 msgid "重做"
 msgstr "Redo"
 
-#: src/features/updater/integration.tsx:50
+#: src/features/updater/integration.tsx:49
 msgid "重启中"
 msgstr "Restarting"
 
@@ -10340,7 +10356,7 @@ msgid "重命名"
 msgstr "Rename"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:37
+#: src/features/logs/log-labels.ts:38
 msgid "重命名文件"
 msgstr "Rename file"
 
@@ -10370,7 +10386,7 @@ msgstr "Restart the match?"
 msgid "重新打开应用"
 msgstr "Reopen application"
 
-#: src/features/updater/integration.tsx:51
+#: src/features/updater/integration.tsx:50
 #: src/features/updater/UpdaterDialog.tsx:144
 msgid "重新检查"
 msgstr "Check Again"
@@ -10379,9 +10395,9 @@ msgstr "Check Again"
 msgid "重新检测"
 msgstr "Detect again"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:229
 #: src/features/poetry/components/PoetryTranslationSection.tsx:230
-#: src/features/poetry/components/PoetryTranslationSection.tsx:397
+#: src/features/poetry/components/PoetryTranslationSection.tsx:231
+#: src/features/poetry/components/PoetryTranslationSection.tsx:398
 msgid "重新生成"
 msgstr "Regenerate"
 
@@ -10411,7 +10427,7 @@ msgid "重置位置"
 msgstr "Reset position"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:46
+#: src/features/logs/log-labels.ts:47
 msgid "重置文件传输连接"
 msgstr "Reset file transfer connection"
 
@@ -10426,7 +10442,7 @@ msgstr "The reset has changed. Check its status again."
 #. 重新读取桌面开机自启状态
 #. 重新读取诗词合集列表
 #. 重新连接传输进度事件监听
-#: src/features/about/AboutPage.tsx:103
+#: src/features/about/AboutPage.tsx:99
 #: src/features/about/DataManagementDialogs.tsx:91
 #: src/features/activity/TransferActivity.tsx:49
 #: src/features/bt/BtTool.tsx:253
@@ -10569,11 +10585,6 @@ msgstr "Descending"
 msgid "隐藏密码"
 msgstr "Hide password"
 
-#: src/features/home/HomePage.tsx:93
-#: src/features/home/HomePage.tsx:94
-msgid "隐藏小游戏"
-msgstr "Hide games"
-
 #: src/features/poetry/LibraryPage.tsx:300
 msgid "随机"
 msgstr "Random"
@@ -10604,6 +10615,10 @@ msgstr "Additional resource files needed"
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:115
 msgid "需重启服务生效。"
 msgstr "Restart the service to apply this."
+
+#: src/features/settings/font-options.ts:12
+msgid "霞鹜文楷"
+msgstr "LXGW WenKai"
 
 #. 游戏音量的静音切换按钮
 #: src/features/games/engine/GameVolumeControl.tsx:53
@@ -10648,7 +10663,7 @@ msgstr "Audio"
 msgid "顶点数"
 msgstr "Vertices"
 
-#: src/features/settings/AppSettingsMenu.tsx:97
+#: src/features/settings/AppSettingsMenu.tsx:99
 msgid "项目帮助"
 msgstr "Project help"
 
@@ -10685,7 +10700,7 @@ msgid "验证器版本：{version}"
 msgstr "Validator version: {version}"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
-#: src/features/logs/log-labels.ts:83
+#: src/features/logs/log-labels.ts:84
 msgid "验证访问权限"
 msgstr "Verify access"
 
@@ -10746,8 +10761,8 @@ msgid "黑胜"
 msgstr "Black wins"
 
 #: src/features/poetry/components/CollectionManagement.tsx:46
-#: src/features/settings/AppearanceSettings.tsx:53
-#: src/features/settings/AppSettingsMenu.tsx:181
+#: src/features/settings/AppearanceSettings.tsx:54
+#: src/features/settings/AppSettingsMenu.tsx:183
 msgid "默认"
 msgstr "Default"
 
@@ -10763,3 +10778,7 @@ msgstr "Default Directory"
 #: src/features/model-viewer/components/ViewerHelp.tsx:59
 msgid "鼠标拖动旋转，右键拖动平移，滚轮缩放。触屏单指旋转，双指平移或缩放。"
 msgstr "Drag to rotate, right-drag to pan, and scroll to zoom. On a touchscreen, use one finger to rotate and two fingers to pan or zoom."
+
+#: src/features/settings/font-options.ts:14
+msgid "龙藏体"
+msgstr "Long Cang"
