@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Gamepad2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useEffect, useEffectEvent, useRef } from "react";
 
+import AppLogo from "~/components/AppLogo";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
-import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import {
@@ -15,7 +15,6 @@ import {
   orderedHomeEntries,
 } from "./entries";
 import { homeDescriptions } from "./home-descriptions";
-import HomeRecentActivity from "./HomeRecentActivity";
 
 export default function HomePage({ category }: { category?: HomeCategory }) {
   const { t } = useLingui();
@@ -43,6 +42,15 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
     void navigate({ to: "/", search: { category: next ? "games" : "tools" } });
   };
 
+  // 双击手势挂在图标上，标题文字只承担当前分类名，不再响应点击。
+  const handleIconDoubleTap = () => {
+    const now = performance.now();
+    if (now - lastTapAt.current < 300) {
+      lastTapAt.current = 0;
+      toggleGames();
+    } else lastTapAt.current = now;
+  };
+
   // 快捷键监听只注册一次，通过 Effect Event 读取最新的 toggleGames。
   const handleGamesShortcut = useEffectEvent(() => {
     toggleGames();
@@ -66,37 +74,16 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
     >
       <ToolPageHeader
         showHome={false}
-        title={
+        leading={
           <span
+            className="inline-flex shrink-0 touch-manipulation select-none"
             title={t`双击或按 ⌘/Ctrl + . 显示或隐藏小游戏`}
-            onPointerDown={() => {
-              const now = performance.now();
-              if (now - lastTapAt.current < 300) {
-                lastTapAt.current = 0;
-                const next = !showGames;
-                setShowGames(next);
-                void navigate({
-                  to: "/",
-                  search: { category: next ? "games" : "tools" },
-                });
-              } else lastTapAt.current = now;
-            }}
+            onPointerDown={handleIconDoubleTap}
           >
-            {homeCategoryLabels[selected]}
+            <AppLogo className="size-7" />
           </span>
         }
-        trailing={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            density="adaptive"
-            aria-label={showGames ? t`隐藏小游戏` : t`显示小游戏`}
-            title={showGames ? t`隐藏小游戏` : t`显示小游戏`}
-            onClick={toggleGames}
-          >
-            <Gamepad2 />
-          </Button>
-        }
+        title={homeCategoryLabels[selected]}
       />
       <AppPageContent bottomInset="scroll">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -130,7 +117,6 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
             );
           })}
         </div>
-        <HomeRecentActivity />
       </AppPageContent>
     </main>
   );

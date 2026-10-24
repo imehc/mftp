@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
-import { ArrowDown, Ellipsis, History } from "lucide-react";
+import { ArrowUp, Ellipsis, History } from "lucide-react";
 import { useState } from "react";
 
 import type { AppError } from "~/bindings";
@@ -111,11 +111,11 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
               className="hidden md:inline-flex"
               onClick={onLatest}
               aria-label={t({
-                comment: "跳到运行期日志列表末尾并恢复跟随",
+                comment: "跳到运行期日志列表顶部并恢复跟随",
                 message: "最新",
               })}
             >
-              <ArrowDown />
+              <ArrowUp />
             </Button>
           ) : null}
           <Button asChild variant="ghost" size="icon-sm" density="adaptive">

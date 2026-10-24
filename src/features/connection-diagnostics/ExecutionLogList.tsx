@@ -12,9 +12,13 @@ import { EXECUTION_LOG_COLUMNS } from "./execution-log-layout";
 import ExecutionLogRow from "./ExecutionLogRow";
 import type { ExecutionLogs } from "./use-execution-logs";
 
+/** 距顶部小于该值的滚动视为仍在跟随最新记录。 */
+const FOLLOW_THRESHOLD = 24;
+
 export default function ExecutionLogList({ logs }: { logs: ExecutionLogs }) {
   const { t } = useLingui();
   const scroll = useRef<HTMLDivElement>(null);
+  const height = useRef(0);
   const filter = useActivityViewStore((state) => state.filter);
   const following = useActivityViewStore((state) => state.following);
   const saveScroll = useActivityViewStore((state) => state.saveScroll);
@@ -22,10 +26,13 @@ export default function ExecutionLogList({ logs }: { logs: ExecutionLogs }) {
     filter === "failed"
       ? logs.operations.filter(executionLogIsFailed)
       : logs.operations;
+  // 倒序展示：最新记录在最上，跟随最新即贴住顶部。
+  const ordered = [...operations].reverse();
   useLayoutEffect(() => {
     const element = scroll.current;
     if (!element) return;
     element.scrollTop = useActivityViewStore.getState().scrollTop;
+    height.current = element.scrollHeight;
     const focusedOperation = useActivityViewStore.getState().focusedOperation;
     if (focusedOperation) {
       const row = Array.from(
@@ -36,17 +43,30 @@ export default function ExecutionLogList({ logs }: { logs: ExecutionLogs }) {
   }, [filter]);
   useLayoutEffect(() => {
     const element = scroll.current;
+    if (!element) return;
+    // 新记录只插在顶部：跟随时贴顶，否则按新增高度补偿，避免阅读位置被顶走。
+    const grown = element.scrollHeight - height.current;
+    height.current = element.scrollHeight;
+    if (following) {
+      element.scrollTop = 0;
+      return;
+    }
+    if (grown > 0) element.scrollTop += grown;
+  }, [logs.operations, following]);
+  useLayoutEffect(() => {
+    const element = scroll.current;
     if (!element || !following) return;
 
     const follow = () => {
-      element.scrollTop = element.scrollHeight;
+      element.scrollTop = 0;
+      height.current = element.scrollHeight;
     };
 
     follow();
     const resize = new ResizeObserver(follow);
     resize.observe(element);
     return () => resize.disconnect();
-  }, [logs.operations, following]);
+  }, [following]);
   return (
     <>
       {logs.error ? (
@@ -95,11 +115,7 @@ export default function ExecutionLogList({ logs }: { logs: ExecutionLogs }) {
         className="app-scroll-safe-end focus-visible:ring-ring flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain outline-none focus-visible:ring-2"
         onScroll={(event) => {
           const element = event.currentTarget;
-          saveScroll(
-            element.scrollTop,
-            element.scrollHeight - element.scrollTop - element.clientHeight <
-              24,
-          );
+          saveScroll(element.scrollTop, element.scrollTop < FOLLOW_THRESHOLD);
         }}
       >
         {logs.loading ? (
@@ -110,7 +126,7 @@ export default function ExecutionLogList({ logs }: { logs: ExecutionLogs }) {
             <Trans>加载中…</Trans>
           </p>
         ) : operations.length ? (
-          operations.map((operation) => (
+          ordered.map((operation) => (
             <ExecutionLogRow key={operation.id} operation={operation} />
           ))
         ) : !logs.error ? (
