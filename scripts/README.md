@@ -24,25 +24,29 @@
 
 只读校验，不修改任何文件；CI 在对应阶段逐步调用：
 
-| 命令                      | 作用                                                         |
-| ------------------------- | ------------------------------------------------------------ |
-| `check:dev-isolation`     | 校验开发环境数据目录隔离（Node test runner）                 |
-| `check:react`             | 校验 React 相关依赖版本一致性                                |
-| `check:model-offline`     | 校验模型功能不引入联网依赖                                   |
-| `check:build-budget`      | 校验前端构建产物体积预算（`tests/checks/build-budget.json`） |
-| `check:platform`          | 校验各平台打包配置（Node test runner）                       |
-| `check:platform-artifact` | 校验发布产物归属与必需文件                                   |
-| `check:android-plugins`   | 校验 Android 插件注册与配置一致                              |
+| 命令                      | 作用                                                                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check:dev-isolation`     | 校验开发环境数据目录隔离（Node test runner）                                                                                                      |
+| `check:react`             | 校验 React 相关依赖版本一致性                                                                                                                     |
+| `check:model-offline`     | 校验模型功能不引入联网依赖                                                                                                                        |
+| `check:build-budget`      | 校验前端构建产物体积预算（`tests/checks/build-budget.json`）                                                                                      |
+| `check:platform`          | 校验各平台打包配置（Node test runner）                                                                                                            |
+| `check:platform-artifact` | 校验发布产物归属与必需文件                                                                                                                        |
+| `check:android-plugins`   | 校验 Android 插件注册与配置一致                                                                                                                   |
+| `check:app-icon-artifact` | 检查 APK 默认/night 图标、iOS 系统深色变体或 macOS 原生明暗图标栈及静态回退；参数为 `android <apk>`、`ios <app>` 或 `macos <app>`，可追加预期包名 |
+| `check:app-icons`         | 校验桌面原生图标配置、源图层与运行时换图权限排除，无需 Apple 工具链                                                                               |
 
 ## android:* 已知平台（Android / iOS）
 
-| 命令            | 作用                                           |
-| --------------- | ---------------------------------------------- |
-| `android:dev`   | 经 `scripts/android.sh` 启动 Android 开发构建  |
-| `android:build` | 经 `scripts/android.sh` 执行 Android 构建流程  |
-| `android:icons` | 生成 Android 应用图标                          |
-| `ios:dev`       | 启动 iOS 开发构建（转发 `pnpm tauri ios dev`） |
-| `ios:build`     | 执行 iOS 构建（转发 `pnpm tauri ios build`）   |
+| 命令            | 作用                                                                                    |
+| --------------- | --------------------------------------------------------------------------------------- |
+| `android:dev`   | 经 `scripts/android.sh` 启动 Android 开发构建                                           |
+| `android:build` | 经 `scripts/android.sh` 执行 Android 构建流程                                           |
+| `android:icons` | 生成 Android 应用图标                                                                   |
+| `ios:icons`     | 生成 iOS 浅色/深色应用图标                                                              |
+| `macos:icons`   | 使用 Xcode 26+ 编译并校验 macOS 原生明暗 Assets.car；macOS beforeBundleCommand 自动调用 |
+| `ios:dev`       | 启动 iOS 开发构建（转发 `pnpm tauri ios dev`）                                          |
+| `ios:build`     | 执行 iOS 构建（转发 `pnpm tauri ios build`）                                            |
 
 ## 领域:动作（生成、准备、版本）
 
@@ -56,6 +60,7 @@
 | `translation:prepare` | 下载并校验 `engine.json` 固定版本的 llama.cpp 源码、应用补丁；`pnpm tauri` 包装与 CI 自动执行，直接调 Cargo 时需手动运行 |
 | `version:check`       | 校验包版本在各清单文件间一致                                                                                             |
 | `version:bump`        | 递增版本号并同步所有清单文件                                                                                             |
+| `fonts:subset`        | 按思源 `chinese-simplified` 字符集重新生成 `src/assets/fonts` 下的中文子集；需 `fonttools` + `brotli`                    |
 
 ## i18n:* 国际化
 

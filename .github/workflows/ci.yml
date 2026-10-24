@@ -65,6 +65,9 @@ jobs:
       - name: Check platform packaging rules
         run: pnpm run check:platform
 
+      - name: Check native icon configuration
+        run: pnpm run check:app-icons
+
       - name: Build frontend
         run: pnpm run build
 
@@ -156,7 +159,7 @@ jobs:
 
   apple-check:
     name: macOS library and iOS plugins (compile only)
-    runs-on: macos-14
+    runs-on: macos-26
     timeout-minutes: 40
     steps:
       - name: Checkout

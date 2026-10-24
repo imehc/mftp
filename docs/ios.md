@@ -16,6 +16,10 @@ iOS 不需要类似 `scripts/android.sh` 的环境包装脚本(交叉编译 vend
 
 ## 常用命令
 
+`pnpm ios:icons` 根据 `public/app-light-icon.png` 和 `public/app-dark-icon.png` 生成同一个 AppIcon 的默认与深色外观资源，不使用备用图标或应用内主题切换。iOS 18 及以上由主屏幕的图标外观决定显示哪张；选择“自动”时随系统外观，用户强制浅色、深色或着色时尊重系统选择。旧系统使用默认图标。
+
+更换原生图标资源后需要重新构建并安装 iOS 应用，单独 `pnpm dev` 的前端热更新不会更新主屏图标。重新生成 Xcode 工程使用 `xcodegen generate --spec src-tauri/gen/apple/project.yml --project src-tauri/gen/apple`，不手改 pbxproj。应用内导航、关于页与 favicon 仍跟随应用内外观。
+
 `pnpm ios:dev` / `pnpm tauri ios dev` 自动使用 `tauri.dev.conf.json`，应用标识为 `com.imehc.mftp.dev`，名称为 `MFTP Dev`。Tauri CLI 在构建前同步 Xcode 的 bundle identifier 和产品名称，应用沙盒与 AI 凭据服务独立于正式版。`pnpm ios:build` 使用正式配置；`--debug` 构建使用开发配置。不手工修改生成的 pbxproj 来切换环境，应始终从对应 pnpm 命令进入。
 
 桌面端同样通过 `pnpm tauri dev` 自动隔离；macOS 数据目录为 `~/Library/Application Support/com.imehc.mftp.dev`，正式版仍为 `com.imehc.mftp`。开发环境首次启动为空，不导入或删除正式版数据。macOS 14+/iOS 17+ 的开发 WebView 使用独立 data store；旧系统仍由应用身份和开发 URL 区分。

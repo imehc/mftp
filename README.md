@@ -94,6 +94,9 @@ docs/                  # 平台构建及开发说明
 
 ## 注意事项
 
+- 系统图标与应用内外观独立：macOS 26+ 的 Finder/Dock 使用原生明暗图标资源，遵循系统的图标外观选择；旧版 macOS 保留静态 ICNS。构建 macOS 安装包需要 Xcode 26+，签名前自动从 `public/app-light-icon.png` 和 `public/app-dark-icon.png` 编译资源，编译产物不入 Git。
+- Windows 当前 MSI/NSIS 的 EXE、快捷方式和任务栏沿用固定 ICO，不通过运行时换图模拟系统主题资源；Microsoft 的包资源限定符方案未接入当前安装方式，不代表 Windows 本身完全不支持。Linux 按项目约定保留固定系统图标。应用内导航、关于页与 favicon 仍遵循应用设置。
+
 - macOS 未签名包可能提示“mftp 已损坏，无法打开”。确认安装包来源可信后，可移除隔离属性：
 
   ```bash

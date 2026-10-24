@@ -187,7 +187,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest
+          - platform: macos-26
             args: --bundles app,dmg
           - platform: windows-latest
             args: --bundles nsis,msi
@@ -257,6 +257,12 @@ jobs:
             exit 1
           fi
 
+      - name: Verify Apple icon toolchain
+        if: matrix.platform == 'macos-26'
+        run: |
+          xcodebuild -version
+          xcrun actool --version --output-format human-readable-text
+
       - name: Build and upload Tauri package
         uses: tauri-apps/tauri-action@v1
         env:
@@ -270,6 +276,10 @@ jobs:
           args: ${{ matrix.args }}
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
+
+      - name: Verify macOS native icon resources
+        if: matrix.platform == 'macos-26'
+        run: pnpm check:app-icon-artifact macos src-tauri/target/release/bundle/macos/mftp.app com.imehc.mftp
 
   android:
     name: Build Android arm64-v8a
@@ -460,6 +470,35 @@ jobs:
             "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${NAME}" \
             -H "Content-Type: application/octet-stream" --input "$NAME" --silent
 
+      - name: Prepare and upload Android update manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft-release.outputs.release_id }}
+          VERSION: ${{ needs.release-info.outputs.version }}
+          RELEASE_NOTES: ${{ needs.release-info.outputs.release_body }}
+        run: |
+          set -euo pipefail
+          APK="src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release.apk"
+          NAME="mftp_${VERSION}_arm64-v8a.apk"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/36.0.0"
+          BADGING="$($BUILD_TOOLS/aapt dump badging "$APK")"
+          PACKAGE_NAME="$(printf '%s\n' "$BADGING" | sed -n "s/^package: name='\([^']*\)'.*/\1/p")"
+          VERSION_NAME="$(printf '%s\n' "$BADGING" | sed -n "s/^package:.*versionName='\([^']*\)'.*/\1/p")"
+          VERSION_CODE="$(printf '%s\n' "$BADGING" | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")"
+          SIZE="$(stat -c '%s' "$APK")"
+          SHA256="$(sha256sum "$APK" | cut -d ' ' -f 1)"
+          PACKAGE_NAME="$PACKAGE_NAME" VERSION_NAME="$VERSION_NAME" VERSION_CODE="$VERSION_CODE" SIZE="$SIZE" SHA256="$SHA256" NAME="$NAME" VERSION="$VERSION" GITHUB_REPOSITORY="$GITHUB_REPOSITORY" RELEASE_NOTES="$RELEASE_NOTES" \
+            node -e 'const fs=require("fs"); const m={packageName:process.env.PACKAGE_NAME,version:process.env.VERSION,versionName:process.env.VERSION_NAME,versionCode:Number(process.env.VERSION_CODE),url:`https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${process.env.VERSION}/${process.env.NAME}`,size:Number(process.env.SIZE),sha256:process.env.SHA256,notes:(process.env.RELEASE_NOTES||"").trim()}; if(!m.packageName||!m.versionCode||!m.size||!m.sha256||!m.notes) throw new Error("Incomplete Android update manifest"); fs.writeFileSync("android.json",JSON.stringify(m,null,2)+"\n");'
+          ASSET_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" --paginate --jq '.[] | select(.name == "android.json") | .id')"
+          ASSET_ID="$(printf '%s\n' "$ASSET_IDS" | head -n 1)"
+          if [ -n "$ASSET_ID" ]; then
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" --silent
+          fi
+          gh api -X POST \
+            "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=android.json" \
+            -H "Content-Type: application/json" --input android.json --silent
+
   publish:
     name: Publish release
     # CI gates publication only; builds already ran in parallel with it.
@@ -496,14 +535,40 @@ jobs:
             -H "Accept: application/octet-stream" > /tmp/mftp-release/latest.json
           gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}" \
             > /tmp/mftp-release/release.json
+          ANDROID_ASSET_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" --paginate \
+            --jq '.[] | select(.name == "android.json") | .id')"
+          ANDROID_ASSET_ID="$(printf '%s\n' "$ANDROID_ASSET_IDS" | head -n 1)"
+          if [ -z "$ANDROID_ASSET_ID" ]; then
+            echo "android.json is missing from the draft release"
+            exit 1
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/releases/assets/${ANDROID_ASSET_ID}" \
+            -H "Accept: application/octet-stream" > /tmp/mftp-release/android.json
 
           node <<'NODE'
           const fs = require("fs");
 
           const manifestPath = "/tmp/mftp-release/latest.json";
+          const version = process.env.VERSION;
           const manifest = JSON.parse(
             fs.readFileSync(manifestPath, "utf8"),
           );
+          const android = JSON.parse(
+            fs.readFileSync("/tmp/mftp-release/android.json", "utf8"),
+          );
+          if (
+            android.packageName !== "com.imehc.mftp" ||
+            android.version !== version ||
+            !Number.isInteger(android.versionCode) ||
+            android.versionCode <= 0 ||
+            !android.url.startsWith("https://") ||
+            !Number.isInteger(android.size) ||
+            android.size <= 0 ||
+            !/^[0-9a-f]{64}$/i.test(android.sha256) ||
+            !android.notes
+          ) {
+            throw new Error("android.json is incomplete or invalid");
+          }
           const release = JSON.parse(
             fs.readFileSync("/tmp/mftp-release/release.json", "utf8"),
           );
