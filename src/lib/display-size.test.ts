@@ -61,7 +61,9 @@ it("设置迁移保留既有用户偏好，手动选择可持久化并重新读�
     {
       locale: "en",
       colorTheme: "tiesen",
+      // 旧版本存的是纯西文字体预设，迁移后应被丢弃。
       fontPreset: "outfit",
+      cjkFont: "kuaile",
       lastTool: "library",
     },
     5,
@@ -70,10 +72,13 @@ it("设置迁移保留既有用户偏好，手动选择可持久化并重新读�
     restoreLastTool: true,
     locale: "en",
     colorTheme: "tiesen",
-    fontPreset: "outfit",
+    cjkFont: "kuaile",
     lastTool: "library",
     displaySize: { mode: "system", scale: 1 },
   });
+  expect(
+    (migrated as unknown as Record<string, unknown>).fontPreset,
+  ).toBeUndefined();
   store.getState().setDisplaySize({ mode: "manual", scale: 1.125 });
   const saved = storage.get("mftp-settings")!;
   expect(JSON.parse(saved).state.displaySize).toEqual({

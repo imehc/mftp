@@ -4,14 +4,15 @@ import { useTheme } from "next-themes";
 
 import { localeLabels, localeOptions } from "~/i18n/locales";
 import {
+  cjkFonts,
   colorThemes,
-  fontPresets,
+  resolveCjkFont,
   resolveColorTheme,
-  resolveFontPreset,
 } from "~/lib/color-theme";
 import { useSettingsStore } from "~/store/settings";
 
 import DisplaySizeSettings from "./DisplaySizeSettings";
+import { fontOptionLabels } from "./font-options";
 import SettingChoice from "./SettingChoice";
 import { SettingsGroup } from "./SettingsEntry";
 
@@ -59,17 +60,12 @@ export default function AppearanceSettings() {
       <SettingChoice
         id="settings-font"
         icon={Type}
-        title={t({ message: "字体", comment: "应用界面字体选择" })}
-        value={settings.fontPreset}
-        onChange={(value) => settings.setFontPreset(resolveFontPreset(value))}
-        options={fontPresets.map((value) => ({
+        title={t({ message: "字体", comment: "应用界面字体选择（中文字体）" })}
+        value={settings.cjkFont}
+        onChange={(value) => settings.setCjkFont(resolveCjkFont(value))}
+        options={cjkFonts.map((value) => ({
           value,
-          label:
-            value === "theme"
-              ? t`跟随主题`
-              : value === "jakarta"
-                ? "Plus Jakarta"
-                : value[0].toUpperCase() + value.slice(1),
+          label: i18n._(fontOptionLabels[value]),
         }))}
       />
       <DisplaySizeSettings />

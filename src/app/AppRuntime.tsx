@@ -1,3 +1,4 @@
+import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
 import { installBtRuntime } from "~/features/bt/integration";
@@ -5,11 +6,12 @@ import { installGameSessionRuntime } from "~/features/games/engine/session-regis
 import { installModelSystemRuntime } from "~/features/model-viewer/system/inbox";
 import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
 import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
+import { applyAppIcon } from "~/lib/app-icon";
 import {
+  applyCjkFont,
   applyColorTheme,
-  applyFontPreset,
+  resolveCjkFont,
   resolveColorTheme,
-  resolveFontPreset,
 } from "~/lib/color-theme";
 import { applyDisplaySize } from "~/lib/display-size";
 import { router } from "~/router";
@@ -22,9 +24,14 @@ import { useSettingsStore } from "~/store/settings";
  * 安装函数自身幂等，StrictMode 的重复挂载不会产生重复订阅。
  */
 export function AppRuntime() {
+  const { resolvedTheme } = useTheme();
   const colorTheme = useSettingsStore((state) => state.colorTheme);
   const displaySize = useSettingsStore((state) => state.displaySize);
-  const fontPreset = useSettingsStore((state) => state.fontPreset);
+  const cjkFont = useSettingsStore((state) => state.cjkFont);
+  useEffect(() => {
+    const theme = resolvedTheme === "dark" ? "dark" : "light";
+    applyAppIcon(theme);
+  }, [resolvedTheme]);
   useEffect(() => {
     applyDisplaySize(displaySize);
   }, [displaySize]);
@@ -33,8 +40,8 @@ export function AppRuntime() {
     applyColorTheme(resolveColorTheme(colorTheme));
   }, [colorTheme]);
   useEffect(() => {
-    applyFontPreset(resolveFontPreset(fontPreset));
-  }, [fontPreset]);
+    applyCjkFont(resolveCjkFont(cjkFont));
+  }, [cjkFont]);
   useEffect(() => {
     const disposeModels = installModelSystemRuntime(() =>
       router.navigate({ to: "/tools/model-viewer" }),

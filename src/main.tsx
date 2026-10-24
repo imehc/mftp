@@ -14,13 +14,13 @@ import {
   UpdaterDialog,
 } from "~/features/updater/integration";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
-import { applyStoredColorTheme } from "~/lib/color-theme";
+import { applyStoredThemeAndFonts } from "~/lib/color-theme";
 import { applyStoredDisplaySize } from "~/lib/display-size";
 import { applyStoredAppearance } from "~/lib/initial-appearance";
 
 import { router } from "./router";
 
-applyStoredColorTheme();
+applyStoredThemeAndFonts();
 applyStoredDisplaySize();
 applyStoredAppearance();
 

@@ -34,8 +34,7 @@ html[data-theme="designbyte"] {
   --sidebar-accent-foreground: oklch(0 0 0);
   --sidebar-border: oklch(0.9401 0 0);
   --sidebar-ring: oklch(0 0 0);
-  --font-sans-token:
-    "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
+  --font-latin-token: "Plus Jakarta Sans Variable", "Plus Jakarta Sans";
   --font-mono-token: "IBM Plex Mono", ui-monospace, monospace;
   --tracking-normal: 0em;
 }
@@ -74,8 +73,7 @@ html.dark[data-theme="designbyte"] {
   --sidebar-accent-foreground: oklch(0.8545 0.1675 159.6564);
   --sidebar-border: oklch(0.3452 0.0098 241.941);
   --sidebar-ring: oklch(0.8545 0.1675 159.6564);
-  --font-sans-token:
-    "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
+  --font-latin-token: "Plus Jakarta Sans Variable", "Plus Jakarta Sans";
   --font-mono-token: "IBM Plex Mono", ui-monospace, monospace;
   --tracking-normal: 0em;
 }
@@ -114,7 +112,7 @@ html[data-theme="mx-brutalist"] {
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0 0 0);
   --sidebar-ring: oklch(0.7721 0.1727 64.1585);
-  --font-sans-token: "Montserrat Variable", Montserrat, sans-serif;
+  --font-latin-token: "Montserrat Variable", Montserrat;
   --font-mono-token: "Space Mono", ui-monospace, monospace;
   --tracking-normal: 0.02em;
 }
@@ -153,7 +151,7 @@ html.dark[data-theme="mx-brutalist"] {
   --sidebar-accent-foreground: oklch(0.9809 0.026 91.6197);
   --sidebar-border: oklch(0.9809 0.026 91.6197);
   --sidebar-ring: oklch(0.7951 0.1631 68.6392);
-  --font-sans-token: "Montserrat Variable", Montserrat, sans-serif;
+  --font-latin-token: "Montserrat Variable", Montserrat;
   --font-mono-token: "Space Mono", ui-monospace, monospace;
   --tracking-normal: 0.04em;
 }
@@ -192,7 +190,7 @@ html[data-theme="cyberpunk"] {
   --sidebar-accent-foreground: oklch(0.1649 0.0352 281.8285);
   --sidebar-border: oklch(0.9205 0.0086 225.0878);
   --sidebar-ring: oklch(0.6726 0.2904 341.4084);
-  --font-sans-token: "Outfit Variable", Outfit, sans-serif;
+  --font-latin-token: "Outfit Variable", Outfit;
   --font-mono-token: "Fira Code", ui-monospace, monospace;
   --tracking-normal: 0em;
 }
@@ -231,7 +229,7 @@ html.dark[data-theme="cyberpunk"] {
   --sidebar-accent-foreground: oklch(0.1649 0.0352 281.8285);
   --sidebar-border: oklch(0.3279 0.0832 280.789);
   --sidebar-ring: oklch(0.6726 0.2904 341.4084);
-  --font-sans-token: "Outfit Variable", Outfit, sans-serif;
+  --font-latin-token: "Outfit Variable", Outfit;
   --font-mono-token: "Fira Code", ui-monospace, monospace;
   --tracking-normal: 0em;
 }
@@ -270,7 +268,7 @@ html[data-theme="tiesen"] {
   --sidebar-accent-foreground: oklch(0.2571 0.1161 272.24);
   --sidebar-border: oklch(0.92 0 0);
   --sidebar-ring: oklch(0.5144 0.1605 267.44);
-  --font-sans-token: "Geist Variable", Geist, sans-serif;
+  --font-latin-token: "Geist Variable", Geist;
   --font-mono-token:
     "Geist Mono Variable", "Geist Mono", ui-monospace, monospace;
   --tracking-normal: 0em;
@@ -310,35 +308,27 @@ html.dark[data-theme="tiesen"] {
   --sidebar-accent-foreground: oklch(0.9214 0.0248 257.65);
   --sidebar-border: oklch(0.26 0 0);
   --sidebar-ring: oklch(0.5144 0.1605 267.44);
-  --font-sans-token: "Geist Variable", Geist, sans-serif;
+  --font-latin-token: "Geist Variable", Geist;
   --font-mono-token:
     "Geist Mono Variable", "Geist Mono", ui-monospace, monospace;
   --tracking-normal: 0em;
 }
 
-/* 独立的字体覆盖（data-font）。 */
-html[data-font="geist"] {
-  --font-sans-token: "Geist Variable", Geist, sans-serif;
-  --font-mono-token:
-    "Geist Mono Variable", "Geist Mono", ui-monospace, monospace;
-  --font-poetry-token: var(--font-sans-token);
+/* 中文字族（data-cjk）。默认留空即跟随系统，避免额外字体加载。
+   每个预设都带回退链，个别生僻字缺字时不会突然变成另一种字重。 */
+html[data-cjk="wenkai"] {
+  --font-cjk-token: "LXGW WenKai App", "STKaiti", "KaiTi", sans-serif;
 }
 
-html[data-font="outfit"] {
-  --font-sans-token: "Outfit Variable", Outfit, sans-serif;
-  --font-mono-token: "Fira Code", ui-monospace, monospace;
-  --font-poetry-token: var(--font-sans-token);
+html[data-cjk="kuaile"] {
+  --font-cjk-token:
+    "ZCOOL KuaiLe App", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
-html[data-font="jakarta"] {
-  --font-sans-token:
-    "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
-  --font-mono-token: "IBM Plex Mono", ui-monospace, monospace;
-  --font-poetry-token: var(--font-sans-token);
+html[data-cjk="longcang"] {
+  --font-cjk-token: "Long Cang App", "KaiTi", "STKaiti", serif;
 }
 
-html[data-font="montserrat"] {
-  --font-sans-token: "Montserrat Variable", Montserrat, sans-serif;
-  --font-mono-token: "Space Mono", ui-monospace, monospace;
-  --font-poetry-token: var(--font-sans-token);
+html[data-cjk="pixel"] {
+  --font-cjk-token: "Fusion Pixel App", "PingFang SC", sans-serif;
 }

@@ -1,8 +1,11 @@
 export type ColorTheme =
   "default" | "designbyte" | "mx-brutalist" | "cyberpunk" | "tiesen";
 
-export type FontPreset =
-  "theme" | "geist" | "outfit" | "jakarta" | "montserrat";
+/**
+ * 界面字体：只提供含中文字形的预设，西文字形始终由 Geist 承担。
+ * 主题仍可覆盖 `--font-latin-token`，但不影响这里选定的汉字体。
+ */
+export type CjkFont = "system" | "wenkai" | "kuaile" | "longcang" | "pixel";
 
 export type ThemeSwatches = {
   background: string;
@@ -62,16 +65,16 @@ export const colorThemes: ReadonlyArray<{
   },
 ];
 
-export const fontPresets = [
-  "theme",
-  "geist",
-  "outfit",
-  "jakarta",
-  "montserrat",
-] as const satisfies ReadonlyArray<FontPreset>;
+export const cjkFonts = [
+  "system",
+  "wenkai",
+  "kuaile",
+  "longcang",
+  "pixel",
+] as const satisfies ReadonlyArray<CjkFont>;
 
 const colorThemeValues = new Set<string>(colorThemes.map((item) => item.value));
-const fontPresetValues = new Set<string>(fontPresets);
+const cjkFontValues = new Set<string>(cjkFonts);
 
 const legacyColorThemes: Record<string, ColorTheme> = {
   blue: "tiesen",
@@ -101,10 +104,6 @@ export function isColorTheme(value: unknown): value is ColorTheme {
   return typeof value === "string" && colorThemeValues.has(value);
 }
 
-export function isFontPreset(value: unknown): value is FontPreset {
-  return typeof value === "string" && fontPresetValues.has(value);
-}
-
 export function resolveColorTheme(value: unknown): ColorTheme {
   if (isColorTheme(value)) return value;
   if (typeof value === "string" && value in legacyColorThemes) {
@@ -113,8 +112,12 @@ export function resolveColorTheme(value: unknown): ColorTheme {
   return "default";
 }
 
-export function resolveFontPreset(value: unknown): FontPreset {
-  return isFontPreset(value) ? value : "theme";
+export function isCjkFont(value: unknown): value is CjkFont {
+  return typeof value === "string" && cjkFontValues.has(value);
+}
+
+export function resolveCjkFont(value: unknown): CjkFont {
+  return isCjkFont(value) ? value : "system";
 }
 
 export function applyColorTheme(theme: ColorTheme) {
@@ -126,25 +129,28 @@ export function applyColorTheme(theme: ColorTheme) {
   }
 }
 
-export function applyFontPreset(font: FontPreset) {
+export function applyCjkFont(font: CjkFont) {
   const root = document.documentElement;
-  if (font === "theme") {
-    root.removeAttribute("data-font");
+  if (font === "system") {
+    root.removeAttribute("data-cjk");
   } else {
-    root.setAttribute("data-font", font);
+    root.setAttribute("data-cjk", font);
   }
 }
 
 /** 在 React 渲染前，从已持久化的设置中恢复主题 / 字体。 */
-export function applyStoredColorTheme() {
+export function applyStoredThemeAndFonts() {
   try {
     const raw = localStorage.getItem("mftp-settings");
     if (!raw) return;
     const parsed = JSON.parse(raw) as {
-      state?: { colorTheme?: unknown; fontPreset?: unknown };
+      state?: {
+        colorTheme?: unknown;
+        cjkFont?: unknown;
+      };
     };
     applyColorTheme(resolveColorTheme(parsed.state?.colorTheme));
-    applyFontPreset(resolveFontPreset(parsed.state?.fontPreset));
+    applyCjkFont(resolveCjkFont(parsed.state?.cjkFont));
   } catch {
     // 忽略损坏的存储；React 完成 hydrate 后会重新应用。
   }

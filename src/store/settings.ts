@@ -3,10 +3,10 @@ import { persist } from "zustand/middleware";
 
 import type { DirectoryTransferMode as SftpDirectoryTransferMode } from "~/bindings";
 import {
+  type CjkFont,
   type ColorTheme,
-  type FontPreset,
+  resolveCjkFont,
   resolveColorTheme,
-  resolveFontPreset,
 } from "~/lib/color-theme";
 import { type DisplaySize, resolveDisplaySize } from "~/lib/display-size";
 import {
@@ -65,7 +65,7 @@ interface SettingsState {
   manualPage: ModuleId | null;
   restoreLastTool: boolean;
   colorTheme: ColorTheme;
-  fontPreset: FontPreset;
+  cjkFont: CjkFont;
   displaySize: DisplaySize;
   /** 首页游戏区默认折叠。 */
   showGames: boolean;
@@ -85,7 +85,7 @@ interface SettingsState {
   setManualPage: (page: ModuleId | null) => void;
   setRestoreLastTool: (restore: boolean) => void;
   setColorTheme: (theme: ColorTheme) => void;
-  setFontPreset: (font: FontPreset) => void;
+  setCjkFont: (font: CjkFont) => void;
   setDisplaySize: (value: DisplaySize) => void;
   setShowGames: (show: boolean) => void;
   setGamesVolume: (volume: number) => void;
@@ -108,7 +108,7 @@ export const useSettingsStore = create<SettingsState>()(
       manualPage: null,
       restoreLastTool: true,
       colorTheme: "default",
-      fontPreset: "theme",
+      cjkFont: "system",
       displaySize: { mode: "system", scale: 1 },
       showGames: false,
       gamesVolume: 0.7,
@@ -136,7 +136,7 @@ export const useSettingsStore = create<SettingsState>()(
           startupMode: restoreLastTool ? "last" : "home",
         }),
       setColorTheme: (theme) => set({ colorTheme: theme }),
-      setFontPreset: (font) => set({ fontPreset: font }),
+      setCjkFont: (font) => set({ cjkFont: font }),
       setDisplaySize: (value) =>
         set({ displaySize: resolveDisplaySize(value) }),
       setShowGames: (show) =>
@@ -170,6 +170,8 @@ export const useSettingsStore = create<SettingsState>()(
       migrate: (persisted) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         delete state.webBrowserDefaultUrl;
+        // 纯西文字体预设已废弃：字体选项改为只提供含中文字形的预设。
+        delete state.fontPreset;
         const legacyTool =
           typeof state.lastTool === "string" ? state.lastTool : null;
         // 两个压缩工具已合并为同一个路由；其余工具只有在
@@ -215,7 +217,7 @@ export const useSettingsStore = create<SettingsState>()(
               ? state.restoreLastTool
               : true,
           colorTheme: resolveColorTheme(state.colorTheme),
-          fontPreset: resolveFontPreset(state.fontPreset),
+          cjkFont: resolveCjkFont(state.cjkFont),
           displaySize: resolveDisplaySize(state.displaySize),
           homeEntryOrder: resolveHomeEntryOrder(state.homeEntryOrder),
           homeEntryVisibility:

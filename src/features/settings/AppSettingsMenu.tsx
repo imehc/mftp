@@ -31,14 +31,16 @@ import AiModelMenu from "~/features/ai-configuration/AiModelMenu";
 import { UpdateMenuItem } from "~/features/updater/integration";
 import { localeLabels, localeOptions } from "~/i18n/locales";
 import {
+  type CjkFont,
+  cjkFonts,
   type ColorTheme,
   colorThemes,
-  type FontPreset,
-  fontPresets,
+  resolveCjkFont,
   resolveColorTheme,
-  resolveFontPreset,
 } from "~/lib/color-theme";
 import { type AppLocale, useSettingsStore } from "~/store/settings";
+
+import { fontOptionLabels } from "./font-options";
 
 const themes = [
   { value: "system", icon: Monitor },
@@ -54,8 +56,8 @@ export default function AppSettingsMenu() {
   const setLocale = useSettingsStore((s) => s.setLocale);
   const colorTheme = useSettingsStore((s) => s.colorTheme);
   const setColorTheme = useSettingsStore((s) => s.setColorTheme);
-  const fontPreset = useSettingsStore((s) => s.fontPreset);
-  const setFontPreset = useSettingsStore((s) => s.setFontPreset);
+  const cjkFont = useSettingsStore((s) => s.cjkFont);
+  const setCjkFont = useSettingsStore((s) => s.setCjkFont);
   const ThemeIcon =
     themes.find((item) => item.value === theme)?.icon ?? Monitor;
   return (
@@ -194,16 +196,12 @@ export default function AppSettingsMenu() {
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="ui-density-adaptive min-w-40 whitespace-nowrap">
             <DropdownMenuRadioGroup
-              value={resolveFontPreset(fontPreset)}
-              onValueChange={(value) => setFontPreset(value as FontPreset)}
+              value={resolveCjkFont(cjkFont)}
+              onValueChange={(value) => setCjkFont(value as CjkFont)}
             >
-              {fontPresets.map((item) => (
+              {cjkFonts.map((item) => (
                 <DropdownMenuRadioItem key={item} value={item}>
-                  {item === "theme"
-                    ? t`跟随主题`
-                    : item === "jakarta"
-                      ? "Plus Jakarta"
-                      : item[0].toUpperCase() + item.slice(1)}
+                  {_(fontOptionLabels[item])}
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup>
