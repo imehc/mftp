@@ -572,7 +572,6 @@ jobs:
           const release = JSON.parse(
             fs.readFileSync("/tmp/mftp-release/release.json", "utf8"),
           );
-          const version = process.env.VERSION;
           if (
             manifest.version !== version ||
             release.name !== `mftp v${version}` ||
