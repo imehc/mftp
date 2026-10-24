@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 
+import AppLogo from "~/components/AppLogo";
 import ActivityEntry from "~/features/activity/ActivityEntry";
 
 import type { NavigationItem, NavigationSection } from "./NavigationItems";
@@ -17,12 +18,7 @@ export default function NavigationRailDesktop({
   const settings = items.filter((item) => item.id === "settings");
   return (
     <aside className="border-border flex w-23 shrink-0 flex-col items-center gap-5 border-r px-2 pt-4.5 pb-[max(0.75rem,var(--safe-bottom,0px))]">
-      <div
-        aria-label="MFTP"
-        className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-lg text-lg font-semibold"
-      >
-        M
-      </div>
+      <AppLogo />
       <nav
         aria-label={t`应用主导航`}
         className="flex min-h-0 w-full flex-1 flex-col gap-2.5"

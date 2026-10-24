@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2EBBFFA2A1B3DB62D59E6ED6 /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 448B75A2FEB9E7CDCDB98EC5 /* libapp.a */; };
+		6A2FCB5D620124513E1EF082 /* libapp.a in Resources */ = {isa = PBXBuildFile; fileRef = 3C200511F11A39A8EBAC4C39 /* libapp.a */; };
 		927456779190CA493B4FB93F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC07ACCAE311B31C2093A8A1 /* QuartzCore.framework */; };
 		9B6C310B82AE603D176545CC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FF653CD69494C813F6A6743 /* Security.framework */; };
 		9C9D92B7E73EDC1E7B37F81C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5374D67E8DC6C87544016366 /* WebKit.framework */; };
@@ -22,68 +23,510 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0065650A52D04DC0505B2463 /* error.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = error.rs; sourceTree = "<group>"; };
-		0284B7943F2D8A7A0D716D35 /* activity.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = activity.rs; sourceTree = "<group>"; };
-		052A969B2490713F552F3E6E /* shell_worker.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = shell_worker.rs; sourceTree = "<group>"; };
-		0690266B04EC628101BA5F7A /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		00288BFF860C5394B4145C0D /* probe.rs */ = {isa = PBXFileReference; path = probe.rs; sourceTree = "<group>"; };
+		005EF55031806ABC19D677CF /* http_range_tests.rs */ = {isa = PBXFileReference; path = http_range_tests.rs; sourceTree = "<group>"; };
+		00AA3013CF28B5A97E52B071 /* runtime.rs */ = {isa = PBXFileReference; path = runtime.rs; sourceTree = "<group>"; };
+		00C5BECE8C45E14E1B96F33F /* anthropic.rs */ = {isa = PBXFileReference; path = anthropic.rs; sourceTree = "<group>"; };
+		00F64FFEAEF0ED19225DE31F /* android_events_tests.rs */ = {isa = PBXFileReference; path = android_events_tests.rs; sourceTree = "<group>"; };
+		011A7A04B8CD8A1B22AD6713 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		01232811870305EBEE96F97C /* logging.rs */ = {isa = PBXFileReference; path = logging.rs; sourceTree = "<group>"; };
+		01B748A223458EF91F466D8A /* ipc_tests.rs */ = {isa = PBXFileReference; path = ipc_tests.rs; sourceTree = "<group>"; };
+		021578DD97EBA100DA8EA1AA /* diagnostics.rs */ = {isa = PBXFileReference; path = diagnostics.rs; sourceTree = "<group>"; };
+		026C3EB9205E48F3F9BCB219 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		0284B7943F2D8A7A0D716D35 /* activity.rs */ = {isa = PBXFileReference; path = activity.rs; sourceTree = "<group>"; };
+		0402A6DBD2074FF33B5A4932 /* export_lifecycle_tests.rs */ = {isa = PBXFileReference; path = export_lifecycle_tests.rs; sourceTree = "<group>"; };
+		0445A6DEA290294E05AEF32F /* http_error.rs */ = {isa = PBXFileReference; path = http_error.rs; sourceTree = "<group>"; };
+		04CC7ECCEBC46B6029A50A95 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		0516DC9A10953392FCFE16DC /* server.rs */ = {isa = PBXFileReference; path = server.rs; sourceTree = "<group>"; };
+		0579C93F961D5E169637AA8C /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		05C604D17428A5B4FA21AE4A /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		073E38A9F597FB9CC21C573E /* legacy.rs */ = {isa = PBXFileReference; path = legacy.rs; sourceTree = "<group>"; };
+		0851E992D2A060C1C9D28ECE /* note_model.rs */ = {isa = PBXFileReference; path = note_model.rs; sourceTree = "<group>"; };
 		08CA93492194B986EA9852D7 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = SOURCE_ROOT; };
-		08D5ED3B785F321DF535D69A /* tasks.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = tasks.rs; sourceTree = "<group>"; };
-		1148E89A735225338E98BF9A /* browser_page.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = browser_page.rs; sourceTree = "<group>"; };
-		1AA8B94F69057CAE5097F9B0 /* logging.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = logging.rs; sourceTree = "<group>"; };
-		24CF78ADBDFD7A0AB45A22D8 /* http_io.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = http_io.rs; sourceTree = "<group>"; };
+		08D30478FDBBBA3C32E7B398 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		09D10B61D88A78C0248B6335 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		0B047E7B74317C24FC49F930 /* upload_routes.rs */ = {isa = PBXFileReference; path = upload_routes.rs; sourceTree = "<group>"; };
+		0B65113385CA3C2B002D3D6E /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		0C41266ECCC5E57B0C20A68F /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		0CE3DA893555A619ECA2A814 /* download_archive.rs */ = {isa = PBXFileReference; path = download_archive.rs; sourceTree = "<group>"; };
+		0D9C45FBB69FC1B3486F789A /* note_commands.rs */ = {isa = PBXFileReference; path = note_commands.rs; sourceTree = "<group>"; };
+		0DB74DE5D5C08E3D864CAA58 /* drafts.rs */ = {isa = PBXFileReference; path = drafts.rs; sourceTree = "<group>"; };
+		0DFBC224E04E517F958348CC /* sync_tests.rs */ = {isa = PBXFileReference; path = sync_tests.rs; sourceTree = "<group>"; };
+		0E6B19D6ACDC9BC9C4E586AD /* environment.rs */ = {isa = PBXFileReference; path = environment.rs; sourceTree = "<group>"; };
+		0ED9B181EDA1A2066516B781 /* attachments.rs */ = {isa = PBXFileReference; path = attachments.rs; sourceTree = "<group>"; };
+		0F75B389EB47CDB67C9399E1 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		0FA88EC5239678088366FA1D /* net_tests.rs */ = {isa = PBXFileReference; path = net_tests.rs; sourceTree = "<group>"; };
+		0FACFC0145355F14BDCAC8AA /* ingest.rs */ = {isa = PBXFileReference; path = ingest.rs; sourceTree = "<group>"; };
+		117ED9DAE2AD43E71C8C8CAB /* library_cache.rs */ = {isa = PBXFileReference; path = library_cache.rs; sourceTree = "<group>"; };
+		1188645DEDDD2D4FA99389D9 /* model_tests.rs */ = {isa = PBXFileReference; path = model_tests.rs; sourceTree = "<group>"; };
+		11D25E015136C91751E611C4 /* maintenance_export_tests.rs */ = {isa = PBXFileReference; path = maintenance_export_tests.rs; sourceTree = "<group>"; };
+		1332CC115ED6231C2EAC264B /* spec.rs */ = {isa = PBXFileReference; path = spec.rs; sourceTree = "<group>"; };
+		1361BEDE4145939726958C2B /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		138706AE435887A0C02A83D8 /* capability_tests.rs */ = {isa = PBXFileReference; path = capability_tests.rs; sourceTree = "<group>"; };
+		13E8971F56134F9B7E9A7032 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		14DC00A5C13700CDF4CBCCFD /* discovery.rs */ = {isa = PBXFileReference; path = discovery.rs; sourceTree = "<group>"; };
+		14EA1C80227D1D58BDA94297 /* management_tests.rs */ = {isa = PBXFileReference; path = management_tests.rs; sourceTree = "<group>"; };
+		155EF4D78C113C816215B98B /* bridge.rs */ = {isa = PBXFileReference; path = bridge.rs; sourceTree = "<group>"; };
+		17379E8750675F365E642E33 /* archive_tests.rs */ = {isa = PBXFileReference; path = archive_tests.rs; sourceTree = "<group>"; };
+		17BD6393676A939133493E1F /* remote_temp_tests.rs */ = {isa = PBXFileReference; path = remote_temp_tests.rs; sourceTree = "<group>"; };
+		17C3DC3A1E66875D564BD0E4 /* files.rs */ = {isa = PBXFileReference; path = files.rs; sourceTree = "<group>"; };
+		17CBB168F3F304A94D7027AB /* activity_tests.rs */ = {isa = PBXFileReference; path = activity_tests.rs; sourceTree = "<group>"; };
+		188E0611A4632CFBA8742023 /* note_tests.rs */ = {isa = PBXFileReference; path = note_tests.rs; sourceTree = "<group>"; };
+		18AE4EA6D69EE94B511B65E7 /* translation_store.rs */ = {isa = PBXFileReference; path = translation_store.rs; sourceTree = "<group>"; };
+		194B7CAF23F808AFBBA14F74 /* transport_body.rs */ = {isa = PBXFileReference; path = transport_body.rs; sourceTree = "<group>"; };
+		1A9A47751E23A01CDF84B877 /* models.rs */ = {isa = PBXFileReference; path = models.rs; sourceTree = "<group>"; };
+		1AEA977B45C4885556BFFF49 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		1B1CE84206234558F273616B /* data_tests.rs */ = {isa = PBXFileReference; path = data_tests.rs; sourceTree = "<group>"; };
+		1B46FA252374F70BA9A24389 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		1B474CB565ECE9B8691D3C1E /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		1B9D2800BB30143CA5B93ED1 /* import.rs */ = {isa = PBXFileReference; path = import.rs; sourceTree = "<group>"; };
+		1BB7B10B29AAAE8D7C456D98 /* sync_tests.rs */ = {isa = PBXFileReference; path = sync_tests.rs; sourceTree = "<group>"; };
+		1BD432E016FF7B79BDE94321 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		1BF1C7C37F80DA5ED52B2317 /* transfer_io.rs */ = {isa = PBXFileReference; path = transfer_io.rs; sourceTree = "<group>"; };
+		1C45AAFD026ADEEBB822F74F /* upload_tests.rs */ = {isa = PBXFileReference; path = upload_tests.rs; sourceTree = "<group>"; };
+		1F6FC8C2B085E651015BC9B5 /* browser_page_tests.rs */ = {isa = PBXFileReference; path = browser_page_tests.rs; sourceTree = "<group>"; };
+		209D9B104AC833D377EF50BA /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		20F62EAD220F4EB35D00A542 /* operations.rs */ = {isa = PBXFileReference; path = operations.rs; sourceTree = "<group>"; };
+		2169732CC4E999E2242C1E30 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		21DFE430ECC8AB7D09984A78 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		22E8CF47E9A653CEF6CA7A36 /* ai_cache.rs */ = {isa = PBXFileReference; path = ai_cache.rs; sourceTree = "<group>"; };
+		22F8CC9E3F638F0D97C23837 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		231496F59FD1C073ABA45F11 /* lifecycle.rs */ = {isa = PBXFileReference; path = lifecycle.rs; sourceTree = "<group>"; };
+		2353E8747937C4E0A9C40524 /* ai_memory.rs */ = {isa = PBXFileReference; path = ai_memory.rs; sourceTree = "<group>"; };
+		235B6FC4B7079EF934DA8BE5 /* translation.rs */ = {isa = PBXFileReference; path = translation.rs; sourceTree = "<group>"; };
+		23EC23278EB592358DE5692A /* access_routes.rs */ = {isa = PBXFileReference; path = access_routes.rs; sourceTree = "<group>"; };
+		23FB6C475B45DDADC02B9295 /* protocol_tests.rs */ = {isa = PBXFileReference; path = protocol_tests.rs; sourceTree = "<group>"; };
+		247F77863FE542B77B5E938D /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		247F906E750A3F161C808CC7 /* transfer_io_tests.rs */ = {isa = PBXFileReference; path = transfer_io_tests.rs; sourceTree = "<group>"; };
+		24848902C3F9FA933F49B511 /* remote_command.rs */ = {isa = PBXFileReference; path = remote_command.rs; sourceTree = "<group>"; };
 		24EC3444B62F380DFA1D5FE3 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		28717CA7AEF661EFC3A0BD0A /* keys.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = keys.rs; sourceTree = "<group>"; };
-		2AC5FEAAA5E3FF4BABD9B327 /* transfer_control.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = transfer_control.rs; sourceTree = "<group>"; };
-		2D90A841493DB74D7777F0C4 /* path_utils.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = path_utils.rs; sourceTree = "<group>"; };
-		30A59BA48A0EFE9F36300D7A /* mftp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mftp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		25DC76105BC8BDE4735B979A /* system_tests.rs */ = {isa = PBXFileReference; path = system_tests.rs; sourceTree = "<group>"; };
+		26708B756D1DBCE0ABC00AF4 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		2672F63CEC2607A67D86EF7B /* testing.rs */ = {isa = PBXFileReference; path = testing.rs; sourceTree = "<group>"; };
+		26AD034EBD593B99099B1E40 /* path_utils.rs */ = {isa = PBXFileReference; path = path_utils.rs; sourceTree = "<group>"; };
+		26C364C8C8003AC8EFC8D02F /* selection.rs */ = {isa = PBXFileReference; path = selection.rs; sourceTree = "<group>"; };
+		26CABE20E04AA70D0EB3EF39 /* staging.rs */ = {isa = PBXFileReference; path = staging.rs; sourceTree = "<group>"; };
+		26FCA8B71563B8A646A2269D /* selection_network_tests.rs */ = {isa = PBXFileReference; path = selection_network_tests.rs; sourceTree = "<group>"; };
+		27834A4759AD45DE05E75C46 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		27AF8E95FDB94B62D8790349 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		28A9DB9C45512A24B4A91F16 /* file_ops_tests.rs */ = {isa = PBXFileReference; path = file_ops_tests.rs; sourceTree = "<group>"; };
+		28D3A003B4D8DD69AA683381 /* net.rs */ = {isa = PBXFileReference; path = net.rs; sourceTree = "<group>"; };
+		293696FA041B373F93BE1080 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		297B42158ED06E03B7B5DA87 /* tasks.rs */ = {isa = PBXFileReference; path = tasks.rs; sourceTree = "<group>"; };
+		2A304F249DCC79A4B3148306 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		2A39C7F7067FAFF310EE4AD1 /* runtime_config_tests.rs */ = {isa = PBXFileReference; path = runtime_config_tests.rs; sourceTree = "<group>"; };
+		2B51019BFE3D01160FDB3E65 /* github.rs */ = {isa = PBXFileReference; path = github.rs; sourceTree = "<group>"; };
+		2B889FCFD67B3B167F0174E9 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		2B897BBD422936770989491A /* monitor.rs */ = {isa = PBXFileReference; path = monitor.rs; sourceTree = "<group>"; };
+		2BB26DF17C891857FCCED2B8 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		2BB54CA38FE19BA30D3C5D26 /* text_tests.rs */ = {isa = PBXFileReference; path = text_tests.rs; sourceTree = "<group>"; };
+		2BE0A259397DB58FA7848AAB /* engine.rs */ = {isa = PBXFileReference; path = engine.rs; sourceTree = "<group>"; };
+		2CBC07EEBCF5855052FEF4D6 /* reset.rs */ = {isa = PBXFileReference; path = reset.rs; sourceTree = "<group>"; };
+		2E289AAEF254DCEB822B0231 /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		2E43659FE4FF6C8C1EE1F408 /* runtime_tests.rs */ = {isa = PBXFileReference; path = runtime_tests.rs; sourceTree = "<group>"; };
+		2EEDAFF89A5C42AAB19510E1 /* protocol.rs */ = {isa = PBXFileReference; path = protocol.rs; sourceTree = "<group>"; };
+		2EF538E2CDDBFA7FDA63632E /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		2F05B7E31DD8843A5DFA6C16 /* capability.rs */ = {isa = PBXFileReference; path = capability.rs; sourceTree = "<group>"; };
+		2F140C868ECAB8764A99EEB8 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		2F467F4D9DAFBAD9FBF26533 /* discovery.rs */ = {isa = PBXFileReference; path = discovery.rs; sourceTree = "<group>"; };
+		300421FF13AA8F9F2BF40D2C /* request.rs */ = {isa = PBXFileReference; path = request.rs; sourceTree = "<group>"; };
+		300AE995FE563CD5C761B036 /* android_tls.rs */ = {isa = PBXFileReference; path = android_tls.rs; sourceTree = "<group>"; };
+		306CFE8F2273C0BD76B55F91 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		3072D28B2BD574517364AC99 /* sse_tests.rs */ = {isa = PBXFileReference; path = sse_tests.rs; sourceTree = "<group>"; };
+		30924877735017D6C77040FF /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		30A59BA48A0EFE9F36300D7A /* mftp_iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = mftp_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		313DE6D0DE0B0D08A06B506F /* external.rs */ = {isa = PBXFileReference; path = external.rs; sourceTree = "<group>"; };
 		329A73582DA9007183CCB55C /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
-		33A4A6C5BF5F8F7C87805C68 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = styles.css; sourceTree = "<group>"; };
+		33CE8C243CDD6CF87971D4FD /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		33FD6E26F0DC71B4C93C798C /* legacy_fixture.rs */ = {isa = PBXFileReference; path = legacy_fixture.rs; sourceTree = "<group>"; };
+		3451F606DE286F508098FE40 /* archive_extract_tests.rs */ = {isa = PBXFileReference; path = archive_extract_tests.rs; sourceTree = "<group>"; };
+		35FA6209E3A1FF0064ABFFB1 /* execution_tests.rs */ = {isa = PBXFileReference; path = execution_tests.rs; sourceTree = "<group>"; };
+		3661F1841E77EC6E96B0AC29 /* lib_tests.rs */ = {isa = PBXFileReference; path = lib_tests.rs; sourceTree = "<group>"; };
+		3671FB36BD6B0FD7594383BF /* ports.rs */ = {isa = PBXFileReference; path = ports.rs; sourceTree = "<group>"; };
+		37343B4F4BCF153E41C8A01D /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		37B2BDED24983AE00058535A /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		385ADC1B1E197FE2205817F4 /* ai.rs */ = {isa = PBXFileReference; path = ai.rs; sourceTree = "<group>"; };
+		386B75E3A627E9BC5AE1A634 /* ownership_tests.rs */ = {isa = PBXFileReference; path = ownership_tests.rs; sourceTree = "<group>"; };
+		38B42565AD2FC2FDC2372F03 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		3A91C35EFE4B22C7813463C8 /* http_request.rs */ = {isa = PBXFileReference; path = http_request.rs; sourceTree = "<group>"; };
+		3ABD8EA738B8E4FB69587018 /* shell_lifecycle.rs */ = {isa = PBXFileReference; path = shell_lifecycle.rs; sourceTree = "<group>"; };
+		3B12AAA2DD7C4373A5601B02 /* validation.rs */ = {isa = PBXFileReference; path = validation.rs; sourceTree = "<group>"; };
+		3C200511F11A39A8EBAC4C39 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
+		3C4306997A63746DCA283C5C /* protocol_tests.rs */ = {isa = PBXFileReference; path = protocol_tests.rs; sourceTree = "<group>"; };
+		3C5A269B85B30DD2DA1C8482 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
 		3C8B90270AF198DF7C7F62A7 /* bindings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bindings.h; sourceTree = "<group>"; };
+		3CA5A2881F7E6834A856314B /* data_tests.rs */ = {isa = PBXFileReference; path = data_tests.rs; sourceTree = "<group>"; };
+		3F3DFDC86EEEA390F9A2F4F3 /* dht_tests.rs */ = {isa = PBXFileReference; path = dht_tests.rs; sourceTree = "<group>"; };
+		3FB87C75E214CD1BD29A7F1C /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		3FEC870FD6059AC8D796C35C /* usage.rs */ = {isa = PBXFileReference; path = usage.rs; sourceTree = "<group>"; };
+		401A7B16E3D7E8B2B596E765 /* note_assets.rs */ = {isa = PBXFileReference; path = note_assets.rs; sourceTree = "<group>"; };
+		4106DF7505C593E64A0E2840 /* management_constraints_tests.rs */ = {isa = PBXFileReference; path = management_constraints_tests.rs; sourceTree = "<group>"; };
+		410737EDAC5800242EC30C44 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		4128129ADF8DF6F6251FCB49 /* adapter_tests.rs */ = {isa = PBXFileReference; path = adapter_tests.rs; sourceTree = "<group>"; };
+		41470B8077B07BF940AA2A0D /* read.rs */ = {isa = PBXFileReference; path = read.rs; sourceTree = "<group>"; };
+		4166DD557331AC79964D4138 /* real_sync_tests.rs */ = {isa = PBXFileReference; path = real_sync_tests.rs; sourceTree = "<group>"; };
+		4178E2A45985EE209C7FD0FC /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		417AD7BBB4DACBABE960F16C /* preview_tests.rs */ = {isa = PBXFileReference; path = preview_tests.rs; sourceTree = "<group>"; };
 		4218BBF72E5B56B7C75BFC41 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		423C8F9E2BDC6761F6410EE6 /* stream.rs */ = {isa = PBXFileReference; path = stream.rs; sourceTree = "<group>"; };
 		448B75A2FEB9E7CDCDB98EC5 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
-		4BC8C74B69D1A384CF7801B7 /* upload.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = upload.rs; sourceTree = "<group>"; };
-		4BEC9A7E935E3D3DF49FA8E6 /* discovery.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = discovery.rs; sourceTree = "<group>"; };
+		44A4971A6835E3B0FDF018D3 /* sftp.rs */ = {isa = PBXFileReference; path = sftp.rs; sourceTree = "<group>"; };
+		464188391D48EF764FE685C4 /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		4723BA730DA27452B6E77921 /* schema_tests.rs */ = {isa = PBXFileReference; path = schema_tests.rs; sourceTree = "<group>"; };
+		474C53B8480E8ADBC5217930 /* discover.rs */ = {isa = PBXFileReference; path = discover.rs; sourceTree = "<group>"; };
+		475AEAA1D15C686A7F5C984D /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		481BF0C1EA6D3644E82F6B2C /* connection_tests.rs */ = {isa = PBXFileReference; path = connection_tests.rs; sourceTree = "<group>"; };
+		485D6AA83DDD42E63DB0C533 /* finalize.rs */ = {isa = PBXFileReference; path = finalize.rs; sourceTree = "<group>"; };
+		4A90655C387507D1F68EF4DC /* app.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = app.js; sourceTree = "<group>"; };
+		4CC84F6E0EB39F8130474C63 /* preview_reader_tests.rs */ = {isa = PBXFileReference; path = preview_reader_tests.rs; sourceTree = "<group>"; };
+		4CD7C069D8801A96731F52F7 /* constraints_tests.rs */ = {isa = PBXFileReference; path = constraints_tests.rs; sourceTree = "<group>"; };
+		4D7DFDD0ABD3F10A5C1F4135 /* url.rs */ = {isa = PBXFileReference; path = url.rs; sourceTree = "<group>"; };
+		4DA60E4F33F57399912B6514 /* transfer.rs */ = {isa = PBXFileReference; path = transfer.rs; sourceTree = "<group>"; };
+		4DE5DA88D320A97782EB19CA /* upload_request.rs */ = {isa = PBXFileReference; path = upload_request.rs; sourceTree = "<group>"; };
+		4EC0B144E1EAD4B15AD87EB6 /* note_clipboard.rs */ = {isa = PBXFileReference; path = note_clipboard.rs; sourceTree = "<group>"; };
+		4F9029B2A6BED7C94D33B9C1 /* system.rs */ = {isa = PBXFileReference; path = system.rs; sourceTree = "<group>"; };
+		4FE20CA4E3A254049B11F3CD /* adapter.rs */ = {isa = PBXFileReference; path = adapter.rs; sourceTree = "<group>"; };
 		4FF653CD69494C813F6A6743 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		5051E5759117692E50AF7903 /* translation_store_tests.rs */ = {isa = PBXFileReference; path = translation_store_tests.rs; sourceTree = "<group>"; };
+		5177171792A2D53EBC237DA6 /* adapter_tests.rs */ = {isa = PBXFileReference; path = adapter_tests.rs; sourceTree = "<group>"; };
+		51E357C3DA937C2465A40A50 /* data.rs */ = {isa = PBXFileReference; path = data.rs; sourceTree = "<group>"; };
+		5276E110B52AA64843D27616 /* ingest_tests.rs */ = {isa = PBXFileReference; path = ingest_tests.rs; sourceTree = "<group>"; };
+		52843B256E60E531B39AE49F /* types.rs */ = {isa = PBXFileReference; path = types.rs; sourceTree = "<group>"; };
+		52D59D547D0B421B20B16E24 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		532342A2DD56E22A745F93EF /* workers_tests.rs */ = {isa = PBXFileReference; path = workers_tests.rs; sourceTree = "<group>"; };
+		532D5F6F20A55D24691830A8 /* helpers.rs */ = {isa = PBXFileReference; path = helpers.rs; sourceTree = "<group>"; };
+		53521F6BB8E6A71E2D50F80F /* ports.rs */ = {isa = PBXFileReference; path = ports.rs; sourceTree = "<group>"; };
 		5374D67E8DC6C87544016366 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		54F82EF753836E4548FD176F /* download_archive.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download_archive.rs; sourceTree = "<group>"; };
-		56EBD384B9800B6C3B681B63 /* server.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = server.rs; sourceTree = "<group>"; };
-		58A230FEFCC88F2473090D02 /* lan.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = lan.rs; sourceTree = "<group>"; };
-		5980F28BDC48F587358E3E6C /* download_file.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download_file.rs; sourceTree = "<group>"; };
-		635120C6DB42548A41DAFA61 /* archive.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = archive.rs; sourceTree = "<group>"; };
-		751E920FB2BC87F766F2826C /* assets.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = assets.rs; sourceTree = "<group>"; };
-		770BA476B5784405D7097886 /* hosts.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = hosts.rs; sourceTree = "<group>"; };
+		5489AA4DC13A35DD0BF58788 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		54B40BE0A252ECE2B3D99E4A /* download_handlers_tests.rs */ = {isa = PBXFileReference; path = download_handlers_tests.rs; sourceTree = "<group>"; };
+		54CB7EDB85FE04A62C1B97DD /* protocol_tests.rs */ = {isa = PBXFileReference; path = protocol_tests.rs; sourceTree = "<group>"; };
+		5658204F23EB628F6646EF50 /* files_tests.rs */ = {isa = PBXFileReference; path = files_tests.rs; sourceTree = "<group>"; };
+		567A09427200F2DF6AF811CB /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		572066E6D1CFFAFDA5391C29 /* draft_tests.rs */ = {isa = PBXFileReference; path = draft_tests.rs; sourceTree = "<group>"; };
+		5755B00D7B8EDAB728A5031E /* ssh.rs */ = {isa = PBXFileReference; path = ssh.rs; sourceTree = "<group>"; };
+		57D028596D76817718D804E7 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		57DA50E9B7D1C82D8A6F05ED /* library_models.rs */ = {isa = PBXFileReference; path = library_models.rs; sourceTree = "<group>"; };
+		586F4EB62B957E195BB85DF3 /* execution_unlogged_tests.rs */ = {isa = PBXFileReference; path = execution_unlogged_tests.rs; sourceTree = "<group>"; };
+		58F65A2A568B987533045BE3 /* schema.sql */ = {isa = PBXFileReference; path = schema.sql; sourceTree = "<group>"; };
+		5997D5E33C88A8ACC428A879 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		59DEE01D4ABBA8A26CED1925 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		5ABDE56AEAA680DA5A78EC72 /* sync.rs */ = {isa = PBXFileReference; path = sync.rs; sourceTree = "<group>"; };
+		5AE207F77A4D3B616AACED8E /* upload_file_tests.rs */ = {isa = PBXFileReference; path = upload_file_tests.rs; sourceTree = "<group>"; };
+		5BA9D6BABD23A9BAB67154F5 /* registry.rs */ = {isa = PBXFileReference; path = registry.rs; sourceTree = "<group>"; };
+		5BB50918CFC54BB74902C79E /* temp_cleanup_tests.rs */ = {isa = PBXFileReference; path = temp_cleanup_tests.rs; sourceTree = "<group>"; };
+		5BE7E8CFA74B934668D1B48A /* maintenance_usage_tests.rs */ = {isa = PBXFileReference; path = maintenance_usage_tests.rs; sourceTree = "<group>"; };
+		5D13D8907AEBBEADA06B3821 /* logged_sftp.rs */ = {isa = PBXFileReference; path = logged_sftp.rs; sourceTree = "<group>"; };
+		5D6E909ABAD941BDA387E271 /* export_commands.rs */ = {isa = PBXFileReference; path = export_commands.rs; sourceTree = "<group>"; };
+		5D8BBDC4235BAA6E22400AE7 /* transaction.rs */ = {isa = PBXFileReference; path = transaction.rs; sourceTree = "<group>"; };
+		5E57136DE2CAE55B09CDA368 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		5E7C3A04AA4EA020BD119A9F /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		5E958C4C37A5F4598A6BCD52 /* transfer_models.rs */ = {isa = PBXFileReference; path = transfer_models.rs; sourceTree = "<group>"; };
+		5F744412408891377115BA09 /* ai_isolation_tests.rs */ = {isa = PBXFileReference; path = ai_isolation_tests.rs; sourceTree = "<group>"; };
+		6095F0DCA5E005A08F8D19BA /* framing_tests.rs */ = {isa = PBXFileReference; path = framing_tests.rs; sourceTree = "<group>"; };
+		60F51CBF767DC328E7618F5B /* assets.rs */ = {isa = PBXFileReference; path = assets.rs; sourceTree = "<group>"; };
+		618C96A8002FA9D69CBE65FC /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		65965BF8525CCAA444C8275D /* redaction.rs */ = {isa = PBXFileReference; path = redaction.rs; sourceTree = "<group>"; };
+		65B082F24631FB3676D45657 /* runtime.rs */ = {isa = PBXFileReference; path = runtime.rs; sourceTree = "<group>"; };
+		65CF929D2B6714968F9A6649 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		6607FBEC56282980D5142CD5 /* probe.rs */ = {isa = PBXFileReference; path = probe.rs; sourceTree = "<group>"; };
+		66266F23DECD344269962767 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		684625CF5603EDF9D2170E10 /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		68BBEDE1C797CADC092E2151 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		690516546229D86EB64CB86B /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		691BA0E57388A07ACFE91F5A /* download_file.rs */ = {isa = PBXFileReference; path = download_file.rs; sourceTree = "<group>"; };
+		699C476CA3BBAE64578A6262 /* http_request_tests.rs */ = {isa = PBXFileReference; path = http_request_tests.rs; sourceTree = "<group>"; };
+		6A0B6E7B52C599916BE60B76 /* sftp_basic.rs */ = {isa = PBXFileReference; path = sftp_basic.rs; sourceTree = "<group>"; };
+		6A81A672F3B5E82C27781218 /* repository_tests.rs */ = {isa = PBXFileReference; path = repository_tests.rs; sourceTree = "<group>"; };
+		6AAAB6A00E7064B79C56D916 /* http_range.rs */ = {isa = PBXFileReference; path = http_range.rs; sourceTree = "<group>"; };
+		6ABB4CAC023001FD5E2E6B72 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		6B84EECB5507B919D89BDB62 /* execution.rs */ = {isa = PBXFileReference; path = execution.rs; sourceTree = "<group>"; };
+		6C1FF4CAEB0FCE0D4DFB9193 /* export_store_tests.rs */ = {isa = PBXFileReference; path = export_store_tests.rs; sourceTree = "<group>"; };
+		6C5DE6705B0ABE0BA782BF29 /* url_tests.rs */ = {isa = PBXFileReference; path = url_tests.rs; sourceTree = "<group>"; };
+		6CC7610AA07022208C234841 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		6CD3FFDAE7CD172CDEF46FC8 /* runtime.rs */ = {isa = PBXFileReference; path = runtime.rs; sourceTree = "<group>"; };
+		6F2A5F28E2BE017B7BC0FB72 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		7022B03099E3C07632D38457 /* db.rs */ = {isa = PBXFileReference; path = db.rs; sourceTree = "<group>"; };
+		70B2B9CC82BA1274E3F46F41 /* sse.rs */ = {isa = PBXFileReference; path = sse.rs; sourceTree = "<group>"; };
+		719241967F0CCD531CDE5AED /* library.rs */ = {isa = PBXFileReference; path = library.rs; sourceTree = "<group>"; };
+		71C34AC00C18E670EDA66D1F /* detail.rs */ = {isa = PBXFileReference; path = detail.rs; sourceTree = "<group>"; };
+		726574A5BCEAA9C5B3A54B04 /* remote_command_tests.rs */ = {isa = PBXFileReference; path = remote_command_tests.rs; sourceTree = "<group>"; };
+		73775BBC97E154F47A601B8C /* playability.rs */ = {isa = PBXFileReference; path = playability.rs; sourceTree = "<group>"; };
+		7420C1C6DE384EA12733686C /* output.rs */ = {isa = PBXFileReference; path = output.rs; sourceTree = "<group>"; };
+		74527D5E81E172849A550B5E /* diagnostics_tests.rs */ = {isa = PBXFileReference; path = diagnostics_tests.rs; sourceTree = "<group>"; };
+		748EAA3384B91BCD8D8974FF /* activity_log.rs */ = {isa = PBXFileReference; path = activity_log.rs; sourceTree = "<group>"; };
+		74A34243571C251E79BFF2BC /* types_tests.rs */ = {isa = PBXFileReference; path = types_tests.rs; sourceTree = "<group>"; };
+		74D187089F813DDBF1D2A584 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		7634870BC42AB7DA4778D9F4 /* manager_session.rs */ = {isa = PBXFileReference; path = manager_session.rs; sourceTree = "<group>"; };
+		764F1D2B346E5D067D163230 /* schema_tests.rs */ = {isa = PBXFileReference; path = schema_tests.rs; sourceTree = "<group>"; };
+		76912C331BDAB0D8F78201B7 /* ai_selection_ipc_tests.rs */ = {isa = PBXFileReference; path = ai_selection_ipc_tests.rs; sourceTree = "<group>"; };
+		76B0D471BA95F84B576B3F4F /* engine_shutdown_tests.rs */ = {isa = PBXFileReference; path = engine_shutdown_tests.rs; sourceTree = "<group>"; };
+		779E5BB3F2738277E6356D9C /* transfer_retry_tests.rs */ = {isa = PBXFileReference; path = transfer_retry_tests.rs; sourceTree = "<group>"; };
+		7934A4419FD6103D9EA496CD /* usage_tests.rs */ = {isa = PBXFileReference; path = usage_tests.rs; sourceTree = "<group>"; };
+		79CAC523B93A8FD789129E6F /* usage.rs */ = {isa = PBXFileReference; path = usage.rs; sourceTree = "<group>"; };
+		7A67FC222CD46EA26151F642 /* responses.rs */ = {isa = PBXFileReference; path = responses.rs; sourceTree = "<group>"; };
+		7AAE29F31EF129AC8E38C5AB /* export.rs */ = {isa = PBXFileReference; path = export.rs; sourceTree = "<group>"; };
+		7ABE5A28ECBCF9E011FCCF4B /* android.rs */ = {isa = PBXFileReference; path = android.rs; sourceTree = "<group>"; };
+		7C73C9B0766BC74B30D4E37F /* export.rs */ = {isa = PBXFileReference; path = export.rs; sourceTree = "<group>"; };
+		7DAB65556BF0B8A4041A540B /* file_ops.rs */ = {isa = PBXFileReference; path = file_ops.rs; sourceTree = "<group>"; };
+		7DF8EE7590921D2A4455A552 /* recorder.rs */ = {isa = PBXFileReference; path = recorder.rs; sourceTree = "<group>"; };
+		7DFB73EDDDA5F469A3916CF9 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		7E10DDF366F3281322576FE7 /* activity.rs */ = {isa = PBXFileReference; path = activity.rs; sourceTree = "<group>"; };
+		7E730C49568ADDFBB51B468D /* data.rs */ = {isa = PBXFileReference; path = data.rs; sourceTree = "<group>"; };
+		7EBF583CAFD53E603CB898D1 /* context.rs */ = {isa = PBXFileReference; path = context.rs; sourceTree = "<group>"; };
+		7F300BFDBC5426847507B49D /* shell_worker_tests.rs */ = {isa = PBXFileReference; path = shell_worker_tests.rs; sourceTree = "<group>"; };
 		8048532235375D1CB121008C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		8182CA488D48B7248625C449 /* auth.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = auth.rs; sourceTree = "<group>"; };
-		842F3A363E5ECB27D8CED42E /* remote_ops.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = remote_ops.rs; sourceTree = "<group>"; };
-		888AFE63EA0527A9AA37E698 /* storage.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = storage.rs; sourceTree = "<group>"; };
+		806231F75E29B108CA19DA02 /* sftp_connection_tests.rs */ = {isa = PBXFileReference; path = sftp_connection_tests.rs; sourceTree = "<group>"; };
+		8115BF0C63D8BEE1237DB27C /* client_tests.rs */ = {isa = PBXFileReference; path = client_tests.rs; sourceTree = "<group>"; };
+		81E0313DA50955EF3BA1A89E /* server_tests.rs */ = {isa = PBXFileReference; path = server_tests.rs; sourceTree = "<group>"; };
+		82CA154166F26A6EB28BDDA7 /* admission.rs */ = {isa = PBXFileReference; path = admission.rs; sourceTree = "<group>"; };
+		83A05110379FACEA7F09662A /* session.rs */ = {isa = PBXFileReference; path = session.rs; sourceTree = "<group>"; };
+		83F33C6F3F2A159F01719EB9 /* remote_command_io.rs */ = {isa = PBXFileReference; path = remote_command_io.rs; sourceTree = "<group>"; };
+		84D61E38C196C4D19F906D46 /* listener.rs */ = {isa = PBXFileReference; path = listener.rs; sourceTree = "<group>"; };
+		85714720BD6444CAF4A6B6A9 /* repository_tests.rs */ = {isa = PBXFileReference; path = repository_tests.rs; sourceTree = "<group>"; };
+		857B6D270DC22D4E380223BB /* sftp_connection.rs */ = {isa = PBXFileReference; path = sftp_connection.rs; sourceTree = "<group>"; };
+		872AF8C07578367923E9BA6C /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		8771ED8449F9F17E5176E269 /* wire.rs */ = {isa = PBXFileReference; path = wire.rs; sourceTree = "<group>"; };
+		877906ECC105424CDFD366AD /* repository_tests.rs */ = {isa = PBXFileReference; path = repository_tests.rs; sourceTree = "<group>"; };
+		87DB61E35526876200DCD5F0 /* file_opener.rs */ = {isa = PBXFileReference; path = file_opener.rs; sourceTree = "<group>"; };
+		888AFE63EA0527A9AA37E698 /* storage.rs */ = {isa = PBXFileReference; path = storage.rs; sourceTree = "<group>"; };
+		88F8C438610E9F3FD9F69A1A /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		896FCD808E492154B20EEA7E /* repository_tests.rs */ = {isa = PBXFileReference; path = repository_tests.rs; sourceTree = "<group>"; };
+		897844511DDFF7CA3D8434E1 /* schema_tests.rs */ = {isa = PBXFileReference; path = schema_tests.rs; sourceTree = "<group>"; };
+		8A2748CCC5D845756D8D03B4 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		8A779070A7D4638675ED30BA /* ai_tests.rs */ = {isa = PBXFileReference; path = ai_tests.rs; sourceTree = "<group>"; };
+		8CCE729789CE88A8D3387909 /* note_backup.rs */ = {isa = PBXFileReference; path = note_backup.rs; sourceTree = "<group>"; };
+		8CE6A88C0B50F5AD68028B13 /* cleanup.rs */ = {isa = PBXFileReference; path = cleanup.rs; sourceTree = "<group>"; };
+		8D47B598F9E07D2BC8218FDA /* apple.rs */ = {isa = PBXFileReference; path = apple.rs; sourceTree = "<group>"; };
 		8E2CEB802F7E76DE9890D836 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		91094DF62370BE889926CE92 /* app.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = app.js; sourceTree = "<group>"; };
-		922E38845D5D7B986ACF8912 /* transfer_io.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = transfer_io.rs; sourceTree = "<group>"; };
-		9292C626ABA4170993323102 /* download_handlers.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download_handlers.rs; sourceTree = "<group>"; };
-		9E98136773591B58E9195B40 /* auth.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = auth.rs; sourceTree = "<group>"; };
-		A341AF3798D52F1B642490CC /* transfer_models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = transfer_models.rs; sourceTree = "<group>"; };
-		A53D0FB7626FA4438D01B1CB /* ssh.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = ssh.rs; sourceTree = "<group>"; };
-		A8CF726E2DD5C3261120D5C9 /* sftp.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = sftp.rs; sourceTree = "<group>"; };
-		ABC1B95F8EEEE2E0FEE9311A /* file_ops.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = file_ops.rs; sourceTree = "<group>"; };
-		AC0E26ABB7201B4AB91C880C /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
-		AD5698ED162041B4D870A518 /* extract.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = extract.rs; sourceTree = "<group>"; };
-		B953FA4CB5345A0CEAD8A5A5 /* ssh.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = ssh.rs; sourceTree = "<group>"; };
-		C14F2C4641A4CFC108D38A4C /* lan_transfer.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = lan_transfer.rs; sourceTree = "<group>"; };
+		8E2F69F7004B8CCF63BFD99F /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		8E47EE63F0A88D28AFF0019B /* note_image.rs */ = {isa = PBXFileReference; path = note_image.rs; sourceTree = "<group>"; };
+		8E679AA4C0650788B7003246 /* emitter.rs */ = {isa = PBXFileReference; path = emitter.rs; sourceTree = "<group>"; };
+		8FA6FD01070A0C6DAC0DBCAD /* handler.rs */ = {isa = PBXFileReference; path = handler.rs; sourceTree = "<group>"; };
+		8FF5353BC049C1E593C34BDF /* catalog.rs */ = {isa = PBXFileReference; path = catalog.rs; sourceTree = "<group>"; };
+		90BBCCF094A3A5E9DC28637C /* stats.rs */ = {isa = PBXFileReference; path = stats.rs; sourceTree = "<group>"; };
+		9147BC2B6B18B28DA27BD707 /* browse_routes.rs */ = {isa = PBXFileReference; path = browse_routes.rs; sourceTree = "<group>"; };
+		91831090B789B681AFCB4330 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		91A65379B3B66BA866F1EB72 /* providers.rs */ = {isa = PBXFileReference; path = providers.rs; sourceTree = "<group>"; };
+		92064807DAF713A72CB30A58 /* protocol_tests.rs */ = {isa = PBXFileReference; path = protocol_tests.rs; sourceTree = "<group>"; };
+		92B14F609C3C8546A4420F02 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		92C48CF674374CD1957BEB6F /* diagnostics.rs */ = {isa = PBXFileReference; path = diagnostics.rs; sourceTree = "<group>"; };
+		93322424D3B4353F9BD14F3B /* selection_tests.rs */ = {isa = PBXFileReference; path = selection_tests.rs; sourceTree = "<group>"; };
+		94C9770D92710D438E6DBD2B /* probe_tests.rs */ = {isa = PBXFileReference; path = probe_tests.rs; sourceTree = "<group>"; };
+		94D0E743B737ABEB90401390 /* selection.rs */ = {isa = PBXFileReference; path = selection.rs; sourceTree = "<group>"; };
+		95D979763BAEA3A27A75D233 /* engine_tests.rs */ = {isa = PBXFileReference; path = engine_tests.rs; sourceTree = "<group>"; };
+		96272541416C0CE588349AE5 /* jobs_tests.rs */ = {isa = PBXFileReference; path = jobs_tests.rs; sourceTree = "<group>"; };
+		963DB0F0FFE815B52E007E19 /* diagnostics_network_tests.rs */ = {isa = PBXFileReference; path = diagnostics_network_tests.rs; sourceTree = "<group>"; };
+		969EEFCDAFFE16286063B801 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		973674EF31F41FF6CD108B56 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		97C736FC27B997B070B44CA8 /* upload.rs */ = {isa = PBXFileReference; path = upload.rs; sourceTree = "<group>"; };
+		984864B72A2EF6B238DF7421 /* ai_lifecycle.rs */ = {isa = PBXFileReference; path = ai_lifecycle.rs; sourceTree = "<group>"; };
+		99663BECCFD5AA9AEDF16733 /* test_support.rs */ = {isa = PBXFileReference; path = test_support.rs; sourceTree = "<group>"; };
+		9973515425D638D08D33BF27 /* download_tests.rs */ = {isa = PBXFileReference; path = download_tests.rs; sourceTree = "<group>"; };
+		99AE9BF5260B8912A0964BD5 /* ai_migration_native_tests.rs */ = {isa = PBXFileReference; path = ai_migration_native_tests.rs; sourceTree = "<group>"; };
+		99DC7A325CBEFC6CF7A535A3 /* connections.rs */ = {isa = PBXFileReference; path = connections.rs; sourceTree = "<group>"; };
+		99F57EEBD3F6ADB538D463DC /* maintenance_reset_tests.rs */ = {isa = PBXFileReference; path = maintenance_reset_tests.rs; sourceTree = "<group>"; };
+		9C1B34F5584A34EBE8560013 /* persistence_tests.rs */ = {isa = PBXFileReference; path = persistence_tests.rs; sourceTree = "<group>"; };
+		9C5F645E1C2C48D72CEC267A /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		9CF5B6B8D1DD66CC73FC78A7 /* download.rs */ = {isa = PBXFileReference; path = download.rs; sourceTree = "<group>"; };
+		9D5DC5C264D2F12F4EADE31D /* export_store.rs */ = {isa = PBXFileReference; path = export_store.rs; sourceTree = "<group>"; };
+		9F174E7A64A8CC313F40776A /* models.rs */ = {isa = PBXFileReference; path = models.rs; sourceTree = "<group>"; };
+		9FCC547D832001090EB3F5F5 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		A13D3566F416F62036FCC5C1 /* remote_temp.rs */ = {isa = PBXFileReference; path = remote_temp.rs; sourceTree = "<group>"; };
+		A21D8D36999F91CD1D784EC8 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		A3F15DC119CEA2BEC14FD539 /* bt_tests.rs */ = {isa = PBXFileReference; path = bt_tests.rs; sourceTree = "<group>"; };
+		A44CDEFD1D2722027241608C /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		A493DD18DB9E86F903DC5816 /* transfer_retry.rs */ = {isa = PBXFileReference; path = transfer_retry.rs; sourceTree = "<group>"; };
+		A4E17E9BCADAA9A9B2615243 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		A57F1E5C6211A9D4CF4FAC20 /* archive.rs */ = {isa = PBXFileReference; path = archive.rs; sourceTree = "<group>"; };
+		A62CAEAFEE558FC086DAE4AE /* shell_worker.rs */ = {isa = PBXFileReference; path = shell_worker.rs; sourceTree = "<group>"; };
+		A638BB0468FCC2E69D0FBB56 /* upload_file.rs */ = {isa = PBXFileReference; path = upload_file.rs; sourceTree = "<group>"; };
+		A6A89E0649CD144F00580448 /* download.rs */ = {isa = PBXFileReference; path = download.rs; sourceTree = "<group>"; };
+		A707A7A4260565D9FE254B55 /* protocol.rs */ = {isa = PBXFileReference; path = protocol.rs; sourceTree = "<group>"; };
+		A8E77AC2C3A28DCC67210F6D /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		AADD0F48D9AFB54FA881D94F /* stream_server_tests.rs */ = {isa = PBXFileReference; path = stream_server_tests.rs; sourceTree = "<group>"; };
+		AAF9A53E8A9CD5BEB7BDC505 /* catalog.rs */ = {isa = PBXFileReference; path = catalog.rs; sourceTree = "<group>"; };
+		AC20D6888D62A8AB3B6595D9 /* chat.rs */ = {isa = PBXFileReference; path = chat.rs; sourceTree = "<group>"; };
+		AC953B752C5B0FE6C4F03783 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		ACF103A131E85CC281A83C0D /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		AD36364DABFAF15C0D131D6E /* transport.rs */ = {isa = PBXFileReference; path = transport.rs; sourceTree = "<group>"; };
+		AF65F76DE0BED06C1FA8522A /* environment_commands.rs */ = {isa = PBXFileReference; path = environment_commands.rs; sourceTree = "<group>"; };
+		AFA362F5F1F26405CCADF27C /* recorder_protocol.rs */ = {isa = PBXFileReference; path = recorder_protocol.rs; sourceTree = "<group>"; };
+		AFA3EB5A6EFD1BFB1240885B /* access.rs */ = {isa = PBXFileReference; path = access.rs; sourceTree = "<group>"; };
+		AFCFA74C41F0EA85CF975A78 /* http_io.rs */ = {isa = PBXFileReference; path = http_io.rs; sourceTree = "<group>"; };
+		B006DD9E3B06AD46594194F7 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		B00F99F8B38392492F09332A /* room_events.rs */ = {isa = PBXFileReference; path = room_events.rs; sourceTree = "<group>"; };
+		B04A523A342699210B584DEF /* service.rs */ = {isa = PBXFileReference; path = service.rs; sourceTree = "<group>"; };
+		B072DD37C5C8ACE2BA72112D /* workers.rs */ = {isa = PBXFileReference; path = workers.rs; sourceTree = "<group>"; };
+		B07F745DB766AACF25A923F7 /* execution_maintenance_tests.rs */ = {isa = PBXFileReference; path = execution_maintenance_tests.rs; sourceTree = "<group>"; };
+		B0843C0F0ADB843A74775FAF /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		B0EAC6D123B4CC48294063ED /* library_validation.rs */ = {isa = PBXFileReference; path = library_validation.rs; sourceTree = "<group>"; };
+		B118C3FE2106BE34A1E942E5 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		B138F2C1140A158F5A6E85AC /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		B17063461C4E6E7F03188179 /* model_tests.rs */ = {isa = PBXFileReference; path = model_tests.rs; sourceTree = "<group>"; };
+		B18ACE7EF5F45787C696659C /* apple_ios.rs */ = {isa = PBXFileReference; path = apple_ios.rs; sourceTree = "<group>"; };
+		B1DC166C8E3548F1BCEB09C5 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		B3FDC11DFFF61BAC9808C2B1 /* persistence.rs */ = {isa = PBXFileReference; path = persistence.rs; sourceTree = "<group>"; };
+		B3FDE483DC4B7E0541F86BB5 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		B41440408FC7A0CEAB2900E5 /* fixtures.rs */ = {isa = PBXFileReference; path = fixtures.rs; sourceTree = "<group>"; };
+		B5A131F5DB051EE94A62EA24 /* note_backup_tests.rs */ = {isa = PBXFileReference; path = note_backup_tests.rs; sourceTree = "<group>"; };
+		B6A6BC5C7C0C534EFFB3779C /* ssh.rs */ = {isa = PBXFileReference; path = ssh.rs; sourceTree = "<group>"; };
+		B6CEC5BAB80D71A4A884F02B /* task_connection_tests.rs */ = {isa = PBXFileReference; path = task_connection_tests.rs; sourceTree = "<group>"; };
+		B6E3D7CF432C53C1F74F2E7C /* events.rs */ = {isa = PBXFileReference; path = events.rs; sourceTree = "<group>"; };
+		B74137806051F96F25C6BCD9 /* remote_command_io_tests.rs */ = {isa = PBXFileReference; path = remote_command_io_tests.rs; sourceTree = "<group>"; };
+		B74B102C35D64661212B0085 /* stream_server.rs */ = {isa = PBXFileReference; path = stream_server.rs; sourceTree = "<group>"; };
+		B7FB8AE7DA10CFEB9F5E3239 /* operations_tests.rs */ = {isa = PBXFileReference; path = operations_tests.rs; sourceTree = "<group>"; };
+		B8BD20B5670D69B82C9A4253 /* events.rs */ = {isa = PBXFileReference; path = events.rs; sourceTree = "<group>"; };
+		B8CFD4DC06ED88E8186925F6 /* export.rs */ = {isa = PBXFileReference; path = export.rs; sourceTree = "<group>"; };
+		B90A7853AAE2AD577C5D54DE /* transport_log_tests.rs */ = {isa = PBXFileReference; path = transport_log_tests.rs; sourceTree = "<group>"; };
+		B95CC02A9D4F2716F46884BF /* admission.rs */ = {isa = PBXFileReference; path = admission.rs; sourceTree = "<group>"; };
+		B9EB6C99B6FA1FF6BD16A8A1 /* keys.rs */ = {isa = PBXFileReference; path = keys.rs; sourceTree = "<group>"; };
+		BA0F81C6DB77D3F8E187523C /* trackers.rs */ = {isa = PBXFileReference; path = trackers.rs; sourceTree = "<group>"; };
+		BAA70B56CF3C1833BE0004FE /* real_test_support.rs */ = {isa = PBXFileReference; path = real_test_support.rs; sourceTree = "<group>"; };
+		BACB6948E6C6E6A1BBF41069 /* logging_tests.rs */ = {isa = PBXFileReference; path = logging_tests.rs; sourceTree = "<group>"; };
+		BB499A5C4B7F0F4F4D9D8AC0 /* tasks.rs */ = {isa = PBXFileReference; path = tasks.rs; sourceTree = "<group>"; };
+		BE41E494DA59122203404EAD /* transfer_control_tests.rs */ = {isa = PBXFileReference; path = transfer_control_tests.rs; sourceTree = "<group>"; };
+		BE4BD36FA5D8AAB2E5F9ECF0 /* browser_page.rs */ = {isa = PBXFileReference; path = browser_page.rs; sourceTree = "<group>"; };
+		BE99BC1D5D0617293F9E57C3 /* remote_ops.rs */ = {isa = PBXFileReference; path = remote_ops.rs; sourceTree = "<group>"; };
+		BED231C159819CF5C3772339 /* services.rs */ = {isa = PBXFileReference; path = services.rs; sourceTree = "<group>"; };
+		BF3AB0CADB1F0913C80E833C /* deadlines.rs */ = {isa = PBXFileReference; path = deadlines.rs; sourceTree = "<group>"; };
+		BF4603F8CF0A3DD71A4EAFCF /* cancel.rs */ = {isa = PBXFileReference; path = cancel.rs; sourceTree = "<group>"; };
+		BF740CADA14C43B6B5E06884 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		BFC13054923AA1D5038F46BF /* transfer_io.rs */ = {isa = PBXFileReference; path = transfer_io.rs; sourceTree = "<group>"; };
+		C024367A49F337E552327EBD /* helper_tests.rs */ = {isa = PBXFileReference; path = helper_tests.rs; sourceTree = "<group>"; };
+		C10D757D2839729AD85AA94B /* bt_tests.rs */ = {isa = PBXFileReference; path = bt_tests.rs; sourceTree = "<group>"; };
+		C11FBEDD614637BFF3C1EF81 /* attachment_commands.rs */ = {isa = PBXFileReference; path = attachment_commands.rs; sourceTree = "<group>"; };
+		C139D7AC0D341710373D2057 /* runtime_tests.rs */ = {isa = PBXFileReference; path = runtime_tests.rs; sourceTree = "<group>"; };
+		C229235AC2669276918A7200 /* errors.rs */ = {isa = PBXFileReference; path = errors.rs; sourceTree = "<group>"; };
+		C253B5EF559658CDA4898CBD /* diagnostic_tests.rs */ = {isa = PBXFileReference; path = diagnostic_tests.rs; sourceTree = "<group>"; };
 		C2645569A59D76881FED23AC /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		C30229C3D75AA6A3A010CD36 /* db_tests.rs */ = {isa = PBXFileReference; path = db_tests.rs; sourceTree = "<group>"; };
+		C33AF2AC32D8D86293A09B55 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		C3CF95656A9AD967A59786D0 /* android_events.rs */ = {isa = PBXFileReference; path = android_events.rs; sourceTree = "<group>"; };
 		C3E20BF48E52CDF353B90FB0 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		CC778BED021158E21B200D2B /* manager_session.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = manager_session.rs; sourceTree = "<group>"; };
-		CFFE911C223A1B6DEA200CE7 /* models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = models.rs; sourceTree = "<group>"; };
-		D56F4EA733AB882B51789DE0 /* sftp_basic.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = sftp_basic.rs; sourceTree = "<group>"; };
+		C40593D96B27E935295306A7 /* rsync.rs */ = {isa = PBXFileReference; path = rsync.rs; sourceTree = "<group>"; };
+		C455F34D3FC101A75A77367C /* upload.rs */ = {isa = PBXFileReference; path = upload.rs; sourceTree = "<group>"; };
+		C5D88B6F9A70EAA37932B469 /* connection_test.rs */ = {isa = PBXFileReference; path = connection_test.rs; sourceTree = "<group>"; };
+		C702C0DF883F70C053BEAF44 /* client.rs */ = {isa = PBXFileReference; path = client.rs; sourceTree = "<group>"; };
+		C76A426161E67125AE046F74 /* translation_pack.rs */ = {isa = PBXFileReference; path = translation_pack.rs; sourceTree = "<group>"; };
+		C78DDFE71EC848B1E94B05A2 /* sync.rs */ = {isa = PBXFileReference; path = sync.rs; sourceTree = "<group>"; };
+		C7EE99ED83804A900594A4C7 /* text.rs */ = {isa = PBXFileReference; path = text.rs; sourceTree = "<group>"; };
+		C7FC960D680F0FF6712AF393 /* preview_reader.rs */ = {isa = PBXFileReference; path = preview_reader.rs; sourceTree = "<group>"; };
+		C907ED09F84ADFFD0FD74F62 /* export_tests.rs */ = {isa = PBXFileReference; path = export_tests.rs; sourceTree = "<group>"; };
+		C9903B00945D50FA00CE1936 /* bt.rs */ = {isa = PBXFileReference; path = bt.rs; sourceTree = "<group>"; };
+		CB64B951695BC98A166A3D31 /* tasks_tests.rs */ = {isa = PBXFileReference; path = tasks_tests.rs; sourceTree = "<group>"; };
+		CC768A0E12A9095525AE045B /* note_image_tests.rs */ = {isa = PBXFileReference; path = note_image_tests.rs; sourceTree = "<group>"; };
+		CE12B4F094BEA32A114482C4 /* environment_tests.rs */ = {isa = PBXFileReference; path = environment_tests.rs; sourceTree = "<group>"; };
+		CE51999DC9643F422A4850CE /* auth_tests.rs */ = {isa = PBXFileReference; path = auth_tests.rs; sourceTree = "<group>"; };
+		CE5C78FF6C83EDEB7D80B5C8 /* activity_log_tests.rs */ = {isa = PBXFileReference; path = activity_log_tests.rs; sourceTree = "<group>"; };
+		CE832C10287D6D1A78E6462A /* http_error_tests.rs */ = {isa = PBXFileReference; path = http_error_tests.rs; sourceTree = "<group>"; };
+		CEA42BA82DE94443A79F5B23 /* activity.rs */ = {isa = PBXFileReference; path = activity.rs; sourceTree = "<group>"; };
+		CF4EB6051486E3A3F29F087D /* trackers_tests.rs */ = {isa = PBXFileReference; path = trackers_tests.rs; sourceTree = "<group>"; };
+		CFA1158AB0C8CD0864CFED7D /* helpers_tests.rs */ = {isa = PBXFileReference; path = helpers_tests.rs; sourceTree = "<group>"; };
+		CFC919D9C32D92BD01D5902E /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		CFFE911C223A1B6DEA200CE7 /* models.rs */ = {isa = PBXFileReference; path = models.rs; sourceTree = "<group>"; };
+		D06581938144908FD9470324 /* download_direct.rs */ = {isa = PBXFileReference; path = download_direct.rs; sourceTree = "<group>"; };
+		D092BF0CC2F86BB51923B7BD /* connection.rs */ = {isa = PBXFileReference; path = connection.rs; sourceTree = "<group>"; };
+		D0FF7AB0684E5A27EF131D20 /* reset.rs */ = {isa = PBXFileReference; path = reset.rs; sourceTree = "<group>"; };
+		D12C9E6AB8133878CB576780 /* ports.rs */ = {isa = PBXFileReference; path = ports.rs; sourceTree = "<group>"; };
+		D1D545A5D4B6099DE1B5AD4A /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		D1D5D66D90B006216787F17B /* ai_android.rs */ = {isa = PBXFileReference; path = ai_android.rs; sourceTree = "<group>"; };
+		D207A65A79ABB2FCB5DA8EA8 /* legacy_schema.rs */ = {isa = PBXFileReference; path = legacy_schema.rs; sourceTree = "<group>"; };
+		D25A7B6BD9D1199E4EDC70A9 /* note_service.rs */ = {isa = PBXFileReference; path = note_service.rs; sourceTree = "<group>"; };
+		D2681A7A5B742F41571AE995 /* staging_tests.rs */ = {isa = PBXFileReference; path = staging_tests.rs; sourceTree = "<group>"; };
+		D307E8D8B2A12D33D5BE4CEF /* transfer_control.rs */ = {isa = PBXFileReference; path = transfer_control.rs; sourceTree = "<group>"; };
+		D37C5E90F09331FF6BEB31E3 /* ai_management_ipc_tests.rs */ = {isa = PBXFileReference; path = ai_management_ipc_tests.rs; sourceTree = "<group>"; };
+		D3AF1ADF9B124B6BA3E1A2F8 /* library_commands.rs */ = {isa = PBXFileReference; path = library_commands.rs; sourceTree = "<group>"; };
+		D3FF0424FB85AE232C96AA05 /* tasks_tests.rs */ = {isa = PBXFileReference; path = tasks_tests.rs; sourceTree = "<group>"; };
+		D4030C0D0E7A300053697150 /* command_baseline.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = command_baseline.txt; sourceTree = "<group>"; };
+		D43210A3364C70152C516E0E /* preview.rs */ = {isa = PBXFileReference; path = preview.rs; sourceTree = "<group>"; };
+		D46B2797A7B4774FC20E6E9F /* jobs.rs */ = {isa = PBXFileReference; path = jobs.rs; sourceTree = "<group>"; };
+		D4AFAA0D40DA223C85EEE17C /* service.rs */ = {isa = PBXFileReference; path = service.rs; sourceTree = "<group>"; };
+		D4CEB5176FA1395E64E8AC9D /* archive_extract.rs */ = {isa = PBXFileReference; path = archive_extract.rs; sourceTree = "<group>"; };
+		D4EFBC45BE0B5BE528BEF764 /* logged_file.rs */ = {isa = PBXFileReference; path = logged_file.rs; sourceTree = "<group>"; };
+		D53CFB770EDB4234035FEE53 /* android.rs */ = {isa = PBXFileReference; path = android.rs; sourceTree = "<group>"; };
+		D5BB9FC45D442609333F44AE /* auth.rs */ = {isa = PBXFileReference; path = auth.rs; sourceTree = "<group>"; };
+		D6126890167A0AEE6FB2A60E /* files.rs */ = {isa = PBXFileReference; path = files.rs; sourceTree = "<group>"; };
+		D695F71E5DEDF4D3D86A2D8E /* translation_tests.rs */ = {isa = PBXFileReference; path = translation_tests.rs; sourceTree = "<group>"; };
+		D6C148A2078CF781C1B5C9D5 /* ai_native_tests.rs */ = {isa = PBXFileReference; path = ai_native_tests.rs; sourceTree = "<group>"; };
 		D7042CE7F565507273DF08A0 /* mftp_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = mftp_iOS.entitlements; sourceTree = "<group>"; };
-		D8B0F25710396A84747D5233 /* download_direct.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download_direct.rs; sourceTree = "<group>"; };
+		D74909CC967818FD25AAC342 /* note_inline_tests.rs */ = {isa = PBXFileReference; path = note_inline_tests.rs; sourceTree = "<group>"; };
+		D768791ADF465B2443523BF7 /* translations.rs */ = {isa = PBXFileReference; path = translations.rs; sourceTree = "<group>"; };
+		D80B1C28ECC7400367C4D9F9 /* lifecycle_tests.rs */ = {isa = PBXFileReference; path = lifecycle_tests.rs; sourceTree = "<group>"; };
+		D81D793DD6FFEB8DE58AEFC3 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		D866B6A66F8583DB9789A210 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		D899FC51BE52969A60B98334 /* upload_request_tests.rs */ = {isa = PBXFileReference; path = upload_request_tests.rs; sourceTree = "<group>"; };
+		D8BC115F8D2396C3F4DDEBE6 /* framing.rs */ = {isa = PBXFileReference; path = framing.rs; sourceTree = "<group>"; };
+		D937509D0FFB91C6D1E802F2 /* ssh.rs */ = {isa = PBXFileReference; path = ssh.rs; sourceTree = "<group>"; };
+		D979ADA7E797C73C4CD3F13A /* helper.rs */ = {isa = PBXFileReference; path = helper.rs; sourceTree = "<group>"; };
+		D97E1AAD1E8D6E859E588D55 /* library_tests.rs */ = {isa = PBXFileReference; path = library_tests.rs; sourceTree = "<group>"; };
+		D98AF1711BFA166E750F0EE2 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		D9A7D02857B0E29252CD3ADF /* note_service_tests.rs */ = {isa = PBXFileReference; path = note_service_tests.rs; sourceTree = "<group>"; };
+		D9CCD00371B11C7882213DB2 /* input.rs */ = {isa = PBXFileReference; path = input.rs; sourceTree = "<group>"; };
+		DBAE2AD231DB7462D07ABC11 /* download_handlers.rs */ = {isa = PBXFileReference; path = download_handlers.rs; sourceTree = "<group>"; };
 		DC07ACCAE311B31C2093A8A1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		DECB1AFF0144D035FE494823 /* temp_cleanup.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = temp_cleanup.rs; sourceTree = "<group>"; };
+		DC4C3DA4CE634D5170C315A9 /* ports.rs */ = {isa = PBXFileReference; path = ports.rs; sourceTree = "<group>"; };
+		DC894CB0878841E45F7DF9FC /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		DC9FCB2D769C1A9E880EC51E /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		DCD6ADF2189C55F4FD329A75 /* shell_lifecycle_tests.rs */ = {isa = PBXFileReference; path = shell_lifecycle_tests.rs; sourceTree = "<group>"; };
+		DD90B281007A871F19C55875 /* ts_characters.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ts_characters.txt; sourceTree = "<group>"; };
+		DDDE82F14E4BEC751B424C52 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		DDFBDEC90FFA9EAEF11C3B61 /* management.rs */ = {isa = PBXFileReference; path = management.rs; sourceTree = "<group>"; };
+		DEBD8E8A20783493B2150C45 /* bt.rs */ = {isa = PBXFileReference; path = bt.rs; sourceTree = "<group>"; };
+		DEE4EFF2831A1A2E1CE34819 /* access_tests.rs */ = {isa = PBXFileReference; path = access_tests.rs; sourceTree = "<group>"; };
+		DEE53F4D701AC6B1E874A2BA /* stream_shutdown_tests.rs */ = {isa = PBXFileReference; path = stream_shutdown_tests.rs; sourceTree = "<group>"; };
 		DEFEDDB5E1415506C830ADA9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E5189D58BA7C4FC00EA53DB6 /* lan_transfer.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = lan_transfer.rs; sourceTree = "<group>"; };
-		EB87133933DCE3650ABA5DE9 /* types.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = types.rs; sourceTree = "<group>"; };
-		EFBC20358ABEC8FA2CFBF6B8 /* lib.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = lib.rs; sourceTree = "<group>"; };
-		F165F5967DFE62CB93576C42 /* commands.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = commands.rs; sourceTree = "<group>"; };
-		F45CE9D41B5946F2DB968F35 /* main.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.rs; sourceTree = "<group>"; };
+		DFE1AB64D21F61F8DA0B96CE /* ai_cache_tests.rs */ = {isa = PBXFileReference; path = ai_cache_tests.rs; sourceTree = "<group>"; };
+		E0DFB836D08E300BFB575688 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		E1D9BB74DA0413B48E4B0F91 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		E3849F273308A8248F6CCC57 /* real_transfer_tests.rs */ = {isa = PBXFileReference; path = real_transfer_tests.rs; sourceTree = "<group>"; };
+		E38F1573DA6F450E57481320 /* temp_cleanup.rs */ = {isa = PBXFileReference; path = temp_cleanup.rs; sourceTree = "<group>"; };
+		E3D0D1F29F05BC3E20BC3B79 /* note_repository.rs */ = {isa = PBXFileReference; path = note_repository.rs; sourceTree = "<group>"; };
+		E3D9614A76093A4854A4E1CD /* connections_tests.rs */ = {isa = PBXFileReference; path = connections_tests.rs; sourceTree = "<group>"; };
+		E59E38FE90BAE572F5026776 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		E5AE4D9B9D64633E2FB5D711 /* repository.rs */ = {isa = PBXFileReference; path = repository.rs; sourceTree = "<group>"; };
+		E703AC96A4F2DBE58386E1FE /* errors.rs */ = {isa = PBXFileReference; path = errors.rs; sourceTree = "<group>"; };
+		E7725F07BD5C9B6638DE5844 /* event_tests.rs */ = {isa = PBXFileReference; path = event_tests.rs; sourceTree = "<group>"; };
+		E8D8903F12D059F5FA77A8B3 /* catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = catalog.json; sourceTree = "<group>"; };
+		E96DF5662093135DA45D6E4C /* admission_tests.rs */ = {isa = PBXFileReference; path = admission_tests.rs; sourceTree = "<group>"; };
+		E9842CA6A52644F026A1BC5A /* auth.rs */ = {isa = PBXFileReference; path = auth.rs; sourceTree = "<group>"; };
+		E9C05F1E60AB67070DE3AE7D /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		EADF9E76B5AF671C191CE1A0 /* model.rs */ = {isa = PBXFileReference; path = model.rs; sourceTree = "<group>"; };
+		EAF04DB80CA8E4BFC3360B88 /* search.rs */ = {isa = PBXFileReference; path = search.rs; sourceTree = "<group>"; };
+		EBA2FE33D0DD86CAE74BB661 /* catalog_tests.rs */ = {isa = PBXFileReference; path = catalog_tests.rs; sourceTree = "<group>"; };
+		EC61A461A43F467FEFBA75CC /* lifecycle_tests.rs */ = {isa = PBXFileReference; path = lifecycle_tests.rs; sourceTree = "<group>"; };
+		ECF8D12A306ED15397B3381C /* mcp_repository.rs */ = {isa = PBXFileReference; path = mcp_repository.rs; sourceTree = "<group>"; };
+		ED0537FDFA8603DA1160DBA0 /* monitor_tests.rs */ = {isa = PBXFileReference; path = monitor_tests.rs; sourceTree = "<group>"; };
+		ED4DE6F2A9D32FAFCC9C494A /* admission_tests.rs */ = {isa = PBXFileReference; path = admission_tests.rs; sourceTree = "<group>"; };
+		EDA2F51E8BBFD3D6DC1FF94B /* time_tests.rs */ = {isa = PBXFileReference; path = time_tests.rs; sourceTree = "<group>"; };
+		EDA9A98ADFB2FE62ACD40DE5 /* server.rs */ = {isa = PBXFileReference; path = server.rs; sourceTree = "<group>"; };
+		EEAAA0545982185FCD2C3D9E /* errors_tests.rs */ = {isa = PBXFileReference; path = errors_tests.rs; sourceTree = "<group>"; };
+		EEBD1388A559894FEDCFB9B6 /* codes.rs */ = {isa = PBXFileReference; path = codes.rs; sourceTree = "<group>"; };
+		EEC0C94E6458CA6B6F6D0583 /* mcp.rs */ = {isa = PBXFileReference; path = mcp.rs; sourceTree = "<group>"; };
+		EF145F142E25AB447C95010C /* mdns_browser.rs */ = {isa = PBXFileReference; path = mdns_browser.rs; sourceTree = "<group>"; };
+		EF18B1C65B84C27DC782DAF1 /* legacy_schema_tests.rs */ = {isa = PBXFileReference; path = legacy_schema_tests.rs; sourceTree = "<group>"; };
+		EF2CF72F564EFFED8DA32F51 /* github_tests.rs */ = {isa = PBXFileReference; path = github_tests.rs; sourceTree = "<group>"; };
+		EF6C78492F31E5AD9FC9B417 /* tests.rs */ = {isa = PBXFileReference; path = tests.rs; sourceTree = "<group>"; };
+		EFBC20358ABEC8FA2CFBF6B8 /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
+		F035686D3C7654D823338019 /* ssh_tests.rs */ = {isa = PBXFileReference; path = ssh_tests.rs; sourceTree = "<group>"; };
+		F0B35835BED29DC087B53C78 /* commands.rs */ = {isa = PBXFileReference; path = commands.rs; sourceTree = "<group>"; };
+		F0B7A7CF3B9AE3342EA8E98D /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		F1974795629A9E96D223CEEB /* http_io_tests.rs */ = {isa = PBXFileReference; path = http_io_tests.rs; sourceTree = "<group>"; };
+		F1A5C17975F3BE73D5FC3FA5 /* export_tests.rs */ = {isa = PBXFileReference; path = export_tests.rs; sourceTree = "<group>"; };
+		F1ED178F3B24F87CEDB79057 /* runtime.rs */ = {isa = PBXFileReference; path = runtime.rs; sourceTree = "<group>"; };
+		F28479C3B77379401D6BE56C /* extract.rs */ = {isa = PBXFileReference; path = extract.rs; sourceTree = "<group>"; };
+		F2874865325E0DB30C1E0335 /* participants.rs */ = {isa = PBXFileReference; path = participants.rs; sourceTree = "<group>"; };
+		F346893BE28B70075AEA1FF4 /* runtime_config.rs */ = {isa = PBXFileReference; path = runtime_config.rs; sourceTree = "<group>"; };
+		F45CE9D41B5946F2DB968F35 /* main.rs */ = {isa = PBXFileReference; path = main.rs; sourceTree = "<group>"; };
+		F654FACF46058F500ACFD7A0 /* repository_tests.rs */ = {isa = PBXFileReference; path = repository_tests.rs; sourceTree = "<group>"; };
+		F6F777800C11274992313B4D /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = styles.css; sourceTree = "<group>"; };
+		F7664709564D12DB7FCC6349 /* transport_tests.rs */ = {isa = PBXFileReference; path = transport_tests.rs; sourceTree = "<group>"; };
+		F832D777A4E91F817222C796 /* bridge_tests.rs */ = {isa = PBXFileReference; path = bridge_tests.rs; sourceTree = "<group>"; };
+		FB2333932974C6FF3B04C48E /* room_events_tests.rs */ = {isa = PBXFileReference; path = room_events_tests.rs; sourceTree = "<group>"; };
+		FBA7F0E4CF77F8710400B54C /* read_tests.rs */ = {isa = PBXFileReference; path = read_tests.rs; sourceTree = "<group>"; };
+		FC0FEEEABC8A9D8802714A18 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		FC381AEAB181024C0873E1AA /* schema.rs */ = {isa = PBXFileReference; path = schema.rs; sourceTree = "<group>"; };
+		FCF7D59BEC4E017AC00CFA41 /* ssh_tests.rs */ = {isa = PBXFileReference; path = ssh_tests.rs; sourceTree = "<group>"; };
+		FED7FEC09F9747388E71DF4C /* deadlines_tests.rs */ = {isa = PBXFileReference; path = deadlines_tests.rs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,13 +548,122 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		020739415B28C893E49A689C /* service */ = {
+			isa = PBXGroup;
+			children = (
+				E96DF5662093135DA45D6E4C /* admission_tests.rs */,
+				82CA154166F26A6EB28BDDA7 /* admission.rs */,
+				BF4603F8CF0A3DD71A4EAFCF /* cancel.rs */,
+				3F3DFDC86EEEA390F9A2F4F3 /* dht_tests.rs */,
+				9973515425D638D08D33BF27 /* download_tests.rs */,
+				A6A89E0649CD144F00580448 /* download.rs */,
+				76B0D471BA95F84B576B3F4F /* engine_shutdown_tests.rs */,
+				95D979763BAEA3A27A75D233 /* engine_tests.rs */,
+				2BE0A259397DB58FA7848AAB /* engine.rs */,
+				0402A6DBD2074FF33B5A4932 /* export_lifecycle_tests.rs */,
+				F1A5C17975F3BE73D5FC3FA5 /* export_tests.rs */,
+				7AAE29F31EF129AC8E38C5AB /* export.rs */,
+				5658204F23EB628F6646EF50 /* files_tests.rs */,
+				D6126890167A0AEE6FB2A60E /* files.rs */,
+				485D6AA83DDD42E63DB0C533 /* finalize.rs */,
+				96272541416C0CE588349AE5 /* jobs_tests.rs */,
+				D46B2797A7B4774FC20E6E9F /* jobs.rs */,
+				567A09427200F2DF6AF811CB /* mod.rs */,
+				73775BBC97E154F47A601B8C /* playability.rs */,
+				4CC84F6E0EB39F8130474C63 /* preview_reader_tests.rs */,
+				C7FC960D680F0FF6712AF393 /* preview_reader.rs */,
+				00288BFF860C5394B4145C0D /* probe.rs */,
+				D2681A7A5B742F41571AE995 /* staging_tests.rs */,
+				26CABE20E04AA70D0EB3EF39 /* staging.rs */,
+				90BBCCF094A3A5E9DC28637C /* stats.rs */,
+				AADD0F48D9AFB54FA881D94F /* stream_server_tests.rs */,
+				B74B102C35D64661212B0085 /* stream_server.rs */,
+				DEE53F4D701AC6B1E874A2BA /* stream_shutdown_tests.rs */,
+				CF4EB6051486E3A3F29F087D /* trackers_tests.rs */,
+				BA0F81C6DB77D3F8E187523C /* trackers.rs */,
+				532342A2DD56E22A745F93EF /* workers_tests.rs */,
+				B072DD37C5C8ACE2BA72112D /* workers.rs */,
+			);
+			path = service;
+			sourceTree = "<group>";
+		};
 		0315B2A8F0354EC6555D49A5 /* storage */ = {
 			isa = PBXGroup;
 			children = (
+				17CBB168F3F304A94D7027AB /* activity_tests.rs */,
 				0284B7943F2D8A7A0D716D35 /* activity.rs */,
-				58A230FEFCC88F2473090D02 /* lan.rs */,
+				1B1CE84206234558F273616B /* data_tests.rs */,
+				51E357C3DA937C2465A40A50 /* data.rs */,
+				C907ED09F84ADFFD0FD74F62 /* export_tests.rs */,
+				7C73C9B0766BC74B30D4E37F /* export.rs */,
+				CFA1158AB0C8CD0864CFED7D /* helpers_tests.rs */,
+				532D5F6F20A55D24691830A8 /* helpers.rs */,
+				1B9D2800BB30143CA5B93ED1 /* import.rs */,
+				2CBC07EEBCF5855052FEF4D6 /* reset.rs */,
+				7934A4419FD6103D9EA496CD /* usage_tests.rs */,
+				79CAC523B93A8FD789129E6F /* usage.rs */,
 			);
 			path = storage;
+			sourceTree = "<group>";
+		};
+		05E67D538BBC3E6D0C00A733 /* service */ = {
+			isa = PBXGroup;
+			children = (
+				ED4DE6F2A9D32FAFCC9C494A /* admission_tests.rs */,
+				B95CC02A9D4F2716F46884BF /* admission.rs */,
+				3451F606DE286F508098FE40 /* archive_extract_tests.rs */,
+				D4CEB5176FA1395E64E8AC9D /* archive_extract.rs */,
+				17379E8750675F365E642E33 /* archive_tests.rs */,
+				A57F1E5C6211A9D4CF4FAC20 /* archive.rs */,
+				CE51999DC9643F422A4850CE /* auth_tests.rs */,
+				E9842CA6A52644F026A1BC5A /* auth.rs */,
+				C5D88B6F9A70EAA37932B469 /* connection_test.rs */,
+				963DB0F0FFE815B52E007E19 /* diagnostics_network_tests.rs */,
+				74527D5E81E172849A550B5E /* diagnostics_tests.rs */,
+				92C48CF674374CD1957BEB6F /* diagnostics.rs */,
+				0CE3DA893555A619ECA2A814 /* download_archive.rs */,
+				D06581938144908FD9470324 /* download_direct.rs */,
+				691BA0E57388A07ACFE91F5A /* download_file.rs */,
+				EEAAA0545982185FCD2C3D9E /* errors_tests.rs */,
+				E703AC96A4F2DBE58386E1FE /* errors.rs */,
+				F28479C3B77379401D6BE56C /* extract.rs */,
+				D4EFBC45BE0B5BE528BEF764 /* logged_file.rs */,
+				5D13D8907AEBBEADA06B3821 /* logged_sftp.rs */,
+				7634870BC42AB7DA4778D9F4 /* manager_session.rs */,
+				66266F23DECD344269962767 /* mod.rs */,
+				ED0537FDFA8603DA1160DBA0 /* monitor_tests.rs */,
+				2B897BBD422936770989491A /* monitor.rs */,
+				26AD034EBD593B99099B1E40 /* path_utils.rs */,
+				B74137806051F96F25C6BCD9 /* remote_command_io_tests.rs */,
+				83F33C6F3F2A159F01719EB9 /* remote_command_io.rs */,
+				726574A5BCEAA9C5B3A54B04 /* remote_command_tests.rs */,
+				24848902C3F9FA933F49B511 /* remote_command.rs */,
+				BE99BC1D5D0617293F9E57C3 /* remote_ops.rs */,
+				17BD6393676A939133493E1F /* remote_temp_tests.rs */,
+				A13D3566F416F62036FCC5C1 /* remote_temp.rs */,
+				6A0B6E7B52C599916BE60B76 /* sftp_basic.rs */,
+				806231F75E29B108CA19DA02 /* sftp_connection_tests.rs */,
+				857B6D270DC22D4E380223BB /* sftp_connection.rs */,
+				DCD6ADF2189C55F4FD329A75 /* shell_lifecycle_tests.rs */,
+				3ABD8EA738B8E4FB69587018 /* shell_lifecycle.rs */,
+				7F300BFDBC5426847507B49D /* shell_worker_tests.rs */,
+				A62CAEAFEE558FC086DAE4AE /* shell_worker.rs */,
+				5BB50918CFC54BB74902C79E /* temp_cleanup_tests.rs */,
+				E38F1573DA6F450E57481320 /* temp_cleanup.rs */,
+				99663BECCFD5AA9AEDF16733 /* test_support.rs */,
+				BE41E494DA59122203404EAD /* transfer_control_tests.rs */,
+				D307E8D8B2A12D33D5BE4CEF /* transfer_control.rs */,
+				247F906E750A3F161C808CC7 /* transfer_io_tests.rs */,
+				1BF1C7C37F80DA5ED52B2317 /* transfer_io.rs */,
+				5E958C4C37A5F4598A6BCD52 /* transfer_models.rs */,
+				779E5BB3F2738277E6356D9C /* transfer_retry_tests.rs */,
+				A493DD18DB9E86F903DC5816 /* transfer_retry.rs */,
+				74A34243571C251E79BFF2BC /* types_tests.rs */,
+				52843B256E60E531B39AE49F /* types.rs */,
+				C455F34D3FC101A75A77367C /* upload.rs */,
+				332F0893A7565C0749611F6A /* rsync */,
+			);
+			path = service;
 			sourceTree = "<group>";
 		};
 		0E86BF61E8C960CB26F9EA19 /* Sources */ = {
@@ -120,6 +672,49 @@
 				A17C64D2D67CC5EC843586EF /* mftp */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		0E8B5BA31B21ABE4BBEB007E /* mcp */ = {
+			isa = PBXGroup;
+			children = (
+				572066E6D1CFFAFDA5391C29 /* draft_tests.rs */,
+				0DB74DE5D5C08E3D864CAA58 /* drafts.rs */,
+				E7725F07BD5C9B6638DE5844 /* event_tests.rs */,
+				DC894CB0878841E45F7DF9FC /* mod.rs */,
+				1BD432E016FF7B79BDE94321 /* model.rs */,
+				5E57136DE2CAE55B09CDA368 /* tests.rs */,
+			);
+			path = mcp;
+			sourceTree = "<group>";
+		};
+		0FEC011D00509DBC492336C2 /* filesystem */ = {
+			isa = PBXGroup;
+			children = (
+				FC0FEEEABC8A9D8802714A18 /* mod.rs */,
+				7DFB73EDDDA5F469A3916CF9 /* tests.rs */,
+			);
+			path = filesystem;
+			sourceTree = "<group>";
+		};
+		113F9E95FDEB9CCB5FC7E891 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				7E10DDF366F3281322576FE7 /* activity.rs */,
+				E3D9614A76093A4854A4E1CD /* connections_tests.rs */,
+				99DC7A325CBEFC6CF7A535A3 /* connections.rs */,
+				B07F745DB766AACF25A923F7 /* execution_maintenance_tests.rs */,
+				35FA6209E3A1FF0064ABFFB1 /* execution_tests.rs */,
+				586F4EB62B957E195BB85DF3 /* execution_unlogged_tests.rs */,
+				6B84EECB5507B919D89BDB62 /* execution.rs */,
+				005EF55031806ABC19D677CF /* http_range_tests.rs */,
+				6AAAB6A00E7064B79C56D916 /* http_range.rs */,
+				EF145F142E25AB447C95010C /* mdns_browser.rs */,
+				27AF8E95FDB94B62D8790349 /* mod.rs */,
+				B7FB8AE7DA10CFEB9F5E3239 /* operations_tests.rs */,
+				20F62EAD220F4EB35D00A542 /* operations.rs */,
+				FDB8FBF9D3ED7EE0A203E7A4 /* diagnostics */,
+			);
+			path = core;
 			sourceTree = "<group>";
 		};
 		13A18A82C0002E343FA7E21A = {
@@ -137,16 +732,164 @@
 			);
 			sourceTree = "<group>";
 		};
-		24505EAB9090A252C69D1552 /* commands */ = {
+		24A90A8B69916FD843317963 /* query */ = {
 			isa = PBXGroup;
 			children = (
-				770BA476B5784405D7097886 /* hosts.rs */,
-				28717CA7AEF661EFC3A0BD0A /* keys.rs */,
-				E5189D58BA7C4FC00EA53DB6 /* lan_transfer.rs */,
-				A8CF726E2DD5C3261120D5C9 /* sftp.rs */,
-				B953FA4CB5345A0CEAD8A5A5 /* ssh.rs */,
+				71C34AC00C18E670EDA66D1F /* detail.rs */,
+				474C53B8480E8ADBC5217930 /* discover.rs */,
+				6ABB4CAC023001FD5E2E6B72 /* mod.rs */,
+				EAF04DB80CA8E4BFC3360B88 /* search.rs */,
 			);
-			path = commands;
+			path = query;
+			sourceTree = "<group>";
+		};
+		30AE9B829DDFC80068F0BB3F /* service */ = {
+			isa = PBXGroup;
+			children = (
+				2F467F4D9DAFBAD9FBF26533 /* discovery.rs */,
+				6095F0DCA5E005A08F8D19BA /* framing_tests.rs */,
+				D8BC115F8D2396C3F4DDEBE6 /* framing.rs */,
+				D80B1C28ECC7400367C4D9F9 /* lifecycle_tests.rs */,
+				F0B7A7CF3B9AE3342EA8E98D /* mod.rs */,
+				386B75E3A627E9BC5AE1A634 /* ownership_tests.rs */,
+				23FB6C475B45DDADC02B9295 /* protocol_tests.rs */,
+				F1ED178F3B24F87CEDB79057 /* runtime.rs */,
+				83A05110379FACEA7F09662A /* session.rs */,
+				38B42565AD2FC2FDC2372F03 /* tests.rs */,
+				8771ED8449F9F17E5176E269 /* wire.rs */,
+			);
+			path = service;
+			sourceTree = "<group>";
+		};
+		332F0893A7565C0749611F6A /* rsync */ = {
+			isa = PBXGroup;
+			children = (
+				F832D777A4E91F817222C796 /* bridge_tests.rs */,
+				155EF4D78C113C816215B98B /* bridge.rs */,
+				138706AE435887A0C02A83D8 /* capability_tests.rs */,
+				2F05B7E31DD8843A5DFA6C16 /* capability.rs */,
+				C024367A49F337E552327EBD /* helper_tests.rs */,
+				D979ADA7E797C73C4CD3F13A /* helper.rs */,
+				59DEE01D4ABBA8A26CED1925 /* mod.rs */,
+				417AD7BBB4DACBABE960F16C /* preview_tests.rs */,
+				D43210A3364C70152C516E0E /* preview.rs */,
+				54CB7EDB85FE04A62C1B97DD /* protocol_tests.rs */,
+				2EEDAFF89A5C42AAB19510E1 /* protocol.rs */,
+				4166DD557331AC79964D4138 /* real_sync_tests.rs */,
+				BAA70B56CF3C1833BE0004FE /* real_test_support.rs */,
+				E3849F273308A8248F6CCC57 /* real_transfer_tests.rs */,
+				1332CC115ED6231C2EAC264B /* spec.rs */,
+				423C8F9E2BDC6761F6410EE6 /* stream.rs */,
+				0DFBC224E04E517F958348CC /* sync_tests.rs */,
+				C78DDFE71EC848B1E94B05A2 /* sync.rs */,
+			);
+			path = rsync;
+			sourceTree = "<group>";
+		};
+		406C3007D58DCAEE74208866 /* updater */ = {
+			isa = PBXGroup;
+			children = (
+				7ABE5A28ECBCF9E011FCCF4B /* android.rs */,
+				08D30478FDBBBA3C32E7B398 /* commands.rs */,
+				E9C05F1E60AB67070DE3AE7D /* mod.rs */,
+				0579C93F961D5E169637AA8C /* model.rs */,
+			);
+			path = updater;
+			sourceTree = "<group>";
+		};
+		4C1874A9EEF241EAF9FD40CD /* poetry */ = {
+			isa = PBXGroup;
+			children = (
+				5177171792A2D53EBC237DA6 /* adapter_tests.rs */,
+				4FE20CA4E3A254049B11F3CD /* adapter.rs */,
+				EBA2FE33D0DD86CAE74BB661 /* catalog_tests.rs */,
+				E8D8903F12D059F5FA77A8B3 /* catalog.json */,
+				8FF5353BC049C1E593C34BDF /* catalog.rs */,
+				C30229C3D75AA6A3A010CD36 /* db_tests.rs */,
+				7022B03099E3C07632D38457 /* db.rs */,
+				B006DD9E3B06AD46594194F7 /* mod.rs */,
+				618C96A8002FA9D69CBE65FC /* model.rs */,
+				2BB54CA38FE19BA30D3C5D26 /* text_tests.rs */,
+				C7EE99ED83804A900594A4C7 /* text.rs */,
+				C76A426161E67125AE046F74 /* translation_pack.rs */,
+				5051E5759117692E50AF7903 /* translation_store_tests.rs */,
+				18AE4EA6D69EE94B511B65E7 /* translation_store.rs */,
+				B57110D8EB6DA32612AA7FA0 /* commands */,
+				66BA62AB809E243D69A9DD01 /* data */,
+				24A90A8B69916FD843317963 /* query */,
+				9827F9DE9ADBAFA18B313104 /* service */,
+				C792C77510FF5C961219E16B /* sync */,
+			);
+			path = poetry;
+			sourceTree = "<group>";
+		};
+		4E594BAB7EC7E2E0CBD4CB13 /* maintenance */ = {
+			isa = PBXGroup;
+			children = (
+				CEA42BA82DE94443A79F5B23 /* activity.rs */,
+				3CA5A2881F7E6834A856314B /* data_tests.rs */,
+				7E730C49568ADDFBB51B468D /* data.rs */,
+				B8CFD4DC06ED88E8186925F6 /* export.rs */,
+				026C3EB9205E48F3F9BCB219 /* mod.rs */,
+				F2874865325E0DB30C1E0335 /* participants.rs */,
+				D0FF7AB0684E5A27EF131D20 /* reset.rs */,
+			);
+			path = maintenance;
+			sourceTree = "<group>";
+		};
+		5A0F86B2A23C8BA9BA257BC4 /* app */ = {
+			isa = PBXGroup;
+			children = (
+				D37C5E90F09331FF6BEB31E3 /* ai_management_ipc_tests.rs */,
+				76912C331BDAB0D8F78201B7 /* ai_selection_ipc_tests.rs */,
+				8CE6A88C0B50F5AD68028B13 /* cleanup.rs */,
+				EC61A461A43F467FEFBA75CC /* lifecycle_tests.rs */,
+				231496F59FD1C073ABA45F11 /* lifecycle.rs */,
+				11D25E015136C91751E611C4 /* maintenance_export_tests.rs */,
+				99F57EEBD3F6ADB538D463DC /* maintenance_reset_tests.rs */,
+				5BE7E8CFA74B934668D1B48A /* maintenance_usage_tests.rs */,
+				E0DFB836D08E300BFB575688 /* mod.rs */,
+				2A39C7F7067FAFF310EE4AD1 /* runtime_config_tests.rs */,
+				F346893BE28B70075AEA1FF4 /* runtime_config.rs */,
+				BED231C159819CF5C3772339 /* services.rs */,
+				74D187089F813DDBF1D2A584 /* tests.rs */,
+				DD11EA66D77F43096F5C0D9B /* registry */,
+			);
+			path = app;
+			sourceTree = "<group>";
+		};
+		66BA62AB809E243D69A9DD01 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				DD90B281007A871F19C55875 /* ts_characters.txt */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		6A3E65CA8470E3E2AA8F77C1 /* modules */ = {
+			isa = PBXGroup;
+			children = (
+				A44CDEFD1D2722027241608C /* mod.rs */,
+				84E67FC030BBC8F7700DD248 /* ai */,
+				C44E74CC9B3FB8C70B43CF2B /* bt */,
+				D8DCE19D4BCBA5ABDE6B32E8 /* diagnostics */,
+				0FEC011D00509DBC492336C2 /* filesystem */,
+				D2B0A323490865000E24CB65 /* game_room */,
+				85C496A2550EE6AA82A0DBA4 /* hosts */,
+				FDA8133C5216F3B25FA204C3 /* keys */,
+				9E57A096DE42A8D8CB75237B /* lan_transfer */,
+				4E594BAB7EC7E2E0CBD4CB13 /* maintenance */,
+				CFC1163BA2941D7851143CCC /* mcp */,
+				DC0F48B951F8D05B53C51B75 /* model_viewer */,
+				4C1874A9EEF241EAF9FD40CD /* poetry */,
+				A4A8612022D92238DE72824E /* speech */,
+				CB6F8278E6C5F0B246698D55 /* ssh */,
+				A97E5BD0B8C843B0BD0A06B7 /* todo */,
+				9B091E672793E702E869CE4A /* translation */,
+				406C3007D58DCAEE74208866 /* updater */,
+				FC60265F6663CB2255B8BBD3 /* vault */,
+			);
+			path = modules;
 			sourceTree = "<group>";
 		};
 		82D211E94CFAE40DB6FE89DB /* Frameworks */ = {
@@ -164,22 +907,127 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		84E67FC030BBC8F7700DD248 /* ai */ = {
+			isa = PBXGroup;
+			children = (
+				EF18B1C65B84C27DC782DAF1 /* legacy_schema_tests.rs */,
+				D207A65A79ABB2FCB5DA8EA8 /* legacy_schema.rs */,
+				D866B6A66F8583DB9789A210 /* mod.rs */,
+				B0843C0F0ADB843A74775FAF /* model.rs */,
+				3671FB36BD6B0FD7594383BF /* ports.rs */,
+				F654FACF46058F500ACFD7A0 /* repository_tests.rs */,
+				57D028596D76817718D804E7 /* repository.rs */,
+				2E289AAEF254DCEB822B0231 /* schema.rs */,
+				B8AE9A63E374CE964E920318 /* completion */,
+				965534A4C295F00517AC1082 /* configuration */,
+				A566199227EC160423B44EBA /* service */,
+			);
+			path = ai;
+			sourceTree = "<group>";
+		};
+		85C496A2550EE6AA82A0DBA4 /* hosts */ = {
+			isa = PBXGroup;
+			children = (
+				BF740CADA14C43B6B5E06884 /* commands.rs */,
+				13E8971F56134F9B7E9A7032 /* mod.rs */,
+				8A2748CCC5D845756D8D03B4 /* model.rs */,
+				2B889FCFD67B3B167F0174E9 /* repository.rs */,
+				684625CF5603EDF9D2170E10 /* schema.rs */,
+			);
+			path = hosts;
+			sourceTree = "<group>";
+		};
+		8C79A351B8F10EB5C11F25E3 /* debug */ = {
+			isa = PBXGroup;
+			children = (
+				3C200511F11A39A8EBAC4C39 /* libapp.a */,
+			);
+			path = debug;
+			sourceTree = "<group>";
+		};
 		8E65C75DEAC2DF142163C9DA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				30A59BA48A0EFE9F36300D7A /* mftp.app */,
+				30A59BA48A0EFE9F36300D7A /* mftp_iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9170169C6EF845B18994DBC0 /* browser_client */ = {
+		965534A4C295F00517AC1082 /* configuration */ = {
 			isa = PBXGroup;
 			children = (
-				91094DF62370BE889926CE92 /* app.js */,
-				751E920FB2BC87F766F2826C /* assets.rs */,
-				AC0E26ABB7201B4AB91C880C /* index.html */,
-				0690266B04EC628101BA5F7A /* mod.rs */,
-				33A4A6C5BF5F8F7C87805C68 /* styles.css */,
+				33CE8C243CDD6CF87971D4FD /* commands.rs */,
+				4CD7C069D8801A96731F52F7 /* constraints_tests.rs */,
+				B41440408FC7A0CEAB2900E5 /* fixtures.rs */,
+				D9CCD00371B11C7882213DB2 /* input.rs */,
+				B9EB6C99B6FA1FF6BD16A8A1 /* keys.rs */,
+				073E38A9F597FB9CC21C573E /* legacy.rs */,
+				B138F2C1140A158F5A6E85AC /* mod.rs */,
+				92B14F609C3C8546A4420F02 /* model.rs */,
+				9F174E7A64A8CC313F40776A /* models.rs */,
+				91A65379B3B66BA866F1EB72 /* providers.rs */,
+				FBA7F0E4CF77F8710400B54C /* read_tests.rs */,
+				41470B8077B07BF940AA2A0D /* read.rs */,
+				897844511DDFF7CA3D8434E1 /* schema_tests.rs */,
+				2EF538E2CDDBFA7FDA63632E /* schema.rs */,
+				58F65A2A568B987533045BE3 /* schema.sql */,
+				94D0E743B737ABEB90401390 /* selection.rs */,
+				2672F63CEC2607A67D86EF7B /* testing.rs */,
+				5D8BBDC4235BAA6E22400AE7 /* transaction.rs */,
+				3B12AAA2DD7C4373A5601B02 /* validation.rs */,
+			);
+			path = configuration;
+			sourceTree = "<group>";
+		};
+		9827F9DE9ADBAFA18B313104 /* service */ = {
+			isa = PBXGroup;
+			children = (
+				6F2A5F28E2BE017B7BC0FB72 /* mod.rs */,
+				D695F71E5DEDF4D3D86A2D8E /* translation_tests.rs */,
+				235B6FC4B7079EF934DA8BE5 /* translation.rs */,
+			);
+			path = service;
+			sourceTree = "<group>";
+		};
+		9B091E672793E702E869CE4A /* translation */ = {
+			isa = PBXGroup;
+			children = (
+				AAF9A53E8A9CD5BEB7BDC505 /* catalog.rs */,
+				F0B35835BED29DC087B53C78 /* commands.rs */,
+				9CF5B6B8D1DD66CC73FC78A7 /* download.rs */,
+				17C3DC3A1E66875D564BD0E4 /* files.rs */,
+				0F75B389EB47CDB67C9399E1 /* mod.rs */,
+				475AEAA1D15C686A7F5C984D /* model.rs */,
+				D4AFAA0D40DA223C85EEE17C /* service.rs */,
+				EF6C78492F31E5AD9FC9B417 /* tests.rs */,
+			);
+			path = translation;
+			sourceTree = "<group>";
+		};
+		9E57A096DE42A8D8CB75237B /* lan_transfer */ = {
+			isa = PBXGroup;
+			children = (
+				872AF8C07578367923E9BA6C /* commands.rs */,
+				2169732CC4E999E2242C1E30 /* mod.rs */,
+				37B2BDED24983AE00058535A /* model.rs */,
+				896FCD808E492154B20EEA7E /* repository_tests.rs */,
+				A8E77AC2C3A28DCC67210F6D /* repository.rs */,
+				4723BA730DA27452B6E77921 /* schema_tests.rs */,
+				690516546229D86EB64CB86B /* schema.rs */,
+				AD297149C9ABBF2600FD10FD /* service */,
+			);
+			path = lan_transfer;
+			sourceTree = "<group>";
+		};
+		A11EB28814E96E299BF0A940 /* browser_client */ = {
+			isa = PBXGroup;
+			children = (
+				4A90655C387507D1F68EF4DC /* app.js */,
+				60F51CBF767DC328E7618F5B /* assets.rs */,
+				410737EDAC5800242EC30C44 /* index.html */,
+				3FB87C75E214CD1BD29A7F1C /* mod.rs */,
+				F6F777800C11274992313B4D /* styles.css */,
+				5489AA4DC13A35DD0BF58788 /* tests.rs */,
 			);
 			path = browser_client;
 			sourceTree = "<group>";
@@ -191,6 +1039,127 @@
 				AE2668B703F4BD944242BD10 /* bindings */,
 			);
 			path = mftp;
+			sourceTree = "<group>";
+		};
+		A4A8612022D92238DE72824E /* speech */ = {
+			isa = PBXGroup;
+			children = (
+				26708B756D1DBCE0ABC00AF4 /* commands.rs */,
+				AC953B752C5B0FE6C4F03783 /* mod.rs */,
+				EADF9E76B5AF671C191CE1A0 /* model.rs */,
+				1AEA977B45C4885556BFFF49 /* tests.rs */,
+			);
+			path = speech;
+			sourceTree = "<group>";
+		};
+		A566199227EC160423B44EBA /* service */ = {
+			isa = PBXGroup;
+			children = (
+				8115BF0C63D8BEE1237DB27C /* client_tests.rs */,
+				C702C0DF883F70C053BEAF44 /* client.rs */,
+				481BF0C1EA6D3644E82F6B2C /* connection_tests.rs */,
+				D092BF0CC2F86BB51923B7BD /* connection.rs */,
+				FED7FEC09F9747388E71DF4C /* deadlines_tests.rs */,
+				BF3AB0CADB1F0913C80E833C /* deadlines.rs */,
+				C253B5EF559658CDA4898CBD /* diagnostic_tests.rs */,
+				33FD6E26F0DC71B4C93C798C /* legacy_fixture.rs */,
+				4106DF7505C593E64A0E2840 /* management_constraints_tests.rs */,
+				14EA1C80227D1D58BDA94297 /* management_tests.rs */,
+				DDFBDEC90FFA9EAEF11C3B61 /* management.rs */,
+				37343B4F4BCF153E41C8A01D /* mod.rs */,
+				94C9770D92710D438E6DBD2B /* probe_tests.rs */,
+				6607FBEC56282980D5142CD5 /* probe.rs */,
+				3C4306997A63746DCA283C5C /* protocol_tests.rs */,
+				A707A7A4260565D9FE254B55 /* protocol.rs */,
+				C139D7AC0D341710373D2057 /* runtime_tests.rs */,
+				00AA3013CF28B5A97E52B071 /* runtime.rs */,
+				26FCA8B71563B8A646A2269D /* selection_network_tests.rs */,
+				93322424D3B4353F9BD14F3B /* selection_tests.rs */,
+				26C364C8C8003AC8EFC8D02F /* selection.rs */,
+				3072D28B2BD574517364AC99 /* sse_tests.rs */,
+				70B2B9CC82BA1274E3F46F41 /* sse.rs */,
+				D3FF0424FB85AE232C96AA05 /* tasks_tests.rs */,
+				BB499A5C4B7F0F4F4D9D8AC0 /* tasks.rs */,
+				B90A7853AAE2AD577C5D54DE /* transport_log_tests.rs */,
+				6C5DE6705B0ABE0BA782BF29 /* url_tests.rs */,
+				4D7DFDD0ABD3F10A5C1F4135 /* url.rs */,
+				F0DAD6BD0E08761408B7C29A /* protocol */,
+			);
+			path = service;
+			sourceTree = "<group>";
+		};
+		A97E5BD0B8C843B0BD0A06B7 /* todo */ = {
+			isa = PBXGroup;
+			children = (
+				969EEFCDAFFE16286063B801 /* commands.rs */,
+				B6E3D7CF432C53C1F74F2E7C /* events.rs */,
+				ECF8D12A306ED15397B3381C /* mcp_repository.rs */,
+				30924877735017D6C77040FF /* mod.rs */,
+				09D10B61D88A78C0248B6335 /* model.rs */,
+				401A7B16E3D7E8B2B596E765 /* note_assets.rs */,
+				B5A131F5DB051EE94A62EA24 /* note_backup_tests.rs */,
+				8CCE729789CE88A8D3387909 /* note_backup.rs */,
+				4EC0B144E1EAD4B15AD87EB6 /* note_clipboard.rs */,
+				0D9C45FBB69FC1B3486F789A /* note_commands.rs */,
+				CC768A0E12A9095525AE045B /* note_image_tests.rs */,
+				8E47EE63F0A88D28AFF0019B /* note_image.rs */,
+				D74909CC967818FD25AAC342 /* note_inline_tests.rs */,
+				0851E992D2A060C1C9D28ECE /* note_model.rs */,
+				E3D0D1F29F05BC3E20BC3B79 /* note_repository.rs */,
+				D9A7D02857B0E29252CD3ADF /* note_service_tests.rs */,
+				D25A7B6BD9D1199E4EDC70A9 /* note_service.rs */,
+				188E0611A4632CFBA8742023 /* note_tests.rs */,
+				6A81A672F3B5E82C27781218 /* repository_tests.rs */,
+				5997D5E33C88A8ACC428A879 /* repository.rs */,
+				764F1D2B346E5D067D163230 /* schema_tests.rs */,
+				464188391D48EF764FE685C4 /* schema.rs */,
+				EDA2F51E8BBFD3D6DC1FF94B /* time_tests.rs */,
+				0E8B5BA31B21ABE4BBEB007E /* mcp */,
+			);
+			path = todo;
+			sourceTree = "<group>";
+		};
+		AD297149C9ABBF2600FD10FD /* service */ = {
+			isa = PBXGroup;
+			children = (
+				23EC23278EB592358DE5692A /* access_routes.rs */,
+				D5BB9FC45D442609333F44AE /* auth.rs */,
+				9147BC2B6B18B28DA27BD707 /* browse_routes.rs */,
+				1F6FC8C2B085E651015BC9B5 /* browser_page_tests.rs */,
+				BE4BD36FA5D8AAB2E5F9ECF0 /* browser_page.rs */,
+				14DC00A5C13700CDF4CBCCFD /* discovery.rs */,
+				54B40BE0A252ECE2B3D99E4A /* download_handlers_tests.rs */,
+				DBAE2AD231DB7462D07ABC11 /* download_handlers.rs */,
+				28A9DB9C45512A24B4A91F16 /* file_ops_tests.rs */,
+				7DAB65556BF0B8A4041A540B /* file_ops.rs */,
+				CE832C10287D6D1A78E6462A /* http_error_tests.rs */,
+				0445A6DEA290294E05AEF32F /* http_error.rs */,
+				F1974795629A9E96D223CEEB /* http_io_tests.rs */,
+				AFCFA74C41F0EA85CF975A78 /* http_io.rs */,
+				699C476CA3BBAE64578A6262 /* http_request_tests.rs */,
+				3A91C35EFE4B22C7813463C8 /* http_request.rs */,
+				BACB6948E6C6E6A1BBF41069 /* logging_tests.rs */,
+				01232811870305EBEE96F97C /* logging.rs */,
+				E1D9BB74DA0413B48E4B0F91 /* mod.rs */,
+				2E43659FE4FF6C8C1EE1F408 /* runtime_tests.rs */,
+				6CD3FFDAE7CD172CDEF46FC8 /* runtime.rs */,
+				81E0313DA50955EF3BA1A89E /* server_tests.rs */,
+				0516DC9A10953392FCFE16DC /* server.rs */,
+				B6CEC5BAB80D71A4A884F02B /* task_connection_tests.rs */,
+				CB64B951695BC98A166A3D31 /* tasks_tests.rs */,
+				297B42158ED06E03B7B5DA87 /* tasks.rs */,
+				9FCC547D832001090EB3F5F5 /* tests.rs */,
+				BFC13054923AA1D5038F46BF /* transfer_io.rs */,
+				5AE207F77A4D3B616AACED8E /* upload_file_tests.rs */,
+				A638BB0468FCC2E69D0FBB56 /* upload_file.rs */,
+				D899FC51BE52969A60B98334 /* upload_request_tests.rs */,
+				4DE5DA88D320A97782EB19CA /* upload_request.rs */,
+				0B047E7B74317C24FC49F930 /* upload_routes.rs */,
+				1C45AAFD026ADEEBB822F74F /* upload_tests.rs */,
+				97C736FC27B997B070B44CA8 /* upload.rs */,
+				A11EB28814E96E299BF0A940 /* browser_client */,
+			);
+			path = service;
 			sourceTree = "<group>";
 		};
 		AE2668B703F4BD944242BD10 /* bindings */ = {
@@ -213,69 +1182,320 @@
 		B4EFECCAFDC6472B6D54B719 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				F165F5967DFE62CB93576C42 /* commands.rs */,
-				0065650A52D04DC0505B2463 /* error.rs */,
-				C14F2C4641A4CFC108D38A4C /* lan_transfer.rs */,
+				87DB61E35526876200DCD5F0 /* file_opener.rs */,
+				3661F1841E77EC6E96B0AC29 /* lib_tests.rs */,
 				EFBC20358ABEC8FA2CFBF6B8 /* lib.rs */,
 				F45CE9D41B5946F2DB968F35 /* main.rs */,
 				CFFE911C223A1B6DEA200CE7 /* models.rs */,
-				A53D0FB7626FA4438D01B1CB /* ssh.rs */,
 				888AFE63EA0527A9AA37E698 /* storage.rs */,
-				24505EAB9090A252C69D1552 /* commands */,
-				FEB97930DD9479D989D5BA3F /* lan_transfer */,
-				C2C29F1284F7039C37B68887 /* ssh */,
+				4DA60E4F33F57399912B6514 /* transfer.rs */,
+				CBC9B86C02052299B4F2C1A4 /* adapters */,
+				5A0F86B2A23C8BA9BA257BC4 /* app */,
+				113F9E95FDEB9CCB5FC7E891 /* core */,
+				DAA1925FB385E0FEA663C6D0 /* error */,
+				6A3E65CA8470E3E2AA8F77C1 /* modules */,
 				0315B2A8F0354EC6555D49A5 /* storage */,
 			);
 			name = src;
 			path = ../../src;
 			sourceTree = "<group>";
 		};
-		C2C29F1284F7039C37B68887 /* ssh */ = {
+		B57110D8EB6DA32612AA7FA0 /* commands */ = {
 			isa = PBXGroup;
 			children = (
-				635120C6DB42548A41DAFA61 /* archive.rs */,
-				9E98136773591B58E9195B40 /* auth.rs */,
-				54F82EF753836E4548FD176F /* download_archive.rs */,
-				D8B0F25710396A84747D5233 /* download_direct.rs */,
-				5980F28BDC48F587358E3E6C /* download_file.rs */,
-				AD5698ED162041B4D870A518 /* extract.rs */,
-				CC778BED021158E21B200D2B /* manager_session.rs */,
-				2D90A841493DB74D7777F0C4 /* path_utils.rs */,
-				842F3A363E5ECB27D8CED42E /* remote_ops.rs */,
-				D56F4EA733AB882B51789DE0 /* sftp_basic.rs */,
-				052A969B2490713F552F3E6E /* shell_worker.rs */,
-				DECB1AFF0144D035FE494823 /* temp_cleanup.rs */,
-				2AC5FEAAA5E3FF4BABD9B327 /* transfer_control.rs */,
-				922E38845D5D7B986ACF8912 /* transfer_io.rs */,
-				A341AF3798D52F1B642490CC /* transfer_models.rs */,
-				EB87133933DCE3650ABA5DE9 /* types.rs */,
-				4BC8C74B69D1A384CF7801B7 /* upload.rs */,
+				719241967F0CCD531CDE5AED /* library.rs */,
+				9C5F645E1C2C48D72CEC267A /* mod.rs */,
+				5ABDE56AEAA680DA5A78EC72 /* sync.rs */,
+				D768791ADF465B2443523BF7 /* translations.rs */,
+			);
+			path = commands;
+			sourceTree = "<group>";
+		};
+		B5DDB364034BE1A63E1E7203 /* arm64 */ = {
+			isa = PBXGroup;
+			children = (
+				8C79A351B8F10EB5C11F25E3 /* debug */,
+			);
+			path = arm64;
+			sourceTree = "<group>";
+		};
+		B8AE9A63E374CE964E920318 /* completion */ = {
+			isa = PBXGroup;
+			children = (
+				021578DD97EBA100DA8EA1AA /* diagnostics.rs */,
+				8E679AA4C0650788B7003246 /* emitter.rs */,
+				C229235AC2669276918A7200 /* errors.rs */,
+				B8BD20B5670D69B82C9A4253 /* events.rs */,
+				05C604D17428A5B4FA21AE4A /* mod.rs */,
+				CFC919D9C32D92BD01D5902E /* model.rs */,
+				7420C1C6DE384EA12733686C /* output.rs */,
+				300421FF13AA8F9F2BF40D2C /* request.rs */,
+				E59E38FE90BAE572F5026776 /* tests.rs */,
+			);
+			path = completion;
+			sourceTree = "<group>";
+		};
+		C44E74CC9B3FB8C70B43CF2B /* bt */ = {
+			isa = PBXGroup;
+			children = (
+				D1D545A5D4B6099DE1B5AD4A /* commands.rs */,
+				91831090B789B681AFCB4330 /* mod.rs */,
+				1188645DEDDD2D4FA99389D9 /* model_tests.rs */,
+				D98AF1711BFA166E750F0EE2 /* model.rs */,
+				D12C9E6AB8133878CB576780 /* ports.rs */,
+				85714720BD6444CAF4A6B6A9 /* repository_tests.rs */,
+				E5AE4D9B9D64633E2FB5D711 /* repository.rs */,
+				FC381AEAB181024C0873E1AA /* schema.rs */,
+				020739415B28C893E49A689C /* service */,
+			);
+			path = bt;
+			sourceTree = "<group>";
+		};
+		C792C77510FF5C961219E16B /* sync */ = {
+			isa = PBXGroup;
+			children = (
+				EF2CF72F564EFFED8DA32F51 /* github_tests.rs */,
+				2B51019BFE3D01160FDB3E65 /* github.rs */,
+				5276E110B52AA64843D27616 /* ingest_tests.rs */,
+				0FACFC0145355F14BDCAC8AA /* ingest.rs */,
+				C33AF2AC32D8D86293A09B55 /* mod.rs */,
+				0FA88EC5239678088366FA1D /* net_tests.rs */,
+				28D3A003B4D8DD69AA683381 /* net.rs */,
+				1BB7B10B29AAAE8D7C456D98 /* sync_tests.rs */,
+			);
+			path = sync;
+			sourceTree = "<group>";
+		};
+		CB6F8278E6C5F0B246698D55 /* ssh */ = {
+			isa = PBXGroup;
+			children = (
+				1B474CB565ECE9B8691D3C1E /* mod.rs */,
+				22F8CC9E3F638F0D97C23837 /* model.rs */,
+				53521F6BB8E6A71E2D50F80F /* ports.rs */,
+				E684261ED203320B45BE577C /* commands */,
+				05E67D538BBC3E6D0C00A733 /* service */,
 			);
 			path = ssh;
+			sourceTree = "<group>";
+		};
+		CBC9B86C02052299B4F2C1A4 /* adapters */ = {
+			isa = PBXGroup;
+			children = (
+				CE5C78FF6C83EDEB7D80B5C8 /* activity_log_tests.rs */,
+				748EAA3384B91BCD8D8974FF /* activity_log.rs */,
+				D1D5D66D90B006216787F17B /* ai_android.rs */,
+				DFE1AB64D21F61F8DA0B96CE /* ai_cache_tests.rs */,
+				22E8CF47E9A653CEF6CA7A36 /* ai_cache.rs */,
+				5F744412408891377115BA09 /* ai_isolation_tests.rs */,
+				984864B72A2EF6B238DF7421 /* ai_lifecycle.rs */,
+				2353E8747937C4E0A9C40524 /* ai_memory.rs */,
+				99AE9BF5260B8912A0964BD5 /* ai_migration_native_tests.rs */,
+				D6C148A2078CF781C1B5C9D5 /* ai_native_tests.rs */,
+				8A779070A7D4638675ED30BA /* ai_tests.rs */,
+				385ADC1B1E197FE2205817F4 /* ai.rs */,
+				300AE995FE563CD5C761B036 /* android_tls.rs */,
+				C10D757D2839729AD85AA94B /* bt_tests.rs */,
+				DEBD8E8A20783493B2150C45 /* bt.rs */,
+				A4E17E9BCADAA9A9B2615243 /* mod.rs */,
+				FB2333932974C6FF3B04C48E /* room_events_tests.rs */,
+				B00F99F8B38392492F09332A /* room_events.rs */,
+				F035686D3C7654D823338019 /* ssh_tests.rs */,
+				5755B00D7B8EDAB728A5031E /* ssh.rs */,
+				DD29C0D8810B878E81A3E41C /* speech */,
+			);
+			path = adapters;
+			sourceTree = "<group>";
+		};
+		CFC1163BA2941D7851143CCC /* mcp */ = {
+			isa = PBXGroup;
+			children = (
+				DEE4EFF2831A1A2E1CE34819 /* access_tests.rs */,
+				AFA3EB5A6EFD1BFB1240885B /* access.rs */,
+				293696FA041B373F93BE1080 /* commands.rs */,
+				8FA6FD01070A0C6DAC0DBCAD /* handler.rs */,
+				84D61E38C196C4D19F906D46 /* listener.rs */,
+				973674EF31F41FF6CD108B56 /* mod.rs */,
+				A21D8D36999F91CD1D784EC8 /* model.rs */,
+				5BA9D6BABD23A9BAB67154F5 /* registry.rs */,
+				877906ECC105424CDFD366AD /* repository_tests.rs */,
+				DDDE82F14E4BEC751B424C52 /* repository.rs */,
+				65B082F24631FB3676D45657 /* runtime.rs */,
+				EDA9A98ADFB2FE62ACD40DE5 /* server.rs */,
+				011A7A04B8CD8A1B22AD6713 /* tests.rs */,
+				194B7CAF23F808AFBBA14F74 /* transport_body.rs */,
+				F7664709564D12DB7FCC6349 /* transport_tests.rs */,
+				AD36364DABFAF15C0D131D6E /* transport.rs */,
+			);
+			path = mcp;
+			sourceTree = "<group>";
+		};
+		D2B0A323490865000E24CB65 /* game_room */ = {
+			isa = PBXGroup;
+			children = (
+				04CC7ECCEBC46B6029A50A95 /* commands.rs */,
+				247F77863FE542B77B5E938D /* mod.rs */,
+				B17063461C4E6E7F03188179 /* model_tests.rs */,
+				2F140C868ECAB8764A99EEB8 /* model.rs */,
+				DC4C3DA4CE634D5170C315A9 /* ports.rs */,
+				30AE9B829DDFC80068F0BB3F /* service */,
+			);
+			path = game_room;
+			sourceTree = "<group>";
+		};
+		D8DCE19D4BCBA5ABDE6B32E8 /* diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				4178E2A45985EE209C7FD0FC /* mod.rs */,
+			);
+			path = diagnostics;
+			sourceTree = "<group>";
+		};
+		DAA1925FB385E0FEA663C6D0 /* error */ = {
+			isa = PBXGroup;
+			children = (
+				A3F15DC119CEA2BEC14FD539 /* bt_tests.rs */,
+				C9903B00945D50FA00CE1936 /* bt.rs */,
+				EEBD1388A559894FEDCFB9B6 /* codes.rs */,
+				313DE6D0DE0B0D08A06B506F /* external.rs */,
+				01B748A223458EF91F466D8A /* ipc_tests.rs */,
+				2A304F249DCC79A4B3148306 /* mod.rs */,
+				9C1B34F5584A34EBE8560013 /* persistence_tests.rs */,
+				B3FDC11DFFF61BAC9808C2B1 /* persistence.rs */,
+				FCF7D59BEC4E017AC00CFA41 /* ssh_tests.rs */,
+				B6A6BC5C7C0C534EFFB3779C /* ssh.rs */,
+				306CFE8F2273C0BD76B55F91 /* tests.rs */,
+			);
+			path = error;
+			sourceTree = "<group>";
+		};
+		DC0F48B951F8D05B53C51B75 /* model_viewer */ = {
+			isa = PBXGroup;
+			children = (
+				C11FBEDD614637BFF3C1EF81 /* attachment_commands.rs */,
+				0ED9B181EDA1A2066516B781 /* attachments.rs */,
+				8E2F69F7004B8CCF63BFD99F /* commands.rs */,
+				AF65F76DE0BED06C1FA8522A /* environment_commands.rs */,
+				CE12B4F094BEA32A114482C4 /* environment_tests.rs */,
+				0E6B19D6ACDC9BC9C4E586AD /* environment.rs */,
+				5D6E909ABAD941BDA387E271 /* export_commands.rs */,
+				6C1FF4CAEB0FCE0D4DFB9193 /* export_store_tests.rs */,
+				9D5DC5C264D2F12F4EADE31D /* export_store.rs */,
+				117ED9DAE2AD43E71C8C8CAB /* library_cache.rs */,
+				D3AF1ADF9B124B6BA3E1A2F8 /* library_commands.rs */,
+				57DA50E9B7D1C82D8A6F05ED /* library_models.rs */,
+				D97E1AAD1E8D6E859E588D55 /* library_tests.rs */,
+				B0EAC6D123B4CC48294063ED /* library_validation.rs */,
+				1361BEDE4145939726958C2B /* mod.rs */,
+				1A9A47751E23A01CDF84B877 /* models.rs */,
+				6CC7610AA07022208C234841 /* repository.rs */,
+				DC9FCB2D769C1A9E880EC51E /* schema.rs */,
+				B04A523A342699210B584DEF /* service.rs */,
+				25DC76105BC8BDE4735B979A /* system_tests.rs */,
+				4F9029B2A6BED7C94D33B9C1 /* system.rs */,
+				5E7C3A04AA4EA020BD119A9F /* tests.rs */,
+			);
+			path = model_viewer;
+			sourceTree = "<group>";
+		};
+		DD11EA66D77F43096F5C0D9B /* registry */ = {
+			isa = PBXGroup;
+			children = (
+				D4030C0D0E7A300053697150 /* command_baseline.txt */,
+				EEC0C94E6458CA6B6F6D0583 /* mcp.rs */,
+				21DFE430ECC8AB7D09984A78 /* mod.rs */,
+				0B65113385CA3C2B002D3D6E /* tests.rs */,
+			);
+			path = registry;
+			sourceTree = "<group>";
+		};
+		DD29C0D8810B878E81A3E41C /* speech */ = {
+			isa = PBXGroup;
+			children = (
+				00F64FFEAEF0ED19225DE31F /* android_events_tests.rs */,
+				C3CF95656A9AD967A59786D0 /* android_events.rs */,
+				D53CFB770EDB4234035FEE53 /* android.rs */,
+				B18ACE7EF5F45787C696659C /* apple_ios.rs */,
+				8D47B598F9E07D2BC8218FDA /* apple.rs */,
+				D81D793DD6FFEB8DE58AEFC3 /* mod.rs */,
+			);
+			path = speech;
+			sourceTree = "<group>";
+		};
+		E684261ED203320B45BE577C /* commands */ = {
+			isa = PBXGroup;
+			children = (
+				B3FDE483DC4B7E0541F86BB5 /* mod.rs */,
+				C40593D96B27E935295306A7 /* rsync.rs */,
+				44A4971A6835E3B0FDF018D3 /* sftp.rs */,
+				D937509D0FFB91C6D1E802F2 /* ssh.rs */,
+			);
+			path = commands;
 			sourceTree = "<group>";
 		};
 		ED5C1380C9E26A4E89C08ADE /* Externals */ = {
 			isa = PBXGroup;
 			children = (
+				B5DDB364034BE1A63E1E7203 /* arm64 */,
 			);
 			path = Externals;
 			sourceTree = "<group>";
 		};
-		FEB97930DD9479D989D5BA3F /* lan_transfer */ = {
+		F0DAD6BD0E08761408B7C29A /* protocol */ = {
 			isa = PBXGroup;
 			children = (
-				8182CA488D48B7248625C449 /* auth.rs */,
-				1148E89A735225338E98BF9A /* browser_page.rs */,
-				4BEC9A7E935E3D3DF49FA8E6 /* discovery.rs */,
-				9292C626ABA4170993323102 /* download_handlers.rs */,
-				ABC1B95F8EEEE2E0FEE9311A /* file_ops.rs */,
-				24CF78ADBDFD7A0AB45A22D8 /* http_io.rs */,
-				1AA8B94F69057CAE5097F9B0 /* logging.rs */,
-				56EBD384B9800B6C3B681B63 /* server.rs */,
-				08D5ED3B785F321DF535D69A /* tasks.rs */,
-				9170169C6EF845B18994DBC0 /* browser_client */,
+				4128129ADF8DF6F6251FCB49 /* adapter_tests.rs */,
+				00C5BECE8C45E14E1B96F33F /* anthropic.rs */,
+				AC20D6888D62A8AB3B6595D9 /* chat.rs */,
+				7A67FC222CD46EA26151F642 /* responses.rs */,
+				3FEC870FD6059AC8D796C35C /* usage.rs */,
 			);
-			path = lan_transfer;
+			path = protocol;
+			sourceTree = "<group>";
+		};
+		FC60265F6663CB2255B8BBD3 /* vault */ = {
+			isa = PBXGroup;
+			children = (
+				0C41266ECCC5E57B0C20A68F /* commands.rs */,
+				3C5A269B85B30DD2DA1C8482 /* mod.rs */,
+				1B46FA252374F70BA9A24389 /* model.rs */,
+				52D59D547D0B421B20B16E24 /* repository.rs */,
+				209D9B104AC833D377EF50BA /* schema.rs */,
+			);
+			path = vault;
+			sourceTree = "<group>";
+		};
+		FDA8133C5216F3B25FA204C3 /* keys */ = {
+			isa = PBXGroup;
+			children = (
+				68BBEDE1C797CADC092E2151 /* commands.rs */,
+				65CF929D2B6714968F9A6649 /* mod.rs */,
+				B1DC166C8E3548F1BCEB09C5 /* model.rs */,
+				B118C3FE2106BE34A1E942E5 /* repository.rs */,
+				ACF103A131E85CC281A83C0D /* schema.rs */,
+			);
+			path = keys;
+			sourceTree = "<group>";
+		};
+		FDB8FBF9D3ED7EE0A203E7A4 /* diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				7EBF583CAFD53E603CB898D1 /* context.rs */,
+				88F8C438610E9F3FD9F69A1A /* mod.rs */,
+				27834A4759AD45DE05E75C46 /* model.rs */,
+				92064807DAF713A72CB30A58 /* protocol_tests.rs */,
+				AFA362F5F1F26405CCADF27C /* recorder_protocol.rs */,
+				7DF8EE7590921D2A4455A552 /* recorder.rs */,
+				65965BF8525CCAA444C8275D /* redaction.rs */,
+				2BB26DF17C891857FCCED2B8 /* tests.rs */,
+			);
+			path = diagnostics;
+			sourceTree = "<group>";
+		};
+		"TEMP_8EE41017-DAF4-46AF-9144-2445D3AF7665" /* x86_64 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = x86_64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,7 +1518,7 @@
 			packageProductDependencies = (
 			);
 			productName = mftp_iOS;
-			productReference = 30A59BA48A0EFE9F36300D7A /* mftp.app */;
+			productReference = 30A59BA48A0EFE9F36300D7A /* mftp_iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -308,7 +1528,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2660;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					AE44CC82EA029BCF05AC8630 = {
+						DevelopmentTeam = Q4TGGJ5RKN;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 57613FAA24DF7232E4711316 /* Build configuration list for PBXProject "mftp" */;
 			developmentRegion = en;
@@ -337,6 +1563,7 @@
 				FF6664D1360603A70972293E /* Assets.xcassets in Resources */,
 				DD4138A61CBDB20017693BE7 /* LaunchScreen.storyboard in Resources */,
 				9D384317E894FD05FDEA671E /* assets in Resources */,
+				6A2FCB5D620124513E1EF082 /* libapp.a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,7 +1589,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\"\ncommand -v fnm >/dev/null 2>&1 && eval \"$(fnm env --shell bash)\"\npnpm tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}";
+			shellScript = "# Xcode runs script phases with a minimal PATH; pull in cargo,\n# Homebrew, and the fnm-managed node/pnpm before invoking tauri.\nexport PATH=\"$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\"\ncommand -v fnm >/dev/null 2>&1 && eval \"$(fnm env --shell bash)\"\npnpm tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -413,11 +1640,8 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = Q4TGGJ5RKN;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				OTHER_LDFLAGS = "-lz";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -438,7 +1662,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -448,10 +1671,17 @@
 		AFCEEBD8B61E18857098E1F4 /* release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = (
+					arm64,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = mftp_iOS/mftp_iOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "Q4TGGJ5RKN";
 				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -462,36 +1692,31 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				"LIBRARY_SEARCH_PATHS[arch=arm64]" = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION)",
-					"$(SDKROOT)/usr/lib/swift",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
-				);
-				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION)",
-					"$(SDKROOT)/usr/lib/swift",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.imehc.mftp;
-				PRODUCT_NAME = "mftp";
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME) $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME) $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				OTHER_LDFLAGS = "-lz";
+				PRODUCT_BUNDLE_IDENTIFIER = com.imehc.mftp.dev;
+				PRODUCT_NAME = "MFTP Dev";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
-				DEVELOPMENT_TEAM = "Q4TGGJ5RKN";
 			};
 			name = release;
 		};
 		BDAEBA10E43CA80B902C8A26 /* debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = (
+					arm64,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = mftp_iOS/mftp_iOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "Q4TGGJ5RKN";
 				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -502,26 +1727,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				"LIBRARY_SEARCH_PATHS[arch=arm64]" = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION)",
-					"$(SDKROOT)/usr/lib/swift",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
-				);
-				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION)",
-					"$(SDKROOT)/usr/lib/swift",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
-					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.imehc.mftp;
-				PRODUCT_NAME = "mftp";
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME) $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME) $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				OTHER_LDFLAGS = "-lz";
+				PRODUCT_BUNDLE_IDENTIFIER = com.imehc.mftp.dev;
+				PRODUCT_NAME = "MFTP Dev";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
-				DEVELOPMENT_TEAM = "Q4TGGJ5RKN";
 			};
 			name = debug;
 		};
@@ -560,11 +1773,8 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = Q4TGGJ5RKN;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				OTHER_LDFLAGS = "-lz";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -578,7 +1788,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;

@@ -23,15 +23,9 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_mftp._tcp</string>
-		<string>_mftp-room._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>mftp 需要访问本地网络,以便发现附近设备进行局域网文件传输和小游戏联机对战。</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
+	<string>mftp 需要访问本地网络,以便发现附近设备并进行局域网文件传输。</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,6 +45,45 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.imehc.mftp.glb</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>glb</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>model/gltf-binary</string>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>glb</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.imehc.mftp.glb</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>GLB 3D model</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+		</dict>
 	</array>
 </dict>
 </plist>

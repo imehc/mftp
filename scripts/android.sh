@@ -54,4 +54,5 @@ for triple in aarch64-linux-android arm-linux-androideabi armv7a-linux-androidea
 done
 export PATH="$SHIM_DIR:$TOOLCHAIN_BIN:$PATH"
 
+pnpm android:icons
 exec pnpm tauri android "$@"

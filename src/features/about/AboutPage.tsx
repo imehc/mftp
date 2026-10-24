@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Gauge, RefreshCw, Trash2 } from "lucide-react";
 
+import AppLogo from "~/components/AppLogo";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
@@ -77,12 +78,7 @@ export default function AboutPage() {
       />
       <AppPageContent bottomInset="scroll">
         <div className="flex shrink-0 flex-col items-center gap-2 py-6">
-          <div
-            className="bg-foreground text-background flex size-10 items-center justify-center rounded-xl text-xl font-semibold"
-            aria-hidden="true"
-          >
-            M
-          </div>
+          <AppLogo decorative className="size-10 rounded-xl" />
           <h1 className="text-lg font-semibold">MFTP</h1>
           <p className="text-muted-foreground text-xs">
             <Trans>本地文件与数据工具</Trans>
