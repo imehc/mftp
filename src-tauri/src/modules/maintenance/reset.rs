@@ -22,9 +22,11 @@ pub(crate) fn is_recovery_command(command: &str) -> bool {
 pub async fn app_data_reset_status(
     state: State<'_, AppServices>,
 ) -> AppResult<Option<AppDataResetProgress>> {
-    let lease = state.executor.recovery_maintenance().await?;
     let storage = state.storage.clone();
-    run_blocking_guarded(lease, move || storage.reset_progress()).await
+    state
+        .executor
+        .blocking_recovery(move || storage.reset_progress())
+        .await
 }
 
 #[tauri::command]

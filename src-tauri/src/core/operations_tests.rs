@@ -3,6 +3,45 @@ use futures_util::poll;
 
 const DEADLINE: Duration = Duration::from_secs(2);
 
+#[test]
+fn recovery_reads_allow_pending_reset_without_admitting_business_work() {
+    let pending = Arc::new(AtomicBool::new(true));
+    let operations = Arc::new(Operations::with_reset_gate(pending));
+    assert_eq!(operations.begin().err().unwrap().code, "app:reset_pending");
+    let reader = operations.begin_recovery().unwrap();
+    assert!(operations.check_recovery_admission().is_ok());
+    assert!(operations.begin_recovery().is_ok());
+    assert!(!operations.wait_idle(Duration::ZERO));
+    drop(reader);
+    assert!(operations.wait_idle(Duration::ZERO));
+    assert_eq!(operations.begin().err().unwrap().code, "app:reset_pending");
+}
+
+#[tokio::test]
+async fn maintenance_waits_for_recovery_reader_and_rejects_new_reads() {
+    let operations = Arc::new(Operations::default());
+    let reader = operations.begin_recovery().unwrap();
+    let mut maintenance = Box::pin(operations.maintenance(DEADLINE));
+    assert!(poll!(&mut maintenance).is_pending());
+    assert_eq!(
+        operations.begin_recovery().err().unwrap().code,
+        "app:maintenance_in_progress"
+    );
+    drop(reader);
+    let maintenance = maintenance.await.unwrap();
+    assert_eq!(
+        operations.begin_recovery().err().unwrap().code,
+        "app:maintenance_in_progress"
+    );
+    drop(maintenance);
+    assert!(operations.begin_recovery().is_ok());
+    operations.close();
+    assert_eq!(
+        operations.begin_recovery().err().unwrap().code,
+        "app:shutting_down"
+    );
+}
+
 #[tokio::test]
 async fn maintenance_reserves_admission_before_draining_all_workers() {
     let operations = Arc::new(Operations::default());

@@ -60,6 +60,13 @@ impl Operations {
         Ok(OperationLease(self.clone()))
     }
 
+    pub(crate) fn begin_recovery(self: &Arc<Self>) -> AppResult<OperationLease> {
+        let mut state = self.state.lock();
+        state.check_admission()?;
+        state.active += 1;
+        Ok(OperationLease(self.clone()))
+    }
+
     pub(crate) fn is_closed(&self) -> bool {
         self.state.lock().closed
     }

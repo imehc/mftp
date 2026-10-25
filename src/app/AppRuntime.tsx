@@ -6,6 +6,7 @@ import { installGameSessionRuntime } from "~/features/games/engine/session-regis
 import { installModelSystemRuntime } from "~/features/model-viewer/system/inbox";
 import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
 import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
+import { checkForUpdateOnLaunch } from "~/features/updater/integration";
 import { applyAppIcon } from "~/lib/app-icon";
 import {
   applyCjkFont,
@@ -28,6 +29,9 @@ export function AppRuntime() {
   const colorTheme = useSettingsStore((state) => state.colorTheme);
   const displaySize = useSettingsStore((state) => state.displaySize);
   const cjkFont = useSettingsStore((state) => state.cjkFont);
+  useEffect(() => {
+    void checkForUpdateOnLaunch();
+  }, []);
   useEffect(() => {
     const theme = resolvedTheme === "dark" ? "dark" : "light";
     applyAppIcon(theme);

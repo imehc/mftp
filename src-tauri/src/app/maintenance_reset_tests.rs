@@ -18,6 +18,50 @@ fn count(f: &Fixture) -> i64 {
 }
 
 #[tokio::test]
+async fn reset_status_does_not_wait_for_unrelated_active_workers() {
+    let fixture = Fixture::new();
+    let worker = fixture.operations.begin().unwrap();
+    let status = tokio::time::timeout(
+        Duration::from_secs(1),
+        app_data_reset_status(fixture.state()),
+    )
+    .await;
+    assert!(
+        status.is_ok(),
+        "read-only reset status waited for unrelated work"
+    );
+    assert!(status.unwrap().unwrap().is_none());
+    assert!(fixture.operations.begin().is_ok());
+    drop(worker);
+}
+
+#[tokio::test]
+async fn reset_status_still_rejects_maintenance_and_shutdown() {
+    let fixture = Fixture::new();
+    let maintenance = fixture
+        .operations
+        .maintenance(Duration::from_secs(1))
+        .await
+        .unwrap();
+    assert_eq!(
+        app_data_reset_status(fixture.state())
+            .await
+            .unwrap_err()
+            .code,
+        "app:maintenance_in_progress"
+    );
+    drop(maintenance);
+    fixture.operations.close();
+    assert_eq!(
+        app_data_reset_status(fixture.state())
+            .await
+            .unwrap_err()
+            .code,
+        "app:shutting_down"
+    );
+}
+
+#[tokio::test]
 async fn failed_bt_tombstone_deletion_is_pending_and_preserves_detached_bytes() {
     let f = Fixture::new();
     // A file at a directory location injects remove_dir_all failure on all hosts.

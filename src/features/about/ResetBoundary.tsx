@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Check, RotateCcw } from "lucide-react";
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import type { AppDataResetStep } from "~/bindings";
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -24,6 +24,26 @@ import {
   useResetStore,
 } from "./reset-runtime";
 
+function StartupResetCheck({ label }: { label: string }) {
+  const [showIndicator, setShowIndicator] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShowIndicator(true), 300);
+    return () => window.clearTimeout(timer);
+  }, []);
+  return (
+    <div
+      className="app-shell bg-background flex items-center justify-center"
+      role="status"
+      aria-label={label}
+      aria-busy="true"
+    >
+      {showIndicator ? (
+        <Spinner aria-hidden className="motion-reduce:animate-none" />
+      ) : null}
+    </div>
+  );
+}
+
 export default function ResetBoundary({ children }: { children: ReactNode }) {
   const { t } = useLingui();
   const root = useRef<HTMLElement>(null);
@@ -35,6 +55,8 @@ export default function ResetBoundary({ children }: { children: ReactNode }) {
     if (phase !== "idle") root.current?.focus();
   }, [phase]);
   if (phase === "idle") return children;
+  if (phase === "checking" && !progress && !errors.length)
+    return <StartupResetCheck label={t`正在检查重置状态`} />;
   const busy = phase === "checking" || phase === "running";
   const finished = phase === "finished";
   const labels: Record<AppDataResetStep, string> = {

@@ -54,6 +54,14 @@ impl Executor {
         run_blocking_guarded(self.operations.begin()?, operation).await
     }
 
+    pub(crate) async fn blocking_recovery<T, F>(&self, operation: F) -> AppResult<T>
+    where
+        T: Send + 'static,
+        F: FnOnce() -> AppResult<T> + Send + 'static,
+    {
+        run_blocking_guarded(self.operations.begin_recovery()?, operation).await
+    }
+
     pub(crate) async fn blocking<T, F>(
         &self,
         context: OperationContext,
