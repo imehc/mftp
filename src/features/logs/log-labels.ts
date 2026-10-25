@@ -7,6 +7,14 @@ import type { ActivityLog } from "~/types";
 // 操作代码只用于查找；按来源区分同名操作，未知代码保留原文以兼容历史记录。
 // lingui-set comment="活动日志中的操作名称，描述已发起的操作，不表示操作成功"
 const actionMessages: Record<string, MessageDescriptor> = {
+  "updater:android_check": msg({
+    comment: "活动日志中的 Android 检查更新操作",
+    message: "检查 Android 更新",
+  }),
+  "updater:android_manifest": msg({
+    comment: "活动日志中的 Android 更新清单网络请求",
+    message: "读取 Android 更新清单",
+  }),
   "ai:ai_provider_test": msg`测试 AI 服务`,
   "ai:ai_provider_test_streaming": msg`测试 AI 流式服务`,
   "ai:poetry_translation": msg`生成诗词译文`,

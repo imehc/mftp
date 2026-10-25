@@ -1,10 +1,10 @@
-#[cfg(target_os = "android")]
+#[cfg(any(target_os = "android", test))]
 use serde::Deserialize;
 use serde::Serialize;
 use specta::Type;
 
 /// Remote manifest, only decoded on Android; other targets never fetch it.
-#[cfg(target_os = "android")]
+#[cfg(any(target_os = "android", test))]
 #[derive(Debug, Clone, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AndroidUpdateManifest {

@@ -5,9 +5,9 @@
 //! `updater:unsupported` and never reach this module.
 
 use super::commands::AndroidUpdateDownloadInput;
+use super::manifest;
 use super::model::{
-    AndroidUpdateDownload, AndroidUpdateInfo, AndroidUpdateInstall, AndroidUpdateManifest,
-    AndroidUpdateProgress,
+    AndroidUpdateDownload, AndroidUpdateInfo, AndroidUpdateInstall, AndroidUpdateProgress,
 };
 use crate::app::services::AppServices;
 use crate::core::activity::OperationContext;
@@ -24,36 +24,13 @@ use std::sync::{
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 
-const ANDROID_UPDATE_MANIFEST: &str =
-    "https://github.com/imehc/mftp/releases/latest/download/android.json";
 const PROGRESS_EVENT: &str = "android-updater://progress";
-const MAX_MANIFEST_BYTES: u64 = 256 * 1024;
 const MAX_APK_BYTES: u64 = 512 * 1024 * 1024;
 
 static DOWNLOAD_CANCEL: OnceLock<Mutex<Option<Arc<AtomicBool>>>> = OnceLock::new();
 
 fn cancel_slot() -> &'static Mutex<Option<Arc<AtomicBool>>> {
     DOWNLOAD_CANCEL.get_or_init(|| Mutex::new(None))
-}
-
-fn validate_manifest(manifest: &AndroidUpdateManifest) -> AppResult<()> {
-    if manifest.package_name != "com.imehc.mftp"
-        || manifest.version_code == 0
-        || manifest.size == 0
-        || manifest.size > MAX_APK_BYTES
-        || manifest.sha256.len() != 64
-        || !manifest
-            .sha256
-            .chars()
-            .all(|value| value.is_ascii_hexdigit())
-        || !manifest.url.starts_with("https://")
-    {
-        return Err(AppError::external(
-            "updater:check_failed",
-            "Android update manifest is invalid",
-        ));
-    }
-    Ok(())
 }
 
 fn client() -> AppResult<Client> {
@@ -63,38 +40,6 @@ fn client() -> AppResult<Client> {
         .user_agent("mftp-android-updater")
         .build()
         .map_err(|error| AppError::external("updater:check_failed", error.to_string()))
-}
-
-fn read_manifest() -> AppResult<AndroidUpdateManifest> {
-    let response = client()?
-        .get(ANDROID_UPDATE_MANIFEST)
-        .send()
-        .map_err(|error| AppError::external("updater:check_failed", error.to_string()))?;
-    if !response.status().is_success() {
-        return Err(AppError::external(
-            "updater:check_failed",
-            format!("Update manifest returned HTTP {}", response.status()),
-        ));
-    }
-    if response.content_length().unwrap_or(0) > MAX_MANIFEST_BYTES {
-        return Err(AppError::external(
-            "updater:check_failed",
-            "Android update manifest is too large",
-        ));
-    }
-    let bytes = response
-        .bytes()
-        .map_err(|error| AppError::external("updater:check_failed", error.to_string()))?;
-    if bytes.len() as u64 > MAX_MANIFEST_BYTES {
-        return Err(AppError::external(
-            "updater:check_failed",
-            "Android update manifest is too large",
-        ));
-    }
-    let manifest: AndroidUpdateManifest = serde_json::from_slice(&bytes)
-        .map_err(|error| AppError::external("updater:check_failed", error.to_string()))?;
-    validate_manifest(&manifest)?;
-    Ok(manifest)
 }
 
 fn cache_dir<R: tauri::Runtime>(app: &AppHandle<R>) -> AppResult<PathBuf> {
@@ -112,29 +57,31 @@ fn digest_hex(bytes: &[u8]) -> String {
 }
 
 pub(super) async fn check(app: &AppHandle, state: &AppServices) -> AppResult<AndroidUpdateInfo> {
-    let native = tauri_plugin_android_updater::app_info(app)
-        .map_err(|error| AppError::external("updater:check_failed", error))?;
-    let current_version = native.version_name.clone();
-    let current_version_code = native.version_code;
+    let app = app.clone();
+    let diagnostics = state.diagnostics.clone();
+    let log = diagnostics.begin("updater", "android_check", manifest::URL);
+    let mut context = OperationContext::new("updater", "android_check", "release");
+    context.operation_id = log.as_ref().map(|log| log.id().to_owned());
+    let correlation = context.operation_id.clone();
     state
         .executor
-        .blocking(
-            OperationContext::new("updater", "android_check", "release"),
-            move || {
-                let manifest = read_manifest()?;
-                Ok(AndroidUpdateInfo {
-                    available: manifest.version_code > current_version_code,
-                    current_version,
-                    current_version_code,
-                    version: manifest.version,
-                    version_code: manifest.version_code,
-                    url: manifest.url,
-                    size: manifest.size,
-                    sha256: manifest.sha256,
-                    notes: manifest.notes,
-                })
-            },
-        )
+        .blocking_diagnostic(context, log, move || {
+            let native = tauri_plugin_android_updater::app_info(&app).map_err(|error| {
+                crate::core::diagnostics::context::record(|log| log.transport_error(&error));
+                AppError::external("updater:check_failed", error).with_arg("stage", "app_info")
+            })?;
+            crate::core::diagnostics::context::event(&serde_json::json!({
+                "stage": "app_info",
+                "currentVersion": native.version_name,
+                "currentVersionCode": native.version_code,
+            }));
+            let remote = manifest::fetch(&diagnostics, correlation.as_deref())?;
+            Ok(manifest::update_info(
+                remote,
+                native.version_name,
+                native.version_code,
+            ))
+        })
         .await
 }
 

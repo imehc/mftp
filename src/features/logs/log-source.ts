@@ -12,6 +12,7 @@ const sources = {
 
 export function logSource(source: string, localize = translate): string {
   if (source in sources) return sources[source as keyof typeof sources];
+  if (source === "updater") return localize(msg`更新`);
   if (source === "lan") return localize(msg`局域网`);
   if (source === "games") return localize(msg`游戏`);
   if (source === "poetry") return localize(msg`诗词库`);
