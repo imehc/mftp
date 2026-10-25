@@ -30,6 +30,14 @@ pub(crate) fn sensitive(name: &str) -> bool {
             | "secret"
             | "clientsecret"
             | "privatekey"
+            | "sig"
+            | "signature"
+            | "jwt"
+            | "xamzsignature"
+            | "xamzsecuritytoken"
+            | "xgoogsignature"
+            | "xgoogcredential"
+            | "xamzcredential"
     )
 }
 
@@ -52,44 +60,13 @@ impl Redactor {
     }
 
     pub(crate) fn url(&self, raw: &str) -> String {
-        let mut text = raw.to_string();
-        if url::Url::parse(raw).is_ok() {
-            if let Some((scheme, rest)) = raw.split_once("://") {
-                let end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
-                if let Some((userinfo, host)) = rest[..end].rsplit_once('@') {
-                    if let Some((username, _)) = userinfo.split_once(':') {
-                        // Replace only the password span; URL reserialization would
-                        // otherwise normalize unrelated path/query bytes.
-                        text = format!("{scheme}://{username}:[REDACTED]@{host}{}", &rest[end..]);
-                    }
-                }
-            }
-        }
-        if let Some((base, rest)) = text.split_once('?') {
-            let (query, fragment) = rest
-                .split_once('#')
-                .map_or((rest, None), |(q, f)| (q, Some(f)));
-            let query = query
-                .split('&')
-                .map(|pair| {
-                    let Some((key, _)) = pair.split_once('=') else {
-                        return pair.to_string();
-                    };
-                    let decoded = url::form_urlencoded::parse(pair.as_bytes()).next();
-                    if decoded.is_some_and(|(key, _)| sensitive(&key)) {
-                        format!("{key}=[REDACTED]")
-                    } else {
-                        pair.into()
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join("&");
-            text = format!(
-                "{base}?{query}{}",
-                fragment.map(|f| format!("#{f}")).unwrap_or_default()
-            );
-        }
-        self.text(&text).0
+        String::from_utf8_lossy(&self.url_bytes(raw.as_bytes()).0).into_owned()
+    }
+
+    pub(crate) fn url_bytes(&self, raw: &[u8]) -> (Vec<u8>, bool) {
+        let (safe, redacted) = redact_url(raw);
+        let (safe, text_redacted) = self.bytes(&safe, false);
+        (safe, redacted || text_redacted)
     }
     pub(crate) fn add_secret(&mut self, secret: &str) {
         if secret.is_empty() {
@@ -144,6 +121,8 @@ impl Redactor {
                 i += 1;
             }
         }
+        let (output, url_redacted) = redact_urls(&output);
+        redacted |= url_redacted;
         let mut safe = Vec::with_capacity(output.len());
         let mut index = 0;
         while index < output.len() {
@@ -172,6 +151,90 @@ impl Redactor {
         }
         (safe, redacted)
     }
+}
+
+fn redact_urls(raw: &[u8]) -> (Vec<u8>, bool) {
+    let mut output = Vec::with_capacity(raw.len());
+    let mut index = 0;
+    let mut redacted = false;
+    while index < raw.len() {
+        let remaining = &raw[index..];
+        let prefix = [b"https://".as_slice(), b"http://".as_slice()]
+            .iter()
+            .any(|prefix| {
+                remaining
+                    .get(..prefix.len())
+                    .is_some_and(|start| start.eq_ignore_ascii_case(prefix))
+            });
+        if !prefix {
+            output.push(raw[index]);
+            index += 1;
+            continue;
+        }
+        let length = remaining
+            .iter()
+            .position(|byte| {
+                byte.is_ascii_whitespace()
+                    || matches!(byte, b'"' | b'\'' | b'<' | b'>' | b')' | b'\\')
+            })
+            .unwrap_or(remaining.len());
+        let (safe, changed) = redact_url(&remaining[..length]);
+        output.extend_from_slice(&safe);
+        redacted |= changed;
+        index += length;
+    }
+    (output, redacted)
+}
+
+fn redact_url(raw: &[u8]) -> (Vec<u8>, bool) {
+    let mut spans = Vec::new();
+    if let Some(scheme_end) = raw.windows(3).position(|part| part == b"://") {
+        let authority_start = scheme_end + 3;
+        let authority_end = raw[authority_start..]
+            .iter()
+            .position(|byte| matches!(byte, b'/' | b'?' | b'#'))
+            .map_or(raw.len(), |end| authority_start + end);
+        if let Some(user_end) = raw[authority_start..authority_end]
+            .iter()
+            .rposition(|byte| *byte == b'@')
+        {
+            let user_end = authority_start + user_end;
+            if let Some(separator) = raw[authority_start..user_end]
+                .iter()
+                .position(|byte| *byte == b':')
+            {
+                spans.push(authority_start + separator + 1..user_end);
+            }
+        }
+    }
+    let fragment = raw
+        .iter()
+        .position(|byte| *byte == b'#')
+        .unwrap_or(raw.len());
+    if let Some(query_start) = raw[..fragment].iter().position(|byte| *byte == b'?') {
+        let mut cursor = query_start + 1;
+        for pair in raw[cursor..fragment].split(|byte| *byte == b'&') {
+            if let Some(separator) = pair.iter().position(|byte| *byte == b'=') {
+                let key = &pair[..separator];
+                if url::form_urlencoded::parse(key)
+                    .next()
+                    .is_some_and(|(key, _)| sensitive(&key))
+                {
+                    spans.push(cursor + separator + 1..cursor + pair.len());
+                }
+            }
+            cursor += pair.len() + 1;
+        }
+    }
+    let mut output = Vec::with_capacity(raw.len());
+    let mut cursor = 0;
+    for span in &spans {
+        output.extend_from_slice(&raw[cursor..span.start]);
+        output.extend_from_slice(MASK);
+        cursor = span.end;
+    }
+    output.extend_from_slice(&raw[cursor..]);
+    (output, !spans.is_empty())
 }
 
 fn skip_space(raw: &[u8], mut i: usize) -> usize {

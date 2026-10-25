@@ -165,3 +165,5 @@ impl Diagnostics {
 mod protocol_tests;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod url_redaction_tests;

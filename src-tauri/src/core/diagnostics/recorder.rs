@@ -84,17 +84,20 @@ impl DiagnosticRecorder {
         action: &str,
         target: &str,
     ) -> Self {
+        let redactor = Redactor::default();
+        let metadata_truncated = source.len() > 64 || action.len() > 64 || target.len() > 512;
+        let (target, redacted) = redactor.text(target);
         let local = DiagnosticOperation {
             id: uuid::Uuid::new_v4().to_string(),
             source: bounded(source, 64),
             action: bounded(action, 64),
-            target: bounded(target, 512),
+            target: bounded(&target, 512),
             correlation_id: None,
             trace: None,
             progress: None,
             discarded_details: 0,
-            metadata_truncated: source.len() > 64 || action.len() > 64 || target.len() > 512,
-            redacted: false,
+            metadata_truncated,
+            redacted,
             started_at: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap_or_default()
@@ -113,7 +116,7 @@ impl DiagnosticRecorder {
             }),
             scope,
             local,
-            redactor: Redactor::default(),
+            redactor,
             bodies: Vec::new(),
             command_bodies: Vec::new(),
             trace: RawBody::new(),
@@ -151,6 +154,8 @@ impl DiagnosticRecorder {
             length += name.len() + value.len();
             let (value, redacted) = if sensitive(&name) {
                 (b"[REDACTED]".to_vec(), true)
+            } else if name.eq_ignore_ascii_case("location") {
+                self.redactor.url_bytes(&value)
             } else {
                 self.redactor.bytes(&value, false)
             };
@@ -211,6 +216,7 @@ impl DiagnosticRecorder {
         self.publish();
     }
 
+    #[cfg(desktop)]
     pub(crate) fn request_start(
         &mut self,
         method: &str,
@@ -229,6 +235,7 @@ impl DiagnosticRecorder {
         }
     }
 
+    #[cfg(desktop)]
     pub(crate) fn request_bytes(&mut self, bytes: &[u8]) {
         if let Some(index) = self
             .local
@@ -240,6 +247,7 @@ impl DiagnosticRecorder {
         }
     }
 
+    #[cfg(desktop)]
     pub(crate) fn request_end(&mut self, end: DiagnosticBodyEnd) {
         if let Some(index) = self
             .local
@@ -363,6 +371,7 @@ impl DiagnosticRecorder {
         );
     }
 
+    #[cfg(desktop)]
     pub(crate) fn unverified(&mut self) {
         self.complete(DiagnosticStatus::Unverified, None);
     }
