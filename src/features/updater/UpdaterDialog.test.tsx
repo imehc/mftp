@@ -47,6 +47,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   await act(async () => root.unmount());
+  await new Promise<void>((resolve) => setTimeout(resolve, 0));
   container.remove();
   useUpdaterStore.setState(initialUpdaterState);
   vi.unstubAllGlobals();
@@ -239,7 +240,7 @@ describe("更新弹窗", () => {
       trigger.focus();
       await renderDialog({ status: "current", currentVersion: "0.2.6" });
       await act(async () => button("完成").click());
-      expect(document.activeElement).toBe(trigger);
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
     } finally {
       trigger.remove();
     }
