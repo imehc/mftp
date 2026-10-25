@@ -75,6 +75,7 @@ pub enum RsyncDirection {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 pub enum RsyncChangeKind {
     Added,
     Updated,
@@ -83,6 +84,7 @@ pub enum RsyncChangeKind {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 pub struct RsyncPreviewItem {
     pub kind: RsyncChangeKind,
     /// Path relative to the sync root, with symlink targets removed.
@@ -95,6 +97,7 @@ pub struct RsyncPreviewItem {
 /// validated against the execution request.
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 pub struct RsyncPreview {
     pub token: String,
     pub direction: RsyncDirection,
@@ -110,6 +113,7 @@ pub struct RsyncPreview {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 pub struct RsyncTransferResult {
     pub exit_code: i32,
     /// Logical file bytes reported by rsync's progress2 output.

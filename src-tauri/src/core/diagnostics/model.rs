@@ -7,6 +7,7 @@ use specta::Type;
 pub enum DiagnosticStatus {
     Running,
     Passed,
+    #[cfg(desktop)]
     Unverified,
     Failed,
     Interrupted,
