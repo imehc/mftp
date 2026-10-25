@@ -1,9 +1,7 @@
-import { useLingui } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent } from "react";
 
-import AppLogo from "~/components/AppLogo";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { useSettingsStore } from "~/store/settings";
@@ -17,7 +15,6 @@ import {
 import { homeDescriptions } from "./home-descriptions";
 
 export default function HomePage({ category }: { category?: HomeCategory }) {
-  const { t } = useLingui();
   const navigate = useNavigate();
   const showGames = useSettingsStore((s) => s.showGames);
   const homeEntryVisibility = useSettingsStore((s) => s.homeEntryVisibility);
@@ -33,22 +30,12 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
   )
     .filter((entry) => homeEntryVisibility[entry.id] !== false)
     .filter(() => !hiddenHomeCategories.includes(selected));
-  const lastTapAt = useRef(0);
 
   // 分类放在路由中，使导航选中态与页面一致。
   const toggleGames = () => {
     const next = !showGames;
     setShowGames(next);
     void navigate({ to: "/", search: { category: next ? "games" : "tools" } });
-  };
-
-  // 双击手势挂在图标上，标题文字只承担当前分类名，不再响应点击。
-  const handleIconDoubleTap = () => {
-    const now = performance.now();
-    if (now - lastTapAt.current < 300) {
-      lastTapAt.current = 0;
-      toggleGames();
-    } else lastTapAt.current = now;
   };
 
   // 快捷键监听只注册一次，通过 Effect Event 读取最新的 toggleGames。
@@ -72,19 +59,7 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
       data-bottom-inset="scroll"
       className="ui-density-adaptive bg-background flex h-full min-h-0 flex-col"
     >
-      <ToolPageHeader
-        showHome={false}
-        leading={
-          <span
-            className="inline-flex shrink-0 touch-manipulation select-none"
-            title={t`双击或按 ⌘/Ctrl + . 显示或隐藏小游戏`}
-            onPointerDown={handleIconDoubleTap}
-          >
-            <AppLogo className="size-7" />
-          </span>
-        }
-        title={homeCategoryLabels[selected]}
-      />
+      <ToolPageHeader showHome={false} title={homeCategoryLabels[selected]} />
       <AppPageContent bottomInset="scroll">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           {entries.map((entry) => {

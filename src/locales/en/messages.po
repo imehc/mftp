@@ -2709,10 +2709,6 @@ msgstr "2P"
 msgid "双人对战"
 msgstr "Two-Player Match"
 
-#: src/features/home/HomePage.tsx:71
-msgid "双击或按 ⌘/Ctrl + . 显示或隐藏小游戏"
-msgstr "Double-click or press ⌘/Ctrl + . to show or hide games"
-
 #: src/features/games/engine/online/useOnlineMatch.ts:58
 msgid "双方棋局状态不一致，本局无法继续。"
 msgstr "The players have different board states. This game cannot continue."
