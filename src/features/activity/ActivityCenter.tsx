@@ -45,7 +45,10 @@ export function ActivityCenter({
           <ExecutionLogToolbar logs={logs} />
         )}
       </div>
-      <TabsContent value="tasks" className="flex min-h-0 flex-1 flex-col gap-3">
+      <TabsContent
+        value="tasks"
+        className="group/activity-tasks flex min-h-0 flex-1 flex-col gap-3"
+      >
         <UpdaterActivity />
         <PoetrySyncActivity />
         <TransferActivity />

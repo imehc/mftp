@@ -5794,7 +5794,7 @@ msgid "暂无主机"
 msgstr "暂无主机"
 
 #. 活动页传输中筛选的空状态
-#: src/features/activity/TransferActivity.tsx:123
+#: src/features/activity/TransferActivity.tsx:124
 #: src/features/lan-transfer/LanTransferActivity.tsx:89
 msgid "暂无任务"
 msgstr "暂无任务"
@@ -5816,7 +5816,7 @@ msgid "暂无可用节点"
 msgstr "暂无可用节点"
 
 #. 活动页失败筛选的空状态
-#: src/features/activity/TransferActivity.tsx:127
+#: src/features/activity/TransferActivity.tsx:128
 msgid "暂无失败任务"
 msgstr "暂无失败任务"
 
@@ -5838,7 +5838,7 @@ msgid "暂无已下载语料"
 msgstr "暂无已下载语料"
 
 #. 活动页已结束筛选的空状态
-#: src/features/activity/TransferActivity.tsx:131
+#: src/features/activity/TransferActivity.tsx:132
 msgid "暂无已结束任务"
 msgstr "暂无已结束任务"
 

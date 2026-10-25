@@ -115,8 +115,9 @@ function TransferList({
 }
 
 function TransferEmpty({ filter }: { filter: TransferFilter }) {
+  // 更新与同步卡片是任务面板的直属 section；按实际渲染结果避让，兼顾可关闭的同步错误。
   return (
-    <Empty className="min-h-32 flex-1">
+    <Empty className="min-h-32 flex-1 group-has-[>section]/activity-tasks:hidden">
       <EmptyHeader>
         {filter === "running" ? (
           <EmptyTitle>
