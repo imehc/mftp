@@ -35,18 +35,17 @@ val rustlsVerifier = providers.exec {
     val packages = (JsonSlurper().parseText(metadata) as Map<*, *>)["packages"] as List<*>
     val verifier = packages.map { it as Map<*, *> }
         .single { it["name"] == "rustls-platform-verifier-android" }
-    Pair(file(verifier["manifest_path"] as String), verifier["version"] as String)
+    verifier["version"] as String
 }
 
 repositories {
     exclusiveContent {
         forRepository {
             maven {
-                url = uri(rustlsVerifier.get().first.parentFile.resolve("maven"))
-                metadataSources { artifact() }
+                url = uri("https://github.com/rustls/rustls-platform-verifier/raw/maven-archive/android-release-support/maven/")
             }
         }
-        filter { includeModule("rustls", "rustls-platform-verifier") }
+        filter { includeModule("org.rustls", "rustls-platform-verifier") }
     }
 }
 
@@ -111,7 +110,7 @@ rust {
 }
 
 dependencies {
-    implementation("rustls:rustls-platform-verifier:${rustlsVerifier.get().second}@aar")
+    implementation("org.rustls:rustls-platform-verifier:${rustlsVerifier.get()}")
     implementation("androidx.webkit:webkit:1.14.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.activity:activity-ktx:1.10.1")

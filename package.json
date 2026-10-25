@@ -12,6 +12,7 @@
     "android:dev": "bash scripts/android.sh dev",
     "android:build": "bash scripts/android.sh build",
     "android:icons": "node scripts/android-icons.mjs",
+    "android:network-security": "node scripts/android-network-security.mjs",
     "macos:icons": "node scripts/macos-icons.mjs",
     "ios:icons": "node scripts/ios-icons.mjs",
     "ios:dev": "pnpm tauri ios dev",

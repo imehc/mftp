@@ -94,6 +94,7 @@ docs/                  # 平台构建及开发说明
 
 ## 注意事项
 
+- Android 证书验证使用系统信任和吊销校验；应用网络策略默认禁止明文，只为上游 CRL 域名及回环地址保留例外。升级 `rustls-platform-verifier` 后，须同步 `scripts/android-network-security.mjs` 中的上游版本和 SHA-256，再运行 `pnpm android:network-security` 重新生成策略。该维护命令需要 curl；普通构建使用仓库内已生成资源，Gradle 自动按 Cargo 解析结果选取匹配的 Android 构件。
 - 系统图标与应用内外观独立：macOS 26+ 的 Finder/Dock 使用原生明暗图标资源，遵循系统的图标外观选择；旧版 macOS 保留静态 ICNS。构建 macOS 安装包需要 Xcode 26+，签名前自动从 `public/app-light-icon.png` 和 `public/app-dark-icon.png` 编译资源，编译产物不入 Git。
 - Windows 当前 MSI/NSIS 的 EXE、快捷方式和任务栏沿用固定 ICO，不通过运行时换图模拟系统主题资源；Microsoft 的包资源限定符方案未接入当前安装方式，不代表 Windows 本身完全不支持。Linux 按项目约定保留固定系统图标。应用内导航、关于页与 favicon 仍遵循应用设置。
 
