@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Download } from "lucide-react";
+import { cn } from "cn";
+import { CircleCheck, Download } from "lucide-react";
 import { useRef } from "react";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -40,7 +41,7 @@ export default function UpdaterDialog() {
   const opener = useRef<HTMLElement | null>(null);
   if (!isUpdaterPlatform()) return null;
   const busy = ["checking", "downloading", "restarting"].includes(status);
-  const title = status === "downloading" ? t`正在更新` : label;
+  const hasDescription = Boolean(version || currentVersion);
   return (
     <Dialog
       open={open}
@@ -49,7 +50,7 @@ export default function UpdaterDialog() {
       }}
     >
       <DialogLayoutContent
-        className="grid-cols-[minmax(0,1fr)] md:max-w-lg"
+        className={cn("grid-cols-[minmax(0,1fr)]", version && "md:max-w-lg")}
         showCloseButton={false}
         onOpenAutoFocus={() => {
           // WebKit 点击按钮不一定移动焦点；body 不是可恢复的触发器。
@@ -73,31 +74,33 @@ export default function UpdaterDialog() {
       >
         <DialogLayoutHeader showCloseButton>
           <DialogTitle className="flex items-center gap-2 leading-snug">
-            <Download className="size-4 shrink-0" />
-            {title}
+            <Download aria-hidden className="size-4 shrink-0" />
+            <Trans>更新</Trans>
           </DialogTitle>
-          <DialogDescription className="mt-1 text-xs wrap-anywhere">
-            {version ? (
-              <Trans comment="更新对话框版本对比，version 是可用版本，currentVersion 是正在运行的版本">
-                版本 {version} · 当前 {currentVersion}
-              </Trans>
-            ) : (
-              t`MFTP 应用更新`
-            )}
-          </DialogDescription>
+          {hasDescription ? (
+            <DialogDescription className="mt-1 text-xs wrap-anywhere">
+              {version ? (
+                <Trans comment="更新对话框版本对比，version 是可用版本，currentVersion 是正在运行的版本">
+                  版本 {version} · 当前 {currentVersion}
+                </Trans>
+              ) : (
+                <Trans comment="更新对话框显示正在运行的应用版本，currentVersion 是版本号">
+                  当前版本 {currentVersion}
+                </Trans>
+              )}
+            </DialogDescription>
+          ) : null}
         </DialogLayoutHeader>
         <DialogLayoutBody className="flex flex-col gap-4">
-          {version ? (
-            <UpdaterReleaseNotes body={notes} truncated={truncated} />
-          ) : status === "error" ? (
-            <UpdaterReleaseNotes body="" truncated={false} />
-          ) : null}
-        </DialogLayoutBody>
-        <div className="flex flex-col gap-4">
-          {version && (busy || status === "ready" || error) ? (
-            <Separator />
-          ) : null}
           <UpdaterProgress />
+          {status === "current" || status === "available" ? (
+            <p className="flex items-center gap-2 text-sm" role="status">
+              {status === "current" ? (
+                <CircleCheck aria-hidden className="size-4 shrink-0" />
+              ) : null}
+              {label}
+            </p>
+          ) : null}
           {status === "ready" && !error ? (
             <p className="text-sm" role="status">
               {installed
@@ -107,45 +110,62 @@ export default function UpdaterDialog() {
           ) : null}
           {error ? (
             <Alert variant="destructive">
-              <AlertDescription className="max-h-32 overflow-y-auto wrap-anywhere">
+              <AlertDescription className="wrap-anywhere">
                 {describeError(error, t)}
               </AlertDescription>
             </Alert>
           ) : null}
-          <DialogLayoutFooter className="max-md:[&>button]:h-auto max-md:[&>button]:py-1.5 max-md:[&>button]:whitespace-normal">
-            <Button variant="outline" onClick={closeUpdaterDialog}>
-              {status === "current"
-                ? t`完成`
-                : status === "ready"
-                  ? t`稍后重启`
-                  : busy
-                    ? t({
-                        message: "收起",
-                        comment: "关闭更新弹窗并继续后台任务，不取消下载",
-                      })
-                    : t`稍后`}
+          {version ? (
+            <>
+              <Separator />
+              <UpdaterReleaseNotes body={notes} truncated={truncated} />
+            </>
+          ) : status === "error" ? (
+            <UpdaterReleaseNotes body="" truncated={false} />
+          ) : null}
+        </DialogLayoutBody>
+        <DialogLayoutFooter className="max-md:[&>button]:whitespace-normal">
+          <Button
+            density="adaptive"
+            variant="outline"
+            onClick={closeUpdaterDialog}
+          >
+            {status === "current"
+              ? t`完成`
+              : status === "ready"
+                ? t`稍后重启`
+                : busy
+                  ? t({
+                      message: "收起",
+                      comment: "关闭更新弹窗并继续后台任务，不取消下载",
+                    })
+                  : t`稍后`}
+          </Button>
+          {status === "available" ? (
+            <Button
+              density="adaptive"
+              onClick={() => void startUpdateDownload()}
+            >
+              <Trans>下载更新</Trans>
             </Button>
-            {status === "available" ? (
-              <Button onClick={() => void startUpdateDownload()}>
-                <Trans>下载更新</Trans>
-              </Button>
-            ) : null}
-            {status === "ready" ? (
-              <Button onClick={() => void restartToApplyUpdate()}>
-                {error
-                  ? installed
-                    ? t`重试重启`
-                    : t`重试安装`
-                  : t`重启并更新`}
-              </Button>
-            ) : null}
-            {status === "error" ? (
-              <Button onClick={() => void checkForUpdateManually()}>
-                <Trans>重新检查</Trans>
-              </Button>
-            ) : null}
-          </DialogLayoutFooter>
-        </div>
+          ) : null}
+          {status === "ready" ? (
+            <Button
+              density="adaptive"
+              onClick={() => void restartToApplyUpdate()}
+            >
+              {error ? (installed ? t`重试重启` : t`重试安装`) : t`重启并更新`}
+            </Button>
+          ) : null}
+          {status === "error" ? (
+            <Button
+              density="adaptive"
+              onClick={() => void checkForUpdateManually()}
+            >
+              <Trans>重新检查</Trans>
+            </Button>
+          ) : null}
+        </DialogLayoutFooter>
       </DialogLayoutContent>
     </Dialog>
   );
