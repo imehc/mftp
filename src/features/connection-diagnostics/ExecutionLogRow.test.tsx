@@ -7,6 +7,8 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticOperation, DiagnosticText } from "~/bindings";
+import { summary } from "~/features/logs/__fixtures__/history";
+import { mergeLogs } from "~/features/logs/unified-logs";
 import { messages } from "~/locales/zh-CN/messages";
 
 vi.mock("@tanstack/react-router", () => ({
@@ -88,7 +90,13 @@ async function render(node: React.ReactNode) {
 
 describe("日志行与简短结果", () => {
   it("没有实际内容的摘要行不可点击且不显示详情标识", async () => {
-    await render(<ExecutionLogRow operation={operation} />);
+    await render(
+      <ExecutionLogRow
+        entry={mergeLogs([], [operation])[0]}
+        sourceLabels={{}}
+        resultLabels={{}}
+      />,
+    );
     expect(container.querySelector("a")).toBeNull();
     expect(container.querySelector("[data-log-detail]")).toBeNull();
     expect(container.textContent).not.toContain(operation.id);
@@ -97,10 +105,14 @@ describe("日志行与简短结果", () => {
   it("实际内容或结构化错误才提供详情链接，隐藏内部标识", async () => {
     await render(
       <ExecutionLogRow
-        operation={{
-          ...operation,
-          trace: { ...empty, text: "Session::handshake" },
-        }}
+        entry={
+          mergeLogs(
+            [],
+            [{ ...operation, trace: { ...empty, text: "Session::handshake" } }],
+          )[0]
+        }
+        sourceLabels={{}}
+        resultLabels={{}}
       />,
     );
     expect(
@@ -110,6 +122,30 @@ describe("日志行与简短结果", () => {
       "查看日志：连接主机",
     );
     expect(container.textContent).not.toContain(operation.id);
+  });
+
+  it("已关联摘要与执行详情只提供一个入口，只有摘要也可管理", async () => {
+    const history = {
+      ...summary,
+      source: operation.source,
+      operationId: operation.id,
+    };
+    await render(
+      <ExecutionLogRow
+        entry={mergeLogs([history], [operation])[0]}
+        sourceLabels={{}}
+        resultLabels={{ success: "成功" }}
+      />,
+    );
+    expect(container.querySelectorAll("a")).toHaveLength(1);
+    await render(
+      <ExecutionLogRow
+        entry={mergeLogs([history], [])[0]}
+        sourceLabels={{}}
+        resultLabels={{ success: "成功" }}
+      />,
+    );
+    expect(container.querySelectorAll("a")).toHaveLength(1);
   });
 
   it("成功 HTTP 列表展示响应码，详情标题展示成功", async () => {

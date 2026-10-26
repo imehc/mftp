@@ -160,6 +160,17 @@ export const aiProviderTestStreaming = (
 export const diagnosticsSnapshot = (after: number) =>
   unwrapCommand(commands.diagnosticsSnapshot(after));
 export const diagnosticsClear = () => commands.diagnosticsClear();
+export const logsPage = (after?: string, limit?: number) =>
+  unwrapCommand(commands.logsPage(after ?? null, limit ?? null));
+export const logsDirectory = () => unwrapCommand(commands.logsDirectory());
+export const logsFiles = () => unwrapCommand(commands.logsFiles());
+export const logsUsage = () => unwrapCommand(commands.logsUsage());
+export const logsClear = (before?: number) =>
+  voidCommand(commands.logsClear(before ?? null));
+export const logsDetail = (id: string) =>
+  unwrapCommand(commands.logsDetail(id));
+export const logsOpenDirectory = () =>
+  voidCommand(commands.logsOpenDirectory());
 
 // ---- 主机 ----
 export const hostsList = () => unwrapCommand(commands.hostsList());

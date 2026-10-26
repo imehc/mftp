@@ -6,6 +6,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createHistoryController } from "~/features/logs/__fixtures__/history";
 import { useTransfersStore } from "~/store/transfers";
 
 import { useActivityViewStore } from "./activity-view-store";
@@ -46,6 +47,7 @@ beforeEach(() => {
     "ResizeObserver",
     class {
       observe() {}
+      unobserve() {}
       disconnect() {}
     },
   );
@@ -55,6 +57,9 @@ beforeEach(() => {
     tab: "tasks",
     transferFilter: "running",
     filter: "all",
+    query: "",
+    source: "all",
+    range: "all",
     following: true,
     scrollTop: 0,
   });
@@ -74,7 +79,11 @@ async function render(tab: "tasks" | "logs") {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <ActivityCenter tab={tab} onTabChange={() => {}} />
+        <ActivityCenter
+          tab={tab}
+          onTabChange={() => {}}
+          history={createHistoryController()}
+        />
       </I18nProvider>,
     ),
   );
@@ -82,28 +91,28 @@ async function render(tab: "tasks" | "logs") {
 
 describe("活动页单行工具栏", () => {
   it.each(["tasks", "logs"] as const)(
-    "页签 %s 的筛选和菜单都与主页签位于同一工具栏",
+    "页签 %s 保留统一页签栏和对应操作菜单",
     async (tab) => {
       await render(tab);
       const toolbar = container.querySelector("[data-activity-toolbar]");
       expect(toolbar?.querySelectorAll("[role=tablist]")).toHaveLength(1);
-      expect(toolbar?.querySelectorAll("[role=combobox]")).toHaveLength(1);
+      expect(toolbar?.querySelectorAll("[role=combobox]")).toHaveLength(
+        tab === "tasks" ? 1 : 0,
+      );
       expect(toolbar?.querySelectorAll("[aria-haspopup=menu]")).toHaveLength(1);
       expect(container.querySelectorAll("[role=tablist]")).toHaveLength(1);
-      expect(
-        container
-          .querySelector("[role=tabpanel]")
-          ?.querySelector("[role=combobox]"),
-      ).toBeNull();
     },
   );
 
-  it("空日志仍保留历史入口和筛选操作", async () => {
+  it("空日志保留搜索和筛选，不再提供独立历史入口", async () => {
     await render("logs");
     expect(
       container.querySelector(
         "[data-activity-toolbar] a[aria-label='历史日志']",
       ),
+    ).toBeNull();
+    expect(
+      container.querySelector("input[aria-label='搜索日志']"),
     ).not.toBeNull();
     expect(
       container.querySelector("[role=tabpanel]:not([hidden])")?.textContent,
@@ -127,7 +136,7 @@ describe("活动页单行工具栏", () => {
     useActivityViewStore.setState({ filter: "failed" });
     await render("logs");
     const button = container.querySelector<HTMLButtonElement>(
-      "[role=tabpanel] button",
+      "[role=tabpanel] [data-slot=empty] button",
     );
     expect(button?.textContent).toBe("显示全部");
     await act(async () => button?.click());

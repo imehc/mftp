@@ -1,6 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
-import { Database, FileClock, Info, LayoutGrid, Sparkles } from "lucide-react";
+import {
+  Database,
+  FileClock,
+  FolderOpen,
+  Info,
+  LayoutGrid,
+  Sparkles,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { McpSettingsEntry } from "~/features/mcp/integration";
 import {
@@ -8,10 +16,47 @@ import {
   DesktopStartupSettings,
 } from "~/features/settings/DesktopSettings";
 import { UpdateSettingsEntry } from "~/features/updater/integration";
+import { logsDirectory, logsOpenDirectory } from "~/lib/ipc";
 
 import AppearanceSettings from "./AppearanceSettings";
 import { SettingsEntry, SettingsGroup } from "./SettingsEntry";
 import TransferSetting from "./TransferSetting";
+
+function LogsDirectoryEntry() {
+  const { t } = useLingui();
+  const [directory, setDirectory] = useState<string>();
+
+  useEffect(() => {
+    let active = true;
+    void logsDirectory()
+      .then((path) => {
+        if (active) setDirectory(path);
+      })
+      .catch(() => {
+        // The activity page remains available even when the platform path is unavailable.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <SettingsEntry
+      icon={FolderOpen}
+      title={t`日志文件夹`}
+      description={
+        directory ? (
+          <span className="block truncate" title={directory}>
+            {directory}
+          </span>
+        ) : (
+          t`查看应用专属日志目录`
+        )
+      }
+      onClick={() => void logsOpenDirectory()}
+    />
+  );
+}
 
 export default function SettingsOverview({ onAi }: { onAi: () => void }) {
   const { t } = useLingui();
@@ -52,10 +97,13 @@ export default function SettingsOverview({ onAi }: { onAi: () => void }) {
       <SettingsGroup title={t`应用`}>
         <SettingsEntry
           icon={FileClock}
-          title={t`历史日志`}
+          title={t`日志`}
           description={t`查看操作和失败原因`}
-          onClick={() => void navigate({ to: "/logs" })}
+          onClick={() =>
+            void navigate({ to: "/activity", search: { tab: "logs" } })
+          }
         />
+        <LogsDirectoryEntry />
         <UpdateSettingsEntry />
         <SettingsEntry
           icon={Info}

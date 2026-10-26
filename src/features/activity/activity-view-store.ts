@@ -8,14 +8,22 @@ declare module "@tanstack/react-router" {
 
 export type ActivityTab = "tasks" | "logs";
 
-export type LogFilter = "all" | "failed";
+export type LogFilter =
+  "all" | "failed" | "success" | "canceled" | "running" | "unverified";
 
 export type TransferFilter = "running" | "error" | "finished";
 
 interface ActivityViewState {
   tab: ActivityTab;
   filter: LogFilter;
+  query: string;
+  source: string;
+  range: string;
+  setLogQuery: (query: string) => void;
+  setLogSource: (source: string) => void;
+  setLogRange: (range: string) => void;
   scrollTop: number;
+  scrollAnchor: { id: string; offset: number } | null;
   following: boolean;
   focusedOperation: string | null;
   focusOperation: (operation: string) => void;
@@ -23,13 +31,24 @@ interface ActivityViewState {
   setTransferFilter: (filter: TransferFilter) => void;
   setTab: (tab: ActivityTab) => void;
   setFilter: (filter: LogFilter) => void;
-  saveScroll: (scrollTop: number, following: boolean) => void;
+  saveScroll: (
+    scrollTop: number,
+    following: boolean,
+    anchor?: { id: string; offset: number } | null,
+  ) => void;
 }
 
 export const useActivityViewStore = create<ActivityViewState>((set) => ({
   tab: "tasks",
   filter: "all",
+  query: "",
+  source: "all",
+  range: "all",
+  setLogQuery: (query) => set({ query, scrollTop: 0, following: true }),
+  setLogSource: (source) => set({ source, scrollTop: 0, following: true }),
+  setLogRange: (range) => set({ range, scrollTop: 0, following: true }),
   scrollTop: 0,
+  scrollAnchor: null,
   following: true,
   focusedOperation: null,
   focusOperation: (focusedOperation) => set({ focusedOperation }),
@@ -37,5 +56,10 @@ export const useActivityViewStore = create<ActivityViewState>((set) => ({
   setTransferFilter: (transferFilter) => set({ transferFilter }),
   setTab: (tab) => set({ tab }),
   setFilter: (filter) => set({ filter, scrollTop: 0, following: true }),
-  saveScroll: (scrollTop, following) => set({ scrollTop, following }),
+  saveScroll: (scrollTop, following, anchor) =>
+    set({
+      scrollTop,
+      following,
+      ...(anchor !== undefined ? { scrollAnchor: anchor } : {}),
+    }),
 }));

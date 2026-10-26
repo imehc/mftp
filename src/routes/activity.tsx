@@ -5,6 +5,7 @@ import ActivityPage from "~/features/activity/ActivityPage";
 interface ActivitySearch {
   tab?: "tasks" | "logs";
   operation?: string;
+  history?: string;
 }
 
 export const Route = createFileRoute("/activity")({
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/activity")({
           : undefined,
     operation:
       typeof search.operation === "string" ? search.operation : undefined,
+    history: typeof search.history === "string" ? search.history : undefined,
   }),
   component: ActivityPage,
 });

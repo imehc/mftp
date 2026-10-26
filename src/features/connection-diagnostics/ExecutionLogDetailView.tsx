@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft, Copy, Ellipsis } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import type { AppError, DiagnosticOperation } from "~/bindings";
 import AppPageContent from "~/components/AppPageContent";
@@ -16,7 +16,10 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { logAction } from "~/features/logs/log-labels";
 import { logSource } from "~/features/logs/log-source";
+import { logDetail } from "~/features/logs/log-utils";
 import { describeError, toIpcError } from "~/lib/errors";
+import { logsDetail } from "~/lib/ipc";
+import type { ActivityLog } from "~/types";
 
 import {
   executionLogStream,
@@ -29,16 +32,36 @@ import ExecutionLogStatus from "./ExecutionLogStatus";
 export default function ExecutionLogDetailView({
   operation,
   onBack,
+  history,
+  historyError,
 }: {
   operation: DiagnosticOperation;
   onBack: () => void;
+  history?: ActivityLog | null;
+  historyError?: AppError | null;
 }) {
   const { t, i18n } = useLingui();
   const [metadata, setMetadata] = useState(false);
   const [copying, setCopying] = useState(false);
   const [copyError, setCopyError] = useState<AppError | null>(null);
+  const [resolved, setResolved] = useState<DiagnosticOperation | null>(null);
+  const [detailError, setDetailError] = useState<AppError | null>(null);
   const scroll = useRef<HTMLDivElement>(null);
-  const blocks = executionLogStream(operation, { localize: t });
+  useEffect(() => {
+    let active = true;
+    void logsDetail(operation.id)
+      .then((detail) => {
+        if (active && detail) setResolved(detail);
+      })
+      .catch((cause) => {
+        if (active) setDetailError(toIpcError(cause).payload);
+      });
+    return () => {
+      active = false;
+    };
+  }, [operation.id]);
+  const currentOperation = resolved ?? operation;
+  const blocks = executionLogStream(currentOperation, { localize: t });
   useLayoutEffect(() => {
     scroll.current?.focus();
   }, [operation.id]);
@@ -65,17 +88,22 @@ export default function ExecutionLogDetailView({
           <span className="flex min-w-0 items-center gap-2">
             <span className="truncate">
               {logAction(
-                { source: operation.source, requestType: operation.action },
+                history ?? {
+                  source: currentOperation.source,
+                  requestType: currentOperation.action,
+                },
                 (message) => i18n._(message),
               )}
             </span>
             <ExecutionLogStatus
-              operation={operation}
+              operation={currentOperation}
               showResponseCode={false}
             />
           </span>
         }
-        description={<span title={operation.target}>{operation.target}</span>}
+        description={
+          <span title={currentOperation.target}>{currentOperation.target}</span>
+        }
         leading={
           <Button
             variant="ghost"
@@ -140,25 +168,28 @@ export default function ExecutionLogDetailView({
           data-log-context
         >
           <span>
-            {logSource(operation.source, (message) => i18n._(message))}
+            {logSource(currentOperation.source, (message) => i18n._(message))}
           </span>
           <time
             className="tabular-nums"
-            dateTime={new Date(operation.startedAt).toISOString()}
+            dateTime={new Date(currentOperation.startedAt).toISOString()}
           >
-            {i18n.date(operation.startedAt, {
+            {i18n.date(currentOperation.startedAt, {
+              month: "2-digit",
+              day: "2-digit",
               hour: "2-digit",
               minute: "2-digit",
               second: "2-digit",
               hour12: false,
             })}
           </time>
-          {operation.redacted ? (
+          {currentOperation.redacted ? (
             <span>
               <Trans>凭据已脱敏</Trans>
             </span>
           ) : null}
-          {operation.metadataTruncated || operation.discardedDetails > 0 ? (
+          {currentOperation.metadataTruncated ||
+          currentOperation.discardedDetails > 0 ? (
             <span>
               <Trans comment="当前操作的部分详情超过内存容量，原文并不完整">
                 部分内容已截断
@@ -166,9 +197,19 @@ export default function ExecutionLogDetailView({
             </span>
           ) : null}
         </div>
+        {historyError ? (
+          <p role="alert" className="text-destructive text-sm">
+            <Trans>读取历史摘要失败</Trans> · {describeError(historyError, t)}
+          </p>
+        ) : null}
         {copyError ? (
           <p role="alert" className="text-destructive text-sm">
             {describeError(copyError, t)}
+          </p>
+        ) : null}
+        {detailError ? (
+          <p role="alert" className="text-destructive text-sm">
+            <Trans>读取执行详情失败</Trans> · {describeError(detailError, t)}
           </p>
         ) : null}
         <div
@@ -187,34 +228,48 @@ export default function ExecutionLogDetailView({
             }
           }}
         >
+          {history && logDetail(history, t) ? (
+            <section className="mb-4 border-b pb-3">
+              <h2 className="mb-2 text-sm font-medium">
+                <Trans comment="日志详情中已持久保存的业务信息或错误">
+                  历史摘要
+                </Trans>
+              </h2>
+              <p className="text-sm wrap-break-word whitespace-pre-wrap">
+                {logDetail(history, t)}
+              </p>
+            </section>
+          ) : null}
           <ExecutionLogDetails blocks={blocks} />
           {metadata ? (
             <dl className="text-muted-foreground mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-2 border-t pt-3 text-xs">
               <dt>
                 <Trans>对象</Trans>
               </dt>
-              <dd className="break-all">{operation.target}</dd>
+              <dd className="break-all">{currentOperation.target}</dd>
               <dt>
                 <Trans comment="日志元信息中的诊断操作标识">操作 ID</Trans>
               </dt>
-              <dd className="break-all">{operation.id}</dd>
-              {operation.correlationId ? (
+              <dd className="break-all">{currentOperation.id}</dd>
+              {currentOperation.correlationId ? (
                 <>
                   <dt>
                     <Trans comment="日志元信息中关联传输任务的标识">
                       关联 ID
                     </Trans>
                   </dt>
-                  <dd className="break-all">{operation.correlationId}</dd>
+                  <dd className="break-all">
+                    {currentOperation.correlationId}
+                  </dd>
                 </>
               ) : null}
               <dt>
                 <Trans comment="当前日志操作的执行时长">耗时</Trans>
               </dt>
               <dd className="tabular-nums">
-                {i18n.number(operation.elapsedMs)} ms
+                {i18n.number(currentOperation.elapsedMs)} ms
               </dd>
-              <ExecutionLogMetadata operation={operation} />
+              <ExecutionLogMetadata operation={currentOperation} />
             </dl>
           ) : null}
         </div>

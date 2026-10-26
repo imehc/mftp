@@ -6,7 +6,11 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { AppError, DiagnosticOperation } from "~/bindings";
+import type { ActivityLog, AppError, DiagnosticOperation } from "~/bindings";
+import {
+  createHistoryController,
+  summary,
+} from "~/features/logs/__fixtures__/history";
 import { messages as enMessages } from "~/locales/en/messages";
 import { messages as zhMessages } from "~/locales/zh-CN/messages";
 
@@ -14,8 +18,12 @@ const state = vi.hoisted(() => ({
   search: { tab: "logs", operation: undefined } as {
     tab: "tasks" | "logs";
     operation?: string;
+    history?: string;
   },
   operations: [] as DiagnosticOperation[],
+  summaries: [] as ActivityLog[],
+  historyLoading: false,
+  historyError: null as AppError | null,
   loading: false,
   error: null as AppError | null,
   detailHistory: false,
@@ -42,6 +50,14 @@ vi.mock("./ActivityProvider", () => ({
     loading: state.loading,
     error: state.error,
   }),
+}));
+vi.mock("~/features/logs/use-activity-logs", () => ({
+  useActivityLogs: () =>
+    createHistoryController({
+      logs: state.summaries,
+      loading: state.historyLoading,
+      error: state.historyError,
+    }),
 }));
 vi.mock("./ActivityCenter", () => ({
   ActivityCenter: () => <div data-activity-center />,
@@ -83,6 +99,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.search = { tab: "logs", operation: operation.id };
   state.operations = [operation];
+  state.summaries = [];
+  state.historyLoading = false;
+  state.historyError = null;
   state.loading = false;
   state.error = null;
   state.detailHistory = true;
@@ -168,7 +187,7 @@ describe("独立日志详情布局与返回", () => {
     expect(state.navigate).not.toHaveBeenCalled();
     state.loading = false;
     await render();
-    expect(state.toast).toHaveBeenCalledWith("该记录已不再保留");
+    expect(state.toast).toHaveBeenCalledWith("当前列表中未找到这条记录");
     expect(state.navigate).toHaveBeenCalledWith({
       search: { tab: "logs" },
       replace: true,
@@ -214,5 +233,41 @@ describe("独立日志详情布局与返回", () => {
     await render();
     expect(state.toast).toHaveBeenCalledOnce();
     expect(state.navigate).toHaveBeenCalledOnce();
+  });
+
+  it("执行详情淘汰后留在同一历史摘要详情页，不误报记录消失", async () => {
+    state.summaries = [{ ...summary, operationId: operation.id }];
+    await render();
+    state.operations = [];
+    await render();
+    expect(container.textContent).toContain(
+      "当前未保留执行详情，历史摘要仍可查看。",
+    );
+    expect(state.navigate).not.toHaveBeenCalled();
+    expect(state.toast).not.toHaveBeenCalled();
+  });
+
+  it("无关联旧摘要不会被声称曾采集执行详情", async () => {
+    state.search = { tab: "logs", history: summary.id };
+    state.operations = [];
+    state.summaries = [{ ...summary, operationId: null }];
+    await render();
+    expect(container.textContent).toContain("此操作仅保留摘要。");
+    expect(container.textContent).not.toContain("当前未保留执行详情");
+  });
+
+  it("任一来源读取失败或仍加载时不误报详情已经释放", async () => {
+    state.operations = [];
+    state.summaries = [{ ...summary, operationId: operation.id }];
+    state.error = {
+      kind: "external",
+      code: "diagnostics:read",
+      message: "Read failed",
+      args: {},
+    };
+    await render();
+    expect(container.textContent).toContain("读取执行详情失败");
+    expect(container.textContent).not.toContain("当前未保留执行详情");
+    expect(state.navigate).not.toHaveBeenCalled();
   });
 });

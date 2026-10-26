@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import ActivityLogsPage from "~/features/logs/ActivityLogsPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/logs")({
-  component: ActivityLogsPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/activity", search: { tab: "logs" }, replace: true });
+  },
 });

@@ -14,6 +14,7 @@ const port = vi.hoisted(() => ({
 }));
 
 vi.mock("~/lib/ipc", () => ({
+  logsPage: undefined,
   diagnosticsSnapshot: port.snapshot,
   diagnosticsClear: port.clear,
 }));

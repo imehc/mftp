@@ -8,7 +8,28 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticOperation } from "~/bindings";
 import { useActivityViewStore } from "~/features/activity/activity-view-store";
+import {
+  createHistoryController,
+  summary,
+} from "~/features/logs/__fixtures__/history";
 import { messages } from "~/locales/zh-CN/messages";
+
+vi.mock("@tanstack/react-virtual", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@tanstack/react-virtual")>();
+  return {
+    ...actual,
+    useVirtualizer: (options: Parameters<typeof actual.useVirtualizer>[0]) =>
+      actual.useVirtualizer({
+        ...options,
+        initialRect: { width: 1024, height: 600 },
+        observeElementRect: (_instance, callback) => {
+          callback({ width: 1024, height: 600 });
+          return () => {};
+        },
+      }),
+  };
+});
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, ...props }: { children: React.ReactNode }) => (
@@ -55,6 +76,7 @@ const logs = {
   loading: false,
   clear: async () => {},
   recordFailure: () => {},
+  refresh: () => undefined,
 } satisfies ExecutionLogs;
 
 let root: Root;
@@ -73,6 +95,9 @@ beforeEach(() => {
   i18n.activate("zh-CN");
   useActivityViewStore.setState({
     filter: "all",
+    query: "",
+    source: "all",
+    range: "all",
     following: true,
     scrollTop: 0,
   });
@@ -91,13 +116,18 @@ async function render() {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <ExecutionLogList logs={logs} />
+        <ExecutionLogList
+          logs={logs}
+          history={createHistoryController({
+            logs: [{ ...summary, operationId: "older" }],
+          })}
+        />
       </I18nProvider>,
     ),
   );
 }
 
-describe("运行期日志列表顺序", () => {
+describe("统一日志列表顺序", () => {
   it("倒序展示，最新记录排在最上", async () => {
     await render();
     const rows = Array.from(container.querySelectorAll("[data-log-row]"));

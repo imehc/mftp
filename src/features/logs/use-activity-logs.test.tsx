@@ -19,6 +19,8 @@ const port = vi.hoisted(() => ({
 }));
 
 vi.mock("~/lib/ipc", () => ({
+  logsPage: undefined,
+  logsClear: undefined,
   activityLogs: port.read,
   activityLogsClear: port.clear,
   activityLogDelete: port.remove,

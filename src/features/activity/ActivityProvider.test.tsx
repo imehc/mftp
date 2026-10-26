@@ -23,7 +23,10 @@ vi.mock("~/features/connection-diagnostics/execution-log-session", () => ({
     return { close: session.close, refresh: session.refresh };
   },
 }));
-vi.mock("~/lib/ipc", () => ({ diagnosticsClear: session.clear }));
+vi.mock("~/lib/ipc", () => ({
+  logsPage: undefined,
+  diagnosticsClear: session.clear,
+}));
 
 import { ActivityProvider, useActivityExecutionLogs } from "./ActivityProvider";
 

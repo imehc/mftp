@@ -16,7 +16,31 @@ export const commands = {
 	speechControl: (sessionId: string, action: SpeechAction) => typedError<SpeechSnapshot, AppError>(__TAURI_INVOKE("speech_control", { sessionId, action })),
 	speechStop: (sessionId: string) => typedError<SpeechSnapshot, AppError>(__TAURI_INVOKE("speech_stop", { sessionId })),
 	diagnosticsSnapshot: (after: number) => typedError<DiagnosticSnapshot, AppError>(__TAURI_INVOKE("diagnostics_snapshot", { after })),
-	diagnosticsClear: () => __TAURI_INVOKE<void>("diagnostics_clear"),
+	diagnosticsClear: () => typedError<null, AppError>(__TAURI_INVOKE("diagnostics_clear")),
+	logsPage: (after: string | null, limit: number | null) => typedError<LogPage, AppError>(__TAURI_INVOKE("logs_page", { after, limit })),
+	logsDirectory: () => typedError<string, AppError>(__TAURI_INVOKE("logs_directory")),
+	logsFiles: () => typedError<LogFile[], AppError>(__TAURI_INVOKE("logs_files")),
+	logsUsage: () => typedError<number, AppError>(__TAURI_INVOKE("logs_usage")),
+	logsClear: (before: number | null) => typedError<null, AppError>(__TAURI_INVOKE("logs_clear", { before })),
+	logsDetail: (id: string) => typedError<{
+	id: string,
+	source: string,
+	action: string,
+	target: string,
+	correlationId: string | null,
+	trace: DiagnosticText | null,
+	progress: DiagnosticProgress | null,
+	discardedDetails: number,
+	metadataTruncated: boolean,
+	redacted: boolean,
+	startedAt: number,
+	elapsedMs: number,
+	status: DiagnosticStatus,
+	phase: DiagnosticPhase,
+	details: DiagnosticDetail[],
+	error: AppError | null,
+} | null, AppError>(__TAURI_INVOKE("logs_detail", { id })),
+	logsOpenDirectory: () => typedError<null, AppError>(__TAURI_INVOKE("logs_open_directory")),
 	modelSystemPoll: () => typedError<ModelSystemSnapshot, AppError>(__TAURI_INVOKE("model_system_poll")),
 	modelEnvironmentBegin: (name: string, size: number) => typedError<string, AppError>(__TAURI_INVOKE("model_environment_begin", { name, size })),
 	modelEnvironmentWrite: (id: string, offset: number, bytes: number[]) => typedError<null, AppError>(__TAURI_INVOKE("model_environment_write", { id, offset, bytes })),
@@ -1024,6 +1048,33 @@ export type LanTrustedDevice = {
 export type LanTrustedDeviceInput = {
 	label: string,
 	ip: string,
+};
+
+export type LogEntry = {
+	id: string,
+	timestamp: number,
+	summary: ActivityLog | null,
+	operation: DiagnosticOperation | null,
+};
+
+export type LogFile = {
+	id: string,
+	bytes: number,
+	modifiedAt: number,
+	protected: boolean,
+};
+
+export type LogHealth = {
+	error: AppError | null,
+	discarded: number,
+	malformed: number,
+	pending: number,
+};
+
+export type LogPage = {
+	entries: LogEntry[],
+	next: string | null,
+	health: LogHealth,
 };
 
 export type McpCredential = {

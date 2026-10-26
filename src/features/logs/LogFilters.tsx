@@ -25,7 +25,19 @@ import {
 } from "~/components/ui/select";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
-import type { ActivityLogsController } from "./use-activity-logs";
+export interface LogFilterController {
+  source: string;
+  setSource: (value: string) => void;
+  result: string;
+  setResult: (value: string) => void;
+  range: string;
+  setRange: (value: string) => void;
+  query: string;
+  setQuery: (value: string) => void;
+  sourceLabels: Record<string, string>;
+  resultLabels: Record<string, string>;
+  busy: boolean;
+}
 
 function FilterSelect({
   label,
@@ -65,7 +77,7 @@ function FilterSelect({
 export default function LogFilters({
   controller: c,
 }: {
-  controller: ActivityLogsController;
+  controller: LogFilterController;
 }) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
@@ -96,7 +108,7 @@ export default function LogFilters({
     },
   ];
   return (
-    <div className="border-border flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2 md:px-4">
+    <div className="flex shrink-0 flex-wrap items-center gap-2 border-b pb-2">
       <InputGroup className="min-w-0 flex-1 basis-40">
         <InputGroupAddon>
           <Search />

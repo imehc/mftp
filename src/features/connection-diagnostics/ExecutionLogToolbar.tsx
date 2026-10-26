@@ -1,6 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
-import { ArrowUp, Ellipsis, History } from "lucide-react";
+import { ArrowUp, Ellipsis, FolderOpen, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 import type { AppError } from "~/bindings";
@@ -21,50 +20,31 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { useActivityViewStore } from "~/features/activity/activity-view-store";
 import { describeError, toIpcError } from "~/lib/errors";
+import { logsOpenDirectory } from "~/lib/ipc";
 
 import type { ExecutionLogs } from "./use-execution-logs";
 
 export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
   const { t } = useLingui();
-  const { filter, setFilter, following, saveScroll } = useActivityViewStore();
+  const { following, saveScroll } = useActivityViewStore();
   const [confirming, setConfirming] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [error, setError] = useState<AppError | null>(null);
   const onLatest = () =>
     saveScroll(useActivityViewStore.getState().scrollTop, true);
-  const options = [
-    {
-      value: "all",
-      label: t({
-        comment: "运行期日志筛选，包含成功失败和运行中",
-        message: "全部记录",
-      }),
-    },
-    {
-      value: "failed",
-      label: t({
-        comment: "运行期日志筛选，仅保留失败和中断操作",
-        message: "仅看失败",
-      }),
-    },
-  ];
-  const changeFilter = (value: string) =>
-    setFilter(value === "failed" ? "failed" : "all");
+
+  async function openDirectory() {
+    setError(null);
+    try {
+      await logsOpenDirectory();
+    } catch (cause) {
+      setError(toIpcError(cause).payload);
+    }
+  }
 
   async function clear() {
     if (clearing) return;
@@ -84,24 +64,6 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
   return (
     <>
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        <Select value={filter} onValueChange={changeFilter}>
-          <SelectTrigger
-            density="adaptive"
-            className="hidden w-fit min-w-32 md:flex"
-            aria-label={t`筛选日志`}
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
         <div className="ml-auto flex items-center gap-1">
           {!following ? (
             <Button
@@ -118,10 +80,17 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
               <ArrowUp />
             </Button>
           ) : null}
-          <Button asChild variant="ghost" size="icon-sm" density="adaptive">
-            <Link to="/logs" aria-label={t`历史日志`} title={t`历史日志`}>
-              <History />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            density="adaptive"
+            disabled={logs.loading}
+            aria-label={t`刷新`}
+            onClick={() => {
+              logs.refresh();
+            }}
+          >
+            <RefreshCw />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -130,7 +99,7 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
                 size="icon-sm"
                 density="adaptive"
                 aria-label={t({
-                  comment: "运行期日志工具栏的筛选、跟随和清空菜单",
+                  comment: "统一日志工具栏的刷新、跟随和清理菜单",
                   message: "日志操作",
                 })}
               >
@@ -138,21 +107,6 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="ui-density-adaptive">
-              <DropdownMenuRadioGroup
-                value={filter}
-                onValueChange={changeFilter}
-                className="md:hidden"
-              >
-                {options.map((option) => (
-                  <DropdownMenuRadioItem
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-              <DropdownMenuSeparator className="md:hidden" />
               <DropdownMenuGroup>
                 <DropdownMenuCheckboxItem
                   checked={following}
@@ -170,15 +124,22 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
                   </Trans>
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuItem
-                  disabled={!logs.operations.length}
+                  disabled={logs.loading}
+                  onSelect={() => void openDirectory()}
+                >
+                  <FolderOpen />
+                  <Trans comment="打开应用专属日志文件夹">打开日志文件夹</Trans>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={logs.loading}
                   variant="destructive"
                   onSelect={() => {
                     setError(null);
                     setConfirming(true);
                   }}
                 >
-                  <Trans comment="只清空内存日志，不删除持久历史">
-                    清空当前日志
+                  <Trans comment="清理统一日志文件和当前活动日志">
+                    清空日志
                   </Trans>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -195,13 +156,11 @@ export default function ExecutionLogToolbar({ logs }: { logs: ExecutionLogs }) {
         <AlertDialogContent className="ui-density-adaptive">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              <Trans comment="手动清空运行期日志的确认标题">
-                清空当前日志？
-              </Trans>
+              <Trans comment="手动清理统一日志文件的确认标题">清空日志？</Trans>
             </AlertDialogTitle>
             <AlertDialogDescription>
               <Trans>
-                当前日志详情会被移除，历史日志和正在运行的任务不受影响。
+                当前日志文件和活动日志会被移除，正在运行的任务不受影响。
               </Trans>
             </AlertDialogDescription>
           </AlertDialogHeader>

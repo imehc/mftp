@@ -14,6 +14,8 @@ import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import { hasExecutionLogContent } from "~/features/connection-diagnostics/execution-log-content";
 import ExecutionLogDetailView from "~/features/connection-diagnostics/ExecutionLogDetailView";
+import HistoryLogDetailView from "~/features/logs/HistoryLogDetailView";
+import { useActivityLogs } from "~/features/logs/use-activity-logs";
 
 import { useActivityViewStore } from "./activity-view-store";
 import { ActivityCenter } from "./ActivityCenter";
@@ -29,12 +31,27 @@ export default function ActivityPage() {
   const setTab = useActivityViewStore((state) => state.setTab);
   const tab = search.tab ?? savedTab;
   const logs = useActivityExecutionLogs();
+  const history = useActivityLogs({
+    enabled: tab === "logs" || !!search.operation || !!search.history,
+    refreshKey: logs.operations
+      .map((operation) => `${operation.id}:${operation.status}`)
+      .join("|"),
+    refreshInterval: 5000,
+  });
   const unavailableOperation = useRef<string | null>(null);
+  const summary = history.logs.find((item) =>
+    search.history
+      ? item.id === search.history
+      : !!search.operation && item.operationId === search.operation,
+  );
   const operation = logs.operations.find(
-    (item) => item.id === search.operation,
+    (item) => item.id === (search.operation ?? summary?.operationId),
   );
   const selected =
-    operation && hasExecutionLogContent(operation) ? operation : null;
+    operation && (summary || hasExecutionLogContent(operation))
+      ? operation
+      : null;
+  const requested = search.operation ?? search.history;
 
   const closeDetail = () => {
     if (canGoBack && router.state.location.state.activityLogDetail)
@@ -51,26 +68,40 @@ export default function ActivityPage() {
     setTab(tab);
   }, [tab, setTab]);
   useEffect(() => {
-    if (!search.operation) {
+    if (!requested) {
       unavailableOperation.current = null;
       return;
     }
     if (
       logs.loading ||
       logs.error ||
+      history.loading ||
+      history.error ||
       selected ||
-      unavailableOperation.current === search.operation
+      summary ||
+      unavailableOperation.current === requested
     )
       return;
-    unavailableOperation.current = search.operation;
+    unavailableOperation.current = requested;
     toast(
       t({
-        comment: "活动详情正在查看的记录已被清空或因容量限制淘汰",
-        message: "该记录已不再保留",
+        comment:
+          "日志链接不在当前有界列表或内存记录中，不能断言数据库中也已删除",
+        message: "当前列表中未找到这条记录",
       }),
     );
     void navigate({ search: { tab: "logs" }, replace: true });
-  }, [search.operation, logs.loading, logs.error, selected, navigate, t]);
+  }, [
+    requested,
+    logs.loading,
+    logs.error,
+    history.loading,
+    history.error,
+    selected,
+    summary,
+    navigate,
+    t,
+  ]);
   return (
     <main
       data-bottom-inset="scroll"
@@ -80,6 +111,15 @@ export default function ActivityPage() {
         <ExecutionLogDetailView
           key={selected.id}
           operation={selected}
+          onBack={closeDetail}
+          history={summary}
+          historyError={history.error}
+        />
+      ) : summary ? (
+        <HistoryLogDetailView
+          log={summary}
+          controller={history}
+          execution={logs}
           onBack={closeDetail}
         />
       ) : (
@@ -95,7 +135,7 @@ export default function ActivityPage() {
                 density="adaptive"
                 aria-label={t`返回`}
                 onClick={() => {
-                  if (search.operation) {
+                  if (requested) {
                     closeDetail();
                     return;
                   }
@@ -115,6 +155,7 @@ export default function ActivityPage() {
           >
             <ActivityCenter
               tab={tab}
+              history={history}
               onTabChange={(next) => {
                 setTab(next);
                 void navigate({ search: { tab: next }, replace: true });

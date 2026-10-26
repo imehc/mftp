@@ -90,7 +90,7 @@ export default function AppSettingsMenu() {
               <Link to="/about">{t`关于`}</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/logs">{t`日志`}</Link>
+              <Link to="/activity" search={{ tab: "logs" }}>{t`日志`}</Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() => void openUrl("https://github.com/imehc/mftp")}
