@@ -12,6 +12,8 @@ function transfer(patch: Partial<TransferState> = {}): TransferState {
     id: "rsync-1",
     label: "上传 project",
     phase: "同步中",
+    kind: "upload",
+    startedAt: 0,
     transferred: 1024,
     total: null,
     updatedAt: 0,

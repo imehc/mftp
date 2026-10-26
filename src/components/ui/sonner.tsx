@@ -8,7 +8,7 @@ import {
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = ({ style, ...props }: ToasterProps) => {
   const { resolvedTheme } = useTheme();
 
   return (
@@ -30,6 +30,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+          // 调用方可以覆盖宽度与圆角，让 toast 与相邻浮层（如传输坞）对齐。
+          ...style,
         } as React.CSSProperties
       }
       toastOptions={{

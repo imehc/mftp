@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowUp,
-  ArrowUpDown,
+  ChevronDown,
   File,
   FolderPlus,
   FolderUp,
@@ -9,13 +9,14 @@ import {
   RefreshCw,
   Upload,
 } from "lucide-react";
-import { createPortal } from "react-dom";
 
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import {
@@ -25,7 +26,6 @@ import {
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
 
 export default function SftpToolbar({
-  target,
   cwd,
   loading,
   busy,
@@ -38,7 +38,6 @@ export default function SftpToolbar({
   sort,
   onSort,
 }: {
-  target?: HTMLElement | null;
   cwd: string | null;
   loading: boolean;
   busy: boolean;
@@ -53,21 +52,58 @@ export default function SftpToolbar({
 }) {
   const { t } = useLingui();
   const sortKeys: SortKey[] = ["name", "mtime", "type", "size"];
-  const actions = (
-    <div className="flex items-center gap-2">
+  return (
+    <div className="flex min-h-11 min-w-0 shrink-0 items-center gap-1 border-b px-3">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={t`上级目录`}
+        onClick={onParent}
+        disabled={loading || !cwd || cwd === "/"}
+      >
+        <ArrowUp />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className="hidden md:inline-flex"
+        aria-label={t`主目录`}
+        onClick={onHome}
+        disabled={loading}
+      >
+        <Home />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={t`刷新`}
+        onClick={onRefresh}
+        disabled={loading || !cwd}
+      >
+        <RefreshCw className={loading ? "animate-spin" : undefined} />
+      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="outline"
-            size="icon"
-            density="adaptive"
-            className="md:hidden"
-            aria-label={t`排序`}
+            variant="ghost"
+            size="icon-sm"
+            className="min-w-16 flex-1 justify-between px-2 md:hidden"
+            aria-label={t`目录操作`}
+            title={cwd ?? undefined}
           >
-            <ArrowUpDown />
+            <span className="min-w-0 truncate font-mono text-xs">
+              {cwd ?? "…"}
+            </span>
+            <ChevronDown className="text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="ui-density-adaptive">
+        <DropdownMenuContent align="start" className="ui-density-adaptive w-48">
+          <DropdownMenuItem onSelect={onHome} disabled={loading}>
+            <Home />
+            {t`主目录`}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>{t`排序`}</DropdownMenuLabel>
           {sortKeys.map((key) => (
             <DropdownMenuItem key={key} onSelect={() => onSort(key)}>
               <span className="flex-1">{sftpColumnLabel(key)}</span>
@@ -80,75 +116,44 @@ export default function SftpToolbar({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button
-        variant="outline"
-        density="adaptive"
-        className="hidden md:inline-flex"
-        onClick={onCreate}
-        disabled={!cwd || busy}
+      <span
+        className="hidden min-w-0 flex-1 truncate font-mono text-xs md:block"
+        title={cwd ?? undefined}
       >
-        <FolderPlus />
-        <Trans>新建</Trans>
-      </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button density="adaptive" disabled={!cwd || busy}>
-            <Upload />
-            <Trans>上传</Trans>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="ui-density-adaptive">
-          <DropdownMenuItem onSelect={onCreate}>
-            <FolderPlus />
-            {t`新建`}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={onUpload}>
-            <File />
-            <Trans>上传文件</Trans>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={onUploadDir}>
-            <FolderUp />
-            <Trans>上传文件夹</Trans>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-  return (
-    <div className="shrink-0 border-b">
-      {/* 操作放入稳定的工作区插槽，移动端与视图切换同行。 */}
-      {target ? createPortal(actions, target) : actions}
-      <div className="flex min-h-11 min-w-0 items-center gap-1 px-3">
+        {cwd ?? "…"}
+      </span>
+      <div className="flex shrink-0 items-center gap-1">
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label={t`上级目录`}
-          onClick={onParent}
-          disabled={loading || !cwd || cwd === "/"}
+          aria-label={t`新建`}
+          onClick={onCreate}
+          disabled={!cwd || busy}
         >
-          <ArrowUp />
+          <FolderPlus />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t`主目录`}
-          onClick={onHome}
-          disabled={loading}
-        >
-          <Home />
-        </Button>
-        <span className="min-w-0 flex-1 font-mono text-xs break-all">
-          {cwd ?? "…"}
-        </span>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t`刷新`}
-          onClick={onRefresh}
-          disabled={loading || !cwd}
-        >
-          <RefreshCw className={loading ? "animate-spin" : undefined} />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t`上传`}
+              disabled={!cwd || busy}
+            >
+              <Upload />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="ui-density-adaptive">
+            <DropdownMenuItem onSelect={onUpload}>
+              <File />
+              <Trans>上传文件</Trans>
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={onUploadDir}>
+              <FolderUp />
+              <Trans>上传文件夹</Trans>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

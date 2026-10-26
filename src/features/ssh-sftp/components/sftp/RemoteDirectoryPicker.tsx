@@ -131,8 +131,8 @@ export default function RemoteDirectoryPicker({
           <DialogTitle>{title}</DialogTitle>
         </DialogLayoutHeader>
 
-        <DialogLayoutBody className="flex flex-col gap-3 pr-1">
-          <div className="flex items-center gap-1">
+        <DialogLayoutBody className="flex flex-col gap-3 overflow-hidden">
+          <div className="flex shrink-0 items-center gap-1">
             <Button
               variant="ghost"
               size="icon-sm"
@@ -200,41 +200,44 @@ export default function RemoteDirectoryPicker({
               </Button>
             </form>
           </div>
-          <div className="border-border min-h-64 rounded-md border">
-            {loading && directories.length === 0 ? (
-              <div className="text-muted-foreground flex h-64 items-center justify-center gap-2 text-sm">
-                <LoaderCircle className="size-4 animate-spin" />
-                <Trans>加载中…</Trans>
-              </div>
-            ) : directories.length === 0 ? (
-              <Empty className="h-64">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <FolderOpen />
-                  </EmptyMedia>
-                  <EmptyTitle>
-                    <Trans>没有子文件夹</Trans>
-                  </EmptyTitle>
-                </EmptyHeader>
-              </Empty>
-            ) : (
-              directories.map((entry) => {
-                const disabled =
-                  !!disabledPath && isSameOrChildPath(entry.path, disabledPath);
-                return (
-                  <button
-                    key={entry.path}
-                    type="button"
-                    className="border-border/40 hover:bg-muted/50 flex w-full items-center gap-2 border-b px-3 py-2 text-left text-sm last:border-b-0 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={loading || disabled}
-                    onClick={() => void loadPath(entry.path)}
-                  >
-                    <Folder className="text-primary size-4 shrink-0" />
-                    <span className="min-w-0 truncate">{entry.name}</span>
-                  </button>
-                );
-              })
-            )}
+          <div className="border-border min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-md border">
+            <div className="min-h-64">
+              {loading && directories.length === 0 ? (
+                <div className="text-muted-foreground flex h-64 items-center justify-center gap-2 text-sm">
+                  <LoaderCircle className="size-4 animate-spin" />
+                  <Trans>加载中…</Trans>
+                </div>
+              ) : directories.length === 0 ? (
+                <Empty className="h-64">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <FolderOpen />
+                    </EmptyMedia>
+                    <EmptyTitle>
+                      <Trans>没有子文件夹</Trans>
+                    </EmptyTitle>
+                  </EmptyHeader>
+                </Empty>
+              ) : (
+                directories.map((entry) => {
+                  const disabled =
+                    !!disabledPath &&
+                    isSameOrChildPath(entry.path, disabledPath);
+                  return (
+                    <button
+                      key={entry.path}
+                      type="button"
+                      className="border-border/40 hover:bg-muted/50 flex w-full items-center gap-2 border-b px-3 py-2 text-left text-sm last:border-b-0 disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={loading || disabled}
+                      onClick={() => void loadPath(entry.path)}
+                    >
+                      <Folder className="text-primary size-4 shrink-0" />
+                      <span className="min-w-0 truncate">{entry.name}</span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
           </div>
         </DialogLayoutBody>
 

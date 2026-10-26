@@ -9,11 +9,14 @@ import { AppRuntime } from "~/app/AppRuntime";
 import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import ResetBoundary from "~/features/about/ResetBoundary";
+import { useDockOffsetStore } from "~/features/transfers/dock-offset";
+import TransferDock from "~/features/transfers/TransferDock";
 import { UpdaterDialog } from "~/features/updater/integration";
 import { AppI18nProvider } from "~/i18n/I18nProvider";
 import { applyStoredThemeAndFonts } from "~/lib/color-theme";
 import { applyStoredDisplaySize } from "~/lib/display-size";
 import { applyStoredAppearance } from "~/lib/initial-appearance";
+import { useMediaQuery } from "~/lib/use-media-query";
 
 import { router } from "./router";
 
@@ -48,10 +51,35 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <AppRuntime />
             <RouterProvider router={router} />
             <UpdaterDialog />
+            <TransferDock />
           </ResetBoundary>
         </TooltipProvider>
-        <Toaster position="bottom-right" />
+        <AppToaster />
       </AppI18nProvider>
     </ThemeProvider>
   </React.StrictMode>,
 );
+
+/**
+ * 右下角浮层只有一个栈：传输坞占最底层，toast 按坞上报的高度往上让位，
+ * 宽度、圆角和右边距与坞一致，避免两个卡片叠在一起时边缘错位。
+ */
+function AppToaster() {
+  const offset = useDockOffsetStore((state) => state.offset);
+  const wide = useMediaQuery("(min-width: 48rem)");
+  const bottom = offset > 0 ? offset : 16;
+  return (
+    <Toaster
+      position="bottom-right"
+      offset={{ right: 16, bottom }}
+      mobileOffset={{ left: 12, right: 12, bottom }}
+      style={
+        {
+          "--border-radius": "0.75rem",
+          // 与传输坞同宽；移动端交给 sonner 自适应，坞本身是满宽。
+          ...(wide ? { "--width": "20rem" } : {}),
+        } as React.CSSProperties
+      }
+    />
+  );
+}

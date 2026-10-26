@@ -42,9 +42,6 @@ import { useDesktopLayout } from "~/lib/use-desktop-layout";
 const SIDEBAR_COLLAPSED_REM = 3.25;
 
 function Workspace({ onHosts }: { onHosts: () => void }) {
-  const [toolbarTarget, setToolbarTarget] = useState<HTMLDivElement | null>(
-    null,
-  );
   const sessions = useSessionsStore((s) => s.sessions);
   const activeId = useSessionsStore((s) => s.activeId);
   const [fileSessions, setFileSessions] = useState<string[]>([]);
@@ -57,7 +54,7 @@ function Workspace({ onHosts }: { onHosts: () => void }) {
     setFileSessions(nextFileSessions);
   return (
     <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
-      <TabBar onHosts={onHosts} actionRef={setToolbarTarget} />
+      <TabBar onHosts={onHosts} />
       <div className="relative flex-1 overflow-hidden">
         {sessions.length === 0 ? (
           <Empty className="h-full">
@@ -100,14 +97,7 @@ function Workspace({ onHosts }: { onHosts: () => void }) {
                 className="h-full"
                 style={{ display: session.view === "sftp" ? "block" : "none" }}
               >
-                <SftpPanel
-                  session={session}
-                  toolbarTarget={
-                    session.id === activeId && session.view === "sftp"
-                      ? toolbarTarget
-                      : null
-                  }
-                />
+                <SftpPanel session={session} />
               </div>
             )}
             {session.view === "monitor" && (
@@ -215,14 +205,16 @@ export default function SshSftpTool() {
           </Button>
         }
         trailing={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setDrawerOpen(true)}
-            aria-label={t`打开主机列表`}
-          >
-            <PanelLeft />
-          </Button>
+          compact ? (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setDrawerOpen(true)}
+              aria-label={t`打开主机列表`}
+            >
+              <PanelLeft />
+            </Button>
+          ) : null
         }
       />
       <Group
@@ -324,6 +316,7 @@ export default function SshSftpTool() {
           <div className="min-h-0 flex-1 overflow-hidden">
             <Sidebar
               overlay
+              singleSession
               collapsed={false}
               onToggleCollapsed={() => setDrawerOpen(false)}
             />

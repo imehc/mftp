@@ -71,6 +71,7 @@ import HostRow from "./hosts/HostRow";
 interface SidebarProps {
   collapsed: boolean;
   overlay?: boolean;
+  singleSession?: boolean;
   onToggleCollapsed: () => void;
 }
 
@@ -119,6 +120,7 @@ function SortableHostRow({
 export default function Sidebar({
   collapsed,
   overlay = false,
+  singleSession = false,
   onToggleCollapsed,
 }: SidebarProps) {
   const { t } = useLingui();
@@ -190,6 +192,19 @@ export default function Sidebar({
     }
   }
 
+  async function openConnection(host: Host, passphrase?: string) {
+    if (singleSession) {
+      // 移动工作区只保留当前连接，切换主机时先释放旧终端和文件任务。
+      const others = useSessionsStore
+        .getState()
+        .sessions.filter((session) => session.hostId !== host.id);
+      for (const session of others) {
+        await closeSession(session.id);
+      }
+    }
+    return openSession(host, passphrase);
+  }
+
   async function connect(host: Host) {
     const existing = sessionByHost.get(host.id);
     if (existing) {
@@ -205,7 +220,7 @@ export default function Sidebar({
       }
     }
     try {
-      await openSession(host);
+      await openConnection(host);
     } catch (e) {
       toast.error(describeError(e));
     }
@@ -514,7 +529,7 @@ export default function Sidebar({
           setPendingHost(null);
           if (host) {
             try {
-              await openSession(host, passphrase);
+              await openConnection(host, passphrase);
             } catch (e) {
               toast.error(describeError(e));
             }

@@ -69,10 +69,9 @@ import SftpToolbar from "./SftpToolbar";
 
 interface Props {
   session: Session;
-  toolbarTarget?: HTMLElement | null;
 }
 
-export default function SftpPanel({ session, toolbarTarget }: Props) {
+export default function SftpPanel({ session }: Props) {
   const { t } = useLingui();
   // 目录名规则与上传/下载共用，放在表单层以便错误就近展示。
   const validateName = (value: string) =>
@@ -241,7 +240,6 @@ export default function SftpPanel({ session, toolbarTarget }: Props) {
   return (
     <div className="bg-background flex h-full flex-col">
       <SftpToolbar
-        target={toolbarTarget}
         cwd={cwd}
         loading={loading}
         busy={!!busy}

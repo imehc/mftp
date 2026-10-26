@@ -308,9 +308,10 @@ export function useSftpRemoteActions({
     setPrompt(null);
     try {
       await ipc.sftpMkdir(sessionId, joinPath(cwd, trimmed));
+      toast.success(t`已创建 ${trimmed}`);
       await load(cwd);
     } catch (e) {
-      toast.error(describeError(e));
+      toast.error(t`新建文件夹失败`, { description: describeError(e) });
     }
   }
 
@@ -327,9 +328,10 @@ export function useSftpRemoteActions({
     setPrompt(null);
     try {
       await ipc.sftpRename(sessionId, entry.path, joinPath(cwd, trimmed));
+      toast.success(t`已重命名为 ${trimmed}`);
       await load(cwd);
     } catch (e) {
-      toast.error(describeError(e));
+      toast.error(t`重命名失败`, { description: describeError(e) });
     }
   }
 
@@ -344,6 +346,7 @@ export function useSftpRemoteActions({
     if (transferId) {
       startTransfer(transferId, t`删除 ${name}`, {
         cancellable: false,
+        kind: "delete",
       });
     }
     try {

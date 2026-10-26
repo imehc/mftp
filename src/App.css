@@ -499,6 +499,20 @@
   }
 }
 
+/* 上传落地后高亮新行：把视线直接引到文件出现的位置，不依赖 toast 被看到。 */
+@keyframes sftp-row-recent {
+  from {
+    background-color: color-mix(in oklab, var(--primary) 16%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.sftp-row-recent {
+  animation: sftp-row-recent 1.7s ease-out;
+}
+
 @keyframes sftp-list-in {
   from {
     opacity: 0;
@@ -518,6 +532,10 @@
   .sftp-list-content {
     animation: none;
   }
+
+  .sftp-row-recent {
+    animation: none;
+  }
 }
 
 /* 固定底部导航已经避让系统区，正文末尾只保留普通间距；Portal 不受影响。 */
@@ -528,4 +546,43 @@
 
 :root[data-ime-visible="true"] [data-slot="bottom-navigation"] {
   display: none;
+}
+
+/* 传输坞：进行中的进度条用流动条纹表示"在走"，比脉冲条更容易读出方向。 */
+@keyframes transfer-progress-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-24px);
+  }
+}
+
+/* 上传/下载箭头轻微浮动；只改 transform，不影响布局和行高。 */
+@keyframes transfer-icon-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.transfer-progress-stripes::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    115deg,
+    color-mix(in oklab, var(--primary-foreground) 35%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+  background-size: 24px 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .transfer-progress-stripes::after {
+    animation: transfer-progress-flow 0.9s linear infinite;
+  }
 }

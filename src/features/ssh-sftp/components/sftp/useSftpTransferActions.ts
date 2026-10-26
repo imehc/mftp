@@ -6,6 +6,7 @@ import {
 import { toast } from "sonner";
 
 import type { ConflictResolution } from "~/features/ssh-sftp/components/sftp/ConflictDialog";
+import { markRecentPath } from "~/features/ssh-sftp/components/sftp/recent-paths";
 import type { RsyncIntegration } from "~/features/ssh-sftp/components/sftp/rsync-contract";
 import {
   type ConflictState,
@@ -79,11 +80,14 @@ export function useSftpTransferActions({
       }
       startTransfer(transferId, label, {
         retry: { kind: "sftp-action", run: () => run(true) },
+        kind: "upload",
       });
       try {
         await ipc.sftpUpload(sessionId, selected, remote, transferId);
         finishTransfer(transferId, "success");
         await load(refreshPath);
+        // 刷新完成后再标记：高亮窗口必须落在新行已经出现之后。
+        markRecentPath(remote);
       } catch (error) {
         // 取消是业务状态而非失败：只按稳定 code 判断，不比较文案。
         finishTransfer(
@@ -116,6 +120,7 @@ export function useSftpTransferActions({
       }
       startTransfer(transferId, label, {
         retry: { kind: "sftp-action", run: () => run(true) },
+        kind: "download",
       });
       try {
         await ipc.sftpDownload(sessionId, entry.path, dest, transferId);
@@ -185,6 +190,7 @@ export function useSftpTransferActions({
       }
       startTransfer(transferId, label, {
         retry: { kind: "sftp-action", run: () => run(true) },
+        kind: "download",
       });
       try {
         await ipc.sftpDownloadDir(
@@ -373,6 +379,7 @@ export function useSftpTransferActions({
       }
       startTransfer(transferId, label, {
         retry: { kind: "sftp-action", run: () => run(true) },
+        kind: "upload",
       });
       try {
         await ipc.sftpUploadDir(
@@ -388,6 +395,7 @@ export function useSftpTransferActions({
         }
         finishTransfer(transferId, "success");
         await load(remoteParent);
+        markRecentPath(joinPath(remoteParent, remoteName));
       } catch (error) {
         // 取消是业务状态而非失败：只按稳定 code 判断，不比较文案。
         finishTransfer(

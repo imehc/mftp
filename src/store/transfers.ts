@@ -20,10 +20,24 @@ function btPhaseLabel(phase: string): string {
   return BT_PHASE_LABELS[phase]?.() ?? phase;
 }
 
+/**
+ * 传输任务的来源动作。
+ *
+ * 传输坞按此选择图标与动效，不从 label 文案反推——文案会随语言和措辞变化。
+ */
+export type TransferKind =
+  "upload" | "download" | "bt" | "sync" | "delete" | "other";
+
 export interface TransferState {
   id: string;
   label: string;
   phase: string;
+  /** 决定坞内图标与动效；默认按 source 推导。 */
+  kind: TransferKind;
+  /** 任务创建时刻（performance.now 基准），用于最小可见时长。 */
+  startedAt: number;
+  /** 结束时刻；运行中为空。 */
+  finishedAt?: number;
   transferred: number;
   total?: number | null;
   speed?: number | null;
@@ -59,6 +73,7 @@ interface TransfersState {
       pausable?: boolean;
       retry?: TransferRetryIntent;
       source?: "sftp" | "bt";
+      kind?: TransferKind;
     },
   ) => void;
   restore: TransfersState["start"];
@@ -141,6 +156,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
             paused: false,
             pausedPhase: undefined,
             updatedAt: now,
+            finishedAt: now,
           };
         }
         if (item.paused) {
@@ -178,12 +194,14 @@ export const useTransfersStore = create<TransfersState>((set) => ({
       status === "error" && error != null
         ? toIpcError(error).payload
         : undefined;
+    const now = performance.now();
     set((state) => ({
       transfers: state.transfers.map((item) =>
         item.id === id
           ? {
               ...item,
               status,
+              finishedAt: now,
               phase:
                 status === "success"
                   ? translate(msg`完成`)
@@ -204,7 +222,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
               controlError: undefined,
               retry: status === "error" ? item.retry : undefined,
               retrying: false,
-              updatedAt: performance.now(),
+              updatedAt: now,
             }
           : item,
       ),
@@ -334,6 +352,10 @@ function createTransfer(
     id,
     label,
     phase: translate(msg`准备中`),
+    // BT 任务由 task-sync 恢复时只带 source；未知来源统一走通用图标。
+    kind: options?.kind ?? (options?.source === "bt" ? "bt" : "other"),
+    startedAt: performance.now(),
+    finishedAt: undefined,
     transferred: 0,
     total: null,
     speed: null,

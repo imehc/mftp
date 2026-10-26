@@ -143,7 +143,10 @@ export function useRsyncIntegration({
       state.direction === "upload"
         ? t`上传 ${displayName}`
         : t`下载 ${displayName}`;
-    startTransfer(transferId, label, { pausable: false });
+    startTransfer(transferId, label, {
+      pausable: false,
+      kind: state.direction === "upload" ? "upload" : "download",
+    });
     try {
       await ipc.rsyncTransfer(
         sessionId,

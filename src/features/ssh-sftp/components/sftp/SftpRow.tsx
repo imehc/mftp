@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useRecentPath } from "~/features/ssh-sftp/components/sftp/recent-paths";
 import {
   entryType,
   formatMtime,
@@ -68,6 +69,7 @@ const SftpRow = function SftpRow({
   // 与虚拟列表估算使用同一口径：宽度和指针能力任一命中都算触控密度。
   const touchDensity = compact || coarsePointer;
   const canExtract = !entry.isDir && isArchive(entry.name);
+  const recent = useRecentPath(entry.path);
   const [menuOpen, setMenuOpen] = useState(false);
   const actions: SftpAction[] = [
     { label: t`下载`, icon: Download, run: () => onDownload(entry) },
@@ -90,6 +92,7 @@ const SftpRow = function SftpRow({
         "group border-border/40 hover:bg-muted/50 grid grid-cols-(--sftp-list-columns) items-center border-b px-3 py-1.5 text-sm max-md:grid-cols-[minmax(0,1fr)_auto]",
         touchDensity && "min-h-14",
         menuOpen && "bg-muted/50",
+        recent && "sftp-row-recent",
       )}
     >
       <button
