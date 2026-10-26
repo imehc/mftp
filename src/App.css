@@ -222,6 +222,14 @@
   }
 }
 
+/* iOS 会在聚焦小于 16px 的输入框时放大视口；75% 显示大小下也须守住下限。
+   放在 layer 外，避免页面 text-sm、md:text-sm 或输入组覆盖；保留用户手动缩放。 */
+@supports (-webkit-touch-callout: none) {
+  :is(input[data-slot], textarea[data-slot]) {
+    font-size: max(16px, 1rem);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
