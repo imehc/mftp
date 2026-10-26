@@ -163,7 +163,7 @@ impl Lifecycle {
                     let _ = tx.send(id);
                 })
             {
-                eprintln!("failed to start shutdown worker for {name}: {error}");
+                crate::runtime_log!("failed to start shutdown worker for {name}: {error}");
             }
         }
         drop(tx);
@@ -194,7 +194,7 @@ impl Drop for Lifecycle {
             // Rollback can run while setup is already unwinding. A faulty stop
             // callback must not abort the process or skip the remaining services.
             if std::panic::catch_unwind(std::panic::AssertUnwindSafe(participant.stop)).is_err() {
-                eprintln!("rollback callback panicked: {}", participant.name);
+                crate::runtime_log!("rollback callback panicked: {}", participant.name);
             }
         }
     }

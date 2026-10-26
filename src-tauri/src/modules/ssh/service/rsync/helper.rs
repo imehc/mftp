@@ -31,7 +31,7 @@ pub(crate) fn run_if_requested() -> bool {
     let code = match helper_main(&program, args.collect()) {
         Ok(()) => 0,
         Err(error) => {
-            eprintln!("mftp rsync helper failed: {error}");
+            crate::runtime_log!("mftp rsync helper failed: {error}");
             1
         }
     };

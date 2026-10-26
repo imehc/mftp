@@ -5,7 +5,6 @@ use crate::modules::lan_transfer::{LanConnectedDevice, LanSharedDir, LanTransfer
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::net::TcpStream;
-use std::path::Path;
 use std::sync::Arc;
 
 use super::auth::{
@@ -36,7 +35,7 @@ pub(super) struct DownloadContext<'a> {
     pub tasks: &'a SharedTasks,
     pub active_transfers: &'a Arc<Mutex<usize>>,
     pub max_concurrent_transfers: usize,
-    pub db_path: &'a Path,
+    pub db_path: &'a std::path::Path,
 }
 
 pub(super) fn handle_download(stream: &mut TcpStream, ctx: DownloadContext<'_>) {

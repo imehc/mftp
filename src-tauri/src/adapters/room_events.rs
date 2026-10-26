@@ -33,13 +33,22 @@ pub(crate) fn event_sink<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> EventS
                 },
             ),
             // Only local IPC adds an identity; the network payload remains opaque.
-            RoomEvent::Message { payload } => app.emit(
-                "game-room://message",
-                GameRoomMessageEvent {
-                    instance_id: instance_id.to_owned(),
-                    payload,
-                },
-            ),
+            RoomEvent::Message { payload } => {
+                crate::core::logging::runtime_event(
+                    "game_room",
+                    "peer_receive",
+                    "success",
+                    format!("instance_id={instance_id} payload={payload}"),
+                    None,
+                );
+                app.emit(
+                    "game-room://message",
+                    GameRoomMessageEvent {
+                        instance_id: instance_id.to_owned(),
+                        payload,
+                    },
+                )
+            }
             RoomEvent::Closed { reason } => app.emit(
                 "game-room://closed",
                 GameRoomClosedEvent {

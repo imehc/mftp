@@ -145,7 +145,16 @@ impl GameRoomManager {
                 .ok_or_else(|| AppError::custom(CustomErrorCode::RoomPeerMissing))?;
             link
         };
-        link.send(&WireMsg::App { payload })
+        let message = format!("instance_id={instance_id} payload={payload}");
+        let result = link.send(&WireMsg::App { payload });
+        crate::core::logging::runtime_event(
+            "game_room",
+            "peer_send",
+            if result.is_ok() { "success" } else { "failed" },
+            message,
+            None,
+        );
+        result
     }
 
     pub fn leave(&self) {

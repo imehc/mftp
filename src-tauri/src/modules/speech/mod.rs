@@ -108,7 +108,7 @@ impl SpeechService {
     pub fn notify(app: &tauri::AppHandle, snapshot: &SpeechSnapshot) {
         // Native callbacks may run on another thread. Publish only after releasing the lock.
         if let Err(error) = app.emit(SPEECH_EVENT, snapshot) {
-            eprintln!(
+            crate::runtime_log!(
                 "Speech event delivery failed: {}",
                 AppError::from(error).code
             );

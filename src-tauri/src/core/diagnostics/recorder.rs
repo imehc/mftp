@@ -63,6 +63,7 @@ impl RawBody {
 
 // A domain worker owns this recorder. Only sanitized immutable views are shared.
 pub(crate) struct DiagnosticRecorder {
+    persisted: serde_json::Value,
     active: Arc<AtomicUsize>,
     pub(super) cell: Arc<RecordCell>,
     scope: Weak<Scope>,
@@ -109,6 +110,7 @@ impl DiagnosticRecorder {
             error: None,
         };
         Self {
+            persisted: serde_json::Value::Null,
             active,
             cell: Arc::new(RecordCell {
                 latest: Mutex::new(local.clone()),
@@ -343,6 +345,9 @@ impl DiagnosticRecorder {
             return;
         };
         self.refresh();
+        if let Some(sink) = &scope.sink {
+            sink.diagnostic(&mut self.persisted, &self.local);
+        }
         // Snapshot readers must never hold up a transport worker. Skipped interim
         // views are replaced by the next cumulative view; the terminal has its own slot.
         let published = if let Some(mut view) = self.cell.latest.try_lock() {
@@ -415,6 +420,9 @@ impl DiagnosticRecorder {
         });
         let _ = self.cell.terminal.set(self.local.clone());
         if let Some(scope) = self.scope.upgrade() {
+            if let Some(sink) = &scope.sink {
+                sink.diagnostic(&mut self.persisted, &self.local);
+            }
             scope.changed();
         }
     }

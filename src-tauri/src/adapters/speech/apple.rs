@@ -172,7 +172,7 @@ fn retire_finished(app: tauri::AppHandle, session: String) {
                 }
             });
         }) {
-            eprintln!(
+            crate::runtime_log!(
                 "Speech cleanup dispatch failed: {}",
                 AppError::from(error).code
             );
@@ -363,7 +363,7 @@ pub fn control(
 pub fn stop_all(app: &tauri::AppHandle, state: &Arc<SpeechService>) {
     if let Some(session) = state.snapshot().session_id {
         if let Err(error) = control(app, state, &session, SpeechAction::Stop) {
-            eprintln!("Speech shutdown failed: {}", error.code);
+            crate::runtime_log!("Speech shutdown failed: {}", error.code);
         }
     }
 }

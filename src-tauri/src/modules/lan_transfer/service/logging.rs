@@ -1,9 +1,9 @@
+#[cfg(not(test))]
+use crate::core::logging;
 use crate::error::{AppError, AppErrorKind, CustomErrorCode};
-use crate::storage::activity::append_activity_log;
-use std::path::Path;
 
 pub(super) fn record_access(
-    db_path: &Path,
+    db_path: &std::path::Path,
     ip: &str,
     request_type: &str,
     result: &str,
@@ -16,7 +16,7 @@ pub(super) fn record_access(
 /// column (the frontend localizes by kind/code); `detail` stays business
 /// metadata such as the file name.
 pub(super) fn record_access_error(
-    db_path: &Path,
+    db_path: &std::path::Path,
     ip: &str,
     request_type: &str,
     error: &AppError,
@@ -33,22 +33,44 @@ pub(super) fn record_access_error(
 }
 
 fn write(
-    db_path: &Path,
+    _db_path: &std::path::Path,
     ip: &str,
     request_type: &str,
     result: &str,
     detail: Option<&str>,
     error: Option<&AppError>,
 ) {
-    // Audit rows are best-effort on the request hot path: a write failure must
-    // never change the HTTP response, but it stays observable with the error's
-    // stable code instead of being silently dropped.
-    if let Err(error) = append_activity_log(db_path, "lan", ip, request_type, result, detail, error)
+    // Tests keep their historical isolated SQLite fixture; production always
+    // uses the process-wide file writer and never falls back to SQL.
+    #[cfg(test)]
     {
-        eprintln!(
-            "failed to append LAN access log: {}: {}",
-            error.code, error.message
+        let _ = crate::storage::activity::append_activity_log(
+            _db_path,
+            "lan",
+            ip,
+            request_type,
+            result,
+            detail,
+            error,
         );
+        return;
+    }
+    #[cfg(not(test))]
+    {
+        let Some(logs) = logging::global() else {
+            return;
+        };
+        logs.operation(crate::models::ActivityLog {
+            id: uuid::Uuid::new_v4().to_string(),
+            created_at: crate::storage::now_ms(),
+            source: "lan".into(),
+            ip: ip.into(),
+            request_type: request_type.into(),
+            result: result.into(),
+            detail: detail.map(str::to_owned),
+            error: error.cloned(),
+            operation_id: None,
+        });
     }
 }
 
@@ -65,7 +87,7 @@ pub(super) fn log_result(error: &AppError) -> &'static str {
 }
 
 pub(super) fn record_transfer_history(
-    db_path: &Path,
+    db_path: &std::path::Path,
     ip: &str,
     direction: &str,
     file_name: &str,
@@ -75,7 +97,7 @@ pub(super) fn record_transfer_history(
 }
 
 pub(super) fn record_transfer_failure(
-    db_path: &Path,
+    db_path: &std::path::Path,
     ip: &str,
     direction: &str,
     file_name: &str,

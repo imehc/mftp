@@ -101,7 +101,7 @@ impl<C: AiCredentials + 'static> AiConfigurationService<C> {
 
     async fn recover_best_effort(&self) {
         if let Err(error) = self.recover_locked().await {
-            eprintln!("AI credential cleanup pending: {}", error.code);
+            crate::runtime_log!("AI credential cleanup pending: {}", error.code);
         }
     }
 

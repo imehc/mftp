@@ -1,8 +1,8 @@
 use crate::error::AppError;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use specta::Type;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Type)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum DiagnosticStatus {
     Running,
@@ -13,7 +13,7 @@ pub enum DiagnosticStatus {
     Interrupted,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Type)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum DiagnosticPhase {
     Preparing,
@@ -23,7 +23,7 @@ pub enum DiagnosticPhase {
     Finished,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Type)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum DiagnosticBodyEnd {
     Receiving,
@@ -32,7 +32,7 @@ pub enum DiagnosticBodyEnd {
     Interrupted,
 }
 
-#[derive(Debug, Clone, Serialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnosticText {
     pub text: String,
@@ -44,7 +44,7 @@ pub struct DiagnosticText {
     pub end: DiagnosticBodyEnd,
 }
 
-#[derive(Debug, Clone, Serialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnosticHeader {
     pub name: String,
@@ -53,7 +53,7 @@ pub struct DiagnosticHeader {
     pub redacted: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",
@@ -86,7 +86,7 @@ pub enum DiagnosticDetail {
     },
 }
 
-#[derive(Debug, Clone, Serialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnosticProgress {
     pub phase: String,
@@ -94,7 +94,7 @@ pub struct DiagnosticProgress {
     pub total: Option<f64>,
 }
 
-#[derive(Debug, Clone, Serialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnosticOperation {
     pub id: String,

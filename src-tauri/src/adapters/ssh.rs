@@ -19,7 +19,7 @@ pub(crate) fn event_sink<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> EventS
             }
         };
         if let Err(error) = result {
-            eprintln!(
+            crate::runtime_log!(
                 "SSH event delivery failed: {}",
                 crate::error::AppError::from(error).code
             );

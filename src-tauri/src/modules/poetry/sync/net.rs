@@ -127,7 +127,7 @@ fn download_and_import(
             if cancelled.load(Ordering::SeqCst) {
                 return Err(AppError::custom(CustomErrorCode::PoetrySyncCancelled));
             }
-            eprintln!("poetry file fetch fell back to tarball: {}", error.message);
+            crate::runtime_log!("poetry file fetch fell back to tarball: {}", error.message);
             // A partial run may have left files behind; the tarball extractor
             // expects an empty root.
             let _ = fs::remove_dir_all(&extract_dir);

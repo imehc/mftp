@@ -50,7 +50,7 @@ macro_rules! common_modules {
                 commands: [speech::commands::speech_catalog, speech::commands::speech_snapshot, speech::commands::speech_start, speech::commands::speech_control, speech::commands::speech_stop],
                 types: [speech::model::SpeechSnapshot],
             },
-            "diagnostics" => { commands: [diagnostics::diagnostics_snapshot, diagnostics::diagnostics_clear], types: [] },
+            "diagnostics" => { commands: [diagnostics::diagnostics_snapshot, diagnostics::diagnostics_clear, diagnostics::logs_page, diagnostics::logs_directory, diagnostics::logs_files, diagnostics::logs_usage, diagnostics::logs_clear, diagnostics::logs_detail, diagnostics::logs_open_directory], types: [] },
             "model_viewer" => {
                 commands: [
                     model_viewer::system::model_system_poll,

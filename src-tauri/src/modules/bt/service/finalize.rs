@@ -51,7 +51,7 @@ pub(super) async fn run_finalize_job(context: FinalizeContext) {
                 })
                 .await
             {
-                eprintln!("failed to persist BT task error: {}", write_error.code);
+                crate::runtime_log!("failed to persist BT task error: {}", write_error.code);
             }
             // The event remains useful if persistence fails. Keep the original
             // payload rather than replacing the task failure with a logging error.

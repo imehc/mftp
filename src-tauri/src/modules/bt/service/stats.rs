@@ -82,7 +82,7 @@ pub(super) fn spawn_progress_pump(
                 Err(error) => {
                     // One diagnostic per failure streak; never publish guessed state.
                     if !query_failed {
-                        eprintln!("BT progress query failed: {}", error.code);
+                        crate::runtime_log!("BT progress query failed: {}", error.code);
                     }
                     query_failed = true;
                     continue;

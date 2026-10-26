@@ -128,7 +128,7 @@ impl LanTransferManager {
                             tasks: thread_tasks,
                             active_transfers: thread_active_transfers,
                             auth_attempts: thread_attempts,
-                            db_path,
+                            db_path: db_path.clone(),
                         },
                     )
                 })?,

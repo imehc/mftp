@@ -58,23 +58,28 @@ pub struct AppServices {
 
 pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     let data_dir = app.path().app_data_dir()?;
-    let storage = Storage::new(data_dir.clone())?;
+    let logs = crate::core::logging::LogService::open(app.path().app_log_dir()?);
+    crate::core::logging::install_runtime(&logs);
+    let storage = Storage::with_logs(data_dir.clone(), logs.clone())?;
     let operations = Arc::new(Operations::with_reset_gate(storage.reset_gate()));
     // One process-wide activity panel backs every external-service protocol.
     // Each revision is announced so the UI can update without polling; the
     // cursor in the snapshot stays authoritative, so a dropped event only
     // costs latency and never loses a record.
-    let diagnostics = Arc::new(crate::core::diagnostics::Diagnostics::with_listener({
-        let app = app.clone();
-        Some(Arc::new(move || {
-            if let Err(error) = app.emit(crate::transfer::ACTIVITY_PANEL_EVENT, ()) {
-                eprintln!(
-                    "Activity panel event delivery failed: {}",
-                    crate::error::AppError::from(error).code
-                );
-            }
-        }))
-    }));
+    let diagnostics = Arc::new(crate::core::diagnostics::Diagnostics::with_log_service(
+        {
+            let app = app.clone();
+            Some(Arc::new(move || {
+                if let Err(error) = app.emit(crate::transfer::ACTIVITY_PANEL_EVENT, ()) {
+                    crate::runtime_log!(
+                        "Activity panel event delivery failed: {}",
+                        crate::error::AppError::from(error).code
+                    );
+                }
+            }))
+        },
+        Some(logs),
+    ));
     let mut lifecycle = Lifecycle::new(operations.clone());
     // Stop-registration names share the maintenance participant ids, and the
     // busy capability registered here is the single source both the shutdown
@@ -136,7 +141,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         let app = app.clone();
         Arc::new(move |change| {
             if let Err(error) = app.emit(crate::modules::todo::events::CHANGED_EVENT, change) {
-                eprintln!(
+                crate::runtime_log!(
                     "Todo change event delivery failed: {}",
                     crate::error::AppError::from(error).code
                 );
@@ -172,7 +177,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     if !storage.reset_is_pending() {
         tauri::async_runtime::spawn(async move {
             if let Err(error) = recovery.recover().await {
-                eprintln!("AI credential recovery pending: {}", error.code);
+                crate::runtime_log!("AI credential recovery pending: {}", error.code);
             }
         });
     }
@@ -246,6 +251,6 @@ fn start_lan_if_configured(services: &AppServices) {
         Ok(())
     };
     if let Err(error) = start() {
-        eprintln!("failed to auto start LAN transfer: {error}");
+        crate::runtime_log!("failed to auto start LAN transfer: {error}");
     }
 }

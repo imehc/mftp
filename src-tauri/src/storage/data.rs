@@ -31,6 +31,9 @@ impl Storage {
                 CustomErrorCode::AppDataModuleSeparateStore,
             ));
         }
+        if module == AppDataModule::ActivityLogs {
+            return self.clear_activity_logs(None);
+        }
         let mut conn = self.conn()?;
         let tx = conn.transaction()?;
         let changed = match module {
@@ -42,7 +45,7 @@ impl Storage {
                 tx.execute("DELETE FROM todo_note_drafts", [])?;
                 tx.execute("DELETE FROM todo_items", [])?
             }
-            AppDataModule::ActivityLogs => tx.execute("DELETE FROM activity_logs", [])?,
+            AppDataModule::ActivityLogs => return self.clear_activity_logs(None),
             AppDataModule::Poetry
             | AppDataModule::TranslationModels
             | AppDataModule::Downloads
@@ -133,7 +136,7 @@ impl Storage {
                         'legacy_json_migrated', 'ai_schema_version', 'todo_schema_version',
                         'bt_error_payload_schema_version', 'bt_download_only_migrated_v1',
                         'model_viewer_schema_version', 'activity_diagnostics_schema_version',
-                        'mcp_schema_version'
+                        'activity_file_schema_version', 'mcp_schema_version'
                     )",
                     [],
                 )?,
@@ -178,7 +181,9 @@ impl Storage {
         // residual tombstone must not fail the reset; usage accounting keeps
         // counting it and the next storage startup retries the sweep.
         if let Err(error) = fs::remove_dir_all(tombstone) {
-            eprintln!("deferred bt internal data cleanup, will retry at next startup: {error}");
+            crate::runtime_log!(
+                "deferred bt internal data cleanup, will retry at next startup: {error}"
+            );
         }
     }
 

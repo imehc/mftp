@@ -76,7 +76,7 @@ impl SpeechLifecycle {
             })
             .await
             {
-                eprintln!("Speech lifecycle stop failed: {}", error.code);
+                crate::runtime_log!("Speech lifecycle stop failed: {}", error.code);
             }
         });
     }

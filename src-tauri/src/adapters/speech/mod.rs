@@ -111,6 +111,6 @@ pub async fn check_startup(app: tauri::AppHandle, state: Arc<SpeechService>, ses
     })
     .await
     {
-        eprintln!("Speech startup check failed: {}", error.code);
+        crate::runtime_log!("Speech startup check failed: {}", error.code);
     }
 }

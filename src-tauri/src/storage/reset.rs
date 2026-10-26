@@ -75,6 +75,9 @@ impl Storage {
     }
 
     pub(crate) fn begin_app_reset(&self) -> AppResult<AppDataResetProgress> {
+        // Log files are a separate store; clear them before deleting business
+        // rows so a successful reset cannot leave protocol history behind.
+        self.logs.clear(None)?;
         let mut conn = self.conn()?;
         let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
         if read(&tx)?.is_some() {

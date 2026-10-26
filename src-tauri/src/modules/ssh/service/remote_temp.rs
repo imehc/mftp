@@ -22,7 +22,7 @@ impl<F: FnOnce() -> AppResult<()>> Drop for Cleanup<F> {
                 if let Err(error) = action() {
                     // Cleanup is best effort and must not replace the original
                     // operation error or make a completed write look retryable.
-                    eprintln!("SSH temporary file cleanup failed: {}", error.code);
+                    crate::runtime_log!("SSH temporary file cleanup failed: {}", error.code);
                 }
             }
         }
@@ -191,7 +191,7 @@ impl Drop for RemoteTempDir<'_> {
                 &self.preferred,
                 &self.path,
             ) {
-                eprintln!("SSH temporary directory cleanup failed: {}", error.code);
+                crate::runtime_log!("SSH temporary directory cleanup failed: {}", error.code);
             }
         }
     }

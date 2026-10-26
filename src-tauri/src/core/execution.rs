@@ -22,7 +22,7 @@ impl Executor {
         })
         .await;
         if let Err(error) = result {
-            eprintln!("activity log worker failed: {}", error.code);
+            crate::runtime_log!("activity log worker failed: {}", error.code);
         }
     }
     pub(crate) async fn recovery_maintenance(&self) -> AppResult<MaintenanceLease> {
@@ -76,7 +76,7 @@ impl Executor {
 
     pub(crate) async fn blocking_diagnostic<T, F>(
         &self,
-        context: OperationContext,
+        mut context: OperationContext,
         log: Option<super::diagnostics::DiagnosticRecorder>,
         operation: F,
     ) -> AppResult<T>
@@ -84,6 +84,9 @@ impl Executor {
         T: Send + 'static,
         F: FnOnce() -> AppResult<T> + Send + 'static,
     {
+        if context.operation_id.is_none() {
+            context.operation_id = log.as_ref().map(|recorder| recorder.id().to_owned());
+        }
         let lease = self.operations.begin()?;
         let activity = self.activity.clone();
         run_blocking(move || {
@@ -122,7 +125,7 @@ impl Executor {
         })
         .await
         {
-            eprintln!("activity log failed: {}", error.code);
+            crate::runtime_log!("activity log failed: {}", error.code);
         }
         result
     }
@@ -135,8 +138,8 @@ fn record<T>(activity: &dyn ActivitySink, context: &OperationContext, result: &A
         activity.record(context, result.as_ref().err())
     })) {
         Ok(Ok(())) => {}
-        Ok(Err(error)) => eprintln!("activity log failed: {}", error.code),
-        Err(_) => eprintln!("activity log worker panicked"),
+        Ok(Err(error)) => crate::runtime_log!("activity log failed: {}", error.code),
+        Err(_) => crate::runtime_log!("activity log worker panicked"),
     }
 }
 

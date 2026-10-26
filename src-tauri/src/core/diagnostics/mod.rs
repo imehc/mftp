@@ -25,6 +25,7 @@ pub(super) struct RecordCell {
 }
 
 pub(super) struct Scope {
+    sink: Option<Arc<crate::core::logging::LogService>>,
     cursor: AtomicU32,
     records: Mutex<VecDeque<Arc<RecordCell>>>,
     discarded: AtomicU32,
@@ -44,9 +45,10 @@ impl Scope {
 }
 
 /// Process-wide activity panel for work against external services. It keeps
-/// only the current operation and the recent results of this session, entirely
-/// in memory: nothing is written to disk, exported, or retained once the panel
-/// is cleared, the window closes, or the app exits.
+/// a bounded in-memory view for live UI updates while the shared log service
+/// persists accepted summaries and diagnostic details in the app log directory.
+/// Clearing the panel releases only this live view; persisted history follows
+/// the unified log retention and clear operations.
 pub(crate) struct Diagnostics {
     scope: Arc<Scope>,
     active: Arc<AtomicUsize>,
@@ -63,8 +65,16 @@ impl Diagnostics {
     /// to push an event so the UI can update without polling; core stays free
     /// of any transport or runtime dependency.
     pub(crate) fn with_listener(changed: Option<Arc<dyn Fn() + Send + Sync>>) -> Self {
+        Self::with_log_service(changed, None)
+    }
+
+    pub(crate) fn with_log_service(
+        changed: Option<Arc<dyn Fn() + Send + Sync>>,
+        sink: Option<Arc<crate::core::logging::LogService>>,
+    ) -> Self {
         Self {
             scope: Arc::new(Scope {
+                sink,
                 cursor: AtomicU32::new(1),
                 records: Mutex::new(VecDeque::new()),
                 discarded: AtomicU32::new(0),

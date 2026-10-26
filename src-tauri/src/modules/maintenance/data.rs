@@ -15,10 +15,8 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
     match module {
         AppDataModule::Hosts => &[participants::SSH],
         AppDataModule::Poetry => &[participants::POETRY],
-        // The LAN HTTP hot path appends `activity_logs` directly without an
-        // operation lease (by design, see the error-handling plan), so a
-        // running server could keep writing rows while they are cleared.
-        // Every other log writer leases through the drained Executor.
+        // The LAN HTTP hot path writes through the shared file writer; drain it
+        // before clearing so no request can append into the cleared generation.
         #[cfg(desktop)]
         AppDataModule::ActivityLogs => &[participants::LAN_TRANSFER],
         #[cfg(mobile)]

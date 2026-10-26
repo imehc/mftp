@@ -58,7 +58,7 @@ impl PoetryLibrary {
         let temp_dir = app_data_root.join("poetry-tmp");
         if let Err(error) = fs::remove_dir_all(&temp_dir) {
             if error.kind() != std::io::ErrorKind::NotFound {
-                eprintln!("failed to clean stale poetry temp data: {error}");
+                crate::runtime_log!("failed to clean stale poetry temp data: {error}");
             }
         }
         Self {
@@ -328,7 +328,7 @@ impl PoetryLibrary {
             imported: 0,
             total: None,
             error: result.err().inspect(|error| {
-                eprintln!("{error_log}: {}", error.message);
+                crate::runtime_log!("{error_log}: {}", error.message);
             }),
         });
     }

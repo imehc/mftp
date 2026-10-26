@@ -12,6 +12,13 @@ common speech_control
 common speech_stop
 common diagnostics_snapshot
 common diagnostics_clear
+common logs_page
+common logs_directory
+common logs_files
+common logs_usage
+common logs_clear
+common logs_detail
+common logs_open_directory
 common model_system_poll
 common model_environment_begin
 common model_environment_write

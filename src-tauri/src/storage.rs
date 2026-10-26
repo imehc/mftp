@@ -22,6 +22,7 @@ use helpers::prepare_database;
 
 #[derive(Clone)]
 pub struct Storage {
+    pub(crate) logs: Arc<crate::core::logging::LogService>,
     root: PathBuf,
     db_path: PathBuf,
     reset_pending: Arc<AtomicBool>,
@@ -35,9 +36,19 @@ pub fn now_ms() -> i64 {
 }
 
 impl Storage {
+    #[cfg(test)]
     pub fn new(root: PathBuf) -> AppResult<Self> {
+        let logs = crate::core::logging::LogService::open(root.join("logs"));
+        Self::with_logs(root, logs)
+    }
+
+    pub(crate) fn with_logs(
+        root: PathBuf,
+        logs: Arc<crate::core::logging::LogService>,
+    ) -> AppResult<Self> {
         fs::create_dir_all(&root)?;
         let storage = Storage {
+            logs,
             db_path: root.join(DB_FILE),
             root,
             reset_pending: Arc::new(AtomicBool::new(false)),
@@ -47,6 +58,9 @@ impl Storage {
         storage.init_db()?;
         storage.init_reset_journal()?;
         storage.migrate_legacy_json()?;
+        if let Err(error) = storage.migrate_activity_files() {
+            crate::runtime_log!("Activity file migration pending: {}", error.code);
+        }
         Ok(storage)
     }
 

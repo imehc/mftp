@@ -1,8 +1,10 @@
 use crate::error::persistence;
 use crate::error::{AppError, AppResult};
 use crate::models::ActivityLog;
+#[cfg(test)]
 use parking_lot::Mutex;
 use rusqlite::{params, Connection, OptionalExtension};
+#[cfg(test)]
 use std::path::{Path, PathBuf};
 
 use super::helpers::column_exists;
@@ -24,16 +26,18 @@ impl Storage {
         error: Option<&AppError>,
         operation_id: &str,
     ) -> AppResult<()> {
-        append_traced_log(
-            self.db_path(),
-            source,
-            address,
-            action,
-            if error.is_some() { "failed" } else { "success" },
-            detail,
-            error,
-            Some(operation_id),
-        )
+        self.logs.operation(ActivityLog {
+            id: uuid::Uuid::new_v4().to_string(),
+            created_at: now_ms(),
+            source: source.into(),
+            ip: address.into(),
+            request_type: action.into(),
+            result: if error.is_some() { "failed" } else { "success" }.into(),
+            detail: detail.map(str::to_owned),
+            error: error.cloned(),
+            operation_id: Some(operation_id.into()),
+        });
+        Ok(())
     }
     pub fn record_result(
         &self,
@@ -43,18 +47,55 @@ impl Storage {
         detail: Option<&str>,
         error: Option<&AppError>,
     ) -> AppResult<()> {
-        append_activity_log(
-            self.db_path(),
-            source,
-            address,
-            action,
-            if error.is_some() { "failed" } else { "success" },
-            detail,
-            error,
-        )
+        self.logs.operation(ActivityLog {
+            id: uuid::Uuid::new_v4().to_string(),
+            created_at: now_ms(),
+            source: source.into(),
+            ip: address.into(),
+            request_type: action.into(),
+            result: if error.is_some() { "failed" } else { "success" }.into(),
+            detail: detail.map(str::to_owned),
+            error: error.cloned(),
+            operation_id: None,
+        });
+        Ok(())
     }
 
     pub fn list_activity_logs(
+        &self,
+        limit: u32,
+        source: Option<&str>,
+        result: Option<&str>,
+    ) -> AppResult<Vec<ActivityLog>> {
+        let mut logs: Vec<_> = self
+            .logs
+            .projection(None)?
+            .summaries
+            .into_values()
+            .filter(|row| {
+                source.is_none_or(|value| value == row.source)
+                    && result.is_none_or(|value| value == row.result)
+            })
+            .collect();
+        // Read-only compatibility for a downgrade or an interrupted migration.
+        // New production writes never target this table.
+        let known: std::collections::HashSet<_> = logs.iter().map(|row| row.id.clone()).collect();
+        logs.extend(
+            self.legacy_activity_logs(limit, source, result)?
+                .into_iter()
+                .filter(|row| !known.contains(&row.id)),
+        );
+        logs.sort_by(|left, right| {
+            right
+                .created_at
+                .cmp(&left.created_at)
+                .then_with(|| right.id.cmp(&left.id))
+        });
+        logs.truncate(limit as usize);
+        Ok(logs)
+    }
+
+    fn legacy_activity_logs(
         &self,
         limit: u32,
         source: Option<&str>,
@@ -110,20 +151,52 @@ impl Storage {
     }
 
     pub fn clear_activity_logs(&self, source: Option<&str>) -> AppResult<u32> {
-        let changed = self.conn()?.execute(
-            "DELETE FROM activity_logs WHERE ?1 IS NULL OR source = ?1",
-            params![source],
-        )?;
-        Ok(changed as u32)
+        if source.is_some() {
+            return Err(AppError::external(
+                "logs:clear-scope",
+                "Logs are cleared by file date, not module",
+            ));
+        }
+        let count = self
+            .list_activity_logs(u32::MAX, None, None)?
+            .len()
+            .min(u32::MAX as usize) as u32;
+        self.logs.clear(None)?;
+        // Remove only rows left by an older build or a downgrade. The current
+        // writer never appends here, so this cannot create a second log store.
+        let conn = self.conn()?;
+        conn.execute("DELETE FROM activity_logs", [])?;
+        Ok(count)
     }
 
     pub fn delete_activity_log(&self, id: &str) -> AppResult<()> {
-        self.conn()?
-            .execute("DELETE FROM activity_logs WHERE id = ?1", params![id])?;
+        Err(AppError::external(
+            "logs:delete-record",
+            "Individual log deletion is unsupported",
+        )
+        .with_arg("id", id))
+    }
+
+    pub(crate) fn migrate_activity_files(&self) -> AppResult<()> {
+        loop {
+            let records = self.legacy_activity_logs(500, None, None)?;
+            if records.is_empty() {
+                break;
+            }
+            self.logs.import_legacy(&records)?;
+            let mut conn = self.conn()?;
+            let tx = conn.transaction()?;
+            for record in records {
+                tx.execute("DELETE FROM activity_logs WHERE id=?1", [record.id])?;
+            }
+            tx.commit()?;
+        }
+        self.conn()?.execute("INSERT INTO app_meta(key,value) VALUES('activity_file_schema_version','1') ON CONFLICT(key) DO UPDATE SET value=excluded.value", [])?;
         Ok(())
     }
 }
 
+#[cfg(test)]
 pub(crate) fn append_activity_log(
     db_path: &Path,
     source: &str,
@@ -142,6 +215,7 @@ pub(crate) fn append_activity_log(
     clippy::too_many_arguments,
     reason = "Preserve the existing activity writer contract while attaching an optional execution identity"
 )]
+#[cfg(test)]
 fn append_traced_log(
     db_path: &Path,
     source: &str,
@@ -231,7 +305,7 @@ pub(super) fn migrate_table_name(conn: &Connection) -> AppResult<()> {
         // Only reachable after a downgrade wrote to a recreated old table.
         // Keep both as-is rather than failing startup or merging by guesswork;
         // the app keeps operating on `activity_logs`.
-        eprintln!(
+        crate::runtime_log!(
             "activity log table rename skipped: both lan_access_logs and activity_logs exist"
         );
         return Ok(());

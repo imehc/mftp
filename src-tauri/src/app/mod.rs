@@ -196,9 +196,10 @@ fn shutdown(app: &tauri::AppHandle, lifecycle: &Arc<lifecycle::Lifecycle>, exit_
         if report.completed() {
             cleanup::cleanup_stale_local_transfer_files(&app.config().identifier);
         } else {
-            eprintln!(
+            crate::runtime_log!(
                 "shutdown incomplete: {:?}, pipeline idle: {}",
-                report.unfinished, report.operations_idle
+                report.unfinished,
+                report.operations_idle
             );
         }
         // Let the second ExitRequested through only after cleanup has finished.

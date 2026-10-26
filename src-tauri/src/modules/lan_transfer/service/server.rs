@@ -3,7 +3,6 @@ use crate::modules::lan_transfer::{LanConnectedDevice, LanSharedDir};
 use parking_lot::Mutex;
 use std::collections::{HashMap, HashSet};
 use std::net::{TcpListener, TcpStream};
-use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread;
@@ -35,7 +34,7 @@ pub(super) struct ServerContext {
     pub(super) tasks: SharedTasks,
     pub(super) active_transfers: Arc<Mutex<usize>>,
     pub(super) auth_attempts: Arc<Mutex<HashMap<String, AuthAttemptState>>>,
-    pub(super) db_path: PathBuf,
+    pub(super) db_path: std::path::PathBuf,
 }
 
 pub(super) fn run_http_server(
@@ -57,7 +56,7 @@ pub(super) fn run_http_server(
                 if let Err(error) = connections.spawn(stream, move |stream| {
                     handle_connection(stream, peer_ip, &context);
                 }) {
-                    eprintln!("failed to start LAN connection worker: {error}");
+                    crate::runtime_log!("failed to start LAN connection worker: {error}");
                 }
             }
             Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {

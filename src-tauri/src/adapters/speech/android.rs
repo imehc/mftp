@@ -79,7 +79,7 @@ fn channel(
             return Ok(());
         };
         let Ok(event) = serde_json::from_str::<NativeEvent>(&json) else {
-            eprintln!("Invalid Android speech event");
+            crate::runtime_log!("Invalid Android speech event");
             return Ok(());
         };
         let Some(state) = state.upgrade() else {
@@ -175,7 +175,7 @@ pub fn stop_all(app: &tauri::AppHandle, state: &Arc<SpeechService>) {
     let state = Arc::clone(state);
     tauri::async_runtime::spawn(async move {
         if let Err(error) = control(&app, &state, &session, SpeechAction::Stop).await {
-            eprintln!("Android speech cleanup failed: {}", error.code);
+            crate::runtime_log!("Android speech cleanup failed: {}", error.code);
         }
     });
 }

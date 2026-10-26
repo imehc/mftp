@@ -50,9 +50,10 @@ impl Storage {
         let download_bytes = self.download_bytes()?;
         let translation_model_bytes = self.translation_model_bytes()?;
         let keys_bytes = dir_size(&self.root.join("keys"))?;
+        let activity_logs_bytes = self.logs.usage()?;
         // 「总占用」是应用数据目录的真实占用，包含模型、缓存等不可按模块清理的内容；
         // 只累加可清理的数据库会明显小于用户看到的磁盘占用。
-        let total_bytes = dir_size(&self.root)?;
+        let total_bytes = dir_size(&self.root)?.saturating_add(activity_logs_bytes);
         // Unclassified leftovers are reported as cache so the rows always add up
         // to the measured directory size instead of leaving a silent gap.
         let cache_bytes = total_bytes.saturating_sub(
@@ -60,11 +61,12 @@ impl Storage {
                 + poetry_database_bytes
                 + translation_model_bytes
                 + download_bytes
-                + keys_bytes,
+                + keys_bytes
+                + activity_logs_bytes,
         );
         // Usage reads must never create a missing database or apply migrations.
         let conn = Connection::open_with_flags(&self.db_path, OpenFlags::SQLITE_OPEN_READ_ONLY)?;
-        let (vault_bytes, hosts_bytes, todo_bytes, activity_logs_bytes) = (
+        let (vault_bytes, hosts_bytes, todo_bytes) = (
             query_bytes(
                 &conn,
                 "SELECT COALESCE(SUM(
@@ -110,19 +112,6 @@ impl Storage {
                         ), 0) FROM todo_items) +
                         (SELECT COALESCE(SUM(LENGTH(CAST(document AS BLOB))),0) FROM todo_notes) +
                         (SELECT COALESCE(SUM(LENGTH(data)+LENGTH(thumbnail)),0) FROM todo_note_images)",
-            )?,
-            query_bytes(
-                &conn,
-                "SELECT COALESCE(SUM(
-                            LENGTH(CAST(COALESCE(id, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(source, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(ip, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(request_type, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(result, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(detail, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(error_payload, '') AS BLOB)) +
-                            LENGTH(CAST(COALESCE(operation_id, '') AS BLOB))
-                        ), 0) FROM activity_logs",
             )?,
         );
         Ok(AppDataUsage {

@@ -46,7 +46,7 @@ impl McpRuntime {
             server.stop_blocking();
         }
         if let Err(error) = self.registry.shutdown() {
-            eprintln!("MCP draft cleanup failed: {}", error.code);
+            crate::runtime_log!("MCP draft cleanup failed: {}", error.code);
         }
     }
 

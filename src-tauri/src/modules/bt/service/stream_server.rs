@@ -60,7 +60,7 @@ impl StreamServer {
         self.workers.wait().await;
         if let Some(task) = self.accept_task.as_mut() {
             if let Err(error) = task.await {
-                eprintln!(
+                crate::runtime_log!(
                     "BT preview accept loop failed (panic: {})",
                     error.is_panic()
                 );

@@ -20,7 +20,7 @@ pub fn run_rsync_helper_if_requested() -> bool {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     if let Err(error) = app::run() {
-        eprintln!("application startup failed: {error}");
+        crate::runtime_log!("application startup failed: {error}");
     }
 }
 
