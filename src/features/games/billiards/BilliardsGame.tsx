@@ -1,7 +1,7 @@
 /**
  * 台球游戏界面外壳：顶部栏（音量、重开/退出）、物理引擎加载门，
  * 以及模式切换。击球是桌面上的弹弓手势（在母球后方拖动以瞄准并蓄力，
- * 松手击出）——底栏只放旋转切换与实时力度读数。
+ * 松手击出）——底栏只放实时力度读数。
  */
 import "./billiards.css";
 
@@ -29,7 +29,6 @@ import {
 } from "./render/audio";
 import { billiardsSessions } from "./session";
 import type { BilliardsDiscipline } from "./types";
-import { useBilliardsOrientation } from "./use-billiards-orientation";
 
 export default function BilliardsGame() {
   const mobile = !useDesktopLayout();
@@ -75,15 +74,12 @@ export default function BilliardsGame() {
       cancelled = true;
     };
   }, [mode, attempt]);
-  const rotate = useBilliardsOrientation(mode !== null, landscape);
   // 只有进入对局才需要等引擎；未选模式时直接显示模式菜单。
   const loading = !physicsReady && mode !== null;
   const headerProps = {
     active: mode !== null,
     finished: matchFinished,
     landscape,
-    mobile,
-    onRotate: () => void rotate(),
     onRestart: restartMatch,
     onExit: exitMatch,
   };

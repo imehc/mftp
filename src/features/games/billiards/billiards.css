@@ -130,11 +130,6 @@
   width: 100% !important;
   height: var(--billiards-power, 0%);
 }
-.billiards-game:fullscreen {
-  padding-top: var(--safe-top, 0px);
-  padding-left: var(--safe-left, 0px);
-  padding-right: var(--safe-right, 0px);
-}
 
 .billiards-game[data-landscape="true"] .billiards-result {
   flex-direction: column;

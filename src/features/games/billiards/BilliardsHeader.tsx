@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, FlagIcon, Maximize2, Minimize2 } from "lucide-react";
+import { ArrowLeft, FlagIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import { ToolPageHeader } from "~/components/ToolPageHeader";
@@ -23,8 +23,6 @@ export interface BilliardsHeaderProps {
   active: boolean;
   finished: boolean;
   landscape: boolean;
-  mobile: boolean;
-  onRotate(): void;
   onRestart(): void;
   onExit(): void;
   details?: ReactNode;
@@ -37,8 +35,6 @@ export function BilliardsHeader({
   active,
   finished,
   landscape,
-  mobile,
-  onRotate,
   onRestart,
   onExit,
   details,
@@ -64,17 +60,6 @@ export function BilliardsHeader({
       </Link>
     </Button>
   );
-  const rotate =
-    active && mobile ? (
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label={landscape ? t`返回竖屏` : t`横屏游玩`}
-        onClick={onRotate}
-      >
-        {landscape ? <Minimize2 /> : <Maximize2 />}
-      </Button>
-    ) : null;
   const actions = active ? (
     <GameActionsMenu
       matchFinished={finished}
@@ -106,7 +91,6 @@ export function BilliardsHeader({
     <>
       {landscape && active ? (
         <div className="billiards-landscape-nav flex items-center justify-center">
-          {rotate}
           {details}
           {actions}
         </div>
@@ -119,7 +103,6 @@ export function BilliardsHeader({
           leading={back}
           trailing={
             <>
-              {rotate}
               {details}
               {actions}
             </>
