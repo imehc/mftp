@@ -16,6 +16,9 @@ const slash = (value: string) => value.replaceAll("\\", "/");
 export function platformAliases(target: string | null) {
   const replacements: Record<string, string> = {};
   if (!target) return replacements;
+  if (target !== "ios" && target !== "android")
+    replacements["~/features/navigation/MobileBackNavigation"] =
+      "src/app/platform/without-mobile-navigation.tsx";
   if (!supports(target, "mcp"))
     replacements["~/features/mcp/integration"] =
       "src/app/platform/without-mcp.tsx";

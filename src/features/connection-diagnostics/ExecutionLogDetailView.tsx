@@ -36,7 +36,7 @@ export default function ExecutionLogDetailView({
   historyError,
 }: {
   operation: DiagnosticOperation;
-  onBack: () => void;
+  onBack: (event?: { detail: number }) => void;
   history?: ActivityLog | null;
   historyError?: AppError | null;
 }) {

@@ -369,6 +369,7 @@ macro_rules! mobile_export_module {
                     model_viewer::export_commands::model_export_cancel,
                     model_viewer::export_commands::model_export_close,
 ], types: [] },
+"mobile_navigation" => { commands: [crate::app::mobile_navigation::mobile_navigation_configure], types: [] },
         }
     };
 }

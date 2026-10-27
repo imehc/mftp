@@ -5,8 +5,9 @@ import {
 } from "@tanstack/react-router";
 
 import { ActivityProvider } from "~/features/activity/ActivityProvider";
+import { MobileBackNavigation } from "~/features/navigation/MobileBackNavigation";
 import ModuleNavigationFrame from "~/features/navigation/ModuleNavigationFrame";
-import { resolveNavigation } from "~/features/navigation/resolve-navigation";
+import { navigationContext } from "~/features/navigation/navigation-context";
 import { useStartupNavigation } from "~/features/navigation/use-startup-navigation";
 import { useSettingsStore } from "~/store/settings";
 
@@ -15,29 +16,12 @@ function RootLayout() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const selectedPoem = useRouterState({
-    select: (state) => state.location.search.poem,
-  });
-  const settingsDetail = useRouterState({
-    select: (state) =>
-      state.location.search.panel === "ai" ||
-      state.location.search.panel === "data" ||
-      state.location.search.panel === "features" ||
-      !!state.location.search.returnUid,
-  });
-  const homeCategory = useRouterState({
-    select: (state) => state.location.search.category,
-  });
+  const search = useRouterState({ select: (state) => state.location.search });
   const showGames = useSettingsStore((state) => state.showGames);
-  const navigation = resolveNavigation({
-    pathname,
-    homeCategory,
-    showGames,
-    selectedPoem,
-    settingsDetail,
-  });
+  const navigation = navigationContext(pathname, search, showGames);
   return (
     <ActivityProvider>
+      <MobileBackNavigation />
       <div className="app-shell">
         {navigation ? (
           <ModuleNavigationFrame

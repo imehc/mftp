@@ -145,6 +145,53 @@ try {
       hashes,
     );
   const android = path.join(project, "src-tauri/gen/android");
+  // 宿主返回处理依赖 AndroidX，在隔离 library 中编译真实源码，不读取签名配置。
+  const navigationSource = path.join(
+    android,
+    "app/src/main/java/com/imehc/mftp/WebViewBackNavigation.kt",
+  );
+  const navigationBytes = fs.readFileSync(navigationSource);
+  const navigationDir = path.join(fixture, "navigation-host");
+  fs.mkdirSync(path.join(navigationDir, "src/main/java/com/imehc/mftp"), {
+    recursive: true,
+  });
+  fs.writeFileSync(
+    path.join(
+      navigationDir,
+      "src/main/java/com/imehc/mftp/WebViewBackNavigation.kt",
+    ),
+    navigationBytes,
+  );
+  hashes["navigation-host/WebViewBackNavigation.kt"] = createHash("sha256")
+    .update(navigationBytes)
+    .digest("hex");
+  fs.writeFileSync(
+    path.join(navigationDir, "src/main/AndroidManifest.xml"),
+    '<manifest xmlns:android="http://schemas.android.com/apk/res/android" />\n',
+  );
+  fs.writeFileSync(
+    path.join(navigationDir, "build.gradle.kts"),
+    `plugins {
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+}
+android {
+    namespace = "com.imehc.navigation.check"
+    compileSdk = 36
+    defaultConfig { minSdk = 28 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions { jvmTarget = "1.8" }
+}
+dependencies {
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("androidx.activity:activity-ktx:1.10.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.10.0")
+}
+`,
+  );
   copyTree(
     path.join(android, "gradle/wrapper"),
     path.join(fixture, "gradle/wrapper"),
@@ -179,7 +226,7 @@ subprojects {
     path.join(fixture, "settings.gradle.kts"),
     `pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
 rootProject.name = "mftp-android-plugin-check"
-include(":tauri-android", ${plugins.map((name) => JSON.stringify(`:${name}`)).join(", ")})
+include(":tauri-android", ":navigation-host", ${plugins.map((name) => JSON.stringify(`:${name}`)).join(", ")})
 `,
   );
   // local.properties 使用 Java properties 转义，不将 SDK 路径注入 Gradle 代码。
@@ -203,6 +250,7 @@ include(":tauri-android", ${plugins.map((name) => JSON.stringify(`:${name}`)).jo
     buildTools,
     offline,
     plugins,
+    hostSources: ["WebViewBackNavigation.kt"],
     sourceSha256: hashes,
   };
   saveReport("prepared");
@@ -216,6 +264,7 @@ include(":tauri-android", ${plugins.map((name) => JSON.stringify(`:${name}`)).jo
         "--no-daemon",
         ...(offline ? ["--offline"] : []),
         ...plugins.map((name) => `:${name}:assembleDebug`),
+        ":navigation-host:assembleDebug",
         ":native-speech:testDebugUnitTest",
       ],
       {

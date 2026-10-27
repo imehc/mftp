@@ -27,6 +27,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
+import { BackLink } from "~/features/navigation/BackLink";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { PoemSummary } from "~/types";
@@ -337,10 +338,15 @@ export default function LibraryPage({
                   variant="ghost"
                   size="sm"
                   className={TOUCH_TARGET_CLASS}
-                  onClick={() => onOpenPoem("")}
+                  asChild
                 >
-                  <ArrowLeft data-icon="inline-start" />
-                  <Trans>返回列表</Trans>
+                  <BackLink
+                    to="/library"
+                    search={{ q: search.q, view: search.view }}
+                  >
+                    <ArrowLeft data-icon="inline-start" />
+                    <Trans>返回列表</Trans>
+                  </BackLink>
                 </Button>
               </div>
               <div className="min-h-0 flex-1">{detailPane}</div>

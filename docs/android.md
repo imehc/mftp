@@ -160,6 +160,8 @@ Android 端与桌面端的功能差异（代码中已处理，无需手动关注
 
 ## 原生插件独立编译检查
 
+检查还包含 `navigation-host` 隔离 library：直接编译宿主的 `WebViewBackNavigation.kt`，依赖版本与应用保持一致，不读取应用签名配置。它验证返回处理源码可编译，不等同于完整 Activity／APK 或系统手势验收。
+
 `pnpm check:android-plugins` 编译 `native-export`、`native-viewer`、`native-speech` 三个 Android library，生成 AAR，并运行语音分句和恢复队列的 JVM 单元测试；不会生成完整 MFTP APK、启动 Gradle 安装任务或连接设备。用于本地和 PR CI 的 Kotlin/资源编译门槛，不代替 Android Rust 主库、整包或原生功能验收。
 
 环境：Node.js 22、pnpm、Cargo、JDK 17–24，以及 Android SDK `platforms;android-36`、`build-tools;36.0.0`。显式配置 `JAVA_HOME` 和 `ANDROID_HOME`（或 `ANDROID_SDK_ROOT`）。不需要 NDK，也不需要先启动应用。

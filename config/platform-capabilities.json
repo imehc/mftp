@@ -1,6 +1,14 @@
 {
   "targets": ["macos", "windows", "linux", "android", "ios"],
   "capabilities": {
+    "mobileNavigation": {
+      "platforms": ["android", "ios"],
+      "routes": [],
+      "sources": [
+        "src/features/navigation/MobileBackNavigation.tsx",
+        "src/features/navigation/back-controller.ts"
+      ]
+    },
     "mcp": {
       "platforms": ["desktop"],
       "routes": [],

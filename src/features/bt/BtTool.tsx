@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { ArrowLeft, Magnet, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +21,7 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Spinner } from "~/components/ui/spinner";
+import { BackLink } from "~/features/navigation/BackLink";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { isMobilePlatform } from "~/lib/platform";
@@ -210,13 +210,13 @@ export default function BtTool() {
           showHome={false}
           leading={
             <Button variant="ghost" size="icon-sm" asChild>
-              <Link
+              <BackLink
                 to="/"
                 search={{ category: "tools" }}
                 aria-label={t`返回首页`}
               >
                 <ArrowLeft />
-              </Link>
+              </BackLink>
             </Button>
           }
           title={<Trans>BT 下载</Trans>}

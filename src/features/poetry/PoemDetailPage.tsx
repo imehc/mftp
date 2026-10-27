@@ -4,6 +4,7 @@ import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
+import { BackLink } from "~/features/navigation/BackLink";
 
 import PoemDetail from "./components/PoemDetail";
 import PoetryReadError from "./components/PoetryReadError";
@@ -63,7 +64,7 @@ export default function PoemDetailPage({
         }
         leading={
           <Button variant="ghost" size="icon-sm" asChild>
-            <Link
+            <BackLink
               aria-label={t`返回古诗词`}
               title={t`返回古诗词`}
               to="/library"
@@ -73,7 +74,7 @@ export default function PoemDetailPage({
               }}
             >
               <ArrowLeft data-icon="inline-start" />
-            </Link>
+            </BackLink>
           </Button>
         }
       />

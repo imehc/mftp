@@ -30,7 +30,7 @@ export default function HistoryLogDetailView({
   log: ActivityLog;
   controller: ActivityLogsController;
   execution: ExecutionLogs;
-  onBack: () => void;
+  onBack: (event?: { detail: number }) => void;
 }) {
   const { t, i18n } = useLingui();
   const scroll = useRef<HTMLDivElement>(null);

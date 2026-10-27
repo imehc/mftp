@@ -215,3 +215,4 @@ mobile model_export_write
 mobile model_export_present
 mobile model_export_cancel
 mobile model_export_close
+mobile mobile_navigation_configure

@@ -15,6 +15,8 @@ class WebViewBackNavigation(
 ) {
   private var disposed = false
   private var pending = false
+  private var request = 0
+  private val timeout = Runnable { pending = false; request += 1 }
   private var keyboardVisible = false
   private var lastImeHiddenAt: Long? = null
 
@@ -26,7 +28,7 @@ class WebViewBackNavigation(
 
   private val callback = object : OnBackPressedCallback(true) {
     override fun handleOnBackPressed() {
-      if (pending || disposed) return
+      if (pending || disposed || !activity.hasWindowFocus()) return
       val imeVisible = ViewCompat.getRootWindowInsets(webView)
         ?.isVisible(WindowInsetsCompat.Type.ime()) == true
       // Flyme forwards the same Back after reporting the IME hidden. Consume
@@ -43,16 +45,27 @@ class WebViewBackNavigation(
         return
       }
       pending = true
+      val current = ++request
+      webView.postDelayed(timeout, 1500)
       // Radix consumes Escape only in the topmost dismissable layer. Respect
       // preventDefault too, so a busy editor can keep its existing close guard.
       webView.evaluateJavascript(
         "(()=>{const e=new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true});" +
-          "document.dispatchEvent(e);return e.defaultPrevented;})()"
+          "document.dispatchEvent(e);if(e.defaultPrevented)return 'handled';" +
+          "const b=new KeyboardEvent('keydown',{key:'BrowserBack',bubbles:true,cancelable:true});" +
+          "document.dispatchEvent(b);if(b.defaultPrevented)return 'handled';" +
+          "return document.documentElement.dataset.mobileNavigation==='root'?'background':'unavailable';})()"
       ) { consumed ->
+        if (current != request) return@evaluateJavascript
+        webView.removeCallbacks(timeout)
         pending = false
-        if (disposed || !activity.hasWindowFocus() || consumed == "true") return@evaluateJavascript
-        // Temporarily disable only our callback; Tauri retains history/exit
-        // behavior and Android keeps priority for dismissing the IME.
+        if (disposed || !activity.hasWindowFocus() || consumed == "\"handled\"") return@evaluateJavascript
+        if (consumed == "\"background\"") {
+          activity.moveTaskToBack(true)
+          return@evaluateJavascript
+        }
+        // During startup/reload the SPA may not have a handler yet. Only this
+        // unavailable case delegates to Tauri; ready root pages never goBack.
         isEnabled = false
         try {
           activity.onBackPressedDispatcher.onBackPressed()
@@ -69,6 +82,8 @@ class WebViewBackNavigation(
 
   fun dispose() {
     disposed = true
+    request += 1
+    webView.removeCallbacks(timeout)
     callback.remove()
   }
 }

@@ -1,6 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
+import { mobilePoetryEntry } from "~/features/poetry/back-navigation";
+import { isMobilePlatform } from "~/lib/platform";
 
 import type { NavigationItem, NavigationSection } from "./NavigationItems";
 
@@ -13,6 +15,7 @@ export default function NavigationLinks({
   active: NavigationSection;
   desktop?: boolean;
 }) {
+  const router = useRouter();
   return items.map((item) => {
     const Icon = item.icon;
     return (
@@ -30,6 +33,32 @@ export default function NavigationLinks({
       >
         <Link
           {...item.link}
+          replace={isMobilePlatform()}
+          onClick={(event) => {
+            if (
+              !isMobilePlatform() ||
+              item.id !== "library" ||
+              event.defaultPrevented ||
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            )
+              return;
+            const entry = mobilePoetryEntry();
+            if (!entry) return;
+            event.preventDefault();
+            const parentHref = router.buildLocation(entry.parent).href;
+            void router
+              .navigate({ ...entry.parent, replace: true })
+              .then(() => {
+                // 用户在父级加载期间改去了其他页，不能再被旧恢复请求拉回。
+                if (router.state.location.href === parentHref)
+                  return router.navigate(entry.destination);
+              })
+              .catch(console.error);
+          }}
           aria-current={item.id === active ? "page" : undefined}
         >
           <Icon />

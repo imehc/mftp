@@ -16,6 +16,8 @@ import { hasExecutionLogContent } from "~/features/connection-diagnostics/execut
 import ExecutionLogDetailView from "~/features/connection-diagnostics/ExecutionLogDetailView";
 import HistoryLogDetailView from "~/features/logs/HistoryLogDetailView";
 import { useActivityLogs } from "~/features/logs/use-activity-logs";
+import { previousAppLocation } from "~/features/navigation/back-history";
+import { runMobileBackTransition } from "~/features/navigation/mobile-back-transition";
 
 import { useActivityViewStore } from "./activity-view-store";
 import { ActivityCenter } from "./ActivityCenter";
@@ -53,15 +55,25 @@ export default function ActivityPage() {
       : null;
   const requested = search.operation ?? search.history;
 
-  const closeDetail = () => {
-    if (canGoBack && router.state.location.state.activityLogDetail)
-      router.history.back();
-    else
-      void navigate({
-        search: { tab: "logs" },
-        replace: true,
-        state: { activityLogDetail: false },
-      });
+  const closeDetail = (event?: { detail: number }) => {
+    const back = canGoBack && router.state.location.state.activityLogDetail;
+    const href = back
+      ? previousAppLocation(router.history)?.href
+      : router.buildLocation({ to: "/activity", search: { tab: "logs" } }).href;
+    runMobileBackTransition(
+      router,
+      href ?? "/activity",
+      () => {
+        if (back) router.history.back();
+        else
+          return navigate({
+            search: { tab: "logs" },
+            replace: true,
+            state: { activityLogDetail: false },
+          });
+      },
+      (event?.detail ?? 0) > 0,
+    );
   };
 
   useEffect(() => {
@@ -134,13 +146,20 @@ export default function ActivityPage() {
                 size="icon-sm"
                 density="adaptive"
                 aria-label={t`返回`}
-                onClick={() => {
+                onClick={(event) => {
                   if (requested) {
-                    closeDetail();
+                    closeDetail(event);
                     return;
                   }
-                  if (canGoBack) router.history.back();
-                  else void router.navigate({ to: "/" });
+                  runMobileBackTransition(
+                    router,
+                    previousAppLocation(router.history)?.href ?? "/",
+                    () => {
+                      if (canGoBack) router.history.back();
+                      else return router.navigate({ to: "/" });
+                    },
+                    event.detail > 0,
+                  );
                 }}
               >
                 <ArrowLeft />

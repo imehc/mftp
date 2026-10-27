@@ -2,6 +2,17 @@ import { Channel } from "@tauri-apps/api/core";
 
 import type { TranslationOutput } from "~/bindings";
 
+/** Android 原生宿主发送标准返回按键；preventDefault 表示本次已消费。 */
+export function listenMobileBack(onBack: () => boolean) {
+  const listener = (event: KeyboardEvent) => {
+    if (event.key === "BrowserBack" && !event.defaultPrevented && onBack())
+      event.preventDefault();
+  };
+
+  document.addEventListener("keydown", listener);
+  return () => document.removeEventListener("keydown", listener);
+}
+
 /**
  * 与 Rust 后端共享的事件名。
  *

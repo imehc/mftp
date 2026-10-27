@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Gauge, RefreshCw, Trash2 } from "lucide-react";
 
 import AppLogo from "~/components/AppLogo";
@@ -7,6 +6,7 @@ import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import { useBtRunningTaskCount } from "~/features/bt/integration";
+import { BackLink } from "~/features/navigation/BackLink";
 import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import {
   SettingsEntry,
@@ -46,9 +46,9 @@ export default function AboutPage() {
         title={<Trans>关于</Trans>}
         leading={
           <Button variant="ghost" size="icon-sm" density="adaptive" asChild>
-            <Link to="/settings" aria-label={t`返回设置`}>
+            <BackLink to="/settings" aria-label={t`返回设置`}>
               <ArrowLeft />
-            </Link>
+            </BackLink>
           </Button>
         }
         trailing={

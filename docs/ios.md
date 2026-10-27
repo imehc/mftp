@@ -69,6 +69,9 @@ pnpm tauri ios dev --open
 
 ## 平台差异
 
+- **页面返回**使用 WebKit 原生交互式边缘手势，支持跟手和中途取消。一级目的地、浮层打开、业务禁止离开或没有有效应用内历史时不启用页面手势，使用现有关闭／返回按钮；Tab 切换不累积返回历史。实现位于 `features/navigation` 与 `plugins/native-navigation`，后者也提供原生键盘可见状态。
+- 原生导航快照在根页也保持记录，禁用返回只切换 WebKit 安装的识别器，不关闭快照能力。显式返回按钮在支持带类型 View Transition 的 WebView 使用页面过渡；减少动态效果、键盘触发或旧 WebView 保留即时返回。页面内的全屏详情返回共享该过渡，普通弹窗与业务关闭操作保留各自行为。
+
 - **更新器(updater)与开机自启(autostart)** 仅桌面可用,处理方式与 Android 相同
   (`Cargo.toml` 平台条件依赖 + `#[cfg(desktop)]` + `capabilities/desktop.json` + 前端 `isDesktopPlatform()`),iOS 更新走 App Store/TestFlight。
 - **局域网传输在移动端整体隐藏**:入口通过 `src/features/home/entries.tsx` 的 `platforms`

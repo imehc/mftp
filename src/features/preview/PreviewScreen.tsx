@@ -11,7 +11,7 @@ import PreviewSurface from "./PreviewSurface";
 export interface PreviewScreenProps {
   /** 文件名，显示在标题栏，并用作图片的 alt 文本。 */
   name: string;
-  onBack: () => void;
+  onBack: (event?: { detail: number }) => void;
   kind: PreviewKind;
   /** 调用方仍在解析 URL 时为 null。 */
   url: string | null;

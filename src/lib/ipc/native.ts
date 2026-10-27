@@ -1,5 +1,12 @@
-import { commands, type ModelExportAction } from "~/bindings";
+import {
+  commands,
+  type MobileNavigationConfig,
+  type ModelExportAction,
+} from "~/bindings";
 import { unwrapCommand, voidCommand } from "~/lib/ipc-result";
+
+export const mobileNavigationConfigure = (input: MobileNavigationConfig) =>
+  voidCommand(commands.mobileNavigationConfigure(input));
 
 export const modelExportBegin = (name: string, size: number) =>
   unwrapCommand(commands.modelExportBegin(name, size));

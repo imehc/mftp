@@ -19,6 +19,8 @@ import {
 import { Button } from "~/components/ui/button";
 import { DialogFooter } from "~/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { BackLink } from "~/features/navigation/BackLink";
+import { useNativeBackGuard } from "~/features/navigation/native-back-guard";
 import { describeError } from "~/lib/errors";
 
 import ExportPanel from "./ExportPanel";
@@ -29,6 +31,7 @@ export default function BackupPage() {
   const { t } = useLingui(),
     navigate = useNavigate();
   const c = useBackup();
+  useNativeBackGuard(c.busy);
   useBlocker({
     shouldBlockFn: () => {
       if (c.busy) toast.info(t`正在处理备份，请稍候`);
@@ -50,10 +53,17 @@ export default function BackupPage() {
             size="icon-sm"
             density="adaptive"
             disabled={c.busy}
-            aria-label={t`返回设置`}
-            onClick={() => void navigate({ to: "/settings", search: {} })}
+            asChild
           >
-            <ArrowLeft />
+            <BackLink
+              to="/settings"
+              search={{}}
+              aria-label={t`返回设置`}
+              aria-disabled={c.busy}
+              tabIndex={c.busy ? -1 : undefined}
+            >
+              <ArrowLeft />
+            </BackLink>
           </Button>
         }
       />

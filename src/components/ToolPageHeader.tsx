@@ -1,11 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { cn } from "cn";
 import { ArrowLeft, Home } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "~/components/ui/button";
 import ActivityEntry from "~/features/activity/ActivityEntry";
+import { BackLink } from "~/features/navigation/BackLink";
 import { TOUCH_TARGET_CHILDREN_CLASS } from "~/lib/touch";
 
 interface ToolPageHeaderProps {
@@ -51,7 +51,7 @@ export function ToolPageHeader({
             className="shrink-0"
             asChild
           >
-            <Link to="/" aria-label={t`返回首页`} title={t`返回首页`}>
+            <BackLink to="/" aria-label={t`返回首页`} title={t`返回首页`}>
               {variant === "compact" ? (
                 <Home data-icon="inline-start" />
               ) : (
@@ -65,7 +65,7 @@ export function ToolPageHeader({
               >
                 <Trans>首页</Trans>
               </span>
-            </Link>
+            </BackLink>
           </Button>
         ) : null}
         {showHome && variant === "compact" ? (

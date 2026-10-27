@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft, FlagIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
@@ -15,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { BackLink } from "~/features/navigation/BackLink";
 
 import { GameActionsMenu } from "../engine/GameActionsMenu";
 import { GameVolumeControl } from "../engine/GameVolumeControl";
@@ -55,9 +55,9 @@ export function BilliardsHeader({
     </Button>
   ) : (
     <Button variant="ghost" size="icon-sm" asChild>
-      <Link to="/" search={{ category: "games" }} aria-label={t`返回首页`}>
+      <BackLink to="/" search={{ category: "games" }} aria-label={t`返回首页`}>
         <ArrowLeft />
-      </Link>
+      </BackLink>
     </Button>
   );
   const actions = active ? (

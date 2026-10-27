@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Group,
@@ -37,6 +36,7 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Sheet, SheetContent, SheetTitle } from "~/components/ui/sheet";
+import { BackLink } from "~/features/navigation/BackLink";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 
 const SIDEBAR_COLLAPSED_REM = 3.25;
@@ -199,9 +199,9 @@ export default function SshSftpTool() {
         showHome={false}
         leading={
           <Button variant="ghost" size="icon-sm" asChild>
-            <Link to="/" aria-label={t`返回首页`}>
+            <BackLink to="/" aria-label={t`返回首页`}>
               <ArrowLeft />
-            </Link>
+            </BackLink>
           </Button>
         }
         trailing={

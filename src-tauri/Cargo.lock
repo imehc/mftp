@@ -3502,6 +3502,7 @@ dependencies = [
  "tauri-plugin-fs",
  "tauri-plugin-keystore",
  "tauri-plugin-native-export",
+ "tauri-plugin-native-navigation",
  "tauri-plugin-native-speech",
  "tauri-plugin-native-viewer",
  "tauri-plugin-opener",
@@ -6292,6 +6293,15 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+ "tauri",
+ "tauri-plugin",
+]
+
+[[package]]
+name = "tauri-plugin-native-navigation"
+version = "0.1.0"
+dependencies = [
+ "serde",
  "tauri",
  "tauri-plugin",
 ]

@@ -97,6 +97,7 @@ anyhow = "1"
 mime_guess = "2"
 
 [target.'cfg(target_os = "ios")'.dependencies]
+tauri-plugin-native-navigation = { path = "plugins/native-navigation" }
 keyring = { version = "3", default-features = false, features = ["apple-native"] }
 objc2-avf-audio = { version = "0.3", default-features = false, features = ["AVAudioSessionTypes"] }
 objc2-ui-kit = { version = "0.3", default-features = false, features = ["std", "UIApplication"] }

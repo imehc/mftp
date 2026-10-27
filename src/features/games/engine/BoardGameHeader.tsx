@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
@@ -15,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { BackLink } from "~/features/navigation/BackLink";
 
 import { GameActionsMenu } from "./GameActionsMenu";
 import { GameVolumeControl } from "./GameVolumeControl";
@@ -55,13 +55,13 @@ export function BoardGameHeader({
             </Button>
           ) : (
             <Button variant="ghost" size="icon-sm" asChild>
-              <Link
+              <BackLink
                 to="/"
                 search={{ category: "games" }}
                 aria-label={t`返回首页`}
               >
                 <ArrowLeft />
-              </Link>
+              </BackLink>
             </Button>
           )
         }

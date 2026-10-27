@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { runLocalBackTransition } from "~/features/navigation/local-back-transition";
 import { isMobilePlatform } from "~/lib/platform";
 import type { BtTaskInfo } from "~/types";
 
@@ -36,7 +37,9 @@ export default function TaskFilesPage({
             variant="ghost"
             size="icon-sm"
             aria-label={t`返回列表`}
-            onClick={onClose}
+            onClick={(event) =>
+              runLocalBackTransition(onClose, event.detail > 0)
+            }
           >
             <ArrowLeft />
           </Button>

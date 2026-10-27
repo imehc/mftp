@@ -10,6 +10,7 @@
 @import "@fontsource/ibm-plex-mono";
 @import "@fontsource/space-mono";
 @import "./themes/presets.css";
+@import "./features/navigation/mobile-back-transition.css";
 
 /* 中文正文字体：覆盖集与思源一致（7946 字），生僻字回退系统楷体，
    避免把三万字的全量文楷打进安装包。 */

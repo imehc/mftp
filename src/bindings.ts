@@ -297,6 +297,7 @@ export const commands = {
 	modelExportPresent: (id: string, action: ModelExportAction) => typedError<ModelExportOutcome, AppError>(__TAURI_INVOKE("model_export_present", { id, action })),
 	modelExportCancel: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_export_cancel", { id })),
 	modelExportClose: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("model_export_close", { id })),
+	mobileNavigationConfigure: (input: MobileNavigationConfig) => typedError<null, AppError>(__TAURI_INVOKE("mobile_navigation_configure", { input })),
 };
 
 /* Types */
@@ -1114,6 +1115,11 @@ export type McpToolInfo = {
 	name: string,
 	description: string,
 	permission: McpPermission,
+};
+
+export type MobileNavigationConfig = {
+	enabled: boolean,
+	href: string,
 };
 
 export type ModelAttachment = {

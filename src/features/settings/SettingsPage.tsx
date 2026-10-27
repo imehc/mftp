@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import AppPageContent from "~/components/AppPageContent";
@@ -9,6 +9,7 @@ import AiConfigurationSettings from "~/features/ai-configuration/AiConfiguration
 import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
 import BackupPage from "~/features/export/BackupPage";
 import { McpSettingsPanel } from "~/features/mcp/integration";
+import { BackLink } from "~/features/navigation/BackLink";
 import { poetryReadingLink } from "~/features/poetry/reading-navigation";
 import type { PoetryReadingView } from "~/features/poetry/reading-view";
 
@@ -44,13 +45,10 @@ export default function SettingsPage({
         }
         leading={
           ai || features || mcp ? (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t`返回设置`}
-              onClick={() => void navigate({ to: "/settings", search: {} })}
-            >
-              <ArrowLeft />
+            <Button variant="ghost" size="icon-sm" asChild>
+              <BackLink to="/settings" search={{}} aria-label={t`返回设置`}>
+                <ArrowLeft />
+              </BackLink>
             </Button>
           ) : undefined
         }
@@ -59,14 +57,14 @@ export default function SettingsPage({
             {ai ? <AiWorkspaceMenu /> : null}
             {returnContext?.returnUid ? (
               <Button variant="outline" density="adaptive" asChild>
-                <Link
+                <BackLink
                   {...poetryReadingLink({
                     page: returnContext.returnPage ?? "detail",
                     uid: returnContext.returnUid,
                     q: returnContext.returnQ,
                     view: returnContext.returnView,
                   })}
-                >{t`返回诗词`}</Link>
+                >{t`返回诗词`}</BackLink>
               </Button>
             ) : null}
           </div>

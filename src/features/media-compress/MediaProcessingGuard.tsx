@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { useNativeBackGuard } from "~/features/navigation/native-back-guard";
 
 const ProcessingContext = createContext<Dispatch<
   SetStateAction<Set<string>>
@@ -43,6 +44,7 @@ export function useMediaProcessing(id: string, processing: boolean) {
 
 export function MediaProcessingGuard({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<Set<string>>(() => new Set());
+  useNativeBackGuard(active.size > 0);
   // 已访问模式保持挂载；只有离开媒体工作区才会终止本页持有的处理任务。
   const blocker = useBlocker({
     shouldBlockFn: ({ next }) =>

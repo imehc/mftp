@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import AppPageContent from "~/components/AppPageContent";
@@ -15,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { BackLink } from "~/features/navigation/BackLink";
 import PoetryLocalManagement from "~/features/poetry/components/PoetryLocalManagement";
 
 import {
@@ -53,13 +53,13 @@ export default function LibraryManagePage({
         title={<Trans>诗词数据管理</Trans>}
         leading={
           <Button variant="ghost" density="adaptive" size="icon-sm" asChild>
-            <Link
+            <BackLink
               aria-label={t`返回古诗词`}
               title={t`返回古诗词`}
               {...poetryManageReturnLink(search)}
             >
               <ArrowLeft data-icon="inline-start" />
-            </Link>
+            </BackLink>
           </Button>
         }
         trailing={
