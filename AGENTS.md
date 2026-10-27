@@ -70,7 +70,7 @@ src-tauri/src/
 - 完成改动后不自动提交，须向用户呈现改动摘要并等待用户手动确认后再提交；用户未确认前不执行 commit。只提交不推送，推送需用户明确要求。
 - 只提交已完成的改动；仍是半成品时只暂存（`git add`）不提交，待完整后再提交。
 - 按主题拆分：一个提交只做一件事，多个主题拆成多个提交，不混入无关改动。
-- 提交标题必须采用 `type: emoji 中文简述` 或 `type(scope): emoji 中文简述`，支持 `!` 破坏性变更标记；类型为 `feat`、`fix`、`perf`、`refactor`、`docs`、`test`、`build`、`ci`、`style`、`chore`、`revert`。`commit-msg` 使用 commitlint 校验，缺少或不符合前缀规范时禁止提交。
+- 提交标题必须采用 `type: emoji 中文简述`，不使用 scope，支持 `!` 破坏性变更标记；类型为 `feat`、`fix`、`perf`、`refactor`、`docs`、`test`、`build`、`ci`、`style`、`chore`、`revert`。`commit-msg` 使用 commitlint 校验，缺少或不符合前缀规范时禁止提交。
 - 每次提交必须使用 `commitlint.config.mjs` 中与 type 对应的 emoji，放在冒号后的描述开头（如 `feat: ✨ 新增功能`、`refactor: ♻️ 调整模块结构`），不替代类型前缀；可通过 `pnpm commit` 使用 cz-git 自动选择。
 - 除非用户明确要求，提交信息不写测试通过、构建通过等验证结果。
 - 提交和暂存只涉及本次改动涉及的文件，不覆盖或回退他人未提交的改动。
