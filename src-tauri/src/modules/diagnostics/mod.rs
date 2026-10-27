@@ -103,7 +103,7 @@ pub async fn logs_open_directory(
 #[tauri::command]
 #[specta::specta]
 pub fn logs_open_directory(_state: State<'_, AppServices>) -> AppResult<()> {
-    Err(AppError::external(
+    Err(crate::error::AppError::external(
         "logs:open-directory",
         "Opening a private log directory is unavailable on iOS",
     ))
