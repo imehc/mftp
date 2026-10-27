@@ -200,7 +200,7 @@ fn read_message_into(
         reader.consume(count);
         if end.is_some() {
             // Consume exactly one frame; pipelined bytes belong to the next phase.
-            return serde_json::from_slice(&frame).map_err(AppError::from);
+            return serde_json::from_slice(frame).map_err(AppError::from);
         }
         if frame.len() == limit {
             return Err(frame_too_large(limit));

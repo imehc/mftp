@@ -28,18 +28,21 @@ const state = vi.hoisted(() => ({
   error: null as AppError | null,
   detailHistory: false,
   canGoBack: true,
+  buildLocation: vi.fn(() => ({ href: "/activity?tab=logs" })),
   navigate: vi.fn(),
   back: vi.fn(),
   toast: vi.fn(),
 }));
 
-vi.mock("@tanstack/react-router", () => ({
+vi.mock("@tanstack/react-router", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-router")>()),
   useSearch: () => state.search,
   useNavigate: () => state.navigate,
   useCanGoBack: () => state.canGoBack,
   useRouter: () => ({
     state: { location: { state: { activityLogDetail: state.detailHistory } } },
     history: { back: state.back },
+    buildLocation: state.buildLocation,
     navigate: state.navigate,
   }),
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
@@ -173,6 +176,10 @@ describe("独立日志详情布局与返回", () => {
       container.querySelector<HTMLButtonElement>("header button")?.click(),
     );
     expect(state.back).not.toHaveBeenCalled();
+    expect(state.buildLocation).toHaveBeenCalledWith({
+      to: "/activity",
+      search: { tab: "logs" },
+    });
     expect(state.navigate).toHaveBeenCalledWith({
       search: { tab: "logs" },
       replace: true,
