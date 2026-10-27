@@ -5,18 +5,10 @@ import { useState } from "react";
 
 import AppPageContent from "~/components/AppPageContent";
 import { Button } from "~/components/ui/button";
-import { Field, FieldLabel } from "~/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 
 import type { Difficulty } from "../engine/ai";
 import { GameSelect } from "../engine/BoardModeMenu";
+import { GameSetupSelect } from "../engine/GameSetupSelect";
 import { useGameHistory, useGamesHistoryStore } from "../engine/history";
 import {
   BILLIARDS_GAME_ID,
@@ -84,48 +76,34 @@ export function BilliardsModeMenu({
   const clearGame = useGamesHistoryStore((s) => s.clearGame);
   return (
     <AppPageContent bottomInset="scroll">
-      <Field orientation="horizontal">
-        <FieldLabel htmlFor="billiards-discipline">
-          <Trans comment="台球开局菜单，选择中式八球、九球或斯诺克规则">
-            玩法
-          </Trans>
-        </FieldLabel>
-        <Select
-          value={discipline}
-          onValueChange={(value) =>
-            onDisciplineChange(value as BilliardsDiscipline)
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <GameSetupSelect
+          label={
+            <Trans comment="台球开局菜单，选择中式八球、九球或斯诺克规则">
+              玩法
+            </Trans>
           }
-        >
-          <SelectTrigger id="billiards-discipline" wrapValue>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="eight-ball">
-                <Trans>中式八球</Trans>
-              </SelectItem>
-              <SelectItem value="snooker">
-                <Trans>斯诺克</Trans>
-              </SelectItem>
-              <SelectItem value="nine-ball">
-                <Trans>美式九球</Trans>
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </Field>
-      {discipline === "snooker" ? (
-        <GameSelect
-          label={<Trans>红球数</Trans>}
-          value={String(reds)}
-          onChange={(value) => setReds(Number(value) as RedCount)}
+          value={discipline}
+          onChange={(value) => onDisciplineChange(value as BilliardsDiscipline)}
           options={[
-            { value: "6", label: t`六红球` },
-            { value: "10", label: t`十红球变体` },
-            { value: "15", label: t`十五红球` },
+            { value: "eight-ball", label: t`中式八球` },
+            { value: "snooker", label: t`斯诺克` },
+            { value: "nine-ball", label: t`美式九球` },
           ]}
         />
-      ) : null}
+        {discipline === "snooker" ? (
+          <GameSetupSelect
+            label={<Trans>红球数</Trans>}
+            value={String(reds)}
+            onChange={(value) => setReds(Number(value) as RedCount)}
+            options={[
+              { value: "6", label: t`六红球` },
+              { value: "10", label: t`十红球变体` },
+              { value: "15", label: t`十五红球` },
+            ]}
+          />
+        ) : null}
+      </div>
       <div className="grid gap-3 md:grid-cols-2">
         <section className="flex flex-col gap-3 rounded-xl border p-4">
           <h2 className="text-sm font-semibold">
@@ -183,7 +161,7 @@ export function BilliardsModeMenu({
               key={item.kind}
               type="button"
               onClick={() => onStart({ kind: item.kind, ...config })}
-              className="hover:bg-accent focus-visible:ring-ring flex min-h-[max(44px,4rem)] w-full items-center gap-3 border-b text-left last:border-0 focus-visible:ring-2"
+              className="hover:bg-accent focus-visible:ring-ring flex min-h-[max(44px,4rem)] w-full items-center gap-3 rounded-lg px-3 py-2 text-left focus-visible:ring-2"
             >
               <item.icon className="text-muted-foreground size-5 shrink-0" />
               <span className="min-w-0 flex-1">
@@ -192,7 +170,7 @@ export function BilliardsModeMenu({
                   {item.description}
                 </span>
               </span>
-              <ChevronRight className="text-muted-foreground size-4" />
+              <ChevronRight className="text-muted-foreground size-4 shrink-0" />
             </button>
           ))}
         </section>

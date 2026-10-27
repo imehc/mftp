@@ -44,7 +44,7 @@ export function GameActionsMenu({
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="ui-density-adaptive flex w-fit max-w-[calc(100vw-2rem)] flex-col gap-1 p-2"
+        className="ui-density-adaptive flex w-fit max-w-[calc(100vw-2rem)] flex-col gap-1 p-2 motion-safe:data-closed:animate-none"
         onCloseAutoFocus={(event) => {
           const action = pendingAction;
           setPendingAction(null);

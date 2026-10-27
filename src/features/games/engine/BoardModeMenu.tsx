@@ -63,6 +63,10 @@ export function BoardModeMenu<P extends { moves: number }>({
   onStart,
   historyMode,
   historyResult,
+  allowOnline = true,
+  allowHotseat = true,
+  setup,
+  seatLabels,
 }: {
   gameId: string;
   red?: boolean;
@@ -70,6 +74,10 @@ export function BoardModeMenu<P extends { moves: number }>({
   onStart: (mode: BoardMode) => void;
   historyMode: (payload: P) => ReactNode;
   historyResult: (payload: P) => ReactNode;
+  allowOnline?: boolean;
+  allowHotseat?: boolean;
+  setup?: ReactNode;
+  seatLabels?: [ReactNode, ReactNode];
 }) {
   const { t, i18n } = useLingui();
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
@@ -78,7 +86,10 @@ export function BoardModeMenu<P extends { moves: number }>({
   const clear = useGamesHistoryStore((s) => s.clearGame);
   return (
     <AppPageContent bottomInset="scroll">
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      {setup}
+      <div
+        className={`grid grid-cols-1 gap-3 ${allowOnline || allowHotseat ? "md:grid-cols-2" : ""}`}
+      >
         <section className="flex min-w-0 flex-col gap-3 rounded-xl border p-4">
           <h2 className="text-sm font-semibold">
             <Trans>电脑对战</Trans>
@@ -98,8 +109,16 @@ export function BoardModeMenu<P extends { moves: number }>({
             value={String(localSeat)}
             onChange={(value) => setLocalSeat(Number(value) as SeatIndex)}
             options={[
-              { value: "0", label: red ? t`先手（执红）` : t`先手（执黑）` },
-              { value: "1", label: red ? t`后手（执黑）` : t`后手（执白）` },
+              {
+                value: "0",
+                label:
+                  seatLabels?.[0] ?? (red ? t`先手（执红）` : t`先手（执黑）`),
+              },
+              {
+                value: "1",
+                label:
+                  seatLabels?.[1] ?? (red ? t`后手（执黑）` : t`后手（执白）`),
+              },
             ]}
           />
           {options}
@@ -112,41 +131,49 @@ export function BoardModeMenu<P extends { moves: number }>({
             <Trans>开始对局</Trans>
           </Button>
         </section>
-        <section className="min-w-0 rounded-xl border p-4">
-          <h2 className="mb-2 text-sm font-semibold">
-            <Trans>其他方式</Trans>
-          </h2>
-          {[
-            {
-              kind: "hotseat" as const,
-              icon: Users,
-              title: t`双人对战`,
-              description: t`同屏轮流`,
-            },
-            {
-              kind: "online" as const,
-              icon: Wifi,
-              title: t`局域网联机`,
-              description: t`创建或加入房间`,
-            },
-          ].map((item) => (
-            <button
-              key={item.kind}
-              type="button"
-              onClick={() => onStart({ kind: item.kind })}
-              className="hover:bg-accent focus-visible:ring-ring flex min-h-[max(44px,4rem)] w-full items-center gap-3 border-b text-left last:border-0 focus-visible:ring-2"
-            >
-              <item.icon className="text-muted-foreground size-5 shrink-0" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium">{item.title}</span>
-                <span className="text-muted-foreground block text-xs">
-                  {item.description}
-                </span>
-              </span>
-              <ChevronRight className="text-muted-foreground size-4 shrink-0" />
-            </button>
-          ))}
-        </section>
+        {allowOnline || allowHotseat ? (
+          <section className="min-w-0 rounded-xl border p-4">
+            <h2 className="mb-2 text-sm font-semibold">
+              <Trans>其他方式</Trans>
+            </h2>
+            {[
+              {
+                kind: "hotseat" as const,
+                icon: Users,
+                title: t`双人对战`,
+                description: t`同屏轮流`,
+              },
+              {
+                kind: "online" as const,
+                icon: Wifi,
+                title: t`局域网联机`,
+                description: t`创建或加入房间`,
+              },
+            ]
+              .filter((item) =>
+                item.kind === "online" ? allowOnline : allowHotseat,
+              )
+              .map((item) => (
+                <button
+                  key={item.kind}
+                  type="button"
+                  onClick={() => onStart({ kind: item.kind })}
+                  className="hover:bg-accent focus-visible:ring-ring flex min-h-[max(44px,4rem)] w-full items-center gap-3 rounded-lg px-3 py-2 text-left focus-visible:ring-2"
+                >
+                  <item.icon className="text-muted-foreground size-5 shrink-0" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium">
+                      {item.title}
+                    </span>
+                    <span className="text-muted-foreground block text-xs">
+                      {item.description}
+                    </span>
+                  </span>
+                  <ChevronRight className="text-muted-foreground size-4 shrink-0" />
+                </button>
+              ))}
+          </section>
+        ) : null}
       </div>
       <section className="rounded-xl border p-3">
         <div className="flex items-center justify-between gap-3">
