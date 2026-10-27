@@ -3,11 +3,13 @@ import { cn } from "cn";
 import { Download, LoaderCircle, Trash2 } from "lucide-react";
 import { type ReactNode } from "react";
 
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import { TOUCH_TARGET_CLASS } from "~/lib/touch";
+import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { PoetryCollectionStatus } from "~/types";
 
 import type { usePoetryCollectionsManage } from "../hooks/use-poetry-collections-manage";
@@ -154,7 +156,7 @@ export function CollectionGroups({ controller }: { controller: Controller }) {
   );
 }
 
-/** 标题栏下载入口：窄屏保留图标与数量，宽屏显示文字与数量。 */
+/** 标题栏下载入口：窄屏使用图标与数量角标，宽屏显示文字与数量。 */
 export function CollectionDownloadButton({
   count,
   disabled,
@@ -165,22 +167,33 @@ export function CollectionDownloadButton({
   onDownload: () => void;
 }) {
   const { t } = useLingui();
+  const desktop = useDesktopLayout();
   return (
     <Button
-      variant="outline"
-      size="sm"
+      variant={desktop ? "outline" : "ghost"}
+      size={desktop ? "sm" : "icon-sm"}
+      density="adaptive"
       disabled={disabled}
       aria-label={t`下载所选`}
       title={t`下载所选`}
       onClick={onDownload}
     >
       <Download data-icon="inline-start" aria-hidden />
-      <span className="hidden md:inline">
-        <Trans>下载所选</Trans>
-      </span>
-      <span className="tabular-nums" aria-hidden>
-        {count}
-      </span>
+      {desktop ? (
+        <>
+          <Trans>下载所选</Trans>
+          <span className="tabular-nums" aria-hidden>
+            {count}
+          </span>
+        </>
+      ) : count > 0 ? (
+        <Badge
+          className="pointer-events-none absolute -end-0.5 -top-0.5 min-w-5 px-1 tabular-nums"
+          aria-hidden
+        >
+          {count}
+        </Badge>
+      ) : null}
     </Button>
   );
 }

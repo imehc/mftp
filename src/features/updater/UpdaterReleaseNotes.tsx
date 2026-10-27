@@ -56,6 +56,8 @@ export default function UpdaterReleaseNotes({
       ) : null}
       <Button
         variant="link"
+        // 发布地址允许跨行，链接不绘制独立按钮表面。
+        density="default"
         size="sm"
         className="h-auto self-start p-0 text-left whitespace-normal"
         onClick={() =>

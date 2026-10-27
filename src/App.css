@@ -49,6 +49,63 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* 窄屏与粗指针使用同一入口，避免按钮外观与热区分别判断平台。 */
+@custom-variant ui-touch {
+  @media (width < theme(--breakpoint-md)), (pointer: coarse) {
+    @slot;
+  }
+}
+
+/* 按钮本体承接点击和焦点，伪元素只绘制紧凑表面，不覆盖内容。 */
+@utility ui-button-surface {
+  --control-surface-height: var(--button-visible-height, 2rem);
+  --button-surface: var(--primary);
+  --button-surface-border: transparent;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    height: var(--control-surface-height);
+    transform: translateY(-50%);
+    border-radius: inherit;
+    border: 1px solid var(--button-surface-border);
+    background: var(--button-surface);
+    pointer-events: none;
+  }
+
+  &[data-density="auto"][data-size^="icon"]::before {
+    inset-inline: auto;
+    left: 50%;
+    width: var(--control-surface-height);
+    transform: translate(-50%, -50%);
+  }
+
+  &[data-variant="outline"] {
+    --button-surface: var(--background);
+    --button-surface-border: var(--border);
+  }
+  &[data-variant="ghost"],
+  &[data-variant="link"] {
+    --button-surface: transparent;
+  }
+  &[data-variant="secondary"] {
+    --button-surface: var(--secondary);
+  }
+  &[data-variant="destructive"] {
+    --button-surface: color-mix(in oklch, var(--destructive) 10%, transparent);
+  }
+  &:is(:hover, [aria-expanded="true"]):not(:disabled) {
+    --button-surface: var(--muted);
+  }
+  &[data-variant="default"]:hover:not(:disabled) {
+    --button-surface: color-mix(in oklch, var(--primary) 80%, transparent);
+  }
+}
+
 @utility app-page-width {
   max-width: 72rem;
 }
@@ -428,56 +485,6 @@
     }
   }
 
-  /* 工具栏按钮与 Tabs 共用可见高度，按钮自身仍承接完整触控区。 */
-  [data-ui-control="button"][data-density="adaptive"] {
-    --control-surface-height: 2rem;
-    --button-surface: var(--primary);
-    --button-surface-border: transparent;
-    position: relative;
-    isolation: isolate;
-    height: var(--control-surface-height);
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-  [data-ui-control="button"][data-density="adaptive"]::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset-inline: 0;
-    top: 50%;
-    height: var(--control-surface-height);
-    transform: translateY(-50%);
-    border-radius: inherit;
-    border: 1px solid var(--button-surface-border);
-    background: var(--button-surface);
-    pointer-events: none;
-  }
-  [data-ui-control="button"][data-density="adaptive"][data-variant="outline"] {
-    --button-surface: var(--background);
-    --button-surface-border: var(--border);
-  }
-  [data-ui-control="button"][data-density="adaptive"][data-variant="ghost"],
-  [data-ui-control="button"][data-density="adaptive"][data-variant="link"] {
-    --button-surface: transparent;
-  }
-  [data-ui-control="button"][data-density="adaptive"][data-variant="secondary"] {
-    --button-surface: var(--secondary);
-  }
-  [data-ui-control="button"][data-density="adaptive"][data-variant="destructive"] {
-    --button-surface: color-mix(in oklch, var(--destructive) 10%, transparent);
-  }
-  [data-ui-control="button"][data-density="adaptive"]:is(
-      :hover,
-      [aria-expanded="true"]
-    ):not(:disabled) {
-    --button-surface: var(--muted);
-  }
-  [data-ui-control="button"][data-density="adaptive"][data-variant="default"]:hover:not(
-      :disabled
-    ) {
-    --button-surface: color-mix(in oklch, var(--primary) 80%, transparent);
-  }
   @media (width < theme(--breakpoint-md)), (pointer: coarse) {
     [data-ui-control="button"][data-density="adaptive"] {
       min-height: max(44px, 2.75rem);

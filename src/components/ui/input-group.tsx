@@ -94,7 +94,7 @@ function InputGroupButton({
   return (
     <Button
       type={type}
-      data-size={size}
+      size={size === "sm" ? "default" : size === "icon-sm" ? "icon" : size}
       variant={variant}
       className={cn(inputGroupButtonVariants({ size }), className)}
       {...props}

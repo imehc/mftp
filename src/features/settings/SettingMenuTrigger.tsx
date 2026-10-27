@@ -13,6 +13,8 @@ export default function SettingMenuTrigger({
       {...props}
       type="button"
       variant="outline"
+      // 设置值允许换行，表面高度由完整标签决定。
+      density="default"
       className="h-auto min-h-8 w-40 max-w-full justify-between py-1 pr-2 pl-2.5 text-left text-sm font-normal whitespace-normal"
     >
       <span className="min-w-0 wrap-break-word">{label}</span>

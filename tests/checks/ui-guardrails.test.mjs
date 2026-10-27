@@ -139,6 +139,27 @@ test("不使用 min-h-11 md:min-h-8 放大可见表面", () => {
   assert.deepEqual(violations, [], violations.join("\n"));
 });
 
+test("只有整项导航和内容决定高度的按钮允许退出自动密度", () => {
+  const exceptions = new Set([
+    "src/components/ui/calendar.tsx",
+    "src/features/navigation/NavigationLinks.tsx",
+    "src/features/activity/ActivityEntry.tsx",
+    "src/features/settings/SettingMenuTrigger.tsx",
+    "src/features/ai-configuration/AiModelMenu.mobile.tsx",
+    "src/features/updater/UpdaterReleaseNotes.tsx",
+  ]);
+  const violations = [];
+  for (const path of walk(srcDir)) {
+    if (path.endsWith(".test.tsx")) continue;
+    for (const tag of openingTags(readFileSync(path, "utf8"), "Button")) {
+      if (!/\bdensity=(?:"default"|\{[^}]*"default")/.test(tag)) continue;
+      const file = relative(project, path);
+      if (!exceptions.has(file)) violations.push(file);
+    }
+  }
+  assert.deepEqual(violations, [], violations.join("\n"));
+});
+
 test("弹窗与页面外壳默认启用自适应密度", () => {
   const files = [
     {

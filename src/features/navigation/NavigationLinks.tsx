@@ -19,6 +19,8 @@ export default function NavigationLinks({
       <Button
         key={item.id}
         asChild
+        // 导航项的图标和文字共同占据整行表面。
+        density="default"
         variant={item.id === active ? "secondary" : "ghost"}
         className={
           desktop

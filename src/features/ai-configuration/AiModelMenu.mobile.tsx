@@ -86,6 +86,8 @@ export default function AiModelMenuMobile() {
                   <Button
                     key={model.id}
                     variant="ghost"
+                    // 模型行可包含名称与标识两行内容，整行都是选择表面。
+                    density="default"
                     fullWidth
                     className="h-auto min-h-[max(44px,2.75rem)] justify-between py-2 text-left font-normal"
                     disabled={

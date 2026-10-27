@@ -207,6 +207,8 @@ function CalendarDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
+      // 日期表面跟随七列网格和选中范围，不使用普通按钮的独立底板。
+      density="default"
       data-day={day.date.toLocaleDateString(locale?.code)}
       data-selected-single={
         modifiers.selected &&

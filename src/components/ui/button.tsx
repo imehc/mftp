@@ -3,6 +3,8 @@ import { cn } from "cn";
 import { Slot } from "radix-ui";
 import * as React from "react";
 
+import { TOUCH_TARGET_CLASS } from "~/lib/touch";
+
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-(--ui-icon-size)",
   {
@@ -21,16 +23,16 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-(--ui-icon-size-xs)",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-(--ui-icon-size-sm)",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon: "size-8",
+          "h-8 gap-1.5 px-2.5 [--button-visible-height:2rem] has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs [--button-visible-height:1.5rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-(--ui-icon-size-xs)",
+        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] [--button-visible-height:1.75rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-(--ui-icon-size-sm)",
+        lg: "h-9 gap-1.5 px-2.5 [--button-visible-height:2.25rem] has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        icon: "size-8 [--button-visible-height:2rem]",
         "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-(--ui-icon-size-xs)",
+          "size-6 rounded-[min(var(--radius-md),10px)] [--button-visible-height:1.5rem] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-(--ui-icon-size-xs)",
         "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
+          "size-7 rounded-[min(var(--radius-md),12px)] [--button-visible-height:1.75rem] in-data-[slot=button-group]:rounded-lg",
+        "icon-lg": "size-9 [--button-visible-height:2.25rem]",
       },
     },
     defaultVariants: {
@@ -46,13 +48,14 @@ function Button({
   size = "default",
   asChild = false,
   fullWidth = false,
-  density = "default",
+  density = "auto",
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
     fullWidth?: boolean;
-    density?: "default" | "adaptive";
+    /** auto 只在触控布局分离表面与热区；adaptive 保留既有的全平台 2rem 表面。 */
+    density?: "auto" | "default" | "adaptive";
   }) {
   const Comp = asChild ? Slot.Root : "button";
 
@@ -65,8 +68,12 @@ function Button({
       data-density={density}
       className={cn(
         buttonVariants({ variant, size }),
+        density === "auto" && [
+          TOUCH_TARGET_CLASS,
+          "ui-touch:ui-button-surface ui-touch:border-transparent ui-touch:bg-transparent ui-touch:shadow-none ui-touch:hover:bg-transparent ui-touch:aria-expanded:bg-transparent ui-touch:dark:border-transparent ui-touch:dark:bg-transparent ui-touch:dark:hover:bg-transparent relative",
+        ],
         density === "adaptive" &&
-          "h-8 border-transparent bg-transparent shadow-none hover:bg-transparent aria-expanded:bg-transparent dark:border-transparent dark:bg-transparent dark:hover:bg-transparent",
+          "ui-button-surface relative h-8 border-transparent bg-transparent shadow-none [--button-visible-height:2rem] hover:bg-transparent aria-expanded:bg-transparent dark:border-transparent dark:bg-transparent dark:hover:bg-transparent",
         fullWidth && "w-full md:w-auto",
         className,
       )}

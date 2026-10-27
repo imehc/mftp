@@ -70,6 +70,8 @@ export default function ActivityEntry({
   return (
     <Button
       asChild
+      // 侧栏是图标加文字的导航项；标题栏沿用普通图标按钮密度。
+      density={variant === "rail" ? "default" : "auto"}
       variant={active ? "secondary" : "ghost"}
       size={variant === "header" ? "icon-sm" : "default"}
       className={

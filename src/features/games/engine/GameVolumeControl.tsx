@@ -25,7 +25,7 @@ export function GameVolumeControl({
         <Button
           variant="ghost"
           size={presentation === "menu" ? "default" : "icon-sm"}
-          density={presentation === "menu" ? "adaptive" : "default"}
+          density={presentation === "menu" ? "adaptive" : "auto"}
           className={
             presentation === "menu" ? "w-full justify-start" : undefined
           }
