@@ -3,6 +3,7 @@ import { beforeEach, expect, test, vi } from "vitest";
 
 import { goMoveParser } from "~/features/games/go/onlineProtocol";
 import { parseGomokuMove } from "~/features/games/gomoku/onlineProtocol";
+import { parseJunqiFrame } from "~/features/games/junqi/online-protocol";
 import { parseXiangqiMove } from "~/features/games/xiangqi/onlineProtocol";
 import {
   GAME_ROOM_CLOSED,
@@ -439,4 +440,58 @@ test("已关闭会话的诊断使用当前语言环境", async () => {
     name: "AbortError",
     message: "The game room connection has ended. Please rejoin.",
   });
+});
+
+test("权威帧按实例过滤并保留早到消息顺序，关闭后不能发送", async () => {
+  const session = await OnlineMatchSession.prepare(
+    parseJunqiFrame,
+    undefined,
+    "direct",
+  );
+  const hello = { v: 1, t: "hello", variant: "hidden" } as const;
+  emitRaw(GAME_ROOM_MESSAGE, {
+    instanceId: "old-instance",
+    payload: "invalid",
+  });
+  emit(GAME_ROOM_MESSAGE, JSON.stringify(hello));
+  session.bind(status);
+  const received: unknown[] = [];
+  const off = session.onMessage((frame) => received.push(frame));
+  expect(received).toEqual([hello]);
+  off();
+  session.onMessage((frame) => received.push(frame));
+  expect(received).toEqual([hello]);
+  await session.sendMessage(hello);
+  expect(sent.map((raw) => JSON.parse(raw))).toEqual([hello]);
+  session.close();
+  await expect(session.sendMessage(hello)).rejects.toMatchObject({
+    name: "AbortError",
+  });
+  expect(registrations.every((entry) => entry.cleaned === 1)).toBe(true);
+});
+
+test("权威帧格式错误或缓冲溢出会终止投递并清理监听", async () => {
+  for (const malformed of [true, false]) {
+    resetEvents();
+    const session = await OnlineMatchSession.prepare(
+      parseJunqiFrame,
+      undefined,
+      "direct",
+    );
+    session.bind(status);
+    if (malformed)
+      emit(
+        GAME_ROOM_MESSAGE,
+        JSON.stringify({ v: 1, t: "hello", variant: "unknown" }),
+      );
+    else
+      for (let n = 0; n < 129; n++)
+        emit(
+          GAME_ROOM_MESSAGE,
+          JSON.stringify({ v: 1, t: "hello", variant: "flip" }),
+        );
+    expect(session.isClosed).toBe(true);
+    expect(registrations.every((entry) => entry.cleaned === 1)).toBe(true);
+    expect(leaves).toBe(0);
+  }
 });

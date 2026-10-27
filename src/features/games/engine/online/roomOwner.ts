@@ -3,7 +3,11 @@ import { toIpcError } from "~/lib/errors";
 import { gameRoomLeave } from "~/lib/ipc";
 
 import type { MoveParser } from "./protocol";
-import { OnlineMatchSession, registrationAborted } from "./session";
+import {
+  OnlineMatchSession,
+  registrationAborted,
+  type RoomFraming,
+} from "./session";
 
 export interface OnlineRoomReady<M> {
   session: OnlineMatchSession<M>;
@@ -46,6 +50,8 @@ async function release(instanceId: string): Promise<void> {
 }
 
 export class RoomOwner<M> {
+  constructor(private readonly framing: RoomFraming = "lockstep") {}
+
   private active = false;
   private attempt: Attempt<M> | null = null;
   private listeners = new Set<() => void>();
@@ -128,6 +134,7 @@ export class RoomOwner<M> {
         const session = await OnlineMatchSession.prepare(
           parseMove,
           attempt.abort.signal,
+          this.framing,
         );
         attempt.session = session;
         if (!this.current(attempt)) return;

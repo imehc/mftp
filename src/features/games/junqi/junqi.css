@@ -1,0 +1,54 @@
+.junqi-board-viewport {
+  /* 以标题栏、业务提示和工具栏之后的实际内容盒适配，不猜测窗口高度。 */
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  padding-bottom: max(0.5rem, var(--safe-bottom, 0px));
+  background: var(--muted);
+}
+
+.junqi-board {
+  width: min(100cqw, calc(100cqh * var(--board-ratio)));
+  aspect-ratio: var(--board-ratio);
+  flex: 0 0 auto;
+  margin-inline: auto;
+}
+
+@media (width >= 48rem) {
+  .junqi-board {
+    /* 在实际操作区域内居中；空间不足时 auto margin 归零，保留滚动起点。 */
+    margin-block: auto;
+  }
+}
+
+@media (width < 48rem), (pointer: coarse) {
+  .junqi-board {
+    /* 只在触控密度下保留非重叠棋位下限，空间不足时由棋盘区滚动。 */
+    width: max(
+      min(100cqw, calc(100cqh * var(--board-ratio))),
+      calc(max(44px, 2.75rem) * var(--board-columns))
+    );
+  }
+}
+
+.junqi-cell {
+  position: absolute;
+  translate: -50% -50%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.junqi-cell[data-actionable="true"] {
+  cursor: pointer;
+}
+
+@media (forced-colors: active) {
+  .junqi-cell:focus-visible,
+  .junqi-cell[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+  }
+}

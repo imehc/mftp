@@ -8,6 +8,7 @@ import {
   Circle,
   CircleDot,
   Crown,
+  Flag,
   Grid3x3,
   KeyRound,
   Languages,
@@ -209,6 +210,13 @@ export const homeEntries: HomeEntry[] = [
     }),
     icon: Crown,
     title: <Trans>中国象棋</Trans>,
+  },
+  {
+    id: "junqi",
+    category: "games",
+    link: linkOptions({ to: "/games/junqi", preload: "intent" }),
+    icon: Flag,
+    title: <Trans>陆战棋</Trans>,
   },
 ];
 export const currentHomePlatform: HomePlatform = isAndroidPlatform()

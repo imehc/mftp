@@ -1,4 +1,5 @@
 import { Plural, Trans } from "@lingui/react/macro";
+import type { ReactNode } from "react";
 
 import {
   AlertDialog,
@@ -24,6 +25,7 @@ export type UndoFlow =
 
 interface OnlineMatchDialogsProps {
   undoFlow: UndoFlow;
+  undoInformation?: ReactNode;
   onRespondUndo: (accept: boolean) => void;
   rematchIncoming: boolean;
   onRespondRematch: (accept: boolean) => void;
@@ -33,6 +35,7 @@ interface OnlineMatchDialogsProps {
 
 export function OnlineMatchDialogs({
   undoFlow,
+  undoInformation,
   onRespondUndo,
   rematchIncoming,
   onRespondRematch,
@@ -56,6 +59,7 @@ export function OnlineMatchDialogs({
                 one="将撤销 # 手棋，是否同意？"
                 other="将撤销 # 手棋，是否同意？"
               />
+              {undoInformation ? <> {undoInformation}</> : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

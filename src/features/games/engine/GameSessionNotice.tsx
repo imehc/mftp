@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useState, useSyncExternalStore } from "react";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -25,6 +25,7 @@ export function GameSessionNotice<Mode, State, Move, Presentation>({
   store: GameSessionStore<Mode, State, Move, Presentation>;
   onRestore?: () => void;
 }) {
+  const { t } = useLingui();
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
   const [discardOpen, setDiscardOpen] = useState(false);
   if (state.status === "loading")
@@ -40,7 +41,7 @@ export function GameSessionNotice<Mode, State, Move, Presentation>({
       <Alert variant={state.error ? "destructive" : "default"}>
         <AlertDescription className="flex flex-col gap-2">
           {state.error ? (
-            <span>{describeError(state.error)}</span>
+            <span>{describeError(state.error, t)}</span>
           ) : (
             <Trans>发现上次的对局存档，是否继续？</Trans>
           )}

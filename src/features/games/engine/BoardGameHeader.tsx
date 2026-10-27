@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowLeft } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ComponentProps, type ReactNode, useState } from "react";
 
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import {
@@ -26,6 +26,8 @@ export function BoardGameHeader({
   canRestart,
   onRestart,
   onExit,
+  help,
+  extraActions,
 }: {
   title: ReactNode;
   active: boolean;
@@ -33,6 +35,8 @@ export function BoardGameHeader({
   canRestart: boolean;
   onRestart: () => void;
   onExit: () => void;
+  help?: ReactNode;
+  extraActions?: ComponentProps<typeof GameActionsMenu>["extraActions"];
 }) {
   const { t } = useLingui();
   const [confirm, setConfirm] = useState(false);
@@ -66,16 +70,20 @@ export function BoardGameHeader({
           )
         }
         trailing={
-          active ? (
-            <GameActionsMenu
-              matchFinished={finished}
-              canRestart={canRestart}
-              onRestart={onRestart}
-              onExit={onExit}
-            />
-          ) : (
-            <GameVolumeControl />
-          )
+          <>
+            {help}
+            {active ? (
+              <GameActionsMenu
+                matchFinished={finished}
+                canRestart={canRestart}
+                onRestart={onRestart}
+                onExit={onExit}
+                extraActions={extraActions}
+              />
+            ) : (
+              <GameVolumeControl />
+            )}
+          </>
         }
       />
       <AlertDialog open={confirm} onOpenChange={setConfirm}>

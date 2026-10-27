@@ -11,10 +11,14 @@ import {
   Text,
   TextStyle,
 } from "pixi.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { prefersReducedMotion } from "~/lib/motion";
 
+import {
+  FALLBACK_BOARD_ACCENT,
+  useBoardAccentColor,
+} from "../engine/use-board-accent";
 import { boardCoordinate } from "./rules";
 import {
   BOARD_SURFACE_HEIGHT,
@@ -37,7 +41,6 @@ const BOARD_HEIGHT = GRID_HEIGHT + CELL * 1.55;
 const FIT_WIDTH = BOARD_WIDTH + CELL * 1.25;
 const FIT_HEIGHT = BOARD_HEIGHT + CELL * 1.35;
 const PIECE_DIAMETER = CELL * 0.86;
-const FALLBACK_ACCENT = 0x1d7561;
 const PIECE_SYMBOL: Record<number, Record<XiangqiPiece["kind"], string>> = {
   0: {
     general: "帅",
@@ -98,25 +101,6 @@ function displayCoordinate(
     x: displayCol * CELL - GRID_WIDTH / 2,
     y: displayRow * CELL - GRID_HEIGHT / 2,
   };
-}
-
-function resolvePrimaryColor(): number {
-  if (typeof document === "undefined") return FALLBACK_ACCENT;
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue("--primary")
-    .trim();
-  const canvas = document.createElement("canvas");
-  canvas.width = 1;
-  canvas.height = 1;
-  const context = canvas.getContext("2d", {
-    willReadFrequently: true,
-  });
-  if (!context || !value) return FALLBACK_ACCENT;
-  context.fillStyle = "#1d7561";
-  context.fillStyle = value;
-  context.fillRect(0, 0, 1, 1);
-  const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
-  return (red << 16) | (green << 8) | blue;
 }
 
 function drawGrid(): Graphics {
@@ -263,7 +247,7 @@ function createScene(
     inCheck: false,
     interactive: false,
     flipped: false,
-    accentColor: FALLBACK_ACCENT,
+    accentColor: FALLBACK_BOARD_ACCENT,
   };
 
   function moveForTarget(index: number): XiangqiMove | undefined {
@@ -501,7 +485,7 @@ export function XiangqiStage(props: XiangqiStageProps) {
   const { i18n } = useLingui();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<Scene | null>(null);
-  const [accentColor, setAccentColor] = useState(resolvePrimaryColor);
+  const accentColor = useBoardAccentColor();
   const accentRef = useRef(accentColor);
   const propsRef = useRef(props);
   const i18nRef = useRef(i18n);
@@ -511,16 +495,6 @@ export function XiangqiStage(props: XiangqiStageProps) {
     propsRef.current = props;
     i18nRef.current = i18n;
   });
-  useEffect(() => {
-    const root = document.documentElement;
-    const syncColor = () => setAccentColor(resolvePrimaryColor());
-    const observer = new MutationObserver(syncColor);
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ["class", "data-theme", "style"],
-    });
-    return () => observer.disconnect();
-  }, []);
   useEffect(() => {
     const host = containerRef.current;
     if (!host) return;

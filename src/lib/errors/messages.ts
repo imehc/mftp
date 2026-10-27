@@ -366,6 +366,18 @@ export const frontendErrorMessages = {
   "model:decode": msg`模型解析失败，请检查模型与依赖文件是否完整`,
   "model:webgl": msg`无法初始化 3D 显示，请重试或检查设备的图形支持`,
   "frontend:shell_closed_before_open": msg`远端连接在终端打开前已关闭`,
+  "junqi:render": msg({
+    message: "棋盘加载失败，请重试。",
+    comment: "军棋二维棋盘初始化失败",
+  }),
+  "junqi:invalid_action": msg({
+    message: "当前操作无法完成，请恢复对局或重新开始。",
+    comment: "军棋规则或对局状态校验失败，原始诊断保留在错误协议中",
+  }),
+  "junqi:context_lost": msg({
+    message: "棋盘显示已中断，对局仍保留，请重试。",
+    comment: "军棋 WebGL 上下文丢失，可重建渲染器",
+  }),
   "billiards:context_lost": msg({
     message: "球桌显示已中断，请重开对局。",
     comment: "台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复",

@@ -39,6 +39,8 @@ export type { MatchControlMessage } from "./protocol";
 // 仅缓冲监听已接入、但对局消费者尚未挂载的短暂窗口。
 const MAX_PENDING_FRAMES = 128;
 
+export type RoomFraming = "lockstep" | "direct";
+
 type SessionEvent =
   | { kind: "message"; event: GameRoomMessageEvent }
   | { kind: "peer"; event: GameRoomPeerEvent }
@@ -95,19 +97,25 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
   private unlisteners: UnlistenFn[] = [];
   private readonly stopped = new AbortController();
   private pending: AppFrame<M>[] = [];
+  private directPending: M[] = [];
+  private readonly messageHandlers = new Set<(message: M) => void>();
   private flushing = false;
   private connected = false;
   private closedReason: GameRoomClosedReason | null = null;
 
-  private constructor(private readonly parseMove: MoveParser<M>) {}
+  private constructor(
+    private readonly parseMove: MoveParser<M>,
+    private readonly framing: RoomFraming,
+  ) {}
 
   /** 先接入监听，再启动后端请求；返回状态后按本机运行代次绑定。 */
   static async prepare<M>(
     parseMove: MoveParser<M>,
     signal?: AbortSignal,
+    framing: RoomFraming = "lockstep",
   ): Promise<OnlineMatchSession<M>> {
     if (signal?.aborted) throw registrationAborted();
-    const session = new OnlineMatchSession(parseMove);
+    const session = new OnlineMatchSession(parseMove, framing);
     const stop = () => session.close();
     signal?.addEventListener("abort", stop, { once: true });
 
@@ -204,6 +212,22 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
   }
 
   private dispatch(raw: string): void {
+    // 权威裁判游戏直接定义帧，不伪装成双方全状态锁步的 move 消息。
+    if (this.framing === "direct") {
+      let message: M | null = null;
+      try {
+        message = this.parseMove(JSON.parse(raw));
+      } catch {
+        /* 非法数据按断连处理。 */
+      }
+      if (message === null || this.directPending.length >= MAX_PENDING_FRAMES) {
+        this.terminate("connection-lost");
+        return;
+      }
+      this.directPending.push(message);
+      this.flushDirect();
+      return;
+    }
     const frame = parseFrame(raw, this.parseMove);
     if (frame === null) return;
     if (this.pending.length >= MAX_PENDING_FRAMES) {
@@ -234,6 +258,37 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
     } finally {
       this.flushing = false;
     }
+  }
+
+  private flushDirect(): void {
+    if (this.flushing) return;
+    this.flushing = true;
+    try {
+      while (
+        !this.isClosed &&
+        this.directPending.length &&
+        this.messageHandlers.size
+      ) {
+        const message = this.directPending.shift()!;
+        for (const handler of [...this.messageHandlers]) handler(message);
+      }
+    } finally {
+      this.flushing = false;
+    }
+  }
+
+  async sendMessage(message: M): Promise<void> {
+    if (this.isClosed || this.framing !== "direct") throw registrationAborted();
+    await gameRoomSend(this.status.instanceId!, JSON.stringify(message));
+  }
+
+  onMessage(handler: (message: M) => void): () => void {
+    if (this.isClosed) return () => {};
+    this.messageHandlers.add(handler);
+    this.flushDirect();
+    return () => {
+      this.messageHandlers.delete(handler);
+    };
   }
 
   private terminate(reason: GameRoomClosedReason): void {
@@ -293,6 +348,8 @@ export class OnlineMatchSession<M> implements MatchTransport<M> {
     for (const unlisten of this.unlisteners) disposeListener(unlisten);
     this.unlisteners = [];
     this.pending = [];
+    this.directPending = [];
+    this.messageHandlers.clear();
     this.earlyEvents = [];
     this.moveHandlers.clear();
     this.controlHandlers.clear();
