@@ -75,7 +75,7 @@ msgstr "{deviceCount, plural, one {# device} other {# devices}}"
 
 #: src/features/transfers/TransferDock.tsx:173
 msgid "{failed} 个失败"
-msgstr ""
+msgstr "{failed} failed"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:127
 msgid "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
@@ -223,7 +223,7 @@ msgstr "{rounded, plural, one {# second} other {# seconds}}"
 
 #: src/features/transfers/TransferDock.tsx:171
 msgid "{running} 个传输中"
-msgstr ""
+msgstr "{running} transferring"
 
 #. 对局结果；seatNameValue 是包含图标的黑棋或白棋名称。
 #: src/features/games/engine/black-white-labels.tsx:79
@@ -4252,7 +4252,7 @@ msgstr "Expand Sidebar"
 
 #: src/features/transfers/TransferDock.tsx:124
 msgid "展开其余 {hiddenCount} 个任务"
-msgstr ""
+msgstr "{hiddenCount, plural, one {Show # more task} other {Show # more tasks}}"
 
 #. 场景树节点的展开按钮，name 为模型节点名称。
 #: src/features/model-viewer/components/SceneTree.tsx:176
@@ -4353,7 +4353,7 @@ msgstr "Launch at Login disabled"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:311
 msgid "已创建 {trimmed}"
-msgstr ""
+msgstr "Created {trimmed}"
 
 #. 待办删除成功的提示
 #: src/features/bt/BtTool.tsx:195
@@ -4640,7 +4640,7 @@ msgstr "Selected {clipName}"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:331
 msgid "已重命名为 {trimmed}"
-msgstr ""
+msgstr "Renamed to {trimmed}"
 
 #: src/features/games/junqi/JunqiRulesDialog.tsx:71
 #: src/features/games/junqi/JunqiToolbar.tsx:99
@@ -4902,7 +4902,7 @@ msgstr "Current file reading progress"
 
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:162
 msgid "当前日志文件和活动日志会被移除，正在运行的任务不受影响。"
-msgstr ""
+msgstr "Current log files and activity logs will be removed. Running tasks are not affected."
 
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:176
 msgid "当前显示上次采样"
@@ -5895,7 +5895,7 @@ msgstr "New Folder"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:314
 msgid "新建文件夹失败"
-msgstr ""
+msgstr "Failed to create folder"
 
 #: src/features/todo/mcp-presentation.ts:11
 msgid "新建文字待办"
@@ -6036,11 +6036,11 @@ msgstr "Logs"
 
 #: src/features/logs/use-activity-logs.ts:205
 msgid "日志已删除"
-msgstr ""
+msgstr "Log deleted"
 
 #: src/features/logs/use-activity-logs.ts:205
 msgid "日志已清空"
-msgstr ""
+msgstr "Logs cleared"
 
 #. 统一日志工具栏的刷新、跟随和清理菜单
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:101
@@ -7984,12 +7984,12 @@ msgstr "Clear search"
 #. 清理统一日志文件和当前活动日志
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:141
 msgid "清空日志"
-msgstr ""
+msgstr "Clear logs"
 
 #. 手动清理统一日志文件的确认标题
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:159
 msgid "清空日志？"
-msgstr ""
+msgstr "Clear logs?"
 
 #: src/features/activity/TransferActivityToolbar.tsx:133
 #: src/features/activity/TransferActivityToolbar.tsx:158
@@ -10418,7 +10418,7 @@ msgstr "Running"
 
 #: src/features/logs/use-activity-logs.ts:52
 msgid "运行时"
-msgstr ""
+msgstr "Runtime"
 
 #: src/features/about/use-about.ts:232
 msgid "运行模式"
@@ -10966,7 +10966,7 @@ msgstr "Rename"
 
 #: src/features/ssh-sftp/components/sftp/useSftpRemoteActions.ts:334
 msgid "重命名失败"
-msgstr ""
+msgstr "Failed to rename"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:60
