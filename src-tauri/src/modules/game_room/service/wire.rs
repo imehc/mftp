@@ -6,14 +6,14 @@
 //! frames and a ping loop keeps liveness observable on both ends.
 
 use parking_lot::Mutex;
-use std::io::{BufReader, Write};
+use std::io::BufReader;
 use std::net::{Shutdown, TcpListener, TcpStream};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 pub(super) use super::framing::WireMsg;
 use super::framing::{
-    encode, read_message, write_frame, HANDSHAKE_FRAME_LIMIT, MESSAGE_FRAME_LIMIT,
+    encode, read_message_logged, write_frame_counted, HANDSHAKE_FRAME_LIMIT, MESSAGE_FRAME_LIMIT,
 };
 use super::{runtime::StopSignal, GameRoomClosedReason, RoomEvent, SessionEventSink};
 use crate::core::connections::Connections;
@@ -30,6 +30,7 @@ pub(super) const IDLE_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// Write half of the peer connection; reads happen on a dedicated thread.
 pub(super) struct PeerLink {
+    logs: Option<super::diagnostics::RoomDiagnostics>,
     stream: Mutex<TcpStream>,
     // Shutdown must never wait for a writer holding the serialization mutex.
     socket: TcpStream,
@@ -39,20 +40,31 @@ impl PeerLink {
     pub(super) fn new(stream: TcpStream) -> std::io::Result<Self> {
         stream.set_write_timeout(Some(HANDSHAKE_TIMEOUT))?;
         Ok(Self {
+            logs: None,
             socket: stream.try_clone()?,
             stream: Mutex::new(stream),
         })
     }
 
+    pub(super) fn with_logs(mut self, logs: super::diagnostics::RoomDiagnostics) -> Self {
+        self.logs = Some(logs);
+        self
+    }
+
     pub(super) fn leave(&self) {
         // A graceful notice is best effort; never queue behind a blocked sender.
         if let Some(mut stream) = self.stream.try_lock() {
-            if stream
-                .set_write_timeout(Some(Duration::from_millis(100)))
-                .is_ok()
-            {
-                let _ = stream.write_all(b"{\"type\":\"leave\"}\n");
-            }
+            let bytes = b"{\"type\":\"leave\"}\n";
+            let mut written = 0;
+            let result = write_frame_counted(
+                &mut stream,
+                bytes,
+                Instant::now() + Duration::from_millis(100),
+                &mut written,
+            )
+            .map_err(crate::error::AppError::from);
+            drop(stream);
+            self.record_write(bytes, written, result.as_ref().err());
         }
         self.shutdown();
     }
@@ -66,12 +78,34 @@ impl PeerLink {
                 std::io::Error::new(std::io::ErrorKind::TimedOut, "Room writer is busy").into(),
             );
         };
-        if let Err(error) = write_frame(&mut stream, &frame, deadline) {
+        let mut written = 0;
+        let result = write_frame_counted(&mut stream, &frame, deadline, &mut written)
+            .map_err(crate::error::AppError::from);
+        drop(stream);
+        self.record_write(&frame, written, result.as_ref().err());
+        if let Err(error) = result {
             // A partial frame cannot be retried or followed by another message.
             self.shutdown();
-            return Err(error.into());
+            return Err(error);
         }
         Ok(())
+    }
+
+    fn record_write(&self, frame: &[u8], written: usize, error: Option<&crate::error::AppError>) {
+        if let Some(logs) = &self.logs {
+            let peer = self
+                .socket
+                .peer_addr()
+                .map(|address| address.to_string())
+                .unwrap_or_default();
+            logs.frame(
+                "send_frame",
+                &peer,
+                &frame[..written],
+                written == frame.len(),
+                error,
+            );
+        }
     }
 
     pub(super) fn shutdown(&self) {
@@ -81,6 +115,7 @@ impl PeerLink {
 
 #[derive(Clone)]
 pub(super) struct HostCtx {
+    pub(super) logs: super::diagnostics::RoomDiagnostics,
     pub(super) stop: Arc<StopSignal>,
     pub(super) link: Arc<Mutex<Option<Arc<PeerLink>>>>,
     pub(super) peer_name: Arc<Mutex<Option<String>>>,
@@ -127,18 +162,21 @@ fn handle_incoming(stream: TcpStream, ctx: &HostCtx) {
     let Ok(write_half) = stream.try_clone() else {
         return;
     };
-    let Ok(candidate) = PeerLink::new(write_half).map(Arc::new) else {
+    let Ok(candidate) =
+        PeerLink::new(write_half).map(|peer| Arc::new(peer.with_logs(ctx.logs.clone())))
+    else {
         return;
     };
     let Ok(read_half) = stream.try_clone() else {
         return;
     };
     let mut reader = BufReader::new(read_half);
-    let (game_id, code, player_name) = match read_message(
+    let (game_id, code, player_name) = match read_message_logged(
         &mut reader,
         &ctx.stop,
         HANDSHAKE_FRAME_LIMIT,
         HANDSHAKE_TIMEOUT,
+        Some(&ctx.logs),
     ) {
         // A discovery probe: answer with the room card and hang up.
         Ok(WireMsg::Probe) => {
@@ -253,7 +291,14 @@ pub(super) fn read_loop(
         if stop.is_stopped() {
             return GameRoomClosedReason::Closed;
         }
-        match read_message(&mut reader, stop, MESSAGE_FRAME_LIMIT, IDLE_TIMEOUT) {
+        let logs = link.lock().as_ref().and_then(|peer| peer.logs.clone());
+        match read_message_logged(
+            &mut reader,
+            stop,
+            MESSAGE_FRAME_LIMIT,
+            IDLE_TIMEOUT,
+            logs.as_ref(),
+        ) {
             Ok(msg) => {
                 if stop.is_stopped() {
                     return GameRoomClosedReason::Closed;

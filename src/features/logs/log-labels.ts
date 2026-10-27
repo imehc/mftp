@@ -76,6 +76,10 @@ const actionMessages: Record<string, MessageDescriptor> = {
   "games:create_room": msg`创建游戏房间`,
   "games:join_room": msg`加入游戏房间`,
   "games:leave_room": msg`离开游戏房间`,
+  "games:connect": msg`连接游戏房间`,
+  "games:discover_connections": msg`探测局域网房间`,
+  "games:send_frame": msg`发送房间消息`,
+  "games:receive_frame": msg`接收房间消息`,
   "translation:model_download": msg`下载翻译模型`,
   "poetry:sync": msg`同步诗词库`,
   "poetry:import": msg`导入诗词库`,
@@ -235,6 +239,8 @@ export function logObject(log: ActivityLog, localize = translate): string {
     const game = log.ip.replace(/\/online-v\d+$/, "");
     if (game === "gomoku") return localize(msg`五子棋房间`);
     if (game === "xiangqi") return localize(msg`中国象棋房间`);
+    if (/^junqi\/(open|hidden|flip)\/authority-v\d+$/.test(game))
+      return localize(msg`陆战棋房间`);
   }
 
   const kind = objectKind(log);

@@ -22,6 +22,7 @@ use super::{GameRoomClosedReason, GameRoomStatus, GameRoomSummary};
 use crate::core::operations::{OperationLease, Operations};
 use crate::error::{AppError, AppResult, CustomErrorCode};
 
+mod diagnostics;
 mod discovery;
 mod framing;
 #[cfg(test)]
@@ -30,6 +31,7 @@ mod lifecycle_tests;
 mod ownership_tests;
 #[cfg(test)]
 mod protocol_tests;
+mod redaction;
 mod runtime;
 mod session;
 #[cfg(test)]
@@ -61,6 +63,7 @@ struct RoomRuntime {
 }
 
 pub struct GameRoomManager {
+    logs: diagnostics::RoomDiagnostics,
     runtime: Mutex<Option<RoomRuntime>>,
     events: EventSink,
     lifecycle: Mutex<()>,
@@ -73,6 +76,7 @@ pub struct GameRoomManager {
 impl GameRoomManager {
     pub(crate) fn new(events: EventSink, operations: Arc<Operations>) -> Self {
         Self {
+            logs: diagnostics::RoomDiagnostics::default(),
             runtime: Mutex::new(None),
             events,
             lifecycle: Mutex::new(()),
@@ -81,6 +85,18 @@ impl GameRoomManager {
             discovery_stop: Arc::new(StopSignal::default()),
             browser: crate::core::mdns_browser::MdnsBrowser::new(discovery::SERVICE_TYPE),
         }
+    }
+
+    pub(crate) fn with_diagnostics(
+        mut self,
+        diagnostics: Arc<crate::core::diagnostics::Diagnostics>,
+        activity: Arc<dyn crate::core::activity::ActivitySink>,
+    ) -> Self {
+        self.logs = diagnostics::RoomDiagnostics {
+            diagnostics,
+            activity: Some(activity),
+        };
+        self
     }
 
     fn admission(&self) -> AppResult<(OperationLease, OperationLease)> {
@@ -145,16 +161,7 @@ impl GameRoomManager {
                 .ok_or_else(|| AppError::custom(CustomErrorCode::RoomPeerMissing))?;
             link
         };
-        let message = format!("instance_id={instance_id} payload={payload}");
-        let result = link.send(&WireMsg::App { payload });
-        crate::core::logging::runtime_event(
-            "game_room",
-            "peer_send",
-            if result.is_ok() { "success" } else { "failed" },
-            message,
-            None,
-        );
-        result
+        link.send(&WireMsg::App { payload })
     }
 
     pub fn leave(&self) {
@@ -208,6 +215,7 @@ impl GameRoomManager {
             game_id,
             own_room.as_deref(),
             &self.discovery_stop,
+            &self.logs,
         )
     }
 

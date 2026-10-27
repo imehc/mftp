@@ -115,6 +115,20 @@ it("搜索同时匹配可读操作、对象类型和完整原值", () => {
   expect(filterLogs([log], "delete", "all", {})).toEqual([log]);
 });
 
+it.each(["open", "hidden", "flip"])(
+  "陆战棋 %s 的新协议房间仍显示可读名称",
+  (variant) => {
+    expect(
+      logObject({
+        ...log,
+        source: "games",
+        requestType: "create_room",
+        ip: `junqi/${variant}/authority-v2/online-v2`,
+      }),
+    ).toBe("陆战棋房间");
+  },
+);
+
 it("语言切换后操作、对象与搜索使用当前语言", () => {
   i18n.load("en", enMessages);
   i18n.activate("en");

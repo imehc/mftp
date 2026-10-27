@@ -102,7 +102,12 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     );
     let game_room = lifecycle.install(
         participants::GAME_ROOM,
-        room_events::install(app, operations.clone()),
+        room_events::install(
+            app,
+            operations.clone(),
+            diagnostics.clone(),
+            Arc::new(StorageActivityLog(storage.clone())),
+        ),
         GameRoomManager::shutdown,
         |service: &GameRoomManager| Ok(service.status().phase != "idle"),
     );

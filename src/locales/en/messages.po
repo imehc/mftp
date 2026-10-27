@@ -2765,6 +2765,11 @@ msgstr "An unknown error occurred. Please try again."
 msgid "发送中"
 msgstr "Sending"
 
+#. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
+#: src/features/logs/log-labels.ts:81
+msgid "发送房间消息"
+msgstr "Send room message"
+
 #: src/components/ui/prompt-dialog.tsx:114
 #: src/features/about/DataManagementDialogs.tsx:168
 #: src/features/activity/TransferActivityToolbar.tsx:155
@@ -4930,6 +4935,11 @@ msgstr "Screenshot saved."
 msgid "房间"
 msgstr "Room"
 
+#. 游戏局域网房间实际 TCP 连接、收发帧与 IO 错误
+#: src/features/connection-diagnostics/execution-log-stream.ts:85
+msgid "房间协议记录"
+msgstr "Room protocol records"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:236
 msgid "房间名（可选）"
 msgstr "Room name (optional)"
@@ -5199,6 +5209,11 @@ msgstr "Sort"
 msgid "排序操作结束"
 msgstr "Reordering ended"
 
+#. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
+#: src/features/logs/log-labels.ts:80
+msgid "探测局域网房间"
+msgstr "Discover LAN rooms"
+
 #. 九球推杆或违规开球后，接受当前球位并自己击球
 #: src/features/games/billiards/NineBallHud.tsx:139
 msgid "接受桌面"
@@ -5213,6 +5228,11 @@ msgstr "API format"
 #: src/features/connection-diagnostics/ExecutionLogStatus.tsx:56
 msgid "接收中"
 msgstr "Receiving"
+
+#. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
+#: src/features/logs/log-labels.ts:82
+msgid "接收房间消息"
+msgstr "Receive room message"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:242
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:246
@@ -10132,6 +10152,11 @@ msgstr "Connected"
 msgid "连接服务"
 msgstr "Connect to the service"
 
+#. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
+#: src/features/logs/log-labels.ts:79
+msgid "连接游戏房间"
+msgstr "Connect to game room"
+
 #: src/features/lan-transfer/LanServiceCard.tsx:72
 msgid "连接确认码"
 msgstr "Connection code"
@@ -10677,6 +10702,10 @@ msgstr "Nearby Rooms"
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:32
 msgid "附近设备"
 msgstr "Nearby devices"
+
+#: src/features/logs/log-labels.ts:243
+msgid "陆战棋房间"
+msgstr "Land Battle Chess room"
 
 #: src/features/ssh-sftp/components/sftp/SftpToolbar.tsx:112
 msgid "降序"

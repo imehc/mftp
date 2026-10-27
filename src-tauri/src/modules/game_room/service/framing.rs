@@ -109,14 +109,50 @@ impl Write for FrameBuffer {
     }
 }
 
+#[cfg(test)]
 pub(super) fn read_message(
     reader: &mut BufReader<TcpStream>,
     stop: &StopSignal,
     limit: usize,
     timeout: Duration,
 ) -> AppResult<WireMsg> {
-    let deadline = Instant::now() + timeout;
+    read_message_logged(reader, stop, limit, timeout, None)
+}
+
+pub(super) fn read_message_logged(
+    reader: &mut BufReader<TcpStream>,
+    stop: &StopSignal,
+    limit: usize,
+    timeout: Duration,
+    logs: Option<&super::diagnostics::RoomDiagnostics>,
+) -> AppResult<WireMsg> {
     let mut frame = Vec::new();
+    let result = read_message_into(reader, stop, limit, timeout, &mut frame);
+    if let Some(logs) = logs {
+        let peer = reader
+            .get_ref()
+            .peer_addr()
+            .map(|address| address.to_string())
+            .unwrap_or_default();
+        logs.frame(
+            "receive_frame",
+            &peer,
+            &frame,
+            frame.last() == Some(&b'\n'),
+            result.as_ref().err(),
+        );
+    }
+    result
+}
+
+fn read_message_into(
+    reader: &mut BufReader<TcpStream>,
+    stop: &StopSignal,
+    limit: usize,
+    timeout: Duration,
+    frame: &mut Vec<u8>,
+) -> AppResult<WireMsg> {
+    let deadline = Instant::now() + timeout;
     loop {
         if stop.is_stopped() {
             return Err(io::Error::new(
@@ -172,10 +208,20 @@ pub(super) fn read_message(
     }
 }
 
+#[cfg(test)]
 pub(super) fn write_frame(
+    stream: &mut TcpStream,
+    bytes: &[u8],
+    deadline: Instant,
+) -> io::Result<()> {
+    write_frame_counted(stream, bytes, deadline, &mut 0)
+}
+
+pub(super) fn write_frame_counted(
     stream: &mut TcpStream,
     mut bytes: &[u8],
     deadline: Instant,
+    written: &mut usize,
 ) -> io::Result<()> {
     // A per-write socket timeout alone can be renewed forever by a slow reader.
     while !bytes.is_empty() {
@@ -189,7 +235,10 @@ pub(super) fn write_frame(
         stream.set_write_timeout(Some(remaining))?;
         match stream.write(bytes) {
             Ok(0) => return Err(io::ErrorKind::WriteZero.into()),
-            Ok(count) => bytes = &bytes[count..],
+            Ok(count) => {
+                *written += count;
+                bytes = &bytes[count..];
+            }
             Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
             Err(error) => return Err(error),
         }

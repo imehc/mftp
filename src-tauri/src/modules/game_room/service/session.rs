@@ -1,5 +1,5 @@
 use super::discovery::{bind_room_listener, lan_ip, run_responder};
-use super::framing::{encode, read_message, validate_metadata, HANDSHAKE_FRAME_LIMIT};
+use super::framing::{encode, read_message_logged, validate_metadata, HANDSHAKE_FRAME_LIMIT};
 use super::wire::{
     accept_loop, normalize_code, ping_loop, read_loop, HostCtx, CONNECT_TIMEOUT, HANDSHAKE_TIMEOUT,
 };
@@ -57,6 +57,7 @@ impl GameRoomManager {
         let link = Arc::new(Mutex::new(None));
         let peer_name = Arc::new(Mutex::new(None));
         let ctx = HostCtx {
+            logs: self.logs.clone(),
             stop: stop.clone(),
             link: link.clone(),
             peer_name: peer_name.clone(),
@@ -135,19 +136,28 @@ impl GameRoomManager {
             .parse()
             .map_err(|_| AppError::custom(CustomErrorCode::RoomAddressInvalid))?;
         self.stop_runtime();
-        let stream = TcpStream::connect_timeout(&addr, CONNECT_TIMEOUT)?;
+        let connected = TcpStream::connect_timeout(&addr, CONNECT_TIMEOUT).map_err(AppError::from);
+        self.logs.frame(
+            "connect",
+            &addr.to_string(),
+            &[],
+            true,
+            connected.as_ref().err(),
+        );
+        let stream = connected?;
         let _ = stream.set_nodelay(true);
         stream.set_read_timeout(Some(HANDSHAKE_TIMEOUT))?;
         let mut handle = RoomHandle::new(lease);
-        let peer = Arc::new(PeerLink::new(stream.try_clone()?)?);
+        let peer = Arc::new(PeerLink::new(stream.try_clone()?)?.with_logs(self.logs.clone()));
         handle.peer = Some(peer.clone());
         peer.send(&hello)?;
         let mut reader = BufReader::new(stream);
-        let welcome = read_message(
+        let welcome = read_message_logged(
             &mut reader,
             &handle.stop,
             HANDSHAKE_FRAME_LIMIT,
             HANDSHAKE_TIMEOUT,
+            Some(&self.logs),
         )?;
         let (room_id, room_name, host_name) = match welcome {
             WireMsg::Welcome {

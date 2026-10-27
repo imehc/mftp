@@ -80,7 +80,10 @@ export function executionLogStream(
   if (operation.trace && hasDiagnosticText(operation.trace))
     blocks.push({
       kind: "trace",
-      title: `> SDK · ${localize(msg({ comment: "SSH/SFTP 实际 SDK 调用记录，不是网络抓包", message: "协议调用（库边界）" }))}`,
+      title:
+        operation.source === "games"
+          ? `> TCP · ${localize(msg({ comment: "游戏局域网房间实际 TCP 连接、收发帧与 IO 错误", message: "房间协议记录" }))}`
+          : `> SDK · ${localize(msg({ comment: "SSH/SFTP 实际 SDK 调用记录，不是网络抓包", message: "协议调用（库边界）" }))}`,
       text: bodyText(operation.trace, labels),
     });
   for (const detail of operation.details.filter(hasDiagnosticDetail)) {

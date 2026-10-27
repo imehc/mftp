@@ -5,7 +5,7 @@ mod recorder_protocol;
 mod redaction;
 pub(crate) use model::*;
 pub(crate) use recorder::DiagnosticRecorder;
-pub(crate) use redaction::Redactor;
+pub(crate) use redaction::{sensitive, Redactor};
 
 use parking_lot::Mutex;
 use std::{

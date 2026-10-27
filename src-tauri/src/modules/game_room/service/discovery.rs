@@ -18,7 +18,8 @@ use std::time::{Duration, Instant};
 
 use super::super::GameRoomSummary;
 
-use super::framing::{encode, read_message, write_frame, HANDSHAKE_FRAME_LIMIT};
+use super::diagnostics::{ProbeDiagnostics, RoomDiagnostics};
+use super::framing::{encode, read_message_logged, write_frame_counted, HANDSHAKE_FRAME_LIMIT};
 use super::{runtime::StopSignal, wire::WireMsg};
 use crate::core::mdns_browser::MdnsBrowser;
 use crate::error::{AppError, AppResult, CustomErrorCode};
@@ -54,11 +55,12 @@ pub(super) fn discover_rooms(
     game_id: &str,
     exclude_room: Option<&str>,
     stop: &StopSignal,
+    logs: &RoomDiagnostics,
 ) -> AppResult<Vec<GameRoomSummary>> {
     thread::scope(|scope| {
         let sweep = thread::Builder::new()
             .name("room-sweep".into())
-            .spawn_scoped(scope, || sweep_lan(game_id, stop))?;
+            .spawn_scoped(scope, || sweep_lan(game_id, stop, logs))?;
         let mut rooms = HashMap::<String, GameRoomSummary>::new();
         // The long-lived browse waits the old window only after a (re)start;
         // later lobby polls read its cache while the sweep runs.
@@ -166,19 +168,59 @@ pub(super) fn probe_room(addr: SocketAddr) -> Option<GameRoomSummary> {
     probe_room_until_stop(addr, &StopSignal::default())
 }
 
+#[cfg(test)]
 pub(super) fn probe_room_until_stop(
     addr: SocketAddr,
     stop: &StopSignal,
 ) -> Option<GameRoomSummary> {
+    probe_room_logged(addr, stop, None, None)
+}
+
+fn probe_room_logged(
+    addr: SocketAddr,
+    stop: &StopSignal,
+    logs: Option<&RoomDiagnostics>,
+    probes: Option<&ProbeDiagnostics>,
+) -> Option<GameRoomSummary> {
     if stop.is_stopped() {
         return None;
     }
-    let mut stream = TcpStream::connect_timeout(&addr, SWEEP_CONNECT_TIMEOUT).ok()?;
+    let connected =
+        TcpStream::connect_timeout(&addr, SWEEP_CONNECT_TIMEOUT).map_err(AppError::from);
+    if let Some(probes) = probes {
+        probes.connected(&addr.to_string(), connected.as_ref().err());
+    }
+    let mut stream = connected.ok()?;
     let _ = stream.set_nodelay(true);
     let frame = encode(&WireMsg::Probe).ok()?;
-    write_frame(&mut stream, &frame, Instant::now() + PROBE_IO_TIMEOUT).ok()?;
+    let mut written = 0;
+    let sent = write_frame_counted(
+        &mut stream,
+        &frame,
+        Instant::now() + PROBE_IO_TIMEOUT,
+        &mut written,
+    )
+    .map_err(AppError::from);
+    if let Some(logs) = logs {
+        logs.frame(
+            "send_frame",
+            &addr.to_string(),
+            &frame[..written],
+            written == frame.len(),
+            sent.as_ref().err(),
+        );
+    }
+    sent.ok()?;
     let mut reader = BufReader::new(stream);
-    match read_message(&mut reader, stop, HANDSHAKE_FRAME_LIMIT, PROBE_IO_TIMEOUT).ok()? {
+    match read_message_logged(
+        &mut reader,
+        stop,
+        HANDSHAKE_FRAME_LIMIT,
+        PROBE_IO_TIMEOUT,
+        logs,
+    )
+    .ok()?
+    {
         WireMsg::RoomInfo {
             room_id,
             game_id,
@@ -224,7 +266,11 @@ fn sweep_subnets() -> Vec<Ipv4Addr> {
 /// Scan the local subnets' fixed port range for rooms of `game_id`.
 /// Worst case ~1000 connect attempts per subnet at 250ms timeout across
 /// 128 threads ≈ 2s — bounded by the lobby's sequential polling.
-fn sweep_lan(game_id: &str, stop: &StopSignal) -> AppResult<Vec<GameRoomSummary>> {
+fn sweep_lan(
+    game_id: &str,
+    stop: &StopSignal,
+    logs: &RoomDiagnostics,
+) -> AppResult<Vec<GameRoomSummary>> {
     let mut targets: Vec<SocketAddr> = Vec::new();
     for base in sweep_subnets() {
         let [a, b, c, _] = base.octets();
@@ -241,6 +287,7 @@ fn sweep_lan(game_id: &str, stop: &StopSignal) -> AppResult<Vec<GameRoomSummary>
         return Ok(Vec::new());
     }
     let targets = Arc::new(Mutex::new(targets));
+    let probes = ProbeDiagnostics::new(logs, game_id);
     let found: Arc<Mutex<Vec<GameRoomSummary>>> = Arc::new(Mutex::new(Vec::new()));
     // Scoped workers cannot outlive the discovery lease, even on spawn failure
     // or panic. Shutdown stops dequeuing targets; individual probes are bounded.
@@ -249,6 +296,7 @@ fn sweep_lan(game_id: &str, stop: &StopSignal) -> AppResult<Vec<GameRoomSummary>
         for _ in 0..SWEEP_THREADS {
             let targets = targets.clone();
             let found = found.clone();
+            let probes = &probes;
             workers.push(
                 thread::Builder::new()
                     .name("room-probe".into())
@@ -257,7 +305,9 @@ fn sweep_lan(game_id: &str, stop: &StopSignal) -> AppResult<Vec<GameRoomSummary>
                             let Some(addr) = targets.lock().pop() else {
                                 return;
                             };
-                            if let Some(room) = probe_room_until_stop(addr, stop) {
+                            if let Some(room) =
+                                probe_room_logged(addr, stop, Some(logs), Some(probes))
+                            {
                                 if room.game_id == game_id {
                                     found.lock().push(room);
                                 }
