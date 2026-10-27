@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
-import { BookOpen, LoaderCircle, Music } from "lucide-react";
+import { BookOpen, LoaderCircle, Tag } from "lucide-react";
 import { useId, useRef, useState } from "react";
+import { useStore } from "zustand";
 
-import type { PoetryTranslationMode } from "~/bindings";
 import { Badge } from "~/components/ui/badge";
 import {
   Empty,
@@ -16,18 +16,25 @@ import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { AuthorBio, PoemDetail as PoemDetailModel } from "~/types";
 
+import { usePoetryReadingPosition } from "../hooks/use-poetry-reading-position";
 import { usePoetrySpeech } from "../hooks/use-poetry-speech";
 import { usePoetrySpeechFollow } from "../hooks/use-poetry-speech-follow";
-import { createSpeechDocument } from "../speech-document";
+import { poetryReadingSession } from "../reading-session";
 import {
-  AnnotationSection,
+  type PoetryReadingView,
+  resolvePoetryReadingView,
+} from "../reading-view";
+import { createSpeechDocument } from "../speech-document";
+import { usePoetryStore } from "../store/poetry-store";
+import {
   AuthorBioSheet,
   CollapsibleStrains,
+  PoemAnnotationContent,
 } from "./PoemAnnotations";
 import PoetrySpeech from "./PoetrySpeech";
 import PoetryTranslationSection from "./PoetryTranslationSection";
-import ReadingControlsDesktop from "./ReadingControls.desktop";
 import ReadingControlsMobile from "./ReadingControls.mobile";
+import ReadingModeTabs from "./ReadingModeTabs";
 
 interface PoemDetailViewProps {
   settingsInHeader?: boolean;
@@ -37,8 +44,10 @@ interface PoemDetailViewProps {
   lineHeight: number;
   onFontSizeChange: (size: number) => void;
   onLineHeightChange: (height: number) => void;
-  initialTranslationMode?: PoetryTranslationMode;
-  onTranslationModeChange?: (mode: PoetryTranslationMode) => void;
+  view?: PoetryReadingView;
+  onViewChange?: (view: PoetryReadingView) => void;
+  returnQuery?: string;
+  returnPage?: "library" | "detail";
 }
 
 export default function PoemDetail({
@@ -49,19 +58,49 @@ export default function PoemDetail({
   lineHeight,
   onFontSizeChange,
   onLineHeightChange,
-  initialTranslationMode,
-  onTranslationModeChange,
+  view: controlledView,
+  onViewChange,
+  returnQuery,
+  returnPage,
 }: PoemDetailViewProps) {
   const narrow = !useDesktopLayout();
   const originalLabelId = useId();
-  const translationLabelId = useId();
-  const [view, setView] = useState(
-    initialTranslationMode ? "translation" : "original",
+  const preferredView = usePoetryStore((state) => state.readingView);
+  const preferredReference = usePoetryStore((state) => state.referenceView);
+  const setPreferredView = usePoetryStore((state) => state.setReadingView);
+  const savedView = useStore(
+    poetryReadingSession,
+    (state) => state.entries.find((entry) => entry.uid === detail?.uid)?.view,
   );
+  const savedReference = useStore(
+    poetryReadingSession,
+    (state) =>
+      state.entries.find((entry) => entry.uid === detail?.uid)?.referenceView,
+  );
+  const strainsOpen = useStore(
+    poetryReadingSession,
+    (state) =>
+      state.entries.find((entry) => entry.uid === detail?.uid)?.strainsOpen ??
+      false,
+  );
+  const view = controlledView ?? savedView ?? preferredView;
+  const referenceView =
+    view === "original" ? (savedReference ?? preferredReference) : view;
+  const activeView = narrow ? view : referenceView;
+  const [translationReadyUid, setTranslationReadyUid] = useState<string>();
   const [bio, setBio] = useState<AuthorBio | null>(null);
   const [speechSettingsOpen, setSpeechSettingsOpen] = useState(false);
   const readingRoot = useRef<HTMLElement>(null);
   const readingViewport = useRef<HTMLDivElement>(null);
+  const capturePosition = usePoetryReadingPosition({
+    uid: loading ? undefined : detail?.uid,
+    positionKey: narrow ? `mobile-${view}` : `desktop-${referenceView}`,
+    ready:
+      !loading &&
+      !!detail &&
+      (activeView !== "translation" || translationReadyUid === detail.uid),
+    viewport: readingViewport,
+  });
   const speechText = createSpeechDocument(loading ? null : detail);
   const speech = usePoetrySpeech(loading ? null : (detail?.uid ?? null));
   usePoetrySpeechFollow(
@@ -76,7 +115,6 @@ export default function PoemDetail({
     setPrevUid(detail?.uid);
     setBio(null);
     setSpeechSettingsOpen(false);
-    setView(initialTranslationMode ? "translation" : "original");
   }
   if (loading)
     return (
@@ -111,8 +149,18 @@ export default function PoemDetail({
   const annotation = detail.annotation;
   return (
     <Tabs
-      value={view}
-      onValueChange={setView}
+      value={activeView}
+      onValueChange={(value) => {
+        const nextView = resolvePoetryReadingView(value);
+        if (!nextView) return;
+        capturePosition();
+        poetryReadingSession.getState().update(detail.uid, {
+          view: nextView,
+          referenceView: nextView === "original" ? referenceView : nextView,
+        });
+        setPreferredView(nextView);
+        onViewChange?.(nextView);
+      }}
       className="ui-density-adaptive flex h-full min-h-0 flex-col gap-0"
     >
       {narrow ? (
@@ -127,65 +175,8 @@ export default function PoemDetail({
       >
         <article
           ref={readingRoot}
-          className="mx-auto flex w-full max-w-prose flex-col gap-6 py-8 md:py-10"
+          className="mx-auto flex w-full max-w-prose flex-col gap-3 pt-3 pb-6 md:pt-4 md:pb-8"
         >
-          <header className="font-poetry flex flex-col items-center gap-3 text-center">
-            <div className="flex w-full flex-wrap items-center justify-between gap-2">
-              <span
-                id={originalLabelId}
-                className="text-muted-foreground text-xs"
-              >
-                {!narrow || view === "original" ? (
-                  <Trans>原文</Trans>
-                ) : (
-                  <Trans>译文</Trans>
-                )}
-              </span>
-              <PoetrySpeech
-                key={detail.uid}
-                speech={speech}
-                text={speechText}
-                onSettingsOpenChange={setSpeechSettingsOpen}
-              />
-            </div>
-            <h2
-              data-poetry-speech="title"
-              className="text-2xl font-semibold tracking-wide wrap-break-word"
-            >
-              {detail.title}
-            </h2>
-            <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
-              {detail.dynasty ? (
-                <>
-                  <span data-poetry-speech="dynasty">{detail.dynasty}</span>
-                  <span aria-hidden>·</span>
-                </>
-              ) : null}
-              {detail.authorBio?.desc ? (
-                <button
-                  data-poetry-speech="author"
-                  type="button"
-                  className="hover:underline"
-                  onClick={() => setBio(detail.authorBio ?? null)}
-                >
-                  {detail.author}
-                </button>
-              ) : (
-                <span data-poetry-speech="author">{detail.author}</span>
-              )}
-              {detail.rhythmic ? (
-                <Badge variant="outline">
-                  <Music aria-hidden />
-                  {detail.rhythmic}
-                </Badge>
-              ) : null}
-              {annotation?.hasAudio ? (
-                <Badge variant="outline">
-                  <Trans>有朗诵</Trans>
-                </Badge>
-              ) : null}
-            </div>
-          </header>
           <TabsContent
             value="original"
             forceMount
@@ -196,72 +187,114 @@ export default function PoemDetail({
               tabIndex: undefined,
             })}
           >
-            <div
-              className="font-poetry flex flex-col gap-3 text-center wrap-break-word"
-              style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
-            >
-              {detail.body.map((paragraph, index) => (
-                <p key={index} data-poetry-speech={`body-${index}`}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            <div className="mt-6 flex flex-col gap-4">
-              <CollapsibleStrains strains={detail.strains} />
-              {annotation ? (
-                <>
-                  <AnnotationSection
-                    title={<Trans>注释</Trans>}
-                    body={annotation.remark}
+            <div className="flex flex-col gap-4">
+              <header className="font-poetry flex flex-col items-center gap-2 text-center">
+                <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                  <span
+                    id={originalLabelId}
+                    className="text-muted-foreground text-xs"
+                  >
+                    <Trans>原文</Trans>
+                  </span>
+                  <PoetrySpeech
+                    key={detail.uid}
+                    speech={speech}
+                    text={speechText}
+                    onSettingsOpenChange={setSpeechSettingsOpen}
                   />
-                  <AnnotationSection
-                    title={<Trans>赏析</Trans>}
-                    body={annotation.appreciation}
-                  />
-                </>
-              ) : null}
-              {detail.notes.length ? (
-                <section className="flex flex-col gap-1">
-                  <h3 className="text-muted-foreground text-sm font-medium">
-                    <Trans>注释</Trans>
-                  </h3>
-                  <ul className="text-muted-foreground flex list-disc flex-col gap-1 pl-4 text-sm leading-relaxed">
-                    {detail.notes.map((note, index) => (
-                      <li key={index}>{note}</li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
+                </div>
+                <h2
+                  data-poetry-speech="title"
+                  className="text-2xl font-semibold tracking-wide wrap-break-word"
+                >
+                  {detail.title}
+                </h2>
+                <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
+                  {detail.dynasty ? (
+                    <>
+                      <span data-poetry-speech="dynasty">{detail.dynasty}</span>
+                      <span aria-hidden>·</span>
+                    </>
+                  ) : null}
+                  {detail.authorBio?.desc ? (
+                    <button
+                      data-poetry-speech="author"
+                      type="button"
+                      className="hover:underline"
+                      onClick={() => setBio(detail.authorBio ?? null)}
+                    >
+                      {detail.author}
+                    </button>
+                  ) : (
+                    <span data-poetry-speech="author">{detail.author}</span>
+                  )}
+                  {detail.rhythmic ? (
+                    <Badge variant="outline">
+                      <Tag aria-hidden />
+                      {detail.rhythmic}
+                    </Badge>
+                  ) : null}
+                  {annotation?.hasAudio ? (
+                    <Badge variant="outline">
+                      <Trans>有朗诵</Trans>
+                    </Badge>
+                  ) : null}
+                </div>
+              </header>
+              <div
+                className="font-poetry flex flex-col gap-3 text-center wrap-break-word"
+                style={{ fontSize: `${fontSize / 16}rem`, lineHeight }}
+              >
+                {detail.body.map((paragraph, index) => (
+                  <p key={index} data-poetry-speech={`body-${index}`}>
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+              <CollapsibleStrains
+                strains={detail.strains}
+                open={strainsOpen}
+                onOpenChange={(open) =>
+                  poetryReadingSession
+                    .getState()
+                    .update(detail.uid, { strainsOpen: open })
+                }
+              />
             </div>
           </TabsContent>
-          {/* 桌面连续显示原文和译文；跨断点只切换可见性与语义，保留翻译任务订阅和编辑草稿。 */}
+          {!narrow ? (
+            <div className="flex flex-col gap-3">
+              <Separator />
+              <ReadingModeTabs desktop />
+            </div>
+          ) : null}
+          <TabsContent
+            value="annotations"
+            forceMount
+            hidden={activeView !== "annotations"}
+          >
+            <PoemAnnotationContent
+              remark={annotation?.remark ?? ""}
+              appreciation={annotation?.appreciation ?? ""}
+              notes={detail.notes}
+            />
+          </TabsContent>
+          {/* 三个面板保持挂载；切换只改变可见性，保留翻译订阅与编辑草稿。 */}
           <TabsContent
             value="translation"
             forceMount
-            hidden={narrow && view !== "translation"}
-            {...(!narrow && {
-              role: "region",
-              "aria-labelledby": translationLabelId,
-              tabIndex: undefined,
-            })}
+            hidden={activeView !== "translation"}
           >
-            {!narrow ? <Separator className="mb-4" /> : null}
             <PoetryTranslationSection
               key={detail.uid}
               uid={detail.uid}
               {...settings}
               referenceTranslation={annotation?.translation}
-              initialMode={initialTranslationMode}
-              onModeChange={onTranslationModeChange}
-              labelId={narrow ? undefined : translationLabelId}
+              returnQuery={returnQuery}
+              returnPage={returnPage}
+              onReady={setTranslationReadyUid}
             />
           </TabsContent>
-          {!narrow ? (
-            <ReadingControlsDesktop
-              settings={settings}
-              settingsInHeader={settingsInHeader}
-            />
-          ) : null}
         </article>
       </div>
       <AuthorBioSheet bio={bio} onClose={() => setBio(null)} />

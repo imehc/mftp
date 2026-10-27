@@ -23,12 +23,16 @@ import {
 } from "./components/CollectionManagement";
 import PoetrySyncStatus from "./components/PoetrySyncStatus";
 import { usePoetryCollectionsManage } from "./hooks/use-poetry-collections-manage";
+import {
+  poetryManageReturnLink,
+  type PoetryManageSearch,
+} from "./reading-navigation";
 
 export default function LibraryManagePage({
   search,
 }: {
   /** 来源列表的查询上下文，返回时带回。 */
-  search: { q?: string; poem?: string };
+  search: PoetryManageSearch;
 }) {
   const { t } = useLingui();
   const controller = usePoetryCollectionsManage();
@@ -52,11 +56,7 @@ export default function LibraryManagePage({
             <Link
               aria-label={t`返回古诗词`}
               title={t`返回古诗词`}
-              to="/library"
-              search={{
-                q: search.q,
-                poem: search.poem,
-              }}
+              {...poetryManageReturnLink(search)}
             >
               <ArrowLeft data-icon="inline-start" />
             </Link>

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { PoetryTranslationMode } from "~/bindings";
+import {
+  type PoetryReadingView,
+  resolvePoetryReadingView,
+} from "~/features/poetry/reading-view";
 import SettingsPage from "~/features/settings/SettingsPage";
 import { desktopOnlyGuard } from "~/lib/platform";
 
@@ -8,7 +11,8 @@ interface SettingsSearch {
   panel?: "ai" | "data" | "features" | "mcp";
   returnUid?: string;
   returnQ?: string;
-  returnMode?: PoetryTranslationMode;
+  returnView?: PoetryReadingView;
+  returnPage?: "library" | "detail";
 }
 
 function SettingsRoute() {
@@ -27,10 +31,8 @@ export const Route = createFileRoute("/settings")({
     returnUid:
       typeof search.returnUid === "string" ? search.returnUid : undefined,
     returnQ: typeof search.returnQ === "string" ? search.returnQ : undefined,
-    returnMode:
-      search.returnMode === "literary" || search.returnMode === "literal"
-        ? search.returnMode
-        : undefined,
+    returnPage: search.returnPage === "library" ? "library" : undefined,
+    returnView: resolvePoetryReadingView(search.returnView, search.returnMode),
   }),
   beforeLoad: ({ search }) => {
     if (search.panel === "mcp") desktopOnlyGuard();

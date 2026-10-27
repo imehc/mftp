@@ -1,12 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import type { PoetryTranslationMode } from "~/bindings";
 import { useRememberTool } from "~/features/navigation/use-remember-tool";
+import { usePoetryReadingRoute } from "~/features/poetry/hooks/use-poetry-reading-route";
 import PoemDetailPage from "~/features/poetry/PoemDetailPage";
+import {
+  type PoetryReadingView,
+  resolvePoetryReadingView,
+} from "~/features/poetry/reading-view";
 
 interface LibraryPoemSearch {
   q?: string;
-  mode?: PoetryTranslationMode;
+  view?: PoetryReadingView;
 }
 
 /**
@@ -17,18 +21,24 @@ function LibraryPoemRoute() {
   useRememberTool("library");
   const navigate = useNavigate();
   const uid = Route.useParams().id;
-  const { q, mode } = Route.useSearch();
+  const { q, view: explicitView } = Route.useSearch();
+  const view = usePoetryReadingRoute({
+    page: "detail",
+    uid,
+    q,
+    view: explicitView,
+  });
 
   return (
     <PoemDetailPage
       uid={uid}
       backQuery={q}
-      initialTranslationMode={mode}
-      onTranslationModeChange={(nextMode: PoetryTranslationMode) => {
+      view={view}
+      onViewChange={(nextView) => {
         void navigate({
           to: "/library/$id",
           params: { id: uid },
-          search: (current) => ({ ...current, mode: nextMode }),
+          search: (current) => ({ ...current, view: nextView }),
           replace: true,
         });
       }}
@@ -39,10 +49,7 @@ function LibraryPoemRoute() {
 export const Route = createFileRoute("/library/$id")({
   validateSearch: (search: Record<string, unknown>): LibraryPoemSearch => ({
     q: typeof search.q === "string" ? search.q : undefined,
-    mode:
-      search.mode === "literary" || search.mode === "literal"
-        ? search.mode
-        : undefined,
+    view: resolvePoetryReadingView(search.view, search.mode),
   }),
   component: LibraryPoemRoute,
 });

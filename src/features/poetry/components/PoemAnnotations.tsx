@@ -1,7 +1,7 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
-import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { useId } from "react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -29,8 +29,15 @@ export function AnnotationSection({
   );
 }
 
-export function CollapsibleStrains({ strains }: { strains: string[] }) {
-  const [open, setOpen] = useState(false);
+export function CollapsibleStrains({
+  strains,
+  open,
+  onOpenChange,
+}: {
+  strains: string[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const contentId = useId();
   if (strains.length === 0) return null;
   return (
@@ -40,13 +47,13 @@ export function CollapsibleStrains({ strains }: { strains: string[] }) {
         size="sm"
         density="adaptive"
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => onOpenChange(!open)}
         aria-expanded={open}
         aria-controls={contentId}
       >
-        <ChevronDown
+        <ChevronRight
           data-icon="inline-start"
-          className={cn("transition-transform", open && "rotate-180")}
+          className={cn("transition-transform", open && "rotate-90")}
           aria-hidden
         />
         <Trans>平仄</Trans>
@@ -62,6 +69,44 @@ export function CollapsibleStrains({ strains }: { strains: string[] }) {
         </div>
       ) : null}
     </section>
+  );
+}
+
+/** 注释页直接展示资料；面板切换由阅读容器统一负责。 */
+export function PoemAnnotationContent({
+  remark,
+  appreciation,
+  notes,
+}: {
+  remark: string;
+  appreciation: string;
+  notes: string[];
+}) {
+  const { t } = useLingui();
+  if (!remark.trim() && !appreciation.trim() && notes.length === 0) {
+    return (
+      <p className="text-muted-foreground text-sm">
+        <Trans comment="当前诗词没有注释、赏析或源注释时的阅读空态">
+          暂无注释
+        </Trans>
+      </p>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-4 wrap-break-word">
+      <AnnotationSection title={t`注释`} body={remark} />
+      <AnnotationSection title={t`赏析`} body={appreciation} />
+      {notes.length > 0 ? (
+        <section className="flex flex-col gap-1">
+          <h3 className="text-muted-foreground text-sm font-medium">{t`源注释`}</h3>
+          <ul className="text-muted-foreground flex list-disc flex-col gap-1 pl-4 text-sm leading-relaxed">
+            {notes.map((note, index) => (
+              <li key={index}>{note}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </div>
   );
 }
 

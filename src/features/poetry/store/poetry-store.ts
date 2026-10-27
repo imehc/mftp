@@ -3,6 +3,13 @@ import { persist } from "zustand/middleware";
 
 import type { PoetryCollectionStatus, PoetrySearchScope } from "~/types";
 
+import {
+  type PoetryReadingView,
+  type PoetryReferenceView,
+  resolvePoetryReadingView,
+  resolvePoetryReferenceView,
+} from "../reading-view";
+
 interface PoetryState {
   /** 来自 `poetry_collections()` 的已安装合集缓存镜像。 */
   collections: PoetryCollectionStatus[];
@@ -22,6 +29,9 @@ interface PoetryState {
   clearSearchHistory: () => void;
 
   /** 详情面板的阅读偏好。 */
+  readingView: PoetryReadingView;
+  referenceView: PoetryReferenceView;
+  setReadingView: (view: PoetryReadingView) => void;
   fontSize: number;
   lineHeight: number;
   speechVoiceId: string | null;
@@ -69,6 +79,14 @@ export const usePoetryStore = create<PoetryState>()(
         })),
       clearSearchHistory: () => set({ searchHistory: [] }),
 
+      readingView: "original",
+      referenceView: "translation",
+      setReadingView: (readingView) =>
+        set((state) => ({
+          readingView,
+          referenceView:
+            readingView === "original" ? state.referenceView : readingView,
+        })),
       fontSize: 17,
       lineHeight: 1.9,
       speechVoiceId: null,
@@ -81,6 +99,19 @@ export const usePoetryStore = create<PoetryState>()(
     {
       name: "mftp-poetry",
       version: 1,
+      // 新字段向后兼容版本 1；损坏的标签值不覆盖默认值或影响既有阅读偏好。
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<PoetryState> | undefined;
+        return {
+          ...current,
+          ...saved,
+          readingView:
+            resolvePoetryReadingView(saved?.readingView) ?? current.readingView,
+          referenceView:
+            resolvePoetryReferenceView(saved?.referenceView) ??
+            current.referenceView,
+        };
+      },
       partialize: (state) => ({
         // 合集是运行时缓存；只持久化用户偏好。
         activeCollectionIds: state.activeCollectionIds,
@@ -90,6 +121,8 @@ export const usePoetryStore = create<PoetryState>()(
         lineHeight: state.lineHeight,
         speechVoiceId: state.speechVoiceId,
         speechRate: state.speechRate,
+        readingView: state.readingView,
+        referenceView: state.referenceView,
       }),
     },
   ),

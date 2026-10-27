@@ -36,15 +36,19 @@ import PoemCard from "./components/PoemCard";
 import PoemDetailPane from "./components/PoemDetail";
 import PoemList from "./components/PoemList";
 import PoetryReadError from "./components/PoetryReadError";
+import ReadingSettingsPopover from "./components/ReadingSettingsPopover";
 import SearchBar from "./components/SearchBar";
 import { usePoetryLibrary } from "./hooks/use-poetry-library";
+import type { PoetryReadingView } from "./reading-view";
 import { usePoetryStore } from "./store/poetry-store";
 
 interface LibraryPageProps {
   search: {
     q?: string;
     poem?: string;
+    view?: PoetryReadingView;
   };
+  onViewChange: (view: PoetryReadingView) => void;
   onSearchChange: (patch: { q?: string }) => void;
   onOpenPoem: (uid: string) => void;
 }
@@ -82,6 +86,7 @@ function SearchResultList({
 
 export default function LibraryPage({
   search,
+  onViewChange,
   onSearchChange,
   onOpenPoem,
 }: LibraryPageProps) {
@@ -131,7 +136,7 @@ export default function LibraryPage({
         aria-label={t`数据管理`}
         title={t`数据管理`}
         to="/library/manage"
-        search={{ q: search.q, poem: search.poem }}
+        search={{ q: search.q, poem: search.poem, view: search.view }}
       >
         <SlidersHorizontal data-icon="inline-start" />
       </Link>
@@ -271,14 +276,23 @@ export default function LibraryPage({
     >
       {detailError ? (
         <PoetryReadError error={detailError} onRetry={retryDetail} />
+      ) : search.poem && !detailLoading && !detail ? (
+        <p className="text-muted-foreground p-4 text-center text-sm">
+          <Trans>没有找到作品</Trans>
+        </p>
       ) : (
         <PoemDetailPane
+          settingsInHeader={!narrow}
           detail={detail}
           loading={detailLoading}
           fontSize={fontSize}
           lineHeight={lineHeight}
           onFontSizeChange={setFontSize}
           onLineHeightChange={setLineHeight}
+          returnQuery={search.q}
+          returnPage="library"
+          view={search.view}
+          onViewChange={onViewChange}
         />
       )}
     </div>
@@ -293,6 +307,14 @@ export default function LibraryPage({
         title={<Trans>古诗词</Trans>}
         trailing={
           <>
+            {!narrow && detail && !detailLoading && !detailError ? (
+              <ReadingSettingsPopover
+                fontSize={fontSize}
+                lineHeight={lineHeight}
+                onFontSizeChange={setFontSize}
+                onLineHeightChange={setLineHeight}
+              />
+            ) : null}
             <Button
               variant="ghost"
               size="icon-sm"

@@ -1,8 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 
-import type { PoetryTranslationMode } from "~/bindings";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
 
@@ -10,6 +9,7 @@ import PoemDetail from "./components/PoemDetail";
 import PoetryReadError from "./components/PoetryReadError";
 import ReadingSettingsPopover from "./components/ReadingSettingsPopover";
 import { usePoemRead } from "./hooks/use-poem-read";
+import type { PoetryReadingView } from "./reading-view";
 import { usePoetryStore } from "./store/poetry-store";
 
 /**
@@ -19,13 +19,13 @@ import { usePoetryStore } from "./store/poetry-store";
 export default function PoemDetailPage({
   uid,
   backQuery,
-  initialTranslationMode,
-  onTranslationModeChange,
+  view,
+  onViewChange,
 }: {
   uid: string;
   backQuery?: string;
-  initialTranslationMode?: PoetryTranslationMode;
-  onTranslationModeChange?: (mode: PoetryTranslationMode) => void;
+  view?: PoetryReadingView;
+  onViewChange?: (view: PoetryReadingView) => void;
 }) {
   const { t } = useLingui();
   const fontSize = usePoetryStore((s) => s.fontSize);
@@ -42,12 +42,24 @@ export default function PoemDetailPage({
         showHome={false}
         title={detail?.title ?? <Trans>古诗词</Trans>}
         trailing={
-          <ReadingSettingsPopover
-            fontSize={fontSize}
-            lineHeight={lineHeight}
-            onFontSizeChange={setFontSize}
-            onLineHeightChange={setLineHeight}
-          />
+          <>
+            <ReadingSettingsPopover
+              fontSize={fontSize}
+              lineHeight={lineHeight}
+              onFontSizeChange={setFontSize}
+              onLineHeightChange={setLineHeight}
+            />
+            <Button variant="ghost" size="icon-sm" asChild>
+              <Link
+                to="/library/manage"
+                search={{ poem: uid, q: backQuery, view, from: "detail" }}
+                aria-label={t`数据管理`}
+                title={t`数据管理`}
+              >
+                <SlidersHorizontal aria-hidden />
+              </Link>
+            </Button>
+          </>
         }
         leading={
           <Button variant="ghost" size="icon-sm" asChild>
@@ -80,8 +92,10 @@ export default function PoemDetailPage({
           lineHeight={lineHeight}
           onFontSizeChange={setFontSize}
           onLineHeightChange={setLineHeight}
-          initialTranslationMode={initialTranslationMode}
-          onTranslationModeChange={onTranslationModeChange}
+          view={view}
+          onViewChange={onViewChange}
+          returnQuery={backQuery}
+          returnPage="detail"
         />
       )}
     </main>

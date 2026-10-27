@@ -164,6 +164,7 @@ export const homeEntries: HomeEntry[] = [
     category: "library",
     link: linkOptions({
       to: "/library",
+      search: { resume: true },
       preload: "intent",
     }),
     icon: BookMarked,

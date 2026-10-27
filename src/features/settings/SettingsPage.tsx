@@ -2,7 +2,6 @@ import { useLingui } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
-import type { PoetryTranslationMode } from "~/bindings";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
@@ -10,6 +9,8 @@ import AiConfigurationSettings from "~/features/ai-configuration/AiConfiguration
 import AiWorkspaceMenu from "~/features/ai-configuration/AiWorkspaceMenu";
 import BackupPage from "~/features/export/BackupPage";
 import { McpSettingsPanel } from "~/features/mcp/integration";
+import { poetryReadingLink } from "~/features/poetry/reading-navigation";
+import type { PoetryReadingView } from "~/features/poetry/reading-view";
 
 import FeatureEntrySettings from "./FeatureEntrySettings";
 import SettingsOverview from "./SettingsOverview";
@@ -21,7 +22,8 @@ export default function SettingsPage({
     panel?: "ai" | "data" | "features" | "mcp";
     returnUid?: string;
     returnQ?: string;
-    returnMode?: PoetryTranslationMode;
+    returnView?: PoetryReadingView;
+    returnPage?: "library" | "detail";
   };
 }) {
   const { t } = useLingui();
@@ -58,12 +60,12 @@ export default function SettingsPage({
             {returnContext?.returnUid ? (
               <Button variant="outline" density="adaptive" asChild>
                 <Link
-                  to="/library/$id"
-                  params={{ id: returnContext.returnUid }}
-                  search={{
+                  {...poetryReadingLink({
+                    page: returnContext.returnPage ?? "detail",
+                    uid: returnContext.returnUid,
                     q: returnContext.returnQ,
-                    mode: returnContext.returnMode,
-                  }}
+                    view: returnContext.returnView,
+                  })}
                 >{t`返回诗词`}</Link>
               </Button>
             ) : null}

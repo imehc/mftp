@@ -1,15 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 import { useRememberTool } from "~/features/navigation/use-remember-tool";
+import {
+  beginPoetryReading,
+  usePoetryReadingRoute,
+} from "~/features/poetry/hooks/use-poetry-reading-route";
 import LibraryPage from "~/features/poetry/LibraryPage";
+import {
+  parsePoetryLibrarySearch,
+  poetryResumeLink,
+} from "~/features/poetry/reading-navigation";
+import type { PoetryReadingView } from "~/features/poetry/reading-view";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
-
-interface LibrarySearch {
-  /** 内联全文检索词；保留在 URL 中以便返回 / 分享。 */
-  q?: string;
-  /** 在详情面板中展示的所选诗词 uid（桌面端主从布局）。 */
-  poem?: string;
-}
 
 function LibraryRoute() {
   const desktop = useDesktopLayout();
@@ -17,7 +19,13 @@ function LibraryRoute() {
   const navigate = useNavigate();
 
   const search = Route.useSearch();
-  const onSearchChange = (patch: { q?: string }) =>
+  const view = usePoetryReadingRoute({
+    page: "library",
+    uid: search.poem,
+    q: search.q,
+    view: search.view,
+  });
+  const onSearchChange = (patch: { q?: string; view?: PoetryReadingView }) =>
     void navigate({
       to: "/library",
       replace: true,
@@ -25,21 +33,29 @@ function LibraryRoute() {
     });
   return (
     <LibraryPage
-      search={search}
+      search={{ ...search, view }}
+      onViewChange={(nextView) => onSearchChange({ view: nextView })}
       onSearchChange={onSearchChange}
       onOpenPoem={(uid) => {
+        const nextView =
+          uid && uid !== search.poem ? beginPoetryReading(uid) : view;
         if (!desktop && uid) {
           void navigate({
             to: "/library/$id",
             params: { id: uid },
-            search: { q: search.q },
+            search: { q: search.q, view: nextView },
           });
           return;
         }
         void navigate({
           to: "/library",
           // 空 uid 表示关掉详情（窄桌面单栏用返回按钮触发），要真正去掉参数。
-          search: (prev) => ({ ...prev, poem: uid || undefined }),
+          search: (prev) => ({
+            ...prev,
+            poem: uid || undefined,
+            view: nextView,
+            resume: undefined,
+          }),
         });
       }}
     />
@@ -47,9 +63,11 @@ function LibraryRoute() {
 }
 
 export const Route = createFileRoute("/library/")({
-  validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
-    q: typeof search.q === "string" ? search.q : undefined,
-    poem: typeof search.poem === "string" ? search.poem : undefined,
-  }),
+  validateSearch: parsePoetryLibrarySearch,
+  beforeLoad: ({ search, preload }) => {
+    if (preload) return;
+    const destination = poetryResumeLink(search);
+    if (destination) throw redirect({ ...destination, replace: true });
+  },
   component: LibraryRoute,
 });

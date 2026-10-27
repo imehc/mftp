@@ -48,7 +48,7 @@ msgstr "{clientCount} clients"
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
 
-#: src/features/poetry/components/CollectionManagement.tsx:54
+#: src/features/poetry/components/CollectionManagement.tsx:56
 msgid "{count, plural, one {# 篇} other {# 篇}}"
 msgstr "{count, plural, one {# poem} other {# poems}}"
 
@@ -362,7 +362,7 @@ msgstr "The AI database is newer than this app. Please update the app."
 #: src/features/logs/log-labels.ts:129
 #: src/features/logs/use-activity-logs.ts:37
 #: src/features/settings/SettingsOverview.tsx:70
-#: src/features/settings/SettingsPage.tsx:41
+#: src/features/settings/SettingsPage.tsx:43
 msgid "AI 服务"
 msgstr "AI Service"
 
@@ -431,7 +431,7 @@ msgstr "AI models"
 msgid "AI 流式请求标识无效"
 msgstr "Invalid AI streaming request ID"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:205
+#: src/features/poetry/components/PoetryTranslationSection.tsx:110
 msgid "AI 生成"
 msgstr "AI generated"
 
@@ -612,7 +612,7 @@ msgstr "MCP authorization was revoked or is unavailable. Check your credential."
 
 #. 本地数据维护被 MCP 工具的编辑草稿或在途操作阻止时显示的任务名称。
 #: src/features/mcp/integration.tsx:17
-#: src/features/settings/SettingsPage.tsx:41
+#: src/features/settings/SettingsPage.tsx:43
 #: src/lib/errors/messages.ts:313
 msgid "MCP 服务"
 msgstr "MCP service"
@@ -929,9 +929,9 @@ msgstr "Download recording"
 msgid "下载截图"
 msgstr "Download screenshot"
 
-#: src/features/poetry/components/CollectionManagement.tsx:173
-#: src/features/poetry/components/CollectionManagement.tsx:174
-#: src/features/poetry/components/CollectionManagement.tsx:179
+#: src/features/poetry/components/CollectionManagement.tsx:177
+#: src/features/poetry/components/CollectionManagement.tsx:178
+#: src/features/poetry/components/CollectionManagement.tsx:184
 msgid "下载所选"
 msgstr "Download selected"
 
@@ -1090,7 +1090,7 @@ msgid "中"
 msgstr "Medium"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:39
-#: src/features/home/entries.tsx:210
+#: src/features/home/entries.tsx:211
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -1198,7 +1198,7 @@ msgid "互换语言"
 msgstr "Swap languages"
 
 #: src/features/games/gomoku/GomokuGame.tsx:40
-#: src/features/home/entries.tsx:190
+#: src/features/home/entries.tsx:191
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -1220,7 +1220,7 @@ msgstr "Pass back"
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "Swapped {formatBytesValue} / {formatBytesValue2}"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:205
+#: src/features/poetry/components/PoetryTranslationSection.tsx:110
 msgid "人工修订"
 msgstr "Manually revised"
 
@@ -1233,6 +1233,10 @@ msgstr "Upload Only"
 #: src/features/mcp/McpCredentialDialogs.tsx:173
 msgid "仅交给可信的本机 MCP 客户端。共享凭据等于共享数据访问权限。"
 msgstr "Only share this with trusted local MCP clients. Sharing a credential grants the same data access."
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:371
+msgid "仅删除当前这条译文；如有其他历史译文，将继续显示。不影响原文和注释。"
+msgstr "Only this translation will be deleted. Any remaining saved translation will be shown. The original poem and annotations are unaffected."
 
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:246
 msgid "仅删除模型库中的附件副本，原始文件不受影响。"
@@ -1306,7 +1310,7 @@ msgid "仍有数据未清理，暂时无法完成重置"
 msgstr "Some data still needs to be cleared before the reset can finish."
 
 #. 诗词详情页未选中作品时的引导，列表在左侧
-#: src/features/poetry/components/PoemDetail.tsx:98
+#: src/features/poetry/components/PoemDetail.tsx:136
 msgid "从左侧选择"
 msgstr "Select from the list on the left."
 
@@ -1522,7 +1526,7 @@ msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:554
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:139
-#: src/features/poetry/components/PoetryTranslationSection.tsx:361
+#: src/features/poetry/components/PoetryTranslationSection.tsx:360
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:458
 #: src/features/todo/TodoItemDialog.tsx:338
 #: src/features/vault/VaultEntryDialog.tsx:251
@@ -1790,7 +1794,7 @@ msgstr "Solids"
 
 #: src/features/formatter/use-formatter.ts:59
 #: src/features/poetry/components/SearchBar.tsx:39
-#: src/features/poetry/LibraryPage.tsx:195
+#: src/features/poetry/LibraryPage.tsx:200
 msgid "全部"
 msgstr "All"
 
@@ -1807,7 +1811,7 @@ msgstr "All priorities"
 msgid "全部分类"
 msgstr "All categories"
 
-#: src/features/poetry/components/CollectionManagement.tsx:139
+#: src/features/poetry/components/CollectionManagement.tsx:141
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
 
@@ -1931,9 +1935,9 @@ msgstr "Full-text search is slower while this is off."
 msgid "关闭编辑草稿"
 msgstr "Close editing draft"
 
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:95
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:150
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:174
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:94
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:149
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:173
 msgid "关闭连接"
 msgstr "Close connection"
 
@@ -2183,7 +2187,7 @@ msgstr "Creating directory"
 #: src/features/mcp/McpToolsTable.tsx:171
 #: src/features/model-viewer/components/LibraryPanel.tsx:314
 #: src/features/poetry/components/PoetryLocalManagement.tsx:130
-#: src/features/poetry/components/PoetryTranslationSection.tsx:381
+#: src/features/poetry/components/PoetryTranslationSection.tsx:382
 #: src/features/settings/TransferSetting.tsx:56
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:91
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:166
@@ -2254,10 +2258,6 @@ msgstr "Delete all saved summaries?"
 #: src/features/logs/log-labels.ts:97
 msgid "删除共享目录"
 msgstr "Remove shared folder"
-
-#: src/features/poetry/components/PoetryTranslationSection.tsx:372
-msgid "删除后可重新生成，不影响原文和注释。"
-msgstr "You can generate it again later. The original text and annotations are unaffected."
 
 #: src/features/todo/TodoTool.tsx:304
 msgid "删除后无法恢复。"
@@ -2346,8 +2346,8 @@ msgstr "Delete annotation library"
 msgid "删除白名单"
 msgstr "Remove from allowlist"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:241
-#: src/features/poetry/components/PoetryTranslationSection.tsx:242
+#: src/features/poetry/components/PoetryTranslationSection.tsx:146
+#: src/features/poetry/components/PoetryTranslationSection.tsx:147
 msgid "删除译文"
 msgstr "Delete translation"
 
@@ -2430,7 +2430,7 @@ msgstr "Features"
 
 #: src/features/settings/FeatureEntrySettings.tsx:158
 #: src/features/settings/SettingsOverview.tsx:76
-#: src/features/settings/SettingsPage.tsx:41
+#: src/features/settings/SettingsPage.tsx:43
 msgid "功能入口"
 msgstr "Feature entries"
 
@@ -2481,9 +2481,10 @@ msgstr "Loading"
 #: src/features/bt/components/FileBrowserPanel.tsx:194
 #: src/features/bt/components/PeersPanel.tsx:78
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:237
-#: src/features/poetry/components/CollectionManagement.tsx:130
+#: src/features/poetry/components/CollectionManagement.tsx:132
 #: src/features/poetry/components/PoemList.tsx:192
 #: src/features/poetry/components/PoetryLocalManagement.tsx:79
+#: src/features/poetry/components/PoetryTranslationSection.tsx:189
 #: src/features/preview/PreviewScreen.tsx:81
 #: src/features/preview/PreviewSurface.tsx:139
 #: src/features/ssh-sftp/components/sftp/RemoteDirectoryPicker.tsx:208
@@ -2585,7 +2586,7 @@ msgstr "Once"
 msgid "卸载"
 msgstr "Uninstall"
 
-#: src/features/poetry/components/CollectionManagement.tsx:78
+#: src/features/poetry/components/CollectionManagement.tsx:80
 msgid "卸载 {name}"
 msgstr "Uninstall {name}"
 
@@ -2703,8 +2704,8 @@ msgstr "Original response"
 msgid "原始字节（十六进制）"
 msgstr "Raw bytes (hex)"
 
-#: src/features/poetry/components/PoemDetail.tsx:139
-#: src/features/poetry/components/ReadingModeTabs.tsx:9
+#: src/features/poetry/components/PoemDetail.tsx:197
+#: src/features/poetry/components/ReadingModeTabs.tsx:19
 msgid "原文"
 msgstr "Original"
 
@@ -2716,7 +2717,7 @@ msgstr "The input exceeds the model context limit. Shorten the text and try agai
 msgid "去下载"
 msgstr "Download it"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:145
+#: src/features/poetry/components/PoetryTranslationSection.tsx:179
 msgid "去设置"
 msgstr "Open settings"
 
@@ -2791,9 +2792,9 @@ msgstr "Sending"
 #: src/features/mcp/McpCredentialEditor.tsx:195
 #: src/features/model-viewer/components/AttachmentsDialog.tsx:252
 #: src/features/model-viewer/components/LibraryPanel.tsx:304
-#: src/features/poetry/components/PoetryTranslationSection.tsx:348
-#: src/features/poetry/components/PoetryTranslationSection.tsx:376
-#: src/features/poetry/components/PoetryTranslationSection.tsx:396
+#: src/features/poetry/components/PoetryTranslationSection.tsx:347
+#: src/features/poetry/components/PoetryTranslationSection.tsx:377
+#: src/features/poetry/components/PoetryTranslationSection.tsx:409
 #: src/features/poetry/LibraryManagePage.tsx:105
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:450
 #: src/features/ssh-sftp/components/hosts/PassphrasePrompt.tsx:91
@@ -2871,7 +2872,7 @@ msgstr "Canceling the archive operation timed out. Please try again later."
 msgid "取消检查"
 msgstr "Cancel inspection"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:194
+#: src/features/poetry/components/PoetryTranslationSection.tsx:237
 msgid "取消生成"
 msgstr "Cancel generation"
 
@@ -2908,9 +2909,9 @@ msgstr "Morph target"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/features/home/entries.tsx:170
-#: src/features/poetry/LibraryPage.tsx:145
-#: src/features/poetry/LibraryPage.tsx:293
+#: src/features/home/entries.tsx:171
+#: src/features/poetry/LibraryPage.tsx:150
+#: src/features/poetry/LibraryPage.tsx:307
 #: src/features/poetry/PoemDetailPage.tsx:43
 msgid "古诗词"
 msgstr "Classical Poetry"
@@ -2929,7 +2930,7 @@ msgstr "Updates can only be checked in the desktop app"
 msgid "只读"
 msgstr "Read Only"
 
-#: src/features/poetry/components/CollectionManagement.tsx:133
+#: src/features/poetry/components/CollectionManagement.tsx:135
 msgid "可下载合集"
 msgstr "Available collections"
 
@@ -2950,12 +2951,12 @@ msgstr "Available tools"
 msgid "可能朝内的壳体"
 msgstr "Possibly inward shells"
 
-#: src/features/poetry/components/CollectionManagement.tsx:47
+#: src/features/poetry/components/CollectionManagement.tsx:49
 msgid "可选"
 msgstr "Optional"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:102
-#: src/features/home/entries.tsx:180
+#: src/features/home/entries.tsx:181
 msgid "台球"
 msgstr "Billiards"
 
@@ -3151,7 +3152,7 @@ msgid "困难"
 msgstr "Hard"
 
 #: src/features/games/go/GoGame.tsx:40
-#: src/features/home/entries.tsx:200
+#: src/features/home/entries.tsx:201
 msgid "围棋"
 msgstr "Go"
 
@@ -3239,7 +3240,7 @@ msgid "在同一模型表面选取两点。"
 msgstr "Pick two points on the same model."
 
 #. 指向标题栏的数据管理入口
-#: src/features/poetry/LibraryPage.tsx:159
+#: src/features/poetry/LibraryPage.tsx:164
 msgid "在数据管理页下载合集。"
 msgstr "Download collections on the Data Management page."
 
@@ -3513,7 +3514,7 @@ msgstr "Size"
 #: src/features/connection-diagnostics/ExecutionLogStatus.tsx:40
 #: src/features/lan-transfer/LanTransferActivity.tsx:23
 #: src/features/logs/use-activity-logs.ts:56
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:200
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:199
 #: src/store/transfers.ts:210
 msgid "失败"
 msgstr "Failed"
@@ -3547,7 +3548,7 @@ msgstr "Media processing mode"
 msgid "字体"
 msgstr "Font"
 
-#: src/features/poetry/components/ReadingSettingsPopover.tsx:54
+#: src/features/poetry/components/ReadingSettingsPopover.tsx:52
 msgid "字号"
 msgstr "Font size"
 
@@ -3940,10 +3941,6 @@ msgstr "Download engine data and cache are cleared; files in the download folder
 msgid "将结果写回输入并切换模式"
 msgstr "Write result back to input and switch mode"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:392
-msgid "将覆盖当前人工修订。"
-msgstr "This will overwrite the current manual revision."
-
 #. 计划时刻的小时选择，24 小时制
 #: src/features/todo/hooks/use-todo-time-fields.ts:23
 msgid "小时"
@@ -3953,7 +3950,7 @@ msgstr "Hour"
 msgid "小游戏"
 msgstr "Games"
 
-#: src/features/poetry/components/CollectionManagement.tsx:149
+#: src/features/poetry/components/CollectionManagement.tsx:151
 msgid "尚未安装合集"
 msgstr "No collections installed"
 
@@ -3965,11 +3962,11 @@ msgstr "No authorizations yet. Add one to connect a client."
 msgid "尚未注册工具"
 msgstr "No tools registered"
 
-#: src/features/poetry/components/PoemDetail.tsx:95
+#: src/features/poetry/components/PoemDetail.tsx:133
 msgid "尚未选择作品"
 msgstr "No poem selected"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:135
+#: src/features/poetry/components/PoetryTranslationSection.tsx:164
 msgid "尚未配置 AI 服务"
 msgstr "AI service is not configured"
 
@@ -4084,7 +4081,7 @@ msgstr "Downloaded {downloadedSize}"
 
 #. 待办新增或编辑保存成功的提示
 #: src/features/media-compress/components/CompressResultCard.tsx:43
-#: src/features/poetry/hooks/use-poetry-translations.ts:181
+#: src/features/poetry/hooks/use-poetry-translations.ts:184
 #: src/features/todo/hooks/use-todo.ts:62
 #: src/features/vault/use-vault.ts:96
 msgid "已保存"
@@ -4135,7 +4132,7 @@ msgstr ""
 #: src/features/bt/BtTool.tsx:195
 #: src/features/poetry/components/TranslationPackManager.tsx:61
 #: src/features/poetry/hooks/use-poetry-local-data.ts:140
-#: src/features/poetry/hooks/use-poetry-translations.ts:200
+#: src/features/poetry/hooks/use-poetry-translations.ts:203
 #: src/features/todo/hooks/use-todo.ts:89
 #: src/features/vault/use-vault.ts:108
 msgid "已删除"
@@ -4210,7 +4207,7 @@ msgstr "Screenshot export cancelled."
 msgid "已取消排序"
 msgstr "Reordering canceled"
 
-#: src/features/poetry/hooks/use-poetry-translations.ts:136
+#: src/features/poetry/hooks/use-poetry-translations.ts:138
 msgid "已取消生成"
 msgstr "Generation cancelled"
 
@@ -4242,7 +4239,7 @@ msgstr "An attachment with this name already exists. Rename the file or remove t
 msgid "已存在相同的标签或模型。"
 msgstr "The same label or model already exists."
 
-#: src/features/poetry/components/CollectionManagement.tsx:143
+#: src/features/poetry/components/CollectionManagement.tsx:145
 #: src/features/translation/ModelManager.tsx:282
 msgid "已安装"
 msgstr "Installed"
@@ -4289,7 +4286,7 @@ msgstr "Launch at Login enabled"
 msgid "已开始调整账号顺序"
 msgstr "Account reordering started"
 
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:127
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:126
 msgid "已打开的连接"
 msgstr "Open connections"
 
@@ -4324,7 +4321,7 @@ msgstr "Changed to automatic binding"
 msgid "已改为自动绑定，重启服务后生效"
 msgstr "Changed to automatic binding. Restart the service to take effect."
 
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:199
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:198
 msgid "已断开"
 msgstr "Disconnected"
 
@@ -4371,7 +4368,7 @@ msgstr "Trusted device added"
 msgid "已清理"
 msgstr "Cleared"
 
-#: src/features/poetry/hooks/use-poetry-translations.ts:131
+#: src/features/poetry/hooks/use-poetry-translations.ts:133
 msgid "已生成"
 msgstr "Generated"
 
@@ -4397,7 +4394,7 @@ msgid "已解压到 {outName}"
 msgstr "Extracted to {outName}"
 
 #: src/features/ssh-sftp/components/hosts/HostRow.tsx:63
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:198
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:197
 msgid "已连接"
 msgstr "Connected"
 
@@ -4418,7 +4415,7 @@ msgstr "Selected {clipName}"
 msgid "已重命名为 {trimmed}"
 msgstr ""
 
-#: src/features/poetry/components/PoemAnnotations.tsx:52
+#: src/features/poetry/components/PoemAnnotations.tsx:59
 msgid "平仄"
 msgstr "Tonal pattern"
 
@@ -4543,7 +4540,7 @@ msgstr "Open mode skips confirmation codes"
 msgid "开放网格无法确定内外，法线不一致仅为提示；退化三角形不计入边统计。"
 msgstr "Open meshes have no inside or outside, and inconsistent normals are only a hint. Degenerate triangles are excluded from edge counts."
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:286
+#: src/features/poetry/components/PoetryTranslationSection.tsx:278
 msgid "开放译文"
 msgstr "Open translation"
 
@@ -5007,7 +5004,7 @@ msgstr "Open"
 msgid "打开一个 3D 模型"
 msgstr "Open a 3D model"
 
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:165
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:164
 #: src/features/ssh-sftp/SshSftpTool.tsx:71
 #: src/features/ssh-sftp/SshSftpTool.tsx:213
 msgid "打开主机列表"
@@ -5139,8 +5136,8 @@ msgstr "Drop an image here, or choose a file"
 msgid "拖放视频到此处，或选择文件"
 msgstr "Drop a video here, or choose a file"
 
-#: src/features/poetry/LibraryPage.tsx:179
-#: src/features/poetry/LibraryPage.tsx:180
+#: src/features/poetry/LibraryPage.tsx:184
+#: src/features/poetry/LibraryPage.tsx:185
 msgid "按合集筛选"
 msgstr "Filter by collection"
 
@@ -5227,7 +5224,7 @@ msgid "推杆"
 msgstr "Follow"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:225
-#: src/features/poetry/components/CollectionManagement.tsx:44
+#: src/features/poetry/components/CollectionManagement.tsx:46
 #: src/features/translation/ModelManager.tsx:277
 msgid "推荐"
 msgstr "Recommended"
@@ -5366,7 +5363,7 @@ msgstr "Operation ID"
 #: src/features/poetry/hooks/use-poetry-local-data.ts:121
 #: src/features/poetry/hooks/use-poetry-local-data.ts:132
 #: src/features/poetry/hooks/use-poetry-local-data.ts:142
-#: src/features/poetry/hooks/use-poetry-translations.ts:59
+#: src/features/poetry/hooks/use-poetry-translations.ts:61
 msgid "操作失败"
 msgstr "Operation failed"
 
@@ -5445,8 +5442,10 @@ msgstr "Data and runtime"
 msgid "数据导入与导出"
 msgstr "Import and export data"
 
-#: src/features/poetry/LibraryPage.tsx:131
-#: src/features/poetry/LibraryPage.tsx:132
+#: src/features/poetry/LibraryPage.tsx:136
+#: src/features/poetry/LibraryPage.tsx:137
+#: src/features/poetry/PoemDetailPage.tsx:56
+#: src/features/poetry/PoemDetailPage.tsx:57
 msgid "数据管理"
 msgstr "Data Management"
 
@@ -5516,10 +5515,6 @@ msgstr "The file selection contains duplicates"
 #: src/features/preview/PreviewScreen.tsx:52
 msgid "文件预览"
 msgstr "File preview"
-
-#: src/features/poetry/components/PoetryTranslationSection.tsx:123
-msgid "文学意译"
-msgstr "Literary"
 
 #: src/features/home/entries.tsx:41
 msgid "文库"
@@ -5880,7 +5875,7 @@ msgstr "No hosts"
 msgid "暂无任务"
 msgstr "No tasks"
 
-#: src/features/poetry/components/PoemAnnotations.tsx:86
+#: src/features/poetry/components/PoemAnnotations.tsx:131
 msgid "暂无作者小传。"
 msgstr "No author biography yet."
 
@@ -5914,7 +5909,7 @@ msgid "暂无对局记录"
 msgstr "No games played yet"
 
 #. 诗词库在未下载任何语料合集时的空状态
-#: src/features/poetry/LibraryPage.tsx:154
+#: src/features/poetry/LibraryPage.tsx:159
 msgid "暂无已下载语料"
 msgstr "No downloaded collections"
 
@@ -5941,6 +5936,11 @@ msgstr "No logs"
 msgid "暂无服务地址"
 msgstr "No service endpoints"
 
+#. 当前诗词没有注释、赏析或源注释时的阅读空态
+#: src/features/poetry/components/PoemAnnotations.tsx:89
+msgid "暂无注释"
+msgstr "No annotations yet"
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:388
 msgid "暂无白名单"
 msgstr "No trusted devices"
@@ -5949,7 +5949,7 @@ msgstr "No trusted devices"
 msgid "暂无设备"
 msgstr "No devices"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:267
+#: src/features/poetry/components/PoetryTranslationSection.tsx:259
 msgid "暂无译文"
 msgstr "No translation"
 
@@ -6091,7 +6091,7 @@ msgstr "Replace"
 msgid "替换为"
 msgstr "Replace with"
 
-#: src/features/poetry/components/PoemDetail.tsx:184
+#: src/features/poetry/components/PoemDetail.tsx:239
 msgid "有朗诵"
 msgstr "Audio available"
 
@@ -6505,7 +6505,7 @@ msgstr "Viewer panels"
 msgid "查看备注图片"
 msgstr "View note images"
 
-#: src/features/updater/UpdaterReleaseNotes.tsx:67
+#: src/features/updater/UpdaterReleaseNotes.tsx:69
 msgid "查看完整发布说明"
 msgstr "View full release notes"
 
@@ -7090,7 +7090,7 @@ msgstr "Checking reset status"
 msgid "正在检测 rsync 并生成同步预览…"
 msgstr "Detecting rsync and generating a sync preview…"
 
-#: src/features/poetry/LibraryPage.tsx:230
+#: src/features/poetry/LibraryPage.tsx:235
 msgid "正在检索…"
 msgstr "Searching…"
 
@@ -7106,12 +7106,14 @@ msgstr "Clearing…"
 msgid "正在清理应用数据"
 msgstr "Clearing app data"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:191
+#: src/features/poetry/components/PoetryTranslationSection.tsx:234
 msgid "正在生成"
 msgstr "Generating"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:179
-#: src/features/poetry/components/PoetryTranslationSection.tsx:180
+#: src/features/poetry/components/PoetryTranslationSection.tsx:208
+#: src/features/poetry/components/PoetryTranslationSection.tsx:209
+#: src/features/poetry/components/PoetryTranslationSection.tsx:222
+#: src/features/poetry/components/PoetryTranslationSection.tsx:223
 msgid "正在生成，点击取消"
 msgstr "Generating, click to cancel"
 
@@ -7354,8 +7356,9 @@ msgid "没有子文件夹"
 msgstr "No child folders"
 
 #: src/features/poetry/components/PoemList.tsx:209
-#: src/features/poetry/LibraryPage.tsx:244
-#: src/features/poetry/PoemDetailPage.tsx:72
+#: src/features/poetry/LibraryPage.tsx:249
+#: src/features/poetry/LibraryPage.tsx:281
+#: src/features/poetry/PoemDetailPage.tsx:84
 msgid "没有找到作品"
 msgstr "No poems found"
 
@@ -7382,8 +7385,9 @@ msgstr "Normal shading"
 msgid "法语"
 msgstr "French"
 
-#: src/features/poetry/components/PoemDetail.tsx:214
-#: src/features/poetry/components/PoemDetail.tsx:226
+#. 诗词阅读标签，展示注释、赏析和源注释
+#: src/features/poetry/components/PoemAnnotations.tsx:97
+#: src/features/poetry/components/ReadingModeTabs.tsx:25
 msgid "注释"
 msgstr "Notes"
 
@@ -7395,12 +7399,12 @@ msgstr "Annotation pack (translations & analysis)"
 msgid "注释包下载仅支持桌面端"
 msgstr "Annotation packages can only be downloaded on desktop"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:310
+#: src/features/poetry/components/PoetryTranslationSection.tsx:309
 msgid "注释包译文"
 msgstr "Annotation Pack Translation"
 
 #: src/features/activity/ActivityEntry.tsx:61
-#: src/features/activity/ActivityEntry.tsx:96
+#: src/features/activity/ActivityEntry.tsx:98
 #: src/features/activity/ActivityPage.tsx:130
 msgid "活动"
 msgstr "Activity"
@@ -7739,6 +7743,10 @@ msgstr "Source file: {sourceSize}"
 msgid "源文件大小不等于内存占用。"
 msgstr "Source file size is not memory usage."
 
+#: src/features/poetry/components/PoemAnnotations.tsx:101
+msgid "源注释"
+msgstr "Source notes"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:224
 msgid "源视频没有音轨"
 msgstr "Source video has no audio track"
@@ -7896,7 +7904,8 @@ msgstr "Ring"
 msgid "球桌显示已中断，请重开对局。"
 msgstr "The table display was interrupted. Restart the match to continue."
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:278
+#. 生成当前诗词的现代汉语译文
+#: src/features/poetry/components/PoetryTranslationSection.tsx:270
 msgid "生成"
 msgstr "Generate"
 
@@ -8021,10 +8030,6 @@ msgstr "White"
 msgid "白棋胜"
 msgstr "White wins"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:120
-msgid "白话直译"
-msgstr "Literal"
-
 #: src/features/mcp/McpServiceBar.tsx:108
 msgid "监听端口，范围 1024 至 65535"
 msgstr "Listening port, from 1024 to 65535"
@@ -8144,7 +8149,7 @@ msgstr "Confirm change"
 msgid "确认删除"
 msgstr "Delete"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:370
+#: src/features/poetry/components/PoetryTranslationSection.tsx:369
 msgid "确认删除？"
 msgstr "Delete?"
 
@@ -8489,7 +8494,7 @@ msgid "算法"
 msgstr "Algorithm"
 
 #: src/features/ai-configuration/AiModelMenu.desktop.tsx:131
-#: src/features/ai-configuration/AiModelMenu.mobile.tsx:134
+#: src/features/ai-configuration/AiModelMenu.mobile.tsx:136
 msgid "管理 AI 配置"
 msgstr "Manage AI configuration"
 
@@ -8849,9 +8854,9 @@ msgstr "Edit permissions"
 msgid "编辑模型"
 msgstr "Edit model"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:219
-#: src/features/poetry/components/PoetryTranslationSection.tsx:220
-#: src/features/poetry/components/PoetryTranslationSection.tsx:330
+#: src/features/poetry/components/PoetryTranslationSection.tsx:124
+#: src/features/poetry/components/PoetryTranslationSection.tsx:125
+#: src/features/poetry/components/PoetryTranslationSection.tsx:329
 msgid "编辑译文"
 msgstr "Edit translation"
 
@@ -9100,7 +9105,7 @@ msgstr "Fetching resource information timed out. Check your connection or try ag
 msgid "蓝球"
 msgstr "Blue"
 
-#: src/features/poetry/components/ReadingSettingsPopover.tsx:68
+#: src/features/poetry/components/ReadingSettingsPopover.tsx:66
 msgid "行距"
 msgstr "Line height"
 
@@ -9125,10 +9130,6 @@ msgstr "Folder to Move"
 #: src/features/export/ImportPanel.tsx:29
 msgid "覆盖：替换备份涉及的模块数据"
 msgstr "Overwrite: replace data in the included modules"
-
-#: src/features/poetry/components/PoetryTranslationSection.tsx:390
-msgid "覆盖人工修订？"
-msgstr "Overwrite manual revisions?"
 
 #: src/features/export/BackupPage.tsx:136
 msgid "覆盖已有数据？"
@@ -9218,7 +9219,7 @@ msgstr "Device Name"
 #: src/features/navigation/NavigationItems.tsx:46
 #: src/features/settings/AppSettingsMenu.tsx:68
 #: src/features/settings/AppSettingsMenu.tsx:80
-#: src/features/settings/SettingsPage.tsx:41
+#: src/features/settings/SettingsPage.tsx:43
 msgid "设置"
 msgstr "Settings"
 
@@ -9270,9 +9271,9 @@ msgstr "Accessing device"
 msgid "诊断"
 msgstr "Diagnostics"
 
-#: src/features/poetry/components/PoemDetail.tsx:141
-#: src/features/poetry/components/PoetryTranslationSection.tsx:100
-#: src/features/poetry/components/ReadingModeTabs.tsx:12
+#. 古诗词正文的现代汉语译文区域
+#: src/features/poetry/components/PoetryTranslationSection.tsx:102
+#: src/features/poetry/components/ReadingModeTabs.tsx:30
 msgid "译文"
 msgstr "Translation"
 
@@ -9280,7 +9281,7 @@ msgstr "Translation"
 msgid "译文与本地语料"
 msgstr "Translations and local data"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:337
+#: src/features/poetry/components/PoetryTranslationSection.tsx:336
 msgid "译文内容"
 msgstr "Translation content"
 
@@ -9296,10 +9297,6 @@ msgstr "Invalid translation package contents"
 #: src/features/poetry/components/TranslationPackManager.tsx:45
 msgid "译文包已导入"
 msgstr "Translation pack imported"
-
-#: src/features/poetry/components/PoetryTranslationSection.tsx:109
-msgid "译文模式"
-msgstr "Translation mode"
 
 #: src/lib/errors/messages.ts:266
 msgid "译文达到输出上限，当前结果不完整，请分段翻译"
@@ -9354,7 +9351,7 @@ msgstr "Poetry library sync canceled"
 msgid "诗词数据库"
 msgstr "Poetry database"
 
-#: src/features/poetry/LibraryManagePage.tsx:49
+#: src/features/poetry/LibraryManagePage.tsx:53
 msgid "诗词数据管理"
 msgstr "Poetry data management"
 
@@ -9503,7 +9500,7 @@ msgid "请先选择视频文件"
 msgstr "Choose a video first"
 
 #. 未配置 AI 服务时无法生成译文
-#: src/features/poetry/components/PoetryTranslationSection.tsx:137
+#: src/features/poetry/components/PoetryTranslationSection.tsx:166
 msgid "请先配置 AI 服务。"
 msgstr "Set up an AI service first."
 
@@ -9669,7 +9666,7 @@ msgid "读取图片"
 msgstr "Read image"
 
 #: src/features/lan-transfer/LanTransferTool.tsx:76
-#: src/features/poetry/components/CollectionManagement.tsx:108
+#: src/features/poetry/components/CollectionManagement.tsx:110
 #: src/features/poetry/components/PoetryReadError.tsx:20
 msgid "读取失败"
 msgstr "Failed to load"
@@ -9721,7 +9718,7 @@ msgstr "Reorder hosts"
 msgid "调整全文索引"
 msgstr "Configure full-text index"
 
-#: src/features/poetry/LibraryPage.tsx:340
+#: src/features/poetry/LibraryPage.tsx:362
 msgid "调整双栏宽度"
 msgstr "Resize columns"
 
@@ -9810,7 +9807,7 @@ msgstr "The resource ID does not match the parsed result. Please try again."
 msgid "资源解析结果异常，请重试"
 msgstr "The parsed resource result is invalid. Please try again."
 
-#: src/features/poetry/components/PoemDetail.tsx:218
+#: src/features/poetry/components/PoemAnnotations.tsx:98
 msgid "赏析"
 msgstr "Appreciation"
 
@@ -9955,14 +9952,14 @@ msgid "返回上级目录"
 msgstr "Parent folder"
 
 #: src/features/bt/components/TaskFilesPage.tsx:38
-#: src/features/poetry/LibraryPage.tsx:321
+#: src/features/poetry/LibraryPage.tsx:343
 msgid "返回列表"
 msgstr "Back to list"
 
-#: src/features/poetry/LibraryManagePage.tsx:53
-#: src/features/poetry/LibraryManagePage.tsx:54
-#: src/features/poetry/PoemDetailPage.tsx:55
-#: src/features/poetry/PoemDetailPage.tsx:56
+#: src/features/poetry/LibraryManagePage.tsx:57
+#: src/features/poetry/LibraryManagePage.tsx:58
+#: src/features/poetry/PoemDetailPage.tsx:67
+#: src/features/poetry/PoemDetailPage.tsx:68
 msgid "返回古诗词"
 msgstr "Back to Classical Poetry"
 
@@ -9988,11 +9985,11 @@ msgstr "Back to modes"
 
 #: src/features/about/AboutPage.tsx:49
 #: src/features/export/BackupPage.tsx:53
-#: src/features/settings/SettingsPage.tsx:48
+#: src/features/settings/SettingsPage.tsx:50
 msgid "返回设置"
 msgstr "Back to settings"
 
-#: src/features/settings/SettingsPage.tsx:67
+#: src/features/settings/SettingsPage.tsx:69
 msgid "返回诗词"
 msgstr "Back to poem"
 
@@ -10100,7 +10097,7 @@ msgstr "The connection to the AI service timed out"
 msgid "连接与模型设置"
 msgstr "Connections and models"
 
-#: src/features/ssh-sftp/components/terminal/TabBar.tsx:197
+#: src/features/ssh-sftp/components/terminal/TabBar.tsx:196
 msgid "连接中"
 msgstr "Connecting"
 
@@ -10487,9 +10484,9 @@ msgstr "Check Again"
 msgid "重新检测"
 msgstr "Detect again"
 
-#: src/features/poetry/components/PoetryTranslationSection.tsx:230
-#: src/features/poetry/components/PoetryTranslationSection.tsx:231
-#: src/features/poetry/components/PoetryTranslationSection.tsx:398
+#: src/features/poetry/components/PoetryTranslationSection.tsx:135
+#: src/features/poetry/components/PoetryTranslationSection.tsx:136
+#: src/features/poetry/components/PoetryTranslationSection.tsx:411
 msgid "重新生成"
 msgstr "Regenerate"
 
@@ -10500,6 +10497,19 @@ msgstr "Regenerate credential"
 #: src/features/mcp/McpCredentialDialogs.tsx:95
 msgid "重新生成凭据？"
 msgstr "Regenerate the credential?"
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:402
+msgid "重新生成后将显示新的现代文译文，当前人工修订会保留为历史译文。"
+msgstr "The new modern Chinese translation will be shown. Your current edits will be kept in the saved translation history."
+
+#: src/features/poetry/components/PoetryTranslationSection.tsx:398
+msgid "重新生成将覆盖已有现代文译文中的人工修订。其他历史译文会保留。"
+msgstr "Generating again will overwrite your edits to the existing modern Chinese translation. Other saved translations will be kept."
+
+#. 用户已编辑过译文，重新生成前的确认标题
+#: src/features/poetry/components/PoetryTranslationSection.tsx:392
+msgid "重新生成译文？"
+msgstr "Generate the translation again?"
 
 #: src/features/preview/PreviewSurface.tsx:119
 msgid "重新读取"
@@ -10546,7 +10556,7 @@ msgstr "The reset has changed. Check its status again."
 #: src/features/games/billiards/BilliardsGame.tsx:120
 #: src/features/games/engine/GameSessionNotice.tsx:74
 #: src/features/lan-transfer/LanTransferTool.tsx:88
-#: src/features/poetry/components/CollectionManagement.tsx:120
+#: src/features/poetry/components/CollectionManagement.tsx:122
 #: src/features/poetry/components/PoemList.tsx:203
 #: src/features/poetry/components/PoetryLocalManagement.tsx:74
 #: src/features/poetry/components/PoetryReadError.tsx:26
@@ -10641,10 +10651,9 @@ msgstr "Keys Z→A"
 msgid "阅读、收藏与翻译"
 msgstr "Reading, favorites and translations"
 
+#: src/features/poetry/components/ReadingSettingsPopover.tsx:34
 #: src/features/poetry/components/ReadingSettingsPopover.tsx:35
-#: src/features/poetry/components/ReadingSettingsPopover.tsx:36
-#: src/features/poetry/components/ReadingSettingsPopover.tsx:39
-#: src/features/poetry/components/ReadingSettingsPopover.tsx:49
+#: src/features/poetry/components/ReadingSettingsPopover.tsx:47
 msgid "阅读设置"
 msgstr "Reading settings"
 
@@ -10678,7 +10687,7 @@ msgstr "Descending"
 msgid "隐藏密码"
 msgstr "Hide password"
 
-#: src/features/poetry/LibraryPage.tsx:300
+#: src/features/poetry/LibraryPage.tsx:322
 msgid "随机"
 msgstr "Random"
 
@@ -10853,7 +10862,7 @@ msgstr "Black"
 msgid "黑胜"
 msgstr "Black wins"
 
-#: src/features/poetry/components/CollectionManagement.tsx:46
+#: src/features/poetry/components/CollectionManagement.tsx:48
 #: src/features/settings/AppearanceSettings.tsx:54
 #: src/features/settings/AppSettingsMenu.tsx:183
 msgid "默认"

@@ -6,7 +6,6 @@ import type {
   AppError,
   PoetryPackTranslation,
   PoetryTranslation,
-  PoetryTranslationMode,
 } from "~/bindings";
 import { hasAiRequestSelection } from "~/features/ai-configuration/request-readiness";
 import { describeError, toIpcError } from "~/lib/errors";
@@ -19,13 +18,14 @@ import {
   poetryTranslationUpdate,
 } from "~/lib/ipc";
 
+import {
+  selectPoetryPackTranslations,
+  selectPoetryTranslation,
+} from "../translation-selection";
+
 /** 阅读内容切换只改变可见性，本 controller 在同一作品内持续持有请求和草稿。 */
-export function usePoetryTranslations(
-  uid: string,
-  initialMode: PoetryTranslationMode = "literal",
-) {
+export function usePoetryTranslations(uid: string) {
   const { t } = useLingui();
-  const [mode, setMode] = useState<PoetryTranslationMode>(initialMode);
   const [translations, setTranslations] = useState<PoetryTranslation[]>([]);
   const [packTranslations, setPackTranslations] = useState<
     PoetryPackTranslation[]
@@ -49,9 +49,11 @@ export function usePoetryTranslations(
   const cancelGenerationRef = useRef<(() => Promise<void>) | null>(null);
   // 取消与「完成」可能同时发生：先点取消的一方决定结果不被采用。
   const cancelRequestedRef = useRef(false);
-  const current = translations.find((item) => item.mode === mode) ?? null;
-  const currentPackTranslations = packTranslations.filter(
-    (item) => item.mode === mode,
+  const current = selectPoetryTranslation(translations);
+  const currentPackTranslations =
+    selectPoetryPackTranslations(packTranslations);
+  const replacesManualTranslation = translations.some(
+    (item) => item.mode === "literal" && item.source === "user",
   );
 
   /** 失败统一走 toast：页面里不再常驻错误条，避免把后端原文堆在正文中。 */
@@ -112,12 +114,12 @@ export function usePoetryTranslations(
     setConfigurationMissing(false);
     try {
       const configuration = await aiConfigurationGet();
-      if (!mountedRef.current) return;
+      if (!mountedRef.current || cancelRequestedRef.current) return;
       if (!hasAiRequestSelection(configuration)) {
         setConfigurationMissing(true);
         return;
       }
-      const generation = poetryTranslationGenerate(uid, mode, (delta) =>
+      const generation = poetryTranslationGenerate(uid, "literal", (delta) =>
         setStreamingContent((content) => content + delta),
       );
       detachGenerationRef.current = generation.detach;
@@ -150,10 +152,11 @@ export function usePoetryTranslations(
 
   /** 用户点「取消生成」：中断后端请求，留下原有译文。 */
   function cancelGeneration() {
+    // 配置查询尚未结束时也接受取消，避免取消后才真正发送生成请求。
+    cancelRequestedRef.current = true;
     const cancel = cancelGenerationRef.current;
     if (!cancel) return;
     cancelGenerationRef.current = null;
-    cancelRequestedRef.current = true;
     void cancel().catch(() => {
       // 请求已经结束（取消只是迟到），无需额外提示。
     });
@@ -207,13 +210,12 @@ export function usePoetryTranslations(
   }
 
   function requestGeneration() {
-    if (current?.source === "user") setRegenerateOpen(true);
+    if (current?.source === "user" || replacesManualTranslation)
+      setRegenerateOpen(true);
     else void generate();
   }
 
   return {
-    mode,
-    setMode,
     current,
     currentPackTranslations,
     loading,
@@ -231,6 +233,7 @@ export function usePoetryTranslations(
     setDeleteOpen,
     regenerateOpen,
     setRegenerateOpen,
+    replacesManualTranslation,
     configurationMissing,
     setConfigurationMissing,
     generate,

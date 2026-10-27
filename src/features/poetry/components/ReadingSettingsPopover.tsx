@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Settings2 } from "lucide-react";
+import { Type } from "lucide-react";
 import { useId } from "react";
 
 import { Button } from "~/components/ui/button";
@@ -13,7 +13,6 @@ import {
 import { Slider } from "~/components/ui/slider";
 
 interface Props {
-  showLabel?: boolean;
   fontSize: number;
   lineHeight: number;
   onFontSizeChange: (size: number) => void;
@@ -29,14 +28,13 @@ export default function ReadingSettingsPopover(props: Props) {
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={props.showLabel ? "outline" : "ghost"}
-          size={props.showLabel ? "sm" : "icon-sm"}
-          density="adaptive"
+          type="button"
+          variant="ghost"
+          size="icon-sm"
           aria-label={t`阅读设置`}
           title={t`阅读设置`}
         >
-          <Settings2 />
-          {props.showLabel ? <Trans>阅读设置</Trans> : null}
+          <Type aria-hidden />
         </Button>
       </PopoverTrigger>
       <PopoverContent

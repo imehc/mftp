@@ -11,7 +11,7 @@ export default function ReadingControlsMobile({
   settingsInHeader: boolean;
 }) {
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 border-b px-3 py-1">
+    <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b px-3 py-1">
       <ReadingModeTabs />
       {!settingsInHeader ? <ReadingSettingsPopover {...settings} /> : null}
     </div>
