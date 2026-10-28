@@ -1,0 +1,31 @@
+.chess-stage {
+  min-height: 12rem;
+}
+.chess-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.chess-piece-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.chess-piece-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: #f9efdb;
+  text-shadow: 0 1px 2px #211a13;
+}
+.chess-piece-label[data-square-tone="light"] {
+  color: #382819;
+  text-shadow: 0 1px 2px #f6e7cb;
+}
+@media (max-height: 28rem) and (max-width: 48rem) {
+  .chess-stage {
+    min-height: 18rem;
+  }
+}

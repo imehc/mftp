@@ -1,0 +1,99 @@
+import "./chess.css";
+
+/** 国际象棋界面外壳：顶部操作与模式切换。 */
+import { Trans } from "@lingui/react/macro";
+import { useState } from "react";
+
+import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
+import { GameSessionNotice } from "../engine/GameSessionNotice";
+import { useGameAudio } from "../engine/use-game-audio";
+import { useGameLifecycle } from "../engine/use-game-session";
+import { chessAudio } from "./audio";
+import { ChessHelp } from "./ChessDialogs";
+import { ChessMatch } from "./ChessMatch";
+import { ChessModeMenu } from "./ChessModeMenu";
+import { ChessOnlineFlow } from "./ChessOnline";
+import { chessSessions } from "./session";
+
+export default function ChessGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <ChessGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function ChessGameContent() {
+  useGameAudio(chessAudio);
+  const lifecycle = useGameLifecycle(chessSessions);
+  const { mode, matchKey } = lifecycle;
+  const [onlinePlaying, setOnlinePlaying] = useState(false);
+  const [matchFinished, setMatchFinished] = useState(false);
+
+  const exitMatch = () => {
+    setOnlinePlaying(false);
+    setMatchFinished(false);
+    lifecycle.exit();
+  };
+
+  const restartMatch = () => {
+    setMatchFinished(false);
+    lifecycle.restart();
+  };
+
+  return (
+    <main
+      data-bottom-inset="scroll"
+      className="ui-density-adaptive bg-background text-foreground flex h-full min-h-0 flex-col overflow-hidden"
+    >
+      {mode?.kind !== "online" || onlinePlaying ? (
+        <BoardGameHeader
+          title={<Trans comment="小游戏名称，标准国际象棋">国际象棋</Trans>}
+          help={<ChessHelp />}
+          active={mode !== null}
+          finished={matchFinished}
+          canRestart={mode?.kind !== "online"}
+          onRestart={restartMatch}
+          onExit={exitMatch}
+        />
+      ) : null}
+      <GameSessionNotice store={chessSessions} onRestore={chessAudio.unlock} />
+      {mode === null ? (
+        lifecycle.canStart ? (
+          <ChessModeMenu
+            onStart={(nextMode) => {
+              chessAudio.unlock();
+              setMatchFinished(false);
+              lifecycle.start(nextMode);
+            }}
+          />
+        ) : null
+      ) : mode.kind === "online" ? (
+        <ChessOnlineFlow
+          onPlayingChange={setOnlinePlaying}
+          onExit={exitMatch}
+          onFinishedChange={setMatchFinished}
+        />
+      ) : (
+        <ChessMatch
+          key={matchKey}
+          mode={mode}
+          onRematch={() => {
+            lifecycle.rematch((current) =>
+              current?.kind === "ai"
+                ? {
+                    ...current,
+                    localSeat: current.localSeat === 0 ? 1 : 0,
+                  }
+                : current,
+            );
+            setMatchFinished(false);
+          }}
+          onExit={exitMatch}
+          onFinishedChange={setMatchFinished}
+        />
+      )}
+    </main>
+  );
+}

@@ -5,6 +5,7 @@ import {
   BookMarked,
   Box,
   Braces,
+  ChessKnight,
   Circle,
   CircleDot,
   Crown,
@@ -225,6 +226,13 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/junqi", preload: "intent" }),
     icon: Flag,
     title: <Trans>陆战棋</Trans>,
+  },
+  {
+    id: "chess",
+    category: "games",
+    link: linkOptions({ to: "/games/chess", preload: "intent" }),
+    icon: ChessKnight,
+    title: <Trans>国际象棋</Trans>,
   },
   {
     id: "magic-cube",

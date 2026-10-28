@@ -226,6 +226,10 @@ msgstr "{penalty, plural, one {Foul: {reason}. # penalty point.} other {Foul: {r
 msgid "{plies, plural, one {申请撤销 # 手棋，需对方同意。} other {申请撤销 # 手棋，需对方同意。}}"
 msgstr "{plies, plural, one {Request to undo # move. Your opponent must agree.} other {Request to undo # moves. Your opponent must agree.}}"
 
+#: src/features/games/chess/ChessMatch.tsx:280
+msgid "{ply, plural, one {# 手} other {# 手}}"
+msgstr "{ply, plural, one {# move} other {# moves}}"
+
 #. 斯诺克瞄准时首个将碰到的目标球的实际分值
 #. 球桌中央选球区域，球体下方仅显示实际分值
 #: src/features/games/billiards/BilliardsMatchView.tsx:401
@@ -305,6 +309,11 @@ msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "{shotNumber, plural, one {Shot #} other {Shot #}}"
 
+#. 国际象棋格子的读屏描述，含阵营和棋子名称
+#: src/features/games/chess/ChessStage.tsx:137
+msgid "{side}的{pieceName}"
+msgstr "{side} {pieceName}"
+
 #: src/features/games/xiangqi/labels.tsx:85
 msgid "{sideNameValue} 获胜"
 msgstr "{sideNameValue} wins"
@@ -313,6 +322,14 @@ msgstr "{sideNameValue} wins"
 #: src/features/formatter/FormatterTool.tsx:151
 msgid "{spaces, plural, one {# 空格} other {# 空格}}"
 msgstr "{spaces, plural, one {# space} other {# spaces}}"
+
+#: src/features/games/chess/ChessStage.tsx:152
+msgid "{square}，{description}"
+msgstr "{square}, {description}"
+
+#: src/features/games/chess/ChessStage.tsx:151
+msgid "{square}，{description}，可走位置"
+msgstr "{square}, {description}, legal destination"
 
 #: src/features/formatter/use-formatter.ts:187
 msgid "{statusLanguage} 格式有效"
@@ -364,7 +381,7 @@ msgstr "3D display interrupted"
 #. 本地 GLB/glTF 三维模型查看工具名称。
 #. 本地 GLB、glTF、FBX 三维模型查看工具名称。
 #. 本地 GLB、glTF、FBX 三维模型查看工具名称。
-#: src/features/home/entries.tsx:69
+#: src/features/home/entries.tsx:70
 #: src/features/model-viewer/ModelViewerPage.tsx:148
 #: src/features/model-viewer/ModelViewerPage.tsx:215
 msgid "3D 模型"
@@ -553,7 +570,7 @@ msgid "BT"
 msgstr "BT"
 
 #: src/features/bt/BtTool.tsx:222
-#: src/features/home/entries.tsx:162
+#: src/features/home/entries.tsx:163
 #: src/lib/errors/messages.ts:312
 msgid "BT 下载"
 msgstr "BT Downloads"
@@ -606,15 +623,15 @@ msgstr "FBX models are previewed for this session only and are not saved to the 
 msgid "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
 msgstr "FBX files are limited to 64 MiB. Processing stops if the model or textures are too complex, or parsing takes over 30 seconds. Simplify the model and try again."
 
-#: src/lib/errors/messages.ts:365
+#: src/lib/errors/messages.ts:367
 msgid "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
 msgstr "The FBX file has no valid unit information. Set the units in your modeling software and export it again."
 
-#: src/lib/errors/messages.ts:364
+#: src/lib/errors/messages.ts:366
 msgid "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
 msgstr "This FBX texture format is not supported. Use PNG, JPEG, WebP or BMP."
 
-#: src/lib/errors/messages.ts:363
+#: src/lib/errors/messages.ts:365
 msgid "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 msgstr "The FBX model exceeds the processing limits or parsing timed out. Simplify the model or textures and try again. Files must not exceed 64 MiB."
 
@@ -790,11 +807,20 @@ msgstr "XYZ orientation: click an axis to change the view, or double-click to fi
 msgid "一方没有合法落点时自动跳过，由另一方继续。双方都无法落子时结束，即使棋盘尚未填满。"
 msgstr "If a player has no legal moves, their turn is skipped. The game ends when neither player can move, even if empty squares remain."
 
+#: src/features/games/chess/labels.tsx:49
+msgid "七十五步规则"
+msgstr "Seventy-five-move rule"
+
 #. 军棋和棋原因
+#: src/features/games/chess/labels.tsx:50
 #: src/features/games/junqi/labels.tsx:118
 #: src/features/games/xiangqi/labels.tsx:57
 msgid "三次重复局面"
 msgstr "Threefold repetition"
+
+#: src/features/games/chess/ChessDialogs.tsx:143
+msgid "三次重复局面或连续五十步没有动兵、吃子时可以申领和棋。五次重复或七十五步时自动和棋，最后一步将死优先。"
+msgstr "A draw may be claimed after threefold repetition or fifty moves by each player without a pawn move or capture. Fivefold repetition or seventy-five moves ends the game automatically; checkmate on the last move takes priority."
 
 #: src/features/games/magic-cube/render/MagicCubeStage.tsx:33
 msgid "三维魔方。拖拽面片转层，拖拽空白旋转视角，滚轮缩放。键盘 R、L、U、D、F、B 转面，Shift 反向，方向键旋转视角。"
@@ -1173,7 +1199,7 @@ msgid "中"
 msgstr "Medium"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:48
-#: src/features/home/entries.tsx:220
+#: src/features/home/entries.tsx:221
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -1211,7 +1237,7 @@ msgstr "Center"
 msgid "中等"
 msgstr "Medium"
 
-#: src/lib/errors/messages.ts:342
+#: src/lib/errors/messages.ts:344
 msgid "临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。"
 msgstr "Temporary export storage is full. Try again later. Shared files are kept for at least 24 hours."
 
@@ -1280,14 +1306,22 @@ msgstr "Swap"
 msgid "互换语言"
 msgstr "Swap languages"
 
+#: src/features/games/chess/labels.tsx:51
+msgid "五十步规则"
+msgstr "Fifty-move rule"
+
 #: src/features/games/gomoku/GomokuGame.tsx:49
-#: src/features/home/entries.tsx:193
+#: src/features/home/entries.tsx:194
 msgid "五子棋"
 msgstr "Gomoku"
 
 #: src/features/logs/log-labels.ts:240
 msgid "五子棋房间"
 msgstr "Gomoku room"
+
+#: src/features/games/chess/labels.tsx:48
+msgid "五次重复局面"
+msgstr "Fivefold repetition"
 
 #. 3D 画布的轨道、自由移动、测量、摆放模式。
 #: src/features/model-viewer/components/NavigationPanel.tsx:39
@@ -1551,6 +1585,7 @@ msgid "作者"
 msgstr "Author"
 
 #: src/features/games/billiards/BilliardsScore.tsx:16
+#: src/features/games/chess/ChessMatch.tsx:163
 #: src/features/games/engine/black-white-labels.tsx:32
 #: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/xiangqi/labels.tsx:30
@@ -1558,6 +1593,7 @@ msgstr "Author"
 msgid "你"
 msgstr "You"
 
+#: src/features/games/chess/ChessMatch.tsx:226
 #: src/features/games/engine/BoardMatchLayout.tsx:59
 #: src/features/games/reversi/ReversiMatch.tsx:141
 msgid "你执白"
@@ -1568,6 +1604,7 @@ msgstr "You play white"
 msgid "你执红"
 msgstr "You play red"
 
+#: src/features/games/chess/ChessMatch.tsx:228
 #: src/features/games/engine/BoardMatchLayout.tsx:54
 #: src/features/games/engine/BoardMatchLayout.tsx:57
 #: src/features/games/junqi/JunqiToolbar.tsx:53
@@ -1579,11 +1616,13 @@ msgstr "You play black"
 msgid "你获胜"
 msgstr "You win"
 
+#: src/features/games/chess/labels.tsx:65
 #: src/features/games/engine/black-white-labels.tsx:72
 #: src/features/games/xiangqi/labels.tsx:79
 msgid "你赢了"
 msgstr "You win"
 
+#: src/features/games/chess/labels.tsx:65
 #: src/features/games/engine/black-white-labels.tsx:74
 #: src/features/games/xiangqi/labels.tsx:81
 msgid "你输了"
@@ -1866,6 +1905,10 @@ msgstr "Metadata"
 msgid "先后手"
 msgstr "Break order"
 
+#: src/features/games/chess/ChessModeMenu.tsx:18
+msgid "先手（执白）"
+msgstr "First (White)"
+
 #: src/features/games/engine/BoardModeMenu.tsx:113
 msgid "先手（执红）"
 msgstr "Play first (Red)"
@@ -2061,6 +2104,17 @@ msgstr "Close editing draft"
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:173
 msgid "关闭连接"
 msgstr "Close connection"
+
+#. 国际象棋 Pawn 棋子
+#: src/features/games/chess/labels.tsx:32
+msgctxt "国际象棋棋子"
+msgid "兵"
+msgstr "Pawn"
+
+#. 国际象棋兵到达最后一排后的选择
+#: src/features/games/chess/ChessDialogs.tsx:41
+msgid "兵的升变"
+msgstr "Pawn promotion"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:133
 #: src/features/games/engine/BoardModeMenu.tsx:135
@@ -2627,7 +2681,7 @@ msgid "加密导出"
 msgstr "Encrypt export"
 
 #: src/features/crypto/CryptoTool.tsx:31
-#: src/features/home/entries.tsx:99
+#: src/features/home/entries.tsx:100
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -3120,14 +3174,14 @@ msgstr "Morph target"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/features/home/entries.tsx:173
+#: src/features/home/entries.tsx:174
 #: src/features/poetry/LibraryPage.tsx:151
 #: src/features/poetry/LibraryPage.tsx:308
 #: src/features/poetry/PoemDetailPage.tsx:44
 msgid "古诗词"
 msgstr "Classical Poetry"
 
-#: src/lib/errors/messages.ts:343
+#: src/lib/errors/messages.ts:345
 msgid "另一个系统导出尚未结束，请先完成或关闭系统面板。"
 msgstr "Another system export is in progress. Complete or close the system dialog first."
 
@@ -3144,6 +3198,10 @@ msgstr "Read Only"
 #: src/features/poetry/components/CollectionManagement.tsx:135
 msgid "可下载合集"
 msgstr "Available collections"
+
+#: src/features/games/chess/ChessDialogs.tsx:86
+msgid "可以申领和棋"
+msgstr "A draw can be claimed"
 
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:78
 msgid "可以直接转动复原魔方练习，也可以点击「打乱」开始挑战。首次有效转层后开始计时，每次转层记一步，180° 也记一步。切页、后台或打开帮助时暂停计时，这是练习用时，不是比赛计时。"
@@ -3179,7 +3237,7 @@ msgid "可选位置"
 msgstr "Available destination"
 
 #: src/features/games/billiards/BilliardsHeader.tsx:102
-#: src/features/home/entries.tsx:183
+#: src/features/home/entries.tsx:184
 msgid "台球"
 msgstr "Billiards"
 
@@ -3233,6 +3291,10 @@ msgstr "Devices on the same LAN can access directly. Use only on trusted network
 msgid "同分黑球已复位。{player} 抽签获选，决定谁先打，母球在 D 区。"
 msgstr "The tied black has been respotted. The draw selected {player} to choose who plays first, with the cue ball in the D."
 
+#: src/features/games/chess/ChessDialogs.tsx:148
+msgid "同屏悔棋撤回一手；人机和联机回到你最近一次走棋之前。联机悔棋需要对方同意。更多菜单可切换俯视和棋盘朝向。"
+msgstr "In local two-player mode, undo takes back one move. Against the computer or online, it returns to before your last move. Online undo requires your opponent’s agreement. Use game options to change the view and board orientation."
+
 #: src/features/games/reversi/ReversiHelp.tsx:48
 msgid "同屏悔棋撤回上一手；人机和联机悔棋回到你最近一次落子之前。联机需要对方同意。"
 msgstr "In a local two-player game, undo takes back one move. Against the computer or online, it returns to before your last move. Online undo requires your opponent’s consent."
@@ -3254,6 +3316,10 @@ msgstr "Once accepted, colors swap and a new game starts immediately."
 #: src/features/games/reversi/ReversiOnline.tsx:114
 msgid "同意后将回到对方最近一次落子之前，并撤回此后的所有翻子。"
 msgstr "Accepting returns to before your opponent’s last move and reverses all flips since then."
+
+#: src/features/games/chess/ChessOnline.tsx:113
+msgid "同意后将回到对方最近一次走棋之前，同时恢复当时的易位、吃过路兵和重复局面记录。"
+msgstr "Accepting returns to before your opponent’s last move and restores castling rights, en passant availability, and repetition history."
 
 #. 台球僵持协商，接受并重新摆球
 #: src/features/games/billiards/NineBallHud.tsx:119
@@ -3346,10 +3412,17 @@ msgstr "Name cannot contain slashes"
 msgid "名称为必填项"
 msgstr "Name is required"
 
+#. 国际象棋 Queen 棋子
+#: src/features/games/chess/labels.tsx:12
+msgctxt "国际象棋棋子"
+msgid "后"
+msgstr "Queen"
+
 #: src/features/games/engine/BoardModeMenu.tsx:118
 msgid "后手（执白）"
 msgstr "Second (White)"
 
+#: src/features/games/chess/ChessModeMenu.tsx:19
 #: src/features/games/engine/BoardModeMenu.tsx:118
 msgid "后手（执黑）"
 msgstr "Play second (Black)"
@@ -3399,6 +3472,8 @@ msgstr "Enable motion control"
 msgid "命令"
 msgstr "Command"
 
+#: src/features/games/chess/labels.tsx:63
+#: src/features/games/chess/labels.tsx:70
 #: src/features/games/junqi/labels.tsx:138
 #: src/features/games/xiangqi/labels.tsx:70
 #: src/features/games/xiangqi/labels.tsx:90
@@ -3434,7 +3509,7 @@ msgid "困难"
 msgstr "Hard"
 
 #: src/features/games/go/GoGame.tsx:49
-#: src/features/home/entries.tsx:203
+#: src/features/home/entries.tsx:204
 msgid "围棋"
 msgstr "Go"
 
@@ -3457,6 +3532,21 @@ msgstr "Exact size"
 #: src/features/media-compress/resize/ResizeControls.tsx:38
 msgid "固定高度"
 msgstr "Fixed height"
+
+#. 小游戏名称，标准国际象棋
+#: src/features/games/chess/ChessGame.tsx:52
+#: src/features/home/entries.tsx:235
+msgid "国际象棋"
+msgstr "Chess"
+
+#: src/features/games/chess/ChessStage.tsx:129
+msgid "国际象棋棋盘"
+msgstr "Chess board"
+
+#: src/features/games/chess/ChessDialogs.tsx:112
+#: src/features/games/chess/ChessDialogs.tsx:119
+msgid "国际象棋玩法"
+msgstr "How to play chess"
 
 #: src/features/bt/components/TorrentFileList.tsx:55
 msgid "图片"
@@ -3831,7 +3921,7 @@ msgstr "Finish any related tasks before clearing this data."
 msgid "姿态变化后需重新选点。"
 msgstr "Pick the two points again after the model moves."
 
-#: src/features/home/entries.tsx:112
+#: src/features/home/entries.tsx:113
 #: src/features/media-compress/MediaCompressTool.tsx:46
 msgid "媒体处理"
 msgstr "Media Tools"
@@ -3839,6 +3929,11 @@ msgstr "Media Tools"
 #: src/features/media-compress/components/CompressModeTabs.tsx:27
 msgid "媒体处理模式"
 msgstr "Media processing mode"
+
+#. 国际象棋剩余子力无法形成将死
+#: src/features/games/chess/labels.tsx:44
+msgid "子力不足"
+msgstr "Insufficient material"
 
 #. 应用界面字体选择（中文字体）
 #: src/features/settings/AppearanceSettings.tsx:63
@@ -3889,7 +3984,7 @@ msgstr "Install the model to translate offline."
 msgid "安装命令已复制"
 msgstr "Install command copied"
 
-#: src/lib/errors/messages.ts:354
+#: src/lib/errors/messages.ts:356
 msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "Installation did not finish. Retry the installation or try again later."
 
@@ -3978,7 +4073,7 @@ msgstr "Vault"
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/about/use-about.ts:59
 #: src/features/export/sections.tsx:26
-#: src/features/home/entries.tsx:142
+#: src/features/home/entries.tsx:143
 #: src/features/logs/log-labels.ts:140
 #: src/features/logs/use-activity-logs.ts:46
 #: src/features/vault/VaultTool.tsx:49
@@ -4028,11 +4123,11 @@ msgstr "During play, request an undo from the More menu. Undo your last move, or
 msgid "对局中断"
 msgstr "Game Interrupted"
 
-#: src/lib/errors/messages.ts:335
+#: src/lib/errors/messages.ts:337
 msgid "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
 msgstr "This saved game is damaged or uses an incompatible version and cannot be restored. The original save has not been deleted."
 
-#: src/lib/errors/messages.ts:336
+#: src/lib/errors/messages.ts:338
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "The game has not been saved successfully. Please retry. The latest progress may be lost if the app exits unexpectedly."
 
@@ -4050,6 +4145,7 @@ msgstr "Match over"
 msgid "对局详情"
 msgstr "Match details"
 
+#: src/features/games/chess/ChessMatch.tsx:167
 #: src/features/games/engine/black-white-labels.tsx:34
 #: src/features/games/junqi/JunqiToolbar.tsx:73
 #: src/features/games/xiangqi/labels.tsx:32
@@ -4193,7 +4289,7 @@ msgstr "Export app data"
 msgid "导出所选数据"
 msgstr "Export selected data"
 
-#: src/lib/errors/messages.ts:341
+#: src/lib/errors/messages.ts:343
 msgid "导出文件无效或超过 64 MiB，请重新生成。"
 msgstr "The export file is invalid or exceeds 64 MiB. Generate it again."
 
@@ -4212,6 +4308,10 @@ msgstr "Navigation"
 #: src/features/games/xiangqi/XiangqiMatch.tsx:182
 msgid "将军"
 msgstr "Check"
+
+#: src/features/games/chess/ChessMatch.tsx:271
+msgid "将军 · 轮到 {player}"
+msgstr "Check · {player} to play"
 
 #: src/features/poetry/LibraryManagePage.tsx:100
 msgid "将删除「{pendingDeleteName}」的全部本地数据（{toLocaleStringValue4} 篇）。此操作不可撤销。"
@@ -4257,6 +4357,8 @@ msgstr "Arrange the numbers in order, with the empty space at the bottom right."
 msgid "将替换当前己方阵型，对方阵型保持不变。"
 msgstr "Your current deployment will be replaced. Your opponent’s deployment will stay the same."
 
+#. 国际象棋被将军且没有合法应对
+#: src/features/games/chess/labels.tsx:39
 #: src/features/games/xiangqi/labels.tsx:55
 msgid "将死"
 msgstr "Checkmate"
@@ -4274,7 +4376,7 @@ msgstr "Write result back to input and switch mode"
 msgid "小时"
 msgstr "Hour"
 
-#: src/features/home/entries.tsx:44
+#: src/features/home/entries.tsx:45
 msgid "小游戏"
 msgstr "Games"
 
@@ -4312,7 +4414,7 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:89
+#: src/features/home/entries.tsx:90
 #: src/features/lan-transfer/LanServiceCard.tsx:40
 #: src/features/lan-transfer/LanTransferTool.tsx:36
 #: src/lib/errors/messages.ts:326
@@ -4413,7 +4515,7 @@ msgid "工兵可排雷并存活；其他普通棋子碰地雷时阵亡，地雷�
 msgstr "Engineers remove mines and survive; other ranked pieces attacking a mine are lost and the mine remains. A bomb and any opposing non-flag piece remove each other. Bombs can capture flags, and you do not need to clear all mines first."
 
 #. 三维查看器的自由相机、预览编辑与诊断工具。
-#: src/features/home/entries.tsx:42
+#: src/features/home/entries.tsx:43
 #: src/features/model-viewer/components/WorkspaceInspector.tsx:60
 msgid "工具"
 msgstr "Tools"
@@ -4595,7 +4697,7 @@ msgstr "Copied to your folder"
 msgid "已复制到系统下载目录"
 msgstr "Copied to the system Downloads folder"
 
-#: src/lib/errors/messages.ts:359
+#: src/lib/errors/messages.ts:361
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "An attachment with this name already exists. Rename the file or remove the old attachment first."
 
@@ -5056,7 +5158,7 @@ msgid "当前操作尚未完成，请稍后重试清理数据"
 msgstr "An operation is still running. Try clearing data again later."
 
 #. 军棋规则或对局状态校验失败，原始诊断保留在错误协议中
-#: src/lib/errors/messages.ts:376
+#: src/lib/errors/messages.ts:378
 msgid "当前操作无法完成，请恢复对局或重新开始。"
 msgstr "This action could not be completed. Restore the game or start again."
 
@@ -5136,7 +5238,7 @@ msgstr "AVIF export is not supported in this environment"
 msgid "当前环境不支持导出 AVIF，请改用 WebP 或 JPG"
 msgstr "AVIF export is unavailable. Use WebP or JPG instead."
 
-#: src/lib/errors/messages.ts:346
+#: src/lib/errors/messages.ts:348
 msgid "当前环境不支持录屏编码，可改用截图。"
 msgstr "Video recording is not supported in this environment. You can take a screenshot instead."
 
@@ -5175,7 +5277,7 @@ msgstr "Your current cube progress and undo history will be replaced. This canno
 msgid "录制视口"
 msgstr "Record viewport"
 
-#: src/lib/errors/messages.ts:349
+#: src/lib/errors/messages.ts:351
 msgid "录屏保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the recording. Check the destination and available space, then try again."
 
@@ -5187,11 +5289,11 @@ msgstr "Recording saved."
 msgid "录屏已生成。保存前请留在此页面。"
 msgstr "Recording ready. Stay on this page until you have saved it."
 
-#: src/lib/errors/messages.ts:347
+#: src/lib/errors/messages.ts:349
 msgid "录屏未完成，请恢复模型显示后重试。"
 msgstr "Recording failed. Restore the model view and try again."
 
-#: src/lib/errors/messages.ts:348
+#: src/lib/errors/messages.ts:350
 msgid "录屏超过 64 MiB 上限，请缩短录制时间后重试。"
 msgstr "The recording exceeded the 64 MiB limit. Try a shorter recording."
 
@@ -5209,7 +5311,7 @@ msgstr "Todos"
 
 #. MCP 工具目录和授权矩阵中的模块名称
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/home/entries.tsx:152
+#: src/features/home/entries.tsx:153
 #: src/features/logs/log-labels.ts:135
 #: src/features/todo/mcp-presentation.ts:4
 #: src/features/todo/TodoTool.tsx:94
@@ -5311,6 +5413,7 @@ msgid "恢复首次打开状态"
 msgstr "Restore the initial state"
 
 #. 联机棋局的操作按钮，向对方申请撤销最近的走棋
+#: src/features/games/chess/ChessMatch.tsx:239
 #: src/features/games/go/GoMatch.tsx:222
 #: src/features/games/gomoku/GomokuMatch.tsx:192
 #: src/features/games/junqi/JunqiMatchView.tsx:202
@@ -5356,7 +5459,7 @@ msgstr "I confirm that keys and generation requests will be sent to the new serv
 msgid "截图与录屏"
 msgstr "Capture tools"
 
-#: src/lib/errors/messages.ts:351
+#: src/lib/errors/messages.ts:353
 msgid "截图保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the screenshot. Check the destination and available space, then try again."
 
@@ -5921,6 +6024,10 @@ msgstr "Supports GLB · glTF · FBX"
 msgid "支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多 16 项、合计 32 MiB。"
 msgstr "Supports UTF-8 text, Markdown (1 MiB), and PDF (8 MiB). Up to 16 attachments and 32 MiB per model."
 
+#: src/features/games/chess/ChessDialogs.tsx:133
+msgid "支持王车易位、吃过路兵和兵的升变。易位不能穿过受攻击的格子；升变可选择后、车、象或马。"
+msgstr "Castling, en passant, and pawn promotion are supported. Castling cannot pass through an attacked square. A pawn may promote to a queen, rook, bishop, or knight."
+
 #: src/features/bt/components/AddTorrentDialog.tsx:271
 #: src/features/bt/components/AddTorrentDialog.tsx:299
 msgid "支持磁力链接与本地 .torrent 文件"
@@ -5973,11 +6080,11 @@ msgstr "Numbers increase from left to right and top to bottom. The last cell is 
 #. 小游戏名，滑动数字方块填入空位并排序
 #. 小游戏名，滑动数字方块填入空位并排序
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:122
-#: src/features/home/entries.tsx:242
+#: src/features/home/entries.tsx:250
 msgid "数字华容道"
 msgstr "Sliding puzzle"
 
-#: src/lib/errors/messages.ts:340
+#: src/lib/errors/messages.ts:342
 msgid "数字华容道已完成，但成绩尚未保存，请重试。"
 msgstr "The puzzle is complete, but the result has not been saved. Please retry."
 
@@ -6080,7 +6187,7 @@ msgstr "The file selection contains duplicates"
 msgid "文件预览"
 msgstr "File preview"
 
-#: src/features/home/entries.tsx:43
+#: src/features/home/entries.tsx:44
 msgid "文库"
 msgstr "Library"
 
@@ -6209,6 +6316,10 @@ msgstr "No Matches"
 msgid "无口令"
 msgstr "No Passphrase"
 
+#: src/features/games/chess/ChessDialogs.tsx:138
+msgid "无合法着法但未被将军时为逼和。王对王、王与单象或单马对王，以及所有象位于同色格等子力不足局面自动和棋。"
+msgstr "Having no legal move while not in check is stalemate. Common insufficient-material positions end in a draw: king versus king, king and a single bishop or knight versus king, or kings and bishops all on the same square color."
+
 #: src/lib/errors/messages.ts:136
 msgid "无效的 BT 任务标识"
 msgstr "Invalid torrent task ID"
@@ -6236,15 +6347,15 @@ msgstr "Could not open with a system app"
 msgid "无法创建画布上下文"
 msgstr "Cannot create canvas context"
 
-#: src/lib/errors/messages.ts:370
+#: src/lib/errors/messages.ts:372
 msgid "无法初始化 3D 显示，请重试或检查设备的图形支持"
 msgstr "Unable to initialize the 3D display. Retry or check your device’s graphics support."
 
-#: src/lib/errors/messages.ts:337
+#: src/lib/errors/messages.ts:339
 msgid "无法删除对局存档，请重试。"
 msgstr "Unable to delete the saved game. Please retry."
 
-#: src/lib/errors/messages.ts:360
+#: src/lib/errors/messages.ts:362
 msgid "无法打开系统转交的模型。请选择有效 GLB 文件并重新打开；导入缓存上限为 512 MiB。"
 msgstr "Could not open the model from the system. Select a valid GLB file and open it again. The import cache limit is 512 MiB."
 
@@ -6256,11 +6367,15 @@ msgstr "Unable to play. Retry or open with a system app."
 msgid "无法显示 3D 内容"
 msgstr "3D display unavailable"
 
-#: src/lib/errors/messages.ts:338
+#: src/lib/errors/messages.ts:340
 msgid "无法显示 3D 魔方。请重新加载画布；已提交的转动进度会保留。"
 msgstr "The 3D cube could not be displayed. Reload the canvas; committed turns will be preserved."
 
-#: src/lib/errors/messages.ts:352
+#: src/lib/errors/messages.ts:335
+msgid "无法显示国际象棋。请重新加载棋盘，当前对局进度会保留。"
+msgstr "The chess board could not be displayed. Reload the board; your current game will be kept."
+
+#: src/lib/errors/messages.ts:354
 msgid "无法检查更新，请稍后重试或查看发布页面。"
 msgstr "Could not check for updates. Try again later or visit the releases page."
 
@@ -6273,7 +6388,7 @@ msgstr "Unable to detect rsync ({side}): {detail}"
 msgid "无法生成同步预览"
 msgstr "Unable to generate sync preview"
 
-#: src/lib/errors/messages.ts:350
+#: src/lib/errors/messages.ts:352
 msgid "无法生成截图，请恢复模型显示后重试。"
 msgstr "Could not create a screenshot. Restore the model view and try again."
 
@@ -6289,7 +6404,7 @@ msgstr "Could not identify the remote operating system"
 msgid "无法读取下载任务"
 msgstr "Unable to load downloads"
 
-#: src/lib/errors/messages.ts:334
+#: src/lib/errors/messages.ts:336
 msgid "无法读取对局存档，请重试。原存档未被删除。"
 msgstr "Unable to read the saved game. Please retry. The original save has not been deleted."
 
@@ -6410,6 +6525,10 @@ msgstr "Show or hide"
 #: src/features/model-viewer/components/ModelList.tsx:177
 msgid "显示或隐藏 {name}"
 msgstr "Show or hide {name}"
+
+#: src/features/games/chess/ChessMatch.tsx:292
+msgid "显示棋子名称"
+msgstr "Show piece names"
 
 #: src/features/settings/FeatureEntrySettings.tsx:170
 msgid "显示此分类"
@@ -6622,7 +6741,7 @@ msgstr "Update AI service"
 msgid "更新 AI 流式设置"
 msgstr "Update AI streaming settings"
 
-#: src/lib/errors/messages.ts:353
+#: src/lib/errors/messages.ts:355
 msgid "更新下载或校验失败，请重新检查更新。"
 msgstr "The update could not be downloaded or verified. Check for updates again."
 
@@ -6635,7 +6754,7 @@ msgstr "Update host"
 msgid "更新于 {updatedLabel}"
 msgstr "Updated at {updatedLabel}"
 
-#: src/lib/errors/messages.ts:356
+#: src/lib/errors/messages.ts:358
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
@@ -7016,7 +7135,7 @@ msgstr "A miss has been called. Decision for {player}: play next, ask {offender}
 msgid "本杆推杆"
 msgstr "Push-out declared"
 
-#: src/lib/errors/messages.ts:367
+#: src/lib/errors/messages.ts:369
 msgid "本次导入的资源超过 512 MiB，请选择较小的模型"
 msgstr "This import exceeds 512 MiB. Choose a smaller model."
 
@@ -7238,7 +7357,7 @@ msgstr "Verify save result"
 
 #: src/features/formatter/FormatterActions.tsx:34
 #: src/features/formatter/FormatterTool.tsx:86
-#: src/features/home/entries.tsx:122
+#: src/features/home/entries.tsx:123
 msgid "格式化"
 msgstr "Formatter"
 
@@ -7296,7 +7415,7 @@ msgid "棋盘"
 msgstr "Board"
 
 #. 军棋二维棋盘初始化失败
-#: src/lib/errors/messages.ts:372
+#: src/lib/errors/messages.ts:374
 msgid "棋盘加载失败，请重试。"
 msgstr "The board could not load. Please try again."
 
@@ -7305,13 +7424,17 @@ msgid "棋盘大小"
 msgstr "Board Size"
 
 #. 军棋 WebGL 上下文丢失，可重建渲染器
-#: src/lib/errors/messages.ts:380
+#: src/lib/errors/messages.ts:382
 msgid "棋盘显示已中断，对局仍保留，请重试。"
 msgstr "The board display was interrupted. Your game is preserved. Please try again."
 
 #: src/features/games/reversi/ReversiStage.tsx:63
 msgid "棋盘渲染暂不可用，已切换为基础棋盘。"
 msgstr "Board rendering is unavailable. Using the basic board instead."
+
+#: src/features/games/chess/ChessMatch.tsx:301
+msgid "棋盘视角"
+msgstr "Board view"
 
 #. 斯诺克彩球，4分
 #: src/features/games/billiards/SnookerBall.tsx:22
@@ -7382,7 +7505,7 @@ msgstr "Couldn't load the model list"
 msgid "模型动画"
 msgstr "Model animation"
 
-#: src/lib/errors/messages.ts:366
+#: src/lib/errors/messages.ts:368
 msgid "模型包含网络地址或不安全路径，已阻止读取"
 msgstr "The model contains a network address or an unsafe path. Reading was blocked."
 
@@ -7465,7 +7588,7 @@ msgstr "Model display names must not exceed 80 characters or contain control cha
 msgid "模型校验失败，请移除未完成的下载后重试"
 msgstr "Model verification failed. Remove the incomplete download and try again."
 
-#: src/lib/errors/messages.ts:361
+#: src/lib/errors/messages.ts:363
 msgid "模型格式无效或文件已损坏，请检查后重新选择"
 msgstr "The model format is invalid or the file is damaged. Check the file and try again."
 
@@ -7480,7 +7603,7 @@ msgstr "Model inspector"
 msgid "模型缺少依赖文件，请补充选择"
 msgstr "The model is missing resource files. Select them to continue."
 
-#: src/lib/errors/messages.ts:369
+#: src/lib/errors/messages.ts:371
 msgid "模型解析失败，请检查模型与依赖文件是否完整"
 msgstr "Unable to decode the model. Check that the model and its resource files are complete."
 
@@ -7497,7 +7620,7 @@ msgstr "Model resources"
 msgid "模型资源过大，请选择较小的模型"
 msgstr "Model resources are too large. Choose a smaller model."
 
-#: src/lib/errors/messages.ts:368
+#: src/lib/errors/messages.ts:370
 msgid "模型超过检查上限，请选择较小的模型。"
 msgstr "This model exceeds the inspection limit. Choose a smaller model."
 
@@ -7511,6 +7634,10 @@ msgstr "Model attachments"
 #: src/features/crypto/CryptoTool.tsx:62
 msgid "模式"
 msgstr "Mode"
+
+#: src/features/games/chess/ChessMatch.tsx:306
+msgid "正上方俯视"
+msgstr "Top view"
 
 #: src/features/formatter/use-formatter.ts:62
 msgid "正则"
@@ -7561,6 +7688,7 @@ msgstr "Preparing video encoder…"
 msgid "正在准备朗读"
 msgstr "Preparing to read"
 
+#: src/features/games/chess/ChessStage.tsx:101
 #: src/features/games/junqi/render/JunqiStage.tsx:236
 msgid "正在准备棋盘…"
 msgstr "Preparing the board…"
@@ -7924,7 +8052,7 @@ msgstr "This material has no textures."
 msgid "此模型不包含动画"
 msgstr "This model has no animations."
 
-#: src/lib/errors/messages.ts:358
+#: src/lib/errors/messages.ts:360
 msgid "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 msgstr "This model has reached its attachment limit: 16 files or 32 MiB in total."
 
@@ -8467,6 +8595,10 @@ msgstr "Select one of your pieces, then a marked destination to move. Use the ar
 msgid "点击标记的空格落子；也可用方向键移动焦点，回车或空格落子。"
 msgstr "Select a marked square to place a disc. You can also move focus with the arrow keys and press Enter or Space."
 
+#: src/features/games/chess/ChessDialogs.tsx:128
+msgid "点击棋子，再点击标记的格子走棋；桌面也可以拖动棋子。方向键移动焦点，回车或空格选子、落子。"
+msgstr "Select a piece, then a highlighted square to move. On desktop, you can also drag pieces. Use arrow keys to move focus and Enter or Space to select and move."
+
 #: src/features/games/junqi/JunqiRulesDialog.tsx:185
 msgid "点击盖子立即翻开，或选择已翻开的己方棋子，再点击标记位置移动。"
 msgstr "Click a covered piece to reveal it, or select a revealed piece of your side and then a marked destination to move."
@@ -8528,6 +8660,12 @@ msgstr "Status unavailable"
 #: src/features/about/AboutPage.tsx:172
 msgid "状态读取失败"
 msgstr "Status unavailable"
+
+#. 国际象棋 King 棋子
+#: src/features/games/chess/labels.tsx:7
+msgctxt "国际象棋棋子"
+msgid "王"
+msgstr "King"
 
 #: src/features/games/engine/online/OnlineLobby.tsx:189
 #: src/features/games/engine/online/OnlineLobby.tsx:237
@@ -8594,7 +8732,7 @@ msgid "环形"
 msgstr "Ring"
 
 #. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
-#: src/lib/errors/messages.ts:384
+#: src/lib/errors/messages.ts:386
 msgid "球桌显示已中断，请重开对局。"
 msgstr "The table display was interrupted. Restart the match to continue."
 
@@ -8681,8 +8819,14 @@ msgstr "Request an undo"
 msgid "申请访问权限"
 msgstr "Request access"
 
+#: src/features/games/chess/ChessDialogs.tsx:99
+#: src/features/games/chess/ChessMatch.tsx:253
+msgid "申领和棋"
+msgstr "Claim draw"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:26
 #: src/features/games/billiards/BilliardsScore.tsx:16
+#: src/features/games/chess/ChessMatch.tsx:165
 #: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/engine/history-labels.tsx:19
 #: src/features/games/junqi/JunqiToolbar.tsx:62
@@ -8710,6 +8854,7 @@ msgstr "Computer matches always show your perspective. The computer acts only on
 
 #: src/features/games/billiards/BilliardsScore.tsx:151
 #: src/features/games/billiards/SnookerHud.tsx:51
+#: src/features/games/chess/ChessMatch.tsx:267
 #: src/features/games/go/GoMatch.tsx:207
 #: src/features/games/gomoku/GomokuMatch.tsx:182
 #: src/features/games/reversi/ReversiMatch.tsx:167
@@ -8725,6 +8870,10 @@ msgstr "Computer wins"
 #: src/features/games/junqi/JunqiToolbar.tsx:124
 msgid "电脑走棋"
 msgstr "Computer's turn"
+
+#: src/lib/errors/messages.ts:334
+msgid "电脑走棋失败，请重新开始或恢复对局后重试。"
+msgstr "The computer could not make a move. Restart or restore the game and try again."
 
 #: src/features/model-viewer/components/ViewerHelp.tsx:69
 msgid "画布聚焦后，可用方向键旋转、Shift 加方向键平移、加减键缩放、Home 适配视图。坐标轴聚焦后，可按 X、Y、Z 切换方向，Shift 切换反方向。"
@@ -8749,12 +8898,22 @@ msgstr "Uses the home directory when blank or the folder is missing"
 msgid "白名单"
 msgstr "Trusted Devices"
 
+#: src/features/games/chess/ChessStage.tsx:134
+#: src/features/games/chess/labels.tsx:55
+msgid "白方"
+msgstr "White"
+
+#: src/features/games/chess/ChessDialogs.tsx:122
+msgid "白方先行。将死对方国王获胜；国王不能被吃掉。"
+msgstr "White moves first. Win by checkmating your opponent’s king; kings are never captured."
+
 #: src/features/games/engine/black-white-labels.tsx:50
 #: src/features/games/reversi/ReversiStage.tsx:103
 #: src/features/games/reversi/use-reversi-pass-notice.ts:32
 msgid "白棋"
 msgstr "White"
 
+#: src/features/games/chess/labels.tsx:66
 #: src/features/games/engine/black-white-labels.tsx:104
 msgid "白棋胜"
 msgstr "White wins"
@@ -9120,6 +9279,7 @@ msgstr "Empty space"
 msgid "空位，第 {row} 行，第 {column} 列"
 msgstr "Empty space, row {row}, column {column}"
 
+#: src/features/games/chess/ChessStage.tsx:141
 #: src/features/games/reversi/ReversiStage.tsx:106
 msgid "空格"
 msgstr "Empty square"
@@ -9134,6 +9294,10 @@ msgstr "Empty Directory"
 #: src/features/about/AboutPage.tsx:184
 msgid "空闲"
 msgstr "Idle"
+
+#: src/features/games/chess/ChessMatch.tsx:305
+msgid "立体视角"
+msgstr "Perspective view"
 
 #: src/features/settings/font-options.ts:13
 msgid "站酷快乐体"
@@ -9192,6 +9356,7 @@ msgstr "Row {row}, column {column}"
 msgid "第一次有效移动开始计时，每滑动一块记一步。离开页面、进入后台或打开菜单与帮助时暂停，记录的是有效练习用时。"
 msgstr "Timing starts with your first valid move. Each tile slide counts as one move. Timing pauses when you leave, put the app in the background, or open a menu or help. This measures active practice time."
 
+#: src/features/games/chess/ChessMatch.tsx:265
 #: src/features/games/reversi/ReversiMatch.tsx:165
 msgid "等待协商结果…"
 msgstr "Waiting for a response…"
@@ -9339,11 +9504,11 @@ msgstr "Precise controls"
 msgid "系统"
 msgstr "System"
 
-#: src/lib/errors/messages.ts:345
+#: src/lib/errors/messages.ts:347
 msgid "系统分享仅在移动应用中可用。"
 msgstr "System sharing is only available in the mobile app."
 
-#: src/lib/errors/messages.ts:344
+#: src/lib/errors/messages.ts:346
 msgid "系统导出未完成，请检查目标位置或分享应用后重试。"
 msgstr "System export did not complete. Check the destination or sharing app and try again."
 
@@ -9582,6 +9747,10 @@ msgstr "Keep editing"
 msgid "继续记录"
 msgstr "Resume recording"
 
+#: src/features/games/chess/ChessDialogs.tsx:96
+msgid "继续走棋"
+msgstr "Play on"
+
 #: src/lib/errors/messages.ts:106
 msgid "续传位置与目标文件大小不一致，请刷新后重试"
 msgstr "The resume offset does not match the destination size. Refresh and try again."
@@ -9742,7 +9911,7 @@ msgstr "Reveal to assign sides"
 msgid "翻棋"
 msgstr "Flip Junqi"
 
-#: src/features/home/entries.tsx:132
+#: src/features/home/entries.tsx:133
 #: src/features/translation/TranslationTool.tsx:120
 #: src/features/translation/TranslationTool.tsx:258
 msgid "翻译"
@@ -9781,6 +9950,7 @@ msgstr "Translation input"
 msgid "翻译输出"
 msgstr "Translation output"
 
+#: src/features/games/chess/ChessMatch.tsx:316
 #: src/features/games/junqi/JunqiMatchView.tsx:178
 msgid "翻转棋盘"
 msgstr "Flip board"
@@ -9817,9 +9987,11 @@ msgstr "Focus {name}"
 msgid "聚焦模型"
 msgstr "Focus model"
 
+#. 棋类历史记录胜负
 #. 棋类历史记录：本地玩家获胜。
 #. 棋类历史记录：本地玩家获胜。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:42
+#: src/features/games/chess/labels.tsx:73
 #: src/features/games/engine/black-white-labels.tsx:89
 #: src/features/games/engine/black-white-labels.tsx:96
 #: src/features/games/xiangqi/labels.tsx:94
@@ -10474,7 +10646,7 @@ msgstr "Enter a valid target size"
 msgid "请输入路径"
 msgstr "Enter a path"
 
-#: src/lib/errors/messages.ts:362
+#: src/lib/errors/messages.ts:364
 msgid "请选择一个 GLB、glTF 或 FBX 模型文件"
 msgstr "Choose a GLB, glTF or FBX model file."
 
@@ -10655,9 +10827,17 @@ msgstr "Invocation requirements"
 msgid "警告"
 msgstr "Warnings"
 
+#. 国际象棋 Bishop 棋子
+#: src/features/games/chess/labels.tsx:22
+msgctxt "国际象棋棋子"
+msgid "象"
+msgstr "Bishop"
+
+#. 棋类历史记录胜负
 #. 棋类历史记录：本地玩家落败。
 #. 棋类历史记录：本地玩家落败。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:42
+#: src/features/games/chess/labels.tsx:75
 #: src/features/games/engine/black-white-labels.tsx:91
 #: src/features/games/engine/black-white-labels.tsx:98
 #: src/features/games/xiangqi/labels.tsx:96
@@ -10732,6 +10912,12 @@ msgstr "Go"
 msgid "跳转到行"
 msgstr "Go to line"
 
+#. 国际象棋 Rook 棋子
+#: src/features/games/chess/labels.tsx:17
+msgctxt "国际象棋棋子"
+msgid "车"
+msgstr "Rook"
+
 #. 围绕目标旋转三维相机。
 #: src/features/model-viewer/components/NavigationPanel.tsx:51
 msgid "轨道查看"
@@ -10757,6 +10943,10 @@ msgstr "Failed to save"
 #: src/features/games/reversi/ReversiMatch.tsx:171
 msgid "轮到 {currentPlayer}"
 msgstr "{currentPlayer} to play"
+
+#: src/features/games/chess/ChessMatch.tsx:273
+msgid "轮到 {player}"
+msgstr "{player} to play"
 
 #: src/features/games/go/GoMatch.tsx:178
 #: src/features/games/gomoku/GomokuMatch.tsx:158
@@ -10929,6 +11119,10 @@ msgstr "Back to Home"
 msgid "还原模型预览"
 msgstr "Reset preview"
 
+#: src/features/games/chess/ChessDialogs.tsx:89
+msgid "这一步将达到三次重复局面或五十步规则。你可以声明这一步并申领和棋，也可以继续走棋。"
+msgstr "This move would qualify for a draw by threefold repetition or the fifty-move rule. You can declare it and claim a draw, or play on."
+
 #: src/features/logs/LogDialogs.tsx:43
 msgid "这条历史摘要将被永久删除。当前执行详情和正在运行的任务不受影响。"
 msgstr "This saved summary will be permanently deleted. Current execution details and running tasks will not be affected."
@@ -11003,7 +11197,7 @@ msgstr "rsync is not installed on the remote server. Install it and detect again
 msgid "远端解压中"
 msgstr "Extracting remotely"
 
-#: src/lib/errors/messages.ts:371
+#: src/lib/errors/messages.ts:373
 msgid "远端连接在终端打开前已关闭"
 msgstr "Remote connection closed before the terminal opened"
 
@@ -11205,6 +11399,10 @@ msgstr "Select Save Location"
 msgid "选择共享目录"
 msgstr "Select Shared Folder"
 
+#: src/features/games/chess/ChessDialogs.tsx:44
+msgid "选择升变棋子后完成这一步。"
+msgstr "Choose a piece to complete the promotion."
+
 #: src/features/media-compress/image/ImageCompressPanel.tsx:164
 #: src/features/media-compress/video/VideoCompressPanel.tsx:207
 msgid "选择压缩程度"
@@ -11360,6 +11558,11 @@ msgstr "Per-model values include shared references, so the total is de-duplicate
 msgid "通过「精确转动」选择一个面和层号，再点击转动按钮。层号从所选面向内数，第一层是最外层。方向以正对所选面为准，镜头旋转不会改变面名称；可在更多菜单开启面标识。"
 msgstr "Use Precise controls to choose a face and layer, then press a turn button. Layers count inward from the selected face; layer 1 is the outermost. Directions are viewed facing that face. Orbiting does not change face names. Enable face labels in the More menu."
 
+#. 国际象棋无合法着法但未被将军，判和棋
+#: src/features/games/chess/labels.tsx:40
+msgid "逼和"
+msgstr "Stalemate"
+
 #: src/features/games/junqi/JunqiRulesDialog.tsx:90
 msgid "道路与安全区"
 msgstr "Roads and protected spaces"
@@ -11405,7 +11608,7 @@ msgstr "Redo turn"
 msgid "重启中"
 msgstr "Restarting"
 
-#: src/lib/errors/messages.ts:355
+#: src/lib/errors/messages.ts:357
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "Could not restart. Try again or reopen the app manually."
 
@@ -11445,6 +11648,10 @@ msgstr "Restart"
 #: src/features/model-viewer/components/LibraryPanel.tsx:118
 msgid "重新加载"
 msgstr "Reload"
+
+#: src/features/games/chess/ChessStage.tsx:121
+msgid "重新加载棋盘"
+msgstr "Reload board"
 
 #: src/features/games/magic-cube/MagicCubeGame.tsx:486
 msgid "重新加载画布"
@@ -11704,7 +11911,7 @@ msgstr "Size"
 msgid "附件副本已保存。"
 msgstr "Attachment copy saved."
 
-#: src/lib/errors/messages.ts:357
+#: src/lib/errors/messages.ts:359
 msgid "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 msgstr "Invalid attachment. Choose UTF-8 text or Markdown (up to 1 MiB), or PDF (up to 8 MiB)."
 
@@ -11720,7 +11927,7 @@ msgstr "Nearby devices"
 #: src/features/games/junqi/JunqiMatch.tsx:39
 #: src/features/games/junqi/JunqiMatchView.tsx:157
 #: src/features/games/junqi/JunqiOnline.tsx:160
-#: src/features/home/entries.tsx:227
+#: src/features/home/entries.tsx:228
 msgid "陆战棋"
 msgstr "Junqi"
 
@@ -11884,6 +12091,12 @@ msgstr "Preview note image"
 msgid "首页"
 msgstr "Home"
 
+#. 国际象棋 Knight 棋子
+#: src/features/games/chess/labels.tsx:27
+msgctxt "国际象棋棋子"
+msgid "马"
+msgstr "Knight"
+
 #. 使用本地 Khronos 验证器检查原始 glTF/GLB 及已授权依赖。
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:236
 msgid "验证 glTF 规范"
@@ -11924,11 +12137,11 @@ msgstr "High quality"
 #. 小游戏名称，指可转动的多阶立方体谜题
 #. 小游戏名称，指可转动的多阶立方体谜题
 #: src/features/games/magic-cube/MagicCubeGame.tsx:175
-#: src/features/home/entries.tsx:234
+#: src/features/home/entries.tsx:242
 msgid "魔方"
 msgstr "Magic cube"
 
-#: src/lib/errors/messages.ts:339
+#: src/lib/errors/messages.ts:341
 msgid "魔方已还原，但挑战记录尚未保存，请重试。"
 msgstr "The cube is solved, but the challenge result has not been saved. Please retry."
 
@@ -11965,6 +12178,8 @@ msgstr "Black {black} · White {white} + {KOMI} komi = {whiteWithKomi}"
 msgid "黑八已重置"
 msgstr "8-ball re-spotted"
 
+#: src/features/games/chess/ChessStage.tsx:134
+#: src/features/games/chess/labels.tsx:55
 #: src/features/games/junqi/labels.tsx:126
 #: src/features/games/junqi/render/JunqiStage.tsx:290
 #: src/features/games/junqi/render/JunqiStage.tsx:291
@@ -11982,6 +12197,7 @@ msgstr "Black"
 msgid "黑棋先行，结束时棋子更多的一方获胜。"
 msgstr "Black moves first. The player with more discs at the end wins."
 
+#: src/features/games/chess/labels.tsx:66
 #: src/features/games/engine/black-white-labels.tsx:102
 msgid "黑棋胜"
 msgstr "Black wins"
@@ -11994,7 +12210,7 @@ msgstr "Black"
 #. 小游戏名称，标准八乘八翻转棋
 #. 小游戏名称，标准八乘八翻转棋
 #: src/features/games/reversi/ReversiGame.tsx:50
-#: src/features/home/entries.tsx:210
+#: src/features/home/entries.tsx:211
 msgid "黑白棋"
 msgstr "Reversi"
 

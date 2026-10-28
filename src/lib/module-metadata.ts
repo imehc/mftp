@@ -49,6 +49,7 @@ export const modules = [
   { id: "reversi", tool: null },
   { id: "go", tool: null },
   { id: "xiangqi", tool: null },
+  { id: "chess", tool: null },
   { id: "junqi", tool: null },
   { id: "magic-cube", tool: null },
   { id: "sliding-puzzle", tool: null },

@@ -16,6 +16,7 @@ import { Route as LogsRouteImport } from './routes/logs'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
+import { Route as GamesChessRouteImport } from './routes/games/chess'
 import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesJunqiRouteImport } from './routes/games/junqi'
@@ -72,6 +73,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const GamesBilliardsRoute = GamesBilliardsRouteImport.update({
   id: '/games/billiards',
   path: '/games/billiards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesChessRoute = GamesChessRouteImport.update({
+  id: '/games/chess',
+  path: '/games/chess',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesGoRoute = GamesGoRouteImport.update({
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/preview': typeof PreviewRoute
   '/settings': typeof SettingsRoute
   '/games/billiards': typeof GamesBilliardsRoute
+  '/games/chess': typeof GamesChessRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/preview': typeof PreviewRoute
   '/settings': typeof SettingsRoute
   '/games/billiards': typeof GamesBilliardsRoute
+  '/games/chess': typeof GamesChessRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/preview': typeof PreviewRoute
   '/settings': typeof SettingsRoute
   '/games/billiards': typeof GamesBilliardsRoute
+  '/games/chess': typeof GamesChessRoute
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
@@ -289,6 +298,7 @@ export interface FileRouteTypes {
     | '/preview'
     | '/settings'
     | '/games/billiards'
+    | '/games/chess'
     | '/games/go'
     | '/games/gomoku'
     | '/games/junqi'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/preview'
     | '/settings'
     | '/games/billiards'
+    | '/games/chess'
     | '/games/go'
     | '/games/gomoku'
     | '/games/junqi'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/preview'
     | '/settings'
     | '/games/billiards'
+    | '/games/chess'
     | '/games/go'
     | '/games/gomoku'
     | '/games/junqi'
@@ -383,6 +395,7 @@ export interface RootRouteChildren {
   PreviewRoute: typeof PreviewRoute
   SettingsRoute: typeof SettingsRoute
   GamesBilliardsRoute: typeof GamesBilliardsRoute
+  GamesChessRoute: typeof GamesChessRoute
   GamesGoRoute: typeof GamesGoRoute
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesJunqiRoute: typeof GamesJunqiRoute
@@ -456,6 +469,13 @@ declare module '@tanstack/react-router' {
       path: '/games/billiards'
       fullPath: '/games/billiards'
       preLoaderRoute: typeof GamesBilliardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/chess': {
+      id: '/games/chess'
+      path: '/games/chess'
+      fullPath: '/games/chess'
+      preLoaderRoute: typeof GamesChessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/go': {
@@ -623,6 +643,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewRoute: PreviewRoute,
   SettingsRoute: SettingsRoute,
   GamesBilliardsRoute: GamesBilliardsRoute,
+  GamesChessRoute: GamesChessRoute,
   GamesGoRoute: GamesGoRoute,
   GamesGomokuRoute: GamesGomokuRoute,
   GamesJunqiRoute: GamesJunqiRoute,

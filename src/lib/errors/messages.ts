@@ -331,6 +331,8 @@ export const appDataSectionNames: Record<string, MessageDescriptor> = {
 // 渲染时本地化。只有确实无法从后端拿到错误、又需要向用户解释的时序
 // （如终端打开前连接被关闭）才在这里登记。
 export const frontendErrorMessages = {
+  "chess:ai": msg`电脑走棋失败，请重新开始或恢复对局后重试。`,
+  "chess:render": msg`无法显示国际象棋。请重新加载棋盘，当前对局进度会保留。`,
   "games:checkpoint_read": msg`无法读取对局存档，请重试。原存档未被删除。`,
   "games:checkpoint_invalid": msg`对局存档损坏或版本不兼容，无法恢复。原存档未被删除。`,
   "games:checkpoint_write": msg`对局尚未成功保存，请重试。异常退出后可能丢失最新进度。`,
