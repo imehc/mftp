@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 
-import { foulLabel, FoulSummary } from "./BilliardsFoulFeedback";
+import { FoulSummary } from "./BilliardsFoulFeedback";
 import { foulFeedback } from "./foul-feedback";
 import type { BilliardsMode, BilliardsState } from "./types";
 
@@ -16,7 +16,7 @@ export interface BilliardsNotice {
  * 把台面状态映射为待展示的顶部消息。
  *
  * 仅包含需要打断/提示玩家的犯规、手中球与黑八复位；「电脑思考中」属于持续
- * 状态，改由其座位徽章承载，不占用消息位。`id` 由内容推导，供 Sonner 去重
+ * 状态，改由其座位徽章承载，不占用消息位。`id` 由内容推导，供轻提示去重
  * 与更新，避免重复播放动画。
  */
 export function billiardsNotices(
@@ -31,7 +31,6 @@ export function billiardsNotices(
       id: `foul:${feedback.shooter ?? "-"}:${feedback.reason}:${feedback.penalty}`,
       tone: "warning",
       title: <FoulSummary feedback={feedback} mode={mode} />,
-      description: foulLabel(feedback.reason),
     });
   }
   if (ballInHand) {

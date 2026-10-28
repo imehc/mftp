@@ -123,6 +123,7 @@ function OnlineMatch({
 
   const {
     controller,
+    notice,
     snapshot,
     undoFlow,
     endReason,
@@ -139,6 +140,7 @@ function OnlineMatch({
         mode={mode}
         session={{ runner: snapshot.match.runner, local: snapshot.match.local }}
         online={{
+          notice,
           peerName: session.peerName,
           localSeat: snapshot.localSeat,
           undoWaiting: undoFlow?.kind === "waiting",

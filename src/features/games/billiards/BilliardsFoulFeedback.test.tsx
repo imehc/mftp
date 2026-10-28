@@ -11,7 +11,12 @@ import { createNineBallState } from "./nine-ball";
 import { NineBallActions } from "./NineBallHud";
 import { createSnookerState } from "./snooker";
 import { SnookerActions } from "./SnookerHud";
-import type { BilliardsMode, NineBallDecision, SnookerState } from "./types";
+import type {
+  BilliardsMode,
+  FoulReason,
+  NineBallDecision,
+  SnookerState,
+} from "./types";
 
 const ai: BilliardsMode = {
   kind: "ai",
@@ -20,6 +25,56 @@ const ai: BilliardsMode = {
 };
 
 const noop = () => {};
+
+it.each([
+  "cue-potted",
+  "no-contact",
+  "wrong-first-contact",
+  "no-rail",
+  "illegal-break",
+  "potted-eight-early",
+  "wrong-ball-potted",
+  "touching-ball-moved",
+  "snooker-behind-nomination",
+] satisfies FoulReason[])("犯规原因 %s 只呈现一次犯规前缀", (reason) => {
+  const text = rendered(
+    <FoulSummary
+      mode={ai}
+      feedback={{ reason, shooter: 0, recipient: null, penalty: 0 }}
+    />,
+  );
+  expect(text.match(/犯规/g)).toHaveLength(1);
+  expect(text).toMatch(/^你犯规：.+/);
+});
+
+it("九球开球提示使用三球要求，母球落袋不重复前缀", () => {
+  expect(
+    rendered(
+      <FoulSummary
+        mode={{ ...ai, discipline: "nine-ball" }}
+        feedback={{
+          reason: "illegal-break",
+          shooter: 0,
+          recipient: null,
+          penalty: 0,
+        }}
+      />,
+    ),
+  ).toBe("你犯规：开球未达到三球要求");
+  expect(
+    rendered(
+      <FoulSummary
+        mode={ai}
+        feedback={{
+          reason: "cue-potted",
+          shooter: 0,
+          recipient: null,
+          penalty: 0,
+        }}
+      />,
+    ),
+  ).toBe("你犯规：母球落袋");
+});
 
 function rendered(children: ReactNode, locale = "zh-CN") {
   const i18n = setupI18n({
@@ -61,7 +116,7 @@ describe("斯诺克犯规说明身份", () => {
     const text = rendered(
       <SnookerActions state={foulState(1)} mode={ai} enabled onMove={noop} />,
     );
-    expect(text).toContain("电脑 犯规，你 获得 4 分。");
+    expect(text).toContain("电脑犯规：未碰到任何球，你获得 4 分。");
     expect(text).toContain("由 你 选择接打，或要求 电脑 从留下位置重打。");
     expect(text).not.toContain("你 · 犯规");
     expect(text).not.toContain("对手获罚分");
@@ -78,7 +133,7 @@ describe("斯诺克犯规说明身份", () => {
           onMove={noop}
         />,
       ),
-    ).toContain("你 犯规，电脑 获得 4 分。");
+    ).toContain("你犯规：未碰到任何球，电脑获得 4 分。");
     expect(
       rendered(
         <SnookerActions
@@ -88,7 +143,7 @@ describe("斯诺克犯规说明身份", () => {
           onMove={noop}
         />,
       ),
-    ).toContain("玩家 1 犯规，玩家 2 获得 4 分。");
+    ).toContain("玩家 1犯规：未碰到任何球，玩家 2获得 4 分。");
   });
 
   it.each(["three-miss", "six-red"] as const)(
@@ -126,7 +181,7 @@ describe("斯诺克犯规说明身份", () => {
     const text = rendered(
       <SnookerActions state={state} mode={ai} enabled onMove={noop} />,
     );
-    expect(text).toContain("电脑 犯规，你 获得 4 分。");
+    expect(text).toContain("电脑犯规：未碰到任何球，你获得 4 分。");
     expect(text).toContain("你 抽签获选，决定谁先打");
   });
 
@@ -143,7 +198,7 @@ describe("斯诺克犯规说明身份", () => {
           }}
         />,
       ),
-    ).toBe("本杆犯规罚分：7 分");
+    ).toBe("犯规：未碰到任何球，罚分 7 分。");
   });
 
   it("英文判罚保留犯规者、获分者和分值", () => {
@@ -151,7 +206,9 @@ describe("斯诺克犯规说明身份", () => {
       <SnookerActions state={foulState(1)} mode={ai} enabled onMove={noop} />,
       "en",
     );
-    expect(text).toContain("Foul by Computer. 4 points awarded to You.");
+    expect(text).toContain(
+      "Foul by Computer: no ball contacted. 4 points awarded to You.",
+    );
     expect(text).toContain(
       "Decision for You: play next or ask Computer to play from the position left.",
     );

@@ -1,11 +1,7 @@
-import { useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
-import {
-  BILLIARDS_NOTICE_DURATION,
-  BILLIARDS_TOASTER_ID,
-  BILLIARDS_VISIBLE_NOTICES,
-} from "./BilliardsToaster";
+import type { LightNoticeMessage } from "~/components/LightNotice";
+
 import { billiardsNotices } from "./notices";
 import type { BilliardsMode, BilliardsState } from "./types";
 
@@ -46,61 +42,35 @@ export function planNotices(
   return { order, visible, suppressed: [...suppressedSet] };
 }
 
-/**
- * 将台面状态同步为顶部中间消息：状态成立时展示，状态消失时关闭。
- *
- * 同时最多展示 `BILLIARDS_VISIBLE_NOTICES` 条，超出时最早出现的一条立即
- * 消失；每条展示 `BILLIARDS_NOTICE_DURATION` 后自动关闭。使用内容派生的
- * 稳定 `id` 去重，已在展示的 id 不重复创建（避免重置计时、重播动画），
- * 卸载时统一清理，避免遗留到下一次对局。
- */
+/** 台球规则提示沿用去重和展示上限，交给共用轻提示处理计时与主题。 */
 export function useBilliardsNotices(
   state: BilliardsState,
   mode: BilliardsMode,
   ballInHand: boolean,
-) {
-  const order = useRef<string[]>([]);
-  const suppressed = useRef<string[]>([]);
-  const shown = useRef<string[]>([]);
-
-  useEffect(() => {
-    const notices = billiardsNotices(state, mode, ballInHand);
-    const activeIds = notices.map((notice) => notice.id);
-    const plan = planNotices(
-      { order: order.current, suppressed: suppressed.current },
-      activeIds,
-      BILLIARDS_VISIBLE_NOTICES,
-    );
-    order.current = plan.order;
-    suppressed.current = plan.suppressed;
-
-    const visibleSet = new Set(plan.visible);
-    for (const notice of notices) {
-      if (!visibleSet.has(notice.id)) continue;
-      // id 由内容派生，内容不变时重复创建只会重置计时，故跳过。
-      if (shown.current.includes(notice.id)) continue;
-      const options = {
-        id: notice.id,
-        toasterId: BILLIARDS_TOASTER_ID,
-        duration: BILLIARDS_NOTICE_DURATION,
-        description: notice.description,
-      };
-      if (notice.tone === "warning") toast.warning(notice.title, options);
-      else toast(notice.title, options);
-    }
-    for (const id of shown.current) {
-      if (!visibleSet.has(id)) toast.dismiss(id);
-    }
-    shown.current = plan.visible;
-  }, [state, mode, ballInHand]);
-
-  useEffect(
-    () => () => {
-      for (const id of shown.current) toast.dismiss(id);
-      order.current = [];
-      suppressed.current = [];
-      shown.current = [];
-    },
-    [],
-  );
+): LightNoticeMessage[] {
+  const notices = billiardsNotices(state, mode, ballInHand);
+  const activeIds = notices.map((notice) => notice.id);
+  const signature = JSON.stringify(activeIds);
+  const [tracked, setTracked] = useState(() => ({
+    signature,
+    plan: planNotices({ order: [], suppressed: [] }, activeIds, 2),
+  }));
+  if (tracked.signature !== signature)
+    setTracked({ signature, plan: planNotices(tracked.plan, activeIds, 2) });
+  return notices
+    .filter((notice) => tracked.plan.visible.includes(notice.id))
+    .map((notice) => ({
+      id: notice.id,
+      message: (
+        <>
+          {notice.title}
+          {notice.description ? (
+            <>
+              {" · "}
+              {notice.description}
+            </>
+          ) : null}
+        </>
+      ),
+    }));
 }

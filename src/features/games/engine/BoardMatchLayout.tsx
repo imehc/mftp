@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 
+import { LightNotice, type LightNoticeMessage } from "~/components/LightNotice";
 import { Badge } from "~/components/ui/badge";
 
 import type { Difficulty } from "./ai";
@@ -16,6 +17,7 @@ export function BoardMatchLayout({
   controls,
   finished,
   children,
+  notice = null,
 }: {
   title: ReactNode;
   mode: { kind: string; difficulty?: Difficulty };
@@ -25,6 +27,7 @@ export function BoardMatchLayout({
   controls: ReactNode;
   finished: boolean;
   children: ReactNode;
+  notice?: LightNoticeMessage | null;
 }) {
   return (
     <>
@@ -74,6 +77,7 @@ export function BoardMatchLayout({
       </div>
       <div className="relative z-0 min-h-0 flex-1 overflow-hidden px-3 py-1.5 md:px-4">
         {children}
+        <LightNotice notice={notice} />
       </div>
       {!finished ? (
         <div

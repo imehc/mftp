@@ -5,7 +5,6 @@
  */
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { toast } from "sonner";
 
 import { areGamesForeground } from "../session-registry";
 import type { OnlineTransport, Presentation } from "./matchTypes";
@@ -35,13 +34,15 @@ export function useOnlineMatch<S, M, P>(
 
     return controller.attachPresentation(present);
   }, [controller]);
-  const noticedRef = useRef(0);
-  useEffect(() => {
-    const notice = snapshot.notice;
-    if (!notice || notice.id === noticedRef.current) return;
-    noticedRef.current = notice.id;
-    toast(notice.kind === "undo" ? t`对方拒绝了悔棋` : t`对方拒绝了再来一局`);
-  }, [snapshot.notice, t]);
+  const notice = snapshot.notice
+    ? {
+        id: `online-${snapshot.notice.id}`,
+        message:
+          snapshot.notice.kind === "undo"
+            ? t`对方拒绝了悔棋`
+            : t`对方拒绝了再来一局`,
+      }
+    : null;
   const pending = snapshot.pending;
   const incoming = pending?.direction === "incoming" ? pending.request : null;
   const outgoing = pending?.direction === "outgoing" ? pending.request : null;
@@ -64,6 +65,7 @@ export function useOnlineMatch<S, M, P>(
               ? t`与对方的连接已断开。`
               : t`对方长时间未回应协商，对局已结束。`;
   return {
+    notice,
     controller,
     snapshot,
     undoFlow,

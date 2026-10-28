@@ -6,6 +6,7 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Flag, Undo2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import type { LightNoticeMessage } from "~/components/LightNotice";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
@@ -30,6 +31,7 @@ import {
 
 /** 对局走局域网房间通道时额外的视图状态。 */
 export interface OnlineViewProps {
+  notice?: LightNoticeMessage | null;
   peerName: string;
   localSeat: SeatIndex;
   undoWaiting: boolean;
@@ -169,6 +171,7 @@ export function GoMatchView({
   return (
     <>
       <BoardMatchLayout
+        notice={online?.notice}
         title={
           state.finished ? (
             matchResultLabel(mode, snapshot.winnerSeat, online)

@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 
+import { LightNotice, type LightNoticeMessage } from "~/components/LightNotice";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/ui/spinner";
@@ -18,6 +19,7 @@ import { createJunqiScene } from "./scene";
 
 export function JunqiStage({
   board,
+  notice = null,
   flipped,
   selected,
   targets,
@@ -29,6 +31,7 @@ export function JunqiStage({
   onCancel,
 }: {
   board: ViewBoard;
+  notice?: LightNoticeMessage | null;
   flipped: boolean;
   selected: number | null;
   targets: number[];
@@ -188,6 +191,7 @@ export function JunqiStage({
   }, [t, i18n.locale, cjkFont, retry, landscape]);
   return (
     <div className="junqi-board-viewport app-scroll-safe-end relative min-h-0 min-w-0 flex-1 overflow-auto">
+      <LightNotice notice={notice} />
       {error ? (
         <Alert variant="destructive" className="mx-auto w-fit">
           <AlertDescription>

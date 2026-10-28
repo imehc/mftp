@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { FlagIcon, RotateCw, Undo2 } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
+import type { LightNoticeMessage } from "~/components/LightNotice";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +44,7 @@ export function JunqiMatchView({
   onAction,
   recordId,
   notice,
+  lightNotice,
   peerName,
   rematchWaiting = false,
   canRecord = true,
@@ -57,6 +59,7 @@ export function JunqiMatchView({
   onExit(): void;
   recordId: string;
   notice?: ReactNode;
+  lightNotice?: LightNoticeMessage | null;
   peerName?: string;
   rematchWaiting?: boolean;
   canRecord?: boolean;
@@ -226,6 +229,7 @@ export function JunqiMatchView({
         onReady={() => submit({ type: "ready" })}
       />
       <JunqiStage
+        notice={lightNotice}
         board={view.board}
         flipped={flipped}
         interactive={interactive}

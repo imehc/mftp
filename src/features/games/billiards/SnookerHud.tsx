@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { FieldGroup } from "~/components/ui/field";
 import { Spinner } from "~/components/ui/spinner";
 
-import { foulLabel, FoulSummary } from "./BilliardsFoulFeedback";
+import { FoulSummary } from "./BilliardsFoulFeedback";
 import { seatName } from "./BilliardsScore";
 import { foulFeedback } from "./foul-feedback";
 import { availablePoints, needsPenaltyPoints } from "./snooker";
@@ -92,14 +92,9 @@ export function SnookerActions({
   return (
     <div className="flex flex-col gap-3 text-sm">
       {feedback ? (
-        <div className="flex flex-col gap-1" role="status">
-          <p>
-            <FoulSummary feedback={feedback} mode={mode} />
-          </p>
-          <p className="text-muted-foreground text-xs">
-            {foulLabel(feedback.reason)}
-          </p>
-        </div>
+        <p role="status">
+          <FoulSummary feedback={feedback} mode={mode} />
+        </p>
       ) : null}
       {decision ? (
         <div className="flex flex-col gap-3">

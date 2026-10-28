@@ -2,6 +2,7 @@
 import { Plural, Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
+import { LightNoticeStack } from "~/components/LightNotice";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -177,7 +178,7 @@ export function MatchView({
   };
 
   const ballInHand = canInteract && state.ballInHand;
-  useBilliardsNotices(state, mode, ballInHand);
+  const notices = useBilliardsNotices(state, mode, ballInHand);
   const remaining = state.balls.filter(
     (ball) => !ball.potted && ball.id !== 0,
   ).length;
@@ -402,6 +403,7 @@ export function MatchView({
           </div>
         ) : null}
 
+        <LightNoticeStack notices={notices} />
         <BilliardsStage
           ref={stageRef}
           resume={

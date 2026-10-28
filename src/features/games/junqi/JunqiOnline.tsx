@@ -1,6 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Spinner } from "~/components/ui/spinner";
@@ -69,16 +68,15 @@ function OnlineMatch({
   const { t } = useLingui();
   const s = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const volume = useSettingsStore((state) => state.gamesVolume);
-  const noticed = useRef(s.undoNotice);
-  useEffect(() => {
-    if (!s.undoNotice || noticed.current === s.undoNotice) return;
-    noticed.current = s.undoNotice;
-    toast(
-      s.undoNotice.kind === "declined"
-        ? t`对方拒绝了悔棋`
-        : t`局面已更新，悔棋请求已失效。`,
-    );
-  }, [s.undoNotice, t]);
+  const lightNotice = s.undoNotice
+    ? {
+        id: `undo-${s.undoNotice.requestId}`,
+        message:
+          s.undoNotice.kind === "declined"
+            ? t`对方拒绝了悔棋`
+            : t`局面已更新，悔棋请求已失效。`,
+      }
+    : null;
   const previous = useRef({ round: s.round, ply: s.view?.ply ?? 0 });
   useEffect(() => {
     if (
@@ -154,6 +152,7 @@ function OnlineMatch({
           onExit={onExit}
           rematchWaiting={s.rematch?.direction === "outgoing"}
           notice={notice}
+          lightNotice={lightNotice}
         />
       ) : (
         <>
