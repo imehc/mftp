@@ -1,114 +1,132 @@
-import { i18n } from "@lingui/core";
+// @vitest-environment happy-dom
+import { setupI18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { z } from "zod";
+import { act } from "react";
+import { createRoot } from "react-dom/client";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
-import { checkpointSchema } from "./checkpoint-schema";
-import { type CheckpointStorage } from "./checkpoint-storage";
-import { LocalController } from "./controllers";
-import { GameSessionStore } from "./game-session-store";
+import { frontendError } from "~/lib/errors";
+
+import type { GameSessionStore } from "./game-session-store";
 import { GameSessionNotice } from "./GameSessionNotice";
-import { MatchRunner } from "./match";
-import type { GameDefinition } from "./types";
 
-vi.mock("react", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("react")>()),
-  useSyncExternalStore: (_subscribe: unknown, getSnapshot: () => unknown) =>
-    getSnapshot(),
-}));
+const navigate = vi.hoisted(() => vi.fn());
+vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigate }));
 
-i18n.load("zh-CN", {});
-i18n.activate("zh-CN");
-const game: GameDefinition<number, number, number> = {
-  id: "notice-test",
-  seatCount: 1,
-  currentSeat: () => 0,
-  winnerSeat: () => null,
-  isFinished: () => false,
-  applyMove: (state, move) => ({ state: state + move, presentation: move }),
-};
-const stores: GameSessionStore<"local", number, number, number>[] = [];
+let host: HTMLDivElement;
+let root: ReturnType<typeof createRoot>;
+const restore = vi.fn();
+const exit = vi.fn();
+const load = vi.fn();
+const retrySave = vi.fn();
 
-function fixture(saved?: unknown) {
-  const storage: CheckpointStorage = {
-    read: vi.fn(async () => saved),
-    write: vi.fn(async () => {}),
-    remove: vi.fn(async () => {}),
-  };
-  const store = new GameSessionStore<"local", number, number, number>(
-    {
-      gameId: game.id,
-      schema: checkpointSchema(game.id, z.literal("local"), z.number()),
-      create(_mode, hooks, checkpoint) {
-        const local = new LocalController<number, number>();
-        return {
-          local,
-          runner: new MatchRunner(game, 0, [local], hooks, checkpoint),
-        };
-      },
-    },
-    storage,
-  );
-  stores.push(store);
-  return { store, storage };
-}
-
-function markup(store: GameSessionStore<"local", number, number, number>) {
-  return renderToStaticMarkup(
-    <I18nProvider i18n={i18n}>
-      <GameSessionNotice store={store} />
-    </I18nProvider>,
-  );
-}
-
-afterEach(() => {
-  for (const store of stores) store.dispose();
-  stores.length = 0;
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  host = document.createElement("div");
+  document.body.appendChild(host);
+  root = createRoot(host);
 });
 
-describe("对局存档提示", () => {
-  it("读取存档时保留加载反馈", () => {
-    const { store } = fixture();
-    expect(markup(store)).toContain("正在读取对局存档");
-  });
+afterEach(async () => {
+  await act(async () => root.unmount());
+  host.remove();
+  vi.unstubAllGlobals();
+});
 
-  it("存在存档时保留恢复和丢弃入口", async () => {
-    const { store } = fixture({
-      version: 1,
-      gameId: game.id,
-      id: crypto.randomUUID(),
-      savedAt: Date.now(),
-      mode: "local",
-      history: [0],
-    });
-    await store.load();
-    const rendered = markup(store);
-    expect(rendered).toContain("发现上次的对局存档，是否继续？");
-    expect(rendered).toContain("继续对局");
-    expect(rendered).toContain("丢弃存档");
-  });
+async function render(
+  saved = true,
+  error = false,
+  onRestore = vi.fn(),
+  overrides = {},
+) {
+  const snapshot = {
+    status: error ? "error" : "ready",
+    saved: saved ? { id: "隔离存档" } : null,
+    error: error
+      ? frontendError("games:checkpoint_read", "Checkpoint read failed")
+      : null,
+    transitioning: false,
+    ...overrides,
+  };
+  const store = {
+    subscribe: () => () => {},
+    getSnapshot: () => snapshot,
+    restore,
+    exit,
+    load,
+    retrySave,
+  } as unknown as GameSessionStore<unknown, unknown, unknown, unknown>;
+  await act(async () =>
+    root.render(
+      <I18nProvider
+        i18n={setupI18n({ locale: "zh-CN", messages: { "zh-CN": {} } })}
+      >
+        <GameSessionNotice store={store} onRestore={onRestore} />
+      </I18nProvider>,
+    ),
+  );
+}
 
-  it("自动保存中和保存成功均不渲染说明或空白提示行", async () => {
-    const { store } = fixture();
-    await store.load();
-    store.start("local");
-    expect(store.ensureSession()).not.toBeNull();
-    expect(store.getSnapshot().saving).toBe(true);
-    expect(markup(store)).toBe("");
-    for (let index = 0; index < 16; index++) await Promise.resolve();
-    expect(store.getSnapshot().saving).toBe(false);
-    expect(store.getSnapshot().savedAt).not.toBeNull();
-    expect(markup(store)).toBe("");
-  });
+async function click(label: string) {
+  const button = [...document.querySelectorAll("button")].find(
+    (item) =>
+      item.textContent === label || item.getAttribute("aria-label") === label,
+  );
+  expect(button).toBeDefined();
+  await act(async () => button?.click());
+}
 
-  it("读取失败仍展示错误与重试入口", async () => {
-    const { store, storage } = fixture();
-    vi.mocked(storage.read).mockRejectedValue(new Error("read failed"));
-    await store.load();
-    expect(store.getSnapshot().error).not.toBeNull();
-    const rendered = markup(store);
-    expect(rendered).toContain("destructive");
-    expect(rendered).toContain("重试");
+it("正常存档只显示恢复弹窗，继续时保留恢复前回调", async () => {
+  const onRestore = vi.fn();
+  await render(true, false, onRestore);
+  expect(document.querySelectorAll('[role="alertdialog"]')).toHaveLength(1);
+  expect(document.querySelector('[data-slot="alert"]')).toBeNull();
+  await click("继续游戏");
+  expect(onRestore).toHaveBeenCalledOnce();
+  expect(restore).toHaveBeenCalledOnce();
+  expect(exit).not.toHaveBeenCalled();
+});
+
+it("读取存档时保留加载反馈", async () => {
+  await render(false, false, undefined, { status: "loading" });
+  expect(host.querySelector('[role="status"]')?.textContent).toContain(
+    "正在读取对局存档",
+  );
+  expect(document.querySelector('[role="alertdialog"]')).toBeNull();
+});
+
+it("自动保存中和保存成功均不渲染说明或预留提示行", async () => {
+  await render(false, false, undefined, { saving: true });
+  expect(host.innerHTML).toBe("");
+  await render(false, false, undefined, {
+    saving: false,
+    savedAt: Date.now(),
   });
+  expect(host.innerHTML).toBe("");
+});
+
+it("丢弃需要确认，取消和关闭均保留存档", async () => {
+  await render();
+  await click("丢弃存档");
+  expect(exit).not.toHaveBeenCalled();
+  await click("取消");
+  await click("关闭");
+  expect(navigate).toHaveBeenCalledWith({
+    to: "/",
+    search: { category: "games" },
+  });
+  expect(exit).not.toHaveBeenCalled();
+  await click("丢弃存档");
+  await click("确认");
+  expect(exit).toHaveBeenCalledOnce();
+});
+
+it("读取失败时仍可重试，不伪装成正常恢复弹窗", async () => {
+  await render(false, true);
+  expect(document.querySelector('[role="alertdialog"]')).toBeNull();
+  expect(document.querySelector('[data-slot="alert"]')).not.toBeNull();
+  await click("重试");
+  expect(load).toHaveBeenCalledOnce();
+  expect(restore).not.toHaveBeenCalled();
 });

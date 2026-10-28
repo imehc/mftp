@@ -1,35 +1,17 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useSyncExternalStore } from "react";
+import { Trans } from "@lingui/react/macro";
 
-import { describeError } from "~/lib/errors";
-
-import { GameRestoreDialog } from "../engine/GameRestoreDialog";
 import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { unlockReversiAudio } from "./audio";
 import { reversiSessions } from "./session";
 
 export function ReversiSessionNotice() {
-  const { t } = useLingui();
-  const state = useSyncExternalStore(
-    reversiSessions.subscribe,
-    reversiSessions.getSnapshot,
+  return (
+    <GameSessionNotice
+      store={reversiSessions}
+      onRestore={unlockReversiAudio}
+      restoreDescription={
+        <Trans>继续上次的黑白棋对局，棋盘和悔棋记录都会恢复。</Trans>
+      }
+    />
   );
-  if (state.saved)
-    return (
-      <GameRestoreDialog
-        description={
-          <Trans>继续上次的黑白棋对局，棋盘和悔棋记录都会恢复。</Trans>
-        }
-        busy={state.transitioning}
-        error={state.error ? describeError(state.error, t) : undefined}
-        onRestore={() => {
-          unlockReversiAudio();
-          reversiSessions.restore();
-        }}
-        onDiscard={() => {
-          void reversiSessions.exit();
-        }}
-      />
-    );
-  return <GameSessionNotice store={reversiSessions} />;
 }

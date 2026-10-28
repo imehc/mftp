@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useState, useSyncExternalStore } from "react";
+import { type ReactNode, useState, useSyncExternalStore } from "react";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
@@ -17,48 +17,54 @@ import { Spinner } from "~/components/ui/spinner";
 import { describeError } from "~/lib/errors";
 
 import type { GameSessionStore } from "./game-session-store";
+import { GameRestoreDialog } from "./GameRestoreDialog";
 
 export function GameSessionNotice<Mode, State, Move, Presentation>({
   store,
   onRestore,
+  restoreDescription,
 }: {
   store: GameSessionStore<Mode, State, Move, Presentation>;
   onRestore?: () => void;
+  restoreDescription?: ReactNode;
 }) {
   const { t } = useLingui();
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
   const [discardOpen, setDiscardOpen] = useState(false);
   if (state.status === "loading")
     return (
-      <div className="text-muted-foreground flex items-center gap-2 p-3 text-sm">
+      <div
+        role="status"
+        className="text-muted-foreground flex items-center gap-2 p-3 text-sm"
+      >
         <Spinner />
         <Trans>正在读取对局存档…</Trans>
       </div>
     );
-  if (!state.error && !state.saved) return null;
+  if (state.saved)
+    return (
+      <GameRestoreDialog
+        description={
+          restoreDescription ?? <Trans>发现上次的对局存档，是否继续？</Trans>
+        }
+        busy={state.transitioning}
+        error={state.error ? describeError(state.error, t) : undefined}
+        onRestore={() => {
+          onRestore?.();
+          store.restore();
+        }}
+        onDiscard={() => {
+          void store.exit();
+        }}
+      />
+    );
+  if (!state.error) return null;
   return (
     <div className="shrink-0 p-3">
       <Alert variant={state.error ? "destructive" : "default"}>
         <AlertDescription className="flex flex-col gap-2">
-          {state.error ? (
-            <span>{describeError(state.error, t)}</span>
-          ) : (
-            <Trans>发现上次的对局存档，是否继续？</Trans>
-          )}
+          <span>{describeError(state.error, t)}</span>
           <div className="flex flex-wrap items-center gap-2">
-            {state.saved ? (
-              <Button
-                size="sm"
-                density="adaptive"
-                disabled={state.transitioning}
-                onClick={() => {
-                  onRestore?.();
-                  store.restore();
-                }}
-              >
-                <Trans comment="恢复已保存的本地游戏对局">继续对局</Trans>
-              </Button>
-            ) : null}
             {state.error ? (
               <Button
                 size="sm"
@@ -75,7 +81,7 @@ export function GameSessionNotice<Mode, State, Move, Presentation>({
                 <Trans>重试</Trans>
               </Button>
             ) : null}
-            {state.saved || state.status === "error" ? (
+            {state.status === "error" ? (
               <Button
                 size="sm"
                 density="adaptive"
