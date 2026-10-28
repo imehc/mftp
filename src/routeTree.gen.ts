@@ -19,6 +19,7 @@ import { Route as GamesBilliardsRouteImport } from './routes/games/billiards'
 import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesJunqiRouteImport } from './routes/games/junqi'
+import { Route as GamesMagicCubeRouteImport } from './routes/games/magic-cube'
 import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
@@ -84,6 +85,11 @@ const GamesGomokuRoute = GamesGomokuRouteImport.update({
 const GamesJunqiRoute = GamesJunqiRouteImport.update({
   id: '/games/junqi',
   path: '/games/junqi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesMagicCubeRoute = GamesMagicCubeRouteImport.update({
+  id: '/games/magic-cube',
+  path: '/games/magic-cube',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesXiangqiRoute = GamesXiangqiRouteImport.update({
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
+  '/games/magic-cube': typeof GamesMagicCubeRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
+  '/games/magic-cube': typeof GamesMagicCubeRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/games/go': typeof GamesGoRoute
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
+  '/games/magic-cube': typeof GamesMagicCubeRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/games/go'
     | '/games/gomoku'
     | '/games/junqi'
+    | '/games/magic-cube'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/games/go'
     | '/games/gomoku'
     | '/games/junqi'
+    | '/games/magic-cube'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/games/go'
     | '/games/gomoku'
     | '/games/junqi'
+    | '/games/magic-cube'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   GamesGoRoute: typeof GamesGoRoute
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesJunqiRoute: typeof GamesJunqiRoute
+  GamesMagicCubeRoute: typeof GamesMagicCubeRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   LibraryIdRoute: typeof LibraryIdRoute
   LibraryManageRoute: typeof LibraryManageRoute
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/games/junqi'
       fullPath: '/games/junqi'
       preLoaderRoute: typeof GamesJunqiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/magic-cube': {
+      id: '/games/magic-cube'
+      path: '/games/magic-cube'
+      fullPath: '/games/magic-cube'
+      preLoaderRoute: typeof GamesMagicCubeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/xiangqi': {
@@ -566,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesGoRoute: GamesGoRoute,
   GamesGomokuRoute: GamesGomokuRoute,
   GamesJunqiRoute: GamesJunqiRoute,
+  GamesMagicCubeRoute: GamesMagicCubeRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
   LibraryIdRoute: LibraryIdRoute,
   LibraryManageRoute: LibraryManageRoute,

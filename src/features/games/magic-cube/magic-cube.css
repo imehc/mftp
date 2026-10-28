@@ -1,0 +1,81 @@
+.magic-cube-workspace {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1;
+}
+
+.magic-cube-stage {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  /* 魔方材质属于实物内容，外围背景仍继承应用主题。 */
+  background: radial-gradient(
+    ellipse at 48% 42%,
+    color-mix(in srgb, var(--foreground) 4%, var(--background)),
+    var(--background) 72%
+  );
+}
+
+.magic-cube-canvas canvas {
+  touch-action: none;
+  cursor: grab;
+  outline-offset: -4px;
+}
+
+.magic-cube-canvas canvas:focus-visible {
+  outline: 2px solid var(--ring);
+}
+
+.magic-cube-side {
+  display: none;
+}
+
+.magic-cube-scroll-toggle {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .magic-cube-workspace {
+    grid-template-columns: minmax(0, 1fr) 14rem;
+  }
+
+  .magic-cube-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+    border-left: 1px solid var(--border);
+  }
+
+  .magic-cube-controls-trigger {
+    display: none;
+  }
+}
+
+@media (max-height: 32rem) {
+  .magic-cube-workspace {
+    overflow-y: auto;
+    display: block;
+  }
+
+  .magic-cube-stage {
+    height: max(18rem, 75vh);
+  }
+
+  .magic-cube-side {
+    display: none;
+  }
+
+  .magic-cube-controls-trigger,
+  .magic-cube-scroll-toggle {
+    display: inline-flex;
+  }
+
+  .magic-cube-workspace:not([data-interacting="true"]) canvas {
+    touch-action: pan-y pinch-zoom;
+  }
+}

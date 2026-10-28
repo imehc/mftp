@@ -16,10 +16,13 @@ import { GameVolumeControl } from "./GameVolumeControl";
 export function GameActionsMenu({
   extraActions,
   onOpenChange,
+  showMatchActions = true,
   ...props
 }: ComponentProps<typeof GameMatchActions> & {
   extraActions?: (closeThen: (action: () => void) => void) => ReactNode;
   onOpenChange?(open: boolean): void;
+  /** 单人谜题复用菜单、音量和焦点交接，由自身提供重置等动作。 */
+  showMatchActions?: boolean;
 }) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
@@ -59,7 +62,7 @@ export function GameActionsMenu({
           setPendingAction(() => action);
           changeOpen(false);
         })}
-        <GameMatchActions {...props} />
+        {showMatchActions ? <GameMatchActions {...props} /> : null}
       </PopoverContent>
     </Popover>
   );

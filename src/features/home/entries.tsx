@@ -8,6 +8,7 @@ import {
   Circle,
   CircleDot,
   Crown,
+  Cuboid,
   Flag,
   Grid3x3,
   KeyRound,
@@ -217,6 +218,13 @@ export const homeEntries: HomeEntry[] = [
     link: linkOptions({ to: "/games/junqi", preload: "intent" }),
     icon: Flag,
     title: <Trans>陆战棋</Trans>,
+  },
+  {
+    id: "magic-cube",
+    category: "games",
+    link: linkOptions({ to: "/games/magic-cube", preload: "intent" }),
+    icon: Cuboid,
+    title: <Trans comment="小游戏名称，指可转动的多阶立方体谜题">魔方</Trans>,
   },
 ];
 export const currentHomePlatform: HomePlatform = isAndroidPlatform()
