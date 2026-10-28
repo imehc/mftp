@@ -50,3 +50,4 @@ docs/*
 !docs/mcp-setup.md
 
 .vitest/
+.impeccable/
