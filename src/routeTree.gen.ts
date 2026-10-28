@@ -20,6 +20,7 @@ import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesJunqiRouteImport } from './routes/games/junqi'
 import { Route as GamesMagicCubeRouteImport } from './routes/games/magic-cube'
+import { Route as GamesReversiRouteImport } from './routes/games/reversi'
 import { Route as GamesSlidingPuzzleRouteImport } from './routes/games/sliding-puzzle'
 import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
@@ -91,6 +92,11 @@ const GamesJunqiRoute = GamesJunqiRouteImport.update({
 const GamesMagicCubeRoute = GamesMagicCubeRouteImport.update({
   id: '/games/magic-cube',
   path: '/games/magic-cube',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesReversiRoute = GamesReversiRouteImport.update({
+  id: '/games/reversi',
+  path: '/games/reversi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesSlidingPuzzleRoute = GamesSlidingPuzzleRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
   '/games/magic-cube': typeof GamesMagicCubeRoute
+  '/games/reversi': typeof GamesReversiRoute
   '/games/sliding-puzzle': typeof GamesSlidingPuzzleRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
   '/games/magic-cube': typeof GamesMagicCubeRoute
+  '/games/reversi': typeof GamesReversiRoute
   '/games/sliding-puzzle': typeof GamesSlidingPuzzleRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
   '/games/magic-cube': typeof GamesMagicCubeRoute
+  '/games/reversi': typeof GamesReversiRoute
   '/games/sliding-puzzle': typeof GamesSlidingPuzzleRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/junqi'
     | '/games/magic-cube'
+    | '/games/reversi'
     | '/games/sliding-puzzle'
     | '/games/xiangqi'
     | '/library/$id'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/junqi'
     | '/games/magic-cube'
+    | '/games/reversi'
     | '/games/sliding-puzzle'
     | '/games/xiangqi'
     | '/library/$id'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/junqi'
     | '/games/magic-cube'
+    | '/games/reversi'
     | '/games/sliding-puzzle'
     | '/games/xiangqi'
     | '/library/$id'
@@ -375,6 +387,7 @@ export interface RootRouteChildren {
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesJunqiRoute: typeof GamesJunqiRoute
   GamesMagicCubeRoute: typeof GamesMagicCubeRoute
+  GamesReversiRoute: typeof GamesReversiRoute
   GamesSlidingPuzzleRoute: typeof GamesSlidingPuzzleRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   LibraryIdRoute: typeof LibraryIdRoute
@@ -471,6 +484,13 @@ declare module '@tanstack/react-router' {
       path: '/games/magic-cube'
       fullPath: '/games/magic-cube'
       preLoaderRoute: typeof GamesMagicCubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/reversi': {
+      id: '/games/reversi'
+      path: '/games/reversi'
+      fullPath: '/games/reversi'
+      preLoaderRoute: typeof GamesReversiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/sliding-puzzle': {
@@ -607,6 +627,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesGomokuRoute: GamesGomokuRoute,
   GamesJunqiRoute: GamesJunqiRoute,
   GamesMagicCubeRoute: GamesMagicCubeRoute,
+  GamesReversiRoute: GamesReversiRoute,
   GamesSlidingPuzzleRoute: GamesSlidingPuzzleRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
   LibraryIdRoute: LibraryIdRoute,

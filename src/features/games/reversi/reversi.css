@@ -1,0 +1,211 @@
+.reversi-viewport {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 280px;
+  min-width: 0;
+  overflow: auto;
+  padding: 12px;
+  scrollbar-color: var(--muted-foreground) transparent;
+}
+
+/* 黑白棋内容材质：模压深色框、绿色盘面与黑白双面棋子。 */
+.reversi-board {
+  position: relative;
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  margin: auto;
+  box-sizing: border-box;
+  container-type: inline-size;
+  border-radius: 3%;
+  background: linear-gradient(
+    145deg,
+    #444845,
+    #202622 24%,
+    #101a15 85%,
+    #333b35
+  );
+  box-shadow:
+    inset 0 2px 2px #758077,
+    inset 0 -4px 3px #080f0b,
+    0 9px 15px #0003;
+}
+
+.reversi-grid {
+  position: absolute;
+  inset: 6%;
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  background: radial-gradient(
+    ellipse at 25% 10%,
+    #398666,
+    #226b4c 60%,
+    #1c5b40
+  );
+  box-shadow:
+    0 1px 1px #ffffff24,
+    0 -2px 3px #0008;
+  border: 1px solid #102b20;
+}
+
+.reversi-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+}
+.reversi-board[data-webgl="true"] {
+  background: none;
+  box-shadow: 0 7px 14px #0003;
+}
+
+.reversi-input-plane {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+.reversi-board[data-webgl="true"] .reversi-canvas {
+  opacity: 1;
+}
+.reversi-board[data-webgl="true"] .reversi-grid {
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+.reversi-board[data-webgl="true"] .reversi-cell {
+  border-color: transparent;
+  box-shadow: none;
+}
+.reversi-board[data-webgl="true"] .reversi-disc,
+.reversi-board[data-webgl="true"] .reversi-last {
+  visibility: hidden;
+}
+
+.reversi-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  min-height: 0;
+}
+.reversi-cell {
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid #123e2c;
+  border-bottom: 1px solid #123e2c;
+  box-shadow: inset 1px 1px 0 #92d4b012;
+}
+.reversi-cell:last-child {
+  border-right: 0;
+}
+.reversi-row:last-child .reversi-cell {
+  border-bottom: 0;
+}
+.reversi-square {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  outline-offset: -3px;
+  perspective: 500px;
+  -webkit-tap-highlight-color: transparent;
+}
+.reversi-square[data-legal="true"] {
+  cursor: pointer;
+}
+.reversi-square:focus-visible {
+  outline: 2px solid #ffe6a3;
+  z-index: 2;
+}
+@media (hover: hover) {
+  .reversi-square[data-legal="true"]:hover {
+    background: #b5eac321;
+  }
+}
+.reversi-disc {
+  position: absolute;
+  width: 79%;
+  height: 79%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.reversi-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.reversi-black {
+  transform: translateZ(1px);
+  background: radial-gradient(
+    ellipse at 33% 20%,
+    #626764,
+    #242a26 43%,
+    #131714 73%
+  );
+  box-shadow:
+    inset 0 1px 1px #9fa8a07a,
+    inset 0 -2px 2px #060a07,
+    0 3px 1px #090f0b,
+    1px 5px 5px #0007;
+}
+.reversi-white {
+  transform: rotateY(180deg) translateZ(1px);
+  background: radial-gradient(
+    ellipse at 33% 20%,
+    #fffffb,
+    #e8e9db 62%,
+    #b7bcad
+  );
+  box-shadow:
+    inset 0 1px 1px #fff,
+    inset 0 -2px 2px #989e90,
+    0 3px 1px #7b8678,
+    1px 5px 5px #0006;
+}
+.reversi-legal {
+  width: 19%;
+  height: 19%;
+  border-radius: 50%;
+  border: 1.5px solid #bbd9bc;
+  background: #cce8c326;
+  pointer-events: none;
+}
+.reversi-last {
+  position: absolute;
+  width: 12%;
+  height: 12%;
+  border-radius: 50%;
+  background: #d6a442;
+  box-shadow: 0 1px 2px #0008;
+  pointer-events: none;
+}
+.reversi-columns,
+.reversi-rows {
+  position: absolute;
+  display: grid;
+  color: #c8d5c9;
+  font-size: clamp(9px, 2.2cqw, 14px);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  user-select: none;
+}
+.reversi-columns {
+  left: 6%;
+  right: 6%;
+  top: 1.5%;
+  grid-template-columns: repeat(8, 1fr);
+}
+.reversi-rows {
+  top: 6%;
+  bottom: 6%;
+  left: 1.5%;
+  width: 3%;
+  grid-template-rows: repeat(8, 1fr);
+  align-items: center;
+}

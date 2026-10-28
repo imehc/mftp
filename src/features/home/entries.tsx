@@ -203,6 +203,13 @@ export const homeEntries: HomeEntry[] = [
     title: <Trans>围棋</Trans>,
   },
   {
+    id: "reversi",
+    category: "games",
+    link: linkOptions({ to: "/games/reversi", preload: "intent" }),
+    icon: CircleDot,
+    title: <Trans comment="小游戏名称，标准八乘八翻转棋">黑白棋</Trans>,
+  },
+  {
     id: "xiangqi",
     category: "games",
     link: linkOptions({

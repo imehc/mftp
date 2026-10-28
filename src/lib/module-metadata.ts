@@ -46,6 +46,7 @@ export const modules = [
   { id: "library", tool: "library" },
   { id: "billiards", tool: null },
   { id: "gomoku", tool: null },
+  { id: "reversi", tool: null },
   { id: "go", tool: null },
   { id: "xiangqi", tool: null },
   { id: "junqi", tool: null },

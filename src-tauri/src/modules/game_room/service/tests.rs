@@ -42,6 +42,87 @@ fn wait_event(
 }
 
 #[test]
+fn reversi_room_isolates_game_and_relays_moves_and_negotiations() {
+    let _network = network_guard();
+    let (host, host_rx) = manager();
+    let (guest, guest_rx) = manager();
+    let game = "reversi/online-v2";
+    let room = host
+        .create(
+            game.into(),
+            "Reversi test".into(),
+            Some("4826".into()),
+            "Host".into(),
+        )
+        .unwrap();
+    let port = room.port.unwrap();
+    let wrong_game = guest
+        .join(
+            "127.0.0.1".into(),
+            port,
+            "gomoku/online-v2".into(),
+            Some("4826".into()),
+            "Guest".into(),
+        )
+        .unwrap_err();
+    assert_eq!(wrong_game.code, "room:game_mismatch");
+    let wrong_code = guest
+        .join(
+            "127.0.0.1".into(),
+            port,
+            game.into(),
+            Some("0000".into()),
+            "Guest".into(),
+        )
+        .unwrap_err();
+    assert_eq!(wrong_code.code, "room:code_invalid");
+    let joined = guest
+        .join(
+            "127.0.0.1".into(),
+            port,
+            game.into(),
+            Some("4826".into()),
+            "Guest".into(),
+        )
+        .unwrap();
+    assert_eq!(joined.seat, Some(1));
+    wait_event(&host_rx, "reversi peer", |event| {
+        matches!(event, RoomEvent::PeerJoined { .. })
+    });
+
+    // The room transports exact frontend envelopes; Reversi legality is tested in TypeScript.
+    let frames = [
+        r#"{"t":"move","v":2,"round":0,"revision":0,"seq":0,"seat":0,"move":{"row":2,"col":3},"stateHash":"board-hash"}"#,
+        r#"{"t":"undo-request","v":2,"round":0,"revision":0,"requestId":1,"atMove":1,"plies":1,"stateHash":"board-hash"}"#,
+        r#"{"t":"undo-response","v":2,"round":0,"revision":0,"requestId":1,"atMove":1,"accept":true}"#,
+        r#"{"t":"rematch-request","v":2,"round":0,"revision":1,"requestId":2,"atMove":60,"stateHash":"final-hash"}"#,
+    ];
+    for (index, frame) in frames.iter().enumerate() {
+        let (sender, receiver) = if index % 2 == 0 {
+            (&host, &guest_rx)
+        } else {
+            (&guest, &host_rx)
+        };
+        sender
+            .send(
+                sender.status().instance_id.as_deref().unwrap(),
+                (*frame).into(),
+            )
+            .unwrap();
+        wait_event(
+            receiver,
+            "exact reversi envelope",
+            |event| matches!(event, RoomEvent::Message { payload } if payload == frame),
+        );
+    }
+    guest.leave();
+    wait_event(&host_rx, "reversi departure", |event| {
+        matches!(event, RoomEvent::PeerLeft)
+    });
+    host.leave();
+}
+
+#[test]
 fn handshake_relay_and_rejoin() {
     let _network = network_guard();
     let (host, host_rx) = manager();

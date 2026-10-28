@@ -56,6 +56,11 @@ msgstr "{clientCount} clients"
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
 
+#. 黑白棋棋格：字母数字坐标和棋子状态
+#: src/features/games/reversi/ReversiStage.tsx:115
+msgid "{coordinate}，{contents}"
+msgstr "{coordinate}, {contents}"
+
 #: src/features/poetry/components/CollectionManagement.tsx:56
 msgid "{count, plural, one {# 篇} other {# 篇}}"
 msgstr "{count, plural, one {# poem} other {# poems}}"
@@ -148,6 +153,7 @@ msgid "{minutes, plural, one {# 分钟前} other {# 分钟前}}"
 msgstr "{minutes, plural, one {# minute ago} other {# minutes ago}}"
 
 #: src/features/games/engine/BoardModeMenu.tsx:183
+#: src/features/games/reversi/ReversiMatch.tsx:176
 msgid "{moveCount, plural, one {# 手} other {# 手}}"
 msgstr "{moveCount, plural, one {# move} other {# moves}}"
 
@@ -198,6 +204,11 @@ msgstr "{onlineConnections} active connections"
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:139
 msgid "{order} 阶魔方"
 msgstr "{order}×{order} cube"
+
+#. 黑白棋自动跳过无合法落点的一方，另一方继续
+#: src/features/games/reversi/use-reversi-pass-notice.ts:35
+msgid "{passedPlayer}无合法落点，自动跳过本回合。"
+msgstr "{passedPlayer} has no legal moves and skips this turn."
 
 #. 斯诺克判罚；offender 是犯规者，beneficiary 是获分者，罚分加给获分者而非扣除犯规者分数
 #: src/features/games/billiards/BilliardsFoulFeedback.tsx:39
@@ -773,6 +784,10 @@ msgstr "Top Processes"
 msgid "XYZ 方向：点击坐标轴切换视角，双击适配模型。也可按 X、Y、Z，按住 Shift 查看反方向。"
 msgstr "XYZ orientation: click an axis to change the view, or double-click to fit the model. You can also press X, Y or Z; hold Shift for the opposite direction."
 
+#: src/features/games/reversi/ReversiHelp.tsx:43
+msgid "一方没有合法落点时自动跳过，由另一方继续。双方都无法落子时结束，即使棋盘尚未填满。"
+msgstr "If a player has no legal moves, their turn is skipped. The game ends when neither player can move, even if empty squares remain."
+
 #. 军棋和棋原因
 #: src/features/games/junqi/labels.tsx:118
 #: src/features/games/xiangqi/labels.tsx:57
@@ -1156,7 +1171,7 @@ msgid "中"
 msgstr "Medium"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:39
-#: src/features/home/entries.tsx:213
+#: src/features/home/entries.tsx:220
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -1543,6 +1558,7 @@ msgid "你"
 msgstr "You"
 
 #: src/features/games/engine/BoardMatchLayout.tsx:48
+#: src/features/games/reversi/ReversiMatch.tsx:140
 msgid "你执白"
 msgstr "You play white"
 
@@ -1554,6 +1570,7 @@ msgstr "You play red"
 #: src/features/games/engine/BoardMatchLayout.tsx:43
 #: src/features/games/engine/BoardMatchLayout.tsx:46
 #: src/features/games/junqi/JunqiToolbar.tsx:48
+#: src/features/games/reversi/ReversiMatch.tsx:138
 msgid "你执黑"
 msgstr "You play black"
 
@@ -3150,6 +3167,10 @@ msgstr "Available tools"
 msgid "可能朝内的壳体"
 msgstr "Possibly inward shells"
 
+#: src/features/games/reversi/ReversiStage.tsx:105
+msgid "可落子"
+msgstr "Legal move"
+
 #: src/features/poetry/components/CollectionManagement.tsx:49
 msgid "可选"
 msgstr "Optional"
@@ -3213,6 +3234,10 @@ msgstr "Devices on the same LAN can access directly. Use only on trusted network
 msgid "同分黑球已复位。{player} 抽签获选，决定谁先打，母球在 D 区。"
 msgstr "The tied black has been respotted. The draw selected {player} to choose who plays first, with the cue ball in the D."
 
+#: src/features/games/reversi/ReversiHelp.tsx:48
+msgid "同屏悔棋撤回上一手；人机和联机悔棋回到你最近一次落子之前。联机需要对方同意。"
+msgstr "In a local two-player game, undo takes back one move. Against the computer or online, it returns to before your last move. Online undo requires your opponent’s consent."
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:140
 #: src/features/games/engine/BoardMatchLayout.tsx:66
 #: src/features/games/engine/BoardModeMenu.tsx:142
@@ -3227,6 +3252,10 @@ msgstr "Accept"
 #: src/features/games/engine/online/OnlineMatchDialogs.tsx:82
 msgid "同意后双方交换先后手，立即开始新对局。"
 msgstr "Once accepted, colors swap and a new game starts immediately."
+
+#: src/features/games/reversi/ReversiOnline.tsx:114
+msgid "同意后将回到对方最近一次落子之前，并撤回此后的所有翻子。"
+msgstr "Accepting returns to before your opponent’s last move and reverses all flips since then."
 
 #. 台球僵持协商，接受并重新摆球
 #: src/features/games/billiards/NineBallHud.tsx:119
@@ -3507,6 +3536,10 @@ msgstr "Run the matching command on your local machine and the remote server."
 #: src/features/ssh-sftp/rsync/RsyncCapabilityNotice.tsx:89
 msgid "在本机终端执行对应命令。"
 msgstr "Run the matching command in your local terminal."
+
+#: src/features/games/reversi/ReversiHelp.tsx:38
+msgid "在标记的空格落子，沿横、竖或斜线夹住对方棋子，所有被夹住的棋子都会翻为己方颜色。"
+msgstr "Place a disc on a marked square to bracket opposing discs horizontally, vertically, or diagonally. All bracketed discs flip to your color."
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:89
 msgid "在线"
@@ -5293,6 +5326,7 @@ msgstr "Restore the initial state"
 #: src/features/games/go/GoMatch.tsx:254
 #: src/features/games/gomoku/GomokuMatch.tsx:209
 #: src/features/games/junqi/JunqiMatchView.tsx:199
+#: src/features/games/reversi/ReversiMatch.tsx:155
 #: src/features/games/xiangqi/XiangqiMatch.tsx:219
 msgid "悔棋"
 msgstr "Undo"
@@ -5953,7 +5987,7 @@ msgstr "Numbers increase from left to right and top to bottom. The last cell is 
 #. 小游戏名，滑动数字方块填入空位并排序
 #. 小游戏名，滑动数字方块填入空位并排序
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:111
-#: src/features/home/entries.tsx:235
+#: src/features/home/entries.tsx:242
 msgid "数字华容道"
 msgstr "Sliding puzzle"
 
@@ -7297,6 +7331,10 @@ msgstr "Board Size"
 msgid "棋盘显示已中断，对局仍保留，请重试。"
 msgstr "The board display was interrupted. Your game is preserved. Please try again."
 
+#: src/features/games/reversi/ReversiStage.tsx:63
+msgid "棋盘渲染暂不可用，已切换为基础棋盘。"
+msgstr "Board rendering is unavailable. Using the basic board instead."
+
 #. 斯诺克彩球，4分
 #: src/features/games/billiards/SnookerBall.tsx:22
 msgid "棕球"
@@ -8437,6 +8475,10 @@ msgstr "Click an XYZ axis to change the view. Double-click the canvas or axes to
 msgid "点击己方棋子，再点击标记位置移动。方向键选择位置，Enter 或空格确认，Esc 取消选择。更多菜单中可认输或退出。"
 msgstr "Select one of your pieces, then a marked destination to move. Use the arrow keys to select, Enter or Space to confirm, and Esc to cancel. Resign or leave from the More menu."
 
+#: src/features/games/reversi/ReversiHelp.tsx:53
+msgid "点击标记的空格落子；也可用方向键移动焦点，回车或空格落子。"
+msgstr "Select a marked square to place a disc. You can also move focus with the arrow keys and press Enter or Space."
+
 #: src/features/games/junqi/JunqiRulesDialog.tsx:185
 msgid "点击盖子立即翻开，或选择已翻开的己方棋子，再点击标记位置移动。"
 msgstr "Click a covered piece to reveal it, or select a revealed piece of your side and then a marked destination to move."
@@ -8683,6 +8725,7 @@ msgstr "Computer matches always show your perspective. The computer acts only on
 #: src/features/games/billiards/SnookerHud.tsx:51
 #: src/features/games/go/GoMatch.tsx:206
 #: src/features/games/gomoku/GomokuMatch.tsx:177
+#: src/features/games/reversi/ReversiMatch.tsx:184
 #: src/features/games/xiangqi/XiangqiMatch.tsx:187
 msgid "电脑思考中…"
 msgstr "Computer is thinking..."
@@ -8720,6 +8763,8 @@ msgid "白名单"
 msgstr "Trusted Devices"
 
 #: src/features/games/engine/black-white-labels.tsx:50
+#: src/features/games/reversi/ReversiStage.tsx:103
+#: src/features/games/reversi/use-reversi-pass-notice.ts:32
 msgid "白棋"
 msgstr "White"
 
@@ -9088,6 +9133,10 @@ msgstr "Empty space"
 msgid "空位，第 {row} 行，第 {column} 列"
 msgstr "Empty space, row {row}, column {column}"
 
+#: src/features/games/reversi/ReversiStage.tsx:106
+msgid "空格"
+msgstr "Empty square"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:297
 msgid "空目录"
 msgstr "Empty Directory"
@@ -9156,6 +9205,10 @@ msgstr "Row {row}, column {column}"
 msgid "第一次有效移动开始计时，每滑动一块记一步。离开页面、进入后台或打开菜单与帮助时暂停，记录的是有效练习用时。"
 msgstr "Timing starts with your first valid move. Each tile slide counts as one move. Timing pauses when you leave, put the app in the background, or open a menu or help. This measures active practice time."
 
+#: src/features/games/reversi/ReversiMatch.tsx:188
+msgid "等待协商结果…"
+msgstr "Waiting for a response…"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:113
 msgid "等待对手加入…"
 msgstr "Waiting for an opponent..."
@@ -9181,6 +9234,7 @@ msgstr "Waiting for opponent’s setup"
 
 #: src/features/games/go/GoMatch.tsx:214
 #: src/features/games/gomoku/GomokuMatch.tsx:185
+#: src/features/games/reversi/ReversiMatch.tsx:192
 #: src/features/games/xiangqi/XiangqiMatch.tsx:195
 msgid "等待对方落子…"
 msgstr "Waiting for the opponent's move..."
@@ -9494,6 +9548,10 @@ msgstr "Continue"
 #: src/features/games/engine/GameRestoreDialog.tsx:59
 msgid "继续上次游戏？"
 msgstr "Resume your game?"
+
+#: src/features/games/reversi/ReversiSessionNotice.tsx:21
+msgid "继续上次的黑白棋对局，棋盘和悔棋记录都会恢复。"
+msgstr "Resume your Reversi game with the board and undo history restored."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:68
@@ -10715,6 +10773,10 @@ msgstr "Turn to start the timer"
 msgid "转存失败"
 msgstr "Failed to save"
 
+#: src/features/games/reversi/ReversiMatch.tsx:167
+msgid "轮到 {currentPlayer}"
+msgstr "{currentPlayer} to play"
+
 #: src/features/games/go/GoMatch.tsx:179
 #: src/features/games/gomoku/GomokuMatch.tsx:158
 msgid "轮到 {seatNameValue}"
@@ -11536,6 +11598,7 @@ msgstr "Reset returns the cube to its solved state. It does not find a solution 
 #: src/features/games/engine/GameSessionNotice.tsx:75
 #: src/features/games/junqi/render/JunqiStage.tsx:208
 #: src/features/games/magic-cube/MagicCubeGame.tsx:398
+#: src/features/games/reversi/ReversiStage.tsx:65
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:293
 #: src/features/lan-transfer/LanTransferTool.tsx:88
 #: src/features/poetry/components/CollectionManagement.tsx:122
@@ -11678,7 +11741,7 @@ msgstr "Nearby devices"
 #: src/features/games/junqi/JunqiMatch.tsx:39
 #: src/features/games/junqi/JunqiMatchView.tsx:156
 #: src/features/games/junqi/JunqiOnline.tsx:160
-#: src/features/home/entries.tsx:220
+#: src/features/home/entries.tsx:227
 msgid "陆战棋"
 msgstr "Junqi"
 
@@ -11882,7 +11945,7 @@ msgstr "High quality"
 #. 小游戏名称，指可转动的多阶立方体谜题
 #. 小游戏名称，指可转动的多阶立方体谜题
 #: src/features/games/magic-cube/MagicCubeGame.tsx:163
-#: src/features/home/entries.tsx:227
+#: src/features/home/entries.tsx:234
 msgid "魔方"
 msgstr "Magic cube"
 
@@ -11903,6 +11966,18 @@ msgstr "How to play the cube"
 msgid "黄球"
 msgstr "Yellow"
 
+#. 黑白棋终局计分，黑白分别为棋子数量
+#: src/features/games/reversi/ReversiMatch.tsx:209
+msgid "黑 {black} : 白 {white}"
+msgstr "Black {black} : White {white}"
+
+#. 黑白棋当前棋子数量
+#. 黑白棋结束时的双方棋子数量
+#: src/features/games/reversi/labels.tsx:14
+#: src/features/games/reversi/ReversiMatch.tsx:171
+msgid "黑 {black} / 白 {white}"
+msgstr "Black {black} / White {white}"
+
 #: src/features/games/go/labels.tsx:12
 msgid "黑 {black} 子 · 白 {white} 子 + 贴目 {KOMI} = {whiteWithKomi}"
 msgstr "Black {black} · White {white} + {KOMI} komi = {whiteWithKomi}"
@@ -11919,8 +11994,14 @@ msgid "黑方"
 msgstr "Black"
 
 #: src/features/games/engine/black-white-labels.tsx:45
+#: src/features/games/reversi/ReversiStage.tsx:101
+#: src/features/games/reversi/use-reversi-pass-notice.ts:32
 msgid "黑棋"
 msgstr "Black"
+
+#: src/features/games/reversi/ReversiHelp.tsx:32
+msgid "黑棋先行，结束时棋子更多的一方获胜。"
+msgstr "Black moves first. The player with more discs at the end wins."
 
 #: src/features/games/engine/black-white-labels.tsx:102
 msgid "黑棋胜"
@@ -11930,6 +12011,22 @@ msgstr "Black wins"
 #: src/features/games/billiards/SnookerBall.tsx:28
 msgid "黑球"
 msgstr "Black"
+
+#. 小游戏名称，标准八乘八翻转棋
+#. 小游戏名称，标准八乘八翻转棋
+#: src/features/games/reversi/ReversiGame.tsx:41
+#: src/features/home/entries.tsx:210
+msgid "黑白棋"
+msgstr "Reversi"
+
+#: src/features/games/reversi/ReversiStage.tsx:91
+msgid "黑白棋棋盘"
+msgstr "Reversi board"
+
+#: src/features/games/reversi/ReversiHelp.tsx:22
+#: src/features/games/reversi/ReversiHelp.tsx:29
+msgid "黑白棋玩法"
+msgstr "How to play Reversi"
 
 #: src/features/games/xiangqi/labels.tsx:106
 msgid "黑胜"
