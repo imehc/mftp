@@ -17,6 +17,7 @@ import { Button } from "~/components/ui/button";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { canSwap } from "./deployment";
 import { JunqiRulesDialog } from "./JunqiRulesDialog";
@@ -176,31 +177,6 @@ export function JunqiMatchView({
               <RotateCw data-icon="inline-start" />
               <Trans>翻转棋盘</Trans>
             </Button>
-            {undo && !deployment && !finished ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="justify-start"
-                disabled={!undo.enabled}
-                title={
-                  !undo.enabled
-                    ? t`需先完成自己的一手棋，并等待当前同步或协商结束。`
-                    : undefined
-                }
-                onClick={() =>
-                  closeThen(() =>
-                    view.variant === "open"
-                      ? undo.request()
-                      : setUndoRevision(view.revision),
-                  )
-                }
-              >
-                <Undo2 data-icon="inline-start" />
-                <Trans comment="联机棋局的操作按钮，向对方申请撤销最近的走棋">
-                  悔棋
-                </Trans>
-              </Button>
-            ) : null}
             {!deployment && !finished && view.turnSide !== null ? (
               <Button
                 variant="ghost"
@@ -219,6 +195,28 @@ export function JunqiMatchView({
       />
       {notice}
       <JunqiToolbar
+        actions={
+          undo && !deployment && !finished ? (
+            <GameToolbarAction
+              icon={Undo2}
+              label={t({
+                message: "悔棋",
+                comment: "联机棋局的操作按钮，向对方申请撤销最近的走棋",
+              })}
+              disabled={!undo.enabled}
+              title={
+                !undo.enabled
+                  ? t`需先完成自己的一手棋，并等待当前同步或协商结束。`
+                  : undefined
+              }
+              onClick={() =>
+                view.variant === "open"
+                  ? undo.request()
+                  : setUndoRevision(view.revision)
+              }
+            />
+          ) : null
+        }
         mode={mode}
         state={view}
         localSeat={localSeat}

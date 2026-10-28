@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
@@ -12,6 +13,14 @@ import { XiangqiModeMenu } from "./XiangqiModeMenu";
 import { XiangqiOnlineFlow } from "./XiangqiOnline";
 
 export default function XiangqiGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <XiangqiGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function XiangqiGameContent() {
   useGameAudio(xiangqiAudio);
   const lifecycle = useGameLifecycle(xiangqiSessions);
   const { mode, matchKey } = lifecycle;

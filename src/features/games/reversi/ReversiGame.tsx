@@ -3,6 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
 import { reversiAudio, unlockReversiAudio } from "./audio";
@@ -14,6 +15,14 @@ import { ReversiSessionNotice } from "./ReversiSessionNotice";
 import { reversiSessions } from "./session";
 
 export default function ReversiGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <ReversiGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function ReversiGameContent() {
   useGameAudio(reversiAudio);
   const lifecycle = useGameLifecycle(reversiSessions);
   const { mode, matchKey } = lifecycle;

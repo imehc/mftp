@@ -11,6 +11,7 @@ import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { AppError } from "~/types";
 
 import { GameSessionNotice } from "../engine/GameSessionNotice";
+import { GameDisplayBar } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
 import { BilliardsConcedeDialog } from "./BilliardsConcedeDialog";
@@ -252,8 +253,8 @@ export function MatchView({
           </div>
         ) : null}
       </div>
-      <div className="billiards-score shrink-0 text-xs">
-        <div className="billiards-summary mx-auto w-full max-w-6xl min-w-0 px-3 md:px-4">
+      <GameDisplayBar className="billiards-score text-xs">
+        <div className="billiards-summary w-full min-w-0">
           {state.finished ? (
             <div className="flex flex-wrap items-center justify-center gap-1.5">
               <Badge variant="secondary">
@@ -365,7 +366,7 @@ export function MatchView({
             </div>
           )}
         </div>
-      </div>
+      </GameDisplayBar>
 
       <div
         className="billiards-stage relative z-0 min-h-0 min-w-0 flex-1 overflow-hidden"

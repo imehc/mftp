@@ -1,0 +1,78 @@
+.game-toolbar {
+  container-type: inline-size;
+  container-name: game-toolbar;
+}
+
+.game-toolbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.game-toolbar-context,
+.game-toolbar-status,
+.game-toolbar-metrics {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.game-toolbar-context {
+  white-space: nowrap;
+}
+
+.game-toolbar-status {
+  flex: 1;
+  justify-content: flex-end;
+  min-height: 1.25rem;
+}
+
+.game-toolbar-primary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-toolbar-metrics {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.game-toolbar-menu {
+  display: none;
+}
+
+@container game-toolbar (width < 36rem) {
+  .game-toolbar-context {
+    display: none;
+  }
+
+  .game-toolbar-status {
+    justify-content: space-between;
+  }
+}
+
+@media (width < 48rem) {
+  .game-header-toolbar .game-toolbar-action-label,
+  .game-header-toolbar .game-toolbar-action-wrap[data-secondary="true"],
+  .game-header-information {
+    display: none;
+  }
+
+  .game-toolbar-menu {
+    display: flex;
+  }
+
+  .game-toolbar-menu-actions .game-toolbar-action-wrap[data-secondary="false"] {
+    display: none;
+  }
+
+  .game-toolbar-menu-actions .game-toolbar-action-wrap,
+  .game-toolbar-menu-actions .game-toolbar-action {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

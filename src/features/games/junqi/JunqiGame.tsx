@@ -4,6 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
@@ -16,6 +17,14 @@ import { junqiSessions } from "./session";
 import type { JunqiVariant } from "./types";
 
 export default function JunqiGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <JunqiGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function JunqiGameContent() {
   useGameAudio(junqiAudio);
   const lifecycle = useGameLifecycle(junqiSessions);
   const [variant, setVariant] = useState<JunqiVariant>("open");

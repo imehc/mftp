@@ -7,12 +7,11 @@ import { Flag, Undo2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import type { LightNoticeMessage } from "~/components/LightNotice";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
 import type { SeatIndex } from "../engine/types";
@@ -182,9 +181,9 @@ export function GoMatchView({
         mode={mode}
         localSeat={localSeat}
         finished={state.finished}
-        status={
+        metrics={
           <>
-            <Badge variant="outline">
+            <span>
               <Plural
                 value={{
                   moveNumber: state.moveCount + (state.finished ? 0 : 1),
@@ -192,67 +191,49 @@ export function GoMatchView({
                 one="第 # 手"
                 other="第 # 手"
               />
-            </Badge>
-            <Badge variant="outline">
+            </span>
+            <span>
               <Trans>
                 提子 {value}:{value2}
               </Trans>
-            </Badge>
-            {state.finished && state.finalScore ? (
-              <Badge variant="outline">{scoreLine(state)}</Badge>
-            ) : null}
-            {aiThinking ? (
-              <Badge variant="outline">
-                <Trans>电脑思考中…</Trans>
-              </Badge>
-            ) : null}
-            {online &&
-            !state.finished &&
-            snapshot.phase === "awaiting-move" &&
-            snapshot.activeSeat !== online.localSeat ? (
-              <Badge variant="outline">
-                <Trans>等待对方落子…</Trans>
-              </Badge>
-            ) : null}
-            {online?.undoWaiting ? (
-              <Badge variant="outline">
-                <Trans>等待对方同意悔棋…</Trans>
-              </Badge>
-            ) : null}
-            {state.consecutivePasses === 1 && !state.finished ? (
-              <Badge variant="outline">
-                <Trans>上一手已停手：再停一手即终局，落子则重新计数</Trans>
-              </Badge>
-            ) : null}
+            </span>
           </>
+        }
+        activity={
+          !state.finished ? (
+            online?.undoWaiting ? (
+              <Trans>等待对方同意悔棋…</Trans>
+            ) : aiThinking ? (
+              <Trans>电脑思考中…</Trans>
+            ) : online && snapshot.activeSeat !== online.localSeat ? (
+              <Trans>等待对方落子…</Trans>
+            ) : null
+          ) : null
+        }
+        details={
+          state.consecutivePasses === 1 && !state.finished ? (
+            <Trans>上一手已停手：再停一手即终局，落子则重新计数</Trans>
+          ) : null
         }
         controls={
           <>
-            <Button
-              variant="outline"
-              size="sm"
-              density="adaptive"
-              disabled={!activeIsLocal || state.finished}
-              title={t`停一手`}
-              onClick={submitPass}
-            >
-              <Flag data-icon="inline-start" />
-              <Trans>停一手</Trans>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              density="adaptive"
+            <GameToolbarAction
+              icon={Undo2}
+              label={t`悔棋`}
               disabled={!canUndo}
               onClick={() =>
                 online
                   ? online.onRequestUndo(undoPlies)
                   : runner.undo(undoPlies)
               }
-            >
-              <Undo2 data-icon="inline-start" />
-              <Trans>悔棋</Trans>
-            </Button>
+            />
+            <GameToolbarAction
+              icon={Flag}
+              secondary
+              label={t`停一手`}
+              disabled={!activeIsLocal || state.finished}
+              onClick={submitPass}
+            />
           </>
         }
       >

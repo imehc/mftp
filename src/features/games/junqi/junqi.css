@@ -12,7 +12,7 @@
   width: min(100cqw, calc(100cqh * var(--board-ratio)));
   aspect-ratio: var(--board-ratio);
   flex: 0 0 auto;
-  margin-inline: auto;
+  margin: auto;
 }
 
 @media (width >= 48rem) {

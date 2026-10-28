@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 
+import { GameMenuActionsSlot } from "./GameHeaderActions";
 import { GameMatchActions } from "./GameHeaderControls";
 import { GameVolumeControl } from "./GameVolumeControl";
 
@@ -47,7 +48,7 @@ export function GameActionsMenu({
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="ui-density-adaptive flex w-fit max-w-[calc(100vw-2rem)] flex-col gap-1 p-2 motion-safe:data-closed:animate-none"
+        className="ui-density-adaptive app-scroll-safe-end flex max-h-(--radix-popover-content-available-height) w-fit max-w-[calc(100vw-2rem)] flex-col gap-1 overflow-y-auto p-2 motion-safe:data-closed:animate-none"
         onCloseAutoFocus={(event) => {
           const action = pendingAction;
           setPendingAction(null);
@@ -58,6 +59,12 @@ export function GameActionsMenu({
         }}
       >
         <GameVolumeControl presentation="menu" />
+        <GameMenuActionsSlot
+          closeThen={(action) => {
+            setPendingAction(() => action);
+            changeOpen(false);
+          }}
+        />
         {extraActions?.((action) => {
           setPendingAction(() => action);
           changeOpen(false);

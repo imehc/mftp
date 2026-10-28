@@ -4,7 +4,6 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowLeft,
   BookOpen,
-  Check,
   History,
   Redo2,
   RotateCcw,
@@ -26,15 +25,19 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
-import { Spinner } from "~/components/ui/spinner";
 import { BackLink } from "~/features/navigation/BackLink";
 import { describeError } from "~/lib/errors";
 import { useSettingsStore } from "~/store/settings";
 
 import { formatGameTime } from "../engine/format-game-time";
 import { GameActionsMenu } from "../engine/GameActionsMenu";
+import {
+  GameHeaderActionsProvider,
+  GameHeaderActionsSlot,
+} from "../engine/GameHeaderActions";
 import { GameRestoreDialog } from "../engine/GameRestoreDialog";
 import { GameSetupSelect } from "../engine/GameSetupSelect";
+import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { useGameAudio } from "../engine/use-game-audio";
 import { createPuzzleAudio } from "./audio";
 import { getPuzzleSession } from "./session";
@@ -49,6 +52,14 @@ type Confirmation =
   { kind: "new"; size: PuzzleSize } | { kind: "restart" | "discard" };
 
 export default function SlidingPuzzleGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <SlidingPuzzleGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function SlidingPuzzleGameContent() {
   const { t } = useLingui();
   const store = getPuzzleSession();
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
@@ -58,14 +69,14 @@ export default function SlidingPuzzleGame() {
   const [menu, setMenu] = useState(false);
   const [confirm, setConfirm] = useState<Confirmation | null>(null);
   const size = state.board.size;
-  const blocked =
+  const actionBlocked =
     help ||
     history ||
-    menu ||
     confirm !== null ||
     state.status !== "ready" ||
     state.saved !== null ||
     state.busy;
+  const blocked = actionBlocked || menu;
   const disabled = blocked || state.data.completed;
   useGameAudio(audio);
 
@@ -125,6 +136,7 @@ export default function SlidingPuzzleGame() {
         }
         trailing={
           <>
+            <GameHeaderActionsSlot />
             <Button
               variant="ghost"
               size="icon-sm"
@@ -142,6 +154,27 @@ export default function SlidingPuzzleGame() {
               onOpenChange={setMenu}
               extraActions={(closeThen) => (
                 <>
+                  <GameSetupSelect
+                    density="adaptive"
+                    wrapValue={false}
+                    label={
+                      <Trans comment="数字华容道棋盘的行数与列数">棋盘</Trans>
+                    }
+                    value={String(size)}
+                    onChange={(value) =>
+                      closeThen(() =>
+                        request({
+                          kind: "new",
+                          size: Number(value) as PuzzleSize,
+                        }),
+                      )
+                    }
+                    options={PUZZLE_SIZES.map((value) => ({
+                      value: String(value),
+                      label: `${value} × ${value}`,
+                    }))}
+                  />
+
                   <Button
                     variant="ghost"
                     density="adaptive"
@@ -174,93 +207,77 @@ export default function SlidingPuzzleGame() {
         }
       />
 
-      <div className="border-border flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-b px-3 py-2">
-        <GameSetupSelect
-          density="adaptive"
-          wrapValue={false}
-          label={<Trans comment="数字华容道棋盘的行数与列数">棋盘</Trans>}
-          value={String(size)}
-          onChange={(value) =>
-            request({ kind: "new", size: Number(value) as PuzzleSize })
-          }
-          options={PUZZLE_SIZES.map((value) => ({
-            value: String(value),
-            label: `${value} × ${value}`,
-          }))}
-        />
-        <div className="flex max-w-full flex-wrap items-center gap-1">
-          <Button
-            size="sm"
-            disabled={blocked}
-            onClick={() => request({ kind: "new", size })}
-          >
-            <Shuffle data-icon="inline-start" />
-            <Trans comment="生成新的有解数字华容道棋盘">打乱</Trans>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t({
-              message: "撤销移动",
-              comment: "撤销数字华容道上一次滑块移动",
-            })}
-            disabled={disabled || state.data.cursor === 0}
-            onClick={() => playSound(store.undo())}
-          >
-            <Undo2 />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t({
-              message: "重做移动",
-              comment: "恢复数字华容道刚撤销的移动",
-            })}
-            disabled={disabled || state.data.cursor === state.data.moves.length}
-            onClick={() => playSound(store.redo())}
-          >
-            <Redo2 />
-          </Button>
-        </div>
-        <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-x-4 gap-y-1 text-xs *:whitespace-nowrap">
-          <span role="status" className="text-muted-foreground">
-            {state.data.completed ? (
-              <span className="text-success flex items-center gap-1">
-                <Check className="size-3" />
-                <Trans comment="数字华容道全部数字已排列完成">已完成</Trans>
-              </span>
-            ) : state.status === "loading" ? (
-              <span className="flex items-center gap-1">
-                <Spinner />
-                <Trans>正在读取进度</Trans>
-              </span>
-            ) : state.data.started ? (
-              <Trans comment="数字华容道正在进行的挑战">挑战中</Trans>
-            ) : (
-              <Trans>移动开始计时</Trans>
-            )}
-          </span>
-          <span className="font-mono tabular-nums" aria-label={t`有效用时`}>
-            {formatGameTime(state.data.elapsedMs)}
-          </span>
+      <GameToolbar
+        context={
           <span>
-            <Plural
-              value={state.data.offset + state.data.cursor}
-              other="# 步"
-            />
+            {size} × {size}
           </span>
-          {state.data.assisted && (
-            <span className="text-muted-foreground">
-              <Trans>使用过撤销</Trans>
+        }
+        actions={
+          <>
+            <GameToolbarAction
+              icon={Undo2}
+              label={t`撤销移动`}
+              disabled={
+                actionBlocked || state.data.completed || state.data.cursor === 0
+              }
+              onClick={() => playSound(store.undo())}
+            />
+            <GameToolbarAction
+              secondary
+              icon={Redo2}
+              label={t`重做移动`}
+              disabled={
+                actionBlocked ||
+                state.data.completed ||
+                state.data.cursor === state.data.moves.length
+              }
+              onClick={() => playSound(store.redo())}
+            />
+            <GameToolbarAction
+              secondary
+              icon={Shuffle}
+              label={
+                state.data.completed
+                  ? t`再来一局`
+                  : t({
+                      message: "打乱",
+                      comment: "生成新的有解数字华容道棋盘",
+                    })
+              }
+              disabled={actionBlocked}
+              onClick={() => request({ kind: "new", size })}
+            />
+          </>
+        }
+        status={
+          state.data.completed ? (
+            <span className="text-success">
+              <Trans comment="数字华容道全部数字已排列完成">已完成</Trans>
             </span>
-          )}
-          {state.data.completed && (
-            <Button size="sm" onClick={() => execute({ kind: "new", size })}>
-              <Trans>再来一局</Trans>
-            </Button>
-          )}
-        </div>
-      </div>
+          ) : state.status === "loading" ? (
+            <Trans>正在读取进度</Trans>
+          ) : state.data.started ? (
+            <Trans comment="数字华容道正在进行的挑战">挑战中</Trans>
+          ) : (
+            <Trans>移动开始计时</Trans>
+          )
+        }
+        metrics={
+          <>
+            <span className="font-mono" aria-label={t`有效用时`}>
+              {formatGameTime(state.data.elapsedMs)}
+            </span>
+            <span>
+              <Plural
+                value={state.data.offset + state.data.cursor}
+                other="# 步"
+              />
+            </span>
+          </>
+        }
+        details={state.data.assisted ? <Trans>使用过撤销</Trans> : null}
+      />
 
       {state.saved && (
         <GameRestoreDialog

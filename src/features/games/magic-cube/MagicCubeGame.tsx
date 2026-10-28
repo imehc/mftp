@@ -4,7 +4,6 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowLeft,
   BookOpen,
-  Check,
   Eye,
   History,
   Redo2,
@@ -44,8 +43,13 @@ import { useSettingsStore } from "~/store/settings";
 
 import { formatGameTime } from "../engine/format-game-time";
 import { GameActionsMenu } from "../engine/GameActionsMenu";
+import {
+  GameHeaderActionsProvider,
+  GameHeaderActionsSlot,
+} from "../engine/GameHeaderActions";
 import { GameRestoreDialog } from "../engine/GameRestoreDialog";
 import { GameSetupSelect } from "../engine/GameSetupSelect";
+import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { useGameAudio } from "../engine/use-game-audio";
 import { createCubeAudio } from "./audio";
 import { faceMove } from "./engine";
@@ -60,6 +64,14 @@ type Confirmation =
   | { kind: "discard" };
 
 export default function MagicCubeGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <MagicCubeGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function MagicCubeGameContent() {
   const { t } = useLingui();
   const store = getCubeSession();
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
@@ -82,15 +94,15 @@ export default function MagicCubeGame() {
   const wide = useMediaQuery("(min-width: 64rem)");
   const order = state.cube.order;
   const selectedDepth = Math.min(depth, order);
-  const blocked =
+  const actionBlocked =
     help ||
     history ||
-    menu ||
     confirm !== null ||
     !ready ||
     renderError ||
     state.status !== "ready" ||
     state.saved !== null;
+  const blocked = actionBlocked || menu;
   const disabled = blocked || state.busy || state.data.completed;
   useGameAudio(audio);
 
@@ -175,6 +187,7 @@ export default function MagicCubeGame() {
         }
         trailing={
           <>
+            <GameHeaderActionsSlot />
             <Button
               variant="ghost"
               size="icon-sm"
@@ -192,6 +205,50 @@ export default function MagicCubeGame() {
               onOpenChange={setMenu}
               extraActions={(closeThen) => (
                 <>
+                  <GameSetupSelect
+                    density="adaptive"
+                    wrapValue={false}
+                    label={
+                      <Trans comment="魔方每条边的小块数量，例如二阶、三阶">
+                        阶数
+                      </Trans>
+                    }
+                    value={String(order)}
+                    onChange={(value) =>
+                      closeThen(() =>
+                        requestNew({
+                          kind: "order",
+                          order: Number(value) as CubeOrder,
+                        }),
+                      )
+                    }
+                    options={ORDERS.map((value) => ({
+                      value: String(value),
+                      label: t({
+                        message: `${value} 阶`,
+                        comment: "魔方阶数，value 为每边小块数量",
+                      }),
+                    }))}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      variant="ghost"
+                      className="justify-start"
+                      aria-pressed={observe}
+                      onClick={() => setObserve(!observe)}
+                    >
+                      <Eye data-icon="inline-start" />
+                      <Trans>观察模式</Trans>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="magic-cube-controls-trigger justify-start"
+                      onClick={() => closeThen(() => setControls(true))}
+                    >
+                      <SlidersHorizontal data-icon="inline-start" />
+                      <Trans>精确转动</Trans>
+                    </Button>
+                  </div>
                   <Button
                     variant="ghost"
                     density="adaptive"
@@ -245,125 +302,79 @@ export default function MagicCubeGame() {
         }
       />
 
-      <div className="border-border flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-b px-3 py-2">
-        <GameSetupSelect
-          density="adaptive"
-          wrapValue={false}
-          label={
-            <Trans comment="魔方每条边的小块数量，例如二阶、三阶">阶数</Trans>
-          }
-          value={String(order)}
-          onChange={(value) =>
-            requestNew({ kind: "order", order: Number(value) as CubeOrder })
-          }
-          options={ORDERS.map((value) => ({
-            value: String(value),
-            label: t({
-              message: `${value} 阶`,
-              comment: "魔方阶数，value 为每边小块数量",
-            }),
-          }))}
-        />
-        <div className="flex max-w-full flex-wrap items-center gap-1">
-          <Button
-            size="sm"
-            disabled={blocked || state.busy}
-            onClick={() => requestNew({ kind: "scramble", order })}
-          >
-            <Shuffle data-icon="inline-start" />
-            <Trans comment="用合法转动打乱魔方并开始新挑战">打乱</Trans>
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            disabled={disabled || state.data.cursor === 0}
-            aria-label={t({
-              message: "撤销转动",
-              comment: "撤销上一步魔方转层操作",
-            })}
-            onClick={store.undo}
-          >
-            <Undo2 />
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            disabled={disabled || state.data.cursor === state.data.moves.length}
-            aria-label={t({
-              message: "重做转动",
-              comment: "恢复刚才撤销的魔方转层操作",
-            })}
-            onClick={store.redo}
-          >
-            <Redo2 />
-          </Button>
-        </div>
-        <div className="flex max-w-full flex-wrap items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-pressed={observe}
-            onClick={() => setObserve(!observe)}
-          >
-            <Eye data-icon="inline-start" />
-            <Trans>观察模式</Trans>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="magic-cube-controls-trigger"
-            onClick={() => setControls(true)}
-          >
-            <SlidersHorizontal data-icon="inline-start" />
-            <Trans>精确转动</Trans>
-          </Button>
-        </div>
-        <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-x-4 gap-y-1 text-xs *:whitespace-nowrap">
-          <span className="text-muted-foreground" role="status">
-            {state.data.completed ? (
-              <span className="text-success flex items-center gap-1">
-                <Check className="size-3" />
-                <Trans>已还原</Trans>
-              </span>
-            ) : state.data.challenge ? (
-              state.data.started ? (
-                <Trans>挑战中</Trans>
-              ) : (
-                <Trans>转动开始计时</Trans>
-              )
-            ) : (
-              <Trans comment="魔方未开始计时挑战，可自由操作">自由练习</Trans>
-            )}
-          </span>
-          <span className="font-mono tabular-nums" aria-label={t`有效用时`}>
-            {formatGameTime(state.elapsedMs)}
-          </span>
-          <span>
-            <Plural
-              value={state.data.offset + state.data.cursor}
-              other="# 步"
+      <GameToolbar
+        context={
+          <Trans comment="魔方阶数，order 是每条边的小块数量">
+            {order} 阶魔方
+          </Trans>
+        }
+        actions={
+          <>
+            <GameToolbarAction
+              icon={Undo2}
+              label={t`撤销转动`}
+              disabled={
+                actionBlocked ||
+                state.busy ||
+                state.data.completed ||
+                state.data.cursor === 0
+              }
+              onClick={store.undo}
             />
-          </span>
-          {state.data.assisted && (
-            <span className="text-muted-foreground">
-              <Trans>使用过撤销</Trans>
+            <GameToolbarAction
+              secondary
+              icon={Redo2}
+              label={t`重做转动`}
+              disabled={
+                actionBlocked ||
+                state.busy ||
+                state.data.completed ||
+                state.data.cursor === state.data.moves.length
+              }
+              onClick={store.redo}
+            />
+            <GameToolbarAction
+              secondary
+              icon={Shuffle}
+              label={t({
+                message: "打乱",
+                comment: "用合法转动打乱魔方并开始新挑战",
+              })}
+              disabled={actionBlocked || state.busy}
+              onClick={() => requestNew({ kind: "scramble", order })}
+            />
+          </>
+        }
+        status={
+          state.data.completed ? (
+            <span className="text-success">
+              <Trans>已还原</Trans>
             </span>
-          )}
-          <Button
-            className="magic-cube-scroll-toggle"
-            size="sm"
-            variant="outline"
-            aria-pressed={interacting}
-            onClick={() => setInteracting(!interacting)}
-          >
-            {interacting ? (
-              <Trans>退出画布操作</Trans>
+          ) : state.data.challenge ? (
+            state.data.started ? (
+              <Trans>挑战中</Trans>
             ) : (
-              <Trans>操作魔方</Trans>
-            )}
-          </Button>
-        </div>
-      </div>
+              <Trans>转动开始计时</Trans>
+            )
+          ) : (
+            <Trans comment="魔方未开始计时挑战，可自由操作">自由练习</Trans>
+          )
+        }
+        metrics={
+          <>
+            <span className="font-mono" aria-label={t`有效用时`}>
+              {formatGameTime(state.elapsedMs)}
+            </span>
+            <span>
+              <Plural
+                value={state.data.offset + state.data.cursor}
+                other="# 步"
+              />
+            </span>
+          </>
+        }
+        details={state.data.assisted ? <Trans>使用过撤销</Trans> : null}
+      />
 
       {state.saved && (
         <GameRestoreDialog
@@ -419,6 +430,21 @@ export default function MagicCubeGame() {
         data-interacting={interacting}
       >
         <div className="magic-cube-stage">
+          <div className="absolute bottom-3 left-3 z-10">
+            <Button
+              className="magic-cube-scroll-toggle"
+              size="sm"
+              variant="outline"
+              aria-pressed={interacting}
+              onClick={() => setInteracting(!interacting)}
+            >
+              {interacting ? (
+                <Trans>退出画布操作</Trans>
+              ) : (
+                <Trans>操作魔方</Trans>
+              )}
+            </Button>
+          </div>
           {!renderError && (
             <MagicCubeStage
               key={`${state.data.id}-${retry}`}

@@ -3,6 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
@@ -13,6 +14,14 @@ import { GomokuOnlineFlow } from "./GomokuOnline";
 import { gomokuSessions } from "./session";
 
 export default function GomokuGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <GomokuGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function GomokuGameContent() {
   useGameAudio(gomokuAudio);
   const lifecycle = useGameLifecycle(gomokuSessions);
   const { mode, matchKey } = lifecycle;

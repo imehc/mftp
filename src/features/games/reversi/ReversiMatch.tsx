@@ -1,13 +1,12 @@
-import { Plural, Trans } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import type { LightNoticeMessage } from "~/components/LightNotice";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { historyModeLabel } from "../engine/history-labels";
 import { useMatchSnapshot } from "../engine/match";
@@ -120,80 +119,75 @@ export function ReversiMatchView({
     black,
     white,
   ]);
+  const { t } = useLingui();
   const currentPlayer = seatName(mode, state.turnSeat, online);
   return (
     <>
       <div className="app-scroll-safe-end flex min-h-0 flex-1 flex-col overflow-auto">
-        <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 md:px-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-muted-foreground text-xs">
-              {historyModeLabel({
-                mode: mode.kind,
-                difficulty: mode.kind === "ai" ? mode.difficulty : undefined,
-              })}
-            </span>
-            {mode.kind !== "hotseat" && (
-              <span className="text-xs">
-                {localSeat === 0 ? (
-                  <Trans>你执黑</Trans>
-                ) : (
-                  <Trans>你执白</Trans>
-                )}
-              </span>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!canUndo}
-              onClick={() =>
-                online
-                  ? online.onRequestUndo(undoPlies)
-                  : runner.undo(undoPlies)
-              }
-            >
-              <Undo2 />
-              <Trans>悔棋</Trans>
-            </Button>
-          </div>
-          <div
-            className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 text-xs"
-            role="status"
-            aria-atomic="true"
-          >
-            <Badge variant="secondary">
-              {state.finished ? (
-                matchResultLabel(mode, state.winnerSeat, online)
-              ) : (
-                <Trans>轮到 {currentPlayer}</Trans>
-              )}
-            </Badge>
-            <span className="whitespace-nowrap tabular-nums">
-              <Trans comment="黑白棋当前棋子数量">
-                黑 {black} / 白 {white}
-              </Trans>
-            </span>
-            <span className="text-muted-foreground whitespace-nowrap tabular-nums">
-              <Plural
-                value={{ moveCount: state.moveCount }}
-                one="# 手"
-                other="# 手"
-              />
-            </span>
-            {aiThinking ? (
-              <span className="text-muted-foreground">
-                <Trans>电脑思考中…</Trans>
-              </span>
-            ) : online?.undoWaiting ? (
+        <GameToolbar
+          context={
+            <>
               <span>
-                <Trans>等待协商结果…</Trans>
+                {historyModeLabel({
+                  mode: mode.kind,
+                  difficulty: mode.kind === "ai" ? mode.difficulty : undefined,
+                })}
               </span>
-            ) : online && activeKind === "remote" && !state.finished ? (
-              <span className="text-muted-foreground">
-                <Trans>等待对方落子…</Trans>
+              {mode.kind !== "hotseat" ? (
+                <span>
+                  {localSeat === 0 ? (
+                    <Trans>你执黑</Trans>
+                  ) : (
+                    <Trans>你执白</Trans>
+                  )}
+                </span>
+              ) : null}
+            </>
+          }
+          actions={
+            !state.finished ? (
+              <GameToolbarAction
+                icon={Undo2}
+                label={t`悔棋`}
+                disabled={!canUndo}
+                onClick={() =>
+                  online
+                    ? online.onRequestUndo(undoPlies)
+                    : runner.undo(undoPlies)
+                }
+              />
+            ) : null
+          }
+          status={
+            state.finished ? (
+              matchResultLabel(mode, state.winnerSeat, online)
+            ) : online?.undoWaiting ? (
+              <Trans>等待协商结果…</Trans>
+            ) : aiThinking ? (
+              <Trans>电脑思考中…</Trans>
+            ) : online && activeKind === "remote" ? (
+              <Trans>等待对方落子…</Trans>
+            ) : (
+              <Trans>轮到 {currentPlayer}</Trans>
+            )
+          }
+          metrics={
+            <>
+              <span>
+                <Trans comment="黑白棋当前棋子数量">
+                  黑 {black} / 白 {white}
+                </Trans>
               </span>
-            ) : null}
-          </div>
-        </div>
+              <span>
+                <Plural
+                  value={{ moveCount: state.moveCount }}
+                  one="# 手"
+                  other="# 手"
+                />
+              </span>
+            </>
+          }
+        />
         <ReversiStage
           state={state}
           notice={passNotice}

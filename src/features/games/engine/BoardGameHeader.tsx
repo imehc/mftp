@@ -17,6 +17,7 @@ import { Button } from "~/components/ui/button";
 import { BackLink } from "~/features/navigation/BackLink";
 
 import { GameActionsMenu } from "./GameActionsMenu";
+import { GameHeaderActionsSlot } from "./GameHeaderActions";
 import { GameVolumeControl } from "./GameVolumeControl";
 
 export function BoardGameHeader({
@@ -71,6 +72,7 @@ export function BoardGameHeader({
         }
         trailing={
           <>
+            <GameHeaderActionsSlot />
             {help}
             {active ? (
               <GameActionsMenu

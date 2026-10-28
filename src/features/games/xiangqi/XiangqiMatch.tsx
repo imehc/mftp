@@ -1,14 +1,13 @@
-import { Plural, Trans } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Undo2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import type { LightNoticeMessage } from "~/components/LightNotice";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
 import type { SeatIndex } from "../engine/types";
@@ -150,6 +149,7 @@ export function XiangqiMatchView({
     state.moveCount,
     state.resultReason,
   ]);
+  const { t } = useLingui();
   const sideNameValue = sideName(mode, state.turnSeat, online);
   return (
     <>
@@ -166,9 +166,9 @@ export function XiangqiMatchView({
         localSeat={localSeat}
         red
         finished={state.finished}
-        status={
+        metrics={
           <>
-            <Badge variant="outline">
+            <span>
               <Plural
                 value={{
                   moveNumber: state.moveCount + (state.finished ? 0 : 1),
@@ -176,48 +176,37 @@ export function XiangqiMatchView({
                 one="第 # 手"
                 other="第 # 手"
               />
-            </Badge>
+            </span>
             {state.inCheck ? (
-              <Badge className="bg-chess-red text-white">
+              <span className="text-destructive">
                 <Trans>将军</Trans>
-              </Badge>
-            ) : null}
-            {aiThinking ? (
-              <Badge variant="outline">
-                <Trans>电脑思考中…</Trans>
-              </Badge>
-            ) : null}
-            {online &&
-            !state.finished &&
-            snapshot.phase === "awaiting-move" &&
-            snapshot.activeSeat !== online.localSeat ? (
-              <Badge variant="outline">
-                <Trans>等待对方落子…</Trans>
-              </Badge>
-            ) : null}
-            {online?.undoWaiting ? (
-              <Badge variant="outline">
-                <Trans>等待对方同意悔棋…</Trans>
-              </Badge>
+              </span>
             ) : null}
           </>
         }
+        activity={
+          !state.finished ? (
+            online?.undoWaiting ? (
+              <Trans>等待对方同意悔棋…</Trans>
+            ) : aiThinking ? (
+              <Trans>电脑思考中…</Trans>
+            ) : online && snapshot.activeSeat !== online.localSeat ? (
+              <Trans>等待对方落子…</Trans>
+            ) : null
+          ) : null
+        }
         controls={
           <>
-            <Button
-              variant="outline"
-              size="sm"
-              density="adaptive"
+            <GameToolbarAction
+              icon={Undo2}
+              label={t`悔棋`}
               disabled={!canUndo}
               onClick={() =>
                 online
                   ? online.onRequestUndo(undoPlies)
                   : runner.undo(undoPlies)
               }
-            >
-              <Undo2 data-icon="inline-start" />
-              <Trans>悔棋</Trans>
-            </Button>
+            />
           </>
         }
       >
