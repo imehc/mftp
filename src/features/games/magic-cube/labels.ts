@@ -26,10 +26,3 @@ export const FACE_LABELS = {
     comment: "魔方固定坐标中的后面，B 是标准转面符号",
   }),
 };
-
-export function formatCubeTime(ms: number): string {
-  const seconds = Math.floor(ms / 1000);
-  return `${Math.floor(seconds / 60)
-    .toString()
-    .padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
-}

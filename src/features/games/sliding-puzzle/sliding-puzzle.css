@@ -1,0 +1,116 @@
+.sliding-puzzle-workspace {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-inline: 8px;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--foreground) 3%, var(--background)),
+    var(--background) 72%
+  );
+}
+
+.sliding-puzzle-centre {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 20px;
+}
+
+/* 盘框与滑块是游戏实体；材质色不替代外围 UI 的主题令牌。 */
+.sliding-puzzle-board {
+  position: relative;
+  flex: none;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgb(255 234 203 / 7%), rgb(18 10 5 / 18%)),
+    var(--puzzle-wood, none), #4d3827;
+  background-size: cover;
+  box-shadow:
+    inset 0 1px 1px rgb(255 240 212 / 30%),
+    inset 0 -3px 4px rgb(17 9 4 / 50%),
+    0 12px 22px -12px rgb(22 13 8 / 48%);
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.sliding-puzzle-board::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 9px;
+  background: rgb(19 12 8 / 36%);
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 35%);
+}
+
+.sliding-puzzle-tile {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: var(--puzzle-cell);
+  height: var(--puzzle-cell);
+  padding: 0;
+  border: 0;
+  border-radius: clamp(5px, 0.6rem, 10px);
+  background: linear-gradient(145deg, #fffaf0, #f1e8d7 65%, #e4d9c5);
+  box-shadow:
+    inset 0 1px 1px #fffef7,
+    inset 0 -3px 2px rgb(108 87 58 / 27%),
+    0 2px 3px rgb(10 6 3 / 40%);
+  color: #413222;
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, calc(var(--puzzle-cell) * 0.38), 3rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px rgb(255 255 255 / 80%);
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sliding-puzzle-tile[data-movable="true"] {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .sliding-puzzle-tile[data-movable="true"]:hover {
+    filter: brightness(1.035);
+  }
+}
+
+.sliding-puzzle-tile[data-movable="true"]:active {
+  filter: brightness(0.94);
+}
+
+.sliding-puzzle-tile:focus-visible {
+  outline: 3px solid #1e695a;
+  outline-offset: -5px;
+  z-index: 2;
+}
+
+.sliding-puzzle-tile[data-tile="0"] {
+  box-shadow: none;
+  background: transparent;
+  z-index: 0;
+}
+
+.sliding-puzzle-tile[data-tile="0"]:focus-visible {
+  outline-color: #fff4d8;
+}
+
+.sliding-puzzle-target {
+  display: grid;
+  grid-template-columns: repeat(var(--puzzle-size), minmax(0, 1fr));
+  gap: 4px;
+  width: min(100%, 15rem);
+}
+
+.sliding-puzzle-target > span {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

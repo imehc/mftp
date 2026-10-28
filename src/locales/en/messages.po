@@ -27,7 +27,8 @@ msgstr "{0, plural, one {# character} other {# characters}}"
 #. placeholder {0}: payload.moves
 #. placeholder {0}: state.data.offset + state.data.cursor
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:144
-#: src/features/games/magic-cube/MagicCubeGame.tsx:394
+#: src/features/games/magic-cube/MagicCubeGame.tsx:342
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:247
 msgid "{0, plural, other {# 步}}"
 msgstr "{0, plural, one {# move} other {# moves}}"
 
@@ -165,6 +166,10 @@ msgstr "Move #"
 #: src/features/games/junqi/JunqiToolbar.tsx:121
 msgid "{moves, plural, one {已走 # 手} other {已走 # 手}}"
 msgstr "{moves, plural, one {# move played} other {# moves played}}"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:145
+msgid "{moves, plural, other {# 步}}"
+msgstr "{moves, plural, one {# move} other {# moves}}"
 
 #: src/features/games/engine/online/use-online-lobby.ts:51
 msgid "{name} 的房间"
@@ -327,13 +332,17 @@ msgid "{value} 的私钥口令"
 msgstr "Private key passphrase for {value}"
 
 #. 魔方阶数，value 为每边小块数量
-#: src/features/games/magic-cube/MagicCubeGame.tsx:260
+#: src/features/games/magic-cube/MagicCubeGame.tsx:261
 msgid "{value} 阶"
 msgstr "{value}×{value}"
 
 #: src/features/games/billiards/BilliardsMatchView.tsx:262
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} wins"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:95
+msgid "「重新开始本局」恢复本局最初的打乱排列，并清零用时与步数；「打乱」生成新的有解棋盘。离开后会保留进度，下次可以继续。"
+msgstr "Restart puzzle returns to the original arrangement and resets time and moves. Scramble creates a new solvable puzzle. Your progress is kept when you leave, so you can resume later."
 
 #: src/features/model-viewer/ModelViewerPage.tsx:331
 msgid "3D 显示已中断"
@@ -584,15 +593,15 @@ msgstr "FBX models are previewed for this session only and are not saved to the 
 msgid "FBX 文件上限为 64 MiB；复杂模型、过大的贴图或超过 30 秒的解析会停止，请简化后重试。"
 msgstr "FBX files are limited to 64 MiB. Processing stops if the model or textures are too complex, or parsing takes over 30 seconds. Simplify the model and try again."
 
-#: src/lib/errors/messages.ts:364
+#: src/lib/errors/messages.ts:365
 msgid "FBX 缺少有效的单位信息，请在建模软件中设置单位后重新导出。"
 msgstr "The FBX file has no valid unit information. Set the units in your modeling software and export it again."
 
-#: src/lib/errors/messages.ts:363
+#: src/lib/errors/messages.ts:364
 msgid "FBX 贴图格式不受支持，请使用 PNG、JPEG、WebP 或 BMP。"
 msgstr "This FBX texture format is not supported. Use PNG, JPEG, WebP or BMP."
 
-#: src/lib/errors/messages.ts:362
+#: src/lib/errors/messages.ts:363
 msgid "FBX 超过处理上限或解析超时，请简化模型或贴图后重试。文件不能超过 64 MiB。"
 msgstr "The FBX model exceeds the processing limits or parsing timed out. Simplify the model or textures and try again. Files must not exceed 64 MiB."
 
@@ -1104,17 +1113,24 @@ msgstr "Connection to the opponent was lost."
 
 #. 删除未完成的游戏存档，随后可开始新对局
 #. 确认删除未完成的游戏存档
+#: src/features/games/engine/GameRestoreDialog.tsx:84
 #: src/features/games/engine/GameSessionNotice.tsx:86
 #: src/features/games/engine/GameSessionNotice.tsx:113
-#: src/features/games/magic-cube/MagicCubeGame.tsx:364
+#: src/features/games/magic-cube/MagicCubeGame.tsx:408
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:303
 msgid "丢弃存档"
 msgstr "Discard save"
 
+#: src/features/games/engine/GameRestoreDialog.tsx:57
 #: src/features/games/engine/GameSessionNotice.tsx:98
 msgid "丢弃对局存档？"
 msgstr "Discard this saved game?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:495
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:333
+msgid "丢弃数字华容道存档？"
+msgstr "Discard the saved sliding puzzle?"
+
+#: src/features/games/magic-cube/MagicCubeGame.tsx:500
 msgid "丢弃魔方存档？"
 msgstr "Discard saved cube?"
 
@@ -1179,7 +1195,7 @@ msgstr "Center"
 msgid "中等"
 msgstr "Medium"
 
-#: src/lib/errors/messages.ts:341
+#: src/lib/errors/messages.ts:342
 msgid "临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。"
 msgstr "Temporary export storage is full. Try again later. Shared files are kept for at least 24 hours."
 
@@ -1581,7 +1597,9 @@ msgid "使用系统应用打开 {entryName}"
 msgstr "Open {entryName} with system app"
 
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:148
-#: src/features/games/magic-cube/MagicCubeGame.tsx:398
+#: src/features/games/magic-cube/MagicCubeGame.tsx:349
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:149
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:254
 msgid "使用过撤销"
 msgstr "Undo used"
 
@@ -1974,6 +1992,7 @@ msgstr "Linked textures"
 #: src/components/ui/dialog.tsx:162
 #: src/components/ui/sheet.tsx:88
 #: src/features/bt/components/AddTorrentDialog.tsx:390
+#: src/features/games/engine/GameRestoreDialog.tsx:100
 #: src/features/model-viewer/components/LibraryPanel.tsx:350
 #: src/features/model-viewer/components/ModelSystemStatus.tsx:30
 #: src/features/ssh-sftp/components/Sidebar.tsx:382
@@ -2069,6 +2088,7 @@ msgstr "Invalid content, cannot decode"
 
 #: src/features/games/billiards/BilliardsMatchView.tsx:495
 #: src/features/games/engine/GameResultBar.tsx:84
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:259
 msgid "再来一局"
 msgstr "One more game"
 
@@ -2248,7 +2268,7 @@ msgstr "Minute"
 msgid "切换 AI 模型"
 msgstr "Switch AI model"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:497
+#: src/features/games/magic-cube/MagicCubeGame.tsx:502
 msgid "切换魔方阶数？"
 msgstr "Change cube size?"
 
@@ -2557,7 +2577,7 @@ msgstr "Power"
 msgid "功能"
 msgstr "Features"
 
-#: src/features/settings/FeatureEntrySettings.tsx:158
+#: src/features/settings/FeatureEntrySettings.tsx:154
 #: src/features/settings/SettingsOverview.tsx:76
 #: src/features/settings/SettingsPage.tsx:44
 msgid "功能入口"
@@ -2903,7 +2923,11 @@ msgstr "Double sided"
 msgid "发现上次的对局存档，是否继续？"
 msgstr "A saved game was found. Would you like to continue?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:329
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:267
+msgid "发现上次的数字华容道进度，是否继续？"
+msgstr "You have a saved sliding puzzle. Continue where you left off?"
+
+#: src/features/games/magic-cube/MagicCubeGame.tsx:370
 msgid "发现上次的魔方进度，是否继续？"
 msgstr "You have a saved cube. Continue where you left off?"
 
@@ -2946,12 +2970,14 @@ msgstr "Send request"
 #: src/features/games/engine/BoardGameHeader.tsx:101
 #: src/features/games/engine/GameHeaderControls.tsx:77
 #: src/features/games/engine/GameHeaderControls.tsx:105
+#: src/features/games/engine/GameRestoreDialog.tsx:84
 #: src/features/games/engine/GameSessionNotice.tsx:106
 #: src/features/games/engine/online/OnlineLobby.tsx:368
 #: src/features/games/junqi/JunqiMatchView.tsx:268
 #: src/features/games/junqi/JunqiMatchView.tsx:302
 #: src/features/games/junqi/JunqiUndoDialog.tsx:58
-#: src/features/games/magic-cube/MagicCubeGame.tsx:510
+#: src/features/games/magic-cube/MagicCubeGame.tsx:515
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:352
 #: src/features/lan-transfer/LanConfirmDialog.tsx:41
 #: src/features/lan-transfer/LanShareDialog.tsx:153
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:546
@@ -3085,7 +3111,7 @@ msgstr "Passphrase Protected"
 msgid "古诗词"
 msgstr "Classical Poetry"
 
-#: src/lib/errors/messages.ts:342
+#: src/lib/errors/messages.ts:343
 msgid "另一个系统导出尚未结束，请先完成或关闭系统面板。"
 msgstr "Another system export is in progress. Complete or close the system dialog first."
 
@@ -3841,7 +3867,7 @@ msgstr "Install the model to translate offline."
 msgid "安装命令已复制"
 msgstr "Install command copied"
 
-#: src/lib/errors/messages.ts:353
+#: src/lib/errors/messages.ts:354
 msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "Installation did not finish. Retry the installation or try again later."
 
@@ -3878,6 +3904,10 @@ msgstr "You can copy it elsewhere once the download finishes."
 #: src/features/model-viewer/components/CanvasControls.tsx:175
 msgid "完成摆放"
 msgstr "Finish placement"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:163
+msgid "完成数字华容道后，成绩会显示在这里。"
+msgstr "Complete a sliding puzzle to see your results here."
 
 #: src/features/todo/TodoTimestamps.tsx:48
 msgid "完成时间"
@@ -4141,7 +4171,7 @@ msgstr "Export app data"
 msgid "导出所选数据"
 msgstr "Export selected data"
 
-#: src/lib/errors/messages.ts:340
+#: src/lib/errors/messages.ts:341
 msgid "导出文件无效或超过 64 MiB，请重新生成。"
 msgstr "The export file is invalid or exceeds 64 MiB. Generate it again."
 
@@ -4196,6 +4226,10 @@ msgstr "Temporary files from poetry sync are deleted; imported poetry data is un
 #: src/features/games/xiangqi/labels.tsx:54
 msgid "将帅被吃"
 msgstr "General captured"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:41
+msgid "将数字按顺序排列，空位留在右下角。"
+msgstr "Arrange the numbers in order, with the empty space at the bottom right."
 
 #: src/features/games/junqi/JunqiMatchView.tsx:297
 msgid "将替换当前己方阵型，对方阵型保持不变。"
@@ -4540,7 +4574,7 @@ msgstr "Copied to your folder"
 msgid "已复制到系统下载目录"
 msgstr "Copied to the system Downloads folder"
 
-#: src/lib/errors/messages.ts:358
+#: src/lib/errors/messages.ts:359
 msgid "已存在同名附件，请先重命名文件或移除旧附件。"
 msgstr "An attachment with this name already exists. Rename the file or remove the old attachment first."
 
@@ -4558,8 +4592,10 @@ msgstr "Installed"
 msgid "已安装 {toLocaleStringValue3} 条，约 14MB"
 msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 
+#. 数字华容道全部数字已排列完成
 #: src/features/about/ResetBoundary.tsx:149
 #: src/features/bt/components/TaskRow.tsx:90
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:230
 #: src/features/todo/TodoTool.tsx:152
 #: src/features/transfers/TransferDock.tsx:175
 msgid "已完成"
@@ -4568,6 +4604,10 @@ msgstr "Completed"
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:122
 msgid "已完成挑战的阶数、有效用时和步数。"
 msgstr "Cube size, active time, and moves for completed challenges."
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:115
+msgid "已完成棋盘的大小、有效用时与步数。"
+msgstr "Board size, active time, and moves for completed puzzles."
 
 #: src/features/poetry/components/TranslationPackManager.tsx:79
 msgid "已导入 {packCount} 个译文包"
@@ -4707,7 +4747,7 @@ msgstr "Finished"
 msgid "已解压到 {outName}"
 msgstr "Extracted to {outName}"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:378
+#: src/features/games/magic-cube/MagicCubeGame.tsx:326
 msgid "已还原"
 msgstr "Solved"
 
@@ -4859,6 +4899,10 @@ msgstr "Start"
 msgid "开始对局"
 msgstr "Start match"
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:337
+msgid "开始新的数字华容道？"
+msgstr "Start a new sliding puzzle?"
+
 #. Security mode that allows LAN access without authentication
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:297
 msgctxt "LAN security mode"
@@ -4982,7 +5026,7 @@ msgid "当前操作尚未完成，请稍后重试清理数据"
 msgstr "An operation is still running. Try clearing data again later."
 
 #. 军棋规则或对局状态校验失败，原始诊断保留在错误协议中
-#: src/lib/errors/messages.ts:375
+#: src/lib/errors/messages.ts:376
 msgid "当前操作无法完成，请恢复对局或重新开始。"
 msgstr "This action could not be completed. Restore the game or start again."
 
@@ -5006,6 +5050,10 @@ msgstr "Showing the 500 most recent saved summaries."
 #: src/features/logs/HistoryLogDetailView.tsx:138
 msgid "当前未保留执行详情，历史摘要仍可查看。"
 msgstr "Execution details are no longer available here. The saved summary is still accessible."
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:346
+msgid "当前棋盘进度和移动记录将被替换，无法恢复。"
+msgstr "Your current board and move history will be replaced. This cannot be undone."
 
 #. 选中模型包含共享引用的已知分配估算。
 #: src/features/ai-configuration/ProviderDetails.tsx:148
@@ -5058,7 +5106,7 @@ msgstr "AVIF export is not supported in this environment"
 msgid "当前环境不支持导出 AVIF，请改用 WebP 或 JPG"
 msgstr "AVIF export is unavailable. Use WebP or JPG instead."
 
-#: src/lib/errors/messages.ts:345
+#: src/lib/errors/messages.ts:346
 msgid "当前环境不支持录屏编码，可改用截图。"
 msgstr "Video recording is not supported in this environment. You can take a screenshot instead."
 
@@ -5088,7 +5136,7 @@ msgstr "No orientation sensor is available on this device. Manual controls remai
 msgid "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured address {bindHost} is not on an available network interface. The access URL may not work."
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:505
+#: src/features/games/magic-cube/MagicCubeGame.tsx:510
 msgid "当前魔方进度和撤销记录将被替换，无法恢复。"
 msgstr "Your current cube progress and undo history will be replaced. This cannot be undone."
 
@@ -5097,7 +5145,7 @@ msgstr "Your current cube progress and undo history will be replaced. This canno
 msgid "录制视口"
 msgstr "Record viewport"
 
-#: src/lib/errors/messages.ts:348
+#: src/lib/errors/messages.ts:349
 msgid "录屏保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the recording. Check the destination and available space, then try again."
 
@@ -5109,11 +5157,11 @@ msgstr "Recording saved."
 msgid "录屏已生成。保存前请留在此页面。"
 msgstr "Recording ready. Stay on this page until you have saved it."
 
-#: src/lib/errors/messages.ts:346
+#: src/lib/errors/messages.ts:347
 msgid "录屏未完成，请恢复模型显示后重试。"
 msgstr "Recording failed. Restore the model view and try again."
 
-#: src/lib/errors/messages.ts:347
+#: src/lib/errors/messages.ts:348
 msgid "录屏超过 64 MiB 上限，请缩短录制时间后重试。"
 msgstr "The recording exceeded the 64 MiB limit. Try a shorter recording."
 
@@ -5224,6 +5272,10 @@ msgstr "Restore last page"
 msgid "恢复待办"
 msgstr "Restore todo"
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:342
+msgid "恢复本局最初的打乱排列，用时与步数清零，当前移动记录无法恢复。"
+msgstr "Return to the original arrangement and reset time and moves. Your current move history will be lost."
+
 #: src/features/about/AboutPage.tsx:128
 msgid "恢复首次打开状态"
 msgstr "Restore the initial state"
@@ -5251,6 +5303,11 @@ msgstr "Quality drops on sustained slow frames or rising heat and recovers once 
 msgid "成功"
 msgstr "Success"
 
+#. 查看数字华容道完成成绩
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:168
+msgid "成绩记录"
+msgstr "Results"
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:127
 msgid "我先开球"
 msgstr "I break"
@@ -5268,7 +5325,7 @@ msgstr "I confirm that keys and generation requests will be sent to the new serv
 msgid "截图与录屏"
 msgstr "Capture tools"
 
-#: src/lib/errors/messages.ts:350
+#: src/lib/errors/messages.ts:351
 msgid "截图保存失败，请检查保存位置和可用空间后重试。"
 msgstr "Could not save the screenshot. Check the destination and available space, then try again."
 
@@ -5347,8 +5404,10 @@ msgstr "Ball in hand: place the cue ball anywhere"
 msgid "手中球：在 D 区拖动母球放置"
 msgstr "Ball in hand: drag the cue ball within the D"
 
+#. 生成新的有解数字华容道棋盘
 #. 用合法转动打乱魔方并开始新挑战
-#: src/features/games/magic-cube/MagicCubeGame.tsx:273
+#: src/features/games/magic-cube/MagicCubeGame.tsx:274
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:198
 msgid "打乱"
 msgstr "Scramble"
 
@@ -5532,11 +5591,13 @@ msgstr "Press Space to start sorting, use the arrow keys to move, press Space to
 msgid "按纯文本展示。"
 msgstr "Shown as plain text."
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:382
+#. 数字华容道正在进行的挑战
+#: src/features/games/magic-cube/MagicCubeGame.tsx:330
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:238
 msgid "挑战中"
 msgstr "Challenge in progress"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:238
+#: src/features/games/magic-cube/MagicCubeGame.tsx:239
 msgid "挑战记录"
 msgstr "Challenge history"
 
@@ -5711,6 +5772,10 @@ msgstr "Place model"
 msgid "撤销"
 msgstr "Undo"
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:88
+msgid "撤销后进行新移动会清除重做分支。最多可以撤销最近 500 步，更早的步数仍计入总数；使用过撤销的成绩会单独标记。"
+msgstr "Moving after undo clears the redo branch. You can undo up to 500 recent moves; earlier moves still count toward the total. Results that use undo are marked."
+
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:83
 msgid "撤销和重做不跨越打乱起点；撤销后转动会清除重做分支。最多保留最近 500 步的撤销记录，更早的步数仍会计入总数。使用过撤销的挑战会单独标记。"
 msgstr "Undo and redo stop at the scrambled starting position. A new turn after undo clears the redo branch. Up to 500 recent moves can be undone; earlier moves still count toward the total. Challenges that use undo are marked."
@@ -5724,8 +5789,13 @@ msgstr "Revoke access"
 msgid "撤销授权？"
 msgstr "Revoke client access?"
 
+#. 撤销数字华容道上一次滑块移动
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:203
+msgid "撤销移动"
+msgstr "Undo move"
+
 #. 撤销上一步魔方转层操作
-#: src/features/games/magic-cube/MagicCubeGame.tsx:279
+#: src/features/games/magic-cube/MagicCubeGame.tsx:280
 msgid "撤销转动"
 msgstr "Undo turn"
 
@@ -5794,7 +5864,7 @@ msgstr "Action identifier"
 msgid "操作系统"
 msgstr "Operating system"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:408
+#: src/features/games/magic-cube/MagicCubeGame.tsx:362
 msgid "操作魔方"
 msgstr "Interact with cube"
 
@@ -5843,6 +5913,41 @@ msgstr "Discard changes"
 #: src/features/vault/VaultEntryDialog.tsx:262
 msgid "放弃未保存的修改？"
 msgstr "Discard unsaved changes?"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleBoard.tsx:141
+msgid "数字 {tile}，第 {row} 行，第 {column} 列，不可移动"
+msgstr "Tile {tile}, row {row}, column {column}, cannot move"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleBoard.tsx:140
+msgid "数字 {tile}，第 {row} 行，第 {column} 列，可移动"
+msgstr "Tile {tile}, row {row}, column {column}, can move"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:51
+msgid "数字从左到右、从上到下递增，最后一格为空位。"
+msgstr "Numbers increase from left to right and top to bottom. The last cell is empty."
+
+#. 小游戏名，滑动数字方块填入空位并排序
+#. 小游戏名，滑动数字方块填入空位并排序
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:111
+#: src/features/home/entries.tsx:235
+msgid "数字华容道"
+msgstr "Sliding puzzle"
+
+#: src/lib/errors/messages.ts:340
+msgid "数字华容道已完成，但成绩尚未保存，请重试。"
+msgstr "The puzzle is complete, but the result has not been saved. Please retry."
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:112
+msgid "数字华容道成绩"
+msgstr "Sliding puzzle results"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleBoard.tsx:120
+msgid "数字华容道棋盘"
+msgstr "Sliding puzzle board"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:38
+msgid "数字华容道玩法"
+msgstr "How to play the sliding puzzle"
 
 #: src/features/logs/use-activity-logs.ts:50
 msgid "数据"
@@ -6087,7 +6192,7 @@ msgstr "Could not open with a system app"
 msgid "无法创建画布上下文"
 msgstr "Cannot create canvas context"
 
-#: src/lib/errors/messages.ts:369
+#: src/lib/errors/messages.ts:370
 msgid "无法初始化 3D 显示，请重试或检查设备的图形支持"
 msgstr "Unable to initialize the 3D display. Retry or check your device’s graphics support."
 
@@ -6095,7 +6200,7 @@ msgstr "Unable to initialize the 3D display. Retry or check your device’s grap
 msgid "无法删除对局存档，请重试。"
 msgstr "Unable to delete the saved game. Please retry."
 
-#: src/lib/errors/messages.ts:359
+#: src/lib/errors/messages.ts:360
 msgid "无法打开系统转交的模型。请选择有效 GLB 文件并重新打开；导入缓存上限为 512 MiB。"
 msgstr "Could not open the model from the system. Select a valid GLB file and open it again. The import cache limit is 512 MiB."
 
@@ -6111,7 +6216,7 @@ msgstr "3D display unavailable"
 msgid "无法显示 3D 魔方。请重新加载画布；已提交的转动进度会保留。"
 msgstr "The 3D cube could not be displayed. Reload the canvas; committed turns will be preserved."
 
-#: src/lib/errors/messages.ts:351
+#: src/lib/errors/messages.ts:352
 msgid "无法检查更新，请稍后重试或查看发布页面。"
 msgstr "Could not check for updates. Try again later or visit the releases page."
 
@@ -6124,7 +6229,7 @@ msgstr "Unable to detect rsync ({side}): {detail}"
 msgid "无法生成同步预览"
 msgstr "Unable to generate sync preview"
 
-#: src/lib/errors/messages.ts:349
+#: src/lib/errors/messages.ts:350
 msgid "无法生成截图，请恢复模型显示后重试。"
 msgstr "Could not create a screenshot. Restore the model view and try again."
 
@@ -6266,7 +6371,7 @@ msgstr "Show or hide"
 msgid "显示或隐藏 {name}"
 msgstr "Show or hide {name}"
 
-#: src/features/settings/FeatureEntrySettings.tsx:175
+#: src/features/settings/FeatureEntrySettings.tsx:170
 msgid "显示此分类"
 msgstr "Show this category"
 
@@ -6274,7 +6379,7 @@ msgstr "Show this category"
 msgid "显示此功能"
 msgstr "Show this feature"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:228
+#: src/features/games/magic-cube/MagicCubeGame.tsx:229
 msgid "显示面标识"
 msgstr "Show face labels"
 
@@ -6364,6 +6469,10 @@ msgstr "No finished tasks"
 #: src/features/todo/TodoTool.tsx:258
 msgid "暂无待办"
 msgstr "No todos"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:160
+msgid "暂无成绩记录"
+msgstr "No results yet"
 
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:159
 msgid "暂无挑战记录"
@@ -6477,7 +6586,7 @@ msgstr "Update AI service"
 msgid "更新 AI 流式设置"
 msgstr "Update AI streaming settings"
 
-#: src/lib/errors/messages.ts:352
+#: src/lib/errors/messages.ts:353
 msgid "更新下载或校验失败，请重新检查更新。"
 msgstr "The update could not be downloaded or verified. Check for updates again."
 
@@ -6490,7 +6599,7 @@ msgstr "Update host"
 msgid "更新于 {updatedLabel}"
 msgstr "Updated at {updatedLabel}"
 
-#: src/lib/errors/messages.ts:355
+#: src/lib/errors/messages.ts:356
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
@@ -6538,7 +6647,8 @@ msgstr "Replace"
 msgid "替换为"
 msgstr "Replace with"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:390
+#: src/features/games/magic-cube/MagicCubeGame.tsx:338
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:243
 msgid "有效用时"
 msgstr "Active time"
 
@@ -6855,7 +6965,7 @@ msgstr "A miss has been called. Decision for {player}: play next, ask {offender}
 msgid "本杆推杆"
 msgstr "Push-out declared"
 
-#: src/lib/errors/messages.ts:366
+#: src/lib/errors/messages.ts:367
 msgid "本次导入的资源超过 512 MiB，请选择较小的模型"
 msgstr "This import exceeds 512 MiB. Choose a smaller model."
 
@@ -7133,8 +7243,13 @@ msgstr "Detection timed out"
 msgid "棋子随机盖放，翻开后身份公开。首翻决定阵营，之后每回合选择翻子或走棋，夺取对方军旗即获胜。"
 msgstr "Pieces are shuffled face down. Revealing a piece makes its identity public, and the first reveal assigns sides. On each turn, reveal a piece or move one. Capture the enemy flag to win."
 
+#. 数字华容道棋盘的行数与列数
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:181
+msgid "棋盘"
+msgstr "Board"
+
 #. 军棋二维棋盘初始化失败
-#: src/lib/errors/messages.ts:371
+#: src/lib/errors/messages.ts:372
 msgid "棋盘加载失败，请重试。"
 msgstr "The board could not load. Please try again."
 
@@ -7143,7 +7258,7 @@ msgid "棋盘大小"
 msgstr "Board Size"
 
 #. 军棋 WebGL 上下文丢失，可重建渲染器
-#: src/lib/errors/messages.ts:379
+#: src/lib/errors/messages.ts:380
 msgid "棋盘显示已中断，对局仍保留，请重试。"
 msgstr "The board display was interrupted. Your game is preserved. Please try again."
 
@@ -7216,7 +7331,7 @@ msgstr "Couldn't load the model list"
 msgid "模型动画"
 msgstr "Model animation"
 
-#: src/lib/errors/messages.ts:365
+#: src/lib/errors/messages.ts:366
 msgid "模型包含网络地址或不安全路径，已阻止读取"
 msgstr "The model contains a network address or an unsafe path. Reading was blocked."
 
@@ -7299,7 +7414,7 @@ msgstr "Model display names must not exceed 80 characters or contain control cha
 msgid "模型校验失败，请移除未完成的下载后重试"
 msgstr "Model verification failed. Remove the incomplete download and try again."
 
-#: src/lib/errors/messages.ts:360
+#: src/lib/errors/messages.ts:361
 msgid "模型格式无效或文件已损坏，请检查后重新选择"
 msgstr "The model format is invalid or the file is damaged. Check the file and try again."
 
@@ -7314,7 +7429,7 @@ msgstr "Model inspector"
 msgid "模型缺少依赖文件，请补充选择"
 msgstr "The model is missing resource files. Select them to continue."
 
-#: src/lib/errors/messages.ts:368
+#: src/lib/errors/messages.ts:369
 msgid "模型解析失败，请检查模型与依赖文件是否完整"
 msgstr "Unable to decode the model. Check that the model and its resource files are complete."
 
@@ -7331,7 +7446,7 @@ msgstr "Model resources"
 msgid "模型资源过大，请选择较小的模型"
 msgstr "Model resources are too large. Choose a smaller model."
 
-#: src/lib/errors/messages.ts:367
+#: src/lib/errors/messages.ts:368
 msgid "模型超过检查上限，请选择较小的模型。"
 msgstr "This model exceeds the inspection limit. Choose a smaller model."
 
@@ -7399,7 +7514,7 @@ msgstr "Preparing to read"
 msgid "正在准备棋盘…"
 msgstr "Preparing the board…"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:438
+#: src/features/games/magic-cube/MagicCubeGame.tsx:443
 msgid "正在准备魔方…"
 msgstr "Preparing cube…"
 
@@ -7683,6 +7798,10 @@ msgstr "Loading execution details…"
 msgid "正在读取模型资源"
 msgstr "Reading model resources"
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:235
+msgid "正在读取进度"
+msgstr "Loading progress"
+
 #: src/features/lan-transfer/LanConnectedDevices.tsx:96
 msgid "正在进行的操作会被中断。"
 msgstr "Operations in progress will be interrupted."
@@ -7741,6 +7860,7 @@ msgstr "This client’s previous requests will be invalidated and unfinished ope
 msgid "此操作仅保留摘要。"
 msgstr "Only a summary is available for this operation."
 
+#: src/features/games/engine/GameRestoreDialog.tsx:66
 #: src/features/games/engine/GameSessionNotice.tsx:101
 msgid "此操作会删除该游戏的存档，无法继续上次的对局。"
 msgstr "This will delete the save for this game. You will not be able to continue the previous match."
@@ -7753,7 +7873,7 @@ msgstr "This material has no textures."
 msgid "此模型不包含动画"
 msgstr "This model has no animations."
 
-#: src/lib/errors/messages.ts:357
+#: src/lib/errors/messages.ts:358
 msgid "此模型的附件已达上限：最多 16 项、合计 32 MiB。"
 msgstr "This model has reached its attachment limit: 16 files or 32 MiB in total."
 
@@ -8274,6 +8394,10 @@ msgstr "Select one of your pieces, then a marked destination to move. Use the ar
 msgid "点击盖子立即翻开，或选择已翻开的己方棋子，再点击标记位置移动。"
 msgstr "Click a covered piece to reveal it, or select a revealed piece of your side and then a marked destination to move."
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:63
+msgid "点击空位上下左右的数字块，将它滑入空位。每次只能移动相邻的一块，不能跨格或斜向移动。"
+msgstr "Select a tile next to the empty space to slide it in. Only one adjacent tile can move at a time; tiles cannot jump or move diagonally."
+
 #: src/features/ssh-sftp/components/Sidebar.tsx:487
 msgid "点右上角 + 新建"
 msgstr "Use the + at the top right to create one"
@@ -8395,7 +8519,8 @@ msgstr "Player 2 wins"
 msgid "玩法"
 msgstr "Discipline"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:180
+#: src/features/games/magic-cube/MagicCubeGame.tsx:181
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:131
 msgid "玩法与操作"
 msgstr "How to play"
 
@@ -8428,7 +8553,7 @@ msgid "环形"
 msgstr "Ring"
 
 #. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
-#: src/lib/errors/messages.ts:383
+#: src/lib/errors/messages.ts:384
 msgid "球桌显示已中断，请重开对局。"
 msgstr "The table display was interrupted. Restart the match to continue."
 
@@ -8449,6 +8574,10 @@ msgstr "Generate poem translation"
 #: src/features/ai-configuration/AiWorkspaceMenu.tsx:47
 msgid "生成请求会发送到你配置的第三方服务，可能产生服务费用。"
 msgstr "Generation requests are sent to the third-party service you configure and may incur service fees."
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:72
+msgid "用 Tab 进入棋盘，方向键移动焦点，Enter 或空格移动当前数字块。方向键只改变焦点，不直接移动数字。"
+msgstr "Press Tab to enter the board, arrow keys to move focus, and Enter or Space to move the focused tile. Arrow keys change focus only; they do not slide tiles."
 
 #: src/features/ssh-sftp/components/monitor/MonitorSections.tsx:164
 msgid "用户"
@@ -8645,6 +8774,11 @@ msgstr "An Item With This Name Already Exists"
 msgid "目标已是最新"
 msgstr "Destination is up to date"
 
+#. 数字华容道完成时的数字排列示意
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:47
+msgid "目标排列"
+msgstr "Target arrangement"
+
 #: src/lib/errors/messages.ts:107
 msgid "目标文件正在上传，请稍后重试"
 msgstr "The destination file is being uploaded. Try again later."
@@ -8688,7 +8822,9 @@ msgstr "Delete host \"{value}\"? This action cannot be undone."
 msgid "确定删除共享目录“{pendingName}”？"
 msgstr "Delete shared directory “{pendingName}”?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:519
+#: src/features/games/engine/GameRestoreDialog.tsx:93
+#: src/features/games/magic-cube/MagicCubeGame.tsx:524
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:361
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:232
 msgid "确认"
 msgstr "Confirm"
@@ -8846,6 +8982,10 @@ msgstr "Move"
 msgid "移动到第 {position} 项"
 msgstr "Moved to position {position}"
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:240
+msgid "移动开始计时"
+msgstr "Move to start timing"
+
 #. 拖动控制自由相机前后左右；方向键也可移动。
 #: src/features/model-viewer/components/CanvasControls.tsx:37
 msgid "移动摇杆"
@@ -8926,6 +9066,10 @@ msgstr "Restart later"
 msgid "空位"
 msgstr "Empty space"
 
+#: src/features/games/sliding-puzzle/SlidingPuzzleBoard.tsx:138
+msgid "空位，第 {row} 行，第 {column} 列"
+msgstr "Empty space, row {row}, column {column}"
+
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:297
 msgid "空目录"
 msgstr "Empty Directory"
@@ -8989,6 +9133,10 @@ msgstr "Syntax error near line {resultLine}, column {resultColumn}"
 #: src/features/games/junqi/render/JunqiStage.tsx:278
 msgid "第 {row} 行第 {column} 列"
 msgstr "Row {row}, column {column}"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:83
+msgid "第一次有效移动开始计时，每滑动一块记一步。离开页面、进入后台或打开菜单与帮助时暂停，记录的是有效练习用时。"
+msgstr "Timing starts with your first valid move. Each tile slide counts as one move. Timing pauses when you leave, put the app in the background, or open a menu or help. This measures active practice time."
 
 #: src/features/games/engine/online/OnlineLobby.tsx:104
 msgid "等待对手加入…"
@@ -9123,9 +9271,9 @@ msgid "粘贴或输入 {languageLabel} 内容"
 msgstr "Paste or type {languageLabel} content"
 
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:51
-#: src/features/games/magic-cube/MagicCubeGame.tsx:317
-#: src/features/games/magic-cube/MagicCubeGame.tsx:464
-#: src/features/games/magic-cube/MagicCubeGame.tsx:474
+#: src/features/games/magic-cube/MagicCubeGame.tsx:318
+#: src/features/games/magic-cube/MagicCubeGame.tsx:469
+#: src/features/games/magic-cube/MagicCubeGame.tsx:479
 msgid "精确转动"
 msgstr "Precise controls"
 
@@ -9133,11 +9281,11 @@ msgstr "Precise controls"
 msgid "系统"
 msgstr "System"
 
-#: src/lib/errors/messages.ts:344
+#: src/lib/errors/messages.ts:345
 msgid "系统分享仅在移动应用中可用。"
 msgstr "System sharing is only available in the mobile app."
 
-#: src/lib/errors/messages.ts:343
+#: src/lib/errors/messages.ts:344
 msgid "系统导出未完成，请检查目标位置或分享应用后重试。"
 msgstr "System export did not complete. Check the destination or sharing app and try again."
 
@@ -9324,6 +9472,11 @@ msgstr "Counts unique objects with instances listed separately; face counts use 
 msgid "继续"
 msgstr "Continue"
 
+#. 小游戏进入页面时，询问是否恢复本地保存的进度
+#: src/features/games/engine/GameRestoreDialog.tsx:59
+msgid "继续上次游戏？"
+msgstr "Resume your game?"
+
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:68
 msgid "继续传输"
@@ -9357,7 +9510,7 @@ msgstr "Keep playing"
 msgid "继续朗读"
 msgstr "Resume reading"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:340
+#: src/features/games/engine/GameRestoreDialog.tsx:93
 msgid "继续游戏"
 msgstr "Continue game"
 
@@ -9676,7 +9829,7 @@ msgid "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转�
 msgstr "Free movement: WASD to move, Q/E for down/up, Shift to accelerate, drag to look around, Esc to exit. Tap a direction on the joystick to step, drag for continuous movement, or use the up/down buttons."
 
 #. 魔方未开始计时挑战，可自由操作
-#: src/features/games/magic-cube/MagicCubeGame.tsx:387
+#: src/features/games/magic-cube/MagicCubeGame.tsx:335
 msgid "自由练习"
 msgstr "Free practice"
 
@@ -9788,7 +9941,7 @@ msgstr "Overwrite: replace data in the included modules"
 msgid "覆盖已有数据？"
 msgstr "Overwrite existing data?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:308
+#: src/features/games/magic-cube/MagicCubeGame.tsx:309
 msgid "观察模式"
 msgstr "Observe mode"
 
@@ -9845,6 +9998,10 @@ msgstr "Planned"
 #: src/features/todo/TodoTimestamps.tsx:78
 msgid "计划时间"
 msgstr "Scheduled for"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:80
+msgid "计时与撤销"
+msgstr "Timing and undo"
 
 #. 按当前姿态重新计算源模型的世界轴对齐包围盒尺寸。
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:133
@@ -10260,7 +10417,7 @@ msgstr "Enter a valid target size"
 msgid "请输入路径"
 msgstr "Enter a path"
 
-#: src/lib/errors/messages.ts:361
+#: src/lib/errors/messages.ts:362
 msgid "请选择一个 GLB、glTF 或 FBX 模型文件"
 msgstr "Choose a GLB, glTF or FBX model file."
 
@@ -10531,7 +10688,7 @@ msgstr "Turn 180 degrees"
 msgid "转动与观察"
 msgstr "Turning and viewing"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:384
+#: src/features/games/magic-cube/MagicCubeGame.tsx:332
 msgid "转动开始计时"
 msgstr "Turn to start the timer"
 
@@ -10657,7 +10814,8 @@ msgstr "Back to list"
 msgid "返回古诗词"
 msgstr "Back to Classical Poetry"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:169
+#: src/features/games/magic-cube/MagicCubeGame.tsx:170
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:120
 msgid "返回小游戏"
 msgstr "Back to games"
 
@@ -10713,6 +10871,10 @@ msgstr "Reset preview"
 #: src/features/logs/LogDialogs.tsx:43
 msgid "这条历史摘要将被永久删除。当前执行详情和正在运行的任务不受影响。"
 msgstr "This saved summary will be permanently deleted. Current execution details and running tasks will not be affected."
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:129
+msgid "这条成绩记录无法读取。"
+msgstr "This result could not be read."
 
 #. 执行日志最近报告的进度计数及总量
 #: src/features/connection-diagnostics/ExecutionLogProgress.tsx:22
@@ -10780,7 +10942,7 @@ msgstr "rsync is not installed on the remote server. Install it and detect again
 msgid "远端解压中"
 msgstr "Extracting remotely"
 
-#: src/lib/errors/messages.ts:370
+#: src/lib/errors/messages.ts:371
 msgid "远端连接在终端打开前已关闭"
 msgstr "Remote connection closed before the terminal opened"
 
@@ -10907,7 +11069,7 @@ msgstr "Exit Match"
 msgid "退出当前对局？"
 msgstr "Exit the current match?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:408
+#: src/features/games/magic-cube/MagicCubeGame.tsx:360
 msgid "退出画布操作"
 msgstr "Stop interacting"
 
@@ -11114,7 +11276,7 @@ msgstr "Select output format"
 msgid "选择附件"
 msgstr "Choose an attachment"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:477
+#: src/features/games/magic-cube/MagicCubeGame.tsx:482
 msgid "选择面和层，再转动选中层。"
 msgstr "Choose a face and layer, then turn the selected layer."
 
@@ -11170,8 +11332,13 @@ msgstr "Collecting…"
 msgid "重做"
 msgstr "Redo"
 
+#. 恢复数字华容道刚撤销的移动
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:215
+msgid "重做移动"
+msgstr "Redo move"
+
 #. 恢复刚才撤销的魔方转层操作
-#: src/features/games/magic-cube/MagicCubeGame.tsx:291
+#: src/features/games/magic-cube/MagicCubeGame.tsx:292
 msgid "重做转动"
 msgstr "Redo turn"
 
@@ -11179,7 +11346,7 @@ msgstr "Redo turn"
 msgid "重启中"
 msgstr "Restarting"
 
-#: src/lib/errors/messages.ts:354
+#: src/lib/errors/messages.ts:355
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "Could not restart. Try again or reopen the app manually."
 
@@ -11220,7 +11387,7 @@ msgstr "Restart"
 msgid "重新加载"
 msgstr "Reload"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:455
+#: src/features/games/magic-cube/MagicCubeGame.tsx:460
 msgid "重新加载画布"
 msgstr "Reload canvas"
 
@@ -11228,7 +11395,16 @@ msgstr "Reload canvas"
 msgid "重新开始对局？"
 msgstr "Restart the match?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:499
+#. 恢复数字华容道本局最初排列并清零计时计步
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:157
+msgid "重新开始本局"
+msgstr "Restart puzzle"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:335
+msgid "重新开始本局？"
+msgstr "Restart this puzzle?"
+
+#: src/features/games/magic-cube/MagicCubeGame.tsx:504
 msgid "重新打乱魔方？"
 msgstr "Scramble the cube again?"
 
@@ -11306,15 +11482,15 @@ msgstr "Reset file transfer connection"
 msgid "重置状态已改变，请重新检查状态"
 msgstr "The reset has changed. Check its status again."
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:215
+#: src/features/games/magic-cube/MagicCubeGame.tsx:216
 msgid "重置视角"
 msgstr "Reset view"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:204
+#: src/features/games/magic-cube/MagicCubeGame.tsx:205
 msgid "重置魔方"
 msgstr "Reset cube"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:501
+#: src/features/games/magic-cube/MagicCubeGame.tsx:506
 msgid "重置魔方？"
 msgstr "Reset cube?"
 
@@ -11341,7 +11517,8 @@ msgstr "Reset returns the cube to its solved state. It does not find a solution 
 #: src/features/games/billiards/BilliardsGame.tsx:120
 #: src/features/games/engine/GameSessionNotice.tsx:75
 #: src/features/games/junqi/render/JunqiStage.tsx:204
-#: src/features/games/magic-cube/MagicCubeGame.tsx:354
+#: src/features/games/magic-cube/MagicCubeGame.tsx:398
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:293
 #: src/features/lan-transfer/LanTransferTool.tsx:88
 #: src/features/poetry/components/CollectionManagement.tsx:122
 #: src/features/poetry/components/PoemList.tsx:203
@@ -11431,6 +11608,7 @@ msgid "键升序"
 msgstr "Keys A→Z"
 
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:61
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:69
 msgid "键盘操作"
 msgstr "Keyboard controls"
 
@@ -11458,7 +11636,7 @@ msgid "阴影"
 msgstr "Shadows"
 
 #. 魔方每条边的小块数量，例如二阶、三阶
-#: src/features/games/magic-cube/MagicCubeGame.tsx:252
+#: src/features/games/magic-cube/MagicCubeGame.tsx:253
 msgid "阶数"
 msgstr "Size"
 
@@ -11466,7 +11644,7 @@ msgstr "Size"
 msgid "附件副本已保存。"
 msgstr "Attachment copy saved."
 
-#: src/lib/errors/messages.ts:356
+#: src/lib/errors/messages.ts:357
 msgid "附件无效。请选择 UTF-8 文本或 Markdown（最多 1 MiB），或 PDF（最多 8 MiB）。"
 msgstr "Invalid attachment. Choose UTF-8 text or Markdown (up to 1 MiB), or PDF (up to 8 MiB)."
 
@@ -11515,7 +11693,7 @@ msgstr "Hide password"
 msgid "隐藏身份"
 msgstr "Hidden identities"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:226
+#: src/features/games/magic-cube/MagicCubeGame.tsx:227
 msgid "隐藏面标识"
 msgstr "Hide face labels"
 
@@ -11685,7 +11863,7 @@ msgstr "High quality"
 
 #. 小游戏名称，指可转动的多阶立方体谜题
 #. 小游戏名称，指可转动的多阶立方体谜题
-#: src/features/games/magic-cube/MagicCubeGame.tsx:162
+#: src/features/games/magic-cube/MagicCubeGame.tsx:163
 #: src/features/home/entries.tsx:227
 msgid "魔方"
 msgstr "Magic cube"

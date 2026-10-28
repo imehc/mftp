@@ -337,6 +337,7 @@ export const frontendErrorMessages = {
   "games:checkpoint_delete": msg`无法删除对局存档，请重试。`,
   "magic-cube:render": msg`无法显示 3D 魔方。请重新加载画布；已提交的转动进度会保留。`,
   "magic-cube:history": msg`魔方已还原，但挑战记录尚未保存，请重试。`,
+  "sliding-puzzle:history": msg`数字华容道已完成，但成绩尚未保存，请重试。`,
   "model:export_invalid": msg`导出文件无效或超过 64 MiB，请重新生成。`,
   "model:export_capacity": msg`临时导出空间已满，请稍后重试。系统分享文件会保留至少 24 小时。`,
   "model:export_busy": msg`另一个系统导出尚未结束，请先完成或关闭系统面板。`,

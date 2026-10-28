@@ -42,12 +42,13 @@ import { describeError, frontendError } from "~/lib/errors";
 import { useMediaQuery } from "~/lib/use-media-query";
 import { useSettingsStore } from "~/store/settings";
 
+import { formatGameTime } from "../engine/format-game-time";
 import { GameActionsMenu } from "../engine/GameActionsMenu";
+import { GameRestoreDialog } from "../engine/GameRestoreDialog";
 import { GameSetupSelect } from "../engine/GameSetupSelect";
 import { useGameAudio } from "../engine/use-game-audio";
 import { createCubeAudio } from "./audio";
 import { faceMove } from "./engine";
-import { formatCubeTime } from "./labels";
 import { MagicCubeControls } from "./MagicCubeControls";
 import { MagicCubeHelp, MagicCubeHistory } from "./MagicCubeDialogs";
 import { type CubeStageHandle, MagicCubeStage } from "./render/MagicCubeStage";
@@ -317,29 +318,72 @@ export default function MagicCubeGame() {
             <Trans>精确转动</Trans>
           </Button>
         </div>
+        <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-x-4 gap-y-1 text-xs *:whitespace-nowrap">
+          <span className="text-muted-foreground" role="status">
+            {state.data.completed ? (
+              <span className="text-success flex items-center gap-1">
+                <Check className="size-3" />
+                <Trans>已还原</Trans>
+              </span>
+            ) : state.data.challenge ? (
+              state.data.started ? (
+                <Trans>挑战中</Trans>
+              ) : (
+                <Trans>转动开始计时</Trans>
+              )
+            ) : (
+              <Trans comment="魔方未开始计时挑战，可自由操作">自由练习</Trans>
+            )}
+          </span>
+          <span className="font-mono tabular-nums" aria-label={t`有效用时`}>
+            {formatGameTime(state.elapsedMs)}
+          </span>
+          <span>
+            <Plural
+              value={state.data.offset + state.data.cursor}
+              other="# 步"
+            />
+          </span>
+          {state.data.assisted && (
+            <span className="text-muted-foreground">
+              <Trans>使用过撤销</Trans>
+            </span>
+          )}
+          <Button
+            className="magic-cube-scroll-toggle"
+            size="sm"
+            variant="outline"
+            aria-pressed={interacting}
+            onClick={() => setInteracting(!interacting)}
+          >
+            {interacting ? (
+              <Trans>退出画布操作</Trans>
+            ) : (
+              <Trans>操作魔方</Trans>
+            )}
+          </Button>
+        </div>
       </div>
 
-      {(state.error || state.saved) && (
+      {state.saved && (
+        <GameRestoreDialog
+          description={<Trans>发现上次的魔方进度，是否继续？</Trans>}
+          busy={state.busy}
+          error={state.error ? describeError(state.error, t) : undefined}
+          onRestore={() => {
+            setReady(false);
+            store.restore();
+          }}
+          onDiscard={() => void store.discard()}
+        />
+      )}
+
+      {state.error && !state.saved && (
         <div className="shrink-0 p-3">
-          <Alert variant={state.error ? "destructive" : "default"}>
+          <Alert variant="destructive">
             <AlertDescription className="flex flex-col gap-2">
-              <span>
-                {state.error
-                  ? describeError(state.error, t)
-                  : t`发现上次的魔方进度，是否继续？`}
-              </span>
+              <span>{describeError(state.error, t)}</span>
               <div className="flex flex-wrap gap-2">
-                {state.saved && (
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setReady(false);
-                      store.restore();
-                    }}
-                  >
-                    <Trans>继续游戏</Trans>
-                  </Button>
-                )}
                 {state.error && (
                   <Button
                     size="sm"
@@ -354,7 +398,7 @@ export default function MagicCubeGame() {
                     <Trans>重试</Trans>
                   </Button>
                 )}
-                {(state.saved || state.status === "error") && (
+                {state.status === "error" && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -369,45 +413,6 @@ export default function MagicCubeGame() {
           </Alert>
         </div>
       )}
-
-      <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2 text-xs">
-        <span className="text-muted-foreground" role="status">
-          {state.data.completed ? (
-            <span className="text-success flex items-center gap-1">
-              <Check className="size-3" />
-              <Trans>已还原</Trans>
-            </span>
-          ) : state.data.challenge ? (
-            state.data.started ? (
-              <Trans>挑战中</Trans>
-            ) : (
-              <Trans>转动开始计时</Trans>
-            )
-          ) : (
-            <Trans comment="魔方未开始计时挑战，可自由操作">自由练习</Trans>
-          )}
-        </span>
-        <span className="font-mono tabular-nums" aria-label={t`有效用时`}>
-          {formatCubeTime(state.elapsedMs)}
-        </span>
-        <span>
-          <Plural value={state.data.offset + state.data.cursor} other="# 步" />
-        </span>
-        {state.data.assisted && (
-          <span className="text-muted-foreground">
-            <Trans>使用过撤销</Trans>
-          </span>
-        )}
-        <Button
-          className="magic-cube-scroll-toggle"
-          size="sm"
-          variant="outline"
-          aria-pressed={interacting}
-          onClick={() => setInteracting(!interacting)}
-        >
-          {interacting ? <Trans>退出画布操作</Trans> : <Trans>操作魔方</Trans>}
-        </Button>
-      </div>
 
       <div
         className="magic-cube-workspace app-scroll-safe-end"

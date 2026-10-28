@@ -13,8 +13,8 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 
+import { formatGameTime } from "../engine/format-game-time";
 import { useGameHistory } from "../engine/history";
-import { formatCubeTime } from "./labels";
 import type { CubeRecord } from "./types";
 
 export function MagicCubeHelp({
@@ -138,7 +138,7 @@ export function MagicCubeHistory({
                       </Trans>
                     </span>
                     <span className="font-mono tabular-nums">
-                      {formatCubeTime(payload.elapsedMs)}
+                      {formatGameTime(payload.elapsedMs)}
                     </span>
                     <span>
                       <Plural value={payload.moves} other="# 步" />

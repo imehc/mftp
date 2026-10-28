@@ -226,6 +226,15 @@ export const homeEntries: HomeEntry[] = [
     icon: Cuboid,
     title: <Trans comment="小游戏名称，指可转动的多阶立方体谜题">魔方</Trans>,
   },
+  {
+    id: "sliding-puzzle",
+    category: "games",
+    link: linkOptions({ to: "/games/sliding-puzzle", preload: "intent" }),
+    icon: Grid3x3,
+    title: (
+      <Trans comment="小游戏名，滑动数字方块填入空位并排序">数字华容道</Trans>
+    ),
+  },
 ];
 export const currentHomePlatform: HomePlatform = isAndroidPlatform()
   ? "android"

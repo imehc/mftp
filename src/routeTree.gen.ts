@@ -20,6 +20,7 @@ import { Route as GamesGoRouteImport } from './routes/games/go'
 import { Route as GamesGomokuRouteImport } from './routes/games/gomoku'
 import { Route as GamesJunqiRouteImport } from './routes/games/junqi'
 import { Route as GamesMagicCubeRouteImport } from './routes/games/magic-cube'
+import { Route as GamesSlidingPuzzleRouteImport } from './routes/games/sliding-puzzle'
 import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
@@ -90,6 +91,11 @@ const GamesJunqiRoute = GamesJunqiRouteImport.update({
 const GamesMagicCubeRoute = GamesMagicCubeRouteImport.update({
   id: '/games/magic-cube',
   path: '/games/magic-cube',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesSlidingPuzzleRoute = GamesSlidingPuzzleRouteImport.update({
+  id: '/games/sliding-puzzle',
+  path: '/games/sliding-puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesXiangqiRoute = GamesXiangqiRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
   '/games/magic-cube': typeof GamesMagicCubeRoute
+  '/games/sliding-puzzle': typeof GamesSlidingPuzzleRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
   '/games/magic-cube': typeof GamesMagicCubeRoute
+  '/games/sliding-puzzle': typeof GamesSlidingPuzzleRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/games/gomoku': typeof GamesGomokuRoute
   '/games/junqi': typeof GamesJunqiRoute
   '/games/magic-cube': typeof GamesMagicCubeRoute
+  '/games/sliding-puzzle': typeof GamesSlidingPuzzleRoute
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/junqi'
     | '/games/magic-cube'
+    | '/games/sliding-puzzle'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/junqi'
     | '/games/magic-cube'
+    | '/games/sliding-puzzle'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/games/gomoku'
     | '/games/junqi'
     | '/games/magic-cube'
+    | '/games/sliding-puzzle'
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
@@ -363,6 +375,7 @@ export interface RootRouteChildren {
   GamesGomokuRoute: typeof GamesGomokuRoute
   GamesJunqiRoute: typeof GamesJunqiRoute
   GamesMagicCubeRoute: typeof GamesMagicCubeRoute
+  GamesSlidingPuzzleRoute: typeof GamesSlidingPuzzleRoute
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   LibraryIdRoute: typeof LibraryIdRoute
   LibraryManageRoute: typeof LibraryManageRoute
@@ -458,6 +471,13 @@ declare module '@tanstack/react-router' {
       path: '/games/magic-cube'
       fullPath: '/games/magic-cube'
       preLoaderRoute: typeof GamesMagicCubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/sliding-puzzle': {
+      id: '/games/sliding-puzzle'
+      path: '/games/sliding-puzzle'
+      fullPath: '/games/sliding-puzzle'
+      preLoaderRoute: typeof GamesSlidingPuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/xiangqi': {
@@ -587,6 +607,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesGomokuRoute: GamesGomokuRoute,
   GamesJunqiRoute: GamesJunqiRoute,
   GamesMagicCubeRoute: GamesMagicCubeRoute,
+  GamesSlidingPuzzleRoute: GamesSlidingPuzzleRoute,
   GamesXiangqiRoute: GamesXiangqiRoute,
   LibraryIdRoute: LibraryIdRoute,
   LibraryManageRoute: LibraryManageRoute,

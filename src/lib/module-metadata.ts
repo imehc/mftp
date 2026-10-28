@@ -50,6 +50,7 @@ export const modules = [
   { id: "xiangqi", tool: null },
   { id: "junqi", tool: null },
   { id: "magic-cube", tool: null },
+  { id: "sliding-puzzle", tool: null },
 ] as const satisfies readonly ModuleMetadata[];
 
 export type ModuleId = (typeof modules)[number]["id"];
