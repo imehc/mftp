@@ -15,7 +15,7 @@ import {
 } from "~/components/ui/select";
 
 import type { Difficulty } from "./ai";
-import { useGameHistory, useGamesHistoryStore } from "./history";
+import { GameHistoryPanel } from "./GameHistory";
 import type { SeatIndex } from "./types";
 
 export type BoardMode =
@@ -55,7 +55,7 @@ export function GameSelect({
   );
 }
 
-/** 三种棋类共用模式骨架，游戏规则和历史文案仍由各模块提供。 */
+/** 棋类共用模式骨架，游戏规则和历史文案仍由各模块提供。 */
 export function BoardModeMenu<P extends { moves: number }>({
   gameId,
   red = false,
@@ -79,11 +79,9 @@ export function BoardModeMenu<P extends { moves: number }>({
   setup?: ReactNode;
   seatLabels?: [ReactNode, ReactNode];
 }) {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [localSeat, setLocalSeat] = useState<SeatIndex>(0);
-  const records = useGameHistory<P>(gameId);
-  const clear = useGamesHistoryStore((s) => s.clearGame);
   return (
     <AppPageContent bottomInset="scroll">
       {setup}
@@ -175,62 +173,22 @@ export function BoardModeMenu<P extends { moves: number }>({
           </section>
         ) : null}
       </div>
-      <section className="rounded-xl border p-3">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold">
-            <Trans>历史记录</Trans>
-          </h2>
-          {records.length ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              density="adaptive"
-              onClick={() => clear(gameId)}
-            >
-              <Trans comment="清除此游戏在本机保存的对局记录">清空</Trans>
-            </Button>
-          ) : null}
-        </div>
-        {records.length ? (
-          <ul className="mt-2 divide-y">
-            {records.slice(0, 12).map((record) => (
-              <li
-                key={record.id}
-                className="flex min-w-0 items-center justify-between gap-3 py-3 text-xs"
-              >
-                <div className="min-w-0">
-                  <div className="truncate font-medium">
-                    {historyMode(record.payload)}
-                  </div>
-                  <time
-                    className="text-muted-foreground mt-1 block tabular-nums"
-                    dateTime={new Date(record.finishedAt).toISOString()}
-                  >
-                    {new Intl.DateTimeFormat(i18n.locale, {
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(record.finishedAt)}
-                  </time>
-                </div>
-                <span className="shrink-0 text-right">
-                  {historyResult(record.payload)} ·{" "}
-                  <Plural
-                    value={{ moveCount: record.payload.moves }}
-                    one="# 手"
-                    other="# 手"
-                  />
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted-foreground mt-3 text-sm">
-            <Trans>暂无对局记录</Trans>
-          </p>
-        )}
-      </section>
+      <GameHistoryPanel<P>
+        gameId={gameId}
+        renderRecord={(payload) => ({
+          details: historyMode(payload),
+          result: (
+            <>
+              {historyResult(payload)} ·{" "}
+              <Plural
+                value={{ moveCount: payload.moves }}
+                one="# 手"
+                other="# 手"
+              />
+            </>
+          ),
+        })}
+      />
     </AppPageContent>
   );
 }

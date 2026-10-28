@@ -8,8 +8,8 @@ import { Button } from "~/components/ui/button";
 
 import type { Difficulty } from "../engine/ai";
 import { GameSelect } from "../engine/BoardModeMenu";
+import { GameHistoryPanel } from "../engine/GameHistory";
 import { GameSetupSelect } from "../engine/GameSetupSelect";
-import { useGameHistory, useGamesHistoryStore } from "../engine/history";
 import {
   BILLIARDS_GAME_ID,
   type BilliardsDiscipline,
@@ -48,15 +48,6 @@ function historyResult(payload: BilliardsHistoryPayload) {
   );
 }
 
-function formatHistoryTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleString(undefined, {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export function BilliardsModeMenu({
   discipline,
   onDisciplineChange,
@@ -72,8 +63,6 @@ export function BilliardsModeMenu({
     discipline === "snooker" ? ({ discipline, reds } as const) : { discipline };
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [playerBreaks, setPlayerBreaks] = useState(true);
-  const records = useGameHistory<BilliardsHistoryPayload>(BILLIARDS_GAME_ID);
-  const clearGame = useGamesHistoryStore((s) => s.clearGame);
   return (
     <AppPageContent bottomInset="scroll">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -175,72 +164,51 @@ export function BilliardsModeMenu({
           ))}
         </section>
       </div>
-      {records.length > 0 ? (
-        <div className="border-border @container flex flex-col gap-2 rounded-xl border p-3">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-xs font-medium">
-              <Trans>历史记录</Trans>
-            </span>
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() => clearGame(BILLIARDS_GAME_ID)}
-            >
-              <Trans>清空</Trans>
-            </Button>
-          </div>
-          <ul className="flex max-h-44 flex-col gap-2 overflow-auto text-xs @lg:gap-1">
-            {records.slice(0, 12).map((record) => (
-              <li
-                key={record.id}
-                className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-3 gap-y-1 @lg:grid-cols-[auto_minmax(0,1fr)_auto]"
-              >
-                <span className="text-muted-foreground col-start-1 row-start-1 text-left whitespace-nowrap tabular-nums">
-                  {formatHistoryTime(record.finishedAt)}
-                </span>
-                <span className="col-span-2 row-start-2 min-w-0 @lg:col-span-1 @lg:col-start-2 @lg:row-start-1 @lg:text-center">
-                  {record.payload.discipline === "snooker" ? (
-                    <span>
-                      <Trans>斯诺克</Trans>
-                      {" · "}
-                      {record.payload.reds === 6 ? (
-                        <Trans>六红球</Trans>
-                      ) : record.payload.reds === 10 ? (
-                        <Trans>十红球变体</Trans>
-                      ) : (
-                        <Trans>十五红球</Trans>
-                      )}
-                    </span>
-                  ) : record.payload.discipline === "nine-ball" ? (
-                    <Trans>美式九球</Trans>
+      <GameHistoryPanel<BilliardsHistoryPayload>
+        gameId={BILLIARDS_GAME_ID}
+        renderRecord={(payload) => ({
+          details: (
+            <>
+              {payload.discipline === "snooker" ? (
+                <span>
+                  <Trans>斯诺克</Trans>
+                  {" · "}
+                  {payload.reds === 6 ? (
+                    <Trans>六红球</Trans>
+                  ) : payload.reds === 10 ? (
+                    <Trans>十红球变体</Trans>
                   ) : (
-                    <Trans>中式八球</Trans>
+                    <Trans>十五红球</Trans>
                   )}
-                  {" · "}
-                  {historyModeLabel(record.payload)}
                 </span>
-                <span className="text-muted-foreground col-start-2 row-start-1 min-w-0 text-right @lg:col-start-3">
-                  {historyResult(record.payload)}
-                  {record.payload.scores ? (
-                    <span className="whitespace-nowrap tabular-nums">
-                      {" · "}
-                      {record.payload.scores.join(" : ")}
-                    </span>
-                  ) : null}
+              ) : payload.discipline === "nine-ball" ? (
+                <Trans>美式九球</Trans>
+              ) : (
+                <Trans>中式八球</Trans>
+              )}
+              {" · "}
+              {historyModeLabel(payload)}
+            </>
+          ),
+          result: (
+            <>
+              {historyResult(payload)}
+              {payload.scores ? (
+                <span className="whitespace-nowrap tabular-nums">
                   {" · "}
-                  <Plural
-                    value={{
-                      shotCount: record.payload.shots,
-                    }}
-                    one="# 杆"
-                    other="# 杆"
-                  />
+                  {payload.scores.join(" : ")}
                 </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+              ) : null}
+              {" · "}
+              <Plural
+                value={{ shotCount: payload.shots }}
+                one="# 杆"
+                other="# 杆"
+              />
+            </>
+          ),
+        })}
+      />
     </AppPageContent>
   );
 }

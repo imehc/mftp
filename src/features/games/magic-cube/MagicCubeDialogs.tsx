@@ -14,6 +14,7 @@ import {
 } from "~/components/ui/empty";
 
 import { formatGameTime } from "../engine/format-game-time";
+import { GameHistoryClearButton, GameHistoryList } from "../engine/GameHistory";
 import { useGameHistory } from "../engine/history";
 import type { CubeRecord } from "./types";
 
@@ -113,8 +114,8 @@ export function MagicCubeHistory({
   const records = useGameHistory<CubeRecord>("magic-cube");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent placement="responsive-sheet">
-        <DialogLayoutHeader>
+      <DialogLayoutContent placement="responsive-sheet" showCloseButton={false}>
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>魔方挑战记录</Trans>
           </DialogTitle>
@@ -124,34 +125,39 @@ export function MagicCubeHistory({
         </DialogLayoutHeader>
         <DialogLayoutBody>
           {records.length ? (
-            <ul className="divide-border divide-y">
-              {records.map(({ id, payload }) => {
-                const order = payload.order;
-                return (
-                  <li
-                    key={id}
-                    className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
-                  >
-                    <span>
-                      <Trans comment="魔方阶数，order 是每条边的小块数量">
-                        {order} 阶魔方
-                      </Trans>
-                    </span>
-                    <span className="font-mono tabular-nums">
-                      {formatGameTime(payload.elapsedMs)}
-                    </span>
-                    <span>
-                      <Plural value={payload.moves} other="# 步" />
-                    </span>
-                    {payload.assisted && (
-                      <span className="text-muted-foreground text-xs">
-                        <Trans>使用过撤销</Trans>
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="flex min-w-0 flex-col gap-2">
+              <div className="flex justify-end">
+                <GameHistoryClearButton gameId="magic-cube" />
+              </div>
+              <GameHistoryList
+                records={records}
+                renderRecord={(payload) => {
+                  const order = payload.order;
+                  return {
+                    details: (
+                      <>
+                        <Trans comment="魔方阶数，order 是每条边的小块数量">
+                          {order} 阶魔方
+                        </Trans>
+                        {payload.assisted && (
+                          <>
+                            {" · "}
+                            <Trans>使用过撤销</Trans>
+                          </>
+                        )}
+                      </>
+                    ),
+                    result: (
+                      <>
+                        {formatGameTime(payload.elapsedMs)}
+                        {" · "}
+                        <Plural value={payload.moves} other="# 步" />
+                      </>
+                    ),
+                  };
+                }}
+              />
+            </div>
           ) : (
             <Empty>
               <EmptyHeader>

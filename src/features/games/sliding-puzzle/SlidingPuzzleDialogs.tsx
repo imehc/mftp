@@ -15,6 +15,7 @@ import {
 } from "~/components/ui/empty";
 
 import { formatGameTime } from "../engine/format-game-time";
+import { GameHistoryClearButton, GameHistoryList } from "../engine/GameHistory";
 import { useGameHistory } from "../engine/history";
 import { puzzleRecordSchema } from "./checkpoint";
 import { PUZZLE_ID, type PuzzleSize } from "./types";
@@ -106,8 +107,8 @@ export function SlidingPuzzleHistory({ open, onOpenChange }: DialogProps) {
   const entries = useGameHistory(PUZZLE_ID);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogLayoutContent placement="responsive-sheet">
-        <DialogLayoutHeader>
+      <DialogLayoutContent placement="responsive-sheet" showCloseButton={false}>
+        <DialogLayoutHeader showCloseButton>
           <DialogTitle>
             <Trans>数字华容道成绩</Trans>
           </DialogTitle>
@@ -117,42 +118,43 @@ export function SlidingPuzzleHistory({ open, onOpenChange }: DialogProps) {
         </DialogLayoutHeader>
         <DialogLayoutBody>
           {entries.length ? (
-            <ul className="divide-border divide-y">
-              {entries.map((entry) => {
-                const parsed = puzzleRecordSchema.safeParse(entry.payload);
-                if (!parsed.success)
-                  return (
-                    <li
-                      key={entry.id}
-                      className="text-muted-foreground py-3 text-sm"
-                    >
-                      <Trans>这条成绩记录无法读取。</Trans>
-                    </li>
-                  );
-                const { size, elapsedMs, moves, assisted } = parsed.data;
-                return (
-                  <li
-                    key={entry.id}
-                    className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
-                  >
-                    <span>
-                      {size} × {size}
-                    </span>
-                    <span className="font-mono tabular-nums">
-                      {formatGameTime(elapsedMs)}
-                    </span>
-                    <span>
-                      <Plural value={moves} other="# 步" />
-                    </span>
-                    {assisted && (
-                      <span className="text-muted-foreground text-xs">
-                        <Trans>使用过撤销</Trans>
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="flex min-w-0 flex-col gap-2">
+              <div className="flex justify-end">
+                <GameHistoryClearButton gameId={PUZZLE_ID} />
+              </div>
+              <GameHistoryList
+                records={entries}
+                renderRecord={(payload) => {
+                  const parsed = puzzleRecordSchema.safeParse(payload);
+                  if (!parsed.success)
+                    return {
+                      details: <Trans>这条成绩记录无法读取。</Trans>,
+                      result: null,
+                    };
+                  const { size, elapsedMs, moves, assisted } = parsed.data;
+                  return {
+                    details: (
+                      <>
+                        {size} × {size}
+                        {assisted && (
+                          <>
+                            {" · "}
+                            <Trans>使用过撤销</Trans>
+                          </>
+                        )}
+                      </>
+                    ),
+                    result: (
+                      <>
+                        {formatGameTime(elapsedMs)}
+                        {" · "}
+                        <Plural value={moves} other="# 步" />
+                      </>
+                    ),
+                  };
+                }}
+              />
+            </div>
           ) : (
             <Empty>
               <EmptyHeader>
