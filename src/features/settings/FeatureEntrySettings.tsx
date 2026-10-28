@@ -8,13 +8,13 @@ import {
 } from "@dnd-kit/core";
 import {
   arrayMove,
+  rectSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { Gamepad2, GripVertical, LayoutGrid } from "lucide-react";
 import { useState } from "react";
 
@@ -116,11 +116,13 @@ function CategoryOrder({ category }: { category: HomeCategory }) {
         setOrder(category, next);
       }}
     >
-      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-        <div className="grid gap-2">
-          {entries.map((entry) => (
-            <SortableFeatureEntry key={entry.id} entry={entry} />
-          ))}
+      <SortableContext items={ids} strategy={rectSortingStrategy}>
+        <div className="@container/feature-entries">
+          <div className="grid grid-cols-1 gap-2 @min-[32rem]/feature-entries:grid-cols-2">
+            {entries.map((entry) => (
+              <SortableFeatureEntry key={entry.id} entry={entry} />
+            ))}
+          </div>
         </div>
       </SortableContext>
     </DndContext>
@@ -148,17 +150,10 @@ export default function FeatureEntrySettings() {
   const categoryVisible =
     !hiddenCategories.includes(category) && hasVisibleEntries;
   return (
-    <section className="bg-card min-w-0 rounded-xl border p-3">
-      <div className="mb-3 flex items-start gap-3">
-        <span className="bg-muted flex size-8 shrink-0 items-center justify-center rounded-lg">
-          <LayoutGrid aria-hidden className="size-4" />
-        </span>
-        <div className="min-w-0">
-          <h2 className="text-sm font-semibold">
-            <Trans>功能入口</Trans>
-          </h2>
-        </div>
-      </div>
+    <section
+      aria-label={t`功能入口`}
+      className="bg-card min-w-0 rounded-xl border p-3"
+    >
       <Tabs
         value={category}
         onValueChange={(value) => setCategory(value as HomeCategory)}
@@ -191,13 +186,13 @@ export default function FeatureEntrySettings() {
             }}
           />
         </SettingsControl>
-        <TabsContent value="tools" className="mt-3">
+        <TabsContent value="tools">
           <CategoryOrder category="tools" />
         </TabsContent>
-        <TabsContent value="library" className="mt-3">
+        <TabsContent value="library">
           <CategoryOrder category="library" />
         </TabsContent>
-        <TabsContent value="games" className="mt-3">
+        <TabsContent value="games">
           <CategoryOrder category="games" />
         </TabsContent>
       </Tabs>

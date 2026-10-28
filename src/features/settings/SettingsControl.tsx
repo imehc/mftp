@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -29,7 +30,10 @@ export default function SettingsControl({
   return (
     <Field
       orientation="horizontal"
-      className="min-h-[max(44px,4rem)] gap-3 border-b px-1 py-2 last:border-0 has-[>[data-slot=field-content]]:items-center"
+      className={cn(
+        "gap-3 border-b px-1 py-2 last:border-0 has-[>[data-slot=field-content]]:items-center",
+        compact ? "min-h-12" : "min-h-[max(44px,4rem)]",
+      )}
     >
       <span className="bg-muted flex size-8 shrink-0 items-center justify-center rounded-lg">
         <Icon aria-hidden className="size-4" />
