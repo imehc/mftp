@@ -412,7 +412,7 @@ msgstr "The AI database is newer than this app. Please update the app."
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:133
 #: src/features/logs/use-activity-logs.ts:37
-#: src/features/settings/SettingsOverview.tsx:70
+#: src/features/settings/SettingsOverview.tsx:26
 #: src/features/settings/SettingsPage.tsx:44
 msgid "AI 服务"
 msgstr "AI Service"
@@ -1990,7 +1990,7 @@ msgstr "Shared data buffers"
 msgid "关于"
 msgstr "About"
 
-#: src/features/settings/SettingsOverview.tsx:110
+#: src/features/settings/SettingsOverview.tsx:67
 msgid "关于与本地数据"
 msgstr "About and local data"
 
@@ -2590,12 +2590,12 @@ msgstr "Remaining {taskEtaValue}"
 msgid "力度"
 msgstr "Power"
 
-#: src/features/settings/SettingsOverview.tsx:67
+#: src/features/settings/SettingsOverview.tsx:23
 msgid "功能"
 msgstr "Features"
 
 #: src/features/settings/FeatureEntrySettings.tsx:154
-#: src/features/settings/SettingsOverview.tsx:76
+#: src/features/settings/SettingsOverview.tsx:32
 #: src/features/settings/SettingsPage.tsx:44
 msgid "功能入口"
 msgstr "Feature entries"
@@ -3661,10 +3661,6 @@ msgstr "Invalid backup format: field {field} is missing or has an invalid value"
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "Could not decrypt the backup: the password is incorrect or the file is damaged"
 
-#: src/features/settings/SettingsOverview.tsx:89
-msgid "备份本机数据"
-msgstr "Back up local data"
-
 #: src/features/todo/notes/TodoNoteEditor.tsx:81
 #: src/features/todo/TodoDetailsDialog.tsx:131
 #: src/features/todo/TodoItemDialog.tsx:288
@@ -3861,10 +3857,6 @@ msgstr "Byte size unknown"
 #: src/features/about/AboutPage.tsx:117
 msgid "存储"
 msgstr "Storage"
-
-#: src/features/settings/SettingsOverview.tsx:111
-msgid "存储、清理与项目帮助"
-msgstr "Storage, cleanup and project help"
 
 #. 模型库磁盘逻辑字节数和可清理缩略图缓存设置。
 #: src/features/model-viewer/components/LibraryPanel.tsx:192
@@ -4832,7 +4824,7 @@ msgstr "Draw"
 msgid "并排"
 msgstr "Row"
 
-#: src/features/settings/SettingsOverview.tsx:97
+#: src/features/settings/SettingsOverview.tsx:52
 msgid "应用"
 msgstr "Application"
 
@@ -6005,12 +5997,12 @@ msgstr "How to play the sliding puzzle"
 msgid "数据"
 msgstr "Data"
 
-#: src/features/settings/SettingsOverview.tsx:85
+#: src/features/settings/SettingsOverview.tsx:41
 msgid "数据与运行"
 msgstr "Data and runtime"
 
 #: src/features/export/BackupPage.tsx:49
-#: src/features/settings/SettingsOverview.tsx:88
+#: src/features/settings/SettingsOverview.tsx:44
 msgid "数据导入与导出"
 msgstr "Import and export data"
 
@@ -6324,7 +6316,7 @@ msgstr "Pointer lock is unavailable. Drag the canvas to look around."
 #. 活动中心页签，统一展示历史操作摘要与当前执行详情
 #: src/features/activity/ActivityCenter.tsx:53
 #: src/features/settings/AppSettingsMenu.tsx:93
-#: src/features/settings/SettingsOverview.tsx:100
+#: src/features/settings/SettingsOverview.tsx:56
 msgid "日志"
 msgstr "Logs"
 
@@ -6340,10 +6332,6 @@ msgstr "Logs cleared"
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:101
 msgid "日志操作"
 msgstr "Log actions"
-
-#: src/features/settings/SettingsOverview.tsx:46
-msgid "日志文件夹"
-msgstr "Log folder"
 
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:190
 msgid "日志记录"
@@ -7143,11 +7131,7 @@ msgstr "View note images"
 msgid "查看完整发布说明"
 msgstr "View full release notes"
 
-#: src/features/settings/SettingsOverview.tsx:53
-msgid "查看应用专属日志目录"
-msgstr "View the app log directory"
-
-#: src/features/settings/SettingsOverview.tsx:101
+#: src/features/settings/SettingsOverview.tsx:58
 msgid "查看操作和失败原因"
 msgstr "View operations and failure details"
 
@@ -10654,7 +10638,7 @@ msgstr "Reposition cue ball"
 msgid "调整顺序"
 msgstr "Reorder"
 
-#: src/features/settings/SettingsOverview.tsx:77
+#: src/features/settings/SettingsOverview.tsx:33
 msgid "调整首页功能的显示顺序"
 msgstr "Adjust the order of features on the home page"
 
@@ -11034,7 +11018,7 @@ msgstr "Connect"
 msgid "连接 AI 服务超时"
 msgstr "The connection to the AI service timed out"
 
-#: src/features/settings/SettingsOverview.tsx:71
+#: src/features/settings/SettingsOverview.tsx:27
 msgid "连接与模型设置"
 msgstr "Connections and models"
 
