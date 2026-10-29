@@ -2,7 +2,8 @@
 //! channel. One thread owns both sides so EOF and cancellation stay ordered.
 
 use super::super::diagnostics::{call, unit};
-use super::bridge::{bridge_error, local_exit, push_tail, BridgeOptions, LocalRsync, STDERR_LIMIT};
+use super::bridge::{bridge_error, local_exit, BridgeOptions};
+use super::local::{push_tail, LocalRsync, STDERR_LIMIT};
 use super::protocol::remote_command_line;
 use crate::core::diagnostics::context;
 use crate::error::{AppError, AppResult, CustomErrorCode};

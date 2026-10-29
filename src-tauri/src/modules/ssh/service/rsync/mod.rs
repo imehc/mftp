@@ -4,6 +4,7 @@
 mod bridge;
 mod capability;
 mod helper;
+mod local;
 mod preview;
 mod protocol;
 mod spec;

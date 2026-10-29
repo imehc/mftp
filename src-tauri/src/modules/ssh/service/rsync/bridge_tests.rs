@@ -1,6 +1,6 @@
 use super::super::super::types::AuthMethod;
 use super::*;
-use std::ffi::OsStr;
+use std::ffi::{OsStr, OsString};
 
 fn options<'a>(local_rsync: &'a Path, direction: RsyncDirection) -> BridgeOptions<'a> {
     BridgeOptions {
