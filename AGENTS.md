@@ -3,7 +3,7 @@
 ## 技术栈
 
 - Tauri v2，支持桌面、Android、iOS；各端独立运行，不依赖另一端提供能力。
-- 前端：React 19 + TypeScript + Vite + TanStack Router + Zustand。
+- 前端：React 19 + TypeScript + Vite + TanStack Router / Query + Zustand。
 - UI：shadcn/ui + Tailwind v4；动画用 gsap，长列表用 `@tanstack/react-virtual`。
 - 后端：Rust + ssh2/libssh2 + SQLite；IPC 类型由 Specta 生成。
 - 包管理器：pnpm；国际化：Lingui；前端测试：Vitest。
@@ -49,6 +49,8 @@ src-tauri/src/
 - TS/TSX/Rust 文件最多 600 行；shadcn `components/ui/`、`bindings.ts`、`routeTree.gen.ts` 除外。
 - 前端注释用中文，Rust 注释用英文；解释非直观逻辑、协议、并发和生命周期的原因。
 - 业务归所属 feature/module，公共层只放共用能力；临时状态留页面，跨页资源按自身生命周期管理。
+- 可缓存的后端读取由 TanStack Query 持有唯一响应，查询 key 包含完整资源身份；查询定义归 feature，Zustand 保留偏好、草稿和运行期准入。沿用共享客户端的离线可读、禁用自动重试与焦点/重连刷新默认值。
+- 密码、token、配对码、临时访问 URL、原始文件字节和原生句柄不得进入 Query/Mutation 缓存。写操作、认证、流式任务和 worker 生命周期保持显式控制；取消查询只放弃旧结果，不视为原生任务已退出。写后失效覆盖源/目标资源，刷新错误不改变写入成功事实；分区清理和 reset 使用共享清理入口，迟到写回须核对数据分区与运行期代次。
 - IPC 统一走 `src/lib/ipc.ts`，事件统一走 `src/lib/events.ts`；契约在 Rust 定义，由 Specta 自动生成前端类型。
 - IPC 契约变更后运行 `pnpm bindings:generate`；开发类型包含所有平台命令，应用注册表按目标裁剪。
 - 新功能沿用统一注册入口：前端接入路由、模块元数据和平台守卫；后端在 `app/registry` 登记命令与事件类型，同步 `command_baseline.txt`，由 `app/services` 装配。
