@@ -14,9 +14,12 @@ export function createQueryResource<T>(
   onInvalidate?: () => void,
 ) {
   const options = ipcQuery(key, read);
-  let listeners = 0;
+  const listeners = new Set<() => void>();
+
+  let disconnect = () => {};
+
   let started = false;
-  return {
+  const resource = {
     client,
     options,
     get: () => client.getQueryData<T>(key),
@@ -37,38 +40,41 @@ export function createQueryResource<T>(
       client.removeQueries({ queryKey: key, exact: true });
     },
     subscribe(notify: () => void) {
-      listeners++;
-      // 观察者只维持缓存寿命；首次读取仍由控制器的运行期准入。
-      const observer = new QueryObserver(client, {
-        ...options,
-        enabled: false,
-      });
-      const unobserve = observer.subscribe(() => notify());
-      const unsubscribe = client.getQueryCache().subscribe((event) => {
-        if (event.query.queryHash !== observer.getCurrentQuery().queryHash)
-          return;
-        if (event.type === "added")
-          observer.setOptions({ ...options, enabled: false });
-        notify();
-        if (
-          event.type === "updated" &&
-          event.action.type === "invalidate" &&
-          listeners > 0 &&
-          started
-        ) {
-          // 已启动的控制器响应外部失效；尚未读取的 BT 等资源不能因此被初始化。
-          if (onInvalidate) onInvalidate();
-          else void this.fetch(true).catch(() => {});
-        }
-      });
+      listeners.add(notify);
+      if (listeners.size === 1) {
+        // 每个资源只保留一个观察者维持缓存寿命；读取仍由控制器准入。
+        const observed = { ...options, enabled: false };
+        const observer = new QueryObserver(client, observed);
+        const unobserve = observer.subscribe(() => {});
+        const unsubscribe = client.getQueryCache().subscribe((event) => {
+          if (event.query.queryHash !== observer.getCurrentQuery().queryHash)
+            return;
+          if (event.type === "added") observer.setOptions(observed);
+          if (!["added", "removed", "updated"].includes(event.type)) return;
+          listeners.forEach((listener) => listener());
+          if (
+            event.type === "updated" &&
+            event.action.type === "invalidate" &&
+            started
+          ) {
+            // 多个消费者只触发一次失效；未启动的 BT 等资源不能因此被初始化。
+            if (onInvalidate) onInvalidate();
+            else void resource.fetch(true).catch(() => {});
+          }
+        });
+        disconnect = () => {
+          unsubscribe();
+          unobserve();
+          observer.destroy();
+        };
+      }
       return () => {
-        listeners--;
-        unsubscribe();
-        unobserve();
-        observer.destroy();
+        listeners.delete(notify);
+        if (!listeners.size) disconnect();
       };
     },
   };
+  return resource;
 }
 
 export type QueryResource<T> = ReturnType<typeof createQueryResource<T>>;

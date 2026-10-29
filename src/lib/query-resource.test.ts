@@ -138,3 +138,30 @@ it("控制器失效回调负责写锁准入，失效本身不绕开它读取", a
   expect(read).toHaveBeenCalledOnce();
   stop();
 });
+
+it("多个消费者共用观察者和失效处理，最后离开时释放", async () => {
+  const cache = client();
+  const read = vi.fn(async () => [1]);
+  const invalidate = vi.fn();
+  const resource = createQueryResource(["shared"], read, cache, invalidate);
+  const first = vi.fn();
+  const second = vi.fn();
+  const stopFirst = resource.subscribe(first);
+  const stopSecond = resource.subscribe(second);
+  await resource.fetch();
+  const query = () => cache.getQueryCache().find({ queryKey: ["shared"] })!;
+  expect(query().getObserversCount()).toBe(1);
+  await cache.invalidateQueries({ queryKey: ["shared"] });
+  expect(invalidate).toHaveBeenCalledOnce();
+  stopFirst();
+  first.mockClear();
+  cache.setQueryData(["shared"], [2]);
+  expect(first).not.toHaveBeenCalled();
+  expect(second).toHaveBeenCalled();
+  cache.removeQueries({ queryKey: ["shared"] });
+  await resource.fetch();
+  expect(query().getObserversCount()).toBe(1);
+  expect(resource.get()).toEqual([1]);
+  stopSecond();
+  expect(query().getObserversCount()).toBe(0);
+});

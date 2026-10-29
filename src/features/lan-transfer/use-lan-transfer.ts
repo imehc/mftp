@@ -81,47 +81,37 @@ export function useLanTransfer() {
     await Promise.all([refreshCore(), refreshSecondary()]);
   }
 
-  async function refreshCore() {
+  async function read(
+    group: "core" | "secondary" | "runtime",
+    action: () => Promise<LanTransferStatus | void>,
+  ) {
     if (writing) return;
     const epoch = reads.current.epoch;
-    const request = ++reads.current.core;
+    const request = ++reads.current[group];
     const current = () =>
-      epoch === reads.current.epoch && request === reads.current.core;
-    setLoading(true);
+      epoch === reads.current.epoch && request === reads.current[group];
+    const setError = {
+      core: setCoreError,
+      secondary: setSecondaryError,
+      runtime: setRuntimeError,
+    }[group];
+    if (group === "core") setLoading(true);
     try {
-      const next = await loadLanTransferCore();
+      const next = await action();
       if (!current()) return;
-      setCoreError(null);
-      setStatus(next.status);
+      setError(null);
+      if (next) setStatus(next);
     } catch (error) {
-      if (current()) setCoreError(toIpcError(error).payload);
+      if (current()) setError(toIpcError(error).payload);
     } finally {
-      if (current()) setLoading(false);
+      if (group === "core" && current()) setLoading(false);
     }
   }
 
-  async function refreshSecondary() {
-    if (writing) return;
-    const epoch = reads.current.epoch;
-    const request = ++reads.current.secondary;
-    const current = () =>
-      epoch === reads.current.epoch && request === reads.current.secondary;
-    try {
-      await loadLanTransferSecondary();
-      if (!current()) return;
-      setSecondaryError(null);
-    } catch (error) {
-      if (current()) setSecondaryError(toIpcError(error).payload);
-    }
-  }
-
-  async function refreshRuntime() {
-    if (writing) return;
-    const epoch = reads.current.epoch;
-    const request = ++reads.current.runtime;
-    const current = () =>
-      epoch === reads.current.epoch && request === reads.current.runtime;
-    try {
+  const refreshCore = () => read("core", loadLanTransferCore);
+  const refreshSecondary = () => read("secondary", loadLanTransferSecondary);
+  const refreshRuntime = () =>
+    read("runtime", async () => {
       const [nextStatus] = await Promise.all([
         ipc.lanTransferStatus(),
         lanQueries.devices.fetch(true),
@@ -129,13 +119,8 @@ export function useLanTransfer() {
         lanQueries.tasks.fetch(true),
         lanQueries.auth.fetch(true),
       ]);
-      if (!current()) return;
-      setRuntimeError(null);
-      setStatus(nextStatus);
-    } catch (error) {
-      if (current()) setRuntimeError(toIpcError(error).payload);
-    }
-  }
+      return nextStatus;
+    });
 
   const refreshOnInvalidation = useEffectEvent(refresh);
   useEffect(

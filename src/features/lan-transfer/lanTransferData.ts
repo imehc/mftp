@@ -3,23 +3,22 @@ import * as ipc from "~/lib/ipc";
 import { lanQueries } from "./queries";
 
 export async function loadLanTransferCore() {
-  const [settings, status, shares, addresses] = await Promise.all([
+  const [, status] = await Promise.all([
     lanQueries.settings.fetch(true),
     ipc.lanTransferStatus(),
     lanQueries.shares.fetch(true),
     lanQueries.addresses.fetch(true),
   ]);
-  return { settings, status, shares, addresses };
+  return status;
 }
 
 export async function loadLanTransferSecondary() {
-  const [devices, tasks, trustedDevices, authRequests] = await Promise.all([
+  await Promise.all([
     lanQueries.devices.fetch(true),
     lanQueries.tasks.fetch(true),
     lanQueries.trusted.fetch(true),
     lanQueries.auth.fetch(true),
   ]);
-  return { devices, tasks, trustedDevices, authRequests };
 }
 
 export function scheduleIdleTask(task: () => void): () => void {
