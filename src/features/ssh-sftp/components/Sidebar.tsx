@@ -11,15 +11,12 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
 import { gsap } from "gsap";
 import {
-  GripVertical,
   KeyRound,
   LoaderCircle,
   PanelLeftClose,
@@ -28,8 +25,7 @@ import {
   Server,
   X,
 } from "lucide-react";
-import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { Alert, AlertAction, AlertDescription } from "~/components/ui/alert";
 import {
@@ -63,58 +59,17 @@ import KeyManager from "~/features/ssh-sftp/components/keys/KeyManager";
 import { describeError } from "~/lib/errors";
 import { prefersReducedMotion } from "~/lib/motion";
 import { useHostsStore } from "~/store/hosts";
-import { useSessionsStore } from "~/store/sessions";
 import type { Host } from "~/types";
 
 import HostRow from "./hosts/HostRow";
+import SortableHostRow from "./hosts/SortableHostRow";
+import { useHostActions } from "./hosts/use-host-actions";
 
 interface SidebarProps {
   collapsed: boolean;
   overlay?: boolean;
   singleSession?: boolean;
   onToggleCollapsed: () => void;
-}
-
-function SortableHostRow({
-  id,
-  children,
-}: {
-  id: string;
-  children: ReactNode;
-}) {
-  const { t } = useLingui();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id,
-  });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-  return (
-    <li
-      ref={setNodeRef}
-      style={style}
-      className={cn("group relative", isDragging && "z-10 opacity-80")}
-    >
-      <button
-        type="button"
-        className="text-muted-foreground hover:bg-sidebar-accent absolute top-1/2 left-0 z-10 flex h-7 w-5 -translate-y-1/2 items-center justify-center rounded-md before:absolute before:inset-0 before:content-[''] pointer-coarse:before:-inset-x-3 pointer-coarse:before:-inset-y-2"
-        aria-label={t`拖动排序`}
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="size-3.5" />
-      </button>
-      <div className="pl-5 pointer-coarse:pl-11">{children}</div>
-    </li>
-  );
 }
 
 export default function Sidebar({
@@ -124,28 +79,29 @@ export default function Sidebar({
   onToggleCollapsed,
 }: SidebarProps) {
   const { t } = useLingui();
+  const {
+    activeId,
+    sessionByHost,
+    pendingHost,
+    setPendingHost,
+    deleteTarget,
+    setDeleteTarget,
+    disconnecting,
+    connect,
+    disconnect,
+    confirmDelete,
+    reorder,
+    submitPassphrase,
+  } = useHostActions(singleSession);
   const sidebarRef = useRef<HTMLElement>(null);
   const hosts = useHostsStore((s) => s.hosts);
   const loadError = useHostsStore((s) => s.loadError);
   const loading = useHostsStore((s) => s.loading);
   const retryLoad = useHostsStore((s) => s.ensureLoaded);
-  const keys = useHostsStore((s) => s.keys);
-  const deleteHost = useHostsStore((s) => s.deleteHost);
-  const reorderHosts = useHostsStore((s) => s.reorderHosts);
-  const openSession = useSessionsStore((s) => s.openSession);
-  const closeSession = useSessionsStore((s) => s.closeSession);
-  const setActive = useSessionsStore((s) => s.setActive);
-  const sessions = useSessionsStore((s) => s.sessions);
-  const activeId = useSessionsStore((s) => s.activeId);
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Host | null>(null);
   const [keysOpen, setKeysOpen] = useState(false);
-  const [pendingHost, setPendingHost] = useState<Host | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Host | null>(null);
-  const [disconnecting, setDisconnecting] = useState<Set<string>>(
-    () => new Set(),
-  );
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -166,15 +122,6 @@ export default function Sidebar({
         h.username.toLowerCase().includes(q),
     );
   })();
-  const sessionByHost = (() => {
-    const map = new Map<string, (typeof sessions)[number]>();
-    for (const session of sessions) {
-      if (session.status === "connecting" || session.status === "connected") {
-        map.set(session.hostId, session);
-      }
-    }
-    return map;
-  })();
   const canSortHosts = !collapsed && !query.trim() && filtered.length > 1;
   const sortableHostIds = hosts.map((host) => host.id);
 
@@ -185,77 +132,7 @@ export default function Sidebar({
     const newIndex = sortableHostIds.indexOf(String(over.id));
     if (oldIndex < 0 || newIndex < 0) return;
     const orderedIds = arrayMove(sortableHostIds, oldIndex, newIndex);
-    try {
-      await reorderHosts(orderedIds);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
-
-  async function openConnection(host: Host, passphrase?: string) {
-    if (singleSession) {
-      // 移动工作区只保留当前连接，切换主机时先释放旧终端和文件任务。
-      const others = useSessionsStore
-        .getState()
-        .sessions.filter((session) => session.hostId !== host.id);
-      for (const session of others) {
-        await closeSession(session.id);
-      }
-    }
-    return openSession(host, passphrase);
-  }
-
-  async function connect(host: Host) {
-    const existing = sessionByHost.get(host.id);
-    if (existing) {
-      setActive(existing.id);
-      return;
-    }
-    // 带口令的密钥需要先让用户输入口令才能连接。
-    if (host.authType === "key") {
-      const key = keys.find((k) => k.id === host.keyId);
-      if (key?.hasPassphrase) {
-        setPendingHost(host);
-        return;
-      }
-    }
-    try {
-      await openConnection(host);
-    } catch (e) {
-      toast.error(describeError(e));
-    }
-  }
-
-  async function disconnect(host: Host) {
-    const session = sessionByHost.get(host.id);
-    if (!session) return;
-    setDisconnecting((current) => new Set(current).add(host.id));
-    try {
-      await closeSession(session.id);
-      const hostLabel = host.label;
-      toast.success(t`已断开 ${hostLabel}`);
-    } catch (e) {
-      toast.error(describeError(e));
-    } finally {
-      setDisconnecting((current) => {
-        const next = new Set(current);
-        next.delete(host.id);
-        return next;
-      });
-    }
-  }
-
-  async function confirmDelete() {
-    if (!deleteTarget) return;
-    const name = deleteTarget.label;
-    try {
-      await deleteHost(deleteTarget.id);
-      toast.success(t`已删除主机 ${name}`);
-    } catch (e) {
-      toast.error(describeError(e));
-    } finally {
-      setDeleteTarget(null);
-    }
+    await reorder(orderedIds);
   }
 
   function hostAddress(host: Host) {
@@ -524,17 +401,7 @@ export default function Sidebar({
       <PassphrasePrompt
         host={pendingHost}
         onClose={() => setPendingHost(null)}
-        onSubmit={async (passphrase) => {
-          const host = pendingHost;
-          setPendingHost(null);
-          if (host) {
-            try {
-              await openConnection(host, passphrase);
-            } catch (e) {
-              toast.error(describeError(e));
-            }
-          }
-        }}
+        onSubmit={submitPassphrase}
       />
 
       <AlertDialog
