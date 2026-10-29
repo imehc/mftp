@@ -18,12 +18,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { listenNativeFileDrop } from "~/lib/events";
-import {
-  isTauriRuntime,
-  pickFilePathNative,
-  pickFilePathsNative,
-} from "~/lib/files";
+import { isTauriRuntime } from "~/lib/files";
 import { formatBytes } from "~/lib/format";
 import { isMobilePlatform } from "~/lib/platform";
 
@@ -38,14 +33,10 @@ import { useWorkspaceLayout } from "./components/use-workspace-layout";
 import { ViewerHelp } from "./components/ViewerHelp";
 import { ViewGizmo } from "./components/ViewGizmo";
 import { WorkspaceInspector } from "./components/WorkspaceInspector";
-import { modelError } from "./domain/errors";
 import { modelFileAccept } from "./domain/formats";
 import { ModelLibraryController } from "./library/controller";
-import { modelExtensions } from "./loaders/registry";
 import { ViewerSession } from "./runtime/session";
-import { browserSource } from "./sources/browser";
-import { nativeSource } from "./sources/native";
-import { isModelName } from "./sources/paths";
+import { useViewerInput } from "./sources/use-viewer-input";
 import { attachSystemInbox } from "./system/inbox";
 
 export default function ModelViewerPage() {
@@ -59,16 +50,20 @@ export default function ModelViewerPage() {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const state = useSyncExternalStore(session.subscribe, session.snapshot);
   const canvas = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
-  const supplement = useRef<HTMLInputElement>(null);
-  const supplementKey = useRef("");
-  const supplementId = useRef<string | null>(null);
-  const [hovering, setHovering] = useState(false);
+  const {
+    input,
+    supplement,
+    hovering,
+    chooseModel,
+    chooseDependency,
+    onFilesSelected,
+    onDependencySelected,
+    dropProps,
+  } = useViewerInput(session);
   const context = state.context;
   const [attempt, setAttempt] = useState(0);
   const [help, setHelp] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const nativeDesktop = isTauriRuntime() && !isMobilePlatform();
 
   useEffect(() => {
     if (!canvas.current) return;
@@ -106,107 +101,7 @@ export default function ModelViewerPage() {
     window.addEventListener("keydown", exitPlacement);
     return () => window.removeEventListener("keydown", exitPlacement);
   }, [session, help, inspectorOpen, libraryOpen]);
-  useEffect(() => {
-    if (!nativeDesktop) return;
-    let active = true;
-    let unlisten: (() => void) | undefined;
-    void listenNativeFileDrop(
-      (paths) => {
-        if (!active) return;
-        const entries = paths.filter(isModelName);
-        if (!entries.length) {
-          session.report(modelError("unsupported"));
-          return;
-        }
-        void session.enqueue(
-          entries.map((path) => ({
-            name: path.split(/[\\/]/).pop() ?? path,
-            open: () => nativeSource(path, paths),
-          })),
-        );
-      },
-      (value) => {
-        if (active) setHovering(value);
-      },
-    )
-      .then((listener) => {
-        if (active) unlisten = listener;
-        else listener();
-      })
-      .catch((error) => {
-        if (active) session.report(error);
-      });
-    return () => {
-      active = false;
-      unlisten?.();
-    };
-  }, [session, nativeDesktop]);
-
-  async function chooseModel() {
-    if (!nativeDesktop) {
-      input.current?.click();
-      return;
-    }
-    try {
-      const paths = await pickFilePathsNative({
-        filterName: t({
-          message: "3D 模型",
-          comment: "本地 GLB、glTF、FBX 三维模型查看工具名称。",
-        }),
-        extensions: modelExtensions,
-      });
-      if (paths?.length)
-        await session.enqueue(
-          paths.map((path) => ({
-            name: path.split(/[\\/]/).pop() ?? path,
-            open: () => nativeSource(path, paths),
-          })),
-        );
-    } catch (error) {
-      session.report(error);
-    }
-  }
-
-  async function chooseDependency(key: string) {
-    const target = state.awaitingId;
-    if (!target) return;
-    if (!nativeDesktop) {
-      supplementKey.current = key;
-      supplementId.current = target;
-      supplement.current?.click();
-      return;
-    }
-    try {
-      const path = await pickFilePathNative({
-        title: key,
-        filterName: t({
-          message: "模型依赖文件",
-          comment: "3D 模型的二进制数据或纹理文件选择器类型。",
-        }),
-        extensions: ["*"],
-      });
-      if (typeof path === "string") await session.attach(key, path, target);
-    } catch (error) {
-      session.report(error);
-    }
-  }
-
   const ready = context === "ready";
-
-  function openFiles(files: File[]) {
-    const entries = files.filter((file) => isModelName(file.name));
-    if (!entries.length) {
-      session.report(modelError("unsupported"));
-      return;
-    }
-    void session.enqueue(
-      entries.map((entry) => ({
-        name: entry.name,
-        size: entry.size,
-        open: () => browserSource(files, entry),
-      })),
-    );
-  }
 
   const sourceSize = state.model ? formatBytes(state.model.size) : "";
   const importLabel = t({
@@ -279,26 +174,13 @@ export default function ModelViewerPage() {
         type="file"
         multiple
         accept={modelFileAccept}
-        onChange={(event) => {
-          const files = Array.from(event.currentTarget.files ?? []);
-          event.currentTarget.value = "";
-          if (files.length) openFiles(files);
-        }}
+        onChange={onFilesSelected}
       />
       <input
         ref={supplement}
         hidden
         type="file"
-        onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          event.currentTarget.value = "";
-          if (file)
-            void session.attach(
-              supplementKey.current,
-              file,
-              supplementId.current,
-            );
-        }}
+        onChange={onDependencySelected}
       />
       <ImportStatus
         state={state}
@@ -388,22 +270,7 @@ export default function ModelViewerPage() {
               "model-canvas bg-muted/30 relative flex min-h-72 min-w-0 flex-1 rounded-xl border md:min-h-96",
               hovering && "border-primary ring-primary ring-2",
             )}
-            onDragOver={(event) => {
-              if (isMobilePlatform()) return;
-              event.preventDefault();
-              setHovering(true);
-            }}
-            onDragLeave={() => setHovering(false)}
-            onDrop={(event) => {
-              event.preventDefault();
-              setHovering(false);
-              if (
-                !nativeDesktop &&
-                !isMobilePlatform() &&
-                event.dataTransfer.files.length
-              )
-                openFiles(Array.from(event.dataTransfer.files));
-            }}
+            {...dropProps}
           >
             <div
               ref={canvas}
@@ -494,7 +361,7 @@ export default function ModelViewerPage() {
                     </Trans>
                   </Button>
                   {!isMobilePlatform() ? (
-                    <p className="text-muted-foreground text-xs">
+                    <p className="app-description">
                       <Trans>也可将模型文件拖到这里</Trans>
                     </p>
                   ) : null}

@@ -20,6 +20,7 @@ import { InspectionTools, type InteractionMode } from "../inspection/tools";
 import { captureModelView, restoreModelPlacement } from "../library/view";
 import { MotionControl } from "../system/motion";
 import { RenderBudget } from "../system/render-budget";
+import { waitUntilVisible } from "../system/visibility";
 import { ModelCollection, type ModelLayout } from "./collection";
 import { FlightControls } from "./flight";
 import { fitCamera } from "./framing";
@@ -29,32 +30,6 @@ import { orientCamera, type ViewAxis } from "./orientation";
 import { ModelPlacement } from "./placement";
 import { litScene } from "./scene";
 import { texturePreview } from "./texture-preview";
-
-async function waitUntilVisible(signal: AbortSignal) {
-  signal.throwIfAborted();
-  if (!document.hidden) return;
-  await new Promise<void>((resolve, reject) => {
-    const cleanup = () => {
-      document.removeEventListener("visibilitychange", visible);
-      signal.removeEventListener("abort", abort);
-    };
-
-    const visible = () => {
-      if (!document.hidden) {
-        cleanup();
-        resolve();
-      }
-    };
-
-    const abort = () => {
-      cleanup();
-      reject(signal.reason);
-    };
-
-    document.addEventListener("visibilitychange", visible);
-    signal.addEventListener("abort", abort, { once: true });
-  });
-}
 
 export class ModelViewerRuntime {
   readonly renderer: WebGLRenderer;
