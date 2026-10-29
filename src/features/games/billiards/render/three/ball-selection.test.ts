@@ -60,7 +60,7 @@ function fixture(reduced = false, portrait = false) {
       onSelectionView: (view) => views.push(view),
       onSelectedBall: (id) => selected.push(id),
       onPowerPreview() {},
-      onShot() {},
+      onShot: () => true,
       onPlaceCue() {},
       onReady() {},
       onError(error) {

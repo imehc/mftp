@@ -9,6 +9,7 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 
+import { BilliardsShotHelp } from "./BilliardsShotHelp";
 import type { BilliardsDiscipline } from "./types";
 
 export function BilliardsRulesDialog({
@@ -68,6 +69,7 @@ export function BilliardsRulesDialog({
                 </Trans>
               </p>
             )}
+            <BilliardsShotHelp />
           </div>
         </DialogLayoutBody>
       </DialogLayoutContent>

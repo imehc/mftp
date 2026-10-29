@@ -14,6 +14,7 @@ import { playCueImpact, stopBilliardsAudio } from "../audio";
 import { createDefaultAim } from "../default-aim";
 import { runPresentation } from "../playback";
 import type { BilliardsScene, SceneCallbacks } from "../scene-contract";
+import { createShotInput } from "../shot-input";
 import { createAimTargetPublisher } from "./aim-target";
 import { createBallSelection } from "./ball-selection";
 import { createBallLayer } from "./balls";
@@ -92,8 +93,6 @@ export function createScene(
     let playing = false;
     /** AI 击球进行中：即使非交互也显示球杆。 */
     let aiAiming = false;
-    /** 弹弓拖动进行中（一次手势完成瞄准 + 蓄力）。 */
-    let dragging = false;
     /** 自由球：临时母球位置，以真实球显示。 */
     let placing: { x: number; y: number; valid: boolean } | null = null;
     let placingDrag = false;
@@ -139,14 +138,8 @@ export function createScene(
       );
     }
 
-    /** 拖动距离（米）：开始蓄力前的死区，以及完整行程。 */
-    const PULL_DEADZONE = 0.07;
-    const PULL_RANGE = 0.55;
-    /** 蓄力低于此值时松手只是重新瞄准而非击球。 */
-    const FIRE_THRESHOLD = 0.05;
-
     function refreshDefaultAim() {
-      if (!position || dragging || selection.active) return;
+      if (!position || shotInput.source !== null || selection.active) return;
       const angle = defaultAiming.update(
         position,
         (!ready || interactive) && !playing && !shotPending,
@@ -247,7 +240,7 @@ export function createScene(
       const guide = preview.get(
         balls,
         aimAngle,
-        dragging ? Math.max(0.06, cuePull.value) : 0.5,
+        shotInput.source !== null ? Math.max(0.06, cuePull.value) : 0.5,
         followDraw,
       );
       if (guide) hud.guide(guide);
@@ -272,50 +265,50 @@ export function createScene(
       cueView.pose(cx, cy, aimAngle, cuePull.value, obstacles);
     }
 
-    function updateDrag(p: { x: number; y: number }): void {
-      const cue = cuePos();
-      if (!cue) return;
-      const dx = p.x - cue.x;
-      const dy = p.y - cue.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > PULL_DEADZONE * 0.5) {
-        // 朝手指反方向击出——把球杆拉到球后方。
-        aimAngle = Math.atan2(-dy, -dx);
-      }
-      const pull = Math.max(
-        0,
-        Math.min(1, (dist - PULL_DEADZONE) / PULL_RANGE),
-      );
-      gsap.killTweensOf(cuePull);
-      cuePull.value = pull;
-      callbacks.onPowerPreview(pull);
-      redrawOverlays();
-    }
-
-    function releaseDrag(): void {
-      if (!dragging) return;
-      dragging = false;
-      const pull = cuePull.value;
-      if (pull >= FIRE_THRESHOLD) {
+    const canInput = () =>
+      !disposed && !playing && !shotPending && interactive && !selection.active;
+    const shotInput = createShotInput({
+      enabled: () => canInput() && !ballInHand && !placingDrag,
+      cue: cuePos,
+      setAngle: (angle) => {
+        aimAngle = angle;
+      },
+      power: () => cuePull.value,
+      setPower(power) {
+        gsap.killTweensOf(cuePull);
+        cuePull.value = power;
+        callbacks.onPowerPreview(power);
+        redrawOverlays();
+      },
+      fire(power) {
         shotPending = true;
         aiAiming = true;
         // 先锁定本杆，worker 结算后由统一挥杆时间线呈现触球。
         callbacks.onPowerPreview(0);
-        callbacks.onShot(aimAngle, Math.max(0.06, pull));
-      } else {
-        // 在死区内松手：保留瞄准，球杆弹性回位。
-        gsap.to(cuePull, {
-          value: 0,
-          duration: window.matchMedia("(prefers-reduced-motion: reduce)")
-            .matches
-            ? 0
-            : 0.18,
-          ease: "power2.out",
-          onUpdate: redrawOverlays,
-        });
+        if (!callbacks.onShot(aimAngle, power)) {
+          // 视图可能先于场景收到回合变化，拒绝的输入不能留下待击球锁。
+          shotPending = false;
+          aiAiming = false;
+          cuePull.value = 0;
+          redrawOverlays();
+        }
+      },
+      reset(animate) {
+        gsap.killTweensOf(cuePull);
         callbacks.onPowerPreview(0);
-      }
-    }
+        if (animate) {
+          gsap.to(cuePull, {
+            value: 0,
+            duration: reduced ? 0 : 0.18,
+            ease: "power2.out",
+            onUpdate: redrawOverlays,
+          });
+        } else {
+          cuePull.value = 0;
+          redrawOverlays();
+        }
+      },
+    });
 
     function updatePlacement(
       p: { x: number; y: number },
@@ -330,33 +323,27 @@ export function createScene(
     }
 
     const input = createTableInput(renderer.domElement, camera.camera, {
-      enabled: () =>
-        !disposed &&
-        !playing &&
-        !shotPending &&
-        interactive &&
-        !selection.active,
+      enabled: () => canInput() && shotInput.source !== "power",
       down(p) {
         if (ballInHand) {
           placingDrag = true;
           updatePlacement(p, false);
         } else {
-          dragging = true;
-          updateDrag(p);
+          shotInput.beginTable(p);
         }
       },
       move(p) {
         if (placingDrag) updatePlacement(p, false);
-        else if (dragging) updateDrag(p);
+        else shotInput.drag(p);
       },
       up(p) {
         if (placingDrag) {
           placingDrag = false;
           updatePlacement(p, true);
-        } else releaseDrag();
+        } else shotInput.releaseTable();
       },
       cancel() {
-        dragging = false;
+        shotInput.cancel("table");
         placingDrag = false;
         if (!shotPending) cuePull.value = 0;
         callbacks.onPowerPreview(0);
@@ -364,16 +351,20 @@ export function createScene(
       },
     });
 
+    function cancelInput() {
+      input.cancel();
+      shotInput.cancel();
+    }
+
     // --- 回放 -------------------------------------------------------
     function playPresentation(
       presentation: BilliardsPresentation,
     ): Promise<void> {
       cancelPlayback?.();
       selection.cancel();
-      input.cancel();
+      cancelInput();
       playing = true;
       placing = null;
-      dragging = false;
       redrawOverlays();
       if (presentation.frames.length === 0) {
         playing = false;
@@ -501,7 +492,7 @@ export function createScene(
     }
 
     function setPosition(state: BilliardsState, nextInteractive: boolean) {
-      if (!nextInteractive) input.cancel();
+      if (!nextInteractive || position !== state) cancelInput();
       selection.reconcile(state);
       position = state;
       balls = state.balls;
@@ -522,7 +513,6 @@ export function createScene(
         placingDrag = false;
       }
       if (!interactive && !shotPending) {
-        dragging = false;
         cuePull.value = 0;
       }
       refreshDefaultAim();
@@ -543,14 +533,18 @@ export function createScene(
         clock.invalidate();
       },
       setSelection(request) {
-        input.cancel();
+        cancelInput();
         selection.set(request, position);
         redrawOverlays();
       },
       previewSelection: selection.preview,
       selectBall: selection.select,
       setPosition,
-      cancelInput: () => input.cancel(),
+      cancelInput,
+      beginPowerShot: shotInput.beginPowerShot,
+      updateShotPower: shotInput.updateShotPower,
+      releasePowerShot: shotInput.releasePowerShot,
+      cancelPowerShot: shotInput.cancelPowerShot,
       setFollowDraw(nextFollowDraw) {
         followDraw = nextFollowDraw;
         redrawOverlays();
@@ -568,6 +562,7 @@ export function createScene(
           dismissSelection,
         );
         selection.dispose();
+        shotInput.cancel();
         input.dispose();
         preview.dispose();
         clock.dispose();

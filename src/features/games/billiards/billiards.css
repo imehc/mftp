@@ -25,6 +25,9 @@
   min-width: 0;
   flex-shrink: 0;
 }
+.billiards-power-slider {
+  align-self: stretch;
+}
 @media (min-width: 48rem) and (pointer: fine) {
   .billiards-stroke {
     width: 10rem;
@@ -120,15 +123,8 @@
   height: 100%;
   flex-direction: column;
 }
-.billiards-game[data-landscape="true"] .billiards-power [role="meter"] {
-  width: 0.25rem;
+.billiards-game[data-landscape="true"] .billiards-power-slider {
   min-height: 2rem;
-  display: flex;
-  align-items: flex-end;
-}
-.billiards-game[data-landscape="true"] .billiards-power [role="meter"] > div {
-  width: 100% !important;
-  height: var(--billiards-power, 0%);
 }
 
 .billiards-game[data-landscape="true"] .billiards-result {

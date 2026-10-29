@@ -461,13 +461,13 @@ export function MatchView({
               nominationPending ||
               runner.getSnapshot().state !== state
             )
-              return;
+              return false;
             const declaredPush =
               state.variant === "nine-ball" &&
               state.pushOutAvailable &&
               pushOut;
             setPushOut(false);
-            local.submit({
+            return local.submit({
               type: "shot",
               pushOut: declaredPush,
               angle,
@@ -524,6 +524,15 @@ export function MatchView({
             followDraw={followDraw}
             onFollowDraw={setFollowDraw}
             power={powerPercent}
+            vertical={headerProps.landscape}
+            turn={snapshot.moveCount}
+            shotInput={{
+              beginPowerShot: () => stageRef.current?.beginPowerShot() ?? false,
+              updateShotPower: (power) =>
+                stageRef.current?.updateShotPower(power) ?? false,
+              releasePowerShot: () => stageRef.current?.releasePowerShot(),
+              cancelPowerShot: () => stageRef.current?.cancelPowerShot(),
+            }}
             interactive={
               canInteract &&
               panel === null &&

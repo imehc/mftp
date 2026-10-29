@@ -1,6 +1,7 @@
 import type { BilliardsPresentation, BilliardsState } from "../types";
+import type { PowerShotControls } from "./shot-input";
 
-export interface BilliardsScene {
+export interface BilliardsScene extends PowerShotControls {
   setSelection(request: BallSelectionRequest | null): void;
   previewSelection(ballId: number): void;
   selectBall(ballId: number): void;
@@ -34,7 +35,7 @@ export interface SceneCallbacks {
   onDismissSelection?(): void;
   onAimTarget?(target: AimTarget | null): void;
   onPowerPreview(power: number): void;
-  onShot(angle: number, power: number): void;
+  onShot(angle: number, power: number): boolean;
   onPlaceCue(x: number, y: number): void;
   onReady(): void;
   onError(error: unknown): void;

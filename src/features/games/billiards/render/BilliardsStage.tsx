@@ -21,10 +21,11 @@ import { stopBilliardsAudio } from "./audio";
 import { BallSelectionOverlay } from "./BallSelectionOverlay";
 import type { BilliardsScene, SceneCallbacks } from "./scene-contract";
 import type { BallSelectionRequest, BallSelectionView } from "./scene-contract";
+import type { PowerShotControls } from "./shot-input";
 import { hasEntered, markEntered } from "./three/intro";
 import { createScene } from "./three/scene";
 
-export interface BilliardsStageHandle {
+export interface BilliardsStageHandle extends PowerShotControls {
   cancelInput(): void;
   /** 播放已结算的走子；当球桌再次静止时 resolve。 */
   playPresentation(presentation: BilliardsPresentation): Promise<void>;
@@ -54,7 +55,7 @@ export interface BilliardsStageProps {
   /** 拖动时实时蓄力预览（0..1），松开/取消时为 0。 */
   onPowerPreview(power: number): void;
   /** 拖动在蓄力足够时松手触发。 */
-  onShot(angle: number, power: number): void;
+  onShot(angle: number, power: number): boolean;
   onPlaceCue(x: number, y: number): void;
   onReady?(): void;
   onError?(error: unknown): void;
@@ -75,7 +76,10 @@ export const BilliardsStage = forwardRef<
 
   useEffect(() => {
     const stopHidden = () => {
-      if (document.hidden) stopBilliardsAudio();
+      if (document.hidden) {
+        sceneRef.current?.cancelInput();
+        stopBilliardsAudio();
+      }
     };
 
     document.addEventListener("visibilitychange", stopHidden);
@@ -219,6 +223,11 @@ export const BilliardsStage = forwardRef<
     ref,
     () => ({
       cancelInput: () => sceneRef.current?.cancelInput(),
+      beginPowerShot: () => sceneRef.current?.beginPowerShot() ?? false,
+      updateShotPower: (power) =>
+        sceneRef.current?.updateShotPower(power) ?? false,
+      releasePowerShot: () => sceneRef.current?.releasePowerShot(),
+      cancelPowerShot: () => sceneRef.current?.cancelPowerShot(),
       playPresentation: (presentation) =>
         sceneRef.current?.playPresentation(presentation) ?? Promise.resolve(),
       animateCue: (angle, power, ai) =>

@@ -119,7 +119,7 @@ function setup(
   } as unknown as WebGLRenderer;
   const callbacks = {
     onPowerPreview: vi.fn(),
-    onShot: vi.fn(),
+    onShot: vi.fn(() => true),
     onPlaceCue: vi.fn(),
     onReady: vi.fn(),
     onError: vi.fn(),
@@ -149,6 +149,61 @@ afterEach(() => {
 });
 
 describe("台球入场场景生命周期", () => {
+  it("力度条使用当前瞄准并同步球杆后拉，出杆后锁定两种输入", async () => {
+    const { scene, callbacks, input } = setup();
+    expect(scene.beginPowerShot()).toBe(false);
+    await Promise.resolve();
+    vi.mocked(createIntro).mock.lastCall![0].ready();
+    const cue = vi.mocked(createCue).mock.results.at(-1)!.value;
+    const angle = cue.pose.mock.lastCall![2];
+    scene.setFollowDraw(0.7);
+    expect(scene.beginPowerShot()).toBe(true);
+    expect(input.enabled()).toBe(false);
+    scene.updateShotPower(0.6);
+    expect(cue.pose.mock.lastCall![2]).toBe(angle);
+    expect(cue.pose.mock.lastCall![3]).toBe(0.6);
+    scene.releasePowerShot();
+    scene.releasePowerShot();
+    expect(callbacks.onShot).toHaveBeenCalledExactlyOnceWith(angle, 0.6);
+    expect(input.enabled()).toBe(false);
+    expect(scene.beginPowerShot()).toBe(false);
+    scene.destroy();
+  });
+
+  it.each(["取消", "回合更新", "禁用", "选球"])(
+    "%s 会结束力度条输入，迟到释放不出杆",
+    async (reason) => {
+      const { scene, state, callbacks } = setup();
+      await Promise.resolve();
+      vi.mocked(createIntro).mock.lastCall![0].ready();
+      scene.beginPowerShot();
+      scene.updateShotPower(0.7);
+      if (reason === "取消") scene.cancelInput();
+      if (reason === "回合更新")
+        scene.setPosition({ ...state, shotCount: 1 }, true);
+      if (reason === "禁用") scene.setPosition(state, false);
+      if (reason === "选球") scene.setSelection({ ids: [1], selectedId: null });
+      scene.releasePowerShot();
+      expect(callbacks.onShot).not.toHaveBeenCalled();
+      expect(callbacks.onPowerPreview).toHaveBeenLastCalledWith(0);
+      scene.destroy();
+    },
+  );
+
+  it("最新对局拒绝击球时释放待击球锁，不阻塞下一次操作", async () => {
+    const { scene, callbacks, input } = setup();
+    await Promise.resolve();
+    vi.mocked(createIntro).mock.lastCall![0].ready();
+    callbacks.onShot.mockReturnValue(false);
+    scene.beginPowerShot();
+    scene.updateShotPower(0.7);
+    scene.releasePowerShot();
+    expect(callbacks.onShot).toHaveBeenCalledTimes(1);
+    expect(input.enabled()).toBe(true);
+    expect(scene.beginPowerShot()).toBe(true);
+    scene.destroy();
+  });
+
   it("斯诺克直接全桌淡入且不创建摆球工具", async () => {
     const { scene, callbacks, state } = setup(
       Promise.resolve(),

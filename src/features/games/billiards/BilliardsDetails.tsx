@@ -12,6 +12,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 
 import { BallTray, seatName, seatTray } from "./BilliardsScore";
+import { BilliardsShotHelp } from "./BilliardsShotHelp";
 import { availablePoints } from "./snooker";
 import { isRed } from "./snooker-equipment";
 import type { BilliardsMode, BilliardsState } from "./types";
@@ -143,6 +144,8 @@ export function BilliardsDetails({
                   );
                 })
               : null}
+            <Separator />
+            <BilliardsShotHelp />
           </div>
         </DialogLayoutBody>
       </DialogLayoutContent>
