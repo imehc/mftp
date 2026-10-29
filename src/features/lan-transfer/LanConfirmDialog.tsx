@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import {
   AlertDialog,
@@ -19,6 +19,9 @@ interface Props {
   confirmLabel: ReactNode;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  onCloseAutoFocus?: ComponentProps<
+    typeof AlertDialogContent
+  >["onCloseAutoFocus"];
 }
 
 export default function LanConfirmDialog({
@@ -28,10 +31,11 @@ export default function LanConfirmDialog({
   confirmLabel,
   onOpenChange,
   onConfirm,
+  onCloseAutoFocus,
 }: Props) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent onCloseAutoFocus={onCloseAutoFocus}>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
