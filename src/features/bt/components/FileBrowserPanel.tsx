@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   ArrowUp,
@@ -9,37 +8,34 @@ import {
   Home,
   RefreshCw,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useRef } from "react";
 
-import type { AppError, BtFileEntry, BtTaskInfo } from "~/bindings";
+import type { BtTaskInfo } from "~/bindings";
 import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/ui/spinner";
 import PreviewSurface from "~/features/preview/PreviewSurface";
-import { describeError, toIpcError } from "~/lib/errors";
+import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
-import * as ipc from "~/lib/ipc";
 import { previewKind } from "~/lib/preview-kind";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
 
-import { filesQuery } from "../queries";
+import { useBtFileBrowser } from "../use-file-browser";
 
 export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
   const { t } = useLingui();
-  const [path, setPath] = useState<string | null>(null);
-  const [revision, setRevision] = useState(0);
-  const client = useQueryClient();
-  const listingRead = useQuery({
-    ...filesQuery(task.infoHash, path),
-    enabled: false,
-  });
-  const listing = listingRead.data ?? null;
-  const [url, setUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<AppError | null>(null);
-  const [opening, setOpening] = useState(false);
+  const browser = useBtFileBrowser(task.infoHash);
+  const {
+    current,
+    entries,
+    url,
+    error,
+    loading,
+    opening,
+    openExternal,
+    reload,
+    parent,
+  } = browser;
   const scroller = useRef<HTMLDivElement>(null);
-  const entries = listing?.entries ?? [];
   const virtualizer = useVirtualizer({
     count: entries.length,
     getScrollElement: () => scroller.current,
@@ -48,68 +44,10 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
   });
   useVirtualizerFontSize(virtualizer);
 
-  useEffect(() => {
-    let cancelled = false;
-    // 快速切换目录或关闭弹窗后，旧请求不能覆盖当前文件及预览地址。
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      setUrl(null);
-      try {
-        const result = await client.query(filesQuery(task.infoHash, path));
-        if (cancelled) return;
-        if (
-          !result.current.isDir &&
-          previewKind(result.current.name) !== "other"
-        ) {
-          const preview = await ipc.btPreviewFile(
-            task.infoHash,
-            result.current.path,
-          );
-          if (cancelled) return;
-          // 每次重试重新读取原文件；服务端同时使用 no-store 禁用响应缓存。
-          setUrl(`${preview.url}&attempt=${revision}`);
-        }
-      } catch (cause) {
-        if (!cancelled) setError(toIpcError(cause).payload);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [client, task.infoHash, path, revision]);
-
-  const openExternal = async (entry: BtFileEntry) => {
-    setOpening(true);
-    try {
-      await ipc.btOpenFile(task.infoHash, entry.path);
-    } catch (cause) {
-      toast.error(t`无法使用系统应用打开`, {
-        description: describeError(cause, t),
-      });
-    } finally {
-      setOpening(false);
-    }
-  };
-
-  const current = listing?.current;
-
-  const reload = () => {
-    // 文件预览没有可保留的列表，重新加载时回到整块加载态。
-    setRevision((value) => value + 1);
-  };
-
   const navigate = (next: string) => {
-    setPath(next);
+    browser.navigate(next);
     scroller.current?.scrollTo(0, 0);
   };
-
-  const parent = (current?.path ?? path ?? "")
-    .split("/")
-    .slice(0, -1)
-    .join("/");
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -179,7 +117,7 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
         </div>
       ) : null}
 
-      {loading && !listing ? (
+      {loading && !current ? (
         <div
           className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm"
           role="status"
@@ -187,7 +125,7 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
           <Spinner aria-label={t`加载中`} />
           <Trans>加载中…</Trans>
         </div>
-      ) : error && !listing ? (
+      ) : error && !current ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-sm">
           <p
             role="alert"
@@ -301,7 +239,7 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
         </>
       )}
       {task.status !== "Completed" ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans comment="资源未下载完时预览可能因缺失分片中断">
             未下载完成，预览可能中断。
           </Trans>

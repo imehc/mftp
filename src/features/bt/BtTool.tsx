@@ -1,8 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { ArrowLeft, Magnet, Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
@@ -23,61 +21,46 @@ import {
 import { Spinner } from "~/components/ui/spinner";
 import { BackLink } from "~/features/navigation/BackLink";
 import { describeError } from "~/lib/errors";
-import * as ipc from "~/lib/ipc";
-import { isMobilePlatform } from "~/lib/platform";
-import { useTransfersStore } from "~/store/transfers";
 import type { BtProbeResult, BtTaskInfo } from "~/types";
 
 import AddTorrentDialog from "./components/AddTorrentDialog";
 import TaskDialogs from "./components/TaskDialogs";
 import TaskFilesPage from "./components/TaskFilesPage";
 import TaskList from "./components/TaskList";
-import { systemDownloadDir } from "./file-actions";
 import { magnetOf } from "./magnet";
 import { acquireBtPage, retryBtSubscription } from "./runtime/btRuntime";
-import { forgetBtTask, syncBtTask } from "./task-sync";
+import { syncBtTask } from "./task-sync";
 import { refreshBtTasks, useBtTasksStore } from "./tasks-store";
+import { useBtTaskActions } from "./use-task-actions";
+
+interface ParsedTorrent {
+  source: string;
+  probe: BtProbeResult;
+  fileIndices: number[];
+}
+
+type TorrentDialog =
+  | { mode: "add"; source: string | null }
+  | { mode: "parsed"; draft: ParsedTorrent };
 
 export default function BtTool() {
   const { t } = useLingui();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialog, setDialog] = useState<TorrentDialog | null>(null);
   const [filesTask, setFilesTask] = useState<BtTaskInfo | null>(null);
-  const [parsedHashes, setParsedHashes] = useState<Set<string>>(new Set());
-  const parsedProbes = useRef(
-    new Map<
-      string,
-      { source: string; probe: BtProbeResult; fileIndices: number[] }
-    >(),
-  );
   const [filesTab, setFilesTab] = useState("files");
-  const [busyTasks, setBusyTasks] = useState<Set<string>>(new Set());
-  const pendingActions = useRef(new Set<string>());
+  const [parsedProbes, setParsedProbes] = useState(
+    new Map<string, ParsedTorrent>(),
+  );
+  const { busyTasks, control, remove, exportTask } = useBtTaskActions();
 
   const openFiles = (task: BtTaskInfo, tab = "files") => {
     setFilesTab(tab);
     setFilesTask(task);
   };
 
-  const runAction = async (hash: string, action: () => Promise<void>) => {
-    if (pendingActions.current.has(hash)) return;
-    pendingActions.current.add(hash);
-    setBusyTasks(new Set(pendingActions.current));
-    try {
-      await action();
-    } finally {
-      pendingActions.current.delete(hash);
-      setBusyTasks(new Set(pendingActions.current));
-    }
-  };
-
-  const [prefill, setPrefill] = useState<string | null>(null);
-  const [prefillProbe, setPrefillProbe] = useState<BtProbeResult | null>(null);
-  const [prefillSelected, setPrefillSelected] = useState<number[] | null>(null);
-  const [dialogReadOnly, setDialogReadOnly] = useState(false);
   const [magnetTask, setMagnetTask] = useState<BtTaskInfo | null>(null);
   const [pendingDelete, setPendingDelete] = useState<BtTaskInfo | null>(null);
   const [pendingCancel, setPendingCancel] = useState<BtTaskInfo | null>(null);
-  const finishTransfer = useTransfersStore((s) => s.finish);
   const tasks = useBtTasksStore((s) => s.tasks);
   const setTasks = useBtTasksStore((s) => s.setTasks);
   const loading = useBtTasksStore((s) => s.loading);
@@ -87,25 +70,17 @@ export default function BtTool() {
   const consumeAddSource = useBtTasksStore((s) => s.consumeAddSource);
   const noPeers = useBtTasksStore((s) => s.noPeers);
 
-  const openPrefilled = (magnet: string) => {
-    setPrefill(magnet);
-    setPrefillProbe(null);
-    setPrefillSelected(null);
-    setDialogReadOnly(false);
-    setDialogOpen(true);
-  };
+  const openPrefilled = (source: string) => setDialog({ mode: "add", source });
+  const openAdd = () => setDialog({ mode: "add", source: null });
+  const draft = dialog?.mode === "parsed" ? dialog.draft : null;
+  const source =
+    dialog?.mode === "add"
+      ? dialog.source
+      : (draft?.source ?? pendingAddSource);
 
-  // 页面挂载期间申请 2s 级轮询；任务同步、无对等节点提示都由模块运行期负责。
+  // 页面挂载期间申请 2s 级轮询；任务同步由模块运行期负责。
   useEffect(() => acquireBtPage(), []);
   const refresh = refreshBtTasks;
-
-  const openAdd = () => {
-    setPrefill(null);
-    setPrefillProbe(null);
-    setPrefillSelected(null);
-    setDialogReadOnly(false);
-    setDialogOpen(true);
-  };
 
   const handleAdded = (
     task: BtTaskInfo,
@@ -113,12 +88,9 @@ export default function BtTool() {
     probe: BtProbeResult,
     fileIndices: number[],
   ) => {
-    parsedProbes.current.set(task.infoHash, { source, probe, fileIndices });
-    setParsedHashes((current) => {
-      const next = new Set(current);
-      next.add(task.infoHash);
-      return next;
-    });
+    setParsedProbes((current) =>
+      new Map(current).set(task.infoHash, { source, probe, fileIndices }),
+    );
     setTasks([
       task,
       ...useBtTasksStore
@@ -131,72 +103,8 @@ export default function BtTool() {
   };
 
   const openParsed = (task: BtTaskInfo) => {
-    const parsed = parsedProbes.current.get(task.infoHash);
-    if (!parsed) return;
-    setPrefill(parsed.source);
-    setPrefillProbe(parsed.probe);
-    setPrefillSelected(parsed.fileIndices);
-    setDialogReadOnly(true);
-    setDialogOpen(true);
-  };
-
-  const control = async (
-    task: BtTaskInfo,
-    action: "Pause" | "Resume" | "Cancel",
-  ) => {
-    try {
-      await ipc.btControl(task.infoHash, action, false);
-      const id = `bt:${task.infoHash}`;
-      if (action === "Cancel") {
-        forgetBtTask(task.infoHash);
-        finishTransfer(id, "cancelled");
-      } else useTransfersStore.getState().setPaused(id, action === "Pause");
-      await refresh();
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  };
-
-  const exportTask = async (task: BtTaskInfo) => {
-    if (isMobilePlatform()) {
-      try {
-        await ipc.btExport(task.infoHash, "");
-        toast.success(t`已复制到系统下载目录`);
-        await refresh();
-      } catch (error) {
-        toast.error(t`转存失败`, { description: describeError(error) });
-      }
-      return;
-    }
-    try {
-      const defaultPath = await systemDownloadDir();
-      const picked = await openDialog({
-        multiple: false,
-        directory: true,
-        defaultPath: defaultPath || undefined,
-      });
-      if (typeof picked !== "string") return;
-      await ipc.btExport(task.infoHash, picked);
-      toast.success(t`已复制到用户目录`);
-      await refresh();
-    } catch (error) {
-      toast.error(t`转存失败`, { description: describeError(error) });
-    }
-  };
-
-  const confirmDelete = async () => {
-    if (!pendingDelete) return;
-    const target = pendingDelete;
-    setPendingDelete(null);
-    try {
-      await ipc.btControl(target.infoHash, "Remove", true);
-      forgetBtTask(target.infoHash);
-      finishTransfer(`bt:${target.infoHash}`, "cancelled");
-      toast.success(t`已删除`);
-      await refresh();
-    } catch (error) {
-      toast.error(describeError(error));
-    }
+    const draft = parsedProbes.get(task.infoHash);
+    if (draft) setDialog({ mode: "parsed", draft });
   };
 
   return (
@@ -313,20 +221,16 @@ export default function BtTool() {
                 rowProps={(task) => ({
                   busy: busyTasks.has(task.infoHash),
                   stalled: noPeers.has(task.infoHash),
-                  hasParsedProbe: parsedHashes.has(task.infoHash),
+                  hasParsedProbe: parsedProbes.has(task.infoHash),
                   onOpenParsed: openParsed,
                   onRetry: (item) => openPrefilled(magnetOf(item)),
                   onPeers: (item) => openFiles(item, "peers"),
                   onControl: (item, action) => {
                     if (action === "Cancel") setPendingCancel(item);
-                    else
-                      void runAction(item.infoHash, () =>
-                        control(item, action),
-                      );
+                    else void control(item, action);
                   },
                   onMagnet: setMagnetTask,
-                  onExport: (item) =>
-                    void runAction(item.infoHash, () => exportTask(item)),
+                  onExport: (item) => void exportTask(item),
                   onOpenFiles: (item) => openFiles(item),
                   onDelete: setPendingDelete,
                 })}
@@ -344,27 +248,23 @@ export default function BtTool() {
           }
           initialTab={filesTab}
           onClose={() => setFilesTask(null)}
-          onExport={() =>
-            void runAction(filesTask.infoHash, () => exportTask(filesTask))
-          }
+          onExport={() => void exportTask(filesTask)}
           busy={busyTasks.has(filesTask.infoHash)}
         />
       ) : null}
       <AddTorrentDialog
-        open={dialogOpen || pendingAddSource !== null}
+        open={dialog !== null || pendingAddSource !== null}
         onOpenChange={(open) => {
-          setDialogOpen(open);
+          if (!open) setDialog(null);
           // 关闭即消费：跨页面重试意图只打开一次对话框。
           if (!open) consumeAddSource();
         }}
-        initialSource={prefill ?? pendingAddSource}
-        initialProbe={prefillProbe}
-        initialSelected={prefillSelected}
-        readOnly={dialogReadOnly}
+        initialSource={source}
+        initialProbe={draft?.probe}
+        initialSelected={draft?.fileIndices}
+        readOnly={dialog?.mode === "parsed"}
         existingInfoHashes={new Set(tasks.map((task) => task.infoHash))}
-        allowExistingTask={
-          (prefill ?? pendingAddSource) != null && prefillProbe == null
-        }
+        allowExistingTask={source != null && draft === null}
         onAdded={handleAdded}
       />
       <TaskDialogs
@@ -373,16 +273,13 @@ export default function BtTool() {
         pendingDeleteLabel={pendingDelete?.label ?? null}
         onCloseDelete={() => setPendingDelete(null)}
         onConfirmDelete={() => {
-          if (pendingDelete)
-            void runAction(pendingDelete.infoHash, confirmDelete);
+          if (pendingDelete) void remove(pendingDelete);
+          setPendingDelete(null);
         }}
         pendingCancelLabel={pendingCancel?.label ?? null}
         onCloseCancel={() => setPendingCancel(null)}
         onConfirmCancel={() => {
-          if (pendingCancel)
-            void runAction(pendingCancel.infoHash, () =>
-              control(pendingCancel, "Cancel"),
-            );
+          if (pendingCancel) void control(pendingCancel, "Cancel");
         }}
       />
     </div>
