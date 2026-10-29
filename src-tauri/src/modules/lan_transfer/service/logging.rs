@@ -53,7 +53,6 @@ fn write(
             detail,
             error,
         );
-        return;
     }
     #[cfg(not(test))]
     {
