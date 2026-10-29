@@ -34,6 +34,37 @@ describe("台球共用蓄力输入", () => {
     expect(input.source).toBeNull();
   });
 
+  it("仅瞄准模式下远距离拖动只改变角度，松手后力度条仍能击球", () => {
+    const { input, options } = fixture();
+    input.setAimOnly(true);
+    input.beginTable({ x: -0.8, y: 0 });
+    input.drag({ x: 0, y: -2 });
+    expect(options.setAngle).toHaveBeenLastCalledWith(Math.PI / 2);
+    expect(options.power()).toBe(0);
+    input.releaseTable();
+    expect(options.fire).not.toHaveBeenCalled();
+    expect(input.source).toBeNull();
+    expect(input.beginPowerShot()).toBe(true);
+    input.updateShotPower(0.8);
+    input.releasePowerShot();
+    expect(options.fire).toHaveBeenCalledExactlyOnceWith(0.8);
+  });
+
+  it("切换偏好取消当前手势，迟到释放不击球，关闭后恢复拖动出杆", () => {
+    const { input, options } = fixture();
+    input.beginTable({ x: -1, y: 0 });
+    input.setAimOnly(true);
+    input.releaseTable();
+    expect(options.fire).not.toHaveBeenCalled();
+    input.beginTable({ x: -1, y: 0 });
+    input.setAimOnly(false);
+    input.releaseTable();
+    expect(options.fire).not.toHaveBeenCalled();
+    input.beginTable({ x: -1, y: 0 });
+    input.releaseTable();
+    expect(options.fire).toHaveBeenCalledExactlyOnceWith(1);
+  });
+
   it("球桌和力度条不能抢占彼此的手势", () => {
     const { input, options } = fixture();
     input.beginTable({ x: -0.4, y: 0 });

@@ -18,6 +18,7 @@ import { BackLink } from "~/features/navigation/BackLink";
 
 import { GameActionsMenu } from "../engine/GameActionsMenu";
 import { GameVolumeControl } from "../engine/GameVolumeControl";
+import { BilliardsAimOnlyControl } from "./BilliardsAimOnlyControl";
 
 export interface BilliardsHeaderProps {
   active: boolean;
@@ -67,22 +68,23 @@ export function BilliardsHeader({
       onRestart={onRestart}
       onExit={onExit}
       onOpenChange={onMenuOpenChange}
-      extraActions={
-        onConcede
-          ? (closeThen) => (
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={!canConcede}
-                className="justify-start"
-                onClick={() => closeThen(onConcede)}
-              >
-                <FlagIcon data-icon="inline-start" />
-                <Trans comment="斯诺克主动认输本局">认输</Trans>
-              </Button>
-            )
-          : undefined
-      }
+      extraActions={(closeThen) => (
+        <>
+          <BilliardsAimOnlyControl />
+          {onConcede ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!canConcede}
+              className="justify-start"
+              onClick={() => closeThen(onConcede)}
+            >
+              <FlagIcon data-icon="inline-start" />
+              <Trans comment="斯诺克主动认输本局">认输</Trans>
+            </Button>
+          ) : null}
+        </>
+      )}
     />
   ) : (
     <GameVolumeControl />

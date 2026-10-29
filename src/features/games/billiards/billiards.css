@@ -1,3 +1,11 @@
+.billiards-canvas {
+  position: fixed;
+  inset: 0;
+  /* 高于页面与导航边框，低于球桌浮层、应用菜单及弹窗。 */
+  z-index: 20;
+  display: block;
+}
+
 .billiards-score {
   height: 3.5rem;
   flex: 0 0 3.5rem;

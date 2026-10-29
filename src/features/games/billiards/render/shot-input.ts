@@ -20,6 +20,7 @@ export function createShotInput(options: {
   reset(animate: boolean): void;
 }) {
   let source: Source | null = null;
+  let aimOnly = false;
 
   function cancel(owner?: Source) {
     if (source === null || (owner && owner !== source)) return;
@@ -56,7 +57,7 @@ export function createShotInput(options: {
     const distance = Math.hypot(dx, dy);
     // 与原球桌手势相同：朝手指反方向瞄准，7cm 死区、55cm 满行程。
     if (distance > 0.035) options.setAngle(Math.atan2(-dy, -dx));
-    update("table", (distance - 0.07) / 0.55);
+    update("table", aimOnly ? 0 : (distance - 0.07) / 0.55);
   }
 
   function release(owner: Source) {
@@ -66,6 +67,10 @@ export function createShotInput(options: {
       return;
     }
     source = null;
+    if (owner === "table" && aimOnly) {
+      options.reset(false);
+      return;
+    }
     const power = options.power();
     // 先释放手势，再由场景同步锁定本杆；重复松手不能再次提交。
     if (power >= 0.05) options.fire(Math.max(0.06, power));
@@ -75,6 +80,11 @@ export function createShotInput(options: {
   return {
     get source() {
       return source;
+    },
+    setAimOnly(value: boolean) {
+      if (aimOnly === value) return;
+      cancel();
+      aimOnly = value;
     },
     beginTable(point: Point) {
       if (begin("table")) drag(point);

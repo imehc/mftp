@@ -232,7 +232,7 @@ msgstr "{ply, plural, one {# 手} other {# 手}}"
 
 #. 斯诺克瞄准时首个将碰到的目标球的实际分值
 #. 球桌中央选球区域，球体下方仅显示实际分值
-#: src/features/games/billiards/BilliardsMatchView.tsx:401
+#: src/features/games/billiards/BilliardsMatchView.tsx:407
 #: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
 msgid "{points} 分"
 msgstr "{points} 分"
@@ -247,7 +247,7 @@ msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgstr "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 
 #: src/features/games/billiards/BilliardsDetails.tsx:81
-#: src/features/games/billiards/BilliardsMatchView.tsx:291
+#: src/features/games/billiards/BilliardsMatchView.tsx:293
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 
@@ -296,7 +296,7 @@ msgstr "{shooter} 未达到三球开球要求。由 {decisionSeat} 选择接受�
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# 杆} other {# 杆}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:270
+#: src/features/games/billiards/BilliardsMatchView.tsx:272
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 
@@ -304,8 +304,8 @@ msgstr "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:282
-#: src/features/games/billiards/BilliardsMatchView.tsx:349
+#: src/features/games/billiards/BilliardsMatchView.tsx:284
+#: src/features/games/billiards/BilliardsMatchView.tsx:351
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 
@@ -366,7 +366,7 @@ msgstr "{value} 的私钥口令"
 msgid "{value} 阶"
 msgstr "{value} 阶"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:264
+#: src/features/games/billiards/BilliardsMatchView.tsx:266
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} 获胜"
 
@@ -1389,6 +1389,11 @@ msgstr "仅本次预览"
 msgid "仅清理缩略图，模型保留。数据库空间会供后续写入复用。"
 msgstr "仅清理缩略图，模型保留。数据库空间会供后续写入复用。"
 
+#. 台球更多菜单开关：桌上拖动只瞄准，松手不击球；力度条仍可击球
+#: src/features/games/billiards/BilliardsAimOnlyControl.tsx:16
+msgid "仅瞄准"
+msgstr "仅瞄准"
+
 #. 明确任务清理不影响日志或运行中的任务
 #: src/features/activity/TransferActivityToolbar.tsx:148
 msgid "仅移除已完成或取消的任务，正在运行的任务和日志不受影响。"
@@ -2128,7 +2133,7 @@ msgstr "内容已截断"
 msgid "内容无效，无法解码"
 msgstr "内容无效，无法解码"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:498
+#: src/features/games/billiards/BilliardsMatchView.tsx:505
 #: src/features/games/engine/GameResultBar.tsx:84
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:242
 msgid "再来一局"
@@ -2989,7 +2994,7 @@ msgstr "发送请求"
 #: src/features/export/BackupPage.tsx:121
 #: src/features/export/BackupPage.tsx:161
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:48
-#: src/features/games/billiards/BilliardsHeader.tsx:124
+#: src/features/games/billiards/BilliardsHeader.tsx:126
 #: src/features/games/engine/BoardGameHeader.tsx:103
 #: src/features/games/engine/GameHeaderControls.tsx:77
 #: src/features/games/engine/GameHeaderControls.tsx:105
@@ -3189,7 +3194,7 @@ msgstr "可选"
 msgid "可选位置"
 msgstr "可选位置"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:102
+#: src/features/games/billiards/BilliardsHeader.tsx:104
 #: src/features/home/entries.tsx:184
 msgid "台球"
 msgstr "台球"
@@ -3582,8 +3587,8 @@ msgid "在标记的空格落子，沿横、竖或斜线夹住对方棋子，所�
 msgstr "在标记的空格落子，沿横、竖或斜线夹住对方棋子，所有被夹住的棋子都会翻为己方颜色。"
 
 #: src/features/games/billiards/BilliardsShotHelp.tsx:6
-msgid "在母球后方拖动可瞄准并蓄力，松手击球。也可保持当前方向，拖动力度条后松手击球；拖回零力度或按 Esc 取消。键盘方向键调整力度，回车或空格击球。"
-msgstr "在母球后方拖动可瞄准并蓄力，松手击球。也可保持当前方向，拖动力度条后松手击球；拖回零力度或按 Esc 取消。键盘方向键调整力度，回车或空格击球。"
+msgid "在母球后方拖动可瞄准并蓄力，松手击球。在更多菜单开启“仅瞄准”后，球桌拖动只瞄准，松手不击球。也可保持当前方向，拖动力度条后松手击球；拖回零力度或按 Esc 取消。键盘方向键调整力度，回车或空格击球。"
+msgstr "在母球后方拖动可瞄准并蓄力，松手击球。在更多菜单开启“仅瞄准”后，球桌拖动只瞄准，松手不击球。也可保持当前方向，拖动力度条后松手击球；拖回零力度或按 Esc 取消。键盘方向键调整力度，回车或空格击球。"
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:89
 msgid "在线"
@@ -4088,7 +4093,7 @@ msgstr "对局尚未成功保存，请重试。异常退出后可能丢失最新
 msgid "对局数据不一致，连接已停止。"
 msgstr "对局数据不一致，连接已停止。"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:266
+#: src/features/games/billiards/BilliardsMatchView.tsx:268
 msgid "对局结束"
 msgstr "对局结束"
 
@@ -5073,7 +5078,7 @@ msgstr "当前地址"
 msgid "当前密钥"
 msgstr "当前密钥"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:119
+#: src/features/games/billiards/BilliardsHeader.tsx:121
 #: src/features/games/engine/BoardGameHeader.tsx:98
 #: src/features/games/engine/GameHeaderControls.tsx:72
 #: src/features/games/engine/GameHeaderControls.tsx:100
@@ -8317,7 +8322,7 @@ msgstr "添加附件"
 msgid "清台"
 msgstr "清台"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:262
+#: src/features/games/billiards/BilliardsMatchView.tsx:264
 msgid "清台完成！"
 msgstr "清台完成！"
 
@@ -10158,7 +10163,7 @@ msgstr "认证方式"
 #. 斯诺克主动认输本局
 #. 棋类对局主动承认失败
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:51
-#: src/features/games/billiards/BilliardsHeader.tsx:81
+#: src/features/games/billiards/BilliardsHeader.tsx:83
 #: src/features/games/junqi/JunqiMatchView.tsx:190
 #: src/features/games/junqi/JunqiMatchView.tsx:276
 #: src/features/games/junqi/labels.tsx:117
@@ -10993,7 +10998,7 @@ msgstr "返回日志列表"
 msgid "返回来源"
 msgstr "返回来源"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:51
+#: src/features/games/billiards/BilliardsHeader.tsx:52
 #: src/features/games/engine/BoardGameHeader.tsx:56
 #: src/features/games/engine/online/OnlineLobby.tsx:71
 msgid "返回模式选择"
@@ -11017,7 +11022,7 @@ msgstr "返回选择"
 #: src/components/ToolPageHeader.tsx:54
 #: src/components/ToolPageHeader.tsx:54
 #: src/features/bt/BtTool.tsx:124
-#: src/features/games/billiards/BilliardsHeader.tsx:58
+#: src/features/games/billiards/BilliardsHeader.tsx:59
 #: src/features/games/engine/BoardGameHeader.tsx:66
 #: src/features/ssh-sftp/SshSftpTool.tsx:202
 msgid "返回首页"
@@ -11187,8 +11192,8 @@ msgctxt "棋面简称"
 msgid "连长"
 msgstr "连长"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:127
-#: src/features/games/billiards/BilliardsMatchView.tsx:506
+#: src/features/games/billiards/BilliardsHeader.tsx:129
+#: src/features/games/billiards/BilliardsMatchView.tsx:513
 #: src/features/games/engine/BoardGameHeader.tsx:106
 #: src/features/games/engine/GameHeaderControls.tsx:108
 msgid "退出"
@@ -11208,7 +11213,7 @@ msgstr "退出信号：{exitSignal}"
 msgid "退出对局"
 msgstr "退出对局"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:116
+#: src/features/games/billiards/BilliardsHeader.tsx:118
 #: src/features/games/engine/BoardGameHeader.tsx:95
 #: src/features/games/engine/GameHeaderControls.tsx:97
 msgid "退出当前对局？"

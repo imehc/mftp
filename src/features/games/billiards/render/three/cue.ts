@@ -15,6 +15,7 @@ import {
   CUE_PULL_DISTANCE,
   CUE_TIP_GAP,
 } from "./cue-clearance";
+import { createCueHitTest } from "./cue-hit";
 import type { Resources } from "./resources";
 
 function cueTexture(band: CueBand, resources: Resources) {
@@ -97,6 +98,7 @@ export function createCue(equipment: TableEquipment, resources: Resources) {
   layer.visible = false;
   return {
     layer,
+    hitTest: createCueHitTest(stick, length),
     pose(
       x: number,
       z: number,

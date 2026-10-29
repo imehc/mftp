@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   prepareRack: vi.fn((_state: unknown) => true),
   updateRack: vi.fn(),
   finishRack: vi.fn(),
+  preview: vi.fn(() => null),
 }));
 
 vi.mock("../audio", () => ({
@@ -26,7 +27,7 @@ vi.mock("../audio", () => ({
 vi.mock("../aim-preview", () => ({
   createAimPreview: () => ({
     invalidate: vi.fn(),
-    get: () => null,
+    get: mocks.preview,
     dispose: vi.fn(),
   }),
 }));
@@ -117,6 +118,10 @@ function setup(
     },
     compileAsync: vi.fn(() => compile),
   } as unknown as WebGLRenderer;
+  const surface = {
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  } as unknown as HTMLElement;
   const callbacks = {
     onPowerPreview: vi.fn(),
     onShot: vi.fn(() => true),
@@ -130,6 +135,7 @@ function setup(
       : createInitialState("practice");
   const scene = createScene(
     renderer,
+    surface,
     callbacks,
     equipment,
     state.balls.map((ball) => ball.id),
@@ -137,10 +143,15 @@ function setup(
     false,
     resume,
   );
-  scene.resize(1024, 600);
+  scene.resize({
+    width: 1024,
+    height: 600,
+    table: { x: 0, y: 0, width: 1024, height: 600 },
+    portrait: false,
+  });
   scene.setPosition(state, true);
   const input = vi.mocked(createTableInput).mock.lastCall![2];
-  return { scene, state, callbacks, input, renderer };
+  return { scene, state, callbacks, input, renderer, surface };
 }
 
 afterEach(() => {
@@ -149,6 +160,21 @@ afterEach(() => {
 });
 
 describe("台球入场场景生命周期", () => {
+  it("手势和关闭选球只监听原输入面，绘制画布不接收指针事件", () => {
+    const { scene, renderer, surface } = setup();
+    expect(vi.mocked(createTableInput).mock.lastCall?.[0]).toBe(surface);
+    expect(surface.addEventListener).toHaveBeenCalledWith(
+      "pointerdown",
+      expect.any(Function),
+    );
+    expect(renderer.domElement.addEventListener).not.toHaveBeenCalled();
+    scene.destroy();
+    expect(surface.removeEventListener).toHaveBeenCalledWith(
+      "pointerdown",
+      expect.any(Function),
+    );
+  });
+
   it("力度条使用当前瞄准并同步球杆后拉，出杆后锁定两种输入", async () => {
     const { scene, callbacks, input } = setup();
     expect(scene.beginPowerShot()).toBe(false);
@@ -170,7 +196,63 @@ describe("台球入场场景生命周期", () => {
     scene.destroy();
   });
 
-  it.each(["取消", "回合更新", "禁用", "选球"])(
+  it("仅瞄准设置传到球桌输入，切换取消旧手势且力度条沿新角度出杆", async () => {
+    const { scene, state, callbacks, input } = setup();
+    await Promise.resolve();
+    vi.mocked(createIntro).mock.lastCall![0].ready();
+    const cue = state.balls.find((ball) => ball.id === 0)!;
+    input.down({ x: cue.x - 1, y: cue.y });
+    scene.setAimOnly(true);
+    input.up({ x: cue.x - 1, y: cue.y });
+    expect(callbacks.onShot).not.toHaveBeenCalled();
+    input.down({ x: cue.x, y: cue.y - 1 });
+    input.move({ x: cue.x, y: cue.y - 2 });
+    // 手势尚未释放时就请求完整参考线，不能依赖 up 恢复静止预览。
+    expect(mocks.preview).toHaveBeenLastCalledWith(
+      state.balls,
+      Math.PI / 2,
+      0.5,
+      0,
+    );
+    input.up({ x: cue.x, y: cue.y - 2 });
+    expect(callbacks.onShot).not.toHaveBeenCalled();
+    expect(callbacks.onPowerPreview).toHaveBeenLastCalledWith(0);
+    scene.beginPowerShot();
+    scene.updateShotPower(0.6);
+    scene.releasePowerShot();
+    expect(callbacks.onShot).toHaveBeenCalledExactlyOnceWith(Math.PI / 2, 0.6);
+    scene.destroy();
+  });
+
+  it("低力度只延长瞄准预览，实际出杆仍使用当前力度", async () => {
+    const { scene, callbacks } = setup();
+    await Promise.resolve();
+    vi.mocked(createIntro).mock.lastCall![0].ready();
+    scene.beginPowerShot();
+    scene.updateShotPower(0.1);
+    expect(mocks.preview).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.any(Number),
+      0.5,
+      0,
+    );
+    scene.updateShotPower(0.8);
+    expect(mocks.preview).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.any(Number),
+      0.8,
+      0,
+    );
+    scene.updateShotPower(0.1);
+    scene.releasePowerShot();
+    expect(callbacks.onShot).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Number),
+      0.1,
+    );
+    scene.destroy();
+  });
+
+  it.each(["取消", "回合更新", "禁用", "选球", "布局更新"])(
     "%s 会结束力度条输入，迟到释放不出杆",
     async (reason) => {
       const { scene, state, callbacks } = setup();
@@ -179,6 +261,13 @@ describe("台球入场场景生命周期", () => {
       scene.beginPowerShot();
       scene.updateShotPower(0.7);
       if (reason === "取消") scene.cancelInput();
+      if (reason === "布局更新")
+        scene.resize({
+          width: 900,
+          height: 500,
+          table: { x: 120, y: 30, width: 650, height: 420 },
+          portrait: false,
+        });
       if (reason === "回合更新")
         scene.setPosition({ ...state, shotCount: 1 }, true);
       if (reason === "禁用") scene.setPosition(state, false);

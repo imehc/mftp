@@ -11,6 +11,7 @@ import { describe, expect, it } from "vitest";
 
 import { EQUIPMENT } from "../../equipment";
 import { tableLayout } from "../layout";
+import type { BilliardsViewport } from "../viewport";
 import type { CameraFocus } from "./camera";
 import { createTableCamera } from "./camera";
 
@@ -33,6 +34,75 @@ const viewports = [
 ] as const;
 
 describe("台球正俯视与摆球近景取景", () => {
+  it("全屏绘制在横竖布局及入场过程中保留原球桌像素位置", () => {
+    for (const equipment of Object.values(EQUIPMENT)) {
+      const rig = createTableCamera(equipment);
+      const original = createTableCamera(equipment);
+      rig.focus(focus);
+      original.focus(focus);
+      for (const [width, height, portrait] of viewports) {
+        const table = { x: 37, y: 91, width, height };
+        const viewport: BilliardsViewport = {
+          width: width + 183,
+          height: height + 147,
+          table,
+          portrait,
+        };
+        rig.resize(width, height, portrait, viewport);
+        original.resize(width, height, portrait);
+        for (const progress of [0, 0.3, 0.7, 1]) {
+          rig.entrance(progress);
+          original.entrance(progress);
+          expect(rig.camera.projectionMatrix.elements).toEqual(
+            original.camera.projectionMatrix.elements,
+          );
+          for (const x of [-1, 0, 1])
+            for (const z of [-0.5, 0, 0.5])
+              for (const y of [0, 0.15]) {
+                const point = new Vector3(x, y, z);
+                const before = point.clone().project(original.camera);
+                const after = point.clone().project(rig.renderCamera);
+                expect(((after.x + 1) * viewport.width) / 2).toBeCloseTo(
+                  table.x + ((before.x + 1) * width) / 2,
+                  9,
+                );
+                expect(((1 - after.y) * viewport.height) / 2).toBeCloseTo(
+                  table.y + ((1 - before.y) * height) / 2,
+                  9,
+                );
+              }
+        }
+      }
+    }
+  });
+
+  it("扩展视野包含旧边界外的点，取消扩展后恢复原投影", () => {
+    for (const equipment of Object.values(EQUIPMENT)) {
+      const rig = createTableCamera(equipment);
+      rig.resize(400, 300, false, {
+        width: 600,
+        height: 500,
+        table: { x: 100, y: 100, width: 400, height: 300 },
+        portrait: false,
+      });
+      for (const [x, y] of [
+        [1.25, 0],
+        [-1.25, 0],
+        [0, 1.25],
+        [0, -1.25],
+      ]) {
+        const point = new Vector3(x, y, 0).unproject(rig.camera);
+        const projection = point.project(rig.renderCamera);
+        expect(Math.abs(projection.x)).toBeLessThan(1);
+        expect(Math.abs(projection.y)).toBeLessThan(1);
+      }
+      rig.resize(400, 300, false);
+      expect(rig.renderCamera.projectionMatrix.elements).toEqual(
+        rig.camera.projectionMatrix.elements,
+      );
+    }
+  });
+
   it("斯诺克采用正交投影，左右及顶库球的轮廓均保持等宽高", () => {
     const equipment = EQUIPMENT.snooker;
     const rig = createTableCamera(equipment);

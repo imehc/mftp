@@ -26,6 +26,7 @@ import { BallTray, SeatCell, seatName } from "./BilliardsScore";
 import { BilliardsVictory } from "./BilliardsVictory";
 import { NineBallScore } from "./NineBallHud";
 import { equipmentForState } from "./placement";
+import { useBilliardsPreferences } from "./preferences";
 import {
   BilliardsStage,
   type BilliardsStageHandle,
@@ -71,6 +72,7 @@ export function MatchView({
   headerProps: BilliardsHeaderProps;
 }) {
   const desktop = useDesktopLayout();
+  const aimOnly = useBilliardsPreferences((state) => state.aimOnly);
   const { runner, local } = session;
   const snapshot = useMatchSnapshot(runner);
   const state = snapshot.state;
@@ -369,9 +371,13 @@ export function MatchView({
       </GameDisplayBar>
 
       <div
-        className="billiards-stage relative z-0 min-h-0 min-w-0 flex-1 overflow-hidden"
+        className="billiards-stage relative z-30 min-h-0 min-w-0 flex-1 overflow-hidden"
         onPointerDown={(event) => {
-          if (panel === "rules" && event.target instanceof HTMLCanvasElement)
+          if (
+            panel === "rules" &&
+            event.target instanceof HTMLElement &&
+            event.target.hasAttribute("data-billiards-input")
+          )
             openPanel(null);
         }}
       >
@@ -407,6 +413,7 @@ export function MatchView({
         <LightNoticeStack notices={notices} />
         <BilliardsStage
           ref={stageRef}
+          aimOnly={aimOnly}
           resume={
             session.restored || runner.hasStarted || snapshot.moveCount > 0
           }

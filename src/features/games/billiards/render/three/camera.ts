@@ -2,6 +2,7 @@ import { OrthographicCamera, PerspectiveCamera } from "three";
 
 import type { TableEquipment } from "../../equipment";
 import { tableLayout } from "../layout";
+import type { BilliardsViewport } from "../viewport";
 
 export interface CameraFocus {
   x: number;
@@ -17,11 +18,13 @@ export function createTableCamera(equipment: TableEquipment) {
     equipment.id === "snooker"
       ? new OrthographicCamera(-1, 1, 1, -1, 0.01, 40)
       : new PerspectiveCamera(35, 1, 0.01, 40);
+  const renderCamera = camera.clone();
   const { OUTER_W, OUTER_H } = tableLayout(equipment);
   let intro = 0;
   let portrait = false;
   let aspect = 1;
   let focus: CameraFocus | null = null;
+  let viewport: BilliardsViewport | undefined;
 
   function apply() {
     camera.up.set(portrait ? 1 : 0, 0, portrait ? 0 : -1);
@@ -53,13 +56,42 @@ export function createTableCamera(equipment: TableEquipment) {
     camera.updateProjectionMatrix();
     camera.lookAt(targetX, 0, targetZ);
     camera.updateMatrixWorld();
+    if (
+      camera instanceof OrthographicCamera &&
+      renderCamera instanceof OrthographicCamera
+    )
+      renderCamera.copy(camera);
+    if (
+      camera instanceof PerspectiveCamera &&
+      renderCamera instanceof PerspectiveCamera
+    )
+      renderCamera.copy(camera);
+    if (viewport) {
+      const { table, width, height } = viewport;
+      // 扩展原取景四周，所有台面点在页面上的像素位置保持不变。
+      renderCamera.setViewOffset(
+        table.width,
+        table.height,
+        -table.x,
+        -table.y,
+        width,
+        height,
+      );
+    }
   }
 
   return {
     camera,
-    resize(width: number, height: number, nextPortrait: boolean) {
+    renderCamera,
+    resize(
+      width: number,
+      height: number,
+      nextPortrait: boolean,
+      nextViewport?: BilliardsViewport,
+    ) {
       aspect = Math.max(1, width) / Math.max(1, height);
       portrait = nextPortrait;
+      viewport = nextViewport;
       apply();
     },
     entrance(value: number) {

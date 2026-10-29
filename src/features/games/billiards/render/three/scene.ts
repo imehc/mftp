@@ -15,6 +15,7 @@ import { createDefaultAim } from "../default-aim";
 import { runPresentation } from "../playback";
 import type { BilliardsScene, SceneCallbacks } from "../scene-contract";
 import { createShotInput } from "../shot-input";
+import type { BilliardsViewport } from "../viewport";
 import { createAimTargetPublisher } from "./aim-target";
 import { createBallSelection } from "./ball-selection";
 import { createBallLayer } from "./balls";
@@ -32,13 +33,14 @@ import { buildTable } from "./table";
 
 export function createScene(
   renderer: WebGLRenderer,
+  inputSurface: HTMLElement,
   callbacks: SceneCallbacks,
   equipment: TableEquipment,
   ballIds: readonly number[],
   mobile: boolean,
   repeatIntro = false,
   resumeIntro = false,
-): BilliardsScene & { resize(width: number, height: number): void } {
+): BilliardsScene & { resize(viewport: BilliardsViewport): void } {
   const resources = createResources();
 
   let releaseLighting = () => {};
@@ -52,7 +54,7 @@ export function createScene(
   }
 
   function initialize(): BilliardsScene & {
-    resize(width: number, height: number): void;
+    resize(viewport: BilliardsViewport): void;
   } {
     const BALL_RADIUS = equipment.ballRadius;
     const HEAD_SPOT_X = -equipment.tableWidth / 4;
@@ -72,7 +74,7 @@ export function createScene(
         const cue = cuePos();
         if (cue) drawCueStick(cue.x, cue.y);
       }
-      renderer.render(world, camera.camera);
+      renderer.render(world, camera.renderCamera);
     }, callbacks.onError);
     // --- 可变场景状态 -----------------------------------------------
     let balls: BallState[] = [];
@@ -122,7 +124,7 @@ export function createScene(
       if (selection.active) callbacks.onDismissSelection?.();
     };
 
-    renderer.domElement.addEventListener("pointerdown", dismissSelection);
+    inputSurface.addEventListener("pointerdown", dismissSelection);
 
     function updateAimTarget() {
       publishAim(
@@ -237,10 +239,11 @@ export function createScene(
 
       const cue = cuePos();
       if (!cue) return;
+      // 瞄准线需抵达远球或库边；低力度不能把参考线截在母球附近。
       const guide = preview.get(
         balls,
         aimAngle,
-        shotInput.source !== null ? Math.max(0.06, cuePull.value) : 0.5,
+        Math.max(0.5, cuePull.value),
         followDraw,
       );
       if (guide) hud.guide(guide);
@@ -322,8 +325,12 @@ export function createScene(
       redrawOverlays();
     }
 
-    const input = createTableInput(renderer.domElement, camera.camera, {
+    const input = createTableInput(inputSurface, camera.camera, {
       enabled: () => canInput() && shotInput.source !== "power",
+      outsideHit: (event, bounds) =>
+        !ballInHand &&
+        cueView.layer.visible &&
+        cueView.hitTest(event, camera.camera, bounds),
       down(p) {
         if (ballInHand) {
           placingDrag = true;
@@ -464,7 +471,7 @@ export function createScene(
         !rack.prepare(position);
       // 先预热实际球桌着色器；异步完成前退出不再创建动画或触发 runner。
       void renderer
-        .compileAsync(world, camera.camera)
+        .compileAsync(world, camera.renderCamera)
         .then(() => {
           if (disposed) return;
           intro = createIntro({
@@ -521,14 +528,12 @@ export function createScene(
     }
 
     return {
-      resize(width: number, height: number) {
-        camera.resize(
-          width,
-          height,
-          window.matchMedia("(orientation: portrait)").matches,
-        );
+      resize(viewport) {
+        cancelInput();
+        const { width, height, table, portrait } = viewport;
+        camera.resize(table.width, table.height, portrait, viewport);
         hud.resize(width, height);
-        selection.resize(width, height);
+        selection.resize(table.width, table.height);
         updateAimTarget();
         clock.invalidate();
       },
@@ -545,6 +550,10 @@ export function createScene(
       updateShotPower: shotInput.updateShotPower,
       releasePowerShot: shotInput.releasePowerShot,
       cancelPowerShot: shotInput.cancelPowerShot,
+      setAimOnly(value) {
+        cancelInput();
+        shotInput.setAimOnly(value);
+      },
       setFollowDraw(nextFollowDraw) {
         followDraw = nextFollowDraw;
         redrawOverlays();
@@ -557,10 +566,7 @@ export function createScene(
         intro?.dispose();
         rack.finish();
         renderer.domElement.style.opacity = "1";
-        renderer.domElement.removeEventListener(
-          "pointerdown",
-          dismissSelection,
-        );
+        inputSurface.removeEventListener("pointerdown", dismissSelection);
         selection.dispose();
         shotInput.cancel();
         input.dispose();

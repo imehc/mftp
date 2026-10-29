@@ -16,7 +16,7 @@ function setup(portrait: boolean) {
   const target = new EventTarget();
   const rect = { left: 23, top: 47, width: portrait ? 390 : 1024, height: 600 };
   let captured: number | null = null;
-  const canvas = Object.assign(target, {
+  const surface = Object.assign(target, {
     getBoundingClientRect: () => rect,
     setPointerCapture: (pointer: number) => {
       captured = pointer;
@@ -25,7 +25,7 @@ function setup(portrait: boolean) {
     releasePointerCapture: () => {
       captured = null;
     },
-  }) as unknown as HTMLCanvasElement;
+  }) as unknown as HTMLDivElement;
   const rig = createTableCamera(CHINESE_EIGHT);
   rig.resize(rect.width, rect.height, portrait);
   rig.entrance(0);
@@ -36,7 +36,7 @@ function setup(portrait: boolean) {
     up: vi.fn(),
     cancel: vi.fn(),
   };
-  const input = createTableInput(canvas, rig.camera, handlers);
+  const input = createTableInput(surface, rig.camera, handlers);
 
   function pointer(type: string, x: number, y: number) {
     const projected = new Vector3(x, 0, y).project(rig.camera);
@@ -50,10 +50,51 @@ function setup(portrait: boolean) {
     target.dispatchEvent(event);
   }
 
-  return { handlers, input, pointer, rig, rect };
+  return { handlers, input, pointer, rig, rect, surface };
 }
 
 describe("正俯视指针输入", () => {
+  it.each(["mouse", "touch", "pen"])(
+    "%s 从全屏绘制坐标命中原输入面，越界释放仍对应正确台面位置",
+    (pointerType) => {
+      const { handlers, input, rig, rect, surface } = setup(false);
+      const width = rect.width + 200;
+      const height = rect.height + 150;
+      rig.resize(rect.width, rect.height, false, {
+        width,
+        height,
+        table: {
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height,
+        },
+        portrait: false,
+      });
+      for (const [type, x, y] of [
+        ["pointerdown", -0.6, 0.2],
+        ["pointermove", -3, 1],
+        ["pointerup", -3.2, 1.2],
+      ] as const) {
+        const projected = new Vector3(x, 0, y).project(rig.renderCamera);
+        surface.dispatchEvent(
+          Object.assign(new Event(type), {
+            pointerId: 1,
+            pointerType,
+            button: 0,
+            clientX: ((projected.x + 1) * width) / 2,
+            clientY: ((1 - projected.y) * height) / 2,
+          }),
+        );
+      }
+      expect(handlers.down.mock.lastCall![0].x).toBeCloseTo(-0.6, 10);
+      expect(handlers.up.mock.lastCall![0].x).toBeCloseTo(-3.2, 10);
+      expect(handlers.up.mock.lastCall![0].y).toBeCloseTo(1.2, 10);
+      expect(handlers.cancel).not.toHaveBeenCalled();
+      input.dispose();
+    },
+  );
+
   it.each([false, true])(
     "瞄准拖动与自由球落点保持台面坐标（竖屏：%s）",
     (portrait) => {

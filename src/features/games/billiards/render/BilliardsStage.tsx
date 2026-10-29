@@ -24,6 +24,7 @@ import type { BallSelectionRequest, BallSelectionView } from "./scene-contract";
 import type { PowerShotControls } from "./shot-input";
 import { hasEntered, markEntered } from "./three/intro";
 import { createScene } from "./three/scene";
+import { observeBilliardsViewport } from "./viewport";
 
 export interface BilliardsStageHandle extends PowerShotControls {
   cancelInput(): void;
@@ -50,6 +51,8 @@ export interface BilliardsStageProps {
   equipment?: TableEquipment;
   /** 本地玩家此时可以瞄准/击球。 */
   interactive: boolean;
+  /** 只限制球桌拖动，力度条仍可沿当前角度击球。 */
+  aimOnly?: boolean;
   /** 跟杆/缩杆旋转：-0.7 缩杆，0 中性，+0.7 跟杆。 */
   followDraw: number;
   /** 拖动时实时蓄力预览（0..1），松开/取消时为 0。 */
@@ -91,7 +94,7 @@ export const BilliardsStage = forwardRef<
     if (!host) return;
     let disposed = false;
     let renderer: WebGLRenderer | null = null;
-    let observer: ResizeObserver | null = null;
+    let viewport: ReturnType<typeof observeBilliardsViewport> | null = null;
     let scene: ReturnType<typeof createScene> | null = null;
 
     let removeContextListener = () => {};
@@ -99,7 +102,7 @@ export const BilliardsStage = forwardRef<
     const cleanup = () => {
       if (disposed) return;
       disposed = true;
-      observer?.disconnect();
+      viewport?.dispose();
       removeContextListener();
       scene?.destroy();
       sceneRef.current = null;
@@ -131,7 +134,10 @@ export const BilliardsStage = forwardRef<
         Math.min(window.devicePixelRatio || 1, mobile ? 2 : 3),
       );
       const canvas = next.domElement;
-      canvas.style.display = "block";
+      canvas.className = "billiards-canvas";
+      // 球杆可以跨过控件显示，整个绘制层必须让点击落到原控件。
+      canvas.style.pointerEvents = "none";
+      canvas.setAttribute("aria-hidden", "true");
 
       const contextLost = (event: Event) => {
         event.preventDefault();
@@ -146,10 +152,15 @@ export const BilliardsStage = forwardRef<
       canvas.addEventListener("webglcontextlost", contextLost);
       removeContextListener = () =>
         canvas.removeEventListener("webglcontextlost", contextLost);
-      host.appendChild(canvas);
-      const entryHost = host.closest(".billiards-game") ?? host;
+      const entryHost =
+        host.closest<HTMLElement>(".billiards-game") ??
+        host.parentElement ??
+        host;
+      // 脱离页面的裁剪与层叠上下文，才能跨过应用导航和标题分隔线。
+      document.body.append(canvas);
       scene = createScene(
         next,
+        host,
         {
           onPowerPreview: (power) => propsRef.current.onPowerPreview(power),
           onAimTarget: (target) => propsRef.current.onAimTarget?.(target),
@@ -183,25 +194,22 @@ export const BilliardsStage = forwardRef<
       );
       sceneRef.current = scene;
 
-      const resize = () => {
+      viewport = observeBilliardsViewport(host, (bounds) => {
         if (disposed) return;
         try {
-          const width = Math.max(1, host.clientWidth);
-          const height = Math.max(1, host.clientHeight);
-          next.setSize(width, height);
-          scene?.resize(width, height);
+          next.setSize(bounds.width, bounds.height);
+          scene?.resize(bounds);
         } catch (error) {
           fail(error);
         }
-      };
+      });
 
-      resize();
+      viewport.measure();
       if (!disposed) {
         scene.setPosition(propsRef.current.state, propsRef.current.interactive);
         scene.setFollowDraw(propsRef.current.followDraw);
+        scene.setAimOnly(propsRef.current.aimOnly === true);
         scene.setSelection(propsRef.current.selection ?? null);
-        observer = new ResizeObserver(resize);
-        observer.observe(host);
       }
     } catch (error) {
       fail(error);
@@ -215,6 +223,9 @@ export const BilliardsStage = forwardRef<
   useEffect(() => {
     sceneRef.current?.setFollowDraw(props.followDraw);
   }, [props.followDraw]);
+  useEffect(() => {
+    sceneRef.current?.setAimOnly(props.aimOnly === true);
+  }, [props.aimOnly]);
   useEffect(() => {
     sceneRef.current?.setSelection(props.selection ?? null);
   }, [props.selection]);
@@ -238,7 +249,7 @@ export const BilliardsStage = forwardRef<
 
   return (
     <div className="relative h-full w-full touch-none">
-      <div ref={containerRef} className="h-full w-full" />
+      <div ref={containerRef} data-billiards-input className="h-full w-full" />
       {selectionView ? (
         <BallSelectionOverlay
           view={selectionView}

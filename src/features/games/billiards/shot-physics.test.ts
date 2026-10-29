@@ -79,6 +79,25 @@ it("自由球附近的低力度预览不会穿过未能抵达的目标", () => {
   expect(guide.contact.x).toBeLessThan(0.8 - BALL_RADIUS * 2);
 });
 
+it("瞄准参考线的最低预览力度可以抵达各球桌远端目标球", () => {
+  for (const equipment of Object.values(EQUIPMENT)) {
+    const x = equipment.tableWidth / 2 - equipment.ballRadius * 3;
+    const y = equipment.tableHeight / 2 - equipment.ballRadius * 3;
+    for (const targetY of [0, y]) {
+      for (const followDraw of [-0.7, 0, 0.7]) {
+        const balls = [ball(0, -x, -targetY), ball(1, x, targetY)];
+        const angle = Math.atan2(targetY, x);
+        const guide = computeAimGuide(balls, angle, followDraw, 0.5, equipment);
+        expect(guide?.target?.id).toBe(1);
+        expect(
+          Math.hypot(guide!.contact.x - x, guide!.contact.y - targetY),
+        ).toBeCloseTo(equipment.ballRadius * 2, 2);
+        expect(guide!.target!.length).toBeGreaterThan(0);
+      }
+    }
+  }
+});
+
 it("中袋落袋记录保留入射速度，台面内擦袋口不会被吸入", () => {
   const toward = simulateShot([ball(0, 0, 0)], {
     angle: Math.PI / 2,

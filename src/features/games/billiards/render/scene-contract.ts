@@ -8,6 +8,7 @@ export interface BilliardsScene extends PowerShotControls {
   cancelInput(): void;
   setPosition(state: BilliardsState, interactive: boolean): void;
   setFollowDraw(followDraw: number): void;
+  setAimOnly(value: boolean): void;
   playPresentation(presentation: BilliardsPresentation): Promise<void>;
   animateCue(angle: number, power: number, ai: boolean): Promise<void>;
   destroy(): void;

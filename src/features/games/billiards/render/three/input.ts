@@ -3,7 +3,7 @@ import { type Camera, Plane, Raycaster, Vector2, Vector3 } from "three";
 import { unlockAudio } from "../audio";
 
 export function createTableInput(
-  canvas: HTMLCanvasElement,
+  surface: HTMLElement,
   camera: Camera,
   handlers: {
     enabled(): boolean;
@@ -11,6 +11,7 @@ export function createTableInput(
     move(point: { x: number; y: number }): void;
     up(point: { x: number; y: number }): void;
     cancel(): void;
+    outsideHit?(event: PointerEvent, bounds: DOMRect): boolean;
   },
 ) {
   const ray = new Raycaster();
@@ -20,7 +21,7 @@ export function createTableInput(
   let active: number | null = null;
 
   const point = (e: PointerEvent) => {
-    const rect = canvas.getBoundingClientRect();
+    const rect = surface.getBoundingClientRect();
     ndc.set(
       ((e.clientX - rect.left) / rect.width) * 2 - 1,
       1 - ((e.clientY - rect.top) / rect.height) * 2,
@@ -32,8 +33,14 @@ export function createTableInput(
   const release = () => {
     const pointer = active;
     active = null;
-    if (pointer !== null && canvas.hasPointerCapture(pointer))
-      canvas.releasePointerCapture(pointer);
+    if (handlers.outsideHit)
+      document.removeEventListener("touchmove", preventScroll);
+    if (pointer !== null && surface.hasPointerCapture(pointer))
+      surface.releasePointerCapture(pointer);
+  };
+
+  const preventScroll = (event: TouchEvent) => {
+    if (active !== null) event.preventDefault();
   };
 
   const cancel = () => {
@@ -54,9 +61,33 @@ export function createTableInput(
       return;
     const p = point(e);
     if (!p) return;
+    // div 输入面与球桌外球杆都不能启动浏览器文字选择或原生拖放。
+    e.preventDefault();
     active = e.pointerId;
-    canvas.setPointerCapture(active);
+    surface.setPointerCapture(active);
     handlers.down(p);
+  };
+
+  const outsideDown = (event: PointerEvent) => {
+    if (event.defaultPrevented || active !== null || !handlers.enabled())
+      return;
+    const path = event.composedPath();
+    if (path.includes(surface)) return;
+    // 控件始终优先；只接管非控件区域中可见球杆的窄命中范围。
+    if (
+      path.some(
+        (node) =>
+          node instanceof Element &&
+          node.matches(
+            'a, button, input, textarea, select, label, summary, [tabindex], [role="button"], [role="slider"], [role="switch"], [role="combobox"], [role="menuitem"], [contenteditable]:not([contenteditable="false"]), [data-slot="slider"]',
+          ),
+      )
+    )
+      return;
+    if (!handlers.outsideHit?.(event, surface.getBoundingClientRect())) return;
+    down(event);
+    if (active !== null && event.pointerType === "touch")
+      document.addEventListener("touchmove", preventScroll, { passive: false });
   };
 
   const move = (e: PointerEvent) => {
@@ -81,22 +112,26 @@ export function createTableInput(
     if (e.pointerId === active) cancel();
   };
 
-  canvas.addEventListener("pointerdown", down);
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerup", up);
-  canvas.addEventListener("pointercancel", lost);
-  canvas.addEventListener("lostpointercapture", lost);
+  surface.addEventListener("pointerdown", down);
+  surface.addEventListener("pointermove", move);
+  surface.addEventListener("pointerup", up);
+  surface.addEventListener("pointercancel", lost);
+  surface.addEventListener("lostpointercapture", lost);
   window.addEventListener("blur", cancel);
+  if (handlers.outsideHit)
+    document.addEventListener("pointerdown", outsideDown);
   return {
     cancel,
     dispose() {
       cancel();
-      canvas.removeEventListener("pointerdown", down);
-      canvas.removeEventListener("pointermove", move);
-      canvas.removeEventListener("pointerup", up);
-      canvas.removeEventListener("pointercancel", lost);
-      canvas.removeEventListener("lostpointercapture", lost);
+      surface.removeEventListener("pointerdown", down);
+      surface.removeEventListener("pointermove", move);
+      surface.removeEventListener("pointerup", up);
+      surface.removeEventListener("pointercancel", lost);
+      surface.removeEventListener("lostpointercapture", lost);
       window.removeEventListener("blur", cancel);
+      if (handlers.outsideHit)
+        document.removeEventListener("pointerdown", outsideDown);
     },
   };
 }
