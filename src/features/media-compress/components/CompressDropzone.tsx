@@ -131,7 +131,7 @@ export function CompressDropzone({
           </div>
           <div>
             <p className="text-sm font-medium">{title}</p>
-            <p className="text-muted-foreground mt-1 text-xs">{description}</p>
+            <p className="app-description mt-1">{description}</p>
           </div>
           <Button
             density="adaptive"

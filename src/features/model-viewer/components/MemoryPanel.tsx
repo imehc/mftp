@@ -106,13 +106,13 @@ export function MemoryPanel({
           </div>
         ))}
       </dl>
-      <p className="text-muted-foreground text-xs leading-relaxed">
+      <p className="app-description">
         <Trans comment="内存估算口径说明，避免把逐模型相加当作总占用">
           逐模型值含共享引用，总计已去重；源数据不等于常驻内存，隐藏模型仍占内存。
         </Trans>
       </p>
       {state.total.unknown > 0 ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans comment="存在无法估算的分配时，合计只是已知部分">
             部分分配无法估算，合计不完整。
           </Trans>
@@ -215,7 +215,7 @@ export function MemoryPanel({
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-muted-foreground text-xs">
+      <p className="app-description">
         <Trans>
           每秒最多记录一次，保留最近 120
           个样本；后台停止记录。虚线表示提醒阈值。

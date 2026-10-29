@@ -79,7 +79,7 @@ export default function HomePage({ category }: { category?: HomeCategory }) {
                     {entry.title}
                   </span>
                   {description ? (
-                    <span className="text-muted-foreground mt-1 block text-xs">
+                    <span className="app-description mt-1 block">
                       {description}
                     </span>
                   ) : null}

@@ -310,7 +310,7 @@ export function ModelList({
           </FieldDescription>
         </div>
       ) : null}
-      <p className="text-muted-foreground text-xs">
+      <p className="app-description">
         <Trans>导入会追加模型。隐藏保留资源，移除不会删除源文件。</Trans>
       </p>
     </div>

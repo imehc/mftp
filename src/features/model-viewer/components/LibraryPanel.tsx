@@ -245,7 +245,7 @@ export function LibraryPanel({
                   >
                     <Trans>清理缓存</Trans>
                   </Button>
-                  <p className="text-xs">
+                  <p className="app-description">
                     <Trans>
                       仅清理缩略图，模型保留。数据库空间会供后续写入复用。
                     </Trans>

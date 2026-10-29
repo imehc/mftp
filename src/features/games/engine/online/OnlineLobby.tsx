@@ -285,7 +285,7 @@ export function OnlineLobby<M>({
               <Trans>取消连接</Trans>
             </Button>
           ) : null}
-          <p className="text-muted-foreground text-center text-xs">
+          <p className="app-description text-center">
             <Trans>仅限同一局域网内联机</Trans>
           </p>
         </AppPageContent>

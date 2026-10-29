@@ -48,7 +48,7 @@ export function RuntimeControls({
               <Trans>启用陀螺仪控制</Trans>
             )}
           </Button>
-          <p role="status" className="text-muted-foreground text-xs">
+          <p role="status" className="app-description">
             {phase === "denied" ? (
               <Trans>未获得方向传感器权限，可继续手动操作。</Trans>
             ) : phase === "unsupported" ? (
@@ -98,7 +98,7 @@ export function RuntimeControls({
               </Trans>
             </p>
           ) : null}
-          <p className="text-xs">
+          <p className="app-description">
             <Trans comment="画质自动降级策略与耗时数据的来源">
               慢帧或热状态升高时自动降级，稳定后恢复；耗时来自应用采样，不代表
               GPU 时间。

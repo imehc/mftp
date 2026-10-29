@@ -121,7 +121,7 @@ export default function RsyncSyncDialog({
                       {describeError(state.error, t)}
                     </AlertDescription>
                   </Alert>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="app-description">
                     <Trans>本次操作尚未执行任何写入。</Trans>
                   </p>
                 </>
@@ -196,12 +196,12 @@ export default function RsyncSyncDialog({
                     </ul>
                   ) : null}
                   {preview.items.length > VISIBLE_ITEMS ? (
-                    <p className="text-muted-foreground text-xs">
+                    <p className="app-description">
                       <Trans>仅显示前 {VISIBLE_ITEMS} 项，执行仍处理全部</Trans>
                     </p>
                   ) : null}
                   {preview.truncated ? (
-                    <p className="text-muted-foreground text-xs">
+                    <p className="app-description">
                       <Trans>更改过多，预览不完整，执行仍处理全部</Trans>
                     </p>
                   ) : null}

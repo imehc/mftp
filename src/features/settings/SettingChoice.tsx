@@ -55,6 +55,8 @@ export default function SettingChoice({
           wrapValue
           id={id}
           aria-label={title}
+          aria-invalid={error || undefined}
+          aria-describedby={description ? `${id}-description` : undefined}
           className="w-40 max-w-full"
         >
           <SelectValue />

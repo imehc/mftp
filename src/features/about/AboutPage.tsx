@@ -80,7 +80,7 @@ export default function AboutPage() {
         <div className="flex shrink-0 flex-col items-center gap-2 py-6">
           <AppLogo decorative className="size-10 rounded-xl" />
           <h1 className="text-lg font-semibold">MFTP</h1>
-          <p className="text-muted-foreground text-xs">
+          <p className="app-description">
             <Trans>本地文件与数据工具</Trans>
           </p>
         </div>

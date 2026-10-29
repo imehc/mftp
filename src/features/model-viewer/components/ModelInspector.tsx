@@ -74,12 +74,12 @@ function ModelInformation({ inspection }: { inspection: ModelInspection }) {
           </div>
         ))}
       </dl>
-      <p className="text-muted-foreground text-xs leading-relaxed">
+      <p className="app-description">
         <Trans comment="模型统计口径：按唯一对象计数，实例与面数另算">
           统计按唯一对象，实例另列；面数按完整几何体计算。
         </Trans>
       </p>
-      <p className="text-muted-foreground text-xs">
+      <p className="app-description">
         <Trans>源文件大小不等于内存占用。</Trans>
       </p>
     </div>

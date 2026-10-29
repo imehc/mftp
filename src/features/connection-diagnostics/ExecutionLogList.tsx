@@ -152,12 +152,12 @@ export default function ExecutionLogList({
         </p>
       ) : null}
       {logs.discarded ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans>执行详情仅保留最近记录，历史摘要仍可查看。</Trans>
         </p>
       ) : null}
       {history.logs.length >= 500 ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans>当前显示最近 500 条历史摘要。</Trans>
         </p>
       ) : null}

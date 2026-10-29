@@ -73,7 +73,7 @@ export default function TranslationPackManager({
           <p className="text-sm font-medium">
             <Trans>开放译文包</Trans>
           </p>
-          <p className="text-muted-foreground mt-0.5 truncate text-xs">
+          <p className="app-description mt-0.5 truncate">
             {packCount
               ? t`已导入 ${packCount} 个译文包`
               : t`仅导入带作者、来源和许可证的本地 JSON`}

@@ -49,8 +49,7 @@ function FieldGroup({
       className={cn(
         "group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3",
         density === "default" && "*:data-[slot=field-group]:gap-4",
-        density === "compact" &&
-          "gap-3 **:data-[slot=field]:gap-1.5 **:data-[slot=field-description]:text-xs",
+        density === "compact" && "gap-3 **:data-[slot=field]:gap-1.5",
         className,
       )}
       {...props}
@@ -147,8 +146,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="field-description"
       className={cn(
-        "text-muted-foreground text-left text-sm leading-normal font-normal group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5",
-        "last:mt-0 nth-last-2:-mt-1",
+        "app-description text-left group-has-data-horizontal/field:text-balance",
         "[&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4",
         className,
       )}

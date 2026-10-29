@@ -123,7 +123,7 @@ export function NavigationPanel({
             保存当前视角
           </Trans>
         </Button>
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans>视角仅在本次会话保留。</Trans>
         </p>
         {state.views.map(({ id, name }) => (

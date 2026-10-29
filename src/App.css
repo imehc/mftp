@@ -107,6 +107,11 @@
   }
 }
 
+/* 字段、设置项和操作补充说明共用字号与行高，间距由所在布局负责。 */
+@utility app-description {
+  @apply text-muted-foreground text-xs leading-normal font-normal;
+}
+
 @utility app-page-width {
   max-width: 72rem;
 }

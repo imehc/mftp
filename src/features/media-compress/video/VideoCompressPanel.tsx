@@ -219,7 +219,7 @@ export default function VideoCompressPanel() {
                 <FieldLabel htmlFor="video-keep-audio" className="leading-none">
                   <Trans>保留音频</Trans>
                 </FieldLabel>
-                <FieldDescription className="mt-0!">
+                <FieldDescription>
                   {meta && !meta.hasAudio ? (
                     <Trans>源视频没有音轨</Trans>
                   ) : !audioCodecOk ? (

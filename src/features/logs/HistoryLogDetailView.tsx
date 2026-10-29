@@ -134,12 +134,12 @@ export default function HistoryLogDetailView({
                 {describeError(execution.error, t)}
               </p>
             ) : (
-              <p className="text-muted-foreground mt-3 text-sm">
+              <p className="app-description mt-3">
                 <Trans>当前未保留执行详情，历史摘要仍可查看。</Trans>
               </p>
             )
           ) : !detail ? (
-            <p className="text-muted-foreground text-sm">
+            <p className="app-description">
               <Trans>此操作仅保留摘要。</Trans>
             </p>
           ) : null}

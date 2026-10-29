@@ -92,7 +92,7 @@ export function MagicCubeControls({
           180°
         </Button>
       </div>
-      <p className="text-muted-foreground text-xs">
+      <p className="app-description">
         <Trans>方向以正对所选面为准，层号从该面向内数。</Trans>
       </p>
     </div>

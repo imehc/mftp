@@ -328,7 +328,7 @@ export function AnimationBar({
             </p>
           </FieldGroup>
           {!state.duration ? (
-            <p className="text-muted-foreground text-xs">
+            <p className="app-description">
               <Trans>此片段时长为零，仅显示静态姿态。</Trans>
             </p>
           ) : null}

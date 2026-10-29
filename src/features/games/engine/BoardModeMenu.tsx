@@ -163,7 +163,7 @@ export function BoardModeMenu<P extends { moves: number }>({
                     <span className="block text-sm font-medium">
                       {item.title}
                     </span>
-                    <span className="text-muted-foreground block text-xs">
+                    <span className="app-description block">
                       {item.description}
                     </span>
                   </span>

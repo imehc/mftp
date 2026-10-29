@@ -103,7 +103,7 @@ function PreviewContent({
             {text?.body}
           </pre>
           {text?.truncated ? (
-            <p className="text-muted-foreground mt-3 rounded-lg border p-3 text-xs">
+            <p className="app-description mt-3 rounded-lg border p-3">
               <Trans>仅显示开头部分</Trans>
             </p>
           ) : null}

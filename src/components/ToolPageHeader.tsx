@@ -84,9 +84,7 @@ export function ToolPageHeader({
             {title}
           </h1>
           {description ? (
-            <p className="text-muted-foreground truncate text-xs">
-              {description}
-            </p>
+            <p className="app-description truncate">{description}</p>
           ) : null}
         </div>
         {children}

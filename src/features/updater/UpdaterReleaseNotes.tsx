@@ -50,7 +50,7 @@ export default function UpdaterReleaseNotes({
         </div>
       ) : null}
       {truncated ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans comment="发布说明被长度限制截断">说明已截断</Trans>
         </p>
       ) : null}

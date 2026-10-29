@@ -103,7 +103,7 @@ export default function PeersPanel({ infoHash }: { infoHash: string }) {
           </Table>
         )}
       </div>
-      <span className="text-muted-foreground text-right text-xs">
+      <span className="app-description text-right">
         <Trans>每 2 秒刷新 · IP 已脱敏</Trans>
       </span>
     </div>

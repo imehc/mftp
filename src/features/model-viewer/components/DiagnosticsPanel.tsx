@@ -144,7 +144,7 @@ export function DiagnosticsPanel({
             ))}
           </dl>
         ) : null}
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans comment="两点测量使用源模型坐标">姿态变化后需重新选点。</Trans>
         </p>
       </FieldGroup>
@@ -176,7 +176,7 @@ export function DiagnosticsPanel({
             分析网格拓扑
           </Trans>
         </Button>
-        <details className="text-muted-foreground text-xs">
+        <details className="app-description">
           <summary
             data-slot="touch-label"
             className="min-h-8 cursor-pointer content-center py-1"
@@ -216,7 +216,7 @@ export function DiagnosticsPanel({
                 </div>
               ))}
             </dl>
-            <p className="text-muted-foreground text-xs">
+            <p className="app-description">
               <Trans comment="网格拓扑检查结果的解读口径">
                 开放网格无法确定内外，法线不一致仅为提示；退化三角形不计入边统计。
               </Trans>
@@ -237,7 +237,7 @@ export function DiagnosticsPanel({
             验证 glTF 规范
           </Trans>
         </Button>
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans>离线检查原始文件；部分扩展可能不受支持。</Trans>
         </p>
       </FieldGroup>

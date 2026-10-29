@@ -48,7 +48,7 @@ export default function ImportPanel({
           <div className="mt-3 flex flex-col gap-2">
             <p className="text-sm font-medium break-all">{c.file.name}</p>
             {c.file.preview.encrypted ? (
-              <p className="text-muted-foreground text-xs">
+              <p className="app-description">
                 <Trans>加密备份将在导入时解密，当前无法预览数据范围。</Trans>
               </p>
             ) : (
@@ -108,7 +108,7 @@ export default function ImportPanel({
                 </SelectContent>
               </Select>
             </Field>
-            <p className="text-muted-foreground text-xs">
+            <p className="app-description">
               <Trans>
                 导入前请核对数据范围，覆盖模式会删除对应模块中的现有记录。
               </Trans>

@@ -48,7 +48,7 @@ export default function UpdaterProgress() {
         </>
       ) : null}
       {status === "downloading" && phase === "connecting" && slow ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans comment="更新源响应慢，仍在等待">
             连接较慢，仍在等待响应。
           </Trans>

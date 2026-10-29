@@ -300,7 +300,7 @@ export default function PoetrySpeech({
                   </Button>
                 </div>
                 {speech.catalog && !voices.length ? (
-                  <p className="text-muted-foreground text-sm">
+                  <p className="app-description">
                     <Trans>
                       请在系统设置的辅助功能中下载中文语音，再刷新音色列表。
                     </Trans>

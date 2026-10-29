@@ -253,7 +253,7 @@ export default function ImageResizePanel() {
                 )}
               </div>
               {dimensionMode === "exact" ? (
-                <p className="text-muted-foreground mt-2 text-xs">
+                <p className="app-description mt-2">
                   <Trans comment="固定宽高与原图比例不同时的后果">
                     宽高比例不同会拉伸变形
                   </Trans>

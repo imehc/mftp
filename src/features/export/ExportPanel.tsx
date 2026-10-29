@@ -101,12 +101,12 @@ export default function ExportPanel({
                   <FieldError id="backup-password-error">{t`两次输入的密码不一致`}</FieldError>
                 ) : null}
               </Field>
-              <p className="text-muted-foreground text-xs">
+              <p className="app-description">
                 <Trans>请妥善保管密码，导入时需要使用。</Trans>
               </p>
             </>
           ) : (
-            <p className="text-muted-foreground text-xs">
+            <p className="app-description">
               <Trans>导出为明文 JSON 文件，请妥善保管。</Trans>
             </p>
           )}

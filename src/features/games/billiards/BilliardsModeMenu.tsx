@@ -155,7 +155,7 @@ export function BilliardsModeMenu({
               <item.icon className="text-muted-foreground size-5 shrink-0" />
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium">{item.title}</span>
-                <span className="text-muted-foreground block text-xs">
+                <span className="app-description block">
                   {item.description}
                 </span>
               </span>

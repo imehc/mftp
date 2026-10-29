@@ -91,7 +91,7 @@ export function AttachmentsDialog({
             </div>
           </DialogLayoutHeader>
           <DialogLayoutBody className="-m-1 flex min-w-0 flex-col gap-4 p-1 wrap-anywhere">
-            <p className="text-muted-foreground text-sm">
+            <p className="app-description">
               <Trans>
                 支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多
                 16 项、合计 32 MiB。
@@ -202,14 +202,14 @@ export function AttachmentsDialog({
               >
                 <h3 className="font-medium break-all">{state.selected.name}</h3>
                 {state.text === null ? (
-                  <p className="text-muted-foreground text-sm">
+                  <p className="app-description">
                     <Trans>
                       PDF 不在应用内预览。请保存副本后使用 PDF 阅读器打开。
                     </Trans>
                   </p>
                 ) : (
                   <>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="app-description">
                       <Trans comment="附件正文渲染方式">按纯文本展示。</Trans>
                     </p>
                     <pre

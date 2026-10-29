@@ -92,6 +92,9 @@ export default function TransferSetting() {
             id="settings-transfer"
             label={modeLabels[mode]}
             aria-label={title}
+            aria-describedby={
+              description ? "settings-transfer-description" : undefined
+            }
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent

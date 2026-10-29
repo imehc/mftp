@@ -83,11 +83,11 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
             </Trans>
           )}
         </Button>
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans>HDR · 最大 2048 × 1024 / 32 MiB</Trans>
         </p>
         {isTauriRuntime() ? (
-          <p className="text-muted-foreground text-xs">
+          <p className="app-description">
             <Trans comment="HDR 环境写入本机存储，跨会话恢复">
               本机记住场景环境。
             </Trans>
@@ -254,7 +254,7 @@ export function PreviewPanel({ runtime }: { runtime: ModelViewerRuntime }) {
             还原模型预览
           </Trans>
         </Button>
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans comment="材质与显示调整不会写入模型文件">仅影响预览。</Trans>
         </p>
       </FieldGroup>

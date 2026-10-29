@@ -31,9 +31,7 @@ export function SettingsEntry({
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-medium">{title}</span>
         {description ? (
-          <span className="text-muted-foreground mt-0.5 block text-xs">
-            {description}
-          </span>
+          <span className="app-description mt-0.5 block">{description}</span>
         ) : null}
       </span>
       <ChevronRight className="text-muted-foreground size-4 shrink-0" />

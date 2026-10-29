@@ -6,6 +6,7 @@ import {
   Field,
   FieldContent,
   FieldDescription,
+  FieldError,
   FieldLabel,
 } from "~/components/ui/field";
 
@@ -30,6 +31,7 @@ export default function SettingsControl({
   return (
     <Field
       orientation="horizontal"
+      data-invalid={error || undefined}
       className={cn(
         "gap-3 border-b px-1 py-2 last:border-0 has-[>[data-slot=field-content]]:items-center",
         compact ? "min-h-12" : "min-h-[max(44px,4rem)]",
@@ -43,12 +45,13 @@ export default function SettingsControl({
           {title}
         </FieldLabel>
         {description ? (
-          <FieldDescription
-            role={error ? "alert" : undefined}
-            className="text-xs"
-          >
-            {description}
-          </FieldDescription>
+          error ? (
+            <FieldError id={`${id}-description`}>{description}</FieldError>
+          ) : (
+            <FieldDescription id={`${id}-description`}>
+              {description}
+            </FieldDescription>
+          )
         ) : null}
       </FieldContent>
       <div

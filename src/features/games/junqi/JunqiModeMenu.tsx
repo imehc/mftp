@@ -36,7 +36,7 @@ export function JunqiModeMenu({
               label: t(label),
             }))}
           />
-          <p className="text-muted-foreground text-xs">
+          <p className="app-description">
             {variant === "hidden" ? (
               <Trans>己方身份可见，对方身份隐藏。</Trans>
             ) : variant === "flip" ? (

@@ -31,7 +31,7 @@ export default function LanDiscoveredDevicesPanel({
           <h2 className="truncate text-sm font-semibold">
             <Trans>附近设备</Trans>
           </h2>
-          <p className="text-muted-foreground truncate text-xs">
+          <p className="app-description truncate">
             <Trans comment="附近设备面板副标题，仅同网段的 MFTP 客户端会被发现">
               同网段设备
             </Trans>
@@ -96,7 +96,7 @@ export default function LanDiscoveredDevicesPanel({
                     })}
                   </div>
                   {!device.online ? (
-                    <div className="text-muted-foreground mt-0.5 text-xs">
+                    <div className="app-description mt-0.5">
                       <Trans>离线，无法打开</Trans>
                     </div>
                   ) : null}

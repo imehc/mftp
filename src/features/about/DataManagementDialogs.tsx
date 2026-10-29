@@ -123,7 +123,7 @@ export default function DataManagementDialogs({
                 </div>
               ))}
             </div>
-            <p className="text-muted-foreground text-xs">
+            <p className="app-description">
               <Trans>
                 主数据库和密钥文件包含正在使用的记录，请在对应模块内清理。
               </Trans>
@@ -155,7 +155,7 @@ export default function DataManagementDialogs({
               </span>
             </div>
           ) : null}
-          <p className="text-muted-foreground text-xs">
+          <p className="app-description">
             <Trans>如果相关任务仍在运行，请先完成任务后再清理。</Trans>
           </p>
           {c.writeError ? (

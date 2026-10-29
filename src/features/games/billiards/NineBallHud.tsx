@@ -194,7 +194,7 @@ export function NineBallActions({
             <Trans comment="台球对局请求双方同意重新摆球">提议重摆</Trans>
           </Button>
           {state.placementRegion === "head" ? (
-            <span className="text-muted-foreground">
+            <span className="app-description">
               <Trans>开球母球须在头线后，可调整至出杆。</Trans>
             </span>
           ) : null}

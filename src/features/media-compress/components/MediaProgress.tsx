@@ -40,7 +40,7 @@ export default function MediaProgress({
           <div className="bg-primary h-full" style={{ width: `${percent}%` }} />
         </div>
       ) : null}
-      <p className="text-muted-foreground text-xs">
+      <p className="app-description">
         <Trans comment="媒体处理进行中，关闭应用会中断处理">请勿关闭应用</Trans>
       </p>
       <div className="flex justify-end max-md:[&>button]:w-full">

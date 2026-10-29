@@ -226,7 +226,7 @@ export function RecordingExport(props: RecordingExportProps) {
         {secondary}
       </div>
       {!props.compact ? (
-        <p className="text-muted-foreground text-xs">
+        <p className="app-description">
           <Trans>最长 60 秒 · 黑色背景 · 无音频 · 不含工具面板</Trans>
         </p>
       ) : null}

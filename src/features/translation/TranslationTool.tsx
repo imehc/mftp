@@ -283,7 +283,7 @@ export default function TranslationTool() {
             className="field-sizing-fixed min-h-0 flex-1 resize-none rounded-none border-x-0 border-t border-b-0 px-3 py-3 text-sm shadow-none focus-visible:ring-2"
           />
           <div className="flex items-center justify-between gap-2 px-3 py-2">
-            <span className="text-muted-foreground text-xs">
+            <span className="app-description">
               {stale && <Trans>输入、语言或模型已更改，请重新翻译。</Trans>}
             </span>
             <CopyButton
@@ -299,7 +299,7 @@ export default function TranslationTool() {
         </section>
       </div>
       {model?.installed ? (
-        <p className="text-muted-foreground shrink-0 text-center text-xs leading-relaxed">
+        <p className="app-description shrink-0 text-center">
           <Trans comment="翻译区域下方的模型来源说明；链接文字是当前所选模型名称">
             由{" "}
             <a
@@ -323,10 +323,7 @@ export default function TranslationTool() {
         </p>
       ) : (
         snapshot && (
-          <p
-            className="text-muted-foreground shrink-0 text-center text-xs leading-relaxed"
-            role="status"
-          >
+          <p className="app-description shrink-0 text-center" role="status">
             <Trans>未配置驱动模型，</Trans>{" "}
             <Button
               variant="link"

@@ -84,7 +84,7 @@ export default function PoetryLocalManagement({ controller }: Props) {
                 />
                 <Trans>正文全文索引</Trans>
               </p>
-              <p className="text-muted-foreground mt-0.5 truncate text-xs">
+              <p className="app-description mt-0.5 truncate">
                 {bodyIndex?.enabled
                   ? t`已索引 ${toLocaleStringValue2} 篇`
                   : t`关闭时正文搜索较慢`}
@@ -108,7 +108,7 @@ export default function PoetryLocalManagement({ controller }: Props) {
               <p className="text-sm font-medium">
                 <Trans>注释包（译文 / 赏析）</Trans>
               </p>
-              <p className="text-muted-foreground mt-0.5 truncate text-xs">
+              <p className="app-description mt-0.5 truncate">
                 {annotationsCount
                   ? t`已安装 ${toLocaleStringValue3} 条，约 14MB`
                   : t`未安装；仅点击时下载，可随时删除`}

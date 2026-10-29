@@ -67,7 +67,7 @@ export function SceneTree({
 
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <p id={`${treeId}-help`} className="text-muted-foreground text-xs">
+      <p id={`${treeId}-help`} className="app-description">
         <Trans comment="场景树键盘操作说明">上下键移动，左右键展开收起。</Trans>
       </p>
       <div

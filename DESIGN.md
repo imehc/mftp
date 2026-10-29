@@ -82,6 +82,7 @@ rem 随应用显示大小变化；下表 px 示例以根字号 16px 为准，不
 ## 字体、颜色与图标
 
 - 标准正文 `text-sm`，辅助信息 `text-xs`；区域标题 `text-sm font-medium` 或 `font-semibold`，与页面标题保持层级。
+- 字段说明统一用 `FieldDescription`；设置项、操作补充说明和格式/容量提示复用 `app-description`，共用 `text-xs leading-normal font-normal text-muted-foreground`，跟随主题与显示大小。间距由父级布局控制，普通/紧凑表单只调整间距。不要：逐页覆盖同类说明的字号、行高和颜色，或用说明样式承载校验错误、正文及主要状态。
 - 例外：iOS 的共享文本输入控件使用 `max(16px, 1rem)`，防止聚焦时 WebView 自动放大；75% 显示大小、横屏和输入组同样遵守。不要：用页面字号覆盖此下限，或通过禁止用户缩放来规避。
 - 继承现有 sans/mono/poetry 字体职责；代码、诗词正文、棋盘文字可以有内容特有的字号。
 - 字体预设必须覆盖全部字体职责。设置中提供字体选择时，sans / mono / poetry 三类令牌都要响应；不要：让某一类文字（如诗词正文）不随预设变化。

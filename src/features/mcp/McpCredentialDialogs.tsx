@@ -106,7 +106,7 @@ export function McpCredentialConfirmation({
             </Trans>
           </p>
           {action.kind === "update" ? (
-            <p className="text-muted-foreground text-sm">
+            <p className="app-description">
               <Trans>
                 保存后，所选权限统一适用于全部模块，包括后续新增模块。
               </Trans>
@@ -169,7 +169,7 @@ export function McpIssuedDialog({
             readOnly
             autoComplete="off"
           />
-          <p className="text-muted-foreground text-sm">
+          <p className="app-description">
             <Trans>
               仅交给可信的本机 MCP 客户端。共享凭据等于共享数据访问权限。
             </Trans>

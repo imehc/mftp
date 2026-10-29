@@ -253,9 +253,7 @@ function SnookerRuleChoice({
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-sm font-medium">{children}</span>
         {description ? (
-          <span className="text-muted-foreground text-xs leading-relaxed">
-            {description}
-          </span>
+          <span className="app-description">{description}</span>
         ) : null}
       </span>
       <ChevronRightIcon
