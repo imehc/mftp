@@ -157,8 +157,6 @@ export const aiProviderTestStreaming = (
   input: Parameters<typeof commands.aiProviderTestStreaming>[0],
 ) => unwrapCommand(commands.aiProviderTestStreaming(input));
 
-export const diagnosticsSnapshot = (after: number) =>
-  unwrapCommand(commands.diagnosticsSnapshot(after));
 export const diagnosticsClear = () => commands.diagnosticsClear();
 export const logsPage = (after?: string, limit?: number) =>
   unwrapCommand(commands.logsPage(after ?? null, limit ?? null));
@@ -192,16 +190,6 @@ export const keyImport = (
 ) => unwrapCommand(commands.keyImport(label, sourcePath, hasPassphrase));
 export const keyDelete = (id: string) => voidCommand(commands.keyDelete(id));
 
-export const activityLogs = (
-  limit?: number,
-  source?: string,
-  result?: string,
-) =>
-  unwrapCommand(
-    commands.activityLogs(limit ?? null, source ?? null, result ?? null),
-  );
-export const activityLogsClear = () =>
-  voidCommand(commands.activityLogsClear());
 export const activityLogDelete = (id: string) =>
   voidCommand(commands.activityLogDelete(id));
 
