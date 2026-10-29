@@ -227,9 +227,14 @@ export default function LibraryPage({
     <div className="flex h-full min-h-0 flex-col">
       {collectionsError ? (
         <PoetryReadError error={collectionsError} onRetry={retryCollections} />
-      ) : searchError && isSearching ? (
+      ) : null}
+      {searchError && isSearching ? (
         <PoetryReadError error={searchError} onRetry={retrySearch} />
-      ) : collectionsLoading ||
+      ) : null}
+      {(collectionsError && !loadedOnce) ||
+      (searchError &&
+        isSearching &&
+        results === null) ? null : collectionsLoading ||
         (isSearching && searching && results === null) ? (
         <div className="text-muted-foreground flex items-center justify-center gap-2 py-8 text-xs">
           <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
@@ -277,7 +282,10 @@ export default function LibraryPage({
     >
       {detailError ? (
         <PoetryReadError error={detailError} onRetry={retryDetail} />
-      ) : search.poem && !detailLoading && !detail ? (
+      ) : null}
+      {detailError && !detail ? null : search.poem &&
+        !detailLoading &&
+        !detail ? (
         <p className="text-muted-foreground p-4 text-center text-sm">
           <Trans>没有找到作品</Trans>
         </p>

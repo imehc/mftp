@@ -6,11 +6,13 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import QueryProvider from "~/app/QueryProvider";
 import type { ActivityLog, AppError, DiagnosticOperation } from "~/bindings";
 import {
   createHistoryController,
   summary,
 } from "~/features/logs/__fixtures__/history";
+import { createAppQueryClient } from "~/lib/query-client";
 import { messages as enMessages } from "~/locales/en/messages";
 import { messages as zhMessages } from "~/locales/zh-CN/messages";
 
@@ -65,6 +67,12 @@ vi.mock("~/features/logs/use-activity-logs", () => ({
 vi.mock("./ActivityCenter", () => ({
   ActivityCenter: () => <div data-activity-center />,
 }));
+vi.mock("~/lib/ipc", () => ({
+  logsDetail: vi.fn(
+    async (id: string) =>
+      state.operations.find((item) => item.id === id) ?? null,
+  ),
+}));
 vi.mock("sonner", () => ({ toast: state.toast }));
 
 import ActivityPage from "./ActivityPage";
@@ -95,11 +103,13 @@ const operation: DiagnosticOperation = {
   details: [],
   error: null,
 };
+let client: ReturnType<typeof createAppQueryClient>;
 let root: Root;
 let container: HTMLDivElement;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  client = createAppQueryClient();
   state.search = { tab: "logs", operation: operation.id };
   state.operations = [operation];
   state.summaries = [];
@@ -120,15 +130,18 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  client.clear();
   vi.unstubAllGlobals();
 });
 
 async function render() {
   await act(async () =>
     root.render(
-      <I18nProvider i18n={i18n}>
-        <ActivityPage />
-      </I18nProvider>,
+      <QueryProvider client={client}>
+        <I18nProvider i18n={i18n}>
+          <ActivityPage />
+        </I18nProvider>
+      </QueryProvider>,
     ),
   );
 }

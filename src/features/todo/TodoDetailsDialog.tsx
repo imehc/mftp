@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-import type { TodoNoteDetails } from "~/bindings";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -13,11 +12,11 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 import { Spinner } from "~/components/ui/spinner";
-import { describeError, toIpcError } from "~/lib/errors";
-import { todoNoteDetails } from "~/lib/ipc";
-import type { AppError, TodoItem } from "~/types";
+import { describeError } from "~/lib/errors";
+import type { TodoItem } from "~/types";
 
 import TodoNoteContent from "./notes/TodoNoteContent";
+import { todoDetailsQuery } from "./queries";
 import TodoTimestamps from "./TodoTimestamps";
 
 export default function TodoDetailsDialog({
@@ -28,32 +27,9 @@ export default function TodoDetailsDialog({
   onClose: () => void;
 }) {
   const { t } = useLingui();
-  const [attempt, setAttempt] = useState(0);
-  const [state, setState] = useState<{
-    key: string;
-    details: TodoNoteDetails | null;
-    error: AppError | null;
-  }>({ key: "", details: null, error: null });
-  const id = item?.id;
-  const key = JSON.stringify([id, item?.updatedAt, attempt]);
-  useEffect(() => {
-    if (!id) return;
-    let active = true;
-    void todoNoteDetails(id).then(
-      (details) => {
-        if (active) setState({ key, details, error: null });
-      },
-      (error: unknown) => {
-        if (active)
-          setState({ key, details: null, error: toIpcError(error).payload });
-      },
-    );
-    return () => {
-      active = false;
-    };
-  }, [id, key]);
-  const details = state.key === key ? state.details : null;
-  const error = state.key === key ? state.error : null;
+  const query = useQuery(todoDetailsQuery(item?.id, item?.updatedAt));
+  const details = query.data ?? null;
+  const error = query.error;
   return (
     <Dialog open={item !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogLayoutContent
@@ -115,7 +91,7 @@ export default function TodoDetailsDialog({
                   <AlertDescription>{describeError(error, t)}</AlertDescription>
                   <Button
                     variant="outline"
-                    onClick={() => setAttempt((value) => value + 1)}
+                    onClick={() => void query.refetch({ cancelRefetch: false })}
                   >
                     <Trans>重试</Trans>
                   </Button>

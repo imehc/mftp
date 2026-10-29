@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { queryClient } from "~/lib/query-client";
 import type { AppError, RsyncCapabilities } from "~/types";
 
 import {
   forgetRsyncCapabilities,
   loadRsyncCapabilities,
-  useRsyncCapabilityStore,
+  rsyncCapabilityKey,
 } from "./capability-store";
 
 const ipcMock = vi.hoisted(() => ({ rsyncCapabilities: vi.fn() }));
@@ -33,7 +34,7 @@ function available(version = "3.2.7"): RsyncCapabilities {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  useRsyncCapabilityStore.setState({ entries: {} });
+  queryClient.clear();
 });
 
 describe("rsync 能力缓存", () => {
@@ -46,12 +47,13 @@ describe("rsync 能力缓存", () => {
     pending.resolve(available());
     await expect(first).resolves.toEqual(available());
     await expect(second).resolves.toEqual(available());
-    expect(useRsyncCapabilityStore.getState().entries.dedupe?.loading).toBe(
-      false,
-    );
+    expect(
+      queryClient.getQueryState(rsyncCapabilityKey("dedupe"))?.fetchStatus ===
+        "fetching",
+    ).toBe(false);
   });
 
-  it("刷新请求取代在途探测，迟到结果不覆盖新状态", async () => {
+  it("刷新等待在途探测退出后读取新状态", async () => {
     const stale = deferred<RsyncCapabilities>();
     const fresh = deferred<RsyncCapabilities>();
     ipcMock.rsyncCapabilities
@@ -59,14 +61,20 @@ describe("rsync 能力缓存", () => {
       .mockReturnValueOnce(fresh.promise);
     const slow = loadRsyncCapabilities("refresh");
     const refresh = loadRsyncCapabilities("refresh", true);
-    expect(ipcMock.rsyncCapabilities).toHaveBeenLastCalledWith("refresh", true);
-    fresh.resolve(available("3.5.1"));
-    await refresh;
+    expect(ipcMock.rsyncCapabilities).toHaveBeenCalledTimes(1);
     stale.resolve(available("3.0.0"));
     await slow;
+    await vi.waitFor(() =>
+      expect(ipcMock.rsyncCapabilities).toHaveBeenLastCalledWith(
+        "refresh",
+        true,
+      ),
+    );
+    fresh.resolve(available("3.5.1"));
+    await refresh;
     expect(
-      useRsyncCapabilityStore.getState().entries.refresh?.capabilities?.local
-        .version,
+      queryClient.getQueryData<RsyncCapabilities>(rsyncCapabilityKey("refresh"))
+        ?.local.version,
     ).toBe("3.5.1");
   });
 
@@ -77,7 +85,9 @@ describe("rsync 能力缓存", () => {
     forgetRsyncCapabilities("forget");
     pending.resolve(available());
     await request;
-    expect(useRsyncCapabilityStore.getState().entries.forget).toBeUndefined();
+    expect(
+      queryClient.getQueryData(rsyncCapabilityKey("forget")),
+    ).toBeUndefined();
   });
 
   it("探测错误保存完整协议并结束加载状态", async () => {
@@ -89,9 +99,11 @@ describe("rsync 能力缓存", () => {
     };
     ipcMock.rsyncCapabilities.mockRejectedValueOnce(error);
     await expect(loadRsyncCapabilities("error")).resolves.toBeNull();
-    expect(useRsyncCapabilityStore.getState().entries.error).toMatchObject({
-      loading: false,
-      error,
+    expect(
+      queryClient.getQueryState(rsyncCapabilityKey("error")),
+    ).toMatchObject({
+      fetchStatus: "idle",
+      error: { payload: error },
     });
   });
 

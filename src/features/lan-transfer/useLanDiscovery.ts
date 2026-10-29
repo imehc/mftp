@@ -1,17 +1,13 @@
 import { openUrl } from "@tauri-apps/plugin-opener";
-import {
-  startTransition,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { scheduleIdleTask } from "~/features/lan-transfer/lanTransferData";
 import { describeError, toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { createPoller } from "~/lib/polling";
+import { createQueryResource, type QueryResource } from "~/lib/query-resource";
+import { useQueryState } from "~/lib/use-query-state";
 import type { AppError, LanDiscoveredDevice } from "~/types";
 
 const OFFLINE_AFTER_MS = 30_000;
@@ -43,8 +39,14 @@ function mergeDevices(
     });
 }
 
+const discovery: QueryResource<LanDiscoveredDevice[]> = createQueryResource(
+  ["lan", "discovery"],
+  async () =>
+    mergeDevices(discovery.get() ?? [], await ipc.lanTransferDiscoverDevices()),
+);
+
 export function useLanDiscovery(active: boolean) {
-  const [devices, setDevices] = useState<LanDiscoveredDevice[]>([]);
+  const [devices] = useQueryState(discovery, []);
   const request = useRef({ generation: 0, pending: false });
   const [discoveryError, setDiscoveryError] = useState<AppError | null>(null);
   const [discovering, setDiscovering] = useState(false);
@@ -55,12 +57,9 @@ export function useLanDiscovery(active: boolean) {
     const generation = request.current.generation;
     setDiscovering(true);
     try {
-      const next = await ipc.lanTransferDiscoverDevices();
+      await discovery.fetch(true);
       if (generation !== request.current.generation) return;
       setDiscoveryError(null);
-      startTransition(() => {
-        setDevices((current) => mergeDevices(current, next));
-      });
     } catch (error) {
       if (generation === request.current.generation)
         setDiscoveryError(toIpcError(error).payload);
@@ -75,8 +74,6 @@ export function useLanDiscovery(active: boolean) {
   const refreshDiscoveryInEffect = useEffectEvent(refreshDiscovery);
   useEffect(() => {
     if (!active) {
-      // 用微任务延后，使 setState 发生在 effect 函数体之外。
-      queueMicrotask(() => setDevices((current) => mergeDevices(current, [])));
       return;
     }
     const requestState = request.current;
@@ -107,7 +104,7 @@ export function useLanDiscovery(active: boolean) {
 
   return {
     discoveryError,
-    discoveredDevices: devices,
+    discoveredDevices: mergeDevices(devices, []),
     discovering,
     refreshDiscovery,
     openDiscoveredDevice,

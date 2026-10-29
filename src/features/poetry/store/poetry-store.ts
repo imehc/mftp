@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { PoetryCollectionStatus, PoetrySearchScope } from "~/types";
+import type { PoetrySearchScope } from "~/types";
 
 import {
   type PoetryReadingView,
@@ -11,10 +11,6 @@ import {
 } from "../reading-view";
 
 interface PoetryState {
-  /** 来自 `poetry_collections()` 的已安装合集缓存镜像。 */
-  collections: PoetryCollectionStatus[];
-  setCollections: (collections: PoetryCollectionStatus[]) => void;
-
   /** 列表 / 详情视图所筛选到的合集 id；为空表示全部。 */
   activeCollectionIds: string[];
   toggleCollection: (id: string) => void;
@@ -47,9 +43,6 @@ const MAX_HISTORY = 12;
 export const usePoetryStore = create<PoetryState>()(
   persist(
     (set) => ({
-      collections: [],
-      setCollections: (collections) => set({ collections }),
-
       activeCollectionIds: [],
       toggleCollection: (id) =>
         set((state) => ({

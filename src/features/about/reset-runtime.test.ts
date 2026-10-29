@@ -133,3 +133,30 @@ it("普通浏览器不请求原生状态，失败后的状态读取仍失败时�
   expect(useResetStore.getState().canReturn).toBe(false);
   expect(useResetStore.getState().errors).toHaveLength(2);
 });
+
+it("重置拒绝旧查询与旧写回，错误恢复返回前仍清空缓存", async () => {
+  const { queryClient, queryScopeGuard, ipcQuery } =
+    await import("~/lib/query-client");
+  let finish!: (items: number[]) => void;
+  const pending = queryClient
+    .query(
+      ipcQuery(
+        ["todo", "list"],
+        () =>
+          new Promise<number[]>((done) => {
+            finish = done;
+          }),
+      ),
+    )
+    .catch(() => undefined);
+  const mayWrite = queryScopeGuard(queryClient, "ai");
+  queryClient.setQueryData(["ai", "configuration"], { revision: 1 });
+  vi.mocked(resetApplicationData).mockRejectedValue(failure);
+  vi.mocked(appDataResetStatus).mockResolvedValue(null);
+  await startReset();
+  finish([1]);
+  await pending;
+  expect(mayWrite()).toBe(false);
+  expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+  expect(queryClient.getMutationCache().getAll()).toHaveLength(0);
+});

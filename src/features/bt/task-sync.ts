@@ -2,6 +2,7 @@ import { useTransfersStore } from "~/store/transfers";
 import type { BtTaskInfo } from "~/types";
 
 import { magnetOf } from "./magnet";
+import { forgetBtTask as forgetTaskQueries } from "./queries";
 
 /**
  * BT 任务与全局传输面板的投影。
@@ -21,6 +22,7 @@ export function transferIdOf(infoHash: string): string {
 /** 丢弃登记，使下一次同步重新注册（删除、取消后调用）。 */
 export function forgetBtTask(infoHash: string): void {
   registered.delete(infoHash);
+  forgetTaskQueries(infoHash);
 }
 
 export function syncBtTask(task: BtTaskInfo, explicit = false): void {

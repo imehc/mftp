@@ -16,12 +16,12 @@ type Props = { controller: ReturnType<typeof usePoetryCollectionsManage> };
 export default function PoetryLocalManagement({ controller }: Props) {
   const { t } = useLingui();
   const localDataAvailable = isDesktopPlatform();
-  const { progress, selectedPendingIds, busy: syncBusy, starting } = controller;
+  const { selectedPendingIds, busy: syncBusy, starting } = controller;
   const {
     bodyIndex,
     annotationsCount,
     translationPacks,
-    setTranslationPacks,
+    onPacksChange,
     extrasError,
     extrasLoading,
     refreshExtras,
@@ -30,12 +30,7 @@ export default function PoetryLocalManagement({ controller }: Props) {
     toggleBodyIndex,
     installAnnotations,
     deleteAnnotations,
-  } = usePoetryLocalData(
-    progress,
-    selectedPendingIds,
-    syncBusy,
-    localDataAvailable,
-  );
+  } = usePoetryLocalData(selectedPendingIds, syncBusy, localDataAvailable);
   const toLocaleStringValue2 = bodyIndex?.indexedPoems.toLocaleString();
   const toLocaleStringValue3 = annotationsCount?.toLocaleString();
   return localDataAvailable ? (
@@ -144,7 +139,7 @@ export default function PoetryLocalManagement({ controller }: Props) {
           <TranslationPackManager
             packs={translationPacks}
             disabled={syncBusy || extrasBusy}
-            onChange={setTranslationPacks}
+            onChange={onPacksChange}
           />
         </div>
       )}

@@ -3,8 +3,10 @@ import { act, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import QueryProvider from "~/app/QueryProvider";
 import type { TranslationRequest, TranslationSnapshot } from "~/bindings";
 import * as ipc from "~/lib/ipc";
+import { createAppQueryClient } from "~/lib/query-client";
 
 import { useTranslation } from "./use-translation";
 
@@ -28,6 +30,7 @@ const request: Omit<TranslationRequest, "requestId"> = {
   sourceLanguage: "auto",
   targetLanguage: "zh-CN",
 };
+const client = createAppQueryClient();
 let root: Root;
 let container: HTMLDivElement;
 let controller: ReturnType<typeof useTranslation>;
@@ -58,11 +61,18 @@ beforeEach(async () => {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  await act(async () => root.render(<Probe />));
+  await act(async () =>
+    root.render(
+      <QueryProvider client={client}>
+        <Probe />
+      </QueryProvider>,
+    ),
+  );
 });
 
 afterEach(async () => {
   await act(async () => root.unmount());
+  client.clear();
   container.remove();
 });
 

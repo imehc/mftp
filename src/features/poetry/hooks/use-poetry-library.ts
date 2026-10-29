@@ -1,11 +1,17 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { describeError, toIpcError } from "~/lib/errors";
+import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
-import type { AppError, PoemDetail, PoemSummary } from "~/types";
 
+import {
+  collectionsQuery,
+  dailyQuery,
+  poetryDay,
+  searchQuery,
+} from "../queries";
 import { usePoetryStore } from "../store/poetry-store";
 import { usePoemRead } from "./use-poem-read";
 import { useDebouncedQuery } from "./use-poetry-search";
@@ -28,29 +34,42 @@ export function usePoetryLibrary({
   onOpenPoem,
 }: UsePoetryLibraryOptions) {
   const { t } = useLingui();
-  const collections = usePoetryStore((s) => s.collections);
-  const setCollections = usePoetryStore((s) => s.setCollections);
+  const collectionRead = useQuery(collectionsQuery());
+  const collections = collectionRead.data ?? [];
   const activeCollectionIds = usePoetryStore((s) => s.activeCollectionIds);
   const scope = usePoetryStore((s) => s.searchScope);
   const pushHistory = usePoetryStore((s) => s.pushSearchHistory);
   const { input, setInput, query } = useDebouncedQuery(300, search.q ?? "");
-  const [results, setResults] = useState<PoemSummary[] | null>(null);
-  const [searching, setSearching] = useState(false);
-  const [daily, setDaily] = useState<PoemDetail | null>(null);
   const {
     detail,
     loading: detailLoading,
     error: detailError,
     retry: retryDetail,
   } = usePoemRead(search.poem);
-  const [collectionsError, setCollectionsError] = useState<AppError | null>(
-    null,
-  );
-  const [collectionsRevision, setCollectionsRevision] = useState(0);
-  const [collectionsLoading, setCollectionsLoading] = useState(true);
-  const [collectionsLoaded, setCollectionsLoaded] = useState(false);
-  const [searchError, setSearchError] = useState<AppError | null>(null);
-  const [searchRevision, setSearchRevision] = useState(0);
+  const installedCount = collections.filter((item) => item.installed).length;
+  const [day, setDay] = useState(poetryDay);
+  useEffect(() => {
+    const update = () => setDay(poetryDay());
+    const timer = setInterval(update, 60_000);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
+  const dailyRead = useQuery({
+    ...dailyQuery(day),
+    enabled: installedCount > 0,
+  });
+  const searchRead = useQuery(searchQuery(query, scope, activeCollectionIds));
+  const isSearching = !!query.trim();
+  const results = isSearching ? (searchRead.data?.items ?? null) : null;
+  const searching = isSearching && searchRead.isFetching;
+  const daily = installedCount > 0 ? (dailyRead.data ?? null) : null;
+  const collectionsError = collectionRead.error?.payload ?? null;
+  const collectionsLoading = collectionRead.isPending;
+  const loadedOnce = collectionRead.data !== undefined;
+  const searchError = searchRead.error?.payload ?? null;
 
   // URL 与本地的查询双向镜像；skip 标志防止自己的导航回写覆盖正在输入的内容。
   const skipUrlSync = useRef(false);
@@ -75,96 +94,6 @@ export function usePoetryLibrary({
     pushQueryToUrl();
   }, [query]);
 
-  useEffect(() => {
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled) {
-        setCollectionsLoading(true);
-        setCollectionsError(null);
-      }
-    });
-    void ipc
-      .poetryCollections()
-      .then((result) => {
-        if (!cancelled) {
-          setCollections(result);
-          setCollectionsLoaded(true);
-        }
-      })
-      .catch((error) => {
-        if (!cancelled) setCollectionsError(toIpcError(error).payload);
-      })
-      .finally(() => {
-        if (!cancelled) setCollectionsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [setCollections, collectionsRevision]);
-
-  const installedCount = collections.filter(
-    (collection) => collection.installed,
-  ).length;
-  const loadedOnce =
-    collectionsLoaded && !collectionsError && !collectionsLoading;
-
-  useEffect(() => {
-    let cancelled = false;
-    if (installedCount > 0)
-      void ipc
-        .poetryDaily()
-        .then((poem) => {
-          if (!cancelled) setDaily(poem);
-        })
-        .catch(() => {
-          if (!cancelled) setDaily(null);
-        });
-    return () => {
-      cancelled = true;
-    };
-  }, [installedCount]);
-
-  const isSearching = query.trim().length > 0;
-  // 防抖后的搜索流程。状态更新被延后，使其在 effect 函数体之外发生。
-  useEffect(() => {
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled) {
-        setResults(null);
-        setSearchError(null);
-        setSearching(isSearching);
-      }
-    });
-    if (!isSearching)
-      return () => {
-        cancelled = true;
-      };
-    void ipc
-      .poetrySearch({
-        query,
-        scope,
-        collectionIds:
-          activeCollectionIds.length > 0 ? activeCollectionIds : null,
-        limit: 60,
-        offset: 0,
-      })
-      .then((result) => {
-        if (!cancelled) setResults(result.items);
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          setResults(null);
-          setSearchError(toIpcError(error).payload);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setSearching(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [activeCollectionIds, isSearching, query, scope, searchRevision]);
-
   const handleSelect = (uid: string) => onOpenPoem(uid);
 
   /** 用户主动提交查询：记入历史并立刻采用输入值。 */
@@ -181,7 +110,7 @@ export function usePoetryLibrary({
       if (poem) select(poem.uid);
     } catch (error) {
       toast.error(t`操作失败`, {
-        description: describeError(error),
+        description: describeError(error, t),
       });
     }
   };
@@ -203,9 +132,13 @@ export function usePoetryLibrary({
     loadedOnce,
     collectionsError,
     collectionsLoading,
-    retryCollections: () => setCollectionsRevision((value) => value + 1),
+    retryCollections: () => {
+      void collectionRead.refetch({ cancelRefetch: false });
+    },
     searchError,
-    retrySearch: () => setSearchRevision((value) => value + 1),
+    retrySearch: () => {
+      if (isSearching) void searchRead.refetch({ cancelRefetch: false });
+    },
     detailError,
     retryDetail,
     handleSelect,

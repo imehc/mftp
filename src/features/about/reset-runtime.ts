@@ -4,6 +4,7 @@ import { create } from "zustand";
 import type { AppDataResetFailure, AppDataResetProgress } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import { appDataResetStatus } from "~/lib/ipc";
+import { clearQueryData } from "~/lib/query-client";
 import type { AppError } from "~/types";
 
 import { resetApplicationData } from "./reset-app-data";
@@ -40,6 +41,7 @@ export function inspectReset() {
       return;
     }
     const hadReset = useResetStore.getState().progress !== null;
+    clearQueryData();
     useResetStore.setState({ phase: "checking", canReturn: false });
     try {
       const progress = await appDataResetStatus();
@@ -68,6 +70,7 @@ export function startReset(resume = false) {
   return exclusive(async () => {
     const id = resume ? useResetStore.getState().progress?.id : undefined;
     if (resume && !id) return;
+    clearQueryData();
     useResetStore.setState({
       phase: "running",
       errors: [],
@@ -101,6 +104,9 @@ export function startReset(resume = false) {
         errors.push(toIpcError(readError).payload);
         useResetStore.setState({ phase: "failed", errors, canReturn: false });
       }
+    } finally {
+      // 根边界卸载期间的晚到回调也必须清除，拒绝重置返回时重新读取。
+      clearQueryData();
     }
   });
 }

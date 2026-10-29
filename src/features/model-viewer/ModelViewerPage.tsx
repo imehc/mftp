@@ -1,6 +1,7 @@
 import "./model-viewer.css";
 
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "cn";
 import { Box, FolderOpen, Library } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -50,8 +51,11 @@ import { attachSystemInbox } from "./system/inbox";
 export default function ModelViewerPage() {
   const { t } = useLingui();
   const { workspace, wide } = useWorkspaceLayout();
+  const queryClient = useQueryClient();
   const [session] = useState(() => new ViewerSession());
-  const [library] = useState(() => new ModelLibraryController(session));
+  const [library] = useState(
+    () => new ModelLibraryController(session, queryClient),
+  );
   const [libraryOpen, setLibraryOpen] = useState(false);
   const state = useSyncExternalStore(session.subscribe, session.snapshot);
   const canvas = useRef<HTMLDivElement>(null);

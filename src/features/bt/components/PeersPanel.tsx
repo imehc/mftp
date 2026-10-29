@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Empty, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Spinner } from "~/components/ui/spinner";
@@ -11,11 +11,10 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { describeError, toIpcError } from "~/lib/errors";
+import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
-import * as ipc from "~/lib/ipc";
-import { createPoller } from "~/lib/polling";
-import type { AppError, BtPeerInfo } from "~/types";
+
+import { peersQuery } from "../queries";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -25,40 +24,13 @@ const POLL_INTERVAL_MS = 2000;
  */
 export default function PeersPanel({ infoHash }: { infoHash: string }) {
   const { t } = useLingui();
-  const [peers, setPeers] = useState<BtPeerInfo[] | null>(null);
-  const [error, setError] = useState<AppError | null>(null);
-  useEffect(() => {
-    const hash = infoHash;
-    let cancelled = false;
-
-    const poll = async () => {
-      try {
-        const result = await ipc.btTaskPeers(hash);
-        if (!cancelled) {
-          setPeers(result);
-          setError(null);
-        }
-      } catch (cause) {
-        if (!cancelled) setError(toIpcError(cause).payload);
-      }
-    };
-
-    // 用微任务延后，使重置发生在 effect 函数体之外。
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setPeers(null);
-      setError(null);
-    });
-    // 串行轮询：慢链路下不堆叠请求，页面不可见时暂停。
-    const poller = createPoller(poll, {
-      intervalMs: POLL_INTERVAL_MS,
-      pauseWhenHidden: true,
-    });
-    return () => {
-      cancelled = true;
-      poller.stop();
-    };
-  }, [infoHash]);
+  const query = useQuery({
+    ...peersQuery(infoHash),
+    enabled: !!infoHash,
+    refetchInterval: POLL_INTERVAL_MS,
+  });
+  const peers = query.data ?? null;
+  const error = query.error;
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="border-border min-h-40 flex-1 overflow-y-auto rounded-xl border">

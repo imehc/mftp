@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import { AppRuntime } from "~/app/AppRuntime";
+import QueryProvider from "~/app/QueryProvider";
 import { Toaster } from "~/components/ui/sonner";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import ResetBoundary from "~/features/about/ResetBoundary";
@@ -48,10 +49,12 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <AppI18nProvider>
         <TooltipProvider>
           <ResetBoundary>
-            <AppRuntime />
-            <RouterProvider router={router} />
-            <UpdaterDialog />
-            <TransferDock />
+            <QueryProvider>
+              <AppRuntime />
+              <RouterProvider router={router} />
+              <UpdaterDialog />
+              <TransferDock />
+            </QueryProvider>
           </ResetBoundary>
         </TooltipProvider>
         <AppToaster />

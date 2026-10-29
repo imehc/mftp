@@ -1,28 +1,19 @@
 import { useLingui } from "@lingui/react/macro";
-import {
-  startTransition,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { describeError, toIpcError } from "~/lib/errors";
 import { pickDirectoryNative } from "~/lib/files";
 import * as ipc from "~/lib/ipc";
 import { createPoller } from "~/lib/polling";
+import { queryClient, queryScopeGuard } from "~/lib/query-client";
+import { refreshQueries } from "~/lib/query-invalidation";
+import { useQueryState } from "~/lib/use-query-state";
 import type {
   AppError,
-  LanAuthRequest,
-  LanConnectedDevice,
-  LanNetworkAddress,
-  LanSharedDir,
   LanSharedDirInput,
   LanTransferSettings,
   LanTransferStatus,
-  LanTransferTask,
-  LanTrustedDevice,
   LanTrustedDeviceInput,
 } from "~/types";
 
@@ -31,7 +22,10 @@ import {
   loadLanTransferSecondary,
   scheduleIdleTask,
 } from "./lanTransferData";
+import { lanQueries, subscribeLanInvalidation } from "./queries";
 import { useLanDiscovery } from "./useLanDiscovery";
+
+let writing = false;
 
 const DEFAULT_SETTINGS: LanTransferSettings = {
   deviceName: "",
@@ -46,14 +40,18 @@ const DEFAULT_SETTINGS: LanTransferSettings = {
 
 export function useLanTransfer() {
   const { t } = useLingui();
-  const [settings, setSettings] = useState<LanTransferSettings | null>(null);
+  const [settings, setSettings] = useQueryState(lanQueries.settings, null);
   const [status, setStatus] = useState<LanTransferStatus | null>(null);
-  const [shares, setShares] = useState<LanSharedDir[]>([]);
-  const [devices, setDevices] = useState<LanConnectedDevice[]>([]);
-  const [addresses, setAddresses] = useState<LanNetworkAddress[]>([]);
-  const [tasks, setTasks] = useState<LanTransferTask[]>([]);
-  const [trustedDevices, setTrustedDevices] = useState<LanTrustedDevice[]>([]);
-  const [authRequests, setAuthRequests] = useState<LanAuthRequest[]>([]);
+  const [shares, setShares] = useQueryState(lanQueries.shares, []);
+  const [devices, setDevices] = useQueryState(lanQueries.devices, []);
+  const [addresses] = useQueryState(lanQueries.addresses, []);
+  const [tasks, setTasks] = useQueryState(lanQueries.tasks, []);
+  const [trustedDevices, setTrustedDevices] = useQueryState(
+    lanQueries.trusted,
+    [],
+  );
+  const [authRequests, setAuthRequests] = useQueryState(lanQueries.auth, []);
+  const mounted = useRef(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -79,10 +77,12 @@ export function useLanTransfer() {
   // 仅挂载时的预热；refreshCore/refreshSecondary 每次渲染都会重新定义，
   // 因此通过 effect event 读取，而不是进入依赖数组。
   async function refresh() {
+    if (writing) return;
     await Promise.all([refreshCore(), refreshSecondary()]);
   }
 
   async function refreshCore() {
+    if (writing) return;
     const epoch = reads.current.epoch;
     const request = ++reads.current.core;
     const current = () =>
@@ -92,10 +92,7 @@ export function useLanTransfer() {
       const next = await loadLanTransferCore();
       if (!current()) return;
       setCoreError(null);
-      setSettings(next.settings);
       setStatus(next.status);
-      setShares(next.shares);
-      setAddresses(next.addresses);
     } catch (error) {
       if (current()) setCoreError(toIpcError(error).payload);
     } finally {
@@ -104,64 +101,59 @@ export function useLanTransfer() {
   }
 
   async function refreshSecondary() {
+    if (writing) return;
     const epoch = reads.current.epoch;
     const request = ++reads.current.secondary;
     const current = () =>
       epoch === reads.current.epoch && request === reads.current.secondary;
     try {
-      const next = await loadLanTransferSecondary();
+      await loadLanTransferSecondary();
       if (!current()) return;
       setSecondaryError(null);
-      startTransition(() => {
-        setDevices(next.devices);
-        setTasks(next.tasks);
-        setTrustedDevices(next.trustedDevices);
-        setAuthRequests(next.authRequests);
-      });
     } catch (error) {
       if (current()) setSecondaryError(toIpcError(error).payload);
     }
   }
 
   async function refreshRuntime() {
-    if (busy) return;
+    if (writing) return;
     const epoch = reads.current.epoch;
     const request = ++reads.current.runtime;
     const current = () =>
       epoch === reads.current.epoch && request === reads.current.runtime;
     try {
-      const [
-        nextStatus,
-        nextDevices,
-        nextAddresses,
-        nextTasks,
-        nextAuthRequests,
-      ] = await Promise.all([
+      const [nextStatus] = await Promise.all([
         ipc.lanTransferStatus(),
-        ipc.lanTransferConnectedDevices(),
-        ipc.lanTransferNetworkAddresses(),
-        ipc.lanTransferTasks(),
-        ipc.lanTransferPendingAuthRequests(),
+        lanQueries.devices.fetch(true),
+        lanQueries.addresses.fetch(true),
+        lanQueries.tasks.fetch(true),
+        lanQueries.auth.fetch(true),
       ]);
       if (!current()) return;
       setRuntimeError(null);
       setStatus(nextStatus);
-      setDevices(nextDevices);
-      setAddresses(nextAddresses);
-      setTasks(nextTasks);
-      setAuthRequests(nextAuthRequests);
     } catch (error) {
       if (current()) setRuntimeError(toIpcError(error).payload);
     }
   }
 
+  const refreshOnInvalidation = useEffectEvent(refresh);
+  useEffect(
+    () =>
+      subscribeLanInvalidation(() => {
+        void refreshOnInvalidation();
+      }),
+    [],
+  );
   const refreshCoreOnMount = useEffectEvent(refreshCore);
   const refreshSecondaryOnMount = useEffectEvent(refreshSecondary);
   useEffect(() => {
+    mounted.current = true;
     const readState = reads.current;
     void refreshCoreOnMount();
     const cancel = scheduleIdleTask(() => void refreshSecondaryOnMount());
     return () => {
+      mounted.current = false;
       readState.epoch++;
       cancel();
     };
@@ -177,189 +169,152 @@ export function useLanTransfer() {
     return () => poller.stop();
   }, [running]);
 
-  async function start() {
-    reads.current.epoch++;
+  async function write<T>(
+    action: () => Promise<T>,
+    apply: (value: T) => void,
+    notice: string,
+  ) {
+    if (writing || !mounted.current) return;
+    const current = queryScopeGuard(queryClient, "lan");
+    writing = true;
+    const epoch = ++reads.current.epoch;
+    Object.values(lanQueries).forEach((query) => query.cancel());
     setLoading(false);
     setBusy(true);
     try {
-      const next = await ipc.lanTransferStart();
-      setStatus(next);
-      setDevices(await ipc.lanTransferConnectedDevices());
-      void refreshDiscovery();
-      toast.success(t`服务已启动`);
+      const value = await action();
+      if (!mounted.current || epoch !== reads.current.epoch || !current())
+        return;
+      apply(value);
+      toast.success(notice);
     } catch (error) {
-      toast.error(describeError(error));
+      if (mounted.current && epoch === reads.current.epoch)
+        toast.error(describeError(error, t));
+      return;
     } finally {
-      setBusy(false);
+      writing = false;
+      if (mounted.current) setBusy(false);
+      // 写入结束时通知当前观察者；离开后重新打开的页面也能恢复读取。
+      // 刷新失败留在读取状态，不改变已经完成的写入结果。
+      if (current()) void refreshQueries(queryClient, { queryKey: ["lan"] });
     }
   }
 
-  async function stop() {
-    reads.current.epoch++;
-    setLoading(false);
-    setBusy(true);
-    try {
-      const next = await ipc.lanTransferStop();
-      setStatus(next);
-      setDevices([]);
-      setTasks([]);
-      setAuthRequests([]);
-      toast.success(t`服务已停止`);
-    } catch (error) {
-      toast.error(describeError(error));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const start = () =>
+    write(
+      ipc.lanTransferStart,
+      (next) => {
+        setStatus(next);
+        void refreshDiscovery();
+      },
+      t`服务已启动`,
+    );
 
-  async function saveSettings(values: LanTransferSettings) {
-    reads.current.epoch++;
-    setLoading(false);
-    setBusy(true);
-    try {
-      const next = await ipc.lanTransferSaveSettings(values);
-      setSettings(next);
-      setSettingsOpen(false);
-      toast.success(t`已保存配置`);
-    } catch (error) {
-      toast.error(describeError(error));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const stop = () =>
+    write(
+      ipc.lanTransferStop,
+      (next) => {
+        setStatus(next);
+        setDevices([]);
+        setTasks([]);
+        setAuthRequests([]);
+      },
+      t`服务已停止`,
+    );
+
+  const saveSettings = (values: LanTransferSettings) =>
+    write(
+      () => ipc.lanTransferSaveSettings(values),
+      (next) => {
+        setSettings(next);
+        setSettingsOpen(false);
+      },
+      t`已保存配置`,
+    );
 
   async function switchBindAuto() {
     if (!settings) return;
-    reads.current.epoch++;
-    setLoading(false);
-    setBusy(true);
-    try {
-      const next = await ipc.lanTransferSaveSettings({
-        ...settings,
-        bindHost: "",
-      });
-      setSettings(next);
-      toast.success(
-        running ? t`已改为自动绑定，重启服务后生效` : t`已改为自动绑定`,
-      );
-    } catch (error) {
-      toast.error(describeError(error));
-    } finally {
-      setBusy(false);
-    }
+    await write(
+      () => ipc.lanTransferSaveSettings({ ...settings, bindHost: "" }),
+      setSettings,
+      running ? t`已改为自动绑定，重启服务后生效` : t`已改为自动绑定`,
+    );
   }
 
-  async function addShare(input: LanSharedDirInput) {
-    reads.current.epoch++;
-    setLoading(false);
-    setBusy(true);
-    try {
-      const dir = await ipc.lanTransferAddSharedDir(input);
-      setShares((items) => [...items, dir]);
-      setShareOpen(false);
-      toast.success(t`已添加共享目录`);
-    } catch (error) {
-      toast.error(describeError(error));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const addShare = (input: LanSharedDirInput) =>
+    write(
+      () => ipc.lanTransferAddSharedDir(input),
+      (dir) => {
+        setShares((items) => [...items, dir]);
+        setShareOpen(false);
+      },
+      t`已添加共享目录`,
+    );
 
-  async function addTrustedDevice(input: LanTrustedDeviceInput) {
-    try {
-      const device = await ipc.lanTransferAddTrustedDevice(input);
-      setTrustedDevices((items) => [...items, device]);
-      toast.success(t`已添加白名单`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
+  const addTrustedDevice = (input: LanTrustedDeviceInput) =>
+    write(
+      () => ipc.lanTransferAddTrustedDevice(input),
+      (device) => {
+        setTrustedDevices((items) => [...items, device]);
+      },
+      t`已添加白名单`,
+    );
 
-  async function deleteTrustedDevice(id: string) {
-    try {
-      await ipc.lanTransferDeleteTrustedDevice(id);
-      setTrustedDevices((items) => items.filter((item) => item.id !== id));
-      toast.success(t`已删除白名单`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
+  const deleteTrustedDevice = (id: string) =>
+    write(
+      () => ipc.lanTransferDeleteTrustedDevice(id),
+      () => {
+        setTrustedDevices((items) => items.filter((item) => item.id !== id));
+      },
+      t`已删除白名单`,
+    );
 
-  async function deleteShare(id: string) {
-    try {
-      await ipc.lanTransferDeleteSharedDir(id);
-      setShares((items) => items.filter((item) => item.id !== id));
-      toast.success(t`已删除共享目录`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
+  const deleteShare = (id: string) =>
+    write(
+      () => ipc.lanTransferDeleteSharedDir(id),
+      () => {
+        setShares((items) => items.filter((item) => item.id !== id));
+      },
+      t`已删除共享目录`,
+    );
 
-  async function disconnectDevice(id: string) {
-    try {
-      await ipc.lanTransferDisconnectDevice(id);
-      const [nextStatus, nextDevices] = await Promise.all([
-        ipc.lanTransferStatus(),
-        ipc.lanTransferConnectedDevices(),
-      ]);
-      setStatus(nextStatus);
-      setDevices(nextDevices);
-      toast.success(t`已断开设备`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
-
-  async function cancelTask(id: string) {
-    try {
-      await ipc.lanTransferCancelTask(id);
-      setTasks(await ipc.lanTransferTasks());
-      toast.success(t`已取消任务`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
+  const disconnectDevice = (id: string) =>
+    write(
+      () => ipc.lanTransferDisconnectDevice(id),
+      () => {},
+      t`已断开设备`,
+    );
+  const cancelTask = (id: string) =>
+    write(
+      () => ipc.lanTransferCancelTask(id),
+      () => {},
+      t`已取消任务`,
+    );
 
   async function refreshAuthRequests() {
-    try {
-      setAuthRequests(await ipc.lanTransferPendingAuthRequests());
-    } catch (error) {
-      toast.error(describeError(error));
-    }
+    if (writing) return;
+    await refreshSecondary();
   }
 
-  async function approveAuthRequest(id: string, permission: string) {
-    try {
-      await ipc.lanTransferApproveAuthRequest(id, permission);
-      await refreshAuthRequests();
-      const [nextStatus, nextDevices] = await Promise.all([
-        ipc.lanTransferStatus(),
-        ipc.lanTransferConnectedDevices(),
-      ]);
-      setStatus(nextStatus);
-      setDevices(nextDevices);
-      toast.success(t`已允许访问`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
-
-  async function rejectAuthRequest(id: string) {
-    try {
-      await ipc.lanTransferRejectAuthRequest(id);
-      await refreshAuthRequests();
-      toast.success(t`已拒绝访问`);
-    } catch (error) {
-      toast.error(describeError(error));
-    }
-  }
+  const approveAuthRequest = (id: string, permission: string) =>
+    write(
+      () => ipc.lanTransferApproveAuthRequest(id, permission),
+      () => {},
+      t`已允许访问`,
+    );
+  const rejectAuthRequest = (id: string) =>
+    write(
+      () => ipc.lanTransferRejectAuthRequest(id),
+      () => {},
+      t`已拒绝访问`,
+    );
 
   async function chooseDownloadDir() {
     if (running) return null;
     try {
       return await pickDirectoryNative(t`选择接收目录`);
     } catch (error) {
-      toast.error(describeError(error));
+      toast.error(describeError(error, t));
       return null;
     }
   }

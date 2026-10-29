@@ -4,18 +4,20 @@ import { act, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { DiagnosticOperation, DiagnosticSnapshot } from "~/bindings";
+import QueryProvider from "~/app/QueryProvider";
+import type { DiagnosticOperation, LogPage } from "~/bindings";
+import { logPage } from "~/features/logs/__fixtures__/page";
+import { logDetailQuery } from "~/features/logs/queries";
+import { createAppQueryClient } from "~/lib/query-client";
 
 const port = vi.hoisted(() => ({
-  snapshot: vi.fn(),
+  read: vi.fn(),
   clear: vi.fn(),
   unlisten: vi.fn(),
   changed: null as (() => void) | null,
 }));
-
 vi.mock("~/lib/ipc", () => ({
-  logsPage: undefined,
-  diagnosticsSnapshot: port.snapshot,
+  logsPage: port.read,
   diagnosticsClear: port.clear,
 }));
 vi.mock("@tauri-apps/api/event", () => ({
@@ -24,9 +26,7 @@ vi.mock("@tauri-apps/api/event", () => ({
     return port.unlisten;
   }),
 }));
-
-import { FALLBACK_POLL_MS } from "./execution-log-session";
-import { useExecutionLogs } from "./use-execution-logs";
+import { LOG_FALLBACK_MS, useExecutionLogs } from "./use-execution-logs";
 
 const operation: DiagnosticOperation = {
   id: "runtime-1",
@@ -46,11 +46,7 @@ const operation: DiagnosticOperation = {
   details: [],
   error: null,
 };
-const initial: DiagnosticSnapshot = {
-  cursor: 1,
-  discarded: 3,
-  operations: [operation],
-};
+const initial = logPage([operation], [], 3);
 const failure = {
   kind: "external",
   code: "diagnostics:test",
@@ -59,6 +55,7 @@ const failure = {
 };
 let root: Root;
 let container: HTMLDivElement;
+let client: ReturnType<typeof createAppQueryClient>;
 let logs: ReturnType<typeof useExecutionLogs>;
 
 function deferred<T>() {
@@ -77,77 +74,124 @@ function Probe() {
   return null;
 }
 
+async function flush() {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(1);
+  });
+}
+
 beforeEach(async () => {
   vi.useFakeTimers();
   vi.clearAllMocks();
-  port.snapshot.mockResolvedValue(initial);
+  port.read.mockResolvedValue(initial);
   port.clear.mockResolvedValue(undefined);
   port.changed = null;
+  client = createAppQueryClient();
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  await act(async () => root.render(<Probe />));
+  await act(async () =>
+    root.render(
+      <QueryProvider client={client}>
+        <Probe />
+      </QueryProvider>,
+    ),
+  );
+  await flush();
 });
 
 afterEach(async () => {
   await act(async () => root.unmount());
+  client.clear();
   container.remove();
   vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
-describe("运行期日志的权威快照与清空", () => {
-  it("读取失败保留记录和结构化错误，未变化快照恢复后仅解除错误", async () => {
-    port.snapshot.mockRejectedValueOnce(failure);
+describe("共享日志查询的事件与清空", () => {
+  it("读取失败保留记录和结构化错误，恢复后解除错误", async () => {
+    port.read.mockRejectedValueOnce(failure);
     await act(async () => port.changed?.());
+    await flush();
     expect(logs.error).toEqual(failure);
-    expect(logs.operations).toEqual(initial.operations);
-    port.snapshot.mockResolvedValueOnce({ ...initial, operations: null });
+    expect(logs.operations).toEqual([operation]);
     await act(async () => port.changed?.());
+    await flush();
     expect(logs.error).toBeNull();
-    expect(logs.operations).toEqual(initial.operations);
+    expect(logs.operations).toEqual([operation]);
     expect(logs.loading).toBe(false);
-    expect(port.snapshot.mock.calls).toEqual([[0], [1], [1]]);
+    expect(port.read.mock.calls).toEqual([
+      [undefined, 500],
+      [undefined, 500],
+      [undefined, 500],
+    ]);
   });
 
-  it("清空等待在途读取补读，保留清空后新记录而不是本地置空", async () => {
-    const oldRead = deferred<DiagnosticSnapshot>();
-    const freshRead = deferred<DiagnosticSnapshot>();
-    port.snapshot
+  it("高频推送等待在途读取结束并只补读一次", async () => {
+    const reading = deferred<LogPage>();
+    port.read.mockReturnValueOnce(reading.promise);
+    await act(async () => port.changed?.());
+    await act(async () => {
+      port.changed?.();
+      port.changed?.();
+      port.changed?.();
+    });
+    expect(port.read).toHaveBeenCalledTimes(2);
+    await act(async () => reading.resolve(initial));
+    await flush();
+    expect(port.read).toHaveBeenCalledTimes(3);
+  });
+
+  it("事件持续到达时推迟兜底轮询，事件丢失后自动补读", async () => {
+    await act(async () => vi.advanceTimersByTimeAsync(LOG_FALLBACK_MS - 100));
+    expect(port.read).toHaveBeenCalledOnce();
+    await act(async () => port.changed?.());
+    await act(async () => vi.advanceTimersByTimeAsync(100));
+    expect(port.read).toHaveBeenCalledTimes(2);
+    await act(async () => vi.advanceTimersByTimeAsync(LOG_FALLBACK_MS));
+    expect(port.read).toHaveBeenCalledTimes(3);
+  });
+
+  it("清空后拒绝迟到的旧摘要和详情，保留清空后新记录", async () => {
+    const oldRead = deferred<LogPage>();
+    const freshRead = deferred<LogPage>();
+    const oldDetail = deferred<DiagnosticOperation>();
+    const detail = client
+      .query({
+        ...logDetailQuery(operation.id),
+        queryFn: () => oldDetail.promise,
+      })
+      .catch(() => undefined);
+    port.read
       .mockReturnValueOnce(oldRead.promise)
       .mockReturnValueOnce(freshRead.promise);
     await act(async () => port.changed?.());
     await act(async () => logs.clear());
     expect(port.clear).toHaveBeenCalledOnce();
-    expect(port.snapshot).toHaveBeenCalledTimes(2);
-    expect(logs.operations).toEqual(initial.operations);
-    await act(async () => oldRead.resolve({ ...initial, operations: null }));
-    expect(port.snapshot).toHaveBeenCalledTimes(3);
+    await act(async () => {
+      oldRead.resolve(initial);
+      oldDetail.resolve(operation);
+    });
     const fresh = { ...operation, id: "runtime-after-clear" };
-    await act(async () =>
-      freshRead.resolve({ cursor: 2, discarded: 0, operations: [fresh] }),
-    );
+    await act(async () => freshRead.resolve(logPage([fresh])));
+    await detail;
+    await flush();
     expect(logs.operations).toEqual([fresh]);
     expect(logs.discarded).toBe(0);
+    expect(
+      client.getQueryData(logDetailQuery(operation.id).queryKey),
+    ).toBeUndefined();
   });
 
-  it("清空后的空权威快照释放旧投影并推进游标", async () => {
-    port.snapshot.mockResolvedValueOnce({
-      cursor: 2,
-      discarded: 0,
-      operations: [],
-    });
+  it("清空后的空权威页释放旧投影", async () => {
+    port.read.mockResolvedValue(logPage());
     await act(async () => logs.clear());
+    await flush();
     expect(logs.operations).toEqual([]);
     expect(logs.discarded).toBe(0);
-    port.snapshot.mockResolvedValueOnce({
-      cursor: 2,
-      discarded: 0,
-      operations: null,
-    });
     await act(async () => port.changed?.());
-    expect(port.snapshot.mock.calls).toEqual([[0], [1], [2]]);
+    await flush();
     expect(logs.operations).toEqual([]);
   });
 
@@ -155,8 +199,8 @@ describe("运行期日志的权威快照与清空", () => {
     port.clear.mockRejectedValueOnce(failure);
     await expect(logs.clear()).rejects.toEqual(failure);
     expect(port.clear).toHaveBeenCalledOnce();
-    expect(port.snapshot).toHaveBeenCalledOnce();
-    expect(logs.operations).toEqual(initial.operations);
+    expect(port.read).toHaveBeenCalledOnce();
+    expect(logs.operations).toEqual([operation]);
   });
 
   it("清空期间卸载后不重建订阅、不读取和重放写操作", async () => {
@@ -168,10 +212,10 @@ describe("运行期日志的权威快照与清空", () => {
       clearing.resolve();
       await task;
       port.changed?.();
-      await vi.advanceTimersByTimeAsync(FALLBACK_POLL_MS * 2);
+      await vi.advanceTimersByTimeAsync(LOG_FALLBACK_MS * 2);
     });
     expect(port.unlisten).toHaveBeenCalledOnce();
-    expect(port.snapshot).toHaveBeenCalledOnce();
+    expect(port.read).toHaveBeenCalledOnce();
     expect(port.clear).toHaveBeenCalledOnce();
   });
 });

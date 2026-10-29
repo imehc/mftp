@@ -4,27 +4,27 @@ import { act, StrictMode, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { DiagnosticOperation, DiagnosticSnapshot } from "~/bindings";
+import QueryProvider from "~/app/QueryProvider";
+import type { DiagnosticOperation } from "~/bindings";
+import { logPage } from "~/features/logs/__fixtures__/page";
+import { createAppQueryClient } from "~/lib/query-client";
 
 const session = vi.hoisted(() => ({
-  publish: null as ((snapshot: DiagnosticSnapshot) => void) | null,
+  changed: null as (() => void) | null,
   open: vi.fn(),
   close: vi.fn(),
-  refresh: vi.fn(),
+  read: vi.fn(),
   clear: vi.fn(async () => {}),
 }));
-
-vi.mock("~/features/connection-diagnostics/execution-log-session", () => ({
-  openExecutionLogSession: (
-    publish: (snapshot: DiagnosticSnapshot) => void,
-  ) => {
+vi.mock("@tauri-apps/api/event", () => ({
+  listen: async (_event: string, changed: () => void) => {
     session.open();
-    session.publish = publish;
-    return { close: session.close, refresh: session.refresh };
+    session.changed = changed;
+    return session.close;
   },
 }));
 vi.mock("~/lib/ipc", () => ({
-  logsPage: undefined,
+  logsPage: session.read,
   diagnosticsClear: session.clear,
 }));
 
@@ -48,6 +48,7 @@ const operation: DiagnosticOperation = {
   details: [],
   error: null,
 };
+let client: ReturnType<typeof createAppQueryClient>;
 let root: Root;
 let container: HTMLDivElement;
 let clearLogs: ReturnType<typeof useActivityExecutionLogs>["clear"];
@@ -70,6 +71,9 @@ function Probe({ pathname }: { pathname: string }) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  client = createAppQueryClient();
+  session.read.mockResolvedValue(logPage());
+  session.clear.mockResolvedValue(undefined);
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   container = document.createElement("div");
   document.body.append(container);
@@ -79,29 +83,35 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  client.clear();
   vi.unstubAllGlobals();
 });
 
 async function renderPath(pathname = "/") {
   await act(async () =>
     root.render(
-      <StrictMode>
-        <ActivityProvider>
-          <Probe pathname={pathname} />
-        </ActivityProvider>
-      </StrictMode>,
+      <QueryProvider client={client}>
+        <StrictMode>
+          <ActivityProvider>
+            <Probe pathname={pathname} />
+          </ActivityProvider>
+        </StrictMode>
+      </QueryProvider>,
     ),
   );
+  await flush();
+}
+
+async function flush() {
+  await act(async () => {
+    await new Promise((done) => setTimeout(done, 0));
+  });
 }
 
 async function publish(status: DiagnosticOperation["status"] = "running") {
-  await act(async () =>
-    session.publish?.({
-      cursor: 2,
-      discarded: 3,
-      operations: [{ ...operation, status }],
-    }),
-  );
+  session.read.mockResolvedValue(logPage([{ ...operation, status }], [], 3));
+  await act(async () => session.changed?.());
+  await flush();
 }
 
 describe("应用级日志生命周期", () => {
@@ -126,9 +136,16 @@ describe("应用级日志生命周期", () => {
   );
 
   it("首次快照完成前保持加载状态", async () => {
+    let resolve!: (page: ReturnType<typeof logPage>) => void;
+    session.read.mockReturnValueOnce(
+      new Promise((done) => {
+        resolve = done;
+      }),
+    );
     await renderPath();
     expect(container.querySelector("[data-loading]")?.textContent).toBe("true");
-    await publish();
+    await act(async () => resolve(logPage([operation])));
+    await flush();
     expect(container.querySelector("[data-loading]")?.textContent).toBe(
       "false",
     );
@@ -137,19 +154,12 @@ describe("应用级日志生命周期", () => {
   it("手动清空后按权威快照更新，不覆盖清空期间产生的新记录", async () => {
     await renderPath();
     await publish();
+    session.read.mockResolvedValue(
+      logPage([{ ...operation, id: "new-operation" }]),
+    );
     await act(async () => clearLogs());
+    await flush();
     expect(session.clear).toHaveBeenCalledTimes(1);
-    expect(session.refresh).toHaveBeenCalledTimes(1);
-    expect(container.querySelector("[data-operations]")?.textContent).toBe(
-      "operation-1:running",
-    );
-    await act(async () =>
-      session.publish?.({
-        cursor: 3,
-        discarded: 0,
-        operations: [{ ...operation, id: "new-operation" }],
-      }),
-    );
     expect(container.querySelector("[data-operations]")?.textContent).toBe(
       "new-operation:running",
     );
@@ -166,7 +176,7 @@ describe("应用级日志生命周期", () => {
     };
     session.clear.mockRejectedValueOnce(failure);
     await expect(clearLogs()).rejects.toEqual(failure);
-    expect(session.refresh).not.toHaveBeenCalled();
+    expect(session.clear).toHaveBeenCalledOnce();
     expect(container.querySelector("[data-operations]")?.textContent).toBe(
       "operation-1:running",
     );

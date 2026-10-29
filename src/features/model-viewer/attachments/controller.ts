@@ -1,3 +1,5 @@
+import type { QueryClient } from "@tanstack/react-query";
+
 import type { ModelAttachment } from "~/bindings";
 import { exportBlob } from "~/features/model-viewer/export/native-export";
 import { type IpcError, toIpcError } from "~/lib/errors";
@@ -7,8 +9,12 @@ import {
   modelAttachmentList,
   modelAttachmentRead,
 } from "~/lib/ipc";
+import { createAppQueryClient } from "~/lib/query-client";
+import { createQueryResource } from "~/lib/query-resource";
+import { createQueryStore } from "~/lib/query-store";
 
 import { modelError } from "../domain/errors";
+import { modelKey } from "../queries";
 
 function hasControl(value: string, text = false) {
   for (const char of value) {
@@ -54,32 +60,43 @@ type State = {
 };
 
 export class AttachmentController {
-  private state: State = {
-    entries: null,
-    selected: null,
-    text: null,
-    busy: false,
-    error: null,
-    saved: false,
-  };
-  private listeners = new Set<() => void>();
+  private entries;
+  private store;
+  private get state() {
+    return this.store.getState();
+  }
   private alive = false;
   private generation = 0;
   private task: AbortController | null = null;
   constructor(
     private model: string,
     private changed: () => void,
-  ) {}
-  snapshot = () => this.state;
-  subscribe = (listener: () => void) => {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
-  };
+    client: QueryClient = createAppQueryClient(),
+  ) {
+    this.entries = createQueryResource<ModelAttachment[] | null>(
+      [...modelKey(model), "attachments"],
+      () => modelAttachmentList(model),
+      client,
+      () => {
+        void this.refresh();
+      },
+    );
+    this.store = createQueryStore<State>(
+      () => ({
+        entries: null,
+        selected: null,
+        text: null,
+        busy: false,
+        error: null,
+        saved: false,
+      }),
+      { entries: this.entries },
+    );
+  }
+  snapshot = () => this.store.getState();
+  subscribe = (listener: () => void) => this.store.subscribe(listener);
   private publish(patch: Partial<State>) {
-    this.state = { ...this.state, ...patch };
-    this.listeners.forEach((listener) => listener());
+    this.store.setState(patch);
   }
   start() {
     this.alive = true;
@@ -87,6 +104,7 @@ export class AttachmentController {
   }
   stop() {
     this.alive = false;
+    this.entries.cancel();
     this.generation++;
     this.task?.abort();
   }
@@ -110,9 +128,10 @@ export class AttachmentController {
     }
   }
   refresh() {
-    return this.run(async () => ({
-      entries: await modelAttachmentList(this.model),
-    }));
+    return this.run(async () => {
+      await this.entries.fetch(true);
+      return {};
+    });
   }
   add(file: File) {
     return this.run(async (signal) => {
@@ -123,8 +142,16 @@ export class AttachmentController {
       await modelAttachmentAdd(this.model, file.name, Array.from(bytes));
       this.changed();
       signal.throwIfAborted();
-      return { entries: await modelAttachmentList(this.model) };
+      return this.readAfterWrite();
     });
+  }
+  private async readAfterWrite(): Promise<Partial<State>> {
+    try {
+      await this.entries.fetch(true);
+      return {};
+    } catch (error) {
+      return { error: toIpcError(error) };
+    }
   }
   read(entry: ModelAttachment) {
     return this.run(async (signal) => {
@@ -160,11 +187,8 @@ export class AttachmentController {
       await modelAttachmentDelete(this.model, entry.id);
       this.changed();
       signal.throwIfAborted();
-      return {
-        entries: await modelAttachmentList(this.model),
-        selected: null,
-        text: null,
-      };
+      this.publish({ selected: null, text: null });
+      return this.readAfterWrite();
     });
   }
 }

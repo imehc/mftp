@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Ellipsis } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import type { AppError, DiagnosticOperation } from "~/bindings";
 import AppPageContent from "~/components/AppPageContent";
@@ -17,8 +18,8 @@ import {
 import { logAction } from "~/features/logs/log-labels";
 import { logSource } from "~/features/logs/log-source";
 import { logDetail } from "~/features/logs/log-utils";
+import { logDetailQuery } from "~/features/logs/queries";
 import { describeError, toIpcError } from "~/lib/errors";
-import { logsDetail } from "~/lib/ipc";
 import type { ActivityLog } from "~/types";
 
 import {
@@ -44,23 +45,10 @@ export default function ExecutionLogDetailView({
   const [metadata, setMetadata] = useState(false);
   const [copying, setCopying] = useState(false);
   const [copyError, setCopyError] = useState<AppError | null>(null);
-  const [resolved, setResolved] = useState<DiagnosticOperation | null>(null);
-  const [detailError, setDetailError] = useState<AppError | null>(null);
+  const detail = useQuery(logDetailQuery(operation.id));
+  const detailError = detail.error;
   const scroll = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    let active = true;
-    void logsDetail(operation.id)
-      .then((detail) => {
-        if (active && detail) setResolved(detail);
-      })
-      .catch((cause) => {
-        if (active) setDetailError(toIpcError(cause).payload);
-      });
-    return () => {
-      active = false;
-    };
-  }, [operation.id]);
-  const currentOperation = resolved ?? operation;
+  const currentOperation = detail.data ?? operation;
   const blocks = executionLogStream(currentOperation, { localize: t });
   useLayoutEffect(() => {
     scroll.current?.focus();

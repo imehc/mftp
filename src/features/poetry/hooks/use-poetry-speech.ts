@@ -1,18 +1,21 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 import { listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { SpeechCatalog, SpeechSnapshot } from "~/bindings";
+import type { SpeechSnapshot } from "~/bindings";
 import { describeError } from "~/lib/errors";
 import { SPEECH_STATE } from "~/lib/events";
 import * as ipc from "~/lib/ipc";
 
+import { speechCatalogQuery } from "../queries";
 import { newerSpeechSnapshot, PoetrySpeechSession } from "../speech-session";
 
 export function usePoetrySpeech(scope: string | null) {
   const { t } = useLingui();
-  const [catalog, setCatalog] = useState<SpeechCatalog | null>(null);
+  const catalogRead = useQuery({ ...speechCatalogQuery(), enabled: !!scope });
+  const catalog = catalogRead.data ?? null;
   const [snapshot, setSnapshot] = useState<SpeechSnapshot | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [pending, setPending] = useState(0);
@@ -21,7 +24,6 @@ export function usePoetrySpeech(scope: string | null) {
   const [previousScope, setPreviousScope] = useState(scope);
   if (previousScope !== scope) {
     setPreviousScope(scope);
-    setCatalog(null);
     setSnapshot(null);
     setError(null);
     setPending(0);
@@ -54,12 +56,9 @@ export function usePoetrySpeech(scope: string | null) {
       if (active) unlisten = cleanup;
       else cleanup();
     });
-    void Promise.all([ipc.speechCatalog(), subscription])
-      .then(([result]) => {
-        if (active) {
-          setCatalog(result);
-          setReady(true);
-        }
+    void subscription
+      .then(() => {
+        if (active) setReady(true);
       })
       .catch((value: unknown) => {
         if (active) setError(value);
@@ -90,7 +89,7 @@ export function usePoetrySpeech(scope: string | null) {
     operation: (session: PoetrySpeechSession) => Promise<void>,
   ) {
     const session = sessionRef.current;
-    if (!session || !ready) return;
+    if (!session || !ready || !catalog) return;
     setPending((value) => value + 1);
     setError(null);
     try {
@@ -103,29 +102,18 @@ export function usePoetrySpeech(scope: string | null) {
   }
 
   async function refresh() {
-    if (!ready) {
-      setError(null);
-      setAttempt((value) => value + 1);
-      return;
-    }
-    setPending((value) => value + 1);
+    if (!scope) return;
     setError(null);
-    try {
-      const result = await ipc.speechCatalog();
-      if (sessionRef.current) setCatalog(result);
-    } catch (value) {
-      if (sessionRef.current) setError(value);
-    } finally {
-      if (sessionRef.current) setPending((value) => value - 1);
-    }
+    if (!ready) setAttempt((value) => value + 1);
+    await catalogRead.refetch({ cancelRefetch: false });
   }
 
   return {
     catalog,
     snapshot,
-    error: error ?? snapshot?.error,
-    busy: pending > 0,
-    ready,
+    error: error ?? catalogRead.error ?? snapshot?.error,
+    busy: pending > 0 || catalogRead.isFetching,
+    ready: ready && !!catalog,
     run,
     refresh,
   };

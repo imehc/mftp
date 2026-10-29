@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useStore } from "zustand";
@@ -24,7 +25,8 @@ import McpToolsTable from "./McpToolsTable";
 
 export default function McpSettings() {
   const { t } = useLingui();
-  const [controller] = useState(createMcpController);
+  const client = useQueryClient();
+  const [controller] = useState(() => createMcpController(undefined, client));
   const state = useStore(controller.store);
   const { snapshot, modules, loading, busy, issued, readFailed, pending } =
     state;

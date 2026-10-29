@@ -74,3 +74,20 @@ it("清理使晚到的旧快照失效，后续读取不复用旧请求", async (
   expect(useHostsStore.getState().hosts).toEqual([]);
   expect(useHostsStore.getState().loaded).toBe(true);
 });
+
+it("密钥缓存回收后重新进入时补读，不被已加载标记挡住", async () => {
+  const { queryClient } = await import("~/lib/query-client");
+  await useHostsStore.getState().ensureLoaded();
+  queryClient.removeQueries({ queryKey: ["ssh-keys"] });
+  const key = {
+    id: "key",
+    label: "Demo",
+    filename: "demo",
+    hasPassphrase: false,
+    createdAt: 1,
+  };
+  vi.mocked(keysList).mockResolvedValue([key]);
+  await useHostsStore.getState().ensureLoaded();
+  expect(keysList).toHaveBeenCalledTimes(2);
+  expect(useHostsStore.getState().keys).toEqual([key]);
+});

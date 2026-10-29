@@ -16,6 +16,7 @@ import {
   type PromptState,
   validPlainName,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { runSftpWrite } from "~/features/ssh-sftp/queries";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { useTransfersStore } from "~/store/transfers";
@@ -150,10 +151,12 @@ export function useSftpRemoteActions({
         );
         return;
       }
-      await ipc.sftpRename(
-        sessionId,
-        joinPath(remoteParent, outName),
-        joinPath(remoteParent, existingName),
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpRename(
+          sessionId,
+          joinPath(remoteParent, outName),
+          joinPath(remoteParent, existingName),
+        ),
       );
     }
     await extractWithName(entry, remoteParent, incomingName);
@@ -168,7 +171,9 @@ export function useSftpRemoteActions({
     const tid = toast.loading(t`正在解压 ${name}…`);
     setBusy(t`正在解压 ${name}…`);
     try {
-      await ipc.sftpExtract(sessionId, entry.path, remoteParent, outName);
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpExtract(sessionId, entry.path, remoteParent, outName),
+      );
       toast.success(t`已解压到 ${outName}`, {
         id: tid,
       });
@@ -268,10 +273,12 @@ export function useSftpRemoteActions({
         );
         return;
       }
-      await ipc.sftpRename(
-        sessionId,
-        joinPath(remoteParent, entryName),
-        renamedExistingPath,
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpRename(
+          sessionId,
+          joinPath(remoteParent, entryName),
+          renamedExistingPath,
+        ),
       );
     }
     await moveEntryWithName(entry, remoteParent, incomingName);
@@ -283,7 +290,9 @@ export function useSftpRemoteActions({
     const tid = toast.loading(t`正在移动 ${name}…`);
     setBusy(t`正在移动 ${name}…`);
     try {
-      await ipc.sftpRename(sessionId, entry.path, target);
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpRename(sessionId, entry.path, target),
+      );
       toast.success(t`已移动 ${name}`, {
         id: tid,
       });
@@ -307,7 +316,9 @@ export function useSftpRemoteActions({
     }
     setPrompt(null);
     try {
-      await ipc.sftpMkdir(sessionId, joinPath(cwd, trimmed));
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpMkdir(sessionId, joinPath(cwd, trimmed)),
+      );
       toast.success(t`已创建 ${trimmed}`);
       await load(cwd);
     } catch (e) {
@@ -327,7 +338,9 @@ export function useSftpRemoteActions({
     }
     setPrompt(null);
     try {
-      await ipc.sftpRename(sessionId, entry.path, joinPath(cwd, trimmed));
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpRename(sessionId, entry.path, joinPath(cwd, trimmed)),
+      );
       toast.success(t`已重命名为 ${trimmed}`);
       await load(cwd);
     } catch (e) {
@@ -350,7 +363,9 @@ export function useSftpRemoteActions({
       });
     }
     try {
-      await ipc.sftpDelete(sessionId, entry.path, entry.isDir, transferId);
+      await runSftpWrite(sessionId, () =>
+        ipc.sftpDelete(sessionId, entry.path, entry.isDir, transferId),
+      );
       if (transferId) finishTransfer(transferId, "success");
       toast.success(t`已删除 ${name}`, {
         id: tid,

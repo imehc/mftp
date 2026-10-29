@@ -1,8 +1,17 @@
-import { create } from "zustand";
+import type { QueryClient } from "@tanstack/react-query";
 
 import type { AiConfigurationView, AppError } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import { aiConfigurationGet, aiModelSwitch } from "~/lib/ipc";
+import {
+  createAppQueryClient,
+  queryClient,
+  queryScopeGuard,
+} from "~/lib/query-client";
+import { createQueryResource } from "~/lib/query-resource";
+import { createQueryStore } from "~/lib/query-store";
+
+import { aiConfigurationKey } from "./queries";
 
 type Operation = () => Promise<AiConfigurationView | void>;
 
@@ -21,85 +30,111 @@ interface ConfigurationState {
 export function createAiConfigurationStore(
   read = aiConfigurationGet,
   switchModel = aiModelSwitch,
+  client: QueryClient = createAppQueryClient(),
 ) {
+  const resource = createQueryResource<AiConfigurationView | null>(
+    aiConfigurationKey,
+    read,
+    client,
+    () => {
+      void store.getState().refresh();
+    },
+  );
   let generation = 0;
   let reading: Promise<boolean> | null = null;
-  return create<ConfigurationState>((set, get) => ({
-    view: null,
-    loading: false,
-    busy: false,
-    error: null,
-    clearError: () => set({ error: null }),
-    switchModel: async (input) => {
-      const { view, busy, loading } = get();
-      const provider = view?.providers.find(
-        (item) => item.id === input.expectedActiveProviderId,
-      );
-      // 菜单旧回调不能切换新地址；后端仍以版本和当前地址做最终准入。
-      if (
-        busy ||
-        loading ||
-        !view ||
-        view.revision !== input.expectedRevision ||
-        view.activeProviderId !== provider?.id ||
-        !provider ||
-        provider.requiresAddressRepair ||
-        !provider.models.some((item) => item.id === input.modelId)
-      )
-        return false;
-      if (provider.currentModelId === input.modelId) return true;
-      return get().execute(() => switchModel(input));
-    },
-    refresh: () => {
-      if (reading) return reading;
-      const request = generation;
-      set({ loading: true });
-      const pending = Promise.resolve().then(async () => {
+  const store = createQueryStore<ConfigurationState>(
+    (set, get) => ({
+      view: null,
+      loading: false,
+      busy: false,
+      error: null,
+      clearError: () => set({ error: null }),
+      switchModel: async (input) => {
+        const { view, busy, loading } = get();
+        const provider = view?.providers.find(
+          (item) => item.id === input.expectedActiveProviderId,
+        );
+        // 菜单旧回调不能切换新地址；后端仍以版本和当前地址做最终准入。
+        if (
+          busy ||
+          loading ||
+          !view ||
+          view.revision !== input.expectedRevision ||
+          view.activeProviderId !== provider?.id ||
+          !provider ||
+          provider.requiresAddressRepair ||
+          !provider.models.some((item) => item.id === input.modelId)
+        )
+          return false;
+        if (provider.currentModelId === input.modelId) return true;
+        return get().execute(() => switchModel(input));
+      },
+      refresh: () => {
+        if (reading) return reading;
+        if (get().busy) return Promise.resolve(false);
+        const request = generation;
+        const current = queryScopeGuard(client, "ai");
+        set({ loading: true });
+        const pending = Promise.resolve().then(async () => {
+          try {
+            await resource.fetch(true);
+            // 写操作开始前发出的读取不能覆盖写操作返回的完整快照。
+            if (request !== generation || !current()) return false;
+            set({ error: null });
+            return true;
+          } catch (error) {
+            if (request === generation)
+              set({ error: toIpcError(error).payload });
+            return false;
+          } finally {
+            if (reading === pending) {
+              reading = null;
+              set({ loading: false });
+            }
+          }
+        });
+        reading = pending;
+        return pending;
+      },
+      execute: async (operation) => {
+        // 同一事件循环中的重复点击也必须被挡住，不能只依赖按钮重渲染。
+        if (get().busy) return false;
+        const current = queryScopeGuard(client, "ai");
+        generation += 1;
+        void client.cancelQueries({ queryKey: aiConfigurationKey });
+        reading = null;
+        set({ busy: true, loading: false, error: null });
         try {
-          const view = await read();
-          // 写操作开始前发出的读取不能覆盖写操作返回的完整快照。
-          if (request !== generation) return false;
-          set({ view, error: null });
+          const view = await operation();
+          generation += 1;
+          if (view && current()) set({ view });
           return true;
         } catch (error) {
-          if (request === generation) set({ error: toIpcError(error).payload });
+          generation += 1;
+          const payload = toIpcError(error).payload;
+          // 刷新公开数据供用户比较，绝不自动重放写入或重复触发原生认证。
+          if (current()) {
+            reading = null;
+            try {
+              await resource.fetch(true);
+            } catch {
+              /* 保留原始写入错误。 */
+            }
+          }
+          set({ error: payload });
           return false;
         } finally {
-          if (reading === pending) {
-            reading = null;
-            set({ loading: false });
-          }
+          set({ busy: false });
         }
-      });
-      reading = pending;
-      return pending;
-    },
-    execute: async (operation) => {
-      // 同一事件循环中的重复点击也必须被挡住，不能只依赖按钮重渲染。
-      if (get().busy) return false;
-      generation += 1;
-      reading = null;
-      set({ busy: true, loading: false, error: null });
-      try {
-        const view = await operation();
-        generation += 1;
-        if (view) set({ view });
-        return true;
-      } catch (error) {
-        generation += 1;
-        const payload = toIpcError(error).payload;
-        // 刷新公开数据供用户比较，绝不自动重放写入或重复触发原生认证。
-        {
-          reading = null;
-          await get().refresh();
-        }
-        set({ error: payload });
-        return false;
-      } finally {
-        set({ busy: false });
-      }
-    },
-  }));
+      },
+    }),
+    { view: resource },
+  );
+  return store;
 }
 
-export const useAiConfiguration = createAiConfigurationStore();
+export const useAiConfiguration = createAiConfigurationStore(
+  aiConfigurationGet,
+  aiModelSwitch,
+  queryClient,
+);

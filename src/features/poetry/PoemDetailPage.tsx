@@ -78,9 +78,8 @@ export default function PoemDetailPage({
           </Button>
         }
       />
-      {error ? (
-        <PoetryReadError error={error} onRetry={retry} />
-      ) : !loading && !detail ? (
+      {error ? <PoetryReadError error={error} onRetry={retry} /> : null}
+      {error && !detail ? null : !loading && !detail ? (
         <p className="text-muted-foreground p-4 text-center text-sm">
           <Trans>没有找到作品</Trans>
         </p>

@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "cn";
 import {
   ArrowUp,
@@ -9,7 +10,7 @@ import {
   LoaderCircle,
   RefreshCw,
 } from "lucide-react";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -35,10 +36,10 @@ import {
   normalizeRemotePath,
   parentPath,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { directoryQuery } from "~/features/ssh-sftp/queries";
 import { describeError } from "~/lib/errors";
 import { firstFormError } from "~/lib/form-errors";
 import * as ipc from "~/lib/ipc";
-import type { SftpEntry } from "~/types";
 
 interface RemoteDirectoryPickerProps {
   open: boolean;
@@ -61,7 +62,13 @@ export default function RemoteDirectoryPicker({
 }: RemoteDirectoryPickerProps) {
   const { t } = useLingui();
   const [path, setPath] = useState(initialPath);
-  const [entries, setEntries] = useState<SftpEntry[]>([]);
+  const client = useQueryClient();
+  const query = useQuery({
+    ...directoryQuery(sessionId, path),
+    enabled: false,
+  });
+  const entries = query.data ?? [];
+  const generation = useRef({ value: 0 });
   const [loading, setLoading] = useState(false);
   const pathForm = useForm({
     defaultValues: {
@@ -86,18 +93,20 @@ export default function RemoteDirectoryPicker({
 
   const loadPath = async (nextPath: string) => {
     const normalized = normalizeRemotePath(nextPath.trim());
+    const current = ++generation.current.value;
     setLoading(true);
     try {
-      const list = await ipc.sftpList(sessionId, normalized);
-      setEntries(list);
+      await client.query(directoryQuery(sessionId, normalized));
+      if (current !== generation.current.value) return;
       setPath(normalized);
       pathForm.reset({
         path: normalized,
       });
     } catch (e) {
-      toast.error(describeError(e));
+      if (current === generation.current.value)
+        toast.error(describeError(e, t));
     } finally {
-      setLoading(false);
+      if (current === generation.current.value) setLoading(false);
     }
   };
 
@@ -105,17 +114,24 @@ export default function RemoteDirectoryPicker({
   // 不会在父组件每次渲染时都重载。
   const loadPathOnOpen = useEffectEvent(loadPath);
   useEffect(() => {
+    const current = generation.current;
     if (open) void loadPathOnOpen(initialPath);
-  }, [open, initialPath]);
+    return () => {
+      current.value++;
+    };
+  }, [open, initialPath, sessionId]);
 
   async function goHome() {
+    const current = ++generation.current.value;
     setLoading(true);
     try {
       const home = await ipc.sftpHome(sessionId);
-      await loadPath(home);
+      if (current === generation.current.value) await loadPath(home);
     } catch (e) {
-      toast.error(describeError(e));
-      setLoading(false);
+      if (current === generation.current.value) {
+        toast.error(describeError(e, t));
+        setLoading(false);
+      }
     }
   }
 

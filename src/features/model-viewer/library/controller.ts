@@ -1,15 +1,20 @@
+import type { QueryClient } from "@tanstack/react-query";
+
 import type { ModelLibraryCatalog, ModelLibraryEdit } from "~/bindings";
 import { type IpcError, toIpcError } from "~/lib/errors";
 import {
   modelLibraryCache,
   modelLibraryCatalog,
   modelLibraryDelete,
-  modelLibraryDocument,
   modelLibraryEdit,
   modelLibrarySaveView,
   modelLibraryThumbnail,
 } from "~/lib/ipc";
+import { createAppQueryClient } from "~/lib/query-client";
+import { createQueryResource } from "~/lib/query-resource";
+import { createQueryStore } from "~/lib/query-store";
 
+import { modelCatalogKey, modelDocumentQuery, modelKey } from "../queries";
 import type { ViewerSession } from "../runtime/session";
 import { librarySource, saveModel } from "./storage";
 
@@ -30,16 +35,13 @@ type LibraryState = {
 };
 
 export class ModelLibraryController {
-  private state: LibraryState = {
-    catalog: null,
-    busy: 0,
-    error: null,
-    failed: false,
-  };
-  private listeners = new Set<() => void>();
+  private catalog;
+  private store;
+  private get state() {
+    return this.store.getState();
+  }
   private alive = false;
   private generation = 0;
-  private refreshGeneration = 0;
   private seen = new Set<string>();
   private ids = new Map<string, string>();
   private failed = new Set<string>();
@@ -50,17 +52,27 @@ export class ModelLibraryController {
   private uploading = new Map<string, AbortController>();
   private unsubscribe?: () => void;
   private timer?: ReturnType<typeof setInterval>;
-  constructor(private session: ViewerSession) {}
-  snapshot = () => this.state;
-  subscribe = (listener: () => void) => {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
-  };
+  constructor(
+    private session: ViewerSession,
+    private client: QueryClient = createAppQueryClient(),
+  ) {
+    this.catalog = createQueryResource<ModelLibraryCatalog | null>(
+      modelCatalogKey,
+      modelLibraryCatalog,
+      client,
+      () => {
+        if (this.alive) void this.refresh().catch(this.report);
+      },
+    );
+    this.store = createQueryStore<LibraryState>(
+      () => ({ catalog: null, busy: 0, error: null, failed: false }),
+      { catalog: this.catalog },
+    );
+  }
+  snapshot = () => this.store.getState();
+  subscribe = (listener: () => void) => this.store.subscribe(listener);
   private publish(value: Partial<LibraryState>) {
-    this.state = { ...this.state, ...value };
-    this.listeners.forEach((listener) => listener());
+    this.store.setState(value);
   }
   private busy(delta: number) {
     this.publish({ busy: Math.max(0, this.state.busy + delta) });
@@ -73,11 +85,7 @@ export class ModelLibraryController {
     this.publish({ error: null });
   }
   async refresh() {
-    const generation = ++this.refreshGeneration;
-    const catalog = await modelLibraryCatalog();
-    if (this.alive && generation === this.refreshGeneration)
-      this.publish({ catalog });
-    return catalog;
+    return (await this.catalog.fetch(true))!;
   }
   start() {
     this.alive = true;
@@ -152,7 +160,8 @@ export class ModelLibraryController {
               Array.from(new Uint8Array(await blob.arrayBuffer())),
             );
           if (this.alive && generation === this.generation) this.flush();
-          await this.refresh();
+          if (this.alive && generation === this.generation)
+            await this.refresh().catch(this.report);
         })
         .catch((error) => {
           if (!abort.signal.aborted) {
@@ -187,6 +196,12 @@ export class ModelLibraryController {
     this.viewWriting = true;
     const generation = this.generation;
     void write(() => modelLibrarySaveView(id, view))
+      .then(() =>
+        this.client.invalidateQueries({
+          queryKey: modelKey(id),
+          refetchType: "none",
+        }),
+      )
       .catch((error) => {
         if (generation !== this.generation || !this.alive) return;
         this.viewFailure = true;
@@ -219,7 +234,7 @@ export class ModelLibraryController {
     }
     this.busy(1);
     try {
-      const document = await modelLibraryDocument(id);
+      const document = await this.client.query(modelDocumentQuery(id));
       if (
         !this.alive ||
         generation !== this.generation ||
@@ -258,7 +273,8 @@ export class ModelLibraryController {
             id,
             Array.from(new Uint8Array(await thumbnail.arrayBuffer())),
           );
-          await this.refresh();
+          if (this.alive && generation === this.generation)
+            await this.refresh().catch(this.report);
         }
       }
     } catch (error) {
@@ -271,7 +287,8 @@ export class ModelLibraryController {
     this.busy(1);
     try {
       await write(() => modelLibraryEdit(id, input));
-      await this.refresh();
+      void this.client.invalidateQueries({ queryKey: modelKey(id) });
+      if (this.alive) await this.refresh().catch(this.report);
     } finally {
       this.busy(-1);
     }
@@ -280,9 +297,10 @@ export class ModelLibraryController {
     this.busy(1);
     try {
       await write(() => modelLibraryDelete(id));
+      this.client.removeQueries({ queryKey: modelKey(id) });
       for (const [modelId, libraryId] of this.ids)
         if (libraryId === id) this.ids.delete(modelId);
-      await this.refresh();
+      if (this.alive) await this.refresh().catch(this.report);
     } finally {
       this.busy(-1);
     }
@@ -291,7 +309,7 @@ export class ModelLibraryController {
     this.busy(1);
     try {
       await write(() => modelLibraryCache(max, clear));
-      await this.refresh();
+      if (this.alive) await this.refresh().catch(this.report);
     } finally {
       this.busy(-1);
     }
@@ -299,6 +317,7 @@ export class ModelLibraryController {
   stop() {
     this.persist(true);
     this.alive = false;
+    this.catalog.cancel();
     this.generation++;
     this.unsubscribe?.();
     clearInterval(this.timer);

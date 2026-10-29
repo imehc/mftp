@@ -142,16 +142,18 @@ describe("MCP 管理控制器", () => {
     expect(state().notice).toBe(0);
   });
 
-  it("旧读取不能覆盖较新快照", async () => {
+  it("并发刷新复用读取，随后刷新采用较新快照", async () => {
     const { controller, api, state } = setup();
     await controller.start();
     const pending = deferred<McpSnapshot>();
     api.snapshot.mockImplementationOnce(() => pending.promise);
     const old = controller.refresh();
     api.snapshot.mockResolvedValueOnce({ ...snapshot, port: 1490 });
-    await controller.refresh();
+    const shared = controller.refresh();
+    expect(api.snapshot).toHaveBeenCalledTimes(2);
     pending.resolve(snapshot);
-    await old;
+    await Promise.all([old, shared]);
+    await controller.refresh();
     expect(state().snapshot?.port).toBe(1490);
   });
 });

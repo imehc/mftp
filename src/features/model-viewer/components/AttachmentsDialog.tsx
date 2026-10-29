@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useEffect,
   useId,
@@ -46,10 +47,11 @@ export function AttachmentsDialog({
   changed: () => void;
 }) {
   const { t } = useLingui();
+  const client = useQueryClient();
   const inputId = useId();
   const removeTrigger = useRef<HTMLButtonElement | null>(null);
   const [controller] = useState(
-    () => new AttachmentController(entry.id, changed),
+    () => new AttachmentController(entry.id, changed, client),
   );
   const state = useSyncExternalStore(controller.subscribe, controller.snapshot);
   const [file, setFile] = useState<File | null>(null);

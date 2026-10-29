@@ -1,24 +1,20 @@
 import { useLingui } from "@lingui/react/macro";
-import { getVersion } from "@tauri-apps/api/app";
+import { useQuery } from "@tanstack/react-query";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { TranslationSnapshot } from "~/bindings";
+import { translationSnapshotQuery } from "~/features/translation/queries";
 import { buildInfo } from "~/lib/build-info";
 import { describeError, toIpcError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
 import * as ipc from "~/lib/ipc";
 import { isDesktopPlatform } from "~/lib/platform";
 import { useHostsStore } from "~/store/hosts";
-import type {
-  AppDataModule,
-  AppDataUsage,
-  AppError,
-  LanTransferStatus,
-} from "~/types";
+import type { AppDataModule, AppError, LanTransferStatus } from "~/types";
 
-import { type EnvironmentInfo, readEnvironment } from "./environment";
+import { environmentQuery, usageQuery, versionQuery } from "./queries";
+import { clearModuleQueries } from "./query-cleanup";
 import { startReset } from "./reset-runtime";
 
 /** 存储明细一行；`module` 为空表示该项只能展示，不能就地清理。 */
@@ -37,17 +33,23 @@ export interface EnvironmentFieldEntry {
 
 export function useAbout() {
   const { t } = useLingui();
-  const [usage, setUsage] = useState<AppDataUsage | null>(null);
+  const usageRead = useQuery(usageQuery());
+  const versionRead = useQuery(versionQuery());
+  const environmentRead = useQuery(environmentQuery());
+  const translationRead = useQuery({
+    ...translationSnapshotQuery(),
+    refetchInterval: (query) => (query.state.data?.task ? 500 : false),
+  });
+  const usage = usageRead.data ?? null;
+  const version = versionRead.data ?? "—";
+  const environment = environmentRead.data ?? null;
+  const translation = translationRead.data ?? null;
+  const error = usageRead.error?.payload ?? null;
+  const versionError = versionRead.error?.payload ?? null;
   const [lan, setLan] = useState<LanTransferStatus | null>(null);
-  const [error, setError] = useState<AppError | null>(null);
   const [lanError, setLanError] = useState<AppError | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [version, setVersion] = useState("—");
-  const [versionError, setVersionError] = useState<AppError | null>(null);
-  const [environment, setEnvironment] = useState<EnvironmentInfo | null>(null);
-  const [translation, setTranslation] = useState<TranslationSnapshot | null>(
-    null,
-  );
+  const [lanLoading, setLanLoading] = useState(isDesktopPlatform);
+  const loading = usageRead.isLoading || lanLoading;
   const [modulesOpen, setModulesOpen] = useState(false);
   const [target, setTarget] = useState<AppDataModule | "all" | null>(null);
   const [busy, setBusy] = useState(false);
@@ -108,68 +110,40 @@ export function useAbout() {
       ]
     : [];
 
-  async function read(run: number) {
-    const alive = () => mounted.current && generation.current === run;
+  async function readLan(run: number) {
+    if (!isDesktopPlatform()) return;
+    try {
+      const value = await ipc.lanTransferStatus();
+      if (mounted.current && generation.current === run) {
+        setLan(value);
+        setLanError(null);
+      }
+    } catch (cause) {
+      if (mounted.current && generation.current === run)
+        setLanError(toIpcError(cause).payload);
+    } finally {
+      if (mounted.current && generation.current === run) setLanLoading(false);
+    }
+  }
+
+  async function read() {
     await Promise.all([
-      getVersion()
-        .then((value) => {
-          if (alive()) {
-            setVersion(value);
-            setVersionError(null);
-          }
-        })
-        .catch((cause) => {
-          if (alive()) setVersionError(toIpcError(cause).payload);
-        }),
-      readEnvironment().then((value) => {
-        if (alive()) setEnvironment(value);
-      }),
-      ipc
-        .translationSnapshot()
-        .then((value) => {
-          if (alive()) setTranslation(value);
-        })
-        .catch(() => {
-          // 状态未知不等于未安装；保留 null，由页面显示占位符。
-          if (alive()) setTranslation(null);
-        }),
-      ipc
-        .appDataUsage()
-        .then((value) => {
-          if (alive()) {
-            setUsage(value);
-            setError(null);
-          }
-        })
-        .catch((cause) => {
-          if (alive()) setError(toIpcError(cause).payload);
-        }),
-      isDesktopPlatform()
-        ? ipc
-            .lanTransferStatus()
-            .then((value) => {
-              if (alive()) {
-                setLan(value);
-                setLanError(null);
-              }
-            })
-            .catch((cause) => {
-              if (alive()) setLanError(toIpcError(cause).payload);
-            })
-        : Promise.resolve(),
+      usageRead.refetch({ cancelRefetch: false }),
+      versionRead.refetch({ cancelRefetch: false }),
+      environmentRead.refetch({ cancelRefetch: false }),
+      translationRead.refetch({ cancelRefetch: false }),
+      readLan(++generation.current),
     ]);
-    if (alive()) setLoading(false);
   }
 
   function reload() {
     if (writing.current) return;
-    setLoading(true);
-    return read(++generation.current);
+    return read();
   }
 
   useEffect(() => {
     mounted.current = true;
-    void read(++generation.current);
+    void readLan(++generation.current);
     return () => {
       mounted.current = false;
     };
@@ -186,13 +160,13 @@ export function useAbout() {
     writing.current = true;
     generation.current++;
     setBusy(true);
-    setLoading(false);
     setWriteError(null);
     try {
       if (target === "all") {
         await startReset();
       } else {
         const result = await ipc.appDataClear(target);
+        clearModuleQueries(target);
         if (target === "hosts") useHostsStore.getState().invalidate();
         if (!mounted.current) return;
         const title = moduleTitles[target];
@@ -203,7 +177,7 @@ export function useAbout() {
               message: `${title}已清理`,
             }),
             result.usageError
-              ? { description: describeError(result.usageError) }
+              ? { description: describeError(result.usageError, t) }
               : undefined,
           );
         } else {
@@ -216,7 +190,7 @@ export function useAbout() {
           );
         }
         setTarget(null);
-        await read(++generation.current);
+        await read();
       }
     } catch (cause) {
       if (mounted.current) setWriteError(toIpcError(cause).payload);
@@ -251,7 +225,7 @@ export function useAbout() {
       await writeText(lines.join("\n"));
       toast.success(t`环境信息已复制`);
     } catch (cause) {
-      toast.error(describeError(cause));
+      toast.error(describeError(cause, t));
     }
   }
 

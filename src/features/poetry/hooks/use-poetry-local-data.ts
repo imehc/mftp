@@ -1,28 +1,28 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { PoetryTranslationPackSummary } from "~/bindings";
 import { describeError, toIpcError } from "~/lib/errors";
 import { pickFilePathNative } from "~/lib/files";
 import {
   poetryAnnotationsDelete,
   poetryAnnotationsInstall,
-  poetryAnnotationsStatus,
   poetryContentIndexBuild,
-  poetryContentIndexStatus,
   poetrySyncImportLocal,
-  poetryTranslationPacks,
 } from "~/lib/ipc";
-import type { AppError, PoetryContentIndexStatus } from "~/types";
+import { refreshQueries } from "~/lib/query-invalidation";
 
-import type { PoetrySyncProgressState } from "../sync-progress";
+import {
+  annotationsQuery,
+  poetryIndexQuery,
+  translationPacksQuery,
+} from "../queries";
 
 const INDEX_TOAST_ID = "poetry-index";
 
 /** 桌面本地语料能力独立于页面布局，读取和动作共享忙碌与卸载边界。 */
 export function usePoetryLocalData(
-  progress: PoetrySyncProgressState,
   selectedPendingIds: string[],
   syncBusy: boolean,
   enabled = true,
@@ -30,61 +30,35 @@ export function usePoetryLocalData(
   const { t } = useLingui();
   const [busy, setBusy] = useState(false);
   const actionPending = useRef(false);
-  const [bodyIndex, setBodyIndex] = useState<PoetryContentIndexStatus | null>(
-    null,
-  );
-  const [annotationsCount, setAnnotationsCount] = useState<number | null>(null);
-  const [translationPacks, setTranslationPacks] = useState<
-    PoetryTranslationPackSummary[]
-  >([]);
-  const [extrasError, setExtrasError] = useState<AppError | null>(null);
-  const [extrasLoading, setExtrasLoading] = useState(true);
-  const extraReads = useRef({ generation: 0, mounted: false });
-
-  // 独立读取并行执行；失败保持错误状态，不把未知状态显示成未安装。
-  const refreshExtras = async () => {
-    if (!extraReads.current.mounted) return;
-    const generation = ++extraReads.current.generation;
-    setExtrasLoading(true);
-    setExtrasError(null);
-    try {
-      const [index, annotations, packs] = await Promise.all([
-        poetryContentIndexStatus(),
-        poetryAnnotationsStatus(),
-        poetryTranslationPacks(),
-      ]);
-      if (generation !== extraReads.current.generation) return;
-      setBodyIndex(index);
-      setAnnotationsCount(annotations.entryCount);
-      setTranslationPacks(packs);
-    } catch (error) {
-      if (generation === extraReads.current.generation)
-        setExtrasError(toIpcError(error).payload);
-    } finally {
-      if (generation === extraReads.current.generation) setExtrasLoading(false);
-    }
-  };
-
-  const refreshInEffect = useEffectEvent(refreshExtras);
+  const client = useQueryClient();
+  const indexRead = useQuery({ ...poetryIndexQuery(), enabled });
+  const annotationsRead = useQuery({ ...annotationsQuery(), enabled });
+  const packsRead = useQuery({ ...translationPacksQuery(), enabled });
+  const bodyIndex = indexRead.data ?? null;
+  const annotationsCount = annotationsRead.data?.entryCount ?? null;
+  const translationPacks = packsRead.data ?? [];
+  const error = indexRead.error ?? annotationsRead.error ?? packsRead.error;
+  const extrasError = error ? toIpcError(error).payload : null;
+  const extrasLoading =
+    indexRead.isLoading || annotationsRead.isLoading || packsRead.isLoading;
+  const mounted = useRef(false);
   useEffect(() => {
-    if (!enabled) return;
-    const reads = extraReads.current;
-    reads.mounted = true;
-    let disposed = false;
-    queueMicrotask(() => {
-      if (!disposed) void refreshExtras();
-    });
+    mounted.current = enabled;
     return () => {
-      disposed = true;
-      reads.mounted = false;
-      reads.generation++;
+      mounted.current = false;
     };
   }, [enabled]);
 
-  useEffect(() => {
-    if (progress.phase !== "done" && progress.phase !== "error") return;
-    queueMicrotask(() => void refreshInEffect());
-  }, [progress.phase, progress.updatedAt]);
+  const refreshExtras = () => {
+    if (!enabled) return;
+    void indexRead.refetch({ cancelRefetch: false });
+    void annotationsRead.refetch({ cancelRefetch: false });
+    void packsRead.refetch({ cancelRefetch: false });
+  };
+
+  const changed = () => {
+    void refreshQueries(client, { queryKey: ["poetry"] });
+  };
 
   const importLocal = async () => {
     if (selectedPendingIds.length === 0) {
@@ -100,7 +74,7 @@ export function usePoetryLocalData(
       await poetrySyncImportLocal(picked, selectedPendingIds);
     } catch (error) {
       toast.error(t`操作失败`, {
-        description: describeError(error),
+        description: describeError(error, t),
       });
     }
   };
@@ -114,13 +88,13 @@ export function usePoetryLocalData(
         });
       }
       await poetryContentIndexBuild(enable);
-      setBodyIndex(await poetryContentIndexStatus());
+      changed();
       toast.dismiss(INDEX_TOAST_ID);
       toast.success(t`正文索引已更新`);
     } catch (error) {
       toast.error(t`操作失败`, {
         id: INDEX_TOAST_ID,
-        description: describeError(error),
+        description: describeError(error, t),
       });
     }
   };
@@ -128,19 +102,20 @@ export function usePoetryLocalData(
   const installAnnotations = async () => {
     try {
       await poetryAnnotationsInstall();
+      changed();
     } catch (error) {
-      toast.error(t`操作失败`, { description: describeError(error) });
+      toast.error(t`操作失败`, { description: describeError(error, t) });
     }
   };
 
   const deleteAnnotations = async () => {
     try {
       await poetryAnnotationsDelete();
-      setAnnotationsCount(0);
+      changed();
       toast.success(t`已删除`);
     } catch (error) {
       toast.error(t`操作失败`, {
-        description: describeError(error),
+        description: describeError(error, t),
       });
     }
   };
@@ -153,7 +128,7 @@ export function usePoetryLocalData(
       await action();
     } finally {
       actionPending.current = false;
-      if (extraReads.current.mounted) setBusy(false);
+      if (mounted.current) setBusy(false);
     }
   }
 
@@ -161,7 +136,7 @@ export function usePoetryLocalData(
     bodyIndex,
     annotationsCount,
     translationPacks,
-    setTranslationPacks,
+    onPacksChange: changed,
     extrasError,
     extrasLoading,
     refreshExtras,

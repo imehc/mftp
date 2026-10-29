@@ -6,16 +6,17 @@ import { act, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import QueryProvider from "~/app/QueryProvider";
 import type {
   RsyncIntegration,
   RsyncSyncRequest,
 } from "~/features/ssh-sftp/components/sftp/rsync-contract";
+import { queryClient } from "~/lib/query-client";
 import { useSessionsStore } from "~/store/sessions";
 import { useSettingsStore } from "~/store/settings";
 import { useTransfersStore } from "~/store/transfers";
 import type { AppError, RsyncCapabilities, RsyncPreview } from "~/types";
 
-import { useRsyncCapabilityStore } from "./capability-store";
 import { useRsyncIntegration } from "./integration";
 
 const ipcMock = vi.hoisted(() => ({
@@ -108,7 +109,9 @@ async function renderProbe(onUploaded: () => Promise<void> = async () => {}) {
   await act(async () => {
     root.render(
       <I18nProvider i18n={i18n}>
-        <Probe onReady={capture} onUploaded={onUploaded} />
+        <QueryProvider>
+          <Probe onReady={capture} onUploaded={onUploaded} />
+        </QueryProvider>
       </I18nProvider>,
     );
     await flush();
@@ -141,7 +144,7 @@ beforeEach(() => {
     networkBytes: 20,
     changedItems: 1,
   });
-  useRsyncCapabilityStore.setState({ entries: {} });
+  queryClient.clear();
   useSettingsStore.setState({
     directoryTransferMode: "rsync",
     rsyncDeleteExtraneous: false,

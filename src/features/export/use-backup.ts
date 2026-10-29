@@ -8,6 +8,7 @@ import { toIpcError } from "~/lib/errors";
 import { baseName, downloadBlob, pickFilePathNative } from "~/lib/files";
 import { dataExport, dataImport, dataInspect } from "~/lib/ipc";
 import { isDesktopPlatform } from "~/lib/platform";
+import { invalidateData } from "~/lib/query-client";
 import { useHostsStore } from "~/store/hosts";
 import type {
   AppError,
@@ -155,7 +156,17 @@ export function useBackup() {
         mode,
       );
       // 写入已经成功，缓存刷新不能使用户误以为导入失败而再次执行写入。
-      useHostsStore.getState().invalidate();
+      if (next.sections.some((entry) => entry.section === "hosts"))
+        useHostsStore.getState().invalidate();
+      void invalidateData([
+        ...next.sections.map((entry) =>
+          entry.section === "aiTranslations" ? "poetry" : entry.section,
+        ),
+        ...(next.sections.some((entry) => entry.section === "hosts")
+          ? ["ssh-keys"]
+          : []),
+        "about",
+      ]);
       if (mounted.current) {
         setReport(next);
         setImportPassword("");

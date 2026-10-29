@@ -7,6 +7,7 @@ import type {
   UseRsyncIntegrationOptions,
 } from "~/features/ssh-sftp/components/sftp/rsync-contract";
 import { nextTransferId } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { runSftpWrite } from "~/features/ssh-sftp/queries";
 import { hasCustomCode, toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import { useSessionsStore } from "~/store/sessions";
@@ -135,6 +136,7 @@ export function useRsyncIntegration({
   async function confirmPreview(): Promise<void> {
     const state = previewState;
     if (!state?.preview || state.loading) return;
+    const token = state.preview.token;
     generation.current += 1;
     setPreviewState(null);
     const transferId = nextTransferId();
@@ -148,15 +150,18 @@ export function useRsyncIntegration({
       kind: state.direction === "upload" ? "upload" : "download",
     });
     try {
-      await ipc.rsyncTransfer(
-        sessionId,
-        state.preview.token,
-        state.direction,
-        state.localDir,
-        state.remoteDir,
-        state.deleteExtraneous,
-        transferId,
-      );
+      const transfer = () =>
+        ipc.rsyncTransfer(
+          sessionId,
+          token,
+          state.direction,
+          state.localDir,
+          state.remoteDir,
+          state.deleteExtraneous,
+          transferId,
+        );
+      if (state.direction === "upload") await runSftpWrite(sessionId, transfer);
+      else await transfer();
       finishTransfer(transferId, "success");
     } catch (error) {
       finishTransfer(

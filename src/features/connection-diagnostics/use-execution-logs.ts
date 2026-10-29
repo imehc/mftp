@@ -1,87 +1,67 @@
-import { useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { listen } from "@tauri-apps/api/event";
+import { useEffect, useState } from "react";
 
-import type {
-  AppError,
-  DiagnosticOperation,
-  DiagnosticSnapshot,
-} from "~/bindings";
+import type { AppError, DiagnosticOperation } from "~/bindings";
+import {
+  clearLogQueries,
+  logPageQuery,
+  refreshLogQueries,
+} from "~/features/logs/queries";
 import { toIpcError } from "~/lib/errors";
-import * as ipc from "~/lib/ipc";
+import { createSubscription } from "~/lib/event-subscription";
+import { ACTIVITY_PANEL } from "~/lib/events";
 
-import { openExecutionLogSession } from "./execution-log-session";
+export const LOG_FALLBACK_MS = 5000;
 
-/** 统一读取文件日志投影；活动事件只触发重读，游标仍由后端负责判定。 */
+/** 根运行期只装一次事件桥接；活动与历史消费者读取同一摘要查询。 */
 export function useExecutionLogs() {
-  const [operations, setOperations] = useState<DiagnosticOperation[]>([]);
-  const [discarded, setDiscarded] = useState(0);
-  const [error, setError] = useState<AppError | null>(null);
-  const [loading, setLoading] = useState(true);
-  const reading = useRef(false);
-  const mounted = useRef(false);
-  const refreshRef = useRef<() => void>(() => undefined);
-
-  function applySnapshot(snapshot: DiagnosticSnapshot) {
-    if (snapshot.operations !== null) setOperations(snapshot.operations);
-    setDiscarded(snapshot.discarded);
-    setError(null);
-    setLoading(false);
-  }
-
-  async function read() {
-    if (reading.current || typeof ipc.logsPage !== "function") return;
-    reading.current = true;
-    try {
-      const page = await ipc.logsPage(undefined, 500);
-      if (!mounted.current) return;
-      setOperations(
-        page.entries
-          .map((entry) => entry.operation)
-          .filter((entry): entry is DiagnosticOperation => entry !== null),
-      );
-      setDiscarded(page.health.discarded);
-      setError(page.health.error);
-    } catch (cause) {
-      if (mounted.current) setError(toIpcError(cause).payload);
-    } finally {
-      reading.current = false;
-      if (mounted.current) setLoading(false);
-    }
-  }
-
+  const client = useQueryClient();
+  const query = useQuery(logPageQuery());
+  const [failure, setFailure] = useState<AppError | null>(null);
   useEffect(() => {
-    mounted.current = true;
-    const session = openExecutionLogSession(
-      (snapshot) => {
-        if (typeof ipc.logsPage === "function") void read();
-        else applySnapshot(snapshot);
-      },
-      (cause) => {
-        if (cause && mounted.current) setError(cause);
-      },
-    );
-    refreshRef.current = () => {
-      if (typeof ipc.logsPage === "function") void read();
-      else session.refresh();
-    };
-    return () => {
-      mounted.current = false;
-      refreshRef.current = () => undefined;
-      session.close();
-    };
-  }, []);
+    let closed = false;
+    let timer: ReturnType<typeof setTimeout>;
 
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (closed) return;
+        void refreshLogQueries(client);
+        schedule();
+      }, LOG_FALLBACK_MS);
+    };
+
+    const subscription = createSubscription(
+      () =>
+        listen(ACTIVITY_PANEL, () => {
+          if (closed) return;
+          void refreshLogQueries(client);
+          schedule();
+        }),
+      { onError: (cause) => setFailure(toIpcError(cause).payload) },
+    );
+    schedule();
+    return () => {
+      closed = true;
+      clearTimeout(timer);
+      subscription.dispose();
+    };
+  }, [client]);
   return {
-    operations,
-    discarded,
-    error,
-    loading,
-    refresh: () => refreshRef.current(),
-    clear: async () => {
-      await ipc.diagnosticsClear();
-      refreshRef.current();
-      // 清理文件与当前快照，不取消仍在执行的外部操作。
+    operations:
+      query.data?.entries
+        .map((entry) => entry.operation)
+        .filter((entry): entry is DiagnosticOperation => entry !== null) ?? [],
+    discarded: query.data?.health.discarded ?? 0,
+    error: failure ?? query.error?.payload ?? query.data?.health.error ?? null,
+    loading: query.isLoading,
+    refresh: () => {
+      setFailure(null);
+      void refreshLogQueries(client);
     },
-    recordFailure: (cause: unknown) => setError(toIpcError(cause).payload),
+    clear: () => clearLogQueries(client),
+    recordFailure: (cause: unknown) => setFailure(toIpcError(cause).payload),
   };
 }
 

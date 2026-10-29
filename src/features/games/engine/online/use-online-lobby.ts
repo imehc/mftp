@@ -1,7 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useSyncExternalStore } from "react";
 
 import { gameRoomCreate, gameRoomJoin, lanTransferSettings } from "~/lib/ipc";
+import { ipcQuery } from "~/lib/query-client";
 import type { GameRoomSummary } from "~/types";
 
 import { type MoveParser, onlineGameId } from "./protocol";
@@ -19,7 +21,7 @@ export function useOnlineLobby<M>(
   const roomGameId = onlineGameId(gameId);
   const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot);
   const discovery = useRoomDiscovery(roomGameId, !state.hosting && !state.busy);
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState<string | null>(null);
   const [roomName, setRoomName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [joinOpen, setJoinOpen] = useState(false);
@@ -27,21 +29,9 @@ export function useOnlineLobby<M>(
   const [joinCode, setJoinCode] = useState("");
   const [codeRequired, setCodeRequired] = useState(false);
   const [addressInvalid, setAddressInvalid] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-    void lanTransferSettings()
-      .then((settings) => {
-        if (!cancelled && settings.deviceName)
-          setNickname((current) => current || settings.deviceName);
-      })
-      .catch(() => {
-        /* 昵称为可选默认值；读取失败仍可手动填写，不阻断联机。 */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-  const playerName = () => nickname.trim() || t`玩家`;
+  const defaults = useQuery(ipcQuery(["lan", "settings"], lanTransferSettings));
+  const effectiveNickname = nickname ?? defaults.data?.deviceName ?? "";
+  const playerName = () => effectiveNickname.trim() || t`玩家`;
 
   const create = () => {
     const name = playerName();
@@ -90,7 +80,7 @@ export function useOnlineLobby<M>(
   return {
     ...state,
     discovery,
-    nickname,
+    nickname: effectiveNickname,
     setNickname,
     roomName,
     setRoomName,

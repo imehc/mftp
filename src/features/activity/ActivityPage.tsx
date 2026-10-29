@@ -35,10 +35,6 @@ export default function ActivityPage() {
   const logs = useActivityExecutionLogs();
   const history = useActivityLogs({
     enabled: tab === "logs" || !!search.operation || !!search.history,
-    refreshKey: logs.operations
-      .map((operation) => `${operation.id}:${operation.status}`)
-      .join("|"),
-    refreshInterval: 5000,
   });
   const unavailableOperation = useRef<string | null>(null);
   const summary = history.logs.find((item) =>

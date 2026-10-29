@@ -1,8 +1,8 @@
-import { create } from "zustand";
-
 import { toIpcError } from "~/lib/errors";
-import * as ipc from "~/lib/ipc";
+import { createQueryStore } from "~/lib/query-store";
 import type { AppError, BtTaskInfo } from "~/types";
+
+import { btTasksQuery } from "./queries";
 
 /**
  * BT 任务快照的全局投影。读取与监听由模块运行期（`runtime/btRuntime`）
@@ -28,21 +28,24 @@ interface BtTasksState {
   consumeAddSource: () => void;
 }
 
-export const useBtTasksStore = create<BtTasksState>((set) => ({
-  tasks: [],
-  error: null,
-  subscriptionError: null,
-  loading: true,
-  noPeers: new Set(),
-  pendingAddSource: null,
-  setTasks: (tasks) => set({ tasks }),
-  setError: (error) => set({ error }),
-  setSubscriptionError: (subscriptionError) => set({ subscriptionError }),
-  setLoading: (loading) => set({ loading }),
-  setNoPeers: (noPeers) => set({ noPeers }),
-  requestAddSource: (pendingAddSource) => set({ pendingAddSource }),
-  consumeAddSource: () => set({ pendingAddSource: null }),
-}));
+export const useBtTasksStore = createQueryStore<BtTasksState>(
+  (set) => ({
+    tasks: [],
+    error: null,
+    subscriptionError: null,
+    loading: true,
+    noPeers: new Set(),
+    pendingAddSource: null,
+    setTasks: (tasks) => set({ tasks }),
+    setError: (error) => set({ error }),
+    setSubscriptionError: (subscriptionError) => set({ subscriptionError }),
+    setLoading: (loading) => set({ loading }),
+    setNoPeers: (noPeers) => set({ noPeers }),
+    requestAddSource: (pendingAddSource) => set({ pendingAddSource }),
+    consumeAddSource: () => set({ pendingAddSource: null }),
+  }),
+  { tasks: btTasksQuery },
+);
 
 /**
  * 串行读取任务列表：同一时刻只有一次在途请求，在途期间的触发合并为
@@ -62,9 +65,8 @@ export function refreshBtTasks(): Promise<void> {
     do {
       request.again = false;
       try {
-        const list = await ipc.btList();
+        await btTasksQuery.fetch(true);
         if (request.again) continue;
-        useBtTasksStore.getState().setTasks(list);
         useBtTasksStore.getState().setError(null);
       } catch (cause) {
         // 读取失败保留最后一次任务快照，不能把失败伪装成空列表。

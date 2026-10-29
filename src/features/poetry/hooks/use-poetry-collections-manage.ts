@@ -1,12 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { describeError, hasCustomCode, toIpcError } from "~/lib/errors";
+import { describeError, hasCustomCode } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
-import type { AppError, PoetryCollectionStatus } from "~/types";
+import { invalidateData } from "~/lib/query-client";
+import type { PoetryCollectionStatus } from "~/types";
 
-import { usePoetryStore } from "../store/poetry-store";
+import { collectionsQuery } from "../queries";
 import { usePoetrySyncProgress } from "../sync-progress";
 
 /**
@@ -16,48 +18,27 @@ import { usePoetrySyncProgress } from "../sync-progress";
  */
 export function usePoetryCollectionsManage() {
   const { t } = useLingui();
-  const collections = usePoetryStore((state) => state.collections);
-  const setCollections = usePoetryStore((state) => state.setCollections);
+  const query = useQuery(collectionsQuery());
+  const collections = query.data ?? [];
+  const loading = query.isPending;
+  const error = query.error?.payload ?? null;
+
+  const refresh = () => {
+    void query.refetch({ cancelRefetch: false });
+  };
+
   const progress = usePoetrySyncProgress();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [starting, setStarting] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<AppError | null>(null);
-  const readGeneration = useRef({ value: 0 });
   const mounted = useRef(false);
   const startingRef = useRef(false);
   const [pendingDelete, setPendingDelete] =
     useState<PoetryCollectionStatus | null>(null);
 
-  const refresh = async () => {
-    if (!mounted.current) return;
-    const generation = ++readGeneration.current.value;
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await ipc.poetryCollections();
-      if (generation === readGeneration.current.value) setCollections(result);
-    } catch (error) {
-      if (generation === readGeneration.current.value)
-        setError(toIpcError(error).payload);
-    } finally {
-      if (generation === readGeneration.current.value) setLoading(false);
-    }
-  };
-
-  const refreshInEffect = useEffectEvent(refresh);
   useEffect(() => {
-    const generation = readGeneration.current;
     mounted.current = true;
-    let disposed = false;
-    queueMicrotask(() => {
-      if (!disposed) void refreshInEffect();
-    });
-    // 离页使在途读取失效，避免旧列表覆盖新页面或较新的刷新结果。
     return () => {
-      disposed = true;
       mounted.current = false;
-      generation.value++;
     };
   }, []);
 
@@ -77,9 +58,10 @@ export function usePoetryCollectionsManage() {
     else
       toast.error(t`同步失败`, {
         id: "poetry-sync",
-        description: progress.error ? describeError(progress.error) : undefined,
+        description: progress.error
+          ? describeError(progress.error, t)
+          : undefined,
       });
-    queueMicrotask(() => void refreshInEffect());
   }, [progress.phase, progress.updatedAt, progress.error, t]);
 
   const tierOrder = { recommended: 0, default: 1, optIn: 2 };
@@ -113,7 +95,7 @@ export function usePoetryCollectionsManage() {
     try {
       await ipc.poetrySyncStart(selectedPendingIds);
     } catch (error) {
-      toast.error(t`操作失败`, { description: describeError(error) });
+      toast.error(t`操作失败`, { description: describeError(error, t) });
     } finally {
       startingRef.current = false;
       if (mounted.current) setStarting(false);
@@ -124,7 +106,7 @@ export function usePoetryCollectionsManage() {
     try {
       await ipc.poetrySyncCancel();
     } catch (error) {
-      toast.error(t`操作失败`, { description: describeError(error) });
+      toast.error(t`操作失败`, { description: describeError(error, t) });
     }
   };
 
@@ -136,9 +118,9 @@ export function usePoetryCollectionsManage() {
       await ipc.poetryCollectionDelete(item.id);
       const itemName = item.name;
       toast.success(t`已删除 ${itemName}`);
-      void refresh();
+      void invalidateData(["poetry"]);
     } catch (error) {
-      toast.error(t`操作失败`, { description: describeError(error) });
+      toast.error(t`操作失败`, { description: describeError(error, t) });
     }
   };
 

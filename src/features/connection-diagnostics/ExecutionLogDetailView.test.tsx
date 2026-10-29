@@ -6,7 +6,9 @@ import { act, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import QueryProvider from "~/app/QueryProvider";
 import type { DiagnosticOperation, DiagnosticText } from "~/bindings";
+import { createAppQueryClient } from "~/lib/query-client";
 import { messages as enMessages } from "~/locales/en/messages";
 import { messages as zhMessages } from "~/locales/zh-CN/messages";
 
@@ -98,14 +100,18 @@ const operation: DiagnosticOperation = {
   details: [],
   error: null,
 };
+vi.mock("~/lib/ipc", () => ({ logsDetail: vi.fn(async () => operation) }));
+
 const copy = vi.fn();
 const back = vi.fn();
+let client: ReturnType<typeof createAppQueryClient>;
 let root: Root;
 let container: HTMLDivElement;
 
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.clearAllMocks();
+  client = createAppQueryClient();
   copy.mockResolvedValue(undefined);
   vi.spyOn(navigator.clipboard, "writeText").mockImplementation(copy);
   i18n.load("zh-CN", zhMessages);
@@ -119,6 +125,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  client.clear();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -126,9 +133,11 @@ afterEach(async () => {
 async function render(current = operation) {
   await act(async () =>
     root.render(
-      <I18nProvider i18n={i18n}>
-        <ExecutionLogDetailView operation={current} onBack={back} />
-      </I18nProvider>,
+      <QueryProvider client={client}>
+        <I18nProvider i18n={i18n}>
+          <ExecutionLogDetailView operation={current} onBack={back} />
+        </I18nProvider>
+      </QueryProvider>,
     ),
   );
 }

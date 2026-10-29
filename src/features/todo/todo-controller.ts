@@ -1,4 +1,4 @@
-import { createStore } from "zustand/vanilla";
+import type { QueryClient } from "@tanstack/react-query";
 
 import type { TodoNoteSaveInput, TodoNoteSummary } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
@@ -10,8 +10,13 @@ import {
   todoNoteSave,
   todoNoteSummaries,
 } from "~/lib/ipc";
+import { createAppQueryClient } from "~/lib/query-client";
+import { refreshQueries } from "~/lib/query-invalidation";
+import { createQueryResource } from "~/lib/query-resource";
+import { createQueryStore } from "~/lib/query-store";
 import type { AppError, TodoItem } from "~/types";
 
+import { todoKeys } from "./queries";
 import { sortTodoItems } from "./todo-utils";
 
 interface TodoState {
@@ -40,20 +45,38 @@ const defaultApi = {
 };
 
 /** 页面实例拥有数据与写入准入；不持久化，也不重放失败的写操作。 */
-export function createTodoController(api = defaultApi) {
-  const store = createStore<TodoState>(() => ({
-    items: [],
-    summaries: [],
-    summaryError: null,
-    loading: true,
-    loadError: null,
-    editing: null,
-    dialogOpen: false,
-    deleting: null,
-    deleteError: null,
-    saving: false,
-    pendingIds: new Set(),
-  }));
+export function createTodoController(
+  api = defaultApi,
+  client: QueryClient = createAppQueryClient(),
+) {
+  const itemsResource = createQueryResource(
+    todoKeys.items,
+    () => trackRead(async () => sortTodoItems(await api.list())),
+    client,
+    externalChanged,
+  );
+  const summariesResource = createQueryResource(
+    todoKeys.summaries,
+    () => trackRead(api.summaries),
+    client,
+    externalChanged,
+  );
+  const store = createQueryStore<TodoState>(
+    () => ({
+      items: [],
+      summaries: [],
+      summaryError: null,
+      loading: true,
+      loadError: null,
+      editing: null,
+      dialogOpen: false,
+      deleting: null,
+      deleteError: null,
+      saving: false,
+      pendingIds: new Set(),
+    }),
+    { items: itemsResource, summaries: summariesResource },
+  );
   let active = false;
   let lifetime = 0;
   let readVersion = 0;
@@ -61,10 +84,12 @@ export function createTodoController(api = defaultApi) {
   let deleteVersion = 0;
   let externalPending = false;
   let reads = 0;
+  let requests = 0;
 
   function externalChanged() {
     if (!active) return;
     externalPending = true;
+    void refreshQueries(client, { queryKey: todoKeys.details });
     flushExternalChanges();
   }
 
@@ -74,6 +99,7 @@ export function createTodoController(api = defaultApi) {
       !active ||
       !externalPending ||
       reads ||
+      requests ||
       state.saving ||
       state.pendingIds.size
     )
@@ -82,7 +108,21 @@ export function createTodoController(api = defaultApi) {
     void read(true);
   }
 
+  async function trackRead<T>(action: () => Promise<T>) {
+    reads++;
+    try {
+      return await action();
+    } finally {
+      reads--;
+      flushExternalChanges();
+    }
+  }
+
   async function load() {
+    const state = store.getState();
+    if (!active || state.saving || state.pendingIds.size) return;
+    itemsResource.cancel();
+    summariesResource.cancel();
     return read(false);
   }
 
@@ -91,19 +131,17 @@ export function createTodoController(api = defaultApi) {
     if (!active || state.saving || state.pendingIds.size) return;
     const run = ++readVersion;
     const life = lifetime;
-    reads++;
+    requests++;
     if (!background) store.setState({ loading: true, loadError: null });
     try {
       const [items, summaries] = await Promise.allSettled([
-        api.list(),
-        api.summaries(),
+        itemsResource.fetch(true),
+        summariesResource.fetch(true),
       ]);
       if (items.status === "rejected") throw items.reason;
       if (summaries.status === "rejected") throw summaries.reason;
       if (active && lifetime === life && readVersion === run)
         store.setState({
-          items: sortTodoItems(items.value),
-          summaries: summaries.value,
           summaryError: null,
           loadError: null,
           loading: false,
@@ -117,7 +155,7 @@ export function createTodoController(api = defaultApi) {
           loading: false,
         });
     } finally {
-      reads--;
+      requests--;
       flushExternalChanges();
     }
   }
@@ -170,12 +208,15 @@ export function createTodoController(api = defaultApi) {
       return null;
     const life = lifetime;
     readVersion++;
+    itemsResource.cancel();
+    summariesResource.cancel();
     store.setState({
       pendingIds: id ? new Set(state.pendingIds).add(id) : state.pendingIds,
       ...(saving ? { saving: true } : {}),
     });
     try {
       await operation();
+      void refreshQueries(client, { queryKey: todoKeys.details });
       return active && lifetime === life ? { ok: true } : null;
     } catch (error) {
       return active && lifetime === life
@@ -211,9 +252,8 @@ export function createTodoController(api = defaultApi) {
       // 关闭后重新打开的草稿，即使目标相同，也属于新的编辑会话。
       if (editorVersion === version) setDialogOpen(false);
       try {
-        const summaries = await api.summaries();
-        if (active && lifetime === life)
-          store.setState({ summaries, summaryError: null });
+        await summariesResource.fetch(true);
+        if (active && lifetime === life) store.setState({ summaryError: null });
       } catch (error) {
         if (active && lifetime === life)
           store.setState({ summaryError: toIpcError(error).payload });
@@ -304,6 +344,8 @@ export function createTodoController(api = defaultApi) {
       active = false;
       lifetime++;
       readVersion++;
+      itemsResource.cancel();
+      summariesResource.cancel();
       externalPending = false;
     },
   };

@@ -1,23 +1,20 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type {
-  AppError,
-  PoetryPackTranslation,
-  PoetryTranslation,
-} from "~/bindings";
+import type { AppError, PoetryTranslation } from "~/bindings";
+import { aiConfigurationQuery } from "~/features/ai-configuration/queries";
 import { hasAiRequestSelection } from "~/features/ai-configuration/request-readiness";
 import { describeError, toIpcError } from "~/lib/errors";
 import {
-  aiConfigurationGet,
-  poetryPackTranslationsList,
   poetryTranslationDelete,
   poetryTranslationGenerate,
-  poetryTranslationsList,
   poetryTranslationUpdate,
 } from "~/lib/ipc";
+import { queryScopeGuard } from "~/lib/query-client";
 
+import { packTranslationsQuery, translationsQuery } from "../queries";
 import {
   selectPoetryPackTranslations,
   selectPoetryTranslation,
@@ -26,13 +23,17 @@ import {
 /** 阅读内容切换只改变可见性，本 controller 在同一作品内持续持有请求和草稿。 */
 export function usePoetryTranslations(uid: string) {
   const { t } = useLingui();
-  const [translations, setTranslations] = useState<PoetryTranslation[]>([]);
-  const [packTranslations, setPackTranslations] = useState<
-    PoetryPackTranslation[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-  const [readError, setReadError] = useState<AppError | null>(null);
-  const [readRevision, setReadRevision] = useState(0);
+  const client = useQueryClient();
+  const translationRead = useQuery({
+    ...translationsQuery(uid),
+    enabled: !!uid,
+  });
+  const packRead = useQuery({ ...packTranslationsQuery(uid), enabled: !!uid });
+  const translations = translationRead.data ?? [];
+  const packTranslations = packRead.data ?? [];
+  const loading = translationRead.isLoading || packRead.isLoading;
+  const readError =
+    translationRead.error?.payload ?? packRead.error?.payload ?? null;
   const actionPending = useRef(false);
   const [generating, setGenerating] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
@@ -43,6 +44,7 @@ export function usePoetryTranslations(uid: string) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [regenerateOpen, setRegenerateOpen] = useState(false);
   const [configurationMissing, setConfigurationMissing] = useState(false);
+  const life = useRef({ version: 0 });
   const mountedRef = useRef(true);
   // 离开页面只解除流式订阅；用户显式取消才打断后端请求。
   const detachGenerationRef = useRef<(() => void) | null>(null);
@@ -63,40 +65,22 @@ export function usePoetryTranslations(uid: string) {
 
   useEffect(() => {
     mountedRef.current = true;
+    const lifetime = life.current;
     return () => {
+      lifetime.version++;
       mountedRef.current = false;
       detachGenerationRef.current?.();
       detachGenerationRef.current = null;
     };
   }, [uid]);
 
-  useEffect(() => {
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled) {
-        setLoading(true);
-        setReadError(null);
-      }
-    });
-    void Promise.all([
-      poetryTranslationsList(uid),
-      poetryPackTranslationsList(uid),
-    ])
-      .then(([items, packItems]) => {
-        if (!cancelled) {
-          setTranslations(items);
-          setPackTranslations(packItems);
-        }
-      })
-      .catch(
-        (nextError) =>
-          !cancelled && setReadError(toIpcError(nextError).payload),
-      )
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [uid, readRevision]);
+  function setTranslations(
+    update: (items: PoetryTranslation[]) => PoetryTranslation[],
+  ) {
+    const key = translationsQuery(uid).queryKey;
+    void client.cancelQueries({ queryKey: key, exact: true });
+    client.setQueryData(key, (items) => update(items ?? []));
+  }
 
   function replaceTranslation(next: PoetryTranslation) {
     setTranslations((items) => [
@@ -107,42 +91,47 @@ export function usePoetryTranslations(uid: string) {
 
   async function generate() {
     if (actionPending.current || loading || readError) return;
+    const lifetime = life.current.version;
+    const currentScope = queryScopeGuard(client, "poetry");
+    const currentPage = () =>
+      mountedRef.current && lifetime === life.current.version;
     actionPending.current = true;
     cancelRequestedRef.current = false;
     setGenerating(true);
     setStreamingContent("");
     setConfigurationMissing(false);
     try {
-      const configuration = await aiConfigurationGet();
-      if (!mountedRef.current || cancelRequestedRef.current) return;
+      const configuration = await client.query(aiConfigurationQuery());
+      if (!currentPage() || !currentScope() || cancelRequestedRef.current)
+        return;
       if (!hasAiRequestSelection(configuration)) {
         setConfigurationMissing(true);
         return;
       }
-      const generation = poetryTranslationGenerate(uid, "literal", (delta) =>
-        setStreamingContent((content) => content + delta),
-      );
+      const generation = poetryTranslationGenerate(uid, "literal", (delta) => {
+        if (currentPage()) setStreamingContent((content) => content + delta);
+      });
       detachGenerationRef.current = generation.detach;
       cancelGenerationRef.current = generation.cancel;
       const translation = await generation.promise;
-      // 已离开页面或已解除订阅时不采用结果。
-      if (!mountedRef.current || !translation || cancelRequestedRef.current) {
+      // 离开后仍更新对应作品的有效缓存，但重置后的结果不得回填。
+      if (!currentScope() || !translation || cancelRequestedRef.current) {
         return;
       }
       replaceTranslation(translation);
-      toast.success(t`已生成`);
+      if (currentPage()) toast.success(t`已生成`);
     } catch (nextError) {
       const payload = toIpcError(nextError).payload;
       // 用户主动取消：不是失败，不弹错误，也不写库。
       if (payload.code === "ai:cancelled") {
-        if (mountedRef.current) toast(t`已取消生成`);
-      } else if (mountedRef.current) {
+        if (currentPage()) toast(t`已取消生成`);
+      } else if (currentPage()) {
         reportError(payload);
       }
     } finally {
       actionPending.current = false;
       cancelGenerationRef.current = null;
-      if (mountedRef.current) {
+      if (currentPage()) {
         setStreamingContent("");
         setGenerating(false);
       }
@@ -170,6 +159,10 @@ export function usePoetryTranslations(uid: string) {
 
   async function saveEdit() {
     if (!editing || !editContent.trim() || actionPending.current) return;
+    const lifetime = life.current.version;
+    const currentScope = queryScopeGuard(client, "poetry");
+    const currentPage = () =>
+      mountedRef.current && lifetime === life.current.version;
     actionPending.current = true;
     setSavingEdit(true);
     try {
@@ -178,34 +171,39 @@ export function usePoetryTranslations(uid: string) {
         editing.mode,
         editContent,
       );
-      if (!mountedRef.current) return;
+      if (!currentScope()) return;
       replaceTranslation(translation);
+      if (!currentPage()) return;
       setEditing(null);
       toast.success(t`已保存`);
     } catch (nextError) {
-      if (mountedRef.current) reportError(toIpcError(nextError).payload);
+      if (currentPage()) reportError(toIpcError(nextError).payload);
     } finally {
       actionPending.current = false;
-      if (mountedRef.current) setSavingEdit(false);
+      if (currentPage()) setSavingEdit(false);
     }
   }
 
   async function remove() {
     if (!current || actionPending.current) return;
+    const lifetime = life.current.version;
+    const currentScope = queryScopeGuard(client, "poetry");
+    const currentPage = () =>
+      mountedRef.current && lifetime === life.current.version;
     actionPending.current = true;
     setDeleting(true);
     try {
       await poetryTranslationDelete(uid, current.mode);
-      if (!mountedRef.current) return;
+      if (!currentScope()) return;
       setTranslations((items) =>
         items.filter((item) => item.mode !== current.mode),
       );
-      toast.success(t`已删除`);
+      if (currentPage()) toast.success(t`已删除`);
     } catch (nextError) {
-      if (mountedRef.current) reportError(toIpcError(nextError).payload);
+      if (currentPage()) reportError(toIpcError(nextError).payload);
     } finally {
       actionPending.current = false;
-      if (mountedRef.current) setDeleting(false);
+      if (currentPage()) setDeleting(false);
     }
   }
 
@@ -220,7 +218,10 @@ export function usePoetryTranslations(uid: string) {
     currentPackTranslations,
     loading,
     readError,
-    retryRead: () => setReadRevision((value) => value + 1),
+    retryRead: () => {
+      void translationRead.refetch({ cancelRefetch: false });
+      void packRead.refetch({ cancelRefetch: false });
+    },
     generating,
     streamingContent,
     deleting,

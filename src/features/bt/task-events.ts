@@ -1,6 +1,7 @@
 import { useTransfersStore } from "~/store/transfers";
 import type { BtTaskEvent } from "~/types";
 
+import { btTasksQuery } from "./queries";
 import { forgetBtTask, transferIdOf } from "./task-sync";
 
 /** 事件类型与错误载荷由 Rust 导出，错误在面板渲染时再本地化。 */
@@ -22,6 +23,12 @@ export function applyBtTaskEvent(event: BtTaskEvent): void {
       break;
     case "removed":
       forgetBtTask(event.infoHash);
+      if (btTasksQuery.get())
+        btTasksQuery.set(
+          btTasksQuery
+            .get()!
+            .filter((task) => task.infoHash !== event.infoHash),
+        );
       break;
     case "export-completed":
       // 转存不改变任务状态，也不该让任务重新走一次注册。

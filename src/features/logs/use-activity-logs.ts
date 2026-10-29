@@ -1,38 +1,36 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { describeError, toIpcError } from "~/lib/errors";
+import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
-import type { ActivityLog, AppError } from "~/types";
+import type { ActivityLog } from "~/types";
 
 import { filterLogs } from "./log-utils";
+import { clearLogQueries, logPageKey, logPageQuery } from "./queries";
 
 export function useActivityLogs({
   enabled = true,
-  refreshKey = "",
-  refreshInterval = 0,
-}: {
-  enabled?: boolean;
-  refreshKey?: string;
-  refreshInterval?: number;
-} = {}) {
+}: { enabled?: boolean } = {}) {
   const { t } = useLingui();
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const client = useQueryClient();
+  const page = useQuery({ ...logPageQuery(), enabled });
+  const logs =
+    page.data?.entries
+      .map((entry) => entry.summary)
+      .filter((entry): entry is ActivityLog => entry !== null) ?? [];
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("all");
   const [result, setResult] = useState("all");
   const [range, setRange] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<AppError | null>(null);
+  const loading = page.isLoading;
+  const error = page.error?.payload ?? page.data?.health.error ?? null;
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState<ActivityLog | null>(null);
   const [deleting, setDeleting] = useState<ActivityLog | "all" | null>(null);
-  const generation = useRef(0);
   const mounted = useRef(false);
-  const reading = useRef(0);
   const writing = useRef(false);
-  const suppressed = useRef(new Set<string>());
   const sourceLabels: Record<string, string> = {
     ai: t({
       comment: "历史日志的来源名称及筛选选项，包含 AI 服务配置与请求操作",
@@ -57,58 +55,8 @@ export function useActivityLogs({
     canceled: t`已取消`,
   };
 
-  async function read(run: number) {
-    reading.current++;
-    try {
-      if (typeof ipc.logsPage === "function") {
-        const page = await ipc.logsPage(undefined, 500);
-        if (mounted.current && generation.current === run) {
-          setLogs(
-            page.entries
-              .map((entry) => entry.summary)
-              .filter((entry): entry is ActivityLog => entry !== null)
-              .filter((entry) => !suppressed.current.has(entry.id)),
-          );
-          setError(page.health.error);
-        }
-      } else {
-        const next = await ipc.activityLogs(
-          500,
-          source === "all" ? undefined : source,
-          result === "all" ? undefined : result,
-        );
-        if (mounted.current && generation.current === run) {
-          setLogs(next.filter((entry) => !suppressed.current.has(entry.id)));
-          setError(null);
-        }
-      }
-    } catch (cause) {
-      if (mounted.current && generation.current === run)
-        setError(toIpcError(cause).payload);
-    } finally {
-      reading.current--;
-      if (mounted.current && generation.current === run) setLoading(false);
-    }
-  }
-
-  function reload() {
-    setLoading(true);
-    setError(null);
-    return read(++generation.current);
-  }
-
-  function changeSource(value: string) {
-    if (value === source) return;
-    setLoading(true);
-    setError(null);
-    setSource(value);
-  }
-
-  function changeResult(value: string) {
-    if (value === result) return;
-    setLoading(true);
-    setError(null);
-    setResult(value);
+  async function reload() {
+    await page.refetch({ cancelRefetch: false });
   }
 
   useEffect(() => {
@@ -117,34 +65,6 @@ export function useActivityLogs({
       mounted.current = false;
     };
   }, []);
-  const readForFilter = useEffectEvent((run: number) => {
-    setLoading(true);
-    return read(run);
-  });
-  useEffect(() => {
-    if (!enabled) return;
-    const run = ++generation.current;
-    const generationRef = generation;
-    void readForFilter(run);
-    return () => {
-      generationRef.current++;
-    };
-  }, [source, result, enabled]);
-
-  const refreshQuietly = useEffectEvent(() => {
-    if (reading.current > 0 || !mounted.current) return;
-    void read(++generation.current);
-  });
-  useEffect(() => {
-    if (enabled) refreshQuietly();
-  }, [enabled, refreshKey]);
-  useEffect(() => {
-    if (!enabled || !refreshInterval) return;
-    const timer = setInterval(() => {
-      if (document.visibilityState !== "hidden") refreshQuietly();
-    }, refreshInterval);
-    return () => clearInterval(timer);
-  }, [enabled, refreshInterval]);
 
   const visible = logs.filter(
     (entry) =>
@@ -162,9 +82,9 @@ export function useActivityLogs({
     query,
     setQuery,
     source,
-    setSource: changeSource,
+    setSource,
     result,
-    setResult: changeResult,
+    setResult,
     range,
     setRange,
     loading,
@@ -181,25 +101,26 @@ export function useActivityLogs({
       if (!deleting || writing.current) return;
       const target = deleting;
       writing.current = true;
-      generation.current++;
       setBusy(true);
       try {
-        if (target === "all") {
-          if (typeof ipc.logsClear === "function") await ipc.logsClear();
-          else await ipc.activityLogsClear();
-        } else if (typeof ipc.logsPage === "function") {
+        if (target === "all") await clearLogQueries(client);
+        else {
           await ipc.activityLogDelete(target.id);
-        } else {
-          await ipc.activityLogDelete(target.id);
+          await client.cancelQueries({ queryKey: logPageKey });
+          client.setQueryData(logPageQuery().queryKey, (previous) =>
+            previous
+              ? {
+                  ...previous,
+                  entries: previous.entries.map((entry) =>
+                    entry.summary?.id === target.id
+                      ? { ...entry, summary: null }
+                      : entry,
+                  ),
+                }
+              : previous,
+          );
         }
         if (!mounted.current) return;
-        if (target === "all") suppressed.current.clear();
-        else suppressed.current.add(target.id);
-        setLogs((previous) =>
-          target === "all"
-            ? []
-            : previous.filter((entry) => entry.id !== target.id),
-        );
         setSelected(null);
         setDeleting(null);
         toast.success(target === "all" ? t`日志已清空` : t`日志已删除`);

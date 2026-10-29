@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   ArrowUp,
@@ -11,12 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type {
-  AppError,
-  BtFileEntry,
-  BtFileListing,
-  BtTaskInfo,
-} from "~/bindings";
+import type { AppError, BtFileEntry, BtTaskInfo } from "~/bindings";
 import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/ui/spinner";
 import PreviewSurface from "~/features/preview/PreviewSurface";
@@ -26,17 +22,23 @@ import * as ipc from "~/lib/ipc";
 import { previewKind } from "~/lib/preview-kind";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
 
+import { filesQuery } from "../queries";
+
 export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
   const { t } = useLingui();
   const [path, setPath] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
-  const [listing, setListing] = useState<BtFileListing | null>(null);
+  const client = useQueryClient();
+  const listingRead = useQuery({
+    ...filesQuery(task.infoHash, path),
+    enabled: false,
+  });
+  const listing = listingRead.data ?? null;
   const [url, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
   const [opening, setOpening] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
-  const listingTask = useRef<string | null>(null);
   const entries = listing?.entries ?? [];
   const virtualizer = useVirtualizer({
     count: entries.length,
@@ -53,15 +55,9 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
       setLoading(true);
       setError(null);
       setUrl(null);
-      // 目录切换时保留旧列表作为加载背景；只有切换到另一个任务才清空。
-      if (listingTask.current !== task.infoHash) {
-        listingTask.current = task.infoHash;
-        setListing(null);
-      }
       try {
-        const result = await ipc.btBrowseFiles(task.infoHash, path);
+        const result = await client.query(filesQuery(task.infoHash, path));
         if (cancelled) return;
-        setListing(result);
         if (
           !result.current.isDir &&
           previewKind(result.current.name) !== "other"
@@ -83,7 +79,7 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
     return () => {
       cancelled = true;
     };
-  }, [task.infoHash, path, revision]);
+  }, [client, task.infoHash, path, revision]);
 
   const openExternal = async (entry: BtFileEntry) => {
     setOpening(true);
@@ -102,12 +98,10 @@ export default function FileBrowserPanel({ task }: { task: BtTaskInfo }) {
 
   const reload = () => {
     // 文件预览没有可保留的列表，重新加载时回到整块加载态。
-    if (listing && !listing.current.isDir) setListing(null);
     setRevision((value) => value + 1);
   };
 
   const navigate = (next: string) => {
-    if (listing && !listing.current.isDir) setListing(null);
     setPath(next);
     scroller.current?.scrollTo(0, 0);
   };

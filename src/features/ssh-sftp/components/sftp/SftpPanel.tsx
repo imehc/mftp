@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 import { type ColumnSizingState, useTable } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { cn } from "cn";
@@ -57,9 +58,9 @@ import SftpRow from "~/features/ssh-sftp/components/sftp/SftpRow";
 import { useSftpNavigation } from "~/features/ssh-sftp/components/sftp/useSftpNavigation";
 import { useSftpRemoteActions } from "~/features/ssh-sftp/components/sftp/useSftpRemoteActions";
 import { useSftpTransferActions } from "~/features/ssh-sftp/components/sftp/useSftpTransferActions";
+import { fileInfoQuery } from "~/features/ssh-sftp/queries";
 import { useRsyncIntegration } from "~/features/ssh-sftp/rsync/integration";
 import { describeError } from "~/lib/errors";
-import * as ipc from "~/lib/ipc";
 import { useVirtualizerFontSize } from "~/lib/root-font-size";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import { useMediaQuery } from "~/lib/use-media-query";
@@ -98,7 +99,22 @@ export default function SftpPanel({ session }: Props) {
   });
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [prompt, setPrompt] = useState<PromptState>(null);
-  const [info, setInfo] = useState<InfoState>(null);
+  const [infoEntry, setInfoEntry] = useState<SftpEntry | null>(null);
+  const fileInfo = useQuery({
+    ...fileInfoQuery(sessionId, infoEntry?.path ?? ""),
+    enabled: !!infoEntry,
+    staleTime: 0,
+  });
+  const info: InfoState = infoEntry
+    ? {
+        entry: infoEntry,
+        details: fileInfo.data ?? null,
+        loading: fileInfo.isLoading,
+      }
+    : null;
+  useEffect(() => {
+    if (fileInfo.error) toast.error(describeError(fileInfo.error, t));
+  }, [fileInfo.error, t]);
   const [directoryPicker, setDirectoryPicker] =
     useState<DirectoryPickerState>(null);
   const [conflict, setConflict] = useState<ConflictState>(null);
@@ -209,33 +225,7 @@ export default function SftpPanel({ session }: Props) {
     );
   };
 
-  async function showInfo(entry: SftpEntry) {
-    setInfo({
-      entry,
-      details: null,
-      loading: true,
-    });
-    try {
-      const details = await ipc.sftpInfo(sessionId, entry.path);
-      setInfo((current) => {
-        if (!current || current.entry.path !== entry.path) return current;
-        return {
-          entry,
-          details,
-          loading: false,
-        };
-      });
-    } catch (e) {
-      toast.error(describeError(e));
-      setInfo((current) => {
-        if (!current || current.entry.path !== entry.path) return current;
-        return {
-          ...current,
-          loading: false,
-        };
-      });
-    }
-  }
+  const showInfo = (entry: SftpEntry) => setInfoEntry(entry);
 
   return (
     <div className="bg-background flex h-full flex-col">
@@ -464,7 +454,10 @@ export default function SftpPanel({ session }: Props) {
         }}
       />
 
-      <FileInfoDialog info={info} onOpenChange={(o) => !o && setInfo(null)} />
+      <FileInfoDialog
+        info={info}
+        onOpenChange={(o) => !o && setInfoEntry(null)}
+      />
 
       <DeleteConfirmDialog
         target={deleteTarget}

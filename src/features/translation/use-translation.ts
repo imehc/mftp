@@ -1,6 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
-import type { TranslationRequest, TranslationSnapshot } from "~/bindings";
+import type { TranslationRequest } from "~/bindings";
 import { toIpcError } from "~/lib/errors";
 import {
   translationCancel,
@@ -8,11 +9,11 @@ import {
   translationRemove,
   translationRun,
   translationSelect,
-  translationSnapshot,
 } from "~/lib/ipc";
 
+import { translationSnapshotQuery } from "./queries";
+
 export function useTranslation() {
-  const [snapshot, setSnapshot] = useState<TranslationSnapshot | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [pending, setPending] = useState(false);
   const [output, setOutput] = useState("");
@@ -24,7 +25,12 @@ export function useTranslation() {
   const active = useRef<string | null>(null);
   const translating = useRef<string | null>(null);
   const discarded = useRef<string | null>(null);
-  const generation = useRef(0);
+  const snapshotRead = useQuery({
+    ...translationSnapshotQuery(),
+    refetchInterval: (query) =>
+      pending || query.state.data?.task ? 500 : false,
+  });
+  const snapshot = snapshotRead.data ?? null;
   const taskActive = snapshot?.task != null;
 
   useEffect(() => {
@@ -37,39 +43,9 @@ export function useTranslation() {
     };
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-
-    async function poll() {
-      const version = ++generation.current;
-      try {
-        const value = await translationSnapshot();
-        if (!cancelled && version === generation.current) setSnapshot(value);
-      } catch (error) {
-        if (!cancelled) setError(error);
-      }
-      if (!cancelled && (pending || taskActive)) timer = setTimeout(poll, 500);
-    }
-
-    void poll();
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [pending, taskActive]);
-
   async function refresh(clearError = false) {
-    const version = ++generation.current;
-    try {
-      const value = await translationSnapshot();
-      if (mounted.current && version === generation.current) {
-        setSnapshot(value);
-        if (clearError) setError(null);
-      }
-    } catch (error) {
-      if (mounted.current) setError(error);
-    }
+    const result = await snapshotRead.refetch({ cancelRefetch: false });
+    if (clearError && !result.error && mounted.current) setError(null);
   }
 
   async function perform(action: (id: string) => Promise<void>) {
@@ -165,7 +141,7 @@ export function useTranslation() {
 
   return {
     snapshot,
-    error,
+    error: error ?? snapshotRead.error,
     output,
     resultKey,
     running,

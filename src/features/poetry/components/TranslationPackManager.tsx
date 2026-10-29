@@ -10,7 +10,6 @@ import { pickFilePathNative } from "~/lib/files";
 import {
   poetryTranslationPackDelete,
   poetryTranslationPackImport,
-  poetryTranslationPacks,
 } from "~/lib/ipc";
 
 export default function TranslationPackManager({
@@ -20,7 +19,7 @@ export default function TranslationPackManager({
 }: {
   packs: PoetryTranslationPackSummary[];
   disabled?: boolean;
-  onChange: (packs: PoetryTranslationPackSummary[]) => void;
+  onChange: () => void;
 }) {
   const { t } = useLingui();
   const packCount = packs.length;
@@ -41,10 +40,10 @@ export default function TranslationPackManager({
       const count = await poetryTranslationPackImport(
         await readTextFile(picked),
       );
-      onChange(await poetryTranslationPacks());
+      onChange();
       toast.success(t`译文包已导入`, { description: t`共 ${count} 条译文` });
     } catch (error) {
-      toast.error(t`导入失败`, { description: describeError(error) });
+      toast.error(t`导入失败`, { description: describeError(error, t) });
     } finally {
       pending.current = false;
       setBusy(false);
@@ -57,10 +56,10 @@ export default function TranslationPackManager({
     setBusy(true);
     try {
       await poetryTranslationPackDelete(id);
-      onChange(packs.filter((item) => item.id !== id));
+      onChange();
       toast.success(t`已删除`);
     } catch (error) {
-      toast.error(t`操作失败`, { description: describeError(error) });
+      toast.error(t`操作失败`, { description: describeError(error, t) });
     } finally {
       pending.current = false;
       setBusy(false);

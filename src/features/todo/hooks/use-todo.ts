@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useStore } from "zustand";
@@ -22,7 +23,8 @@ import {
 /** 两端共用的待办状态与动作；布局不拥有 IPC 或异步资源。 */
 export function useTodo() {
   const { t } = useLingui();
-  const [controller] = useState(createTodoController);
+  const client = useQueryClient();
+  const [controller] = useState(() => createTodoController(undefined, client));
   const state = useStore(controller.store);
   const { items } = state;
   const [query, setQuery] = useState("");

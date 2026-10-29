@@ -6,6 +6,7 @@ import {
   type Subscription,
 } from "~/lib/event-subscription";
 import { LIBRARY_SYNC_PROGRESS } from "~/lib/events";
+import { invalidateData } from "~/lib/query-client";
 import type { AppError, PoetrySyncProgress } from "~/types";
 
 /**
@@ -92,6 +93,7 @@ function applyProgress(payload: PoetrySyncProgress): void {
     },
   });
   if (!terminal) silenceTimer = setTimeout(markStale, SILENCE_MS);
+  else void invalidateData(["poetry"]);
 }
 
 export function installPoetrySyncRuntime(): () => void {

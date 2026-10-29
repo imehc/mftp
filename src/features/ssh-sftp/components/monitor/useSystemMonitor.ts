@@ -1,9 +1,15 @@
 import { msg } from "@lingui/core/macro";
+import {
+  type QueryClient,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 import { translate } from "~/i18n/translate";
 import { toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
+import { ipcQuery } from "~/lib/query-client";
 import { useSessionsStore } from "~/store/sessions";
 import type { AppError, Session, SystemStats } from "~/types";
 
@@ -36,12 +42,18 @@ export interface MonitorPoint {
 // 用户切换会话视图时面板会卸载，因此图表历史必须存活于 React state 之外。
 // 以后端会话 id 为键。
 const historyMap = new Map<string, MonitorPoint[]>();
+const historyStamp = new Map<string, number>();
+const statsQuery = (sessionId: string) =>
+  ipcQuery(["ssh", sessionId, "stats"], () => ipc.sshSystemStats(sessionId));
 
 // 清理已不存在（已关闭标签）的会话历史。
 useSessionsStore.subscribe((state) => {
   const alive = new Set(state.sessions.map((session) => session.id));
   for (const id of historyMap.keys()) {
-    if (!alive.has(id)) historyMap.delete(id);
+    if (!alive.has(id)) {
+      historyMap.delete(id);
+      historyStamp.delete(id);
+    }
   }
 });
 
@@ -58,11 +70,14 @@ function toPoint(stats: SystemStats): MonitorPoint {
   };
 }
 
-async function fetchSystemStats(sessionId: string): Promise<SystemStats> {
+async function fetchSystemStats(
+  sessionId: string,
+  client: QueryClient,
+): Promise<SystemStats> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
-      ipc.sshSystemStats(sessionId),
+      client.query({ ...statsQuery(sessionId), staleTime: 0 }),
       new Promise<never>((_, reject) => {
         timer = setTimeout(
           () => reject(new Error(translate(msg`监控采集超时`))),
@@ -77,7 +92,9 @@ async function fetchSystemStats(sessionId: string): Promise<SystemStats> {
 
 export function useSystemMonitor(session: Session) {
   const sessionId = session.id;
-  const [data, setData] = useState<SystemStats | null>(null);
+  const client = useQueryClient();
+  const stats = useQuery({ ...statsQuery(sessionId), enabled: false });
+  const data = stats.data ?? null;
   const [history, setHistory] = useState<MonitorPoint[]>(
     () => historyMap.get(sessionId) ?? [],
   );
@@ -98,16 +115,21 @@ export function useSystemMonitor(session: Session) {
     const seq = ++seqRef.current;
     setLoading(true);
     try {
-      const next = await fetchSystemStats(sessionId);
+      const next = await fetchSystemStats(sessionId, client);
       if (seqRef.current !== seq) return;
       failuresRef.current = 0;
-      const points = [
-        ...(historyMap.get(sessionId) ?? []),
-        toPoint(next),
-      ].slice(-HISTORY_LIMIT);
+      const stamp =
+        client.getQueryState(statsQuery(sessionId).queryKey)?.dataUpdatedAt ??
+        0;
+      const points =
+        historyStamp.get(sessionId) === stamp
+          ? (historyMap.get(sessionId) ?? [])
+          : [...(historyMap.get(sessionId) ?? []), toPoint(next)].slice(
+              -HISTORY_LIMIT,
+            );
+      historyStamp.set(sessionId, stamp);
       historyMap.set(sessionId, points);
       setHistory(points);
-      setData(next);
       setError(null);
       setPaused(false);
       setLastUpdated(Date.now());

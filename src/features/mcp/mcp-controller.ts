@@ -1,4 +1,4 @@
-import { createStore } from "zustand/vanilla";
+import type { QueryClient } from "@tanstack/react-query";
 
 import type {
   AppError,
@@ -19,6 +19,9 @@ import {
   mcpStart,
   mcpStop,
 } from "~/lib/ipc";
+import { createAppQueryClient } from "~/lib/query-client";
+import { createQueryResource } from "~/lib/query-resource";
+import { createQueryStore } from "~/lib/query-store";
 
 const defaultApi = {
   snapshot: mcpSnapshot,
@@ -44,18 +47,40 @@ interface State {
   issued: McpIssuedCredential | null;
 }
 
-export function createMcpController(api = defaultApi) {
-  const store = createStore<State>(() => ({
-    snapshot: null,
-    modules: [],
-    busy: false,
-    pending: null,
-    loading: true,
-    readFailed: false,
-    error: null,
-    notice: 0,
-    issued: null,
-  }));
+export function createMcpController(
+  api = defaultApi,
+  client: QueryClient = createAppQueryClient(),
+) {
+  const snapshotResource = createQueryResource<McpSnapshot | null>(
+    ["mcp", "snapshot"],
+    api.snapshot,
+    client,
+    () => {
+      void refresh();
+    },
+  );
+  const catalogResource = createQueryResource(
+    ["mcp", "catalog"],
+    api.catalog,
+    client,
+    () => {
+      void refresh();
+    },
+  );
+  const store = createQueryStore<State>(
+    () => ({
+      snapshot: null,
+      modules: [],
+      busy: false,
+      pending: null,
+      loading: true,
+      readFailed: false,
+      error: null,
+      notice: 0,
+      issued: null,
+    }),
+    { snapshot: snapshotResource, modules: catalogResource },
+  );
   let active = false;
   let lifetime = 0;
   let reading = 0;
@@ -75,13 +100,13 @@ export function createMcpController(api = defaultApi) {
     const version = ++reading;
     const life = lifetime;
     try {
-      const [snapshot, modules] = await Promise.all([
-        api.snapshot(),
-        api.catalog(),
+      await Promise.all([
+        snapshotResource.fetch(true),
+        catalogResource.fetch(),
       ]);
       if (!active || life !== lifetime || version !== reading) return;
       lastReadFailure = null;
-      store.setState({ snapshot, modules, loading: false, readFailed: false });
+      store.setState({ loading: false, readFailed: false });
     } catch (cause) {
       if (!active || life !== lifetime || version !== reading) return;
       const error = toIpcError(cause).payload;
@@ -108,6 +133,7 @@ export function createMcpController(api = defaultApi) {
     const life = lifetime;
     writing = true;
     reading++;
+    snapshotResource.cancel();
     store.setState({ busy: true, pending, issued: null });
     let success = false;
     try {
@@ -142,6 +168,8 @@ export function createMcpController(api = defaultApi) {
       active = false;
       lifetime++;
       reading++;
+      snapshotResource.cancel();
+      catalogResource.cancel();
       lastReadFailure = null;
       store.setState({ issued: null });
     },

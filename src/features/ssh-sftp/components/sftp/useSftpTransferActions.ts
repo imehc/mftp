@@ -17,6 +17,7 @@ import {
   type PromptState,
   validPlainName,
 } from "~/features/ssh-sftp/components/sftp/SftpPanel.utils";
+import { runSftpWrite } from "~/features/ssh-sftp/queries";
 import { describeError, hasCustomCode } from "~/lib/errors";
 import { baseName } from "~/lib/files";
 import * as ipc from "~/lib/ipc";
@@ -83,7 +84,9 @@ export function useSftpTransferActions({
         kind: "upload",
       });
       try {
-        await ipc.sftpUpload(sessionId, selected, remote, transferId);
+        await runSftpWrite(sessionId, () =>
+          ipc.sftpUpload(sessionId, selected, remote, transferId),
+        );
         finishTransfer(transferId, "success");
         await load(refreshPath);
         // 刷新完成后再标记：高亮窗口必须落在新行已经出现之后。
@@ -308,10 +311,12 @@ export function useSftpTransferActions({
     if (incomingName !== remoteName) {
       await uploadDirWithName(localDir, incomingName, {
         afterUpload: async () => {
-          await ipc.sftpRename(
-            sessionId,
-            joinPath(targetDir, remoteName),
-            joinPath(targetDir, existingName),
+          await runSftpWrite(sessionId, () =>
+            ipc.sftpRename(
+              sessionId,
+              joinPath(targetDir, remoteName),
+              joinPath(targetDir, existingName),
+            ),
           );
           await load(targetDir);
         },
@@ -322,15 +327,19 @@ export function useSftpTransferActions({
     await uploadDirWithName(localDir, stagingName, {
       displayName: remoteName,
       afterUpload: async () => {
-        await ipc.sftpRename(
-          sessionId,
-          joinPath(targetDir, remoteName),
-          joinPath(targetDir, existingName),
+        await runSftpWrite(sessionId, () =>
+          ipc.sftpRename(
+            sessionId,
+            joinPath(targetDir, remoteName),
+            joinPath(targetDir, existingName),
+          ),
         );
-        await ipc.sftpRename(
-          sessionId,
-          joinPath(targetDir, stagingName),
-          joinPath(targetDir, remoteName),
+        await runSftpWrite(sessionId, () =>
+          ipc.sftpRename(
+            sessionId,
+            joinPath(targetDir, stagingName),
+            joinPath(targetDir, remoteName),
+          ),
         );
         await load(targetDir);
       },
@@ -382,13 +391,15 @@ export function useSftpTransferActions({
         kind: "upload",
       });
       try {
-        await ipc.sftpUploadDir(
-          sessionId,
-          localDir,
-          remoteParent,
-          remoteName,
-          transferMode,
-          transferId,
+        await runSftpWrite(sessionId, () =>
+          ipc.sftpUploadDir(
+            sessionId,
+            localDir,
+            remoteParent,
+            remoteName,
+            transferMode,
+            transferId,
+          ),
         );
         if (options?.afterUpload) {
           await options.afterUpload();

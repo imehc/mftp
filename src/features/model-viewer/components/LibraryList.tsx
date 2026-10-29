@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import {
   Box,
@@ -20,9 +21,9 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { formatBytes } from "~/lib/format";
-import { modelLibraryReadThumbnail } from "~/lib/ipc";
 
 import type { ModelLibraryController } from "../library/controller";
+import { modelThumbnailQuery } from "../queries";
 import { useVirtualProbe } from "./use-virtual-probe";
 
 function Thumbnail({
@@ -32,19 +33,14 @@ function Thumbnail({
   entry: ModelLibraryEntry;
   controller: ModelLibraryController;
 }) {
-  const [url, setUrl] = useState<string | null>(null);
+  const query = useQuery({
+    ...modelThumbnailQuery(entry.id, entry.updatedAt),
+    enabled: entry.hasThumbnail,
+  });
+  const url = query.data;
   useEffect(() => {
-    let active = true;
-    if (entry.hasThumbnail)
-      void modelLibraryReadThumbnail(entry.id)
-        .then((value) => {
-          if (active) setUrl(value);
-        })
-        .catch(controller.report);
-    return () => {
-      active = false;
-    };
-  }, [entry.id, entry.hasThumbnail, controller]);
+    if (query.error) controller.report(query.error);
+  }, [query.error, controller]);
   return url && entry.hasThumbnail ? (
     <img
       src={url}

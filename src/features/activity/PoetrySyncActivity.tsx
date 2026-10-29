@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import PoetrySyncStatus from "~/features/poetry/components/PoetrySyncStatus";
-import { usePoetryStore } from "~/features/poetry/store/poetry-store";
+import { collectionsQuery } from "~/features/poetry/queries";
 import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import { describeError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
@@ -11,13 +12,13 @@ import * as ipc from "~/lib/ipc";
 export default function PoetrySyncActivity() {
   const { t } = useLingui();
   const progress = usePoetrySyncProgress();
-  const collections = usePoetryStore((state) => state.collections);
+  const { data: collections = [] } = useQuery(collectionsQuery());
 
   const cancel = async () => {
     try {
       await ipc.poetrySyncCancel();
     } catch (error) {
-      toast.error(t`操作失败`, { description: describeError(error) });
+      toast.error(t`操作失败`, { description: describeError(error, t) });
     }
   };
 

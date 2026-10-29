@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+import { forgetSessionQueries } from "~/features/ssh-sftp/queries";
 import { toIpcError } from "~/lib/errors";
 import * as ipc from "~/lib/ipc";
 import type { Host, Session } from "~/types";
@@ -91,6 +92,7 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
       activeId = remaining.length ? remaining[remaining.length - 1].id : null;
     }
     set({ sessions: remaining, activeId });
+    if (s) forgetSessionQueries(s.id);
   },
 
   setActive(tabId) {

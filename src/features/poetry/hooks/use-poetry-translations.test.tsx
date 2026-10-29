@@ -6,6 +6,7 @@ import { act, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import QueryProvider from "~/app/QueryProvider";
 import type { AiConfigurationView, PoetryTranslation } from "~/bindings";
 import {
   aiConfigurationGet,
@@ -15,6 +16,7 @@ import {
   poetryTranslationsList,
   poetryTranslationUpdate,
 } from "~/lib/ipc";
+import { createAppQueryClient } from "~/lib/query-client";
 
 import { usePoetryTranslations } from "./use-poetry-translations";
 
@@ -35,6 +37,7 @@ vi.mock("sonner", () => ({
 i18n.load("zh-CN", {});
 i18n.activate("zh-CN");
 
+const client = createAppQueryClient();
 let root: Root;
 let container: HTMLDivElement;
 let controller: ReturnType<typeof usePoetryTranslations>;
@@ -80,10 +83,15 @@ async function mount() {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <Probe />
+        <QueryProvider client={client}>
+          <Probe />
+        </QueryProvider>
       </I18nProvider>,
     ),
   );
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  });
 }
 
 beforeEach(() => {
@@ -106,6 +114,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   if (mounted) await act(async () => root.unmount());
+  client.clear();
   container.remove();
   vi.unstubAllGlobals();
 });
