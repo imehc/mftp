@@ -12,7 +12,6 @@ import {
   DialogLayoutFooter,
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
-import { Separator } from "~/components/ui/separator";
 import {
   checkForUpdateManually,
   closeUpdaterDialog,
@@ -20,20 +19,20 @@ import {
   startUpdateDownload,
 } from "~/features/updater/controller";
 import { describeError } from "~/lib/errors";
-import { isUpdaterPlatform } from "~/lib/platform";
+import { isAndroidPlatform, isUpdaterPlatform } from "~/lib/platform";
 import { useUpdaterStore } from "~/store/updater";
 
 import UpdaterProgress from "./UpdaterProgress";
 import UpdaterReleaseNotes from "./UpdaterReleaseNotes";
-import { useUpdaterLabel } from "./use-updater-label";
+import { useUpdaterLabel, useUpdaterSummary } from "./use-updater-label";
 
 export default function UpdaterDialog() {
   const { t } = useLingui();
+  const summary = useUpdaterSummary();
   const label = useUpdaterLabel();
   const open = useUpdaterStore((state) => state.dialogOpen);
   const status = useUpdaterStore((state) => state.status);
   const version = useUpdaterStore((state) => state.version);
-  const currentVersion = useUpdaterStore((state) => state.currentVersion);
   const notes = useUpdaterStore((state) => state.releaseNotes);
   const truncated = useUpdaterStore((state) => state.notesTruncated);
   const error = useUpdaterStore((state) => state.error);
@@ -41,7 +40,8 @@ export default function UpdaterDialog() {
   const opener = useRef<HTMLElement | null>(null);
   if (!isUpdaterPlatform()) return null;
   const busy = ["checking", "downloading", "restarting"].includes(status);
-  const hasDescription = Boolean(version || currentVersion);
+  // Android 的安装交给系统安装器并替换应用，没有“重启并更新”这回事。
+  const androidInstall = isAndroidPlatform();
   return (
     <Dialog
       open={open}
@@ -77,35 +77,28 @@ export default function UpdaterDialog() {
             <Download aria-hidden className="size-4 shrink-0" />
             <Trans>更新</Trans>
           </DialogTitle>
-          {hasDescription ? (
-            <DialogDescription className="mt-1 text-xs wrap-anywhere">
-              {version ? (
-                <Trans comment="更新对话框版本对比，version 是可用版本，currentVersion 是正在运行的版本">
-                  版本 {version} · 当前 {currentVersion}
-                </Trans>
-              ) : (
-                <Trans comment="更新对话框显示正在运行的应用版本，currentVersion 是版本号">
-                  当前版本 {currentVersion}
-                </Trans>
-              )}
+          {summary.lead || summary.detail ? (
+            <DialogDescription
+              role={summary.lead ? "status" : undefined}
+              className="mt-1 text-xs wrap-anywhere"
+            >
+              {summary.lead ? (
+                <span className="text-foreground font-medium">
+                  {summary.lead}
+                </span>
+              ) : null}
+              {summary.lead && summary.detail ? " · " : null}
+              {summary.detail}
             </DialogDescription>
           ) : null}
         </DialogLayoutHeader>
         <DialogLayoutBody className="flex flex-col gap-4">
-          <UpdaterProgress />
-          {status === "current" || status === "available" ? (
+          {/* 还没有发布说明可看时（检查阶段），进度留在正文，避免弹窗只剩空正文。 */}
+          {version ? null : <UpdaterProgress variant="body" />}
+          {status === "current" ? (
             <p className="flex items-center gap-2 text-sm" role="status">
-              {status === "current" ? (
-                <CircleCheck aria-hidden className="size-4 shrink-0" />
-              ) : null}
+              <CircleCheck aria-hidden className="size-4 shrink-0" />
               {label}
-            </p>
-          ) : null}
-          {status === "ready" && !error ? (
-            <p className="text-sm" role="status">
-              {installed
-                ? t`更新已安装，重启应用后生效。`
-                : t`更新包已准备好，重启时安装。请先保存正在进行的工作。`}
             </p>
           ) : null}
           {error ? (
@@ -115,56 +108,62 @@ export default function UpdaterDialog() {
               </AlertDescription>
             </Alert>
           ) : null}
-          {version ? (
-            <>
-              <Separator />
-              <UpdaterReleaseNotes body={notes} truncated={truncated} />
-            </>
-          ) : status === "error" ? (
-            <UpdaterReleaseNotes body="" truncated={false} />
+          {version || status === "error" ? (
+            <UpdaterReleaseNotes body={notes} truncated={truncated} />
           ) : null}
         </DialogLayoutBody>
-        <DialogLayoutFooter className="max-md:[&>button]:whitespace-normal">
-          <Button
-            density="adaptive"
-            variant="outline"
-            onClick={closeUpdaterDialog}
-          >
-            {status === "current"
-              ? t`完成`
-              : status === "ready"
-                ? t`稍后重启`
-                : busy
-                  ? t({
-                      message: "收起",
-                      comment: "关闭更新弹窗并继续后台任务，不取消下载",
-                    })
-                  : t`稍后`}
-          </Button>
-          {status === "available" ? (
+        <DialogLayoutFooter className="relative items-center">
+          {version ? <UpdaterProgress /> : null}
+          <div className="flex flex-row gap-2 max-md:flex-1 md:justify-end max-md:[&>button]:min-w-0 max-md:[&>button]:flex-1 max-md:[&>button]:whitespace-normal">
             <Button
               density="adaptive"
-              onClick={() => void startUpdateDownload()}
+              variant="outline"
+              onClick={closeUpdaterDialog}
             >
-              <Trans>下载更新</Trans>
+              {status === "current"
+                ? t`完成`
+                : status === "ready"
+                  ? androidInstall
+                    ? t`稍后安装`
+                    : t`稍后重启`
+                  : busy
+                    ? t({
+                        message: "收起",
+                        comment: "关闭更新弹窗并继续后台任务，不取消下载",
+                      })
+                    : t`稍后`}
             </Button>
-          ) : null}
-          {status === "ready" ? (
-            <Button
-              density="adaptive"
-              onClick={() => void restartToApplyUpdate()}
-            >
-              {error ? (installed ? t`重试重启` : t`重试安装`) : t`重启并更新`}
-            </Button>
-          ) : null}
-          {status === "error" ? (
-            <Button
-              density="adaptive"
-              onClick={() => void checkForUpdateManually()}
-            >
-              <Trans>重新检查</Trans>
-            </Button>
-          ) : null}
+            {status === "available" ? (
+              <Button
+                density="adaptive"
+                onClick={() => void startUpdateDownload()}
+              >
+                <Trans>下载更新</Trans>
+              </Button>
+            ) : null}
+            {status === "ready" ? (
+              <Button
+                density="adaptive"
+                onClick={() => void restartToApplyUpdate()}
+              >
+                {error
+                  ? installed && !androidInstall
+                    ? t`重试重启`
+                    : t`重试安装`
+                  : androidInstall
+                    ? t`立即安装`
+                    : t`重启并更新`}
+              </Button>
+            ) : null}
+            {status === "error" ? (
+              <Button
+                density="adaptive"
+                onClick={() => void checkForUpdateManually()}
+              >
+                <Trans>重新检查</Trans>
+              </Button>
+            ) : null}
+          </div>
         </DialogLayoutFooter>
       </DialogLayoutContent>
     </Dialog>

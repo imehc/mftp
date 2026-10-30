@@ -67,7 +67,7 @@ describe("活动中心更新卡片", () => {
       downloaded: 512,
       total: 1024,
     });
-    expect(container.textContent).toContain("正在下载更新");
+    expect(container.textContent).toContain("下载中");
     expect(container.textContent).toContain("50%");
     expect(container.querySelector('[role="progressbar"]')).not.toBeNull();
   });

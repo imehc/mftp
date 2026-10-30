@@ -20,7 +20,12 @@ import {
 } from "./controller";
 import UpdaterDialog from "./UpdaterDialog";
 
-vi.mock("~/lib/platform", () => ({ isUpdaterPlatform: () => true }));
+const platform = vi.hoisted(() => ({ android: false }));
+
+vi.mock("~/lib/platform", () => ({
+  isAndroidPlatform: () => platform.android,
+  isUpdaterPlatform: () => true,
+}));
 vi.mock("@tauri-apps/plugin-opener", () => ({ openUrl: vi.fn() }));
 vi.mock("./controller", () => ({
   checkForUpdateManually: vi.fn(),
@@ -39,6 +44,7 @@ let container: HTMLDivElement;
 
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  platform.android = false;
   vi.clearAllMocks();
   container = document.createElement("div");
   document.body.append(container);
@@ -76,7 +82,7 @@ function button(label: string) {
 }
 
 describe("更新弹窗", () => {
-  it("检查提示只出现一次且正文与操作栏是独立布局区域", async () => {
+  it("检查提示只出现一次且进度留在正文", async () => {
     const dialog = await renderDialog({ status: "checking" });
     expect(dialog.textContent?.match(/正在检查更新/g)).toHaveLength(1);
     expect(
@@ -88,6 +94,9 @@ describe("更新弹窗", () => {
       dialog.querySelector('[data-slot="dialog-layout-body"] [role="status"]')
         ?.textContent,
     ).toContain("正在检查更新");
+    expect(
+      dialog.querySelector('[data-slot="dialog-footer"] [role="status"]'),
+    ).toBeNull();
     expect(dialog.querySelector('[data-slot="separator"]')).toBeNull();
     expect(button("收起").dataset.density).toBe("adaptive");
     await act(async () => button("收起").click());
@@ -96,7 +105,7 @@ describe("更新弹窗", () => {
     expect(checkForUpdateManually).not.toHaveBeenCalled();
   });
 
-  it("最新版本结果在正文显示并保留当前版本说明", async () => {
+  it("最新版本提示留在正文并保留当前版本口径", async () => {
     const dialog = await renderDialog({ status: "checking" });
     const title = dialog.querySelector(
       '[data-slot="dialog-title"]',
@@ -109,10 +118,12 @@ describe("更新弹窗", () => {
     ).toBe(title);
     expect(
       dialog.querySelector('[data-slot="dialog-layout-body"]')?.textContent,
-    ).toBe("当前已是最新版本");
-    expect(
-      dialog.querySelector('[data-slot="dialog-description"]')?.textContent,
-    ).toContain("0.2.6");
+    ).toBe("已是最新版本");
+    const description = dialog.querySelector(
+      '[data-slot="dialog-description"]',
+    );
+    expect(description?.textContent).toContain("当前版本 0.2.6");
+    expect(description?.textContent).not.toContain("当前已是最新版本");
     expect(
       document.getElementById(dialog.getAttribute("aria-describedby")!)
         ?.textContent,
@@ -130,14 +141,20 @@ describe("更新弹窗", () => {
       releaseNotes: "# 更新说明\n- 改进检查更新",
     });
     const body = dialog.querySelector('[data-slot="dialog-layout-body"]');
-    expect(body?.textContent).toContain("发现新版本");
     expect(body?.textContent).toContain("改进检查更新");
     expect(body?.textContent).toContain("查看完整发布说明");
+    expect(body?.textContent).not.toContain("发现新版本");
+    const description = dialog.querySelector(
+      '[data-slot="dialog-description"]',
+    );
+    expect(description?.textContent).toContain("发现新版本");
+    expect(description?.textContent).toContain("0.2.7");
+    expect(description?.textContent).toContain("当前 0.2.6");
     await act(async () => button("下载更新").click());
     expect(startUpdateDownload).toHaveBeenCalledOnce();
   });
 
-  it("下载进度和长发布说明均位于唯一滚动正文", async () => {
+  it("下载进度固定在操作栏，长发布说明独占滚动正文", async () => {
     const dialog = await renderDialog({
       status: "downloading",
       version: "0.2.7",
@@ -146,18 +163,20 @@ describe("更新弹窗", () => {
       total: 1024,
       releaseNotes: "改进应用体验\n".repeat(100),
     });
-    const body = dialog.querySelector('[data-slot="dialog-layout-body"]');
+    const footer = dialog.querySelector('[data-slot="dialog-footer"]');
     expect(
-      body
+      footer
         ?.querySelector('[role="progressbar"]')
         ?.getAttribute("aria-valuenow"),
     ).toBe("50");
-    expect(body?.textContent).toContain("50%");
+    expect(footer?.textContent).toContain("下载中");
+    expect(footer?.textContent).toContain("已下载");
+    expect(footer?.textContent).not.toContain("50%");
+    expect(footer?.parentElement).toBe(dialog);
+    const body = dialog.querySelector('[data-slot="dialog-layout-body"]');
+    expect(body?.querySelector('[role="progressbar"]')).toBeNull();
+    expect(body?.querySelector('[role="status"]')).toBeNull();
     expect(body?.textContent).toContain("改进应用体验");
-    expect(body?.querySelector('[data-slot="dialog-footer"]')).toBeNull();
-    expect(
-      dialog.querySelector('[data-slot="dialog-footer"]')?.parentElement,
-    ).toBe(dialog);
   });
 
   it.each([false, true])(
@@ -169,7 +188,7 @@ describe("更新弹窗", () => {
         installed,
       });
       expect(dialog.querySelector('[role="status"]')?.textContent).toContain(
-        installed ? "更新已安装" : "更新包已准备好",
+        installed ? "更新已安装" : "更新已准备好",
       );
       expect(button("稍后重启")).toBeDefined();
       await act(async () => button("重启并更新").click());
@@ -196,13 +215,30 @@ describe("更新弹窗", () => {
     expect(checkForUpdateManually).toHaveBeenCalledOnce();
   });
 
+  it("Android 就绪状态提供安装操作而不是重启", async () => {
+    platform.android = true;
+    const dialog = await renderDialog({
+      status: "ready",
+      version: "0.2.7",
+      currentVersion: "0.2.6",
+    });
+    expect(button("稍后安装")).toBeDefined();
+    expect(button("立即安装")).toBeDefined();
+    expect(button("重启并更新")).toBeUndefined();
+    expect(
+      dialog.querySelector('[data-slot="dialog-description"]')?.textContent,
+    ).toContain("系统安装器");
+    await act(async () => button("立即安装").click());
+    expect(restartToApplyUpdate).toHaveBeenCalledOnce();
+  });
+
   it("重启中状态不会因弹窗调整而丢失", async () => {
     const dialog = await renderDialog({
       status: "restarting",
       version: "0.2.7",
     });
     expect(
-      dialog.querySelector('[data-slot="dialog-layout-body"] [role="status"]')
+      dialog.querySelector('[data-slot="dialog-footer"] [role="status"]')
         ?.textContent,
     ).toContain("正在安装并重启");
     expect(button("收起")).toBeDefined();

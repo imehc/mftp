@@ -10,6 +10,7 @@ import { Progress } from "~/components/ui/progress";
 import { openUpdaterDialog } from "~/features/updater/controller";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
+import { isAndroidPlatform } from "~/lib/platform";
 import { useUpdaterStore } from "~/store/updater";
 
 import { updaterPercent } from "./UpdaterProgress";
@@ -33,12 +34,18 @@ export default function UpdaterActivity() {
     status === "restarting";
   const transferring = status === "downloading" && phase === "downloading";
   const percent = transferring ? updaterPercent(downloaded, total) : null;
+  // Android 由系统安装器替换应用，不存在“重启”这一步。
   const title =
     status === "ready" && !failed
-      ? t({
-          message: "等待重启",
-          comment: "更新包已准备好，等待用户确认安装并重启",
-        })
+      ? isAndroidPlatform()
+        ? t({
+            message: "等待安装",
+            comment: "Android 更新包已下载，等待用户交给系统安装器",
+          })
+        : t({
+            message: "等待重启",
+            comment: "更新包已准备好，等待用户确认安装并重启",
+          })
       : label;
   return (
     <section className="bg-card shrink-0 rounded-xl border">

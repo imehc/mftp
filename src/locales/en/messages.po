@@ -366,6 +366,10 @@ msgstr "Private key passphrase for {value}"
 msgid "{value} 阶"
 msgstr "{value}×{value}"
 
+#: src/features/updater/use-updater-label.ts:56
+msgid "{version} · 当前 {currentVersion}"
+msgstr "{version} · current {currentVersion}"
+
 #: src/features/games/billiards/BilliardsMatchView.tsx:266
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} wins"
@@ -969,6 +973,7 @@ msgstr "Download {entryName2}"
 
 #: src/features/bt/components/TaskRow.tsx:100
 #: src/features/updater/integration.tsx:47
+#: src/features/updater/use-updater-label.ts:23
 #: src/store/transfers.ts:12
 msgid "下载中"
 msgstr "Downloading"
@@ -1028,7 +1033,7 @@ msgstr "The downloaded file does not exist"
 msgid "下载文件夹"
 msgstr "Download Folder"
 
-#: src/features/updater/UpdaterDialog.tsx:149
+#: src/features/updater/UpdaterDialog.tsx:141
 msgid "下载更新"
 msgstr "Download Update"
 
@@ -1043,8 +1048,8 @@ msgid "下载翻译模型"
 msgstr "Download translation model"
 
 #: src/features/bt/components/TaskRow.tsx:130
-#: src/features/updater/UpdaterActivity.tsx:93
-#: src/features/updater/UpdaterProgress.tsx:46
+#: src/features/updater/UpdaterActivity.tsx:100
+#: src/features/updater/UpdaterProgress.tsx:82
 msgid "下载进度"
 msgstr "Download progress"
 
@@ -1316,6 +1321,10 @@ msgstr "Combat reveals only whether the attacker survives, the defender survives
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:266
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "Swapped {formatBytesValue} / {formatBytesValue2}"
+
+#: src/features/updater/use-updater-label.ts:70
+msgid "交给系统安装器，请先保存工作"
+msgstr "Hands off to the system installer. Save your work first"
 
 #: src/features/poetry/components/PoetryTranslationSection.tsx:110
 msgid "人工修订"
@@ -2959,7 +2968,8 @@ msgstr "You have a saved sliding puzzle. Continue where you left off?"
 msgid "发现上次的魔方进度，是否继续？"
 msgstr "You have a saved cube. Continue where you left off?"
 
-#: src/features/updater/use-updater-label.ts:16
+#: src/features/updater/use-updater-label.ts:18
+#: src/features/updater/use-updater-label.ts:62
 msgid "发现新版本"
 msgstr "New version available"
 
@@ -3935,6 +3945,10 @@ msgstr "Security Mode"
 msgid "安装"
 msgstr "Install"
 
+#: src/features/updater/use-updater-label.ts:28
+msgid "安装中"
+msgstr "Installing"
+
 #. 离线翻译模型弹窗：下载并安装后才能离线使用
 #: src/features/translation/ModelManager.tsx:166
 msgid "安装后即可离线翻译。"
@@ -3957,7 +3971,7 @@ msgstr "Install annotation library"
 #: src/features/lan-transfer/LanTransferActivity.tsx:22
 #: src/features/media-compress/image/ImageCompressPanel.tsx:184
 #: src/features/media-compress/video/use-video-compress.ts:191
-#: src/features/updater/UpdaterDialog.tsx:134
+#: src/features/updater/UpdaterDialog.tsx:124
 #: src/features/vault/VaultTool.tsx:63
 #: src/store/transfers.ts:151
 #: src/store/transfers.ts:207
@@ -4500,7 +4514,7 @@ msgid "已上传"
 msgstr "Uploaded"
 
 #. 更新包已经下载的容量，downloadedSize 是格式化后的字节数
-#: src/features/updater/UpdaterProgress.tsx:38
+#: src/features/updater/UpdaterProgress.tsx:72
 msgid "已下载 {downloadedSize}"
 msgstr "Downloaded {downloadedSize}"
 
@@ -4762,6 +4776,10 @@ msgstr "Disconnected from {hostLabel}"
 #: src/features/lan-transfer/use-lan-transfer.ts:270
 msgid "已断开设备"
 msgstr "Device disconnected"
+
+#: src/features/updater/use-updater-label.ts:16
+msgid "已是最新版本"
+msgstr "You're up to date"
 
 #: src/features/bt/components/TaskRow.tsx:96
 #: src/store/transfers.ts:14
@@ -5085,10 +5103,6 @@ msgstr "Current key"
 msgid "当前对局的进度将会丢失。"
 msgstr "Current match progress will be lost."
 
-#: src/features/updater/use-updater-label.ts:14
-msgid "当前已是最新版本"
-msgstr "Already on the latest version"
-
 #: src/app/platform/without-rsync.tsx:20
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:56
 msgid "当前平台不支持 rsync，请选择压缩包或直连。"
@@ -5166,8 +5180,7 @@ msgstr "Current scale: {percent}"
 msgid "当前没有可用页面，将进入首页。"
 msgstr "No pages are available. The app will open the home page."
 
-#. 更新对话框显示正在运行的应用版本，currentVersion 是版本号
-#: src/features/updater/UpdaterDialog.tsx:87
+#: src/features/updater/use-updater-label.ts:58
 msgid "当前版本 {currentVersion}"
 msgstr "Current version {currentVersion}"
 
@@ -5983,7 +5996,7 @@ msgstr "Favorite"
 
 #. 关闭更新弹窗并继续后台任务，不取消下载
 #: src/features/transfers/TransferDock.tsx:128
-#: src/features/updater/UpdaterDialog.tsx:138
+#: src/features/updater/UpdaterDialog.tsx:130
 msgid "收起"
 msgstr "Hide"
 
@@ -6319,8 +6332,8 @@ msgid "无法显示国际象棋。请重新加载棋盘，当前对局进度会�
 msgstr "The chess board could not be displayed. Reload the board; your current game will be kept."
 
 #: src/lib/errors/messages.ts:354
-msgid "无法检查更新，请稍后重试或查看发布页面。"
-msgstr "Could not check for updates. Try again later or visit the releases page."
+msgid "无法检查更新，请稍后重试。"
+msgstr "Couldn't check for updates. Try again later."
 
 #. rsync 能力探测失败；side 是“本机/远端”，detail 是诊断信息。
 #: src/lib/errors/messages.ts:198
@@ -6683,8 +6696,8 @@ msgid "更新 AI 流式设置"
 msgstr "Update AI streaming settings"
 
 #: src/lib/errors/messages.ts:355
-msgid "更新下载或校验失败，请重新检查更新。"
-msgstr "The update could not be downloaded or verified. Check for updates again."
+msgid "更新下载或校验失败，请重试。"
+msgstr "Download or verification failed. Try again."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:39
@@ -6699,22 +6712,21 @@ msgstr "Updated at {updatedLabel}"
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
-#: src/features/updater/UpdaterDialog.tsx:108
-msgid "更新包已准备好，重启时安装。请先保存正在进行的工作。"
-msgstr "The update is ready to install when you restart. Save your work first."
-
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:45
 msgid "更新密码条目"
 msgstr "Update password entry"
 
-#: src/features/updater/use-updater-label.ts:22
+#: src/features/updater/use-updater-label.ts:25
+#: src/features/updater/use-updater-label.ts:67
+#: src/features/updater/use-updater-label.ts:73
 msgid "更新已准备好"
 msgstr "Update ready"
 
-#: src/features/updater/UpdaterDialog.tsx:107
-msgid "更新已安装，重启应用后生效。"
-msgstr "The update is installed. Restart the app to apply it."
+#: src/features/updater/use-updater-label.ts:67
+#: src/features/updater/use-updater-label.ts:73
+msgid "更新已安装"
+msgstr "Update installed"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:36
@@ -6726,8 +6738,10 @@ msgstr "Update task"
 msgid "更新待办失败"
 msgstr "Failed to update todo"
 
-#: src/features/updater/use-updater-label.ts:22
-#: src/features/updater/use-updater-label.ts:26
+#: src/features/updater/use-updater-label.ts:25
+#: src/features/updater/use-updater-label.ts:30
+#: src/features/updater/use-updater-label.ts:64
+#: src/features/updater/use-updater-label.ts:77
 msgid "更新未完成"
 msgstr "Update incomplete"
 
@@ -7284,6 +7298,7 @@ msgid "校验"
 msgstr "Validate"
 
 #: src/features/translation/ModelManager.tsx:61
+#: src/features/updater/use-updater-label.ts:22
 msgid "校验中"
 msgstr "Verifying"
 
@@ -7320,7 +7335,7 @@ msgstr "Check whether file exists"
 #: src/features/updater/integration.tsx:43
 #: src/features/updater/integration.tsx:45
 #: src/features/updater/integration.tsx:88
-#: src/features/updater/use-updater-label.ts:28
+#: src/features/updater/use-updater-label.ts:32
 msgid "检查更新"
 msgstr "Check for Updates"
 
@@ -7583,10 +7598,6 @@ msgstr "Regexp"
 msgid "正在下载"
 msgstr "Downloading"
 
-#: src/features/updater/use-updater-label.ts:20
-msgid "正在下载更新"
-msgstr "Downloading update"
-
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 msgid "正在保存"
 msgstr "Saving"
@@ -7719,7 +7730,7 @@ msgstr "Updating model library"
 msgid "正在处理附件…"
 msgstr "Processing attachment…"
 
-#: src/features/updater/use-updater-label.ts:24
+#: src/features/updater/use-updater-label.ts:28
 msgid "正在安装并重启…"
 msgstr "Installing and restarting…"
 
@@ -7786,10 +7797,6 @@ msgstr "Preparing files"
 msgid "正在校验"
 msgstr "Verifying"
 
-#: src/features/updater/use-updater-label.ts:19
-msgid "正在校验更新…"
-msgstr "Verifying update…"
-
 #: src/features/updater/integration.tsx:44
 #: src/features/updater/integration.tsx:87
 msgid "正在检查"
@@ -7799,7 +7806,7 @@ msgstr "Checking"
 msgid "正在检查…"
 msgstr "Inspecting…"
 
-#: src/features/updater/use-updater-label.ts:12
+#: src/features/updater/use-updater-label.ts:13
 msgid "正在检查更新…"
 msgstr "Checking for updates..."
 
@@ -7928,10 +7935,6 @@ msgstr "Connecting to {sessionTitle}…"
 #: src/features/model-viewer/components/RuntimeControls.tsx:46
 msgid "正在连接方向传感器…"
 msgstr "Connecting to orientation sensor\\u2026"
-
-#: src/features/updater/use-updater-label.ts:18
-msgid "正在连接更新源…"
-msgstr "Connecting to update server…"
 
 #: src/features/poetry/components/SearchBar.tsx:51
 msgid "正文"
@@ -8554,11 +8557,6 @@ msgstr "Weld tolerance (m)"
 #: src/features/model-viewer/components/AnimationBar.tsx:41
 msgid "片段 {number}"
 msgstr "Clip {number}"
-
-#. 更新对话框版本对比，version 是可用版本，currentVersion 是正在运行的版本
-#: src/features/updater/UpdaterDialog.tsx:83
-msgid "版本 {version} · 当前 {currentVersion}"
-msgstr "Version {version} · Current {currentVersion}"
 
 #: src/features/ssh-sftp/rsync/RsyncCapabilityNotice.tsx:38
 msgid "版本不受支持（需要 3.1 或更高版本）"
@@ -9191,11 +9189,15 @@ msgstr "Remove draft image"
 msgid "移除转义"
 msgstr "Unescape"
 
-#: src/features/updater/UpdaterDialog.tsx:142
+#: src/features/updater/UpdaterDialog.tsx:134
 msgid "稍后"
 msgstr "Later"
 
-#: src/features/updater/UpdaterDialog.tsx:136
+#: src/features/updater/UpdaterDialog.tsx:127
+msgid "稍后安装"
+msgstr "Install later"
+
+#: src/features/updater/UpdaterDialog.tsx:128
 msgid "稍后重启"
 msgstr "Restart later"
 
@@ -9226,6 +9228,10 @@ msgstr "Idle"
 #: src/features/games/chess/ChessMatch.tsx:305
 msgid "立体视角"
 msgstr "Perspective view"
+
+#: src/features/updater/UpdaterDialog.tsx:154
+msgid "立即安装"
+msgstr "Install now"
 
 #: src/features/settings/font-options.ts:13
 msgid "站酷快乐体"
@@ -9289,6 +9295,11 @@ msgstr "Timing starts with your first valid move. Each tile slide counts as one 
 msgid "等待协商结果…"
 msgstr "Waiting for a response…"
 
+#. Android 更新包已下载，等待用户交给系统安装器
+#: src/features/updater/UpdaterActivity.tsx:41
+msgid "等待安装"
+msgstr "Waiting to install"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:113
 msgid "等待对手加入…"
 msgstr "Waiting for an opponent..."
@@ -9334,7 +9345,7 @@ msgid "等待确认"
 msgstr "Awaiting confirmation"
 
 #. 更新包已准备好，等待用户确认安装并重启
-#: src/features/updater/UpdaterActivity.tsx:38
+#: src/features/updater/UpdaterActivity.tsx:45
 msgid "等待重启"
 msgstr "Restart pending"
 
@@ -11112,6 +11123,7 @@ msgid "连接与模型设置"
 msgstr "Connections and models"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:196
+#: src/features/updater/use-updater-label.ts:21
 msgid "连接中"
 msgstr "Connecting"
 
@@ -11164,7 +11176,7 @@ msgid "连接设备"
 msgstr "Connected Devices"
 
 #. 更新源响应慢，仍在等待
-#: src/features/updater/UpdaterProgress.tsx:52
+#: src/features/updater/UpdaterProgress.tsx:90
 msgid "连接较慢，仍在等待响应。"
 msgstr "The connection is slow; still waiting for a response."
 
@@ -11507,9 +11519,17 @@ msgstr "Restarting"
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "Could not restart. Try again or reopen the app manually."
 
-#: src/features/updater/UpdaterDialog.tsx:157
+#: src/features/updater/UpdaterDialog.tsx:155
 msgid "重启并更新"
 msgstr "Restart and Update"
+
+#: src/features/updater/use-updater-label.ts:74
+msgid "重启应用后生效"
+msgstr "Takes effect after restart"
+
+#: src/features/updater/use-updater-label.ts:74
+msgid "重启时安装，请先保存工作"
+msgstr "Installed on restart. Save your work first"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:388
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:390
@@ -11573,8 +11593,12 @@ msgstr "Scramble the cube again?"
 msgid "重新打开应用"
 msgstr "Reopen application"
 
+#: src/features/updater/use-updater-label.ts:69
+msgid "重新打开应用后生效"
+msgstr "Takes effect after you reopen the app"
+
 #: src/features/updater/integration.tsx:50
-#: src/features/updater/UpdaterDialog.tsx:165
+#: src/features/updater/UpdaterDialog.tsx:163
 msgid "重新检查"
 msgstr "Check Again"
 
@@ -11712,7 +11736,7 @@ msgstr "Retry"
 msgid "重试保存"
 msgstr "Retry saving"
 
-#: src/features/updater/UpdaterDialog.tsx:157
+#: src/features/updater/UpdaterDialog.tsx:152
 msgid "重试安装"
 msgstr "Retry installation"
 
@@ -11726,7 +11750,7 @@ msgstr "Retry display"
 msgid "重试环境存储"
 msgstr "Retry environment storage"
 
-#: src/features/updater/UpdaterDialog.tsx:157
+#: src/features/updater/UpdaterDialog.tsx:151
 msgid "重试重启"
 msgstr "Retry restart"
 

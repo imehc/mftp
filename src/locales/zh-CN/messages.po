@@ -366,6 +366,10 @@ msgstr "{value} 的私钥口令"
 msgid "{value} 阶"
 msgstr "{value} 阶"
 
+#: src/features/updater/use-updater-label.ts:56
+msgid "{version} · 当前 {currentVersion}"
+msgstr "{version} · 当前 {currentVersion}"
+
 #: src/features/games/billiards/BilliardsMatchView.tsx:266
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} 获胜"
@@ -969,6 +973,7 @@ msgstr "下载 {entryName2}"
 
 #: src/features/bt/components/TaskRow.tsx:100
 #: src/features/updater/integration.tsx:47
+#: src/features/updater/use-updater-label.ts:23
 #: src/store/transfers.ts:12
 msgid "下载中"
 msgstr "下载中"
@@ -1028,7 +1033,7 @@ msgstr "下载文件不存在"
 msgid "下载文件夹"
 msgstr "下载文件夹"
 
-#: src/features/updater/UpdaterDialog.tsx:149
+#: src/features/updater/UpdaterDialog.tsx:141
 msgid "下载更新"
 msgstr "下载更新"
 
@@ -1043,8 +1048,8 @@ msgid "下载翻译模型"
 msgstr "下载翻译模型"
 
 #: src/features/bt/components/TaskRow.tsx:130
-#: src/features/updater/UpdaterActivity.tsx:93
-#: src/features/updater/UpdaterProgress.tsx:46
+#: src/features/updater/UpdaterActivity.tsx:100
+#: src/features/updater/UpdaterProgress.tsx:82
 msgid "下载进度"
 msgstr "下载进度"
 
@@ -1316,6 +1321,10 @@ msgstr "交战只公开进攻方存活、防守方存活或同归于尽，不直
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:266
 msgid "交换 {formatBytesValue} / {formatBytesValue2}"
 msgstr "交换 {formatBytesValue} / {formatBytesValue2}"
+
+#: src/features/updater/use-updater-label.ts:70
+msgid "交给系统安装器，请先保存工作"
+msgstr "交给系统安装器，请先保存工作"
 
 #: src/features/poetry/components/PoetryTranslationSection.tsx:110
 msgid "人工修订"
@@ -2959,7 +2968,8 @@ msgstr "发现上次的数字华容道进度，是否继续？"
 msgid "发现上次的魔方进度，是否继续？"
 msgstr "发现上次的魔方进度，是否继续？"
 
-#: src/features/updater/use-updater-label.ts:16
+#: src/features/updater/use-updater-label.ts:18
+#: src/features/updater/use-updater-label.ts:62
 msgid "发现新版本"
 msgstr "发现新版本"
 
@@ -3935,6 +3945,10 @@ msgstr "安全模式"
 msgid "安装"
 msgstr "安装"
 
+#: src/features/updater/use-updater-label.ts:28
+msgid "安装中"
+msgstr "安装中"
+
 #. 离线翻译模型弹窗：下载并安装后才能离线使用
 #: src/features/translation/ModelManager.tsx:166
 msgid "安装后即可离线翻译。"
@@ -3957,7 +3971,7 @@ msgstr "安装注释库"
 #: src/features/lan-transfer/LanTransferActivity.tsx:22
 #: src/features/media-compress/image/ImageCompressPanel.tsx:184
 #: src/features/media-compress/video/use-video-compress.ts:191
-#: src/features/updater/UpdaterDialog.tsx:134
+#: src/features/updater/UpdaterDialog.tsx:124
 #: src/features/vault/VaultTool.tsx:63
 #: src/store/transfers.ts:151
 #: src/store/transfers.ts:207
@@ -4500,7 +4514,7 @@ msgid "已上传"
 msgstr "已上传"
 
 #. 更新包已经下载的容量，downloadedSize 是格式化后的字节数
-#: src/features/updater/UpdaterProgress.tsx:38
+#: src/features/updater/UpdaterProgress.tsx:72
 msgid "已下载 {downloadedSize}"
 msgstr "已下载 {downloadedSize}"
 
@@ -4762,6 +4776,10 @@ msgstr "已断开 {hostLabel}"
 #: src/features/lan-transfer/use-lan-transfer.ts:270
 msgid "已断开设备"
 msgstr "已断开设备"
+
+#: src/features/updater/use-updater-label.ts:16
+msgid "已是最新版本"
+msgstr "已是最新版本"
 
 #: src/features/bt/components/TaskRow.tsx:96
 #: src/store/transfers.ts:14
@@ -5085,10 +5103,6 @@ msgstr "当前密钥"
 msgid "当前对局的进度将会丢失。"
 msgstr "当前对局的进度将会丢失。"
 
-#: src/features/updater/use-updater-label.ts:14
-msgid "当前已是最新版本"
-msgstr "当前已是最新版本"
-
 #: src/app/platform/without-rsync.tsx:20
 #: src/features/ssh-sftp/components/sftp/useSftpTransferActions.ts:56
 msgid "当前平台不支持 rsync，请选择压缩包或直连。"
@@ -5166,8 +5180,7 @@ msgstr "当前比例：{percent}"
 msgid "当前没有可用页面，将进入首页。"
 msgstr "当前没有可用页面，将进入首页。"
 
-#. 更新对话框显示正在运行的应用版本，currentVersion 是版本号
-#: src/features/updater/UpdaterDialog.tsx:87
+#: src/features/updater/use-updater-label.ts:58
 msgid "当前版本 {currentVersion}"
 msgstr "当前版本 {currentVersion}"
 
@@ -5983,7 +5996,7 @@ msgstr "收藏"
 
 #. 关闭更新弹窗并继续后台任务，不取消下载
 #: src/features/transfers/TransferDock.tsx:128
-#: src/features/updater/UpdaterDialog.tsx:138
+#: src/features/updater/UpdaterDialog.tsx:130
 msgid "收起"
 msgstr "收起"
 
@@ -6319,8 +6332,8 @@ msgid "无法显示国际象棋。请重新加载棋盘，当前对局进度会�
 msgstr "无法显示国际象棋。请重新加载棋盘，当前对局进度会保留。"
 
 #: src/lib/errors/messages.ts:354
-msgid "无法检查更新，请稍后重试或查看发布页面。"
-msgstr "无法检查更新，请稍后重试或查看发布页面。"
+msgid "无法检查更新，请稍后重试。"
+msgstr "无法检查更新，请稍后重试。"
 
 #. rsync 能力探测失败；side 是“本机/远端”，detail 是诊断信息。
 #: src/lib/errors/messages.ts:198
@@ -6683,8 +6696,8 @@ msgid "更新 AI 流式设置"
 msgstr "更新 AI 流式设置"
 
 #: src/lib/errors/messages.ts:355
-msgid "更新下载或校验失败，请重新检查更新。"
-msgstr "更新下载或校验失败，请重新检查更新。"
+msgid "更新下载或校验失败，请重试。"
+msgstr "更新下载或校验失败，请重试。"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:39
@@ -6699,22 +6712,21 @@ msgstr "更新于 {updatedLabel}"
 msgid "更新信息已失效，请重新检查更新"
 msgstr "更新信息已失效，请重新检查更新"
 
-#: src/features/updater/UpdaterDialog.tsx:108
-msgid "更新包已准备好，重启时安装。请先保存正在进行的工作。"
-msgstr "更新包已准备好，重启时安装。请先保存正在进行的工作。"
-
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:45
 msgid "更新密码条目"
 msgstr "更新密码条目"
 
-#: src/features/updater/use-updater-label.ts:22
+#: src/features/updater/use-updater-label.ts:25
+#: src/features/updater/use-updater-label.ts:67
+#: src/features/updater/use-updater-label.ts:73
 msgid "更新已准备好"
 msgstr "更新已准备好"
 
-#: src/features/updater/UpdaterDialog.tsx:107
-msgid "更新已安装，重启应用后生效。"
-msgstr "更新已安装，重启应用后生效。"
+#: src/features/updater/use-updater-label.ts:67
+#: src/features/updater/use-updater-label.ts:73
+msgid "更新已安装"
+msgstr "更新已安装"
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:36
@@ -6726,8 +6738,10 @@ msgstr "更新待办"
 msgid "更新待办失败"
 msgstr "更新待办失败"
 
-#: src/features/updater/use-updater-label.ts:22
-#: src/features/updater/use-updater-label.ts:26
+#: src/features/updater/use-updater-label.ts:25
+#: src/features/updater/use-updater-label.ts:30
+#: src/features/updater/use-updater-label.ts:64
+#: src/features/updater/use-updater-label.ts:77
 msgid "更新未完成"
 msgstr "更新未完成"
 
@@ -7284,6 +7298,7 @@ msgid "校验"
 msgstr "校验"
 
 #: src/features/translation/ModelManager.tsx:61
+#: src/features/updater/use-updater-label.ts:22
 msgid "校验中"
 msgstr "校验中"
 
@@ -7320,7 +7335,7 @@ msgstr "检查文件是否存在"
 #: src/features/updater/integration.tsx:43
 #: src/features/updater/integration.tsx:45
 #: src/features/updater/integration.tsx:88
-#: src/features/updater/use-updater-label.ts:28
+#: src/features/updater/use-updater-label.ts:32
 msgid "检查更新"
 msgstr "检查更新"
 
@@ -7583,10 +7598,6 @@ msgstr "正则"
 msgid "正在下载"
 msgstr "正在下载"
 
-#: src/features/updater/use-updater-label.ts:20
-msgid "正在下载更新"
-msgstr "正在下载更新"
-
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 msgid "正在保存"
 msgstr "正在保存"
@@ -7719,7 +7730,7 @@ msgstr "正在处理模型库"
 msgid "正在处理附件…"
 msgstr "正在处理附件…"
 
-#: src/features/updater/use-updater-label.ts:24
+#: src/features/updater/use-updater-label.ts:28
 msgid "正在安装并重启…"
 msgstr "正在安装并重启…"
 
@@ -7786,10 +7797,6 @@ msgstr "正在整理文件"
 msgid "正在校验"
 msgstr "正在校验"
 
-#: src/features/updater/use-updater-label.ts:19
-msgid "正在校验更新…"
-msgstr "正在校验更新…"
-
 #: src/features/updater/integration.tsx:44
 #: src/features/updater/integration.tsx:87
 msgid "正在检查"
@@ -7799,7 +7806,7 @@ msgstr "正在检查"
 msgid "正在检查…"
 msgstr "正在检查…"
 
-#: src/features/updater/use-updater-label.ts:12
+#: src/features/updater/use-updater-label.ts:13
 msgid "正在检查更新…"
 msgstr "正在检查更新…"
 
@@ -7928,10 +7935,6 @@ msgstr "正在连接 {sessionTitle}…"
 #: src/features/model-viewer/components/RuntimeControls.tsx:46
 msgid "正在连接方向传感器…"
 msgstr "正在连接方向传感器…"
-
-#: src/features/updater/use-updater-label.ts:18
-msgid "正在连接更新源…"
-msgstr "正在连接更新源…"
 
 #: src/features/poetry/components/SearchBar.tsx:51
 msgid "正文"
@@ -8554,11 +8557,6 @@ msgstr "焊接容差（米）"
 #: src/features/model-viewer/components/AnimationBar.tsx:41
 msgid "片段 {number}"
 msgstr "片段 {number}"
-
-#. 更新对话框版本对比，version 是可用版本，currentVersion 是正在运行的版本
-#: src/features/updater/UpdaterDialog.tsx:83
-msgid "版本 {version} · 当前 {currentVersion}"
-msgstr "版本 {version} · 当前 {currentVersion}"
 
 #: src/features/ssh-sftp/rsync/RsyncCapabilityNotice.tsx:38
 msgid "版本不受支持（需要 3.1 或更高版本）"
@@ -9191,11 +9189,15 @@ msgstr "移除草稿图片"
 msgid "移除转义"
 msgstr "移除转义"
 
-#: src/features/updater/UpdaterDialog.tsx:142
+#: src/features/updater/UpdaterDialog.tsx:134
 msgid "稍后"
 msgstr "稍后"
 
-#: src/features/updater/UpdaterDialog.tsx:136
+#: src/features/updater/UpdaterDialog.tsx:127
+msgid "稍后安装"
+msgstr "稍后安装"
+
+#: src/features/updater/UpdaterDialog.tsx:128
 msgid "稍后重启"
 msgstr "稍后重启"
 
@@ -9226,6 +9228,10 @@ msgstr "空闲"
 #: src/features/games/chess/ChessMatch.tsx:305
 msgid "立体视角"
 msgstr "立体视角"
+
+#: src/features/updater/UpdaterDialog.tsx:154
+msgid "立即安装"
+msgstr "立即安装"
 
 #: src/features/settings/font-options.ts:13
 msgid "站酷快乐体"
@@ -9289,6 +9295,11 @@ msgstr "第一次有效移动开始计时，每滑动一块记一步。离开页
 msgid "等待协商结果…"
 msgstr "等待协商结果…"
 
+#. Android 更新包已下载，等待用户交给系统安装器
+#: src/features/updater/UpdaterActivity.tsx:41
+msgid "等待安装"
+msgstr "等待安装"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:113
 msgid "等待对手加入…"
 msgstr "等待对手加入…"
@@ -9334,7 +9345,7 @@ msgid "等待确认"
 msgstr "等待确认"
 
 #. 更新包已准备好，等待用户确认安装并重启
-#: src/features/updater/UpdaterActivity.tsx:38
+#: src/features/updater/UpdaterActivity.tsx:45
 msgid "等待重启"
 msgstr "等待重启"
 
@@ -11112,6 +11123,7 @@ msgid "连接与模型设置"
 msgstr "连接与模型设置"
 
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:196
+#: src/features/updater/use-updater-label.ts:21
 msgid "连接中"
 msgstr "连接中"
 
@@ -11164,7 +11176,7 @@ msgid "连接设备"
 msgstr "连接设备"
 
 #. 更新源响应慢，仍在等待
-#: src/features/updater/UpdaterProgress.tsx:52
+#: src/features/updater/UpdaterProgress.tsx:90
 msgid "连接较慢，仍在等待响应。"
 msgstr "连接较慢，仍在等待响应。"
 
@@ -11507,9 +11519,17 @@ msgstr "重启中"
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "重启失败，请重试或手动重新打开应用。"
 
-#: src/features/updater/UpdaterDialog.tsx:157
+#: src/features/updater/UpdaterDialog.tsx:155
 msgid "重启并更新"
 msgstr "重启并更新"
+
+#: src/features/updater/use-updater-label.ts:74
+msgid "重启应用后生效"
+msgstr "重启应用后生效"
+
+#: src/features/updater/use-updater-label.ts:74
+msgid "重启时安装，请先保存工作"
+msgstr "重启时安装，请先保存工作"
 
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:388
 #: src/features/ssh-sftp/components/sftp/SftpPanel.tsx:390
@@ -11573,8 +11593,12 @@ msgstr "重新打乱魔方？"
 msgid "重新打开应用"
 msgstr "重新打开应用"
 
+#: src/features/updater/use-updater-label.ts:69
+msgid "重新打开应用后生效"
+msgstr "重新打开应用后生效"
+
 #: src/features/updater/integration.tsx:50
-#: src/features/updater/UpdaterDialog.tsx:165
+#: src/features/updater/UpdaterDialog.tsx:163
 msgid "重新检查"
 msgstr "重新检查"
 
@@ -11712,7 +11736,7 @@ msgstr "重试"
 msgid "重试保存"
 msgstr "重试保存"
 
-#: src/features/updater/UpdaterDialog.tsx:157
+#: src/features/updater/UpdaterDialog.tsx:152
 msgid "重试安装"
 msgstr "重试安装"
 
@@ -11726,7 +11750,7 @@ msgstr "重试显示"
 msgid "重试环境存储"
 msgstr "重试环境存储"
 
-#: src/features/updater/UpdaterDialog.tsx:157
+#: src/features/updater/UpdaterDialog.tsx:151
 msgid "重试重启"
 msgstr "重试重启"
 
