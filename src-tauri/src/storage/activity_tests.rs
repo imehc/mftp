@@ -185,7 +185,7 @@ fn post_watermark_failed_rows_without_payload_produce_no_error() {
 }
 
 #[test]
-fn coexisting_tables_are_left_untouched() {
+fn coexisting_tables_are_merged_and_the_legacy_table_is_dropped() {
     let root = test_root("coexist");
     std::fs::create_dir_all(&root).unwrap();
     {
@@ -217,21 +217,26 @@ fn coexisting_tables_are_left_untouched() {
         .unwrap();
     }
 
-    // A downgrade may have written to a recreated old table; startup must not
-    // fail or merge, and the app keeps operating on activity_logs.
+    // An earlier build left both tables behind; startup merges the legacy rows
+    // and drops the old table so later startups have nothing left to inspect.
     let storage = Storage::new(root.clone()).unwrap();
     let logs = storage.list_activity_logs(10, None, None).unwrap();
-    assert_eq!(logs.len(), 1);
-    assert_eq!(logs[0].id, "new-only");
+    let ids: Vec<_> = logs.iter().map(|log| log.id.as_str()).collect();
+    assert!(ids.contains(&"old-only"));
+    assert!(ids.contains(&"new-only"));
     {
         let conn = storage.conn().unwrap();
         let names = table_names(&conn);
         assert!(names.iter().any(|name| name == "activity_logs"));
-        assert!(names.iter().any(|name| name == "lan_access_logs"));
-        let old_rows: i64 = conn
-            .query_row("SELECT COUNT(*) FROM lan_access_logs", [], |row| row.get(0))
-            .unwrap();
-        assert_eq!(old_rows, 1);
+        assert!(!names.iter().any(|name| name == "lan_access_logs"));
     }
+    drop(storage);
+
+    // The legacy table's absence is the marker: reopening changes nothing.
+    let reopened = Storage::new(root.clone()).unwrap();
+    assert_eq!(
+        reopened.list_activity_logs(10, None, None).unwrap().len(),
+        ids.len()
+    );
     std::fs::remove_dir_all(root).unwrap();
 }

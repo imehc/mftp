@@ -297,28 +297,63 @@ fn read_legacy_watermark(conn: &Connection) -> AppResult<i64> {
 /// One-time forward rename: `lan_access_logs` was the cross-module shared
 /// activity log store despite the historical name (the `source` column
 /// discriminates producers). Forward-only: no dual write, no view alias.
+///
+/// The legacy table's absence is the completion marker: once no
+/// `lan_access_logs` remains there is nothing left to check, so no separate
+/// `app_meta` flag is needed (a flag could disagree with the actual schema,
+/// e.g. after restoring a database or a downgrade writing to the old table).
 pub(super) fn migrate_table_name(conn: &Connection) -> AppResult<()> {
     if !table_exists(conn, "lan_access_logs")? {
         return Ok(());
     }
-    if table_exists(conn, "activity_logs")? {
-        // Only reachable after a downgrade wrote to a recreated old table.
-        // Keep both as-is rather than failing startup or merging by guesswork;
-        // the app keeps operating on `activity_logs`.
-        crate::runtime_log!(
-            "activity log table rename skipped: both lan_access_logs and activity_logs exist"
-        );
+    if !table_exists(conn, "activity_logs")? {
+        // SQLite has no ALTER INDEX rename; rebuild the index under the new name.
+        conn.execute_batch(
+            r#"
+            ALTER TABLE lan_access_logs RENAME TO activity_logs;
+            DROP INDEX IF EXISTS idx_lan_access_logs_created_at;
+            CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at
+            ON activity_logs(created_at DESC);
+            "#,
+        )?;
         return Ok(());
     }
-    // SQLite has no ALTER INDEX rename; rebuild the index under the new name.
-    conn.execute_batch(
+    // Both tables exist: an earlier build created `activity_logs` while the
+    // legacy table was still in place, so the rename guard can never fire
+    // again. Rows carry the same meaning and the legacy table only has a
+    // subset of the columns, so merge by primary key and drop it instead of
+    // leaving an orphan table that every startup has to re-examine.
+    // `INSERT OR IGNORE` keeps the new table's row on an id collision; the
+    // merge and the drop commit together, so an interrupted run retries.
+    if !column_exists(conn, "activity_logs", "source")? {
+        conn.execute(
+            "ALTER TABLE activity_logs ADD COLUMN source TEXT NOT NULL DEFAULT 'lan'",
+            [],
+        )?;
+    }
+    let tx = conn.unchecked_transaction()?;
+    // `source` was added after the table rename, so a very old database may
+    // still lack it; default the same value the column would carry.
+    if column_exists(conn, "lan_access_logs", "source")? {
+        tx.execute(
+            "INSERT OR IGNORE INTO activity_logs(id, created_at, source, ip, request_type, result, detail)
+             SELECT id, created_at, source, ip, request_type, result, detail FROM lan_access_logs",
+            [],
+        )?;
+    } else {
+        tx.execute(
+            "INSERT OR IGNORE INTO activity_logs(id, created_at, source, ip, request_type, result, detail)
+             SELECT id, created_at, 'lan', ip, request_type, result, detail FROM lan_access_logs",
+            [],
+        )?;
+    }
+    tx.execute_batch(
         r#"
-        ALTER TABLE lan_access_logs RENAME TO activity_logs;
         DROP INDEX IF EXISTS idx_lan_access_logs_created_at;
-        CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at
-        ON activity_logs(created_at DESC);
+        DROP TABLE lan_access_logs;
         "#,
     )?;
+    tx.commit()?;
     Ok(())
 }
 
