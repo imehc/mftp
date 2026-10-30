@@ -8,6 +8,7 @@ import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
 import { unlockXiangqiAudio, xiangqiAudio } from "./audio";
 import { xiangqiSessions } from "./session";
+import { XiangqiHelp } from "./XiangqiHelp";
 import { XiangqiMatch } from "./XiangqiMatch";
 import { XiangqiModeMenu } from "./XiangqiModeMenu";
 import { XiangqiOnlineFlow } from "./XiangqiOnline";
@@ -46,6 +47,7 @@ function XiangqiGameContent() {
       {mode?.kind !== "online" || onlinePlaying ? (
         <BoardGameHeader
           title={<Trans>中国象棋</Trans>}
+          help={<XiangqiHelp />}
           active={mode !== null}
           finished={matchFinished}
           canRestart={mode?.kind !== "online"}

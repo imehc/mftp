@@ -10,7 +10,7 @@ import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
 import { chessAudio } from "./audio";
-import { ChessHelp } from "./ChessDialogs";
+import { ChessHelp } from "./ChessHelp";
 import { ChessMatch } from "./ChessMatch";
 import { ChessModeMenu } from "./ChessModeMenu";
 import { ChessOnlineFlow } from "./ChessOnline";

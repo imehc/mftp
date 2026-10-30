@@ -18,6 +18,7 @@ export function BoardMatchLayout({
   metrics,
   activity,
   controls,
+  menuActions,
   finished,
   children,
   notice = null,
@@ -30,6 +31,8 @@ export function BoardMatchLayout({
   metrics: ReactNode;
   activity?: ReactNode;
   controls: ReactNode;
+  /** 只进更多菜单的视角类动作。 */
+  menuActions?: ReactNode;
   finished: boolean;
   children: ReactNode;
   notice?: LightNoticeMessage | null;
@@ -66,6 +69,7 @@ export function BoardMatchLayout({
         status={activity || title}
         metrics={metrics}
         details={details}
+        menuActions={menuActions}
       />
       <div className="relative z-0 min-h-0 flex-1 overflow-hidden px-3 py-2 md:px-4">
         {children}

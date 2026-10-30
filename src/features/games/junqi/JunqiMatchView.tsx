@@ -20,7 +20,7 @@ import { GameResultBar } from "../engine/GameResultBar";
 import { GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { canSwap } from "./deployment";
-import { JunqiRulesDialog } from "./JunqiRulesDialog";
+import { JunqiHelp } from "./JunqiHelp";
 import { JunqiToolbar } from "./JunqiToolbar";
 import { JunqiUndoDialog } from "./JunqiUndoDialog";
 import { REASON_LABELS, ResultLabel } from "./labels";
@@ -161,17 +161,16 @@ export function JunqiMatchView({
         onRestart={onRestart}
         onExit={onExit}
         help={
-          <JunqiRulesDialog
-            variant={mode.variant}
-            online={mode.kind === "online"}
-          />
+          <JunqiHelp variant={mode.variant} online={mode.kind === "online"} />
         }
         extraActions={(closeThen) => (
           <>
             <Button
               variant="ghost"
               size="sm"
-              className="justify-start"
+              density="adaptive"
+              className="w-full justify-start"
+              aria-pressed={flipped}
               onClick={() => closeThen(() => setFlipped((value) => !value))}
             >
               <RotateCw data-icon="inline-start" />

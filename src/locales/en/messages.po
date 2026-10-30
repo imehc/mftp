@@ -26,9 +26,9 @@ msgstr "{0, plural, one {# character} other {# characters}}"
 
 #. placeholder {0}: payload.moves
 #. placeholder {0}: state.data.offset + state.data.cursor
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:154
-#: src/features/games/magic-cube/MagicCubeGame.tsx:369
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:272
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:68
+#: src/features/games/magic-cube/MagicCubeGame.tsx:332
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:227
 msgid "{0, plural, other {# 步}}"
 msgstr "{0, plural, one {# move} other {# moves}}"
 
@@ -51,7 +51,7 @@ msgstr "{characterCount, plural, one {# character} other {# characters}}"
 msgid "{clientCount} 个客户端"
 msgstr "{clientCount} clients"
 
-#: src/features/games/billiards/BilliardsDetails.tsx:136
+#: src/features/games/billiards/BilliardsInfo.tsx:99
 #: src/features/games/billiards/BilliardsScore.tsx:156
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {# consecutive foul} other {# consecutive fouls}}"
@@ -90,7 +90,7 @@ msgstr "{deviceCount, plural, one {# device} other {# devices}}"
 msgid "{failed} 个失败"
 msgstr "{failed} failed"
 
-#: src/features/games/billiards/BilliardsDetails.tsx:128
+#: src/features/games/billiards/BilliardsInfo.tsx:91
 msgid "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
 msgstr "{foulCount, plural, one {# foul} other {# fouls}}"
 
@@ -159,13 +159,13 @@ msgstr "{moveCount, plural, one {# move} other {# moves}}"
 
 #: src/features/games/go/GoMatch.tsx:264
 #: src/features/games/gomoku/GomokuMatch.tsx:216
-#: src/features/games/xiangqi/XiangqiMatch.tsx:238
+#: src/features/games/xiangqi/XiangqiMatch.tsx:248
 msgid "{moveCount, plural, one {共 # 手} other {共 # 手}}"
 msgstr "{moveCount, plural, one {# move total} other {# moves total}}"
 
 #: src/features/games/go/GoMatch.tsx:187
 #: src/features/games/gomoku/GomokuMatch.tsx:167
-#: src/features/games/xiangqi/XiangqiMatch.tsx:172
+#: src/features/games/xiangqi/XiangqiMatch.tsx:173
 msgid "{moveNumber, plural, one {第 # 手} other {第 # 手}}"
 msgstr "{moveNumber, plural, one {Move #} other {Move #}}"
 
@@ -173,13 +173,17 @@ msgstr "{moveNumber, plural, one {Move #} other {Move #}}"
 msgid "{moves, plural, one {已走 # 手} other {已走 # 手}}"
 msgstr "{moves, plural, one {# move played} other {# moves played}}"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:151
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:72
 msgid "{moves, plural, other {# 步}}"
 msgstr "{moves, plural, one {# move} other {# moves}}"
 
 #: src/features/games/engine/online/use-online-lobby.ts:41
 msgid "{name} 的房间"
 msgstr "{name}'s room"
+
+#: src/features/games/engine/GameHelpDialog.tsx:77
+msgid "{name}玩法"
+msgstr "How to play {name}"
 
 #. offender 是连续漏击的犯规者，不是确认警告的人
 #: src/features/games/billiards/SnookerHud.tsx:107
@@ -202,8 +206,8 @@ msgstr "{onlineConnections} active connections"
 
 #. 魔方阶数，order 是每条边的小块数量
 #. 魔方阶数，order 是每条边的小块数量
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:139
-#: src/features/games/magic-cube/MagicCubeGame.tsx:307
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:53
+#: src/features/games/magic-cube/MagicCubeGame.tsx:270
 msgid "{order} 阶魔方"
 msgstr "{order}×{order} cube"
 
@@ -226,13 +230,13 @@ msgstr "{penalty, plural, one {Foul: {reason}. # penalty point.} other {Foul: {r
 msgid "{plies, plural, one {申请撤销 # 手棋，需对方同意。} other {申请撤销 # 手棋，需对方同意。}}"
 msgstr "{plies, plural, one {Request to undo # move. Your opponent must agree.} other {Request to undo # moves. Your opponent must agree.}}"
 
-#: src/features/games/chess/ChessMatch.tsx:280
+#: src/features/games/chess/ChessMatch.tsx:283
 msgid "{ply, plural, one {# 手} other {# 手}}"
 msgstr "{ply, plural, one {# move} other {# moves}}"
 
 #. 斯诺克瞄准时首个将碰到的目标球的实际分值
 #. 球桌中央选球区域，球体下方仅显示实际分值
-#: src/features/games/billiards/BilliardsMatchView.tsx:407
+#: src/features/games/billiards/BilliardsStageArea.tsx:105
 #: src/features/games/billiards/render/BallSelectionOverlay.tsx:69
 msgid "{points} 分"
 msgstr "{points} pts"
@@ -242,12 +246,12 @@ msgstr "{points} pts"
 msgid "{proposer} 提议僵持重摆，由 {decisionSeat} 决定是否接受。接受后由本局原开球者开球。"
 msgstr "Re-rack proposed by {proposer}. Decision for {decisionSeat}: accept or continue the rack. If accepted, the original breaker breaks again."
 
-#: src/features/games/billiards/BilliardsDetails.tsx:67
+#: src/features/games/billiards/BilliardsInfo.tsx:35
 msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgstr "{redCount, plural, one {# red left} other {# reds left}}"
 
-#: src/features/games/billiards/BilliardsDetails.tsx:81
-#: src/features/games/billiards/BilliardsMatchView.tsx:293
+#: src/features/games/billiards/BilliardsInfo.tsx:49
+#: src/features/games/billiards/BilliardsScoreBar.tsx:74
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {# ball remaining} other {# balls remaining}}"
 
@@ -296,16 +300,16 @@ msgstr "The break by {shooter} did not meet the three-ball requirement. Decision
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# shot} other {# shots}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:272
+#: src/features/games/billiards/BilliardsScoreBar.tsx:53
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {# shot total} other {# shots total}}"
 
-#: src/features/games/billiards/BilliardsDetails.tsx:63
+#: src/features/games/billiards/BilliardsInfo.tsx:31
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {Total shots: #} other {Total shots: #}}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:284
-#: src/features/games/billiards/BilliardsMatchView.tsx:351
+#: src/features/games/billiards/BilliardsScoreBar.tsx:65
+#: src/features/games/billiards/BilliardsScoreBar.tsx:128
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "{shotNumber, plural, one {Shot #} other {Shot #}}"
 
@@ -362,7 +366,7 @@ msgid "{value} 的私钥口令"
 msgstr "Private key passphrase for {value}"
 
 #. 魔方阶数，value 为每边小块数量
-#: src/features/games/magic-cube/MagicCubeGame.tsx:227
+#: src/features/games/magic-cube/MagicCubeGame.tsx:200
 msgid "{value} 阶"
 msgstr "{value}×{value}"
 
@@ -370,11 +374,11 @@ msgstr "{value}×{value}"
 msgid "{version} · 当前 {currentVersion}"
 msgstr "{version} · current {currentVersion}"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:266
+#: src/features/games/billiards/BilliardsScoreBar.tsx:47
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} wins"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:96
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:72
 msgid "「重新开始本局」恢复本局最初的打乱排列，并清零用时与步数；「打乱」生成新的有解棋盘。离开后会保留进度，下次可以继续。"
 msgstr "Restart puzzle returns to the original arrangement and resets time and moves. Scramble creates a new solvable puzzle. Your progress is kept when you leave, so you can resume later."
 
@@ -396,9 +400,13 @@ msgstr "3D Models"
 msgid "3D 模型画布"
 msgstr "3D model canvas"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:76
+#: src/features/games/junqi/JunqiHelp.tsx:47
 msgid "50 枚棋子随机盖放在非行营位置，行营为空。先翻者取得首枚棋子的阵营，另一方取相反阵营；翻到军旗或地雷也能定边。盖子不能移动或被攻击，会阻挡道路；任何一方都可翻开，每次消耗一个回合。"
 msgstr "All 50 pieces are shuffled face down onto non-camp spaces. Camps start empty. The first revealed piece assigns its side to the player who revealed it, even if it is a flag or mine. The other player takes the opposite side. Covered pieces block movement and cannot move or be attacked. Either player may reveal one, using a turn."
+
+#: src/features/games/billiards/BilliardsHelp.tsx:115
+msgid "8 号球固定在第三排中间，最后一排两个底角一颗全色、一颗花色，其余球随机摆放。开球时打进 8 号会被摆回脚点，不算犯规。"
+msgstr "The 8 sits in the middle of the third row and the two back corners hold one solid and one stripe; the rest are placed at random. An 8 potted on the break returns to the foot spot and is not a foul."
 
 #: src/features/games/billiards/NineBallHud.tsx:203
 msgid "9 号球已复位"
@@ -807,7 +815,7 @@ msgstr "Top Processes"
 msgid "XYZ 方向：点击坐标轴切换视角，双击适配模型。也可按 X、Y、Z，按住 Shift 查看反方向。"
 msgstr "XYZ orientation: click an axis to change the view, or double-click to fit the model. You can also press X, Y or Z; hold Shift for the opposite direction."
 
-#: src/features/games/reversi/ReversiHelp.tsx:43
+#: src/features/games/reversi/ReversiHelp.tsx:23
 msgid "一方没有合法落点时自动跳过，由另一方继续。双方都无法落子时结束，即使棋盘尚未填满。"
 msgstr "If a player has no legal moves, their turn is skipped. The game ends when neither player can move, even if empty squares remain."
 
@@ -822,7 +830,7 @@ msgstr "Seventy-five-move rule"
 msgid "三次重复局面"
 msgstr "Threefold repetition"
 
-#: src/features/games/chess/ChessDialogs.tsx:143
+#: src/features/games/chess/ChessHelp.tsx:42
 msgid "三次重复局面或连续五十步没有动兵、吃子时可以申领和棋。五次重复或七十五步时自动和棋，最后一步将死优先。"
 msgstr "A draw may be claimed after threefold repetition or fifty moves by each player without a pawn move or capture. Fivefold repetition or seventy-five moves ends the game automatically; checkmate on the last move takes priority."
 
@@ -1116,6 +1124,10 @@ msgstr "Root directories and protected paths cannot be deleted"
 msgid "不能移动到自身或子文件夹中"
 msgstr "Cannot move into itself or a child folder"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:154
+msgid "不要求击球后必须碰库，也不需要指定袋口。练习模式为自由清台，不分组、不计犯规胜负。"
+msgstr "No rail contact after the shot is required, and no pocket is called. Practice is a free clear-the-table run with no groups and no foul-based result."
+
 #. 模型没有可准确比较的静态顶点法线。
 #: src/features/model-viewer/components/DiagnosticsPanel.tsx:88
 msgid "不适用"
@@ -1137,8 +1149,8 @@ msgstr "Connection to the opponent was lost."
 #: src/features/games/engine/GameRestoreDialog.tsx:84
 #: src/features/games/engine/GameSessionNotice.tsx:92
 #: src/features/games/engine/GameSessionNotice.tsx:119
-#: src/features/games/magic-cube/MagicCubeGame.tsx:419
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:320
+#: src/features/games/magic-cube/MagicCubeGame.tsx:382
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:275
 msgid "丢弃存档"
 msgstr "Discard save"
 
@@ -1147,11 +1159,11 @@ msgstr "Discard save"
 msgid "丢弃对局存档？"
 msgstr "Discard this saved game?"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:350
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:304
 msgid "丢弃数字华容道存档？"
 msgstr "Discard the saved sliding puzzle?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:526
+#: src/features/games/magic-cube/MagicCubeGame.tsx:488
 msgid "丢弃魔方存档？"
 msgstr "Discard saved cube?"
 
@@ -1176,7 +1188,8 @@ msgstr "Measure distance"
 msgid "中"
 msgstr "Medium"
 
-#: src/features/games/xiangqi/XiangqiGame.tsx:48
+#: src/features/games/xiangqi/XiangqiGame.tsx:49
+#: src/features/games/xiangqi/XiangqiHelp.tsx:9
 #: src/features/home/entries.tsx:221
 msgid "中国象棋"
 msgstr "Chinese Chess"
@@ -1189,6 +1202,7 @@ msgstr "Chinese chess room"
 msgid "中国象棋棋盘"
 msgstr "Chinese chess board"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:30
 #: src/features/games/billiards/BilliardsModeMenu.tsx:78
 #: src/features/games/billiards/BilliardsModeMenu.tsx:187
 msgid "中式八球"
@@ -1270,6 +1284,10 @@ msgstr "Home Directory"
 msgid "主题"
 msgstr "Theme"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:49
+msgid "九颗球紧排成菱形，9 号在脚点。开球需落袋球数与越过开球线的球数合计不少于三颗，否则视为违规开球，由对手决定重摆或继续。"
+msgstr "The nine balls are racked in a tight diamond with the 9 on the foot spot. A break is legal when potted balls plus balls driven past the head string total at least three; otherwise it is an illegal break and the opponent chooses between a re-rack and playing on."
+
 #: src/features/model-viewer/ModelViewerPage.tsx:365
 msgid "也可将模型文件拖到这里"
 msgstr "You can also drop a model file here"
@@ -1287,7 +1305,8 @@ msgstr "Swap languages"
 msgid "五十步规则"
 msgstr "Fifty-move rule"
 
-#: src/features/games/gomoku/GomokuGame.tsx:49
+#: src/features/games/gomoku/GomokuGame.tsx:50
+#: src/features/games/gomoku/GomokuHelp.tsx:9
 #: src/features/home/entries.tsx:194
 msgid "五子棋"
 msgstr "Gomoku"
@@ -1310,11 +1329,11 @@ msgstr "Interaction mode"
 msgid "交回对方"
 msgstr "Pass back"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:141
+#: src/features/games/junqi/JunqiHelp.tsx:107
 msgid "交战"
 msgstr "Combat"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:128
+#: src/features/games/junqi/JunqiHelp.tsx:96
 msgid "交战只公开进攻方存活、防守方存活或同归于尽，不直接揭示存活敌子的身份。司令阵亡后己方军旗位置公开，终局后才公开剩余身份。"
 msgstr "Combat reveals only whether the attacker survives, the defender survives, or both are removed. A surviving enemy piece keeps its identity hidden. When a Commander is removed, that side’s flag is revealed. All remaining identities are revealed only when the game ends."
 
@@ -1571,7 +1590,7 @@ msgid "作者"
 msgstr "Author"
 
 #: src/features/games/billiards/BilliardsScore.tsx:16
-#: src/features/games/chess/ChessMatch.tsx:163
+#: src/features/games/chess/ChessMatch.tsx:166
 #: src/features/games/engine/black-white-labels.tsx:32
 #: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/xiangqi/labels.tsx:30
@@ -1579,20 +1598,20 @@ msgstr "Author"
 msgid "你"
 msgstr "You"
 
-#: src/features/games/chess/ChessMatch.tsx:226
-#: src/features/games/engine/BoardMatchLayout.tsx:59
+#: src/features/games/chess/ChessMatch.tsx:229
+#: src/features/games/engine/BoardMatchLayout.tsx:62
 #: src/features/games/reversi/ReversiMatch.tsx:141
 msgid "你执白"
 msgstr "You play white"
 
-#: src/features/games/engine/BoardMatchLayout.tsx:52
+#: src/features/games/engine/BoardMatchLayout.tsx:55
 #: src/features/games/junqi/JunqiToolbar.tsx:51
 msgid "你执红"
 msgstr "You play red"
 
-#: src/features/games/chess/ChessMatch.tsx:228
-#: src/features/games/engine/BoardMatchLayout.tsx:54
+#: src/features/games/chess/ChessMatch.tsx:231
 #: src/features/games/engine/BoardMatchLayout.tsx:57
+#: src/features/games/engine/BoardMatchLayout.tsx:60
 #: src/features/games/junqi/JunqiToolbar.tsx:53
 #: src/features/games/reversi/ReversiMatch.tsx:139
 msgid "你执黑"
@@ -1639,10 +1658,10 @@ msgstr "Open with system app"
 msgid "使用系统应用打开 {entryName}"
 msgstr "Open {entryName} with system app"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:145
-#: src/features/games/magic-cube/MagicCubeGame.tsx:376
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:142
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:279
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:59
+#: src/features/games/magic-cube/MagicCubeGame.tsx:339
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:63
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:234
 msgid "使用过撤销"
 msgstr "Undo used"
 
@@ -1650,9 +1669,9 @@ msgstr "Undo used"
 msgid "供可信的本机客户端调用应用模块。"
 msgstr "Let trusted local clients access application modules."
 
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:66
-msgid "依次首碰最低号球，合法进 9 号获胜。采用三球开球、推杆选择及连续三犯规则。"
-msgstr "Contact the lowest-numbered ball first. Legally pocket the 9-ball to win. Includes the three-ball break requirement, push-out decisions and three consecutive fouls."
+#: src/features/games/billiards/BilliardsHelp.tsx:33
+msgid "依次首碰台面最低号球，合法打进 9 号球获胜。"
+msgstr "Always contact the lowest-numbered ball first; pot the 9 legally to win."
 
 #: src/features/ai-configuration/AiEditorDialog.tsx:296
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:424
@@ -1801,6 +1820,10 @@ msgstr "Seeding"
 msgid "停一手"
 msgstr "Pass"
 
+#: src/features/games/go/GoHelp.tsx:32
+msgid "停手与终局"
+msgstr "Passing and the end of the game"
+
 #. 停止模型动画并回到片段起点。
 #: src/features/model-viewer/components/AnimationBar.tsx:213
 #: src/features/translation/TranslationTool.tsx:249
@@ -1903,7 +1926,11 @@ msgstr "Play first (Red)"
 msgid "先手（执黑）"
 msgstr "First (Black)"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:65
+#: src/features/games/billiards/BilliardsHelp.tsx:37
+msgid "先清完己方组别，再合法打进 8 号球获胜。"
+msgstr "Clear your own group, then pot the 8 legally to win."
+
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:39
 msgid "先点击或聚焦魔方画布。R、L、U、D、F、B 分别顺时针转动右、左、上、下、前、后面；按住 Shift 反向转动。方向键旋转视角，Esc 取消拖动。精确转动面板也支持键盘操作。"
 msgstr "Click or focus the cube canvas first. R, L, U, D, F, B turn the right, left, up, down, front, and back faces clockwise. Hold Shift to reverse. Arrow keys orbit; Esc cancels a drag. The precise controls also support keyboard navigation."
 
@@ -1980,7 +2007,7 @@ msgstr "All modules"
 msgid "全部结果"
 msgstr "All Results"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:106
+#: src/features/games/junqi/JunqiHelp.tsx:77
 msgid "公路走相邻一步，可沿行营斜线移动。铁路上可沿直线走任意距离，工兵还可转弯；所有棋子都不能越子。"
 msgstr "Move one adjacent space along a road, including marked diagonals into and out of camps. On railways, pieces may travel any unobstructed distance in a straight line; engineers may also turn. No piece may jump over another."
 
@@ -1988,6 +2015,10 @@ msgstr "Move one adjacent space along a road, including marked diagonals into an
 #: src/features/games/billiards/BilliardsModeMenu.tsx:177
 msgid "六红球"
 msgstr "Six reds"
+
+#: src/features/games/billiards/BilliardsHelp.tsx:98
+msgid "六红球采用五次漏击规则，十红球沿用十五红球的流程。自动裁判只对「明确直达却没有击中目标球」判漏击，目标球被完全遮挡时只判普通犯规，不判断主观是否尽力。"
+msgstr "Six-red snooker uses the five-miss rule and ten-red follows the fifteen-red flow. The automatic referee only calls a miss when a ball was clearly reachable in a straight line and was not hit; when the target is fully snookered it calls an ordinary foul and does not judge intent."
 
 #: src/features/poetry/components/TranslationPackManager.tsx:44
 msgid "共 {count} 条译文"
@@ -2097,7 +2128,7 @@ msgid "兵"
 msgstr "Pawn"
 
 #. 国际象棋兵到达最后一排后的选择
-#: src/features/games/chess/ChessDialogs.tsx:41
+#: src/features/games/chess/ChessDialogs.tsx:35
 msgid "兵的升变"
 msgstr "Pawn promotion"
 
@@ -2142,9 +2173,9 @@ msgstr "Content truncated"
 msgid "内容无效，无法解码"
 msgstr "Invalid content, cannot decode"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:505
+#: src/features/games/billiards/BilliardsActionsBar.tsx:63
 #: src/features/games/engine/GameResultBar.tsx:84
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:242
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:197
 msgid "再来一局"
 msgstr "One more game"
 
@@ -2180,7 +2211,7 @@ msgid "最长 60 秒 · 黑色背景 · 无音频 · 不含工具面板"
 msgstr "Up to 60 seconds · Black background · No audio or tool panels"
 
 #. 斯诺克对局详情，球员本局最高连续得分
-#: src/features/games/billiards/BilliardsDetails.tsx:120
+#: src/features/games/billiards/BilliardsInfo.tsx:83
 msgid "最高单杆 {highestBreak}"
 msgstr "Highest break {highestBreak}"
 
@@ -2217,11 +2248,11 @@ msgstr "Flag"
 msgid "军旗被夺"
 msgstr "Flag captured"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:167
+#: src/features/games/junqi/JunqiHelp.tsx:126
 msgid "军旗被夺、主动认输，或既没有盖子可翻也没有合法走法时判负。相同公开局面且同一方走棋出现三次，或连续 100 手仅移动且未吃子，自动和棋；翻子或吃子会重置无进展计数。"
 msgstr "You lose if your flag is captured, you resign, or you have neither a covered piece to reveal nor a legal move. The game is drawn if the same visible position with the same player to move occurs three times, or after 100 consecutive moves without a capture or reveal. Revealing or capturing resets this counter."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:172
+#: src/features/games/junqi/JunqiHelp.tsx:131
 msgid "军旗被夺、主动认输，或轮到自己时无合法走法，均判负。本应用约定：同一方走棋的相同局面出现三次，或连续 100 手没有棋子被移除，自动和棋。"
 msgstr "You lose if your flag is captured, you concede, or you have no legal move on your turn. In this app, the game is drawn after the same position occurs three times with the same side to move, or after 100 consecutive moves without a piece being removed."
 
@@ -2274,6 +2305,14 @@ msgstr "This credential is shown only once. After closing, you can only generate
 msgid "凭据已脱敏"
 msgstr "Credentials redacted"
 
+#: src/features/games/billiards/BilliardsInfo.tsx:111
+msgid "击球方式与犯规判定见「玩法说明」。"
+msgstr "Shot controls and foul rules are in How to play."
+
+#: src/features/games/billiards/BilliardsHelp.tsx:59
+msgid "击球顺序"
+msgstr "Order of play"
+
 #. 通过移动系统分享面板分享已经生成的模型视口视频。
 #. 通过移动系统分享面板分享已经生成的模型视口视频。
 #: src/features/model-viewer/components/RecordingExport.tsx:146
@@ -2305,9 +2344,14 @@ msgid "分类"
 msgstr "Category"
 
 #. 模型库中用户自定义的分类名称，留空表示不分组。
+#: src/features/games/billiards/BilliardsHelp.tsx:123
 #: src/features/model-viewer/components/LibraryEntryEditor.tsx:98
 msgid "分组"
 msgstr "Group"
+
+#: src/features/games/billiards/BilliardsHelp.tsx:135
+msgid "分组后每一杆必须首先碰到己方组别的球；清完己方组别后，首碰改为 8 号球。母球落袋、没有碰到任何球、首碰错误都是犯规，犯规后对手获得自由球，可以在台面任意位置摆放母球。"
+msgstr "After groups are set, every shot must contact your own group first; once it is cleared, contact the 8 first. Cue ball in a pocket, contacting nothing, and a wrong first contact are fouls, and the opponent then gets ball in hand anywhere on the table."
 
 #. 模型纹理图像的像素尺寸。
 #: src/features/model-viewer/components/ResourceDetails.tsx:53
@@ -2324,7 +2368,7 @@ msgstr "Minute"
 msgid "切换 AI 模型"
 msgstr "Switch AI model"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:528
+#: src/features/games/magic-cube/MagicCubeGame.tsx:490
 msgid "切换魔方阶数？"
 msgstr "Change cube size?"
 
@@ -2775,7 +2819,7 @@ msgstr "Break {currentBreak}"
 msgid "单次"
 msgstr "Once"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:95
+#: src/features/games/junqi/JunqiHelp.tsx:65
 msgid "单线表示公路，双轨表示铁路，圆形表示行营，方框表示大本营"
 msgstr "A single line is a road, a double track is a railway, a circle is a camp, and a rectangle is headquarters."
 
@@ -2939,6 +2983,10 @@ msgstr "Open Junqi"
 msgid "双人暗棋"
 msgstr "Hidden Junqi"
 
+#: src/features/games/xiangqi/XiangqiHelp.tsx:24
+msgid "双方将帅在同一列且中间没有棋子时，可以直接吃掉对方将帅。因此照面视为被将军，必须应将。"
+msgstr "When the two generals face each other on the same file with nothing between them, either can capture the other directly, so facing generals counts as being in check and must be answered."
+
 #: src/features/games/junqi/JunqiToolbar.tsx:155
 msgid "双方棋子同归于尽"
 msgstr "Both pieces removed"
@@ -2960,11 +3008,11 @@ msgstr "Double sided"
 msgid "发现上次的对局存档，是否继续？"
 msgstr "A saved game was found. Would you like to continue?"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:284
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:239
 msgid "发现上次的数字华容道进度，是否继续？"
 msgstr "You have a saved sliding puzzle. Continue where you left off?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:381
+#: src/features/games/magic-cube/MagicCubeGame.tsx:344
 msgid "发现上次的魔方进度，是否继续？"
 msgstr "You have a saved cube. Continue where you left off?"
 
@@ -3004,19 +3052,18 @@ msgstr "Send request"
 #: src/features/export/BackupPage.tsx:121
 #: src/features/export/BackupPage.tsx:161
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:48
-#: src/features/games/billiards/BilliardsHeader.tsx:126
-#: src/features/games/engine/BoardGameHeader.tsx:103
+#: src/features/games/engine/BoardGameHeader.tsx:129
 #: src/features/games/engine/GameHeaderControls.tsx:77
 #: src/features/games/engine/GameHeaderControls.tsx:105
 #: src/features/games/engine/GameHistory.tsx:90
 #: src/features/games/engine/GameRestoreDialog.tsx:84
 #: src/features/games/engine/GameSessionNotice.tsx:112
 #: src/features/games/engine/online/OnlineLobby.tsx:382
-#: src/features/games/junqi/JunqiMatchView.tsx:270
-#: src/features/games/junqi/JunqiMatchView.tsx:304
+#: src/features/games/junqi/JunqiMatchView.tsx:269
+#: src/features/games/junqi/JunqiMatchView.tsx:303
 #: src/features/games/junqi/JunqiUndoDialog.tsx:58
-#: src/features/games/magic-cube/MagicCubeGame.tsx:541
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:369
+#: src/features/games/magic-cube/MagicCubeGame.tsx:503
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:323
 #: src/features/lan-transfer/LanConfirmDialog.tsx:45
 #: src/features/lan-transfer/LanShareDialog.tsx:153
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:416
@@ -3167,11 +3214,11 @@ msgstr "Read Only"
 msgid "可下载合集"
 msgstr "Available collections"
 
-#: src/features/games/chess/ChessDialogs.tsx:86
+#: src/features/games/chess/ChessDialogs.tsx:80
 msgid "可以申领和棋"
 msgstr "A draw can be claimed"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:78
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:50
 msgid "可以直接转动复原魔方练习，也可以点击「打乱」开始挑战。首次有效转层后开始计时，每次转层记一步，180° 也记一步。切页、后台或打开帮助时暂停计时，这是练习用时，不是比赛计时。"
 msgstr "Practice freely on a solved cube, or select Scramble to start a challenge. Timing begins with your first turn. Each turn counts as one move, including a 180° turn. Timing pauses when you leave the page, put the app in the background, or open help. This measures practice time, not competition time."
 
@@ -3204,7 +3251,13 @@ msgstr "Optional"
 msgid "可选位置"
 msgstr "Available destination"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:104
+#: src/features/games/go/GoHelp.tsx:16
+msgid "可选择 9 路、13 路或 19 路棋盘，默认 19 路。"
+msgstr "Boards of 9 x 9, 13 x 13, and 19 x 19 are available; the default is 19 x 19."
+
+#: src/features/games/billiards/BilliardsGame.tsx:102
+#: src/features/games/billiards/BilliardsMatch.tsx:63
+#: src/features/games/billiards/BilliardsMatchHeader.tsx:54
 #: src/features/home/entries.tsx:184
 msgid "台球"
 msgstr "Billiards"
@@ -3214,7 +3267,7 @@ msgid "台面余分 {remaining}，落后方需要罚分追赶；对局继续。"
 msgstr "{remaining} points remaining on the table; the trailing player needs penalties to catch up. Play continues."
 
 #. 斯诺克桌面所有剩余目标球的可得分值
-#: src/features/games/billiards/BilliardsDetails.tsx:74
+#: src/features/games/billiards/BilliardsInfo.tsx:42
 msgid "台面余分 {remainingPoints}"
 msgstr "Points remaining on the table: {remainingPoints}"
 
@@ -3234,15 +3287,15 @@ msgctxt "棋面简称"
 msgid "司令"
 msgstr "Cdr"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:150
+#: src/features/games/junqi/JunqiHelp.tsx:113
 msgid "司令 ＞ 军长 ＞ 师长 ＞ 旅长 ＞ 团长 ＞ 营长 ＞ 连长 ＞ 排长 ＞ 工兵。大吃小，同级同归于尽。"
 msgstr "Commander > Army > Division > Brigade > Regiment > Battalion > Company > Platoon > Engineer. Higher ranks defeat lower ranks; equal ranks remove both pieces."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:144
+#: src/features/games/junqi/JunqiHelp.tsx:109
 msgid "司令、军长各 1 枚；师长、旅长、团长、营长各 2 枚；连长、排长、工兵各 3 枚；炸弹 2 枚、地雷 3 枚、军旗 1 枚。"
 msgstr "Each side has 1 commander, 1 army commander, 2 each of division, brigade, regiment and battalion, 3 each of company, platoon and engineer, 2 bombs, 3 mines and 1 flag."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:57
+#: src/features/games/junqi/JunqiHelp.tsx:20
 msgid "各自布阵，己方棋子可见，对方身份隐藏。通过走棋和交战推断身份，夺取对方军旗即获胜。"
 msgstr "Deploy your pieces with your own identities visible and the opponent’s hidden. Infer enemy identities from moves and combat. Capture the enemy flag to win."
 
@@ -3250,20 +3303,28 @@ msgstr "Deploy your pieces with your own identities visible and the opponent’s
 msgid "合并：相同记录更新，其余插入"
 msgstr "Merge: update matching records and insert the rest"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:53
+msgid "合法开球后对手可以选择推杆：推杆那一杆不计犯规，只需碰到任意球，之后恢复正常判定。"
+msgstr "After a legal break the opponent may push out: that shot cannot be a foul as long as it touches a ball, and normal rules resume afterwards."
+
+#: src/features/games/billiards/BilliardsHelp.tsx:72
+msgid "合法打进 9 号球获胜。犯规、推杆或违规开球时打进的 9 号会被摆回台面。"
+msgstr "Potting the 9 legally wins. A 9 potted on a foul, a push out, or an illegal break is spotted back."
+
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:304
 msgid "同一局域网内设备可直接访问。仅在可信网络中使用，并配合默认权限限制访问范围。"
 msgstr "Devices on the same LAN can access directly. Use only on trusted networks, and limit access with the default permission."
+
+#: src/features/games/xiangqi/XiangqiHelp.tsx:40
+msgid "同一局面连同行棋方出现三次，或连续 60 回合（120 个半回合）没有吃子，自动和棋。"
+msgstr "The same position with the same side to move appearing three times, or 60 full moves (120 half-moves) without a capture, is an automatic draw."
 
 #. 斯诺克同分黑球，player 是抽签获选的决策者
 #: src/features/games/billiards/SnookerHud.tsx:103
 msgid "同分黑球已复位。{player} 抽签获选，决定谁先打，母球在 D 区。"
 msgstr "The tied black has been respotted. The draw selected {player} to choose who plays first, with the cue ball in the D."
 
-#: src/features/games/chess/ChessDialogs.tsx:148
-msgid "同屏悔棋撤回一手；人机和联机回到你最近一次走棋之前。联机悔棋需要对方同意。更多菜单可切换俯视和棋盘朝向。"
-msgstr "In local two-player mode, undo takes back one move. Against the computer or online, it returns to before your last move. Online undo requires your opponent’s agreement. Use game options to change the view and board orientation."
-
-#: src/features/games/reversi/ReversiHelp.tsx:48
+#: src/features/games/reversi/ReversiHelp.tsx:39
 msgid "同屏悔棋撤回上一手；人机和联机悔棋回到你最近一次落子之前。联机需要对方同意。"
 msgstr "In a local two-player game, undo takes back one move. Against the computer or online, it returns to before your last move. Online undo requires your opponent’s consent."
 
@@ -3440,11 +3501,13 @@ msgstr "Enable motion control"
 msgid "命令"
 msgstr "Command"
 
+#: src/features/games/chess/ChessHelp.tsx:40
 #: src/features/games/chess/labels.tsx:63
 #: src/features/games/chess/labels.tsx:70
 #: src/features/games/junqi/labels.tsx:138
 #: src/features/games/xiangqi/labels.tsx:70
 #: src/features/games/xiangqi/labels.tsx:90
+#: src/features/games/xiangqi/XiangqiHelp.tsx:38
 msgid "和棋"
 msgstr "Draw"
 
@@ -3476,7 +3539,12 @@ msgstr "Stalemate"
 msgid "困难"
 msgstr "Hard"
 
-#: src/features/games/go/GoGame.tsx:49
+#: src/features/games/go/GoHelp.tsx:11
+msgid "围住更多的地域即为优势，双方停手后按数子计分。"
+msgstr "Surrounding more territory wins; once both sides pass, the score is counted by area."
+
+#: src/features/games/go/GoGame.tsx:50
+#: src/features/games/go/GoHelp.tsx:10
 #: src/features/home/entries.tsx:204
 msgid "围棋"
 msgstr "Go"
@@ -3503,6 +3571,7 @@ msgstr "Fixed height"
 
 #. 小游戏名称，标准国际象棋
 #: src/features/games/chess/ChessGame.tsx:52
+#: src/features/games/chess/ChessHelp.tsx:9
 #: src/features/home/entries.tsx:235
 msgid "国际象棋"
 msgstr "Chess"
@@ -3510,11 +3579,6 @@ msgstr "Chess"
 #: src/features/games/chess/ChessStage.tsx:129
 msgid "国际象棋棋盘"
 msgstr "Chess board"
-
-#: src/features/games/chess/ChessDialogs.tsx:112
-#: src/features/games/chess/ChessDialogs.tsx:119
-msgid "国际象棋玩法"
-msgstr "How to play chess"
 
 #: src/features/bt/components/TorrentFileList.tsx:55
 msgid "图片"
@@ -3592,13 +3656,13 @@ msgstr "Run the matching command on your local machine and the remote server."
 msgid "在本机终端执行对应命令。"
 msgstr "Run the matching command in your local terminal."
 
-#: src/features/games/reversi/ReversiHelp.tsx:38
+#: src/features/games/reversi/ReversiHelp.tsx:15
 msgid "在标记的空格落子，沿横、竖或斜线夹住对方棋子，所有被夹住的棋子都会翻为己方颜色。"
 msgstr "Place a disc on a marked square to bracket opposing discs horizontally, vertically, or diagonally. All bracketed discs flip to your color."
 
-#: src/features/games/billiards/BilliardsShotHelp.tsx:6
-msgid "在母球后方拖动可瞄准并蓄力，松手击球。在更多菜单开启“仅瞄准”后，球桌拖动只瞄准，松手不击球。也可保持当前方向，拖动力度条后松手击球；拖回零力度或按 Esc 取消。键盘方向键调整力度，回车或空格击球。"
-msgstr "Drag behind the cue ball to aim and build power, then release to shoot. Enable “Aim only” in the More menu to aim on the table without shooting on release. You can also drag the power bar to shoot along the current aim. Return to zero power or press Esc to cancel. Use the arrow keys to adjust power, then press Enter or Space to shoot."
+#: src/features/games/billiards/BilliardsHelp.tsx:11
+msgid "在母球后方拖动可瞄准并蓄力，松手击球。在更多菜单开启「仅瞄准」后，球桌拖动只瞄准，松手不击球。也可保持当前方向，拖动力度条后松手击球；拖回零力度或按 Esc 取消。键盘方向键调整力度，回车或空格击球。"
+msgstr "Drag behind the cue ball to aim and build power, then release to shoot. With Aim only enabled in the more menu, dragging on the table only aims and never shoots. You can also keep the current direction, drag the power bar, and release; drag back to zero or press Esc to cancel. Arrow keys adjust power, Enter or Space shoots."
 
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:89
 msgid "在线"
@@ -3994,7 +4058,7 @@ msgstr "You can copy it elsewhere once the download finishes."
 msgid "完成摆放"
 msgstr "Finish placement"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:165
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:86
 msgid "完成数字华容道后，成绩会显示在这里。"
 msgstr "Complete a sliding puzzle to see your results here."
 
@@ -4087,7 +4151,7 @@ msgstr "Key labels must contain 1–80 characters and no control characters."
 msgid "密钥管理"
 msgstr "Key Manager"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:204
+#: src/features/games/junqi/JunqiHelp.tsx:161
 msgid "对局中可在更多菜单申请悔棋：撤销自己刚走的 1 手；对方已回应时撤销 2 手，回到自己的回合。翻子也算一手，须对方同意；布阵和终局不可悔棋，最多保留最近 100 手供回退。"
 msgstr "During play, request an undo from the More menu. Undo your last move, or two moves if your opponent has already responded, returning to your turn. Revealing a piece counts as a move. Your opponent must agree. Undo is unavailable during deployment or after the game ends. The last 100 moves are kept for undo."
 
@@ -4103,28 +4167,22 @@ msgstr "This saved game is damaged or uses an incompatible version and cannot be
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "The game has not been saved successfully. Please retry. The latest progress may be lost if the app exits unexpectedly."
 
-#: src/features/games/junqi/JunqiOnline.tsx:96
+#: src/features/games/junqi/JunqiOnline.tsx:97
 msgid "对局数据不一致，连接已停止。"
 msgstr "Game data is inconsistent. The connection has stopped."
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:268
+#: src/features/games/billiards/BilliardsScoreBar.tsx:49
 msgid "对局结束"
 msgstr "Match over"
 
-#: src/features/games/billiards/BilliardsDetails.tsx:48
-#: src/features/games/billiards/BilliardsDetails.tsx:49
-#: src/features/games/billiards/BilliardsDetails.tsx:57
-msgid "对局详情"
-msgstr "Match details"
-
-#: src/features/games/chess/ChessMatch.tsx:167
+#: src/features/games/chess/ChessMatch.tsx:170
 #: src/features/games/engine/black-white-labels.tsx:34
 #: src/features/games/junqi/JunqiToolbar.tsx:73
 #: src/features/games/xiangqi/labels.tsx:32
 msgid "对方"
 msgstr "Opponent"
 
-#: src/features/games/junqi/JunqiOnline.tsx:92
+#: src/features/games/junqi/JunqiOnline.tsx:93
 msgid "对方已离开或连接已断开。未完成的对局不计胜负。"
 msgstr "Your opponent left or the connection was lost. Unfinished games do not count as wins or losses."
 
@@ -4141,7 +4199,7 @@ msgid "对方拒绝了再来一局"
 msgstr "Opponent declined the rematch"
 
 #: src/features/games/engine/online/useOnlineMatch.ts:42
-#: src/features/games/junqi/JunqiOnline.tsx:76
+#: src/features/games/junqi/JunqiOnline.tsx:77
 msgid "对方拒绝了悔棋"
 msgstr "Opponent declined the undo"
 
@@ -4277,11 +4335,11 @@ msgstr "Export details"
 msgid "导航"
 msgstr "Navigation"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:182
+#: src/features/games/xiangqi/XiangqiMatch.tsx:183
 msgid "将军"
 msgstr "Check"
 
-#: src/features/games/chess/ChessMatch.tsx:271
+#: src/features/games/chess/ChessMatch.tsx:274
 msgid "将军 · 轮到 {player}"
 msgstr "Check · {player} to play"
 
@@ -4317,15 +4375,19 @@ msgstr "Extraneous target content will be deleted"
 msgid "将删除诗词同步产生的临时文件，不影响已导入的诗词数据。"
 msgstr "Temporary files from poetry sync are deleted; imported poetry data is untouched."
 
+#: src/features/games/xiangqi/XiangqiHelp.tsx:22
+msgid "将帅照面"
+msgstr "Facing generals"
+
 #: src/features/games/xiangqi/labels.tsx:54
 msgid "将帅被吃"
 msgstr "General captured"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:42
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:20
 msgid "将数字按顺序排列，空位留在右下角。"
 msgstr "Arrange the numbers in order, with the empty space at the bottom right."
 
-#: src/features/games/junqi/JunqiMatchView.tsx:299
+#: src/features/games/junqi/JunqiMatchView.tsx:298
 msgid "将替换当前己方阵型，对方阵型保持不变。"
 msgstr "Your current deployment will be replaced. Your opponent’s deployment will stay the same."
 
@@ -4334,6 +4396,14 @@ msgstr "Your current deployment will be replaced. Your opponent’s deployment w
 #: src/features/games/xiangqi/labels.tsx:55
 msgid "将死"
 msgstr "Checkmate"
+
+#: src/features/games/xiangqi/XiangqiHelp.tsx:32
+msgid "将死对方、对方无合法着法（困毙），或直接吃掉对方将帅，均获胜。"
+msgstr "You win by checkmating, by leaving the opponent with no legal move (stalemate), or by capturing the opposing general."
+
+#: src/features/games/chess/ChessHelp.tsx:34
+msgid "将死对方国王即获胜。无合法着法但未被将军时为逼和；王对王、王与单象或单马对王，以及所有象位于同色格等子力不足局面自动和棋。"
+msgstr "You win by checkmating the opposing king. No legal move while not in check is stalemate; king versus king, king and a lone bishop or knight versus king, and all bishops on one colour are automatic draws."
 
 #: src/features/about/DataManagementDialogs.tsx:57
 msgid "将清理下载任务的引擎数据与缓存，下载目录中的文件会保留。"
@@ -4439,11 +4509,11 @@ msgstr "LAN request headers exceed the size limit"
 msgid "局域网请求无效或不完整"
 msgstr "The LAN request is invalid or incomplete"
 
-#: src/features/games/junqi/JunqiOnline.tsx:77
+#: src/features/games/junqi/JunqiOnline.tsx:78
 msgid "局面已更新，悔棋请求已失效。"
 msgstr "The position has changed. The undo request has expired."
 
-#: src/features/games/junqi/JunqiOnline.tsx:110
+#: src/features/games/junqi/JunqiOnline.tsx:111
 msgid "局面已更新，请重新选择走法。"
 msgstr "The position has changed. Please choose your move again."
 
@@ -4482,7 +4552,7 @@ msgctxt "棋面简称"
 msgid "工兵"
 msgstr "Eng"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:156
+#: src/features/games/junqi/JunqiHelp.tsx:117
 msgid "工兵可排雷并存活；其他普通棋子碰地雷时阵亡，地雷保留。炸弹与任何非军旗棋子交战均同归于尽。炸弹也可夺旗，无须先排光地雷。"
 msgstr "Engineers remove mines and survive; other ranked pieces attacking a mine are lost and the mine remains. A bomb and any opposing non-flag piece remove each other. Bombs can capture flags, and you do not need to clear all mines first."
 
@@ -4685,17 +4755,17 @@ msgstr "Installed {toLocaleStringValue3} items, about 14MB"
 #. 数字华容道全部数字已排列完成
 #: src/features/about/ResetBoundary.tsx:149
 #: src/features/bt/components/TaskRow.tsx:90
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:256
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:211
 #: src/features/todo/TodoTool.tsx:152
 #: src/features/transfers/TransferDock.tsx:175
 msgid "已完成"
 msgstr "Completed"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:123
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:37
 msgid "已完成挑战的阶数、有效用时和步数。"
 msgstr "Cube size, active time, and moves for completed challenges."
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:116
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:37
 msgid "已完成棋盘的大小、有效用时与步数。"
 msgstr "Board size, active time, and moves for completed puzzles."
 
@@ -4841,7 +4911,7 @@ msgstr "Finished"
 msgid "已解压到 {outName}"
 msgstr "Extracted to {outName}"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:351
+#: src/features/games/magic-cube/MagicCubeGame.tsx:314
 msgid "已还原"
 msgstr "Solved"
 
@@ -4867,7 +4937,7 @@ msgstr "Selected {clipName}"
 msgid "已重命名为 {trimmed}"
 msgstr "Renamed to {trimmed}"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:71
+#: src/features/games/junqi/JunqiHelp.tsx:43
 #: src/features/games/junqi/JunqiToolbar.tsx:117
 msgid "布阵"
 msgstr "Deployment"
@@ -4993,7 +5063,7 @@ msgstr "Start"
 msgid "开始对局"
 msgstr "Start match"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:354
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:308
 msgid "开始新的数字华容道？"
 msgstr "Start a new sliding puzzle?"
 
@@ -5041,6 +5111,10 @@ msgstr "the break did not meet the three-ball requirement"
 #: src/features/games/billiards/NineBallHud.tsx:198
 msgid "开球母球须在头线后，可调整至出杆。"
 msgstr "Place the cue ball behind the head string. You may adjust it until you shoot."
+
+#: src/features/games/billiards/BilliardsHelp.tsx:125
+msgid "开球结束后，第一颗合法落袋的球决定双方组别：一方全色 1–7，另一方花色 9–15。分组前台面处于未分组状态，此时首碰 8 号算犯规。"
+msgstr "After the break, the first ball legally potted sets the groups: one side takes solids 1-7 and the other stripes 9-15. Until then the table is open, and contacting the 8 first is a foul."
 
 #: src/features/ai-configuration/ProviderDetails.tsx:226
 #: src/features/ai-configuration/ProviderDetails.tsx:267
@@ -5096,8 +5170,7 @@ msgstr "Active address"
 msgid "当前密钥"
 msgstr "Current key"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:121
-#: src/features/games/engine/BoardGameHeader.tsx:98
+#: src/features/games/engine/BoardGameHeader.tsx:124
 #: src/features/games/engine/GameHeaderControls.tsx:72
 #: src/features/games/engine/GameHeaderControls.tsx:100
 msgid "当前对局的进度将会丢失。"
@@ -5150,7 +5223,7 @@ msgstr "Showing the 500 most recent saved summaries."
 msgid "当前未保留执行详情，历史摘要仍可查看。"
 msgstr "Execution details are no longer available here. The saved summary is still accessible."
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:363
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:317
 msgid "当前棋盘进度和移动记录将被替换，无法恢复。"
 msgstr "Your current board and move history will be replaced. This cannot be undone."
 
@@ -5234,7 +5307,7 @@ msgstr "No orientation sensor is available on this device. Manual controls remai
 msgid "当前配置的 {bindHost} 不在可用网卡列表中，访问地址可能失效。"
 msgstr "The configured address {bindHost} is not on an available network interface. The access URL may not work."
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:536
+#: src/features/games/magic-cube/MagicCubeGame.tsx:498
 msgid "当前魔方进度和撤销记录将被替换，无法恢复。"
 msgstr "Your current cube progress and undo history will be replaced. This cannot be undone."
 
@@ -5326,8 +5399,12 @@ msgstr "Pending"
 msgid "待授权请求"
 msgstr "Pending Authorization Requests"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:83
+msgid "得分"
+msgstr "Scoring"
+
 #. 斯诺克对局详情，球员当前得分
-#: src/features/games/billiards/BilliardsDetails.tsx:115
+#: src/features/games/billiards/BilliardsInfo.tsx:78
 msgid "得分 {score}"
 msgstr "Score {score}"
 
@@ -5370,7 +5447,7 @@ msgstr "Restore last page"
 msgid "恢复待办"
 msgstr "Restore todo"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:359
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:313
 msgid "恢复本局最初的打乱排列，用时与步数清零，当前移动记录无法恢复。"
 msgstr "Return to the original arrangement and reset time and moves. Your current move history will be lost."
 
@@ -5379,12 +5456,13 @@ msgid "恢复首次打开状态"
 msgstr "Restore the initial state"
 
 #. 联机棋局的操作按钮，向对方申请撤销最近的走棋
-#: src/features/games/chess/ChessMatch.tsx:239
+#: src/features/games/chess/ChessMatch.tsx:242
 #: src/features/games/go/GoMatch.tsx:222
 #: src/features/games/gomoku/GomokuMatch.tsx:192
-#: src/features/games/junqi/JunqiMatchView.tsx:202
+#: src/features/games/junqi/JunqiMatchView.tsx:201
+#: src/features/games/reversi/ReversiHelp.tsx:37
 #: src/features/games/reversi/ReversiMatch.tsx:151
-#: src/features/games/xiangqi/XiangqiMatch.tsx:202
+#: src/features/games/xiangqi/XiangqiMatch.tsx:203
 msgid "悔棋"
 msgstr "Undo"
 
@@ -5392,6 +5470,11 @@ msgstr "Undo"
 #: src/features/games/junqi/JunqiUndoDialog.tsx:20
 msgid "悔棋会恢复当时的棋盘、盖子和阵营状态，但已看见的身份、亮旗和交战信息无法收回。"
 msgstr "Undo restores the previous board, covered pieces and side assignments, but neither player can forget identities, revealed flags or combat information already seen."
+
+#: src/features/games/chess/ChessHelp.tsx:18
+#: src/features/games/xiangqi/XiangqiHelp.tsx:52
+msgid "悔棋在标题栏右侧：同屏撤回一手，人机和联机回到你最近一次走棋之前，联机需要对方同意。"
+msgstr "Undo sits on the right of the title bar: one ply in hotseat, and back before your last move against the computer or online, where the opponent must agree."
 
 #. 画质自动降级策略与耗时数据的来源
 #: src/features/model-viewer/components/RuntimeControls.tsx:102
@@ -5404,7 +5487,7 @@ msgid "成功"
 msgstr "Success"
 
 #. 查看数字华容道完成成绩
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:201
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:160
 msgid "成绩记录"
 msgstr "Results"
 
@@ -5502,12 +5585,12 @@ msgstr "Ball in hand: drag the cue ball within the D"
 
 #. 生成新的有解数字华容道棋盘
 #. 用合法转动打乱魔方并开始新挑战
-#: src/features/games/magic-cube/MagicCubeGame.tsx:339
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:243
+#: src/features/games/magic-cube/MagicCubeGame.tsx:302
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:198
 msgid "打乱"
 msgstr "Scramble"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:168
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:82
 msgid "打乱魔方并完成还原后，成绩会显示在这里。"
 msgstr "Scramble a cube and solve it to see your results here."
 
@@ -5645,7 +5728,7 @@ msgstr "Drag the power bar and release to shoot. Use the arrow keys to adjust po
 msgid "拖动排序"
 msgstr "Drag to reorder"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:45
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:23
 msgid "拖拽彩色面片转动一层，松手后吸附到位；小幅拖动不会走步。拖拽空白旋转视角，滚轮或双指捏合缩放。「观察模式」下也可以拖拽魔方旋转视角。"
 msgstr "Drag a colored tile to turn a layer. It snaps into place when released; a small drag does not make a move. Drag empty space to orbit and scroll or pinch to zoom. In Observe mode, dragging the cube also orbits the view."
 
@@ -5687,12 +5770,12 @@ msgid "按纯文本展示。"
 msgstr "Shown as plain text."
 
 #. 数字华容道正在进行的挑战
-#: src/features/games/magic-cube/MagicCubeGame.tsx:355
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:261
+#: src/features/games/magic-cube/MagicCubeGame.tsx:318
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:216
 msgid "挑战中"
 msgstr "Challenge in progress"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:296
+#: src/features/games/magic-cube/MagicCubeGame.tsx:263
 msgid "挑战记录"
 msgstr "Challenge history"
 
@@ -5796,6 +5879,10 @@ msgstr "the eight ball was potted too early"
 msgid "提子 {value}:{value2}"
 msgstr "Captures {value}:{value2}"
 
+#: src/features/games/go/GoHelp.tsx:24
+msgid "提子与禁着"
+msgstr "Captures and illegal moves"
+
 #. 台球对局请求双方同意重新摆球
 #. 台球对局请求双方同意重新摆球
 #: src/features/games/billiards/BilliardsRuleControl.tsx:55
@@ -5872,16 +5959,21 @@ msgstr "Search poems"
 msgid "摆放模型"
 msgstr "Place model"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:47
+#: src/features/games/billiards/BilliardsHelp.tsx:113
+msgid "摆球与开球"
+msgstr "Rack and break"
+
 #. 待办备注编辑器：撤销上一步内容修改
 #: src/features/todo/notes/TodoNoteEditor.tsx:372
 msgid "撤销"
 msgstr "Undo"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:89
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:63
 msgid "撤销后进行新移动会清除重做分支。最多可以撤销最近 500 步，更早的步数仍计入总数；使用过撤销的成绩会单独标记。"
 msgstr "Moving after undo clears the redo branch. You can undo up to 500 recent moves; earlier moves still count toward the total. Results that use undo are marked."
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:84
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:54
 msgid "撤销和重做不跨越打乱起点；撤销后转动会清除重做分支。最多保留最近 500 步的撤销记录，更早的步数仍会计入总数。使用过撤销的挑战会单独标记。"
 msgstr "Undo and redo stop at the scrambled starting position. A new turn after undo clears the redo branch. Up to 500 recent moves can be undone; earlier moves still count toward the total. Challenges that use undo are marked."
 
@@ -5894,11 +5986,11 @@ msgstr "Revoke access"
 msgid "撤销授权？"
 msgstr "Revoke client access?"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:220
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:175
 msgid "撤销移动"
 msgstr "Undo move"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:315
+#: src/features/games/magic-cube/MagicCubeGame.tsx:278
 msgid "撤销转动"
 msgstr "Undo turn"
 
@@ -5921,8 +6013,10 @@ msgstr "Speed"
 #. 客户端授权表的行操作列
 #: src/features/ai-configuration/ProviderDetails.tsx:207
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:178
+#: src/features/games/billiards/BilliardsHelp.tsx:9
 #: src/features/games/billiards/BilliardsRuleControl.tsx:60
-#: src/features/games/junqi/JunqiRulesDialog.tsx:181
+#: src/features/games/chess/ChessHelp.tsx:13
+#: src/features/games/reversi/ReversiHelp.tsx:29
 #: src/features/mcp/McpCredentialsTable.tsx:93
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:232
 msgid "操作"
@@ -5933,7 +6027,14 @@ msgstr "Actions"
 msgid "操作 ID"
 msgstr "Operation ID"
 
-#: src/features/games/junqi/JunqiOnline.tsx:98
+#: src/features/games/go/GoHelp.tsx:40
+#: src/features/games/gomoku/GomokuHelp.tsx:28
+#: src/features/games/junqi/JunqiHelp.tsx:139
+#: src/features/games/xiangqi/XiangqiHelp.tsx:47
+msgid "操作与悔棋"
+msgstr "Controls and undo"
+
+#: src/features/games/junqi/JunqiOnline.tsx:99
 msgid "操作发送失败，对局已停止，不会自动重发。"
 msgstr "The action could not be sent. The game has stopped and the action will not be retried automatically."
 
@@ -5967,7 +6068,7 @@ msgstr "Action identifier"
 msgid "操作系统"
 msgstr "Operating system"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:444
+#: src/features/games/magic-cube/MagicCubeGame.tsx:407
 msgid "操作魔方"
 msgstr "Interact with cube"
 
@@ -5980,7 +6081,7 @@ msgstr "Supports GLB · glTF · FBX"
 msgid "支持 UTF-8 文本、Markdown（1 MiB）和 PDF（8 MiB）。每个模型最多 16 项、合计 32 MiB。"
 msgstr "Supports UTF-8 text, Markdown (1 MiB), and PDF (8 MiB). Up to 16 attachments and 32 MiB per model."
 
-#: src/features/games/chess/ChessDialogs.tsx:133
+#: src/features/games/chess/ChessHelp.tsx:26
 msgid "支持王车易位、吃过路兵和兵的升变。易位不能穿过受攻击的格子；升变可选择后、车、象或马。"
 msgstr "Castling, en passant, and pawn promotion are supported. Castling cannot pass through an attacked square. A pawn may promote to a queen, rook, bishop, or knight."
 
@@ -6029,13 +6130,14 @@ msgstr "Tile {tile}, row {row}, column {column}, cannot move"
 msgid "数字 {tile}，第 {row} 行，第 {column} 列，可移动"
 msgstr "Tile {tile}, row {row}, column {column}, can move"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:52
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:31
 msgid "数字从左到右、从上到下递增，最后一格为空位。"
 msgstr "Numbers increase from left to right and top to bottom. The last cell is empty."
 
 #. 小游戏名，滑动数字方块填入空位并排序
 #. 小游戏名，滑动数字方块填入空位并排序
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:122
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:106
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:19
 #: src/features/home/entries.tsx:250
 msgid "数字华容道"
 msgstr "Sliding puzzle"
@@ -6044,17 +6146,13 @@ msgstr "Sliding puzzle"
 msgid "数字华容道已完成，但成绩尚未保存，请重试。"
 msgstr "The puzzle is complete, but the result has not been saved. Please retry."
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:113
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:34
 msgid "数字华容道成绩"
 msgstr "Sliding puzzle results"
 
 #: src/features/games/sliding-puzzle/SlidingPuzzleBoard.tsx:120
 msgid "数字华容道棋盘"
 msgstr "Sliding puzzle board"
-
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:39
-msgid "数字华容道玩法"
-msgstr "How to play the sliding puzzle"
 
 #: src/features/logs/use-activity-logs.ts:48
 msgid "数据"
@@ -6170,9 +6268,9 @@ msgstr "Disconnect device"
 msgid "断开连接"
 msgstr "Disconnect"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:29
 #: src/features/games/billiards/BilliardsModeMenu.tsx:79
 #: src/features/games/billiards/BilliardsModeMenu.tsx:174
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:43
 msgid "斯诺克"
 msgstr "Snooker"
 
@@ -6271,10 +6369,6 @@ msgstr "No Matches"
 #: src/features/ssh-sftp/components/keys/KeyManager.tsx:160
 msgid "无口令"
 msgstr "No Passphrase"
-
-#: src/features/games/chess/ChessDialogs.tsx:138
-msgid "无合法着法但未被将军时为逼和。王对王、王与单象或单马对王，以及所有象位于同色格等子力不足局面自动和棋。"
-msgstr "Having no legal move while not in check is stalemate. Common insufficient-material positions end in a draw: king versus king, king and a single bishop or knight versus king, or kings and bishops all on the same square color."
 
 #: src/lib/errors/messages.ts:136
 msgid "无效的 BT 任务标识"
@@ -6481,7 +6575,7 @@ msgstr "Show or hide"
 msgid "显示或隐藏 {name}"
 msgstr "Show or hide {name}"
 
-#: src/features/games/chess/ChessMatch.tsx:292
+#: src/features/games/chess/ChessMatch.tsx:295
 msgid "显示棋子名称"
 msgstr "Show piece names"
 
@@ -6493,7 +6587,7 @@ msgstr "Show this category"
 msgid "显示此功能"
 msgstr "Show this feature"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:286
+#: src/features/games/magic-cube/MagicCubeGame.tsx:254
 msgid "显示面标识"
 msgstr "Show face labels"
 
@@ -6580,11 +6674,11 @@ msgstr "No finished tasks"
 msgid "暂无待办"
 msgstr "No todos"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:162
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:83
 msgid "暂无成绩记录"
 msgstr "No results yet"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:165
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:79
 msgid "暂无挑战记录"
 msgstr "No challenges yet"
 
@@ -6665,6 +6759,10 @@ msgstr "More actions"
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:145
 msgid "更多文件操作"
 msgstr "More file actions"
+
+#: src/features/games/chess/ChessHelp.tsx:50
+msgid "更多菜单可以翻转棋盘，翻转只改变显示方向，不影响走棋。游戏信息里可以切换立体视角与正上方俯视。"
+msgstr "The more menu flips the board, which only changes the display and never the moves. Game information switches between the 3D view and top-down."
 
 #: src/features/media-compress/components/CompressQualityField.tsx:57
 msgid "更小"
@@ -6757,8 +6855,8 @@ msgstr "Replace"
 msgid "替换为"
 msgstr "Replace with"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:365
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:268
+#: src/features/games/magic-cube/MagicCubeGame.tsx:328
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:223
 msgid "有效用时"
 msgstr "Active time"
 
@@ -7049,6 +7147,10 @@ msgstr "The local destination is a folder and cannot be overwritten"
 msgid "本局将结束，对手获胜并保存当前比分。"
 msgstr "This frame will end; the opponent wins and the current score is saved."
 
+#: src/features/games/billiards/BilliardsHelp.tsx:152
+msgid "本应用的简化"
+msgstr "Simplifications in this app"
+
 #: src/features/ssh-sftp/rsync/RsyncCapabilityNotice.tsx:111
 #: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:65
 #: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:66
@@ -7223,11 +7325,6 @@ msgstr "View service address"
 msgid "查看模型"
 msgstr "View a model"
 
-#. 台球开局页标题栏图标，打开当前所选玩法的规则说明
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:22
-msgid "查看游戏规则"
-msgstr "View game rules"
-
 #: src/features/bt/components/TaskRow.tsx:195
 msgid "查看节点明细"
 msgstr "View peer details"
@@ -7293,6 +7390,10 @@ msgstr "Title, category, note text, images, code blocks, dates, and completion s
 msgid "标题、网址、账号、密码、分类、备注"
 msgstr "Title, URL, username, password, category, notes"
 
+#: src/features/games/go/GoHelp.tsx:34
+msgid "标题栏可以「停一手」。双方连续各停一手即结束并立即数子；停手会清除劫的禁着点，也不写入局面历史。落子后连停计数从头开始。"
+msgstr "The title bar has Pass. Two consecutive passes end the game and score immediately; a pass clears the ko point and is not written to the position history, and playing a stone resets the pass count."
+
 #: src/features/formatter/FormatterActions.tsx:69
 msgid "校验"
 msgstr "Validate"
@@ -7356,19 +7457,47 @@ msgstr "Detection failed"
 msgid "检测超时"
 msgstr "Detection timed out"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:61
+#: src/features/games/go/GoHelp.tsx:26
+msgid "棋子没有气时被提走。不能自杀，也不能让盘面回到此前出现过的任一局面，因此单劫不能立即回提。"
+msgstr "Stones with no liberties are captured. Suicide is illegal and the board may not return to any earlier position, so a single ko cannot be retaken immediately."
+
+#: src/features/games/junqi/JunqiHelp.tsx:24
 msgid "棋子随机盖放，翻开后身份公开。首翻决定阵营，之后每回合选择翻子或走棋，夺取对方军旗即获胜。"
 msgstr "Pieces are shuffled face down. Revealing a piece makes its identity public, and the first reveal assigns sides. On each turn, reveal a piece or move one. Capture the enemy flag to win."
 
 #. 数字华容道棋盘的行数与列数
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:161
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:125
 msgid "棋盘"
 msgstr "Board"
+
+#: src/features/games/gomoku/GomokuHelp.tsx:13
+msgid "棋盘与先后"
+msgstr "Board and move order"
+
+#: src/features/games/go/GoHelp.tsx:14
+msgid "棋盘与计分"
+msgstr "Board and scoring"
+
+#: src/features/games/xiangqi/XiangqiHelp.tsx:13
+msgid "棋盘与走法"
+msgstr "Board and movement"
+
+#: src/features/games/gomoku/GomokuHelp.tsx:15
+msgid "棋盘为 15 × 15，黑棋先行，之后双方交替落子。"
+msgstr "The board is 15 x 15. Black moves first, then the two sides alternate."
+
+#: src/features/games/xiangqi/XiangqiHelp.tsx:15
+msgid "棋盘为 9 列 10 行，红方先行。"
+msgstr "The board has 9 files and 10 ranks, and Red moves first."
 
 #. 军棋二维棋盘初始化失败
 #: src/lib/errors/messages.ts:374
 msgid "棋盘加载失败，请重试。"
 msgstr "The board could not load. Please try again."
+
+#: src/features/games/gomoku/GomokuHelp.tsx:24
+msgid "棋盘填满且无人连成五子时为和棋。"
+msgstr "A full board with no five in a row is a draw."
 
 #: src/features/games/go/GoModeMenu.tsx:23
 msgid "棋盘大小"
@@ -7383,7 +7512,7 @@ msgstr "The board display was interrupted. Your game is preserved. Please try ag
 msgid "棋盘渲染暂不可用，已切换为基础棋盘。"
 msgstr "Board rendering is unavailable. Using the basic board instead."
 
-#: src/features/games/chess/ChessMatch.tsx:301
+#: src/features/games/chess/ChessMatch.tsx:304
 msgid "棋盘视角"
 msgstr "Board view"
 
@@ -7586,7 +7715,15 @@ msgstr "Model attachments"
 msgid "模式"
 msgstr "Mode"
 
-#: src/features/games/chess/ChessMatch.tsx:306
+#: src/features/games/gomoku/GomokuHelp.tsx:21
+msgid "横、竖或斜向连成五子即获胜。超过五子的长连同样算胜，本应用不设三三、四四或长连禁手。"
+msgstr "Five in a row horizontally, vertically, or diagonally wins. Overlines of more than five also win; this app has no three-three, four-four, or overline restriction."
+
+#: src/features/games/gomoku/GomokuHelp.tsx:10
+msgid "横、竖或斜线先连成五子的一方获胜。"
+msgstr "The first side to line up five stones wins."
+
+#: src/features/games/chess/ChessMatch.tsx:309
 msgid "正上方俯视"
 msgstr "Top view"
 
@@ -7640,7 +7777,7 @@ msgstr "Preparing to read"
 msgid "正在准备棋盘…"
 msgstr "Preparing the board…"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:469
+#: src/features/games/magic-cube/MagicCubeGame.tsx:432
 msgid "正在准备魔方…"
 msgstr "Preparing cube…"
 
@@ -7665,7 +7802,7 @@ msgstr "Loading"
 msgid "正在加载处理工具…"
 msgstr "Loading media tool…"
 
-#: src/features/games/billiards/BilliardsGame.tsx:121
+#: src/features/games/billiards/BilliardsGame.tsx:128
 msgid "正在加载物理引擎…"
 msgstr "Loading physics engine..."
 
@@ -7699,8 +7836,8 @@ msgstr "Cancelling and releasing resources"
 msgid "正在同步"
 msgstr "Syncing"
 
-#: src/features/games/junqi/JunqiOnline.tsx:122
-#: src/features/games/junqi/JunqiOnline.tsx:173
+#: src/features/games/junqi/JunqiOnline.tsx:123
+#: src/features/games/junqi/JunqiOnline.tsx:175
 msgid "正在同步对局…"
 msgstr "Syncing game…"
 
@@ -7920,7 +8057,7 @@ msgstr "Loading execution details…"
 msgid "正在读取模型资源"
 msgstr "Reading model resources"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:259
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:214
 msgid "正在读取进度"
 msgstr "Loading progress"
 
@@ -8030,9 +8167,17 @@ msgstr "Cue ball"
 msgid "母球落袋"
 msgstr "cue ball potted"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:69
+msgid "母球落袋、未碰到任何球、首碰不是最低号球、未进球且没有球碰库都算犯规，对手获得自由球。连续三次犯规判负；第二次犯规会给出警告。"
+msgstr "Cue ball in a pocket, hitting no ball, contacting a ball other than the lowest, or potting nothing without a rail contact are fouls, and the opponent gets ball in hand. Three consecutive fouls lose the rack; the second foul gives a warning."
+
 #: src/features/bt/components/PeersPanel.tsx:107
 msgid "每 2 秒刷新 · IP 已脱敏"
 msgstr "Refreshes every 2s · IPs masked"
+
+#: src/features/games/billiards/BilliardsHelp.tsx:61
+msgid "每一杆必须首先碰到台面最低号球，落袋任意球都算有效；有球落袋可以继续击球，否则交换球权。"
+msgstr "Each shot must contact the lowest-numbered ball on the table first. Potting any ball counts, and a pot lets you continue; otherwise the turn passes."
 
 #: src/lib/errors/messages.ts:226
 msgid "每个 AI 服务地址最多保存 10 个模型"
@@ -8058,7 +8203,7 @@ msgstr "Select Read, Write, and Delete separately for each client. Permissions a
 msgid "每个网格实例单独分析当前姿态，不跨网格焊接。上限为 20 万顶点、10 万三角形、1000 个实例；分析会暂停当前模型动画。"
 msgstr "Each mesh instance is analyzed in its current pose, without welding across meshes. Limit: 200,000 vertices, 100,000 triangles and 1,000 instances. Analysis pauses the current model animation."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:81
+#: src/features/games/junqi/JunqiHelp.tsx:52
 msgid "每方 25 枚棋子。军旗放大本营，地雷放最后两排，炸弹不能放第一排，行营初始为空。点击两枚己方棋子交换位置，或随机布阵；双方确认后红方先行。"
 msgstr "Each side has 25 pieces. Place the flag in headquarters, mines in the back two rows, and bombs anywhere except the front row. Camps start empty. Select two of your pieces to swap them, or randomize your deployment. Red moves first after both sides confirm."
 
@@ -8325,9 +8470,13 @@ msgstr "Add attachment"
 msgid "清台"
 msgstr "Cleared"
 
-#: src/features/games/billiards/BilliardsMatchView.tsx:264
+#: src/features/games/billiards/BilliardsScoreBar.tsx:45
 msgid "清台完成！"
 msgstr "Table cleared!"
+
+#: src/features/games/billiards/BilliardsHelp.tsx:145
+msgid "清完己方组别后合法打进 8 号球获胜。提前打进 8 号，或打进 8 号时同时犯规，判负。"
+msgstr "Pot the 8 legally after clearing your group to win. Potting the 8 early, or potting it while fouling, loses the rack."
 
 #: src/features/about/DataManagementDialogs.tsx:120
 msgid "清理"
@@ -8431,8 +8580,8 @@ msgstr "Rendering and device status"
 msgid "游戏"
 msgstr "Games"
 
-#. 展开小游戏的模式、计数及完整状态
-#: src/features/games/engine/GameToolbar.tsx:108
+#. 展开小游戏的模式、计数、参数及完整状态
+#: src/features/games/engine/GameInfoPopover.tsx:38
 msgid "游戏信息"
 msgstr "Game information"
 
@@ -8470,16 +8619,6 @@ msgstr "Incorrect game room code"
 msgid "游戏房间连接已结束，请重新加入"
 msgstr "The game room connection has ended. Please rejoin."
 
-#. 台球开局页的玩法说明弹窗标题
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:48
-msgid "游戏规则"
-msgstr "Game rules"
-
-#. 展开小游戏的次要参数和完整状态
-#: src/features/games/engine/GameToolbar.tsx:107
-msgid "游戏选项"
-msgstr "Game options"
-
 #: src/features/games/engine/GameVolumeControl.tsx:21
 msgid "游戏音量"
 msgstr "Game volume"
@@ -8509,6 +8648,10 @@ msgstr "Source video has no audio track"
 msgid "源语言"
 msgstr "Source language"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:96
+msgid "漏击与犯规"
+msgstr "Misses and fouls"
+
 #. 军棋特殊棋子
 #: src/features/games/junqi/labels.tsx:39
 msgid "炸弹"
@@ -8524,23 +8667,35 @@ msgstr "Bomb"
 msgid "点击 XYZ 坐标轴切换视角，双击画布或坐标轴可重新显示整个模型。"
 msgstr "Click an XYZ axis to change the view. Double-click the canvas or axes to fit the whole model."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:194
-msgid "点击己方棋子，再点击标记位置移动。方向键选择位置，Enter 或空格确认，Esc 取消选择。更多菜单中可认输或退出。"
-msgstr "Select one of your pieces, then a marked destination to move. Use the arrow keys to select, Enter or Space to confirm, and Esc to cancel. Resign or leave from the More menu."
+#: src/features/games/go/GoHelp.tsx:42
+msgid "点击交叉点落子，被占据的点与禁着点不响应。悔棋在标题栏右侧：同屏撤回一手，人机和联机回到你最近一次落子之前，联机需要对方同意。"
+msgstr "Tap an intersection to play; occupied points and ko points do not respond. Undo sits on the right of the title bar: one move in hotseat, and back before your last move against the computer or online, where the opponent must agree."
 
-#: src/features/games/reversi/ReversiHelp.tsx:53
+#: src/features/games/junqi/JunqiHelp.tsx:141
+msgid "点击己方棋子，再点击标记位置移动。方向键选择位置，Enter 或空格确认，Esc 取消选择。更多菜单可以翻转棋盘、认输或退出，翻转只改变显示方向。"
+msgstr "Tap your piece, then tap a marked point to move. Arrow keys pick a point, Enter or Space confirms, and Esc cancels. The more menu flips the board, concedes, or exits; flipping only changes the display."
+
+#: src/features/games/xiangqi/XiangqiHelp.tsx:49
+msgid "点击己方棋子，再点击标记的落点走棋。更多菜单可以翻转棋盘，翻转只改变显示方向，不影响落子。"
+msgstr "Tap your piece, then tap a marked square to move. The more menu flips the board, which only changes the display and never the moves."
+
+#: src/features/games/reversi/ReversiHelp.tsx:31
 msgid "点击标记的空格落子；也可用方向键移动焦点，回车或空格落子。"
 msgstr "Select a marked square to place a disc. You can also move focus with the arrow keys and press Enter or Space."
 
-#: src/features/games/chess/ChessDialogs.tsx:128
+#: src/features/games/chess/ChessHelp.tsx:15
 msgid "点击棋子，再点击标记的格子走棋；桌面也可以拖动棋子。方向键移动焦点，回车或空格选子、落子。"
 msgstr "Select a piece, then a highlighted square to move. On desktop, you can also drag pieces. Use arrow keys to move focus and Enter or Space to select and move."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:185
+#: src/features/games/junqi/JunqiHelp.tsx:147
 msgid "点击盖子立即翻开，或选择已翻开的己方棋子，再点击标记位置移动。"
 msgstr "Click a covered piece to reveal it, or select a revealed piece of your side and then a marked destination to move."
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:64
+#: src/features/games/gomoku/GomokuHelp.tsx:30
+msgid "点击空交叉点落子，已落子的点不响应。悔棋在标题栏右侧：同屏撤回一手，人机和联机回到你最近一次落子之前，联机需要对方同意。"
+msgstr "Tap an empty intersection to play; occupied points do not respond. Undo sits on the right of the title bar: one move in hotseat, and back before your last move against the computer or online, where the opponent must agree."
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:43
 msgid "点击空位上下左右的数字块，将它滑入空位。每次只能移动相邻的一块，不能跨格或斜向移动。"
 msgstr "Select a tile next to the empty space to slide it in. Only one adjacent tile can move at a time; tiles cannot jump or move diagonally."
 
@@ -8566,10 +8721,18 @@ msgstr "Unsupported version (3.1 or later required)"
 msgid "特殊权限"
 msgstr "Special"
 
+#: src/features/games/chess/ChessHelp.tsx:24
+msgid "特殊走法"
+msgstr "Special moves"
+
 #. 台球上一杆犯规，旧存档未记录犯规者
 #: src/features/games/billiards/BilliardsFoulFeedback.tsx:59
 msgid "犯规：{reason}"
 msgstr "Foul: {reason}"
+
+#: src/features/games/billiards/BilliardsHelp.tsx:67
+msgid "犯规与胜负"
+msgstr "Fouls and result"
 
 #. 斯诺克犯规后选择接打或重打的弹层标题
 #: src/features/games/billiards/BilliardsRulePanel.tsx:74
@@ -8630,15 +8793,9 @@ msgstr "Player 2 wins"
 msgid "玩法"
 msgstr "Discipline"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:194
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:143
-msgid "玩法与操作"
-msgstr "How to play"
-
-#. 军棋标题栏帮助按钮，打开规则说明
-#: src/features/games/junqi/JunqiRulesDialog.tsx:31
-#: src/features/games/junqi/JunqiRulesDialog.tsx:35
-msgid "玩法与规则"
+#. 小游戏标题栏的帮助按钮
+#: src/features/games/engine/GameHelpDialog.tsx:54
+msgid "玩法说明"
 msgstr "How to play"
 
 #: src/features/about/AboutPage.tsx:104
@@ -8686,7 +8843,7 @@ msgstr "Generate poem translation"
 msgid "生成请求会发送到你配置的第三方服务，可能产生服务费用。"
 msgstr "Generation requests are sent to the third-party service you configure and may incur service fees."
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:73
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:51
 msgid "用 Tab 进入棋盘，方向键移动焦点，Enter 或空格移动当前数字块。方向键只改变焦点，不直接移动数字。"
 msgstr "Press Tab to enter the board, arrow keys to move focus, and Enter or Space to move the focused tile. Arrow keys change focus only; they do not slide tiles."
 
@@ -8751,14 +8908,14 @@ msgstr "Request an undo"
 msgid "申请访问权限"
 msgstr "Request access"
 
-#: src/features/games/chess/ChessDialogs.tsx:99
-#: src/features/games/chess/ChessMatch.tsx:253
+#: src/features/games/chess/ChessDialogs.tsx:93
+#: src/features/games/chess/ChessMatch.tsx:256
 msgid "申领和棋"
 msgstr "Claim draw"
 
 #: src/features/games/billiards/BilliardsModeMenu.tsx:26
 #: src/features/games/billiards/BilliardsScore.tsx:16
-#: src/features/games/chess/ChessMatch.tsx:165
+#: src/features/games/chess/ChessMatch.tsx:168
 #: src/features/games/engine/black-white-labels.tsx:40
 #: src/features/games/engine/history-labels.tsx:19
 #: src/features/games/junqi/JunqiToolbar.tsx:62
@@ -8770,7 +8927,7 @@ msgstr "Computer"
 msgid "电脑先开球"
 msgstr "Computer breaks"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:199
+#: src/features/games/junqi/JunqiHelp.tsx:152
 msgid "电脑对局可重新开局；离开页面会暂停并保留进度。"
 msgstr "You can restart games against the computer. Leaving the page pauses the game and saves your progress."
 
@@ -8780,17 +8937,17 @@ msgstr "You can restart games against the computer. Leaving the page pauses the 
 msgid "电脑对战"
 msgstr "Computer Match"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:133
+#: src/features/games/junqi/JunqiHelp.tsx:99
 msgid "电脑对战始终显示你的视角，电脑只能依据它已知的信息行动。"
 msgstr "Computer matches always show your perspective. The computer acts only on information it knows."
 
 #: src/features/games/billiards/BilliardsScore.tsx:151
 #: src/features/games/billiards/SnookerHud.tsx:51
-#: src/features/games/chess/ChessMatch.tsx:267
+#: src/features/games/chess/ChessMatch.tsx:270
 #: src/features/games/go/GoMatch.tsx:207
 #: src/features/games/gomoku/GomokuMatch.tsx:182
 #: src/features/games/reversi/ReversiMatch.tsx:167
-#: src/features/games/xiangqi/XiangqiMatch.tsx:192
+#: src/features/games/xiangqi/XiangqiMatch.tsx:193
 msgid "电脑思考中…"
 msgstr "Computer is thinking..."
 
@@ -8835,9 +8992,9 @@ msgstr "Trusted Devices"
 msgid "白方"
 msgstr "White"
 
-#: src/features/games/chess/ChessDialogs.tsx:122
-msgid "白方先行。将死对方国王获胜；国王不能被吃掉。"
-msgstr "White moves first. Win by checkmating your opponent’s king; kings are never captured."
+#: src/features/games/chess/ChessHelp.tsx:10
+msgid "白方先行。将死对方国王获胜，国王不能被吃掉。"
+msgstr "White moves first. Checkmate the opposing king to win; the king is never captured."
 
 #: src/features/games/engine/black-white-labels.tsx:50
 #: src/features/games/reversi/ReversiStage.tsx:103
@@ -8914,7 +9071,7 @@ msgid "目标已是最新"
 msgstr "Destination is up to date"
 
 #. 数字华容道完成时的数字排列示意
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:48
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:26
 msgid "目标排列"
 msgstr "Target arrangement"
 
@@ -8964,8 +9121,8 @@ msgstr "Delete shared directory “{pendingName}”?"
 #. 确认清空此小游戏的历史记录
 #: src/features/games/engine/GameHistory.tsx:93
 #: src/features/games/engine/GameRestoreDialog.tsx:93
-#: src/features/games/magic-cube/MagicCubeGame.tsx:550
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:378
+#: src/features/games/magic-cube/MagicCubeGame.tsx:512
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:332
 #: src/features/ssh-sftp/components/sftp/ConflictDialog.tsx:232
 msgid "确认"
 msgstr "Confirm"
@@ -9048,6 +9205,10 @@ msgstr "Disk I/O"
 msgid "磁盘空间不足，无法保存上传内容"
 msgstr "There is not enough disk space to save the upload"
 
+#: src/features/games/chess/ChessHelp.tsx:48
+msgid "视角与翻转"
+msgstr "View and flipping"
+
 #: src/features/model-viewer/components/NavigationPanel.tsx:127
 msgid "视角仅在本次会话保留。"
 msgstr "Views are kept for this session only."
@@ -9117,7 +9278,7 @@ msgstr "Move"
 msgid "移动到第 {position} 项"
 msgstr "Moved to position {position}"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:263
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:218
 msgid "移动开始计时"
 msgstr "Move to start timing"
 
@@ -9225,7 +9386,7 @@ msgstr "Empty Directory"
 msgid "空闲"
 msgstr "Idle"
 
-#: src/features/games/chess/ChessMatch.tsx:305
+#: src/features/games/chess/ChessMatch.tsx:308
 msgid "立体视角"
 msgstr "Perspective view"
 
@@ -9286,11 +9447,11 @@ msgstr "Syntax error near line {resultLine}, column {resultColumn}"
 msgid "第 {row} 行第 {column} 列"
 msgstr "Row {row}, column {column}"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:84
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:60
 msgid "第一次有效移动开始计时，每滑动一块记一步。离开页面、进入后台或打开菜单与帮助时暂停，记录的是有效练习用时。"
 msgstr "Timing starts with your first valid move. Each tile slide counts as one move. Timing pauses when you leave, put the app in the background, or open a menu or help. This measures active practice time."
 
-#: src/features/games/chess/ChessMatch.tsx:265
+#: src/features/games/chess/ChessMatch.tsx:268
 #: src/features/games/reversi/ReversiMatch.tsx:165
 msgid "等待协商结果…"
 msgstr "Waiting for a response…"
@@ -9311,11 +9472,11 @@ msgstr "Waiting for opponent..."
 #: src/features/games/go/GoMatch.tsx:205
 #: src/features/games/gomoku/GomokuMatch.tsx:180
 #: src/features/games/junqi/JunqiToolbar.tsx:104
-#: src/features/games/xiangqi/XiangqiMatch.tsx:190
+#: src/features/games/xiangqi/XiangqiMatch.tsx:191
 msgid "等待对方同意悔棋…"
 msgstr "Waiting for the opponent to accept the undo..."
 
-#: src/features/games/junqi/JunqiOnline.tsx:94
+#: src/features/games/junqi/JunqiOnline.tsx:95
 msgid "等待对方响应超时，请重新创建或加入房间。"
 msgstr "Timed out waiting for your opponent. Please create or join a room again."
 
@@ -9326,7 +9487,7 @@ msgstr "Waiting for opponent’s setup"
 #: src/features/games/go/GoMatch.tsx:209
 #: src/features/games/gomoku/GomokuMatch.tsx:184
 #: src/features/games/reversi/ReversiMatch.tsx:169
-#: src/features/games/xiangqi/XiangqiMatch.tsx:194
+#: src/features/games/xiangqi/XiangqiMatch.tsx:195
 msgid "等待对方落子…"
 msgstr "Waiting for the opponent's move..."
 
@@ -9432,10 +9593,10 @@ msgstr "Sticky bit"
 msgid "粘贴或输入 {languageLabel} 内容"
 msgstr "Paste or type {languageLabel} content"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:52
-#: src/features/games/magic-cube/MagicCubeGame.tsx:249
-#: src/features/games/magic-cube/MagicCubeGame.tsx:495
-#: src/features/games/magic-cube/MagicCubeGame.tsx:505
+#: src/features/games/magic-cube/MagicCubeGame.tsx:222
+#: src/features/games/magic-cube/MagicCubeGame.tsx:458
+#: src/features/games/magic-cube/MagicCubeGame.tsx:468
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:29
 msgid "精确转动"
 msgstr "Precise controls"
 
@@ -9488,10 +9649,6 @@ msgstr "System monitoring does not support {os} yet. Only Linux is supported."
 msgid "系统默认"
 msgstr "System default"
 
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:56
-msgid "红彩交替后依次清彩。六红球含五次漏击规则；十红球沿用十五红球流程。自动裁判仅对明确直达却未击中目标判漏击，完全被遮挡时只判普通犯规，不判断主观尽力程度。"
-msgstr "Alternate reds and colours, then clear the colours in order. Six-red includes the five-miss rule; ten-red follows the fifteen-red flow. The auto referee only calls a miss when a clear direct shot fails to hit the ball on; when fully snookered it calls a plain foul and does not judge effort."
-
 #: src/features/games/junqi/labels.tsx:126
 #: src/features/games/junqi/render/JunqiStage.tsx:290
 #: src/features/games/junqi/render/JunqiStage.tsx:291
@@ -9499,14 +9656,30 @@ msgstr "Alternate reds and colours, then clear the colours in order. Six-red inc
 msgid "红方"
 msgstr "Red"
 
+#: src/features/games/xiangqi/XiangqiHelp.tsx:10
+msgid "红方先行，将死或无子可动的一方判负。"
+msgstr "Red moves first; the side that is checkmated or has no legal move loses."
+
 #. 斯诺克球名，1分；多个红球外观相同
 #: src/features/games/billiards/SnookerBall.tsx:10
 msgid "红球"
 msgstr "Red"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:85
+msgid "红球 1 分，彩球依次为黄 2 分、绿 3 分、棕 4 分、蓝 5 分、粉 6 分、黑 7 分。先红后彩交替击打，彩球落袋后摆回原位。"
+msgstr "A red is worth 1; colours are yellow 2, green 3, brown 4, blue 5, pink 6, and black 7. Pot a red and then a colour alternately, and colours are respotted after being potted."
+
+#: src/features/games/billiards/BilliardsHelp.tsx:35
+msgid "红球与彩球交替击打，得分更高的一方获胜。"
+msgstr "Pot reds and colours alternately; the higher score wins."
+
 #: src/features/games/billiards/BilliardsModeMenu.tsx:85
 msgid "红球数"
 msgstr "Reds"
+
+#: src/features/games/billiards/BilliardsHelp.tsx:90
+msgid "红球清完后按黄、绿、棕、蓝、粉、黑的顺序依次清彩，此后打入的彩球不再摆回。得分更高的一方获胜。"
+msgstr "Once the reds are gone, colours are cleared in the order yellow, green, brown, blue, pink, black and are no longer respotted. The higher score wins."
 
 #: src/features/games/xiangqi/labels.tsx:106
 msgid "红胜"
@@ -9547,14 +9720,15 @@ msgstr "Wireframe"
 msgid "练习"
 msgstr "Practice"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:75
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:48
 msgid "练习与挑战"
 msgstr "Practice and challenges"
 
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:61
-msgid "练习为自由清台，不计算正式比赛单杆。"
-msgstr "Practice is a free clearance; no official breaks are recorded."
+#: src/features/games/billiards/BilliardsHelp.tsx:106
+msgid "练习为自由清台，不计算正式比赛的单杆得分。"
+msgstr "Practice is a free clear-the-table run and does not count break scores."
 
+#: src/features/games/billiards/BilliardsHelp.tsx:104
 #: src/features/games/billiards/BilliardsModeMenu.tsx:145
 msgid "练习模式"
 msgstr "Practice Mode"
@@ -9682,7 +9856,7 @@ msgstr "Keep editing"
 msgid "继续记录"
 msgstr "Resume recording"
 
-#: src/features/games/chess/ChessDialogs.tsx:96
+#: src/features/games/chess/ChessDialogs.tsx:90
 msgid "继续走棋"
 msgstr "Play on"
 
@@ -9821,13 +9995,13 @@ msgstr "Mesh instance"
 msgid "网络"
 msgstr "Network"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:27
 #: src/features/games/billiards/BilliardsModeMenu.tsx:80
 #: src/features/games/billiards/BilliardsModeMenu.tsx:185
-#: src/features/games/billiards/BilliardsRulesDialog.tsx:45
 msgid "美式九球"
 msgstr "American nine-ball"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:69
+#: src/features/games/junqi/JunqiHelp.tsx:41
 msgid "翻子与阵营"
 msgstr "Revealing pieces and assigning sides"
 
@@ -9880,8 +10054,9 @@ msgstr "Translation input"
 msgid "翻译输出"
 msgstr "Translation output"
 
-#: src/features/games/chess/ChessMatch.tsx:316
-#: src/features/games/junqi/JunqiMatchView.tsx:178
+#: src/features/games/chess/ChessMatch.tsx:320
+#: src/features/games/junqi/JunqiMatchView.tsx:177
+#: src/features/games/xiangqi/XiangqiMatch.tsx:219
 msgid "翻转棋盘"
 msgstr "Flip board"
 
@@ -9903,7 +10078,7 @@ msgstr "Online"
 msgid "联机对局"
 msgstr "Online game"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:190
+#: src/features/games/junqi/JunqiHelp.tsx:155
 msgid "联机对局由房主裁判，每台设备只显示本方视角。断线将中断对局，不自动判负；再次开局需双方同意。"
 msgstr "The host acts as referee for online games. Each device shows only its own view. A disconnection interrupts the game without declaring a loss. Both players must agree to a rematch."
 
@@ -9929,7 +10104,14 @@ msgstr "Focus model"
 msgid "胜"
 msgstr "Win"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:163
+#: src/features/games/billiards/BilliardsHelp.tsx:143
+#: src/features/games/chess/ChessHelp.tsx:32
+#: src/features/games/gomoku/GomokuHelp.tsx:19
+#: src/features/games/xiangqi/XiangqiHelp.tsx:30
+msgid "胜负"
+msgstr "Result"
+
+#: src/features/games/junqi/JunqiHelp.tsx:123
 msgid "胜负与和棋"
 msgstr "Winning and draws"
 
@@ -9988,7 +10170,7 @@ msgid "自由移动：WASD 移动，Q/E 升降，Shift 加速，拖动画布转�
 msgstr "Free movement: WASD to move, Q/E for down/up, Shift to accelerate, drag to look around, Esc to exit. Tap a direction on the joystick to step, drag for continuous movement, or use the up/down buttons."
 
 #. 魔方未开始计时挑战，可自由操作
-#: src/features/games/magic-cube/MagicCubeGame.tsx:360
+#: src/features/games/magic-cube/MagicCubeGame.tsx:323
 msgid "自由练习"
 msgstr "Free practice"
 
@@ -10052,6 +10234,10 @@ msgctxt "棋面简称"
 msgid "营长"
 msgstr "Bn"
 
+#: src/features/games/reversi/ReversiHelp.tsx:13
+msgid "落子与翻子"
+msgstr "Placing and flipping"
+
 #. 斯诺克彩球，5分
 #: src/features/games/billiards/SnookerBall.tsx:24
 msgid "蓝球"
@@ -10062,11 +10248,11 @@ msgstr "Blue"
 msgid "行营"
 msgstr "Camp"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:112
+#: src/features/games/junqi/JunqiHelp.tsx:81
 msgid "行营内棋子不能被攻击，但可以走出。翻棋中大本营视为普通站点，不锁住棋子；地雷和军旗随机盖放，翻开后仍不能移动。"
 msgstr "Pieces in camps cannot be attacked but may leave. In Flip Junqi, headquarters are ordinary spaces and do not lock pieces in place. Mines and flags are shuffled like other pieces but still cannot move after being revealed."
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:116
+#: src/features/games/junqi/JunqiHelp.tsx:85
 msgid "行营内的棋子不能被攻击，但可以主动走出。棋子进入大本营后不能再移动。地雷和军旗始终不能移动。"
 msgstr "Pieces in camps cannot be attacked, but may leave. A piece that enters headquarters cannot move again. Mines and flags can never move."
 
@@ -10100,7 +10286,7 @@ msgstr "Overwrite: replace data in the included modules"
 msgid "覆盖已有数据？"
 msgstr "Overwrite existing data?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:241
+#: src/features/games/magic-cube/MagicCubeGame.tsx:214
 msgid "观察模式"
 msgstr "Observe mode"
 
@@ -10145,6 +10331,10 @@ msgstr "Resolve start directory"
 msgid "解码"
 msgstr "Decode"
 
+#: src/features/games/go/GoHelp.tsx:17
+msgid "计分采用中国规则数子：一方地域等于盘上己方棋子加上只与己方棋子相邻的空点，双方都相邻的单官双方都不计。白方另加{KOMI} 点贴目，因此不会出现平局。"
+msgstr "Scoring uses Chinese area counting: a side's area is its stones on the board plus empty points adjacent only to its own stones, while points adjacent to both sides count for neither. White adds {KOMI} komi, so there are no draws."
+
 #. 待办计划时间的紧凑标签
 #: src/features/todo/TodoTimestamps.tsx:73
 msgctxt "timestamp label"
@@ -10158,7 +10348,7 @@ msgstr "Planned"
 msgid "计划时间"
 msgstr "Scheduled for"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:81
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:58
 msgid "计时与撤销"
 msgstr "Timing and undo"
 
@@ -10174,23 +10364,23 @@ msgstr "Authentication"
 #. 斯诺克主动认输本局
 #. 棋类对局主动承认失败
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:51
-#: src/features/games/billiards/BilliardsHeader.tsx:83
-#: src/features/games/junqi/JunqiMatchView.tsx:190
-#: src/features/games/junqi/JunqiMatchView.tsx:276
+#: src/features/games/billiards/BilliardsMatchHeader.tsx:76
+#: src/features/games/junqi/JunqiMatchView.tsx:189
+#: src/features/games/junqi/JunqiMatchView.tsx:275
 #: src/features/games/junqi/labels.tsx:117
 msgid "认输"
 msgstr "Concede"
 
-#: src/features/games/junqi/JunqiMatchView.tsx:265
+#: src/features/games/junqi/JunqiMatchView.tsx:264
 msgid "认输后对方获胜，本局将结束。"
 msgstr "Conceding ends the game and awards the win to your opponent."
 
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:40
-#: src/features/games/junqi/JunqiMatchView.tsx:262
+#: src/features/games/junqi/JunqiMatchView.tsx:261
 msgid "认输本局？"
 msgstr "Concede this frame?"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:36
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:16
 msgid "让六个面分别恢复为同一种颜色。"
 msgstr "Restore each of the six faces to a single color."
 
@@ -10373,7 +10563,7 @@ msgstr "This backup is encrypted. Enter its password."
 msgid "该密钥不存在或不属于此 AI 服务地址"
 msgstr "This key does not exist or belongs to a different AI service address."
 
-#: src/features/games/junqi/JunqiOnline.tsx:111
+#: src/features/games/junqi/JunqiOnline.tsx:112
 msgid "该操作不符合当前规则，请重新选择。"
 msgstr "This action is not allowed by the current rules. Please choose again."
 
@@ -10844,6 +11034,10 @@ msgctxt "国际象棋棋子"
 msgid "车"
 msgstr "Rook"
 
+#: src/features/games/xiangqi/XiangqiHelp.tsx:16
+msgid "车沿直线任意走；马走日字，蹩马腿时不能走；象走田字且不过河，塞象眼时不能走；士在九宫内斜走；将帅在九宫内直走一格；炮吃子需隔一个棋子；兵过河后可以横走。"
+msgstr "The chariot moves any distance along a line; the horse moves one point then one diagonally and is blocked by its leg; the elephant moves two points diagonally, cannot cross the river, and is blocked by its eye; advisors move diagonally inside the palace; the general moves one point orthogonally inside the palace; the cannon captures only over exactly one screen; soldiers gain sideways moves after crossing the river."
+
 #. 围绕目标旋转三维相机。
 #: src/features/model-viewer/components/NavigationPanel.tsx:51
 msgid "轨道查看"
@@ -10853,11 +11047,11 @@ msgstr "Orbit"
 msgid "转动 180 度"
 msgstr "Turn 180 degrees"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:42
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:21
 msgid "转动与观察"
 msgstr "Turning and viewing"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:357
+#: src/features/games/magic-cube/MagicCubeGame.tsx:320
 msgid "转动开始计时"
 msgstr "Turn to start the timer"
 
@@ -10869,7 +11063,7 @@ msgstr "Failed to save"
 msgid "轮到 {currentPlayer}"
 msgstr "{currentPlayer} to play"
 
-#: src/features/games/chess/ChessMatch.tsx:273
+#: src/features/games/chess/ChessMatch.tsx:276
 msgid "轮到 {player}"
 msgstr "{player} to play"
 
@@ -10878,13 +11072,17 @@ msgstr "{player} to play"
 msgid "轮到 {seatNameValue}"
 msgstr "{seatNameValue}'s turn"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:162
+#: src/features/games/xiangqi/XiangqiMatch.tsx:163
 msgid "轮到 {sideNameValue}"
 msgstr "{sideNameValue}'s turn"
 
-#: src/features/games/junqi/JunqiMatchView.tsx:186
+#: src/features/games/junqi/JunqiMatchView.tsx:185
 msgid "轮到你时可以认输"
 msgstr "You can concede on your turn"
+
+#: src/features/games/reversi/ReversiHelp.tsx:21
+msgid "轮次与终局"
+msgstr "Turns and the end"
 
 #: src/features/crypto/CryptoTool.tsx:80
 #: src/features/translation/TranslationTool.tsx:210
@@ -10990,9 +11188,8 @@ msgstr "Back to list"
 msgid "返回古诗词"
 msgstr "Back to Classical Poetry"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:182
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:131
-msgid "返回小游戏"
+#: src/features/games/engine/BoardGameHeader.tsx:86
+msgid "返回小游戏列表"
 msgstr "Back to games"
 
 #: src/features/about/ResetBoundary.tsx:194
@@ -11009,8 +11206,7 @@ msgstr "Back to logs"
 msgid "返回来源"
 msgstr "Return to source"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:52
-#: src/features/games/engine/BoardGameHeader.tsx:56
+#: src/features/games/engine/BoardGameHeader.tsx:76
 #: src/features/games/engine/online/OnlineLobby.tsx:71
 msgid "返回模式选择"
 msgstr "Back to modes"
@@ -11033,8 +11229,6 @@ msgstr "Back to Menu"
 #: src/components/ToolPageHeader.tsx:54
 #: src/components/ToolPageHeader.tsx:54
 #: src/features/bt/BtTool.tsx:124
-#: src/features/games/billiards/BilliardsHeader.tsx:59
-#: src/features/games/engine/BoardGameHeader.tsx:66
 #: src/features/ssh-sftp/SshSftpTool.tsx:202
 msgid "返回首页"
 msgstr "Back to Home"
@@ -11044,11 +11238,11 @@ msgstr "Back to Home"
 msgid "还原模型预览"
 msgstr "Reset preview"
 
-#: src/features/games/chess/ChessDialogs.tsx:89
+#: src/features/games/chess/ChessDialogs.tsx:83
 msgid "这一步将达到三次重复局面或五十步规则。你可以声明这一步并申领和棋，也可以继续走棋。"
 msgstr "This move would qualify for a draw by threefold repetition or the fifty-move rule. You can declare it and claim a draw, or play on."
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:131
+#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:52
 msgid "这条成绩记录无法读取。"
 msgstr "This result could not be read."
 
@@ -11204,9 +11398,8 @@ msgctxt "棋面简称"
 msgid "连长"
 msgstr "Coy"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:129
-#: src/features/games/billiards/BilliardsMatchView.tsx:513
-#: src/features/games/engine/BoardGameHeader.tsx:106
+#: src/features/games/billiards/BilliardsActionsBar.tsx:66
+#: src/features/games/engine/BoardGameHeader.tsx:132
 #: src/features/games/engine/GameHeaderControls.tsx:108
 msgid "退出"
 msgstr "Exit"
@@ -11225,13 +11418,12 @@ msgstr "Exit signal: {exitSignal}"
 msgid "退出对局"
 msgstr "Exit Match"
 
-#: src/features/games/billiards/BilliardsHeader.tsx:118
-#: src/features/games/engine/BoardGameHeader.tsx:95
+#: src/features/games/engine/BoardGameHeader.tsx:121
 #: src/features/games/engine/GameHeaderControls.tsx:97
 msgid "退出当前对局？"
 msgstr "Exit the current match?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:442
+#: src/features/games/magic-cube/MagicCubeGame.tsx:405
 msgid "退出画布操作"
 msgstr "Stop interacting"
 
@@ -11306,7 +11498,7 @@ msgstr "Select Save Location"
 msgid "选择共享目录"
 msgstr "Select Shared Folder"
 
-#: src/features/games/chess/ChessDialogs.tsx:44
+#: src/features/games/chess/ChessDialogs.tsx:38
 msgid "选择升变棋子后完成这一步。"
 msgstr "Choose a piece to complete the promotion."
 
@@ -11442,7 +11634,7 @@ msgstr "Select output format"
 msgid "选择附件"
 msgstr "Choose an attachment"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:508
+#: src/features/games/magic-cube/MagicCubeGame.tsx:471
 msgid "选择面和层，再转动选中层。"
 msgstr "Choose a face and layer, then turn the selected layer."
 
@@ -11461,7 +11653,7 @@ msgstr "Alpha"
 msgid "逐模型值含共享引用，总计已去重；源数据不等于常驻内存，隐藏模型仍占内存。"
 msgstr "Per-model values include shared references, so the total is de-duplicated. Source data is not resident memory, and hidden models still use memory."
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:55
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:31
 msgid "通过「精确转动」选择一个面和层号，再点击转动按钮。层号从所选面向内数，第一层是最外层。方向以正对所选面为准，镜头旋转不会改变面名称；可在更多菜单开启面标识。"
 msgstr "Use Precise controls to choose a face and layer, then press a turn button. Layers count inward from the selected face; layer 1 is the outermost. Directions are viewed facing that face. Orbiting does not change face names. Enable face labels in the More menu."
 
@@ -11470,7 +11662,7 @@ msgstr "Use Precise controls to choose a face and layer, then press a turn butto
 msgid "逼和"
 msgstr "Stalemate"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:90
+#: src/features/games/junqi/JunqiHelp.tsx:60
 msgid "道路与安全区"
 msgstr "Roads and protected spaces"
 
@@ -11503,11 +11695,11 @@ msgstr "Collecting…"
 msgid "重做"
 msgstr "Redo"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:229
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:184
 msgid "重做移动"
 msgstr "Redo move"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:327
+#: src/features/games/magic-cube/MagicCubeGame.tsx:290
 msgid "重做转动"
 msgstr "Redo turn"
 
@@ -11568,24 +11760,28 @@ msgstr "Reload"
 msgid "重新加载棋盘"
 msgstr "Reload board"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:486
+#: src/features/games/magic-cube/MagicCubeGame.tsx:449
 msgid "重新加载画布"
 msgstr "Reload canvas"
+
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:70
+msgid "重新开始与恢复"
+msgstr "Restart and resume"
 
 #: src/features/games/engine/GameHeaderControls.tsx:69
 msgid "重新开始对局？"
 msgstr "Restart the match?"
 
 #. 恢复数字华容道本局最初排列并清零计时计步
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:190
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:149
 msgid "重新开始本局"
 msgstr "Restart puzzle"
 
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:352
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:306
 msgid "重新开始本局？"
 msgstr "Restart this puzzle?"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:530
+#: src/features/games/magic-cube/MagicCubeGame.tsx:492
 msgid "重新打乱魔方？"
 msgstr "Scramble the cube again?"
 
@@ -11641,7 +11837,7 @@ msgstr "Reload file"
 msgid "重新读取 MCP 设置"
 msgstr "Reload MCP settings"
 
-#: src/features/games/junqi/JunqiMatchView.tsx:296
+#: src/features/games/junqi/JunqiMatchView.tsx:295
 msgid "重新随机布阵？"
 msgstr "Randomize deployment again?"
 
@@ -11649,7 +11845,7 @@ msgstr "Randomize deployment again?"
 msgid "重新预览"
 msgstr "Preview again"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:93
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:62
 msgid "重置与恢复"
 msgstr "Reset and resume"
 
@@ -11667,19 +11863,19 @@ msgstr "Reset file transfer connection"
 msgid "重置状态已改变，请重新检查状态"
 msgstr "The reset has changed. Check its status again."
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:273
+#: src/features/games/magic-cube/MagicCubeGame.tsx:244
 msgid "重置视角"
 msgstr "Reset view"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:262
+#: src/features/games/magic-cube/MagicCubeGame.tsx:235
 msgid "重置魔方"
 msgstr "Reset cube"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:532
+#: src/features/games/magic-cube/MagicCubeGame.tsx:494
 msgid "重置魔方？"
 msgstr "Reset cube?"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:96
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:64
 msgid "重置魔方回到复原状态，不会自动求解或记为挑战成功。切换阶数、重置或重新打乱会替换当前进度。离开页面会保留进度，下次打开可以继续。"
 msgstr "Reset returns the cube to its solved state. It does not find a solution or count as completing a challenge. Changing size, resetting, or scrambling again replaces your progress. Leaving the page keeps your progress so you can resume later."
 
@@ -11699,12 +11895,12 @@ msgstr "Reset returns the cube to its solved state. It does not find a solution 
 #: src/features/bt/components/FileBrowserPanel.tsx:155
 #: src/features/bt/components/TaskRow.tsx:166
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:145
-#: src/features/games/billiards/BilliardsGame.tsx:117
+#: src/features/games/billiards/BilliardsGame.tsx:124
 #: src/features/games/engine/GameSessionNotice.tsx:81
 #: src/features/games/junqi/render/JunqiStage.tsx:208
-#: src/features/games/magic-cube/MagicCubeGame.tsx:409
+#: src/features/games/magic-cube/MagicCubeGame.tsx:372
 #: src/features/games/reversi/ReversiStage.tsx:65
-#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:310
+#: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:265
 #: src/features/lan-transfer/LanTransferTool.tsx:88
 #: src/features/poetry/components/CollectionManagement.tsx:122
 #: src/features/poetry/components/PoemList.tsx:152
@@ -11783,8 +11979,8 @@ msgstr "Error"
 msgid "键升序"
 msgstr "Keys A→Z"
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:62
-#: src/features/games/sliding-puzzle/SlidingPuzzleDialogs.tsx:70
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:37
+#: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:49
 msgid "键盘操作"
 msgstr "Keyboard controls"
 
@@ -11812,7 +12008,7 @@ msgid "阴影"
 msgstr "Shadows"
 
 #. 魔方每条边的小块数量，例如二阶、三阶
-#: src/features/games/magic-cube/MagicCubeGame.tsx:212
+#: src/features/games/magic-cube/MagicCubeGame.tsx:185
 msgid "阶数"
 msgstr "Size"
 
@@ -11833,20 +12029,17 @@ msgid "附近设备"
 msgstr "Nearby devices"
 
 #: src/features/games/junqi/JunqiGame.tsx:52
+#: src/features/games/junqi/JunqiHelp.tsx:31
 #: src/features/games/junqi/JunqiMatch.tsx:39
 #: src/features/games/junqi/JunqiMatchView.tsx:157
-#: src/features/games/junqi/JunqiOnline.tsx:160
+#: src/features/games/junqi/JunqiOnline.tsx:161
 #: src/features/home/entries.tsx:228
 msgid "陆战棋"
 msgstr "Junqi"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:43
-msgid "陆战棋 · 玩法与规则"
-msgstr "Junqi · How to play"
-
-#: src/features/games/junqi/JunqiRulesDialog.tsx:53
-msgid "陆战棋又称军棋。当前采用双人明棋，双方棋子公开；夺取对方军旗即获胜。"
-msgstr "Junqi, also called land battle chess, is played here with both sides’ pieces visible. Capture your opponent’s flag to win."
+#: src/features/games/junqi/JunqiHelp.tsx:18
+msgid "陆战棋又称军棋，双方棋子身份公开，夺取对方军旗即获胜。"
+msgstr "Junqi is also known as army chess. Both sides are visible in this mode; capture the enemy flag to win."
 
 #: src/features/logs/log-labels.ts:243
 msgid "陆战棋房间"
@@ -11865,11 +12058,11 @@ msgstr "Descending"
 msgid "隐藏密码"
 msgstr "Hide password"
 
-#: src/features/games/junqi/JunqiRulesDialog.tsx:125
+#: src/features/games/junqi/JunqiHelp.tsx:94
 msgid "隐藏身份"
 msgstr "Hidden identities"
 
-#: src/features/games/magic-cube/MagicCubeGame.tsx:284
+#: src/features/games/magic-cube/MagicCubeGame.tsx:254
 msgid "隐藏面标识"
 msgstr "Hide face labels"
 
@@ -11877,7 +12070,7 @@ msgstr "Hide face labels"
 msgid "随机"
 msgstr "Random"
 
-#: src/features/games/junqi/JunqiMatchView.tsx:314
+#: src/features/games/junqi/JunqiMatchView.tsx:313
 #: src/features/games/junqi/JunqiToolbar.tsx:87
 msgid "随机布阵"
 msgstr "Randomize"
@@ -11896,7 +12089,7 @@ msgstr "Difficulty"
 msgid "需停止服务后修改。"
 msgstr "Stop the service to change this."
 
-#: src/features/games/junqi/JunqiMatchView.tsx:209
+#: src/features/games/junqi/JunqiMatchView.tsx:208
 msgid "需先完成自己的一手棋，并等待当前同步或协商结束。"
 msgstr "Play a move first and wait for any current synchronization or negotiation to finish."
 
@@ -11991,6 +12184,10 @@ msgstr "Preview"
 msgid "预览备注图片"
 msgstr "Preview note image"
 
+#: src/features/games/billiards/BilliardsHelp.tsx:133
+msgid "首碰与犯规"
+msgstr "First contact and fouls"
+
 #: src/components/ToolPageHeader.tsx:66
 #: src/features/settings/StartupPageSettings.tsx:39
 msgid "首页"
@@ -12041,7 +12238,8 @@ msgstr "High quality"
 
 #. 小游戏名称，指可转动的多阶立方体谜题
 #. 小游戏名称，指可转动的多阶立方体谜题
-#: src/features/games/magic-cube/MagicCubeGame.tsx:175
+#: src/features/games/magic-cube/MagicCubeGame.tsx:169
+#: src/features/games/magic-cube/MagicCubeHelp.tsx:15
 #: src/features/home/entries.tsx:242
 msgid "魔方"
 msgstr "Magic cube"
@@ -12050,13 +12248,9 @@ msgstr "Magic cube"
 msgid "魔方已还原，但挑战记录尚未保存，请重试。"
 msgstr "The cube is solved, but the challenge result has not been saved. Please retry."
 
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:120
+#: src/features/games/magic-cube/MagicCubeDialogs.tsx:34
 msgid "魔方挑战记录"
 msgstr "Cube challenge history"
-
-#: src/features/games/magic-cube/MagicCubeDialogs.tsx:33
-msgid "魔方玩法与操作"
-msgstr "How to play the cube"
 
 #. 斯诺克彩球，2分
 #: src/features/games/billiards/SnookerBall.tsx:18
@@ -12098,7 +12292,7 @@ msgstr "Black"
 msgid "黑棋"
 msgstr "Black"
 
-#: src/features/games/reversi/ReversiHelp.tsx:32
+#: src/features/games/reversi/ReversiHelp.tsx:10
 msgid "黑棋先行，结束时棋子更多的一方获胜。"
 msgstr "Black moves first. The player with more discs at the end wins."
 
@@ -12115,6 +12309,7 @@ msgstr "Black"
 #. 小游戏名称，标准八乘八翻转棋
 #. 小游戏名称，标准八乘八翻转棋
 #: src/features/games/reversi/ReversiGame.tsx:50
+#: src/features/games/reversi/ReversiHelp.tsx:9
 #: src/features/home/entries.tsx:211
 msgid "黑白棋"
 msgstr "Reversi"
@@ -12122,11 +12317,6 @@ msgstr "Reversi"
 #: src/features/games/reversi/ReversiStage.tsx:91
 msgid "黑白棋棋盘"
 msgstr "Reversi board"
-
-#: src/features/games/reversi/ReversiHelp.tsx:22
-#: src/features/games/reversi/ReversiHelp.tsx:29
-msgid "黑白棋玩法"
-msgstr "How to play Reversi"
 
 #: src/features/games/xiangqi/labels.tsx:106
 msgid "黑胜"

@@ -1,18 +1,10 @@
 import "./game-toolbar.css";
 
-import { useLingui } from "@lingui/react/macro";
 import { cn } from "cn";
-import { Info, type LucideIcon, SlidersHorizontal } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 
 import { Button } from "~/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "~/components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +12,7 @@ import {
 } from "~/components/ui/tooltip";
 
 import { GameHeaderActions, useGameHeaderAction } from "./GameHeaderActions";
+import { GameInfoPopover } from "./GameInfoPopover";
 
 /** 共用状态区外壳；复杂比分仍由游戏自己的组件呈现。 */
 export function GameDisplayBar({
@@ -84,6 +77,35 @@ export function GameToolbarAction({
   );
 }
 
+/** 更多菜单里的整行动作；点击后先关闭菜单再执行。 */
+export function GameMenuActionButton({
+  icon: Icon,
+  children,
+  ...props
+}: Omit<ComponentProps<typeof Button>, "children"> & {
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
+  const invoke = useGameHeaderAction();
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      density="adaptive"
+      className="w-full justify-start"
+      {...props}
+      onClick={
+        props.onClick
+          ? (event) => invoke(() => props.onClick?.(event))
+          : undefined
+      }
+    >
+      <Icon data-icon="inline-start" />
+      {children}
+    </Button>
+  );
+}
+
 /** 对局负责动作，Portal 只把节点交给当前页面的标题栏和菜单槽位。 */
 export function GameToolbar({
   context,
@@ -91,80 +113,51 @@ export function GameToolbar({
   status,
   metrics,
   details,
-  options,
-  onOptionsOpenChange,
+  parameters,
+  menuActions,
+  onInfoOpenChange,
 }: {
   context?: ReactNode;
   actions?: ReactNode;
   status: ReactNode;
   metrics?: ReactNode;
   details?: ReactNode;
-  options?: ReactNode;
-  onOptionsOpenChange?(open: boolean): void;
+  /** 信息弹层里的参数区，例如开关与选择器。 */
+  parameters?: ReactNode;
+  /** 只出现在更多菜单的动作，例如翻转棋盘，不受窄屏菜单显隐影响。 */
+  menuActions?: ReactNode;
+  onInfoOpenChange?(open: boolean): void;
 }) {
-  const { t } = useLingui();
-  const label = options
-    ? t({ message: "游戏选项", comment: "展开小游戏的次要参数和完整状态" })
-    : t({ message: "游戏信息", comment: "展开小游戏的模式、计数及完整状态" });
-  const information = (
-    <>
-      {options}
-      {context ? (
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-          {context}
-        </div>
-      ) : null}
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        {status}
-        {metrics}
-      </div>
-      {details ? (
-        <div className="text-muted-foreground flex flex-col gap-2 text-xs">
-          {details}
-        </div>
-      ) : null}
-    </>
-  );
   return (
     <>
       <GameHeaderActions>
         <div className="game-header-toolbar flex items-center gap-1">
           {actions}
-          <Popover onOpenChange={onOptionsOpenChange}>
-            <PopoverTrigger asChild>
-              <Button
-                className="game-header-information"
-                variant="ghost"
-                size="icon-sm"
-                aria-label={label}
-                title={label}
-              >
-                {options ? <SlidersHorizontal /> : <Info />}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="ui-density-adaptive app-scroll-safe-end max-h-(--radix-popover-content-available-height) max-w-[calc(100vw-1.5rem)] overflow-y-auto"
-            >
-              <PopoverHeader>
-                <PopoverTitle>{label}</PopoverTitle>
-              </PopoverHeader>
-              {information}
-            </PopoverContent>
-          </Popover>
         </div>
       </GameHeaderActions>
-      <GameHeaderActions menu>
-        <div className="game-toolbar-menu flex max-w-72 flex-col gap-3 py-2">
-          <div className="game-toolbar-menu-actions flex flex-col gap-1">
-            {actions}
+      <GameInfoPopover
+        parameters={parameters}
+        menuLeading={actions}
+        onOpenChange={onInfoOpenChange}
+      >
+        {context ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            {context}
           </div>
-          <span className="text-muted-foreground text-xs font-medium">
-            {label}
-          </span>
-          {information}
+        ) : null}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {status}
+          {metrics}
         </div>
-      </GameHeaderActions>
+        {details ? (
+          <div className="text-muted-foreground flex flex-col gap-2 text-xs">
+            {details}
+          </div>
+        ) : null}
+      </GameInfoPopover>
+      {menuActions ? (
+        <GameHeaderActions menu>{menuActions}</GameHeaderActions>
+      ) : null}
       <GameDisplayBar>
         <div className="game-toolbar-content">
           {context ? (

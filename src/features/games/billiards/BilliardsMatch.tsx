@@ -1,11 +1,14 @@
+import { Trans } from "@lingui/react/macro";
 import { useRef, useState } from "react";
 
 import { toIpcError } from "~/lib/errors";
 import type { AppError } from "~/types";
 
+import { BoardGameHeader } from "../engine/BoardGameHeader";
 import type { LocalGameSession } from "../engine/game-session-store";
 import { useLocalGameSession } from "../engine/use-game-session";
-import { BilliardsHeader, type BilliardsHeaderProps } from "./BilliardsHeader";
+import { BilliardsHelp } from "./BilliardsHelp";
+import type { BilliardsHeaderProps } from "./BilliardsMatchHeader";
 import { MatchView } from "./BilliardsMatchView";
 import type { BilliardsStageHandle } from "./render/BilliardsStage";
 import { billiardsSessions } from "./session";
@@ -56,7 +59,16 @@ export function BilliardsMatch({
   if (!session)
     return (
       <>
-        <BilliardsHeader {...headerProps} />
+        <BoardGameHeader
+          title={<Trans>台球</Trans>}
+          active={headerProps.active}
+          finished={headerProps.finished}
+          canRestart
+          onRestart={headerProps.onRestart}
+          onExit={headerProps.onExit}
+          landscape={headerProps.landscape}
+          help={<BilliardsHelp discipline={mode.discipline ?? "eight-ball"} />}
+        />
         <div className="flex-1" />
       </>
     );

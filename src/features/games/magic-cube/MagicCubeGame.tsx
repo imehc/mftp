@@ -2,8 +2,6 @@ import "./magic-cube.css";
 
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
-  ArrowLeft,
-  BookOpen,
   Eye,
   History,
   Redo2,
@@ -16,7 +14,6 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -36,25 +33,23 @@ import {
   DialogLayoutHeader,
 } from "~/components/ui/dialog-layout";
 import { Spinner } from "~/components/ui/spinner";
-import { BackLink } from "~/features/navigation/BackLink";
 import { describeError, frontendError } from "~/lib/errors";
 import { useMediaQuery } from "~/lib/use-media-query";
 import { useSettingsStore } from "~/store/settings";
 
+import { BoardGameHeader } from "../engine/BoardGameHeader";
 import { formatGameTime } from "../engine/format-game-time";
-import { GameActionsMenu } from "../engine/GameActionsMenu";
-import {
-  GameHeaderActionsProvider,
-  GameHeaderActionsSlot,
-} from "../engine/GameHeaderActions";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { GameRestoreDialog } from "../engine/GameRestoreDialog";
 import { GameSetupSelect } from "../engine/GameSetupSelect";
 import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { useGameAudio } from "../engine/use-game-audio";
+import { useVictoryCelebration } from "../engine/use-victory-celebration";
 import { createCubeAudio } from "./audio";
 import { faceMove } from "./engine";
 import { MagicCubeControls } from "./MagicCubeControls";
-import { MagicCubeHelp, MagicCubeHistory } from "./MagicCubeDialogs";
+import { MagicCubeHistory } from "./MagicCubeDialogs";
+import { MagicCubeHelp } from "./MagicCubeHelp";
 import { type CubeStageHandle, MagicCubeStage } from "./render/MagicCubeStage";
 import { getCubeSession } from "./session";
 import { type CubeOrder, type Face, ORDERS } from "./types";
@@ -105,6 +100,8 @@ function MagicCubeGameContent() {
   const blocked = actionBlocked || menu;
   const disabled = blocked || state.busy || state.data.completed;
   useGameAudio(audio);
+  // 还原动作的转动动画结束后再庆祝，避免彩带盖住最后一步。
+  useVictoryCelebration(state.data.completed && !state.busy);
 
   useEffect(() => {
     void store.load();
@@ -167,141 +164,107 @@ function MagicCubeGameContent() {
       onPointerDownCapture={unlock}
       onKeyDownCapture={unlock}
     >
-      <ToolPageHeader
-        variant="compact"
-        showHome={false}
-        showActivity={false}
+      <BoardGameHeader
         title={
           <Trans comment="小游戏名称，指可转动的多阶立方体谜题">魔方</Trans>
         }
-        leading={
-          <Button variant="ghost" size="icon-sm" asChild>
-            <BackLink
-              to="/"
-              search={{ category: "games" }}
-              aria-label={t`返回小游戏`}
-            >
-              <ArrowLeft />
-            </BackLink>
-          </Button>
-        }
-        trailing={
+        variant="puzzle"
+        active={false}
+        finished={state.data.completed}
+        canRestart={false}
+        onRestart={() => {}}
+        onExit={() => {}}
+        onMenuOpenChange={setMenu}
+        help={<MagicCubeHelp open={help} onOpenChange={setHelp} />}
+        extraActions={(closeThen) => (
           <>
-            <GameHeaderActionsSlot />
+            <GameSetupSelect
+              density="adaptive"
+              wrapValue={false}
+              label={
+                <Trans comment="魔方每条边的小块数量，例如二阶、三阶">
+                  阶数
+                </Trans>
+              }
+              value={String(order)}
+              onChange={(value) =>
+                closeThen(() =>
+                  requestNew({
+                    kind: "order",
+                    order: Number(value) as CubeOrder,
+                  }),
+                )
+              }
+              options={ORDERS.map((value) => ({
+                value: String(value),
+                label: t({
+                  message: `${value} 阶`,
+                  comment: "魔方阶数，value 为每边小块数量",
+                }),
+              }))}
+            />
+            <div className="flex flex-col gap-1">
+              <Button
+                variant="ghost"
+                className="justify-start"
+                aria-pressed={observe}
+                onClick={() => setObserve(!observe)}
+              >
+                <Eye data-icon="inline-start" />
+                <Trans>观察模式</Trans>
+              </Button>
+              <Button
+                variant="ghost"
+                className="magic-cube-controls-trigger justify-start"
+                onClick={() => closeThen(() => setControls(true))}
+              >
+                <SlidersHorizontal data-icon="inline-start" />
+                <Trans>精确转动</Trans>
+              </Button>
+            </div>
             <Button
               variant="ghost"
-              size="icon-sm"
-              aria-label={t`玩法与操作`}
-              onClick={() => setHelp(true)}
+              density="adaptive"
+              className="w-full justify-start"
+              disabled={state.status !== "ready" || !!state.saved}
+              onClick={() =>
+                closeThen(() => requestNew({ kind: "reset", order }))
+              }
             >
-              <BookOpen />
+              <RotateCcw data-icon="inline-start" />
+              <Trans>重置魔方</Trans>
             </Button>
-            <GameActionsMenu
-              showMatchActions={false}
-              matchFinished={state.data.completed}
-              canRestart={false}
-              onRestart={() => {}}
-              onExit={() => {}}
-              onOpenChange={setMenu}
-              extraActions={(closeThen) => (
-                <>
-                  <GameSetupSelect
-                    density="adaptive"
-                    wrapValue={false}
-                    label={
-                      <Trans comment="魔方每条边的小块数量，例如二阶、三阶">
-                        阶数
-                      </Trans>
-                    }
-                    value={String(order)}
-                    onChange={(value) =>
-                      closeThen(() =>
-                        requestNew({
-                          kind: "order",
-                          order: Number(value) as CubeOrder,
-                        }),
-                      )
-                    }
-                    options={ORDERS.map((value) => ({
-                      value: String(value),
-                      label: t({
-                        message: `${value} 阶`,
-                        comment: "魔方阶数，value 为每边小块数量",
-                      }),
-                    }))}
-                  />
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      variant="ghost"
-                      className="justify-start"
-                      aria-pressed={observe}
-                      onClick={() => setObserve(!observe)}
-                    >
-                      <Eye data-icon="inline-start" />
-                      <Trans>观察模式</Trans>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="magic-cube-controls-trigger justify-start"
-                      onClick={() => closeThen(() => setControls(true))}
-                    >
-                      <SlidersHorizontal data-icon="inline-start" />
-                      <Trans>精确转动</Trans>
-                    </Button>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    density="adaptive"
-                    className="w-full justify-start"
-                    disabled={state.status !== "ready" || !!state.saved}
-                    onClick={() =>
-                      closeThen(() => requestNew({ kind: "reset", order }))
-                    }
-                  >
-                    <RotateCcw data-icon="inline-start" />
-                    <Trans>重置魔方</Trans>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    density="adaptive"
-                    className="w-full justify-start"
-                    onClick={() =>
-                      closeThen(() => stage.current?.resetCamera())
-                    }
-                  >
-                    <Scan data-icon="inline-start" />
-                    <Trans>重置视角</Trans>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    density="adaptive"
-                    className="w-full justify-start"
-                    aria-pressed={labels}
-                    onClick={() => setLabels(!labels)}
-                  >
-                    <Tags data-icon="inline-start" />
-                    {labels ? (
-                      <Trans>隐藏面标识</Trans>
-                    ) : (
-                      <Trans>显示面标识</Trans>
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    density="adaptive"
-                    className="w-full justify-start"
-                    onClick={() => closeThen(() => setHistory(true))}
-                  >
-                    <History data-icon="inline-start" />
-                    <Trans>挑战记录</Trans>
-                  </Button>
-                </>
-              )}
-            />
+            <Button
+              variant="ghost"
+              density="adaptive"
+              className="w-full justify-start"
+              onClick={() => closeThen(() => stage.current?.resetCamera())}
+            >
+              <Scan data-icon="inline-start" />
+              <Trans>重置视角</Trans>
+            </Button>
+            <Button
+              variant="ghost"
+              density="adaptive"
+              className="w-full justify-start"
+              aria-pressed={labels}
+              onClick={() => setLabels(!labels)}
+            >
+              <Tags data-icon="inline-start" />
+              {labels ? <Trans>隐藏面标识</Trans> : <Trans>显示面标识</Trans>}
+            </Button>
+            <Button
+              variant="ghost"
+              density="adaptive"
+              className="w-full justify-start"
+              onClick={() => closeThen(() => setHistory(true))}
+            >
+              <History data-icon="inline-start" />
+              <Trans>挑战记录</Trans>
+            </Button>
           </>
-        }
+        )}
       />
-
       <GameToolbar
         context={
           <Trans comment="魔方阶数，order 是每条边的小块数量">
@@ -511,7 +474,6 @@ function MagicCubeGameContent() {
           <DialogLayoutBody>{precision}</DialogLayoutBody>
         </DialogLayoutContent>
       </Dialog>
-      <MagicCubeHelp open={help} onOpenChange={setHelp} />
       <MagicCubeHistory open={history} onOpenChange={setHistory} />
       <AlertDialog
         open={confirm !== null}

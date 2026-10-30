@@ -8,6 +8,7 @@ import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
 import { gomokuAudio, unlockGomokuAudio } from "./audio";
+import { GomokuHelp } from "./GomokuHelp";
 import { GomokuMatch } from "./GomokuMatch";
 import { GomokuModeMenu } from "./GomokuModeMenu";
 import { GomokuOnlineFlow } from "./GomokuOnline";
@@ -47,6 +48,7 @@ function GomokuGameContent() {
       {mode?.kind !== "online" || onlinePlaying ? (
         <BoardGameHeader
           title={<Trans>五子棋</Trans>}
+          help={<GomokuHelp />}
           active={mode !== null}
           finished={matchFinished}
           canRestart={mode?.kind !== "online"}

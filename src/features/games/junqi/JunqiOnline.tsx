@@ -11,6 +11,7 @@ import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { OnlineLobby } from "../engine/online/OnlineLobby";
 import { OnlineMatchDialogs } from "../engine/online/OnlineMatchDialogs";
 import { playJunqiMove } from "./audio";
+import { JunqiHelp } from "./JunqiHelp";
 import { JunqiMatchView } from "./JunqiMatchView";
 import { JunqiUndoInformation } from "./JunqiUndoDialog";
 import type { JunqiOnlineController } from "./online-controller";
@@ -163,6 +164,7 @@ function OnlineMatch({
             canRestart={false}
             onRestart={() => {}}
             onExit={onExit}
+            help={<JunqiHelp variant={variant} online />}
           />
           {notice}
           <div

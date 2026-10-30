@@ -1,49 +1,33 @@
 /** 对局订阅、规则状态与结果呈现。 */
-import { Plural, Trans } from "@lingui/react/macro";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { LightNoticeStack } from "~/components/LightNotice";
 import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { describeError } from "~/lib/errors";
 import { useDesktopLayout } from "~/lib/use-desktop-layout";
 import type { AppError } from "~/types";
 
 import { GameSessionNotice } from "../engine/GameSessionNotice";
-import { GameDisplayBar } from "../engine/GameToolbar";
-import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
+import type {
+  BilliardsMatchContext,
+  BilliardsStageRef,
+} from "./billiards-match-view-types";
+import { BilliardsActionsBar } from "./BilliardsActionsBar";
 import { BilliardsConcedeDialog } from "./BilliardsConcedeDialog";
-import { BilliardsControls } from "./BilliardsControls";
-import { BilliardsDecisionNotice } from "./BilliardsDecisionNotice";
-import { BilliardsDetails } from "./BilliardsDetails";
-import { BilliardsHeader, type BilliardsHeaderProps } from "./BilliardsHeader";
 import type { Session } from "./BilliardsMatch";
-import { BilliardsRuleControl } from "./BilliardsRuleControl";
-import { BilliardsRulePanel } from "./BilliardsRulePanel";
-import { BallTray, SeatCell, seatName } from "./BilliardsScore";
-import { BilliardsVictory } from "./BilliardsVictory";
-import { NineBallScore } from "./NineBallHud";
-import { equipmentForState } from "./placement";
-import { useBilliardsPreferences } from "./preferences";
 import {
-  BilliardsStage,
-  type BilliardsStageHandle,
-} from "./render/BilliardsStage";
+  type BilliardsHeaderProps,
+  BilliardsMatchHeader,
+} from "./BilliardsMatchHeader";
+import { BilliardsScoreBar } from "./BilliardsScoreBar";
+import { BilliardsStageArea } from "./BilliardsStageArea";
+import { BilliardsVictory } from "./BilliardsVictory";
+import { useBilliardsPreferences } from "./preferences";
 import type { AimTarget } from "./render/scene-contract";
 import { type BilliardsPanel, canSubmitRuleMove } from "./rule-panel-state";
 import { billiardsSessions } from "./session";
-import { snookerValue } from "./snooker-equipment";
-import { snookerSelection } from "./snooker-selection";
-import { SnookerScore } from "./SnookerHud";
-import { SnookerTargetControl } from "./SnookerTargetControl";
-import {
-  BILLIARDS_GAME_ID,
-  type BilliardsHistoryPayload,
-  type BilliardsMode,
-  type BilliardsMove,
-} from "./types";
+import type { BilliardsMode, BilliardsMove } from "./types";
+import { useBilliardsMatchRecord } from "./use-billiards-match-record";
 import { useBilliardsNotices } from "./use-billiards-notices";
 import { useRulePanel } from "./use-rule-panel";
 
@@ -60,9 +44,7 @@ export function MatchView({
 }: {
   mode: BilliardsMode;
   session: Session;
-  stageRef: {
-    current: BilliardsStageHandle | null;
-  };
+  stageRef: BilliardsStageRef;
   onRematch: () => void;
   onExit: () => void;
   onFinishedChange: (finished: boolean) => void;
@@ -93,34 +75,9 @@ export function MatchView({
   const pushOut = pushDeclaration.scope === pushScope && pushDeclaration.value;
   const setPushOut = (value: boolean) =>
     setPushDeclaration({ scope: pushScope, value });
-  const addRecord = useGamesHistoryStore((s) => s.addRecord);
-  const recordedRef = useRef(false);
 
-  // 每场已结束的对局只持久化一条历史记录。
-  useEffect(() => {
-    if (!state.finished || recordedRef.current) return;
-    recordedRef.current = true;
-    addRecord({
-      id: runner.id,
-      gameId: BILLIARDS_GAME_ID,
-      finishedAt: Date.now(),
-      payload: {
-        version: 2,
-        discipline: mode.discipline ?? "eight-ball",
-        mode: mode.kind,
-        difficulty: mode.kind === "ai" ? mode.difficulty : undefined,
-        winnerSeat: snapshot.winnerSeat,
-        shots: state.shotCount,
-        fouls: state.foulCounts,
-        reds: mode.discipline === "snooker" ? mode.reds : undefined,
-        scores: state.variant === "snooker" ? state.scores : undefined,
-        highestBreaks:
-          state.variant === "snooker" ? state.highestBreaks : undefined,
-      } satisfies BilliardsHistoryPayload,
-    });
-    // 上面的 recordedRef 保证只记录一条；这里的每个依赖项在本 keyed
-    // 对局实例的整个生命周期内都是稳定的。
-  }, [addRecord, mode, runner.id, snapshot.winnerSeat, state]);
+  useBilliardsMatchRecord(mode, runner.id, snapshot.winnerSeat, state);
+
   const activeIsLocal =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
@@ -141,8 +98,6 @@ export function MatchView({
     !decisionPending &&
     (!nominationPending || state.ballInHand);
   const selectionKind = nominationPending ? "color" : storedSelectionKind;
-  const selectionChoices =
-    state.variant === "snooker" ? snookerSelection(state) : null;
   const { panel, setPanel } = useRulePanel(
     state,
     snapshot.moveCount,
@@ -151,11 +106,14 @@ export function MatchView({
     activeIsLocal,
   );
 
+  /** 打开面板或执行规则动作前统一取消球桌输入：先停手势，再清零力度预览。 */
+  const resetStageInput = () => {
+    stageRef.current?.cancelInput();
+    setPowerPreview(0);
+  };
+
   const openPanel = (next: BilliardsPanel) => {
-    if (next) {
-      stageRef.current?.cancelInput();
-      setPowerPreview(0);
-    }
+    if (next) resetStageInput();
     setPanel(next);
   };
 
@@ -182,17 +140,25 @@ export function MatchView({
 
   const ballInHand = canInteract && state.ballInHand;
   const notices = useBilliardsNotices(state, mode, ballInHand);
-  const remaining = state.balls.filter(
-    (ball) => !ball.potted && ball.id !== 0,
-  ).length;
   const powerPercent = Math.round(powerPreview * 100);
-  const points = aimTarget ? snookerValue(aimTarget.ballId) : 0;
   useEffect(() => {
     onFinishedChange(state.finished);
   }, [onFinishedChange, state.finished]);
-  // 两处渲染点都由 `snapshot.winnerSeat !== null` 保护。
-  const winnerSeatLabel =
-    snapshot.winnerSeat !== null ? seatName(mode, snapshot.winnerSeat) : "";
+
+  // 三个视图共享同一份对局观测值；`state` 保持与 `snapshot.state` 同一引用，
+  // 球桌区要靠它和 `runner.getSnapshot().state` 比较「渲染所用状态是否仍然当前」。
+  const match: BilliardsMatchContext = {
+    mode,
+    snapshot,
+    state,
+    panel,
+    canInteract,
+    activeIsLocal,
+    nominationPending,
+    onPanel: openPanel,
+    onMove: submitRule,
+  };
+
   return (
     <>
       <BilliardsVictory
@@ -200,16 +166,16 @@ export function MatchView({
         mode={mode}
         winnerSeat={snapshot.winnerSeat}
       />
-      <BilliardsHeader
-        {...headerProps}
-        details={
-          <BilliardsDetails
-            state={state}
-            mode={mode}
-            open={panel === "details"}
-            onOpenChange={(next) => openPanel(next ? "details" : null)}
-          />
-        }
+      <BilliardsMatchHeader
+        mode={mode}
+        state={state}
+        panel={panel === "details" ? "details" : null}
+        onPanel={openPanel}
+        active
+        finished={headerProps.finished}
+        landscape={headerProps.landscape}
+        onRestart={headerProps.onRestart}
+        onExit={headerProps.onExit}
         canConcede={activeIsLocal && !state.finished}
         onConcede={
           state.variant === "snooker" && !state.finished
@@ -227,10 +193,7 @@ export function MatchView({
         }
         onMenuOpenChange={(next) => {
           setMenuOpen(next);
-          if (next) {
-            stageRef.current?.cancelInput();
-            setPowerPreview(0);
-          }
+          if (next) resetStageInput();
         }}
       />
       <BilliardsConcedeDialog
@@ -255,326 +218,60 @@ export function MatchView({
           </div>
         ) : null}
       </div>
-      <GameDisplayBar className="billiards-score text-xs">
-        <div className="billiards-summary w-full min-w-0">
-          {state.finished ? (
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
-              <Badge variant="secondary">
-                {state.variant === "practice" ? (
-                  <Trans>清台完成！</Trans>
-                ) : snapshot.winnerSeat !== null ? (
-                  <Trans>{winnerSeatLabel} 获胜</Trans>
-                ) : (
-                  <Trans>对局结束</Trans>
-                )}
-              </Badge>
-              <Badge variant="outline">
-                <Plural
-                  value={{
-                    shotCount: state.shotCount,
-                  }}
-                  one="共 # 杆"
-                  other="共 # 杆"
-                />
-              </Badge>
-            </div>
-          ) : mode.kind === "practice" ? (
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
-              <Badge variant="outline">
-                <Plural
-                  value={{
-                    shotNumber: state.shotCount + 1,
-                  }}
-                  one="第 # 杆"
-                  other="第 # 杆"
-                />
-              </Badge>
-              <Badge variant="outline">
-                <Plural
-                  value={{
-                    remainingBallCount: remaining,
-                  }}
-                  one="剩余 # 球"
-                  other="剩余 # 球"
-                />
-              </Badge>
-              {desktop ? (
-                <BallTray
-                  state={state}
-                  ids={state.balls
-                    .filter((ball) => ball.id)
-                    .map((ball) => ball.id)}
-                />
-              ) : null}
-            </div>
-          ) : state.variant === "snooker" ? (
-            <SnookerScore
-              state={state}
-              mode={mode}
-              activeSeat={snapshot.activeSeat}
-              aiThinking={aiThinking}
-              target={
-                <SnookerTargetControl
-                  state={state}
-                  enabled={
-                    activeIsLocal &&
-                    !selectionReturning &&
-                    (!selectionBusy || panel === "target")
-                  }
-                  open={panel === "target"}
-                  kind={selectionKind}
-                  onKind={setSelectionKind}
-                  onOpenChange={(next) => openPanel(next ? "target" : null)}
-                  onMove={submitRule}
-                />
-              }
-            />
-          ) : state.variant === "nine-ball" ? (
-            <NineBallScore
-              state={state}
-              mode={mode}
-              activeSeat={snapshot.activeSeat}
-              aiThinking={aiThinking}
-            />
-          ) : (
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
-              <SeatCell
-                mode={mode}
-                state={state}
-                seat={0}
-                active={snapshot.activeSeat === 0}
-                align="start"
-                thinking={aiThinking && snapshot.activeSeat === 0}
-              />
-              <div className="flex max-w-[50vw] flex-wrap items-center justify-center gap-1.5">
-                <Badge variant="outline">
-                  <Plural
-                    value={{
-                      shotNumber: state.shotCount + 1,
-                    }}
-                    one="第 # 杆"
-                    other="第 # 杆"
-                  />
-                </Badge>
-              </div>
-              <SeatCell
-                mode={mode}
-                state={state}
-                seat={1}
-                active={snapshot.activeSeat === 1}
-                align="end"
-                thinking={aiThinking && snapshot.activeSeat === 1}
-              />
-            </div>
-          )}
-        </div>
-      </GameDisplayBar>
-
-      <div
-        className="billiards-stage relative z-30 min-h-0 min-w-0 flex-1 overflow-hidden"
-        onPointerDown={(event) => {
-          if (
-            panel === "rules" &&
-            event.target instanceof HTMLElement &&
-            event.target.hasAttribute("data-billiards-input")
-          )
-            openPanel(null);
+      <BilliardsScoreBar
+        match={match}
+        aiThinking={aiThinking}
+        desktop={desktop}
+        target={{
+          enabled:
+            activeIsLocal &&
+            !selectionReturning &&
+            (!selectionBusy || panel === "target"),
+          kind: selectionKind,
+          onKind: setSelectionKind,
         }}
-      >
-        {state.variant === "snooker" || state.variant === "nine-ball" ? (
-          <BilliardsRulePanel
-            state={state}
-            mode={mode}
-            enabled={activeIsLocal}
-            panel={panel}
-            onPanel={openPanel}
-            onMove={submitRule}
-            pushOut={pushOut}
-            onPushOut={(value) => {
-              if (runner.getSnapshot().state === state && activeIsLocal)
-                setPushOut(value);
-            }}
-          />
-        ) : null}
-        {aimTarget && panel === null && !menuOpen && canInteract ? (
-          <div
-            className="billiards-aim-points pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full text-xs font-semibold whitespace-nowrap text-white tabular-nums [text-shadow:0_1px_3px_#000,0_0_2px_#000]"
-            style={{
-              left: `clamp(1.5rem, ${aimTarget.x}%, calc(100% - 1.5rem))`,
-              top: `max(1.5rem, calc(${aimTarget.y}% - 0.75rem))`,
-            }}
-          >
-            <Trans comment="斯诺克瞄准时首个将碰到的目标球的实际分值">
-              {points} 分
-            </Trans>
-          </div>
-        ) : null}
-
-        <LightNoticeStack notices={notices} />
-        <BilliardsStage
-          ref={stageRef}
-          aimOnly={aimOnly}
-          resume={
-            session.restored || runner.hasStarted || snapshot.moveCount > 0
-          }
-          onReady={() => runner.start()}
-          onError={onStageError}
-          state={state}
-          equipment={equipmentForState(state)}
-          interactive={canInteract && panel === null && !menuOpen}
-          followDraw={followDraw}
-          onPowerPreview={setPowerPreview}
-          onAimTarget={setAimTarget}
-          selection={
-            panel === "target" &&
-            state.variant === "snooker" &&
-            selectionChoices
-              ? {
-                  ids:
-                    selectionKind === "color"
-                      ? selectionChoices.colors
-                      : selectionChoices.free,
-                  selectedId:
-                    selectionKind === "color"
-                      ? state.on.kind === "color"
-                        ? state.on.nominated
-                        : null
-                      : state.nominatedFree,
-                }
-              : null
-          }
-          onSelectionActive={(active, phase) => {
+      />
+      <BilliardsStageArea
+        match={match}
+        session={session}
+        menuOpen={menuOpen}
+        selection={{
+          kind: selectionKind,
+          busy: selectionBusy,
+          onActive: (active, phase) => {
             setSelectionBusy(active);
             setSelectionReturning(phase === "returning");
-          }}
-          onDismissSelection={() => openPanel(null)}
-          onSelectedBall={(ballId) => {
-            if (
-              panel === "target" &&
-              submitRule({
-                type: selectionKind === "color" ? "nominate" : "nominate-free",
-                ballId,
-              })
-            )
-              openPanel(null);
-          }}
-          onShot={(angle, power) => {
-            if (
-              !canInteract ||
-              panel !== null ||
-              menuOpen ||
-              selectionBusy ||
-              state.ballInHand ||
-              nominationPending ||
-              runner.getSnapshot().state !== state
-            )
-              return false;
-            const declaredPush =
-              state.variant === "nine-ball" &&
-              state.pushOutAvailable &&
-              pushOut;
-            setPushOut(false);
-            return local.submit({
-              type: "shot",
-              pushOut: declaredPush,
-              angle,
-              power,
-              followDraw,
-            });
-          }}
-          onPlaceCue={(x, y) => {
-            if (
-              !canInteract ||
-              panel !== null ||
-              menuOpen ||
-              runner.getSnapshot().state !== state
-            )
-              return;
-            local.submit({
-              type: "place-cue",
-              x,
-              y,
-            });
-          }}
-        />
-      </div>
-      <div className="billiards-actions">
-        {state.finished ? (
-          <div className="billiards-result flex h-full items-center justify-center gap-2 px-2">
-            <Button size="sm" density="adaptive" onClick={onRematch}>
-              <Trans>再来一局</Trans>
-            </Button>
-            <Button
-              size="sm"
-              density="adaptive"
-              variant="ghost"
-              onClick={onExit}
-            >
-              <Trans>退出</Trans>
-            </Button>
-          </div>
-        ) : decisionPending && activeIsLocal ? (
-          <BilliardsDecisionNotice
-            foul={
-              state.variant === "snooker" && state.decision?.kind === "foul"
-            }
-            open={panel === "rules"}
-            onOpen={() => {
-              if (
-                canSubmitRuleMove(snapshot, runner.getSnapshot(), activeIsLocal)
-              )
-                openPanel("rules");
-            }}
-          />
-        ) : (
-          <BilliardsControls
-            followDraw={followDraw}
-            onFollowDraw={setFollowDraw}
-            power={powerPercent}
-            vertical={headerProps.landscape}
-            turn={snapshot.moveCount}
-            shotInput={{
-              beginPowerShot: () => stageRef.current?.beginPowerShot() ?? false,
-              updateShotPower: (power) =>
-                stageRef.current?.updateShotPower(power) ?? false,
-              releasePowerShot: () => stageRef.current?.releasePowerShot(),
-              cancelPowerShot: () => stageRef.current?.cancelPowerShot(),
-            }}
-            interactive={
-              canInteract &&
-              panel === null &&
-              !menuOpen &&
-              !selectionBusy &&
-              !ballInHand &&
-              !nominationPending
-            }
-            action={
-              <BilliardsRuleControl
-                state={state}
-                enabled={
-                  activeIsLocal &&
-                  !menuOpen &&
-                  !selectionBusy &&
-                  (panel === null || panel === "rules")
-                }
-                open={panel === "rules"}
-                pushOut={pushOut}
-                onOpenChange={(open) => openPanel(open ? "rules" : null)}
-                onReposition={() => {
-                  stageRef.current?.cancelInput();
-                  setPowerPreview(0);
-                  submitRule({ type: "reposition-cue" });
-                }}
-                onProposeStalemate={() => {
-                  stageRef.current?.cancelInput();
-                  setPowerPreview(0);
-                  submitRule({ type: "propose-stalemate" });
-                }}
-              />
-            }
-          />
-        )}
-      </div>
+          },
+        }}
+        pushOut={{ value: pushOut, onChange: setPushOut }}
+        aim={{ target: aimTarget, onTarget: setAimTarget }}
+        onPowerPreview={setPowerPreview}
+        followDraw={followDraw}
+        aimOnly={aimOnly}
+        notices={notices}
+        stageRef={stageRef}
+        onStageError={onStageError}
+      />
+      <BilliardsActionsBar
+        match={match}
+        session={session}
+        gates={{
+          menuOpen,
+          selectionBusy,
+          ballInHand,
+        }}
+        power={{
+          followDraw,
+          percent: powerPercent,
+          onFollowDraw: setFollowDraw,
+        }}
+        pushOut={pushOut}
+        stageRef={stageRef}
+        onResetInput={resetStageInput}
+        onRematch={onRematch}
+        onExit={onExit}
+        vertical={headerProps.landscape}
+      />
     </>
   );
 }

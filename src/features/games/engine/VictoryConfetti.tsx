@@ -232,7 +232,7 @@ function drawParticle(
   context.restore();
 }
 
-function launchVictoryConfetti(): void {
+export function launchVictoryConfetti(): void {
   if (activeCelebrationCanvas?.isConnected || prefersReducedMotion()) {
     return;
   }

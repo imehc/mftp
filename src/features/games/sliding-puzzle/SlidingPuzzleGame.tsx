@@ -1,18 +1,9 @@
 import "./sliding-puzzle.css";
 
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import {
-  ArrowLeft,
-  BookOpen,
-  History,
-  Redo2,
-  RotateCcw,
-  Shuffle,
-  Undo2,
-} from "lucide-react";
+import { History, Redo2, RotateCcw, Shuffle, Undo2 } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -25,27 +16,22 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
-import { BackLink } from "~/features/navigation/BackLink";
 import { describeError } from "~/lib/errors";
 import { useSettingsStore } from "~/store/settings";
 
+import { BoardGameHeader } from "../engine/BoardGameHeader";
 import { formatGameTime } from "../engine/format-game-time";
-import { GameActionsMenu } from "../engine/GameActionsMenu";
-import {
-  GameHeaderActionsProvider,
-  GameHeaderActionsSlot,
-} from "../engine/GameHeaderActions";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { GameRestoreDialog } from "../engine/GameRestoreDialog";
 import { GameSetupSelect } from "../engine/GameSetupSelect";
 import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { useGameAudio } from "../engine/use-game-audio";
+import { useVictoryCelebration } from "../engine/use-victory-celebration";
 import { createPuzzleAudio } from "./audio";
 import { getPuzzleSession } from "./session";
 import { SlidingPuzzleBoard } from "./SlidingPuzzleBoard";
-import {
-  SlidingPuzzleHelp,
-  SlidingPuzzleHistory,
-} from "./SlidingPuzzleDialogs";
+import { SlidingPuzzleHistory } from "./SlidingPuzzleDialogs";
+import { SlidingPuzzleHelp } from "./SlidingPuzzleHelp";
 import { PUZZLE_SIZES, type PuzzleSize } from "./types";
 
 type Confirmation =
@@ -79,6 +65,7 @@ function SlidingPuzzleGameContent() {
   const blocked = actionBlocked || menu;
   const disabled = blocked || state.data.completed;
   useGameAudio(audio);
+  useVictoryCelebration(state.data.completed);
 
   useEffect(() => {
     void store.load();
@@ -114,99 +101,67 @@ function SlidingPuzzleGameContent() {
       onPointerDownCapture={unlock}
       onKeyDownCapture={unlock}
     >
-      <ToolPageHeader
-        variant="compact"
-        showHome={false}
-        showActivity={false}
+      <BoardGameHeader
         title={
           <Trans comment="小游戏名，滑动数字方块填入空位并排序">
             数字华容道
           </Trans>
         }
-        leading={
-          <Button variant="ghost" size="icon-sm" asChild>
-            <BackLink
-              to="/"
-              search={{ category: "games" }}
-              aria-label={t`返回小游戏`}
-            >
-              <ArrowLeft />
-            </BackLink>
-          </Button>
+        variant="puzzle"
+        active={false}
+        finished={state.data.completed}
+        canRestart={false}
+        onRestart={() => {}}
+        onExit={() => {}}
+        onMenuOpenChange={setMenu}
+        help={
+          <SlidingPuzzleHelp open={help} onOpenChange={setHelp} size={size} />
         }
-        trailing={
+        extraActions={(closeThen) => (
           <>
-            <GameHeaderActionsSlot />
+            <GameSetupSelect
+              density="adaptive"
+              wrapValue={false}
+              label={<Trans comment="数字华容道棋盘的行数与列数">棋盘</Trans>}
+              value={String(size)}
+              onChange={(value) =>
+                closeThen(() =>
+                  request({
+                    kind: "new",
+                    size: Number(value) as PuzzleSize,
+                  }),
+                )
+              }
+              options={PUZZLE_SIZES.map((value) => ({
+                value: String(value),
+                label: `${value} × ${value}`,
+              }))}
+            />
+
             <Button
               variant="ghost"
-              size="icon-sm"
-              aria-label={t`玩法与操作`}
-              onClick={() => setHelp(true)}
+              density="adaptive"
+              className="w-full justify-start"
+              disabled={state.status !== "ready" || !!state.saved || state.busy}
+              onClick={() => closeThen(() => request({ kind: "restart" }))}
             >
-              <BookOpen />
+              <RotateCcw data-icon="inline-start" />
+              <Trans comment="恢复数字华容道本局最初排列并清零计时计步">
+                重新开始本局
+              </Trans>
             </Button>
-            <GameActionsMenu
-              showMatchActions={false}
-              matchFinished={state.data.completed}
-              canRestart={false}
-              onRestart={() => {}}
-              onExit={() => {}}
-              onOpenChange={setMenu}
-              extraActions={(closeThen) => (
-                <>
-                  <GameSetupSelect
-                    density="adaptive"
-                    wrapValue={false}
-                    label={
-                      <Trans comment="数字华容道棋盘的行数与列数">棋盘</Trans>
-                    }
-                    value={String(size)}
-                    onChange={(value) =>
-                      closeThen(() =>
-                        request({
-                          kind: "new",
-                          size: Number(value) as PuzzleSize,
-                        }),
-                      )
-                    }
-                    options={PUZZLE_SIZES.map((value) => ({
-                      value: String(value),
-                      label: `${value} × ${value}`,
-                    }))}
-                  />
-
-                  <Button
-                    variant="ghost"
-                    density="adaptive"
-                    className="w-full justify-start"
-                    disabled={
-                      state.status !== "ready" || !!state.saved || state.busy
-                    }
-                    onClick={() =>
-                      closeThen(() => request({ kind: "restart" }))
-                    }
-                  >
-                    <RotateCcw data-icon="inline-start" />
-                    <Trans comment="恢复数字华容道本局最初排列并清零计时计步">
-                      重新开始本局
-                    </Trans>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    density="adaptive"
-                    className="w-full justify-start"
-                    onClick={() => closeThen(() => setHistory(true))}
-                  >
-                    <History data-icon="inline-start" />
-                    <Trans comment="查看数字华容道完成成绩">成绩记录</Trans>
-                  </Button>
-                </>
-              )}
-            />
+            <Button
+              variant="ghost"
+              density="adaptive"
+              className="w-full justify-start"
+              onClick={() => closeThen(() => setHistory(true))}
+            >
+              <History data-icon="inline-start" />
+              <Trans comment="查看数字华容道完成成绩">成绩记录</Trans>
+            </Button>
           </>
-        }
+        )}
       />
-
       <GameToolbar
         context={
           <span>
@@ -335,7 +290,6 @@ function SlidingPuzzleGameContent() {
         />
       </div>
 
-      <SlidingPuzzleHelp open={help} onOpenChange={setHelp} size={size} />
       <SlidingPuzzleHistory open={history} onOpenChange={setHistory} />
       <AlertDialog
         open={confirm !== null}

@@ -1,13 +1,13 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { Undo2 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { RotateCw, Undo2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import type { LightNoticeMessage } from "~/components/LightNotice";
 import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { GameResultBar } from "../engine/GameResultBar";
-import { GameToolbarAction } from "../engine/GameToolbar";
+import { GameMenuActionButton, GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
 import type { SeatIndex } from "../engine/types";
@@ -87,6 +87,7 @@ export function XiangqiMatchView({
   const { runner, local } = session;
   const snapshot = useMatchSnapshot(runner);
   const state = snapshot.state;
+  const [reversed, setReversed] = useState(false);
   const addRecord = useGamesHistoryStore((store) => store.addRecord);
   const recordedRef = useRef(false);
   const activeIsLocal =
@@ -209,6 +210,15 @@ export function XiangqiMatchView({
             />
           </>
         }
+        menuActions={
+          <GameMenuActionButton
+            icon={RotateCw}
+            aria-pressed={reversed}
+            onClick={() => setReversed((value) => !value)}
+          >
+            <Trans>翻转棋盘</Trans>
+          </GameMenuActionButton>
+        }
       >
         <XiangqiStage
           board={state.board}
@@ -218,9 +228,9 @@ export function XiangqiMatchView({
           inCheck={state.inCheck}
           interactive={activeIsLocal && !state.finished}
           flipped={
-            mode.kind === "online"
+            (mode.kind === "online"
               ? online?.localSeat === 1
-              : mode.kind === "ai" && mode.localSeat === 1
+              : mode.kind === "ai" && mode.localSeat === 1) !== reversed
           }
           onPlay={(move) => local.submit(move)}
         />

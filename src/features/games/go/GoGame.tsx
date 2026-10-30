@@ -8,6 +8,7 @@ import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
 import { goAudio, unlockGoAudio } from "./audio";
+import { GoHelp } from "./GoHelp";
 import { GoMatch } from "./GoMatch";
 import { GoModeMenu } from "./GoModeMenu";
 import { GoOnlineFlow } from "./GoOnline";
@@ -47,6 +48,7 @@ function GoGameContent() {
       {mode?.kind !== "online" || onlinePlaying ? (
         <BoardGameHeader
           title={<Trans>围棋</Trans>}
+          help={<GoHelp />}
           active={mode !== null}
           finished={matchFinished}
           canRestart={mode?.kind !== "online"}

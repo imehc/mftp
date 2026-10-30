@@ -4,14 +4,17 @@ import { Handshake, RotateCw, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import type { LightNoticeMessage } from "~/components/LightNotice";
-import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { useSettingsStore } from "~/store/settings";
 
 import { GameSelect } from "../engine/BoardModeMenu";
 import { GameResultBar } from "../engine/GameResultBar";
-import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
+import {
+  GameMenuActionButton,
+  GameToolbar,
+  GameToolbarAction,
+} from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { historyModeLabel } from "../engine/history-labels";
 import { useMatchSnapshot } from "../engine/match";
@@ -285,7 +288,7 @@ export function ChessMatchView({
               <span>{t(resultNames[state.result])}</span>
             ) : undefined
           }
-          options={
+          parameters={
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="chess-piece-names">
@@ -306,18 +309,18 @@ export function ChessMatchView({
                   { value: "top", label: t`正上方俯视` },
                 ]}
               />
-              <Button
-                size="sm"
-                variant="ghost"
-                className="justify-start"
-                onClick={() => setReversed((value) => !value)}
-              >
-                <RotateCw data-icon="inline-start" />
-                <Trans>翻转棋盘</Trans>
-              </Button>
             </div>
           }
-          onOptionsOpenChange={setOptionsOpen}
+          menuActions={
+            <GameMenuActionButton
+              icon={RotateCw}
+              aria-pressed={reversed}
+              onClick={() => setReversed((value) => !value)}
+            >
+              <Trans>翻转棋盘</Trans>
+            </GameMenuActionButton>
+          }
+          onInfoOpenChange={setOptionsOpen}
         />
         <ChessStage
           state={state}

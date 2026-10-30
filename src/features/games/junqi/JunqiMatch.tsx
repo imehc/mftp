@@ -9,8 +9,8 @@ import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useMatchSnapshot } from "../engine/match";
 import { useLocalGameSession } from "../engine/use-game-session";
 import { playJunqiMove } from "./audio";
+import { JunqiHelp } from "./JunqiHelp";
 import { JunqiMatchView } from "./JunqiMatchView";
-import { JunqiRulesDialog } from "./JunqiRulesDialog";
 import { junqiSessions } from "./session";
 import type {
   JunqiLocalMode,
@@ -42,7 +42,7 @@ export function JunqiMatch(props: MatchProps) {
           canRestart
           onRestart={props.onRestart}
           onExit={props.onExit}
-          help={<JunqiRulesDialog variant={props.mode.variant} />}
+          help={<JunqiHelp variant={props.mode.variant} />}
         />
         <GameSessionNotice store={junqiSessions} />
         <div

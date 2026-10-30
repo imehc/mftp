@@ -14,12 +14,13 @@ import { useMediaQuery } from "~/lib/use-media-query";
 import { useSettingsStore } from "~/store/settings";
 import type { AppError } from "~/types";
 
+import { BoardGameHeader } from "../engine/BoardGameHeader";
+import { GameHeaderActionsProvider } from "../engine/GameHeaderActions";
 import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameLifecycle } from "../engine/use-game-session";
-import { BilliardsHeader } from "./BilliardsHeader";
+import { BilliardsHelp } from "./BilliardsHelp";
 import { BilliardsMatch } from "./BilliardsMatch";
 import { BilliardsModeMenu } from "./BilliardsModeMenu";
-import { BilliardsRulesDialog } from "./BilliardsRulesDialog";
 import {
   prepareBilliardsAudio,
   setGameAudioVolume,
@@ -29,6 +30,14 @@ import { billiardsSessions } from "./session";
 import type { BilliardsDiscipline } from "./types";
 
 export default function BilliardsGame() {
+  return (
+    <GameHeaderActionsProvider>
+      <BilliardsGameContent />
+    </GameHeaderActionsProvider>
+  );
+}
+
+function BilliardsGameContent() {
   const mobile = !useDesktopLayout();
   const landscape = useMediaQuery("(orientation: landscape)") && mobile;
   const [physicsError, setPhysicsError] = useState<AppError | null>(null);
@@ -89,13 +98,11 @@ export default function BilliardsGame() {
       >
         {loading || mode === null ? (
           <>
-            <BilliardsHeader
+            <BoardGameHeader
+              title={<Trans>台球</Trans>}
               {...headerProps}
-              details={
-                mode === null ? (
-                  <BilliardsRulesDialog discipline={discipline} />
-                ) : null
-              }
+              canRestart
+              help={<BilliardsHelp discipline={discipline} />}
             />
             <GameSessionNotice
               store={billiardsSessions}

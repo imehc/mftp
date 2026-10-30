@@ -9,10 +9,10 @@ import { GameSessionNotice } from "../engine/GameSessionNotice";
 import { useGameAudio } from "../engine/use-game-audio";
 import { useGameLifecycle } from "../engine/use-game-session";
 import { junqiAudio } from "./audio";
+import { JunqiHelp } from "./JunqiHelp";
 import { JunqiMatch } from "./JunqiMatch";
 import { JunqiModeMenu } from "./JunqiModeMenu";
 import { JunqiOnlineFlow } from "./JunqiOnline";
-import { JunqiRulesDialog } from "./JunqiRulesDialog";
 import { junqiSessions } from "./session";
 import type { JunqiVariant } from "./types";
 
@@ -55,7 +55,7 @@ function JunqiGameContent() {
             canRestart={false}
             onRestart={lifecycle.restart}
             onExit={lifecycle.exit}
-            help={<JunqiRulesDialog variant={variant} />}
+            help={<JunqiHelp variant={variant} />}
           />
           <GameSessionNotice
             store={junqiSessions}

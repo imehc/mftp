@@ -64,7 +64,7 @@
   grid-column: 1 / -1;
   grid-row: 1;
 }
-.billiards-game[data-landscape="true"] .billiards-landscape-nav {
+.billiards-game[data-landscape="true"] .game-landscape-nav {
   grid-column: 1;
   grid-row: 2;
   flex-wrap: wrap;
