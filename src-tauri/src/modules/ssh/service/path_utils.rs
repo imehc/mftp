@@ -1,6 +1,5 @@
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use std::path::{Path, PathBuf};
-use std::time::Duration;
 
 pub(super) fn uuid_v4() -> String {
     uuid::Uuid::new_v4().to_string()
@@ -116,9 +115,4 @@ pub(super) fn extract_cmd(archive: &str, dest_dir: &str) -> AppResult<String> {
     } else {
         Err(AppError::custom(CustomErrorCode::SftpArchiveUnsupported))
     }
-}
-
-#[allow(dead_code)]
-pub fn brief_pause() {
-    std::thread::sleep(Duration::from_millis(10));
 }

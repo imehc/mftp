@@ -20,9 +20,11 @@ serde_json = "1"
 
 [dev-dependencies]
 tauri = { version = "2", features = ["test"] }
-zeroize = "1.9"
 tokio = { version = "1", features = ["test-util"] }
 png = "0.18"
+# TypeScript export is only used by binding generation and registry tests.
+tauri-specta = { version = "=2.0.0-rc.24", features = ["typescript"] }
+specta-typescript = "=0.0.11"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dev-dependencies]
 rmcp = { version = "=3.6.0", default-features = false, features = ["server", "client", "base64", "transport-streamable-http-client-reqwest"] }
@@ -53,9 +55,8 @@ local-ip-address = "0.6.13"
 whoami = { version = "2", default-features = false }
 fs2 = "0.4.3"
 mdns-sd = "=0.21.5"
-tauri-specta = { version = "=2.0.0-rc.24", features = ["typescript"] }
+tauri-specta = "=2.0.0-rc.24"
 specta = { version = "=2.0.0-rc.24", features = ["derive"] }
-specta-typescript = "=0.0.11"
 
 # URL validation, LAN query parsing and diagnostics redaction.
 url = { version = "2", default-features = false }

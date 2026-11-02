@@ -1,9 +1,9 @@
 /**
  * 生成中文子集字体。
  *
- * 三款中文字体共用同一份字符集——以思源黑体 `chinese-simplified` 的覆盖为准
- * （7946 字），保证切换字体时字形覆盖一致；超出该集合的生僻字由 CSS font stack
- * 回退到系统字体，因此不必把三万字的全量字库打进安装包。
+ * 霞鹜文楷以思源黑体 `chinese-simplified` 的字符集（7946 字）生成子集；
+ * 超出该集合的生僻字由 CSS font stack 回退到系统字体，
+ * 因此不必把三万字的全量字库打进安装包。
  *
  * 依赖 python3 + fonttools + brotli（`pip install fonttools brotli`）。
  * 用法：`pnpm fonts:subset`，或用 `PYTHON=/path/to/python` 指定解释器。

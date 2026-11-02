@@ -2,7 +2,6 @@ import js from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
 import { defineConfig, globalIgnores } from "eslint/config";
 import lingui from "eslint-plugin-lingui";
-import reactCompiler from "eslint-plugin-react-compiler";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
@@ -59,7 +58,6 @@ export default defineConfig(
     "dist/**",
     "dist-ssr/**",
     ".tanstack/**",
-    // 固定版本的第三方 WASM 解码器分发文件，保持上游原始字节。
     // 文档、设计片段和辅助验收产物不纳入 ESLint 检查。
     "docs/**",
     // Agent skills 由 `pnpm skills:sync` 安装，属于本地工具，不纳入项目检查。
@@ -73,12 +71,8 @@ export default defineConfig(
   ]),
   js.configs.recommended,
   tseslint.configs.recommended,
+  // Hooks 推荐配置已包含 React Compiler 检查。
   reactHooks.configs.flat.recommended,
-  {
-    plugins: { "react-compiler": reactCompiler },
-    // React Compiler：暴露会破坏记忆化的 React 规则违规行为
-    rules: { "react-compiler/react-compiler": "warn" },
-  },
   lingui.configs["flat/recommended"],
   {
     files: [
