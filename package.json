@@ -122,7 +122,7 @@
   },
   "devDependencies": {
     "@babel/core": "^8.0.6",
-    "@commitlint/cli": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@eslint/js": "^10.0.1",
     "@lingui/cli": "^6.11.0",
