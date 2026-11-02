@@ -82,11 +82,6 @@ impl Fixture {
                 operations.clone(),
             )),
             diagnostics: Arc::new(crate::core::diagnostics::Diagnostics::default()),
-            model_inbox: Arc::new(crate::modules::model_viewer::system::ModelOpenInbox::default()),
-            model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),
-            model_library: crate::modules::model_viewer::ModelLibraryRepository::new(
-                storage.clone(),
-            ),
             storage: storage.clone(),
             ai_tasks: Arc::new(AiTaskManager::new(operations.clone())),
             ai_configuration: crate::modules::ai::AiConfigurationService::new(

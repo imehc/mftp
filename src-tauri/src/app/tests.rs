@@ -159,7 +159,7 @@ fn maintenance_and_shutdown_gates_reject_ipc_before_dispatching_the_command() {
 }
 
 #[test]
-fn export_cleanup_can_drain_while_new_operations_are_rejected() {
+fn shutdown_cleanup_can_drain_while_new_operations_are_rejected() {
     let operations = Arc::new(crate::core::operations::Operations::default());
     let lifecycle = Arc::new(lifecycle::Lifecycle::new(operations.clone()));
     let app = mock_builder()
@@ -193,35 +193,19 @@ fn export_cleanup_can_drain_while_new_operations_are_rejected() {
             .maintenance(Duration::from_secs(1))
             .await
             .unwrap();
-        for cmd in [
-            "model_export_cancel",
-            "model_export_close",
-            "model_environment_abort",
-            "speech_stop",
-        ] {
-            assert_eq!(
-                get_ipc_response(&webview, request(cmd)).is_ok(),
-                !cmd.starts_with("model_export_") || cfg!(mobile)
-            );
+        for cmd in ["diagnostics_clear", "speech_stop"] {
+            assert!(get_ipc_response(&webview, request(cmd)).is_ok());
         }
-        for cmd in [
-            "model_export_begin",
-            "model_export_write",
-            "model_export_present",
-            "model_environment_begin",
-            "model_environment_clear",
-            "speech_start",
-            "speech_control",
-        ] {
+        for cmd in ["speech_start", "speech_control"] {
             assert!(get_ipc_response(&webview, request(cmd)).is_err());
         }
         drop(lease);
     });
     lifecycle.begin_shutdown();
-    assert_eq!(
-        get_ipc_response(&webview, request("model_export_close")).is_ok(),
-        cfg!(mobile)
-    );
-    assert!(get_ipc_response(&webview, request("model_environment_abort")).is_ok());
-    assert!(get_ipc_response(&webview, request("model_export_present")).is_err());
+    for cmd in ["diagnostics_clear", "speech_stop"] {
+        assert!(get_ipc_response(&webview, request(cmd)).is_ok());
+    }
+    for cmd in ["speech_start", "speech_control"] {
+        assert!(get_ipc_response(&webview, request(cmd)).is_err());
+    }
 }

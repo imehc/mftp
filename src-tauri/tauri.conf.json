@@ -50,27 +50,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "fileAssociations": [
-      {
-        "ext": [
-          "glb"
-        ],
-        "name": "GLB 3D model",
-        "role": "Viewer",
-        "rank": "Alternate",
-        "mimeType": "model/gltf-binary",
-        "exportedType": {
-          "identifier": "com.imehc.mftp.glb",
-          "conformsTo": [
-            "public.data"
-          ]
-        },
-        "androidIntentActionFilters": [
-          "view",
-          "send"
-        ]
-      }
-    ],
     "resources": {
       "native/translation/LLAMA-LICENSE": "licenses/llama.cpp.txt"
     }

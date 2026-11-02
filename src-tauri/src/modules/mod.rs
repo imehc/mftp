@@ -18,7 +18,6 @@ pub(crate) mod lan_transfer;
 pub(crate) mod maintenance;
 #[cfg(desktop)]
 pub(crate) mod mcp;
-pub(crate) mod model_viewer;
 pub(crate) mod todo;
 pub(crate) mod vault;
 

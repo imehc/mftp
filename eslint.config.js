@@ -60,7 +60,6 @@ export default defineConfig(
     "dist-ssr/**",
     ".tanstack/**",
     // 固定版本的第三方 WASM 解码器分发文件，保持上游原始字节。
-    "public/model-decoders/**",
     // 文档、设计片段和辅助验收产物不纳入 ESLint 检查。
     "docs/**",
     // Agent skills 由 `pnpm skills:sync` 安装，属于本地工具，不纳入项目检查。

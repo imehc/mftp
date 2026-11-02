@@ -212,6 +212,5 @@ rem 随应用显示大小变化；下表 px 示例以根字号 16px 为准，不
 - 表单与弹窗：`src/components/ui/field.tsx`、`src/components/ui/dialog-layout.tsx`
 - 固定选项控件：`src/components/FixedSelect.tsx`
 - 标准表单工具：`src/features/crypto/CryptoTool.tsx`
-- 容器自适应工作区：`src/features/model-viewer/ModelViewerPage.tsx` 与 `model-viewer.css`
 - 行操作双端参照：`src/features/ssh-sftp/components/sftp/SftpRow.tsx`（共享动作数组）
 - 表单错误参照：`src/features/todo/TodoItemDialog.tsx`（`FieldError` 与 `aria-describedby` 配对）

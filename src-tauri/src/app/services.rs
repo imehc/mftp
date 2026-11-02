@@ -24,11 +24,6 @@ use crate::storage::Storage;
 #[derive(Clone)]
 pub struct AppServices {
     pub(crate) diagnostics: Arc<crate::core::diagnostics::Diagnostics>,
-    pub(crate) model_inbox: Arc<crate::modules::model_viewer::system::ModelOpenInbox>,
-    #[cfg(mobile)]
-    pub(crate) model_exports: Arc<crate::modules::model_viewer::ModelExportStore>,
-    pub(crate) model_viewer: Arc<crate::modules::model_viewer::ModelViewerService>,
-    pub(crate) model_library: crate::modules::model_viewer::ModelLibraryRepository,
     pub storage: Storage,
     pub ai_tasks: Arc<AiTaskManager>,
     pub(crate) ai_configuration: Arc<AiConfigurationService<AiKeychain>>,
@@ -189,16 +184,6 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     let services = AppServices {
         translation,
         diagnostics,
-        model_inbox: app
-            .state::<Arc<crate::modules::model_viewer::system::ModelOpenInbox>>()
-            .inner()
-            .clone(),
-        #[cfg(mobile)]
-        model_exports: Arc::new(crate::modules::model_viewer::ModelExportStore::new(
-            app.path().app_cache_dir()?.join("mftp-model-exports"),
-        )),
-        model_viewer: Arc::new(crate::modules::model_viewer::ModelViewerService::default()),
-        model_library: crate::modules::model_viewer::ModelLibraryRepository::new(storage.clone()),
         executor,
         ai_configuration,
         #[cfg(target_os = "android")]

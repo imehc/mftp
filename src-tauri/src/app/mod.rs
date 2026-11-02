@@ -24,16 +24,9 @@ pub(crate) fn run() -> AppResult<()> {
     let registry = registry::specta_builder();
     // Full developer bindings are exported by the host test catalog.
 
-    let app = tauri::Builder::default().manage(Arc::new(
-        crate::modules::model_viewer::system::ModelOpenInbox::default(),
-    ));
+    let app = tauri::Builder::default();
     #[cfg(desktop)]
-    let app = app.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-        crate::modules::model_viewer::system::enqueue_arguments(
-            app,
-            args,
-            std::path::Path::new(&cwd),
-        );
+    let app = app.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
         if let Some(window) = app.get_webview_window("main") {
             let _ = window.set_focus();
         }
@@ -46,10 +39,6 @@ pub(crate) fn run() -> AppResult<()> {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init());
-    #[cfg(mobile)]
-    let app = app
-        .plugin(tauri_plugin_native_viewer::init())
-        .plugin(tauri_plugin_native_export::init());
     #[cfg(target_os = "ios")]
     let app = app.plugin(tauri_plugin_native_navigation::init());
     #[cfg(desktop)]
@@ -79,14 +68,6 @@ pub(crate) fn run() -> AppResult<()> {
             app.manage(services);
             #[cfg(target_os = "android")]
             crate::adapters::speech::install(app.handle());
-            #[cfg(desktop)]
-            if let Ok(cwd) = std::env::current_dir() {
-                crate::modules::model_viewer::system::enqueue_arguments(
-                    app.handle(),
-                    std::env::args().collect(),
-                    &cwd,
-                );
-            }
             Ok(())
         })
         .invoke_handler(guard_commands(registry.invoke_handler()))
@@ -104,12 +85,8 @@ fn guard_commands<R: tauri::Runtime>(
         // or shutdown is draining the native worker.
         if matches!(
             invoke.message.command(),
-            "model_environment_abort" | "diagnostics_clear" | "speech_stop"
-        ) || (cfg!(mobile)
-            && matches!(
-                invoke.message.command(),
-                "model_export_cancel" | "model_export_close" | "mobile_navigation_configure"
-            ))
+            "diagnostics_clear" | "speech_stop"
+        ) || (cfg!(mobile) && invoke.message.command() == "mobile_navigation_configure")
         {
             return commands(invoke);
         }
@@ -160,12 +137,6 @@ fn on_run_event(app: &tauri::AppHandle, event: tauri::RunEvent) {
                 state.diagnostics.clear();
             }
             crate::adapters::speech::stop_all(app, &state.speech);
-        }
-        #[cfg(any(target_os = "macos", target_os = "ios"))]
-        tauri::RunEvent::Opened { urls } => {
-            for url in urls {
-                state.model_inbox.push(url.to_string());
-            }
         }
         tauri::RunEvent::ExitRequested { api, code, .. } => {
             state.diagnostics.clear();

@@ -22,17 +22,6 @@
             android:label="@string/main_activity_title"
             android:name=".MainActivity"
             android:exported="true">
-            <!-- tauri-file-associations. AUTO-GENERATED. DO NOT REMOVE. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="model/gltf-binary" />
-                <data android:pathPattern=".*\\.glb" />
-            </intent-filter>
-            
-            <!-- tauri-file-associations. AUTO-GENERATED. DO NOT REMOVE. -->
         </activity>
 
         <provider

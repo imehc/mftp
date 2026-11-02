@@ -67,6 +67,8 @@ pnpm tauri ios dev --open
 
 修改 `project.yml` 后运行 `xcodegen generate` 或重新 `tauri ios init` 让 `.xcodeproj` 生效。
 
+只更新工程引用时优先运行 `xcodegen generate`。`tauri ios init` 会额外生成默认尺寸图标；重新 init 后运行 `pnpm ios:icons`，恢复项目的浅色/深色资源并清理默认尺寸图标，再生成 Xcode 工程。
+
 ## 平台差异
 
 - **页面返回**使用 WebKit 原生交互式边缘手势，支持跟手和中途取消。一级目的地、浮层打开、业务禁止离开或没有有效应用内历史时不启用页面手势，使用现有关闭／返回按钮；Tab 切换不累积返回历史。实现位于 `features/navigation` 与 `plugins/native-navigation`，后者也提供原生键盘可见状态。

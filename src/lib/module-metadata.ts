@@ -27,7 +27,6 @@ export const modules = [
   },
   { id: "crypto", tool: "crypto" },
   { id: "media-compress", tool: "media-compress" },
-  { id: "model-viewer", tool: "model-viewer" },
   { id: "formatter", tool: "formatter" },
   { id: "translation", tool: "translation" },
   { id: "vault", tool: "vault" },

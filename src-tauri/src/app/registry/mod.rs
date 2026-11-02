@@ -8,8 +8,8 @@ use crate::modules::bt;
 #[cfg(desktop)]
 use crate::modules::lan_transfer;
 use crate::modules::{
-    ai, diagnostics, filesystem, game_room, hosts, keys, maintenance, model_viewer, poetry, speech,
-    ssh, todo, translation, updater, vault,
+    ai, diagnostics, filesystem, game_room, hosts, keys, maintenance, poetry, speech, ssh, todo,
+    translation, updater, vault,
 };
 use crate::{error, models};
 use tauri_specta::{collect_commands, Builder};
@@ -51,40 +51,6 @@ macro_rules! common_modules {
                 types: [speech::model::SpeechSnapshot],
             },
             "diagnostics" => { commands: [diagnostics::diagnostics_snapshot, diagnostics::diagnostics_clear, diagnostics::logs_page, diagnostics::logs_directory, diagnostics::logs_files, diagnostics::logs_usage, diagnostics::logs_clear, diagnostics::logs_detail, diagnostics::logs_open_directory], types: [] },
-            "model_viewer" => {
-                commands: [
-                    model_viewer::system::model_system_poll,
-                    model_viewer::environment_commands::model_environment_begin,
-                    model_viewer::environment_commands::model_environment_write,
-                    model_viewer::environment_commands::model_environment_commit,
-                    model_viewer::environment_commands::model_environment_current,
-                    model_viewer::environment_commands::model_environment_read,
-                    model_viewer::environment_commands::model_environment_abort,
-                    model_viewer::environment_commands::model_environment_clear,
-                    model_viewer::attachment_commands::model_attachment_list,
-                    model_viewer::attachment_commands::model_attachment_add,
-                    model_viewer::attachment_commands::model_attachment_read,
-                    model_viewer::attachment_commands::model_attachment_delete,
-                    model_viewer::commands::model_viewer_open,
-                    model_viewer::commands::model_viewer_attach,
-                    model_viewer::commands::model_viewer_size,
-                    model_viewer::commands::model_viewer_read,
-                    model_viewer::commands::model_viewer_close,
-                    model_viewer::library_commands::model_library_catalog,
-                    model_viewer::library_commands::model_library_begin,
-                    model_viewer::library_commands::model_library_write,
-                    model_viewer::library_commands::model_library_commit,
-                    model_viewer::library_commands::model_library_document,
-                    model_viewer::library_commands::model_library_read,
-                    model_viewer::library_commands::model_library_edit,
-                    model_viewer::library_commands::model_library_save_view,
-                    model_viewer::library_commands::model_library_delete,
-                    model_viewer::library_commands::model_library_thumbnail,
-                    model_viewer::library_commands::model_library_cache,
-                    model_viewer::library_commands::model_library_read_thumbnail,
-                ],
-                types: [],
-            },
             "ai" => {
                 commands: [
                     ai::configuration::commands::ai_configuration_get,
@@ -362,14 +328,7 @@ macro_rules! bt_module {
 macro_rules! mobile_export_module {
     ($next:ident, $($modules:tt)*) => {
         $next! { $($modules)*
-"model_export" => { commands: [
-                    model_viewer::export_commands::model_export_begin,
-                    model_viewer::export_commands::model_export_write,
-                    model_viewer::export_commands::model_export_present,
-                    model_viewer::export_commands::model_export_cancel,
-                    model_viewer::export_commands::model_export_close,
-], types: [] },
-"mobile_navigation" => { commands: [crate::app::mobile_navigation::mobile_navigation_configure], types: [] },
+            "mobile_navigation" => { commands: [crate::app::mobile_navigation::mobile_navigation_configure], types: [] },
         }
     };
 }

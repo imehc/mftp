@@ -43,9 +43,6 @@ export function platformAliases(target: string | null) {
     replacements["~/features/bt/integration"] =
       "src/app/platform/without-bt.ts";
   }
-  if (!supports(target, "mobileModel"))
-    replacements["~/features/model-viewer/export/native-export"] =
-      "src/features/model-viewer/export/native-export.desktop.ts";
   return Object.fromEntries(
     Object.entries(replacements).map(([key, file]) => [
       key,

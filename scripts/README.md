@@ -28,7 +28,6 @@
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `check:dev-isolation`     | 校验开发环境数据目录隔离（Node test runner）                                                                                                      |
 | `check:react`             | 校验 React 相关依赖版本一致性                                                                                                                     |
-| `check:model-offline`     | 校验模型功能不引入联网依赖                                                                                                                        |
 | `check:build-budget`      | 校验前端构建产物体积预算（`tests/checks/build-budget.json`）                                                                                      |
 | `check:platform`          | 校验各平台打包配置（Node test runner）                                                                                                            |
 | `check:platform-artifact` | 校验发布产物归属与必需文件                                                                                                                        |

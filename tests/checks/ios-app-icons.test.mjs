@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 const apple = new URL("../../src-tauri/gen/apple/", import.meta.url);
@@ -26,6 +26,11 @@ test("iOS 主图标包含默认和系统深色变体而非备用图标", () => {
     assert.equal(image.size, "1024x1024");
     assert.ok(existsSync(new URL(image.filename, asset)));
   }
+  assert.deepEqual(
+    readdirSync(asset).sort(),
+    ["Contents.json", ...images.map((image) => image.filename)].sort(),
+    "图标目录不得残留 Tauri 初始化生成的默认尺寸图标",
+  );
   assert.equal(
     existsSync(new URL("Assets.xcassets/AppIconDark.appiconset", apple)),
     false,

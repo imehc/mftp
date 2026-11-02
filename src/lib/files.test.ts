@@ -29,13 +29,13 @@ it.each([
 
 it("指定后缀时保留原生过滤与文件选择结果", async () => {
   const path = await pickFilePathNative({
-    filterName: "模型",
-    extensions: ["glb", "gltf", "fbx"],
+    filterName: "图片",
+    extensions: ["png", "jpg"],
   });
   expect(path).toBe("/tmp/paint.png");
   expect(open).toHaveBeenCalledWith(
     expect.objectContaining({
-      filters: [{ name: "模型", extensions: ["glb", "gltf", "fbx"] }],
+      filters: [{ name: "图片", extensions: ["png", "jpg"] }],
     }),
   );
   expect(filesystemAllowPath).toHaveBeenCalledWith("/tmp/paint.png");

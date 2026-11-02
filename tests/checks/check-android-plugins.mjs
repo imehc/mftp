@@ -12,12 +12,7 @@ const project = path.resolve(
 const options = new Set(process.argv.slice(2));
 const offline = options.has("--offline");
 const prepareOnly = options.has("--prepare-only");
-const plugins = [
-  "android-updater",
-  "native-export",
-  "native-viewer",
-  "native-speech",
-];
+const plugins = ["android-updater", "native-speech"];
 const excluded = new Set(["build", ".gradle", ".git", ".DS_Store"]);
 let fixture;
 let report;

@@ -47,9 +47,6 @@ jobs:
       - name: Check React version consistency
         run: pnpm run check:react
 
-      - name: Check model offline resources
-        run: pnpm run check:model-offline
-
       - name: Check form error semantics
         run: pnpm run check:form-errors
 
@@ -210,12 +207,6 @@ jobs:
       # or validate the complete iOS application or native system behavior.
       - name: Check iOS library
         run: cargo check --manifest-path src-tauri/Cargo.toml --locked --lib --target aarch64-apple-ios-sim
-
-      - name: Compile iOS export and viewer plugins
-        run: >-
-          cargo check --manifest-path src-tauri/Cargo.toml --locked
-          -p tauri-plugin-native-export -p tauri-plugin-native-viewer
-          --target aarch64-apple-ios-sim
 
   android-plugins:
     name: Android plugins (compile only)

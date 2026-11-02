@@ -21,9 +21,6 @@ vi.mock("~/features/bt/integration", () => ({
 vi.mock("~/features/games/engine/session-registry", () => ({
   installGameSessionRuntime: vi.fn(() => vi.fn()),
 }));
-vi.mock("~/features/model-viewer/system/inbox", () => ({
-  installModelSystemRuntime: vi.fn(() => vi.fn()),
-}));
 vi.mock("~/features/poetry/sync-progress", () => ({
   installPoetrySyncRuntime: vi.fn(() => vi.fn()),
 }));
@@ -38,7 +35,6 @@ vi.mock("~/lib/color-theme", () => ({
   resolveColorTheme: vi.fn(),
 }));
 vi.mock("~/lib/display-size", () => ({ applyDisplaySize: vi.fn() }));
-vi.mock("~/router", () => ({ router: { navigate: vi.fn() } }));
 vi.mock("next-themes", () => ({
   useTheme: () => ({ resolvedTheme: "light" }),
 }));

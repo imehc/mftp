@@ -3501,10 +3501,8 @@ dependencies = [
  "tauri-plugin-dialog",
  "tauri-plugin-fs",
  "tauri-plugin-keystore",
- "tauri-plugin-native-export",
  "tauri-plugin-native-navigation",
  "tauri-plugin-native-speech",
- "tauri-plugin-native-viewer",
  "tauri-plugin-opener",
  "tauri-plugin-os",
  "tauri-plugin-process",
@@ -6288,16 +6286,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tauri-plugin-native-export"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tauri",
- "tauri-plugin",
-]
-
-[[package]]
 name = "tauri-plugin-native-navigation"
 version = "0.1.0"
 dependencies = [
@@ -6311,16 +6299,6 @@ name = "tauri-plugin-native-speech"
 version = "0.1.0"
 dependencies = [
  "serde",
- "tauri",
- "tauri-plugin",
-]
-
-[[package]]
-name = "tauri-plugin-native-viewer"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
  "tauri",
  "tauri-plugin",
 ]

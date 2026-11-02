@@ -49,12 +49,7 @@
         "src/features/poetry/components/TranslationPackManager.tsx",
         "src/features/poetry/hooks/use-poetry-local-data.ts"
       ]
-    },
-    "mobileModel": {
-      "platforms": ["android", "ios"],
-      "routes": [],
-      "sources": ["src/features/model-viewer/export/native-export.ts"]
     }
   },
-  "resources": ["app-light-icon.png", "app-dark-icon.png", "model-decoders/"]
+  "resources": ["app-light-icon.png", "app-dark-icon.png"]
 }
