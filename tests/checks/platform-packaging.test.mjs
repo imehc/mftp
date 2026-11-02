@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
 import {
   buildPlatform,
-  ignoredRoutes,
   normalizePlatform,
   platformManifest,
   projectRoot,
@@ -37,14 +36,6 @@ test("五个目标的路由和源模块矩阵与原生配置一致", () => {
       ),
     );
     assert.equal(config.build.frontendDist, `../dist/${target}`);
-    assert.equal(
-      ignoredRoutes(target).includes("tools/bt.tsx"),
-      target === "ios",
-    );
-    assert.equal(
-      sourceIncluded(target, "src/features/bt/tasks-store.ts"),
-      target !== "ios",
-    );
     assert.equal(supports(target, "lan"), !["android", "ios"].includes(target));
     // 布局是窗口尺寸能力，移动/桌面后缀不是全局排除规则。
     assert.equal(
@@ -77,5 +68,29 @@ test("rsync 能力只随 macOS/Linux 产物提供", () => {
       "src/features/ssh-sftp/components/sftp/SftpPanel.tsx",
     ),
     true,
+  );
+});
+
+test("BT 模块在所有平台均已移除", () => {
+  assert.equal("bt" in platformManifest.capabilities, false);
+  for (const path of [
+    "src/features/bt",
+    "src/routes/tools/bt.tsx",
+    "src/app/platform/without-bt.ts",
+    "src/app/platform/without-bt-control.ts",
+    "src-tauri/src/modules/bt",
+    "src-tauri/src/adapters/bt.rs",
+  ])
+    assert.equal(existsSync(join(projectRoot, path)), false, path);
+  assert.doesNotMatch(
+    readFileSync(
+      join(projectRoot, "src-tauri/src/app/registry/command_baseline.txt"),
+      "utf8",
+    ),
+    /\bbt_\w+/,
+  );
+  assert.doesNotMatch(
+    readFileSync(join(projectRoot, "src-tauri/Cargo.toml"), "utf8"),
+    /\blibrqbit(?:-core)?\b/,
   );
 });

@@ -3,8 +3,6 @@
 #[cfg(desktop)]
 pub(crate) mod mcp;
 
-#[cfg(any(desktop, target_os = "android"))]
-use crate::modules::bt;
 #[cfg(desktop)]
 use crate::modules::lan_transfer;
 use crate::modules::{
@@ -297,33 +295,6 @@ macro_rules! lan_module {
     };
 }
 
-#[cfg(any(desktop, target_os = "android"))]
-macro_rules! bt_module {
-    ($next:ident, $($modules:tt)*) => {
-        $next! { $($modules)*
-    "bt" => {
-        commands: [
-            bt::commands::bt_probe,
-            bt::commands::bt_add_download,
-            bt::commands::bt_export,
-            bt::commands::bt_list,
-            bt::commands::bt_control,
-            bt::commands::bt_task_peers,
-            bt::commands::bt_dht_status,
-            bt::commands::bt_playability,
-            bt::commands::bt_browse_files,
-            bt::commands::bt_preview_file,
-            bt::commands::bt_open_file,
-        ],
-        types: [bt::BtProbeResult, bt::BtTaskInfo, bt::BtTaskStatus,
-            bt::BtPackageMode, bt::BtFileMeta, bt::BtControlAction,
-            bt::BtPeerInfo, bt::BtDhtStatus, bt::BtDhtState,
-            bt::BtPlayability, bt::BtTaskEvent],
-    },
-        }
-    };
-}
-
 #[cfg(any(mobile, test))]
 macro_rules! mobile_export_module {
     ($next:ident, $($modules:tt)*) => {
@@ -378,13 +349,9 @@ macro_rules! add_mcp { ($($modules:tt)*) => { add_lan!($($modules)*); }; }
 
 // Filter complete command groups before Specta/Tauri expand the command list.
 #[cfg(desktop)]
-macro_rules! add_lan { ($($modules:tt)*) => { lan_module!(add_bt, $($modules)*); }; }
+macro_rules! add_lan { ($($modules:tt)*) => { lan_module!(add_mobile, $($modules)*); }; }
 #[cfg(mobile)]
-macro_rules! add_lan { ($($modules:tt)*) => { add_bt!($($modules)*); }; }
-#[cfg(any(desktop, target_os = "android"))]
-macro_rules! add_bt { ($($modules:tt)*) => { bt_module!(add_mobile, $($modules)*); }; }
-#[cfg(target_os = "ios")]
-macro_rules! add_bt { ($($modules:tt)*) => { add_mobile!($($modules)*); }; }
+macro_rules! add_lan { ($($modules:tt)*) => { add_mobile!($($modules)*); }; }
 #[cfg(mobile)]
 macro_rules! add_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
 #[cfg(desktop)]

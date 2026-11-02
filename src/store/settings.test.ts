@@ -48,12 +48,12 @@ describe("启动偏好迁移与持久化", () => {
       await migrate({
         startupMode: "manual",
         manualPage: "lan-transfer",
-        lastPage: "bt",
+        lastPage: "crypto",
       }),
     ).toMatchObject({
       startupMode: "manual",
       manualPage: "lan-transfer",
-      lastPage: "bt",
+      lastPage: "crypto",
     });
     expect(
       await migrate({

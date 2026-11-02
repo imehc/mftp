@@ -1,4 +1,4 @@
-//! Pure single-byte-range parsing shared by the LAN and BT HTTP adapters.
+//! Pure single-byte-range parsing used by the LAN HTTP adapter.
 
 #[cfg(any(desktop, target_os = "android", test))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

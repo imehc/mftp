@@ -61,7 +61,6 @@ export default function ResetBoundary({ children }: { children: ReactNode }) {
   const finished = phase === "finished";
   const labels: Record<AppDataResetStep, string> = {
     poetry: t`诗词库与临时文件`,
-    bt: t`BT 内部数据`,
     credentials: t`AI 密钥`,
     translation: t`离线翻译模型`,
   };

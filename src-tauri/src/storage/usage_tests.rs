@@ -30,7 +30,6 @@ fn empty_data_and_absent_optional_files_are_measured_as_zero() {
     assert_eq!(usage.todo_bytes, 0);
     assert_eq!(usage.activity_logs_bytes, 0);
     assert_eq!(usage.poetry_database_bytes, 0);
-    assert_eq!(usage.download_bytes, 0);
     assert_eq!(usage.translation_model_bytes, 0);
     assert_eq!(usage.keys_bytes, 0);
     // 各项相加必须等于测到的目录占用，不允许出现无法解释的差额。
@@ -39,7 +38,6 @@ fn empty_data_and_absent_optional_files_are_measured_as_zero() {
         usage.main_database_bytes
             + usage.poetry_database_bytes
             + usage.translation_model_bytes
-            + usage.download_bytes
             + usage.keys_bytes
             + usage.cache_bytes
     );
@@ -91,7 +89,7 @@ fn invalid_parent_paths_are_not_treated_as_missing_optional_files() {
 fn denied_directory_access_retains_the_io_error() {
     use std::os::unix::fs::PermissionsExt;
     let fixture = Fixture::new();
-    let directory = fixture.root.join("bt");
+    let directory = fixture.root.join("inaccessible-data");
     fs::create_dir(&directory).unwrap();
     fs::write(directory.join("data"), b"keep").unwrap();
     let permissions = fs::metadata(&directory).unwrap().permissions();

@@ -57,7 +57,7 @@ export function createQueryResource<T>(
             event.action.type === "invalidate" &&
             started
           ) {
-            // 多个消费者只触发一次失效；未启动的 BT 等资源不能因此被初始化。
+            // 多个消费者只触发一次失效；未启动的资源不能因此被初始化。
             if (onInvalidate) onInvalidate();
             else void resource.fetch(true).catch(() => {});
           }

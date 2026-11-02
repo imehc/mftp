@@ -248,17 +248,6 @@ export const commands = {
 	lanTransferTrustedDevices: () => typedError<LanTrustedDevice[], AppError>(__TAURI_INVOKE("lan_transfer_trusted_devices")),
 	lanTransferAddTrustedDevice: (input: LanTrustedDeviceInput) => typedError<LanTrustedDevice, AppError>(__TAURI_INVOKE("lan_transfer_add_trusted_device", { input })),
 	lanTransferDeleteTrustedDevice: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("lan_transfer_delete_trusted_device", { id })),
-	btProbe: (source: string) => typedError<BtProbeResult, AppError>(__TAURI_INVOKE("bt_probe", { source })),
-	btAddDownload: (source: string, infoHash: string, fileIndices: number[]) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_add_download", { source, infoHash, fileIndices })),
-	btExport: (infoHash: string, destDir: string) => typedError<BtTaskInfo, AppError>(__TAURI_INVOKE("bt_export", { infoHash, destDir })),
-	btList: () => typedError<BtTaskInfo[], AppError>(__TAURI_INVOKE("bt_list")),
-	btControl: (infoHash: string, action: BtControlAction, deleteFiles: boolean) => typedError<null, AppError>(__TAURI_INVOKE("bt_control", { infoHash, action, deleteFiles })),
-	btTaskPeers: (infoHash: string) => typedError<BtPeerInfo[], AppError>(__TAURI_INVOKE("bt_task_peers", { infoHash })),
-	btDhtStatus: () => typedError<BtDhtStatus, AppError>(__TAURI_INVOKE("bt_dht_status")),
-	btPlayability: (infoHash: string, fileIndex: number, prepare: boolean) => typedError<BtPlayability, AppError>(__TAURI_INVOKE("bt_playability", { infoHash, fileIndex, prepare })),
-	btBrowseFiles: (infoHash: string, path: string | null) => typedError<BtFileListing, AppError>(__TAURI_INVOKE("bt_browse_files", { infoHash, path })),
-	btPreviewFile: (infoHash: string, path: string) => typedError<BtFilePreview, AppError>(__TAURI_INVOKE("bt_preview_file", { infoHash, path })),
-	btOpenFile: (infoHash: string, path: string) => typedError<null, AppError>(__TAURI_INVOKE("bt_open_file", { infoHash, path })),
 	mobileNavigationConfigure: (input: MobileNavigationConfig) => typedError<null, AppError>(__TAURI_INVOKE("mobile_navigation_configure", { input })),
 };
 
@@ -575,7 +564,7 @@ export type AppDataClearResult = {
 	preserved: string[],
 };
 
-export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs" | "translationModels" | "downloads" | "cache";
+export type AppDataModule = "vault" | "hosts" | "todo" | "poetry" | "activityLogs" | "translationModels" | "cache";
 
 export type AppDataResetFailure = {
 	step: AppDataResetStep,
@@ -597,7 +586,7 @@ export type AppDataResetResult = {
 	preserved: string[],
 };
 
-export type AppDataResetStep = "poetry" | "bt" | "credentials" | "translation";
+export type AppDataResetStep = "poetry" | "credentials" | "translation";
 
 export type AppDataUsage = {
 	vaultBytes: number,
@@ -608,8 +597,6 @@ export type AppDataUsage = {
 	activityLogsBytes: number,
 	// Downloaded translation models, including partial downloads.
 	translationModelBytes: number,
-	// BT working data and tombstones left by a failed cleanup.
-	downloadBytes: number,
 	// Private keys persisted as files outside the main database.
 	keysBytes: number,
 	// Everything else under the data directory: temp files and caches.
@@ -642,118 +629,7 @@ export type AuthorSummary = {
 	poemCount: number,
 };
 
-export type BtControlAction = "Pause" | "Resume" | "Cancel" | "Remove";
-
-export type BtDhtState = "Disabled" | "NotEstablished" | "Bootstrapping" | "Ready";
-
-// Shared DHT diagnostics for the current platform-local BT session.
-export type BtDhtStatus = {
-	enabled: boolean,
-	ipv4Nodes: number,
-	ipv6Nodes: number,
-	outstandingRequests: number,
-	state: BtDhtState,
-};
-
-export type BtFileEntry = {
-	// Relative to the task's download directory, never an arbitrary device path.
-	path: string,
-	name: string,
-	isDir: boolean,
-	size: number,
-};
-
-export type BtFileListing = {
-	current: BtFileEntry,
-	entries: BtFileEntry[],
-};
-
-export type BtFileMeta = {
-	index: number,
-	path: string,
-	len: number,
-};
-
-export type BtFilePreview = {
-	url: string,
-	partial: boolean,
-};
-
-export type BtPackageMode = "Direct" | "Archive";
-
-// Per-peer details (IP masked).
-export type BtPeerInfo = {
-	addr: string,
-	clientName: string | null,
-	fetchedBytes: number,
-	uploadedBytes: number,
-	state: string,
-};
-
-export type BtPlayability = {
-	infoHash: string,
-	fileIndex: number,
-	fileName: string,
-	supported: boolean,
-	totalBytes: number,
-	contiguousBytes: number,
-	minimumBytes: number,
-	ready: boolean,
-	loading: boolean,
-	reason: string | null,
-	url: string | null,
-};
-
-export type BtProbeResult = {
-	infoHash: string,
-	name: string,
-	files: BtFileMeta[],
-	totalLen: number,
-};
-
-/**
- *  Payload of bt://task-event. The kind covers save, package, and removal
- *  lifecycle notifications; detailed progress stays on TransferProgress.
- */
-export type BtTaskEvent = { kind: "package-completed"; infoHash: string } | { kind: "package-failed"; infoHash: string; error: AppError } | { kind: "export-completed"; infoHash: string } | { kind: "cancelled"; infoHash: string } | { kind: "removed"; infoHash: string };
-
-export type BtTaskInfo = {
-	infoHash: string,
-	label: string,
-	// Application-private directory that owns the downloaded pieces.
-	downloadDir: string,
-	// Completed file/archive path inside the application-private directory.
-	outputPath: string | null,
-	// Optional user-directory copy created by an explicit export action.
-	exportPath: string | null,
-	exported: boolean,
-	status: BtTaskStatus,
-	packageMode: BtPackageMode,
-	// Selected source file used by the progressive preview endpoint.
-	fileIndex: number | null,
-	fileName: string | null,
-	error: AppError | null,
-	total: number | null,
-	progress: number | null,
-	finished: boolean,
-	peersLive: number,
-	/**
-	 *  Live engine state; None while the engine is down or the handle has not
-	 *  been restored yet. The transfer panel only adopts a task once this says
-	 *  it is actually downloading, so history stays out of it.
-	 */
-	state: BtTaskState | null,
-};
-
-/**
- *  Engine-side task state. Kept as an enum rather than a display string so
- *  the frontend owns the wording (i18n).
- */
-export type BtTaskState = "Initializing" | "Downloading" | "Seeding" | "Paused" | "Error";
-
-export type BtTaskStatus = "Active" | "Packaging" | "Completed" | "Cancelled" | "Error";
-
-export type CustomErrorCode = "mcp:registration_invalid" | "mcp:unauthorized" | "mcp:configuration_invalid" | "mcp:busy" | "mcp:transport" | "translation:model_unknown" | "translation:input_invalid" | "translation:resource_invalid" | "translation:checksum" | "translation:cancelled" | "translation:busy" | "translation:not_installed" | "translation:engine" | "translation:input_limit" | "translation:output_limit" | "translation:download_range" | "translation:download" | "translation:space" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "bt:file_not_in_task" | "bt:task_not_found" | "bt:file_not_found" | "bt:preview_unavailable" | "bt:invalid_info_hash" | "bt:task_cancelled" | "bt:no_exportable_files" | "bt:invalid_archive_path" | "bt:archive_already_exists" | "bt:session_restore_failed" | "bt:task_size_out_of_range" | "bt:export_not_completed" | "bt:export_already_done" | "bt:selection_empty" | "bt:selection_duplicate" | "bt:selection_invalid" | "bt:hash_mismatch" | "bt:finalize_cancel_timeout" | "bt:readd_completed" | "bt:readd_packaging" | "bt:readd_active_selection" | "bt:readd_conflict" | "bt:task_not_initialized" | "bt:task_completed_no_cancel" | "bt:task_not_running" | "bt:staging_dir_foreign" | "bt:info_not_ready" | "bt:no_downloadable_files" | "bt:source_unsupported" | "bt:probe_timeout" | "bt:probe_unexpected" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "rsync:local_missing" | "rsync:local_unsupported" | "rsync:remote_missing" | "rsync:remote_unsupported" | "rsync:probe_failed" | "rsync:probe_timeout" | "rsync:remote_command_rejected" | "rsync:bridge_failed" | "rsync:bridge_timeout" | "rsync:local_exit" | "rsync:remote_exit" | "rsync:target_invalid" | "rsync:preview_expired" | "rsync:preview_mismatch" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "speech:unavailable" | "speech:input_invalid" | "speech:voice_missing" | "speech:busy" | "speech:control_failed" | "speech:start_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+export type CustomErrorCode = "mcp:registration_invalid" | "mcp:unauthorized" | "mcp:configuration_invalid" | "mcp:busy" | "mcp:transport" | "translation:model_unknown" | "translation:input_invalid" | "translation:resource_invalid" | "translation:checksum" | "translation:cancelled" | "translation:busy" | "translation:not_installed" | "translation:engine" | "translation:input_limit" | "translation:output_limit" | "translation:download_range" | "translation:download" | "translation:space" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "rsync:local_missing" | "rsync:local_unsupported" | "rsync:remote_missing" | "rsync:remote_unsupported" | "rsync:probe_failed" | "rsync:probe_timeout" | "rsync:remote_command_rejected" | "rsync:bridge_failed" | "rsync:bridge_timeout" | "rsync:local_exit" | "rsync:remote_exit" | "rsync:target_invalid" | "rsync:preview_expired" | "rsync:preview_mismatch" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "speech:unavailable" | "speech:input_invalid" | "speech:voice_missing" | "speech:busy" | "speech:control_failed" | "speech:start_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
 
 export type DiagnosticBodyEnd = "receiving" | "complete" | "protocolEnd" | "interrupted";
 
@@ -1586,32 +1462,11 @@ export type TodoNoteSummary = {
 // Optional todo priority; absence means none was chosen.
 export type TodoPriority = "high" | "medium" | "low";
 
-export type TransferProgress = TransferProgress_Serialize | TransferProgress_Deserialize;
-
-export type TransferProgress_Deserialize = {
+export type TransferProgress = {
 	id: string,
 	phase: string,
 	transferred: number,
 	total: number | null,
-	/**
-	 *  None: completion is driven by the command return value (SFTP).
-	 *  Some(true): the task is done; the frontend should mark it success
-	 *  (engine-managed tasks such as BT).
-	 */
-	finished?: boolean | null,
-};
-
-export type TransferProgress_Serialize = {
-	id: string,
-	phase: string,
-	transferred: number,
-	total: number | null,
-	/**
-	 *  None: completion is driven by the command return value (SFTP).
-	 *  Some(true): the task is done; the frontend should mark it success
-	 *  (engine-managed tasks such as BT).
-	 */
-	finished?: boolean | null,
 };
 
 export type TranslationModel = {

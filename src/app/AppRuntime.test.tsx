@@ -15,9 +15,6 @@ import { AppRuntime } from "./AppRuntime";
 vi.mock("~/features/updater/integration", () => ({
   checkForUpdateOnLaunch: vi.fn(),
 }));
-vi.mock("~/features/bt/integration", () => ({
-  installBtRuntime: vi.fn(() => vi.fn()),
-}));
 vi.mock("~/features/games/engine/session-registry", () => ({
   installGameSessionRuntime: vi.fn(() => vi.fn()),
 }));

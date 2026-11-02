@@ -8,11 +8,6 @@ pub struct TransferProgress {
     pub phase: String,
     pub transferred: u64,
     pub total: Option<u64>,
-    /// None: completion is driven by the command return value (SFTP).
-    /// Some(true): the task is done; the frontend should mark it success
-    /// (engine-managed tasks such as BT).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub finished: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -55,7 +50,6 @@ pub enum AppDataModule {
     Poetry,
     ActivityLogs,
     TranslationModels,
-    Downloads,
     Cache,
 }
 
@@ -70,8 +64,6 @@ pub struct AppDataUsage {
     pub activity_logs_bytes: u64,
     /// Downloaded translation models, including partial downloads.
     pub translation_model_bytes: u64,
-    /// BT working data and tombstones left by a failed cleanup.
-    pub download_bytes: u64,
     /// Private keys persisted as files outside the main database.
     pub keys_bytes: u64,
     /// Everything else under the data directory: temp files and caches.
@@ -104,7 +96,6 @@ pub struct AppDataResetResult {
 #[serde(rename_all = "camelCase")]
 pub enum AppDataResetStep {
     Poetry,
-    Bt,
     Credentials,
     Translation,
 }

@@ -32,7 +32,5 @@ pub(super) fn emit_progress(
         phase: phase.to_owned(),
         transferred,
         total,
-        // SFTP completion still comes from the command result.
-        finished: None,
     }));
 }

@@ -36,12 +36,6 @@ export const modules = [
     tool: null,
     platforms: platformManifest.capabilities.mcp.platforms as ModulePlatform[],
   },
-  // iOS 不注册 BT 引擎；桌面端和 Android 使用独立本地 Session。
-  {
-    id: "bt",
-    tool: "bt",
-    platforms: platformManifest.capabilities.bt.platforms as ModulePlatform[],
-  },
   { id: "library", tool: "library" },
   { id: "billiards", tool: null },
   { id: "gomoku", tool: null },

@@ -54,7 +54,6 @@ impl Storage {
             reset_pending: Arc::new(AtomicBool::new(false)),
         };
         prepare_database(&storage.db_path)?;
-        storage.sweep_bt_tombstones();
         storage.init_db()?;
         storage.init_reset_journal()?;
         storage.migrate_legacy_json()?;
@@ -112,7 +111,6 @@ impl Storage {
         crate::modules::keys::schema::init(&conn)?;
         crate::modules::lan_transfer::schema::init(&mut conn)?;
         crate::modules::vault::schema::init(&conn)?;
-        crate::modules::bt::schema::init(&mut conn)?;
         crate::modules::todo::schema::init(&mut conn)?;
         crate::modules::ai::schema::init(&mut conn)?;
         #[cfg(desktop)]
@@ -247,8 +245,7 @@ impl Storage {
         &self.db_path
     }
 
-    // Only BT adapters/repositories and storage-backed tests need this path.
-    #[cfg(any(desktop, target_os = "android", test))]
+    #[cfg(test)]
     pub(crate) fn root_path(&self) -> &Path {
         &self.root
     }

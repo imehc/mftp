@@ -64,7 +64,6 @@ export function useAbout() {
     poetry: t`诗词库`,
     activityLogs: t`活动日志`,
     translationModels: t`翻译模型`,
-    downloads: t`下载数据`,
     cache: t`缓存与临时`,
   };
   const moduleBytes: Record<AppDataModule, number> | null = usage
@@ -75,7 +74,6 @@ export function useAbout() {
         poetry: usage.poetryDatabaseBytes,
         activityLogs: usage.activityLogsBytes,
         translationModels: usage.translationModelBytes,
-        downloads: usage.downloadBytes,
         cache: usage.cacheBytes,
       }
     : null;
@@ -93,12 +91,6 @@ export function useAbout() {
           label: t`翻译模型`,
           bytes: usage.translationModelBytes,
           module: "translationModels",
-        },
-        {
-          key: "downloads",
-          label: t`下载数据`,
-          bytes: usage.downloadBytes,
-          module: "downloads",
         },
         { key: "keys", label: t`密钥文件`, bytes: usage.keysBytes },
         {

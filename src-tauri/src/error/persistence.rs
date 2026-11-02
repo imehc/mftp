@@ -1,6 +1,8 @@
 //! Versioned storage boundary. Never rewrite an unknown envelope while reading it.
 
-use super::{AppError, AppResult};
+use super::AppError;
+#[cfg(test)]
+use super::AppResult;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -9,6 +11,8 @@ struct StoredError {
     error: AppError,
 }
 
+// Only legacy SQLite fixtures write this envelope; production logs use JSONL.
+#[cfg(test)]
 pub(crate) fn encode(error: &AppError) -> AppResult<String> {
     Ok(serde_json::to_string(&StoredError {
         version: 1,

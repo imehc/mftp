@@ -3,14 +3,12 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-#[cfg(any(desktop, target_os = "android"))]
-mod bt;
 mod codes;
 mod external;
 mod ssh;
 // The shared activity log store persists structured errors on every platform
 // (the Executor logging path exists in mobile builds too), so the versioned
-// envelope is unconditional; BT task errors reuse the same codec.
+// envelope is unconditional.
 pub(crate) mod persistence;
 
 pub use codes::CustomErrorCode;

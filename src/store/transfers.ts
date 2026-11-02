@@ -6,33 +6,18 @@ import { translate } from "~/i18n/translate";
 import { toIpcError } from "~/lib/errors";
 import type { AppError, TransferProgress } from "~/types";
 
-/** 后端 BT phase 是机器 key，文案归前端；未收录的 key 原样透出。 */
-const BT_PHASE_LABELS: Record<string, () => string> = {
-  "bt:metadata": () => translate(msg`获取资源信息…`),
-  "bt:downloading": () => translate(msg`下载中`),
-  "bt:seeding": () => translate(msg`做种中`),
-  "bt:paused": () => translate(msg`已暂停`),
-  "bt:error": () => translate(msg`错误`),
-  "bt:packaging": () => translate(msg`打包中`),
-};
-
-function btPhaseLabel(phase: string): string {
-  return BT_PHASE_LABELS[phase]?.() ?? phase;
-}
-
 /**
  * 传输任务的来源动作。
  *
  * 传输坞按此选择图标与动效，不从 label 文案反推——文案会随语言和措辞变化。
  */
-export type TransferKind =
-  "upload" | "download" | "bt" | "sync" | "delete" | "other";
+export type TransferKind = "upload" | "download" | "sync" | "delete" | "other";
 
 export interface TransferState {
   id: string;
   label: string;
   phase: string;
-  /** 决定坞内图标与动效；默认按 source 推导。 */
+  /** 决定坞内图标与动效；未声明时使用通用图标。 */
   kind: TransferKind;
   /** 任务创建时刻（performance.now 基准），用于最小可见时长。 */
   startedAt: number;
@@ -56,13 +41,10 @@ export interface TransferState {
   /** 重试动作的类型化描述；不能保存页面的 setState 闭包。 */
   retry?: TransferRetryIntent;
   retrying?: boolean;
-  /** 面板徽标展示的任务来源；默认为 sftp（历史行为）。 */
-  source?: "sftp" | "bt";
 }
 
 interface TransfersState {
   transfers: TransferState[];
-  dismissed: Set<string>;
   /** 进度事件监听不可用；面板据此提示，不把失败当成“没有任务”。 */
   runtimeError?: AppError;
   start: (
@@ -72,11 +54,9 @@ interface TransfersState {
       cancellable?: boolean;
       pausable?: boolean;
       retry?: TransferRetryIntent;
-      source?: "sftp" | "bt";
       kind?: TransferKind;
     },
   ) => void;
-  restore: TransfersState["start"];
   dismiss: (id: string) => void;
   updateProgressBatch: (progresses: TransferProgress[]) => void;
   finish: (
@@ -96,41 +76,19 @@ interface TransfersState {
 
 export const useTransfersStore = create<TransfersState>((set) => ({
   transfers: [],
-  dismissed: new Set(),
   runtimeError: undefined,
   start(id, label, options) {
-    set((state) => {
-      const dismissed = new Set(state.dismissed);
-      dismissed.delete(id);
-      return {
-        dismissed,
-        transfers: [
-          createTransfer(id, label, options),
-          ...state.transfers.filter((item) => item.id !== id),
-        ],
-      };
-    });
-  },
-  restore(id, label, options) {
-    set((state) => {
-      if (state.dismissed.has(id)) return state;
-      return {
-        transfers: [
-          createTransfer(id, label, options),
-          ...state.transfers.filter((item) => item.id !== id),
-        ],
-      };
-    });
+    set((state) => ({
+      transfers: [
+        createTransfer(id, label, options),
+        ...state.transfers.filter((item) => item.id !== id),
+      ],
+    }));
   },
   dismiss(id) {
-    set((state) => {
-      const dismissed = new Set(state.dismissed);
-      dismissed.add(id);
-      return {
-        dismissed,
-        transfers: state.transfers.filter((item) => item.id !== id),
-      };
-    });
+    set((state) => ({
+      transfers: state.transfers.filter((item) => item.id !== id),
+    }));
   },
   updateProgressBatch(progresses) {
     if (progresses.length === 0) return;
@@ -143,22 +101,6 @@ export const useTransfersStore = create<TransfersState>((set) => ({
         const progress = progressById.get(item.id);
         if (!progress || item.status !== "running") return item;
 
-        // 引擎托管的任务（BT）：后端 finished 标志会直接把任务标记为 success。
-        if (progress.finished === true) {
-          return {
-            ...item,
-            status: "success" as const,
-            phase: translate(msg`完成`),
-            transferred: progress.total ?? progress.transferred,
-            total: progress.total ?? null,
-            speed: null,
-            cancelling: false,
-            paused: false,
-            pausedPhase: undefined,
-            updatedAt: now,
-            finishedAt: now,
-          };
-        }
         if (item.paused) {
           return {
             ...item,
@@ -167,8 +109,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
             speed: null,
           };
         }
-        const phase =
-          item.source === "bt" ? btPhaseLabel(progress.phase) : progress.phase;
+        const phase = progress.phase;
         const phaseChanged = phase !== item.phase;
         return {
           ...item,
@@ -331,12 +272,7 @@ export const useTransfersStore = create<TransfersState>((set) => ({
   },
   clearFinished() {
     set((state) => {
-      const dismissed = new Set(state.dismissed);
-      for (const item of state.transfers) {
-        if (item.status !== "running") dismissed.add(item.id);
-      }
       return {
-        dismissed,
         transfers: state.transfers.filter((item) => item.status === "running"),
       };
     });
@@ -352,8 +288,7 @@ function createTransfer(
     id,
     label,
     phase: translate(msg`准备中`),
-    // BT 任务由 task-sync 恢复时只带 source；未知来源统一走通用图标。
-    kind: options?.kind ?? (options?.source === "bt" ? "bt" : "other"),
+    kind: options?.kind ?? "other",
     startedAt: performance.now(),
     finishedAt: undefined,
     transferred: 0,
@@ -367,7 +302,6 @@ function createTransfer(
     controlPending: false,
     controlError: undefined,
     retry: options?.retry,
-    source: options?.source,
     retrying: false,
   };
 }

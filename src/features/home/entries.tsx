@@ -15,7 +15,6 @@ import {
   Languages,
   ListTodo,
   LockKeyhole,
-  Magnet,
   TerminalSquare,
   Wifi,
 } from "lucide-react";
@@ -141,16 +140,6 @@ export const homeEntries: HomeEntry[] = [
     }),
     icon: ListTodo,
     title: <Trans>待办事项</Trans>,
-  },
-  {
-    id: "bt",
-    category: "tools",
-    link: linkOptions({
-      to: "/tools/bt",
-      preload: "intent",
-    }),
-    icon: Magnet,
-    title: <Trans>BT 下载</Trans>,
   },
   {
     id: "library",

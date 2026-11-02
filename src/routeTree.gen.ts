@@ -27,7 +27,6 @@ import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
 import { Route as LibraryManageRouteImport } from './routes/library/manage'
-import { Route as ToolsBtRouteImport } from './routes/tools/bt'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
 import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
@@ -129,11 +128,6 @@ const LibraryManageRoute = LibraryManageRouteImport.update({
   path: '/library/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsBtRoute = ToolsBtRouteImport.update({
-  id: '/tools/bt',
-  path: '/tools/bt',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
   id: '/tools/crypto',
   path: '/tools/crypto',
@@ -203,7 +197,6 @@ export interface FileRoutesByFullPath {
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
-  '/tools/bt': typeof ToolsBtRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -234,7 +227,6 @@ export interface FileRoutesByTo {
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
-  '/tools/bt': typeof ToolsBtRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -266,7 +258,6 @@ export interface FileRoutesById {
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
-  '/tools/bt': typeof ToolsBtRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -299,7 +290,6 @@ export interface FileRouteTypes {
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
-    | '/tools/bt'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -330,7 +320,6 @@ export interface FileRouteTypes {
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
-    | '/tools/bt'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -361,7 +350,6 @@ export interface FileRouteTypes {
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
-    | '/tools/bt'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -393,7 +381,6 @@ export interface RootRouteChildren {
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   LibraryIdRoute: typeof LibraryIdRoute
   LibraryManageRoute: typeof LibraryManageRoute
-  ToolsBtRoute: typeof ToolsBtRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsFormatterRoute: typeof ToolsFormatterRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
@@ -535,13 +522,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryManageRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/bt': {
-      id: '/tools/bt'
-      path: '/tools/bt'
-      fullPath: '/tools/bt'
-      preLoaderRoute: typeof ToolsBtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tools/crypto': {
       id: '/tools/crypto'
       path: '/tools/crypto'
@@ -633,7 +613,6 @@ const rootRouteChildren: RootRouteChildren = {
   GamesXiangqiRoute: GamesXiangqiRoute,
   LibraryIdRoute: LibraryIdRoute,
   LibraryManageRoute: LibraryManageRoute,
-  ToolsBtRoute: ToolsBtRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsFormatterRoute: ToolsFormatterRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,

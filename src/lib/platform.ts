@@ -45,13 +45,6 @@ export function desktopOnlyGuard(): void {
   }
 }
 
-/** BT 当前在桌面端和 Android 提供本地引擎，iOS 保持明确不可用。 */
-export function btAvailableGuard(): void {
-  if (isIosPlatform()) {
-    throw redirect({ to: "/" });
-  }
-}
-
 export function isUpdaterPlatform(): boolean {
   return (
     isDesktopPlatform() ||

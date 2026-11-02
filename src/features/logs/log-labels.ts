@@ -68,9 +68,6 @@ const actionMessages: Record<string, MessageDescriptor> = {
   "sftp:resume_transfer": msg`继续传输`,
   "sftp:reset_connection": msg`重置文件传输连接`,
   "sftp:extract": msg`解压文件`,
-  "bt:add_download": msg`添加下载任务`,
-  "bt:export": msg`导出下载文件`,
-  "bt:control": msg`管理下载任务`,
   "data:export": msg`导出应用数据`,
   "data:import": msg`导入应用数据`,
   "games:create_room": msg`创建游戏房间`,
@@ -149,8 +146,6 @@ function objectKind(log: ActivityLog): MessageDescriptor | null {
       )
         ? msg`传输任务`
         : msg`SFTP 会话`;
-    case "bt":
-      return msg`BT 下载任务`;
     case "data":
       return msg`应用数据`;
     case "games":
@@ -198,7 +193,7 @@ const fileActions = new Set([
   "extract",
 ]);
 
-// 只缩短明确的 UUID / BT 哈希；文件路径、IP 地址和普通名称保持完整。
+// 只缩短明确的 UUID / 哈希；文件路径、IP 地址和普通名称保持完整。
 function shortIdentifier(value: string): string {
   const opaque =
     /^(?:[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}|[\da-f]{40}|[\da-f]{64})$/i;

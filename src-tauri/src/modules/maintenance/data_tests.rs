@@ -43,6 +43,6 @@ fn busy_error_is_custom_with_stable_participant_argument() {
 
 #[test]
 fn preserved_report_uses_a_localizable_key_not_display_copy() {
-    assert_eq!(PRESERVED_USER_FILES, "bt-downloads-and-lan-shared-files");
+    assert_eq!(PRESERVED_USER_FILES, "downloads-and-lan-shared-files");
     assert!(PRESERVED_USER_FILES.is_ascii());
 }

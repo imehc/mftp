@@ -170,15 +170,4 @@ desktop lan_transfer_delete_shared_dir
 desktop lan_transfer_trusted_devices
 desktop lan_transfer_add_trusted_device
 desktop lan_transfer_delete_trusted_device
-desktop,android bt_probe
-desktop,android bt_add_download
-desktop,android bt_export
-desktop,android bt_list
-desktop,android bt_control
-desktop,android bt_task_peers
-desktop,android bt_dht_status
-desktop,android bt_playability
-desktop,android bt_browse_files
-desktop,android bt_preview_file
-desktop,android bt_open_file
 mobile mobile_navigation_configure

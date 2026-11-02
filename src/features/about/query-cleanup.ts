@@ -8,8 +8,7 @@ const scopes: Record<AppDataModule, string[]> = {
   poetry: ["poetry"],
   activityLogs: ["logs"],
   translationModels: ["translation"],
-  downloads: ["bt"],
-  cache: ["poetry", "model", "bt"],
+  cache: ["poetry"],
 };
 
 /** 按实际清理分区通知，不通过导入业务模块破坏平台裁剪。 */

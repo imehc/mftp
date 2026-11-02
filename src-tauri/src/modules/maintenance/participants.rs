@@ -16,8 +16,6 @@ pub(crate) const MCP: &str = "mcp";
 pub(crate) const LAN_TRANSFER: &str = "lan_transfer";
 pub(crate) const GAME_ROOM: &str = "game_room";
 pub(crate) const POETRY: &str = "poetry";
-#[cfg(any(desktop, target_os = "android", test))]
-pub(crate) const BT: &str = "bt";
 
 /// Shared by both admission paths: maintenance rejections and the lifecycle's
 /// fail-closed lookup produce the same `app:data_busy` payload.

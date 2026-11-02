@@ -35,6 +35,15 @@ for (const module of report.modules)
     sourceIncluded(target, module) && !forbiddenRoutes.includes(module),
     `Unexpected module: ${module}`,
   );
+assert.ok(
+  report.modules.every(
+    (module) =>
+      !/(?:src\/features\/bt\/|src\/routes\/tools\/bt\.tsx|without-bt)/.test(
+        module,
+      ),
+  ),
+  "Retired BT implementation found in artifact",
+);
 
 function files(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

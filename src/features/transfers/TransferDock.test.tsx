@@ -50,7 +50,6 @@ function progress(patch: Partial<TransferProgress> = {}): TransferProgress {
     phase: "上传中",
     transferred: 50,
     total: 100,
-    finished: false,
     ...patch,
   } as TransferProgress;
 }
@@ -59,7 +58,7 @@ let container: HTMLDivElement;
 let root: Root;
 
 beforeEach(() => {
-  useTransfersStore.setState({ transfers: [], dismissed: new Set() });
+  useTransfersStore.setState({ transfers: [] });
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
@@ -68,7 +67,7 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount());
   container.remove();
-  useTransfersStore.setState({ transfers: [], dismissed: new Set() });
+  useTransfersStore.setState({ transfers: [] });
 });
 
 function render() {

@@ -5,7 +5,6 @@ use crate::core::{activity::ActivitySink, execution::Executor, operations::Opera
 use crate::error::AppError;
 use crate::models::{ExportSection, ImportMode};
 use crate::modules::ai::AiTaskManager;
-use crate::modules::bt::{ports::FileAccess, repository::BtRepository, BtManager};
 use crate::modules::game_room::GameRoomManager;
 use crate::modules::lan_transfer::{repository::LanRepository, LanTransferManager};
 use crate::modules::maintenance::export::{data_export, data_import, data_inspect};
@@ -15,7 +14,7 @@ use crate::storage::Storage;
 use crate::{app::services::AppServices, error::AppResult};
 use parking_lot::Mutex;
 use serde_json::{json, Value};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::{mpsc, Arc};
 use std::time::Duration;
 use tauri::{test::MockRuntime, Manager, State};
@@ -24,16 +23,6 @@ use tauri::{test::MockRuntime, Manager, State};
 mod reset_tests;
 #[path = "maintenance_usage_tests.rs"]
 mod usage_tests;
-
-struct UnusedFiles;
-impl FileAccess for UnusedFiles {
-    fn download_dir(&self) -> AppResult<PathBuf> {
-        unreachable!("document commands do not open system files")
-    }
-    fn open(&self, _: &Path) -> AppResult<()> {
-        unreachable!("document commands do not open system files")
-    }
-}
 
 struct Fixture {
     app: tauri::App<MockRuntime>,
@@ -105,12 +94,6 @@ impl Fixture {
             )),
             speech: Arc::new(crate::modules::speech::SpeechService::default()),
             poetry: Arc::new(PoetryLibrary::new(root.clone(), operations.clone())),
-            bt: Arc::new(BtManager::new(
-                BtRepository::new(storage.clone()),
-                root.join("bt"),
-                Arc::new(|_| {}),
-                Arc::new(UnusedFiles),
-            )),
             executor,
             lifecycle: Arc::new(lifecycle),
         };

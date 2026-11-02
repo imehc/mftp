@@ -39,7 +39,6 @@ export function useActivityLogs({
     lan: t`局域网`,
     ssh: "SSH",
     sftp: "SFTP",
-    bt: "BT",
     todo: t`待办`,
     vault: t`密码本`,
     hosts: t`主机`,

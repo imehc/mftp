@@ -6,7 +6,7 @@ use tauri::test::{get_ipc_response, mock_builder, mock_context, noop_assets, INV
 #[specta::specta]
 fn error_probe(custom: bool) -> AppResult<()> {
     Err(if custom {
-        AppError::custom(CustomErrorCode::BtFileNotInTask).with_arg("path", "目录/文件.txt")
+        AppError::custom(CustomErrorCode::SftpArchiveUnsafePath).with_arg("path", "目录/文件.txt")
     } else {
         std::io::Error::from(std::io::ErrorKind::NotFound).into()
     })

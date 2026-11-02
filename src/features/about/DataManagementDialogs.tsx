@@ -54,7 +54,6 @@ export default function DataManagementDialogs({
   const title = c.target && c.target !== "all" ? c.moduleTitles[c.target] : "";
   const fileDescriptions = {
     translationModels: t`将删除已下载的翻译模型，之后需要重新下载。`,
-    downloads: t`将清理下载任务的引擎数据与缓存，下载目录中的文件会保留。`,
     cache: t`将删除诗词同步产生的临时文件，不影响已导入的诗词数据。`,
   };
   const description: ReactNode = c.target

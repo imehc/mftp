@@ -46,8 +46,8 @@ fn log_failures_and_panics_do_not_replace_business_results() {
                     .unwrap(),
                 42
             );
-            let original =
-                AppError::custom(CustomErrorCode::BtFileNotInTask).with_arg("path", "original");
+            let original = AppError::custom(CustomErrorCode::SftpArchiveUnsafePath)
+                .with_arg("path", "original");
             let error = original.clone();
             assert_eq!(
                 executor
@@ -133,8 +133,8 @@ fn shutdown_rejects_new_work_before_executing_or_logging() {
 fn blocking_preserves_success_and_domain_error() {
     tauri::async_runtime::block_on(async {
         assert_eq!(run_blocking(|| Ok(42)).await.unwrap(), 42);
-        let original =
-            AppError::custom(CustomErrorCode::BtFileNotInTask).with_arg("path", "folder/file.txt");
+        let original = AppError::custom(CustomErrorCode::SftpArchiveUnsafePath)
+            .with_arg("path", "folder/file.txt");
         let expected = original.clone();
         let result = run_blocking(move || Err::<(), _>(original)).await;
         assert_eq!(result.unwrap_err(), expected);

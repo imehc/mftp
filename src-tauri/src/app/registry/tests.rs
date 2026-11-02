@@ -6,19 +6,22 @@ use tauri_specta::{BuilderConfiguration, LanguageExt};
 
 mod common_only {
     use super::super::*;
-    // Exercise the exact iOS expansion on the host, without loading BT commands.
+    // Exercise the common platform expansion on the host.
     common_modules!(define_registry,);
 }
 
 #[test]
-fn common_platform_catalog_excludes_bt_but_keeps_every_common_command() {
+fn common_platform_catalog_keeps_every_common_command() {
     let expected: Vec<_> = include_str!("command_baseline.txt")
         .lines()
         .filter_map(|line| line.strip_prefix("common "))
         .collect();
-    assert!(!common_only::module_commands()
-        .iter()
-        .any(|(module, _)| *module == "bt"));
+    let actual: Vec<_> = common_only::module_commands()
+        .into_iter()
+        .flat_map(|(_, commands)| commands)
+        .map(|path| path.rsplit("::").next().unwrap().trim())
+        .collect();
+    assert_eq!(actual, expected);
     let captured = Mutex::new(None);
     common_only::specta_builder()
         .export(Capture(&captured), Path::new("unused"))
@@ -136,10 +139,8 @@ fn event_only_types_are_still_exported() {
             "{name}"
         );
     }
-    assert_eq!(
-        bindings.contains("export type BtTaskEvent ="),
-        cfg!(any(desktop, target_os = "android"))
-    );
+    assert!(!bindings.contains("export type Bt"));
+    assert!(!bindings.contains("btProbe:"));
     for name in [
         "aiProviderActivate",
         "aiProviderSelect",
@@ -226,8 +227,7 @@ fn grouped_catalog_preserves_the_handler_and_argument_extraction() {
 #[cfg(desktop)]
 pub(crate) mod full_contract {
     use super::super::*;
-    macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_bt, $($modules)*); }; }
-    macro_rules! full_bt { ($($modules:tt)*) => { bt_module!(full_mobile, $($modules)*); }; }
+    macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_mobile, $($modules)*); }; }
     macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
     macro_rules! full_mcp { ($($modules:tt)*) => { mcp_module!(full_lan, $($modules)*); }; }
     #[cfg(any(target_os = "macos", target_os = "linux"))]
@@ -269,8 +269,7 @@ mod mobile_catalogs {
     mod android {
         use super::*;
         macro_rules! finish { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
-        macro_rules! add_bt { ($($modules:tt)*) => { bt_module!(finish, $($modules)*); }; }
-        common_modules!(add_bt,);
+        common_modules!(finish,);
     }
 
     #[test]

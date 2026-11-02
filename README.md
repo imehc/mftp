@@ -13,7 +13,6 @@
 | SSH 终端      | 主机与密钥管理、多标签交互式终端、远程系统监控                         |
 | SFTP 文件管理 | 浏览、上传下载、文件夹传输、重命名、移动、解压、冲突处理和文件预览     |
 | 局域网传输    | 本机接收服务、二维码和浏览器访问、共享目录、信任设备、确认码及权限控制 |
-| BT 下载       | 磁力链接与种子下载、任务控制、目录浏览、连接信息和原文件预览           |
 | 媒体处理      | 图片压缩、视频压缩和图片尺寸调整                                       |
 | JSON 格式化   | 语法校验、格式化、压缩、键排序、转义与反转义                           |
 | 编码工具      | 标准及 URL-safe Base64 编码、解码                                      |
@@ -30,7 +29,6 @@
 | ------------------------------------------ | ---- | ------- | ------ |
 | SSH/SFTP、媒体处理、日常工具、诗词与小游戏 | 支持 | 支持    | 支持   |
 | 局域网传输模块                             | 支持 | 不开放  | 不开放 |
-| BT 下载                                    | 支持 | 支持    | 不开放 |
 | 应用内自动更新、开机自启                   | 支持 | 不开放  | 不开放 |
 
 平台入口以 [`src/lib/module-metadata.ts`](src/lib/module-metadata.ts) 为准；原生插件也按平台分别注册。局域网传输模块的限制与小游戏房间功能分别管理。
@@ -44,7 +42,7 @@
 | UI 与交互        | shadcn/ui、Tailwind CSS v4、GSAP、TanStack Virtual   |
 | 终端与编辑器     | xterm.js、CodeMirror                                 |
 | 图形与媒体       | Three.js、PixiJS、Rapier、Mediabunny                 |
-| 下载与类型契约   | librqbit、Specta / tauri-specta                      |
+| 类型契约         | Specta / tauri-specta                                |
 | 国际化与工程工具 | Lingui、pnpm、Vitest、ESLint、Prettier               |
 
 React Compiler 已启用。前后端 IPC 契约在 Rust 侧定义，由 Specta 生成 TypeScript 类型。

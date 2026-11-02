@@ -62,12 +62,8 @@ pub(super) async fn run_owned(
         state
             .lifecycle
             .ensure_no_busy(&state.lifecycle.participant_ids())?;
-        #[cfg(any(desktop, target_os = "android"))]
-        let _bt_maintenance = state.bt.maintenance().await?;
         let ssh = state.manager.clone();
         run_blocking(move || ssh.cleanup_local_temps()).await?;
-        #[cfg(any(desktop, target_os = "android"))]
-        state.bt.stop_background_work().await;
         let storage = state.storage.clone();
         let (mut progress, before) = run_blocking(move || {
             if let Some(progress) = existing {
@@ -89,9 +85,6 @@ pub(super) async fn run_owned(
                     }
                     AppDataResetStep::Poetry => {
                         run_blocking(move || storage.clear_poetry_database()).await?
-                    }
-                    AppDataResetStep::Bt => {
-                        run_blocking(move || storage.remove_bt_internal_data()).await?
                     }
                     AppDataResetStep::Credentials => {
                         state

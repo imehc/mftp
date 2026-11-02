@@ -151,7 +151,6 @@ beforeEach(() => {
   });
   useTransfersStore.setState({
     transfers: [],
-    dismissed: new Set(),
     runtimeError: undefined,
   });
   useSessionsStore.setState({

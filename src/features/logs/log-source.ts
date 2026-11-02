@@ -7,7 +7,6 @@ const sources = {
   http: "HTTP",
   ssh: "SSH",
   sftp: "SFTP",
-  bt: "BT",
 };
 
 export function logSource(source: string, localize = translate): string {

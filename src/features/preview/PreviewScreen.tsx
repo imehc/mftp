@@ -20,14 +20,13 @@ export interface PreviewScreenProps {
   loadingLabel?: ReactNode;
   /** 标题栏右侧（如关闭 / 保存到本地）。 */
   trailing?: ReactNode;
-  /** 预览区下方的状态栏（如 BT 速度与连接数）。 */
+  /** 预览区下方的状态栏。 */
   footer?: ReactNode;
 }
 
 /**
  * 通用整页预览：标题栏 + 按类型渲染的预览区 + 可选状态栏。
- * 任何模块只要解析出文件 URL 即可渲染；BT 模块会在底部
- * 追加自己的实时统计。
+ * 任何模块只要解析出文件 URL 即可渲染。
  */
 export default function PreviewScreen({
   name,

@@ -4,7 +4,6 @@ import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { expect, test } from "vitest";
 
 import type { AppError, LanTransferTask } from "~/bindings";
-import { applyBtTaskEvent } from "~/features/bt/task-events";
 import { describeError, IpcError, toIpcError } from "~/lib/errors";
 import {
   customErrorMessages,
@@ -12,17 +11,16 @@ import {
 } from "~/lib/errors/messages";
 import {
   appDataReset,
-  btBrowseFiles,
-  btList,
   lanTransferTasks,
   sftpDownload,
+  sftpList,
 } from "~/lib/ipc";
 import { useTransfersStore } from "~/store/transfers";
 
 const custom: AppError = {
   kind: "custom",
-  code: "bt:file_not_in_task",
-  message: "File does not belong to this download task",
+  code: "sftp:archive_unsafe_path",
+  message: "Archive contains an unsafe path",
   args: { path: "目录/文件.txt" },
 };
 const external: AppError = {
@@ -31,14 +29,12 @@ const external: AppError = {
   message: "Permission denied",
   args: { osCode: "13" },
 };
-const descriptor = customErrorMessages["bt:file_not_in_task"];
+const descriptor = customErrorMessages["sftp:archive_unsafe_path"];
 const retained = toIpcError(custom);
-// 实际 BT 事件与 IPC 边界用例共用的任务标识。
-const taskHash = "a".repeat(40);
-const transferId = `bt:${taskHash}`;
-i18n.load("zh-CN", { [descriptor.id]: ["文件不属于此下载任务"] });
+const transferId = "sftp-error-test";
+i18n.load("zh-CN", { [descriptor.id]: ["压缩包路径不安全"] });
 i18n.load("en", {
-  [descriptor.id]: ["File outside task: ", ["path"]],
+  [descriptor.id]: ["Unsafe archive path: ", ["path"]],
   [unknownErrorMessage.id]: ["Unknown error"],
 });
 i18n.activate("zh-CN");
@@ -62,22 +58,18 @@ test("归一化 AppError 并保持协议结构", () => {
       expect(!String(error).includes("[object Object]")).toBeTruthy();
     }
   }
-  expect(String(retained)).toBe("文件不属于此下载任务");
+  expect(String(retained)).toBe("压缩包路径不安全");
   i18n.activate("en");
-  expect(describeError(retained)).toBe("File outside task: 目录/文件.txt");
+  expect(describeError(retained)).toBe("Unsafe archive path: 目录/文件.txt");
   expect(retained.payload.message).toBe(custom.message);
   expect(describeError(external)).toBe("Permission denied");
 });
 
-test("BT 事件经传输 store 后保留协议并随语言切换", () => {
-  // 实际 BT 事件经过传输 store 后仍保留协议，既有任务也能随语言切换。
+test("传输状态保留错误协议并随语言切换", () => {
+  // 任务错误经过传输状态保存后仍保留协议，既有任务也能随语言切换。
   for (const payload of [custom, external]) {
-    useTransfersStore.getState().start(transferId, "BT test", { source: "bt" });
-    applyBtTaskEvent({
-      kind: "package-failed",
-      infoHash: taskHash,
-      error: payload,
-    });
+    useTransfersStore.getState().start(transferId, "SFTP test");
+    useTransfersStore.getState().finish(transferId, "error", payload);
     const item = useTransfersStore.getState().transfers[0];
     expect(item.status).toBe("error");
     expect(item.error).toStrictEqual(payload);
@@ -90,19 +82,19 @@ test("BT 事件经传输 store 后保留协议并随语言切换", () => {
   i18n.activate("zh-CN");
   expect(
     describeError(useTransfersStore.getState().transfers[0].controlError),
-  ).toBe("文件不属于此下载任务");
+  ).toBe("压缩包路径不安全");
   i18n.activate("en");
   expect(
     describeError(useTransfersStore.getState().transfers[0].controlError),
-  ).toBe("File outside task: 目录/文件.txt");
+  ).toBe("Unsafe archive path: 目录/文件.txt");
   useTransfersStore
     .getState()
     .finish(transferId, "error", "historical transfer error");
   expect(useTransfersStore.getState().transfers[0].error?.code).toBe(
     "legacy:raw",
   );
-  for (const kind of ["package-completed", "cancelled"] as const) {
-    applyBtTaskEvent({ kind, infoHash: taskHash });
+  for (const status of ["success", "cancelled"] as const) {
+    useTransfersStore.getState().finish(transferId, status);
     expect(useTransfersStore.getState().transfers[0].error).toBe(undefined);
     expect(useTransfersStore.getState().transfers[0].controlError).toBe(
       undefined,
@@ -252,25 +244,17 @@ test("生成绑定与 IPC 边界保留完整错误", async () => {
       mockIPC(() => {
         throw failure;
       });
-      await expect(
-        btBrowseFiles("a".repeat(40), "../outside"),
-      ).rejects.toSatisfy((error: unknown) => {
-        expect(error).toBeInstanceOf(IpcError);
-        expect((error as IpcError).payload).toStrictEqual(
-          toIpcError(failure).payload,
-        );
-        return true;
-      });
+      await expect(sftpList("session", "/remote")).rejects.toSatisfy(
+        (error: unknown) => {
+          expect(error).toBeInstanceOf(IpcError);
+          expect((error as IpcError).payload).toStrictEqual(
+            toIpcError(failure).payload,
+          );
+          return true;
+        },
+      );
       clearMocks();
     }
-    const listing = {
-      current: { name: "root", path: "", isDir: true, size: 0 },
-      entries: [],
-    };
-    mockIPC(() => listing);
-    expect(await btBrowseFiles("a".repeat(40), null)).toStrictEqual(listing);
-    mockIPC(() => [{ infoHash: taskHash, status: "Error", error: custom }]);
-    expect((await btList())[0].error).toStrictEqual(custom);
     // LAN 任务经实际生成绑定读取后保留完整错误，渲染语言变化不改写任务。
     const lanMessage = customErrorMessages["lan:transfer_incomplete"];
     expect(lanMessage.id).toBeTruthy();

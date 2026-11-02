@@ -1,7 +1,6 @@
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
-import { installBtRuntime } from "~/features/bt/integration";
 import { installGameSessionRuntime } from "~/features/games/engine/session-registry";
 import { installPoetrySyncRuntime } from "~/features/poetry/sync-progress";
 import { installTransferRuntime } from "~/features/transfers/runtime/transferRuntime";
@@ -17,7 +16,7 @@ import { applyDisplaySize } from "~/lib/display-size";
 import { useSettingsStore } from "~/store/settings";
 
 /**
- * 应用运行期：装配需要跨页面存活的后台同步（传输进度、BT 任务快照）。
+ * 应用运行期：装配需要跨页面存活的后台同步（传输进度、诗词同步与游戏会话）。
  *
  * 具体订阅和状态变换归各自模块；这里只负责安装与清理，不实现业务逻辑。
  * 安装函数自身幂等，StrictMode 的重复挂载不会产生重复订阅。
@@ -46,14 +45,12 @@ export function AppRuntime() {
   }, [cjkFont]);
   useEffect(() => {
     const disposeTransfers = installTransferRuntime();
-    const disposeBt = installBtRuntime();
     const disposePoetry = installPoetrySyncRuntime();
     const disposeGames = installGameSessionRuntime();
     return () => {
       // 逆序清理；单个模块的清理失败不应阻止其他模块释放资源。
       disposeGames();
       disposePoetry();
-      disposeBt();
       disposeTransfers();
     };
   }, []);

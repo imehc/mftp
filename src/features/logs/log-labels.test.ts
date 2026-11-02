@@ -36,9 +36,6 @@ it("相同操作代码按来源显示不同含义", () => {
 it("缺少名称的对象显示类型与短标识且保留原始日志", () => {
   expect(logObject(log)).toBe("主机 · 12345678…");
   expect(log.ip).toBe(id);
-  expect(logObject({ ...log, source: "bt", ip: "a".repeat(40) })).toBe(
-    "BT 下载任务 · aaaaaaaa…",
-  );
   expect(logObject({ ...log, source: "data", ip: "" })).toBe("应用数据");
 });
 

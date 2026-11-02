@@ -5,27 +5,13 @@ use std::path::Path;
 
 use super::Storage;
 
-// A reset detaches the live BT directory into this prefix before deleting;
-// leftovers from a failed pass are swept by the next `Storage::new`.
-pub(super) const BT_TOMBSTONE_PREFIX: &str = "bt.pending-delete-";
-
-fn detach_bt_directory(path: &Path, tombstone: &Path) -> AppResult<bool> {
-    // An inaccessible path is not an absent one. Never delete in place if
-    // rename fails: the next engine must not reuse a tree with live writers.
-    if !path.try_exists()? {
-        return Ok(false);
-    }
-    fs::rename(path, tombstone)?;
-    Ok(true)
-}
-
 impl Storage {
     pub fn clear_data_module(&self, module: AppDataModule) -> AppResult<u32> {
         // File-backed modules are routed by the command layer; reaching here
         // means a caller bypassed that routing.
         if matches!(
             module,
-            AppDataModule::TranslationModels | AppDataModule::Downloads | AppDataModule::Cache
+            AppDataModule::TranslationModels | AppDataModule::Cache
         ) {
             return Err(AppError::custom(
                 CustomErrorCode::AppDataModuleSeparateStore,
@@ -46,10 +32,7 @@ impl Storage {
                 tx.execute("DELETE FROM todo_items", [])?
             }
             AppDataModule::ActivityLogs => return self.clear_activity_logs(None),
-            AppDataModule::Poetry
-            | AppDataModule::TranslationModels
-            | AppDataModule::Downloads
-            | AppDataModule::Cache => {
+            AppDataModule::Poetry | AppDataModule::TranslationModels | AppDataModule::Cache => {
                 // The entry layer routes poetry clears to its own database and
                 // file-backed modules to filesystem deletes; reaching here means
                 // a caller bypassed that routing.
@@ -106,7 +89,7 @@ impl Storage {
             "todo_items",
             "app_meta",
         ];
-        let mut changed = crate::modules::bt::schema::reset(tx)?;
+        let mut changed = 0;
         #[cfg(desktop)]
         {
             changed += tx.execute("DELETE FROM mcp_credentials", [])?;
@@ -133,7 +116,6 @@ impl Storage {
                 "app_meta" => tx.execute(
                     "DELETE FROM app_meta WHERE key NOT IN (
                         'legacy_json_migrated', 'ai_schema_version', 'todo_schema_version',
-                        'bt_error_payload_schema_version', 'bt_download_only_migrated_v1',
                         'activity_diagnostics_schema_version',
                         'activity_file_schema_version', 'mcp_schema_version'
                     )",
@@ -143,63 +125,6 @@ impl Storage {
             };
         }
         Ok(changed as u32)
-    }
-
-    pub fn remove_bt_internal_data(&self) -> AppResult<()> {
-        let path = self.root.join("bt");
-        // librqbit 9.0.1 `Session::stop()` only pauses torrents, signals
-        // cancellation and sleeps ~1s (their own source admits it is not a
-        // quiescence barrier), so third-party writers may still be alive when
-        // reset deletes engine data. Renaming the live directory to a
-        // same-volume tombstone first detaches the name the next engine will
-        // recreate: fd-holding writers can only append to the already-orphaned
-        // tree, never to fresh state.
-        let tombstone = self
-            .root
-            .join(format!("{BT_TOMBSTONE_PREFIX}{}", uuid::Uuid::new_v4()));
-        if detach_bt_directory(&path, &tombstone)? {
-            fs::remove_dir_all(&tombstone)?;
-        }
-        // A previous attempt may have detached successfully before deletion
-        // failed. Keep that phase pending until its detached data is gone.
-        for entry in fs::read_dir(&self.root)? {
-            let entry = entry?;
-            if entry
-                .file_name()
-                .to_string_lossy()
-                .starts_with(BT_TOMBSTONE_PREFIX)
-            {
-                fs::remove_dir_all(entry.path())?;
-            }
-        }
-        Ok(())
-    }
-
-    fn delete_bt_tombstone(&self, tombstone: &Path) {
-        // Surviving writers may recreate files while this delete runs. A
-        // residual tombstone must not fail the reset; usage accounting keeps
-        // counting it and the next storage startup retries the sweep.
-        if let Err(error) = fs::remove_dir_all(tombstone) {
-            crate::runtime_log!(
-                "deferred bt internal data cleanup, will retry at next startup: {error}"
-            );
-        }
-    }
-
-    pub(super) fn sweep_bt_tombstones(&self) {
-        // Run before this process can start a fresh engine.
-        let Ok(entries) = fs::read_dir(&self.root) else {
-            return;
-        };
-        for entry in entries.flatten() {
-            if entry
-                .file_name()
-                .to_string_lossy()
-                .starts_with(BT_TOMBSTONE_PREFIX)
-            {
-                self.delete_bt_tombstone(&entry.path());
-            }
-        }
     }
 }
 

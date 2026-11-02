@@ -2,7 +2,6 @@ import {
   ArrowDown,
   ArrowLeftRight,
   ArrowUp,
-  Download,
   type LucideIcon,
   RefreshCw,
   Trash2,
@@ -21,7 +20,6 @@ export interface TransferIconSpec {
 const SPECS: Record<TransferKind, TransferIconSpec> = {
   upload: { icon: ArrowUp, motion: "bob" },
   download: { icon: ArrowDown, motion: "bob" },
-  bt: { icon: Download, motion: "bob" },
   sync: { icon: RefreshCw, motion: "spin" },
   delete: { icon: Trash2, motion: null },
   other: { icon: ArrowLeftRight, motion: null },

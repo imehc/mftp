@@ -89,7 +89,6 @@ impl Storage {
             records_deleted,
             pending: vec![
                 AppDataResetStep::Poetry,
-                AppDataResetStep::Bt,
                 AppDataResetStep::Credentials,
                 AppDataResetStep::Translation,
             ],

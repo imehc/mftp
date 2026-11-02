@@ -1,6 +1,6 @@
 /**
  * 扩展名 -> 预览类型。所有需要预览文件的模块共用
- *（BT 流、SFTP、本地选择器），因此放在 lib 而非某个 feature 文件夹中。
+ *（SFTP、本地选择器），因此放在 lib 而非某个 feature 文件夹中。
  */
 
 export type PreviewKind = "video" | "audio" | "image" | "text" | "other";

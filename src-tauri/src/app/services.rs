@@ -45,8 +45,6 @@ pub struct AppServices {
     pub poetry: Arc<PoetryLibrary>,
     pub(crate) translation: Arc<crate::modules::translation::TranslationService>,
     pub(crate) speech: Arc<crate::modules::speech::SpeechService>,
-    #[cfg(any(desktop, target_os = "android"))]
-    pub bt: Arc<crate::modules::bt::BtManager>,
     pub(crate) executor: Executor,
     pub(crate) lifecycle: Arc<Lifecycle>,
 }
@@ -105,13 +103,6 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         ),
         GameRoomManager::shutdown,
         |service: &GameRoomManager| Ok(service.status().phase != "idle"),
-    );
-    #[cfg(any(desktop, target_os = "android"))]
-    let bt = lifecycle.install(
-        participants::BT,
-        crate::adapters::bt::install(app, storage.clone()),
-        crate::adapters::bt::shutdown,
-        |bt: &crate::modules::bt::BtManager| bt.has_active_work(),
     );
     // Poetry workers hold their own operation leases until the real thread
     // exits (see sync::spawn_job); the stop callback only requests a
@@ -205,8 +196,6 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         poetry,
         speech: Arc::new(crate::modules::speech::SpeechService::default()),
         ai_tasks: Arc::new(AiTaskManager::new(operations)),
-        #[cfg(any(desktop, target_os = "android"))]
-        bt,
         lifecycle: Arc::new(lifecycle),
     };
     // The LAN runtime and its listeners are desktop-only.

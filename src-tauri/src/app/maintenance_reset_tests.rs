@@ -62,35 +62,6 @@ async fn reset_status_still_rejects_maintenance_and_shutdown() {
 }
 
 #[tokio::test]
-async fn failed_bt_tombstone_deletion_is_pending_and_preserves_detached_bytes() {
-    let f = Fixture::new();
-    // A file at a directory location injects remove_dir_all failure on all hosts.
-    std::fs::write(f.root.join("bt"), b"synthetic internal data").unwrap();
-    let result = app_data_reset(f.state()).await.unwrap();
-    assert_eq!(result.progress.pending, [AppDataResetStep::Bt]);
-    let tombstone = std::fs::read_dir(&f.root)
-        .unwrap()
-        .map(|entry| entry.unwrap().path())
-        .find(|path| {
-            path.file_name()
-                .unwrap()
-                .to_string_lossy()
-                .starts_with("bt.pending-delete-")
-        })
-        .unwrap();
-    assert_eq!(
-        std::fs::read(&tombstone).unwrap(),
-        b"synthetic internal data"
-    );
-    assert!(!f.root.join("bt").exists());
-    std::fs::remove_file(tombstone).unwrap();
-    let result = app_data_reset_resume(f.state(), result.progress.id)
-        .await
-        .unwrap();
-    assert!(result.progress.pending.is_empty());
-}
-
-#[tokio::test]
 async fn reset_stays_exclusive_until_frontend_acknowledges_matching_operation() {
     let f = Fixture::new();
     seed(&f);
@@ -138,8 +109,6 @@ async fn failed_poetry_cleanup_reports_partial_commit_and_resume_does_not_reset_
     let f = Fixture::new();
     seed(&f);
     std::fs::create_dir(f.root.join("poetry.sqlite3")).unwrap();
-    std::fs::create_dir(f.root.join("bt")).unwrap();
-    std::fs::write(f.root.join("bt/internal"), b"internal").unwrap();
     let external = f.root.join("user-download.bin");
     std::fs::write(&external, b"keep").unwrap();
     let result = app_data_reset(f.state()).await.unwrap();
@@ -148,7 +117,6 @@ async fn failed_poetry_cleanup_reports_partial_commit_and_resume_does_not_reset_
     assert_eq!(result.failures.len(), 1);
     assert_eq!(result.failures[0].step, AppDataResetStep::Poetry);
     assert!(!result.failures[0].error.code.is_empty());
-    assert!(!f.root.join("bt").exists());
     assert_eq!(
         app_data_reset_finish(f.state(), result.progress.id.clone())
             .await
@@ -195,8 +163,8 @@ async fn failed_checkpoint_keeps_completed_file_work_safe_to_resume() {
     std::fs::write(f.root.join("poetry.sqlite3"), b"fixture").unwrap();
     f.storage.conn().unwrap().execute_batch("CREATE TRIGGER reject_checkpoint BEFORE UPDATE ON app_reset_journal BEGIN SELECT RAISE(ABORT, 'injected'); END;").unwrap();
     let result = app_data_reset(f.state()).await.unwrap();
-    assert_eq!(result.progress.pending.len(), 4);
-    assert_eq!(result.failures.len(), 4);
+    assert_eq!(result.progress.pending.len(), 3);
+    assert_eq!(result.failures.len(), 3);
     assert!(!f.root.join("poetry.sqlite3").exists());
     f.storage
         .conn()

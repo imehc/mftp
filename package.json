@@ -30,7 +30,7 @@
     "routes:generate": "node scripts/generate-routes.mjs",
     "fonts:subset": "node scripts/subset-cjk-fonts.mjs",
     "translation:prepare": "node scripts/prepare-translation-engine.mjs",
-    "bindings:generate": "cargo test --manifest-path src-tauri/Cargo.toml --locked --lib export_typescript_bindings",
+    "bindings:generate": "cargo test --manifest-path src-tauri/Cargo.toml --locked --lib export_typescript_bindings && node scripts/sync-types.mjs",
     "version:check": "node scripts/version.mjs check",
     "version:bump": "node scripts/version.mjs bump",
     "i18n:extract": "lingui extract --clean",

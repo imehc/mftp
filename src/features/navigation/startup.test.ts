@@ -94,9 +94,6 @@ describe("启动页面决策", () => {
     for (const platform of ["desktop", "android", "ios", "mobile"] as const) {
       const ids = startupPages({ ...input, platform }).map((entry) => entry.id);
       expect(ids.includes("lan-transfer")).toBe(platform === "desktop");
-      expect(ids.includes("bt")).toBe(
-        platform === "desktop" || platform === "android",
-      );
       for (const mode of ["manual", "last"] as const) {
         expect(
           startupEntry({
@@ -107,17 +104,6 @@ describe("启动页面决策", () => {
             lastPage: "lan-transfer",
           })?.id,
         ).toBe(platform === "desktop" ? "lan-transfer" : undefined);
-        expect(
-          startupEntry({
-            ...input,
-            mode,
-            platform,
-            manualPage: "bt",
-            lastPage: "bt",
-          })?.id,
-        ).toBe(
-          platform === "desktop" || platform === "android" ? "bt" : undefined,
-        );
       }
     }
   });

@@ -37,12 +37,6 @@ export function platformAliases(target: string | null) {
   if (!supports(target, "poetryLocal"))
     replacements["~/features/poetry/components/PoetryLocalManagement"] =
       "src/app/platform/without-poetry-local.tsx";
-  if (!supports(target, "bt")) {
-    replacements["~/features/bt/transfer-control"] =
-      "src/app/platform/without-bt-control.ts";
-    replacements["~/features/bt/integration"] =
-      "src/app/platform/without-bt.ts";
-  }
   return Object.fromEntries(
     Object.entries(replacements).map(([key, file]) => [
       key,

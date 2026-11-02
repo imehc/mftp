@@ -22,12 +22,6 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
         #[cfg(mobile)]
         AppDataModule::ActivityLogs => &[],
         AppDataModule::TranslationModels => &[participants::TRANSLATION],
-        // A live download engine keeps file handles inside the data directory;
-        // clearing while it runs would race the detach below.
-        #[cfg(any(desktop, target_os = "android"))]
-        AppDataModule::Downloads => &[participants::BT],
-        #[cfg(not(any(desktop, target_os = "android")))]
-        AppDataModule::Downloads => &[],
         #[cfg(desktop)]
         AppDataModule::Todo => &[participants::MCP],
         #[cfg(mobile)]
@@ -37,7 +31,7 @@ fn participants_for(module: AppDataModule) -> &'static [&'static str] {
 }
 
 // The frontend localizes this stable key; the backend must not ship display copy.
-pub(super) const PRESERVED_USER_FILES: &str = "bt-downloads-and-lan-shared-files";
+pub(super) const PRESERVED_USER_FILES: &str = "downloads-and-lan-shared-files";
 
 #[tauri::command]
 #[specta::specta]
@@ -86,16 +80,6 @@ pub async fn app_data_clear(
                     before,
                     Vec::new(),
                 ))
-            })
-            .await?
-        }
-        AppDataModule::Downloads => {
-            run_blocking(move || {
-                let _maintenance = maintenance;
-                let _ssh_maintenance = ssh_maintenance;
-                let before = storage.app_data_usage();
-                storage.remove_bt_internal_data()?;
-                Ok(storage.data_clear_result(AppDataModule::Downloads, 0, before, Vec::new()))
             })
             .await?
         }

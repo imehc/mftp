@@ -7,7 +7,6 @@ import { useTransfersStore } from "~/store/transfers";
 import { createTransferActions } from "./transfer-actions";
 
 vi.mock("~/lib/ipc", () => ({
-  btControl: vi.fn(),
   sftpCancelTransfer: vi.fn(),
   sftpPauseTransfer: vi.fn(),
   sftpResumeTransfer: vi.fn(),
@@ -19,18 +18,8 @@ beforeEach(() => {
   i18n.loadAndActivate({ locale: "zh-CN", messages: {} });
   useTransfersStore.setState({
     transfers: [],
-    dismissed: new Set(),
     runtimeError: undefined,
   });
-});
-
-test("BT 取消仍通过原命令并标记结束", async () => {
-  useTransfersStore.getState().start("bt:hash", "test");
-  await createTransferActions().cancelTransfer(
-    useTransfersStore.getState().transfers[0],
-  );
-  expect(ipc.btControl).toHaveBeenCalledWith("hash", "Cancel", false);
-  expect(useTransfersStore.getState().transfers[0].status).toBe("cancelled");
 });
 
 test("SFTP 取消等待实际结束事件，不提前宣告完成", async () => {
@@ -86,4 +75,19 @@ test("已从列表移除的旧任务不能再次触发操作", async () => {
   useTransfersStore.getState().dismiss("sftp");
   await createTransferActions().cancelTransfer(snapshot);
   expect(ipc.sftpCancelTransfer).not.toHaveBeenCalled();
+});
+
+test("SFTP 暂停任务恢复后继续运行并释放控制状态", async () => {
+  useTransfersStore.getState().start("sftp", "下载文件");
+  useTransfersStore.getState().setPaused("sftp", true);
+  await createTransferActions().togglePause(
+    useTransfersStore.getState().transfers[0],
+  );
+  expect(ipc.sftpResumeTransfer).toHaveBeenCalledWith("sftp");
+  expect(ipc.sftpPauseTransfer).not.toHaveBeenCalled();
+  expect(useTransfersStore.getState().transfers[0]).toMatchObject({
+    status: "running",
+    paused: false,
+    controlPending: false,
+  });
 });

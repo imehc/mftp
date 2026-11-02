@@ -11,13 +11,12 @@ interface PreviewSearch {
   /** 在标题栏显示的文件名；同时也作为类型识别的兜底依据。 */
   name: string;
   kind?: PreviewKind;
-  /** 给非 BT 调用方的可直接加载 URL（blob:、asset:、http:）。 */
+  /** 可直接加载的 URL（blob:、asset:、http:）。 */
   url?: string;
 }
 
 /**
- * 通用预览页面。任何模块都可以带上 `url` 链接到这里；BT 模块则改为
- * 传入 `url` 加载可直接访问的媒体资源。
+ * 通用预览页面，调用方传入 `url` 加载可直接访问的媒体资源。
  */
 function PreviewRoute() {
   const { name, kind, url } = Route.useSearch();

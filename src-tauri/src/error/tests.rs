@@ -4,7 +4,7 @@ use serde_json::json;
 #[test]
 fn wire_shape_is_identical_for_both_kinds() {
     let errors = [
-        AppError::custom(CustomErrorCode::BtFileNotInTask),
+        AppError::custom(CustomErrorCode::SftpArchiveUnsafePath),
         AppError::from(std::io::Error::from(std::io::ErrorKind::PermissionDenied)),
     ];
     for error in errors {
@@ -17,10 +17,10 @@ fn wire_shape_is_identical_for_both_kinds() {
         assert_eq!(restored, error);
     }
     assert_eq!(
-        serde_json::to_value(AppError::custom(CustomErrorCode::BtFileNotInTask)).unwrap(),
+        serde_json::to_value(AppError::custom(CustomErrorCode::SftpArchiveUnsafePath)).unwrap(),
         json!({
-            "kind": "custom", "code": "bt:file_not_in_task",
-            "message": "File does not belong to this download task", "args": {}
+            "kind": "custom", "code": "sftp:archive_unsafe_path",
+            "message": "Archive contains an unsafe path", "args": {}
         })
     );
 }
@@ -28,7 +28,7 @@ fn wire_shape_is_identical_for_both_kinds() {
 #[test]
 fn io_roundtrip_preserves_custom_and_external_payloads() {
     for original in [
-        AppError::custom(CustomErrorCode::BtFileNotInTask).with_arg("path", "目录/文件.txt"),
+        AppError::custom(CustomErrorCode::SftpArchiveUnsafePath).with_arg("path", "目录/文件.txt"),
         AppError::from(std::io::Error::from(std::io::ErrorKind::TimedOut))
             .with_arg("operation", "read"),
     ] {

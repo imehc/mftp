@@ -5,7 +5,6 @@ import AppLogo from "~/components/AppLogo";
 import AppPageContent from "~/components/AppPageContent";
 import { ToolPageHeader } from "~/components/ToolPageHeader";
 import { Button } from "~/components/ui/button";
-import { useBtRunningTaskCount } from "~/features/bt/integration";
 import { BackLink } from "~/features/navigation/BackLink";
 import { usePoetrySyncProgress } from "~/features/poetry/sync-progress";
 import {
@@ -14,7 +13,7 @@ import {
 } from "~/features/settings/SettingsEntry";
 import { describeError } from "~/lib/errors";
 import { formatBytes } from "~/lib/format";
-import { isDesktopPlatform, isIosPlatform } from "~/lib/platform";
+import { isDesktopPlatform } from "~/lib/platform";
 import { useSessionsStore } from "~/store/sessions";
 import { useTransfersStore } from "~/store/transfers";
 
@@ -34,8 +33,6 @@ export default function AboutPage() {
   const activeTransfers = transfers.filter(
     (s) => s.status === "running",
   ).length;
-  // 任务快照由模块运行期维护；未加载完成时返回 null，页面显示占位符而不是「空闲」。
-  const btTasks = useBtRunningTaskCount();
   return (
     <main
       data-bottom-inset="scroll"
@@ -144,22 +141,6 @@ export default function AboutPage() {
                 label={t`文件传输`}
                 value={activeTransfers ? String(activeTransfers) : t`空闲`}
               />
-              {/* iOS 不提供本地下载引擎，状态位会一直读不到。 */}
-              {isIosPlatform() ? null : (
-                <EnvironmentField
-                  label={t`下载任务`}
-                  value={
-                    btTasks === null
-                      ? "—"
-                      : btTasks
-                        ? t({
-                            message: `${btTasks} 个进行中`,
-                            comment: "运行状态：正在运行的下载任务数量",
-                          })
-                        : t`空闲`
-                  }
-                />
-              )}
               <EnvironmentField
                 label={t`翻译引擎`}
                 value={c.translationStatus ?? "—"}

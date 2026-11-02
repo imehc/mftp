@@ -8,20 +8,13 @@ i18n.load("zh-CN", {});
 i18n.activate("zh-CN");
 
 afterEach(() => {
-  useTransfersStore.setState({ transfers: [], dismissed: new Set() });
+  useTransfersStore.setState({ transfers: [] });
 });
 
 describe("传输任务的来源类型", () => {
   it("显式传入的 kind 优先", () => {
     useTransfersStore.getState().start("t1", "上传 a.zip", { kind: "upload" });
     expect(useTransfersStore.getState().transfers[0].kind).toBe("upload");
-  });
-
-  it("BT 任务由 source 推导，恢复的任务同样成立", () => {
-    useTransfersStore
-      .getState()
-      .restore("bt:abc", "某个种子", { source: "bt" });
-    expect(useTransfersStore.getState().transfers[0].kind).toBe("bt");
   });
 
   it("未声明来源时回退到通用类型", () => {

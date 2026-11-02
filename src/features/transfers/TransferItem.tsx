@@ -43,18 +43,11 @@ export default function TransferItem({
   const metricsEta = metrics.eta;
   return (
     <div className="border-border bg-background flex flex-col gap-2 rounded-xl border p-3 text-sm">
-      {/* 用 flex 而不是固定网格：BT 行会在标签旁追加来源 / 模式徽标，
-          多余的网格子项会被换到单独一行。 */}
       <div className="flex items-center gap-2">
         {statusIcon}
         <span className="text-foreground min-w-0 flex-1 truncate font-medium">
           {transfer.label}
         </span>
-        {transfer.source === "bt" ? (
-          <span className="bg-muted text-muted-foreground shrink-0 rounded-sm px-1 py-px text-[10px] font-medium">
-            <Trans>BT</Trans>
-          </span>
-        ) : null}
         {transfer.status === "running" && transfer.cancellable !== false ? (
           <div className="flex shrink-0 items-center gap-0.5">
             {transfer.pausable !== false ? (

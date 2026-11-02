@@ -68,7 +68,6 @@ fn sftp_progress_keeps_wire_fields_without_finished_flag() {
         phase: "phase".into(),
         transferred: 12,
         total: Some(24),
-        finished: None,
     }));
     assert_eq!(
         *received.lock().unwrap(),

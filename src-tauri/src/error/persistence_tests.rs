@@ -4,7 +4,7 @@ use crate::error::CustomErrorCode;
 #[test]
 fn version_one_preserves_both_error_kinds_and_parameters() {
     for error in [
-        AppError::custom(CustomErrorCode::BtArchiveAlreadyExists)
+        AppError::custom(CustomErrorCode::SftpArchiveUnsafePath)
             .with_arg("path", "目录/archive.tar"),
         AppError::from(std::io::Error::from_raw_os_error(13)).with_arg("operation", "read"),
     ] {

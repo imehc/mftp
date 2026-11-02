@@ -25,7 +25,7 @@ export function listenMobileBack(onBack: () => boolean) {
  */
 
 /**
- * SFTP 与 BT 任务共用的传输进度（共享的后端通道位于
+ * SFTP 任务的传输进度（后端通道位于
  * `src-tauri/src/transfer.rs`）。载荷类型：`TransferProgress`。
  *
  * 线上的事件值早于 `scheme://` 约定；重命名它需要前后端协调改动，
@@ -63,9 +63,6 @@ export const TODO_CHANGED = "todo://changed";
 /** 单次诗词译文生成的流式增量。载荷类型：`PoetryTranslationStreamEvent`。 */
 export const poetryTranslationStreamEvent = (requestId: string) =>
   `ai://poetry-translation/${requestId}`;
-
-/** BT 任务级事件（存到本地完成 / 失败）。载荷类型：`BtTaskEvent`。 */
-export const BT_TASK_EVENT = "bt://task-event";
 
 /** 离线翻译正文只通过发起窗口所属通道交付。 */
 export function translationOutputChannel(

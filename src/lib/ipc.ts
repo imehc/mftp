@@ -21,7 +21,6 @@ import {
 import { poetryTranslationStreamEvent } from "~/lib/events";
 import { unwrapCommand, voidCommand } from "~/lib/ipc-result";
 import type {
-  BtControlAction,
   ExportSection,
   HostInput,
   ImportMode,
@@ -514,35 +513,3 @@ export const poetryTranslationDelete = (
   uid: string,
   mode: PoetryTranslationMode,
 ) => voidCommand(commands.deletePoetryTranslation(uid, mode));
-
-// ---- BT ----
-export const btProbe = (source: string) =>
-  unwrapCommand(commands.btProbe(source));
-export const btAddDownload = (
-  source: string,
-  infoHash: string,
-  fileIndices: number[],
-) => unwrapCommand(commands.btAddDownload(source, infoHash, fileIndices));
-export const btExport = (infoHash: string, destDir: string) =>
-  unwrapCommand(commands.btExport(infoHash, destDir));
-export const btList = () => unwrapCommand(commands.btList());
-export const btControl = (
-  infoHash: string,
-  action: BtControlAction,
-  deleteFiles: boolean,
-) => voidCommand(commands.btControl(infoHash, action, deleteFiles));
-export const btTaskPeers = (infoHash: string) =>
-  unwrapCommand(commands.btTaskPeers(infoHash));
-export const btDhtStatus = () => unwrapCommand(commands.btDhtStatus());
-export const btPlayability = (
-  infoHash: string,
-  fileIndex: number,
-  prepare: boolean,
-) => unwrapCommand(commands.btPlayability(infoHash, fileIndex, prepare));
-
-export const btBrowseFiles = (infoHash: string, path: string | null = null) =>
-  unwrapCommand(commands.btBrowseFiles(infoHash, path));
-export const btPreviewFile = (infoHash: string, path: string) =>
-  unwrapCommand(commands.btPreviewFile(infoHash, path));
-export const btOpenFile = (infoHash: string, path: string) =>
-  voidCommand(commands.btOpenFile(infoHash, path));

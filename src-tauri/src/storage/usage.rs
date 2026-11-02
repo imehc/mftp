@@ -6,7 +6,7 @@ use std::io::ErrorKind;
 use std::path::Path;
 use walkdir::WalkDir;
 
-use super::{data::BT_TOMBSTONE_PREFIX, Storage};
+use super::Storage;
 
 fn file_family_size(path: &Path) -> AppResult<u64> {
     let mut bytes = 0;
@@ -47,12 +47,11 @@ impl Storage {
         let poetry = self.root.join("poetry.sqlite3");
         let main_database_bytes = file_family_size(&self.db_path)?;
         let poetry_database_bytes = file_family_size(&poetry)?;
-        let download_bytes = self.download_bytes()?;
         let translation_model_bytes = self.translation_model_bytes()?;
         let keys_bytes = dir_size(&self.root.join("keys"))?;
         let activity_logs_bytes = self.logs.usage()?;
-        // 「总占用」是应用数据目录的真实占用，包含模型、缓存等不可按模块清理的内容；
-        // 只累加可清理的数据库会明显小于用户看到的磁盘占用。
+        // “Total usage” refers to the actual usage of the application data directory. It includes elements like models and caches, which cannot be cleaned up individually.
+        // Only adding up cleanable databases will significantly underreport the disk usage seen by the user.
         let total_bytes = dir_size(&self.root)?.saturating_add(activity_logs_bytes);
         // Unclassified leftovers are reported as cache so the rows always add up
         // to the measured directory size instead of leaving a silent gap.
@@ -60,7 +59,6 @@ impl Storage {
             main_database_bytes
                 + poetry_database_bytes
                 + translation_model_bytes
-                + download_bytes
                 + keys_bytes
                 + activity_logs_bytes,
         );
@@ -122,7 +120,6 @@ impl Storage {
             poetry_database_bytes,
             activity_logs_bytes,
             translation_model_bytes,
-            download_bytes,
             keys_bytes,
             cache_bytes,
             total_bytes,
@@ -134,21 +131,6 @@ impl Storage {
     fn translation_model_bytes(&self) -> AppResult<u64> {
         Ok(dir_size(&self.root.join("translation-models"))?
             + dir_size(&self.root.join("no_backup").join("translation-models"))?)
-    }
-
-    fn download_bytes(&self) -> AppResult<u64> {
-        let mut bytes = dir_size(&self.root.join("bt"))?;
-        for entry in fs::read_dir(&self.root)? {
-            let entry = entry?;
-            if entry
-                .file_name()
-                .to_string_lossy()
-                .starts_with(BT_TOMBSTONE_PREFIX)
-            {
-                bytes += dir_size(&entry.path())?;
-            }
-        }
-        Ok(bytes)
     }
 
     pub(crate) fn freed_bytes(
