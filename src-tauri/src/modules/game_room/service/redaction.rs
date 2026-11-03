@@ -35,7 +35,11 @@ fn edits(
         return None;
     }
     let value = serde_json::from_slice::<Value>(raw).ok()?;
-    let hello = depth == 0 && value.get("type").and_then(Value::as_str) == Some("hello");
+    let hello = depth == 0
+        && matches!(
+            value.get("type").and_then(Value::as_str),
+            Some("hello" | "party-hello")
+        );
     let mut result = Vec::new();
     let mut cursor = 0;
     while cursor < raw.len() {

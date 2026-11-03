@@ -13,8 +13,10 @@ const schema = checkpointSchema("test", z.literal("local"), z.number());
 const game: GameDefinition<number, number, number> = {
   id: "test",
   seatCount: 1,
+  version: 1,
+  observe: (state) => state,
   currentSeat: () => 0,
-  winnerSeat: () => null,
+  outcome: (state) => (state >= 10 ? { kind: "draw" } : null),
   isFinished: (state) => state >= 10,
   applyMove: (state, move) => ({ state: state + move, presentation: move }),
 };
@@ -83,7 +85,7 @@ describe("跨页面会话与跨进程检查点", () => {
     const restored = next.store.ensureSession()!;
     expect(restored.restored).toBe(true);
     expect(restored.runner.hasStarted).toBe(false);
-    expect(restored.runner.getCheckpoint()).toEqual([0]);
+    expect(restored.runner.getObservationHistory()).toEqual([0]);
     expect(next.store.ensureSession()).toBe(restored);
   });
 
@@ -182,7 +184,7 @@ describe("跨页面会话与跨进程检查点", () => {
     second.store.restore();
     const restored = second.store.ensureSession()!;
     expect(restored.runner.id).toBe(id);
-    expect(restored.runner.getCheckpoint()).toEqual([0, 2]);
+    expect(restored.runner.getObservationHistory()).toEqual([0, 2]);
     expect(restored.runner.undo(1)).toBe(true);
     await tick();
     expect(schema.parse(second.value()).history).toEqual([0]);

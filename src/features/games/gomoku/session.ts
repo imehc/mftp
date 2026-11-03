@@ -25,13 +25,24 @@ export const gomokuStateSchema: z.ZodType<GomokuState> = z.strictObject({
   lastMove: z.strictObject({ row: coordinate, col: coordinate }).nullable(),
 });
 
-export const gomokuCheckpointSchema = checkpointSchema(
+const modeSchema = boardModeSchema;
+const legacySchema = checkpointSchema(
   GOMOKU_GAME_ID,
   boardModeSchema,
   gomokuStateSchema,
-).refine((checkpoint) =>
-  checkpoint.history.every((state, index) => state.moveCount === index),
 );
+const currentSchema = checkpointSchema(
+  GOMOKU_GAME_ID,
+  modeSchema,
+  gomokuStateSchema,
+  2,
+);
+export const gomokuCheckpointSchema = z
+  .union([legacySchema, currentSchema])
+  .transform((checkpoint) => ({ ...checkpoint, version: 2 }))
+  .refine((checkpoint) =>
+    checkpoint.history.every((state, index) => state.moveCount === index),
+  );
 
 export const gomokuSessions = new GameSessionStore<
   GomokuMode,
@@ -40,6 +51,7 @@ export const gomokuSessions = new GameSessionStore<
   GomokuMove
 >({
   gameId: GOMOKU_GAME_ID,
+  checkpointVersion: 2,
   schema: gomokuCheckpointSchema,
   create: (mode, hooks, checkpoint) =>
     createBoardSession(

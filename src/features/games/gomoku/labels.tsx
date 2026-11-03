@@ -1,6 +1,6 @@
-export { historyModeLabel, formatHistoryTime } from "../engine/history-labels";
+export { formatHistoryTime, historyModeLabel } from "../engine/history-labels";
 export {
-  seatName,
-  matchResultLabel,
   historyResult,
+  matchResultLabel,
+  seatName,
 } from "../engine/black-white-labels";

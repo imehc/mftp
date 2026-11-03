@@ -4,6 +4,7 @@ import { createRng } from "../engine/ai";
 import { junqiAi } from "./ai";
 import { junqiCheckpointSchema } from "./checkpoint";
 import { legalMoves } from "./movement";
+import { junqiGame } from "./rules";
 import { applyAction, createInitialState } from "./rules";
 
 describe("军棋存档与电脑", () => {
@@ -44,7 +45,7 @@ describe("军棋存档与电脑", () => {
     );
     for (const difficulty of ["easy", "medium", "hard"] as const) {
       const move = await junqiAi.chooseMove(
-        state,
+        junqiGame.observe(state, 0),
         0,
         difficulty,
         new AbortController().signal,
@@ -55,7 +56,7 @@ describe("军棋存档与电脑", () => {
     state.board[6] = { id: "e", kind: "engineer", side: 0 };
     state.board[1] = { id: "f", kind: "flag", side: 1 };
     const move = await junqiAi.chooseMove(
-      state,
+      junqiGame.observe(state, 0),
       0,
       "hard",
       new AbortController().signal,
@@ -64,7 +65,12 @@ describe("军棋存档与电脑", () => {
     const controller = new AbortController();
     controller.abort();
     await expect(
-      junqiAi.chooseMove(state, 0, "hard", controller.signal),
+      junqiAi.chooseMove(
+        junqiGame.observe(state, 0),
+        0,
+        "hard",
+        controller.signal,
+      ),
     ).rejects.toThrow();
   });
 

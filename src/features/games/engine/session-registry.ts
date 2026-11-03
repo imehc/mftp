@@ -1,20 +1,27 @@
+import type { TaskInterruptionSource } from "~/lib/task-interruption";
+
 interface SessionResource {
-  foreground(visible: boolean): void;
+  foreground(visible: boolean, source?: TaskInterruptionSource): void;
   dispose(): void;
 }
 
 const resources = new Set<SessionResource>();
 let foreground = true;
+let foregroundSource: TaskInterruptionSource = "appHidden";
 
 export function registerGameResource(resource: SessionResource): () => void {
   resources.add(resource);
-  resource.foreground(foreground);
+  resource.foreground(foreground, foregroundSource);
   return () => resources.delete(resource);
 }
 
-export function setGamesForeground(visible: boolean): void {
+export function setGamesForeground(
+  visible: boolean,
+  source: TaskInterruptionSource = "appHidden",
+): void {
   foreground = visible;
-  for (const resource of resources) resource.foreground(visible);
+  foregroundSource = source;
+  for (const resource of resources) resource.foreground(visible, source);
 }
 
 export function areGamesForeground(): boolean {
@@ -31,6 +38,6 @@ export function installGameSessionRuntime(): () => void {
   update();
   return () => {
     document.removeEventListener("visibilitychange", update);
-    setGamesForeground(false);
+    setGamesForeground(false, "runtimeDisposed");
   };
 }

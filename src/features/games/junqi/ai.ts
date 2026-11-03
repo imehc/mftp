@@ -1,15 +1,15 @@
 import type { AiStrategy } from "../engine/ai";
 import { chooseObservedMove } from "./observed-ai";
 import { openAi } from "./open-ai";
-import type { JunqiMove, JunqiState, Side } from "./types";
-import { projectView } from "./visibility";
+import type { JunqiMove, Side } from "./types";
+import type { JunqiObservation } from "./view-types";
 
-export const junqiAi: AiStrategy<JunqiState, JunqiMove> = {
-  chooseMove(state, seat, difficulty, signal) {
-    if (state.variant === "open")
-      return openAi.chooseMove(state, seat, difficulty, signal);
+export const junqiAi: AiStrategy<JunqiObservation, JunqiMove> = {
+  chooseMove(observation, seat, difficulty, signal) {
+    if (observation.openState)
+      return openAi.chooseMove(observation.openState, seat, difficulty, signal);
     return chooseObservedMove(
-      projectView(state, seat as Side),
+      observation.view,
       seat as Side,
       difficulty,
       signal,

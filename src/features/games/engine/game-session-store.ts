@@ -1,14 +1,16 @@
 import type { z } from "zod";
 
 import { frontendError, toIpcError } from "~/lib/errors";
+import type { TaskInterruptionSource } from "~/lib/task-interruption";
 import type { AppError } from "~/types";
 
 import {
   type CheckpointStorage,
   checkpointStorage,
 } from "./checkpoint-storage";
-import type { LocalController } from "./controllers";
 import type { MatchHooks, MatchRunner, MoveResolvedInfo } from "./match";
+import { createMatchHandle, type MatchHandle } from "./match-handle";
+import type { ParticipantConfiguration } from "./participants";
 import { registerGameResource } from "./session-registry";
 
 export interface GameCheckpoint<Mode, State> {
@@ -18,46 +20,91 @@ export interface GameCheckpoint<Mode, State> {
   savedAt: number;
   mode: Mode;
   history: State[];
+  participants?: ParticipantConfiguration;
+  rulesVersion?: number;
 }
 
-export interface LocalGameSession<State, Move, Presentation> {
+export interface LocalGameInput<Move> {
+  readonly awaitingInput: boolean;
+  submit(move: Move): boolean;
+}
+
+export interface LocalGameSession<
+  State,
+  Move,
+  _Presentation,
+  Observation = State,
+> {
   restored?: boolean;
-  runner: MatchRunner<State, Move, Presentation>;
-  local: LocalController<State, Move>;
+  runner: MatchHandle<Observation, Move>;
+  local: LocalGameInput<Move>;
   /** 需要异步准备对局资源（如物理引擎）的实现提供该钩子；失败后可重试。 */
   ready?(): Promise<void>;
   dispose?(): void;
 }
 
-interface GameSessionConfig<Mode, State, Move, Presentation> {
+interface AuthorityGameSession<
+  State,
+  Move,
+  Presentation,
+  Observation,
+> extends Omit<
+  LocalGameSession<State, Move, Presentation, Observation>,
+  "runner"
+> {
+  runner: MatchRunner<State, Move, Presentation, Observation>;
+  /** 游戏显式提供只读控制投影，不传原始策略或任务对象。 */
+  extensions?: Record<string, unknown>;
+}
+
+interface GameSessionConfig<Mode, State, Move, Presentation, Observation> {
   gameId: string;
   checkpointVersion?: number;
   schema: z.ZodType<GameCheckpoint<Mode, State>>;
   create(
     mode: Mode,
-    hooks: MatchHooks<State, Move, Presentation>,
-    checkpoint: { id: string; history?: State[] },
-  ): LocalGameSession<State, Move, Presentation>;
+    hooks: MatchHooks<State, Move, Presentation, Observation>,
+    checkpoint: {
+      id: string;
+      history?: State[];
+      participants?: ParticipantConfiguration;
+      rulesVersion?: number;
+    },
+  ): AuthorityGameSession<State, Move, Presentation, Observation>;
   online?(mode: Mode): boolean;
   exitOnline?(mode: Mode): Promise<void>;
 }
 
-interface SessionSnapshot<Mode, State, Move, Presentation> {
+interface SessionSnapshot<Mode, State, Move, Presentation, Observation> {
   status: "loading" | "ready" | "error";
   active: {
     id: string;
     mode: Mode;
-    session: LocalGameSession<State, Move, Presentation> | null;
+    session: LocalGameSession<State, Move, Presentation, Observation> | null;
   } | null;
-  saved: GameCheckpoint<Mode, State> | null;
+  saved:
+    | (Omit<GameCheckpoint<Mode, State>, "history"> & { moveCount: number })
+    | null;
   error: AppError | null;
   saving: boolean;
   savedAt: number | null;
   transitioning: boolean;
 }
 
-export class GameSessionStore<Mode, State, Move, Presentation> {
-  private snapshot: SessionSnapshot<Mode, State, Move, Presentation> = {
+export class GameSessionStore<
+  Mode,
+  State,
+  Move,
+  Presentation,
+  Observation = State,
+> {
+  private snapshot: SessionSnapshot<
+    Mode,
+    State,
+    Move,
+    Presentation,
+    Observation
+  > = {
     status: "loading",
     active: null,
     saved: null,
@@ -69,13 +116,17 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
   private readonly listeners = new Set<() => void>();
   private loading: Promise<void> | null = null;
   private restored: GameCheckpoint<Mode, State> | undefined;
+  private savedCheckpoint: GameCheckpoint<Mode, State> | undefined;
+  private authoritySession:
+    AuthorityGameSession<State, Move, Presentation, Observation> | undefined;
   private presentation:
     | ((
-        info: MoveResolvedInfo<State, Move, Presentation>,
+        info: MoveResolvedInfo<Observation, Move, Presentation>,
       ) => void | Promise<void>)
     | null = null;
   private visible = false;
   private foreground = true;
+  private foregroundStopSource: TaskInterruptionSource = "appHidden";
   private revision = 0;
   private pendingCheckpoint:
     { id: string; history: readonly State[] } | undefined;
@@ -83,12 +134,19 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
   private readonly unregister: () => void;
 
   constructor(
-    private readonly config: GameSessionConfig<Mode, State, Move, Presentation>,
+    private readonly config: GameSessionConfig<
+      Mode,
+      State,
+      Move,
+      Presentation,
+      Observation
+    >,
     private readonly storage: CheckpointStorage = checkpointStorage,
   ) {
     this.unregister = registerGameResource({
-      foreground: (visible) => {
+      foreground: (visible, source) => {
         this.foreground = visible;
+        this.foregroundStopSource = source ?? "appHidden";
         this.updateRunning();
       },
       dispose: () => this.dispose(),
@@ -102,7 +160,9 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
   };
 
   private publish(
-    patch: Partial<SessionSnapshot<Mode, State, Move, Presentation>>,
+    patch: Partial<
+      SessionSnapshot<Mode, State, Move, Presentation, Observation>
+    >,
   ): void {
     this.snapshot = { ...this.snapshot, ...patch };
     for (const listener of this.listeners) listener();
@@ -118,6 +178,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
       .then((value) => {
         if (this.disposed) return;
         if (value === undefined) {
+          this.savedCheckpoint = undefined;
           this.publish({ status: "ready", saved: null });
           return;
         }
@@ -132,7 +193,12 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
           });
           return;
         }
-        this.publish({ status: "ready", saved: parsed.data });
+        this.savedCheckpoint = parsed.data;
+        const { history, ...metadata } = parsed.data;
+        this.publish({
+          status: "ready",
+          saved: { ...metadata, moveCount: history.length - 1 },
+        });
       })
       .catch(() => {
         if (!this.disposed)
@@ -168,7 +234,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
   };
 
   restore = (): void => {
-    const saved = this.snapshot.saved;
+    const saved = this.savedCheckpoint;
     if (
       !saved ||
       this.snapshot.active ||
@@ -177,6 +243,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
     )
       return;
     this.restored = saved;
+    this.savedCheckpoint = undefined;
     this.publish({
       saved: null,
       active: { id: saved.id, mode: saved.mode, session: null },
@@ -185,7 +252,12 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
     });
   };
 
-  ensureSession(): LocalGameSession<State, Move, Presentation> | null {
+  ensureSession(): LocalGameSession<
+    State,
+    Move,
+    Presentation,
+    Observation
+  > | null {
     const active = this.snapshot.active;
     if (!active || this.config.online?.(active.mode) || this.disposed)
       return null;
@@ -202,13 +274,40 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
           onError: (error) =>
             this.publish({ error: toIpcError(error).payload }),
         },
-        { id: active.id, history: this.restored?.history },
+        {
+          id: active.id,
+          history: this.restored?.history,
+          participants: this.restored?.participants,
+          rulesVersion: this.restored?.rulesVersion,
+        },
       );
       session.restored = this.restored !== undefined;
       this.restored = undefined;
-      this.publish({ active: { ...active, session }, error: null });
-      this.save(active.id, session.runner.getCheckpoint());
-      return session;
+      this.authoritySession = session;
+      const publicSession: LocalGameSession<
+        State,
+        Move,
+        Presentation,
+        Observation
+      > = {
+        ...session.extensions,
+        runner: createMatchHandle(session.runner),
+        local: {
+          submit: (move) => session.runner.submitLocal(move),
+          get awaitingInput() {
+            return session.runner.awaitingLocalInput;
+          },
+        },
+        ready: session.ready,
+        dispose: session.dispose,
+        restored: session.restored,
+      };
+      this.publish({
+        active: { ...active, session: publicSession },
+        error: null,
+      });
+      this.save(active.id, session.runner.getAuthorityCheckpoint());
+      return publicSession;
     } catch (error) {
       this.publish({ error: toIpcError(error).payload });
       return null;
@@ -217,7 +316,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
 
   attach(
     presentation: (
-      info: MoveResolvedInfo<State, Move, Presentation>,
+      info: MoveResolvedInfo<Observation, Move, Presentation>,
     ) => void | Promise<void>,
     start: boolean,
   ): () => void {
@@ -237,7 +336,15 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
     const runner = this.snapshot.active?.session?.runner;
     if (this.visible && this.foreground && !this.snapshot.transitioning)
       runner?.resume();
-    else runner?.pause();
+    else
+      this.authoritySession?.runner.pause(
+        false,
+        !this.foreground
+          ? this.foregroundStopSource
+          : this.snapshot.transitioning
+            ? "transition"
+            : "viewDetached",
+      );
   }
 
   private save(id: string, history: readonly State[]): void {
@@ -255,6 +362,13 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
       savedAt: Date.now(),
       mode: active.mode,
       history: [...history],
+      rulesVersion: this.authoritySession?.runner.rulesVersion ?? 1,
+      ...(this.authoritySession?.runner.getAuthorityConfiguration()
+        ? {
+            participants:
+              this.authoritySession.runner.getAuthorityConfiguration(),
+          }
+        : {}),
     };
     this.publish({ saving: true });
     void this.storage
@@ -292,8 +406,11 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
   retrySave = (): void => {
     const active = this.snapshot.active;
     if (active && this.config.online?.(active.mode)) void this.exit();
-    else if (active?.session)
-      this.save(active.id, active.session.runner.getCheckpoint());
+    else if (active && this.authoritySession)
+      this.save(
+        active.id,
+        this.authoritySession.runner.getAuthorityCheckpoint(),
+      );
     else if (active) this.ensureSession();
     else if (this.snapshot.status === "error") void this.load();
   };
@@ -310,6 +427,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
       if (this.disposed) return false;
       this.releaseActive();
       this.restored = undefined;
+      this.savedCheckpoint = undefined;
       this.revision++;
       this.publish({
         status: "ready",
@@ -347,6 +465,7 @@ export class GameSessionStore<Mode, State, Move, Presentation> {
     const active = this.snapshot.active;
     active?.session?.runner.dispose();
     active?.session?.dispose?.();
+    this.authoritySession = undefined;
     this.presentation = null;
     this.visible = false;
   }

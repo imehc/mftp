@@ -1,5 +1,6 @@
 import { Chess, DEFAULT_POSITION, type Move, type Square } from "chess.js";
 
+import { seatOutcome } from "../engine/outcome";
 import type { GameDefinition } from "../engine/types";
 import {
   CHESS_GAME_ID,
@@ -150,10 +151,12 @@ export const chessGame: GameDefinition<
   ChessPresentation
 > = {
   id: CHESS_GAME_ID,
+  version: 1,
+  observe: (state) => state,
   seatCount: 2,
   currentSeat: (state) =>
     state.result ? null : seatFor(new Chess(state.fen).turn()),
-  winnerSeat: (state) => state.winnerSeat,
+  outcome: (state) => seatOutcome(state.result !== null, state.winnerSeat),
   isFinished: (state) => state.result !== null,
   applyMove: applyChessMove,
 };

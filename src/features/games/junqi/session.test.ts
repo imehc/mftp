@@ -5,7 +5,6 @@ import type { CheckpointStorage } from "../engine/checkpoint-storage";
 import { GameSessionStore } from "../engine/game-session-store";
 import { junqiAi } from "./ai";
 import { junqiCheckpointSchema } from "./checkpoint";
-import { legalMoves } from "./movement";
 import { createInitialState, junqiGame } from "./rules";
 import type {
   JunqiMode,
@@ -13,6 +12,8 @@ import type {
   JunqiPresentation,
   JunqiState,
 } from "./types";
+import type { JunqiObservation } from "./view-types";
+import { viewActions } from "./visibility";
 
 async function tick() {
   for (let n = 0; n < 30; n++) await Promise.resolve();
@@ -38,7 +39,13 @@ describe("军棋会话恢复与退出", () => {
       },
     };
     const make = () =>
-      new GameSessionStore<JunqiMode, JunqiState, JunqiMove, JunqiPresentation>(
+      new GameSessionStore<
+        JunqiMode,
+        JunqiState,
+        JunqiMove,
+        JunqiPresentation,
+        JunqiObservation
+      >(
         {
           gameId: "junqi",
           schema: junqiCheckpointSchema,
@@ -70,10 +77,10 @@ describe("军棋会话恢复与退出", () => {
       await vi.advanceTimersByTimeAsync(700);
       await tick();
       const initial = session.runner.getSnapshot().state;
-      session.local.submit(legalMoves(initial.board, 0)[0]);
+      session.local.submit(viewActions(initial.view)[0]);
       await tick();
       const position = session.runner.getSnapshot().state;
-      expect(position.ply).toBe(1);
+      expect(position.view.ply).toBe(1);
       expect(junqiCheckpointSchema.safeParse(saved).success).toBe(true);
       detach();
       await tick();
@@ -87,7 +94,7 @@ describe("军棋会话恢复与退出", () => {
       expect(restored?.runner.id).toBe(session.runner.id);
       await next.replace(mode);
       expect(next.ensureSession()?.runner.id).not.toBe(session.runner.id);
-      expect(next.ensureSession()?.runner.getSnapshot().state.phase).toBe(
+      expect(next.ensureSession()?.runner.getSnapshot().state.view.phase).toBe(
         "deployment",
       );
     } finally {

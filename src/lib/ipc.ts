@@ -1,6 +1,8 @@
 import { listen } from "@tauri-apps/api/event";
 
 export * from "./ipc/filesystem";
+export * from "./ipc/game-party";
+export * from "./ipc/game-room";
 export * from "./ipc/lan-transfer";
 export * from "./ipc/native";
 export * from "./ipc/speech";
@@ -141,28 +143,6 @@ export const keyDelete = (id: string) => voidCommand(commands.keyDelete(id));
 
 export const activityLogDelete = (id: string) =>
   voidCommand(commands.activityLogDelete(id));
-
-// ---- 游戏房间 ----
-export const gameRoomStatus = () => unwrapCommand(commands.gameRoomStatus());
-export const gameRoomCreate = (
-  gameId: string,
-  roomName: string,
-  code: string | null,
-  playerName: string,
-) => unwrapCommand(commands.gameRoomCreate(gameId, roomName, code, playerName));
-export const gameRoomJoin = (
-  host: string,
-  port: number,
-  gameId: string,
-  code: string | null,
-  playerName: string,
-) => unwrapCommand(commands.gameRoomJoin(host, port, gameId, code, playerName));
-export const gameRoomDiscover = (gameId: string) =>
-  unwrapCommand(commands.gameRoomDiscover(gameId));
-export const gameRoomSend = (instanceId: string, payload: string) =>
-  voidCommand(commands.gameRoomSend(instanceId, payload));
-export const gameRoomLeave = (instanceId: string) =>
-  voidCommand(commands.gameRoomLeave(instanceId));
 
 // ---- SSH 命令 ----
 export const sshConnect = (hostId: string, passphrase?: string) =>

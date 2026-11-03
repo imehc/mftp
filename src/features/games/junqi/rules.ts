@@ -1,3 +1,4 @@
+import { seatOutcome } from "../engine/outcome";
 import type { GameDefinition } from "../engine/types";
 import { applyFlipAction, flipPositionKey } from "./flip-rules";
 import { applyHiddenAction } from "./hidden-rules";
@@ -10,6 +11,8 @@ import {
   type JunqiState,
   type JunqiVariant,
 } from "./types";
+import type { JunqiObservation } from "./view-types";
+import { projectView } from "./visibility";
 
 export { positionKey } from "./open-rules";
 
@@ -36,12 +39,18 @@ export function applyAction(
 export const junqiGame: GameDefinition<
   JunqiState,
   JunqiMove,
-  JunqiPresentation
+  JunqiPresentation,
+  JunqiObservation
 > = {
   id: JUNQI_GAME_ID,
+  version: 1,
   seatCount: 2,
   currentSeat: (state) => (state.phase === "finished" ? null : state.turnSeat),
-  winnerSeat: (state) => state.winner,
+  outcome: (state) => seatOutcome(state.phase === "finished", state.winner),
+  observe: (state, seat) => ({
+    view: projectView(state, seat as 0 | 1),
+    ...(state.variant === "open" ? { openState: structuredClone(state) } : {}),
+  }),
   isFinished: (state) => state.phase === "finished",
   applyMove(state, move, seat) {
     return {

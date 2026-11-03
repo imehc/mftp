@@ -8,7 +8,7 @@ export function matchUndoPlies(
   localSeat?: number,
 ): number {
   if (snapshot.phase !== "awaiting-move") return 0;
-  return undoPliesFor(runner.getCheckpoint(), localSeat);
+  return undoPliesFor(runner.getObservationHistory(), localSeat);
 }
 
 /** 自动跳过后可连续落子，必须查真实落子方，不能按奇偶数回退。 */

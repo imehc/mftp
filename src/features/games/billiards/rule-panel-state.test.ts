@@ -199,6 +199,9 @@ describe("规则操作提交守卫", () => {
   it("仅当前本地等待输入状态可以提交，旧回合、处理中和结束状态拒绝提交", () => {
     const state = nomination();
     const snapshot: MatchSnapshot<BilliardsState> = {
+      outcome: null,
+      viewerSeat: 0,
+      participants: [],
       state,
       phase: "awaiting-move",
       activeSeat: 0,

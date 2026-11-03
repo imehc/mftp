@@ -24,6 +24,7 @@ pub(crate) fn sensitive(name: &str) -> bool {
             | "token"
             | "accesstoken"
             | "refreshtoken"
+            | "recoverytoken"
             | "idtoken"
             | "apikey"
             | "xapikey"

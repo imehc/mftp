@@ -266,7 +266,7 @@ export function ChessMatchView({
               result
             ) : online?.undoWaiting ? (
               <Trans>等待协商结果…</Trans>
-            ) : kind === "ai" ? (
+            ) : kind === "computer" ? (
               <Trans>电脑思考中…</Trans>
             ) : (
               <>

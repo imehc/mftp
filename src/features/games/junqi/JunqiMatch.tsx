@@ -18,7 +18,7 @@ import type {
   JunqiPresentation,
   JunqiState,
 } from "./types";
-import { projectView } from "./visibility";
+import type { JunqiObservation } from "./view-types";
 
 interface MatchProps {
   mode: JunqiLocalMode;
@@ -63,7 +63,12 @@ function LocalMatch({
   onExit,
   session,
 }: MatchProps & {
-  session: LocalGameSession<JunqiState, JunqiMove, JunqiPresentation>;
+  session: LocalGameSession<
+    JunqiState,
+    JunqiMove,
+    JunqiPresentation,
+    JunqiObservation
+  >;
 }) {
   const { runner, local } = session;
   const snapshot = useMatchSnapshot(runner);
@@ -73,7 +78,7 @@ function LocalMatch({
   return (
     <JunqiMatchView
       mode={mode}
-      view={projectView(snapshot.state, mode.localSeat)}
+      view={snapshot.state.view}
       localSeat={mode.localSeat}
       interactive={interactive}
       recordId={runner.id}

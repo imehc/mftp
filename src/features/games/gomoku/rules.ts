@@ -1,3 +1,4 @@
+import { seatOutcome } from "../engine/outcome";
 import type {
   GameDefinition,
   MoveResolution,
@@ -93,9 +94,11 @@ export const gomokuGame: GameDefinition<
   GomokuPresentation
 > = {
   id: "gomoku",
+  version: 1,
+  observe: (state) => state,
   seatCount: 2,
   currentSeat: (state) => (state.finished ? null : state.turnSeat),
-  winnerSeat: (state) => state.winnerSeat,
+  outcome: (state) => seatOutcome(state.finished, state.winnerSeat),
   isFinished: (state) => state.finished,
   applyMove(
     state,

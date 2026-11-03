@@ -1,6 +1,7 @@
 import type { Difficulty } from "../engine/ai";
-import type { LocalController } from "../engine/controllers";
-import type { MatchRunner } from "../engine/match";
+import type { BoardMode } from "../engine/board-session";
+import type { LocalGameInput } from "../engine/game-session-store";
+import type { MatchHandle } from "../engine/match-handle";
 
 export const REVERSI_GAME_ID = "reversi";
 export const BOARD_SIZE = 8;
@@ -26,10 +27,7 @@ export interface ReversiPresentation extends ReversiMove {
   flipped: number[];
 }
 
-export type ReversiMode =
-  | { kind: "ai"; difficulty: Difficulty; localSeat: number }
-  | { kind: "hotseat" }
-  | { kind: "online" };
+export type ReversiMode = BoardMode;
 
 export interface ReversiHistoryPayload {
   mode: ReversiMode["kind"];
@@ -42,6 +40,6 @@ export interface ReversiHistoryPayload {
 }
 
 export interface ReversiSession {
-  runner: MatchRunner<ReversiState, ReversiMove, ReversiPresentation>;
-  local: LocalController<ReversiState, ReversiMove>;
+  runner: MatchHandle<ReversiState, ReversiMove>;
+  local: LocalGameInput<ReversiMove>;
 }

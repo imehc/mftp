@@ -2,6 +2,7 @@ import type {
   BaseState,
   JunqiVariant,
   Knowledge,
+  OpenState,
   PieceKind,
   Side,
 } from "./types";
@@ -26,4 +27,10 @@ export interface JunqiView {
   lastMove: BaseState["lastMove"];
   lastCombat: BaseState["lastCombat"];
   candidates: Knowledge;
+}
+
+/** 明棋策略可观察公开规则状态，暗棋和翻棋仅提供遮盖后的局面。 */
+export interface JunqiObservation {
+  view: JunqiView;
+  openState?: OpenState;
 }

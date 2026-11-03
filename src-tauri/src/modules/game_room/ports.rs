@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub(crate) enum RoomEvent {
+    Party(super::GamePartyEvent),
     PeerJoined {
         name: String,
     },

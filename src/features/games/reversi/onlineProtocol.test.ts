@@ -128,7 +128,7 @@ describe("黑白棋联机协议与双端对局", () => {
     await play(guest);
     expect(stateOf(host)).toEqual(stateOf(guest));
     host.requestUndo(
-      undoPliesFor(host.getSnapshot().match.runner.getCheckpoint(), 0),
+      undoPliesFor(host.getSnapshot().match.runner.getAuthorityCheckpoint(), 0),
     );
     await settle();
     expect(

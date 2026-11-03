@@ -1,6 +1,6 @@
 import type { Difficulty } from "../engine/ai";
-import type { LocalController } from "../engine/controllers";
-import type { MatchRunner } from "../engine/match";
+import type { LocalGameInput } from "../engine/game-session-store";
+import type { MatchHandle } from "../engine/match-handle";
 import type { SeatIndex } from "../engine/types";
 
 export const GOMOKU_GAME_ID = "gomoku";
@@ -46,6 +46,6 @@ export interface GomokuHistoryPayload {
 
 /** 一局对战：runner 加上本地输入喂入的 controller。 */
 export interface GomokuSession {
-  runner: MatchRunner<GomokuState, GomokuMove, GomokuMove>;
-  local: LocalController<GomokuState, GomokuMove>;
+  runner: MatchHandle<GomokuState, GomokuMove>;
+  local: LocalGameInput<GomokuMove>;
 }

@@ -140,6 +140,7 @@ macro_rules! common_modules {
                 ],
                 types: [models::TransferProgress],
             },
+
             "game_room" => {
                 commands: [
                     game_room::commands::game_room_status,
@@ -148,11 +149,17 @@ macro_rules! common_modules {
                     game_room::commands::game_room_discover,
                     game_room::commands::game_room_send,
                     game_room::commands::game_room_leave,
+                    game_room::commands::game_party_status,
+                    game_room::commands::game_party_create,
+                    game_room::commands::game_party_join,
+                    game_room::commands::game_party_resume,
+                    game_room::commands::game_party_send,
                 ],
                 types: [
                     game_room::GameRoomPeerEvent,
                     game_room::GameRoomClosedEvent,
                     game_room::GameRoomMessageEvent,
+                    game_room::GamePartyEvent,
                 ],
             },
             "vault" => {

@@ -1,19 +1,15 @@
 import { BoardModeMenu } from "../engine/BoardModeMenu";
 import { historyModeLabel, historyResult } from "./labels";
-import {
-  GOMOKU_GAME_ID,
-  type GomokuHistoryPayload,
-  type GomokuMode,
-} from "./types";
+import type { GomokuHistoryPayload, GomokuMode } from "./types";
 
 export function GomokuModeMenu({
   onStart,
 }: {
-  onStart: (mode: GomokuMode) => void;
+  onStart(mode: GomokuMode): void;
 }) {
   return (
     <BoardModeMenu<GomokuHistoryPayload>
-      gameId={GOMOKU_GAME_ID}
+      gameId="gomoku"
       onStart={onStart}
       historyMode={historyModeLabel}
       historyResult={historyResult}

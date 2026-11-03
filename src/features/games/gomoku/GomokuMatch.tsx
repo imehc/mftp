@@ -93,7 +93,7 @@ export function GomokuMatchView({
   const aiThinking =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
-    runner.controllers[snapshot.activeSeat]?.kind === "ai";
+    runner.controllers[snapshot.activeSeat]?.kind === "computer";
   const localSeat =
     mode.kind === "online"
       ? (online?.localSeat ?? 0)

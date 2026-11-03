@@ -1,6 +1,6 @@
 import type { Difficulty } from "../engine/ai";
-import type { LocalController } from "../engine/controllers";
-import type { MatchRunner } from "../engine/match";
+import type { LocalGameInput } from "../engine/game-session-store";
+import type { MatchHandle } from "../engine/match-handle";
 import type { SeatIndex } from "../engine/types";
 
 export const XIANGQI_GAME_ID = "xiangqi";
@@ -62,6 +62,6 @@ export interface XiangqiHistoryPayload {
 }
 
 export interface XiangqiSession {
-  runner: MatchRunner<XiangqiState, XiangqiMove, XiangqiPresentation>;
-  local: LocalController<XiangqiState, XiangqiMove>;
+  runner: MatchHandle<XiangqiState, XiangqiMove>;
+  local: LocalGameInput<XiangqiMove>;
 }

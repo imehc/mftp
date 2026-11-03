@@ -1,6 +1,6 @@
 import type { Difficulty } from "../engine/ai";
-import type { LocalController } from "../engine/controllers";
-import type { MatchRunner } from "../engine/match";
+import type { LocalGameInput } from "../engine/game-session-store";
+import type { MatchHandle } from "../engine/match-handle";
 import type { SeatIndex } from "../engine/types";
 
 export const GO_GAME_ID = "go";
@@ -69,6 +69,6 @@ export interface GoHistoryPayload {
 
 /** 一局对战：runner 加上本地输入喂入的 controller。 */
 export interface GoSession {
-  runner: MatchRunner<GoState, GoMove, GoPresentation>;
-  local: LocalController<GoState, GoMove>;
+  runner: MatchHandle<GoState, GoMove>;
+  local: LocalGameInput<GoMove>;
 }

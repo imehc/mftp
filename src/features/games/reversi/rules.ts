@@ -1,3 +1,4 @@
+import { seatOutcome } from "../engine/outcome";
 import type { GameDefinition, MoveResolution } from "../engine/types";
 import {
   BOARD_SIZE,
@@ -130,9 +131,11 @@ export const reversiGame: GameDefinition<
   ReversiPresentation
 > = {
   id: "reversi",
+  version: 1,
+  observe: (state) => state,
   seatCount: 2,
   currentSeat: (state) => (state.finished ? null : state.turnSeat),
-  winnerSeat: (state) => state.winnerSeat,
+  outcome: (state) => seatOutcome(state.finished, state.winnerSeat),
   isFinished: (state) => state.finished,
   applyMove: applyReversiMove,
 };

@@ -67,7 +67,7 @@ describe("黑白棋存档与悔棋", () => {
       checkpoint,
     );
     runner.start();
-    const plies = undoPliesFor(runner.getCheckpoint(), 0);
+    const plies = undoPliesFor(runner.getAuthorityCheckpoint(), 0);
     expect(plies).toBe(2);
     expect(runner.undo(plies)).toBe(true);
     expect(runner.getSnapshot().state).toEqual(checkpoint.history[10]);

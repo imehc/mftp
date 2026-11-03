@@ -1,6 +1,7 @@
-import { AiController, LocalController } from "../engine/controllers";
+import type { LocalGameInput } from "../engine/game-session-store";
 import { GameSessionStore } from "../engine/game-session-store";
-import { MatchRunner } from "../engine/match";
+import { createParticipantSession } from "../engine/participant-session";
+import type { ParticipantConfiguration } from "../engine/participants";
 import { createBilliardsAiStrategy } from "./ai";
 import { billiardsCheckpointSchema } from "./checkpoint";
 import { createNineBallState } from "./nine-ball";
@@ -57,29 +58,38 @@ export const billiardsSessions = new GameSessionStore<
     const equipment = equipmentForState(initial);
     const simulation = createSimulationClient(equipment.id);
     try {
-      const local = new LocalController<BilliardsState, BilliardsMove>();
-      const controllers =
-        mode.kind === "practice"
-          ? [local]
-          : mode.kind === "hotseat"
-            ? [local, local]
+      const configuration: ParticipantConfiguration = {
+        version: 1,
+        viewerSeat: mode.kind === "hotseat" ? "active" : 0,
+        seats:
+          mode.kind === "practice"
+            ? [{ kind: "local", seat: 0 }]
             : [
-                local,
-                new AiController(
-                  createBilliardsAiStrategy(simulation.shot, equipment),
-                  mode.difficulty,
-                ),
-              ];
-      const runner = new MatchRunner(
+                { kind: "local", seat: 0 },
+                mode.kind === "ai"
+                  ? { kind: "computer", seat: 1, difficulty: mode.difficulty }
+                  : { kind: "local", seat: 1 },
+              ],
+      };
+      const { runner, locals } = createParticipantSession(
         createBilliardsGame(initial.variant, simulation.shot),
         initial,
-        controllers,
+        configuration,
+        { computer: createBilliardsAiStrategy(simulation.shot, equipment) },
         hooks,
         checkpoint,
+        700,
       );
+      const local: LocalGameInput<BilliardsMove> = {
+        submit: (move) => runner.submitLocal(move),
+        get awaitingInput() {
+          return runner.awaitingLocalInput;
+        },
+      };
       return {
         runner,
         local,
+        locals,
         ready: simulation.ready,
         dispose: () => simulation.dispose(),
       };

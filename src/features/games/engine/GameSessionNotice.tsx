@@ -19,12 +19,18 @@ import { describeError } from "~/lib/errors";
 import type { GameSessionStore } from "./game-session-store";
 import { GameRestoreDialog } from "./GameRestoreDialog";
 
-export function GameSessionNotice<Mode, State, Move, Presentation>({
+export function GameSessionNotice<
+  Mode,
+  State,
+  Move,
+  Presentation,
+  Observation,
+>({
   store,
   onRestore,
   restoreDescription,
 }: {
-  store: GameSessionStore<Mode, State, Move, Presentation>;
+  store: GameSessionStore<Mode, State, Move, Presentation, Observation>;
   onRestore?: () => void;
   restoreDescription?: ReactNode;
 }) {

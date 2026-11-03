@@ -1,6 +1,6 @@
 /**
  * PlayerController 的实现。对局循环对每个座位一视同仁；这些类把
- * UI 输入和 AI 策略（以及第三阶段的远端对手）适配到该契约上。
+ * UI 输入、电脑策略和远端对手适配到该契约上。
  */
 import { abortableDelay, type AiStrategy, type Difficulty } from "./ai";
 import type { MoveRequestContext, PlayerController } from "./types";
@@ -65,10 +65,10 @@ export class LocalController<S, M> implements PlayerController<S, M> {
 
 /**
  * 以固定难度运行游戏提供的 AiStrategy。把极快的搜索补足到
- * `minThinkMs`，让 AI 回合显得是经过思考，而非瞬间落子。
+ * `minThinkMs`，让电脑回合显得是经过思考，而非瞬间落子。
  */
-export class AiController<S, M> implements PlayerController<S, M> {
-  readonly kind = "ai" as const;
+export class ComputerController<S, M> implements PlayerController<S, M> {
+  readonly kind = "computer" as const;
 
   constructor(
     private readonly strategy: AiStrategy<S, M>,
@@ -79,7 +79,7 @@ export class AiController<S, M> implements PlayerController<S, M> {
   async requestMove(ctx: MoveRequestContext<S>): Promise<M> {
     const startedAt = performance.now();
     const move = await this.strategy.chooseMove(
-      ctx.state,
+      ctx.observation,
       ctx.seat,
       this.difficulty,
       ctx.signal,
@@ -163,4 +163,4 @@ export class RemoteController<S, M> implements PlayerController<S, M> {
 }
 
 export type AnyController<S, M> =
-  LocalController<S, M> | AiController<S, M> | RemoteController<S, M>;
+  LocalController<S, M> | ComputerController<S, M> | RemoteController<S, M>;

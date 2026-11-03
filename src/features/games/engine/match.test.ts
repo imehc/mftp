@@ -7,8 +7,10 @@ import type { GameDefinition, PlayerController } from "./types";
 const game: GameDefinition<number, number, number> = {
   id: "test",
   seatCount: 1,
+  version: 1,
+  observe: (state) => state,
   currentSeat: () => 0,
-  winnerSeat: () => null,
+  outcome: (state) => (state >= 10 ? { kind: "draw" } : null),
   isFinished: (state) => state >= 10,
   applyMove: (state, move) => ({ state: state + move, presentation: move }),
 };
@@ -30,7 +32,7 @@ describe("对局暂停与稳定检查点", () => {
     runner.start();
     local.submit(2);
     await tick();
-    expect(runner.getCheckpoint()).toEqual([0, 2]);
+    expect(runner.getAuthorityCheckpoint()).toEqual([0, 2]);
     expect(runner.getSnapshot().state).toBe(2);
     expect(runner.getSnapshot().moveCount).toBe(1);
     expect(error).toHaveBeenCalledOnce();
@@ -46,12 +48,12 @@ describe("对局暂停与稳定检查点", () => {
     runner.pause();
     await tick();
     expect(local.submit(3)).toBe(false);
-    expect(runner.getCheckpoint()).toEqual([0, 2]);
+    expect(runner.getAuthorityCheckpoint()).toEqual([0, 2]);
     runner.resume();
     await tick();
     expect(local.submit(3)).toBe(true);
     await tick();
-    expect(runner.getCheckpoint()).toEqual([0, 2, 5]);
+    expect(runner.getAuthorityCheckpoint()).toEqual([0, 2, 5]);
     expect(runner.undo(1)).toBe(true);
     expect(runner.getSnapshot().state).toBe(2);
     runner.dispose();
@@ -64,7 +66,7 @@ describe("对局暂停与稳定检查点", () => {
     local.submit(2);
     runner.pause();
     await tick();
-    expect(runner.getCheckpoint()).toEqual([0, 2]);
+    expect(runner.getAuthorityCheckpoint()).toEqual([0, 2]);
     expect(local.awaitingInput).toBe(false);
     runner.dispose();
   });
@@ -72,7 +74,7 @@ describe("对局暂停与稳定检查点", () => {
   it("暂停期间完成的过期人工智能结果不能落子", async () => {
     let complete!: (move: number) => void;
     const ai: PlayerController<number, number> = {
-      kind: "ai",
+      kind: "computer",
       requestMove: () =>
         new Promise((resolve) => {
           complete = resolve;
@@ -83,7 +85,7 @@ describe("对局暂停与稳定检查点", () => {
     runner.pause();
     complete(2);
     await tick();
-    expect(runner.getCheckpoint()).toEqual([0]);
+    expect(runner.getAuthorityCheckpoint()).toEqual([0]);
     runner.resume();
     await tick();
     complete(10);

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { DIFFICULTIES } from "../engine/ai";
 import { junqiAi } from "./ai";
 import { validDeployment } from "./deployment";
+import { junqiGame } from "./rules";
 import { applyAction, createInitialState, positionKey } from "./rules";
 
 function playing() {
@@ -15,12 +16,22 @@ describe("军棋电脑策略", () => {
     let state = createInitialState();
     const opponent = structuredClone(state.board.slice(0, 30));
     const signal = new AbortController().signal;
-    const arrange = await junqiAi.chooseMove(state, 0, "medium", signal);
+    const arrange = await junqiAi.chooseMove(
+      junqiGame.observe(state, 0),
+      0,
+      "medium",
+      signal,
+    );
     expect(arrange.type).toBe("arrange");
     state = applyAction(state, arrange, 0);
     expect(validDeployment(state.board, 0)).toBe(true);
     expect(state.board.slice(0, 30)).toEqual(opponent);
-    const ready = await junqiAi.chooseMove(state, 0, "medium", signal);
+    const ready = await junqiAi.chooseMove(
+      junqiGame.observe(state, 0),
+      0,
+      "medium",
+      signal,
+    );
     expect(ready).toEqual({ type: "ready" });
     expect(applyAction(state, ready, 0).ready).toEqual([true, false]);
   });
@@ -36,7 +47,7 @@ describe("军棋电脑策略", () => {
       state.board[25] = { id: "enemy", side: 1, kind: "commander" };
       state.positions = { [positionKey(state)]: 1 };
       const move = await junqiAi.chooseMove(
-        state,
+        junqiGame.observe(state, 0),
         0,
         difficulty,
         new AbortController().signal,

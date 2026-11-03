@@ -11,12 +11,14 @@ import {
   type JunqiPresentation,
   type JunqiState,
 } from "./types";
+import type { JunqiObservation } from "./view-types";
 
 export const junqiSessions = new GameSessionStore<
   JunqiMode,
   JunqiState,
   JunqiMove,
-  JunqiPresentation
+  JunqiPresentation,
+  JunqiObservation
 >({
   gameId: JUNQI_GAME_ID,
   schema: junqiCheckpointSchema,

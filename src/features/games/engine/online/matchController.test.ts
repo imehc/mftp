@@ -9,6 +9,7 @@ import type { GameRoomClosedReason } from "~/bindings";
 import type { RemoteMove } from "~/features/games/engine/transport";
 import type { GameDefinition } from "~/features/games/engine/types";
 
+import { seatOutcome } from "../outcome";
 import { OnlineMatchController } from "./matchController";
 import type { OnlineTransport } from "./matchTypes";
 import { type MatchControlMessage, ONLINE_PROTOCOL_VERSION } from "./protocol";
@@ -21,8 +22,10 @@ interface RaceState {
 const raceGame: GameDefinition<RaceState, number, number> = {
   id: "race",
   seatCount: 2,
+  version: 1,
+  observe: (state) => state,
   currentSeat: (state) => (state.count >= 3 ? null : state.count % 2),
-  winnerSeat: (state) => (state.count >= 3 ? (state.count - 1) % 2 : null),
+  outcome: (state) => seatOutcome(state.count >= 3, (state.count - 1) % 2),
   isFinished: (state) => state.count >= 3,
   applyMove: (state, _move, seat) => ({
     state: { count: state.count + 1 },

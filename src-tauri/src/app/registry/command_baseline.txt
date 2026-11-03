@@ -75,6 +75,11 @@ common game_room_join
 common game_room_discover
 common game_room_send
 common game_room_leave
+common game_party_status
+common game_party_create
+common game_party_join
+common game_party_resume
+common game_party_send
 common vault_entries_list
 common vault_entry_create
 common vault_entry_update

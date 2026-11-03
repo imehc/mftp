@@ -10,7 +10,7 @@ export function chessUndoPlies(
   seat?: number,
 ): number {
   if (snapshot.phase !== "awaiting-move") return 0;
-  const history = runner.getCheckpoint();
+  const history = runner.getObservationHistory();
   if (history.length < 2) return 0;
   if (seat === undefined) return 1;
   for (let index = history.length - 1; index > 0; index--) {

@@ -19,6 +19,29 @@ const READ_POLL: Duration = Duration::from_millis(100);
     rename_all_fields = "camelCase"
 )]
 pub(super) enum WireMsg {
+    PartyHello {
+        protocol_version: u16,
+        game_id: String,
+        rules_version: u32,
+        code: Option<String>,
+        player_name: String,
+        device_id: String,
+        recovery: Option<super::party::Recovery>,
+    },
+    PartyWelcome {
+        status: super::super::GamePartyStatus,
+        recovery_token: String,
+    },
+    PartyAck {
+        recovery_token: String,
+    },
+    PartyReady,
+    PartyMembers {
+        members: Vec<super::super::GamePartyMember>,
+    },
+    PartyMessage {
+        envelope: super::super::GamePartyEnvelope,
+    },
     Hello {
         game_id: String,
         code: Option<String>,
@@ -67,7 +90,7 @@ pub(super) fn validate_metadata(fields: &[&str]) -> AppResult<()> {
 
 pub(super) fn encode(message: &WireMsg) -> AppResult<Vec<u8>> {
     let limit = match message {
-        WireMsg::App { .. } => MESSAGE_FRAME_LIMIT,
+        WireMsg::App { .. } | WireMsg::PartyMessage { .. } => MESSAGE_FRAME_LIMIT,
         _ => HANDSHAKE_FRAME_LIMIT,
     };
     let mut output = FrameBuffer {

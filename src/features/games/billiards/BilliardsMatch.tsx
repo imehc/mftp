@@ -49,7 +49,7 @@ export function BilliardsMatch({
           move.power,
           billiardsSessions.getSnapshot().active?.session?.runner.controllers[
             seat
-          ]?.kind === "ai",
+          ]?.kind === "computer",
         );
       }
       await stageRef.current?.playPresentation(resolution.presentation);

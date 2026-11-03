@@ -7,6 +7,7 @@
  * 要求、第一颗落袋的球决定组别、开球进黑八重置、自由球可在任意位置。
  */
 import { createRng } from "../engine/ai";
+import { seatOutcome } from "../engine/outcome";
 import type {
   GameDefinition,
   MoveResolution,
@@ -358,6 +359,8 @@ export function createBilliardsGame(
 ): GameDefinition<BilliardsState, BilliardsMove, BilliardsPresentation> {
   return {
     id: `billiards-${variant}`,
+    version: 1,
+    observe: (state) => state,
     seatCount: variant === "practice" ? 1 : 2,
     currentSeat: (state) =>
       state.finished
@@ -367,7 +370,7 @@ export function createBilliardsGame(
           : state.variant === "snooker"
             ? snookerSeat(state)
             : state.turnSeat,
-    winnerSeat: (state) => state.winnerSeat,
+    outcome: (state) => seatOutcome(state.finished, state.winnerSeat),
     isFinished: (state) => state.finished,
     applyMove: async (state, move, seat) => {
       if (state.finished) throw new Error("billiards: match already finished");

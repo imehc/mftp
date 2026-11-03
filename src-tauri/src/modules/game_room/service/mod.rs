@@ -29,6 +29,7 @@ mod framing;
 mod lifecycle_tests;
 #[cfg(test)]
 mod ownership_tests;
+mod party;
 #[cfg(test)]
 mod protocol_tests;
 mod redaction;
@@ -63,6 +64,7 @@ struct RoomRuntime {
 }
 
 pub struct GameRoomManager {
+    party: party::PartyManager,
     logs: diagnostics::RoomDiagnostics,
     runtime: Mutex<Option<RoomRuntime>>,
     events: EventSink,
@@ -76,6 +78,7 @@ pub struct GameRoomManager {
 impl GameRoomManager {
     pub(crate) fn new(events: EventSink, operations: Arc<Operations>) -> Self {
         Self {
+            party: party::PartyManager::default(),
             logs: diagnostics::RoomDiagnostics::default(),
             runtime: Mutex::new(None),
             events,
@@ -177,7 +180,8 @@ impl GameRoomManager {
             .runtime
             .lock()
             .as_ref()
-            .is_some_and(|r| r.instance_id == instance_id);
+            .is_some_and(|r| r.instance_id == instance_id)
+            || self.party.matches(instance_id);
         if matches {
             self.stop_runtime();
         }
@@ -194,6 +198,7 @@ impl GameRoomManager {
     // Called only with lifecycle held. Keep status non-idle until the generation
     // has released every connection and worker; queued starts cannot overtake it.
     fn stop_runtime(&self) {
+        self.party.leave();
         let mut handle = self.runtime.lock().as_mut().and_then(|runtime| {
             let mut handle = runtime.handle.take()?;
             handle.peer = runtime.link.lock().clone();

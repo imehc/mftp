@@ -1,3 +1,4 @@
+import { seatOutcome } from "../engine/outcome";
 import type {
   GameDefinition,
   MoveResolution,
@@ -217,9 +218,11 @@ export function legalPlays(state: GoState): GoMove[] {
 
 export const goGame: GameDefinition<GoState, GoMove, GoPresentation> = {
   id: "go",
+  version: 1,
+  observe: (state) => state,
   seatCount: 2,
   currentSeat: (state) => (state.finished ? null : state.turnSeat),
-  winnerSeat: (state) => state.winnerSeat,
+  outcome: (state) => seatOutcome(state.finished, state.winnerSeat),
   isFinished: (state) => state.finished,
   applyMove(state, move, seat): MoveResolution<GoState, GoPresentation> {
     if (state.finished) throw new Error("go: match already finished");

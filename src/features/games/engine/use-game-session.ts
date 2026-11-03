@@ -3,8 +3,8 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { GameSessionStore } from "./game-session-store";
 import type { MoveResolvedInfo } from "./match";
 
-export function useGameLifecycle<Mode, State, Move, Presentation>(
-  store: GameSessionStore<Mode, State, Move, Presentation>,
+export function useGameLifecycle<Mode, State, Move, Presentation, Observation>(
+  store: GameSessionStore<Mode, State, Move, Presentation, Observation>,
 ) {
   const snapshot = useSyncExternalStore(store.subscribe, store.getSnapshot);
   useEffect(() => {
@@ -29,10 +29,16 @@ export function useGameLifecycle<Mode, State, Move, Presentation>(
   };
 }
 
-export function useLocalGameSession<Mode, State, Move, Presentation>(
-  store: GameSessionStore<Mode, State, Move, Presentation>,
+export function useLocalGameSession<
+  Mode,
+  State,
+  Move,
+  Presentation,
+  Observation,
+>(
+  store: GameSessionStore<Mode, State, Move, Presentation, Observation>,
   present: (
-    info: MoveResolvedInfo<State, Move, Presentation>,
+    info: MoveResolvedInfo<Observation, Move, Presentation>,
   ) => void | Promise<void>,
   startOnAttach = true,
 ) {

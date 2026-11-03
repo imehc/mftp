@@ -1,3 +1,4 @@
+import { seatOutcome } from "../engine/outcome";
 import type {
   GameDefinition,
   MoveResolution,
@@ -332,9 +333,11 @@ export const xiangqiGame: GameDefinition<
   XiangqiPresentation
 > = {
   id: "xiangqi",
+  version: 1,
+  observe: (state) => state,
   seatCount: 2,
   currentSeat: (state) => (state.finished ? null : state.turnSeat),
-  winnerSeat: (state) => state.winnerSeat,
+  outcome: (state) => seatOutcome(state.finished, state.winnerSeat),
   isFinished: (state) => state.finished,
   applyMove(
     state,

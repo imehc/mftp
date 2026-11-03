@@ -85,7 +85,7 @@ export function MatchView({
   const aiThinking =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
-    runner.controllers[snapshot.activeSeat]?.kind === "ai";
+    runner.controllers[snapshot.activeSeat]?.kind === "computer";
   const decisionPending =
     (state.variant === "snooker" || state.variant === "nine-ball") &&
     !!state.decision;

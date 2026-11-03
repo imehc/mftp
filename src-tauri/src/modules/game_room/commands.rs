@@ -1,3 +1,4 @@
+use super::{GamePartyCreateInput, GamePartyEnvelope, GamePartyJoinInput, GamePartyStatus};
 use super::{GameRoomStatus, GameRoomSummary};
 use crate::app::services::AppServices;
 use crate::core::activity::OperationContext;
@@ -94,5 +95,80 @@ pub async fn game_room_leave(state: State<'_, AppServices>, instance_id: String)
                 Ok(())
             },
         )
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn game_party_status(
+    state: State<'_, AppServices>,
+) -> AppResult<Option<GamePartyStatus>> {
+    let manager = state.game_room.clone();
+    state
+        .executor
+        .blocking_unlogged(move || Ok(manager.party_status()))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn game_party_create(
+    state: State<'_, AppServices>,
+    input: GamePartyCreateInput,
+) -> AppResult<GamePartyStatus> {
+    let manager = state.game_room.clone();
+    state
+        .executor
+        .blocking(
+            OperationContext::new("games", "create_party", input.game_id.clone()),
+            move || manager.create_party(input),
+        )
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn game_party_join(
+    state: State<'_, AppServices>,
+    input: GamePartyJoinInput,
+) -> AppResult<GamePartyStatus> {
+    let manager = state.game_room.clone();
+    state
+        .executor
+        .blocking(
+            OperationContext::new("games", "join_party", input.host.clone()),
+            move || manager.join_party(input),
+        )
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn game_party_resume(
+    state: State<'_, AppServices>,
+    instance_id: String,
+) -> AppResult<GamePartyStatus> {
+    let manager = state.game_room.clone();
+    state
+        .executor
+        .blocking(
+            OperationContext::new("games", "resume_party", instance_id.clone()),
+            move || manager.resume_party(&instance_id),
+        )
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn game_party_send(
+    state: State<'_, AppServices>,
+    instance_id: String,
+    target_member_id: Option<String>,
+    envelope: GamePartyEnvelope,
+) -> AppResult<()> {
+    let manager = state.game_room.clone();
+    state
+        .executor
+        .blocking_unlogged(move || manager.send_party(&instance_id, target_member_id, envelope))
         .await
 }

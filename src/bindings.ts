@@ -102,6 +102,29 @@ export const commands = {
 	gameRoomDiscover: (gameId: string) => typedError<GameRoomSummary[], AppError>(__TAURI_INVOKE("game_room_discover", { gameId })),
 	gameRoomSend: (instanceId: string, payload: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_send", { instanceId, payload })),
 	gameRoomLeave: (instanceId: string) => typedError<null, AppError>(__TAURI_INVOKE("game_room_leave", { instanceId })),
+	gamePartyStatus: () => typedError<{
+	instanceId: string,
+	protocolVersion: number,
+	roomId: string,
+	gameId: string,
+	rulesVersion: number,
+	seatCount: number,
+	roomName: string,
+	host: string,
+	port: number,
+	hosting: boolean,
+	memberId: string,
+	seat: number,
+	connected: boolean,
+	connectionGeneration: number,
+	members: GamePartyMember[],
+	// Only the authority can display the share code; recovery credentials stay private.
+	code: string | null,
+} | null, AppError>(__TAURI_INVOKE("game_party_status")),
+	gamePartyCreate: (input: GamePartyCreateInput) => typedError<GamePartyStatus, AppError>(__TAURI_INVOKE("game_party_create", { input })),
+	gamePartyJoin: (input: GamePartyJoinInput) => typedError<GamePartyStatus, AppError>(__TAURI_INVOKE("game_party_join", { input })),
+	gamePartyResume: (instanceId: string) => typedError<GamePartyStatus, AppError>(__TAURI_INVOKE("game_party_resume", { instanceId })),
+	gamePartySend: (instanceId: string, targetMemberId: string | null, envelope: GamePartyEnvelope) => typedError<null, AppError>(__TAURI_INVOKE("game_party_send", { instanceId, targetMemberId, envelope })),
 	vaultEntriesList: () => typedError<VaultEntry[], AppError>(__TAURI_INVOKE("vault_entries_list")),
 	vaultEntryCreate: (input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_create", { input })),
 	vaultEntryUpdate: (id: string, input: VaultEntryInput) => typedError<VaultEntry, AppError>(__TAURI_INVOKE("vault_entry_update", { id, input })),
@@ -690,6 +713,70 @@ export type DirectoryTransferMode = "archive" | "direct";
 
 // A data section that can be exported; add a variant per exportable module.
 export type ExportSection = "vault" | "hosts" | "todo" | "lan" | "aiTranslations";
+
+export type GamePartyCreateInput = {
+	gameId: string,
+	rulesVersion: number,
+	seatCount: number,
+	remoteSeats: number[],
+	roomName: string,
+	code: string | null,
+	playerName: string,
+};
+
+export type GamePartyEnvelope = {
+	protocolVersion: number,
+	roomId: string,
+	matchId: string,
+	rulesVersion: number,
+	generation: number,
+	revision: number,
+	actionId: string,
+	sequence: number,
+	kind: GamePartyMessageKind,
+	payload: string,
+};
+
+export type GamePartyEvent = { type: "members"; instanceId: string; localSeat: number; members: GamePartyMember[] } | { type: "message"; instanceId: string; memberId: string; seat: number; connectionGeneration: number; envelope: GamePartyEnvelope } | { type: "disconnected"; instanceId: string; connectionGeneration: number };
+
+export type GamePartyJoinInput = {
+	host: string,
+	port: number,
+	gameId: string,
+	rulesVersion: number,
+	code: string | null,
+	playerName: string,
+};
+
+export type GamePartyMember = {
+	memberId: string,
+	seat: number,
+	name: string,
+	connected: boolean,
+	connectionGeneration: number,
+};
+
+export type GamePartyMessageKind = "start" | "action" | "commit" | "snapshot" | "request" | "response";
+
+export type GamePartyStatus = {
+	instanceId: string,
+	protocolVersion: number,
+	roomId: string,
+	gameId: string,
+	rulesVersion: number,
+	seatCount: number,
+	roomName: string,
+	host: string,
+	port: number,
+	hosting: boolean,
+	memberId: string,
+	seat: number,
+	connected: boolean,
+	connectionGeneration: number,
+	members: GamePartyMember[],
+	// Only the authority can display the share code; recovery credentials stay private.
+	code: string | null,
+};
 
 export type GameRoomClosedEvent = {
 	instanceId: string,

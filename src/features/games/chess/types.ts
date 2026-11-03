@@ -1,8 +1,8 @@
 import type { Square } from "chess.js";
 
 import type { Difficulty } from "../engine/ai";
-import type { LocalController } from "../engine/controllers";
-import type { MatchRunner } from "../engine/match";
+import type { LocalGameInput } from "../engine/game-session-store";
+import type { MatchHandle } from "../engine/match-handle";
 
 export const CHESS_GAME_ID = "chess";
 
@@ -57,8 +57,8 @@ export interface ChessHistoryPayload {
 }
 
 export interface ChessSession {
-  runner: MatchRunner<ChessState, ChessMove, ChessPresentation>;
-  local: LocalController<ChessState, ChessMove>;
+  runner: MatchHandle<ChessState, ChessMove>;
+  local: LocalGameInput<ChessMove>;
 }
 
 export type ChessView = "table" | "top";

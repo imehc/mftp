@@ -73,7 +73,8 @@ export function ReversiMatchView({
     snapshot.phase === "awaiting-move" &&
     activeKind === "local" &&
     !online?.undoWaiting;
-  const aiThinking = snapshot.phase === "awaiting-move" && activeKind === "ai";
+  const aiThinking =
+    snapshot.phase === "awaiting-move" && activeKind === "computer";
   const localSeat =
     mode.kind === "online"
       ? (online?.localSeat ?? 0)

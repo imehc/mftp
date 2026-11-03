@@ -1,6 +1,6 @@
 import { Channel } from "@tauri-apps/api/core";
 
-import type { TranslationOutput } from "~/bindings";
+import type { GamePartyEvent, TranslationOutput } from "~/bindings";
 
 /** Android 原生宿主发送标准返回按键；preventDefault 表示本次已消费。 */
 export function listenMobileBack(onBack: () => boolean) {
@@ -37,6 +37,16 @@ export const TRANSFER_PROGRESS = "sftp-transfer-progress";
 export const GAME_ROOM_PEER = "game-room://peer";
 export const GAME_ROOM_MESSAGE = "game-room://message";
 export const GAME_ROOM_CLOSED = "game-room://closed";
+export const GAME_PARTY_EVENT = "game-room://party";
+
+export async function listenGameParty(
+  receive: (event: GamePartyEvent) => void,
+) {
+  const { listen } = await import("@tauri-apps/api/event");
+  return listen<GamePartyEvent>(GAME_PARTY_EVENT, (event) =>
+    receive(event.payload),
+  );
+}
 
 /**
  * SSH 终端事件按会话区分，因此事件名中带有会话 id。

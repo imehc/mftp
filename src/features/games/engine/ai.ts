@@ -1,7 +1,7 @@
 /**
  * 各游戏共用的 AI 抽象：游戏提供 `AiStrategy`（如何搜索走法）；
  * 框架统一难度档位，并把策略转成 `PlayerController`（见
- * controllers.ts 的 AiController）。
+ * controllers.ts 的 ComputerController）。
  */
 import type { SeatIndex } from "./types";
 

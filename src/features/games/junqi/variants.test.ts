@@ -6,6 +6,7 @@ import { isCamp } from "./board";
 import { junqiCheckpointSchema } from "./checkpoint";
 import { validDeployment } from "./deployment";
 import { chooseObservedMove } from "./observed-ai";
+import { junqiGame } from "./rules";
 import { applyAction, createInitialState, positionKey } from "./rules";
 import {
   type FlipState,
@@ -126,8 +127,18 @@ describe("军棋暗棋规则与观察边界", () => {
       other.seed++;
       const signal = new AbortController().signal;
       expect(projectView(other, 0)).toEqual(projectView(state, 0));
-      const first = await junqiAi.chooseMove(state, 0, difficulty, signal);
-      const second = await junqiAi.chooseMove(other, 0, difficulty, signal);
+      const first = await junqiAi.chooseMove(
+        junqiGame.observe(state, 0),
+        0,
+        difficulty,
+        signal,
+      );
+      const second = await junqiAi.chooseMove(
+        junqiGame.observe(other, 0),
+        0,
+        difficulty,
+        signal,
+      );
       expect(first).toEqual(second);
       expect(viewActions(projectView(state, 0))).toContainEqual(first);
     },
