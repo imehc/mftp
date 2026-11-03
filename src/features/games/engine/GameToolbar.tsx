@@ -13,6 +13,7 @@ import {
 
 import { GameHeaderActions, useGameHeaderAction } from "./GameHeaderActions";
 import { GameInfoPopover } from "./GameInfoPopover";
+import { GameMatchDisplay, type GameToolbarPlayers } from "./GameMatchDisplay";
 
 /** 共用状态区外壳；复杂比分仍由游戏自己的组件呈现。 */
 export function GameDisplayBar({
@@ -111,6 +112,8 @@ export function GameToolbar({
   context,
   actions,
   status,
+  statusActions,
+  players,
   metrics,
   details,
   parameters,
@@ -120,6 +123,10 @@ export function GameToolbar({
   context?: ReactNode;
   actions?: ReactNode;
   status: ReactNode;
+  /** 与当前状态关联的恢复动作，保持可见，不参与文字截断。 */
+  statusActions?: ReactNode;
+  /** 对局采用本方 / 居中计数 / 对方；单人谜题保留原有结构。 */
+  players?: GameToolbarPlayers;
   metrics?: ReactNode;
   details?: ReactNode;
   /** 信息弹层里的参数区，例如开关与选择器。 */
@@ -145,10 +152,12 @@ export function GameToolbar({
             {context}
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          {status}
-          {metrics}
-        </div>
+        {!players ? (
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {status}
+            {metrics}
+          </div>
+        ) : null}
         {details ? (
           <div className="text-muted-foreground flex flex-col gap-2 text-xs">
             {details}
@@ -159,27 +168,45 @@ export function GameToolbar({
         <GameHeaderActions menu>{menuActions}</GameHeaderActions>
       ) : null}
       <GameDisplayBar>
-        <div className="game-toolbar-content">
-          {context ? (
-            <div className="game-toolbar-context text-muted-foreground text-xs">
-              {context}
-            </div>
-          ) : null}
-          <div className="game-toolbar-status text-xs">
-            <span
-              className="game-toolbar-primary"
-              role="status"
-              aria-atomic="true"
-            >
-              {status}
-            </span>
-            {metrics ? (
-              <div className="game-toolbar-metrics text-muted-foreground tabular-nums">
-                {metrics}
+        {players ? (
+          <GameMatchDisplay
+            players={players}
+            metrics={metrics}
+            statusActions={statusActions}
+          />
+        ) : (
+          <div className="game-toolbar-content">
+            {context ? (
+              <div className="game-toolbar-context text-muted-foreground text-xs">
+                {context}
               </div>
             ) : null}
+            <div className="game-toolbar-status text-xs">
+              <span
+                className="game-toolbar-primary"
+                role="status"
+                aria-atomic="true"
+              >
+                {status}
+              </span>
+              {statusActions ? (
+                <div className="flex shrink-0 items-center gap-2">
+                  {statusActions}
+                </div>
+              ) : null}
+              {metrics ? (
+                <div className="game-toolbar-metrics text-muted-foreground tabular-nums">
+                  {metrics}
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
+        {players ? (
+          <span className="sr-only" role="status" aria-atomic="true">
+            {status}
+          </span>
+        ) : null}
       </GameDisplayBar>
     </>
   );

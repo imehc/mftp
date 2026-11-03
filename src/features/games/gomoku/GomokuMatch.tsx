@@ -11,6 +11,7 @@ import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameThinkingIndicator } from "../engine/GameThinkingIndicator";
 import { GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
@@ -90,7 +91,7 @@ export function GomokuMatchView({
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
     runner.controllers[snapshot.activeSeat]?.kind === "local";
-  const aiThinking =
+  const computerThinking =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
     runner.controllers[snapshot.activeSeat]?.kind === "computer";
@@ -100,7 +101,7 @@ export function GomokuMatchView({
       : mode.kind === "ai"
         ? mode.localSeat
         : 0;
-  // 悔棋回退到本地玩家的回合：对方（AI 或远程对手）已回应则退两步，
+  // 悔棋回退到本地玩家的回合：对方（电脑或远程对手）已回应则退两步，
   // 对方仍在思考则退一步。联机模式走同意请求而非直接悔棋。
   const undoPlies =
     (mode.kind === "ai" || mode.kind === "online") &&
@@ -160,6 +161,7 @@ export function GomokuMatchView({
         }
         mode={mode}
         localSeat={localSeat}
+        activeSeat={snapshot.activeSeat}
         finished={state.finished}
         metrics={
           <>
@@ -178,8 +180,8 @@ export function GomokuMatchView({
           !state.finished ? (
             online?.undoWaiting ? (
               <Trans>等待对方同意悔棋…</Trans>
-            ) : aiThinking ? (
-              <Trans>电脑思考中…</Trans>
+            ) : computerThinking ? (
+              <GameThinkingIndicator />
             ) : online && snapshot.activeSeat !== online.localSeat ? (
               <Trans>等待对方落子…</Trans>
             ) : null

@@ -92,6 +92,22 @@
 .billiards-game[data-landscape="true"] .billiards-summary > div > div {
   align-items: center;
 }
+/* 对局在横屏也保留水平双方状态，练习模式继续使用原来的侧栏。 */
+.billiards-game[data-landscape="true"] .billiards-score:has([data-match]) {
+  grid-column: 2;
+  grid-row: 2;
+  max-width: none;
+  height: 3.5rem;
+  padding: 0.25rem 0.75rem;
+}
+.billiards-game[data-landscape="true"] .billiards-summary[data-match] > div {
+  display: grid;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+.billiards-game[data-landscape="true"]:has([data-match]) .billiards-stage {
+  grid-row: 3 / -1;
+}
 .billiards-game[data-landscape="true"] .billiards-stage {
   grid-column: 2;
   grid-row: 2 / -1;

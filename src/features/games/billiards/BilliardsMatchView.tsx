@@ -26,6 +26,7 @@ import { useBilliardsPreferences } from "./preferences";
 import type { AimTarget } from "./render/scene-contract";
 import { type BilliardsPanel, canSubmitRuleMove } from "./rule-panel-state";
 import { billiardsSessions } from "./session";
+import { SnookerTargetControl } from "./SnookerTargetControl";
 import type { BilliardsMode, BilliardsMove } from "./types";
 import { useBilliardsMatchRecord } from "./use-billiards-match-record";
 import { useBilliardsNotices } from "./use-billiards-notices";
@@ -85,7 +86,9 @@ export function MatchView({
   const aiThinking =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
-    runner.controllers[snapshot.activeSeat]?.kind === "computer";
+    ["computer", "ai"].includes(
+      runner.controllers[snapshot.activeSeat]?.kind ?? "",
+    );
   const decisionPending =
     (state.variant === "snooker" || state.variant === "nine-ball") &&
     !!state.decision;
@@ -167,6 +170,23 @@ export function MatchView({
         winnerSeat={snapshot.winnerSeat}
       />
       <BilliardsMatchHeader
+        parameters={
+          state.variant === "snooker" ? (
+            <SnookerTargetControl
+              state={state}
+              enabled={
+                activeIsLocal &&
+                !selectionReturning &&
+                (!selectionBusy || panel === "target")
+              }
+              open={panel === "target"}
+              kind={selectionKind}
+              onKind={setSelectionKind}
+              onOpenChange={(next) => openPanel(next ? "target" : null)}
+              onMove={submitRule}
+            />
+          ) : undefined
+        }
         mode={mode}
         state={state}
         panel={panel === "details" ? "details" : null}

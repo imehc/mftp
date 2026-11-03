@@ -2,6 +2,8 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Check, Shuffle } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { GamePlayerLabel } from "../engine/GamePlayerLabel";
+import { GameThinkingIndicator } from "../engine/GameThinkingIndicator";
 import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { ResultLabel, SideLabel, VariantLabel } from "./labels";
 import type { JunqiMode, Side } from "./types";
@@ -34,6 +36,43 @@ export function JunqiToolbar({
   const opponentTurn = state.turnSeat !== localSeat;
   return (
     <GameToolbar
+      players={{
+        local: (
+          <GamePlayerLabel
+            identity="you"
+            color={
+              state.viewerSide === null
+                ? null
+                : state.viewerSide === 0
+                  ? "red"
+                  : "black"
+            }
+          />
+        ),
+        opponent: (
+          <GamePlayerLabel
+            identity={mode.kind === "ai" ? "computer" : "opponent"}
+            color={
+              state.viewerSide === null
+                ? null
+                : state.viewerSide === 0
+                  ? "black"
+                  : "red"
+            }
+          />
+        ),
+        active: finished ? undefined : opponentTurn ? "opponent" : "local",
+        activitySide: opponentTurn ? "opponent" : "local",
+        activity: undoWaiting ? (
+          <Trans>等待对方同意悔棋…</Trans>
+        ) : finished ? null : deployment ? (
+          <Trans>布阵</Trans>
+        ) : opponentTurn && mode.kind === "ai" ? (
+          <GameThinkingIndicator />
+        ) : state.turnSide === null ? (
+          <Trans>翻子定边</Trans>
+        ) : null,
+      }}
       context={
         <>
           <span>
@@ -121,9 +160,7 @@ export function JunqiToolbar({
           mode.kind === "online" ? (
             <Trans>对方走棋</Trans>
           ) : (
-            <Trans comment="军棋当前回合由电脑走棋，显示在棋盘右上方状态区">
-              电脑走棋
-            </Trans>
+            <GameThinkingIndicator />
           )
         ) : state.turnSide === null ? (
           <Trans comment="翻棋的第一个回合，翻开棋子决定双方阵营">

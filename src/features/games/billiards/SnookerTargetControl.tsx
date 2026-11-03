@@ -17,6 +17,7 @@ export function SnookerTargetControl({
   onKind,
   onOpenChange,
   onMove,
+  compact = false,
 }: {
   state: SnookerState;
   enabled: boolean;
@@ -25,6 +26,8 @@ export function SnookerTargetControl({
   onKind(kind: "color" | "free"): void;
   onOpenChange(open: boolean): void;
   onMove(move: BilliardsMove): boolean;
+  /** 状态行只保留一个目标入口，完整自由球操作留在游戏信息里。 */
+  compact?: boolean;
 }) {
   const { t } = useLingui();
   const selection = snookerSelection(state);
@@ -79,7 +82,7 @@ export function SnookerTargetControl({
           <ChevronDownIcon data-icon="inline-end" />
         ) : null}
       </Button>
-      {state.freeBall ? (
+      {state.freeBall && !compact ? (
         <Button
           size="icon-sm"
           density="adaptive"
@@ -116,7 +119,7 @@ export function SnookerTargetControl({
           )}
         </Button>
       ) : null}
-      {state.freeBall && state.nominatedFree !== null ? (
+      {state.freeBall && state.nominatedFree !== null && !compact ? (
         <Button
           size="icon-sm"
           density="adaptive"

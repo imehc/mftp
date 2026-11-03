@@ -8,6 +8,12 @@ interface HistoryMode {
 }
 
 export function historyModeLabel(payload: HistoryMode) {
+  if (!["hotseat", "online", "ai"].includes(payload.mode))
+    return (
+      <Trans comment="历史记录来自已移除的对局模式，保留记录但该模式不能开局。">
+        已停用模式
+      </Trans>
+    );
   if (payload.mode === "hotseat")
     return <Trans comment="棋类对局模式：两人在同一设备对战。">双人</Trans>;
   if (payload.mode === "online")

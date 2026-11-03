@@ -25,12 +25,20 @@ export function BilliardsInfo({
   ).length;
   const remainingPoints =
     state.variant === "snooker" ? availablePoints(state) : 0;
+  const currentBreak = state.variant === "snooker" ? state.currentBreak : 0;
   return (
     <div className="flex flex-col gap-3 text-sm">
       <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
-        <Plural value={{ shotCount }} one="总杆数 #" other="总杆数 #" />
+        {mode.kind === "practice" ? (
+          <Plural value={{ shotCount }} one="总杆数 #" other="总杆数 #" />
+        ) : null}
         {state.variant === "snooker" ? (
           <>
+            <span className="whitespace-nowrap">
+              <Trans comment="斯诺克游戏信息中的当前连续得分，currentBreak 为分数。">
+                当前单杆 {currentBreak}
+              </Trans>
+            </span>
             <span className="whitespace-nowrap">
               <Plural
                 value={{ redCount }}

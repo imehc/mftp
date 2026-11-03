@@ -46,7 +46,12 @@ msgstr "{characterCount, plural, one {# 个字符} other {# 个字符}}"
 msgid "{clientCount} 个客户端"
 msgstr "{clientCount} 个客户端"
 
-#: src/features/games/billiards/BilliardsInfo.tsx:99
+#. 窄屏玩家与棋色的简短标签，保持单行。
+#: src/features/games/engine/GamePlayerLabel.tsx:90
+msgid "{compactPlayerName}·{compactColorName}"
+msgstr "{compactPlayerName}·{compactColorName}"
+
+#: src/features/games/billiards/BilliardsInfo.tsx:107
 #: src/features/games/billiards/BilliardsScore.tsx:156
 msgid "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
 msgstr "{consecutiveFouls, plural, one {连续犯规 # 次} other {连续犯规 # 次}}"
@@ -85,7 +90,7 @@ msgstr "{deviceCount, plural, one {# 设备} other {# 设备}}"
 msgid "{failed} 个失败"
 msgstr "{failed} 个失败"
 
-#: src/features/games/billiards/BilliardsInfo.tsx:91
+#: src/features/games/billiards/BilliardsInfo.tsx:99
 msgid "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
 msgstr "{foulCount, plural, one {犯规 # 次} other {犯规 # 次}}"
 
@@ -148,23 +153,23 @@ msgid "{minutes, plural, one {# 分钟前} other {# 分钟前}}"
 msgstr "{minutes, plural, one {# 分钟前} other {# 分钟前}}"
 
 #: src/features/games/engine/BoardModeMenu.tsx:183
-#: src/features/games/reversi/ReversiMatch.tsx:182
+#: src/features/games/reversi/ReversiMatch.tsx:198
 msgid "{moveCount, plural, one {# 手} other {# 手}}"
 msgstr "{moveCount, plural, one {# 手} other {# 手}}"
 
-#: src/features/games/go/GoMatch.tsx:264
-#: src/features/games/gomoku/GomokuMatch.tsx:216
-#: src/features/games/xiangqi/XiangqiMatch.tsx:248
+#: src/features/games/go/GoMatch.tsx:265
+#: src/features/games/gomoku/GomokuMatch.tsx:218
+#: src/features/games/xiangqi/XiangqiMatch.tsx:258
 msgid "{moveCount, plural, one {共 # 手} other {共 # 手}}"
 msgstr "{moveCount, plural, one {共 # 手} other {共 # 手}}"
 
-#: src/features/games/go/GoMatch.tsx:187
-#: src/features/games/gomoku/GomokuMatch.tsx:167
-#: src/features/games/xiangqi/XiangqiMatch.tsx:173
+#: src/features/games/go/GoMatch.tsx:189
+#: src/features/games/gomoku/GomokuMatch.tsx:169
+#: src/features/games/xiangqi/XiangqiMatch.tsx:177
 msgid "{moveNumber, plural, one {第 # 手} other {第 # 手}}"
 msgstr "{moveNumber, plural, one {第 # 手} other {第 # 手}}"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:141
+#: src/features/games/junqi/JunqiToolbar.tsx:178
 msgid "{moves, plural, one {已走 # 手} other {已走 # 手}}"
 msgstr "{moves, plural, one {已走 # 手} other {已走 # 手}}"
 
@@ -221,11 +226,16 @@ msgstr "{penalty, plural, one {{offender}犯规：{reason}，{beneficiary}获得
 msgid "{penalty, plural, one {犯规：{reason}，罚分 # 分。} other {犯规：{reason}，罚分 # 分。}}"
 msgstr "{penalty, plural, one {犯规：{reason}，罚分 # 分。} other {犯规：{reason}，罚分 # 分。}}"
 
+#. 玩家身份与完整棋色，亦供辅助技术读取。
+#: src/features/games/engine/GamePlayerLabel.tsx:84
+msgid "{playerName}执{colorName}"
+msgstr "{playerName}执{colorName}"
+
 #: src/features/games/junqi/JunqiUndoDialog.tsx:48
 msgid "{plies, plural, one {申请撤销 # 手棋，需对方同意。} other {申请撤销 # 手棋，需对方同意。}}"
 msgstr "{plies, plural, one {申请撤销 # 手棋，需对方同意。} other {申请撤销 # 手棋，需对方同意。}}"
 
-#: src/features/games/chess/ChessMatch.tsx:283
+#: src/features/games/chess/ChessMatch.tsx:302
 msgid "{ply, plural, one {# 手} other {# 手}}"
 msgstr "{ply, plural, one {# 手} other {# 手}}"
 
@@ -241,12 +251,12 @@ msgstr "{points} 分"
 msgid "{proposer} 提议僵持重摆，由 {decisionSeat} 决定是否接受。接受后由本局原开球者开球。"
 msgstr "{proposer} 提议僵持重摆，由 {decisionSeat} 决定是否接受。接受后由本局原开球者开球。"
 
-#: src/features/games/billiards/BilliardsInfo.tsx:35
+#: src/features/games/billiards/BilliardsInfo.tsx:43
 msgid "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 msgstr "{redCount, plural, one {剩余 # 颗红球} other {剩余 # 颗红球}}"
 
-#: src/features/games/billiards/BilliardsInfo.tsx:49
-#: src/features/games/billiards/BilliardsScoreBar.tsx:74
+#: src/features/games/billiards/BilliardsInfo.tsx:57
+#: src/features/games/billiards/BilliardsScoreBar.tsx:85
 msgid "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 msgstr "{remainingBallCount, plural, one {剩余 # 球} other {剩余 # 球}}"
 
@@ -295,16 +305,16 @@ msgstr "{shooter} 未达到三球开球要求。由 {decisionSeat} 选择接受�
 msgid "{shotCount, plural, one {# 杆} other {# 杆}}"
 msgstr "{shotCount, plural, one {# 杆} other {# 杆}}"
 
-#: src/features/games/billiards/BilliardsScoreBar.tsx:53
+#: src/features/games/billiards/BilliardsScoreBar.tsx:64
 msgid "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 msgstr "{shotCount, plural, one {共 # 杆} other {共 # 杆}}"
 
-#: src/features/games/billiards/BilliardsInfo.tsx:31
+#: src/features/games/billiards/BilliardsInfo.tsx:33
 msgid "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 msgstr "{shotCount, plural, one {总杆数 #} other {总杆数 #}}"
 
-#: src/features/games/billiards/BilliardsScoreBar.tsx:65
-#: src/features/games/billiards/BilliardsScoreBar.tsx:128
+#: src/features/games/billiards/BilliardsMatchScore.tsx:77
+#: src/features/games/billiards/BilliardsScoreBar.tsx:76
 msgid "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 msgstr "{shotNumber, plural, one {第 # 杆} other {第 # 杆}}"
 
@@ -369,7 +379,7 @@ msgstr "{value} 阶"
 msgid "{version} · 当前 {currentVersion}"
 msgstr "{version} · 当前 {currentVersion}"
 
-#: src/features/games/billiards/BilliardsScoreBar.tsx:47
+#: src/features/games/billiards/BilliardsScoreBar.tsx:58
 msgid "{winnerSeatLabel} 获胜"
 msgstr "{winnerSeatLabel} 获胜"
 
@@ -410,7 +420,7 @@ msgstr "AI 已完成响应，但没有返回可用正文"
 msgid "AI 已达到输出或推理预算上限，结果不完整"
 msgstr "AI 已达到输出或推理预算上限，结果不完整"
 
-#: src/lib/errors/messages.ts:202
+#: src/lib/errors/messages.ts:203
 msgid "AI 数据库版本高于当前应用版本，请升级应用"
 msgstr "AI 数据库版本高于当前应用版本，请升级应用"
 
@@ -465,7 +475,7 @@ msgstr "AI 服务未能完成本次请求"
 msgid "AI 服务返回 HTTP 错误，请检查服务配置"
 msgstr "AI 服务返回 HTTP 错误，请检查服务配置"
 
-#: src/lib/errors/messages.ts:200
+#: src/lib/errors/messages.ts:201
 msgid "AI 服务返回内容超出大小限制"
 msgstr "AI 服务返回内容超出大小限制"
 
@@ -496,7 +506,7 @@ msgstr "AI 生成"
 msgid "AI 生成及人工修订的诗词译文，不包含 API Key"
 msgstr "AI 生成及人工修订的诗词译文，不包含 API Key"
 
-#: src/lib/errors/messages.ts:207
+#: src/lib/errors/messages.ts:208
 msgid "AI 翻译保存失败"
 msgstr "AI 翻译保存失败"
 
@@ -505,11 +515,16 @@ msgid "AI 设置未保存，且密钥回滚失败"
 msgstr "AI 设置未保存，且密钥回滚失败"
 
 #: src/features/export/sections.tsx:52
-#: src/lib/errors/messages.ts:277
+#: src/lib/errors/messages.ts:282
 msgid "AI 译文"
 msgstr "AI 译文"
 
-#: src/lib/errors/messages.ts:199
+#. 阻止数据清理或退出排空的在途 AI 任务名称。
+#: src/lib/errors/messages.ts:259
+msgid "AI 请求"
+msgstr "AI 请求"
+
+#: src/lib/errors/messages.ts:200
 msgid "AI 请求内容超出大小限制"
 msgstr "AI 请求内容超出大小限制"
 
@@ -525,7 +540,11 @@ msgstr "AI 请求已达到等待上限"
 msgid "AI 请求策略与当前服务不兼容"
 msgstr "AI 请求策略与当前服务不兼容"
 
-#: src/lib/errors/messages.ts:201
+#: src/lib/errors/messages.ts:199
+msgid "AI 请求过多，请等待现有任务结束后重试"
+msgstr "AI 请求过多，请等待现有任务结束后重试"
+
+#: src/lib/errors/messages.ts:202
 msgid "AI 输出内容超出大小限制"
 msgstr "AI 输出内容超出大小限制"
 
@@ -537,7 +556,7 @@ msgstr "AI 返回内容不符合要求的格式"
 msgid "AI 返回的数据不符合所选协议"
 msgstr "AI 返回的数据不符合所选协议"
 
-#: src/lib/errors/messages.ts:250
+#: src/lib/errors/messages.ts:251
 msgid "AI 返回的译文格式无效"
 msgstr "AI 返回的译文格式无效"
 
@@ -572,7 +591,7 @@ msgstr "English"
 msgid "Git Commit"
 msgstr "Git Commit"
 
-#: src/lib/errors/messages.ts:245
+#: src/lib/errors/messages.ts:246
 msgid "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
 msgstr "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
 
@@ -601,7 +620,7 @@ msgstr "MCP 授权已撤销或不可用，请检查连接凭据"
 #. 本地数据维护被 MCP 工具的编辑草稿或在途操作阻止时显示的任务名称。
 #: src/features/mcp/integration.tsx:17
 #: src/features/settings/SettingsPage.tsx:44
-#: src/lib/errors/messages.ts:263
+#: src/lib/errors/messages.ts:268
 msgid "MCP 服务"
 msgstr "MCP 服务"
 
@@ -698,7 +717,7 @@ msgstr "SSH 终端尚未打开"
 msgid "SSH 终端已关闭"
 msgstr "SSH 终端已关闭"
 
-#: src/lib/errors/messages.ts:258
+#: src/lib/errors/messages.ts:263
 msgid "SSH 连接"
 msgstr "SSH 连接"
 
@@ -737,7 +756,7 @@ msgstr "三维魔方。拖拽面片转层，拖拽空白旋转视角，滚轮缩
 msgid "上一个"
 msgstr "上一个"
 
-#: src/features/games/go/GoMatch.tsx:215
+#: src/features/games/go/GoMatch.tsx:216
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "上一手已停手：再停一手即终局，落子则重新计数"
 
@@ -799,20 +818,20 @@ msgstr "上传目标不是普通文件或文件夹"
 msgid "上传长度、分片范围或冲突处理方式无效"
 msgstr "上传长度、分片范围或冲突处理方式无效"
 
-#: src/lib/errors/messages.ts:244
+#: src/lib/errors/messages.ts:245
 msgid "上游接口返回数据缺少必要字段"
 msgstr "上游接口返回数据缺少必要字段"
 
-#: src/lib/errors/messages.ts:238
+#: src/lib/errors/messages.ts:239
 msgid "上游文件清单中没有匹配的文件"
 msgstr "上游文件清单中没有匹配的文件"
 
 #. 清单路径可能越过下载目录；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:239
+#: src/lib/errors/messages.ts:240
 msgid "上游文件清单包含不安全路径：{path}"
 msgstr "上游文件清单包含不安全路径：{path}"
 
-#: src/lib/errors/messages.ts:237
+#: src/lib/errors/messages.ts:238
 msgid "上游文件清单过大被截断，无法安全同步"
 msgstr "上游文件清单过大被截断，无法安全同步"
 
@@ -859,7 +878,7 @@ msgstr "下载 {entryName2}"
 msgid "下载中"
 msgstr "下载中"
 
-#: src/lib/errors/messages.ts:218
+#: src/lib/errors/messages.ts:219
 msgid "下载响应的范围、长度或版本不匹配，请重新下载"
 msgstr "下载响应的范围、长度或版本不匹配，请重新下载"
 
@@ -906,7 +925,7 @@ msgid "不会保存，仅在测试连接时使用"
 msgstr "不会保存，仅在测试连接时使用"
 
 #. 斯诺克放弃自由球提名，直接打原目标
-#: src/features/games/billiards/SnookerTargetControl.tsx:125
+#: src/features/games/billiards/SnookerTargetControl.tsx:128
 msgid "不使用"
 msgstr "不使用"
 
@@ -925,7 +944,7 @@ msgstr "不指定时间"
 msgid "不支持传输特殊文件：{path}"
 msgstr "不支持传输特殊文件：{path}"
 
-#: src/lib/errors/messages.ts:208
+#: src/lib/errors/messages.ts:209
 msgid "不支持此翻译模型，请选择列表中的模型"
 msgstr "不支持此翻译模型，请选择列表中的模型"
 
@@ -933,7 +952,7 @@ msgstr "不支持此翻译模型，请选择列表中的模型"
 msgid "不支持的压缩包格式"
 msgstr "不支持的压缩包格式"
 
-#: src/lib/errors/messages.ts:246
+#: src/lib/errors/messages.ts:247
 msgid "不支持的译文包格式"
 msgstr "不支持的译文包格式"
 
@@ -956,15 +975,15 @@ msgstr "与对方的连接已断开。"
 #. 删除未完成的游戏存档，随后可开始新对局
 #. 确认删除未完成的游戏存档
 #: src/features/games/engine/GameRestoreDialog.tsx:84
-#: src/features/games/engine/GameSessionNotice.tsx:92
-#: src/features/games/engine/GameSessionNotice.tsx:119
+#: src/features/games/engine/GameSessionNotice.tsx:98
+#: src/features/games/engine/GameSessionNotice.tsx:125
 #: src/features/games/magic-cube/MagicCubeGame.tsx:382
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:275
 msgid "丢弃存档"
 msgstr "丢弃存档"
 
 #: src/features/games/engine/GameRestoreDialog.tsx:57
-#: src/features/games/engine/GameSessionNotice.tsx:104
+#: src/features/games/engine/GameSessionNotice.tsx:110
 msgid "丢弃对局存档？"
 msgstr "丢弃对局存档？"
 
@@ -1028,8 +1047,8 @@ msgstr "中杆"
 #: src/features/games/billiards/BilliardsModeMenu.tsx:33
 #: src/features/games/billiards/BilliardsModeMenu.tsx:107
 #: src/features/games/engine/BoardModeMenu.tsx:101
-#: src/features/games/engine/history-labels.tsx:26
-#: src/features/games/junqi/JunqiToolbar.tsx:68
+#: src/features/games/engine/history-labels.tsx:32
+#: src/features/games/junqi/JunqiToolbar.tsx:107
 msgid "中等"
 msgstr "中等"
 
@@ -1044,7 +1063,7 @@ msgstr "主数据库和密钥文件包含正在使用的记录，请在对应模
 #: src/features/export/sections.tsx:32
 #: src/features/logs/use-activity-logs.ts:44
 #: src/features/ssh-sftp/components/Sidebar.tsx:250
-#: src/lib/errors/messages.ts:274
+#: src/lib/errors/messages.ts:279
 msgid "主机"
 msgstr "主机"
 
@@ -1297,31 +1316,33 @@ msgstr "低"
 msgid "作者"
 msgstr "作者"
 
+#. 对局状态栏的本地玩家身份。
 #: src/features/games/billiards/BilliardsScore.tsx:16
-#: src/features/games/chess/ChessMatch.tsx:166
+#: src/features/games/chess/ChessMatch.tsx:168
 #: src/features/games/engine/black-white-labels.tsx:32
 #: src/features/games/engine/black-white-labels.tsx:40
+#: src/features/games/engine/GamePlayerLabel.tsx:19
 #: src/features/games/xiangqi/labels.tsx:30
 #: src/features/games/xiangqi/labels.tsx:38
 msgid "你"
 msgstr "你"
 
-#: src/features/games/chess/ChessMatch.tsx:229
-#: src/features/games/engine/BoardMatchLayout.tsx:62
-#: src/features/games/reversi/ReversiMatch.tsx:141
+#: src/features/games/chess/ChessMatch.tsx:248
+#: src/features/games/engine/BoardMatchLayout.tsx:77
+#: src/features/games/reversi/ReversiMatch.tsx:162
 msgid "你执白"
 msgstr "你执白"
 
-#: src/features/games/engine/BoardMatchLayout.tsx:55
-#: src/features/games/junqi/JunqiToolbar.tsx:51
+#: src/features/games/engine/BoardMatchLayout.tsx:70
+#: src/features/games/junqi/JunqiToolbar.tsx:90
 msgid "你执红"
 msgstr "你执红"
 
-#: src/features/games/chess/ChessMatch.tsx:231
-#: src/features/games/engine/BoardMatchLayout.tsx:57
-#: src/features/games/engine/BoardMatchLayout.tsx:60
-#: src/features/games/junqi/JunqiToolbar.tsx:53
-#: src/features/games/reversi/ReversiMatch.tsx:139
+#: src/features/games/chess/ChessMatch.tsx:250
+#: src/features/games/engine/BoardMatchLayout.tsx:72
+#: src/features/games/engine/BoardMatchLayout.tsx:75
+#: src/features/games/junqi/JunqiToolbar.tsx:92
+#: src/features/games/reversi/ReversiMatch.tsx:160
 msgid "你执黑"
 msgstr "你执黑"
 
@@ -1466,7 +1487,7 @@ msgstr "修改日期"
 msgid "修改时间"
 msgstr "修改时间"
 
-#: src/features/games/go/GoMatch.tsx:233
+#: src/features/games/go/GoMatch.tsx:234
 msgid "停一手"
 msgstr "停一手"
 
@@ -1571,7 +1592,7 @@ msgstr "先点击或聚焦魔方画布。R、L、U、D、F、B 分别顺时针�
 #. 翻棋开局由本地玩家首先翻子
 #. 翻棋首翻前，本地玩家先翻棋子决定阵营
 #: src/features/games/junqi/JunqiModeMenu.tsx:53
-#: src/features/games/junqi/JunqiToolbar.tsx:42
+#: src/features/games/junqi/JunqiToolbar.tsx:81
 msgid "先翻"
 msgstr "先翻"
 
@@ -1594,6 +1615,7 @@ msgstr "全屏"
 msgid "全文索引"
 msgstr "全文索引"
 
+#: src/features/games/billiards/BilliardsMatchScore.tsx:40
 #: src/features/games/billiards/BilliardsScore.tsx:164
 msgid "全色球"
 msgstr "全色球"
@@ -1816,7 +1838,7 @@ msgid "最新"
 msgstr "最新"
 
 #. 斯诺克对局详情，球员本局最高连续得分
-#: src/features/games/billiards/BilliardsInfo.tsx:83
+#: src/features/games/billiards/BilliardsInfo.tsx:91
 msgid "最高单杆 {highestBreak}"
 msgstr "最高单杆 {highestBreak}"
 
@@ -1877,7 +1899,7 @@ msgstr "军长"
 #: src/features/media-compress/image/ImageCompressPanel.tsx:184
 #: src/features/media-compress/video/use-video-compress.ts:196
 #: src/features/translation/ModelManager.tsx:65
-#: src/store/transfers.ts:295
+#: src/store/transfers.ts:290
 msgid "准备中"
 msgstr "准备中"
 
@@ -1895,7 +1917,7 @@ msgstr "凭据只显示这一次。关闭后无法找回，只能重新生成。
 msgid "凭据已脱敏"
 msgstr "凭据已脱敏"
 
-#: src/features/games/billiards/BilliardsInfo.tsx:111
+#: src/features/games/billiards/BilliardsInfo.tsx:119
 msgid "击球方式与犯规判定见「玩法说明」。"
 msgstr "击球方式与犯规判定见「玩法说明」。"
 
@@ -2336,7 +2358,7 @@ msgstr "压缩"
 msgid "压缩包"
 msgstr "压缩包"
 
-#: src/lib/errors/messages.ts:243
+#: src/lib/errors/messages.ts:244
 msgid "压缩包包含不安全路径"
 msgstr "压缩包包含不安全路径"
 
@@ -2414,7 +2436,7 @@ msgstr "原始字节（十六进制）"
 msgid "原文"
 msgstr "原文"
 
-#: src/lib/errors/messages.ts:216
+#: src/lib/errors/messages.ts:217
 msgid "原文超出模型上下文限制，请缩短文本后重试"
 msgstr "原文超出模型上下文限制，请缩短文本后重试"
 
@@ -2434,7 +2456,7 @@ msgstr "参数未变化，无需重新处理"
 
 #. 棋类对局模式：两人在同一设备对战。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:23
-#: src/features/games/engine/history-labels.tsx:12
+#: src/features/games/engine/history-labels.tsx:18
 msgid "双人"
 msgstr "双人"
 
@@ -2457,7 +2479,7 @@ msgstr "双人暗棋"
 msgid "双方将帅在同一列且中间没有棋子时，可以直接吃掉对方将帅。因此照面视为被将军，必须应将。"
 msgstr "双方将帅在同一列且中间没有棋子时，可以直接吃掉对方将帅。因此照面视为被将军，必须应将。"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:155
+#: src/features/games/junqi/JunqiToolbar.tsx:192
 msgid "双方棋子同归于尽"
 msgstr "双方棋子同归于尽"
 
@@ -2469,7 +2491,7 @@ msgstr "双方棋局状态不一致，本局无法继续。"
 msgid "双方身份公开，布阵后开始。"
 msgstr "双方身份公开，布阵后开始。"
 
-#: src/features/games/engine/GameSessionNotice.tsx:48
+#: src/features/games/engine/GameSessionNotice.tsx:54
 msgid "发现上次的对局存档，是否继续？"
 msgstr "发现上次的对局存档，是否继续？"
 
@@ -2486,7 +2508,7 @@ msgstr "发现上次的魔方进度，是否继续？"
 msgid "发现新版本"
 msgstr "发现新版本"
 
-#: src/lib/errors/messages.ts:253
+#: src/lib/errors/messages.ts:254
 msgid "发生未知错误，请重试"
 msgstr "发生未知错误，请重试"
 
@@ -2519,7 +2541,7 @@ msgstr "发送请求"
 #: src/features/games/engine/GameHeaderControls.tsx:105
 #: src/features/games/engine/GameHistory.tsx:90
 #: src/features/games/engine/GameRestoreDialog.tsx:84
-#: src/features/games/engine/GameSessionNotice.tsx:112
+#: src/features/games/engine/GameSessionNotice.tsx:118
 #: src/features/games/engine/online/OnlineLobby.tsx:382
 #: src/features/games/junqi/JunqiMatchView.tsx:269
 #: src/features/games/junqi/JunqiMatchView.tsx:303
@@ -2670,7 +2692,7 @@ msgstr "可选择 9 路、13 路或 19 路棋盘，默认 19 路。"
 
 #: src/features/games/billiards/BilliardsGame.tsx:102
 #: src/features/games/billiards/BilliardsMatch.tsx:63
-#: src/features/games/billiards/BilliardsMatchHeader.tsx:54
+#: src/features/games/billiards/BilliardsMatchHeader.tsx:57
 #: src/features/home/entries.tsx:163
 msgid "台球"
 msgstr "台球"
@@ -2680,7 +2702,7 @@ msgid "台面余分 {remaining}，落后方需要罚分追赶；对局继续。"
 msgstr "台面余分 {remaining}，落后方需要罚分追赶；对局继续。"
 
 #. 斯诺克桌面所有剩余目标球的可得分值
-#: src/features/games/billiards/BilliardsInfo.tsx:42
+#: src/features/games/billiards/BilliardsInfo.tsx:50
 msgid "台面余分 {remainingPoints}"
 msgstr "台面余分 {remainingPoints}"
 
@@ -2871,7 +2893,7 @@ msgstr "后手（执黑）"
 #. 翻棋开局由电脑首先翻子
 #. 翻棋首翻前，本地玩家后翻棋子，等待对方定边
 #: src/features/games/junqi/JunqiModeMenu.tsx:54
-#: src/features/games/junqi/JunqiToolbar.tsx:46
+#: src/features/games/junqi/JunqiToolbar.tsx:85
 msgid "后翻"
 msgstr "后翻"
 
@@ -2938,8 +2960,8 @@ msgstr "困毙"
 #: src/features/games/billiards/BilliardsModeMenu.tsx:31
 #: src/features/games/billiards/BilliardsModeMenu.tsx:108
 #: src/features/games/engine/BoardModeMenu.tsx:102
-#: src/features/games/engine/history-labels.tsx:24
-#: src/features/games/junqi/JunqiToolbar.tsx:66
+#: src/features/games/engine/history-labels.tsx:30
+#: src/features/games/junqi/JunqiToolbar.tsx:105
 msgid "困难"
 msgstr "困难"
 
@@ -3301,7 +3323,7 @@ msgstr "大本营"
 #: src/features/lan-transfer/LanTransferActivity.tsx:23
 #: src/features/logs/use-activity-logs.ts:53
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:199
-#: src/store/transfers.ts:156
+#: src/store/transfers.ts:151
 msgid "失败"
 msgstr "失败"
 
@@ -3345,7 +3367,7 @@ msgstr "存储"
 msgid "存储明细"
 msgstr "存储明细"
 
-#: src/lib/errors/messages.ts:220
+#: src/lib/errors/messages.ts:221
 msgid "存储空间不足，请清理空间后重试"
 msgstr "存储空间不足，请清理空间后重试"
 
@@ -3371,7 +3393,7 @@ msgstr "安装后即可离线翻译。"
 msgid "安装命令已复制"
 msgstr "安装命令已复制"
 
-#: src/lib/errors/messages.ts:295
+#: src/lib/errors/messages.ts:300
 msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "安装未完成，可重试安装或稍后再试。"
 
@@ -3386,7 +3408,7 @@ msgstr "安装注释库"
 #: src/features/media-compress/video/use-video-compress.ts:191
 #: src/features/updater/UpdaterDialog.tsx:124
 #: src/features/vault/VaultTool.tsx:63
-#: src/store/transfers.ts:153
+#: src/store/transfers.ts:148
 msgid "完成"
 msgstr "完成"
 
@@ -3436,7 +3458,7 @@ msgstr "宽高比例不同会拉伸变形"
 msgid "密码"
 msgstr "密码"
 
-#: src/lib/errors/messages.ts:273
+#: src/lib/errors/messages.ts:278
 msgid "密码库"
 msgstr "密码库"
 
@@ -3493,11 +3515,11 @@ msgstr "对局中可在更多菜单申请悔棋：撤销自己刚走的 1 手；
 msgid "对局中断"
 msgstr "对局中断"
 
-#: src/lib/errors/messages.ts:287
+#: src/lib/errors/messages.ts:292
 msgid "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
 msgstr "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
 
-#: src/lib/errors/messages.ts:288
+#: src/lib/errors/messages.ts:293
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 
@@ -3505,14 +3527,22 @@ msgstr "对局尚未成功保存，请重试。异常退出后可能丢失最新
 msgid "对局数据不一致，连接已停止。"
 msgstr "对局数据不一致，连接已停止。"
 
-#: src/features/games/billiards/BilliardsScoreBar.tsx:49
+#: src/features/games/billiards/BilliardsScoreBar.tsx:60
 msgid "对局结束"
 msgstr "对局结束"
 
-#: src/features/games/chess/ChessMatch.tsx:170
+#. 对局状态栏的远程玩家身份。
+#: src/features/games/chess/ChessMatch.tsx:172
 #: src/features/games/engine/black-white-labels.tsx:34
-#: src/features/games/junqi/JunqiToolbar.tsx:73
+#: src/features/games/engine/GamePlayerLabel.tsx:23
+#: src/features/games/junqi/JunqiToolbar.tsx:112
 #: src/features/games/xiangqi/labels.tsx:32
+msgid "对方"
+msgstr "对方"
+
+#. 窄屏远程玩家身份，英文用 Peer。
+#: src/features/games/engine/GamePlayerLabel.tsx:47
+msgctxt "紧凑玩家身份"
 msgid "对方"
 msgstr "对方"
 
@@ -3545,7 +3575,7 @@ msgstr "对方获胜"
 msgid "对方请求悔棋"
 msgstr "对方请求悔棋"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:122
+#: src/features/games/junqi/JunqiToolbar.tsx:161
 msgid "对方走棋"
 msgstr "对方走棋"
 
@@ -3637,11 +3667,12 @@ msgstr "导出应用数据"
 msgid "导出所选数据"
 msgstr "导出所选数据"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:183
+#: src/features/games/chess/ChessMatch.tsx:232
+#: src/features/games/xiangqi/XiangqiMatch.tsx:192
 msgid "将军"
 msgstr "将军"
 
-#: src/features/games/chess/ChessMatch.tsx:274
+#: src/features/games/chess/ChessMatch.tsx:293
 msgid "将军 · 轮到 {player}"
 msgstr "将军 · 轮到 {player}"
 
@@ -3757,7 +3788,7 @@ msgstr "局域网"
 #: src/features/home/entries.tsx:79
 #: src/features/lan-transfer/LanServiceCard.tsx:40
 #: src/features/lan-transfer/LanTransferTool.tsx:36
-#: src/lib/errors/messages.ts:276
+#: src/lib/errors/messages.ts:281
 msgid "局域网传输"
 msgstr "局域网传输"
 
@@ -3790,7 +3821,7 @@ msgid "局域网共享文件"
 msgstr "局域网共享文件"
 
 #: src/features/about/AboutPage.tsx:150
-#: src/lib/errors/messages.ts:261
+#: src/lib/errors/messages.ts:266
 msgid "局域网服务"
 msgstr "局域网服务"
 
@@ -3882,7 +3913,7 @@ msgstr "已保存"
 msgid "已保存 · 未验证"
 msgstr "已保存 · 未验证"
 
-#: src/lib/errors/messages.ts:203
+#: src/lib/errors/messages.ts:204
 msgid "已保存的 AI 翻译记录无效"
 msgstr "已保存的 AI 翻译记录无效"
 
@@ -3897,6 +3928,11 @@ msgstr "已保存配置"
 #: src/features/lan-transfer/LanServiceCard.tsx:32
 msgid "已停止"
 msgstr "已停止"
+
+#. 历史记录来自已移除的对局模式，保留记录但该模式不能开局。
+#: src/features/games/engine/history-labels.tsx:13
+msgid "已停用模式"
+msgstr "已停用模式"
 
 #: src/features/lan-transfer/use-lan-transfer.ts:288
 msgid "已允许访问"
@@ -3946,7 +3982,7 @@ msgstr "已删除白名单"
 
 #: src/features/lan-transfer/LanTransferActivity.tsx:24
 #: src/features/logs/use-activity-logs.ts:54
-#: src/store/transfers.ts:155
+#: src/store/transfers.ts:150
 msgid "已取消"
 msgstr "已取消"
 
@@ -4079,7 +4115,7 @@ msgstr "已断开设备"
 msgid "已是最新版本"
 msgstr "已是最新版本"
 
-#: src/store/transfers.ts:218
+#: src/store/transfers.ts:213
 msgid "已暂停"
 msgstr "已暂停"
 
@@ -4093,7 +4129,7 @@ msgstr "已替换 $ 处匹配"
 msgid "已替换第 $ 行的匹配"
 msgstr "已替换第 $ 行的匹配"
 
-#: src/lib/errors/messages.ts:221
+#: src/lib/errors/messages.ts:222
 msgid "已有诗词库同步任务在运行，请稍后重试"
 msgstr "已有诗词库同步任务在运行，请稍后重试"
 
@@ -4150,7 +4186,8 @@ msgid "已重命名为 {trimmed}"
 msgstr "已重命名为 {trimmed}"
 
 #: src/features/games/junqi/JunqiHelp.tsx:43
-#: src/features/games/junqi/JunqiToolbar.tsx:117
+#: src/features/games/junqi/JunqiToolbar.tsx:69
+#: src/features/games/junqi/JunqiToolbar.tsx:156
 msgid "布阵"
 msgstr "布阵"
 
@@ -4327,7 +4364,7 @@ msgstr "当前不可用"
 msgid "当前不在游戏房间中"
 msgstr "当前不在游戏房间中"
 
-#: src/lib/errors/messages.ts:213
+#: src/lib/errors/messages.ts:214
 msgid "当前任务尚未退出，请停止后再试"
 msgstr "当前任务尚未退出，请停止后再试"
 
@@ -4347,6 +4384,11 @@ msgstr "当前列表中未找到这条记录"
 #: src/features/formatter/use-formatter.ts:70
 msgid "当前匹配"
 msgstr "当前匹配"
+
+#. 斯诺克游戏信息中的当前连续得分，currentBreak 为分数。
+#: src/features/games/billiards/BilliardsInfo.tsx:38
+msgid "当前单杆 {currentBreak}"
+msgstr "当前单杆 {currentBreak}"
 
 #: src/features/ai-configuration/AiModelMenu.desktop.tsx:82
 #: src/features/ai-configuration/AiModelMenu.mobile.tsx:79
@@ -4386,7 +4428,7 @@ msgid "当前操作尚未完成，请稍后重试清理数据"
 msgstr "当前操作尚未完成，请稍后重试清理数据"
 
 #. 军棋规则或对局状态校验失败，原始诊断保留在错误协议中
-#: src/lib/errors/messages.ts:303
+#: src/lib/errors/messages.ts:308
 msgid "当前操作无法完成，请恢复对局或重新开始。"
 msgstr "当前操作无法完成，请恢复对局或重新开始。"
 
@@ -4479,7 +4521,7 @@ msgstr "当前魔方进度和撤销记录将被替换，无法恢复。"
 #: src/features/about/use-about.ts:63
 #: src/features/export/sections.tsx:38
 #: src/features/logs/use-activity-logs.ts:42
-#: src/lib/errors/messages.ts:275
+#: src/lib/errors/messages.ts:280
 msgid "待办"
 msgstr "待办"
 
@@ -4539,7 +4581,7 @@ msgid "得分"
 msgstr "得分"
 
 #. 斯诺克对局详情，球员当前得分
-#: src/features/games/billiards/BilliardsInfo.tsx:78
+#: src/features/games/billiards/BilliardsInfo.tsx:86
 msgid "得分 {score}"
 msgstr "得分 {score}"
 
@@ -4576,13 +4618,13 @@ msgid "恢复首次打开状态"
 msgstr "恢复首次打开状态"
 
 #. 联机棋局的操作按钮，向对方申请撤销最近的走棋
-#: src/features/games/chess/ChessMatch.tsx:242
-#: src/features/games/go/GoMatch.tsx:222
-#: src/features/games/gomoku/GomokuMatch.tsx:192
+#: src/features/games/chess/ChessMatch.tsx:261
+#: src/features/games/go/GoMatch.tsx:223
+#: src/features/games/gomoku/GomokuMatch.tsx:194
 #: src/features/games/junqi/JunqiMatchView.tsx:201
 #: src/features/games/reversi/ReversiHelp.tsx:37
-#: src/features/games/reversi/ReversiMatch.tsx:151
-#: src/features/games/xiangqi/XiangqiMatch.tsx:203
+#: src/features/games/reversi/ReversiMatch.tsx:172
+#: src/features/games/xiangqi/XiangqiMatch.tsx:213
 msgid "悔棋"
 msgstr "悔棋"
 
@@ -4952,10 +4994,6 @@ msgstr "推荐"
 msgid "提前打进黑八"
 msgstr "提前打进黑八"
 
-#: src/features/games/go/GoMatch.tsx:196
-msgid "提子 {value}:{value2}"
-msgstr "提子 {value}:{value2}"
-
 #: src/features/games/go/GoHelp.tsx:24
 msgid "提子与禁着"
 msgstr "提子与禁着"
@@ -5169,7 +5207,7 @@ msgstr "数字从左到右、从上到下递增，最后一格为空位。"
 msgid "数字华容道"
 msgstr "数字华容道"
 
-#: src/lib/errors/messages.ts:292
+#: src/lib/errors/messages.ts:297
 msgid "数字华容道已完成，但成绩尚未保存，请重试。"
 msgstr "数字华容道已完成，但成绩尚未保存，请重试。"
 
@@ -5398,7 +5436,7 @@ msgstr "无棋可走"
 msgid "无法创建画布上下文"
 msgstr "无法创建画布上下文"
 
-#: src/lib/errors/messages.ts:289
+#: src/lib/errors/messages.ts:294
 msgid "无法删除对局存档，请重试。"
 msgstr "无法删除对局存档，请重试。"
 
@@ -5406,15 +5444,15 @@ msgstr "无法删除对局存档，请重试。"
 msgid "无法播放，请重试或使用系统应用打开"
 msgstr "无法播放，请重试或使用系统应用打开"
 
-#: src/lib/errors/messages.ts:290
+#: src/lib/errors/messages.ts:295
 msgid "无法显示 3D 魔方。请重新加载画布；已提交的转动进度会保留。"
 msgstr "无法显示 3D 魔方。请重新加载画布；已提交的转动进度会保留。"
 
-#: src/lib/errors/messages.ts:285
+#: src/lib/errors/messages.ts:290
 msgid "无法显示国际象棋。请重新加载棋盘，当前对局进度会保留。"
 msgstr "无法显示国际象棋。请重新加载棋盘，当前对局进度会保留。"
 
-#: src/lib/errors/messages.ts:293
+#: src/lib/errors/messages.ts:298
 msgid "无法检查更新，请稍后重试。"
 msgstr "无法检查更新，请稍后重试。"
 
@@ -5435,7 +5473,7 @@ msgstr "无法获取本地用户名，请手动填写 SSH 用户名"
 msgid "无法识别远端操作系统"
 msgstr "无法识别远端操作系统"
 
-#: src/lib/errors/messages.ts:286
+#: src/lib/errors/messages.ts:291
 msgid "无法读取对局存档，请重试。原存档未被删除。"
 msgstr "无法读取对局存档，请重试。原存档未被删除。"
 
@@ -5526,7 +5564,7 @@ msgstr "显示大小"
 msgid "显示密码"
 msgstr "显示密码"
 
-#: src/features/games/chess/ChessMatch.tsx:295
+#: src/features/games/chess/ChessMatch.tsx:314
 msgid "显示棋子名称"
 msgstr "显示棋子名称"
 
@@ -5719,7 +5757,7 @@ msgstr "更新 AI 服务"
 msgid "更新 AI 流式设置"
 msgstr "更新 AI 流式设置"
 
-#: src/lib/errors/messages.ts:294
+#: src/lib/errors/messages.ts:299
 msgid "更新下载或校验失败，请重试。"
 msgstr "更新下载或校验失败，请重试。"
 
@@ -5732,7 +5770,7 @@ msgstr "更新主机"
 msgid "更新于 {updatedLabel}"
 msgstr "更新于 {updatedLabel}"
 
-#: src/lib/errors/messages.ts:297
+#: src/lib/errors/messages.ts:302
 msgid "更新信息已失效，请重新检查更新"
 msgstr "更新信息已失效，请重新检查更新"
 
@@ -5906,7 +5944,7 @@ msgstr "未找到本机的 rsync，请安装后重新检测"
 msgid "未找到该 AI 服务地址，可能已被删除"
 msgstr "未找到该 AI 服务地址，可能已被删除"
 
-#: src/lib/errors/messages.ts:206
+#: src/lib/errors/messages.ts:207
 msgid "未找到该 AI 翻译"
 msgstr "未找到该 AI 翻译"
 
@@ -5927,7 +5965,7 @@ msgid "未找到该待办事项，可能已被删除"
 msgstr "未找到该待办事项，可能已被删除"
 
 #. 诗词详情读取失败；uid 是诗词唯一标识。
-#: src/lib/errors/messages.ts:223
+#: src/lib/errors/messages.ts:224
 msgid "未找到该诗词：{uid}"
 msgstr "未找到该诗词：{uid}"
 
@@ -5942,7 +5980,7 @@ msgid "未知棋子"
 msgstr "未知棋子"
 
 #. 同步请求引用了目录中不存在的数据来源；sourceId 是数据来源标识。
-#: src/lib/errors/messages.ts:232
+#: src/lib/errors/messages.ts:233
 msgid "未知的诗词数据来源：{sourceId}"
 msgstr "未知的诗词数据来源：{sourceId}"
 
@@ -6012,7 +6050,7 @@ msgstr "本地文件与数据工具"
 msgid "本地文件夹名称"
 msgstr "本地文件夹名称"
 
-#: src/lib/errors/messages.ts:215
+#: src/lib/errors/messages.ts:216
 msgid "本地模型运行失败，请检查模型或尝试更小的模型"
 msgstr "本地模型运行失败，请检查模型或尝试更小的模型"
 
@@ -6299,7 +6337,7 @@ msgid "棋盘为 9 列 10 行，红方先行。"
 msgstr "棋盘为 9 列 10 行，红方先行。"
 
 #. 军棋二维棋盘初始化失败
-#: src/lib/errors/messages.ts:299
+#: src/lib/errors/messages.ts:304
 msgid "棋盘加载失败，请重试。"
 msgstr "棋盘加载失败，请重试。"
 
@@ -6312,7 +6350,7 @@ msgid "棋盘大小"
 msgstr "棋盘大小"
 
 #. 军棋 WebGL 上下文丢失，可重建渲染器
-#: src/lib/errors/messages.ts:307
+#: src/lib/errors/messages.ts:312
 msgid "棋盘显示已中断，对局仍保留，请重试。"
 msgstr "棋盘显示已中断，对局仍保留，请重试。"
 
@@ -6320,7 +6358,7 @@ msgstr "棋盘显示已中断，对局仍保留，请重试。"
 msgid "棋盘渲染暂不可用，已切换为基础棋盘。"
 msgstr "棋盘渲染暂不可用，已切换为基础棋盘。"
 
-#: src/features/games/chess/ChessMatch.tsx:304
+#: src/features/games/chess/ChessMatch.tsx:323
 msgid "棋盘视角"
 msgstr "棋盘视角"
 
@@ -6344,7 +6382,7 @@ msgstr "模块"
 msgid "模型"
 msgstr "模型"
 
-#: src/lib/errors/messages.ts:219
+#: src/lib/errors/messages.ts:220
 msgid "模型下载失败，请检查网络后重试"
 msgstr "模型下载失败，请检查网络后重试"
 
@@ -6360,7 +6398,7 @@ msgstr "模型列表加载失败"
 msgid "模型名称 / ID"
 msgstr "模型名称 / ID"
 
-#: src/lib/errors/messages.ts:210
+#: src/lib/errors/messages.ts:211
 msgid "模型文件或安装记录无效，请移除后重新下载"
 msgstr "模型文件或安装记录无效，请移除后重新下载"
 
@@ -6368,7 +6406,7 @@ msgstr "模型文件或安装记录无效，请移除后重新下载"
 msgid "模型显示名称不能超过 80 个字符或包含控制字符"
 msgstr "模型显示名称不能超过 80 个字符或包含控制字符"
 
-#: src/lib/errors/messages.ts:211
+#: src/lib/errors/messages.ts:212
 msgid "模型校验失败，请移除未完成的下载后重试"
 msgstr "模型校验失败，请移除未完成的下载后重试"
 
@@ -6384,7 +6422,7 @@ msgstr "横、竖或斜向连成五子即获胜。超过五子的长连同样算
 msgid "横、竖或斜线先连成五子的一方获胜。"
 msgstr "横、竖或斜线先连成五子的一方获胜。"
 
-#: src/features/games/chess/ChessMatch.tsx:309
+#: src/features/games/chess/ChessMatch.tsx:328
 msgid "正上方俯视"
 msgstr "正上方俯视"
 
@@ -6467,7 +6505,7 @@ msgstr "正在加载编辑器"
 msgid "正在加载账号…"
 msgstr "正在加载账号…"
 
-#: src/store/transfers.ts:183
+#: src/store/transfers.ts:178
 msgid "正在取消"
 msgstr "正在取消"
 
@@ -6618,7 +6656,7 @@ msgstr "正在读取图片"
 msgid "正在读取备注"
 msgstr "正在读取备注"
 
-#: src/features/games/engine/GameSessionNotice.tsx:41
+#: src/features/games/engine/GameSessionNotice.tsx:47
 msgid "正在读取对局存档…"
 msgstr "正在读取对局存档…"
 
@@ -6677,7 +6715,7 @@ msgid "此操作仅保留摘要。"
 msgstr "此操作仅保留摘要。"
 
 #: src/features/games/engine/GameRestoreDialog.tsx:66
-#: src/features/games/engine/GameSessionNotice.tsx:107
+#: src/features/games/engine/GameSessionNotice.tsx:113
 msgid "此操作会删除该游戏的存档，无法继续上次的对局。"
 msgstr "此操作会删除该游戏的存档，无法继续上次的对局。"
 
@@ -6780,7 +6818,7 @@ msgstr "注释"
 msgid "注释包（译文 / 赏析）"
 msgstr "注释包（译文 / 赏析）"
 
-#: src/lib/errors/messages.ts:229
+#: src/lib/errors/messages.ts:230
 msgid "注释包下载仅支持桌面端"
 msgstr "注释包下载仅支持桌面端"
 
@@ -6939,7 +6977,7 @@ msgstr "添加转义"
 msgid "清台"
 msgstr "清台"
 
-#: src/features/games/billiards/BilliardsScoreBar.tsx:45
+#: src/features/games/billiards/BilliardsScoreBar.tsx:56
 msgid "清台完成！"
 msgstr "清台完成！"
 
@@ -7036,7 +7074,7 @@ msgstr "游戏信息"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:152
-#: src/lib/errors/messages.ts:262
+#: src/lib/errors/messages.ts:267
 msgid "游戏房间"
 msgstr "游戏房间"
 
@@ -7151,6 +7189,11 @@ msgstr "特殊权限"
 msgid "特殊走法"
 msgstr "特殊走法"
 
+#. 九球玩家连续犯规次数，foulCount 为次数。
+#: src/features/games/billiards/BilliardsMatchScore.tsx:34
+msgid "犯规 {foulCount}"
+msgstr "犯规 {foulCount}"
+
 #. 台球上一杆犯规，旧存档未记录犯规者
 #: src/features/games/billiards/BilliardsFoulFeedback.tsx:59
 msgid "犯规：{reason}"
@@ -7188,11 +7231,19 @@ msgstr "王"
 #: src/features/games/engine/online/OnlineLobby.tsx:237
 #: src/features/games/engine/online/OnlineLobby.tsx:354
 #: src/features/games/engine/online/use-online-lobby.ts:34
-#: src/features/games/junqi/JunqiToolbar.tsx:73
+#: src/features/games/junqi/JunqiToolbar.tsx:112
 msgid "玩家"
 msgstr "玩家"
 
+#. 同屏双人对局的第一位玩家，状态栏左侧。
 #: src/features/games/billiards/BilliardsScore.tsx:17
+#: src/features/games/engine/GamePlayerLabel.tsx:25
+msgid "玩家 1"
+msgstr "玩家 1"
+
+#. 窄屏第一位玩家，英文用 P1。
+#: src/features/games/engine/GamePlayerLabel.tsx:53
+msgctxt "紧凑玩家身份"
 msgid "玩家 1"
 msgstr "玩家 1"
 
@@ -7200,7 +7251,15 @@ msgstr "玩家 1"
 msgid "玩家 1 胜"
 msgstr "玩家 1 胜"
 
+#. 同屏双人对局的第二位玩家，状态栏右侧。
 #: src/features/games/billiards/BilliardsScore.tsx:17
+#: src/features/games/engine/GamePlayerLabel.tsx:29
+msgid "玩家 2"
+msgstr "玩家 2"
+
+#. 窄屏第二位玩家，英文用 P2。
+#: src/features/games/engine/GamePlayerLabel.tsx:59
+msgctxt "紧凑玩家身份"
 msgid "玩家 2"
 msgstr "玩家 2"
 
@@ -7229,7 +7288,7 @@ msgid "环境信息已复制"
 msgstr "环境信息已复制"
 
 #. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
-#: src/lib/errors/messages.ts:311
+#: src/lib/errors/messages.ts:316
 msgid "球桌显示已中断，请重开对局。"
 msgstr "球桌显示已中断，请重开对局。"
 
@@ -7312,17 +7371,25 @@ msgid "申请访问权限"
 msgstr "申请访问权限"
 
 #: src/features/games/chess/ChessDialogs.tsx:93
-#: src/features/games/chess/ChessMatch.tsx:256
+#: src/features/games/chess/ChessMatch.tsx:275
 msgid "申领和棋"
 msgstr "申领和棋"
 
+#. 对局状态栏的本地算法对手身份。
 #: src/features/games/billiards/BilliardsModeMenu.tsx:26
 #: src/features/games/billiards/BilliardsScore.tsx:16
-#: src/features/games/chess/ChessMatch.tsx:168
+#: src/features/games/chess/ChessMatch.tsx:170
 #: src/features/games/engine/black-white-labels.tsx:40
-#: src/features/games/engine/history-labels.tsx:19
-#: src/features/games/junqi/JunqiToolbar.tsx:62
+#: src/features/games/engine/GamePlayerLabel.tsx:21
+#: src/features/games/engine/history-labels.tsx:25
+#: src/features/games/junqi/JunqiToolbar.tsx:101
 #: src/features/games/xiangqi/labels.tsx:38
+msgid "电脑"
+msgstr "电脑"
+
+#. 窄屏身份，英文用 CPU。
+#: src/features/games/engine/GamePlayerLabel.tsx:41
+msgctxt "紧凑玩家身份"
 msgid "电脑"
 msgstr "电脑"
 
@@ -7344,13 +7411,13 @@ msgstr "电脑对战"
 msgid "电脑对战始终显示你的视角，电脑只能依据它已知的信息行动。"
 msgstr "电脑对战始终显示你的视角，电脑只能依据它已知的信息行动。"
 
+#. 加载图标的可访问名称及悬停说明，等待本地电脑完成走法。
+#: src/features/games/engine/GameThinkingIndicator.tsx:8
+msgid "电脑思考中"
+msgstr "电脑思考中"
+
 #: src/features/games/billiards/BilliardsScore.tsx:151
 #: src/features/games/billiards/SnookerHud.tsx:51
-#: src/features/games/chess/ChessMatch.tsx:270
-#: src/features/games/go/GoMatch.tsx:207
-#: src/features/games/gomoku/GomokuMatch.tsx:182
-#: src/features/games/reversi/ReversiMatch.tsx:167
-#: src/features/games/xiangqi/XiangqiMatch.tsx:193
 msgid "电脑思考中…"
 msgstr "电脑思考中…"
 
@@ -7358,12 +7425,7 @@ msgstr "电脑思考中…"
 msgid "电脑获胜"
 msgstr "电脑获胜"
 
-#. 军棋当前回合由电脑走棋，显示在棋盘右上方状态区
-#: src/features/games/junqi/JunqiToolbar.tsx:124
-msgid "电脑走棋"
-msgstr "电脑走棋"
-
-#: src/lib/errors/messages.ts:284
+#: src/lib/errors/messages.ts:289
 msgid "电脑走棋失败，请重新开始或恢复对局后重试。"
 msgstr "电脑走棋失败，请重新开始或恢复对局后重试。"
 
@@ -7380,6 +7442,17 @@ msgstr "留空则用 SSH 配置或系统用户"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:418
 msgid "留空或目录不存在时使用主目录"
 msgstr "留空或目录不存在时使用主目录"
+
+#. 小游戏玩家所执棋子的颜色。
+#: src/features/games/engine/GamePlayerLabel.tsx:37
+msgid "白"
+msgstr "白"
+
+#. 窄屏棋色，英文用 W。
+#: src/features/games/engine/GamePlayerLabel.tsx:73
+msgctxt "紧凑棋色"
+msgid "白"
+msgstr "白"
 
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:267
 #: src/features/lan-transfer/LanTrustedDevices.tsx:76
@@ -7418,7 +7491,7 @@ msgstr "监控"
 msgid "监控采集超时"
 msgstr "监控采集超时"
 
-#: src/lib/errors/messages.ts:236
+#: src/lib/errors/messages.ts:237
 msgid "目录中缺少所需的诗词数据来源"
 msgstr "目录中缺少所需的诗词数据来源"
 
@@ -7554,7 +7627,7 @@ msgstr "确认密码"
 msgid "确认导入"
 msgstr "确认导入"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:93
+#: src/features/games/junqi/JunqiToolbar.tsx:132
 msgid "确认布阵"
 msgstr "确认布阵"
 
@@ -7619,7 +7692,7 @@ msgid "离线，无法打开"
 msgstr "离线，无法打开"
 
 #: src/features/logs/use-activity-logs.ts:46
-#: src/lib/errors/messages.ts:260
+#: src/lib/errors/messages.ts:265
 msgid "离线翻译"
 msgstr "离线翻译"
 
@@ -7649,11 +7722,11 @@ msgstr "移动到第 {position} 项"
 msgid "移动开始计时"
 msgstr "移动开始计时"
 
-#: src/lib/errors/messages.ts:227
+#: src/lib/errors/messages.ts:228
 msgid "移动端不支持从本地导入诗词库"
 msgstr "移动端不支持从本地导入诗词库"
 
-#: src/lib/errors/messages.ts:228
+#: src/lib/errors/messages.ts:229
 msgid "移动端不支持导入本地译文包"
 msgstr "移动端不支持导入本地译文包"
 
@@ -7721,7 +7794,7 @@ msgstr "空目录"
 msgid "空闲"
 msgstr "空闲"
 
-#: src/features/games/chess/ChessMatch.tsx:308
+#: src/features/games/chess/ChessMatch.tsx:327
 msgid "立体视角"
 msgstr "立体视角"
 
@@ -7786,8 +7859,10 @@ msgstr "第 {row} 行第 {column} 列"
 msgid "第一次有效移动开始计时，每滑动一块记一步。离开页面、进入后台或打开菜单与帮助时暂停，记录的是有效练习用时。"
 msgstr "第一次有效移动开始计时，每滑动一块记一步。离开页面、进入后台或打开菜单与帮助时暂停，记录的是有效练习用时。"
 
-#: src/features/games/chess/ChessMatch.tsx:268
-#: src/features/games/reversi/ReversiMatch.tsx:165
+#: src/features/games/chess/ChessMatch.tsx:227
+#: src/features/games/chess/ChessMatch.tsx:287
+#: src/features/games/reversi/ReversiMatch.tsx:141
+#: src/features/games/reversi/ReversiMatch.tsx:186
 msgid "等待协商结果…"
 msgstr "等待协商结果…"
 
@@ -7804,10 +7879,11 @@ msgstr "等待对手加入…"
 msgid "等待对方…"
 msgstr "等待对方…"
 
-#: src/features/games/go/GoMatch.tsx:205
-#: src/features/games/gomoku/GomokuMatch.tsx:180
-#: src/features/games/junqi/JunqiToolbar.tsx:104
-#: src/features/games/xiangqi/XiangqiMatch.tsx:191
+#: src/features/games/go/GoMatch.tsx:206
+#: src/features/games/gomoku/GomokuMatch.tsx:182
+#: src/features/games/junqi/JunqiToolbar.tsx:67
+#: src/features/games/junqi/JunqiToolbar.tsx:143
+#: src/features/games/xiangqi/XiangqiMatch.tsx:201
 msgid "等待对方同意悔棋…"
 msgstr "等待对方同意悔棋…"
 
@@ -7815,14 +7891,15 @@ msgstr "等待对方同意悔棋…"
 msgid "等待对方响应超时，请重新创建或加入房间。"
 msgstr "等待对方响应超时，请重新创建或加入房间。"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:113
+#: src/features/games/junqi/JunqiToolbar.tsx:152
 msgid "等待对方布阵"
 msgstr "等待对方布阵"
 
-#: src/features/games/go/GoMatch.tsx:209
-#: src/features/games/gomoku/GomokuMatch.tsx:184
-#: src/features/games/reversi/ReversiMatch.tsx:169
-#: src/features/games/xiangqi/XiangqiMatch.tsx:195
+#: src/features/games/go/GoMatch.tsx:210
+#: src/features/games/gomoku/GomokuMatch.tsx:186
+#: src/features/games/reversi/ReversiMatch.tsx:145
+#: src/features/games/reversi/ReversiMatch.tsx:190
+#: src/features/games/xiangqi/XiangqiMatch.tsx:205
 msgid "等待对方落子…"
 msgstr "等待对方落子…"
 
@@ -7865,8 +7942,8 @@ msgstr "简体中文"
 #: src/features/games/billiards/BilliardsModeMenu.tsx:29
 #: src/features/games/billiards/BilliardsModeMenu.tsx:106
 #: src/features/games/engine/BoardModeMenu.tsx:100
-#: src/features/games/engine/history-labels.tsx:22
-#: src/features/games/junqi/JunqiToolbar.tsx:64
+#: src/features/games/engine/history-labels.tsx:28
+#: src/features/games/junqi/JunqiToolbar.tsx:103
 msgid "简单"
 msgstr "简单"
 
@@ -7934,6 +8011,17 @@ msgstr "系统监控暂不支持 {os}，仅支持 Linux"
 #: src/features/settings/font-options.ts:11
 msgid "系统默认"
 msgstr "系统默认"
+
+#. 小游戏玩家所执棋子的颜色。
+#: src/features/games/engine/GamePlayerLabel.tsx:38
+msgid "红"
+msgstr "红"
+
+#. 窄屏棋色，英文用 R。
+#: src/features/games/engine/GamePlayerLabel.tsx:78
+msgctxt "紧凑棋色"
+msgid "红"
+msgstr "红"
 
 #: src/features/games/junqi/labels.tsx:126
 #: src/features/games/junqi/render/JunqiStage.tsx:290
@@ -8056,7 +8144,7 @@ msgstr "继续上次的黑白棋对局，棋盘和悔棋记录都会恢复。"
 msgid "继续传输"
 msgstr "继续传输"
 
-#: src/store/transfers.ts:227
+#: src/store/transfers.ts:222
 msgid "继续传输中"
 msgstr "继续传输中"
 
@@ -8212,7 +8300,8 @@ msgid "翻子与阵营"
 msgstr "翻子与阵营"
 
 #. 翻棋的第一个回合，翻开棋子决定双方阵营
-#: src/features/games/junqi/JunqiToolbar.tsx:129
+#: src/features/games/junqi/JunqiToolbar.tsx:73
+#: src/features/games/junqi/JunqiToolbar.tsx:166
 msgid "翻子定边"
 msgstr "翻子定边"
 
@@ -8231,15 +8320,15 @@ msgstr "翻译"
 msgid "翻译中"
 msgstr "翻译中"
 
-#: src/lib/errors/messages.ts:212
+#: src/lib/errors/messages.ts:213
 msgid "翻译任务已取消"
 msgstr "翻译任务已取消"
 
-#: src/lib/errors/messages.ts:204
+#: src/lib/errors/messages.ts:205
 msgid "翻译内容不能为空"
 msgstr "翻译内容不能为空"
 
-#: src/lib/errors/messages.ts:205
+#: src/lib/errors/messages.ts:206
 msgid "翻译内容过长"
 msgstr "翻译内容过长"
 
@@ -8260,9 +8349,9 @@ msgstr "翻译输入"
 msgid "翻译输出"
 msgstr "翻译输出"
 
-#: src/features/games/chess/ChessMatch.tsx:320
+#: src/features/games/chess/ChessMatch.tsx:339
 #: src/features/games/junqi/JunqiMatchView.tsx:177
-#: src/features/games/xiangqi/XiangqiMatch.tsx:219
+#: src/features/games/xiangqi/XiangqiMatch.tsx:229
 msgid "翻转棋盘"
 msgstr "翻转棋盘"
 
@@ -8276,7 +8365,7 @@ msgid "耗时 {taskEtaValue}"
 msgstr "耗时 {taskEtaValue}"
 
 #. 棋类对局模式：通过网络与另一位玩家对战。
-#: src/features/games/engine/history-labels.tsx:15
+#: src/features/games/engine/history-labels.tsx:21
 msgid "联机"
 msgstr "联机"
 
@@ -8337,8 +8426,8 @@ msgstr "自由清台"
 
 #. 斯诺克可选的替代目标球提名
 #. 斯诺克可选的替代目标球提名
-#: src/features/games/billiards/SnookerTargetControl.tsx:94
-#: src/features/games/billiards/SnookerTargetControl.tsx:98
+#: src/features/games/billiards/SnookerTargetControl.tsx:97
+#: src/features/games/billiards/SnookerTargetControl.tsx:101
 msgid "自由球"
 msgstr "自由球"
 
@@ -8361,6 +8450,7 @@ msgstr "至少保留一项"
 msgid "至少修改其中一个名称。"
 msgstr "至少修改其中一个名称。"
 
+#: src/features/games/billiards/BilliardsMatchScore.tsx:42
 #: src/features/games/billiards/BilliardsScore.tsx:166
 msgid "花色球"
 msgstr "花色球"
@@ -8487,7 +8577,7 @@ msgstr "认证方式"
 #. 斯诺克主动认输本局
 #. 棋类对局主动承认失败
 #: src/features/games/billiards/BilliardsConcedeDialog.tsx:51
-#: src/features/games/billiards/BilliardsMatchHeader.tsx:76
+#: src/features/games/billiards/BilliardsMatchHeader.tsx:79
 #: src/features/games/junqi/JunqiMatchView.tsx:189
 #: src/features/games/junqi/JunqiMatchView.tsx:275
 #: src/features/games/junqi/labels.tsx:117
@@ -8582,7 +8672,7 @@ msgstr "译文内容"
 msgid "译文包"
 msgstr "译文包"
 
-#: src/lib/errors/messages.ts:247
+#: src/lib/errors/messages.ts:248
 msgid "译文包内容无效"
 msgstr "译文包内容无效"
 
@@ -8590,7 +8680,7 @@ msgstr "译文包内容无效"
 msgid "译文包已导入"
 msgstr "译文包已导入"
 
-#: src/lib/errors/messages.ts:217
+#: src/lib/errors/messages.ts:218
 msgid "译文达到输出上限，当前结果不完整，请分段翻译"
 msgstr "译文达到输出上限，当前结果不完整，请分段翻译"
 
@@ -8603,7 +8693,7 @@ msgstr "试听音色"
 msgid "试试其他关键词或清除筛选"
 msgstr "试试其他关键词或清除筛选"
 
-#: src/lib/errors/messages.ts:249
+#: src/lib/errors/messages.ts:250
 msgid "诗词内容过大，无法发起 AI 翻译"
 msgstr "诗词内容过大，无法发起 AI 翻译"
 
@@ -8631,11 +8721,11 @@ msgstr "诗词库"
 msgid "诗词库与临时文件"
 msgstr "诗词库与临时文件"
 
-#: src/lib/errors/messages.ts:259
+#: src/lib/errors/messages.ts:264
 msgid "诗词库同步"
 msgstr "诗词库同步"
 
-#: src/lib/errors/messages.ts:222
+#: src/lib/errors/messages.ts:223
 msgid "诗词库同步已取消"
 msgstr "诗词库同步已取消"
 
@@ -8652,11 +8742,11 @@ msgstr "诗词数据管理"
 msgid "诗词注释库"
 msgstr "诗词注释库"
 
-#: src/lib/errors/messages.ts:231
+#: src/lib/errors/messages.ts:232
 msgid "诗词源文件解析失败"
 msgstr "诗词源文件解析失败"
 
-#: src/lib/errors/messages.ts:230
+#: src/lib/errors/messages.ts:231
 msgid "诗词目录配置无效"
 msgstr "诗词目录配置无效"
 
@@ -8710,7 +8800,7 @@ msgstr "该私钥有口令"
 msgid "该设备需要重新连接才能继续访问。"
 msgstr "该设备需要重新连接才能继续访问。"
 
-#: src/lib/errors/messages.ts:248
+#: src/lib/errors/messages.ts:249
 msgid "该诗词没有可翻译的正文"
 msgstr "该诗词没有可翻译的正文"
 
@@ -8733,7 +8823,7 @@ msgstr "说明已截断"
 msgid "请为主机选择认证密钥"
 msgstr "请为主机选择认证密钥"
 
-#: src/lib/errors/messages.ts:214
+#: src/lib/errors/messages.ts:215
 msgid "请先下载翻译模型"
 msgstr "请先下载翻译模型"
 
@@ -8843,7 +8933,7 @@ msgstr "请输入密钥口令后再测试"
 msgid "请输入待办标题"
 msgstr "请输入待办标题"
 
-#: src/lib/errors/messages.ts:209
+#: src/lib/errors/messages.ts:210
 msgid "请输入有效文本并选择支持的语言"
 msgstr "请输入有效文本并选择支持的语言"
 
@@ -9058,7 +9148,7 @@ msgstr "赏析"
 msgid "赛博朋克"
 msgstr "赛博朋克"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:134
+#: src/features/games/junqi/JunqiToolbar.tsx:171
 msgid "走棋"
 msgstr "走棋"
 
@@ -9103,20 +9193,20 @@ msgstr "转动与观察"
 msgid "转动开始计时"
 msgstr "转动开始计时"
 
-#: src/features/games/reversi/ReversiMatch.tsx:171
+#: src/features/games/reversi/ReversiMatch.tsx:192
 msgid "轮到 {currentPlayer}"
 msgstr "轮到 {currentPlayer}"
 
-#: src/features/games/chess/ChessMatch.tsx:276
+#: src/features/games/chess/ChessMatch.tsx:295
 msgid "轮到 {player}"
 msgstr "轮到 {player}"
 
-#: src/features/games/go/GoMatch.tsx:178
-#: src/features/games/gomoku/GomokuMatch.tsx:158
+#: src/features/games/go/GoMatch.tsx:179
+#: src/features/games/gomoku/GomokuMatch.tsx:159
 msgid "轮到 {seatNameValue}"
 msgstr "轮到 {seatNameValue}"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:163
+#: src/features/games/xiangqi/XiangqiMatch.tsx:166
 msgid "轮到 {sideNameValue}"
 msgstr "轮到 {sideNameValue}"
 
@@ -9277,7 +9367,7 @@ msgstr "这一步将达到三次重复局面或五十步规则。你可以声明
 msgid "这条成绩记录无法读取。"
 msgstr "这条成绩记录无法读取。"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:157
+#: src/features/games/junqi/JunqiToolbar.tsx:194
 msgid "进攻方获胜"
 msgstr "进攻方获胜"
 
@@ -9328,7 +9418,7 @@ msgstr "远端文件夹名称"
 msgid "远端服务器未安装 rsync，请安装后重新检测"
 msgstr "远端服务器未安装 rsync，请安装后重新检测"
 
-#: src/lib/errors/messages.ts:298
+#: src/lib/errors/messages.ts:303
 msgid "远端连接在终端打开前已关闭"
 msgstr "远端连接在终端打开前已关闭"
 
@@ -9472,7 +9562,7 @@ msgid "逆时针转动"
 msgstr "逆时针转动"
 
 #. 斯诺克出杆前选择目标彩球
-#: src/features/games/billiards/SnookerTargetControl.tsx:74
+#: src/features/games/billiards/SnookerTargetControl.tsx:77
 msgid "选彩"
 msgstr "选彩"
 
@@ -9505,7 +9595,7 @@ msgstr "选择上传文件"
 msgid "选择上传文件夹"
 msgstr "选择上传文件夹"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:151
+#: src/features/games/junqi/JunqiToolbar.tsx:188
 msgid "选择两枚己方棋子交换位置"
 msgstr "选择两枚己方棋子交换位置"
 
@@ -9576,7 +9666,7 @@ msgid "选择源语言"
 msgstr "选择源语言"
 
 #: src/features/games/billiards/render/BallSelectionOverlay.tsx:32
-#: src/features/games/billiards/SnookerTargetControl.tsx:69
+#: src/features/games/billiards/SnookerTargetControl.tsx:72
 msgid "选择目标球"
 msgstr "选择目标球"
 
@@ -9657,7 +9747,7 @@ msgstr "道路与安全区"
 
 #. 协议详情或元数据超出内存容量，复制文本也保留此不完整标记
 #. 当前操作的部分详情超过内存容量，原文并不完整
-#: src/features/connection-diagnostics/execution-log-stream.ts:191
+#: src/features/connection-diagnostics/execution-log-stream.ts:195
 #: src/features/connection-diagnostics/ExecutionLogDetailView.tsx:182
 msgid "部分内容已截断"
 msgstr "部分内容已截断"
@@ -9687,7 +9777,7 @@ msgstr "重做转动"
 msgid "重启中"
 msgstr "重启中"
 
-#: src/lib/errors/messages.ts:296
+#: src/lib/errors/messages.ts:301
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "重启失败，请重试或手动重新打开应用。"
 
@@ -9857,7 +9947,7 @@ msgstr "重置魔方回到复原状态，不会自动求解或记为挑战成功
 #: src/features/activity/TransferActivity.tsx:49
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:145
 #: src/features/games/billiards/BilliardsGame.tsx:124
-#: src/features/games/engine/GameSessionNotice.tsx:81
+#: src/features/games/engine/GameSessionNotice.tsx:87
 #: src/features/games/junqi/render/JunqiStage.tsx:208
 #: src/features/games/magic-cube/MagicCubeGame.tsx:372
 #: src/features/games/reversi/ReversiStage.tsx:65
@@ -9923,7 +10013,7 @@ msgstr "阅读、收藏与翻译"
 msgid "阅读设置"
 msgstr "阅读设置"
 
-#: src/features/games/junqi/JunqiToolbar.tsx:159
+#: src/features/games/junqi/JunqiToolbar.tsx:196
 msgid "防守方获胜"
 msgstr "防守方获胜"
 
@@ -9983,7 +10073,7 @@ msgid "随机"
 msgstr "随机"
 
 #: src/features/games/junqi/JunqiMatchView.tsx:313
-#: src/features/games/junqi/JunqiToolbar.tsx:87
+#: src/features/games/junqi/JunqiToolbar.tsx:126
 msgid "随机布阵"
 msgstr "随机布阵"
 
@@ -10118,7 +10208,7 @@ msgstr "高质量"
 msgid "魔方"
 msgstr "魔方"
 
-#: src/lib/errors/messages.ts:291
+#: src/lib/errors/messages.ts:296
 msgid "魔方已还原，但挑战记录尚未保存，请重试。"
 msgstr "魔方已还原，但挑战记录尚未保存，请重试。"
 
@@ -10131,15 +10221,24 @@ msgstr "魔方挑战记录"
 msgid "黄球"
 msgstr "黄球"
 
+#. 小游戏玩家所执棋子的颜色。
+#: src/features/games/engine/GamePlayerLabel.tsx:35
+msgid "黑"
+msgstr "黑"
+
+#. 窄屏棋色，英文用 B。
+#: src/features/games/engine/GamePlayerLabel.tsx:67
+msgctxt "紧凑棋色"
+msgid "黑"
+msgstr "黑"
+
 #. 黑白棋终局计分，黑白分别为棋子数量
-#: src/features/games/reversi/ReversiMatch.tsx:203
+#: src/features/games/reversi/ReversiMatch.tsx:219
 msgid "黑 {black} : 白 {white}"
 msgstr "黑 {black} : 白 {white}"
 
-#. 黑白棋当前棋子数量
 #. 黑白棋结束时的双方棋子数量
 #: src/features/games/reversi/labels.tsx:14
-#: src/features/games/reversi/ReversiMatch.tsx:177
 msgid "黑 {black} / 白 {white}"
 msgstr "黑 {black} / 白 {white}"
 
@@ -10213,13 +10312,3 @@ msgstr "默认目录"
 #: src/features/settings/font-options.ts:14
 msgid "龙藏体"
 msgstr "龙藏体"
-
-
-#. 阻止数据清理或退出排空的在途 AI 任务名称。
-#: src/lib/errors/messages.ts:259
-msgid "AI 请求"
-msgstr "AI 请求"
-
-#: src/lib/errors/messages.ts:199
-msgid "AI 请求过多，请等待现有任务结束后重试"
-msgstr "AI 请求过多，请等待现有任务结束后重试"

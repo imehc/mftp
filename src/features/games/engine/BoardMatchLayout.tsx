@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { LightNotice, type LightNoticeMessage } from "~/components/LightNotice";
 
 import type { Difficulty } from "./ai";
+import { boardPlayers } from "./board-players";
 import { GameToolbar } from "./GameToolbar";
 import { historyModeLabel } from "./history-labels";
 import type { SeatIndex } from "./types";
@@ -13,23 +14,36 @@ export function BoardMatchLayout({
   title,
   mode,
   localSeat,
+  activeSeat,
   red = false,
   details,
+  playerStats,
   metrics,
   activity,
+  activityActions,
   controls,
   menuActions,
   finished,
   children,
   notice = null,
+  modeLabel,
 }: {
   title: ReactNode;
-  mode: { kind: "ai" | "hotseat" | "online"; difficulty?: Difficulty };
+  mode: {
+    kind: "ai" | "hotseat" | "online";
+    difficulty?: Difficulty;
+  };
+  /** 游戏自己的对手标签；共享布局不解释专属模式。 */
+  modeLabel?: ReactNode;
   localSeat: SeatIndex;
+  activeSeat?: SeatIndex | null;
   red?: boolean;
   details?: ReactNode;
+  playerStats?: { local?: ReactNode; opponent?: ReactNode };
   metrics: ReactNode;
   activity?: ReactNode;
+  /** 内容区状态行中的恢复动作；文字可截断，动作保持可操作。 */
+  activityActions?: ReactNode;
   controls: ReactNode;
   /** 只进更多菜单的视角类动作。 */
   menuActions?: ReactNode;
@@ -43,10 +57,11 @@ export function BoardMatchLayout({
         context={
           <>
             <span>
-              {historyModeLabel({
-                mode: mode.kind,
-                difficulty: mode.difficulty,
-              })}
+              {modeLabel ??
+                historyModeLabel({
+                  mode: mode.kind,
+                  difficulty: mode.difficulty,
+                })}
             </span>
             {mode.kind !== "hotseat" ? (
               <span>
@@ -67,6 +82,15 @@ export function BoardMatchLayout({
         }
         actions={finished ? null : controls}
         status={activity || title}
+        statusActions={activityActions}
+        players={boardPlayers({
+          kind: mode.kind,
+          localSeat,
+          activeSeat,
+          firstColor: red ? "red" : "black",
+          activity,
+          stats: playerStats,
+        })}
         metrics={metrics}
         details={details}
         menuActions={menuActions}

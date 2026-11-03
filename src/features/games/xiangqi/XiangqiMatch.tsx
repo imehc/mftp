@@ -7,6 +7,7 @@ import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameThinkingIndicator } from "../engine/GameThinkingIndicator";
 import { GameMenuActionButton, GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
@@ -94,7 +95,7 @@ export function XiangqiMatchView({
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
     runner.controllers[snapshot.activeSeat]?.kind === "local";
-  const aiThinking =
+  const computerThinking =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
     runner.controllers[snapshot.activeSeat]?.kind === "computer";
@@ -165,6 +166,7 @@ export function XiangqiMatchView({
         }
         mode={mode}
         localSeat={localSeat}
+        activeSeat={snapshot.activeSeat}
         red
         finished={state.finished}
         metrics={
@@ -178,19 +180,25 @@ export function XiangqiMatchView({
                 other="第 # 手"
               />
             </span>
-            {state.inCheck ? (
-              <span className="text-destructive">
-                <Trans>将军</Trans>
-              </span>
-            ) : null}
           </>
+        }
+        playerStats={
+          state.inCheck
+            ? {
+                [state.turnSeat === localSeat ? "local" : "opponent"]: (
+                  <span className="text-destructive">
+                    <Trans>将军</Trans>
+                  </span>
+                ),
+              }
+            : undefined
         }
         activity={
           !state.finished ? (
             online?.undoWaiting ? (
               <Trans>等待对方同意悔棋…</Trans>
-            ) : aiThinking ? (
-              <Trans>电脑思考中…</Trans>
+            ) : computerThinking ? (
+              <GameThinkingIndicator />
             ) : online && snapshot.activeSeat !== online.localSeat ? (
               <Trans>等待对方落子…</Trans>
             ) : null

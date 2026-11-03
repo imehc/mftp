@@ -5,7 +5,9 @@ import { useEffect, useRef } from "react";
 import type { LightNoticeMessage } from "~/components/LightNotice";
 import { useSettingsStore } from "~/store/settings";
 
+import { boardPlayers } from "../engine/board-players";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameThinkingIndicator } from "../engine/GameThinkingIndicator";
 import { GameToolbar, GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { historyModeLabel } from "../engine/history-labels";
@@ -73,7 +75,7 @@ export function ReversiMatchView({
     snapshot.phase === "awaiting-move" &&
     activeKind === "local" &&
     !online?.undoWaiting;
-  const aiThinking =
+  const computerThinking =
     snapshot.phase === "awaiting-move" && activeKind === "computer";
   const localSeat =
     mode.kind === "online"
@@ -126,6 +128,24 @@ export function ReversiMatchView({
     <>
       <div className="app-scroll-safe-end flex min-h-0 flex-1 flex-col overflow-auto">
         <GameToolbar
+          players={boardPlayers({
+            kind: mode.kind,
+            localSeat,
+            activeSeat: snapshot.activeSeat,
+            stats: {
+              local: localSeat === 0 ? black : white,
+              opponent: localSeat === 0 ? white : black,
+            },
+            activity: !state.finished ? (
+              online?.undoWaiting ? (
+                <Trans>等待协商结果…</Trans>
+              ) : computerThinking ? (
+                <GameThinkingIndicator />
+              ) : online && activeKind === "remote" ? (
+                <Trans>等待对方落子…</Trans>
+              ) : null
+            ) : null,
+          })}
           context={
             <>
               <span>
@@ -164,8 +184,8 @@ export function ReversiMatchView({
               matchResultLabel(mode, state.winnerSeat, online)
             ) : online?.undoWaiting ? (
               <Trans>等待协商结果…</Trans>
-            ) : aiThinking ? (
-              <Trans>电脑思考中…</Trans>
+            ) : computerThinking ? (
+              <GameThinkingIndicator />
             ) : online && activeKind === "remote" ? (
               <Trans>等待对方落子…</Trans>
             ) : (
@@ -174,11 +194,6 @@ export function ReversiMatchView({
           }
           metrics={
             <>
-              <span>
-                <Trans comment="黑白棋当前棋子数量">
-                  黑 {black} / 白 {white}
-                </Trans>
-              </span>
               <span>
                 <Plural
                   value={{ moveCount: state.moveCount }}

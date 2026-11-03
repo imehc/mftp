@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { FlagIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { Button } from "~/components/ui/button";
 
@@ -34,6 +35,7 @@ export function BilliardsMatchHeader({
   onMenuOpenChange,
   canConcede = false,
   onConcede,
+  parameters,
 }: {
   mode: BilliardsMode;
   state: BilliardsState;
@@ -47,6 +49,7 @@ export function BilliardsMatchHeader({
   onMenuOpenChange?(open: boolean): void;
   canConcede?: boolean;
   onConcede?(): void;
+  parameters?: ReactNode;
 }) {
   return (
     <>
@@ -80,6 +83,7 @@ export function BilliardsMatchHeader({
         )}
       />
       <GameInfoPopover
+        parameters={parameters}
         open={panel === "details"}
         onOpenChange={(next) => onPanel(next ? "details" : null)}
       >

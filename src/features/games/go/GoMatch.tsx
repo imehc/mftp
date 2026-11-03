@@ -11,6 +11,7 @@ import { useSettingsStore } from "~/store/settings";
 
 import { BoardMatchLayout } from "../engine/BoardMatchLayout";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameThinkingIndicator } from "../engine/GameThinkingIndicator";
 import { GameToolbarAction } from "../engine/GameToolbar";
 import { useGamesHistoryStore } from "../engine/history";
 import { useMatchSnapshot } from "../engine/match";
@@ -92,7 +93,7 @@ export function GoMatchView({
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
     runner.controllers[snapshot.activeSeat]?.kind === "local";
-  const aiThinking =
+  const computerThinking =
     snapshot.phase === "awaiting-move" &&
     snapshot.activeSeat !== null &&
     runner.controllers[snapshot.activeSeat]?.kind === "computer";
@@ -165,8 +166,6 @@ export function GoMatchView({
       kind: "pass",
     });
   const seatNameValue = seatName(mode, state.turnSeat, online);
-  const value = state.captures[0];
-  const value2 = state.captures[1];
   return (
     <>
       <BoardMatchLayout
@@ -180,6 +179,7 @@ export function GoMatchView({
         }
         mode={mode}
         localSeat={localSeat}
+        activeSeat={snapshot.activeSeat}
         finished={state.finished}
         metrics={
           <>
@@ -192,19 +192,18 @@ export function GoMatchView({
                 other="第 # 手"
               />
             </span>
-            <span>
-              <Trans>
-                提子 {value}:{value2}
-              </Trans>
-            </span>
           </>
         }
+        playerStats={{
+          local: state.captures[localSeat],
+          opponent: state.captures[localSeat === 0 ? 1 : 0],
+        }}
         activity={
           !state.finished ? (
             online?.undoWaiting ? (
               <Trans>等待对方同意悔棋…</Trans>
-            ) : aiThinking ? (
-              <Trans>电脑思考中…</Trans>
+            ) : computerThinking ? (
+              <GameThinkingIndicator />
             ) : online && snapshot.activeSeat !== online.localSeat ? (
               <Trans>等待对方落子…</Trans>
             ) : null

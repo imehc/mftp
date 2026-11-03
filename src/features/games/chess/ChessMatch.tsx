@@ -8,8 +8,10 @@ import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { useSettingsStore } from "~/store/settings";
 
+import { boardPlayers } from "../engine/board-players";
 import { GameSelect } from "../engine/BoardModeMenu";
 import { GameResultBar } from "../engine/GameResultBar";
+import { GameThinkingIndicator } from "../engine/GameThinkingIndicator";
 import {
   GameMenuActionButton,
   GameToolbar,
@@ -215,6 +217,23 @@ export function ChessMatchView({
     <>
       <div className="app-scroll-safe-end flex min-h-0 flex-1 flex-col overflow-auto">
         <GameToolbar
+          players={boardPlayers({
+            kind: mode.kind,
+            localSeat: localSeat === 0 ? 0 : 1,
+            activeSeat: finished ? null : seat,
+            firstColor: "white",
+            activity: !finished ? (
+              online?.undoWaiting ? (
+                <Trans>等待协商结果…</Trans>
+              ) : kind === "computer" ? (
+                <GameThinkingIndicator />
+              ) : chess.isCheck() ? (
+                <span className="text-destructive">
+                  <Trans>将军</Trans>
+                </span>
+              ) : null
+            ) : null,
+          })}
           context={
             <>
               <span>
@@ -267,7 +286,7 @@ export function ChessMatchView({
             ) : online?.undoWaiting ? (
               <Trans>等待协商结果…</Trans>
             ) : kind === "computer" ? (
-              <Trans>电脑思考中…</Trans>
+              <GameThinkingIndicator />
             ) : (
               <>
                 {chess.isCheck() ? (
