@@ -110,6 +110,24 @@ fn reset_preserves_migration_versions_and_clears_settings_atomically() {
     let root = temp_root("reset-metadata");
     let storage = Storage::new(root.clone()).unwrap();
     let conn = storage.conn().unwrap();
+    // Structural versions are owned by their own migrations, so the expected
+    // values come from startup instead of hard-coded literals that break every
+    // time a module bumps its schema.
+    let versions: Vec<(&str, Option<String>)> = [
+        "legacy_json_migrated",
+        "ai_schema_version",
+        "todo_schema_version",
+        "activity_diagnostics_schema_version",
+        "activity_file_schema_version",
+        "mcp_schema_version",
+    ]
+    .into_iter()
+    .map(|key| (key, read_meta(&storage, key)))
+    .collect();
+    assert!(
+        versions[1].1.is_some(),
+        "ai schema version was not recorded"
+    );
     conn.execute_batch(
         "INSERT INTO todo_items(id,title,completed,created_at,updated_at) VALUES('todo','Task',0,1,1);
          INSERT INTO app_meta(key,value) VALUES('obsolete_cache_quota','1024');
@@ -138,17 +156,15 @@ fn reset_preserves_migration_versions_and_clears_settings_atomically() {
     // is intentionally cleared while structural versions remain unchanged.
     assert!(read_meta(&storage, "activity_log_error_legacy_before_ms").is_none());
     assert!(storage.migration_done(&conn).unwrap());
-    for (key, value) in [
-        ("ai_schema_version", "4"),
-        ("activity_diagnostics_schema_version", "1"),
-    ] {
-        assert_eq!(read_meta(&storage, key).as_deref(), Some(value));
+    for (key, expected) in &versions {
+        assert_eq!(
+            read_meta(&storage, key).as_deref(),
+            expected.as_deref(),
+            "reset changed {key}"
+        );
     }
     let reopened = Storage::new(root.clone()).unwrap();
-    assert_eq!(
-        read_meta(&reopened, "ai_schema_version").as_deref(),
-        Some("4")
-    );
+    assert_eq!(read_meta(&reopened, "ai_schema_version"), versions[1].1);
     drop(conn);
     fs::remove_dir_all(root).unwrap();
 }
