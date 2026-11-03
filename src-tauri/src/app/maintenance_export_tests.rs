@@ -65,20 +65,23 @@ impl Fixture {
             executor.clone(),
         )
         .unwrap();
+        let ai_tasks = Arc::new(AiTaskManager::new(operations.clone()));
+        let ai_configuration = crate::modules::ai::AiConfigurationService::new(
+            crate::modules::ai::AiRepository::new(storage.clone()),
+            Arc::new(AiKeychain::in_memory()),
+            executor.clone(),
+            operations.clone(),
+        );
+        let diagnostics = Arc::new(crate::core::diagnostics::Diagnostics::default());
         let state = AppServices {
             translation: Arc::new(crate::modules::translation::TranslationService::new(
                 root.join("translation-models"),
                 operations.clone(),
             )),
-            diagnostics: Arc::new(crate::core::diagnostics::Diagnostics::default()),
+            diagnostics,
             storage: storage.clone(),
-            ai_tasks: Arc::new(AiTaskManager::new(operations.clone())),
-            ai_configuration: crate::modules::ai::AiConfigurationService::new(
-                crate::modules::ai::AiRepository::new(storage.clone()),
-                Arc::new(AiKeychain::in_memory()),
-                executor.clone(),
-                operations.clone(),
-            ),
+            ai_tasks,
+            ai_configuration,
             manager: Arc::new(SshManager::new(root.join("transfer-temp-files.json"))),
             lan_transfer: Arc::new(LanTransferManager::new(operations.clone())),
             lan_repository: LanRepository::new(storage.clone()),

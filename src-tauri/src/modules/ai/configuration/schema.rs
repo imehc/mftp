@@ -3,7 +3,7 @@ use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBe
 use crate::error::{AppError, AppResult, CustomErrorCode};
 use crate::modules::ai::{legacy_schema, service::url};
 
-pub(in crate::modules::ai) const VERSION: i64 = 4;
+pub(in crate::modules::ai) const VERSION: i64 = 6;
 pub(in crate::modules::ai) const LEGACY_PROVIDER: &str = "1e227548-da9b-52f8-8e79-18175d9a0df7";
 pub(in crate::modules::ai) const LEGACY_KEY: &str = "73f7eabc-03ce-5cb1-9452-4db4eb464d1b";
 pub(in crate::modules::ai) const LEGACY_MODEL: &str = "f9e51a88-54bc-51d8-8a5e-5b0d58d389bc";
@@ -34,8 +34,11 @@ pub(in crate::modules::ai) fn init(conn: &mut Connection) -> AppResult<()> {
         tx.commit()?;
         return Ok(());
     }
-    if version == 3 {
-        migrate_protocol(&tx)?;
+    if (3..=5).contains(&version) {
+        if version == 3 {
+            migrate_protocol(&tx)?;
+        }
+        retire_game_policy(&tx)?;
         tx.commit()?;
         return Ok(());
     }
@@ -57,6 +60,7 @@ pub(in crate::modules::ai) fn init(conn: &mut Connection) -> AppResult<()> {
     migrate_connection(&tx)?;
     tx.execute("DROP TABLE ai_connection", [])?;
     migrate_protocol(&tx)?;
+    retire_game_policy(&tx)?;
     tx.execute(
         "INSERT INTO app_meta(key, value) VALUES('ai_schema_version', ?1)
          ON CONFLICT(key) DO UPDATE SET value = excluded.value",
@@ -155,6 +159,17 @@ fn migrate_protocol(tx: &Transaction<'_>) -> AppResult<()> {
         "ALTER TABLE ai_providers ADD COLUMN protocol TEXT NOT NULL DEFAULT 'responses'
         CHECK(protocol IN ('responses', 'chatCompletions', 'anthropicMessages'));
         UPDATE app_meta SET value = '4' WHERE key = 'ai_schema_version';",
+    )?;
+    Ok(())
+}
+
+fn retire_game_policy(tx: &Transaction<'_>) -> AppResult<()> {
+    // Game request preferences are retired; connection and credential metadata
+    // remain untouched. Never downgrade databases created by the schema 5 build.
+    tx.execute_batch("DROP TABLE IF EXISTS ai_model_request_policies;")?;
+    tx.execute(
+        "UPDATE app_meta SET value = ?1 WHERE key = 'ai_schema_version'",
+        [VERSION.to_string()],
     )?;
     Ok(())
 }

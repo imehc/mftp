@@ -1,7 +1,7 @@
 use super::*;
 use crate::modules::ai::completion::{
-    AiCompletionRequest, AiControlMessage, AiOutputPolicy, AiProviderErrorCode,
-    AiStreamEventPayload,
+    AiCancellationSource, AiCompletionRequest, AiControlMessage, AiOutputPolicy,
+    AiProviderErrorCode, AiStreamEventPayload,
 };
 use crate::modules::ai::service::runtime::complete;
 
@@ -150,7 +150,11 @@ async fn explicit_cancellation_closes_each_protocol_without_a_success_event() {
                         ..
                     }
                 ) {
-                    sender.try_send(AiControlMessage::Cancel).unwrap();
+                    sender
+                        .try_send(AiControlMessage::CancelWithSource {
+                            source: AiCancellationSource::ViewDetached,
+                        })
+                        .unwrap();
                 }
                 events.push(event);
             },
@@ -158,6 +162,7 @@ async fn explicit_cancellation_closes_each_protocol_without_a_success_event() {
         .await
         .unwrap_err();
         assert_eq!(error.code, "ai:cancelled");
+        assert_eq!(error.args["cancelSource"], "viewDetached");
         assert!(matches!(
             events.last().unwrap().payload,
             AiStreamEventPayload::Cancelled { .. }
@@ -235,9 +240,12 @@ async fn structured_output_is_parsed_only_after_successful_protocol_completion()
             "not-json",
             Err("ai:output_invalid"),
         ),
-        (AiOutputPolicy::GameMove, "[]", Err("ai:output_invalid")),
         (AiOutputPolicy::StructuredJson, "[]", Ok("[]")),
-        (AiOutputPolicy::GameMove, "{\"move\":1}", Ok("{\"move\":1}")),
+        (
+            AiOutputPolicy::StructuredJson,
+            "{\"move\":1}",
+            Ok("{\"move\":1}"),
+        ),
     ] {
         let body = json!({"status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":content}]}]}).to_string();
         let (url, worker) = server(body, 200);

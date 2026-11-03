@@ -168,6 +168,7 @@ custom_codes! {
     AiCredentialRollbackFailed => ("ai:credential_rollback_failed", "AI settings were not saved and credential rollback failed"),
     AiStreamRequestIdInvalid => ("ai:stream_request_id_invalid", "Invalid AI stream request id"),
     AiTaskAlreadyRunning => ("ai:task_already_running", "The same AI task is already running"),
+    AiTaskLimit => ("ai:task_limit", "AI task limit reached"),
     AiRequestTooLarge => ("ai:request_too_large", "AI request exceeds the size limit"),
     AiResponseTooLarge => ("ai:response_too_large", "AI provider response exceeds the size limit"),
     AiOutputTooLarge => ("ai:output_too_large", "AI output exceeds the size limit"),

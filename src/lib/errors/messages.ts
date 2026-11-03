@@ -196,6 +196,7 @@ export const customErrorMessages = {
   "ai:credential_rollback_failed": msg`AI 设置未保存，且密钥回滚失败`,
   "ai:stream_request_id_invalid": msg`AI 流式请求标识无效`,
   "ai:task_already_running": msg`相同的 AI 任务正在执行中`,
+  "ai:task_limit": msg`AI 请求过多，请等待现有任务结束后重试`,
   "ai:request_too_large": msg`AI 请求内容超出大小限制`,
   "ai:response_too_large": msg`AI 服务返回内容超出大小限制`,
   "ai:output_too_large": msg`AI 输出内容超出大小限制`,
@@ -255,6 +256,10 @@ export const unknownErrorMessage = msg`发生未知错误，请重试`;
 // app:data_busy 的 participant 参数是后端稳定任务标识（见 modules/maintenance/data.rs），
 // 展示前在本目录翻译为任务名称；未知标识原样透出以便诊断。
 export const dataBusyParticipantNames: Record<string, MessageDescriptor> = {
+  ai: msg({
+    message: "AI 请求",
+    comment: "阻止数据清理或退出排空的在途 AI 任务名称。",
+  }),
   ssh: msg`SSH 连接`,
   poetry: msg`诗词库同步`,
   translation: msg`离线翻译`,

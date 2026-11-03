@@ -10213,3 +10213,13 @@ msgstr "Default Directory"
 #: src/features/settings/font-options.ts:14
 msgid "龙藏体"
 msgstr "Long Cang"
+
+
+#. 阻止数据清理或退出排空的在途 AI 任务名称。
+#: src/lib/errors/messages.ts:259
+msgid "AI 请求"
+msgstr "AI requests"
+
+#: src/lib/errors/messages.ts:199
+msgid "AI 请求过多，请等待现有任务结束后重试"
+msgstr "Too many AI requests. Wait for the current tasks to finish and try again."

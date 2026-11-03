@@ -119,6 +119,7 @@ impl WaitContext<'_> {
                             }
                         }
                         None | Some(AiControlMessage::Cancel) => return Err(AiProviderErrorCode::Cancelled.error()),
+                        Some(AiControlMessage::CancelWithSource { source }) => return Err(source.error()),
                     }
                 }
                 result = &mut future => { self.check()?; return result; }

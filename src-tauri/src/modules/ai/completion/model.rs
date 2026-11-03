@@ -3,6 +3,37 @@ use specta::Type;
 
 use crate::modules::ai::AiProtocol;
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AiCancellationSource {
+    AppHidden,
+    ViewDetached,
+    RuntimeDisposed,
+    PositionChanged,
+    SessionDisposed,
+    Superseded,
+    Paused,
+    Transition,
+}
+
+impl AiCancellationSource {
+    pub(crate) fn error(self) -> crate::error::AppError {
+        let mut error = super::AiProviderErrorCode::Cancelled.error();
+        let source = match self {
+            Self::AppHidden => "appHidden",
+            Self::ViewDetached => "viewDetached",
+            Self::RuntimeDisposed => "runtimeDisposed",
+            Self::PositionChanged => "positionChanged",
+            Self::SessionDisposed => "sessionDisposed",
+            Self::Superseded => "superseded",
+            Self::Paused => "paused",
+            Self::Transition => "transition",
+        };
+        error.args.insert("cancelSource".into(), source.into());
+        error
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum AiReasoningEffort {
@@ -11,15 +42,13 @@ pub enum AiReasoningEffort {
     High,
 }
 
-/// The runtime requires bounded, nonempty text and validates JSON syntax (an object
-/// for GameMove). After protocol completion, callers must enforce their domain
-/// schema and, for game moves, the current match, position, seat, and legal moves.
+/// The runtime requires bounded, nonempty text and validates JSON syntax for
+/// structured output. Callers enforce their own domain schema after completion.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum AiOutputPolicy {
     Text,
     StructuredJson,
-    GameMove,
 }
 
 /// An observed phase is evidence, not an inference from latency or a model name.

@@ -1,8 +1,8 @@
 use super::*;
 use crate::modules::ai::{
     completion::{
-        AiCompletionRequest, AiContentBlock, AiOutput, AiReasoningKind, AiStreamEvent,
-        AiTextRequest,
+        AiCancellationSource, AiCompletionRequest, AiContentBlock, AiOutput, AiReasoningKind,
+        AiStreamEvent, AiTextRequest,
     },
     AiProtocol,
 };
@@ -366,6 +366,24 @@ async fn cancellation_and_closed_owner_channels_stop_waiting() {
             "ai:cancelled"
         );
     }
+}
+
+#[tokio::test(start_paused = true)]
+async fn cancellation_while_waiting_preserves_structured_source() {
+    let (sender, mut receiver) = tokio::sync::mpsc::channel(2);
+    sender
+        .send(AiControlMessage::CancelWithSource {
+            source: AiCancellationSource::AppHidden,
+        })
+        .await
+        .unwrap();
+    let (mut context, _) = context(policy(), true, Some(&mut receiver));
+    let error = context
+        .wait::<()>(std::future::pending())
+        .await
+        .unwrap_err();
+    assert_eq!(error.code, "ai:cancelled");
+    assert_eq!(error.args["cancelSource"], "appHidden");
 }
 
 #[tokio::test(start_paused = true)]

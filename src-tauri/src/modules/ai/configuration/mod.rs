@@ -16,3 +16,7 @@ mod selection;
 pub(crate) mod testing;
 mod transaction;
 pub(super) mod validation;
+
+#[cfg(test)]
+#[path = "retirement_tests.rs"]
+mod retirement_tests;

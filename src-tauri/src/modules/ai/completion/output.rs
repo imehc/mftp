@@ -208,11 +208,8 @@ impl<'a> AiOutput<'a> {
             return Err(AiProviderErrorCode::NoText.error());
         }
         if self.policy != AiOutputPolicy::Text {
-            let value: serde_json::Value = serde_json::from_str(&text)
+            let _: serde_json::Value = serde_json::from_str(&text)
                 .map_err(|_| AiProviderErrorCode::OutputInvalid.error())?;
-            if self.policy == AiOutputPolicy::GameMove && !value.is_object() {
-                return Err(AiProviderErrorCode::OutputInvalid.error());
-            }
         }
         Ok(AiCompletionResult {
             text,

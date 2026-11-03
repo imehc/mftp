@@ -176,6 +176,10 @@ export function executionLogStream(
         describeError(operation.error, localize),
         `${operation.error.kind} · ${operation.error.code}`,
         operation.error.message,
+        // 后端日志已脱敏的结构化参数保留在诊断正文，便于定位取消来源与超时阶段。
+        ...(Object.keys(operation.error.args).length
+          ? [JSON.stringify(operation.error.args)]
+          : []),
       ]
         .filter((line, index, lines) => lines.indexOf(line) === index)
         .join("\n"),

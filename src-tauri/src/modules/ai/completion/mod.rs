@@ -14,8 +14,8 @@ pub(crate) use emitter::AiEmitter;
 pub use errors::AiProviderErrorCode;
 pub use events::{AiContentBlock, AiReasoningKind, AiStreamEvent, AiStreamEventPayload};
 pub use model::{
-    AiCompletionDiagnostics, AiFinishReason, AiObservedPhase, AiOutputPolicy, AiReasoningEffort,
-    AiRunOutcome, AiTimeoutStage, AiUsage,
+    AiCancellationSource, AiCompletionDiagnostics, AiFinishReason, AiObservedPhase, AiOutputPolicy,
+    AiReasoningEffort, AiRunOutcome, AiTimeoutStage, AiUsage,
 };
 pub(crate) use output::{AiCompletionResult, AiOutput};
 pub use request::{

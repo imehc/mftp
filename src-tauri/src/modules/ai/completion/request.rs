@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{AiOutputPolicy, AiProviderErrorCode, AiReasoningEffort};
+use super::{AiCancellationSource, AiOutputPolicy, AiProviderErrorCode, AiReasoningEffort};
 use crate::error::AppResult;
 use crate::modules::ai::AiProtocol;
 
@@ -164,5 +164,6 @@ impl<'a> AiCompletionRequest<'a> {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum AiControlMessage {
     Cancel,
+    CancelWithSource { source: AiCancellationSource },
     Extend { additional_ms: u32 },
 }

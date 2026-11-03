@@ -2,33 +2,6 @@ use super::management::{create, key_save, model_save};
 use super::*;
 use crate::modules::ai::configuration::{input::*, model::*};
 
-fn target(view: &AiConfigurationView, id: &str) -> AiProviderTargetInput {
-    AiProviderTargetInput {
-        expected_revision: view.revision,
-        provider_id: id.into(),
-    }
-}
-fn switch(view: &AiConfigurationView, provider: &str, model: &str) -> AiModelSwitchInput {
-    AiModelSwitchInput {
-        expected_revision: view.revision,
-        expected_active_provider_id: provider.into(),
-        model_id: model.into(),
-    }
-}
-fn options(
-    view: &AiConfigurationView,
-    provider: &str,
-    key: &str,
-    model: &str,
-) -> AiProviderSelectionInput {
-    AiProviderSelectionInput {
-        expected_revision: view.revision,
-        provider_id: provider.into(),
-        current_key_id: key.into(),
-        current_model_id: model.into(),
-    }
-}
-
 #[tokio::test]
 async fn a_b_a_restores_each_choice_and_global_streaming_survives_reopen() {
     let f = Fixture::new();
@@ -440,4 +413,33 @@ async fn selection_waits_for_pending_credential_read_without_mixing_snapshot() {
     let snapshot = f.service.request_snapshot().await.unwrap();
     assert!(snapshot.config.base_url.contains("b.example.com"));
     assert_eq!(snapshot.api_key, "private-secret-b");
+}
+
+fn target(view: &AiConfigurationView, id: &str) -> AiProviderTargetInput {
+    AiProviderTargetInput {
+        expected_revision: view.revision,
+        provider_id: id.into(),
+    }
+}
+
+fn switch(view: &AiConfigurationView, provider: &str, model: &str) -> AiModelSwitchInput {
+    AiModelSwitchInput {
+        expected_revision: view.revision,
+        expected_active_provider_id: provider.into(),
+        model_id: model.into(),
+    }
+}
+
+fn options(
+    view: &AiConfigurationView,
+    provider: &str,
+    key: &str,
+    model: &str,
+) -> AiProviderSelectionInput {
+    AiProviderSelectionInput {
+        expected_revision: view.revision,
+        provider_id: provider.into(),
+        current_key_id: key.into(),
+        current_model_id: model.into(),
+    }
 }

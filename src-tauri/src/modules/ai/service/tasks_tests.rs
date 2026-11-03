@@ -96,3 +96,33 @@ fn duplicate_control_registration_is_rejected_and_released_on_drop() {
     drop(control);
     assert!(manager.control(id).is_ok());
 }
+
+#[tokio::test]
+async fn duplicate_control_keeps_the_original_receiver_reachable() {
+    let manager = Arc::new(AiTaskManager::new(Arc::new(Operations::default())));
+    let mut control = manager.control("original").unwrap();
+    assert!(manager.control("original").is_err());
+    assert!(manager.cancel("original"));
+    assert!(matches!(
+        control.receiver().recv().await,
+        Some(AiControlMessage::Cancel)
+    ));
+}
+
+#[test]
+fn shutdown_cancels_controls_but_keeps_admission_until_workers_exit() {
+    let operations = Arc::new(Operations::default());
+    let manager = Arc::new(AiTaskManager::new(operations.clone()));
+    let task = manager.begin("poem:literal".into()).unwrap();
+    let mut control = manager.control("request").unwrap();
+    manager.shutdown();
+    assert!(matches!(
+        control.receiver().try_recv(),
+        Ok(AiControlMessage::Cancel)
+    ));
+    assert!(!operations.wait_idle(Duration::ZERO));
+    assert!(manager.begin("other".into()).is_err());
+    drop(control);
+    drop(task);
+    assert!(operations.wait_idle(Duration::ZERO));
+}

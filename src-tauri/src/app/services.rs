@@ -158,6 +158,12 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
     #[cfg(desktop)]
     mcp.attach(storage.clone(), diagnostics.clone(), executor.clone())?;
     let ai_credentials = Arc::new(AiKeychain::install(app));
+    let ai_tasks = lifecycle.install(
+        participants::AI,
+        Arc::new(AiTaskManager::new(operations.clone())),
+        AiTaskManager::shutdown,
+        |tasks: &AiTaskManager| Ok(tasks.is_busy()),
+    );
     let ai_configuration = AiConfigurationService::new(
         AiRepository::new(storage.clone()),
         ai_credentials.clone(),
@@ -195,7 +201,7 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         game_room,
         poetry,
         speech: Arc::new(crate::modules::speech::SpeechService::default()),
-        ai_tasks: Arc::new(AiTaskManager::new(operations)),
+        ai_tasks,
         lifecycle: Arc::new(lifecycle),
     };
     // The LAN runtime and its listeners are desktop-only.

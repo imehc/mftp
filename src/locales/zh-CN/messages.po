@@ -10213,3 +10213,13 @@ msgstr "默认目录"
 #: src/features/settings/font-options.ts:14
 msgid "龙藏体"
 msgstr "龙藏体"
+
+
+#. 阻止数据清理或退出排空的在途 AI 任务名称。
+#: src/lib/errors/messages.ts:259
+msgid "AI 请求"
+msgstr "AI 请求"
+
+#: src/lib/errors/messages.ts:199
+msgid "AI 请求过多，请等待现有任务结束后重试"
+msgstr "AI 请求过多，请等待现有任务结束后重试"

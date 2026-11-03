@@ -126,6 +126,22 @@ describe("终端协议流投影", () => {
     expect(executionLogStreamText(blocks)).not.toContain("RESPONSE");
   });
 
+  it("应用错误正文保留结构化取消来源和耗时，复制日志即可定位", () => {
+    const blocks = stream({
+      error: {
+        kind: "external",
+        code: "ai:cancelled",
+        message: "AI request was cancelled",
+        args: { cancelSource: "appHidden", elapsedMs: "4209" },
+      },
+    });
+    expect(blocks[0].kind).toBe("appError");
+    expect(executionLogStreamText(blocks)).toContain(
+      '"cancelSource":"appHidden"',
+    );
+    expect(executionLogStreamText(blocks)).toContain('"elapsedMs":"4209"');
+  });
+
   it("未采集文件载荷只保留采集状态，字节统计不进入默认流", () => {
     const blocks = stream({
       details: [
