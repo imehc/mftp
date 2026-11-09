@@ -126,7 +126,7 @@
     "@lingui/vite-plugin": "^6.11.0",
     "@rolldown/plugin-babel": "^0.2.4",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.4",
     "@tanstack/router-cli": "^1.167.46",
     "@tanstack/router-plugin": "^1.168.48",
     "@tauri-apps/cli": "^2",
