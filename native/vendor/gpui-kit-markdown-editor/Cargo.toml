@@ -1,0 +1,19 @@
+[package]
+name = "gpui-kit-markdown-editor"
+version = "0.2.0"
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/wabzqem/gpui-kit-markdown-editor"
+publish = false
+
+[lib]
+name = "markdown_editor"
+doctest = false
+
+[features]
+test-support = ["gpui-kit/test-support"]
+
+[dependencies]
+gpui-kit = { version = "=0.9.1", default-features = false, features = ["component", "assets"] }
+markdown = "=1.0.0"
+unicode-segmentation = "1.12"

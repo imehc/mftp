@@ -1,0 +1,17 @@
+[workspace]
+members = ["native", "crates/mftp-foundation", "crates/mftp-todo", "crates/mftp-image"]
+default-members = ["native"]
+exclude = ["src-tauri", "native/vendor/gpui-kit-markdown-editor"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+
+[workspace.lints.clippy]
+dbg_macro = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+
+[profile.release]
+strip = true

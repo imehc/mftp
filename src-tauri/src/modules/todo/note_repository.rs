@@ -229,6 +229,7 @@ impl TodoRepository {
         )?;
         let details = details_in(&tx, &id)?;
         tx.commit()?;
+        drop(conn);
         self.notify_changed(&details.item.id);
         Ok(details)
     }

@@ -30,6 +30,9 @@ specta-typescript = "=0.0.11"
 rmcp = { version = "=3.6.0", default-features = false, features = ["server", "client", "base64", "transport-streamable-http-client-reqwest"] }
 
 [dependencies]
+mftp-image = { path = "../crates/mftp-image" }
+mftp-foundation = { path = "../crates/mftp-foundation", features = ["specta", "sqlite", "json", "ssh", "http", "walkdir", "tauri"] }
+mftp-todo = { path = "../crates/mftp-todo", features = ["specta"] }
 mftp-translation-engine = { path = "native/translation" }
 tauri = { version = "2", features = ["protocol-asset", "image-png"] }
 tauri-plugin-opener = "2"
@@ -72,6 +75,7 @@ zeroize = "1.9"
 
 # Desktop-only plugins: updater, autostart and window-state have no mobile support.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+mftp-todo = { path = "../crates/mftp-todo", features = ["schemars"] }
 arboard = { version = "3.7", default-features = false, features = ["image-data"] }
 rmcp = { version = "=3.6.0", default-features = false, features = ["server", "base64", "transport-streamable-http-server"] }
 axum = { version = "0.8", default-features = false, features = ["http1", "tokio"] }

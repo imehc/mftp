@@ -119,6 +119,7 @@ impl TodoRepository {
         )?;
         let item = details_in(&transaction, &input.id)?.item;
         transaction.commit()?;
+        drop(connection);
         self.notify_changed(&input.id);
         Ok(item)
     }

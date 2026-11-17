@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "specta")]
 use specta::Type;
 
 // Keep wire names and diagnostics together so adding a code cannot omit either.
 macro_rules! custom_codes {
     ($($variant:ident => ($code:literal, $message:literal)),* $(,)?) => {
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+        #[cfg_attr(feature = "specta", derive(Type))]
         pub enum CustomErrorCode {
             $(#[serde(rename = $code)] $variant),*
         }

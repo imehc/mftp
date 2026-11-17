@@ -49,8 +49,8 @@ pub(super) fn insert_image(
 ) -> AppResult<()> {
     conn.execute("INSERT INTO todo_note_images(id,item_id,draft_id,mime_type,width,height,data,thumbnail_mime,thumbnail_width,thumbnail_height,thumbnail)
         VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)",
-        params![id, item_id, draft_id, prepared.image.format.to_mime_type(), prepared.image.width, prepared.image.height,
-            prepared.image.bytes, prepared.thumbnail.format.to_mime_type(), prepared.thumbnail.width, prepared.thumbnail.height, prepared.thumbnail.bytes])?;
+        params![id, item_id, draft_id, prepared.image().format().to_mime_type(), prepared.image().width(), prepared.image().height(),
+            prepared.image().bytes(), prepared.thumbnail().format().to_mime_type(), prepared.thumbnail().width(), prepared.thumbnail().height(), prepared.thumbnail().bytes()])?;
     Ok(())
 }
 
@@ -82,7 +82,7 @@ impl TodoRepository {
         tx.commit()?;
         Ok(TodoNoteImageImport {
             image,
-            compressed: prepared.compressed,
+            compressed: prepared.is_compressed(),
         })
     }
 

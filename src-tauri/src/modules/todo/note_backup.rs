@@ -170,7 +170,7 @@ pub(crate) fn import(conn: &Connection, value: &Value, mode: ImportMode) -> AppR
                 return Err(invalid());
             }
             let image_data = prepare_image(&bytes)?;
-            if image_data.image.bytes != bytes {
+            if image_data.image().bytes() != bytes {
                 return Err(invalid());
             }
             prepared.insert(image.id.clone(), image_data);

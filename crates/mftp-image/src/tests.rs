@@ -1,3 +1,4 @@
+#![expect(clippy::unwrap_used, reason = "Isolated codec fixtures.")]
 use super::*;
 use image::ImageEncoder;
 use std::cell::Cell;
@@ -34,7 +35,7 @@ fn noise(width: u32, height: u32, transparent: bool) -> DynamicImage {
     }))
 }
 
-fn assert_budget(result: &PreparedNoteImage) {
+fn assert_budget(result: &PreparedImage) {
     assert!(result.image.bytes.len() <= MAX_IMAGE_BYTES);
     assert!(result.thumbnail.bytes.len() <= MAX_THUMBNAIL_BYTES);
     assert!(result.thumbnail.width <= 256);
@@ -52,7 +53,7 @@ fn keeps_valid_images_at_or_below_exact_decimal_threshold() {
     for length in [499_999, 500_000] {
         let mut input = png(&solid(32, 16));
         input.resize(length, 0);
-        let output = prepare_note_image(&input, || false).unwrap();
+        let output = prepare_image(&input, || false).unwrap();
         assert_eq!(output.image.bytes, input);
         assert_eq!(output.image.format, ImageFormat::Png);
         assert!(!output.compressed);
@@ -64,7 +65,7 @@ fn keeps_valid_images_at_or_below_exact_decimal_threshold() {
 fn compresses_valid_image_one_byte_over_threshold() {
     let mut input = png(&solid(32, 16));
     input.resize(500_001, 0);
-    let output = prepare_note_image(&input, || false).unwrap();
+    let output = prepare_image(&input, || false).unwrap();
     assert!(output.compressed);
     assert!(output.image.bytes.len() < input.len());
     assert_eq!((output.image.width, output.image.height), (32, 16));
@@ -77,7 +78,7 @@ fn reduces_large_opaque_image_without_modifying_input() {
     let original = input.clone();
     assert!(input.len() > MAX_IMAGE_BYTES);
     let start = Instant::now();
-    let output = prepare_note_image(&input, || false).unwrap();
+    let output = prepare_image(&input, || false).unwrap();
     println!(
         "opaque: {} -> {} bytes, {}x{}, {:?}",
         input.len(),
@@ -96,7 +97,7 @@ fn reduces_large_opaque_image_without_modifying_input() {
 fn preserves_transparency_when_multiple_resize_steps_are_needed() {
     let input = png(&noise(1_024, 768, true));
     let start = Instant::now();
-    let output = prepare_note_image(&input, || false).unwrap();
+    let output = prepare_image(&input, || false).unwrap();
     println!(
         "transparent: {} -> {} bytes, {}x{}, {:?}",
         input.len(),
@@ -117,19 +118,19 @@ fn preserves_transparency_when_multiple_resize_steps_are_needed() {
 #[test]
 fn rejects_input_and_pixel_bombs_even_if_file_is_small() {
     assert!(matches!(
-        prepare_note_image(&vec![0; MAX_INPUT_BYTES + 1], || false),
-        Err(NoteImageError::InputTooLarge)
+        prepare_image(&vec![0; MAX_INPUT_BYTES + 1], || false),
+        Err(PrepareImageError::InputTooLarge)
     ));
     let input = png(&solid(4_000, 3_001));
     assert!(input.len() < MAX_IMAGE_BYTES);
     assert!(matches!(
-        prepare_note_image(&input, || false),
-        Err(NoteImageError::PixelLimit)
+        prepare_image(&input, || false),
+        Err(PrepareImageError::PixelLimit)
     ));
     let input = png(&solid(MAX_EDGE + 1, 1));
     assert!(matches!(
-        prepare_note_image(&input, || false),
-        Err(NoteImageError::EdgeLimit)
+        prepare_image(&input, || false),
+        Err(PrepareImageError::EdgeLimit)
     ));
 }
 
@@ -142,15 +143,15 @@ fn rejects_svg_gif_and_corrupt_input() {
         b"".as_slice(),
     ] {
         assert!(matches!(
-            prepare_note_image(input, || false),
-            Err(NoteImageError::UnsupportedFormat)
+            prepare_image(input, || false),
+            Err(PrepareImageError::UnsupportedFormat)
         ));
     }
     let mut input = png(&solid(16, 16));
     input.truncate(input.len() / 2);
-    let error = prepare_note_image(&input, || false).unwrap_err();
-    assert!(matches!(error, NoteImageError::Codec(_)));
-    if let NoteImageError::Codec(source) = error {
+    let error = prepare_image(&input, || false).unwrap_err();
+    assert!(matches!(error, PrepareImageError::Codec(_)));
+    if let PrepareImageError::Codec(source) = error {
         assert!(!source.to_string().is_empty());
     }
 }
@@ -158,17 +159,17 @@ fn rejects_svg_gif_and_corrupt_input() {
 #[test]
 fn honours_cancellation_before_and_after_codec_work() {
     assert!(matches!(
-        prepare_note_image(&[], || true),
-        Err(NoteImageError::Cancelled)
+        prepare_image(&[], || true),
+        Err(PrepareImageError::Cancelled)
     ));
     let input = png(&noise(512, 512, false));
     for stop_at in [2, 3, 4, 5] {
         let calls = Cell::new(0);
-        let result = prepare_note_image(&input, || {
+        let result = prepare_image(&input, || {
             calls.set(calls.get() + 1);
             calls.get() >= stop_at
         });
-        assert!(matches!(result, Err(NoteImageError::Cancelled)));
+        assert!(matches!(result, Err(PrepareImageError::Cancelled)));
     }
 }
 
@@ -179,9 +180,11 @@ fn bounded_encoder_never_keeps_over_budget_bytes() {
     assert!(buffer.write_all(&[3, 4]).is_err());
     assert_eq!(buffer.bytes, vec![1, 2]);
     assert!(buffer.exceeded);
-    assert!(encode(&solid(32, 32), ImageFormat::Jpeg, 90, 1)
-        .unwrap()
-        .is_none());
+    assert!(
+        encode(&solid(32, 32), ImageFormat::Jpeg, 90, 1)
+            .unwrap()
+            .is_none()
+    );
 }
 
 #[test]
@@ -196,8 +199,8 @@ fn rejects_animated_png_instead_of_silently_taking_first_frame() {
         writer.write_image_data(&[0, 0, 255, 255]).unwrap();
     }
     assert!(matches!(
-        prepare_note_image(&bytes, || false),
-        Err(NoteImageError::AnimatedImage)
+        prepare_image(&bytes, || false),
+        Err(PrepareImageError::AnimatedImage)
     ));
 }
 
@@ -226,12 +229,14 @@ fn rejects_animated_webp_instead_of_silently_taking_first_frame() {
     let mut bytes = b"RIFF".to_vec();
     bytes.extend_from_slice(&(payload.len() as u32).to_le_bytes());
     bytes.extend(payload);
-    assert!(WebPDecoder::new(Cursor::new(&bytes))
-        .unwrap()
-        .has_animation());
+    assert!(
+        WebPDecoder::new(Cursor::new(&bytes))
+            .unwrap()
+            .has_animation()
+    );
     assert!(matches!(
-        prepare_note_image(&bytes, || false),
-        Err(NoteImageError::AnimatedImage)
+        prepare_image(&bytes, || false),
+        Err(PrepareImageError::AnimatedImage)
     ));
 }
 
@@ -244,7 +249,7 @@ fn applies_jpeg_orientation_to_thumbnail_and_compressed_image() {
     let mut encoder = JpegEncoder::new_with_quality(&mut input, 90);
     encoder.set_exif_metadata(exif).unwrap();
     encoder.encode_image(&solid(30, 20)).unwrap();
-    let prepared = prepare_note_image(&input, || false).unwrap();
+    let prepared = prepare_image(&input, || false).unwrap();
     assert_eq!((prepared.image.width, prepared.image.height), (20, 30));
     assert_eq!(prepared.image.bytes, input);
     assert_eq!(
@@ -252,7 +257,7 @@ fn applies_jpeg_orientation_to_thumbnail_and_compressed_image() {
         (20, 30)
     );
     input.resize(MAX_IMAGE_BYTES + 1, 0);
-    let prepared = prepare_note_image(&input, || false).unwrap();
+    let prepared = prepare_image(&input, || false).unwrap();
     assert_eq!((prepared.image.width, prepared.image.height), (20, 30));
     assert_budget(&prepared);
     let mut decoder = ImageReader::new(Cursor::new(&prepared.image.bytes))

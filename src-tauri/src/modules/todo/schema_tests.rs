@@ -1,5 +1,5 @@
-use super::*;
 use crate::storage::Storage;
+use rusqlite::Connection;
 
 #[test]
 fn legacy_todo_migration_is_idempotent_and_reset_keeps_version_after_reopen() {
