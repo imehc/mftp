@@ -1,0 +1,135 @@
+_version: 1
+app:
+  quit: 退出 MFTP Native
+settings:
+  # 应用偏好设置页标题及导航入口。
+  title: 设置
+  # 使用操作系统偏好，同时用于语言与外观选项。
+  system: 跟随系统
+  language: 语言
+  appearance: 外观
+  light: 浅色
+  dark: 深色
+languages:
+  # 语言选项始终显示自名，不随当前界面语言变化。
+  chinese: 简体中文
+  english: English
+todo:
+  # Compact note summary and accessible label for a task's first thumbnail.
+  image_count_one: "1 张图片"
+  image_count: "%{count} 张图片"
+  priority_high_label: 高优先级
+  priority_medium_label: 中优先级
+  priority_low_label: 低优先级
+  overdue: 逾期
+  abandoned: 已废弃
+  abandon: 废弃
+  category: 分类
+  category_options: 已有分类
+  priority: 优先级
+  priority_high: 高
+  priority_medium: 中
+  priority_low: 低
+  no_priority: 无
+  all_priorities: 全部优先级
+  all_categories: 全部分类
+  planned: 计划时间
+  no_date: 选择日期
+  specify_time: 时刻
+  unscheduled: 未安排
+  untracked: 时间未记录
+  state: 状态
+  created_at: 创建时间
+  updated_at: 更新时间
+  completed_at: 完成时间
+  abandoned_at: 废弃时间
+  empty_overdue: 暂无逾期任务
+  empty_abandoned: 暂无已废弃任务
+  # 待办单行标题输入字段的可见标签与可访问名称。
+  title: 任务标题
+  # Commands, destinations and decisions in the native todo workspace.
+  active: 进行中
+  completed: 已完成
+  new: 新建任务
+  new_title: 新建任务
+  edit_title: 编辑任务
+  search: 搜索任务
+  notes: 备注
+  create: 创建
+  save: 保存
+  cancel: 取消
+  close_editor: 关闭编辑
+  complete: 完成任务
+  restore: 恢复任务
+  more: 任务操作
+  edit: 编辑
+  delete: 删除
+  delete_title: 删除任务？
+  delete_body: 任务及其备注将被永久删除。
+  unsaved_title: 保存更改？
+  unsaved_body: 是否保存本次更改？
+  save_changes: 保存更改
+  details: 任务详情
+  info: 任务信息
+  keep_editing: 继续编辑
+  discard: 放弃修改
+  loading: 正在读取任务
+  retry: 重试
+  no_results: 没有匹配的任务
+  empty_active: 暂无未完成任务
+  empty_completed: 暂无已完成任务
+  clear_search: 清除搜索
+  add_notes: 添加备注
+errors:
+  due_date_invalid: 请选择有效的计划日期。
+  due_time_invalid: 计划时刻无效，请检查日期与本地时间。
+  # Recoverable errors preserve task input and never trigger an automatic write retry.
+  title_required: 请输入任务标题。
+  conflict: 任务已发生变化。草稿已保留，请关闭后重新打开任务以核对最新内容。
+  not_found: 该任务已不存在，草稿已保留。
+  queue_busy: 其他操作仍在执行，请稍后重试。
+  permission: 无法访问数据，请检查数据目录的权限。
+  state_invalid: 无法读取已保存的偏好或草稿，原数据已保留。
+  operation: 无法完成操作，请重试。
+  startup: 存储不可用。请检查数据目录后重新启动应用，原数据已保留。
+  persistence: 无法保存偏好或草稿，请保持窗口打开并重试。
+rich_text:
+  # Context menu commands copy original image bytes, rather than the preview.
+  copy_image: "复制图片"
+  copy_image_number: "复制第 %{number} 张图片"
+  # Reusable native editor formatting commands and local recovery messages.
+  bold: "粗体"
+  italic: "斜体"
+  format: "更多格式"
+  # 正文可见字符簇数量；不含空白、格式标记和图片。
+  character_count: "%{count} 字"
+  paragraph: "正文"
+  heading: "标题"
+  bullets: "无序列表"
+  numbered: "有序列表"
+  quote: "引用"
+  code_block: "代码块"
+  strike: "删除线"
+  inline_code: "行内代码"
+  undo: "撤销"
+  redo: "重做"
+  link: "链接"
+  url: "链接地址"
+  url_invalid: "请输入不包含认证信息的 http、https 或 mailto 地址。"
+  invalid: "备注过大或包含不支持的内容。草稿已保留。"
+  image_unavailable: "暂时无法插入此图片。备注已保留。"
+  image: "图片"
+  insert_image: "插入图片…"
+  image_processing: "正在处理图片…"
+  image_retry: "重试"
+  image_remove: "移除"
+  image_input_too_large: "图片超过 20 MB，请选择较小的图片。"
+  image_dimensions: "图片超过 1200 万像素或单边 8192，请缩小后重试。"
+  image_unsupported: "支持静态 PNG、JPEG 和 WebP 图片。"
+  image_limit: "图片数量或暂存容量已达上限，请移除图片或保存后重试。"
+  image_output_too_large: "图片压缩后仍过大，请缩小后重试。"
+  image_one_at_a_time: "请等当前图片处理完成后再插入。"
+  image_missing: "图片尚未就绪，请重试或移除后保存。"
+  image_rejected: "图片未能导入，请移除后继续。"
+  image_failed: "无法处理图片，请重试或移除。"
+  image_position: "插入位置已变化，请点击正文后重试。"

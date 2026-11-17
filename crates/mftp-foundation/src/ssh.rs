@@ -1,7 +1,7 @@
 use super::AppError;
 
 impl AppError {
-    pub(crate) fn from_ssh(error: &ssh2::Error) -> Self {
+    pub fn from_ssh(error: &ssh2::Error) -> Self {
         let (code, source, number) = match error.code() {
             // libssh2 numeric transport/authentication constants, not message text.
             ssh2::ErrorCode::Session(number) => (
@@ -30,11 +30,11 @@ impl AppError {
             .with_arg("sourceCode", number)
     }
 
-    pub(crate) fn ssh_invalid_response(diagnostic: &'static str) -> Self {
+    pub fn ssh_invalid_response(diagnostic: &'static str) -> Self {
         Self::external("ssh:invalid_response", diagnostic)
     }
 
-    pub(crate) fn ssh_remote_exit(exit_code: i32, diagnostic: &str) -> Self {
+    pub fn ssh_remote_exit(exit_code: i32, diagnostic: &str) -> Self {
         // Keep the remote tool's diagnostic, never attach the executed command
         // or authentication inputs. Bound untrusted output on the IPC boundary.
         let diagnostic: String = diagnostic.trim().chars().take(4096).collect();
@@ -55,7 +55,3 @@ impl From<ssh2::Error> for AppError {
         Self::from_ssh(&error)
     }
 }
-
-#[cfg(test)]
-#[path = "ssh_tests.rs"]
-mod tests;

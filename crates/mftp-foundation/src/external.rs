@@ -7,7 +7,7 @@ impl From<std::io::Error> for AppError {
 }
 
 impl AppError {
-    pub(crate) fn from_io(error: &std::io::Error) -> Self {
+    pub fn from_io(error: &std::io::Error) -> Self {
         // IO-based libraries may wrap an application error as a source. Restore
         // its payload before classifying IO, including through nested wrappers.
         let mut source = error
@@ -19,6 +19,7 @@ impl AppError {
             if let Some(app_error) = current.downcast_ref::<AppError>() {
                 return app_error.clone();
             }
+            #[cfg(feature = "ssh")]
             if let Some(ssh_error) = current.downcast_ref::<ssh2::Error>() {
                 return Self::from_ssh(ssh_error);
             }
@@ -58,6 +59,7 @@ impl AppError {
     }
 }
 
+#[cfg(feature = "walkdir")]
 impl From<walkdir::Error> for AppError {
     fn from(error: walkdir::Error) -> Self {
         let converted = match error.io_error() {
@@ -71,6 +73,7 @@ impl From<walkdir::Error> for AppError {
     }
 }
 
+#[cfg(feature = "json")]
 impl From<serde_json::Error> for AppError {
     fn from(error: serde_json::Error) -> Self {
         // Deserializer diagnostics can echo untrusted values. Keep location and
@@ -87,15 +90,16 @@ impl From<serde_json::Error> for AppError {
     }
 }
 
+#[cfg(feature = "sqlite")]
 impl From<rusqlite::Error> for AppError {
     fn from(error: rusqlite::Error) -> Self {
         // Row mappers wrap already-classified domain errors in
         // ToSqlConversionFailure; restore the payload instead of flattening it
         // into the generic database diagnostic below.
-        if let rusqlite::Error::ToSqlConversionFailure(inner) = &error {
-            if let Some(app_error) = inner.downcast_ref::<AppError>() {
-                return app_error.clone();
-            }
+        if let rusqlite::Error::ToSqlConversionFailure(inner) = &error
+            && let Some(app_error) = inner.downcast_ref::<AppError>()
+        {
+            return app_error.clone();
         }
         // SQLite diagnostics may embed SQL or values; retain numeric diagnostics.
         match error {
@@ -111,6 +115,7 @@ impl From<rusqlite::Error> for AppError {
     }
 }
 
+#[cfg(feature = "http")]
 impl From<reqwest::Error> for AppError {
     fn from(error: reqwest::Error) -> Self {
         // Even source chains can contain credentials and query tokens. Do not
@@ -136,33 +141,5 @@ impl From<reqwest::Error> for AppError {
             converted = converted.with_arg("status", status.as_u16());
         }
         converted
-    }
-}
-
-impl From<tauri::Error> for AppError {
-    fn from(error: tauri::Error) -> Self {
-        match error {
-            tauri::Error::Io(error) => error.into(),
-            tauri::Error::Json(error) => error.into(),
-            tauri::Error::JoinError(error) if error.is_cancelled() => {
-                Self::external("task:cancelled", "Background task was cancelled")
-            }
-            // Panic payloads can contain secrets. The runtime owns diagnostic logs.
-            tauri::Error::JoinError(_) => {
-                Self::external("task:panicked", "Background task panicked")
-            }
-            _ => Self::external("runtime:operation", "Runtime operation failed"),
-        }
-    }
-}
-
-impl From<tauri_plugin_opener::Error> for AppError {
-    fn from(error: tauri_plugin_opener::Error) -> Self {
-        match error {
-            tauri_plugin_opener::Error::Io(error) => error.into(),
-            tauri_plugin_opener::Error::Json(error) => error.into(),
-            tauri_plugin_opener::Error::Tauri(error) => error.into(),
-            error => Self::external("opener:open", error.to_string()),
-        }
     }
 }

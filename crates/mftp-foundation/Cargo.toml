@@ -1,0 +1,29 @@
+[package]
+name = "mftp-foundation"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[features]
+default = []
+specta = ["dep:specta"]
+json = ["dep:serde_json"]
+sqlite = ["dep:rusqlite"]
+ssh = ["dep:ssh2"]
+http = ["dep:reqwest"]
+walkdir = ["dep:walkdir"]
+tauri = ["dep:tauri", "dep:tauri-plugin-opener", "json"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+specta = { version = "=2.0.0-rc.24", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+rusqlite = { version = "=0.40.2", features = ["bundled"], optional = true }
+ssh2 = { version = "0.9", features = ["vendored-openssl"], optional = true }
+reqwest = { version = "0.13", default-features = false, optional = true }
+walkdir = { version = "2", optional = true }
+tauri = { version = "2", default-features = false, optional = true }
+tauri-plugin-opener = { version = "2", optional = true }
+
+[lints]
+workspace = true

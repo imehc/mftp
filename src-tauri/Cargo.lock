@@ -711,8 +711,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aa79e62e7697b8e29b513a68abacf485adcd1fe8284a4316c5ae868e6633327"
 dependencies = [
  "iana-time-zone",
+ "js-sys",
  "num-traits",
  "serde",
+ "wasm-bindgen",
  "windows-link",
 ]
 
@@ -2850,6 +2852,9 @@ dependencies = [
  "keyring",
  "local-ip-address",
  "mdns-sd",
+ "mftp-foundation",
+ "mftp-image",
+ "mftp-todo",
  "mftp-translation-engine",
  "objc2",
  "objc2-avf-audio",
@@ -2893,6 +2898,41 @@ dependencies = [
  "walkdir",
  "whoami",
  "zeroize",
+]
+
+[[package]]
+name = "mftp-foundation"
+version = "0.1.0"
+dependencies = [
+ "reqwest",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "specta",
+ "ssh2",
+ "tauri",
+ "tauri-plugin-opener",
+ "walkdir",
+]
+
+[[package]]
+name = "mftp-image"
+version = "0.1.0"
+dependencies = [
+ "image",
+]
+
+[[package]]
+name = "mftp-todo"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "mftp-foundation",
+ "rusqlite",
+ "schemars 1.2.1",
+ "serde",
+ "specta",
+ "uuid",
 ]
 
 [[package]]

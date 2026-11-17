@@ -1,11 +1,11 @@
 use crate::error::{AppError, AppResult};
 use crate::modules::hosts::model::{auth_type_to_db, Host};
 use crate::modules::keys::model::SshKey;
+pub use mftp_foundation::time::now_ms;
 use rusqlite::{params, Connection, OptionalExtension};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::{atomic::AtomicBool, Arc};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 const DB_FILE: &str = "mftp.sqlite3";
 pub(crate) mod activity;
@@ -26,13 +26,6 @@ pub struct Storage {
     root: PathBuf,
     db_path: PathBuf,
     reset_pending: Arc<AtomicBool>,
-}
-
-pub fn now_ms() -> i64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0)
 }
 
 impl Storage {

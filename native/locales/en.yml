@@ -1,0 +1,135 @@
+_version: 1
+app:
+  quit: Quit MFTP Native
+settings:
+  # Page title and navigation entry for application preferences.
+  title: Settings
+  # The operating system preference; used for both language and appearance.
+  system: Follow system
+  language: Language
+  appearance: Appearance
+  light: Light
+  dark: Dark
+languages:
+  # Language options always use their own names, including in other locales.
+  chinese: 简体中文
+  english: English
+todo:
+  # Compact note summary and accessible label for a task's first thumbnail.
+  image_count_one: "1 image"
+  image_count: "%{count} images"
+  priority_high_label: High priority
+  priority_medium_label: Medium priority
+  priority_low_label: Low priority
+  overdue: Overdue
+  abandoned: Abandoned
+  abandon: Abandon
+  category: Category
+  category_options: Existing categories
+  priority: Priority
+  priority_high: High
+  priority_medium: Medium
+  priority_low: Low
+  no_priority: None
+  all_priorities: All priorities
+  all_categories: All categories
+  planned: Scheduled
+  no_date: Select date
+  specify_time: Set time
+  unscheduled: Unscheduled
+  untracked: Time not recorded
+  state: State
+  created_at: Created
+  updated_at: Updated
+  completed_at: Completed
+  abandoned_at: Abandoned
+  empty_overdue: No overdue tasks
+  empty_abandoned: No abandoned tasks
+  # Accessible and visible label of the single-line task title field.
+  title: Task title
+  # Commands, destinations and decisions in the native todo workspace.
+  active: Active
+  completed: Completed
+  new: New task
+  new_title: New task
+  edit_title: Edit task
+  search: Search tasks
+  notes: Notes
+  create: Create
+  save: Save
+  cancel: Cancel
+  close_editor: Close editor
+  complete: Complete task
+  restore: Restore task
+  more: Task actions
+  edit: Edit
+  delete: Delete
+  delete_title: Delete task?
+  delete_body: The task and its notes will be permanently deleted.
+  unsaved_title: Save changes?
+  unsaved_body: Save these changes before leaving?
+  save_changes: Save changes
+  details: Task details
+  info: Task information
+  keep_editing: Keep editing
+  discard: Discard changes
+  loading: Loading tasks
+  retry: Retry
+  no_results: No matching tasks
+  empty_active: No active tasks
+  empty_completed: No completed tasks
+  clear_search: Clear search
+  add_notes: Add notes
+errors:
+  due_date_invalid: Select a valid scheduled date.
+  due_time_invalid: The scheduled time is invalid. Check the date and local time.
+  # Recoverable errors preserve task input and never trigger an automatic write retry.
+  title_required: Enter a task title.
+  conflict: The task has changed. Your draft is retained; close it and reopen the task to review the latest version.
+  not_found: This task no longer exists. Your draft is retained.
+  queue_busy: Another operation is still running. Try again shortly.
+  permission: Access was denied. Check the data folder permissions.
+  state_invalid: Stored preferences or draft could not be read. The original data has been preserved.
+  operation: The operation could not be completed. Try again.
+  startup: Storage is unavailable. Check the data folder and restart the application. Existing data has been preserved.
+  persistence: Preferences or draft could not be saved. Keep this window open and retry.
+rich_text:
+  # Context menu commands copy original image bytes, rather than the preview.
+  copy_image: "Copy image"
+  copy_image_number: "Copy image %{number}"
+  # Reusable native editor formatting commands and local recovery messages.
+  bold: "Bold"
+  italic: "Italic"
+  format: "More formatting"
+  # Visible text graphemes, excluding whitespace, format markers and images.
+  character_count: "%{count} chars"
+  paragraph: "Paragraph"
+  heading: "Heading"
+  bullets: "Bulleted list"
+  numbered: "Numbered list"
+  quote: "Quote"
+  code_block: "Code block"
+  strike: "Strikethrough"
+  inline_code: "Inline code"
+  undo: "Undo"
+  redo: "Redo"
+  link: "Link"
+  url: "Link address"
+  url_invalid: "Enter an http, https or mailto address without embedded credentials."
+  invalid: "Notes are too large or contain unsupported content. Your draft is retained."
+  image_unavailable: "This image could not be inserted. Your notes are retained."
+  image: "Image"
+  insert_image: "Insert image…"
+  image_processing: "Processing image…"
+  image_retry: "Retry"
+  image_remove: "Remove"
+  image_input_too_large: "The image exceeds 20 MB. Choose a smaller image."
+  image_dimensions: "The image exceeds 12 megapixels or an 8192-pixel edge. Resize it and try again."
+  image_unsupported: "Use a static PNG, JPEG or WebP image."
+  image_limit: "The image count or temporary storage limit was reached. Remove images or save and try again."
+  image_output_too_large: "The compressed image is still too large. Resize it and try again."
+  image_one_at_a_time: "Wait for the current image to finish processing."
+  image_missing: "The image is not ready. Retry or remove it before saving."
+  image_rejected: "Image was rejected. Remove it to continue."
+  image_failed: "Couldn’t process the image. Retry or remove it."
+  image_position: "The insertion position changed. Click in the document and try again."

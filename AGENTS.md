@@ -6,7 +6,9 @@
 - 前端：React 19 + TypeScript + Vite + TanStack Router / Query + Zustand。
 - UI：shadcn/ui + Tailwind v4；动画用 gsap，长列表用 `@tanstack/react-virtual`。
 - 后端：Rust + ssh2/libssh2 + SQLite；IPC 类型由 Specta 生成。
-- 包管理器：pnpm；国际化：Lingui；前端测试：Vitest。
+- 包管理器：pnpm；React 国际化：Lingui；前端测试：Vitest。
+- 独立 `native/` 桌面应用使用 GPUI Kit、Cargo 和 `rust-i18n`，翻译源归 `native/locales/`；原生构建不依赖 Node/Lingui，共享 Rust 业务层不依赖任一端的国际化框架。
+- 原生待办第一期功能完整度须对齐现有待办实现，UI 与交互可独立；共享领域规则和数据语义，不以原生可行性验证为由略去资源、草稿或相关集成能力，未接入项保持明确待办。
 
 ## 目录结构
 
@@ -37,6 +39,7 @@ src-tauri/src/
 - 新功能、重构等非简单任务，先分析项目架构、职责边界与影响范围，输出独立计划文档（方案、实施阶段、验证标准），经用户确认后分阶段实施；每阶段更新进度、验证结果与剩余事项。
 - 简单修正可直接调整，无需计划文档或分阶段；具体任务计划、进度与实现细节不写入 AGENTS.md。
 - README 只记录项目或模块的职责、使用/构建方式、配置和兼容限制；任务方案、实施进度、测试结果及手动验收步骤放独立文档。
+- `native/` 不维护 `PRODUCT.md`；其 README 只写原生应用自身的内容，不加入 Node、Tauri 等无关技术或应用的对比说明。
 - 优先复用现有组件、工具和依赖，按职责拆分，避免重复抽象。
 - 小游戏当前仅接入本地、电脑和远端玩家；后续 AI 接入不得按模型名称或提供方域名写请求特例，模型能力与参数统一由共享 AI 配置/协议层管理。
 - 不需要真正三维空间交互的功能禁止使用 Three.js；平面小游戏优先复用 PixiJS，通过纹理、光影和动画表达实体感。魔方等确需三维旋转的功能可使用 Three.js。
@@ -59,12 +62,12 @@ src-tauri/src/
 - IPC 统一走 `src/lib/ipc.ts`，事件统一走 `src/lib/events.ts`；契约在 Rust 定义，由 Specta 自动生成前端类型。
 - IPC 契约变更后运行 `pnpm bindings:generate`；开发类型包含所有平台命令，应用注册表按目标裁剪。
 - 新功能沿用统一注册入口：前端接入路由、模块元数据和平台守卫；后端在 `app/registry` 登记命令与事件类型，同步 `command_baseline.txt`，由 `app/services` 装配。
-- 错误统一为 `AppError { kind, code, message, args }`，全链路保留；按 kind/code 判断，前端用 `describeError` 展示。React 组件使用 `describeError(error, t)`，`t` 来自 `useLingui()`，确保 React Compiler 能追踪语言切换。业务错误用英文诊断，展示文案走 Lingui。
+- 错误统一为 `AppError { kind, code, message, args }`，全链路保留；按 kind/code 判断，React 用 `describeError(error, t)` 展示，`t` 来自 `useLingui()`，确保 React Compiler 能追踪语言切换。业务错误用英文诊断，React 展示文案走 Lingui，原生展示文案走 `rust-i18n`。
 - 与外部交互的功能统一接入共享执行日志，覆盖 HTTP/AI、SSH、SFTP 及后续协议；口径是“与外部交互时能看到发送了什么参数、执行了什么命令、接收了什么数据、报了什么错”，**包含入站连接与对等连接**（LAN 服务端、游戏房间），不限于我们主动调用外部服务。由各协议在实际执行边界采集请求/操作、参数或命令、返回结果和原始错误，按操作身份关联现有操作摘要。不得以 IPC 入参、推测内容或诊断摘要冒充实际收发内容，也不得为新功能另建独立日志体系。判定能否接入看**协议边界是否由我们实现**：边界在我们手里（我们调 reqwest/ssh2、我们自己写的路由或 framing）可接入；边界在第三方库里且库未暴露注入点（如 librqbit）不可接入，此时应加强该模块自己的结构化状态展示而非塞进面板。
 - 执行日志是**全局、统一文件存储、可丢弃**的活动视图：进程内只有一个作用域，桌面左侧导航与移动标题栏提供入口，进入独立活动页查看，不使用底部日志区；切页和返回不清空。日志写入当前 app 专属日志目录的 JSONL 文件，由单 writer 异步追加、按天和容量轮转，默认保留 7 天、总预算 100 MiB；页面以事件推送（`diagnostics://activity`）触发分页投影重读，兜底轮询仅在事件丢失时生效，游标和清理 generation 是权威信号。
 - 操作摘要与执行详情统一在活动日志页展示，仅按明确的 `operationId` 关联，旧记录不得按时间或对象猜测合并。列表只读取摘要投影，详情通过 `logs_detail` 按 ID 重建；手动清空统一日志文件和当前内存投影，按文件范围清理，不影响运行任务；协议正文不得迁入业务数据库，用户可查看日志并打开日志目录。
 - 执行日志仅对密钥、密码、token、私钥、认证头等凭据脱敏，其余已采集内容原样保留；原始错误详情与结构化 `AppError` 并存。凭据在进入日志缓冲前处理，覆盖请求、响应及错误中的回显；明确标注脱敏、截断和未采集内容，不伪造不可观察的协议数据。采集与缓冲必须有界，日志失败不得改变业务结果、触发重试或阻塞传输；通知监听者须在释放记录锁之后进行，不默认录制交互终端逐键输入或文件内容。
-- 用户可见文案全部走 Lingui；提交 `messages.po`。文案改动后执行 `pnpm run i18n:extract && pnpm run i18n:compile && pnpm build`。
+- React 用户可见文案全部走 Lingui；提交 `messages.po`。React 文案改动后执行 `pnpm run i18n:extract && pnpm run i18n:compile && pnpm build`。原生文案走 `rust-i18n`，提交 `native/locales/` 翻译源并运行原生构建和国际化定向测试。
 
 - 阻塞工作放后端 blocking 管道；异步处理竞态、取消和清理，任务完成以实际 worker 退出为准。
 - 数据迁移须版本化、幂等并保留用户数据；reset 与任务互斥，保留有效迁移标志；SQL 参数化。
