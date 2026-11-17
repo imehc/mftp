@@ -13,6 +13,12 @@
       "skillPath": "skills/enhanced-message-context/SKILL.md",
       "computedHash": "de808be0383d355a128534dc8f80676461317df447b46c6cf93005a71b6abc37"
     },
+    "gpui-kit": {
+      "source": "longbridge/gpui-kit",
+      "sourceType": "github",
+      "skillPath": "skills/gpui-kit/SKILL.md",
+      "computedHash": "511ec5a2f55cc7c71c3c2ffa041f0f11d363fa938aad58d34f6d628e63b0daac"
+    },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
