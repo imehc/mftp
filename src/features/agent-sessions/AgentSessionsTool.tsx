@@ -21,6 +21,9 @@ export default function AgentSessionsTool() {
   const c = useAgentSessions();
   const [onlyChat, setOnlyChat] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const sizes = new Map(
+    c.storage.data?.items.map((item) => [item.key, item.bytes]) ?? [],
+  );
   const failure = c.refreshError ?? c.sources.error ?? c.error;
   const issues = [...(c.sources.data?.issues ?? []), ...(c.page?.issues ?? [])];
   return (
@@ -110,6 +113,28 @@ export default function AgentSessionsTool() {
           </AlertDescription>
         </Alert>
       )}
+      {c.storage.error && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            <Trans>存储占用统计失败</Trans> ·{" "}
+            {describeError(c.storage.error, t)}{" "}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void c.storage.refetch()}
+            >
+              <Trans>重试</Trans>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      {c.storage.data?.complete === false && (
+        <Alert>
+          <AlertDescription>
+            <Trans>部分会话占用未能计量，已显示可确认的记录大小。</Trans>
+          </AlertDescription>
+        </Alert>
+      )}
       {c.sources.isPending ? (
         <div
           role="status"
@@ -120,11 +145,12 @@ export default function AgentSessionsTool() {
         </div>
       ) : (
         c.sources.data && (
-          <div className="border-border bg-card grid min-h-0 flex-1 grid-cols-1 overflow-hidden rounded-xl border @[44rem]/session:grid-cols-[20rem_minmax(0,1fr)] @[56rem]/session:grid-cols-[12rem_20rem_minmax(0,1fr)]">
+          <div className="border-border bg-card grid min-h-0 flex-1 grid-cols-1 overflow-hidden rounded-xl border @[44rem]/session:grid-cols-[20rem_minmax(0,1fr)] @[56rem]/session:grid-cols-[15rem_20rem_minmax(0,1fr)]">
             <SessionSources
               snapshot={c.sources.data}
               selected={c.agent}
               onSelect={c.setAgent}
+              storage={c.storage.data?.sources}
             />
             <div className="contents">
               <div
@@ -142,6 +168,7 @@ export default function AgentSessionsTool() {
                   onSelect={c.setSelected}
                   onPage={c.setOffset}
                   onClear={c.clearFilters}
+                  sizes={sizes}
                 />
               </div>
               {c.selected ? (

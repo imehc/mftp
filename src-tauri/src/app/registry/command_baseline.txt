@@ -181,3 +181,4 @@ macos agent_sessions_query
 macos agent_session_detail
 macos agent_sessions_cancel
 macos agent_session_image
+macos agent_sessions_storage

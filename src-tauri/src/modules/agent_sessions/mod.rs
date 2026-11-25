@@ -1,4 +1,4 @@
-//! Read-only local transcript discovery and retrieval, available on macOS.
+//! Read-only local transcript discovery, usage and retrieval, available on macOS.
 mod codebuddy;
 pub(crate) mod commands;
 mod database;
@@ -15,11 +15,16 @@ mod reader;
 mod revision;
 mod service;
 mod sqlite_snapshot;
+mod storage;
+mod storage_service;
 mod text;
 mod transcript;
 mod vscode;
 
 pub(crate) use service::AgentSessionService;
+
+#[cfg(test)]
+mod storage_service_tests;
 
 #[cfg(test)]
 mod codebuddy_tests;

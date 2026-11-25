@@ -36,6 +36,8 @@ impl Drop for Fixture {
 
 fn query(snapshot: &AgentSessionsSnapshot, search: &str) -> AgentSessionQuery {
     AgentSessionQuery {
+        sort: SessionSort::Updated,
+        min_bytes: None,
         generation: snapshot.generation.clone(),
         agent: None,
         archived: None,

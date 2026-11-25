@@ -16,6 +16,9 @@ export const agentSessionDetail = (
   unwrapCommand(
     commands.agentSessionDetail(generation, key, offset, 100, requestId),
   );
+
+export const agentSessionsStorage = (generation: string, requestId: string) =>
+  unwrapCommand(commands.agentSessionsStorage(generation, requestId));
 export const agentSessionsCancel = (requestId: string) =>
   commands.agentSessionsCancel(requestId);
 

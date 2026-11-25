@@ -6,6 +6,24 @@ use crate::error::AppResult;
 
 #[tauri::command]
 #[specta::specta]
+pub async fn agent_sessions_storage(
+    state: State<'_, AppServices>,
+    generation: String,
+    request_id: String,
+) -> AppResult<AgentSessionStorage> {
+    let service = state.agent_sessions.clone();
+    let request = service.begin(request_id)?;
+    state
+        .executor
+        .blocking_unlogged(move || {
+            let _request = request;
+            service.storage(&generation, &_request.cancel)
+        })
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn agent_sessions_snapshot(
     state: State<'_, AppServices>,
     refresh: bool,

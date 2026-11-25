@@ -373,7 +373,8 @@ macro_rules! add_agent_sessions {
                     crate::modules::agent_sessions::commands::agent_sessions_query,
                     crate::modules::agent_sessions::commands::agent_session_detail,
                     crate::modules::agent_sessions::commands::agent_sessions_cancel,
-                    crate::modules::agent_sessions::commands::agent_session_image],
+                    crate::modules::agent_sessions::commands::agent_session_image,
+                    crate::modules::agent_sessions::commands::agent_sessions_storage],
                 types: [],
             },
         }

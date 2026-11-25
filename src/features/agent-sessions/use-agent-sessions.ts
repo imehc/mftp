@@ -15,13 +15,15 @@ import {
 import { queryScopeGuard } from "~/lib/query-client";
 
 import { sessionDateBounds, type SessionDateRange } from "./date-range";
-import { agentSourcesQuery } from "./queries";
+import { agentSourcesQuery, agentStorageQuery } from "./queries";
 
 export function useAgentSessions() {
   const client = useQueryClient();
   const sources = useQuery(agentSourcesQuery());
   const [agent, setAgent] = useState<SessionAgent | "all">("all");
   const [archive, setArchive] = useState<"all" | "active" | "archived">("all");
+  const [sort, setSort] = useState<"updated" | "size">("updated");
+  const [minBytes, setMinBytes] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
   const [range, setRange] = useState<SessionDateRange>("all");
@@ -50,10 +52,13 @@ export function useAgentSessions() {
   const mounted = useRef(true);
   const bounds = sessionDateBounds(range, from, to, new Date(), month);
   const generation = sources.data?.generation ?? "";
+  const storage = useQuery(agentStorageQuery(generation));
   const filterIdentity = JSON.stringify([
     generation,
     agent,
     archive,
+    sort,
+    minBytes,
     debounced,
     bounds.from,
     bounds.to,
@@ -91,6 +96,8 @@ export function useAgentSessions() {
         generation,
         agent: agent === "all" ? null : agent,
         archived: archive === "all" ? null : archive === "archived",
+        sort,
+        minBytes,
         search: debounced,
         from: bounds.from,
         to: bounds.to,
@@ -114,6 +121,8 @@ export function useAgentSessions() {
     generation,
     agent,
     archive,
+    sort,
+    minBytes,
     debounced,
     bounds.from,
     bounds.to,
@@ -162,6 +171,8 @@ export function useAgentSessions() {
   function clearFilters() {
     setAgent("all");
     setArchive("all");
+    setSort("updated");
+    setMinBytes(null);
     setSearch("");
     setRange("all");
     setFrom("");
@@ -170,10 +181,15 @@ export function useAgentSessions() {
 
   return {
     sources,
+    storage,
     agent,
     setAgent,
     archive,
     setArchive,
+    sort,
+    setSort,
+    minBytes,
+    setMinBytes,
     search,
     setSearch,
     range,
@@ -196,7 +212,11 @@ export function useAgentSessions() {
     refreshError,
     clearFilters,
     filtered:
-      agent !== "all" || !!search || range !== "all" || archive !== "all",
+      agent !== "all" ||
+      !!search ||
+      range !== "all" ||
+      archive !== "all" ||
+      minBytes !== null,
     busy,
     retry: () => setRetry((value) => value + 1),
   };

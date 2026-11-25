@@ -15,6 +15,7 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Spinner } from "~/components/ui/spinner";
+import { formatBytes } from "~/lib/format";
 import { useSettingsStore } from "~/store/settings";
 
 import { AgentIcon, agentName } from "./agents";
@@ -30,6 +31,7 @@ interface Props {
   onSelect: (session: AgentSessionSummary) => void;
   onPage: (offset: number) => void;
   onClear: () => void;
+  sizes?: ReadonlyMap<string, number | null>;
 }
 
 export function SessionResults({
@@ -41,8 +43,9 @@ export function SessionResults({
   onSelect,
   onPage,
   onClear,
+  sizes,
 }: Props) {
-  const { i18n } = useLingui();
+  const { i18n, t } = useLingui();
   const scroll = useRef<HTMLDivElement>(null);
   const size = useSettingsStore((settings) => settings.displaySize);
   const items = page?.items ?? emptyItems;
@@ -87,6 +90,7 @@ export function SessionResults({
           >
             {virtualizer.getVirtualItems().map((row) => {
               const session = items[row.index];
+              const bytes = sizes?.get(session.key);
               return (
                 <button
                   key={session.key}
@@ -128,6 +132,28 @@ export function SessionResults({
                   <div className="app-description flex min-w-0 items-center justify-between gap-2">
                     <span className="min-w-0 truncate font-mono">
                       {session.sessionId ?? <Trans>未记录 session ID</Trans>}
+                    </span>
+                    <span
+                      data-slot="session-storage-size"
+                      className="app-description text-muted-foreground flex shrink-0 items-center gap-1.5 tabular-nums"
+                      title={
+                        bytes === null
+                          ? t`共享存储无法独立计量`
+                          : bytes === undefined
+                            ? t`会话存储占用尚未计量`
+                            : t`会话存储占用`
+                      }
+                    >
+                      <span aria-hidden="true">·</span>
+                      {bytes === null ? (
+                        <Trans comment="会话存储在共享数据库等容器中，无法给出单独的文件大小">
+                          无法独立计量
+                        </Trans>
+                      ) : bytes === undefined ? (
+                        "—"
+                      ) : (
+                        formatBytes(bytes)
+                      )}
                     </span>
                   </div>
                 </button>

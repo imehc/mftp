@@ -15,6 +15,8 @@ const GLOBAL: &str = "Library/Application Support/Code/User/globalStorage/emptyW
 
 fn query(snapshot: &AgentSessionsSnapshot, search: &str) -> AgentSessionQuery {
     AgentSessionQuery {
+        sort: SessionSort::Updated,
+        min_bytes: None,
         generation: snapshot.generation.clone(),
         agent: None,
         archived: None,

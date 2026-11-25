@@ -115,7 +115,7 @@ pub(super) fn has_records(path: &Path, cancel: &AtomicBool) -> AppResult<bool> {
         .ok_or_else(|| error(CustomErrorCode::AgentSessionFormat))
 }
 
-fn ordered_paths(path: &Path, cancel: &AtomicBool) -> AppResult<Vec<PathBuf>> {
+pub(super) fn ordered_paths(path: &Path, cancel: &AtomicBool) -> AppResult<Vec<PathBuf>> {
     let index = json(path, cancel)?;
     let ids = index["messages"]
         .as_array()

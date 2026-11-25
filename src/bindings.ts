@@ -277,6 +277,7 @@ export const commands = {
 	agentSessionDetail: (generation: string, key: string, offset: number, limit: number, requestId: string) => typedError<AgentSessionDetail, AppError>(__TAURI_INVOKE("agent_session_detail", { generation, key, offset, limit, requestId })),
 	agentSessionsCancel: (requestId: string) => __TAURI_INVOKE<void>("agent_sessions_cancel", { requestId }),
 	agentSessionImage: (generation: string, key: string, messageIndex: number, imageIndex: number, requestId: string) => typedError<AgentSessionImagePayload, AppError>(__TAURI_INVOKE("agent_session_image", { generation, key, messageIndex, imageIndex, requestId })),
+	agentSessionsStorage: (generation: string, requestId: string) => typedError<AgentSessionStorage, AppError>(__TAURI_INVOKE("agent_sessions_storage", { generation, requestId })),
 };
 
 /* Types */
@@ -342,8 +343,30 @@ export type AgentSessionQuery = {
 	search: string,
 	from: number | null,
 	to: number | null,
+	sort?: SessionSort,
+	minBytes: number | null,
 	offset: number,
 	limit: number,
+};
+
+export type AgentSessionStorage = {
+	generation: string,
+	sources: AgentSessionStorageSource[],
+	items: AgentSessionStorageItem[],
+	complete: boolean,
+};
+
+export type AgentSessionStorageItem = {
+	key: string,
+	bytes: number | null,
+	allocatedBytes: number | null,
+};
+
+export type AgentSessionStorageSource = {
+	agent: SessionAgent,
+	bytes: number,
+	allocatedBytes: number,
+	complete: boolean,
 };
 
 export type AgentSessionSummary = {
@@ -1395,6 +1418,8 @@ export type SessionIssue = {
 };
 
 export type SessionRole = "user" | "assistant" | "tool" | "thinking" | "system";
+
+export type SessionSort = "updated" | "size";
 
 export type SessionSource = {
 	agent: SessionAgent,

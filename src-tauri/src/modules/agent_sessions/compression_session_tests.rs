@@ -28,6 +28,8 @@ fn compressed(fixture: &Fixture, name: &str, records: &[Value]) -> PathBuf {
 
 fn query(snapshot: &AgentSessionsSnapshot, search: &str) -> AgentSessionQuery {
     AgentSessionQuery {
+        sort: SessionSort::Updated,
+        min_bytes: None,
         generation: snapshot.generation.clone(),
         agent: Some(SessionAgent::Codex),
         archived: None,

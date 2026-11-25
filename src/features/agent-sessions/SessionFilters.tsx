@@ -180,6 +180,63 @@ export function SessionFilters({ controller: c }: { controller: Controller }) {
               </Select>
             </Field>
             <SessionDateFilter controller={c} />
+            <Field orientation="horizontal">
+              <FieldLabel htmlFor="session-sort-filter">
+                <Trans comment="会话列表按最后活动时间或文件占用排序">
+                  排序方式
+                </Trans>
+              </FieldLabel>
+              <Select
+                value={c.sort}
+                onValueChange={(value) =>
+                  c.setSort(value as Controller["sort"])
+                }
+              >
+                <SelectTrigger id="session-sort-filter" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="ui-density-adaptive">
+                  <SelectGroup>
+                    <SelectItem value="updated">
+                      <Trans>最近活动优先</Trans>
+                    </SelectItem>
+                    <SelectItem value="size">
+                      <Trans>占用最大优先</Trans>
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field orientation="horizontal">
+              <FieldLabel htmlFor="session-size-filter">
+                <Trans comment="筛选达到所选文件大小的会话">最小占用</Trans>
+              </FieldLabel>
+              <Select
+                value={String(c.minBytes ?? 0)}
+                onValueChange={(value) => c.setMinBytes(Number(value) || null)}
+              >
+                <SelectTrigger id="session-size-filter" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="ui-density-adaptive">
+                  <SelectGroup>
+                    <SelectItem value="0">
+                      <Trans>不限大小</Trans>
+                    </SelectItem>
+                    {[1, 10, 100].map((size) => (
+                      <SelectItem key={size} value={String(size * 1024 * 1024)}>
+                        {size} MB
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+            {c.minBytes !== null && (
+              <p className="app-description">
+                <Trans>无法单独计量的共享数据库会话不参与大小筛选。</Trans>
+              </p>
+            )}
             {c.filtered && (
               <Button variant="ghost" onClick={c.clearFilters}>
                 <Trans comment="清除面板中的来源、日期、归档条件与搜索词">

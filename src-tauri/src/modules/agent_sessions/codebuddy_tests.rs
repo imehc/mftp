@@ -32,7 +32,7 @@ fn conversation(fixture: &Fixture, history: &str, id: &str, records: &[Value]) -
             let message_id = format!("m{index}");
             fixture.write(
                 &format!("{history}/{id}/messages/{message_id}.json"),
-                &[record.clone()],
+                std::slice::from_ref(record),
             );
             message_id
         })
@@ -45,6 +45,8 @@ fn conversation(fixture: &Fixture, history: &str, id: &str, records: &[Value]) -
 
 fn query(snapshot: &AgentSessionsSnapshot, search: &str) -> AgentSessionQuery {
     AgentSessionQuery {
+        sort: SessionSort::Updated,
+        min_bytes: None,
         generation: snapshot.generation.clone(),
         agent: Some(SessionAgent::Codebuddy),
         archived: None,

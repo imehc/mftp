@@ -25,7 +25,7 @@ msgid "{0, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{0, plural, one {# 个字符} other {# 个字符}}"
 
 #. placeholder {0}: page.total
-#: src/features/agent-sessions/SessionResults.tsx:75
+#: src/features/agent-sessions/SessionResults.tsx:78
 msgid "{0, plural, one {# 个结果} other {# 个结果}}"
 msgstr "{0, plural, one {# 个结果} other {# 个结果}}"
 
@@ -410,14 +410,12 @@ msgid "9 号球已复位"
 msgstr "9 号球已复位"
 
 #. 本机 AI agent 历史对话工具的名称
-#: src/features/agent-sessions/AgentSessionsTool.tsx:28
+#: src/features/agent-sessions/AgentSessionsTool.tsx:31
 #: src/features/home/entries.tsx:69
 msgid "Agent 会话"
 msgstr "Agent 会话"
 
-#. 左侧导航标题，按 AI 编码工具区分历史来源
 #: src/features/agent-sessions/SessionFilters.tsx:76
-#: src/features/agent-sessions/SessionSources.tsx:23
 msgid "Agent 分类"
 msgstr "Agent 分类"
 
@@ -782,7 +780,7 @@ msgstr "上一个"
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "上一手已停手：再停一手即终局，落子则重新计数"
 
-#: src/features/agent-sessions/SessionResults.tsx:171
+#: src/features/agent-sessions/SessionResults.tsx:197
 msgid "上一页"
 msgstr "上一页"
 
@@ -876,7 +874,7 @@ msgstr "上面 U"
 msgid "下一个"
 msgstr "下一个"
 
-#: src/features/agent-sessions/SessionResults.tsx:182
+#: src/features/agent-sessions/SessionResults.tsx:208
 msgid "下一页"
 msgstr "下一页"
 
@@ -999,6 +997,10 @@ msgstr "不能移动到自身或子文件夹中"
 #: src/features/games/billiards/BilliardsHelp.tsx:154
 msgid "不要求击球后必须碰库，也不需要指定袋口。练习模式为自由清台，不分组、不计犯规胜负。"
 msgstr "不要求击球后必须碰库，也不需要指定袋口。练习模式为自由清台，不分组、不计犯规胜负。"
+
+#: src/features/agent-sessions/SessionFilters.tsx:224
+msgid "不限大小"
+msgstr "不限大小"
 
 #: src/features/games/engine/online/useOnlineMatch.ts:65
 msgid "与对方的连接已断开。"
@@ -1295,13 +1297,28 @@ msgid "优先级"
 msgstr "优先级"
 
 #. 会话检索结果列表标题
-#: src/features/agent-sessions/SessionResults.tsx:68
+#: src/features/agent-sessions/SessionResults.tsx:71
 msgid "会话"
 msgstr "会话"
 
 #: src/features/agent-sessions/SessionDetail.tsx:86
 msgid "会话信息"
 msgstr "会话信息"
+
+#: src/features/agent-sessions/SessionResults.tsx:144
+msgid "会话存储占用"
+msgstr "会话存储占用"
+
+#: src/features/agent-sessions/SessionResults.tsx:143
+msgid "会话存储占用尚未计量"
+msgstr "会话存储占用尚未计量"
+
+#. 来源数量徽标的读屏标签，count是会话数量，storageSize是格式化存储大小或未计量占位
+#. 来源数量徽标的读屏标签，count是会话数量，storageSize是格式化存储大小或未计量占位
+#: src/features/agent-sessions/SessionSources.tsx:57
+#: src/features/agent-sessions/SessionSources.tsx:102
+msgid "会话数量：{count}；会话存储占用：{storageSize}"
+msgstr "会话数量：{count}；会话存储占用：{storageSize}"
 
 #. 本机会话读取失败，包含压缩格式、未知存储结构和损坏的 JSON/数据库
 #: src/lib/errors/messages.ts:17
@@ -1698,7 +1715,7 @@ msgid "全部优先级"
 msgstr "全部优先级"
 
 #. 显示所有 agent 的会话
-#: src/features/agent-sessions/SessionSources.tsx:35
+#: src/features/agent-sessions/SessionSources.tsx:52
 msgid "全部会话"
 msgstr "全部会话"
 
@@ -1755,6 +1772,10 @@ msgstr "六红球采用五次漏击规则，十红球沿用十五红球的流程
 #: src/features/poetry/components/TranslationPackManager.tsx:44
 msgid "共 {count} 条译文"
 msgstr "共 {count} 条译文"
+
+#: src/features/agent-sessions/SessionResults.tsx:141
+msgid "共享存储无法独立计量"
+msgstr "共享存储无法独立计量"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/lan-transfer/LanSharedDirsSection.tsx:36
@@ -1908,6 +1929,11 @@ msgstr "最多授权 16 个客户端"
 msgid "最大边长"
 msgstr "最大边长"
 
+#. 筛选达到所选文件大小的会话
+#: src/features/agent-sessions/SessionFilters.tsx:212
+msgid "最小占用"
+msgstr "最小占用"
+
 #: src/features/media-compress/resize/ImageResizePanel.tsx:247
 msgid "最小边长"
 msgstr "最小边长"
@@ -1920,6 +1946,10 @@ msgstr "最新"
 #: src/features/agent-sessions/SessionFilters.tsx:168
 msgid "最近 7 天"
 msgstr "最近 7 天"
+
+#: src/features/agent-sessions/SessionFilters.tsx:201
+msgid "最近活动优先"
+msgstr "最近活动优先"
 
 #. 斯诺克对局详情，球员本局最高连续得分
 #: src/features/games/billiards/BilliardsInfo.tsx:91
@@ -2280,8 +2310,8 @@ msgstr "刷新状态"
 
 #. 标题栏图标按钮，重新读取本机 agent 会话目录
 #. 标题栏图标按钮，重新读取本机 agent 会话目录
-#: src/features/agent-sessions/AgentSessionsTool.tsx:40
-#: src/features/agent-sessions/AgentSessionsTool.tsx:44
+#: src/features/agent-sessions/AgentSessionsTool.tsx:43
+#: src/features/agent-sessions/AgentSessionsTool.tsx:47
 msgid "刷新记录"
 msgstr "刷新记录"
 
@@ -2427,6 +2457,10 @@ msgstr "单杆 {currentBreak}"
 #: src/features/games/junqi/JunqiHelp.tsx:65
 msgid "单线表示公路，双轨表示铁路，圆形表示行营，方框表示大本营"
 msgstr "单线表示公路，双轨表示铁路，圆形表示行营，方框表示大本营"
+
+#: src/features/agent-sessions/SessionFilters.tsx:204
+msgid "占用最大优先"
+msgstr "占用最大优先"
 
 #: src/features/poetry/LibraryManagePage.tsx:107
 msgid "卸载"
@@ -3480,6 +3514,10 @@ msgstr "字号"
 msgid "存储"
 msgstr "存储"
 
+#: src/features/agent-sessions/AgentSessionsTool.tsx:119
+msgid "存储占用统计失败"
+msgstr "存储占用统计失败"
+
 #: src/features/about/DataManagementDialogs.tsx:76
 msgid "存储明细"
 msgstr "存储明细"
@@ -4212,7 +4250,7 @@ msgstr "已开始调整账号顺序"
 
 #: src/features/agent-sessions/SessionDetail.tsx:127
 #: src/features/agent-sessions/SessionFilters.tsx:138
-#: src/features/agent-sessions/SessionResults.tsx:109
+#: src/features/agent-sessions/SessionResults.tsx:113
 msgid "已归档"
 msgstr "已归档"
 
@@ -5115,6 +5153,11 @@ msgstr "排序"
 msgid "排序操作结束"
 msgstr "排序操作结束"
 
+#. 会话列表按最后活动时间或文件占用排序
+#: src/features/agent-sessions/SessionFilters.tsx:185
+msgid "排序方式"
+msgstr "排序方式"
+
 #. 军棋棋子名称
 #: src/features/games/junqi/labels.tsx:37
 msgid "排长"
@@ -5619,7 +5662,7 @@ msgid "无权限"
 msgstr "无权限"
 
 #: src/features/agent-sessions/SessionDetail.tsx:82
-#: src/features/agent-sessions/SessionResults.tsx:123
+#: src/features/agent-sessions/SessionResults.tsx:127
 msgid "无标题会话"
 msgstr "无标题会话"
 
@@ -5636,6 +5679,10 @@ msgstr "无法创建画布上下文"
 #: src/lib/errors/messages.ts:308
 msgid "无法删除对局存档，请重试。"
 msgstr "无法删除对局存档，请重试。"
+
+#: src/features/agent-sessions/SessionFilters.tsx:237
+msgid "无法单独计量的共享数据库会话不参与大小筛选。"
+msgstr "无法单独计量的共享数据库会话不参与大小筛选。"
 
 #: src/features/preview/MediaPlayer.tsx:234
 msgid "无法播放，请重试或使用系统应用打开"
@@ -5657,6 +5704,11 @@ msgstr "无法检查更新，请稍后重试。"
 #: src/lib/errors/messages.ts:163
 msgid "无法检测{side}的 rsync：{detail}"
 msgstr "无法检测{side}的 rsync：{detail}"
+
+#. 会话存储在共享数据库等容器中，无法给出单独的文件大小
+#: src/features/agent-sessions/SessionResults.tsx:149
+msgid "无法独立计量"
+msgstr "无法独立计量"
 
 #: src/features/ssh-sftp/rsync/RsyncSyncDialog.tsx:118
 msgid "无法生成同步预览"
@@ -5813,7 +5865,7 @@ msgstr "暂无主机"
 msgid "暂无任务"
 msgstr "暂无任务"
 
-#: src/features/agent-sessions/SessionResults.tsx:149
+#: src/features/agent-sessions/SessionResults.tsx:175
 msgid "暂无会话记录"
 msgstr "暂无会话记录"
 
@@ -6226,7 +6278,7 @@ msgstr "未翻棋子"
 msgid "未记录"
 msgstr "未记录"
 
-#: src/features/agent-sessions/SessionResults.tsx:130
+#: src/features/agent-sessions/SessionResults.tsx:134
 msgid "未记录 session ID"
 msgstr "未记录 session ID"
 
@@ -6395,7 +6447,7 @@ msgid "查看共享目录"
 msgstr "查看共享目录"
 
 #. 查看会话扫描失败或超限的来源文件
-#: src/features/agent-sessions/AgentSessionsTool.tsx:100
+#: src/features/agent-sessions/AgentSessionsTool.tsx:103
 msgid "查看原因"
 msgstr "查看原因"
 
@@ -6818,7 +6870,7 @@ msgstr "正在打开文件夹…"
 msgid "正在打开终端…"
 msgstr "正在打开终端…"
 
-#: src/features/agent-sessions/AgentSessionsTool.tsx:119
+#: src/features/agent-sessions/AgentSessionsTool.tsx:144
 msgid "正在扫描本机会话"
 msgstr "正在扫描本机会话"
 
@@ -6852,7 +6904,7 @@ msgstr "正在检测 rsync 并生成同步预览…"
 msgid "正在检索…"
 msgstr "正在检索…"
 
-#: src/features/agent-sessions/SessionResults.tsx:145
+#: src/features/agent-sessions/SessionResults.tsx:171
 msgid "正在检索会话"
 msgstr "正在检索会话"
 
@@ -7040,7 +7092,7 @@ msgstr "每日一诗"
 msgid "汉 界"
 msgstr "汉 界"
 
-#: src/features/agent-sessions/SessionResults.tsx:147
+#: src/features/agent-sessions/SessionResults.tsx:173
 msgid "没有匹配的会话"
 msgstr "没有匹配的会话"
 
@@ -7322,8 +7374,8 @@ msgid "清除已结束的任务？"
 msgstr "清除已结束的任务？"
 
 #. 清除面板中的来源、日期、归档条件与搜索词
-#: src/features/agent-sessions/SessionFilters.tsx:185
-#: src/features/agent-sessions/SessionResults.tsx:156
+#: src/features/agent-sessions/SessionFilters.tsx:242
+#: src/features/agent-sessions/SessionResults.tsx:182
 #: src/features/mcp/McpToolsTable.tsx:212
 msgid "清除筛选"
 msgstr "清除筛选"
@@ -10053,6 +10105,10 @@ msgstr "逼和"
 msgid "道路与安全区"
 msgstr "道路与安全区"
 
+#: src/features/agent-sessions/AgentSessionsTool.tsx:134
+msgid "部分会话占用未能计量，已显示可确认的记录大小。"
+msgstr "部分会话占用未能计量，已显示可确认的记录大小。"
+
 #. 协议详情或元数据超出内存容量，复制文本也保留此不完整标记
 #. 当前操作的部分详情超过内存容量，原文并不完整
 #: src/features/connection-diagnostics/execution-log-stream.ts:195
@@ -10060,7 +10116,7 @@ msgstr "道路与安全区"
 msgid "部分内容已截断"
 msgstr "部分内容已截断"
 
-#: src/features/agent-sessions/AgentSessionsTool.tsx:97
+#: src/features/agent-sessions/AgentSessionsTool.tsx:100
 msgid "部分来源无法读取"
 msgstr "部分来源无法读取"
 
@@ -10261,7 +10317,8 @@ msgstr "重置魔方回到复原状态，不会自动求解或记为挑战成功
 #: src/features/about/AboutPage.tsx:96
 #: src/features/about/DataManagementDialogs.tsx:90
 #: src/features/activity/TransferActivity.tsx:49
-#: src/features/agent-sessions/AgentSessionsTool.tsx:89
+#: src/features/agent-sessions/AgentSessionsTool.tsx:92
+#: src/features/agent-sessions/AgentSessionsTool.tsx:126
 #: src/features/agent-sessions/SessionDetail.tsx:165
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:145
 #: src/features/games/billiards/BilliardsGame.tsx:124

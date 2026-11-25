@@ -17,22 +17,23 @@ use crate::error::{AppError, AppResult, CustomErrorCode};
 const MAX_JOB_TIME: Duration = Duration::from_secs(45);
 
 #[derive(Clone)]
-struct Entry {
-    summary: AgentSessionSummary,
-    complete: bool,
+pub(super) struct Entry {
+    pub(super) summary: AgentSessionSummary,
+    pub(super) complete: bool,
     has_records: bool,
-    resource: Candidate,
+    pub(super) resource: Candidate,
 }
 
 #[derive(Default)]
-struct Index {
-    entries: Vec<Entry>,
-    snapshot: Option<AgentSessionsSnapshot>,
+pub(super) struct Index {
+    pub(super) entries: Vec<Entry>,
+    pub(super) hidden_entries: Vec<Entry>,
+    pub(super) snapshot: Option<AgentSessionsSnapshot>,
 }
 
 pub(crate) struct AgentSessionService {
-    home: PathBuf,
-    index: Mutex<Index>,
+    pub(super) home: PathBuf,
+    pub(super) index: Mutex<Index>,
     scan_gate: Mutex<()>,
     requests: Mutex<HashMap<String, Arc<AtomicBool>>>,
 }
@@ -121,6 +122,7 @@ impl AgentSessionService {
         let mut reader = Reader::default();
         let found = discovery::discover(&self.home, &mut reader, cancel)?;
         let mut entries = Vec::new();
+        let mut hidden_entries = Vec::new();
         let mut sources = found.sources;
         let mut issues = found.issues;
         let mut complete = issues.is_empty();
@@ -199,6 +201,10 @@ impl AgentSessionService {
                             source.count += 1;
                         }
                         entries.push(entry);
+                    } else {
+                        // Metadata-only files still contribute to source usage
+                        // even though the reading list omits them.
+                        hidden_entries.push(entry);
                     }
                 }
                 Err(err) if err.code == CustomErrorCode::AgentSessionCancelled.as_str() => {
@@ -233,6 +239,7 @@ impl AgentSessionService {
         };
         *self.index.lock() = Index {
             entries,
+            hidden_entries,
             snapshot: Some(snapshot.clone()),
         };
         Ok(snapshot)
@@ -247,6 +254,7 @@ impl AgentSessionService {
             || input.from.is_some_and(|n| !n.is_finite())
             || input.to.is_some_and(|n| !n.is_finite())
             || input.from.zip(input.to).is_some_and(|(a, b)| a > b)
+            || input.min_bytes.is_some_and(|n| !n.is_finite() || n < 0.0)
         {
             return Err(error(CustomErrorCode::AgentSessionInput));
         }
@@ -259,11 +267,24 @@ impl AgentSessionService {
             .clone();
         let entries = index.entries.clone();
         drop(index);
+        let mut complete = snapshot.complete;
+        let sizes = if input.sort == SessionSort::Size || input.min_bytes.is_some() {
+            let resources = super::storage_service::resources(&entries);
+            let storage =
+                super::storage::snapshot(&input.generation, &snapshot.sources, &resources, cancel)?;
+            complete &= storage.complete;
+            storage
+                .items
+                .into_iter()
+                .map(|item| (item.key, item.bytes))
+                .collect::<HashMap<_, _>>()
+        } else {
+            HashMap::new()
+        };
         let needle = input.search.trim().to_lowercase();
         let started = Instant::now();
         let mut matches = Vec::new();
         let mut reader = Reader::default();
-        let mut complete = snapshot.complete;
         let mut issues = Vec::new();
         for entry in entries {
             if cancel.load(Ordering::Acquire) {
@@ -286,6 +307,13 @@ impl AgentSessionService {
                     .is_some_and(|archived| archived != summary.archived)
                 || input.from.is_some_and(|from| summary.updated_at < from)
                 || input.to.is_some_and(|to| summary.updated_at > to)
+                || input.min_bytes.is_some_and(|minimum| {
+                    sizes
+                        .get(&summary.key)
+                        .copied()
+                        .flatten()
+                        .is_none_or(|bytes| bytes < minimum)
+                })
             {
                 continue;
             }
@@ -356,6 +384,20 @@ impl AgentSessionService {
             matches.push(summary);
         }
         self.check_generation(&input.generation)?;
+        if input.sort == SessionSort::Size {
+            matches.sort_by(|a, b| {
+                let a_size = sizes.get(&a.key).copied().flatten();
+                let b_size = sizes.get(&b.key).copied().flatten();
+                match (a_size, b_size) {
+                    (Some(a), Some(b)) => b.total_cmp(&a),
+                    (Some(_), None) => std::cmp::Ordering::Less,
+                    (None, Some(_)) => std::cmp::Ordering::Greater,
+                    (None, None) => std::cmp::Ordering::Equal,
+                }
+                .then(b.updated_at.total_cmp(&a.updated_at))
+                .then(a.key.cmp(&b.key))
+            });
+        }
         let total = matches.len() as u32;
         let limit = input.limit.clamp(1, 200);
         let items: Vec<_> = matches
@@ -374,7 +416,7 @@ impl AgentSessionService {
         })
     }
 
-    fn check_generation(&self, generation: &str) -> AppResult<()> {
+    pub(super) fn check_generation(&self, generation: &str) -> AppResult<()> {
         if self
             .index
             .lock()

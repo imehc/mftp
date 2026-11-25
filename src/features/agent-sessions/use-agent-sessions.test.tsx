@@ -12,6 +12,7 @@ import { useAgentSessions } from "./use-agent-sessions";
 
 vi.mock("~/lib/ipc", () => ({
   agentSessionsSnapshot: vi.fn(),
+  agentSessionsStorage: vi.fn(),
   agentSessionsQuery: vi.fn(),
   agentSessionsCancel: vi.fn(),
 }));
@@ -54,6 +55,12 @@ beforeEach(async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   vi.resetAllMocks();
   vi.mocked(ipc.agentSessionsSnapshot).mockResolvedValue(snapshot);
+  vi.mocked(ipc.agentSessionsStorage).mockResolvedValue({
+    generation: "first",
+    sources: [],
+    items: [],
+    complete: true,
+  });
   vi.mocked(ipc.agentSessionsQuery).mockResolvedValue(empty);
   vi.mocked(ipc.agentSessionsCancel).mockResolvedValue();
   element = document.createElement("div");
@@ -105,8 +112,12 @@ describe("会话检索生命周期", () => {
       client
         .getQueryCache()
         .getAll()
+        .filter((query) => query.state.data !== undefined)
         .map((query) => query.queryKey),
-    ).toEqual([["agent-sessions", "sources"]]);
+    ).toEqual([
+      ["agent-sessions", "sources"],
+      ["agent-sessions", "storage", "first"],
+    ]);
   });
 
   it("刷新失败保留原来的来源快照和成功的读取结果", async () => {
@@ -157,5 +168,46 @@ describe("会话检索生命周期", () => {
     expect(c.range).toBe("all");
     expect(c.archive).toBe("all");
     expect(c.filtered).toBe(false);
+  });
+
+  it("大小筛选和排序交给后端分页前处理，切换时重置页码", async () => {
+    await act(async () => c.setOffset(100));
+    await act(async () => {
+      c.setSort("size");
+      c.setMinBytes(10 * 1024 * 1024);
+    });
+    expect(c.offset).toBe(0);
+    expect(ipc.agentSessionsQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        sort: "size",
+        minBytes: 10 * 1024 * 1024,
+        offset: 0,
+      }),
+      expect.any(String),
+    );
+    await act(async () => c.clearFilters());
+    expect(c.minBytes).toBeNull();
+    expect(c.sort).toBe("updated");
+  });
+
+  it("占用读取失败不改变已经成功的会话检索，并按来源代次隔离统计", async () => {
+    vi.mocked(ipc.agentSessionsStorage).mockRejectedValueOnce(
+      new Error("fixture storage"),
+    );
+    vi.mocked(ipc.agentSessionsSnapshot).mockResolvedValueOnce({
+      ...snapshot,
+      generation: "next",
+    });
+    await act(async () => c.refresh());
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect(c.page).not.toBeNull();
+    expect(c.error).toBeNull();
+    expect(c.storage.error).not.toBeNull();
+    expect(ipc.agentSessionsStorage).toHaveBeenLastCalledWith(
+      "next",
+      expect.any(String),
+    );
   });
 });
