@@ -230,10 +230,7 @@ pub(crate) mod full_contract {
     use super::super::*;
     macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_mobile, $($modules)*); }; }
     macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(full_agent_sessions, $($modules)*); }; }
-    #[cfg(target_os = "macos")]
-    macro_rules! full_agent_sessions { ($($modules:tt)*) => { add_agent_sessions!($($modules)*); }; }
-    #[cfg(not(target_os = "macos"))]
-    macro_rules! full_agent_sessions { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
+    macro_rules! full_agent_sessions { ($($modules:tt)*) => { agent_sessions_module!(define_registry, $($modules)*); }; }
     macro_rules! full_mcp { ($($modules:tt)*) => { mcp_module!(full_lan, $($modules)*); }; }
     #[cfg(any(target_os = "macos", target_os = "linux"))]
     macro_rules! full_rsync { ($($modules:tt)*) => { rsync_module!(full_mcp, $($modules)*); }; }
@@ -253,12 +250,51 @@ pub(crate) mod full_contract {
             .filter(|line| !line.starts_with('#'))
             .filter_map(|line| line.split_once(' '))
             .filter(|(platform, _)| {
-                (*platform != "macos,linux" || cfg!(any(target_os = "macos", target_os = "linux")))
-                    && (*platform != "macos" || cfg!(target_os = "macos"))
+                *platform != "macos,linux" || cfg!(any(target_os = "macos", target_os = "linux"))
             })
             .map(|(_, name)| name)
             .collect();
         assert_eq!(names, expected);
+    }
+
+    #[test]
+    fn developer_bindings_always_include_macos_session_contract() {
+        let output =
+            std::env::temp_dir().join(format!("mftp-full-contract-{}.ts", uuid::Uuid::new_v4()));
+        specta_builder()
+            .export(specta_typescript::Typescript::default(), &output)
+            .unwrap();
+        let bindings = std::fs::read_to_string(&output).unwrap();
+        std::fs::remove_file(output).unwrap();
+        for name in [
+            "agentSessionsSnapshot",
+            "agentSessionsQuery",
+            "agentSessionDetail",
+            "agentSessionsCancel",
+            "agentSessionImage",
+            "agentSessionsStorage",
+        ] {
+            assert!(
+                bindings.contains(&format!("{name}:")),
+                "missing macOS command: {name}"
+            );
+        }
+        for name in [
+            "SessionAgent",
+            "SessionRole",
+            "AgentSessionSummary",
+            "AgentSessionQuery",
+            "AgentSessionPage",
+            "AgentSessionDetail",
+            "AgentSessionImagePayload",
+            "AgentSessionsSnapshot",
+            "AgentSessionStorage",
+        ] {
+            assert!(
+                bindings.contains(&format!("export type {name} =")),
+                "missing macOS type: {name}"
+            );
+        }
     }
 }
 

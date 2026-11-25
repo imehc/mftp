@@ -364,10 +364,10 @@ macro_rules! add_mobile { ($($modules:tt)*) => { mobile_export_module!(define_re
 #[cfg(desktop)]
 macro_rules! add_mobile { ($($modules:tt)*) => { add_agent_sessions!($($modules)*); }; }
 
-#[cfg(target_os = "macos")]
-macro_rules! add_agent_sessions {
-    ($($modules:tt)*) => {
-        define_registry! { $($modules)*
+#[cfg(any(target_os = "macos", all(desktop, test)))]
+macro_rules! agent_sessions_module {
+    ($next:ident, $($modules:tt)*) => {
+        $next! { $($modules)*
             "agent_sessions" => {
                 commands: [crate::modules::agent_sessions::commands::agent_sessions_snapshot,
                     crate::modules::agent_sessions::commands::agent_sessions_query,
@@ -380,6 +380,8 @@ macro_rules! add_agent_sessions {
         }
     };
 }
+#[cfg(target_os = "macos")]
+macro_rules! add_agent_sessions { ($($modules:tt)*) => { agent_sessions_module!(define_registry, $($modules)*); }; }
 #[cfg(all(desktop, not(target_os = "macos")))]
 macro_rules! add_agent_sessions { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
 

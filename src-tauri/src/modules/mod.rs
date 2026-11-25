@@ -1,6 +1,6 @@
 //! Feature-owned backend modules, migrated incrementally.
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", all(desktop, test)))]
 pub(crate) mod agent_sessions;
 pub(crate) mod ai;
 pub(crate) mod diagnostics;

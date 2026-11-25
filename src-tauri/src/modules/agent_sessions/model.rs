@@ -15,6 +15,7 @@ pub enum SessionAgent {
     Codebuddy,
 }
 
+#[cfg(target_os = "macos")]
 impl SessionAgent {
     pub(super) fn slug(self) -> &'static str {
         match self {
