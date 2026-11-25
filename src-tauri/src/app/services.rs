@@ -23,6 +23,8 @@ use crate::storage::Storage;
 /// The single shared service state injected via Tauri `State`.
 #[derive(Clone)]
 pub struct AppServices {
+    #[cfg(target_os = "macos")]
+    pub(crate) agent_sessions: Arc<crate::modules::agent_sessions::AgentSessionService>,
     pub(crate) diagnostics: Arc<crate::core::diagnostics::Diagnostics>,
     pub storage: Storage,
     pub ai_tasks: Arc<AiTaskManager>,
@@ -74,6 +76,15 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         Some(logs),
     ));
     let mut lifecycle = Lifecycle::new(operations.clone());
+    #[cfg(target_os = "macos")]
+    let agent_sessions = lifecycle.install(
+        "agent_sessions",
+        Arc::new(crate::modules::agent_sessions::AgentSessionService::new(
+            app.path().home_dir()?,
+        )),
+        crate::modules::agent_sessions::AgentSessionService::shutdown,
+        crate::modules::agent_sessions::AgentSessionService::is_busy,
+    );
     // Stop-registration names share the maintenance participant ids, and the
     // busy capability registered here is the single source both the shutdown
     // report and the maintenance admission list query.
@@ -179,6 +190,8 @@ pub(super) fn install(app: &tauri::AppHandle) -> AppResult<AppServices> {
         });
     }
     let services = AppServices {
+        #[cfg(target_os = "macos")]
+        agent_sessions,
         translation,
         diagnostics,
         executor,

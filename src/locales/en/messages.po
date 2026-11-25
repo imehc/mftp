@@ -24,6 +24,16 @@ msgstr ""
 msgid "{0, plural, one {# 个字符} other {# 个字符}}"
 msgstr "{0, plural, one {# character} other {# characters}}"
 
+#. placeholder {0}: page.total
+#: src/features/agent-sessions/SessionResults.tsx:75
+msgid "{0, plural, one {# 个结果} other {# 个结果}}"
+msgstr "{0, plural, one {# result} other {# results}}"
+
+#. placeholder {0}: session.messageCount
+#: src/features/agent-sessions/SessionDetail.tsx:131
+msgid "{0, plural, one {# 条对话} other {# 条对话}}"
+msgstr "{0, plural, one {# message} other {# messages}}"
+
 #. placeholder {0}: payload.moves
 #. placeholder {0}: state.data.offset + state.data.cursor
 #: src/features/games/magic-cube/MagicCubeDialogs.tsx:68
@@ -157,15 +167,15 @@ msgstr "{minutes, plural, one {# minute ago} other {# minutes ago}}"
 msgid "{moveCount, plural, one {# 手} other {# 手}}"
 msgstr "{moveCount, plural, one {# move} other {# moves}}"
 
-#: src/features/games/go/GoMatch.tsx:265
+#: src/features/games/go/GoMatch.tsx:263
 #: src/features/games/gomoku/GomokuMatch.tsx:218
-#: src/features/games/xiangqi/XiangqiMatch.tsx:258
+#: src/features/games/xiangqi/XiangqiMatch.tsx:256
 msgid "{moveCount, plural, one {共 # 手} other {共 # 手}}"
 msgstr "{moveCount, plural, one {# move total} other {# moves total}}"
 
-#: src/features/games/go/GoMatch.tsx:189
+#: src/features/games/go/GoMatch.tsx:187
 #: src/features/games/gomoku/GomokuMatch.tsx:169
-#: src/features/games/xiangqi/XiangqiMatch.tsx:177
+#: src/features/games/xiangqi/XiangqiMatch.tsx:175
 msgid "{moveNumber, plural, one {第 # 手} other {第 # 手}}"
 msgstr "{moveNumber, plural, one {Move #} other {Move #}}"
 
@@ -399,6 +409,18 @@ msgstr "The 8 sits in the middle of the third row and the two back corners hold 
 msgid "9 号球已复位"
 msgstr "9-ball re-spotted"
 
+#. 本机 AI agent 历史对话工具的名称
+#: src/features/agent-sessions/AgentSessionsTool.tsx:28
+#: src/features/home/entries.tsx:69
+msgid "Agent 会话"
+msgstr "Agent sessions"
+
+#. 左侧导航标题，按 AI 编码工具区分历史来源
+#: src/features/agent-sessions/SessionFilters.tsx:76
+#: src/features/agent-sessions/SessionSources.tsx:23
+msgid "Agent 分类"
+msgstr "Agents"
+
 #: src/lib/errors/ai-provider.ts:22
 msgid "AI 响应未完整结束，请重新请求"
 msgstr "The AI response ended before completion. Send a new request."
@@ -408,7 +430,7 @@ msgid "AI 密钥"
 msgstr "AI keys"
 
 #. AI 凭据认证期间应用退到后台或密钥被修改，需回到前台重新操作。
-#: src/lib/errors/messages.ts:192
+#: src/lib/errors/messages.ts:206
 msgid "AI 密钥认证已失效，请返回应用后重试"
 msgstr "AI key authentication has expired. Return to the app and try again."
 
@@ -420,7 +442,7 @@ msgstr "The AI response completed without usable text"
 msgid "AI 已达到输出或推理预算上限，结果不完整"
 msgstr "The AI reached its output or reasoning budget. The result is incomplete."
 
-#: src/lib/errors/messages.ts:203
+#: src/lib/errors/messages.ts:217
 msgid "AI 数据库版本高于当前应用版本，请升级应用"
 msgstr "The AI database is newer than this app. Please update the app."
 
@@ -433,7 +455,7 @@ msgstr "The AI database is newer than this app. Please update the app."
 msgid "AI 服务"
 msgstr "AI Service"
 
-#: src/lib/errors/messages.ts:181
+#: src/lib/errors/messages.ts:195
 msgid "AI 服务名称须为 1–80 个字符，且不能包含控制字符"
 msgstr "AI service names must contain 1–80 characters and no control characters."
 
@@ -446,7 +468,7 @@ msgstr "AI service addresses"
 msgid "AI 服务地址不存在该接口，请检查地址与协议"
 msgstr "The AI service address has no such endpoint. Check the address and protocol."
 
-#: src/lib/errors/messages.ts:187
+#: src/lib/errors/messages.ts:201
 msgid "AI 服务地址无效"
 msgstr "Invalid AI service address"
 
@@ -475,7 +497,7 @@ msgstr "The AI service could not complete this request"
 msgid "AI 服务返回 HTTP 错误，请检查服务配置"
 msgstr "The AI service returned an HTTP error. Check the service configuration."
 
-#: src/lib/errors/messages.ts:201
+#: src/lib/errors/messages.ts:215
 msgid "AI 服务返回内容超出大小限制"
 msgstr "The AI service response exceeds the size limit"
 
@@ -494,7 +516,7 @@ msgstr "The AI service reported no generation progress for too long. This reques
 msgid "AI 模型"
 msgstr "AI models"
 
-#: src/lib/errors/messages.ts:197
+#: src/lib/errors/messages.ts:211
 msgid "AI 流式请求标识无效"
 msgstr "Invalid AI streaming request ID"
 
@@ -506,25 +528,25 @@ msgstr "AI generated"
 msgid "AI 生成及人工修订的诗词译文，不包含 API Key"
 msgstr "AI-generated and manually revised poetry translations, excluding API Keys"
 
-#: src/lib/errors/messages.ts:208
+#: src/lib/errors/messages.ts:222
 msgid "AI 翻译保存失败"
 msgstr "Failed to save the AI translation"
 
-#: src/lib/errors/messages.ts:196
+#: src/lib/errors/messages.ts:210
 msgid "AI 设置未保存，且密钥回滚失败"
 msgstr "AI settings were not saved, and restoring the previous key failed"
 
 #: src/features/export/sections.tsx:52
-#: src/lib/errors/messages.ts:282
+#: src/lib/errors/messages.ts:296
 msgid "AI 译文"
 msgstr "AI Translation"
 
 #. 阻止数据清理或退出排空的在途 AI 任务名称。
-#: src/lib/errors/messages.ts:259
+#: src/lib/errors/messages.ts:273
 msgid "AI 请求"
 msgstr "AI requests"
 
-#: src/lib/errors/messages.ts:200
+#: src/lib/errors/messages.ts:214
 msgid "AI 请求内容超出大小限制"
 msgstr "The AI request exceeds the size limit"
 
@@ -540,11 +562,11 @@ msgstr "The AI request reached its waiting limit"
 msgid "AI 请求策略与当前服务不兼容"
 msgstr "The AI request policy is incompatible with this service"
 
-#: src/lib/errors/messages.ts:199
+#: src/lib/errors/messages.ts:213
 msgid "AI 请求过多，请等待现有任务结束后重试"
 msgstr "Too many AI requests. Wait for the current tasks to finish and try again."
 
-#: src/lib/errors/messages.ts:202
+#: src/lib/errors/messages.ts:216
 msgid "AI 输出内容超出大小限制"
 msgstr "The AI output exceeds the size limit"
 
@@ -556,11 +578,11 @@ msgstr "The AI output does not match the required format"
 msgid "AI 返回的数据不符合所选协议"
 msgstr "The AI response does not match the selected protocol"
 
-#: src/lib/errors/messages.ts:251
+#: src/lib/errors/messages.ts:265
 msgid "AI 返回的译文格式无效"
 msgstr "The AI returned an invalid translation format"
 
-#: src/lib/errors/messages.ts:171
+#: src/lib/errors/messages.ts:185
 msgid "AI 配置已更新，请重新加载后重试"
 msgstr "AI configuration has changed. Reload and try again."
 
@@ -569,7 +591,7 @@ msgstr "AI configuration has changed. Reload and try again."
 msgid "Anthropic Messages"
 msgstr "Anthropic Messages"
 
-#: src/lib/errors/messages.ts:191
+#: src/lib/errors/messages.ts:205
 msgid "API Key 为空或过长"
 msgstr "The API key is empty or too long"
 
@@ -591,7 +613,7 @@ msgstr "English"
 msgid "Git Commit"
 msgstr "Git commit"
 
-#: src/lib/errors/messages.ts:246
+#: src/lib/errors/messages.ts:260
 msgid "GitHub API 剩余请求次数不足，请稍后重试或改用桌面端下载"
 msgstr "The GitHub API rate limit is too low. Try again later or download using the desktop app."
 
@@ -609,18 +631,18 @@ msgid "MCP 客户端授权列表"
 msgstr "MCP client permissions"
 
 #. 应用内部 MCP 模块或工具登记无效；不是用户填写外部模型连接地址失败。
-#: src/lib/errors/messages.ts:46
+#: src/lib/errors/messages.ts:60
 msgid "MCP 工具注册失败，请检查模块配置"
 msgstr "MCP tool registration failed. Check the module configuration."
 
-#: src/lib/errors/messages.ts:51
+#: src/lib/errors/messages.ts:65
 msgid "MCP 授权已撤销或不可用，请检查连接凭据"
 msgstr "MCP authorization was revoked or is unavailable. Check your credential."
 
 #. 本地数据维护被 MCP 工具的编辑草稿或在途操作阻止时显示的任务名称。
 #: src/features/mcp/integration.tsx:17
 #: src/features/settings/SettingsPage.tsx:44
-#: src/lib/errors/messages.ts:268
+#: src/lib/errors/messages.ts:282
 msgid "MCP 服务"
 msgstr "MCP service"
 
@@ -629,11 +651,11 @@ msgstr "MCP service"
 msgid "MCP 服务帮助"
 msgstr "MCP service help"
 
-#: src/lib/errors/messages.ts:54
+#: src/lib/errors/messages.ts:68
 msgid "MCP 服务连接失败，请检查端口和执行日志"
 msgstr "MCP connection failed. Check the port and execution log."
 
-#: src/lib/errors/messages.ts:52
+#: src/lib/errors/messages.ts:66
 msgid "MCP 端口、授权名称或模块权限无效"
 msgstr "Invalid MCP port, authorization name, or module permissions."
 
@@ -662,11 +684,11 @@ msgstr "PNG is lossless; quality has limited effect"
 msgid "Responses"
 msgstr "Responses"
 
-#: src/lib/errors/messages.ts:158
+#: src/lib/errors/messages.ts:172
 msgid "rsync 传输桥接失败，请重试"
 msgstr "rsync transfer bridge failed. Please try again."
 
-#: src/lib/errors/messages.ts:159
+#: src/lib/errors/messages.ts:173
 msgid "rsync 传输桥接超时，请重试"
 msgstr "rsync transfer bridge timed out. Please try again."
 
@@ -683,7 +705,7 @@ msgstr "rsync is unavailable"
 msgid "SFTP 会话"
 msgstr "SFTP session"
 
-#: src/lib/errors/messages.ts:144
+#: src/lib/errors/messages.ts:158
 msgid "SFTP 写入长时间没有进展，请重试"
 msgstr "The SFTP write stalled. Please try again."
 
@@ -700,7 +722,7 @@ msgstr "SSH / SFTP host connection profiles"
 msgid "SSH 会话"
 msgstr "SSH session"
 
-#: src/lib/errors/messages.ts:114
+#: src/lib/errors/messages.ts:128
 msgid "SSH 会话不存在，请重新连接"
 msgstr "The SSH session no longer exists. Please reconnect."
 
@@ -709,15 +731,15 @@ msgstr "The SSH session no longer exists. Please reconnect."
 msgid "SSH 密钥"
 msgstr "SSH key"
 
-#: src/lib/errors/messages.ts:115
+#: src/lib/errors/messages.ts:129
 msgid "SSH 终端尚未打开"
 msgstr "The SSH terminal has not been opened"
 
-#: src/lib/errors/messages.ts:116
+#: src/lib/errors/messages.ts:130
 msgid "SSH 终端已关闭"
 msgstr "The SSH terminal is closed"
 
-#: src/lib/errors/messages.ts:263
+#: src/lib/errors/messages.ts:277
 msgid "SSH 连接"
 msgstr "SSH connection"
 
@@ -756,10 +778,15 @@ msgstr "3D cube. Drag a tile to turn a layer, drag empty space to orbit, and scr
 msgid "上一个"
 msgstr "Previous"
 
-#: src/features/games/go/GoMatch.tsx:216
+#: src/features/games/go/GoMatch.tsx:214
 msgid "上一手已停手：再停一手即终局，落子则重新计数"
 msgstr "The last move was a pass: pass again to end the game, or play to reset the count"
 
+#: src/features/agent-sessions/SessionResults.tsx:171
+msgid "上一页"
+msgstr "Previous page"
+
+#: src/features/agent-sessions/SessionDateFilter.tsx:107
 #: src/features/todo/TodoSchedulePicker.tsx:94
 msgid "上个月"
 msgstr "Previous month"
@@ -798,11 +825,11 @@ msgstr "Upload File"
 msgid "上传文件夹"
 msgstr "Upload Folder"
 
-#: src/lib/errors/messages.ts:87
+#: src/lib/errors/messages.ts:101
 msgid "上传文件的相对路径无效"
 msgstr "The upload file has an invalid relative path"
 
-#: src/lib/errors/messages.ts:136
+#: src/lib/errors/messages.ts:150
 msgid "上传校验失败，远端临时文件不存在"
 msgstr "Upload verification failed: the remote temporary file is missing"
 
@@ -810,28 +837,28 @@ msgstr "Upload verification failed: the remote temporary file is missing"
 msgid "上传的文件夹"
 msgstr "Uploaded Folder"
 
-#: src/lib/errors/messages.ts:90
+#: src/lib/errors/messages.ts:104
 msgid "上传目标不是普通文件或文件夹"
 msgstr "The upload destination is not a regular file or directory"
 
-#: src/lib/errors/messages.ts:86
+#: src/lib/errors/messages.ts:100
 msgid "上传长度、分片范围或冲突处理方式无效"
 msgstr "The upload length, byte range, or conflict option is invalid"
 
-#: src/lib/errors/messages.ts:245
+#: src/lib/errors/messages.ts:259
 msgid "上游接口返回数据缺少必要字段"
 msgstr "The upstream response is missing required fields"
 
-#: src/lib/errors/messages.ts:239
+#: src/lib/errors/messages.ts:253
 msgid "上游文件清单中没有匹配的文件"
 msgstr "No matching files were found in the upstream file list"
 
 #. 清单路径可能越过下载目录；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:240
+#: src/lib/errors/messages.ts:254
 msgid "上游文件清单包含不安全路径：{path}"
 msgstr "The upstream file list contains an unsafe path: {path}"
 
-#: src/lib/errors/messages.ts:238
+#: src/lib/errors/messages.ts:252
 msgid "上游文件清单过大被截断，无法安全同步"
 msgstr "The upstream file list was truncated because it is too large. It cannot be synced safely."
 
@@ -849,6 +876,11 @@ msgstr "Up U"
 msgid "下一个"
 msgstr "Next"
 
+#: src/features/agent-sessions/SessionResults.tsx:182
+msgid "下一页"
+msgstr "Next page"
+
+#: src/features/agent-sessions/SessionDateFilter.tsx:108
 #: src/features/todo/TodoSchedulePicker.tsx:95
 msgid "下个月"
 msgstr "Next month"
@@ -878,7 +910,7 @@ msgstr "Download {entryName2}"
 msgid "下载中"
 msgstr "Downloading"
 
-#: src/lib/errors/messages.ts:219
+#: src/lib/errors/messages.ts:233
 msgid "下载响应的范围、长度或版本不匹配，请重新下载"
 msgstr "The download range, size, or version did not match. Download the model again."
 
@@ -940,23 +972,23 @@ msgid "不指定时间"
 msgstr "No specific time"
 
 #. SFTP 错误；path 是文件路径，特殊文件指设备、套接字等非普通文件。
-#: src/lib/errors/messages.ts:125
+#: src/lib/errors/messages.ts:139
 msgid "不支持传输特殊文件：{path}"
 msgstr "Transferring special files is not supported: {path}"
 
-#: src/lib/errors/messages.ts:209
+#: src/lib/errors/messages.ts:223
 msgid "不支持此翻译模型，请选择列表中的模型"
 msgstr "This translation model is not supported. Choose a model from the list."
 
-#: src/lib/errors/messages.ts:139
+#: src/lib/errors/messages.ts:153
 msgid "不支持的压缩包格式"
 msgstr "Unsupported archive format"
 
-#: src/lib/errors/messages.ts:247
+#: src/lib/errors/messages.ts:261
 msgid "不支持的译文包格式"
 msgstr "Unsupported translation package format"
 
-#: src/lib/errors/messages.ts:129
+#: src/lib/errors/messages.ts:143
 msgid "不能删除根目录或受保护的路径"
 msgstr "Root directories and protected paths cannot be deleted"
 
@@ -1013,7 +1045,7 @@ msgstr "Medium"
 
 #: src/features/games/xiangqi/XiangqiGame.tsx:49
 #: src/features/games/xiangqi/XiangqiHelp.tsx:9
-#: src/features/home/entries.tsx:200
+#: src/features/home/entries.tsx:209
 msgid "中国象棋"
 msgstr "Chinese Chess"
 
@@ -1063,7 +1095,7 @@ msgstr "The main database and key files are managed inside their own modules."
 #: src/features/export/sections.tsx:32
 #: src/features/logs/use-activity-logs.ts:44
 #: src/features/ssh-sftp/components/Sidebar.tsx:250
-#: src/lib/errors/messages.ts:279
+#: src/lib/errors/messages.ts:293
 msgid "主机"
 msgstr "Hosts"
 
@@ -1117,7 +1149,7 @@ msgstr "Fifty-move rule"
 
 #: src/features/games/gomoku/GomokuGame.tsx:50
 #: src/features/games/gomoku/GomokuHelp.tsx:9
-#: src/features/home/entries.tsx:173
+#: src/features/home/entries.tsx:182
 msgid "五子棋"
 msgstr "Gomoku"
 
@@ -1210,11 +1242,13 @@ msgstr "Only completed or cancelled tasks are removed. Running tasks and logs ar
 msgid "仅限同一局域网内联机"
 msgstr "Online play works within the same LAN only"
 
+#: src/features/agent-sessions/SessionDateFilter.tsx:115
+#: src/features/agent-sessions/SessionFilters.tsx:165
 #: src/features/todo/TodoSchedulePicker.tsx:100
 msgid "今天"
 msgstr "Today"
 
-#: src/lib/errors/messages.ts:18
+#: src/lib/errors/messages.ts:32
 msgid "仍有数据未清理，暂时无法完成重置"
 msgstr "Some data still needs to be cleared before the reset can finish."
 
@@ -1260,6 +1294,32 @@ msgstr "Task progress sync is unavailable"
 msgid "优先级"
 msgstr "Priority"
 
+#. 会话检索结果列表标题
+#: src/features/agent-sessions/SessionResults.tsx:68
+msgid "会话"
+msgstr "Sessions"
+
+#: src/features/agent-sessions/SessionDetail.tsx:86
+msgid "会话信息"
+msgstr "Session info"
+
+#. 本机会话读取失败，包含压缩格式、未知存储结构和损坏的 JSON/数据库
+#: src/lib/errors/messages.ts:17
+msgid "会话格式不受支持或记录已损坏"
+msgstr "The session format is unsupported or its records are damaged"
+
+#: src/lib/errors/messages.ts:11
+msgid "会话记录已变化，请刷新后重新打开"
+msgstr "Session history has changed. Refresh and reopen the session."
+
+#: src/lib/errors/messages.ts:9
+msgid "会话读取尚未结束，请稍后重试"
+msgstr "A session read is still running. Try again shortly."
+
+#: src/lib/errors/messages.ts:10
+msgid "会话读取已取消"
+msgstr "Session read cancelled"
+
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:147
@@ -1267,7 +1327,7 @@ msgstr "Priority"
 msgid "传输任务"
 msgstr "Transfer task"
 
-#: src/lib/errors/messages.ts:121
+#: src/lib/errors/messages.ts:135
 msgid "传输任务尚未开始或已结束"
 msgstr "The transfer has not started or has already ended"
 
@@ -1277,7 +1337,7 @@ msgstr "The transfer has not started or has already ended"
 msgid "传输原始错误"
 msgstr "Original transport error"
 
-#: src/lib/errors/messages.ts:123
+#: src/lib/errors/messages.ts:137
 msgid "传输已取消"
 msgstr "Transfer canceled"
 
@@ -1316,7 +1376,9 @@ msgstr "Low"
 msgid "作者"
 msgstr "Author"
 
+#. 历史会话中的本机用户身份标签
 #. 对局状态栏的本地玩家身份。
+#: src/features/agent-sessions/SessionConversation.tsx:18
 #: src/features/games/billiards/BilliardsScore.tsx:16
 #: src/features/games/chess/ChessMatch.tsx:168
 #: src/features/games/engine/black-white-labels.tsx:32
@@ -1487,7 +1549,7 @@ msgstr "Modified Date"
 msgid "修改时间"
 msgstr "Modified Time"
 
-#: src/features/games/go/GoMatch.tsx:234
+#: src/features/games/go/GoMatch.tsx:232
 msgid "停一手"
 msgstr "Pass"
 
@@ -1626,9 +1688,19 @@ msgstr "Solids"
 msgid "全部"
 msgstr "All"
 
+#. 会话来源分类，显示本机已发现的全部 agent 记录
+#: src/features/agent-sessions/SessionFilters.tsx:98
+msgid "全部 agent"
+msgstr "All agents"
+
 #: src/features/todo/TodoTool.tsx:179
 msgid "全部优先级"
 msgstr "All priorities"
+
+#. 显示所有 agent 的会话
+#: src/features/agent-sessions/SessionSources.tsx:35
+msgid "全部会话"
+msgstr "All sessions"
 
 #: src/features/todo/TodoTool.tsx:206
 #: src/features/vault/VaultTool.tsx:114
@@ -1638,6 +1710,10 @@ msgstr "All categories"
 #: src/features/poetry/components/CollectionManagement.tsx:141
 msgid "全部合集均已安装。"
 msgstr "All collections are installed."
+
+#: src/features/agent-sessions/SessionFilters.tsx:162
+msgid "全部日期"
+msgstr "All dates"
 
 #: src/features/logs/LogFilters.tsx:107
 msgid "全部时间"
@@ -1658,6 +1734,10 @@ msgstr "All modules"
 #: src/features/logs/LogFilters.tsx:101
 msgid "全部结果"
 msgstr "All Results"
+
+#: src/features/agent-sessions/SessionFilters.tsx:132
+msgid "全部记录"
+msgstr "All records"
 
 #: src/features/games/junqi/JunqiHelp.tsx:77
 msgid "公路走相邻一步，可沿行营斜线移动。铁路上可沿直线走任意距离，工兵还可转弯；所有棋子都不能越子。"
@@ -1684,11 +1764,11 @@ msgid "共享目录"
 msgstr "Shared Folders"
 
 #. 局域网浏览/下载引用了不存在的共享；share 是共享目录标识。
-#: src/lib/errors/messages.ts:92
+#: src/lib/errors/messages.ts:106
 msgid "共享目录不存在或已被移除：{share}"
 msgstr "The shared folder does not exist or was removed: {share}"
 
-#: src/lib/errors/messages.ts:100
+#: src/lib/errors/messages.ts:114
 msgid "共享目录不存在或无法访问，请检查共享设置"
 msgstr "The shared folder does not exist or cannot be accessed. Check the sharing settings."
 
@@ -1816,7 +1896,7 @@ msgstr "One more game"
 msgid "最低目标"
 msgstr "Lowest ball"
 
-#: src/lib/errors/messages.ts:175
+#: src/lib/errors/messages.ts:189
 msgid "最多保存 5 个 AI 服务地址"
 msgstr "You can save up to 5 AI service addresses."
 
@@ -1836,6 +1916,10 @@ msgstr "Shortest side"
 #: src/features/connection-diagnostics/ExecutionLogToolbar.tsx:75
 msgid "最新"
 msgstr "Latest"
+
+#: src/features/agent-sessions/SessionFilters.tsx:168
+msgid "最近 7 天"
+msgstr "Last 7 days"
 
 #. 斯诺克对局详情，球员本局最高连续得分
 #: src/features/games/billiards/BilliardsInfo.tsx:91
@@ -2093,7 +2177,7 @@ msgstr "Delete key?"
 msgid "删除密钥“{pendingLabel}”？使用该密钥的主机将无法连接，需重新导入。"
 msgstr "Delete key “{pendingLabel}”? Hosts using this key will no longer connect and the key must be imported again."
 
-#: src/lib/errors/messages.ts:186
+#: src/lib/errors/messages.ts:200
 msgid "删除当前密钥或模型前，请选择此地址下的其他项作为替代"
 msgstr "Before deleting the current key or model, select another one under this address to replace it."
 
@@ -2194,6 +2278,13 @@ msgstr "Refresh rooms"
 msgid "刷新状态"
 msgstr "Refresh status"
 
+#. 标题栏图标按钮，重新读取本机 agent 会话目录
+#. 标题栏图标按钮，重新读取本机 agent 会话目录
+#: src/features/agent-sessions/AgentSessionsTool.tsx:40
+#: src/features/agent-sessions/AgentSessionsTool.tsx:44
+msgid "刷新记录"
+msgstr "Refresh history"
+
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:134
 #: src/features/ssh-sftp/components/monitor/SystemMonitorPanel.tsx:144
 msgid "刷新间隔"
@@ -2248,7 +2339,7 @@ msgstr "Join room"
 msgid "加入游戏房间"
 msgstr "Join game room"
 
-#: src/lib/errors/messages.ts:77
+#: src/lib/errors/messages.ts:91
 msgid "加入游戏房间被拒绝"
 msgstr "Joining the game room was rejected"
 
@@ -2261,7 +2352,7 @@ msgid "加密导出"
 msgstr "Encrypt export"
 
 #: src/features/crypto/CryptoTool.tsx:31
-#: src/features/home/entries.tsx:89
+#: src/features/home/entries.tsx:98
 msgid "加解密"
 msgstr "Encode / Decode"
 
@@ -2282,6 +2373,15 @@ msgstr "Loading"
 #: src/features/ssh-sftp/components/sftp/SftpPanel.utils.ts:323
 msgid "加载中…"
 msgstr "Loading..."
+
+#: src/features/agent-sessions/SessionDetail.tsx:265
+msgid "加载更多"
+msgstr "Load more"
+
+#. 历史会话中的 AI 回复身份标签
+#: src/features/agent-sessions/SessionConversation.tsx:19
+msgid "助手"
+msgstr "Assistant"
 
 #: src/features/formatter/use-formatter.ts:60
 msgid "区分大小写"
@@ -2358,12 +2458,12 @@ msgstr "Compress"
 msgid "压缩包"
 msgstr "Archive"
 
-#: src/lib/errors/messages.ts:244
+#: src/lib/errors/messages.ts:258
 msgid "压缩包包含不安全路径"
 msgstr "The archive contains an unsafe path"
 
 #. 解压被拒绝；path 是压缩包内可能越过目标目录的路径。
-#: src/lib/errors/messages.ts:140
+#: src/lib/errors/messages.ts:154
 msgid "压缩包包含不安全路径：{path}"
 msgstr "The archive contains an unsafe path: {path}"
 
@@ -2436,7 +2536,7 @@ msgstr "Raw bytes (hex)"
 msgid "原文"
 msgstr "Original"
 
-#: src/lib/errors/messages.ts:217
+#: src/lib/errors/messages.ts:231
 msgid "原文超出模型上下文限制，请缩短文本后重试"
 msgstr "The input exceeds the model context limit. Shorten the text and try again."
 
@@ -2508,7 +2608,7 @@ msgstr "You have a saved cube. Continue where you left off?"
 msgid "发现新版本"
 msgstr "New version available"
 
-#: src/lib/errors/messages.ts:254
+#: src/lib/errors/messages.ts:268
 msgid "发生未知错误，请重试"
 msgstr "An unknown error occurred. Please try again."
 
@@ -2637,12 +2737,17 @@ msgstr "Unmute"
 msgid "口令保护"
 msgstr "Passphrase Protected"
 
-#: src/features/home/entries.tsx:153
+#: src/features/home/entries.tsx:162
 #: src/features/poetry/LibraryPage.tsx:151
 #: src/features/poetry/LibraryPage.tsx:316
 #: src/features/poetry/PoemDetailPage.tsx:44
 msgid "古诗词"
 msgstr "Classical Poetry"
+
+#. 更多面板阅读开关，只显示用户提问和助手回复
+#: src/features/agent-sessions/SessionViewControls.tsx:41
+msgid "只看对话"
+msgstr "Conversation only"
 
 #: src/features/updater/controller.ts:88
 msgid "只能在桌面应用中检查更新"
@@ -2693,7 +2798,7 @@ msgstr "Boards of 9 x 9, 13 x 13, and 19 x 19 are available; the default is 19 x
 #: src/features/games/billiards/BilliardsGame.tsx:102
 #: src/features/games/billiards/BilliardsMatch.tsx:63
 #: src/features/games/billiards/BilliardsMatchHeader.tsx:57
-#: src/features/home/entries.tsx:163
+#: src/features/home/entries.tsx:172
 msgid "台球"
 msgstr "Billiards"
 
@@ -2815,7 +2920,7 @@ msgstr "Sync failed"
 msgid "同步完成"
 msgstr "Sync complete"
 
-#: src/lib/errors/messages.ts:162
+#: src/lib/errors/messages.ts:176
 msgid "同步目标无效：{path}"
 msgstr "Invalid sync target: {path}"
 
@@ -2824,11 +2929,11 @@ msgstr "Invalid sync target: {path}"
 msgid "同步诗词库"
 msgstr "Sync poetry library"
 
-#: src/lib/errors/messages.ts:164
+#: src/lib/errors/messages.ts:178
 msgid "同步选项已变化，请重新预览"
 msgstr "Sync options have changed. Preview again."
 
-#: src/lib/errors/messages.ts:163
+#: src/lib/errors/messages.ts:177
 msgid "同步预览已过期，请重新预览"
 msgstr "The sync preview has expired. Preview again."
 
@@ -2971,7 +3076,7 @@ msgstr "Surrounding more territory wins; once both sides pass, the score is coun
 
 #: src/features/games/go/GoGame.tsx:50
 #: src/features/games/go/GoHelp.tsx:10
-#: src/features/home/entries.tsx:183
+#: src/features/home/entries.tsx:192
 msgid "围棋"
 msgstr "Go"
 
@@ -2998,7 +3103,7 @@ msgstr "Fixed height"
 #. 小游戏名称，标准国际象棋
 #: src/features/games/chess/ChessGame.tsx:52
 #: src/features/games/chess/ChessHelp.tsx:9
-#: src/features/home/entries.tsx:214
+#: src/features/home/entries.tsx:223
 msgid "国际象棋"
 msgstr "Chess"
 
@@ -3006,7 +3111,15 @@ msgstr "Chess"
 msgid "国际象棋棋盘"
 msgstr "Chess board"
 
-#: src/lib/errors/messages.ts:66
+#: src/features/agent-sessions/SessionImage.tsx:83
+msgid "图片不可用"
+msgstr "Image unavailable"
+
+#: src/lib/errors/messages.ts:7
+msgid "图片不可用或格式不支持"
+msgstr "Image unavailable or unsupported format"
+
+#: src/lib/errors/messages.ts:80
 msgid "图片单边超过 8192 像素限制，请先缩小后再添加"
 msgstr "The image exceeds the 8192 pixel edge limit. Resize it before adding it."
 
@@ -3019,11 +3132,11 @@ msgstr "Image Compress"
 msgid "图片备注"
 msgstr "Image note"
 
-#: src/lib/errors/messages.ts:64
+#: src/lib/errors/messages.ts:78
 msgid "图片大小、像素或数量超过限制"
 msgstr "The image exceeds the size, pixel, or count limit"
 
-#: src/lib/errors/messages.ts:70
+#: src/lib/errors/messages.ts:84
 msgid "图片导入已取消"
 msgstr "Image import cancelled"
 
@@ -3031,7 +3144,7 @@ msgstr "Image import cancelled"
 msgid "图片导入已取消，请移除后重新插入。"
 msgstr "Image import was cancelled. Remove it and insert it again."
 
-#: src/lib/errors/messages.ts:68
+#: src/lib/errors/messages.ts:82
 msgid "图片损坏或无法处理，请重新选择"
 msgstr "The image is damaged or cannot be processed. Please choose another image"
 
@@ -3044,11 +3157,11 @@ msgstr "Image action failed"
 msgid "图片文件"
 msgstr "Image files"
 
-#: src/lib/errors/messages.ts:63
+#: src/lib/errors/messages.ts:77
 msgid "图片正在处理，请稍后再试"
 msgstr "An image is being processed. Please try again shortly"
 
-#: src/lib/errors/messages.ts:65
+#: src/lib/errors/messages.ts:79
 msgid "图片超过 1200 万像素限制，请先缩小后再添加"
 msgstr "The image exceeds the 12 million pixel limit. Resize it before adding it."
 
@@ -3157,33 +3270,33 @@ msgstr "Backup contents"
 msgid "备份密码"
 msgstr "Backup password"
 
-#: src/lib/errors/messages.ts:71
+#: src/lib/errors/messages.ts:85
 msgid "备份数据超过当前支持的大小，请减少导出内容"
 msgstr "The backup exceeds the supported size. Please export less data"
 
-#: src/lib/errors/messages.ts:36
+#: src/lib/errors/messages.ts:50
 msgid "备份文件中没有可导入的数据"
 msgstr "The backup contains no data to import"
 
 #. 某个数据节解析失败；section 已由前端本地化为数据节名称。
-#: src/lib/errors/messages.ts:37
+#: src/lib/errors/messages.ts:51
 msgid "备份文件中的「{section}」数据无效，无法导入"
 msgstr "The backup contains invalid data for {section} and cannot be imported"
 
-#: src/lib/errors/messages.ts:33
+#: src/lib/errors/messages.ts:47
 msgid "备份文件使用了不支持的加密算法，请升级应用后重试"
 msgstr "The backup uses an unsupported encryption algorithm. Update the app and try again."
 
-#: src/lib/errors/messages.ts:32
+#: src/lib/errors/messages.ts:46
 msgid "备份文件使用了不支持的密钥派生算法，请升级应用后重试"
 msgstr "The backup uses an unsupported key derivation algorithm. Update the app and try again."
 
 #. 导入文件信封校验失败；field 是备份文件的英文字段名（如 kdf、salt）。
-#: src/lib/errors/messages.ts:27
+#: src/lib/errors/messages.ts:41
 msgid "备份文件格式无效：缺少字段 {field} 或取值不正确"
 msgstr "Invalid backup format: field {field} is missing or has an invalid value"
 
-#: src/lib/errors/messages.ts:34
+#: src/lib/errors/messages.ts:48
 msgid "备份文件解密失败：密码错误或文件已损坏"
 msgstr "Could not decrypt the backup: the password is incorrect or the file is damaged"
 
@@ -3194,7 +3307,7 @@ msgstr "Could not decrypt the backup: the password is incorrect or the file is d
 msgid "备注"
 msgstr "Notes"
 
-#: src/lib/errors/messages.ts:58
+#: src/lib/errors/messages.ts:72
 msgid "备注内容无效或超过限制"
 msgstr "The note is invalid or exceeds the supported limits"
 
@@ -3204,7 +3317,7 @@ msgstr "The note is invalid or exceeds the supported limits"
 msgid "备注图片"
 msgstr "Note image"
 
-#: src/lib/errors/messages.ts:69
+#: src/lib/errors/messages.ts:83
 msgid "备注图片不可用，请重新插入"
 msgstr "The note image is unavailable. Please insert it again"
 
@@ -3212,11 +3325,11 @@ msgstr "The note image is unavailable. Please insert it again"
 msgid "备注插入工具"
 msgstr "Note insertion tools"
 
-#: src/lib/errors/messages.ts:59
+#: src/lib/errors/messages.ts:73
 msgid "备注版本暂不支持，请更新应用"
 msgstr "This note version is not supported. Please update the app"
 
-#: src/lib/errors/messages.ts:61
+#: src/lib/errors/messages.ts:75
 msgid "备注编辑会话已关闭，请重新打开"
 msgstr "The note editing session has closed. Please reopen it"
 
@@ -3227,6 +3340,10 @@ msgstr "First note image"
 #: src/components/CopyButton.tsx:51
 msgid "复制"
 msgstr "Copy"
+
+#: src/features/agent-sessions/SessionDetail.tsx:151
+msgid "复制 session ID"
+msgstr "Copy session ID"
 
 #: src/features/todo/notes/TodoNoteContent.tsx:53
 msgid "复制代码"
@@ -3336,7 +3453,7 @@ msgstr "Headers truncated"
 msgid "如果相关任务仍在运行，请先完成任务后再清理。"
 msgstr "Finish any related tasks before clearing this data."
 
-#: src/features/home/entries.tsx:102
+#: src/features/home/entries.tsx:111
 #: src/features/media-compress/MediaCompressTool.tsx:46
 msgid "媒体处理"
 msgstr "Media Tools"
@@ -3367,7 +3484,7 @@ msgstr "Storage"
 msgid "存储明细"
 msgstr "Storage details"
 
-#: src/lib/errors/messages.ts:221
+#: src/lib/errors/messages.ts:235
 msgid "存储空间不足，请清理空间后重试"
 msgstr "Not enough storage space. Free up space and try again."
 
@@ -3393,7 +3510,7 @@ msgstr "Install the model to translate offline."
 msgid "安装命令已复制"
 msgstr "Install command copied"
 
-#: src/lib/errors/messages.ts:300
+#: src/lib/errors/messages.ts:314
 msgid "安装未完成，可重试安装或稍后再试。"
 msgstr "Installation did not finish. Retry the installation or try again later."
 
@@ -3458,14 +3575,14 @@ msgstr "A different aspect ratio stretches the image."
 msgid "密码"
 msgstr "Password"
 
-#: src/lib/errors/messages.ts:278
+#: src/lib/errors/messages.ts:292
 msgid "密码库"
 msgstr "Vault"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/about/use-about.ts:61
 #: src/features/export/sections.tsx:26
-#: src/features/home/entries.tsx:132
+#: src/features/home/entries.tsx:141
 #: src/features/logs/log-labels.ts:137
 #: src/features/logs/use-activity-logs.ts:43
 #: src/features/vault/VaultTool.tsx:49
@@ -3497,7 +3614,7 @@ msgstr "Key passphrase (test only)"
 msgid "密钥文件"
 msgstr "Key files"
 
-#: src/lib/errors/messages.ts:182
+#: src/lib/errors/messages.ts:196
 msgid "密钥标签须为 1–80 个字符，且不能包含控制字符"
 msgstr "Key labels must contain 1–80 characters and no control characters."
 
@@ -3515,11 +3632,11 @@ msgstr "During play, request an undo from the More menu. Undo your last move, or
 msgid "对局中断"
 msgstr "Game Interrupted"
 
-#: src/lib/errors/messages.ts:292
+#: src/lib/errors/messages.ts:306
 msgid "对局存档损坏或版本不兼容，无法恢复。原存档未被删除。"
 msgstr "This saved game is damaged or uses an incompatible version and cannot be restored. The original save has not been deleted."
 
-#: src/lib/errors/messages.ts:293
+#: src/lib/errors/messages.ts:307
 msgid "对局尚未成功保存，请重试。异常退出后可能丢失最新进度。"
 msgstr "The game has not been saved successfully. Please retry. The latest progress may be lost if the app exits unexpectedly."
 
@@ -3582,6 +3699,20 @@ msgstr "Opponent’s turn"
 #: src/features/games/engine/online/useOnlineMatch.ts:66
 msgid "对方长时间未回应协商，对局已结束。"
 msgstr "The other player did not respond in time. The game has ended."
+
+#: src/features/agent-sessions/SessionImage.tsx:95
+#: src/features/agent-sessions/SessionImage.tsx:104
+#: src/features/agent-sessions/SessionImage.tsx:110
+msgid "对话图片"
+msgstr "Conversation image"
+
+#: src/features/agent-sessions/SessionDetail.tsx:186
+msgid "对话正文已加密"
+msgstr "Conversation text is encrypted"
+
+#: src/features/agent-sessions/SessionConversation.tsx:97
+msgid "对话记录"
+msgstr "Conversation"
 
 #: src/features/connection-diagnostics/ExecutionLogDetailView.tsx:235
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:181
@@ -3668,7 +3799,7 @@ msgid "导出所选数据"
 msgstr "Export selected data"
 
 #: src/features/games/chess/ChessMatch.tsx:232
-#: src/features/games/xiangqi/XiangqiMatch.tsx:192
+#: src/features/games/xiangqi/XiangqiMatch.tsx:190
 msgid "将军"
 msgstr "Check"
 
@@ -3747,7 +3878,7 @@ msgstr "Write result back to input and switch mode"
 msgid "小时"
 msgstr "Hour"
 
-#: src/features/home/entries.tsx:43
+#: src/features/home/entries.tsx:45
 msgid "小游戏"
 msgstr "Games"
 
@@ -3785,22 +3916,22 @@ msgstr "Size mode"
 msgid "局域网"
 msgstr "LAN"
 
-#: src/features/home/entries.tsx:79
+#: src/features/home/entries.tsx:88
 #: src/features/lan-transfer/LanServiceCard.tsx:40
 #: src/features/lan-transfer/LanTransferTool.tsx:36
-#: src/lib/errors/messages.ts:281
+#: src/lib/errors/messages.ts:295
 msgid "局域网传输"
 msgstr "LAN Transfer"
 
-#: src/lib/errors/messages.ts:83
+#: src/lib/errors/messages.ts:97
 msgid "局域网传输任务已达并发上限，请稍后重试"
 msgstr "The concurrent LAN transfer limit has been reached. Please try again later."
 
-#: src/lib/errors/messages.ts:81
+#: src/lib/errors/messages.ts:95
 msgid "局域网传输已取消"
 msgstr "LAN transfer was cancelled"
 
-#: src/lib/errors/messages.ts:82
+#: src/lib/errors/messages.ts:96
 msgid "局域网传输意外结束，请重试"
 msgstr "The LAN transfer ended unexpectedly. Please try again."
 
@@ -3821,7 +3952,7 @@ msgid "局域网共享文件"
 msgstr "Share files over the LAN"
 
 #: src/features/about/AboutPage.tsx:150
-#: src/lib/errors/messages.ts:266
+#: src/lib/errors/messages.ts:280
 msgid "局域网服务"
 msgstr "LAN service"
 
@@ -3830,11 +3961,11 @@ msgstr "LAN service"
 msgid "局域网联机"
 msgstr "LAN multiplayer"
 
-#: src/lib/errors/messages.ts:85
+#: src/lib/errors/messages.ts:99
 msgid "局域网请求头超出大小限制"
 msgstr "LAN request headers exceed the size limit"
 
-#: src/lib/errors/messages.ts:84
+#: src/lib/errors/messages.ts:98
 msgid "局域网请求无效或不完整"
 msgstr "The LAN request is invalid or incomplete"
 
@@ -3860,6 +3991,11 @@ msgstr "Expand Sidebar"
 msgid "展开其余 {hiddenCount} 个任务"
 msgstr "{hiddenCount, plural, one {Show # more task} other {Show # more tasks}}"
 
+#. 更多面板阅读开关，展开历史工具、思考和系统消息的正文
+#: src/features/agent-sessions/SessionViewControls.tsx:47
+msgid "展开工具"
+msgstr "Expand tools"
+
 #. 军棋中可排雷、沿铁路转弯的棋子
 #: src/features/games/junqi/labels.tsx:38
 msgid "工兵"
@@ -3875,7 +4011,8 @@ msgstr "Eng"
 msgid "工兵可排雷并存活；其他普通棋子碰地雷时阵亡，地雷保留。炸弹与任何非军旗棋子交战均同归于尽。炸弹也可夺旗，无须先排光地雷。"
 msgstr "Engineers remove mines and survive; other ranked pieces attacking a mine are lost and the mine remains. A bomb and any opposing non-flag piece remove each other. Bombs can capture flags, and you do not need to clear all mines first."
 
-#: src/features/home/entries.tsx:41
+#: src/features/agent-sessions/SessionConversation.tsx:20
+#: src/features/home/entries.tsx:43
 msgid "工具"
 msgstr "Tools"
 
@@ -3913,7 +4050,7 @@ msgstr "Saved"
 msgid "已保存 · 未验证"
 msgstr "Saved · Unverified"
 
-#: src/lib/errors/messages.ts:204
+#: src/lib/errors/messages.ts:218
 msgid "已保存的 AI 翻译记录无效"
 msgstr "The saved AI translation record is invalid"
 
@@ -4073,6 +4210,12 @@ msgstr "Launch at Login enabled"
 msgid "已开始调整账号顺序"
 msgstr "Account reordering started"
 
+#: src/features/agent-sessions/SessionDetail.tsx:127
+#: src/features/agent-sessions/SessionFilters.tsx:138
+#: src/features/agent-sessions/SessionResults.tsx:109
+msgid "已归档"
+msgstr "Archived"
+
 #: src/features/ssh-sftp/components/terminal/TabBar.tsx:126
 msgid "已打开的连接"
 msgstr "Open connections"
@@ -4115,6 +4258,10 @@ msgstr "Device disconnected"
 msgid "已是最新版本"
 msgstr "You're up to date"
 
+#: src/features/agent-sessions/SessionDetail.tsx:209
+msgid "已显示命中的工具、思考或系统记录。"
+msgstr "Matching tool, reasoning, or system records are shown."
+
 #: src/store/transfers.ts:213
 msgid "已暂停"
 msgstr "Paused"
@@ -4129,7 +4276,7 @@ msgstr "replaced $ matches"
 msgid "已替换第 $ 行的匹配"
 msgstr "replaced match on line $"
 
-#: src/lib/errors/messages.ts:222
+#: src/lib/errors/messages.ts:236
 msgid "已有诗词库同步任务在运行，请稍后重试"
 msgstr "A poetry library sync is already running. Please try again later."
 
@@ -4177,6 +4324,7 @@ msgstr "Solved"
 msgid "已连接"
 msgstr "Connected"
 
+#: src/features/agent-sessions/SessionDateFilter.tsx:116
 #: src/features/todo/TodoSchedulePicker.tsx:101
 msgid "已选择"
 msgstr "Selected"
@@ -4211,6 +4359,11 @@ msgstr "Tonal pattern"
 msgid "平局"
 msgstr "Draw"
 
+#: src/features/agent-sessions/SessionDateFilter.tsx:48
+#: src/features/agent-sessions/SessionDateFilter.tsx:111
+msgid "年份"
+msgstr "Year"
+
 #: src/features/settings/SettingsOverview.tsx:52
 msgid "应用"
 msgstr "Application"
@@ -4229,11 +4382,11 @@ msgstr "Start service automatically when the app launches"
 msgid "应用数据"
 msgstr "App data"
 
-#: src/lib/errors/messages.ts:14
+#: src/lib/errors/messages.ts:28
 msgid "应用正在清理数据，请稍后重试"
 msgstr "The app is clearing data. Please try again later."
 
-#: src/lib/errors/messages.ts:13
+#: src/lib/errors/messages.ts:27
 msgid "应用正在退出，无法执行此操作"
 msgstr "The app is shutting down and cannot perform this action"
 
@@ -4253,7 +4406,7 @@ msgstr "App records have been cleared. Finish the remaining cleanup to use the a
 msgid "应用重置尚未完成"
 msgstr "App reset is incomplete"
 
-#: src/lib/errors/messages.ts:16
+#: src/lib/errors/messages.ts:30
 msgid "应用重置尚未完成，请先继续清理"
 msgstr "Finish the pending app reset before continuing."
 
@@ -4341,6 +4494,10 @@ msgstr "Place the cue ball behind the head string. You may adjust it until you s
 msgid "开球结束后，第一颗合法落袋的球决定双方组别：一方全色 1–7，另一方花色 9–15。分组前台面处于未分组状态，此时首碰 8 号算犯规。"
 msgstr "After the break, the first ball legally potted sets the groups: one side takes solids 1-7 and the other stripes 9-15. Until then the table is open, and contacting the 8 first is a foul."
 
+#: src/features/agent-sessions/SessionFilters.tsx:114
+msgid "归档状态"
+msgstr "Archive status"
+
 #: src/features/ai-configuration/ProviderDetails.tsx:226
 #: src/features/ai-configuration/ProviderDetails.tsx:267
 #: src/features/ai-configuration/ProviderNavigation.desktop.tsx:57
@@ -4348,7 +4505,7 @@ msgstr "After the break, the first ball legally potted sets the groups: one side
 msgid "当前"
 msgstr "Current"
 
-#: src/lib/errors/messages.ts:170
+#: src/lib/errors/messages.ts:184
 msgid "当前 AI 服务地址已变更，请重新打开模型菜单"
 msgstr "The current AI service address has changed. Reopen the model menu."
 
@@ -4360,15 +4517,15 @@ msgstr "Audio transcoding is not supported in this WebView"
 msgid "当前不可用"
 msgstr "Currently unavailable"
 
-#: src/lib/errors/messages.ts:78
+#: src/lib/errors/messages.ts:92
 msgid "当前不在游戏房间中"
 msgstr "You are not in a game room"
 
-#: src/lib/errors/messages.ts:214
+#: src/lib/errors/messages.ts:228
 msgid "当前任务尚未退出，请停止后再试"
 msgstr "The current task is still running. Stop it before trying again."
 
-#: src/lib/errors/messages.ts:122
+#: src/lib/errors/messages.ts:136
 msgid "当前传输阶段无法暂停"
 msgstr "The transfer cannot be paused at this stage"
 
@@ -4411,7 +4568,7 @@ msgstr "Current match progress will be lost."
 msgid "当前平台不支持 rsync，请选择压缩包或直连。"
 msgstr "rsync is not supported on this platform. Choose archive or direct transfer."
 
-#: src/lib/errors/messages.ts:138
+#: src/lib/errors/messages.ts:152
 msgid "当前平台不支持创建本地符号链接"
 msgstr "Creating local symbolic links is not supported on this platform"
 
@@ -4419,16 +4576,16 @@ msgstr "Creating local symbolic links is not supported on this platform"
 msgid "当前平台不支持增量同步。"
 msgstr "Incremental sync is unavailable on this platform."
 
-#: src/lib/errors/messages.ts:7
+#: src/lib/errors/messages.ts:21
 msgid "当前平台暂不支持系统朗读"
 msgstr "System reading is not yet supported on this platform"
 
-#: src/lib/errors/messages.ts:15
+#: src/lib/errors/messages.ts:29
 msgid "当前操作尚未完成，请稍后重试清理数据"
 msgstr "An operation is still running. Try clearing data again later."
 
 #. 军棋规则或对局状态校验失败，原始诊断保留在错误协议中
-#: src/lib/errors/messages.ts:308
+#: src/lib/errors/messages.ts:322
 msgid "当前操作无法完成，请恢复对局或重新开始。"
 msgstr "This action could not be completed. Restore the game or start again."
 
@@ -4502,6 +4659,10 @@ msgstr "This environment lacks video encoding support."
 msgid "当前筛选暂无待办"
 msgstr "No todos match the current filter"
 
+#: src/lib/errors/messages.ts:12
+msgid "当前索引中没有该会话，请刷新后重试"
+msgstr "This session is missing from the index. Refresh and try again."
+
 #: src/features/preview/MediaPlayer.tsx:217
 msgid "当前设备不支持全屏播放"
 msgstr "Fullscreen playback is unavailable on this device"
@@ -4521,24 +4682,24 @@ msgstr "Your current cube progress and undo history will be replaced. This canno
 #: src/features/about/use-about.ts:63
 #: src/features/export/sections.tsx:38
 #: src/features/logs/use-activity-logs.ts:42
-#: src/lib/errors/messages.ts:280
+#: src/lib/errors/messages.ts:294
 msgid "待办"
 msgstr "Todos"
 
 #. MCP 工具目录和授权矩阵中的模块名称
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
-#: src/features/home/entries.tsx:142
+#: src/features/home/entries.tsx:151
 #: src/features/logs/log-labels.ts:132
 #: src/features/todo/mcp-presentation.ts:4
 #: src/features/todo/TodoTool.tsx:94
 msgid "待办事项"
 msgstr "Todo"
 
-#: src/lib/errors/messages.ts:60
+#: src/lib/errors/messages.ts:74
 msgid "待办已被更新，请重新打开后编辑"
 msgstr "This todo has changed. Please reopen it before editing"
 
-#: src/lib/errors/messages.ts:56
+#: src/lib/errors/messages.ts:70
 msgid "待办截止日期需使用 YYYY-MM-DD 格式"
 msgstr "The task due date must use YYYY-MM-DD format"
 
@@ -4547,7 +4708,7 @@ msgstr "The task due date must use YYYY-MM-DD format"
 msgid "待办操作"
 msgstr "Task actions"
 
-#: src/lib/errors/messages.ts:45
+#: src/lib/errors/messages.ts:59
 msgid "待办标题不能为空"
 msgstr "The task title cannot be empty"
 
@@ -4556,7 +4717,7 @@ msgstr "The task title cannot be empty"
 msgid "待办状态"
 msgstr "Task status"
 
-#: src/lib/errors/messages.ts:55
+#: src/lib/errors/messages.ts:69
 msgid "待办计划时间无效"
 msgstr "Invalid scheduled time for this task"
 
@@ -4589,6 +4750,10 @@ msgstr "Score {score}"
 msgid "德语"
 msgstr "German"
 
+#: src/features/agent-sessions/SessionConversation.tsx:21
+msgid "思考"
+msgstr "Thinking"
+
 #: src/features/about/AboutPage.tsx:117
 msgid "总占用"
 msgstr "Total usage"
@@ -4619,12 +4784,12 @@ msgstr "Restore the initial state"
 
 #. 联机棋局的操作按钮，向对方申请撤销最近的走棋
 #: src/features/games/chess/ChessMatch.tsx:261
-#: src/features/games/go/GoMatch.tsx:223
+#: src/features/games/go/GoMatch.tsx:221
 #: src/features/games/gomoku/GomokuMatch.tsx:194
 #: src/features/games/junqi/JunqiMatchView.tsx:201
 #: src/features/games/reversi/ReversiHelp.tsx:37
 #: src/features/games/reversi/ReversiMatch.tsx:172
-#: src/features/games/xiangqi/XiangqiMatch.tsx:213
+#: src/features/games/xiangqi/XiangqiMatch.tsx:211
 msgid "悔棋"
 msgstr "Undo"
 
@@ -4677,7 +4842,7 @@ msgstr "Room name (optional)"
 msgid "房间名称"
 msgstr "Room name"
 
-#: src/lib/errors/messages.ts:76
+#: src/lib/errors/messages.ts:90
 msgid "房间的游戏类型不匹配"
 msgstr "The room uses a different game type"
 
@@ -4703,11 +4868,11 @@ msgstr "All clients will disconnect and unfinished operations will be interrupte
 msgid "所有者"
 msgstr "Owner"
 
-#: src/lib/errors/messages.ts:25
+#: src/lib/errors/messages.ts:39
 msgid "所选文件不是有效的 JSON，请检查导入文件"
 msgstr "The selected file is not valid JSON. Check the import file."
 
-#: src/lib/errors/messages.ts:26
+#: src/lib/errors/messages.ts:40
 msgid "所选文件不是本应用导出的备份文件"
 msgstr "The selected file is not a backup exported by this app"
 
@@ -4758,7 +4923,7 @@ msgstr "Open existing item"
 msgid "打开日志文件夹"
 msgstr "Open log folder"
 
-#: src/lib/errors/messages.ts:62
+#: src/lib/errors/messages.ts:76
 msgid "打开的备注过多，请先关闭其他编辑窗口"
 msgstr "Too many notes are open. Please close another editor first"
 
@@ -4865,6 +5030,14 @@ msgstr "Drop an image here, or choose a file"
 msgid "拖放视频到此处，或选择文件"
 msgstr "Drop a video here, or choose a file"
 
+#: src/features/agent-sessions/SessionFilters.tsx:91
+msgid "按 agent 分类"
+msgstr "Filter by agent"
+
+#: src/features/agent-sessions/SessionFilters.tsx:155
+msgid "按最后活动日期筛选"
+msgstr "Filter by last activity date"
+
 #: src/features/poetry/LibraryPage.tsx:185
 #: src/features/poetry/LibraryPage.tsx:186
 msgid "按合集筛选"
@@ -4873,6 +5046,15 @@ msgstr "Filter by collection"
 #: src/features/media-compress/resize/ResizeControls.tsx:80
 msgid "按尺寸"
 msgstr "By size"
+
+#: src/features/agent-sessions/SessionFilters.tsx:125
+msgid "按归档状态筛选"
+msgstr "Filter by archive status"
+
+#. 会话日期筛选，选择任意历史月份
+#: src/features/agent-sessions/SessionFilters.tsx:171
+msgid "按月份"
+msgstr "By month"
 
 #: src/features/mcp/McpToolsTable.tsx:62
 msgid "按模块分组的 MCP 工具目录"
@@ -5031,6 +5213,12 @@ msgstr "Search history"
 msgid "搜索名称或调用名称"
 msgstr "Search tool or invocation name"
 
+#. 本机会话全文检索输入框
+#: src/features/agent-sessions/SessionFilters.tsx:50
+#: src/features/agent-sessions/SessionFilters.tsx:54
+msgid "搜索对话、项目或 session ID"
+msgstr "Search conversations, projects, or session IDs"
+
 #: src/features/mcp/McpToolsTable.tsx:56
 msgid "搜索工具名称或调用名称"
 msgstr "Search tool name or invocation name"
@@ -5044,6 +5232,10 @@ msgstr "Search tasks"
 #: src/features/logs/LogFilters.tsx:118
 msgid "搜索日志"
 msgstr "Search logs"
+
+#: src/lib/errors/messages.ts:8
+msgid "搜索条件无效，请检查日期范围或缩短搜索内容"
+msgstr "Check the date range or shorten your search."
 
 #: src/features/vault/VaultTool.tsx:90
 msgid "搜索标题、账号、网址"
@@ -5203,11 +5395,11 @@ msgstr "Numbers increase from left to right and top to bottom. The last cell is 
 #. 小游戏名，滑动数字方块填入空位并排序
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:106
 #: src/features/games/sliding-puzzle/SlidingPuzzleHelp.tsx:19
-#: src/features/home/entries.tsx:229
+#: src/features/home/entries.tsx:238
 msgid "数字华容道"
 msgstr "Sliding puzzle"
 
-#: src/lib/errors/messages.ts:297
+#: src/lib/errors/messages.ts:311
 msgid "数字华容道已完成，但成绩尚未保存，请重试。"
 msgstr "The puzzle is complete, but the result has not been saved. Please retry."
 
@@ -5255,7 +5447,7 @@ msgid "文件传输"
 msgstr "File transfer"
 
 #. SFTP 上传或下载校验；actual 为目标文件字节数，expected 为源文件字节数。
-#: src/lib/errors/messages.ts:130
+#: src/lib/errors/messages.ts:144
 msgid "文件传输校验失败：实际大小为 {actual} 字节，预期为 {expected} 字节"
 msgstr "Transfer verification failed: received {actual} bytes, expected {expected} bytes"
 
@@ -5292,7 +5484,7 @@ msgstr "File payload not captured"
 msgid "文件预览"
 msgstr "File preview"
 
-#: src/features/home/entries.tsx:42
+#: src/features/home/entries.tsx:44
 msgid "文库"
 msgstr "Library"
 
@@ -5418,13 +5610,18 @@ msgid "无口令"
 msgstr "No Passphrase"
 
 #. 局域网绑定或可信设备校验；ip 是用户输入的地址。
-#: src/lib/errors/messages.ts:101
+#: src/lib/errors/messages.ts:115
 msgid "无效的 IP 地址：{ip}"
 msgstr "Invalid IP address: {ip}"
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:110
 msgid "无权限"
 msgstr "No access"
+
+#: src/features/agent-sessions/SessionDetail.tsx:82
+#: src/features/agent-sessions/SessionResults.tsx:123
+msgid "无标题会话"
+msgstr "Untitled session"
 
 #. 军棋对局结束原因，轮到的一方没有合法走法
 #: src/features/games/junqi/labels.tsx:113
@@ -5436,7 +5633,7 @@ msgstr "No legal moves"
 msgid "无法创建画布上下文"
 msgstr "Cannot create canvas context"
 
-#: src/lib/errors/messages.ts:294
+#: src/lib/errors/messages.ts:308
 msgid "无法删除对局存档，请重试。"
 msgstr "Unable to delete the saved game. Please retry."
 
@@ -5444,20 +5641,20 @@ msgstr "Unable to delete the saved game. Please retry."
 msgid "无法播放，请重试或使用系统应用打开"
 msgstr "Unable to play. Retry or open with a system app."
 
-#: src/lib/errors/messages.ts:295
+#: src/lib/errors/messages.ts:309
 msgid "无法显示 3D 魔方。请重新加载画布；已提交的转动进度会保留。"
 msgstr "The 3D cube could not be displayed. Reload the canvas; committed turns will be preserved."
 
-#: src/lib/errors/messages.ts:290
+#: src/lib/errors/messages.ts:304
 msgid "无法显示国际象棋。请重新加载棋盘，当前对局进度会保留。"
 msgstr "The chess board could not be displayed. Reload the board; your current game will be kept."
 
-#: src/lib/errors/messages.ts:298
+#: src/lib/errors/messages.ts:312
 msgid "无法检查更新，请稍后重试。"
 msgstr "Couldn't check for updates. Try again later."
 
 #. rsync 能力探测失败；side 是“本机/远端”，detail 是诊断信息。
-#: src/lib/errors/messages.ts:149
+#: src/lib/errors/messages.ts:163
 msgid "无法检测{side}的 rsync：{detail}"
 msgstr "Unable to detect rsync ({side}): {detail}"
 
@@ -5465,15 +5662,19 @@ msgstr "Unable to detect rsync ({side}): {detail}"
 msgid "无法生成同步预览"
 msgstr "Unable to generate sync preview"
 
-#: src/lib/errors/messages.ts:120
+#: src/lib/errors/messages.ts:134
 msgid "无法获取本地用户名，请手动填写 SSH 用户名"
 msgstr "Could not get the local username. Enter the SSH username manually."
 
-#: src/lib/errors/messages.ts:165
+#: src/lib/errors/messages.ts:179
 msgid "无法识别远端操作系统"
 msgstr "Could not identify the remote operating system"
 
-#: src/lib/errors/messages.ts:291
+#: src/lib/errors/messages.ts:13
+msgid "无法读取会话目录，请检查访问权限"
+msgstr "Cannot read the session folder. Check access permissions."
+
+#: src/lib/errors/messages.ts:305
 msgid "无法读取对局存档，请重试。原存档未被删除。"
 msgstr "Unable to read the saved game. Please retry. The original save has not been deleted."
 
@@ -5481,7 +5682,7 @@ msgstr "Unable to read the saved game. Please retry. The original save has not b
 msgid "无法读取视频信息"
 msgstr "Unable to read video information"
 
-#: src/lib/errors/messages.ts:19
+#: src/lib/errors/messages.ts:33
 msgid "无法读取重置记录，请保留应用数据并联系维护者"
 msgstr "The reset record could not be read. Keep the app data and contact the maintainer."
 
@@ -5527,6 +5728,10 @@ msgstr "Log details"
 #: src/features/logs/HistoryLogDetailView.tsx:72
 msgid "日志详情操作"
 msgstr "Log detail actions"
+
+#: src/features/agent-sessions/SessionFilters.tsx:146
+msgid "日期"
+msgstr "Date"
 
 #: src/features/translation/TranslationTool.tsx:36
 msgid "日语"
@@ -5608,6 +5813,10 @@ msgstr "No hosts"
 msgid "暂无任务"
 msgstr "No tasks"
 
+#: src/features/agent-sessions/SessionResults.tsx:149
+msgid "暂无会话记录"
+msgstr "No sessions yet"
+
 #: src/features/poetry/components/PoemAnnotations.tsx:131
 msgid "暂无作者小传。"
 msgstr "No author biography yet."
@@ -5619,6 +5828,10 @@ msgstr "No shared folders"
 #: src/features/lan-transfer/LanDiscoveredDevicesPanel.tsx:68
 msgid "暂无发现设备"
 msgstr "No discovered devices"
+
+#: src/features/agent-sessions/SessionDetail.tsx:216
+msgid "暂无可读记录"
+msgstr "No readable records"
 
 #. 活动页失败筛选的空状态
 #: src/features/activity/TransferActivity.tsx:128
@@ -5703,6 +5916,8 @@ msgstr "Unable to finish the reset"
 msgid "暂时无法预览，文件可能尚未下载完整或编码不受支持"
 msgstr "Preview unavailable. The file may be incomplete or its codec unsupported."
 
+#. Agent 会话标题栏图标，打开阅读开关下拉面板
+#: src/features/agent-sessions/SessionViewControls.tsx:24
 #: src/features/ssh-sftp/components/sftp/SftpRow.tsx:144
 msgid "更多"
 msgstr "More"
@@ -5757,7 +5972,7 @@ msgstr "Update AI service"
 msgid "更新 AI 流式设置"
 msgstr "Update AI streaming settings"
 
-#: src/lib/errors/messages.ts:299
+#: src/lib/errors/messages.ts:313
 msgid "更新下载或校验失败，请重试。"
 msgstr "Download or verification failed. Try again."
 
@@ -5770,7 +5985,7 @@ msgstr "Update host"
 msgid "更新于 {updatedLabel}"
 msgstr "Updated at {updatedLabel}"
 
-#: src/lib/errors/messages.ts:302
+#: src/lib/errors/messages.ts:316
 msgid "更新信息已失效，请重新检查更新"
 msgstr "Update information expired. Check for updates again."
 
@@ -5819,6 +6034,12 @@ msgstr "Replace"
 msgid "替换为"
 msgstr "Replace with"
 
+#: src/features/agent-sessions/SessionDateFilter.tsx:41
+#: src/features/agent-sessions/SessionDateFilter.tsx:65
+#: src/features/agent-sessions/SessionDateFilter.tsx:110
+msgid "月份"
+msgstr "Month"
+
 #: src/features/games/magic-cube/MagicCubeGame.tsx:328
 #: src/features/games/sliding-puzzle/SlidingPuzzleGame.tsx:223
 msgid "有效用时"
@@ -5854,7 +6075,7 @@ msgstr "Service started"
 msgid "服务生命周期"
 msgstr "Service lifecycle"
 
-#: src/lib/errors/messages.ts:8
+#: src/lib/errors/messages.ts:22
 msgid "朗读内容过长或参数无效"
 msgstr "The reading text is too long or its settings are invalid"
 
@@ -5868,7 +6089,7 @@ msgstr "Read original"
 msgid "朗读已暂停"
 msgstr "Reading paused"
 
-#: src/lib/errors/messages.ts:10
+#: src/lib/errors/messages.ts:24
 msgid "朗读操作尚未完成，请稍后重试"
 msgstr "A reading operation is still in progress. Try again shortly."
 
@@ -5924,48 +6145,52 @@ msgstr "Not installed; downloaded on demand only, removable anytime"
 msgid "未完成"
 msgstr "Overdue"
 
+#: src/features/agent-sessions/SessionFilters.tsx:135
+msgid "未归档"
+msgstr "Not archived"
+
 #: src/features/ssh-sftp/rsync/RsyncCapabilityNotice.tsx:36
 msgid "未找到 rsync"
 msgstr "rsync not found"
 
-#: src/lib/errors/messages.ts:119
+#: src/lib/errors/messages.ts:133
 msgid "未找到可用的 SSH 代理或本地私钥"
 msgstr "No usable SSH agent or local private key was found"
 
-#: src/lib/errors/messages.ts:9
+#: src/lib/errors/messages.ts:23
 msgid "未找到可用的中文音色，请在系统设置中下载中文语音后重试"
 msgstr "No Chinese voice is available. Download one in system settings and try again."
 
-#: src/lib/errors/messages.ts:145
+#: src/lib/errors/messages.ts:159
 msgid "未找到本机的 rsync，请安装后重新检测"
 msgstr "rsync was not found on this machine. Install it and detect again."
 
-#: src/lib/errors/messages.ts:172
+#: src/lib/errors/messages.ts:186
 msgid "未找到该 AI 服务地址，可能已被删除"
 msgstr "AI service address not found. It may have been deleted."
 
-#: src/lib/errors/messages.ts:207
+#: src/lib/errors/messages.ts:221
 msgid "未找到该 AI 翻译"
 msgstr "The AI translation was not found"
 
-#: src/lib/errors/messages.ts:44
+#: src/lib/errors/messages.ts:58
 msgid "未找到该 SSH 密钥，可能已被删除"
 msgstr "The SSH key was not found. It may have been deleted."
 
-#: src/lib/errors/messages.ts:42
+#: src/lib/errors/messages.ts:56
 msgid "未找到该主机，可能已被删除"
 msgstr "The host was not found. It may have been deleted."
 
-#: src/lib/errors/messages.ts:41
+#: src/lib/errors/messages.ts:55
 msgid "未找到该密码条目，可能已被删除"
 msgstr "The vault entry was not found. It may have been deleted."
 
-#: src/lib/errors/messages.ts:57
+#: src/lib/errors/messages.ts:71
 msgid "未找到该待办事项，可能已被删除"
 msgstr "The task was not found. It may have been deleted."
 
 #. 诗词详情读取失败；uid 是诗词唯一标识。
-#: src/lib/errors/messages.ts:224
+#: src/lib/errors/messages.ts:238
 msgid "未找到该诗词：{uid}"
 msgstr "The poem was not found: {uid}"
 
@@ -5980,7 +6205,7 @@ msgid "未知棋子"
 msgstr "Unknown piece"
 
 #. 同步请求引用了目录中不存在的数据来源；sourceId 是数据来源标识。
-#: src/lib/errors/messages.ts:233
+#: src/lib/errors/messages.ts:247
 msgid "未知的诗词数据来源：{sourceId}"
 msgstr "Unknown poetry source: {sourceId}"
 
@@ -6000,6 +6225,10 @@ msgstr "Covered piece"
 #: src/features/todo/TodoTimestamps.tsx:68
 msgid "未记录"
 msgstr "Not recorded"
+
+#: src/features/agent-sessions/SessionResults.tsx:130
+msgid "未记录 session ID"
+msgstr "Session ID not recorded"
 
 #. 已完成待办缺少完成时间时单独成组
 #: src/features/todo/TodoList.tsx:86
@@ -6050,11 +6279,11 @@ msgstr "Local file and data tools"
 msgid "本地文件夹名称"
 msgstr "Local Folder Name"
 
-#: src/lib/errors/messages.ts:216
+#: src/lib/errors/messages.ts:230
 msgid "本地模型运行失败，请检查模型或尝试更小的模型"
 msgstr "The local model failed to run. Check the model or try a smaller one."
 
-#: src/lib/errors/messages.ts:124
+#: src/lib/errors/messages.ts:138
 msgid "本地源路径不是文件夹"
 msgstr "The local source path is not a folder"
 
@@ -6062,7 +6291,7 @@ msgstr "The local source path is not a folder"
 msgid "本地目录"
 msgstr "Local Directory"
 
-#: src/lib/errors/messages.ts:137
+#: src/lib/errors/messages.ts:151
 msgid "本地目标已是文件夹，无法覆盖"
 msgstr "The local destination is a folder and cannot be overwritten"
 
@@ -6081,11 +6310,11 @@ msgstr "Simplifications in this app"
 msgid "本机"
 msgstr "Local"
 
-#: src/lib/errors/messages.ts:160
+#: src/lib/errors/messages.ts:174
 msgid "本机 rsync 异常结束（退出码 {exitCode}）"
 msgstr "Local rsync exited unexpectedly (code {exitCode})"
 
-#: src/lib/errors/messages.ts:146
+#: src/lib/errors/messages.ts:160
 msgid "本机 rsync 版本不受支持，需要 3.1 或更高版本"
 msgstr "The local rsync version is not supported. Version 3.1 or later is required."
 
@@ -6139,6 +6368,10 @@ msgstr "Spin"
 msgid "来源"
 msgstr "Source"
 
+#: src/features/agent-sessions/SessionDetail.tsx:144
+msgid "来源未记录 session ID"
+msgstr "The source did not record a session ID."
+
 #: src/features/about/use-about.ts:203
 msgid "构建日期"
 msgstr "Build date"
@@ -6160,6 +6393,20 @@ msgstr "View download file details"
 #: src/features/logs/log-labels.ts:104
 msgid "查看共享目录"
 msgstr "View shared directories"
+
+#. 查看会话扫描失败或超限的来源文件
+#: src/features/agent-sessions/AgentSessionsTool.tsx:100
+msgid "查看原因"
+msgstr "View details"
+
+#. 关闭只看对话，展示此加密会话中可读的工具和记忆
+#: src/features/agent-sessions/SessionDetail.tsx:198
+msgid "查看可读记录"
+msgstr "View readable records"
+
+#: src/features/agent-sessions/SessionImage.tsx:91
+msgid "查看图片"
+msgstr "View image"
 
 #: src/features/todo/TodoRow.tsx:35
 #: src/features/todo/TodoRow.tsx:36
@@ -6260,7 +6507,7 @@ msgstr "Verify save result"
 
 #: src/features/formatter/FormatterActions.tsx:34
 #: src/features/formatter/FormatterTool.tsx:86
-#: src/features/home/entries.tsx:112
+#: src/features/home/entries.tsx:121
 msgid "格式化"
 msgstr "Formatter"
 
@@ -6291,7 +6538,7 @@ msgid "检查状态"
 msgstr "Check status"
 
 #. rsync 能力探测超时；side 是“本机/远端”。
-#: src/lib/errors/messages.ts:153
+#: src/lib/errors/messages.ts:167
 msgid "检测{side}的 rsync 超时，请重试"
 msgstr "rsync detection timed out ({side}). Please try again."
 
@@ -6337,7 +6584,7 @@ msgid "棋盘为 9 列 10 行，红方先行。"
 msgstr "The board has 9 files and 10 ranks, and Red moves first."
 
 #. 军棋二维棋盘初始化失败
-#: src/lib/errors/messages.ts:304
+#: src/lib/errors/messages.ts:318
 msgid "棋盘加载失败，请重试。"
 msgstr "The board could not load. Please try again."
 
@@ -6350,7 +6597,7 @@ msgid "棋盘大小"
 msgstr "Board Size"
 
 #. 军棋 WebGL 上下文丢失，可重建渲染器
-#: src/lib/errors/messages.ts:312
+#: src/lib/errors/messages.ts:326
 msgid "棋盘显示已中断，对局仍保留，请重试。"
 msgstr "The board display was interrupted. Your game is preserved. Please try again."
 
@@ -6382,7 +6629,7 @@ msgstr "Module"
 msgid "模型"
 msgstr "Model"
 
-#: src/lib/errors/messages.ts:220
+#: src/lib/errors/messages.ts:234
 msgid "模型下载失败，请检查网络后重试"
 msgstr "The model download failed. Check your connection and try again."
 
@@ -6398,15 +6645,15 @@ msgstr "Couldn't load the model list"
 msgid "模型名称 / ID"
 msgstr "Model name / ID"
 
-#: src/lib/errors/messages.ts:211
+#: src/lib/errors/messages.ts:225
 msgid "模型文件或安装记录无效，请移除后重新下载"
 msgstr "The model file or installation record is invalid. Remove it and download again."
 
-#: src/lib/errors/messages.ts:183
+#: src/lib/errors/messages.ts:197
 msgid "模型显示名称不能超过 80 个字符或包含控制字符"
 msgstr "Model display names must not exceed 80 characters or contain control characters."
 
-#: src/lib/errors/messages.ts:212
+#: src/lib/errors/messages.ts:226
 msgid "模型校验失败，请移除未完成的下载后重试"
 msgstr "Model verification failed. Remove the incomplete download and try again."
 
@@ -6571,6 +6818,10 @@ msgstr "Opening folder..."
 msgid "正在打开终端…"
 msgstr "Opening terminal..."
 
+#: src/features/agent-sessions/AgentSessionsTool.tsx:119
+msgid "正在扫描本机会话"
+msgstr "Scanning local sessions"
+
 #: src/features/games/engine/online/OnlineLobby.tsx:163
 msgid "正在搜索…"
 msgstr "Searching…"
@@ -6600,6 +6851,10 @@ msgstr "Detecting rsync and generating a sync preview…"
 #: src/features/poetry/LibraryPage.tsx:241
 msgid "正在检索…"
 msgstr "Searching…"
+
+#: src/features/agent-sessions/SessionResults.tsx:145
+msgid "正在检索会话"
+msgstr "Searching sessions"
 
 #: src/features/about/DataManagementDialogs.tsx:177
 msgid "正在清理…"
@@ -6660,6 +6915,10 @@ msgstr "Loading note"
 msgid "正在读取对局存档…"
 msgstr "Reading saved game…"
 
+#: src/features/agent-sessions/SessionDetail.tsx:178
+msgid "正在读取对话"
+msgstr "Reading conversation"
+
 #: src/features/todo/TodoTool.tsx:247
 msgid "正在读取待办"
 msgstr "Loading todos"
@@ -6698,11 +6957,11 @@ msgstr "Body not retained"
 msgid "正文索引已更新"
 msgstr "Full-text index updated"
 
-#: src/lib/errors/messages.ts:179
+#: src/lib/errors/messages.ts:193
 msgid "此 AI 服务地址下已存在相同的密钥标签"
 msgstr "A key with this label already exists under this AI service address."
 
-#: src/lib/errors/messages.ts:180
+#: src/lib/errors/messages.ts:194
 msgid "此 AI 服务地址下已存在相同的模型 ID"
 msgstr "This model ID already exists under this AI service address."
 
@@ -6718,6 +6977,10 @@ msgstr "Only a summary is available for this operation."
 #: src/features/games/engine/GameSessionNotice.tsx:113
 msgid "此操作会删除该游戏的存档，无法继续上次的对局。"
 msgstr "This will delete the save for this game. You will not be able to continue the previous match."
+
+#: src/features/agent-sessions/SessionDetail.tsx:189
+msgid "此来源的用户与助手正文无法读取。"
+msgstr "User and assistant text cannot be read from this source."
 
 #: src/features/games/engine/GameHistory.tsx:85
 msgid "此游戏在本机的历史记录将被清空，无法恢复。"
@@ -6745,19 +7008,19 @@ msgstr "Cue ball in a pocket, hitting no ball, contacting a ball other than the 
 msgid "每一杆必须首先碰到台面最低号球，落袋任意球都算有效；有球落袋可以继续击球，否则交换球权。"
 msgstr "Each shot must contact the lowest-numbered ball on the table first. Potting any ball counts, and a pot lets you continue; otherwise the turn passes."
 
-#: src/lib/errors/messages.ts:177
+#: src/lib/errors/messages.ts:191
 msgid "每个 AI 服务地址最多保存 10 个模型"
 msgstr "Each AI service address can have up to 10 models."
 
-#: src/lib/errors/messages.ts:176
+#: src/lib/errors/messages.ts:190
 msgid "每个 AI 服务地址最多保存 5 把密钥"
 msgstr "Each AI service address can have up to 5 keys."
 
-#: src/lib/errors/messages.ts:184
+#: src/lib/errors/messages.ts:198
 msgid "每个 AI 服务地址至少保留一个密钥条目"
 msgstr "Each AI service address must keep at least one key entry."
 
-#: src/lib/errors/messages.ts:185
+#: src/lib/errors/messages.ts:199
 msgid "每个 AI 服务地址至少保留一个模型"
 msgstr "Each AI service address must keep at least one model."
 
@@ -6776,6 +7039,10 @@ msgstr "Daily poem"
 #: src/features/games/xiangqi/XiangqiStage.tsx:522
 msgid "汉 界"
 msgstr "汉 界"
+
+#: src/features/agent-sessions/SessionResults.tsx:147
+msgid "没有匹配的会话"
+msgstr "No matching sessions"
 
 #: src/features/mcp/McpToolsTable.tsx:203
 msgid "没有匹配的工具"
@@ -6818,7 +7085,7 @@ msgstr "Notes"
 msgid "注释包（译文 / 赏析）"
 msgstr "Annotation pack (translations & analysis)"
 
-#: src/lib/errors/messages.ts:230
+#: src/lib/errors/messages.ts:244
 msgid "注释包下载仅支持桌面端"
 msgstr "Annotation packages can only be downloaded on desktop"
 
@@ -7054,6 +7321,9 @@ msgstr "Clear finished"
 msgid "清除已结束的任务？"
 msgstr "Clear finished tasks?"
 
+#. 清除面板中的来源、日期、归档条件与搜索词
+#: src/features/agent-sessions/SessionFilters.tsx:185
+#: src/features/agent-sessions/SessionResults.tsx:156
 #: src/features/mcp/McpToolsTable.tsx:212
 msgid "清除筛选"
 msgstr "Clear filters"
@@ -7074,31 +7344,31 @@ msgstr "Game information"
 
 #. 活动日志的对象类型；历史记录未保存名称时，与对象标识一起显示
 #: src/features/logs/log-labels.ts:152
-#: src/lib/errors/messages.ts:267
+#: src/lib/errors/messages.ts:281
 msgid "游戏房间"
 msgstr "Game room"
 
-#: src/lib/errors/messages.ts:79
+#: src/lib/errors/messages.ts:93
 msgid "游戏房间中的对方尚未连接"
 msgstr "The other player has not connected to the game room"
 
-#: src/lib/errors/messages.ts:73
+#: src/lib/errors/messages.ts:87
 msgid "游戏房间响应异常，请重新加入"
 msgstr "The game room returned an unexpected response. Please rejoin."
 
-#: src/lib/errors/messages.ts:72
+#: src/lib/errors/messages.ts:86
 msgid "游戏房间地址格式不正确"
 msgstr "Invalid game room address format"
 
-#: src/lib/errors/messages.ts:75
+#: src/lib/errors/messages.ts:89
 msgid "游戏房间已满"
 msgstr "The game room is full"
 
-#: src/lib/errors/messages.ts:80
+#: src/lib/errors/messages.ts:94
 msgid "游戏房间数据过大，请缩短房间信息或减少发送内容"
 msgstr "The game room data is too large. Shorten the room details or send less content."
 
-#: src/lib/errors/messages.ts:74
+#: src/lib/errors/messages.ts:88
 msgid "游戏房间码不正确"
 msgstr "Incorrect game room code"
 
@@ -7288,7 +7558,7 @@ msgid "环境信息已复制"
 msgstr "Environment info copied"
 
 #. 台球图形上下文丢失，当前对局已停止；通过已有重开操作恢复
-#: src/lib/errors/messages.ts:316
+#: src/lib/errors/messages.ts:330
 msgid "球桌显示已中断，请重开对局。"
 msgstr "The table display was interrupted. Restart the match to continue."
 
@@ -7325,6 +7595,10 @@ msgstr "User {pctValue} · System {pctValue2} · Idle {pctValue3}"
 #: src/features/ssh-sftp/components/hosts/HostForm.tsx:251
 msgid "用户名"
 msgstr "Username"
+
+#: src/features/agent-sessions/SessionDetail.tsx:106
+msgid "用户和助手正文已加密，仅能读取工具与记忆。"
+msgstr "User and assistant text is encrypted. Only tools and memories can be read."
 
 #: src/features/ssh-sftp/components/sftp/FileInfoDialog.tsx:131
 msgid "用户组"
@@ -7425,7 +7699,7 @@ msgstr "Computer is thinking..."
 msgid "电脑获胜"
 msgstr "Computer wins"
 
-#: src/lib/errors/messages.ts:289
+#: src/lib/errors/messages.ts:303
 msgid "电脑走棋失败，请重新开始或恢复对局后重试。"
 msgstr "The computer could not make a move. Restart or restore the game and try again."
 
@@ -7491,7 +7765,7 @@ msgstr "Monitor"
 msgid "监控采集超时"
 msgstr "Monitor sampling timed out"
 
-#: src/lib/errors/messages.ts:237
+#: src/lib/errors/messages.ts:251
 msgid "目录中缺少所需的诗词数据来源"
 msgstr "The folder is missing required poetry sources"
 
@@ -7543,7 +7817,7 @@ msgstr "Destination is up to date"
 msgid "目标排列"
 msgstr "Target arrangement"
 
-#: src/lib/errors/messages.ts:89
+#: src/lib/errors/messages.ts:103
 msgid "目标文件正在上传，请稍后重试"
 msgstr "The destination file is being uploaded. Try again later."
 
@@ -7560,7 +7834,7 @@ msgstr "Target height"
 msgid "直连"
 msgstr "Direct"
 
-#: src/lib/errors/messages.ts:198
+#: src/lib/errors/messages.ts:212
 msgid "相同的 AI 任务正在执行中"
 msgstr "The same AI task is already running"
 
@@ -7658,7 +7932,7 @@ msgstr "Disks"
 msgid "磁盘 I/O"
 msgstr "Disk I/O"
 
-#: src/lib/errors/messages.ts:91
+#: src/lib/errors/messages.ts:105
 msgid "磁盘空间不足，无法保存上传内容"
 msgstr "There is not enough disk space to save the upload"
 
@@ -7692,7 +7966,7 @@ msgid "离线，无法打开"
 msgstr "Offline; cannot open"
 
 #: src/features/logs/use-activity-logs.ts:46
-#: src/lib/errors/messages.ts:265
+#: src/lib/errors/messages.ts:279
 msgid "离线翻译"
 msgstr "Offline translation"
 
@@ -7722,11 +7996,11 @@ msgstr "Moved to position {position}"
 msgid "移动开始计时"
 msgstr "Move to start timing"
 
-#: src/lib/errors/messages.ts:228
+#: src/lib/errors/messages.ts:242
 msgid "移动端不支持从本地导入诗词库"
 msgstr "Importing a local poetry library is not supported on mobile"
 
-#: src/lib/errors/messages.ts:229
+#: src/lib/errors/messages.ts:243
 msgid "移动端不支持导入本地译文包"
 msgstr "Importing local translation packages is not supported on mobile"
 
@@ -7814,7 +8088,7 @@ msgid "端口"
 msgstr "Port"
 
 #. 局域网服务启动失败；startPort/endPort 是尝试的端口范围。
-#: src/lib/errors/messages.ts:109
+#: src/lib/errors/messages.ts:123
 msgid "端口 {startPort}-{endPort} 范围内没有可用端口，请更换起始端口后重试"
 msgstr "No ports are available in the range {startPort}-{endPort}. Change the starting port and try again."
 
@@ -7879,11 +8153,11 @@ msgstr "Waiting for an opponent..."
 msgid "等待对方…"
 msgstr "Waiting for opponent..."
 
-#: src/features/games/go/GoMatch.tsx:206
+#: src/features/games/go/GoMatch.tsx:204
 #: src/features/games/gomoku/GomokuMatch.tsx:182
 #: src/features/games/junqi/JunqiToolbar.tsx:67
 #: src/features/games/junqi/JunqiToolbar.tsx:143
-#: src/features/games/xiangqi/XiangqiMatch.tsx:201
+#: src/features/games/xiangqi/XiangqiMatch.tsx:199
 msgid "等待对方同意悔棋…"
 msgstr "Waiting for the opponent to accept the undo..."
 
@@ -7895,11 +8169,11 @@ msgstr "Timed out waiting for your opponent. Please create or join a room again.
 msgid "等待对方布阵"
 msgstr "Waiting for opponent’s setup"
 
-#: src/features/games/go/GoMatch.tsx:210
+#: src/features/games/go/GoMatch.tsx:208
 #: src/features/games/gomoku/GomokuMatch.tsx:186
 #: src/features/games/reversi/ReversiMatch.tsx:145
 #: src/features/games/reversi/ReversiMatch.tsx:190
-#: src/features/games/xiangqi/XiangqiMatch.tsx:205
+#: src/features/games/xiangqi/XiangqiMatch.tsx:203
 msgid "等待对方落子…"
 msgstr "Waiting for the opponent's move..."
 
@@ -7925,6 +8199,11 @@ msgstr "Filter MCP modules"
 #: src/features/activity/TransferActivityToolbar.tsx:75
 msgid "筛选任务"
 msgstr "Filter tasks"
+
+#. 标题栏图标，打开 agent、日期与归档状态筛选面板
+#: src/features/agent-sessions/SessionFilters.tsx:35
+msgid "筛选会话"
+msgstr "Filter sessions"
 
 #: src/features/vault/VaultTool.tsx:100
 msgid "筛选和排序"
@@ -7991,11 +8270,15 @@ msgstr "Paste or type {languageLabel} content"
 msgid "精确转动"
 msgstr "Precise controls"
 
-#: src/lib/errors/messages.ts:12
+#: src/features/agent-sessions/SessionConversation.tsx:22
+msgid "系统"
+msgstr "System"
+
+#: src/lib/errors/messages.ts:26
 msgid "系统朗读未能开始，请换一个音色或检查中文语音是否已下载"
 msgstr "Reading could not start. Try another voice or check that the Chinese voice is downloaded."
 
-#: src/lib/errors/messages.ts:11
+#: src/lib/errors/messages.ts:25
 msgid "系统未能调整朗读状态，请重试"
 msgstr "The system could not change playback. Try again."
 
@@ -8004,7 +8287,7 @@ msgid "系统架构"
 msgstr "Architecture"
 
 #. SSH 系统监控错误；os 是远端操作系统名称。
-#: src/lib/errors/messages.ts:166
+#: src/lib/errors/messages.ts:180
 msgid "系统监控暂不支持 {os}，仅支持 Linux"
 msgstr "System monitoring does not support {os} yet. Only Linux is supported."
 
@@ -8093,7 +8376,7 @@ msgstr "Terminal and remote files"
 msgid "终端会话"
 msgstr "Terminal session"
 
-#: src/lib/errors/messages.ts:118
+#: src/lib/errors/messages.ts:132
 msgid "终端输入数据格式无效"
 msgstr "Invalid terminal input format"
 
@@ -8107,7 +8390,7 @@ msgid "绑定 IP 不可用"
 msgstr "Bind IP Unavailable"
 
 #. 局域网服务绑定校验；ip 是被拒绝的绑定地址。
-#: src/lib/errors/messages.ts:105
+#: src/lib/errors/messages.ts:119
 msgid "绑定 IP 不是局域网地址：{ip}"
 msgstr "The bind IP is not a LAN address: {ip}"
 
@@ -8181,7 +8464,7 @@ msgstr "Keep editing"
 msgid "继续走棋"
 msgstr "Play on"
 
-#: src/lib/errors/messages.ts:88
+#: src/lib/errors/messages.ts:102
 msgid "续传位置与目标文件大小不一致，请刷新后重试"
 msgstr "The resume offset does not match the destination size. Refresh and try again."
 
@@ -8310,7 +8593,7 @@ msgstr "Reveal to assign sides"
 msgid "翻棋"
 msgstr "Flip Junqi"
 
-#: src/features/home/entries.tsx:122
+#: src/features/home/entries.tsx:131
 #: src/features/translation/TranslationTool.tsx:120
 #: src/features/translation/TranslationTool.tsx:258
 msgid "翻译"
@@ -8320,15 +8603,15 @@ msgstr "Translate"
 msgid "翻译中"
 msgstr "Translating"
 
-#: src/lib/errors/messages.ts:213
+#: src/lib/errors/messages.ts:227
 msgid "翻译任务已取消"
 msgstr "Translation task cancelled"
 
-#: src/lib/errors/messages.ts:205
+#: src/lib/errors/messages.ts:219
 msgid "翻译内容不能为空"
 msgstr "The translation cannot be empty"
 
-#: src/lib/errors/messages.ts:206
+#: src/lib/errors/messages.ts:220
 msgid "翻译内容过长"
 msgstr "The translation is too long"
 
@@ -8351,7 +8634,7 @@ msgstr "Translation output"
 
 #: src/features/games/chess/ChessMatch.tsx:339
 #: src/features/games/junqi/JunqiMatchView.tsx:177
-#: src/features/games/xiangqi/XiangqiMatch.tsx:229
+#: src/features/games/xiangqi/XiangqiMatch.tsx:227
 msgid "翻转棋盘"
 msgstr "Flip board"
 
@@ -8409,6 +8692,10 @@ msgstr "Auto"
 #: src/features/lan-transfer/LanTransferSettingsDialog.tsx:183
 msgid "自动选择"
 msgstr "Automatic"
+
+#: src/features/agent-sessions/SessionFilters.tsx:176
+msgid "自定义日期"
+msgstr "Custom dates"
 
 #. 启动模式选项，每次启动打开用户指定的功能页面
 #: src/features/settings/StartupPageSettings.tsx:40
@@ -8597,6 +8884,10 @@ msgstr "Concede this frame?"
 msgid "让六个面分别恢复为同一种颜色。"
 msgstr "Restore each of the six faces to a single color."
 
+#: src/lib/errors/messages.ts:16
+msgid "记录中的 session ID 冲突，暂时无法读取"
+msgstr "Conflicting session IDs were found. This record cannot be read."
+
 #: src/features/ai-configuration/ProviderDetails.tsx:81
 msgid "设为当前"
 msgstr "Set as active"
@@ -8672,7 +8963,7 @@ msgstr "Translation content"
 msgid "译文包"
 msgstr "Translation pack"
 
-#: src/lib/errors/messages.ts:248
+#: src/lib/errors/messages.ts:262
 msgid "译文包内容无效"
 msgstr "Invalid translation package contents"
 
@@ -8680,7 +8971,7 @@ msgstr "Invalid translation package contents"
 msgid "译文包已导入"
 msgstr "Translation pack imported"
 
-#: src/lib/errors/messages.ts:218
+#: src/lib/errors/messages.ts:232
 msgid "译文达到输出上限，当前结果不完整，请分段翻译"
 msgstr "The translation reached the output limit and is incomplete. Translate the text in smaller sections."
 
@@ -8693,7 +8984,7 @@ msgstr "Preview voice"
 msgid "试试其他关键词或清除筛选"
 msgstr "Try another keyword or clear the filters"
 
-#: src/lib/errors/messages.ts:250
+#: src/lib/errors/messages.ts:264
 msgid "诗词内容过大，无法发起 AI 翻译"
 msgstr "The poem is too large to translate with AI"
 
@@ -8721,11 +9012,11 @@ msgstr "Poetry library"
 msgid "诗词库与临时文件"
 msgstr "Poetry library and temporary files"
 
-#: src/lib/errors/messages.ts:264
+#: src/lib/errors/messages.ts:278
 msgid "诗词库同步"
 msgstr "Poetry sync"
 
-#: src/lib/errors/messages.ts:223
+#: src/lib/errors/messages.ts:237
 msgid "诗词库同步已取消"
 msgstr "Poetry library sync canceled"
 
@@ -8742,11 +9033,11 @@ msgstr "Poetry data management"
 msgid "诗词注释库"
 msgstr "Poetry annotation library"
 
-#: src/lib/errors/messages.ts:232
+#: src/lib/errors/messages.ts:246
 msgid "诗词源文件解析失败"
 msgstr "Failed to parse the poetry source file"
 
-#: src/lib/errors/messages.ts:231
+#: src/lib/errors/messages.ts:245
 msgid "诗词目录配置无效"
 msgstr "Invalid poetry folder configuration"
 
@@ -8755,19 +9046,19 @@ msgstr "Invalid poetry folder configuration"
 msgid "诗词集"
 msgstr "Poetry collection"
 
-#: src/lib/errors/messages.ts:178
+#: src/lib/errors/messages.ts:192
 msgid "该 AI 服务地址已存在"
 msgstr "This AI service address already exists."
 
-#: src/lib/errors/messages.ts:43
+#: src/lib/errors/messages.ts:57
 msgid "该主机存储的认证方式无效，请重新编辑并保存"
 msgstr "The saved authentication method for this host is invalid. Edit and save the host again."
 
-#: src/lib/errors/messages.ts:35
+#: src/lib/errors/messages.ts:49
 msgid "该备份文件已加密，请输入密码"
 msgstr "This backup is encrypted. Enter its password."
 
-#: src/lib/errors/messages.ts:173
+#: src/lib/errors/messages.ts:187
 msgid "该密钥不存在或不属于此 AI 服务地址"
 msgstr "This key does not exist or belongs to a different AI service address."
 
@@ -8783,11 +9074,11 @@ msgstr "This folder and all of its contents will be permanently deleted."
 msgid "该格式不支持预览"
 msgstr "Preview is not supported for this format"
 
-#: src/lib/errors/messages.ts:24
+#: src/lib/errors/messages.ts:38
 msgid "该模块数据不在主数据库中，请通过对应功能入口清理"
 msgstr "This module's data is not in the main database. Clear it from the module's own page."
 
-#: src/lib/errors/messages.ts:174
+#: src/lib/errors/messages.ts:188
 msgid "该模型不存在或不属于此 AI 服务地址"
 msgstr "This model does not exist or belongs to a different AI service address."
 
@@ -8800,7 +9091,7 @@ msgstr "This key has a passphrase"
 msgid "该设备需要重新连接才能继续访问。"
 msgstr "The device must reconnect to continue accessing this share."
 
-#: src/lib/errors/messages.ts:249
+#: src/lib/errors/messages.ts:263
 msgid "该诗词没有可翻译的正文"
 msgstr "This poem has no content to translate"
 
@@ -8819,28 +9110,28 @@ msgstr "Speaking rate"
 msgid "说明已截断"
 msgstr "Release notes truncated"
 
-#: src/lib/errors/messages.ts:117
+#: src/lib/errors/messages.ts:131
 msgid "请为主机选择认证密钥"
 msgstr "Select an authentication key for the host"
 
-#: src/lib/errors/messages.ts:215
+#: src/lib/errors/messages.ts:229
 msgid "请先下载翻译模型"
 msgstr "Download a translation model first."
 
-#: src/lib/errors/messages.ts:189
+#: src/lib/errors/messages.ts:203
 msgid "请先保存 AI 服务地址和模型"
 msgstr "Save the AI service address and model first"
 
-#: src/lib/errors/messages.ts:190
+#: src/lib/errors/messages.ts:204
 msgid "请先保存 API Key"
 msgstr "Save an API key first"
 
-#: src/lib/errors/messages.ts:53
+#: src/lib/errors/messages.ts:67
 msgid "请先停止 MCP 服务并等待任务完成"
 msgstr "Stop the MCP service and wait for its tasks to finish first."
 
 #. 数据清理被在途任务阻止；participant 已由前端本地化为任务名称。
-#: src/lib/errors/messages.ts:20
+#: src/lib/errors/messages.ts:34
 msgid "请先停止{participant}，稍后再清理数据"
 msgstr "Stop {participant} before clearing data"
 
@@ -8872,7 +9163,7 @@ msgstr "Keep the app open"
 msgid "请在系统设置的辅助功能中下载中文语音，再刷新音色列表。"
 msgstr "Download a Chinese voice in your system accessibility settings, then refresh this list."
 
-#: src/lib/errors/messages.ts:188
+#: src/lib/errors/messages.ts:202
 msgid "请填写 AI 模型名称，或名称过长"
 msgstr "The AI model name is empty or too long"
 
@@ -8895,7 +9186,7 @@ msgid "请求"
 msgstr "Request"
 
 #. 局域网共享路径校验被拒；path 是被拒绝的相对路径。
-#: src/lib/errors/messages.ts:96
+#: src/lib/errors/messages.ts:110
 msgid "请求路径无效或超出共享目录：{path}"
 msgstr "The requested path is invalid or outside the shared folder: {path}"
 
@@ -8933,7 +9224,7 @@ msgstr "Enter the key passphrase before testing"
 msgid "请输入待办标题"
 msgstr "Enter a todo title"
 
-#: src/lib/errors/messages.ts:210
+#: src/lib/errors/messages.ts:224
 msgid "请输入有效文本并选择支持的语言"
 msgstr "Enter valid text and choose a supported language."
 
@@ -8961,7 +9252,7 @@ msgstr "Choose a replacement"
 msgid "请选择有效的计划日期和时间"
 msgstr "Select a valid scheduled date and time"
 
-#: src/lib/errors/messages.ts:67
+#: src/lib/errors/messages.ts:81
 msgid "请选择静态 PNG、JPEG 或 WebP 图片"
 msgstr "Please choose a static PNG, JPEG, or WebP image"
 
@@ -9058,6 +9349,10 @@ msgstr "Read system metrics"
 #: src/features/todo/mcp-presentation.ts:17
 msgid "读取编辑草稿"
 msgstr "Read editing draft"
+
+#: src/lib/errors/messages.ts:14
+msgid "读取达到大小或时间上限，部分历史尚未检索"
+msgstr "The read reached a size or time limit. Some history has not been searched."
 
 #. 活动日志中的操作名称，描述已发起的操作，不表示操作成功
 #: src/features/logs/log-labels.ts:41
@@ -9201,12 +9496,12 @@ msgstr "{currentPlayer} to play"
 msgid "轮到 {player}"
 msgstr "{player} to play"
 
-#: src/features/games/go/GoMatch.tsx:179
+#: src/features/games/go/GoMatch.tsx:177
 #: src/features/games/gomoku/GomokuMatch.tsx:159
 msgid "轮到 {seatNameValue}"
 msgstr "{seatNameValue}'s turn"
 
-#: src/features/games/xiangqi/XiangqiMatch.tsx:166
+#: src/features/games/xiangqi/XiangqiMatch.tsx:164
 msgid "轮到 {sideNameValue}"
 msgstr "{sideNameValue}'s turn"
 
@@ -9217,6 +9512,10 @@ msgstr "You can concede on your turn"
 #: src/features/games/reversi/ReversiHelp.tsx:21
 msgid "轮次与终局"
 msgstr "Turns and the end"
+
+#: src/features/agent-sessions/SessionDetail.tsx:242
+msgid "较早记录"
+msgstr "Earlier records"
 
 #: src/features/crypto/CryptoTool.tsx:80
 #: src/features/translation/TranslationTool.tsx:210
@@ -9304,6 +9603,10 @@ msgstr "Last 7 Days"
 msgid "返回"
 msgstr "Back"
 
+#: src/features/agent-sessions/SessionDetail.tsx:76
+msgid "返回会话列表"
+msgstr "Back to sessions"
+
 #: src/features/poetry/LibraryPage.tsx:356
 msgid "返回列表"
 msgstr "Back to list"
@@ -9353,8 +9656,8 @@ msgstr "Back to poem"
 msgid "返回选择"
 msgstr "Back to Menu"
 
-#: src/components/ToolPageHeader.tsx:54
-#: src/components/ToolPageHeader.tsx:54
+#: src/components/ToolPageHeader.tsx:56
+#: src/components/ToolPageHeader.tsx:56
 #: src/features/ssh-sftp/SshSftpTool.tsx:202
 msgid "返回首页"
 msgstr "Back to Home"
@@ -9384,11 +9687,11 @@ msgstr "In Progress"
 msgid "远端"
 msgstr "Remote"
 
-#: src/lib/errors/messages.ts:161
+#: src/lib/errors/messages.ts:175
 msgid "远端 rsync 异常结束（退出码 {exitCode}）"
 msgstr "Remote rsync exited unexpectedly (code {exitCode})"
 
-#: src/lib/errors/messages.ts:148
+#: src/lib/errors/messages.ts:162
 msgid "远端 rsync 版本不受支持，需要 3.1 或更高版本"
 msgstr "The remote rsync version is not supported. Version 3.1 or later is required."
 
@@ -9406,7 +9709,7 @@ msgstr "“{name}” already exists on the remote."
 msgid "远端已有名称"
 msgstr "Existing Remote Name"
 
-#: src/lib/errors/messages.ts:157
+#: src/lib/errors/messages.ts:171
 msgid "远端拒绝了 rsync 命令，请检查服务器设置"
 msgstr "The remote server rejected the rsync command. Check the server settings."
 
@@ -9414,11 +9717,11 @@ msgstr "The remote server rejected the rsync command. Check the server settings.
 msgid "远端文件夹名称"
 msgstr "Remote Folder Name"
 
-#: src/lib/errors/messages.ts:147
+#: src/lib/errors/messages.ts:161
 msgid "远端服务器未安装 rsync，请安装后重新检测"
 msgstr "rsync is not installed on the remote server. Install it and detect again."
 
-#: src/lib/errors/messages.ts:303
+#: src/lib/errors/messages.ts:317
 msgid "远端连接在终端打开前已关闭"
 msgstr "Remote connection closed before the terminal opened"
 
@@ -9578,6 +9881,10 @@ msgstr "Choose"
 msgid "选择 AI 服务配置"
 msgstr "Select AI service configuration"
 
+#: src/features/agent-sessions/SessionDetail.tsx:287
+msgid "选择一个会话"
+msgstr "Select a session"
+
 #: src/features/media-compress/video/VideoCompressPanel.tsx:122
 msgid "选择一个视频"
 msgstr "Choose a video"
@@ -9653,6 +9960,7 @@ msgstr "Select Receive Directory"
 msgid "选择文件"
 msgstr "Choose file"
 
+#: src/features/agent-sessions/SessionDateFilter.tsx:109
 #: src/features/todo/TodoSchedulePicker.tsx:96
 msgid "选择月份"
 msgstr "Choose month"
@@ -9752,6 +10060,14 @@ msgstr "Roads and protected spaces"
 msgid "部分内容已截断"
 msgstr "Some content was truncated"
 
+#: src/features/agent-sessions/AgentSessionsTool.tsx:97
+msgid "部分来源无法读取"
+msgstr "Some sources could not be read"
+
+#: src/lib/errors/messages.ts:15
+msgid "部分记录损坏、不完整或超过读取上限"
+msgstr "Some records are damaged, incomplete, or exceed the read limit."
+
 #: src/features/ai-configuration/AiEditorDialog.tsx:269
 msgid "配置已更新，草稿已保留。请核对最新配置后再保存。"
 msgstr "The configuration has changed. Your draft is preserved. Review the latest configuration before saving."
@@ -9777,7 +10093,7 @@ msgstr "Redo turn"
 msgid "重启中"
 msgstr "Restarting"
 
-#: src/lib/errors/messages.ts:301
+#: src/lib/errors/messages.ts:315
 msgid "重启失败，请重试或手动重新打开应用。"
 msgstr "Could not restart. Try again or reopen the app manually."
 
@@ -9917,7 +10233,7 @@ msgstr "Reset and resume"
 msgid "重置文件传输连接"
 msgstr "Reset file transfer connection"
 
-#: src/lib/errors/messages.ts:17
+#: src/lib/errors/messages.ts:31
 msgid "重置状态已改变，请重新检查状态"
 msgstr "The reset has changed. Check its status again."
 
@@ -9945,6 +10261,8 @@ msgstr "Reset returns the cube to its solved state. It does not find a solution 
 #: src/features/about/AboutPage.tsx:96
 #: src/features/about/DataManagementDialogs.tsx:90
 #: src/features/activity/TransferActivity.tsx:49
+#: src/features/agent-sessions/AgentSessionsTool.tsx:89
+#: src/features/agent-sessions/SessionDetail.tsx:165
 #: src/features/connection-diagnostics/ExecutionLogList.tsx:145
 #: src/features/games/billiards/BilliardsGame.tsx:124
 #: src/features/games/engine/GameSessionNotice.tsx:87
@@ -10035,7 +10353,7 @@ msgstr "Nearby devices"
 #: src/features/games/junqi/JunqiMatch.tsx:39
 #: src/features/games/junqi/JunqiMatchView.tsx:157
 #: src/features/games/junqi/JunqiOnline.tsx:161
-#: src/features/home/entries.tsx:207
+#: src/features/home/entries.tsx:216
 msgid "陆战棋"
 msgstr "Junqi"
 
@@ -10167,7 +10485,7 @@ msgstr "Preview note image"
 msgid "首碰与犯规"
 msgstr "First contact and fouls"
 
-#: src/components/ToolPageHeader.tsx:66
+#: src/components/ToolPageHeader.tsx:68
 #: src/features/settings/StartupPageSettings.tsx:39
 msgid "首页"
 msgstr "Home"
@@ -10204,11 +10522,11 @@ msgstr "High quality"
 #. 小游戏名称，指可转动的多阶立方体谜题
 #: src/features/games/magic-cube/MagicCubeGame.tsx:169
 #: src/features/games/magic-cube/MagicCubeHelp.tsx:15
-#: src/features/home/entries.tsx:221
+#: src/features/home/entries.tsx:230
 msgid "魔方"
 msgstr "Magic cube"
 
-#: src/lib/errors/messages.ts:296
+#: src/lib/errors/messages.ts:310
 msgid "魔方已还原，但挑战记录尚未保存，请重试。"
 msgstr "The cube is solved, but the challenge result has not been saved. Please retry."
 
@@ -10283,7 +10601,7 @@ msgstr "Black"
 #. 小游戏名称，标准八乘八翻转棋
 #: src/features/games/reversi/ReversiGame.tsx:50
 #: src/features/games/reversi/ReversiHelp.tsx:9
-#: src/features/home/entries.tsx:190
+#: src/features/home/entries.tsx:199
 msgid "黑白棋"
 msgstr "Reversi"
 

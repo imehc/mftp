@@ -1,6 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 
 export * from "./ipc/filesystem";
+export * from "~/lib/ipc/agent-sessions";
 export * from "./ipc/game-party";
 export * from "./ipc/game-room";
 export * from "./ipc/lan-transfer";

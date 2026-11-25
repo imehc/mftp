@@ -1,0 +1,97 @@
+/* 品牌色仅用于来源标识，不改变项目的控件或主题配色。 */
+.agent-icon {
+  overflow: hidden;
+  border-radius: 20%;
+}
+
+/* 统一外部槽位，按图形实心面积和素材留白补偿视觉大小，不拉伸品牌图形。 */
+.agent-icon-image {
+  flex: none;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+}
+
+.agent-codex > .agent-icon-image {
+  width: 115%;
+  height: 115%;
+}
+
+.agent-workbuddy > .agent-icon-image {
+  width: 84%;
+  height: 84%;
+}
+
+.agent-codebuddy > .agent-icon-image {
+  width: 88%;
+  height: 88%;
+}
+
+/* 单色品牌素材的 currentColor 随图片文档默认为黑色，深色主题切换为白色。 */
+.dark .agent-opencode > .agent-icon-image,
+.dark .agent-copilot > .agent-icon-image {
+  filter: invert(1);
+}
+
+.agent-claude {
+  --agent-color: #d97757;
+  --agent-ink: #aa5033;
+}
+.agent-codex {
+  --agent-color: #3941ff;
+  --agent-ink: #3941ff;
+}
+.agent-workbuddy {
+  --agent-color: #01c886;
+  --agent-ink: #087d59;
+}
+.agent-opencode,
+.agent-copilot {
+  --agent-color: #575757;
+  --agent-ink: #404040;
+}
+.agent-qoder {
+  --agent-color: #2adb5c;
+  --agent-ink: #14782d;
+}
+.agent-codebuddy {
+  --agent-color: #6c4dff;
+  --agent-ink: #5a39db;
+}
+.dark .agent-claude {
+  --agent-color: #f0a083;
+  --agent-ink: #f0a083;
+}
+.dark .agent-codex {
+  --agent-color: #9aa4ff;
+  --agent-ink: #9aa4ff;
+}
+.dark .agent-workbuddy {
+  --agent-color: #01c886;
+  --agent-ink: #57dfa9;
+}
+.dark .agent-opencode,
+.dark .agent-copilot {
+  --agent-color: #e4e4e7;
+  --agent-ink: #e4e4e7;
+}
+.dark .agent-qoder {
+  --agent-color: #2adb5c;
+  --agent-ink: #63e988;
+}
+.dark .agent-codebuddy {
+  --agent-color: #a896ff;
+  --agent-ink: #b4a5ff;
+}
+
+.agent-choice[data-selected="true"],
+.agent-session-row[data-selected="true"] {
+  background: color-mix(in srgb, var(--agent-color) 10%, var(--card));
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--agent-color) 45%, var(--border));
+}
+
+.agent-choice[data-selected="true"] {
+  color: var(--agent-ink);
+}

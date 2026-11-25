@@ -8,6 +8,7 @@ interface Props {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  headerActionsClassName?: string;
   children: ReactNode;
   width?: "standard" | "full";
   scroll?: "page" | "content";
@@ -23,6 +24,7 @@ export default function AppPageLayout({
   title,
   description,
   actions,
+  headerActionsClassName,
   children,
   width = "standard",
   scroll = "page",
@@ -44,6 +46,7 @@ export default function AppPageLayout({
         title={title}
         description={description}
         trailing={actions}
+        trailingClassName={headerActionsClassName}
       />
       <AppPageContent
         width={width}

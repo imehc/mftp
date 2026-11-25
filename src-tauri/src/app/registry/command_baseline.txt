@@ -176,3 +176,8 @@ desktop lan_transfer_trusted_devices
 desktop lan_transfer_add_trusted_device
 desktop lan_transfer_delete_trusted_device
 mobile mobile_navigation_configure
+macos agent_sessions_snapshot
+macos agent_sessions_query
+macos agent_session_detail
+macos agent_sessions_cancel
+macos agent_session_image

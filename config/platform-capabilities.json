@@ -1,6 +1,14 @@
 {
   "targets": ["macos", "windows", "linux", "android", "ios"],
   "capabilities": {
+    "agentSessions": {
+      "platforms": ["macos"],
+      "routes": ["tools/agent-sessions.tsx"],
+      "sources": [
+        "src/features/agent-sessions/",
+        "src/lib/ipc/agent-sessions.ts"
+      ]
+    },
     "mobileNavigation": {
       "platforms": ["android", "ios"],
       "routes": [],

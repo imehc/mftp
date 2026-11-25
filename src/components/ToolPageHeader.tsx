@@ -13,6 +13,7 @@ interface ToolPageHeaderProps {
   description?: ReactNode;
   variant?: "standard" | "compact";
   trailing?: ReactNode;
+  trailingClassName?: string;
   leading?: ReactNode;
   children?: ReactNode;
   showHome?: boolean;
@@ -25,6 +26,7 @@ export function ToolPageHeader({
   description,
   variant = "standard",
   trailing,
+  trailingClassName,
   leading,
   children,
   showHome = true,
@@ -90,7 +92,12 @@ export function ToolPageHeader({
         {children}
       </div>
       {trailing || status || showActivity ? (
-        <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2">
+        <div
+          className={cn(
+            "ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2",
+            trailingClassName,
+          )}
+        >
           {trailing}
           {status}
           {showActivity ? <ActivityEntry variant="header" /> : null}

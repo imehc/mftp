@@ -15,6 +15,7 @@ import {
   Languages,
   ListTodo,
   LockKeyhole,
+  MessagesSquare,
   TerminalSquare,
   Wifi,
 } from "lucide-react";
@@ -31,6 +32,7 @@ import {
 import {
   isAndroidPlatform,
   isIosPlatform,
+  isMacosPlatform,
   isMobilePlatform,
 } from "~/lib/platform";
 import type { HomeCategoryId, HomeEntryVisibility } from "~/store/settings";
@@ -59,6 +61,13 @@ export interface HomeEntry {
 }
 
 export const homeEntries: HomeEntry[] = [
+  {
+    id: "agent-sessions",
+    category: "tools",
+    link: linkOptions({ to: "/tools/agent-sessions", preload: "intent" }),
+    icon: MessagesSquare,
+    title: <Trans comment="本机 AI agent 历史对话工具的名称">Agent 会话</Trans>,
+  },
   {
     id: "ssh-sftp",
     category: "tools",
@@ -236,7 +245,9 @@ export const currentHomePlatform: HomePlatform = isAndroidPlatform()
     ? "ios"
     : isMobilePlatform()
       ? "mobile"
-      : "desktop";
+      : isMacosPlatform()
+        ? "macos"
+        : "desktop";
 
 /** 当前平台可用的首页入口；平台能力来自模块元数据。 */
 export function homeEntriesForPlatform(platform: HomePlatform): HomeEntry[] {

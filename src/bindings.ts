@@ -272,6 +272,11 @@ export const commands = {
 	lanTransferAddTrustedDevice: (input: LanTrustedDeviceInput) => typedError<LanTrustedDevice, AppError>(__TAURI_INVOKE("lan_transfer_add_trusted_device", { input })),
 	lanTransferDeleteTrustedDevice: (id: string) => typedError<null, AppError>(__TAURI_INVOKE("lan_transfer_delete_trusted_device", { id })),
 	mobileNavigationConfigure: (input: MobileNavigationConfig) => typedError<null, AppError>(__TAURI_INVOKE("mobile_navigation_configure", { input })),
+	agentSessionsSnapshot: (refresh: boolean, requestId: string) => typedError<AgentSessionsSnapshot, AppError>(__TAURI_INVOKE("agent_sessions_snapshot", { refresh, requestId })),
+	agentSessionsQuery: (input: AgentSessionQuery, requestId: string) => typedError<AgentSessionPage, AppError>(__TAURI_INVOKE("agent_sessions_query", { input, requestId })),
+	agentSessionDetail: (generation: string, key: string, offset: number, limit: number, requestId: string) => typedError<AgentSessionDetail, AppError>(__TAURI_INVOKE("agent_session_detail", { generation, key, offset, limit, requestId })),
+	agentSessionsCancel: (requestId: string) => __TAURI_INVOKE<void>("agent_sessions_cancel", { requestId }),
+	agentSessionImage: (generation: string, key: string, messageIndex: number, imageIndex: number, requestId: string) => typedError<AgentSessionImagePayload, AppError>(__TAURI_INVOKE("agent_session_image", { generation, key, messageIndex, imageIndex, requestId })),
 };
 
 /* Types */
@@ -290,6 +295,82 @@ export type ActivityLog = {
 	 *  by the frontend through kind/code; `detail` keeps business metadata.
 	 */
 	error?: AppError | null,
+};
+
+export type AgentSessionDetail = {
+	session: AgentSessionSummary,
+	messages: AgentSessionMessage[],
+	total: number,
+	nextOffset: number | null,
+	complete: boolean,
+};
+
+export type AgentSessionImagePayload = {
+	dataBase64: string,
+	mime: string,
+};
+
+export type AgentSessionImageRef = {
+	index: number,
+	name: string,
+};
+
+export type AgentSessionMessage = {
+	index: number,
+	role: SessionRole,
+	text: string,
+	timestamp: number | null,
+	truncated: boolean,
+	model: string | null,
+	images: AgentSessionImageRef[],
+	continuation: boolean,
+};
+
+export type AgentSessionPage = {
+	generation: string,
+	items: AgentSessionSummary[],
+	total: number,
+	nextOffset: number | null,
+	complete: boolean,
+	issues: SessionIssue[],
+};
+
+export type AgentSessionQuery = {
+	generation: string,
+	agent: SessionAgent | null,
+	archived: boolean | null,
+	search: string,
+	from: number | null,
+	to: number | null,
+	offset: number,
+	limit: number,
+};
+
+export type AgentSessionSummary = {
+	key: string,
+	agent: SessionAgent,
+	sessionId: string | null,
+	title: string,
+	preview: string,
+	cwd: string,
+	path: string,
+	updatedAt: number,
+	createdAt: number | null,
+	messageCount: number,
+	revision: string,
+	matchIndex: number | null,
+	model: string | null,
+	archived: boolean,
+	contentAvailability: SessionContentAvailability,
+};
+
+export type AgentSessionsSnapshot = {
+	generation: string,
+	scannedAt: number,
+	sources: SessionSource[],
+	total: number,
+	issues: SessionIssue[],
+	complete: boolean,
 };
 
 /**
@@ -651,7 +732,7 @@ export type AuthorSummary = {
 	poemCount: number,
 };
 
-export type CustomErrorCode = "mcp:registration_invalid" | "mcp:unauthorized" | "mcp:configuration_invalid" | "mcp:busy" | "mcp:transport" | "translation:model_unknown" | "translation:input_invalid" | "translation:resource_invalid" | "translation:checksum" | "translation:cancelled" | "translation:busy" | "translation:not_installed" | "translation:engine" | "translation:input_limit" | "translation:output_limit" | "translation:download_range" | "translation:download" | "translation:space" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "rsync:local_missing" | "rsync:local_unsupported" | "rsync:remote_missing" | "rsync:remote_unsupported" | "rsync:probe_failed" | "rsync:probe_timeout" | "rsync:remote_command_rejected" | "rsync:bridge_failed" | "rsync:bridge_timeout" | "rsync:local_exit" | "rsync:remote_exit" | "rsync:target_invalid" | "rsync:preview_expired" | "rsync:preview_mismatch" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:task_limit" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "speech:unavailable" | "speech:input_invalid" | "speech:voice_missing" | "speech:busy" | "speech:control_failed" | "speech:start_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
+export type CustomErrorCode = "agent_sessions:image" | "agent_sessions:input" | "agent_sessions:busy" | "agent_sessions:cancelled" | "agent_sessions:changed" | "agent_sessions:missing" | "agent_sessions:read" | "agent_sessions:limit" | "agent_sessions:partial" | "agent_sessions:identity" | "agent_sessions:format" | "mcp:registration_invalid" | "mcp:unauthorized" | "mcp:configuration_invalid" | "mcp:busy" | "mcp:transport" | "translation:model_unknown" | "translation:input_invalid" | "translation:resource_invalid" | "translation:checksum" | "translation:cancelled" | "translation:busy" | "translation:not_installed" | "translation:engine" | "translation:input_limit" | "translation:output_limit" | "translation:download_range" | "translation:download" | "translation:space" | "app:shutting_down" | "app:maintenance_in_progress" | "app:operations_busy" | "app:data_busy" | "app:reset_pending" | "app:reset_changed" | "app:reset_incomplete" | "app:reset_state_invalid" | "app:data_module_separate_store" | "appdata:not_json" | "appdata:not_mftp_file" | "appdata:format_invalid" | "appdata:kdf_unsupported" | "appdata:cipher_unsupported" | "appdata:decrypt_failed" | "appdata:password_required" | "appdata:no_sections" | "appdata:section_invalid" | "vault:entry_not_found" | "hosts:host_not_found" | "hosts:auth_type_invalid" | "keys:key_not_found" | "todo:title_required" | "todo:due_time_invalid" | "todo:due_date_invalid" | "todo:item_not_found" | "todo:note_invalid" | "todo:note_version" | "todo:note_conflict" | "todo:note_draft_closed" | "todo:note_draft_limit" | "todo:note_busy" | "todo:note_image_limit" | "todo:note_image_pixels" | "todo:note_image_dimensions" | "todo:note_image_unsupported" | "todo:note_image_invalid" | "todo:note_image_missing" | "todo:note_cancelled" | "appdata:too_large" | "room:address_invalid" | "room:handshake_invalid" | "room:code_invalid" | "room:full" | "room:game_mismatch" | "room:join_rejected" | "room:not_joined" | "room:peer_missing" | "room:frame_too_large" | "lan:transfer_cancelled" | "lan:transfer_incomplete" | "lan:transfer_limit_reached" | "lan:request_invalid" | "lan:request_headers_too_large" | "lan:upload_invalid" | "lan:upload_name_invalid" | "lan:upload_offset_mismatch" | "lan:upload_target_busy" | "lan:upload_target_invalid" | "lan:upload_space_insufficient" | "lan:share_unknown" | "lan:shared_path_invalid" | "lan:shared_dir_unavailable" | "lan:ip_invalid" | "lan:bind_ip_not_lan" | "lan:bind_port_unavailable" | "ssh:session_not_found" | "ssh:shell_not_open" | "ssh:shell_closed" | "ssh:key_not_selected" | "ssh:invalid_write_payload" | "ssh:no_auth_method" | "ssh:username_unavailable" | "sftp:transfer_not_found" | "sftp:transfer_not_pausable" | "sftp:transfer_cancelled" | "sftp:not_directory" | "sftp:unsupported_file" | "sftp:protected_path" | "sftp:size_mismatch" | "sftp:remote_file_missing" | "sftp:target_is_directory" | "sftp:symlink_unsupported" | "sftp:archive_unsupported" | "sftp:archive_unsafe_path" | "sftp:write_stalled" | "rsync:local_missing" | "rsync:local_unsupported" | "rsync:remote_missing" | "rsync:remote_unsupported" | "rsync:probe_failed" | "rsync:probe_timeout" | "rsync:remote_command_rejected" | "rsync:bridge_failed" | "rsync:bridge_timeout" | "rsync:local_exit" | "rsync:remote_exit" | "rsync:target_invalid" | "rsync:preview_expired" | "rsync:preview_mismatch" | "ssh:system_unknown" | "ssh:system_unsupported" | "ai:active_provider_changed" | "ai:revision_conflict" | "ai:provider_not_found" | "ai:key_not_found" | "ai:model_not_found" | "ai:provider_limit" | "ai:key_limit" | "ai:model_limit" | "ai:provider_duplicate" | "ai:key_duplicate" | "ai:model_duplicate" | "ai:provider_name_invalid" | "ai:key_label_invalid" | "ai:display_name_invalid" | "ai:last_key" | "ai:last_model" | "ai:replacement_required" | "ai:address_invalid" | "ai:model_invalid" | "ai:connection_not_configured" | "ai:api_key_missing" | "ai:api_key_invalid" | "ai:authentication_expired" | "ai:credential_rollback_failed" | "ai:stream_request_id_invalid" | "ai:task_already_running" | "ai:task_limit" | "ai:request_too_large" | "ai:response_too_large" | "ai:output_too_large" | "ai:schema_too_new" | "ai:translation_record_invalid" | "ai:translation_content_empty" | "ai:translation_content_too_long" | "ai:translation_not_found" | "ai:translation_persist_failed" | "speech:unavailable" | "speech:input_invalid" | "speech:voice_missing" | "speech:busy" | "speech:control_failed" | "speech:start_failed" | "poetry:sync_busy" | "poetry:sync_cancelled" | "poetry:poem_not_found" | "poetry:local_import_unsupported" | "poetry:pack_import_unsupported" | "poetry:annotations_desktop_only" | "poetry:catalog_invalid" | "poetry:parse_failed" | "poetry:source_unknown" | "poetry:source_missing" | "poetry:tree_truncated" | "poetry:no_matching_files" | "poetry:unsafe_tree_path" | "poetry:unsafe_archive_path" | "poetry:upstream_response_invalid" | "poetry:api_budget_too_small" | "poetry:pack_format_unsupported" | "poetry:pack_invalid" | "poetry:translation_source_empty" | "poetry:translation_input_too_large" | "poetry:translation_output_invalid";
 
 export type DiagnosticBodyEnd = "receiving" | "complete" | "protocolEnd" | "interrupted";
 
@@ -1301,6 +1382,25 @@ export type RsyncTransferResult = {
 	// Raw protocol bytes exchanged over the SSH channel.
 	networkBytes: number,
 	changedItems: number,
+};
+
+export type SessionAgent = "claude" | "codex" | "workbuddy" | "opencode" | "copilot" | "qoder" | "codebuddy";
+
+export type SessionContentAvailability = "full" | "encrypted";
+
+export type SessionIssue = {
+	agent: SessionAgent,
+	path: string,
+	error: AppError,
+};
+
+export type SessionRole = "user" | "assistant" | "tool" | "thinking" | "system";
+
+export type SessionSource = {
+	agent: SessionAgent,
+	root: string,
+	available: boolean,
+	count: number,
 };
 
 // A remote directory entry returned by SFTP listing.

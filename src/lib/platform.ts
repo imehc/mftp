@@ -30,6 +30,20 @@ export function isDesktopPlatform(): boolean {
   return !isMobilePlatform();
 }
 
+/** 构建平台是能力依据；浏览器开发用系统标识区分 macOS。 */
+export function isMacosPlatform(): boolean {
+  return (
+    buildPlatform === "macos" ||
+    (buildPlatform === "web" &&
+      !isMobilePlatform() &&
+      /mac/i.test(navigator.platform))
+  );
+}
+
+export function macosOnlyGuard(): void {
+  if (!isMacosPlatform()) throw redirect({ to: "/" });
+}
+
 /** rsync 首版仅随 macOS/Linux 产物提供；开发态 web 视为可用。 */
 export function rsyncSupportedPlatform(): boolean {
   return !["windows", "android", "ios"].includes(buildPlatform);

@@ -74,6 +74,10 @@ impl Fixture {
         );
         let diagnostics = Arc::new(crate::core::diagnostics::Diagnostics::default());
         let state = AppServices {
+            #[cfg(target_os = "macos")]
+            agent_sessions: Arc::new(crate::modules::agent_sessions::AgentSessionService::new(
+                root.join("isolated-home"),
+            )),
             translation: Arc::new(crate::modules::translation::TranslationService::new(
                 root.join("translation-models"),
                 operations.clone(),

@@ -63,6 +63,7 @@ fn registered_commands_match_platform_baseline_without_duplicates() {
                 "desktop" => cfg!(desktop),
                 "desktop,android" => cfg!(any(desktop, target_os = "android")),
                 "macos,linux" => cfg!(any(target_os = "macos", target_os = "linux")),
+                "macos" => cfg!(target_os = "macos"),
                 "macos,windows" => cfg!(any(target_os = "macos", target_os = "windows")),
                 "mobile" => cfg!(mobile),
                 _ => panic!("unknown platform group: {platform}"),
@@ -228,7 +229,11 @@ fn grouped_catalog_preserves_the_handler_and_argument_extraction() {
 pub(crate) mod full_contract {
     use super::super::*;
     macro_rules! full_lan { ($($modules:tt)*) => { lan_module!(full_mobile, $($modules)*); }; }
-    macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
+    macro_rules! full_mobile { ($($modules:tt)*) => { mobile_export_module!(full_agent_sessions, $($modules)*); }; }
+    #[cfg(target_os = "macos")]
+    macro_rules! full_agent_sessions { ($($modules:tt)*) => { add_agent_sessions!($($modules)*); }; }
+    #[cfg(not(target_os = "macos"))]
+    macro_rules! full_agent_sessions { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
     macro_rules! full_mcp { ($($modules:tt)*) => { mcp_module!(full_lan, $($modules)*); }; }
     #[cfg(any(target_os = "macos", target_os = "linux"))]
     macro_rules! full_rsync { ($($modules:tt)*) => { rsync_module!(full_mcp, $($modules)*); }; }
@@ -248,7 +253,8 @@ pub(crate) mod full_contract {
             .filter(|line| !line.starts_with('#'))
             .filter_map(|line| line.split_once(' '))
             .filter(|(platform, _)| {
-                *platform != "macos,linux" || cfg!(any(target_os = "macos", target_os = "linux"))
+                (*platform != "macos,linux" || cfg!(any(target_os = "macos", target_os = "linux")))
+                    && (*platform != "macos" || cfg!(target_os = "macos"))
             })
             .map(|(_, name)| name)
             .collect();

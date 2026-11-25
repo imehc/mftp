@@ -4,6 +4,20 @@ import { msg } from "@lingui/core/macro";
 import type { CustomErrorCode } from "~/bindings";
 
 export const customErrorMessages = {
+  "agent_sessions:image": msg`图片不可用或格式不支持`,
+  "agent_sessions:input": msg`搜索条件无效，请检查日期范围或缩短搜索内容`,
+  "agent_sessions:busy": msg`会话读取尚未结束，请稍后重试`,
+  "agent_sessions:cancelled": msg`会话读取已取消`,
+  "agent_sessions:changed": msg`会话记录已变化，请刷新后重新打开`,
+  "agent_sessions:missing": msg`当前索引中没有该会话，请刷新后重试`,
+  "agent_sessions:read": msg`无法读取会话目录，请检查访问权限`,
+  "agent_sessions:limit": msg`读取达到大小或时间上限，部分历史尚未检索`,
+  "agent_sessions:partial": msg`部分记录损坏、不完整或超过读取上限`,
+  "agent_sessions:identity": msg`记录中的 session ID 冲突，暂时无法读取`,
+  "agent_sessions:format": msg({
+    message: "会话格式不受支持或记录已损坏",
+    comment: "本机会话读取失败，包含压缩格式、未知存储结构和损坏的 JSON/数据库",
+  }),
   "speech:unavailable": msg`当前平台暂不支持系统朗读`,
   "speech:input_invalid": msg`朗读内容过长或参数无效`,
   "speech:voice_missing": msg`未找到可用的中文音色，请在系统设置中下载中文语音后重试`,

@@ -1,5 +1,7 @@
 //! Feature-owned backend modules, migrated incrementally.
 
+#[cfg(target_os = "macos")]
+pub(crate) mod agent_sessions;
 pub(crate) mod ai;
 pub(crate) mod diagnostics;
 pub(crate) mod filesystem;

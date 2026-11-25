@@ -27,6 +27,7 @@ import { Route as GamesXiangqiRouteImport } from './routes/games/xiangqi'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
 import { Route as LibraryManageRouteImport } from './routes/library/manage'
+import { Route as ToolsAgentSessionsRouteImport } from './routes/tools/agent-sessions'
 import { Route as ToolsCryptoRouteImport } from './routes/tools/crypto'
 import { Route as ToolsFormatterRouteImport } from './routes/tools/formatter'
 import { Route as ToolsImageCompressRouteImport } from './routes/tools/image-compress'
@@ -128,6 +129,11 @@ const LibraryManageRoute = LibraryManageRouteImport.update({
   path: '/library/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAgentSessionsRoute = ToolsAgentSessionsRouteImport.update({
+  id: '/tools/agent-sessions',
+  path: '/tools/agent-sessions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCryptoRoute = ToolsCryptoRouteImport.update({
   id: '/tools/crypto',
   path: '/tools/crypto',
@@ -197,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
+  '/tools/agent-sessions': typeof ToolsAgentSessionsRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
+  '/tools/agent-sessions': typeof ToolsAgentSessionsRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/games/xiangqi': typeof GamesXiangqiRoute
   '/library/$id': typeof LibraryIdRoute
   '/library/manage': typeof LibraryManageRoute
+  '/tools/agent-sessions': typeof ToolsAgentSessionsRoute
   '/tools/crypto': typeof ToolsCryptoRoute
   '/tools/formatter': typeof ToolsFormatterRoute
   '/tools/image-compress': typeof ToolsImageCompressRoute
@@ -290,6 +299,7 @@ export interface FileRouteTypes {
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
+    | '/tools/agent-sessions'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
+    | '/tools/agent-sessions'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/games/xiangqi'
     | '/library/$id'
     | '/library/manage'
+    | '/tools/agent-sessions'
     | '/tools/crypto'
     | '/tools/formatter'
     | '/tools/image-compress'
@@ -381,6 +393,7 @@ export interface RootRouteChildren {
   GamesXiangqiRoute: typeof GamesXiangqiRoute
   LibraryIdRoute: typeof LibraryIdRoute
   LibraryManageRoute: typeof LibraryManageRoute
+  ToolsAgentSessionsRoute: typeof ToolsAgentSessionsRoute
   ToolsCryptoRoute: typeof ToolsCryptoRoute
   ToolsFormatterRoute: typeof ToolsFormatterRoute
   ToolsImageCompressRoute: typeof ToolsImageCompressRoute
@@ -522,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryManageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/agent-sessions': {
+      id: '/tools/agent-sessions'
+      path: '/tools/agent-sessions'
+      fullPath: '/tools/agent-sessions'
+      preLoaderRoute: typeof ToolsAgentSessionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/crypto': {
       id: '/tools/crypto'
       path: '/tools/crypto'
@@ -613,6 +633,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesXiangqiRoute: GamesXiangqiRoute,
   LibraryIdRoute: LibraryIdRoute,
   LibraryManageRoute: LibraryManageRoute,
+  ToolsAgentSessionsRoute: ToolsAgentSessionsRoute,
   ToolsCryptoRoute: ToolsCryptoRoute,
   ToolsFormatterRoute: ToolsFormatterRoute,
   ToolsImageCompressRoute: ToolsImageCompressRoute,

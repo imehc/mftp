@@ -22,6 +22,17 @@ macro_rules! custom_codes {
 }
 
 custom_codes! {
+    AgentSessionImage => ("agent_sessions:image", "Session image is unavailable, unsupported or exceeds the image size limit"),
+    AgentSessionInput => ("agent_sessions:input", "Invalid session search parameters"),
+    AgentSessionBusy => ("agent_sessions:busy", "Session reader is still active"),
+    AgentSessionCancelled => ("agent_sessions:cancelled", "Session read cancelled"),
+    AgentSessionChanged => ("agent_sessions:changed", "Session history changed; refresh the index"),
+    AgentSessionMissing => ("agent_sessions:missing", "Session is not in the current index"),
+    AgentSessionRead => ("agent_sessions:read", "Session source could not be read"),
+    AgentSessionLimit => ("agent_sessions:limit", "Session scan exceeded a read or time limit"),
+    AgentSessionPartial => ("agent_sessions:partial", "Session contains incomplete, malformed or oversized records"),
+    AgentSessionIdentity => ("agent_sessions:identity", "Session contains conflicting native IDs"),
+    AgentSessionFormat => ("agent_sessions:format", "Compressed session format is not supported"),
     McpRegistrationInvalid => ("mcp:registration_invalid", "Invalid MCP module or tool registration"),
     McpUnauthorized => ("mcp:unauthorized", "MCP credential is missing, revoked or unavailable"),
     McpConfigurationInvalid => ("mcp:configuration_invalid", "Invalid MCP service configuration or permission"),

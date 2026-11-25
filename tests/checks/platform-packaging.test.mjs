@@ -71,6 +71,19 @@ test("rsync 能力只随 macOS/Linux 产物提供", () => {
   );
 });
 
+test("本机会话检索的路由和实现仅随 macOS 产物提供", () => {
+  for (const target of platformManifest.targets) {
+    assert.equal(supports(target, "agentSessions"), target === "macos");
+    assert.equal(
+      sourceIncluded(
+        target,
+        "src/features/agent-sessions/AgentSessionsTool.tsx",
+      ),
+      target === "macos",
+    );
+  }
+});
+
 test("BT 模块在所有平台均已移除", () => {
   assert.equal("bt" in platformManifest.capabilities, false);
   for (const path of [

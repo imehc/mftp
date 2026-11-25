@@ -362,7 +362,25 @@ macro_rules! add_lan { ($($modules:tt)*) => { add_mobile!($($modules)*); }; }
 #[cfg(mobile)]
 macro_rules! add_mobile { ($($modules:tt)*) => { mobile_export_module!(define_registry, $($modules)*); }; }
 #[cfg(desktop)]
-macro_rules! add_mobile { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
+macro_rules! add_mobile { ($($modules:tt)*) => { add_agent_sessions!($($modules)*); }; }
+
+#[cfg(target_os = "macos")]
+macro_rules! add_agent_sessions {
+    ($($modules:tt)*) => {
+        define_registry! { $($modules)*
+            "agent_sessions" => {
+                commands: [crate::modules::agent_sessions::commands::agent_sessions_snapshot,
+                    crate::modules::agent_sessions::commands::agent_sessions_query,
+                    crate::modules::agent_sessions::commands::agent_session_detail,
+                    crate::modules::agent_sessions::commands::agent_sessions_cancel,
+                    crate::modules::agent_sessions::commands::agent_session_image],
+                types: [],
+            },
+        }
+    };
+}
+#[cfg(all(desktop, not(target_os = "macos")))]
+macro_rules! add_agent_sessions { ($($modules:tt)*) => { define_registry!($($modules)*); }; }
 
 common_modules!(add_rsync,);
 

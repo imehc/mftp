@@ -7,7 +7,8 @@ import platformManifest from "../../config/platform-capabilities.json";
  * 新增入口要改多处且容易漏。这里只描述稳定 ID／平台／是否可恢复，
  * 图标与页面组合仍留在 UI 层，标题仍走 Lingui。
  */
-export type ModulePlatform = "desktop" | "android" | "ios" | "mobile";
+export type ModulePlatform =
+  "desktop" | "macos" | "windows" | "linux" | "android" | "ios" | "mobile";
 
 export interface ModuleMetadata {
   /** 稳定模块 id：与文件路由、首页入口 id 一致。 */
@@ -31,6 +32,12 @@ export const modules = [
   { id: "translation", tool: "translation" },
   { id: "vault", tool: "vault" },
   { id: "todo", tool: "todo" },
+  {
+    id: "agent-sessions",
+    tool: "agent-sessions",
+    platforms: platformManifest.capabilities.agentSessions
+      .platforms as ModulePlatform[],
+  },
   {
     id: "mcp",
     tool: null,
@@ -87,5 +94,12 @@ export function moduleAvailableOn(
   module: ModuleMetadata,
   platform: ModulePlatform,
 ): boolean {
-  return !module.platforms || module.platforms.includes(platform);
+  const group = ["macos", "windows", "linux"].includes(platform)
+    ? "desktop"
+    : platform;
+  return (
+    !module.platforms ||
+    module.platforms.includes(platform) ||
+    module.platforms.includes(group as ModulePlatform)
+  );
 }
