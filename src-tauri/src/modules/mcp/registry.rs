@@ -60,9 +60,14 @@ where
     Fut: Future<Output = AppResult<O>> + Send + 'static,
 {
     content_tool(name, description, permission, operation, |output| {
-        serde_json::to_value(output)
-            .map(CallToolResult::structured)
-            .map_err(AppError::from)
+        let value = serde_json::to_value(output).map_err(AppError::from)?;
+        // `structuredContent` must be an object as well, so a unit result is
+        // reported as an empty successful result rather than `null`.
+        Ok(if value.is_null() {
+            CallToolResult::success(Vec::new())
+        } else {
+            CallToolResult::structured(value)
+        })
     })
 }
 
@@ -85,7 +90,14 @@ where
         description,
         schema_for_input::<I>().map_err(registration_error)?,
     );
-    metadata.output_schema = Some(schema_for_output::<O>());
+    // MCP requires `outputSchema`, when present, to describe an object: clients
+    // validate it as such and reject the whole tool list otherwise. Tools
+    // returning `()` only produce `{"type": "null"}`, so they declare no output
+    // schema instead of an invalid one.
+    let output_schema = schema_for_output::<O>();
+    if output_schema.get("type").and_then(|kind| kind.as_str()) == Some("object") {
+        metadata.output_schema = Some(output_schema);
+    }
     let mut annotations = ToolAnnotations::default();
     annotations.read_only_hint = Some(permission == Permission::Read);
     annotations.destructive_hint = Some(permission != Permission::Read);

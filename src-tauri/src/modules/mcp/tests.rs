@@ -297,3 +297,58 @@ async fn sdk_handler_resolves_permission_changes_for_each_request() {
     client.cancel().await.unwrap();
     server_task.await.unwrap().unwrap();
 }
+
+#[tokio::test]
+async fn unit_output_declares_no_schema_and_no_structured_content() {
+    let registration = ModuleRegistration {
+        id: "alpha",
+        title: "alpha",
+        lifecycle: None,
+        tools: vec![
+            tool(
+                "alpha_object",
+                "Returns an object",
+                Permission::Read,
+                |_, input: Echo| async { Ok(input) },
+            )
+            .unwrap(),
+            tool(
+                "alpha_unit",
+                "Returns nothing",
+                Permission::Read,
+                |_, _: Echo| async { Ok(()) },
+            )
+            .unwrap(),
+        ],
+    };
+    let registry = Registry::new(vec![registration]).unwrap();
+    let reader = caller(ModuleGrant {
+        read: true,
+        write: false,
+        delete: false,
+    });
+
+    // A non-object `outputSchema` makes validating clients reject the whole
+    // `tools/list` response, so only object schemas may be advertised.
+    let tools = registry.list(&reader);
+    for listed in &tools {
+        if let Some(schema) = listed.output_schema.as_ref() {
+            assert_eq!(
+                schema.get("type").and_then(|kind| kind.as_str()),
+                Some("object"),
+                "{} declares a non-object output schema",
+                listed.name
+            );
+        }
+    }
+    let named = |name: &str| tools.iter().find(|tool| tool.name == name).unwrap();
+    assert!(named("alpha_object").output_schema.is_some());
+    assert!(named("alpha_unit").output_schema.is_none());
+
+    // `structuredContent` must be an object too, so a unit result carries none.
+    let result = registry
+        .call(reader, "alpha_unit", json!({"text":"x"}))
+        .await
+        .unwrap();
+    assert!(result.structured_content.is_none());
+}
